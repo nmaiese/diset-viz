@@ -801,8 +801,10 @@ class LePagineProvincia(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
 
-    def test_ce_ne_sono_centotre(self):
-        self.assertEqual(len(self.chiavi), 103)
+    def test_ce_ne_sono_centosette(self):
+        """Erano 103: una regex della pipeline scartava i codici IT1xx di
+        Monza e della Brianza, Fermo, Barletta-Andria-Trani e Sud Sardegna."""
+        self.assertEqual(len(self.chiavi), 107)
 
     def test_rispondono_tutte(self):
         for chiave in self.chiavi:
@@ -849,11 +851,11 @@ class LePagineProvincia(unittest.TestCase):
                 self.assertIn(f"/provincia/{chiave}<", sitemap)
 
     def test_la_classifica_porta_a_ognuna(self):
-        """Le 103 righe erano testo nudo, su una pagina che sta in posizione
-        4,1 per la sua query principale."""
+        """Le righe erano testo nudo, su una pagina che sta in posizione 4,1
+        per la sua query principale."""
         html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
         link = set(re.findall(r'href="(/provincia/[a-z0-9-]+)"', html))
-        self.assertEqual(len(link), 103)
+        self.assertEqual(len(link), len(self.chiavi))
         for percorso in sorted(link)[:10]:
             with self.subTest(percorso=percorso):
                 self.assertEqual(self.client.get(percorso).status_code, 200)

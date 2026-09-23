@@ -29,6 +29,7 @@ from collections import defaultdict
 from app import bes_data, profiles
 from app import quality_life_bes as qb
 from app.cache import cache
+from app.cache_util import synchronized_cache
 from app.external_data import freshness_label, freshness_status
 from app.taxonomy import CANONICAL_CATEGORIES
 
@@ -114,6 +115,39 @@ def profilo(chiave):
         "top_positive": _indicatori(territorio.get("top_positive_indicators")),
         "top_negative": _indicatori(territorio.get("top_negative_indicators")),
     }
+
+
+_CODELIST = bes_data.PROVINCE_CODES.parents[3] / "data" / "provincia" / "codelist_CL_ITTER107.csv"
+
+
+@synchronized_cache(maxsize=1)
+def unmeasured_provinces():
+    """Le province della codifica Istat per cui il BES non ha dati, per nome.
+
+    La nota pubblica di copertura si calcola da qui, confrontando la codifica
+    con le province misurate. Scritta a mano diceva "Sud Sardegna non e'
+    presente in questa edizione del BES", e non era vero: la scartava una
+    regex della pipeline. Le province sarde soppresse prima del 2016 non sono
+    un'assenza ma un'esclusione, e la nota le dice a parte.
+    """
+    import csv
+
+    # Qui dentro e non in testa: `scripts.province_sources` importa
+    # `app.taxonomy`, che carica il pacchetto `app` e con lui questo modulo, e
+    # l'import in testa rompeva `build_province_dataset.py` lanciato da solo.
+    from scripts.province_sources import DEFUNCT_PROVINCES, NUTS3_PATTERN
+
+    measured = set()
+    with bes_data.PROVINCE_CODES.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle, delimiter=";"):
+            measured.add(row["code"])
+    names = []
+    with _CODELIST.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle, delimiter=";"):
+            if (NUTS3_PATTERN.match(row["code"]) and row["code"] not in measured
+                    and row["name"] not in DEFUNCT_PROVINCES):
+                names.append(row["name"])
+    return sorted(names)
 
 
 def vicine(chiave, quante=6):

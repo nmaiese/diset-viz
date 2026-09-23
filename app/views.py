@@ -922,6 +922,8 @@ def methodology():
         canonical=f"{SITE_URL}/metodologia",
         methodology_regioni=regioni["methodology"] if regioni else None,
         methodology_province=province["methodology"] if province else None,
+        measured_provinces=len(province["ranking"]) if province else 0,
+        unmeasured_provinces=province_profile.unmeasured_provinces(),
         categories=qb.get_quality_life_categories(),
         profiles=qb.get_quality_life_profiles(),
         quality_life_indicators=[
@@ -1666,6 +1668,7 @@ def quality_life_classifica(url_level):
         region_paths=region_paths,
         quality_map_data=quality_map_data,
         url_level=url_level,
+        unmeasured_provinces=province_profile.unmeasured_provinces(),
         profiles=qb.get_quality_life_profiles(),
         active_profile=slug,
         default_profile=qb.DEFAULT_PROFILE,

@@ -65,7 +65,15 @@ SEX_TOTAL_CODES = {"9", "T"}
 # (Carbonia-Iglesias). The trailing [0-9A-Z] is what keeps Cremona/Mantova/
 # Grosseto and the Sardinian provinces in, while staying distinct from the
 # 3-char NUTS2 region codes.
-NUTS3_PATTERN = re.compile(r"^IT[A-Z]\d[0-9A-Z]$")
+#
+# Le province nate dopo il 2004 e riordinate dopo il 2016 non seguono quella
+# forma: Istat le codifica IT1xx (IT108 Monza e della Brianza, IT109 Fermo,
+# IT110 Barletta-Andria-Trani, IT111 Sud Sardegna). Fino al 23/9/2026 questa
+# regex le scartava tutte e quattro, e la pagina pubblica ne dava la colpa al
+# BES. La codelist porta anche IT1xx senza nessun dato (IT113, IT119, le
+# province sarde del 2025): non entrano perche' `build_province_dataset` tiene
+# solo i codici che hanno righe, non perche' la forma le escluda.
+NUTS3_PATTERN = re.compile(r"^(?:IT[A-Z]\d[0-9A-Z]|IT1\d\d)$")
 # NUTS2 region codes look like ITC1, ITF3 (IT + letter + 1 digit): kept as a
 # bonus regional comparison layer.
 NUTS2_PATTERN = re.compile(r"^IT[A-Z]\d$")
@@ -162,6 +170,30 @@ CURATED_DIRECTION_BES = {
     "12SER020": "higher_better",   # copertura rete internet ultra veloce
     "12SER024": "higher_better",   # raccolta differenziata (heuristic flipped it)
     "12SER025": "lower_better",    # emigrazione ospedaliera
+    # D1, 23/9/2026: i 18 indicatori che il manifest provinciale e quello
+    # regionale leggevano al contrario. Il verso e' quello provinciale di prima,
+    # 13 confermati dalla polarita' Istat, 5 dubbi tenuti perche' la definizione
+    # non lascia margini. Tabella e fonti: redazione-ai,
+    # analisi/2026-09-23-verso-bes-18.md. Fissati qui cosi' l'euristica sul nome
+    # non li puo' piu' rovesciare, e il manifest regionale li legge da qui.
+    "01SAL004": "lower_better",    # mortalita' infantile
+    "01SAL005": "lower_better",    # mortalita' per incidenti stradali 15-34
+    "01SAL006": "lower_better",    # mortalita' per tumore 20-64
+    "01SAL007": "lower_better",    # mortalita' per demenze 65+
+    "01SAL020": "lower_better",    # mortalita' evitabile
+    "02IST001": "higher_better",   # scuola a 4-5 anni (dubbio: quasi saturo)
+    "02IST004": "higher_better",   # passaggio all'universita'
+    "03LAV007": "lower_better",    # infortuni mortali e con inabilita'
+    "06POL001": "higher_better",   # partecipazione elettorale
+    "10AMB003": "lower_better",    # dispersione della rete idrica
+    "10AMB008": "higher_better",   # verde urbano (dubbio: Isernia fuori scala)
+    "10AMB011": "lower_better",    # popolazione esposta a frane (dubbio: polarita' Istat non trovata)
+    "10AMB012": "lower_better",    # popolazione esposta ad alluvioni (idem)
+    "10AMB014": "higher_better",   # aree protette (dubbio: solo un indizio testuale Istat)
+    "11RIC002": "higher_better",   # propensione alla brevettazione
+    "11RIC025": "higher_better",   # mobilita' dei laureati
+    "12SER007": "lower_better",    # irregolarita' del servizio elettrico
+    "12SER022": "higher_better",   # posti letto ad alta assistenza
 }
 
 

@@ -220,7 +220,7 @@ class QualityLifeStaticTest(unittest.TestCase):
 
 
 class QualityLifeBesEngineTest(unittest.TestCase):
-    LEVELS = {"regione": ("regioni", 20), "provincia": ("province", 103)}
+    LEVELS = {"regione": ("regioni", 20), "provincia": ("province", 107)}
 
     def test_levels_present(self):
         for level in self.LEVELS:

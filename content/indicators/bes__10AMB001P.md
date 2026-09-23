@@ -41,8 +41,8 @@ Il massimo della rilevazione è rimasto lo stesso numero e ha cambiato luogo. Ne
 Non scendono tutte. Dodici province hanno oggi più polveri di otto anni fa, undici nel Centro-Sud e Belluno unica eccezione settentrionale. Grosseto e Caserta salgono di sette microgrammi, Ragusa e Catania di cinque.
 
 <!-- sezione: limiti -->
-## Undici province senza un numero, e cinque sono calabresi
+## Le province senza un numero, e cinque sono calabresi
 
-La copertura è il limite più serio, e manca dove il lettore vorrebbe verificare. Nel 2023 hanno un valore 92 province su 103, e le undici assenti sono Imperia, Latina, Isernia, Matera, Nuoro, Oristano e tutte e cinque le province della Calabria. Ogni lettura per ripartizioni poggia quindi, al Sud, su una base più sottile di quanto la mappa lasci credere.
+La copertura è il limite più serio, e manca dove il lettore vorrebbe verificare. Nel 2023 hanno un valore 92 province su 103, e le undici assenti sono Imperia, Latina, Isernia, Matera, Nuoro, Oristano e tutte e cinque le province della Calabria. Questi conti sono fatti sulle 103 province che il sito misurava fino a settembre 2026: con le quattro entrate dopo, fra le assenti c'è anche Fermo. Ogni lettura per ripartizioni poggia quindi, al Sud, su una base più sottile di quanto la mappa lasci credere.
 
 Una media annua non dice poi quanti giorni sono cattivi, e il vincolo che in Italia salta davvero è quello giornaliero, superato nel 2023 in 63 stazioni. Una provincia con molti picchi invernali e una con andamento piatto ricevono qui lo stesso numero. Le centraline, infine, stanno nei capoluoghi, e il valore racconta l'aria della città più di quella della provincia.

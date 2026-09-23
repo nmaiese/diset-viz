@@ -274,6 +274,30 @@ class ProposeDirectionTest(unittest.TestCase):
         self.assertTrue(province_sources.NUTS3_PATTERN.match("ITC11"))   # Torino
         self.assertFalse(province_sources.NUTS3_PATTERN.match("ITC1"))   # NUTS2 region
         self.assertTrue(province_sources.NUTS2_PATTERN.match("ITC1"))
+        # Le province nate dopo il 2004: fino al 23/9/2026 la regex le scartava.
+        for code in ("IT108", "IT109", "IT110", "IT111"):
+            self.assertTrue(province_sources.NUTS3_PATTERN.match(code), code)
+        for code in ("IT", "ITC", "IT1", "IT10", "IT1000"):
+            self.assertFalse(province_sources.NUTS3_PATTERN.match(code), code)
+
+    def test_la_pipeline_si_importa_da_sola(self):
+        """In un processo nuovo, senza l'app gia' caricata: un import di
+        `scripts.province_sources` in testa a `app/province_profile.py` faceva
+        un ciclo, e `build_province_dataset.py` lanciato da solo non partiva."""
+        import subprocess
+        import sys
+        from pathlib import Path
+        radice = Path(__file__).resolve().parents[2]
+        for modulo in ("scripts.build_province_dataset", "scripts.province_sources",
+                       "scripts.discover_provinces"):
+            with self.subTest(modulo=modulo):
+                esito = subprocess.run([sys.executable, "-c", f"import {modulo}"],
+                                       cwd=radice, capture_output=True, text=True, check=False)
+                self.assertEqual(esito.returncode, 0, esito.stderr[-500:])
+
+    def test_discover_provinces_usa_la_stessa_definizione(self):
+        from scripts import discover_provinces
+        self.assertIs(discover_provinces.NUTS3_PATTERN, province_sources.NUTS3_PATTERN)
 
     def test_edition_variant_labels_and_units_are_resolved(self):
         indicators = {

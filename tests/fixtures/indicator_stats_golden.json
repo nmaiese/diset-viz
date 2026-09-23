@@ -12036,21 +12036,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.381553,
-     "common_count": 103,
-     "current_avg": 83.435922,
+     "average_delta": 0.383178,
+     "common_count": 107,
+     "current_avg": 83.450467,
      "decrease_count": 3,
-     "increase_count": 93,
-     "previous_avg": 83.054369,
+     "increase_count": 97,
+     "previous_avg": 83.06729,
      "previous_year": 2023,
      "stable_count": 7,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Lecco",
     "last": "Napoli",
-    "mean": 83.435922,
+    "mean": 83.450467,
     "median": 83.5,
     "year_max": 2024
    },
@@ -12128,21 +12128,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.073973,
-     "common_count": 73,
-     "current_avg": 2.554795,
-     "decrease_count": 28,
-     "increase_count": 41,
-     "previous_avg": 2.480822,
+     "average_delta": 0.064935,
+     "common_count": 77,
+     "current_avg": 2.47013,
+     "decrease_count": 29,
+     "increase_count": 43,
+     "previous_avg": 2.405195,
      "previous_year": 2021,
-     "stable_count": 4,
+     "stable_count": 5,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Ascoli Piceno",
     "last": "Enna",
-    "mean": 2.401942,
+    "mean": 2.346729,
     "median": 2.2,
     "year_max": 2022
    },
@@ -12172,21 +12172,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.097087,
-     "common_count": 103,
-     "current_avg": 0.592233,
-     "decrease_count": 51,
-     "increase_count": 38,
-     "previous_avg": 0.68932,
+     "average_delta": -0.095327,
+     "common_count": 107,
+     "current_avg": 0.588785,
+     "decrease_count": 52,
+     "increase_count": 39,
+     "previous_avg": 0.684112,
      "previous_year": 2022,
-     "stable_count": 14,
+     "stable_count": 16,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Belluno",
     "last": "Vercelli",
-    "mean": 0.592233,
+    "mean": 0.588785,
     "median": 0.5,
     "year_max": 2023
    },
@@ -12216,21 +12216,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.292233,
-     "common_count": 103,
-     "current_avg": 7.505825,
-     "decrease_count": 59,
-     "increase_count": 40,
-     "previous_avg": 7.798058,
+     "average_delta": -0.3,
+     "common_count": 107,
+     "current_avg": 7.501869,
+     "decrease_count": 62,
+     "increase_count": 41,
+     "previous_avg": 7.801869,
      "previous_year": 2021,
      "stable_count": 4,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Vibo Valentia",
     "last": "Napoli",
-    "mean": 7.505825,
+    "mean": 7.501869,
     "median": 7.4,
     "year_max": 2022
    },
@@ -12260,22 +12260,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.796117,
-     "common_count": 103,
-     "current_avg": 34.845631,
-     "decrease_count": 32,
-     "increase_count": 70,
-     "previous_avg": 33.049515,
+     "average_delta": 1.819626,
+     "common_count": 107,
+     "current_avg": 35.051402,
+     "decrease_count": 33,
+     "increase_count": 73,
+     "previous_avg": 33.231776,
      "previous_year": 2021,
      "stable_count": 1,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Piacenza",
     "last": "Aosta",
-    "mean": 34.845631,
-    "median": 34.4,
+    "mean": 35.051402,
+    "median": 34.5,
     "year_max": 2022
    },
    "regione": {
@@ -12448,22 +12448,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -1.317476,
-     "common_count": 103,
-     "current_avg": 17.696117,
-     "decrease_count": 85,
+     "average_delta": -1.346729,
+     "common_count": 107,
+     "current_avg": 17.648598,
+     "decrease_count": 89,
      "increase_count": 17,
-     "previous_avg": 19.013592,
+     "previous_avg": 18.995327,
      "previous_year": 2021,
      "stable_count": 1,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Treviso",
     "last": "Crotone",
-    "mean": 17.696117,
-    "median": 17.7,
+    "mean": 17.648598,
+    "median": 17.5,
     "year_max": 2022
    },
    "regione": {
@@ -12516,22 +12516,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.902913,
-     "common_count": 103,
-     "current_avg": 95.546602,
+     "average_delta": 1.904673,
+     "common_count": 107,
+     "current_avg": 95.556075,
      "decrease_count": 10,
-     "increase_count": 93,
-     "previous_avg": 93.643689,
+     "increase_count": 97,
+     "previous_avg": 93.651402,
      "previous_year": 2021,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Vibo Valentia",
     "last": "Roma",
-    "mean": 95.546602,
-    "median": 95.7,
+    "mean": 95.556075,
+    "median": 95.8,
     "year_max": 2023
    },
    "regione": {
@@ -12560,22 +12560,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.58835,
-     "common_count": 103,
-     "current_avg": 65.715534,
-     "decrease_count": 24,
-     "increase_count": 77,
-     "previous_avg": 64.127184,
+     "average_delta": 1.525234,
+     "common_count": 107,
+     "current_avg": 65.431776,
+     "decrease_count": 26,
+     "increase_count": 79,
+     "previous_avg": 63.906542,
      "previous_year": 2023,
      "stable_count": 2,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bologna",
-    "last": "Prato",
-    "mean": 65.715534,
-    "median": 67.3,
+    "last": "Barletta-Andria-Trani",
+    "mean": 65.431776,
+    "median": 66.4,
     "year_max": 2024
    },
    "regione": {
@@ -12604,21 +12604,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.775728,
-     "common_count": 103,
-     "current_avg": 28.798058,
-     "decrease_count": 46,
-     "increase_count": 57,
-     "previous_avg": 28.02233,
+     "average_delta": 0.669159,
+     "common_count": 107,
+     "current_avg": 28.711215,
+     "decrease_count": 48,
+     "increase_count": 59,
+     "previous_avg": 28.042056,
      "previous_year": 2023,
      "stable_count": 0,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bologna",
     "last": "Siracusa",
-    "mean": 28.798058,
+    "mean": 28.711215,
     "median": 27.5,
     "year_max": 2024
    }
@@ -12628,21 +12628,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.694175,
-     "common_count": 103,
-     "current_avg": 53.038835,
+     "average_delta": 0.701869,
+     "common_count": 107,
+     "current_avg": 53.056075,
      "decrease_count": 38,
-     "increase_count": 65,
-     "previous_avg": 52.34466,
+     "increase_count": 69,
+     "previous_avg": 52.354206,
      "previous_year": 2021,
      "stable_count": 0,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Isernia",
     "last": "Bolzano",
-    "mean": 53.038835,
+    "mean": 53.056075,
     "median": 53.9,
     "year_max": 2022
    },
@@ -12696,21 +12696,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.621359,
-     "common_count": 103,
-     "current_avg": 14.843689,
-     "decrease_count": 56,
-     "increase_count": 45,
-     "previous_avg": 15.465049,
+     "average_delta": -0.661682,
+     "common_count": 107,
+     "current_avg": 14.888785,
+     "decrease_count": 59,
+     "increase_count": 46,
+     "previous_avg": 15.550467,
      "previous_year": 2023,
      "stable_count": 2,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Padova",
     "last": "Taranto",
-    "mean": 14.843689,
+    "mean": 14.888785,
     "median": 12.3,
     "year_max": 2024
    },
@@ -12740,22 +12740,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -1.215534,
-     "common_count": 103,
-     "current_avg": 9.940777,
-     "decrease_count": 81,
-     "increase_count": 21,
-     "previous_avg": 11.156311,
+     "average_delta": -1.204673,
+     "common_count": 107,
+     "current_avg": 9.864486,
+     "decrease_count": 84,
+     "increase_count": 22,
+     "previous_avg": 11.069159,
      "previous_year": 2023,
      "stable_count": 1,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Cagliari",
     "last": "Brindisi",
-    "mean": 9.940777,
-    "median": 9.7,
+    "mean": 9.864486,
+    "median": 9.4,
     "year_max": 2024
    },
    "regione": {
@@ -12784,21 +12784,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.037864,
-     "common_count": 103,
-     "current_avg": 44.246602,
-     "decrease_count": 52,
-     "increase_count": 51,
-     "previous_avg": 44.284466,
+     "average_delta": -0.03271,
+     "common_count": 107,
+     "current_avg": 44.218692,
+     "decrease_count": 54,
+     "increase_count": 53,
+     "previous_avg": 44.251402,
      "previous_year": 2023,
      "stable_count": 0,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Sondrio",
     "last": "Crotone",
-    "mean": 44.246602,
+    "mean": 44.218692,
     "median": 41.7,
     "year_max": 2024
    }
@@ -12808,22 +12808,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.495146,
-     "common_count": 103,
-     "current_avg": 40.215534,
-     "decrease_count": 15,
-     "increase_count": 85,
-     "previous_avg": 38.720388,
+     "average_delta": 1.476636,
+     "common_count": 107,
+     "current_avg": 40.145794,
+     "decrease_count": 16,
+     "increase_count": 88,
+     "previous_avg": 38.669159,
      "previous_year": 2023,
      "stable_count": 3,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Sondrio",
     "last": "Crotone",
-    "mean": 40.215534,
-    "median": 38.7,
+    "mean": 40.145794,
+    "median": 38.5,
     "year_max": 2024
    }
   }
@@ -13000,22 +13000,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.930097,
-     "common_count": 103,
-     "current_avg": 67.475728,
-     "decrease_count": 34,
-     "increase_count": 68,
-     "previous_avg": 66.545631,
+     "average_delta": 0.878505,
+     "common_count": 107,
+     "current_avg": 67.316822,
+     "decrease_count": 37,
+     "increase_count": 69,
+     "previous_avg": 66.438318,
      "previous_year": 2023,
      "stable_count": 1,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bolzano",
     "last": "Taranto",
-    "mean": 67.475728,
-    "median": 72.2,
+    "mean": 67.316822,
+    "median": 72.1,
     "year_max": 2024
    },
    "regione": {
@@ -13054,12 +13054,12 @@
      "stable_count": 1,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bolzano",
     "last": "Taranto",
-    "mean": 13.423301,
-    "median": 9.3,
+    "mean": 13.439252,
+    "median": 9.7,
     "year_max": 2024
    },
    "regione": {
@@ -13112,21 +13112,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.202913,
-     "common_count": 103,
-     "current_avg": 35.281553,
-     "decrease_count": 59,
-     "increase_count": 42,
-     "previous_avg": 35.484466,
+     "average_delta": -0.169159,
+     "common_count": 107,
+     "current_avg": 35.204673,
+     "decrease_count": 61,
+     "increase_count": 44,
+     "previous_avg": 35.373832,
      "previous_year": 2023,
      "stable_count": 2,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Brescia",
     "last": "Taranto",
-    "mean": 35.281553,
+    "mean": 35.204673,
     "median": 38.2,
     "year_max": 2024
    }
@@ -13160,22 +13160,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.562136,
-     "common_count": 103,
-     "current_avg": 77.181553,
+     "average_delta": 0.561682,
+     "common_count": 107,
+     "current_avg": 77.149533,
      "decrease_count": 2,
-     "increase_count": 100,
-     "previous_avg": 76.619417,
+     "increase_count": 104,
+     "previous_avg": 76.58785,
      "previous_year": 2022,
      "stable_count": 1,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Lecco",
     "last": "Vibo Valentia",
-    "mean": 77.181553,
-    "median": 77.5,
+    "mean": 77.149533,
+    "median": 77.4,
     "year_max": 2023
    }
   }
@@ -13232,21 +13232,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -1.238835,
-     "common_count": 103,
-     "current_avg": 25.506796,
-     "decrease_count": 61,
-     "increase_count": 42,
-     "previous_avg": 26.745631,
+     "average_delta": -1.190654,
+     "common_count": 107,
+     "current_avg": 25.625234,
+     "decrease_count": 64,
+     "increase_count": 43,
+     "previous_avg": 26.815888,
      "previous_year": 2023,
      "stable_count": 0,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Brescia",
     "last": "Reggio Calabria",
-    "mean": 25.506796,
+    "mean": 25.625234,
     "median": 19.4,
     "year_max": 2024
    }
@@ -13256,21 +13256,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.574757,
-     "common_count": 103,
-     "current_avg": 12.353398,
-     "decrease_count": 59,
-     "increase_count": 43,
-     "previous_avg": 12.928155,
+     "average_delta": -0.58972,
+     "common_count": 107,
+     "current_avg": 12.265421,
+     "decrease_count": 61,
+     "increase_count": 45,
+     "previous_avg": 12.85514,
      "previous_year": 2021,
      "stable_count": 1,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Verbano-Cusio-Ossola",
     "last": "Arezzo",
-    "mean": 12.353398,
+    "mean": 12.265421,
     "median": 12.5,
     "year_max": 2022
    },
@@ -13492,21 +13492,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1004.553731,
-     "common_count": 67,
-     "current_avg": 21102.104478,
+     "average_delta": 1003.649296,
+     "common_count": 71,
+     "current_avg": 21099.932394,
      "decrease_count": 0,
-     "increase_count": 67,
-     "previous_avg": 20097.550746,
+     "increase_count": 71,
+     "previous_avg": 20096.283099,
      "previous_year": 2022,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Milano",
     "last": "Foggia",
-    "mean": 21139.441748,
+    "mean": 21136.604673,
     "median": 21323.2,
     "year_max": 2023
    }
@@ -13540,22 +13540,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 710.818447,
-     "common_count": 103,
-     "current_avg": 21071.933981,
+     "average_delta": 709.729907,
+     "common_count": 107,
+     "current_avg": 21031.657009,
      "decrease_count": 0,
-     "increase_count": 103,
-     "previous_avg": 20361.115534,
+     "increase_count": 107,
+     "previous_avg": 20321.927103,
      "previous_year": 2022,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Milano",
     "last": "Vibo Valentia",
-    "mean": 21071.933981,
-    "median": 20923.0,
+    "mean": 21031.657009,
+    "median": 20917.3,
     "year_max": 2023
    }
   }
@@ -13588,22 +13588,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1425.003883,
-     "common_count": 103,
-     "current_avg": 21172.393204,
+     "average_delta": 1421.670093,
+     "common_count": 107,
+     "current_avg": 21108.830841,
      "decrease_count": 0,
-     "increase_count": 103,
-     "previous_avg": 19747.38932,
+     "increase_count": 107,
+     "previous_avg": 19687.160748,
      "previous_year": 2022,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Milano",
     "last": "Crotone",
-    "mean": 21172.393204,
-    "median": 21509.9,
+    "mean": 21108.830841,
+    "median": 21502.9,
     "year_max": 2023
    }
   }
@@ -13612,21 +13612,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.357282,
-     "common_count": 103,
-     "current_avg": 8.809709,
-     "decrease_count": 99,
+     "average_delta": -0.357009,
+     "common_count": 107,
+     "current_avg": 8.856075,
+     "decrease_count": 102,
      "increase_count": 1,
-     "previous_avg": 9.16699,
+     "previous_avg": 9.213084,
      "previous_year": 2022,
-     "stable_count": 3,
+     "stable_count": 4,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bolzano",
     "last": "Crotone",
-    "mean": 8.809709,
+    "mean": 8.856075,
     "median": 8.1,
     "year_max": 2023
    }
@@ -13708,21 +13708,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.192308,
-     "common_count": 52,
-     "current_avg": 0.609615,
-     "decrease_count": 37,
-     "increase_count": 3,
-     "previous_avg": 0.801923,
+     "average_delta": -0.185455,
+     "common_count": 55,
+     "current_avg": 0.603636,
+     "decrease_count": 39,
+     "increase_count": 4,
+     "previous_avg": 0.789091,
      "previous_year": 2023,
      "stable_count": 12,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bolzano",
     "last": "Pescara",
-    "mean": 0.575728,
+    "mean": 0.573832,
     "median": 0.5,
     "year_max": 2024
    }
@@ -13924,11 +13924,11 @@
   "levels": {
    "provincia": {
     "annual": null,
-    "count": 95,
-    "coverage": 0.9223,
+    "count": 99,
+    "coverage": 0.9252,
     "first": "Aosta",
     "last": "Belluno",
-    "mean": 42.350526,
+    "mean": 42.406061,
     "median": 42.9,
     "year_max": 2024
    }
@@ -13938,22 +13938,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.018447,
-     "common_count": 103,
-     "current_avg": 66.740777,
-     "decrease_count": 46,
-     "increase_count": 56,
-     "previous_avg": 66.72233,
+     "average_delta": -0.006542,
+     "common_count": 107,
+     "current_avg": 66.385047,
+     "decrease_count": 49,
+     "increase_count": 57,
+     "previous_avg": 66.391589,
      "previous_year": 2021,
      "stable_count": 1,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Trento",
     "last": "Agrigento",
-    "mean": 66.740777,
-    "median": 64.9,
+    "mean": 66.385047,
+    "median": 64.8,
     "year_max": 2022
    },
    "regione": {
@@ -14030,22 +14030,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -6.541748,
-     "common_count": 103,
-     "current_avg": 50.033981,
-     "decrease_count": 96,
+     "average_delta": -6.515888,
+     "common_count": 107,
+     "current_avg": 49.774766,
+     "decrease_count": 100,
      "increase_count": 7,
-     "previous_avg": 56.575728,
+     "previous_avg": 56.290654,
      "previous_year": 2019,
      "stable_count": 0,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Firenze",
     "last": "Nuoro",
-    "mean": 50.033981,
-    "median": 51.1,
+    "mean": 49.774766,
+    "median": 50.9,
     "year_max": 2024
    },
    "regione": {
@@ -14075,7 +14075,7 @@
    "provincia": {
     "annual": null,
     "count": 29,
-    "coverage": 0.2816,
+    "coverage": 0.271,
     "first": "Cuneo",
     "last": "Imperia",
     "mean": 49.882759,
@@ -14112,21 +14112,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.951456,
-     "common_count": 103,
-     "current_avg": 34.686408,
-     "decrease_count": 33,
-     "increase_count": 69,
-     "previous_avg": 33.734951,
+     "average_delta": 0.923364,
+     "common_count": 107,
+     "current_avg": 34.643925,
+     "decrease_count": 35,
+     "increase_count": 70,
+     "previous_avg": 33.720561,
      "previous_year": 2023,
-     "stable_count": 1,
+     "stable_count": 2,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Pordenone",
     "last": "Benevento",
-    "mean": 34.686408,
+    "mean": 34.643925,
     "median": 35.0,
     "year_max": 2024
    }
@@ -14160,21 +14160,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.68932,
-     "common_count": 103,
-     "current_avg": 25.474757,
-     "decrease_count": 37,
-     "increase_count": 65,
-     "previous_avg": 23.785437,
+     "average_delta": 1.619626,
+     "common_count": 107,
+     "current_avg": 25.406542,
+     "decrease_count": 40,
+     "increase_count": 66,
+     "previous_avg": 23.786916,
      "previous_year": 2023,
      "stable_count": 1,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Prato",
     "last": "Trieste",
-    "mean": 25.474757,
+    "mean": 25.406542,
     "median": 25.3,
     "year_max": 2024
    }
@@ -14280,22 +14280,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.382828,
-     "common_count": 99,
-     "current_avg": 81.4,
+     "average_delta": 0.824272,
+     "common_count": 103,
+     "current_avg": 81.57767,
      "decrease_count": 42,
-     "increase_count": 57,
-     "previous_avg": 81.017172,
+     "increase_count": 61,
+     "previous_avg": 80.753398,
      "previous_year": 2021,
      "stable_count": 0,
      "year": 2022
     },
-    "count": 99,
-    "coverage": 0.9612,
+    "count": 103,
+    "coverage": 0.9626,
     "first": "L'Aquila",
     "last": "Reggio Calabria",
-    "mean": 81.4,
-    "median": 84.7,
+    "mean": 81.57767,
+    "median": 85.0,
     "year_max": 2022
    }
   }
@@ -14304,21 +14304,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -1.258252,
-     "common_count": 103,
-     "current_avg": 74.291262,
-     "decrease_count": 62,
-     "increase_count": 39,
-     "previous_avg": 75.549515,
+     "average_delta": -1.353271,
+     "common_count": 107,
+     "current_avg": 74.278505,
+     "decrease_count": 65,
+     "increase_count": 40,
+     "previous_avg": 75.631776,
      "previous_year": 2021,
      "stable_count": 2,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Trieste",
     "last": "L'Aquila",
-    "mean": 74.291262,
+    "mean": 74.278505,
     "median": 75.4,
     "year_max": 2022
    }
@@ -14400,21 +14400,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 5.476699,
-     "common_count": 103,
-     "current_avg": 125.015534,
-     "decrease_count": 33,
-     "increase_count": 67,
-     "previous_avg": 119.538835,
+     "average_delta": 7.442991,
+     "common_count": 107,
+     "current_avg": 126.608411,
+     "decrease_count": 35,
+     "increase_count": 69,
+     "previous_avg": 119.165421,
      "previous_year": 2023,
      "stable_count": 3,
      "year": 2024
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Macerata",
-    "last": "Brescia",
-    "mean": 125.015534,
+    "last": "Fermo",
+    "mean": 126.608411,
     "median": 125.1,
     "year_max": 2024
    }
@@ -14448,21 +14448,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.015534,
-     "common_count": 103,
-     "current_avg": 0.584466,
-     "decrease_count": 29,
+     "average_delta": 0.014151,
+     "common_count": 106,
+     "current_avg": 0.582075,
+     "decrease_count": 30,
      "increase_count": 41,
-     "previous_avg": 0.568932,
+     "previous_avg": 0.567925,
      "previous_year": 2022,
-     "stable_count": 33,
+     "stable_count": 35,
      "year": 2023
     },
-    "count": 103,
-    "coverage": 1.0,
+    "count": 106,
+    "coverage": 0.9907,
     "first": "Aosta",
     "last": "Nuoro",
-    "mean": 0.584466,
+    "mean": 0.582075,
     "median": 0.5,
     "year_max": 2023
    }
@@ -14544,22 +14544,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 21.462136,
-     "common_count": 103,
-     "current_avg": 234.497087,
+     "average_delta": 21.163208,
+     "common_count": 106,
+     "current_avg": 235.078302,
      "decrease_count": 28,
-     "increase_count": 75,
-     "previous_avg": 213.034951,
+     "increase_count": 78,
+     "previous_avg": 213.915094,
      "previous_year": 2022,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 103,
-    "coverage": 1.0,
+    "count": 106,
+    "coverage": 0.9907,
     "first": "Nuoro",
     "last": "Pisa",
-    "mean": 234.497087,
-    "median": 233.7,
+    "mean": 235.078302,
+    "median": 237.15,
     "year_max": 2023
    }
   }
@@ -14592,22 +14592,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 11.480583,
-     "common_count": 103,
-     "current_avg": 126.053398,
-     "decrease_count": 37,
-     "increase_count": 65,
-     "previous_avg": 114.572816,
+     "average_delta": 11.25,
+     "common_count": 106,
+     "current_avg": 125.035849,
+     "decrease_count": 38,
+     "increase_count": 67,
+     "previous_avg": 113.785849,
      "previous_year": 2022,
      "stable_count": 1,
      "year": 2023
     },
-    "count": 103,
-    "coverage": 1.0,
+    "count": 106,
+    "coverage": 0.9907,
     "first": "Vibo Valentia",
     "last": "Milano",
-    "mean": 126.053398,
-    "median": 80.6,
+    "mean": 125.035849,
+    "median": 78.5,
     "year_max": 2023
    }
   }
@@ -14640,22 +14640,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 2.51165,
-     "common_count": 103,
-     "current_avg": 31.047573,
-     "decrease_count": 40,
-     "increase_count": 62,
-     "previous_avg": 28.535922,
+     "average_delta": 2.441509,
+     "common_count": 106,
+     "current_avg": 31.067925,
+     "decrease_count": 42,
+     "increase_count": 63,
+     "previous_avg": 28.626415,
      "previous_year": 2022,
      "stable_count": 1,
      "year": 2023
     },
-    "count": 103,
-    "coverage": 1.0,
+    "count": 106,
+    "coverage": 0.9907,
     "first": "Vibo Valentia",
     "last": "Firenze",
-    "mean": 31.047573,
-    "median": 24.9,
+    "mean": 31.067925,
+    "median": 25.0,
     "year_max": 2023
    }
   }
@@ -14688,22 +14688,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.508889,
-     "common_count": 45,
-     "current_avg": 2.642222,
+     "average_delta": -0.47234,
+     "common_count": 47,
+     "current_avg": 2.595745,
      "decrease_count": 29,
-     "increase_count": 13,
-     "previous_avg": 3.151111,
+     "increase_count": 15,
+     "previous_avg": 3.068085,
      "previous_year": 2022,
      "stable_count": 3,
      "year": 2023
     },
-    "count": 103,
-    "coverage": 1.0,
+    "count": 106,
+    "coverage": 0.9907,
     "first": "Pordenone",
     "last": "Isernia",
-    "mean": 2.968932,
-    "median": 2.9,
+    "mean": 2.921698,
+    "median": 2.8,
     "year_max": 2023
    }
   }
@@ -14736,21 +14736,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.18932,
-     "common_count": 103,
-     "current_avg": 4.385437,
+     "average_delta": -0.08972,
+     "common_count": 107,
+     "current_avg": 4.41215,
      "decrease_count": 56,
-     "increase_count": 41,
-     "previous_avg": 4.574757,
+     "increase_count": 45,
+     "previous_avg": 4.501869,
      "previous_year": 2022,
      "stable_count": 6,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Prato",
     "last": "Asti",
-    "mean": 4.385437,
+    "mean": 4.41215,
     "median": 4.1,
     "year_max": 2023
    }
@@ -14976,21 +14976,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.083301,
-     "common_count": 103,
-     "current_avg": 1.860971,
-     "decrease_count": 63,
+     "average_delta": -0.086449,
+     "common_count": 107,
+     "current_avg": 1.811028,
+     "decrease_count": 67,
      "increase_count": 35,
-     "previous_avg": 1.944272,
+     "previous_avg": 1.897477,
      "previous_year": 2021,
      "stable_count": 5,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Napoli",
     "last": "Caltanissetta",
-    "mean": 1.860971,
+    "mean": 1.811028,
     "median": 0.55,
     "year_max": 2022
    },
@@ -15140,22 +15140,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.085185,
-     "common_count": 27,
-     "current_avg": 7.451852,
+     "average_delta": 0.082143,
+     "common_count": 28,
+     "current_avg": 7.267857,
      "decrease_count": 10,
      "increase_count": 14,
-     "previous_avg": 7.366667,
+     "previous_avg": 7.185714,
      "previous_year": 2022,
-     "stable_count": 3,
+     "stable_count": 4,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bolzano",
     "last": "Vercelli",
-    "mean": 9.141748,
-    "median": 6.6,
+    "mean": 9.057944,
+    "median": 6.5,
     "year_max": 2023
    },
    "regione": {
@@ -15184,21 +15184,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.187255,
-     "common_count": 102,
-     "current_avg": 1.151961,
+     "average_delta": -0.172642,
+     "common_count": 106,
+     "current_avg": 1.483019,
      "decrease_count": 19,
-     "increase_count": 14,
-     "previous_avg": 1.339216,
+     "increase_count": 15,
+     "previous_avg": 1.65566,
      "previous_year": 2021,
-     "stable_count": 69,
+     "stable_count": 72,
      "year": 2022
     },
-    "count": 102,
-    "coverage": 0.9903,
-    "first": "Torino",
+    "count": 106,
+    "coverage": 0.9907,
+    "first": "Monza e della Brianza",
     "last": "Oristano",
-    "mean": 1.151961,
+    "mean": 1.483019,
     "median": 0.7,
     "year_max": 2022
    },
@@ -15276,21 +15276,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -1.417582,
-     "common_count": 91,
-     "current_avg": 25.043956,
-     "decrease_count": 66,
-     "increase_count": 9,
-     "previous_avg": 26.461538,
+     "average_delta": -1.382979,
+     "common_count": 94,
+     "current_avg": 25.06383,
+     "decrease_count": 67,
+     "increase_count": 10,
+     "previous_avg": 26.446809,
      "previous_year": 2022,
-     "stable_count": 16,
+     "stable_count": 17,
      "year": 2023
     },
-    "count": 92,
-    "coverage": 0.8932,
+    "count": 95,
+    "coverage": 0.8879,
     "first": "L'Aquila",
     "last": "Foggia",
-    "mean": 25.0,
+    "mean": 25.021053,
     "median": 23.0,
     "year_max": 2023
    }
@@ -15324,21 +15324,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -1.534884,
-     "common_count": 43,
-     "current_avg": 14.976744,
-     "decrease_count": 30,
+     "average_delta": -1.659091,
+     "common_count": 44,
+     "current_avg": 15.045455,
+     "decrease_count": 31,
      "increase_count": 2,
-     "previous_avg": 16.511628,
+     "previous_avg": 16.704545,
      "previous_year": 2022,
      "stable_count": 11,
      "year": 2023
     },
-    "count": 44,
-    "coverage": 0.4272,
+    "count": 45,
+    "coverage": 0.4206,
     "first": "Viterbo",
     "last": "Cremona",
-    "mean": 14.977273,
+    "mean": 15.044444,
     "median": 15.0,
     "year_max": 2023
    }
@@ -15348,21 +15348,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.458252,
-     "common_count": 103,
-     "current_avg": 43.627184,
-     "decrease_count": 50,
-     "increase_count": 53,
-     "previous_avg": 43.168932,
+     "average_delta": 0.454206,
+     "common_count": 107,
+     "current_avg": 43.236449,
+     "decrease_count": 52,
+     "increase_count": 55,
+     "previous_avg": 42.782243,
      "previous_year": 2020,
      "stable_count": 0,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Milano",
     "last": "L'Aquila",
-    "mean": 43.627184,
+    "mean": 43.236449,
     "median": 42.5,
     "year_max": 2022
    },
@@ -15440,22 +15440,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.179612,
-     "common_count": 103,
-     "current_avg": 53.799029,
-     "decrease_count": 19,
-     "increase_count": 62,
-     "previous_avg": 53.619417,
+     "average_delta": 0.182243,
+     "common_count": 107,
+     "current_avg": 53.634579,
+     "decrease_count": 20,
+     "increase_count": 64,
+     "previous_avg": 53.452336,
      "previous_year": 2022,
-     "stable_count": 22,
+     "stable_count": 23,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Isernia",
     "last": "Crotone",
-    "mean": 53.799029,
-    "median": 25.3,
+    "mean": 53.634579,
+    "median": 25.7,
     "year_max": 2023
    },
    "regione": {
@@ -15532,21 +15532,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.029126,
-     "common_count": 103,
-     "current_avg": 2.804854,
+     "average_delta": 0.028037,
+     "common_count": 107,
+     "current_avg": 2.750467,
      "decrease_count": 24,
      "increase_count": 37,
-     "previous_avg": 2.775728,
+     "previous_avg": 2.72243,
      "previous_year": 2017,
-     "stable_count": 42,
+     "stable_count": 46,
      "year": 2020
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Cremona",
     "last": "Verbano-Cusio-Ossola",
-    "mean": 2.804854,
+    "mean": 2.750467,
     "median": 2.0,
     "year_max": 2020
    },
@@ -15576,21 +15576,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.143689,
-     "common_count": 103,
-     "current_avg": 13.253398,
+     "average_delta": 1.121495,
+     "common_count": 107,
+     "current_avg": 12.942991,
      "decrease_count": 20,
-     "increase_count": 70,
-     "previous_avg": 12.109709,
+     "increase_count": 73,
+     "previous_avg": 11.821495,
      "previous_year": 2017,
-     "stable_count": 13,
+     "stable_count": 14,
      "year": 2020
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Enna",
     "last": "Ferrara",
-    "mean": 13.253398,
+    "mean": 12.942991,
     "median": 5.4,
     "year_max": 2020
    },
@@ -15645,20 +15645,20 @@
    "provincia": {
     "annual": {
      "average_delta": 0.0,
-     "common_count": 103,
-     "current_avg": 20.466019,
+     "common_count": 107,
+     "current_avg": 20.381308,
      "decrease_count": 0,
      "increase_count": 0,
-     "previous_avg": 20.466019,
+     "previous_avg": 20.381308,
      "previous_year": 2021,
-     "stable_count": 103,
+     "stable_count": 107,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Salerno",
     "last": "Lodi",
-    "mean": 20.466019,
+    "mean": 20.381308,
     "median": 18.0,
     "year_max": 2022
    },
@@ -15712,22 +15712,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 8.561165,
-     "common_count": 103,
-     "current_avg": 57.279612,
+     "average_delta": 8.4,
+     "common_count": 107,
+     "current_avg": 56.314953,
      "decrease_count": 9,
-     "increase_count": 94,
-     "previous_avg": 48.718447,
+     "increase_count": 98,
+     "previous_avg": 47.914953,
      "previous_year": 2022,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Sondrio",
     "last": "Genova",
-    "mean": 57.279612,
-    "median": 28.4,
+    "mean": 56.314953,
+    "median": 28.6,
     "year_max": 2023
    },
    "regione": {
@@ -15756,22 +15756,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.319417,
-     "common_count": 103,
-     "current_avg": 67.895146,
+     "average_delta": 1.300935,
+     "common_count": 107,
+     "current_avg": 68.128037,
      "decrease_count": 19,
-     "increase_count": 82,
-     "previous_avg": 66.575728,
+     "increase_count": 86,
+     "previous_avg": 66.827103,
      "previous_year": 2022,
      "stable_count": 2,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Treviso",
     "last": "Palermo",
-    "mean": 67.895146,
-    "median": 68.8,
+    "mean": 68.128037,
+    "median": 68.9,
     "year_max": 2023
    }
   }
@@ -15804,21 +15804,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.024369,
-     "common_count": 103,
-     "current_avg": 8.452718,
+     "average_delta": 0.024953,
+     "common_count": 107,
+     "current_avg": 8.685981,
      "decrease_count": 0,
-     "increase_count": 93,
-     "previous_avg": 8.42835,
+     "increase_count": 97,
+     "previous_avg": 8.661028,
      "previous_year": 2022,
      "stable_count": 10,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Aosta",
-    "last": "Napoli",
-    "mean": 8.452718,
+    "last": "Monza e della Brianza",
+    "mean": 8.685981,
     "median": 7.38,
     "year_max": 2023
    }
@@ -15900,22 +15900,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 2.650485,
-     "common_count": 103,
-     "current_avg": 497.796117,
-     "decrease_count": 44,
-     "increase_count": 58,
-     "previous_avg": 495.145631,
+     "average_delta": 2.64486,
+     "common_count": 107,
+     "current_avg": 495.523364,
+     "decrease_count": 45,
+     "increase_count": 60,
+     "previous_avg": 492.878505,
      "previous_year": 2022,
-     "stable_count": 1,
+     "stable_count": 2,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Potenza",
     "last": "Reggio Emilia",
-    "mean": 497.796117,
-    "median": 491.0,
+    "mean": 495.523364,
+    "median": 489.0,
     "year_max": 2023
    }
   }
@@ -16020,21 +16020,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -15.25534,
-     "common_count": 103,
-     "current_avg": 61.514563,
-     "decrease_count": 71,
-     "increase_count": 32,
-     "previous_avg": 76.769903,
+     "average_delta": -14.992523,
+     "common_count": 107,
+     "current_avg": 60.68785,
+     "decrease_count": 74,
+     "increase_count": 33,
+     "previous_avg": 75.680374,
      "previous_year": 2021,
      "stable_count": 0,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Varese",
     "last": "Reggio Calabria",
-    "mean": 61.514563,
+    "mean": 60.68785,
     "median": 40.5,
     "year_max": 2022
    },
@@ -16102,21 +16102,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.070874,
-     "common_count": 103,
-     "current_avg": 1.273786,
+     "average_delta": 0.071963,
+     "common_count": 107,
+     "current_avg": 1.273832,
      "decrease_count": 0,
-     "increase_count": 64,
-     "previous_avg": 1.202913,
+     "increase_count": 68,
+     "previous_avg": 1.201869,
      "previous_year": 2021,
      "stable_count": 39,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Roma",
     "last": "Taranto",
-    "mean": 1.273786,
+    "mean": 1.273832,
     "median": 1.2,
     "year_max": 2022
    }
@@ -16198,11 +16198,11 @@
   "levels": {
    "provincia": {
     "annual": null,
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Prato",
     "last": "Rieti",
-    "mean": 25.768932,
+    "mean": 26.13271,
     "median": 21.6,
     "year_max": 2018
    },
@@ -16256,22 +16256,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -2.219417,
-     "common_count": 103,
-     "current_avg": -15.340777,
-     "decrease_count": 73,
-     "increase_count": 29,
-     "previous_avg": -13.121359,
+     "average_delta": -2.014953,
+     "common_count": 107,
+     "current_avg": -15.426168,
+     "decrease_count": 74,
+     "increase_count": 31,
+     "previous_avg": -13.411215,
      "previous_year": 2022,
-     "stable_count": 1,
+     "stable_count": 2,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bologna",
     "last": "Caltanissetta",
-    "mean": -15.340777,
-    "median": -13.8,
+    "mean": -15.426168,
+    "median": -14.1,
     "year_max": 2023
    },
    "regione": {
@@ -16300,21 +16300,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 1.752427,
-     "common_count": 103,
-     "current_avg": 17.472816,
-     "decrease_count": 9,
-     "increase_count": 93,
-     "previous_avg": 15.720388,
+     "average_delta": 1.763551,
+     "common_count": 107,
+     "current_avg": 17.373832,
+     "decrease_count": 10,
+     "increase_count": 96,
+     "previous_avg": 15.61028,
      "previous_year": 2021,
      "stable_count": 1,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Gorizia",
     "last": "Caserta",
-    "mean": 17.472816,
+    "mean": 17.373832,
     "median": 15.4,
     "year_max": 2022
    }
@@ -16324,22 +16324,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.696117,
-     "common_count": 103,
-     "current_avg": 31.459223,
-     "decrease_count": 12,
-     "increase_count": 84,
-     "previous_avg": 30.763107,
+     "average_delta": 0.682243,
+     "common_count": 107,
+     "current_avg": 31.130841,
+     "decrease_count": 13,
+     "increase_count": 87,
+     "previous_avg": 30.448598,
      "previous_year": 2022,
      "stable_count": 7,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Cagliari",
-    "last": "Asti",
-    "mean": 31.459223,
-    "median": 28.6,
+    "last": "Fermo",
+    "mean": 31.130841,
+    "median": 28.2,
     "year_max": 2023
    }
   }
@@ -16372,21 +16372,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.35534,
-     "common_count": 103,
-     "current_avg": 32.706796,
+     "average_delta": -0.318692,
+     "common_count": 107,
+     "current_avg": 32.333645,
      "decrease_count": 56,
-     "increase_count": 42,
-     "previous_avg": 33.062136,
+     "increase_count": 46,
+     "previous_avg": 32.652336,
      "previous_year": 2021,
      "stable_count": 5,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Verbano-Cusio-Ossola",
-    "last": "Vibo Valentia",
-    "mean": 32.706796,
+    "last": "Sud Sardegna",
+    "mean": 32.333645,
     "median": 32.6,
     "year_max": 2022
    }
@@ -16444,21 +16444,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.329126,
-     "common_count": 103,
-     "current_avg": 2.532039,
+     "average_delta": 0.336449,
+     "common_count": 107,
+     "current_avg": 2.533645,
      "decrease_count": 20,
-     "increase_count": 71,
-     "previous_avg": 2.202913,
+     "increase_count": 75,
+     "previous_avg": 2.197196,
      "previous_year": 2022,
      "stable_count": 12,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Trieste",
     "last": "Catania",
-    "mean": 2.532039,
+    "mean": 2.533645,
     "median": 2.0,
     "year_max": 2023
    },
@@ -16488,22 +16488,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -23.511111,
-     "common_count": 45,
-     "current_avg": 2045.444444,
-     "decrease_count": 20,
-     "increase_count": 25,
-     "previous_avg": 2068.955556,
+     "average_delta": -23.851064,
+     "common_count": 47,
+     "current_avg": 1995.638298,
+     "decrease_count": 21,
+     "increase_count": 26,
+     "previous_avg": 2019.489362,
      "previous_year": 2022,
      "stable_count": 0,
      "year": 2023
     },
-    "count": 45,
-    "coverage": 0.4369,
+    "count": 47,
+    "coverage": 0.4393,
     "first": "Cagliari",
     "last": "Ragusa",
-    "mean": 2045.444444,
-    "median": 1725.0,
+    "mean": 1995.638298,
+    "median": 1691.0,
     "year_max": 2023
    },
    "regione": {
@@ -16556,22 +16556,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 14.485714,
-     "common_count": 56,
-     "current_avg": 65.621429,
+     "average_delta": 14.791525,
+     "common_count": 59,
+     "current_avg": 65.633898,
      "decrease_count": 3,
-     "increase_count": 53,
-     "previous_avg": 51.135714,
+     "increase_count": 56,
+     "previous_avg": 50.842373,
      "previous_year": 2023,
      "stable_count": 0,
      "year": 2024
     },
-    "count": 102,
-    "coverage": 0.9903,
+    "count": 106,
+    "coverage": 0.9907,
     "first": "Trieste",
     "last": "Oristano",
-    "mean": 66.065686,
-    "median": 66.35,
+    "mean": 66.128302,
+    "median": 66.95,
     "year_max": 2024
    },
    "regione": {
@@ -16624,21 +16624,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": -0.184466,
-     "common_count": 103,
-     "current_avg": 3.030097,
-     "decrease_count": 52,
-     "increase_count": 30,
-     "previous_avg": 3.214563,
+     "average_delta": -0.183178,
+     "common_count": 107,
+     "current_avg": 2.991589,
+     "decrease_count": 53,
+     "increase_count": 31,
+     "previous_avg": 3.174766,
      "previous_year": 2021,
-     "stable_count": 21,
+     "stable_count": 23,
      "year": 2022
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Verona",
     "last": "Gorizia",
-    "mean": 3.030097,
+    "mean": 2.991589,
     "median": 3.0,
     "year_max": 2022
    },
@@ -16668,22 +16668,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 2.464078,
-     "common_count": 103,
-     "current_avg": 68.541748,
-     "decrease_count": 29,
-     "increase_count": 59,
-     "previous_avg": 66.07767,
+     "average_delta": 2.482243,
+     "common_count": 107,
+     "current_avg": 69.460748,
+     "decrease_count": 30,
+     "increase_count": 61,
+     "previous_avg": 66.978505,
      "previous_year": 2022,
-     "stable_count": 15,
+     "stable_count": 16,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Belluno",
     "last": "Trieste",
-    "mean": 68.541748,
-    "median": 71.7,
+    "mean": 69.460748,
+    "median": 73.4,
     "year_max": 2023
    },
    "regione": {
@@ -16712,21 +16712,21 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 0.326214,
-     "common_count": 103,
-     "current_avg": 10.804854,
-     "decrease_count": 17,
-     "increase_count": 68,
-     "previous_avg": 10.478641,
+     "average_delta": 0.313084,
+     "common_count": 107,
+     "current_avg": 10.688785,
+     "decrease_count": 19,
+     "increase_count": 70,
+     "previous_avg": 10.375701,
      "previous_year": 2022,
      "stable_count": 18,
      "year": 2023
     },
-    "count": 103,
+    "count": 107,
     "coverage": 1.0,
     "first": "Bergamo",
     "last": "Matera",
-    "mean": 10.804854,
+    "mean": 10.688785,
     "median": 8.8,
     "year_max": 2023
    },
@@ -16941,6 +16941,409 @@
     "mean": 77.315,
     "median": 77.65,
     "year_max": 2023
+   }
+  }
+ },
+ "dem:BIRTHRATE": {
+  "levels": {
+   "regione": {
+    "above_avg": 8,
+    "annual": {
+     "average_delta": -0.175,
+     "common_count": 20,
+     "current_avg": 6.045,
+     "decrease_count": 15,
+     "increase_count": 1,
+     "previous_avg": 6.22,
+     "previous_year": 2023,
+     "stable_count": 4,
+     "year": 2024
+    },
+    "avg_change_abs": -1.755,
+    "avg_change_pct": -22.5,
+    "below_avg": 12,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 6.045,
+    "median": 5.8,
+    "worst": null,
+    "year_max": 2024,
+    "year_min_avg": 7.8
+   }
+  }
+ },
+ "dem:GROWTHRATEN": {
+  "levels": {
+   "regione": {
+    "above_avg": 9,
+    "annual": {
+     "average_delta": 0.07,
+     "common_count": 20,
+     "current_avg": -5.495,
+     "decrease_count": 6,
+     "increase_count": 10,
+     "previous_avg": -5.565,
+     "previous_year": 2023,
+     "stable_count": 4,
+     "year": 2024
+    },
+    "avg_change_abs": -2.11,
+    "avg_change_pct": 62.333826,
+    "below_avg": 11,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": -5.495,
+    "median": -5.9,
+    "worst": null,
+    "year_max": 2024,
+    "year_min_avg": -3.385
+   }
+  }
+ },
+ "dem:GROWTHRATET": {
+  "levels": {
+   "regione": {
+    "above_avg": 10,
+    "annual": {
+     "average_delta": 0.18,
+     "common_count": 20,
+     "current_avg": -1.32,
+     "decrease_count": 11,
+     "increase_count": 8,
+     "previous_avg": -1.5,
+     "previous_year": 2023,
+     "stable_count": 1,
+     "year": 2024
+    },
+    "avg_change_abs": 2.055,
+    "avg_change_pct": -60.888889,
+    "below_avg": 10,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": -1.32,
+    "median": -1.3,
+    "worst": null,
+    "year_max": 2024,
+    "year_min_avg": -3.375
+   }
+  }
+ },
+ "dem:LIFEEXP65F": {
+  "levels": {
+   "regione": {
+    "above_avg": 12,
+    "annual": {
+     "average_delta": 0.33,
+     "common_count": 20,
+     "current_avg": 22.765,
+     "decrease_count": 0,
+     "increase_count": 18,
+     "previous_avg": 22.435,
+     "previous_year": 2023,
+     "stable_count": 2,
+     "year": 2024
+    },
+    "avg_change_abs": 0.79,
+    "avg_change_pct": 3.594994,
+    "below_avg": 8,
+    "best": "Trentino Alto Adige",
+    "count": 20,
+    "gap_abs": 2.3,
+    "gap_ratio": null,
+    "gap_trend": -0.3,
+    "mean": 22.765,
+    "median": 22.85,
+    "worst": "Campania",
+    "year_max": 2024,
+    "year_min_avg": 21.975
+   }
+  }
+ },
+ "dem:LIFEEXP65M": {
+  "levels": {
+   "regione": {
+    "above_avg": 10,
+    "annual": {
+     "average_delta": 0.43,
+     "common_count": 20,
+     "current_avg": 19.86,
+     "decrease_count": 1,
+     "increase_count": 18,
+     "previous_avg": 19.43,
+     "previous_year": 2023,
+     "stable_count": 1,
+     "year": 2024
+    },
+    "avg_change_abs": 1.135,
+    "avg_change_pct": 6.061415,
+    "below_avg": 10,
+    "best": "Trentino Alto Adige",
+    "count": 20,
+    "gap_abs": 2.1,
+    "gap_ratio": null,
+    "gap_trend": 0.0,
+    "mean": 19.86,
+    "median": 19.85,
+    "worst": "Campania",
+    "year_max": 2024,
+    "year_min_avg": 18.725
+   }
+  }
+ },
+ "dem:MARRATE": {
+  "levels": {
+   "regione": {
+    "above_avg": 9,
+    "annual": {
+     "average_delta": -0.18,
+     "common_count": 20,
+     "current_avg": 2.94,
+     "decrease_count": 16,
+     "increase_count": 1,
+     "previous_avg": 3.12,
+     "previous_year": 2023,
+     "stable_count": 3,
+     "year": 2024
+    },
+    "avg_change_abs": -0.265,
+    "avg_change_pct": -8.268331,
+    "below_avg": 11,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 2.94,
+    "median": 2.9,
+    "worst": null,
+    "year_max": 2024,
+    "year_min_avg": 3.205
+   }
+  }
+ },
+ "dem:MEANAGECH": {
+  "levels": {
+   "regione": {
+    "above_avg": 10,
+    "annual": {
+     "average_delta": 0.07,
+     "common_count": 20,
+     "current_avg": 32.66,
+     "decrease_count": 3,
+     "increase_count": 13,
+     "previous_avg": 32.59,
+     "previous_year": 2023,
+     "stable_count": 4,
+     "year": 2024
+    },
+    "avg_change_abs": 0.895,
+    "avg_change_pct": 2.817567,
+    "below_avg": 10,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 32.66,
+    "median": 32.65,
+    "worst": null,
+    "year_max": 2024,
+    "year_min_avg": 31.765
+   }
+  }
+ },
+ "dem:NMIGRATEAB": {
+  "levels": {
+   "regione": {
+    "above_avg": 12,
+    "annual": {
+     "average_delta": -0.32,
+     "common_count": 20,
+     "current_avg": 4.61,
+     "decrease_count": 14,
+     "increase_count": 3,
+     "previous_avg": 4.93,
+     "previous_year": 2023,
+     "stable_count": 3,
+     "year": 2024
+    },
+    "avg_change_abs": 4.285,
+    "avg_change_pct": 1318.461538,
+    "below_avg": 8,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 4.61,
+    "median": 4.8,
+    "worst": null,
+    "year_max": 2024,
+    "year_min_avg": 0.325
+   }
+  }
+ },
+ "dem:NMIGRATEIN": {
+  "levels": {
+   "regione": {
+    "above_avg": 14,
+    "annual": {
+     "average_delta": 0.33,
+     "common_count": 20,
+     "current_avg": -0.18,
+     "decrease_count": 9,
+     "increase_count": 11,
+     "previous_avg": -0.51,
+     "previous_year": 2023,
+     "stable_count": 0,
+     "year": 2024
+    },
+    "avg_change_abs": 0.135,
+    "avg_change_pct": -42.857143,
+    "below_avg": 6,
+    "best": "Emilia-Romagna",
+    "count": 20,
+    "gap_abs": 7.4,
+    "gap_ratio": null,
+    "gap_trend": 0.3,
+    "mean": -0.18,
+    "median": 0.75,
+    "worst": "Basilicata",
+    "year_max": 2024,
+    "year_min_avg": -0.315
+   }
+  }
+ },
+ "dem:OLDAGEDEPR": {
+  "levels": {
+   "regione": {
+    "above_avg": 11,
+    "annual": {
+     "average_delta": 0.74,
+     "common_count": 20,
+     "current_avg": 40.725,
+     "decrease_count": 0,
+     "increase_count": 20,
+     "previous_avg": 39.985,
+     "previous_year": 2024,
+     "stable_count": 0,
+     "year": 2025
+    },
+    "avg_change_abs": 5.535,
+    "avg_change_pct": 15.7289,
+    "below_avg": 9,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 40.725,
+    "median": 41.1,
+    "worst": null,
+    "year_max": 2025,
+    "year_min_avg": 35.19
+   }
+  }
+ },
+ "dem:POP014": {
+  "levels": {
+   "regione": {
+    "above_avg": 9,
+    "annual": {
+     "average_delta": -0.275,
+     "common_count": 20,
+     "current_avg": 11.575,
+     "decrease_count": 20,
+     "increase_count": 0,
+     "previous_avg": 11.85,
+     "previous_year": 2024,
+     "stable_count": 0,
+     "year": 2025
+    },
+    "avg_change_abs": -1.835,
+    "avg_change_pct": -13.683818,
+    "below_avg": 11,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 11.575,
+    "median": 11.4,
+    "worst": null,
+    "year_max": 2025,
+    "year_min_avg": 13.41
+   }
+  }
+ },
+ "dem:POP1564": {
+  "levels": {
+   "regione": {
+    "above_avg": 10,
+    "annual": {
+     "average_delta": -0.15,
+     "common_count": 20,
+     "current_avg": 62.86,
+     "decrease_count": 15,
+     "increase_count": 0,
+     "previous_avg": 63.01,
+     "previous_year": 2024,
+     "stable_count": 5,
+     "year": 2025
+    },
+    "avg_change_abs": -1.24,
+    "avg_change_pct": -1.934477,
+    "below_avg": 10,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 62.86,
+    "median": 62.95,
+    "worst": null,
+    "year_max": 2025,
+    "year_min_avg": 64.1
+   }
+  }
+ },
+ "dem:POP65OVER": {
+  "levels": {
+   "regione": {
+    "above_avg": 11,
+    "annual": {
+     "average_delta": 0.425,
+     "common_count": 20,
+     "current_avg": 25.57,
+     "decrease_count": 0,
+     "increase_count": 20,
+     "previous_avg": 25.145,
+     "previous_year": 2024,
+     "stable_count": 0,
+     "year": 2025
+    },
+    "avg_change_abs": 3.075,
+    "avg_change_pct": 13.669704,
+    "below_avg": 9,
+    "best": null,
+    "count": 20,
+    "gap_abs": null,
+    "gap_ratio": null,
+    "gap_trend": null,
+    "mean": 25.57,
+    "median": 25.9,
+    "worst": null,
+    "year_max": 2025,
+    "year_min_avg": 22.495
    }
   }
  },
