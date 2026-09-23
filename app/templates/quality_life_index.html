@@ -1,15 +1,17 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
 {% set active_nav = 'qualita-della-vita' %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Qualità della vita", "path": "/qualita-della-vita"}] %}
 
 {% block title %}Qualità della vita: {{ region_total }} regioni e {{ province_total }} province a confronto{% endblock %}
-{% block description %}Classifica qualità della vita nelle regioni italiane su indicatori Istat: reddito, lavoro, salute, ambiente, istruzione, servizi e metodo trasparente.{% endblock %}
+{% block description %}Classifica della qualità della vita nelle regioni e nelle province italiane su indicatori Istat: reddito, lavoro, salute, ambiente, istruzione e servizi.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Qualità della vita nelle regioni italiane",
+  "name": "Qualità della vita nelle regioni e nelle province italiane",
   "description": {{ 'Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori Istat selezionati.' | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
@@ -18,24 +20,15 @@
   "isAccessibleForFree": true
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
 <article class="page wrap" id="contenuto">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   <header class="quality-hero">
-    <h1>Qualità della vita nelle regioni italiane</h1>
+    <h1>Qualità della vita nelle regioni e nelle province italiane</h1>
     <p class="page-lead">La classifica seleziona dal catalogo unico gli indicatori Istat adatti a descrivere la qualità della vita. Per le regioni combina BES nazionale e indicatori territoriali DISET. I pesi sono visibili e modificabili.</p>
   </header>
 
@@ -47,9 +40,9 @@
     </a>
     {% if has_province_data %}
     <a class="quality-card" href="/qualita-della-vita/classifica/province">
-      <small>Approfondimento</small>
+      <small>Classifica</small>
       <h3>Classifica delle province →</h3>
-      <p>Una prima versione su base BES dei Territori, ancora in revisione.</p>
+      <p>Punteggio complessivo e per categoria, provincia per provincia.</p>
     </a>
     {% endif %}
     <a class="quality-card" href="/metodologia#qualita-della-vita">
@@ -75,8 +68,21 @@
   </section>
   {% endif %}
 
-  {% if has_province_data %}
-  <p class="quality-note quality-disclaimer">La classifica provinciale è un lavoro in corso: leggila insieme alla <a href="/metodologia#qualita-della-vita">metodologia</a>, prima di considerarla definitiva.</p>
+  {% if province_preview %}
+  <section class="quality-preview">
+    <p class="section-label">Anteprima: le prime province, profilo Equilibrato</p>
+    <ol class="quality-preview-list">
+      {% for row in province_preview %}
+      <li>
+        <span class="quality-preview-rank">{{ row.rank }}</span>
+        <span class="quality-preview-name"><a href="{{ row.path }}">{{ row.name }}</a></span>
+        <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
+        <span class="quality-score">{{ row.score | it_num }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="page-note"><a href="/province">Trova la tua provincia →</a></p>
+  </section>
   {% endif %}
 
   <p class="quality-note">Un catalogo, una selezione dichiarata. Le regioni combinano l'aggiornamento nazionale BES 2026 con gli indicatori territoriali completi e recenti. Le province usano il BES dei Territori, l'ultima fonte omogenea disponibile a quel livello. Cambiando profilo cambia il peso delle categorie.</p>

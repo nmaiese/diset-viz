@@ -688,6 +688,7 @@ class IlPercorsoVisibileEQuelloDichiarato(unittest.TestCase):
         "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita/classifica/regioni",
         "/divari-regionali", "/quiz", "/quiz/indovina-la-regione", "/metodologia",
         "/confronto", "/catalogo-dati", "/province", "/provincia/lecce",
+        "/qualita-della-vita",
     )
 
     def setUp(self):
@@ -956,3 +957,41 @@ class ItaliaRegioneProvincia(unittest.TestCase):
         dati = self.client.get("/api/region/puglia").get_json()
         self.assertEqual({p["key"] for p in dati["provinces"]},
                          {p["key"] for p in self.per_regione["puglia"]})
+
+
+class LeProvincePerLeMacchine(unittest.TestCase):
+    """llms.txt, llms-full.txt, SKILL.md, OpenAPI e i Markdown non nominavano
+    le province: un modello che leggeva il sito non sapeva che esistessero."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+
+    def test_llms_e_llms_full_portano_le_province(self):
+        from app import province_profile
+        self.assertIn("/province)", self.client.get("/llms.txt").get_data(as_text=True))
+        completo = self.client.get("/llms-full.txt").get_data(as_text=True)
+        self.assertIn("## Province", completo)
+        with app.app_context():
+            for chiave in province_profile.chiavi():
+                self.assertIn(f"/provincia/{chiave})", completo)
+
+    def test_lo_skill_e_l_openapi_portano_le_province(self):
+        skill = self.client.get("/.well-known/agent-skills/query-divario-italia/SKILL.md").get_data(as_text=True)
+        self.assertIn("/provincia/<key>", skill)
+        self.assertIn("/province", skill)
+        percorsi = self.client.get("/openapi.json").get_json()["paths"]
+        for percorso in ("/api/quality-life/{level}/rankings", "/api/quality-life/{level}/{key}"):
+            self.assertIn(percorso, percorsi)
+
+    def test_home_e_metodologia_in_markdown_portano_le_province(self):
+        for percorso in ("/", "/metodologia"):
+            with self.subTest(pagina=percorso):
+                markdown = self.client.get(percorso, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+                self.assertIn("/province)", markdown)
+
+    def test_la_qualita_della_vita_parla_di_regioni_e_province(self):
+        html = self.client.get("/qualita-della-vita").get_data(as_text=True)
+        self.assertIn("<h1>Qualità della vita nelle regioni e nelle province italiane</h1>", html)
+        self.assertNotIn("in revisione", html)
+        self.assertIn('href="/province"', html)

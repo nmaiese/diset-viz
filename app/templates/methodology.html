@@ -4,7 +4,7 @@
 {% set active_nav = 'metodologia' %}
 
 {% block title %}Metodologia e fonti | {{ site_name }}{% endblock %}
-{% block description %}Metodo, fonti e limiti di Divario Italia: indicatori territoriali Istat, copertura regionale, pagine indicatore e classifiche qualità della vita.{% endblock %}
+{% block description %}Metodo, fonti e limiti di Divario Italia: indicatori Istat per regioni e province, pagine indicatore e classifiche della qualità della vita.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -36,13 +36,13 @@
     },
     {
       "@type": "Question",
-      "name": "I confronti tra regioni sono affidabili?",
+      "name": "I confronti tra regioni e province sono affidabili?",
       "acceptedAnswer": { "@type": "Answer", "text": "I confronti mostrano differenze osservate tra territori, non dimostrano da soli un rapporto di causa. Gli indicatori possono avere anni e coperture diverse, quindi vanno letti insieme alla loro definizione." }
     },
     {
       "@type": "Question",
       "name": "Posso scaricare i dati?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Si. Ogni scheda indicatore offre il download in formato CSV e JSON. La licenza dei dati e {{ data_license_label }}." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Si. Le schede indicatore con una serie regionale offrono il download in formato CSV e JSON. I valori provinciali si leggono nelle pagine delle province. La licenza dei dati e {{ data_license_label }}." }
     },
     {
       "@type": "Question",
@@ -63,7 +63,7 @@
 <article class="page prose-wrap" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
   <h1>Metodologia e fonti</h1>
-  <p class="page-lead">Divario Italia usa dati territoriali pubblici per rendere confrontabili regioni, temi e indicatori. Ogni pagina deve permettere di capire che cosa misura il dato, da dove arriva, quale anno copre e quali limiti ha.</p>
+  <p class="page-lead">Divario Italia usa dati territoriali pubblici per rendere confrontabili regioni, province, temi e indicatori. Ogni pagina deve permettere di capire che cosa misura il dato, da dove arriva, quale anno copre e quali limiti ha.</p>
 
   <section>
     <h2>Fonte principale</h2>
@@ -183,7 +183,7 @@
     </div>
     {% endif %}
 
-    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica e cambia profilo →</a></p>
+    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica delle regioni e cambia profilo →</a> · <a href="/qualita-della-vita/classifica/province">la classifica delle province →</a></p>
   </section>
 
   <section>
@@ -195,10 +195,10 @@
     <h2>Domande frequenti</h2>
     <h3>Da dove arrivano i dati di Divario Italia?</h3>
     <p>I dati provengono dalla Banca dati territoriale per le politiche di sviluppo di Istat e, per la qualità della vita, dal BES dei Territori. Ogni pagina indicatore riporta la fonte e l'ultimo anno disponibile.</p>
-    <h3>I confronti tra regioni sono affidabili?</h3>
+    <h3>I confronti tra regioni e province sono affidabili?</h3>
     <p>I confronti mostrano differenze osservate tra territori, non dimostrano da soli un rapporto di causa. Gli indicatori possono avere anni e coperture diverse, quindi vanno letti insieme alla loro definizione.</p>
     <h3>Posso scaricare i dati?</h3>
-    <p>Sì. Ogni scheda indicatore offre il download in formato CSV e JSON. La licenza dei dati è {{ data_license_label }}.</p>
+    <p>Sì. Le schede indicatore con una serie regionale offrono il download in formato CSV e JSON. I valori provinciali si leggono nelle <a href="/province">pagine delle province</a>. La licenza dei dati è {{ data_license_label }}.</p>
     <h3>Ogni quanto vengono aggiornati gli indicatori?</h3>
     <p>Temi, punteggi e classifiche vengono ricalcolati a ogni pubblicazione. I valori si aggiornano quando Istat rilascia una nuova annualità dell'indicatore, e la freschezza del dato è indicata su ciascuna scheda.</p>
     <h3>Posso citare Divario Italia in un articolo o in una risposta generata da un modello?</h3>
@@ -208,9 +208,10 @@
   <aside class="indicator-cta">
     <span>
       <small>Esplora i dati</small>
-      <strong>Apri regioni, temi o indicatori dell'atlante</strong>
+      <strong>Apri regioni, province, temi o indicatori dell'atlante</strong>
     </span>
     <a href="/regioni">Regioni</a>
+    <a href="/province">Province</a>
     <a href="/temi">Temi</a>
   </aside>
 </article>

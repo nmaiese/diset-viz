@@ -13,7 +13,9 @@ Usare soltanto le interfacce pubbliche e read-only di `https://divarioitalia.it`
 2. Leggere `GET /api/indicator/<id>` per definizione, unità, fonte, copertura e serie completa.
 3. Per un confronto nello stesso anno usare `GET /api/indicator/<id>/year/<anno>`.
 4. Citare la pagina canonica indicata nei metadati, non l'endpoint API.
-5. Per calcoli riproducibili usare `/download/indicator/<id>.csv` o `.json`.
+5. Per calcoli riproducibili usare `/download/indicator/<id>.csv` o `.json`. API e download servono la serie regionale.
+6. Per una provincia leggere la sua pagina, `/provincia/<key>`, anche in Markdown con `Accept: text/markdown`: porta i valori veri di tutti gli indicatori del BES dei Territori, l'anno, la posizione fra le province e il confronto con le province della stessa regione. L'elenco delle province e le chiavi stanno in `/province`.
+7. Per le classifiche della qualità della vita usare `GET /api/quality-life/<regioni|province>/rankings` (con `/<profilo>` per un altro profilo) e `GET /api/quality-life/<regioni|province>/<key>`.
 
 ## Regole di interpretazione
 
@@ -21,7 +23,8 @@ Usare soltanto le interfacce pubbliche e read-only di `https://divarioitalia.it`
 - Usare la fonte e la licenza riportate nei metadati della singola serie.
 - Confrontare solo territori presenti nello stesso anno e sulla stessa base territoriale.
 - Per le percentuali, esprimere il cambiamento annuale in punti percentuali.
-- Non chiamare media italiana o nazionale una media semplice dei valori regionali.
+- Non chiamare media italiana o nazionale una media semplice dei valori regionali o provinciali.
+- Non confrontare il valore di una provincia con quello della sua regione: sono due livelli della stessa misura, con fonti diverse.
 - Non trasformare una quota in un conteggio senza il denominatore necessario.
 - Non dedurre cause da una differenza territoriale o da una correlazione.
 - Rispettare `explain.direction`: un valore più alto non è sempre migliore.
@@ -30,6 +33,8 @@ Usare soltanto le interfacce pubbliche e read-only di `https://divarioitalia.it`
 ## Percorsi utili
 
 - Catalogo umano: `https://divarioitalia.it/catalogo-dati`
+- Regioni: `https://divarioitalia.it/regioni`
+- Province: `https://divarioitalia.it/province`
 - Metodologia: `https://divarioitalia.it/metodologia`
 - Specifica API: `https://divarioitalia.it/openapi.json`
 - Indice per modelli: `https://divarioitalia.it/llms.txt`
