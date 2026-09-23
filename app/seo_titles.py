@@ -332,7 +332,23 @@ def _preposition(name, level):
     name = (name or "").strip()
     if not name:
         return ""
-    return f"a {name}" if level.get("key") == "provincia" else f"in {name}"
+    return at_place(name) if level.get("key") == "provincia" else f"in {name}"
+
+
+def at_place(name):
+    """"a Milano", "ad Aosta", "all'Aquila", "alla Spezia".
+
+    La preposizione davanti al nome di una citta' o di una provincia. Scritta a
+    mano nei template dava "a Aosta" e "a L'Aquila" su sei pagine.
+    """
+    name = (name or "").strip()
+    if name.startswith("L'"):
+        return f"all'{name[2:]}"
+    if name.startswith("La "):
+        return f"alla {name[3:]}"
+    if name[:1].lower() == "a":
+        return f"ad {name}"
+    return f"a {name}"
 
 
 def answer_description(meta, level, max_len=DESCRIPTION_MAX):

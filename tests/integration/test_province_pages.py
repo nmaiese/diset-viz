@@ -18,13 +18,13 @@ Queste prove tengono due cose che si rompono in silenzio:
 import re
 import unittest
 
-from app import app, bes_data, province_profile
+from app import app, bes_data, it_numbers, province_profile
 
 
 def _visibile(html):
-    corpo = re.search(r'<main class="wrap".*</main>', html, re.S)
+    corpo = re.search(r'<main class="wrap[ "].*</main>', html, re.DOTALL)
     assert corpo, "la pagina non ha il corpo atteso"
-    testo = re.sub(r"<(script|style)\b.*?</\1>", "", corpo.group(0), flags=re.S)
+    testo = re.sub(r"<(script|style)\b.*?</\1>", "", corpo.group(0), flags=re.DOTALL)
     testo = re.sub(r"<[^>]+>", " ", testo)
     return re.sub(r"\s+", " ", testo).strip()
 
@@ -121,7 +121,7 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
         for voce in voci[:12]:
             with self.subTest(indicatore=voce["name"]):
                 self.assertIn(voce["name"], testo)
-                self.assertIn(str(formatta(voce["value"])), testo)
+                self.assertIn(formatta(voce["value"], voce["decimals"]), testo)
         unita = {v["unit"] for v in voci if v["unit"]}
         for misura in list(unita)[:5]:
             self.assertIn(misura, testo)
@@ -179,22 +179,82 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
         self.assertTrue(con_media, "nessun confronto dentro la regione da rendere")
         for voce in con_media[:5]:
             with self.subTest(indicatore=voce["name"]):
-                self.assertIn(str(formatta(voce["in_regione"]["media"])), testo)
+                self.assertIn(formatta(voce["in_regione"]["media"], voce["decimals"]), testo)
 
         con_variazione = [v for v in voci if v["variazione"] is not None]
         self.assertTrue(con_variazione, "nessuna variazione da rendere")
         self.assertIn(f"dal {con_variazione[0]['year_from']}", testo)
 
     def test_il_markdown_porta_le_stesse_risposte_dell_html(self):
-        """HTML e Markdown sono lo stesso documento alla stessa URL."""
-        markdown = self.client.get(
-            "/provincia/lecce", headers={"Accept": "text/markdown"}).get_data(as_text=True)
-        voci = province_profile.indicatori("lecce")
-        self.assertIn("Tutti gli indicatori misurati per Lecce", markdown)
-        for voce in voci[:8]:
-            with self.subTest(indicatore=voce["id"]):
-                self.assertIn(voce["name"], markdown)
-                self.assertIn(str(voce["value"]), markdown)
+        """HTML e Markdown sono lo stesso documento alla stessa URL: ogni cifra
+        che l'HTML mostra c'e' anche nel Markdown, scritta allo stesso modo. Il
+        Markdown scriveva i numeri col punto decimale (8.829 cifre su 103
+        pagine), e la prova di prima lo fissava con `str(valore)`."""
+        for chiave in ("lecce", "aosta", "napoli", "l-aquila", "trieste"):
+            html = _visibile(self.client.get(f"/provincia/{chiave}").get_data(as_text=True))
+            markdown = self.client.get(
+                f"/provincia/{chiave}", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+            profilo = province_profile.profilo(chiave)
+            with self.subTest(provincia=chiave, cosa="punteggio"):
+                punteggio = it_numbers.number(profilo["score"])
+                self.assertIn(punteggio, html)
+                self.assertIn(punteggio, markdown)
+                self.assertIn(f"{profilo['rank']}ª su {profilo['total']}", markdown)
+            for voce in province_profile.indicatori(chiave):
+                valore = it_numbers.number(voce["value"], voce["decimals"])
+                with self.subTest(provincia=chiave, indicatore=voce["id"]):
+                    self.assertIn(voce["name"], markdown)
+                    self.assertIn(voce["theme"], markdown)
+                    self.assertIn(valore, html)
+                    self.assertIn(valore, markdown)
+                    if voce["variazione"] is not None:
+                        variazione = it_numbers.change(voce["variazione"], voce["decimals"])
+                        self.assertIn(f"dal {voce['year_from']} {variazione}", html)
+                        self.assertIn(f"dal {voce['year_from']} {variazione}", markdown)
+
+    def test_una_cifra_una_forma(self):
+        """I difetti che l'audit del 22/9 ha trovato su tutte le 103 pagine."""
+        for chiave in province_profile.chiavi():
+            pagina = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+            markdown = self.client.get(
+                f"/provincia/{chiave}", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+            with self.subTest(provincia=chiave):
+                # anno e variazione attaccati: "2023dal 2015"
+                self.assertNotRegex(pagina, r"\d{4}</small><small>dal")
+                self.assertNotRegex(pagina + markdown, r"[+-]0,0+(?!\d)")
+                # il Markdown all'italiana: niente decimali col punto, niente "13a"
+                # "72.1" col punto decimale. "1.047" e' un migliaio all'italiana.
+                # Fuori dai link, dove "PM2.5" e' un nome e non una cifra.
+                cifre = re.sub(r"\[[^\]]*\]\([^)]*\)", "", markdown)
+                self.assertNotRegex(cifre, r"(?<![\d.])\d+\.\d{1,2}(?![\d.])")
+                self.assertNotIn("qualita'", markdown)
+                self.assertNotRegex(markdown, r"\b\d+a su \d+")
+                # quattro macro-aree, non gli undici domini BES
+                self.assertLessEqual(pagina.count('class="macro-pill"'), 4)
+                # "a Aosta", "a L'Aquila"
+                self.assertNotRegex(pagina + markdown, r"\ba (?:A|L'|L&#39;|La )")
+
+    def test_le_vicine_sono_sempre_sei(self):
+        """La finestra centrata sull'ultima in classifica ne dava tre."""
+        chiavi = province_profile.chiavi()
+        for chiave in (chiavi[0], chiavi[1], chiavi[len(chiavi) // 2], chiavi[-2], chiavi[-1]):
+            with self.subTest(provincia=chiave):
+                vicine = province_profile.vicine(chiave)
+                self.assertEqual(len(vicine), 6)
+                self.assertNotIn(chiave, [v["key"] for v in vicine])
+
+    def test_il_creatore_e_divario_italia_e_la_fonte_istat(self):
+        """"creator: Istat" su un punteggio che Istat non ha mai pubblicato."""
+        import json
+        pagina = self.client.get("/provincia/l-aquila").get_data(as_text=True)
+        blocchi = [json.loads(b) for b in re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', pagina, re.DOTALL)]
+        dataset = next(b for b in blocchi if b.get("@type") == "Dataset")
+        self.assertEqual(dataset["name"], "Qualità della vita all'Aquila")
+        self.assertEqual(dataset["creator"], {"@id": "https://divarioitalia.it/chi-siamo#organizzazione"})
+        self.assertEqual(dataset["isBasedOn"]["creator"]["name"], "Istat")
+        self.assertRegex(dataset["temporalCoverage"], r"^\d{4}/\d{4}$")
+        self.assertGreater(len(dataset["variableMeasured"]), 50)
 
 
 if __name__ == "__main__":

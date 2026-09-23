@@ -19,6 +19,7 @@ from app import sources
 from app import seo_policy
 from app import seo_titles
 from app import indicator_notes
+from app import it_numbers
 from app import indicator_texts
 from app import indicator_universe
 from app import indicator_view
@@ -40,7 +41,7 @@ from app import publisher
 from app import agent_discovery
 from app import nav
 from app import taxonomy
-from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
+from app.taxonomy import DUPLICATE_BES_IDS, MACRO_AREA_ORDER, PROVINCE_ONLY_TITLE_COLLISIONS
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -167,6 +168,11 @@ def _inject_license():
         "data_licenses_label": sources.licenses_label,
         "publisher": publisher.ORGANIZATION,
         "publisher_jsonld": publisher.organization_json(),
+        # Chi ha costruito punteggi, classifiche e profili e' Divario Italia, e
+        # la fonte dei dati e' Istat: i JSON-LD dicevano "creator: Istat" su
+        # numeri che Istat non ha mai pubblicato. Il creatore punta alla stessa
+        # organizzazione del publisher, la fonte va in `isBasedOn`.
+        "organization_ref_jsonld": json.dumps({"@id": publisher.ORGANIZATION_ID}),
         "corrections_url": publisher.CORRECTIONS_URL,
         "contact_email": publisher.CONTACT_EMAIL,
         "consent_cmp_name": publisher.CONSENT_CMP_NAME,
@@ -206,13 +212,26 @@ def _rate_limit_ok(bucket, limit, window_s):
 @app.template_filter("it_num")
 def it_num(value, decimals=1):
     """Format a number Italian-style: dot thousands, comma decimals."""
-    if value is None:
-        return "n.d."
-    try:
-        formatted = f"{float(value):,.{decimals}f}"
-    except (TypeError, ValueError):
-        return str(value)
-    return formatted.replace(",", "§").replace(".", ",").replace("§", ".")
+    return it_numbers.number(value, decimals)
+
+
+@app.template_filter("freshness_label")
+def freshness_label_filter(status):
+    """`recent` -> `Recente`. Le pagine regione stampavano il codice inglese."""
+    from app.external_data import freshness_label
+    return freshness_label(status)
+
+
+@app.template_filter("at_place")
+def at_place_filter(name):
+    """`{{ p.name | at_place }}`: "a Milano", "ad Aosta", "all'Aquila"."""
+    return seo_titles.at_place(name)
+
+
+@app.template_filter("it_change")
+def it_change(value, decimals=1):
+    """A signed change, `+3,9` or `-1,2`, and `invariato` when it rounds to zero."""
+    return it_numbers.change(value, decimals)
 
 
 @app.template_filter("it_plural")
@@ -424,6 +443,10 @@ def data_catalog():
             "url": f"{SITE_URL}{meta['canonical_path']}",
             "path": meta["canonical_path"],
             "source": meta.get("source_label") or meta.get("family_label") or "",
+            # Il titolo diceva "N indicatori scaricabili" contando anche i 26
+            # BES solo provinciali, che il download non ce l'hanno: si conta
+            # da `meta.downloads`, non si presume.
+            "downloadable": bool(meta.get("downloads")),
         })
     description = (
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
@@ -1140,9 +1163,9 @@ def _descrizione_provincia(profilo):
     cercata, poi anche "meglio su". L'apertura con posizione e punteggio sta
     sempre dentro, perche' e' il motivo per cui la pagina esiste.
     """
-    testa = (f"Qualità della vita a {profilo['name']}: {profilo['rank']}ª su "
+    testa = (f"Qualità della vita {seo_titles.at_place(profilo['name'])}: {profilo['rank']}ª su "
              f"{profilo['total']} province, punteggio "
-             f"{str(profilo['score']).replace('.', ',')} su 100.")
+             f"{it_numbers.number(profilo['score'])} su 100.")
     forte = profilo["strongest"][0]["name"].lower() if profilo.get("strongest") else None
     debole = profilo["weakest"][0]["name"].lower() if profilo.get("weakest") else None
 
@@ -1188,7 +1211,8 @@ def province_page(province_key):
         return agent_discovery.markdown_response(
             agent_discovery.province_markdown(
                 profilo, province_profile.vicine(province_key), SITE_URL,
-                indicatori=righe),
+                indicators=righe, gains=su, losses=giu,
+                first_in_region=prime, last_in_region=ultime),
             f"{SITE_URL}/provincia/{province_key}",
         )
     return render_template(
@@ -1196,6 +1220,10 @@ def province_page(province_key):
         profile=profilo,
         vicine=province_profile.vicine(province_key),
         indicatori=righe,
+        # Le quattro macro-aree nell'ordine del sito, lo stesso filtro della
+        # pagina regione.
+        macro_aree=[area for area in MACRO_AREA_ORDER
+                    if any(riga["macro_area"] == area for riga in righe)],
         movimenti_su=su,
         movimenti_giu=giu,
         prime_in_regione=prime,

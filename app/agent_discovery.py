@@ -8,6 +8,8 @@ from pathlib import Path
 
 from flask import Response, request
 
+from app import it_numbers
+
 
 AGENT_SKILL_SCHEMA = "https://schemas.agentskills.io/discovery/0.2.0/schema.json"
 SKILL_NAME = "query-divario-italia"
@@ -214,13 +216,7 @@ def skill_index_document(site_url):
 
 
 def _number(value, decimals=2):
-    if value is None:
-        return "n.d."
-    try:
-        formatted = f"{float(value):,.{decimals}f}"
-    except (TypeError, ValueError):
-        return str(value)
-    return formatted.replace(",", "§").replace(".", ",").replace("§", ".")
+    return it_numbers.number(value, decimals)
 
 
 def _clean(value):
@@ -610,75 +606,145 @@ def region_markdown(profile, site_url):
     return "\n".join(lines)
 
 
-def province_markdown(profilo, vicine, site_url, indicatori=None):
+def province_markdown(profile, neighbours, site_url, indicators=None,
+                      gains=(), losses=(), first_in_region=(), last_in_region=()):
     """La stessa pagina provincia, per chi chiede `text/markdown`.
 
-    HTML e Markdown sono lo stesso documento alla stessa URL: una variante che
-    non porta la risposta principale della pagina e' una pagina diversa con lo
-    stesso canonico. Per questo la tabella dei valori veri sta anche qui: da
-    quando c'e', la risposta principale di questa pagina non e' piu' il
-    punteggio ma quanto vale ogni indicatore in questa provincia.
+    HTML e Markdown sono lo stesso documento alla stessa URL, quindi questa
+    funzione segue il template sezione per sezione, con le stesse cifre scritte
+    nello stesso modo. Fino al 23/9 era una pagina diversa: numeri col punto
+    decimale, "qualita'" con l'apostrofo, "13a" invece di "13ª", quattro sezioni
+    e la colonna Tema in meno.
     """
+    from app.seo_titles import at_place
+
+    name = profile["name"]
+    region = profile.get("region") or ""
+    total = profile["total"]
+    score = it_numbers.number(profile["score"])
+    kicker = "Qualità della vita"
+    if region:
+        kicker += f" · {region}"
+    if profile.get("metro_city"):
+        kicker += " · Città metropolitana"
+    lead = (f"Con il profilo {profile['profile'].get('name', '').lower()}, {name} "
+            f"ottiene {score} su 100.")
+    if profile.get("strongest"):
+        lead += f" Va meglio su {profile['strongest'][0]['name'].lower()}"
+        if profile.get("weakest"):
+            lead += f" e peggio su {profile['weakest'][0]['name'].lower()}"
+        lead += "."
     lines = [
-        f"# {profilo['name']}, qualita' della vita",
+        f"# {name} è {profile['rank']}ª su {total} province",
         "",
-        f"{profilo['name']} e' {profilo['rank']}a su {profilo['total']} province "
-        f"con il profilo {profilo['profile'].get('name', '').lower()}, "
-        f"punteggio {profilo['score']} su 100.",
+        kicker,
         "",
-        f"URL canonica: {_absolute(site_url, profilo['path'])}",
+        lead,
+        "",
+        f"URL canonica: {_absolute(site_url, profile['path'])}",
         "",
         "## Scheda",
         "",
-        f"- Posizione: {profilo['rank']} su {profilo['total']}",
-        f"- Punteggio: {profilo['score']} su 100, dove 50 e' la media",
+        f"- Posizione: {profile['rank']}ª su {total}",
+        f"- Punteggio: {score} su 100, dove 50 è la media",
     ]
-    if profilo.get("region"):
-        regione = profilo["region"]
-        if profilo.get("region_path"):
-            regione = f"[{regione}]({_absolute(site_url, profilo['region_path'])})"
-        lines.append(f"- Regione: {regione}")
-    lines.append(f"- Copertura: {round((profilo.get('coverage') or 0) * 100)}% degli indicatori del punteggio")
-    lines.append(f"- Fonte: {profilo['methodology'].get('source', 'Istat, BES dei Territori')}")
+    if region:
+        label = f"[{region}]({_absolute(site_url, profile['region_path'])})" if profile.get("region_path") else region
+        lines.append(f"- Regione: {label}")
+    if profile.get("metro_city"):
+        lines.append("- Città metropolitana: sì")
+    if profile.get("strongest"):
+        lines.append(f"- Forza: {profile['strongest'][0]['name']}")
+    if profile.get("weakest"):
+        lines.append(f"- Debole: {profile['weakest'][0]['name']}")
 
-    if profilo.get("categories"):
-        lines += ["", "## Le dimensioni, dalla piu' forte alla piu' debole", "",
+    if profile.get("categories"):
+        lines += ["", "## Le dimensioni, dalla più forte alla più debole", "",
                   "| dimensione | punteggio |", "| --- | ---: |"]
-        for voce in profilo["categories"]:
-            lines.append(f"| {voce['name']} | {voce['score']} |")
+        for entry in profile["categories"]:
+            lines.append(f"| {entry['name']} | {it_numbers.number(entry['score'])} |")
+        lines += ["", f"Punteggi da 0 a 100 sul profilo {profile['profile'].get('name', '').lower()}, "
+                      f"dove 50 è la media delle {total} province. Non è una classifica ufficiale."]
 
-    for titolo, elenco in (("Gli indicatori che la tirano su", profilo.get("top_positive")),
-                           ("Gli indicatori che la tirano giu'", profilo.get("top_negative"))):
-        if elenco:
-            lines += ["", f"## {titolo}", ""]
-            for voce in elenco:
-                anno = f" ({voce['year_max']})" if voce.get("year_max") else ""
-                lines.append(f"- [{voce['name']}]({_absolute(site_url, voce['path'])}){anno}")
-
-    if indicatori:
-        lines += ["", f"## Tutti gli indicatori misurati per {profilo['name']}", "",
-                  f"{len(indicatori)} indicatori del BES dei Territori, con il valore "
-                  "vero, l'anno e la posizione fra le province che quell'anno hanno "
-                  "un dato. 1 e' la posizione migliore.",
+    if indicators:
+        in_region = any(row.get("in_regione") for row in indicators)
+        lines += ["", f"## Tutti gli indicatori misurati {at_place(name)}", "",
+                  f"I {len(indicators)} indicatori del BES dei Territori con un dato per {name}: "
+                  "quanto valgono, in che anno, e in che posizione fra le province che quell'anno "
+                  "hanno un dato (1 è la migliore)."
+                  + (" Accanto alla posizione c'è quella fra le province della sua regione, "
+                     "con la media delle altre." if in_region else ""),
                   "",
-                  "| indicatore | valore | anno | posizione |", "| --- | ---: | ---: | ---: |"]
-        for voce in indicatori:
-            unita = f" {voce['unit']}" if voce.get("unit") else ""
-            lines.append(
-                f"| [{voce['name']}]({_absolute(site_url, voce['path'])}) "
-                f"| {voce['value']}{unita} | {voce['year']} "
-                f"| {voce['rank']} su {voce['province_count']} |")
+                  "| indicatore | tema | valore | posizione | movimento |",
+                  "| --- | --- | ---: | ---: | ---: |"]
+        for row in indicators:
+            decimals = row.get("decimals", 1)
+            value = it_numbers.number(row["value"], decimals)
+            unit = f" {row['unit']}" if row.get("unit") else ""
+            value_cell = f"{value}{unit}, {row['year']}"
+            if row.get("variazione") is not None:
+                value_cell += f", dal {row['year_from']} {it_numbers.change(row['variazione'], decimals)}"
+            rank_cell = f"{row['rank']} su {row['province_count']}"
+            if row.get("in_regione"):
+                ir = row["in_regione"]
+                rank_cell += (f", {ir['posizione']}ª di {ir['quante']} in {region}, media delle altre "
+                              f"{ir['quante'] - 1}: {it_numbers.number(ir['media'], decimals)}")
+            movement = row.get("movement")
+            move_cell = "-" if movement is None else ("=" if movement == 0 else f"{movement:+d}")
+            lines.append(f"| [{row['name']}]({_absolute(site_url, row['path'])}) | {row['theme']} "
+                         f"| {value_cell} | {rank_cell} | {move_cell} |")
 
-    if vicine:
+    def _value_list(title, rows):
+        lines.extend(["", f"## {title}", ""])
+        for row in rows:
+            unit = f" {row['unit']}" if row.get("unit") else ""
+            lines.append(f"- [{row['name']}]({_absolute(site_url, row['path'])}), "
+                         f"{it_numbers.number(row['value'], row.get('decimals', 1))}{unit}, {row['year']}")
+
+    if first_in_region or last_in_region:
+        if first_in_region:
+            _value_list("Prima della sua regione", first_in_region)
+        else:
+            lines += ["", "## Prima della sua regione", "",
+                      f"Su nessuno degli indicatori misurati {name} è la prima fra le province di {region}."]
+        if last_in_region:
+            _value_list("Ultima della sua regione", last_in_region)
+        else:
+            lines += ["", "## Ultima della sua regione", "",
+                      f"Su nessuno degli indicatori misurati {name} è l'ultima fra le province di {region}."]
+
+    if gains or losses:
+        lines += ["", "## Dove ha guadagnato posizioni", ""]
+        for row in gains:
+            lines.append(f"- [{row['name']}]({_absolute(site_url, row['path'])}), "
+                         f"+{row['movement']} posizioni, {row['rank']}ª nel {row['year']}")
+        lines += ["", "## Dove ne ha perse", ""]
+        for row in losses:
+            lines.append(f"- [{row['name']}]({_absolute(site_url, row['path'])}), "
+                         f"{row['movement']} posizioni, {row['rank']}ª nel {row['year']}")
+
+    for title, entries in (("Gli indicatori che la tirano su", profile.get("top_positive")),
+                           ("Gli indicatori che la tirano giù", profile.get("top_negative"))):
+        if entries:
+            lines += ["", f"## {title}", ""]
+            for entry in entries:
+                year = f" ({entry['year_max']})" if entry.get("year_max") else ""
+                lines.append(f"- [{entry['name']}]({_absolute(site_url, entry['path'])}){year}")
+
+    if neighbours:
         lines += ["", "## Le province che le stanno intorno in classifica", ""]
-        for voce in vicine:
-            lines.append(f"- {voce['rank']}a [{voce['name']}]({_absolute(site_url, voce['path'])}), {voce['score']}")
+        for entry in neighbours:
+            lines.append(f"- {entry['rank']}ª [{entry['name']}]({_absolute(site_url, entry['path'])}), "
+                         f"{it_numbers.number(entry['score'])}")
 
-    lines += ["", "## Metodo", "",
-              profilo["profile"].get("description", ""),
-              "",
-              f"Classifica completa: {_absolute(site_url, '/qualita-della-vita/classifica/province')}",
-              f"Metodologia: {_absolute(site_url, '/metodologia#qualita-della-vita')}"]
+    coverage = round((profile.get("coverage") or 0) * 100)
+    lines += ["", "## Fonti e metodo", "",
+              f"- Fonte: {profile['methodology'].get('source') or 'Istat, BES dei Territori'}",
+              f"- Come è calcolato: {profile['profile'].get('description', '')} I punteggi di dimensione "
+              f"sono standardizzati sulle {total} province e mostrati da 0 a 100, dove 50 è la media.",
+              f"- Copertura: {coverage}% degli indicatori del punteggio ha un dato per {name}.",
+              f"- Classifica completa: {_absolute(site_url, '/qualita-della-vita/classifica/province')}",
+              f"- Metodologia: {_absolute(site_url, '/metodologia#qualita-della-vita')}"]
     return "\n".join(lines)
 
 

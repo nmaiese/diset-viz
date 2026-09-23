@@ -5,7 +5,7 @@
 
 {# Il catalogo e' l'unica pagina il cui contenuto **e'** un conteggio, e il
    titolo non lo diceva. La marca cade come sugli altri hub. #}
-{% block title %}Catalogo dati: {{ datasets | length }} indicatori territoriali scaricabili{% endblock %}
+{% block title %}Catalogo dati: {{ datasets | length }} indicatori territoriali{% endblock %}
 {% block description %}{{ catalog_description }}{% endblock %}
 
 {% block head_extra %}
@@ -18,7 +18,7 @@
   {{ breadcrumb.trail(percorso) }}
   <h1>Catalogo dati di Divario Italia</h1>
   <p class="page-lead">{{ catalog_description }}</p>
-  <p class="page-note">Il catalogo collega {{ datasets | length }} dataset indicizzabili. Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>
+  <p class="page-note">Il catalogo collega {{ datasets | length }} dataset indicizzabili, {{ datasets | selectattr('downloadable') | list | length }} con la serie scaricabile in CSV e JSON. Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>
 
   <section aria-labelledby="dataset-title">
     <h2 id="dataset-title">Dataset disponibili</h2>
