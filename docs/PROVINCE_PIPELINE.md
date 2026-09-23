@@ -76,13 +76,13 @@ la fonte corretta per province e città metropolitane.
 ## Output (in `app/static/data/`)
 
 - **`Assoluti_Provincia.csv`** — stesse 12 colonne di `Assoluti_Regione.csv`, ma
-  `Area="Provincia"`. ~48.700 righe, 67 indicatori, 103 unità classificate, 2015-2024.
+  `Area="Provincia"`. ~50.300 righe, 67 indicatori, 107 unità classificate, 2015-2024.
   `idIndicatore` = codice BES (`DATA_TYPE`, es. `01SAL001`), `Tema` = dominio BES,
   `Dato` con la virgola decimale come nel dataset regionale.
 - **`province_manifest.csv`** — la mappa **auditabile**: per ogni indicatore il
   dataflow sorgente, il dominio BES, la **categoria QoL proposta**, la
   **direzione proposta**, l'unità, gli anni e la copertura provinciale.
-- **`province_codes.csv`** — le 103 unità classificate: codice NUTS3, nome normalizzato,
+- **`province_codes.csv`** — le 107 unità classificate, cioè i codici che hanno righe nella cache: codice NUTS3, nome normalizzato,
   slug (`province_key`), regione, flag città metropolitana.
 
 I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
@@ -107,12 +107,20 @@ I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
   `scripts/province_sources.py:CURATED_DIRECTION_BES`, come
   `app/indicator_notes.CURATED_DIRECTION` per i dati regionali. Il verso di un
   indicatore presente anche a livello regionale deve coincidere con quello di
-  `bes_regione_manifest.csv`: oggi non coincide su 18 indicatori.
+  `bes_regione_manifest.csv`. Sui 18 che non coincidevano il verso l'ha deciso
+  Nello il 23/9 (D1): e' quello provinciale, fissato in `CURATED_DIRECTION_BES`.
+  Il manifest regionale lo prende da li' alla prossima rigenerazione.
 - La codelist Istat `CL_ITTER107` porta sia le **province sarde pre-2016**
   (Ogliastra, Medio Campidano, Carbonia-Iglesias, Olbia-Tempio), con dati solo
   fino al 2019, sia i codici delle province nate dopo, `IT108`-`IT111` (Monza e
   della Brianza, Fermo, Barletta-Andria-Trani, Sud Sardegna), che nella cache
-  hanno dati fino all'edizione 2025.
+  hanno dati fino all'edizione 2025 ed entrano in classifica. Porta anche
+  `IT113` e `IT119` (Gallura Nord-Est Sardegna, Sulcis Iglesiente), senza righe:
+  restano fuori, e la nota di copertura pubblica li nomina, calcolata da
+  `province_profile.unmeasured_provinces`.
+- Nella codelist Bolzano e Trento hanno come genitore la loro provincia
+  autonoma (`ITD1`, `ITD2`): `build_province_dataset` li mette nel Trentino Alto
+  Adige, scritto come in `app/data.py`.
 - `BES_08` (benessere soggettivo) non è mappato a una categoria (resta contesto).
 
 ## Visualizzazione (già attiva)
@@ -135,11 +143,11 @@ Che cosa entra nello score:
   `scripts/province_sources.py:CURATED_DIRECTION_BES` (correggono sia gli errori
   dell'euristica, es. "mancata partecipazione" e "raccolta differenziata", sia i
   contestuali). Restano fuori gli indicatori privi di etichetta leggibile;
-- le province che passano `NUTS3_PATTERN` (`scripts/province_sources.py`), meno le
-  quattro sarde soppresse prima del 2016 (`DEFUNCT_PROVINCES`). La regex non
-  riconosce i codici `IT1xx`, quindi oggi scarta anche `IT108`-`IT111`, che nella
-  cache hanno i dati: non è una scelta. Il denominatore di copertura è scritto a
-  mano in `build_province_dataset.py`;
+- le province che passano `NUTS3_PATTERN` (`scripts/province_sources.py`, anche
+  i codici `IT1xx`) **e hanno righe nella cache**, meno le quattro sarde
+  soppresse prima del 2016 (`DEFUNCT_PROVINCES`). Fino al 23/9/2026 la regex
+  scartava `IT108`-`IT111`. Il denominatore di copertura si calcola dalle
+  province con dati;
 - **campioni per categoria**: la pagina mostra la provincia che guida ogni
   categoria, per far emergere le specializzazioni;
 - nessuno stretch artificiale dei punteggi: la cura delle direzioni basta a

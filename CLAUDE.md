@@ -58,7 +58,7 @@ server-rendered**, non l'atlante: l'atlante sta a `/atlante` (sorgente in
 `/confronto`. Ogni indicatore di ogni famiglia a
 `/indicatore/<slug>/<acronimo>-<id>`, servito da **un template su un view
 model**; i temi a `/temi` e `/tema/<slug>`; le regioni a `/regioni` e
-`/regione/<key>`; le 103 province a `/provincia/<key>`; il blog a `/blog`, col suo
+`/regione/<key>`; le 107 province a `/provincia/<key>`; il blog a `/blog`, col suo
 feed a `/blog/feed.xml`; l'hub editoriale a `/divari-regionali`;
 la ricerca a `/ricerca`; la dashboard D3 originale a `/legacy` (non va rotta);
 l'API JSON sotto `/api/`. Le verità rotta per rotta

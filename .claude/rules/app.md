@@ -20,7 +20,7 @@ paths:
   successo.
 - `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
-- `/provincia/<key>` — il profilo di una delle 103 province misurate dal BES:
+- `/provincia/<key>` — il profilo di una delle 107 province misurate dal BES:
   posizione, punteggio, le dodici dimensioni, **i valori veri di tutti i 67
   indicatori** con unita', anno e posizione fra le province, dove e' prima e
   dove e' ultima fra le province della sua regione, gli indicatori che la
