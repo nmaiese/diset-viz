@@ -45,8 +45,10 @@ paths:
   `content/posts/`.
 - `/blog/feed.xml` — il feed RSS 2.0 del blog, con `/feed.xml` e `/rss.xml` che
   ci arrivano con un 301. Le date vanno in RFC 822, non nell'ISO della sitemap.
-- `/qualita-della-vita`, `/classifica`, `/metodologia`, `/province` — pagine
-  qualità della vita, regionali e provinciali.
+- `/qualita-della-vita`, `/qualita-della-vita/classifica/<regioni|province>`,
+  `/qualita-della-vita/metodologia` — l'indice e le due classifiche della
+  qualità della vita (`?profilo=` sceglie i pesi). `/qualita-della-vita/province`
+  è un 301 verso la classifica provinciale.
 - `/indicatore/<slug>/<acronimo>-<id>` — ogni indicatore, di ogni famiglia
   (`ter`, `bes`, `ims`, `eur`, `dem`). Keyword-first per la SEO: lo slug umano
   guida, il codice risolve. Il codice è l'ultimo segmento e porta l'id, quindi

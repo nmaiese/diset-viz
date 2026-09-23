@@ -102,13 +102,17 @@ I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
 
 ## Note di qualità e limiti
 
-- **Direzione e categoria sono PROPOSTE**, non definitive: l'euristica sui nomi
-  italiani sbaglia sui casi ambigui (32 indicatori restano `contextual`). Vanno
-  riviste a mano nella fase di integrazione, esattamente come
-  `app/indicator_notes.CURATED_DIRECTION` per i dati regionali.
-- La Sardegna è codificata con le **province pre-2016** (Ogliastra, Medio
-  Campidano, Carbonia-Iglesias) perché così le pubblica la codelist Istat
-  `CL_ITTER107` di questo dataflow. Non c'è "Sud Sardegna".
+- **Direzione e categoria nascono da un'euristica** sui nomi italiani, che sbaglia
+  sui casi ambigui. Le correzioni stanno in
+  `scripts/province_sources.py:CURATED_DIRECTION_BES`, come
+  `app/indicator_notes.CURATED_DIRECTION` per i dati regionali. Il verso di un
+  indicatore presente anche a livello regionale deve coincidere con quello di
+  `bes_regione_manifest.csv`: oggi non coincide su 18 indicatori.
+- La codelist Istat `CL_ITTER107` porta sia le **province sarde pre-2016**
+  (Ogliastra, Medio Campidano, Carbonia-Iglesias, Olbia-Tempio), con dati solo
+  fino al 2019, sia i codici delle province nate dopo, `IT108`-`IT111` (Monza e
+  della Brianza, Fermo, Barletta-Andria-Trani, Sud Sardegna), che nella cache
+  hanno dati fino all'edizione 2025.
 - `BES_08` (benessere soggettivo) non è mappato a una categoria (resta contesto).
 
 ## Visualizzazione (già attiva)
@@ -126,19 +130,20 @@ delta-rank, campioni e classifiche per categoria), con loader
 direttamente, senza passare da `app/data.py` e senza toccare la soglia
 `len(regions)==20` del catalogo regionale.
 
-Stato attuale:
-- **64 indicatori su 67** entrano nello score: le direzioni sono curate a mano in
+Che cosa entra nello score:
+- gli indicatori con un verso: le direzioni curate a mano stanno in
   `scripts/province_sources.py:CURATED_DIRECTION_BES` (correggono sia gli errori
   dell'euristica, es. "mancata partecipazione" e "raccolta differenziata", sia i
-  contestuali). Restano fuori 3 indicatori privi di etichetta leggibile.
-- **103 province**: le 4 province sarde soppresse prima del 2016 sono escluse
-  (`DEFUNCT_PROVINCES`), e Sud Sardegna non è in questa edizione del BES, quindi il
-  denominatore di copertura è 103.
-- **Campioni per categoria**: la pagina mostra la provincia che guida ogni
-  categoria, per far emergere le specializzazioni (es. Cagliari sull'ambiente).
-- Distribuzione punteggi dopo la cura: media 50, deviazione standard ~14, range
-  ~22-75. La cura delle direzioni ha già ridotto la compressione, quindi non
-  applichiamo stretch artificiali.
+  contestuali). Restano fuori gli indicatori privi di etichetta leggibile;
+- le province che passano `NUTS3_PATTERN` (`scripts/province_sources.py`), meno le
+  quattro sarde soppresse prima del 2016 (`DEFUNCT_PROVINCES`). La regex non
+  riconosce i codici `IT1xx`, quindi oggi scarta anche `IT108`-`IT111`, che nella
+  cache hanno i dati: non è una scelta. Il denominatore di copertura è scritto a
+  mano in `build_province_dataset.py`;
+- **campioni per categoria**: la pagina mostra la provincia che guida ogni
+  categoria, per far emergere le specializzazioni;
+- nessuno stretch artificiale dei punteggi: la cura delle direzioni basta a
+  ridurre la compressione (media 50 per costruzione).
 
 ## Seconda fonte: valutata, non integrata (per scelta)
 
@@ -157,13 +162,5 @@ disponibile come futuro layer "dinamismo economico" per il profilo *Opportunità
 coi soli indicatori relativi. Le dimensioni che darebbero varietà territoriale
 (ambiente, servizi, trasporti, digitale, turismo a livello provinciale) non sono un
 singolo dataflow consolidato, solo flussi sparsi mono-tema.
-
-## Prossima fase
-
-- pagina di dettaglio per singola provincia e geometrie NUTS3 (GeoJSON) per le mappe;
-- eventuale layer SIR "dinamismo economico" (vedi sopra), opt-in e ben etichettato.
-- integrazione di fonti verticali provinciali 2025 solo tramite il layer esterno
-  (`app/static/data/external/`), senza fondere righe provinciali nel dataset
-  regionale e senza usare dati assoluti nello scoring.
 
 Vedi anche [`docs/DATA_PIPELINE.md`](DATA_PIPELINE.md) per lo strato dati regionale.
