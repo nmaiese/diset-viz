@@ -114,7 +114,8 @@ def rank(position, total=None, of: str | None = None) -> Markup:
     tail = ""
     if total is not None:
         tail = f'<span class="n__u">{THIN}su {int(total)}{(" " + escape(of)) if of else ""}</span>'
-    return Markup(f'<span class="n n--rank"><data value="{int(position)}">{int(position)}</data>'
+    pos = round(float(position))  # una posizione media di 13,9 si scrive 14ª, come nei title
+    return Markup(f'<span class="n n--rank"><data value="{pos}">{pos}</data>'
                   f'<span class="n__o">ª</span>{tail}</span>')
 
 

@@ -206,6 +206,10 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .toc a { display: block; padding: 6px 0 6px var(--space-3); margin-left: -1px; border-left: 3px solid transparent; color: var(--text-2); text-decoration: none; }
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
+/* Sotto i 1200 alla testata si aggiunge la barra delle sezioni: un'ancora non
+   deve far finire il titolo sotto l'una o l'altra. */
+@media (max-width: 1199px) { html { scroll-padding-top: calc(var(--masthead-s) + 60px); } }
+@media (min-width: 960px) and (max-width: 1199px) { html { scroll-padding-top: calc(var(--masthead-l) + 60px); } }
 @media (max-width: 1199px) {
   /* Un elemento sticky resta dentro il suo contenitore: dentro l'aside (alto
      quanto l'indice) o in una cella di griglia non resterebbe mai in alto.
@@ -606,7 +610,9 @@ body.has-proto { padding-bottom: 96px; }
 
 /* ---------- i grafici: testo a grandezza vera, colori solo da token ---------- */
 .chart { max-width: 920px; }
-.chart svg text { font-family: var(--font-num); font-variant-numeric: lining-nums tabular-nums; }
+/* Nei grafici le etichette non stanno in colonna: cifre proporzionali, che con
+   alcuni caratteri (Schibsted) le tabellari spaziano troppo. */
+.chart svg text { font-family: var(--font-num); font-variant-numeric: lining-nums proportional-nums; }
 .chart__l svg { max-width: 920px; }
 .chart--hero { margin-top: var(--space-2); }
 

@@ -311,8 +311,28 @@ if (mode === "prima") {
   try {
     for (const w of widths.split(",")) {
       const viewport = { width: Number(w), height: Number(w) > 600 ? 900 : 800, deviceScaleFactor: Number(w) > 600 ? 1 : 2, mobile: Number(w) <= 600 };
-      const info = await capture(cdp, url, { viewport, theme: "light" }, `${prefix}-${w}`);
+      const initScript = "document.documentElement.dataset.shot='1'" + (process.env.FONT ? `;document.documentElement.dataset.font=${JSON.stringify(process.env.FONT)}` : "");
+      const info = await capture(cdp, url, { viewport, theme: process.env.THEME || "light", initScript }, `${prefix}-${w}`);
       console.log(`${prefix} ${w}: ${info.h}px`);
+    }
+  } finally { cdp.close(); }
+} else if (mode === "sticky") {
+  // A 375 pixel, scorsa la pagina a 3000: la barra delle sezioni deve stare
+  // subito sotto la testata.
+  const cdp = await launch();
+  try {
+    for (const name of (process.argv[3] || "indicatore,regione,articolo").split(",")) {
+      const viewport = { width: 375, height: 800, deviceScaleFactor: 1, mobile: true };
+      const { s, sessionId, targetId } = await openPage(cdp, { viewport, theme: "light" });
+      const loaded = cdp.waitFor("Page.loadEventFired", sessionId);
+      await s("Page.navigate", { url: pathToFileURL(join(V1, "dist", "pagine", `${name}.html`)).href });
+      await loaded;
+      const r = await evaluate(s, `(async () => { scrollTo(0, 3000); await new Promise(r => setTimeout(r, 300));
+        const t = document.querySelector('.toc'), m = document.querySelector('.mast');
+        return { toc: t ? Math.round(t.getBoundingClientRect().top) : null, mast: Math.round(m.getBoundingClientRect().bottom),
+                 current: t && t.querySelector('[aria-current]') ? t.querySelector('[aria-current]').textContent.trim() : null }; })()`);
+      console.log(`${name}: barra a ${r.toc}px, testata finisce a ${r.mast}px, voce corrente: ${r.current}`);
+      await cdp.send("Target.closeTarget", { targetId });
     }
   } finally { cdp.close(); }
 } else if (mode === "check") {

@@ -134,7 +134,7 @@ def cover(pages: list[str]) -> str:
   </div>
   <div class="cover__open prose">
     <h2>Da decidere guardando i prototipi</h2>
-    <p>Il numero chiave della regione. Il titolo della Puglia usa ancora la posizione media sugli indicatori, come oggi, e la prima tessera mostra la posizione nella qualità della vita, che è il numero chiave delle province. Le due forme sono sulla stessa pagina per sceglierne una: cambia il titolo di venti pagine.</p>
+    <p>Il numero chiave della regione. Il titolo della Puglia usa ancora la posizione media sugli indicatori, come oggi, e la striscia che apre la pagina mostra la posizione nella qualità della vita, che è il numero chiave delle province. Le due forme sono sulla stessa pagina per sceglierne una: cambia il titolo di venti pagine.</p>
     <p>Gli spazi pubblicitari sono segnaposto. Perché restino dove sono disegnati, gli annunci automatici di AdSense vanno spenti dalla console.</p>
   </div>
 </main>
