@@ -239,7 +239,8 @@ async function check() {
           await s("Page.navigate", { url: pathToFileURL(file).href });
           await loaded;
           await evaluate(s, "document.documentElement.dataset.shot='1'");
-          await evaluate(s, "document.fonts.ready.then(() => 1)");
+          if (process.env.FONT) await evaluate(s, `document.documentElement.dataset.font=${JSON.stringify(process.env.FONT)}`);
+          await evaluate(s, "document.fonts.ready.then(() => new Promise(r => setTimeout(r, 150)))");
           const o = await evaluate(s, OVERFLOW);
           if (o.SW > o.W) { failures++; console.log(`SFORA ${name} ${width} ${tname}: ${o.SW} su ${o.W}`, o.bad); }
           await cdp.send("Target.closeTarget", { targetId });

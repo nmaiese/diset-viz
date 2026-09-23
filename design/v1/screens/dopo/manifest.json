@@ -3,26 +3,70 @@
   "blocked": [],
   "shots": [
     {
-      "page": "indicatore",
-      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/indicatore.html",
+      "page": "home",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/home.html",
       "viewport": 375,
       "theme": null,
-      "h": 12486,
+      "h": 11403,
       "w": 375,
       "sw": 375,
-      "foldBytes": 98396,
-      "fullBytes": 613034
+      "foldBytes": 78360,
+      "fullBytes": 472785
+    },
+    {
+      "page": "home",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/home.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 11403,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 74914,
+      "fullBytes": 458795
+    },
+    {
+      "page": "home",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/home.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 7177,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 59432,
+      "fullBytes": 661418
+    },
+    {
+      "page": "home",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/home.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 7177,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 57200,
+      "fullBytes": 644350
     },
     {
       "page": "indicatore",
       "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/indicatore.html",
       "viewport": 375,
       "theme": null,
-      "h": 12486,
+      "h": 12462,
       "w": 375,
       "sw": 375,
-      "foldBytes": 95794,
-      "fullBytes": 592039
+      "foldBytes": 98440,
+      "fullBytes": 613939
+    },
+    {
+      "page": "indicatore",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/indicatore.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 12462,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 95800,
+      "fullBytes": 592810
     },
     {
       "page": "indicatore",
@@ -32,8 +76,8 @@
       "h": 8956,
       "w": 1440,
       "sw": 1440,
-      "foldBytes": 75664,
-      "fullBytes": 795584
+      "foldBytes": 76042,
+      "fullBytes": 796635
     },
     {
       "page": "indicatore",
@@ -43,8 +87,228 @@
       "h": 8956,
       "w": 1440,
       "sw": 1440,
-      "foldBytes": 72840,
-      "fullBytes": 769855
+      "foldBytes": 73108,
+      "fullBytes": 770838
+    },
+    {
+      "page": "regione",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/regione.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 12339,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 98136,
+      "fullBytes": 512629
+    },
+    {
+      "page": "regione",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/regione.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 12339,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 94262,
+      "fullBytes": 496659
+    },
+    {
+      "page": "regione",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/regione.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 13132,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 75042,
+      "fullBytes": 1574786
+    },
+    {
+      "page": "regione",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/regione.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 13132,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 72408,
+      "fullBytes": 1545087
+    },
+    {
+      "page": "provincia",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/provincia.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 11302,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 79390,
+      "fullBytes": 510631
+    },
+    {
+      "page": "provincia",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/provincia.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 11302,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 76320,
+      "fullBytes": 495907
+    },
+    {
+      "page": "provincia",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/provincia.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 10084,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 71370,
+      "fullBytes": 1090282
+    },
+    {
+      "page": "provincia",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/provincia.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 10084,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 68786,
+      "fullBytes": 1062594
+    },
+    {
+      "page": "articolo",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/articolo.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 13066,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 96048,
+      "fullBytes": 721401
+    },
+    {
+      "page": "articolo",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/articolo.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 13066,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 93286,
+      "fullBytes": 699627
+    },
+    {
+      "page": "articolo",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/articolo.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 9804,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 79388,
+      "fullBytes": 982339
+    },
+    {
+      "page": "articolo",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/articolo.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 9804,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 77462,
+      "fullBytes": 956713
+    },
+    {
+      "page": "classifica",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/classifica.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 10481,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 82452,
+      "fullBytes": 460193
+    },
+    {
+      "page": "classifica",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/classifica.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 10481,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 77982,
+      "fullBytes": 445560
+    },
+    {
+      "page": "classifica",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/classifica.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 5672,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 66104,
+      "fullBytes": 516985
+    },
+    {
+      "page": "classifica",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/classifica.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 5672,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 63754,
+      "fullBytes": 503038
+    },
+    {
+      "page": "qualita-della-vita",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/qualita-della-vita.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 10361,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 80802,
+      "fullBytes": 455933
+    },
+    {
+      "page": "qualita-della-vita",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/qualita-della-vita.html",
+      "viewport": 375,
+      "theme": null,
+      "h": 10361,
+      "w": 375,
+      "sw": 375,
+      "foldBytes": 77256,
+      "fullBytes": 441360
+    },
+    {
+      "page": "qualita-della-vita",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/qualita-della-vita.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 6145,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 69238,
+      "fullBytes": 557132
+    },
+    {
+      "page": "qualita-della-vita",
+      "url": "file:///home/nilo/dev/sites/diset-viz/design/v1/dist/pagine/qualita-della-vita.html",
+      "viewport": 1440,
+      "theme": null,
+      "h": 6145,
+      "w": 1440,
+      "sw": 1440,
+      "foldBytes": 66080,
+      "fullBytes": 541552
     }
   ]
 }
