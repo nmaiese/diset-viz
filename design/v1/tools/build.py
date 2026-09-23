@@ -44,7 +44,15 @@ PAGES = {
     "articolo": {"label": "Articolo", "active": "storie"},
     "classifica": {"label": "Classifica", "active": "qualita"},
     "qualita-della-vita": {"label": "Qualità della vita", "active": "qualita"},
+    # Gli stati difficili: stesso template, altro contesto. Non vanno nella barra.
+    "indicatore-senza-prosa": {"label": "Scheda senza prosa", "active": "temi", "template": "indicatore", "variant": True},
+    "indicatore-due-livelli": {"label": "Scheda a due livelli", "active": "temi", "template": "indicatore", "variant": True},
+    "indicatore-province": {"label": "Scheda solo provinciale", "active": "temi", "template": "indicatore", "variant": True},
 }
+
+
+def template_of(name: str) -> str:
+    return PAGES[name].get("template", name)
 
 NAV = [
     {"key": "territori", "label": "Territori", "group": [
@@ -164,9 +172,9 @@ def derive_for(name: str, ctx: dict) -> dict:
 def render_page(env, flask_app, state, href, name: str) -> str:
     payload = load_context(name)
     ctx = payload["context"]
-    d = derive_for(name, ctx)
+    d = derive_for(template_of(name), ctx)
     state["page"] = name
-    template = env.get_template(f"pages/{name}.html.j2")
+    template = env.get_template(f"pages/{template_of(name)}.html.j2")
     with flask_app.test_request_context(payload["route"]):
         html = template.render(**ctx, d=d, active=PAGES[name]["active"], footer=footer(href), page_key=name)
     # I link scritti nella prosa arrivano gia' in HTML: si portano al prototipo
@@ -179,7 +187,7 @@ def proto_bar(mode: str, current: str | None) -> str:
     if mode == "artifact":
         links.append(f'<a href="#copertina"{" aria-current=\"page\"" if current == "copertina" else ""}>Copertina</a>')
     for key, spec in PAGES.items():
-        if not (SRC / "pages" / f"{key}.html.j2").exists():
+        if spec.get("variant") or not (SRC / "pages" / f"{key}.html.j2").exists():
             continue
         target = f"#{key}" if mode == "artifact" else f"{key}.html"
         cur = ' aria-current="page"' if key == current else ""
@@ -218,7 +226,7 @@ def build_pages(only: list[str] | None = None) -> list[Path]:
     for name, spec in PAGES.items():
         if only and name not in only:
             continue
-        if not (SRC / "pages" / f"{name}.html.j2").exists():
+        if not (SRC / "pages" / f"{template_of(name)}.html.j2").exists():
             continue
         body = render_page(env, flask_app, state, href, name)
         head = json.loads((DATA / f"{name}.head.json").read_text(encoding="utf-8"))
@@ -231,7 +239,7 @@ def build_pages(only: list[str] | None = None) -> list[Path]:
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             f'<link rel="stylesheet" href="{fonts}">\n'
-            f"<script>{THEME_BOOT}</script>\n<style>\n{css}\n{page_css(name)}\n</style>\n{jsonld}\n</head>\n"
+            f"<script>{THEME_BOOT}</script>\n<style>\n{css}\n{page_css(template_of(name))}\n</style>\n{jsonld}\n</head>\n"
             f'<body class="has-proto" data-page="{name}">\n{body}\n{proto_bar("pagine", name)}\n<script>\n{js}\n</script>\n</body>\n</html>\n'
         )
         target = out / f"{name}.html"

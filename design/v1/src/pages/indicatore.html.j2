@@ -56,7 +56,7 @@
         <figure class="module" data-explore>
           <figcaption class="module__head">
             <h3 class="h-sub" data-claim>{{ d.claim }}</h3>
-            <p class="subline">{{ meta.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} dal valore più alto al più basso{% if meta.direction in ('lower_better', 'higher_worse') %}, che qui è il migliore{% endif %}.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} {% if meta.direction in ('lower_better', 'higher_worse') %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
           </figcaption>
           <div class="toolbar">
             {% if levels | length > 1 %}

@@ -17,7 +17,7 @@ import re
 from html import escape
 
 from app.data import REGION_GEO_AREA
-from app.seo_titles import format_number
+from app.seo_titles import format_number, of_region
 
 PLACEHOLDER = "[dato da calcolare]"
 MEZZOGIORNO = {key for key, area in REGION_GEO_AREA.items() if area in ("Sud", "Isole")}
@@ -33,15 +33,54 @@ def num(value) -> str:
 
 
 def short_unit(unit: str | None) -> str | None:
-    """L'unita' che si attacca alla cifra, o None se va nell'etichetta."""
+    """L'unita' come si scrive accanto a una cifra.
+
+    "euro" resta "euro", "Numero medio di anni" diventa "anni", "Per 10.000
+    occupati" diventa "per 10.000 occupati", che accanto a "12,4" si legge. Le
+    unita' piu' lunghe non si accorciano a occhio: restano nel sottotitolo.
+    """
     unit = (unit or "").strip()
     if not unit:
         return None
     if unit == "%" or unit.startswith("%"):
         return "%"
-    if len(unit) > 14:
-        return None
-    return unit
+    m = re.match(r"(?i)numero medio di (.+)", unit)
+    if m:
+        return m.group(1)
+    lowered = unit[:1].lower() + unit[1:]
+    if lowered.startswith("per "):
+        return lowered
+    if len(unit) <= 14:
+        return unit
+    if len(unit) <= 24:
+        return lowered
+    return None
+
+
+def of_place(name: str, level_key: str) -> str:
+    """"della Basilicata", "del Piemonte" per le regioni, "di Milano" per le province."""
+    if level_key == "regione":
+        return of_region(name)
+    if name.startswith("L'"):
+        return f"dell'{name[2:]}"
+    if name.startswith("La "):
+        return f"della {name[3:]}"
+    return f"di {name}"
+
+
+def the_place(name: str, level_key: str) -> str:
+    """"il Trentino Alto Adige", "la Calabria", "l'Umbria" per le regioni, il nome nudo per le province."""
+    if level_key != "regione":
+        return name
+    of = of_region(name)
+    return {"del ": "il ", "dell'": "l'", "della ": "la ", "delle ": "le "}.get(
+        next(p for p in ("delle ", "della ", "dell'", "del ") if of.startswith(p)), "") + name
+
+
+def del_(text: str) -> str:
+    """"del 3,6%" ma "dell'11,3%" e "dell'8%": l'articolo davanti a una cifra si
+    elide quando la cifra si legge con una vocale."""
+    return "dell'" if re.match(r"(8|11)|1(?![\d.])", text) else "del "
 
 
 def with_unit(value, unit: str | None) -> str:
@@ -320,9 +359,11 @@ def indicator(ctx: dict) -> dict:
         elif r >= 2:
             what = "più che raddoppiata"
         elif stats["avg_change_pct"] > 0:
-            what = f"cresciuta del {num(stats['avg_change_pct'])}%"
+            pct = num(stats["avg_change_pct"]) + "%"
+            what = f"cresciuta {del_(pct)}{pct}"
         else:
-            what = f"scesa del {num(abs(stats['avg_change_pct']))}%"
+            pct = num(abs(stats["avg_change_pct"])) + "%"
+            what = f"scesa {del_(pct)}{pct}"
         gap = stats.get("gap_trend")
         gap_text = ""
         if gap is not None and stats.get("year_min_gap_abs"):
@@ -335,11 +376,13 @@ def indicator(ctx: dict) -> dict:
         series_claim = f"Dal {stats['year_min']} al {stats['year_max']} la media semplice è {what}{gap_text}"
     series_note = None
     hd, ld = stats.get("highest_delta"), stats.get("lowest_delta")
+    lk = level["key"]
     if hd and ld and hd.get("kind") == "aumento" and ld.get("kind") == "aumento":
-        series_note = (f"Su tutto il periodo cresce di più {hd['name']} ({signed(hd['delta'], change_unit)}), "
-                       f"di meno {ld['name']} ({signed(ld['delta'], change_unit)}).")
+        series_note = (f"Su tutto il periodo cresce di più {the_place(hd['name'], lk)} ({signed(hd['delta'], change_unit)}), "
+                       f"di meno {the_place(ld['name'], lk)} ({signed(ld['delta'], change_unit)}).")
     elif hd and ld:
-        series_note = f"Su tutto il periodo la variazione va da {signed(ld['delta'], change_unit)} di {ld['name']} a {signed(hd['delta'], change_unit)} di {hd['name']}."
+        series_note = (f"Su tutto il periodo la variazione va da {signed(ld['delta'], change_unit)} {of_place(ld['name'], lk)} "
+                       f"a {signed(hd['delta'], change_unit)} {of_place(hd['name'], lk)}.")
 
     values = [o["value"] for o in level.get("observations") or [] if o.get("value") is not None]
     explore_js = {
