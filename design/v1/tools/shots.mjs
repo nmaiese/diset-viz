@@ -277,6 +277,24 @@ if (mode === "prima") {
     const f = join(dist, `${name}.html`);
     return existsSync(f) ? pathToFileURL(f).href : null;
   }, { initScript: "document.documentElement.dataset.shot='1'" });
+} else if (mode === "artifact") {
+  // Il file unico dell'Artifact, avvolto come lo avvolge claude.ai, con
+  // l'ancora di ogni pagina: controlla che il router mostri la sezione giusta.
+  const file = join(V1, "dist", "artifact", "divario-italia-1-0.html");
+  const { readFileSync } = await import("node:fs");
+  const wrapped = join(tmpdir(), "divario-artifact.html");
+  writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>' + readFileSync(file, "utf-8") + "</body></html>");
+  const outDir = join(V1, "screens", "artifact");
+  mkdirSync(outDir, { recursive: true });
+  const cdp = await launch();
+  try {
+    for (const hash of (process.argv[3] || "copertina,indicatore").split(",")) {
+      for (const vw of ["1440", "375"]) {
+        const info = await capture(cdp, pathToFileURL(wrapped).href + "#" + hash, { viewport: VIEWPORTS[vw], theme: "light" }, join(outDir, `${hash}-${vw}`));
+        console.log(`artifact ${hash} ${vw}: ${info.h}px`);
+      }
+    }
+  } finally { cdp.close(); }
 } else if (mode === "check") {
   await check();
 } else {
