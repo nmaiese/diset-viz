@@ -1672,14 +1672,19 @@ def _quality_life_row_count(level):
 def quality_life_index():
     preview = qb.build_bes_ranking(URL_LEVEL["regioni"], qb.DEFAULT_PROFILE)
     preview_rows = preview["ranking"][:3] if preview else []
+    province_ranking = qb.build_bes_ranking(URL_LEVEL["province"], qb.DEFAULT_PROFILE)
     return render_template(
         "quality_life_index.html",
+        province_preview=[
+            {**row, "path": f"/provincia/{row['key']}"}
+            for row in (province_ranking["ranking"][:3] if province_ranking else [])
+        ],
         categories=qb.get_quality_life_categories(),
         profiles=qb.get_quality_life_profiles(),
         default_profile=qb.DEFAULT_PROFILE,
         preview_rows=preview_rows,
         has_province_data=qb.has_bes_data(URL_LEVEL["province"]),
-        # I due conteggi servono al `<title>`: "20 regioni e 103 province" dice
+        # I due conteggi servono al `<title>`: "20 regioni e 107 province" dice
         # che cosa si trova, il nome del sito no. La classifica provinciale e'
         # gia' costruita e memoizzata da `/qualita-della-vita/classifica`.
         region_total=len(preview["ranking"]) if preview else 0,
@@ -2436,6 +2441,7 @@ def llms_txt():
         "## Sezioni principali",
         f"- [Atlante degli indicatori]({SITE_URL}/atlante): mappa interattiva e catalogo regionale degli indicatori territoriali.",
         f"- [Regioni]({SITE_URL}/regioni): profilo di ogni regione italiana con i suoi indicatori chiave.",
+        f"- [Province]({SITE_URL}/province): profilo di ognuna delle {province_profile.total()} province, con i valori veri degli indicatori del BES dei Territori.",
         f"- [Temi]({SITE_URL}/temi): indicatori raggruppati per area, da economia e lavoro a demografia, salute e istruzione.",
         f"- [Qualita della vita]({SITE_URL}/qualita-della-vita): classifiche di regioni e province con pesi e metodo dichiarati.",
         f"- [Metodologia e fonti]({SITE_URL}/metodologia): metodo, fonti Istat, criteri di qualita e limiti dei confronti.",
@@ -2547,6 +2553,22 @@ def llms_full_txt():
         block = _llms_indicator_full_block(indicator_id)
         if block:
             lines.append(block)
+
+    # Le province, regione per regione: stavano solo nella sitemap, e un
+    # modello che leggeva questo corpus non sapeva che esistessero.
+    lines.append("## Province")
+    lines.append("")
+    lines.append(
+        f"Il profilo di ognuna delle {province_profile.total()} province misurate dal BES dei "
+        "Territori di Istat: valori veri degli indicatori, posizione fra le province e "
+        f"confronto con le altre province della stessa regione. Indice: {SITE_URL}/province")
+    lines.append("")
+    overview = profiles.regions_overview()
+    for region_key, provinces in province_profile.by_region().items():
+        if provinces:
+            names = ", ".join(f"[{p['name']}]({SITE_URL}{p['path']})" for p in provinces)
+            lines.append(f"- {overview[region_key]['region']}: {names}")
+    lines.append("")
 
     lines.append("## Catalogo completo degli indicatori indicizzabili")
     lines.append("")

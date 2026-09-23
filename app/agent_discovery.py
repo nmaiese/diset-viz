@@ -99,6 +99,13 @@ def openapi_document(site_url):
         "description": "ID del catalogo, per esempio 901, bes:01SAL001 o eur:rd_e_gerdreg.",
         "schema": {"type": "string"},
     }
+    level_parameter = {
+        "name": "level",
+        "in": "path",
+        "required": True,
+        "description": "Livello territoriale.",
+        "schema": {"type": "string", "enum": ["regioni", "province"]},
+    }
     year_parameter = {
         "name": "year",
         "in": "path",
@@ -154,6 +161,7 @@ def openapi_document(site_url):
             "/api/indicator/{indicator_id}": {
                 "get": {
                     "summary": "Restituisce metadati e serie completa di un indicatore",
+                    "description": "La serie servita e' quella regionale. I valori provinciali stanno nelle pagine /provincia/<key>, anche in Markdown.",
                     "operationId": "getIndicator",
                     "parameters": [indicator_parameter],
                     "responses": json_responses,
@@ -164,6 +172,38 @@ def openapi_document(site_url):
                     "summary": "Restituisce i valori territoriali di un indicatore in un anno",
                     "operationId": "getIndicatorYear",
                     "parameters": [indicator_parameter, year_parameter],
+                    "responses": json_responses,
+                }
+            },
+            "/api/quality-life/{level}/rankings": {
+                "get": {
+                    "summary": "Classifica della qualita' della vita, profilo predefinito",
+                    "operationId": "getQualityLifeRanking",
+                    "parameters": [level_parameter],
+                    "responses": json_responses,
+                }
+            },
+            "/api/quality-life/{level}/rankings/{profile}": {
+                "get": {
+                    "summary": "Classifica della qualita' della vita con un altro profilo di pesi",
+                    "operationId": "getQualityLifeRankingByProfile",
+                    "parameters": [level_parameter, {
+                        "name": "profile", "in": "path", "required": True,
+                        "description": "Slug del profilo, da /api/quality-life/profiles.",
+                        "schema": {"type": "string"},
+                    }],
+                    "responses": json_responses,
+                }
+            },
+            "/api/quality-life/{level}/{key}": {
+                "get": {
+                    "summary": "Punteggio, posizione e categorie di una regione o di una provincia",
+                    "operationId": "getQualityLifeTerritory",
+                    "parameters": [level_parameter, {
+                        "name": "key", "in": "path", "required": True,
+                        "description": "Chiave del territorio, per esempio lombardia o lecce. L'elenco delle province e' in /province.",
+                        "schema": {"type": "string"},
+                    }],
                     "responses": json_responses,
                 }
             },
@@ -178,6 +218,7 @@ def openapi_document(site_url):
             "/download/indicator/{indicator_id}.csv": {
                 "get": {
                     "summary": "Scarica la serie in CSV lungo",
+                    "description": "Serie regionale. Gli indicatori misurati solo per provincia non hanno download.",
                     "operationId": "downloadIndicatorCsv",
                     "parameters": [indicator_parameter],
                     "responses": {
@@ -241,8 +282,10 @@ def home_markdown(summary, featured, posts, site_url):
         "",
         f"- [Atlante]({site_url}/atlante)",
         f"- [Regioni]({site_url}/regioni)",
+        f"- [Province]({site_url}/province)",
         f"- [Temi]({site_url}/temi)",
         f"- [Confronto tra regioni]({site_url}/confronto)",
+        f"- [Qualità della vita, regioni e province]({site_url}/qualita-della-vita)",
         f"- [Catalogo dati]({site_url}/catalogo-dati)",
         f"- [Metodologia e fonti]({site_url}/metodologia)",
         "",
@@ -361,7 +404,15 @@ def methodology_markdown(site_url, license_label, license_url):
             "La fonte primaria e il relativo collegamento sono riportati in ogni scheda indicatore.",
             f"Licenza di riferimento per i dati Istat: [{license_label}]({license_url}). Le altre famiglie mantengono la licenza dichiarata dalla propria fonte.",
             "",
+            "## Regioni e province",
+            "",
+            ("Le regioni usano il BES nazionale e gli indicatori territoriali Istat, le province il BES dei Territori. "
+             "Le schede indicatore con una serie regionale offrono il download in CSV e JSON, i valori provinciali "
+             "si leggono nelle pagine delle province."),
+            "",
             f"- [Catalogo dati]({site_url}/catalogo-dati)",
+            f"- [Le regioni]({site_url}/regioni)",
+            f"- [Le province]({site_url}/province)",
             f"- [Indice per modelli linguistici]({site_url}/llms.txt)",
         ]
     )

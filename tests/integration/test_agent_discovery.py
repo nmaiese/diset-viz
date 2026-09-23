@@ -59,6 +59,11 @@ class AgentDiscoveryTest(unittest.TestCase):
                 "/api/indicator/{indicator_id}/year/{year}",
                 "/download/indicator/{indicator_id}.json",
                 "/download/indicator/{indicator_id}.csv",
+                # La qualita' della vita, dal 23/9/2026: e' l'unico accesso
+                # pubblico ai numeri delle province, ed e' in sola lettura.
+                "/api/quality-life/{level}/rankings",
+                "/api/quality-life/{level}/rankings/{profile}",
+                "/api/quality-life/{level}/{key}",
             },
         )
         for operations in document["paths"].values():
