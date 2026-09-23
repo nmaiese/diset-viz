@@ -1,0 +1,27 @@
+{
+  "x": "ext:mim_stranieri_terza_media",
+  "y": "bes:SDG-311",
+  "anni_x": [
+    2018,
+    2025
+  ],
+  "anni_y": [
+    2018,
+    2025
+  ],
+  "legami": {
+    "tutti": {
+      "punti": 18,
+      "correlazione": 0.47
+    },
+    "Centro-Nord": {
+      "punti": 10,
+      "correlazione": 0.94
+    },
+    "Mezzogiorno": {
+      "punti": 8,
+      "correlazione": -0.53
+    }
+  },
+  "nota": "Correlazione di Pearson fra territori. Misura se due grandezze si muovono insieme, non una causa."
+}

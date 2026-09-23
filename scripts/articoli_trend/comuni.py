@@ -67,6 +67,10 @@ def definizione(chiave: str) -> dict:
     con questa, non con il nome dell'indicatore.
     """
     famiglia, codice = chiave.split(":", 1)
+    if famiglia == "ext":
+        meta = serie_esterna(codice)["meta"]
+        return {"definizione": meta["method"], "fonti": meta["fonte"],
+                "source_url": meta["source_url_ext"], "source_reference": meta["script"]}
     cerca = {"bes": f"bes:{codice}", "prov": f"bes:{codice}", "ims": f"multiscopo:{codice}", "ter": codice}[famiglia]
     riga = _definizioni().get(cerca) or {}
     if not riga and famiglia == "ter":
@@ -117,9 +121,42 @@ def righe(famiglia: str) -> tuple[dict, ...]:
     return tuple(tutte)
 
 
+ELABORAZIONI = RADICE / "data" / "elaborazioni"
+RIPARTIZIONI = ("Italia", "Nord", "Centro", "Mezzogiorno")
+
+
+def serie_esterna(nome: str) -> dict:
+    """`ext:<nome>`: un'elaborazione versionata in data/elaborazioni/.
+
+    Il CSV porta territorio, anno, valore. Il JSON accanto porta nome, unita',
+    fonte, archivio, source_url e **method**: un'elaborazione senza metodo non
+    entra in un dossier.
+    """
+    meta_file = json.loads((ELABORAZIONI / f"{nome}.json").read_text(encoding="utf-8"))
+    if not meta_file.get("method"):
+        raise ValueError(f"elaborazione {nome} senza method")
+    valori: dict[str, dict[int, float]] = {}
+    with (ELABORAZIONI / f"{nome}.csv").open(encoding="utf-8") as file:
+        for r in csv.DictReader(file):
+            valori.setdefault(r["territorio"], {})[int(r["anno"])] = float(r["valore"])
+    anni = sorted({a for per in valori.values() for a in per})
+    livello = "ripartizione" if set(valori) <= set(RIPARTIZIONI) else "regione"
+    meta = {
+        "chiave": f"ext:{nome}", "famiglia": "ext", "codice": nome, "livello": livello,
+        "tema": "", "nome": meta_file["nome"], "unita": meta_file["unita"],
+        "fonte": meta_file["fonte"], "archivio": meta_file.get("archivio", ""),
+        "file": f"data/elaborazioni/{nome}.csv", "method": meta_file["method"],
+        "script": meta_file.get("script", ""), "source_url_ext": meta_file.get("source_url", ""),
+        "anni": [anni[0], anni[-1]], "territori": len(valori),
+    }
+    return {"meta": meta, "valori": valori}
+
+
 def serie(chiave: str) -> dict:
     """`bes:03LAV007` -> metadati e valori {territorio: {anno: valore}}."""
     famiglia, codice = chiave.split(":", 1)
+    if famiglia == "ext":
+        return serie_esterna(codice)
     valori: dict[str, dict[int, float]] = {}
     meta = None
     for r in righe(famiglia):

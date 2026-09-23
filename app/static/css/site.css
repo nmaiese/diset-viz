@@ -1427,6 +1427,23 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .fig__etichetta--mz { fill: var(--ink); }
 .fig__etichetta--on { fill: var(--accent-text); }
 .fig__nota, .fig__fonte { font-family: var(--font-body); font-size: 10.5px; fill: var(--muted); }
+/* Le ripartizioni ufficiali Istat: tratti diversi oltre ai colori. Italia e'
+   il riferimento, sottile e neutro; il Mezzogiorno tratteggiato come sopra. */
+.fig__linea--nord { stroke: var(--brand-teal); }
+.fig__linea--centro { stroke: var(--brand-teal); stroke-dasharray: 2 4; }
+.fig__linea--it { stroke: var(--cmp-3); stroke-width: 1.5; }
+.fig__punto--nord, .fig__punto--centro { fill: var(--brand-teal); }
+.fig__punto--it { fill: var(--cmp-3); }
+.fig__etichetta--nord, .fig__etichetta--centro { fill: var(--brand-teal-text); }
+.fig__etichetta--it { fill: var(--muted); }
+/* La dispersione: cerchi per il Centro-Nord, quadrati per il Mezzogiorno. */
+.fig__pt { fill: var(--cmp-2); }
+.fig__pt--cn { fill: var(--brand-teal); }
+.fig__pt--mz { fill: var(--ink); opacity: 0.7; }
+.fig__pt.is-on { fill: var(--accent); opacity: 1; }
+.fig__pt-nome { font-family: var(--font-body); font-size: 11px; fill: var(--ink-soft); }
+.fig__pt-nome.is-on { fill: var(--accent-text); font-weight: 600; }
+.fig__asse-nome { font-family: var(--font-mono); font-size: 10.5px; fill: var(--muted); }
 
 /* L'attribuzione della foto e il riquadro "I dati di questo articolo". */
 .article-cover .article-cover__credit { text-align: left; font-size: 12.5px; }

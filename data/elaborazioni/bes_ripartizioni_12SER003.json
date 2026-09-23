@@ -1,0 +1,11 @@
+{
+  "nome": "Anziani trattati in assistenza domiciliare integrata, Italia e ripartizioni",
+  "unita": "Valori percentuali",
+  "fonte": "Istat",
+  "archivio": "Benessere equo e sostenibile, aggiornamento intermedio 2026, valori ufficiali per ripartizione",
+  "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+  "licenza": "CC BY 4.0",
+  "method": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni).",
+  "script": "scripts/articoli_trend/elab_bes_ripartizioni.py",
+  "codice_bes": "12SER003"
+}

@@ -154,9 +154,41 @@ popolazione. Non sono la media nazionale e non si chiamano cosi'. Se il
 pezzo ha bisogno del valore Italia, lo prende dalla pubblicazione Istat e lo
 dichiara fra le `cifre_esterne`, con URL.
 
+### 4b. Contesto e prova delle tesi
+
+Un dossier con i numeri giusti non basta. Prima di scrivere, per ogni pezzo:
+
+1. **Chi ne ha già scritto.** Rapporti delle fonti (Istat, Invalsi, Inail, Iss),
+   lavoce.info, Openpolis, Info Data, centri di ricerca. Se ne ricavano i
+   concetti, con parole nostre e citando chi li ha proposti, e si cerca
+   l'angolo che nessuno ha coperto.
+2. **Valori ufficiali, non medie semplici.** Per Italia, Nord, Centro e
+   Mezzogiorno si usano i valori calcolati dall'Istat
+   (`elab_bes_ripartizioni`), che pesano la popolazione. La media semplice
+   delle regioni sbaglia: sui posti letto il Centro (60 per 10.000) spariva
+   dentro un "Centro-Nord" a 97.
+3. **Le ipotesi alternative, con i dati.** Ogni tesi causale ("il Nord peggiora
+   perché ci sono più alunni stranieri") si mette alla prova con un indicatore
+   che la possa smentire, in un'elaborazione versionata in
+   `data/elaborazioni/` con `method` e script (`elab_mim_stranieri`,
+   `elab_settori_infortuni`, `elab_media_province`). Il grafico di dispersione
+   salva le correlazioni in `data/articoli/<slug>/legame_*.json`, **anche
+   dentro ciascun gruppo**: un legame che esiste solo fra Nord e Sud può
+   dipendere da qualunque cosa distingua le due aree, e va scritto così.
+4. **Quello che non regge si scrive.** Un test che fallisce è un'informazione
+   per il lettore, non un pezzo da tagliare.
+5. **Fact-check avversariale.** Chi scrive non referta: prima della PR ogni
+   pezzo passa dall'agent `fact-checker`, con il dossier e le copie delle
+   fonti. I suoi rilievi alti si correggono tutti.
+
+Il 23 settembre 2026 questo passaggio ha cambiato le tesi di tutti e quattro i
+pezzi: le ipotesi di partenza (stranieri, settori, famiglie, soccorsi) erano
+tutte parzialmente sbagliate o non dimostrabili.
+
 ### 5. Grafici
 
 ```bash
+bin/py -m scripts.articoli_trend.grafici <slug> dispersione ext:X --con bes:Y --anni-x 2018,2025 --anni-y 2018,2025 --titolo "..." --nome legame
 bin/py -m scripts.articoli_trend.grafici <slug> barre   bes:03LAV007 --evidenzia Umbria,Lombardia --titolo "..." --nome classifica
 bin/py -m scripts.articoli_trend.grafici <slug> estremi prov:03LAV007 --quanti 10 --titolo "..." --nome province
 bin/py -m scripts.articoli_trend.grafici <slug> linee   bes:03LAV007 --territori Umbria --titolo "..." --nome serie

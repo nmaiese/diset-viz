@@ -1,134 +1,171 @@
 ---
-title: "Infortuni gravi sul lavoro: il rischio più alto non è nelle grandi città"
-seo_title: "Infortuni gravi sul lavoro: le province più a rischio"
+title: 'Infortuni gravi sul lavoro: i grandi settori non bastano a spiegare la mappa'
+seo_title: 'Infortuni gravi sul lavoro: perché Arezzo non è Mantova'
 slug: infortuni-lavoro-province
-description: "Arezzo 20,3 infortuni mortali o invalidanti ogni 10.000 occupati, Milano 6,4. Le province più a rischio sono nel centro Italia, non nelle metropoli. Dati Istat."
+description: Arezzo e Mantova hanno la stessa quota di lavoro in campi, fabbriche e cantieri, ma ad Arezzo gli infortuni gravi sono più di tre volte. Abbiamo cercato perché.
 date: 2026-09-23
-author: "Redazione Divario Italia"
+author: Redazione Divario Italia
 cover: /static/img/blog/infortuni-lavoro-province.jpg
-cover_alt: "Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere."
-cover_caption: "Un cartello di cantiere a Pontebba, in Friuli-Venezia Giulia."
+cover_alt: Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere.
+cover_caption: Un cartello di cantiere a Pontebba, in Friuli-Venezia Giulia.
 cover_credit:
-  autore: "Herzi Pinki"
-  licenza: "CC BY-SA 4.0"
-  licenza_url: "https://creativecommons.org/licenses/by-sa/4.0"
-  fonte_url: "https://commons.wikimedia.org/wiki/File:Caduta_materiali_dall%27_alto,_San_Rocco_03.jpg"
-  fonte_nome: "Wikimedia Commons"
-  modifiche: "Ritagliata e ridimensionata"
+  autore: Herzi Pinki
+  licenza: CC BY-SA 4.0
+  licenza_url: https://creativecommons.org/licenses/by-sa/4.0
+  fonte_url: https://commons.wikimedia.org/wiki/File:Caduta_materiali_dall%27_alto,_San_Rocco_03.jpg
+  fonte_nome: Wikimedia Commons
+  modifiche: Ritagliata e ridimensionata
 tags:
-  - Lavoro
-  - Sicurezza sul lavoro
-  - Province
+- Lavoro
+- Sicurezza sul lavoro
+- Province
 indicator: bes-03LAV007
-indicator_label: "Tasso di infortuni sul lavoro mortali e con inabilità permanente"
+indicator_label: Tasso di infortuni sul lavoro mortali e con inabilità permanente
 trend:
   tema: sicurezza-lavoro
   rilevato: 2026-09-23
   classifica: data/trend/2026-09-23/classifica.json
-  punteggio: {interesse: 0.95, dato: 0.68, storia: 0.89, totale: 0.746, posto: 7}
+  punteggio:
+    interesse: 0.95
+    dato: 0.68
+    storia: 0.89
+    totale: 0.746
+    posto: 7
   segnali:
-    - tipo: google_news_principali
-      testo: "Tragedia al Colosseo, Andrea Moretti morto a 22 anni mentre installava il nuovo impianto di illuminazione (RomaToday)"
-      fonte: "Google News Italia, notizie principali"
-      url: "https://news.google.com/rss/articles/CBMidkFVX3lxTE1WNmhmVG9RdXY5c1lzelp6blhMWWZPMDdUWm1jQUxYTWh5cHpFWS1XZ0FmWkFZNFdvVEVPejR4SzJTc3pWSXp5VVFrVFJrSm1RWG5Bb2lGTG5QSTRNY0JIREVNTTFyOXhCQUc5SEw1QWw2d3lycFE?oc=5"
-      data: 2026-09-23
-    - tipo: google_news_tema
-      testo: "56 titoli sulle morti e gli infortuni sul lavoro negli ultimi sette giorni, fra cui Sant'Arcangelo (Potenza) e Polesine Parmense"
-      fonte: "Google News Italia, ricerca degli ultimi 7 giorni"
-      url: "https://news.google.com/rss/search?q=(morto%20sul%20lavoro%20OR%20incidente%20sul%20lavoro%20OR%20infortuni)%20when:7d&hl=it&gl=IT&ceid=IT:it"
-      data: 2026-09-23
-    - tipo: google_trends_interesse
-      testo: "morti sul lavoro: interesse degli ultimi 7 giorni 11,49 volte la media degli 83 precedenti. Regioni con piu' interesse: Lombardia, Emilia-Romagna, Toscana"
-      fonte: "Google Trends (pytrends), Italia, finestra today 3-m e now 7-d"
-      url: "https://trends.google.com/trends/explore?geo=IT&q=morti%20sul%20lavoro"
-      data: 2026-09-23
-    - tipo: google_trends_interesse
-      testo: "incidente sul lavoro: interesse degli ultimi 7 giorni 2,45 volte la media degli 83 precedenti. Regioni con piu' interesse: Basilicata, Emilia-Romagna, Lombardia"
-      fonte: "Google Trends (pytrends), Italia, finestra today 3-m e now 7-d"
-      url: "https://trends.google.com/trends/explore?geo=IT&q=incidente%20sul%20lavoro"
-      data: 2026-09-23
+  - tipo: google_news_principali
+    testo: Tragedia al Colosseo, Andrea Moretti morto a 22 anni mentre installava il nuovo impianto di illuminazione (RomaToday)
+    fonte: Google News Italia, notizie principali
+    url: https://news.google.com/rss/articles/CBMidkFVX3lxTE1WNmhmVG9RdXY5c1lzelp6blhMWWZPMDdUWm1jQUxYTWh5cHpFWS1XZ0FmWkFZNFdvVEVPejR4SzJTc3pWSXp5VVFrVFJrSm1RWG5Bb2lGTG5QSTRNY0JIREVNTTFyOXhCQUc5SEw1QWw2d3lycFE?oc=5
+    data: 2026-09-23
+  - tipo: google_news_tema
+    testo: 56 titoli sulle morti e gli infortuni sul lavoro negli ultimi sette giorni, fra cui Sant'Arcangelo (Potenza) e Polesine Parmense
+    fonte: Google News Italia, ricerca degli ultimi 7 giorni
+    url: https://news.google.com/rss/search?q=(morto%20sul%20lavoro%20OR%20incidente%20sul%20lavoro%20OR%20infortuni)%20when:7d&hl=it&gl=IT&ceid=IT:it
+    data: 2026-09-23
+  - tipo: google_trends_interesse
+    testo: 'morti sul lavoro: interesse degli ultimi 7 giorni 11,49 volte la media degli 83 precedenti. Regioni con piu'' interesse: Lombardia, Emilia-Romagna, Toscana'
+    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    url: https://trends.google.com/trends/explore?geo=IT&q=morti%20sul%20lavoro
+    data: 2026-09-23
+  - tipo: google_trends_interesse
+    testo: 'incidente sul lavoro: interesse degli ultimi 7 giorni 2,45 volte la media degli 83 precedenti. Regioni con piu'' interesse: Basilicata, Emilia-Romagna, Lombardia'
+    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    url: https://trends.google.com/trends/explore?geo=IT&q=incidente%20sul%20lavoro
+    data: 2026-09-23
 dataset:
-  name: "Infortuni sul lavoro mortali e con inabilità permanente per provincia e regione"
-  description: "Infortuni sul lavoro mortali e con inabilità permanente ogni 10.000 occupati, per provincia e per regione, dal 2018 al 2022."
-  method: "Dati Istat su fonte Inail, senza rielaborazione. Le medie di Centro-Nord e Mezzogiorno sono medie semplici dei valori regionali, non pesate per il numero di occupati."
-  temporal: "2018/2022"
-  spatial: "Italia, regioni e province"
-  creator: "Istat, su dati Inail"
-  source_url: "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip"
+  name: Infortuni sul lavoro mortali e con inabilità permanente e composizione settoriale dell'occupazione, per provincia
+  description: Infortuni sul lavoro mortali e con inabilità permanente ogni 10.000 occupati per provincia, regione e ripartizione (2018-2022), quota di occupati in agricoltura, industria e costruzioni per provincia (2022) e tasso atteso in base ai soli settori.
+  method: 'Tassi: dati Istat su fonte Inail, senza rielaborazione, compresi i valori ufficiali per ripartizione. Tasso atteso: regressione lineare del tasso provinciale 2022 sulle quote di occupati in agricoltura, industria in senso stretto e costruzioni (Istat, Conti territoriali), elaborazione Divario Italia con lo script scripts/articoli_trend/elab_settori_infortuni.py.'
+  temporal: 2018/2022
+  spatial: Italia, ripartizioni, regioni e province
+  creator: Istat, Inail
+  source_url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
   download: /static/data/articoli/infortuni-lavoro-province.csv
 cifre_esterne:
-  - cifra: "595"
-    cosa: "denunce di infortunio con esito mortale, gennaio-luglio 2026"
-    fonte: "Inail, comunicato dell'8 settembre 2026 sui dati di luglio"
-    url: "https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html"
-  - cifra: "607"
-    cosa: "denunce di infortunio con esito mortale, gennaio-luglio 2025"
-    fonte: "Inail, comunicato dell'8 settembre 2026 sui dati di luglio"
-    url: "https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html"
-  - cifra: "422"
-    cosa: "denunce mortali in occasione di lavoro (esclusi studenti e tragitto casa-lavoro), gennaio-luglio 2026"
-    fonte: "Inail, comunicato dell'8 settembre 2026 sui dati di luglio"
-    url: "https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html"
-  - cifra: "67"
-    cosa: "denunce mortali in occasione di lavoro nelle costruzioni, gennaio-luglio 2025"
-    fonte: "Inail, comunicato dell'8 settembre 2026 sui dati di luglio"
-    url: "https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html"
-  - cifra: "76"
-    cosa: "denunce mortali in occasione di lavoro nelle costruzioni, gennaio-luglio 2026"
-    fonte: "Inail, comunicato dell'8 settembre 2026 sui dati di luglio"
-    url: "https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html"
+- cifra: 14,8
+  cosa: tasso di infortuni gravi degli uomini, 2022
+  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
+- cifra: 5,8
+  cosa: tasso di infortuni gravi delle donne, 2022
+  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
+- cifra: 24,1
+  cosa: tasso di infortuni gravi degli uomini stranieri, 2022
+  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
+- cifra: 13,7
+  cosa: tasso di infortuni gravi degli uomini italiani, 2022
+  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
+- cifra: 26,0
+  cosa: tasso di infortuni gravi fra 65 e 89 anni, 2022
+  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
+- cifra: '67'
+  cosa: denunce mortali nelle costruzioni, gennaio-luglio 2025
+  fonte: Inail, comunicato dell'8 settembre 2026
+  url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
+- cifra: '76'
+  cosa: denunce mortali nelle costruzioni, gennaio-luglio 2026
+  fonte: Inail, comunicato dell'8 settembre 2026
+  url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
+- cifra: 15,8
+  cosa: tasso di infortuni gravi fra 50 e 64 anni, 2022
+  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
+- cifra: '422'
+  cosa: denunce mortali in occasione di lavoro, esclusi studenti e tragitti, gennaio-luglio 2026
+  fonte: Inail, comunicato dell'8 settembre 2026
+  url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
+- cifra: '432'
+  cosa: denunce mortali in occasione di lavoro, esclusi studenti e tragitti, gennaio-luglio 2025
+  fonte: Inail, comunicato dell'8 settembre 2026
+  url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
 ---
 
-Andrea Moretti aveva 22 anni ed è morto nella notte dentro il Colosseo, mentre lavorava al nuovo impianto di illuminazione. La notizia è arrivata il 23 settembre. Due giorni prima erano morti un operaio nel Parmense e uno nel Potentino. In questi giorni la sicurezza sul lavoro è fra le notizie principali. Dietro i singoli casi c'è una geografia del rischio che si vede solo nei dati, e che non coincide con quella delle grandi città.
+Andrea Moretti aveva 22 anni ed è morto nella notte dentro il Colosseo, mentre lavorava al nuovo impianto di illuminazione. La notizia è arrivata il 23 settembre. Nei giorni precedenti erano morti un operaio nel Parmense e uno nel Potentino. La domanda è sempre la stessa: dove si rischia di più, e perché?
 
-Nel 2022 in provincia di Arezzo ci sono stati **20,3 infortuni mortali o con invalidità permanente ogni 10.000 occupati**. In provincia di Milano 6,4. Nel Verbano-Cusio-Ossola 4,7. Fra la prima e l'ultima provincia il rischio è 4,3 volte tanto.
+La risposta che sembra ovvia è: dove si lavora di più nei campi, nelle fabbriche e nei cantieri. Abbiamo verificato provincia per provincia, con i grandi settori dell'Istat. Spiegano poco.
+
+Arezzo e Mantova hanno quasi la stessa quota di occupati in agricoltura, industria e costruzioni, il **39,6% e il 38,9%**. Ad Arezzo gli infortuni mortali o invalidanti sono 20,3 ogni 10.000 occupati, a Mantova 5,8.
 {: .data-callout}
 
 ## In breve
 
-- Sei delle dieci province con il tasso più alto sono in Toscana e in Umbria. Le altre sono Potenza, Teramo, Chieti e Forlì-Cesena.
-- Le province di Milano, Torino e Roma stanno in fondo alla classifica, con 6,4, 6,6 e 7,1.
-- Fra le regioni l'Umbria ha 17,8 infortuni gravi ogni 10.000 occupati, il Piemonte 8,0. Più del doppio.
+- Nel 2022 in Italia ci sono stati 11,0 infortuni sul lavoro mortali o con invalidità permanente ogni 10.000 occupati. Nel Mezzogiorno 13,0, al Centro 11,9, al Nord 9,6.
+- Le province più colpite sono in Toscana, Umbria, Abruzzo e Basilicata. Le meno colpite sono quasi tutte nel Nord-Ovest.
+- Agricoltura, industria e costruzioni, prese come grandi settori, spiegano poco più di un decimo delle differenze fra province.
 
 ## Che cosa conta questo indicatore
 
-Non conta solo i morti. Conta gli infortuni sul lavoro che hanno ucciso qualcuno o gli hanno lasciato un danno permanente, e li divide per il numero degli occupati. È il modo per confrontare territori con più o meno lavoratori: un dato grezzo darebbe più infortuni dove lavora più gente, e basta. Il dato Istat, su fonte Inail, arriva al 2022.
+Non conta solo i morti. Conta gli infortuni che hanno ucciso qualcuno o gli hanno lasciato un danno permanente, divisi per il numero degli occupati. Il dato è dell'Istat su fonte Inail e arriva al 2022. Una nota dell'Istat avverte che i dati di quell'anno sono provvisori.
 
 ## Una mappa che passa per il centro Italia
 
-La classifica delle province non segue il solito confine fra Nord e Sud. In cima ci sono Arezzo con 20,3, Potenza con 20,1 e Massa-Carrara con 19,8. Poi Teramo, Grosseto, Perugia, Lucca, Chieti e Siena. Il dato non dice in quali settori avvengono gli infortuni, quindi non spiega da solo perché queste province siano in cima.
+In cima ci sono Arezzo con 20,3, Potenza con 20,1 e Massa-Carrara con 19,8, poi Teramo, Grosseto, Perugia, Lucca, Chieti e Siena. In fondo non ci sono soltanto le grandi città. C'è quasi tutto il Nord-Ovest: Verbano-Cusio-Ossola 4,7, Novara 4,8, Mantova 5,8, Pavia 5,9, Biella 6,3, Milano 6,4, Torino 6,6.
 
 <!-- figura: province-2022 -->
 
-In fondo alla classifica ci sono Verbano-Cusio-Ossola, Novara, Mantova e Pavia, e poco sopra Milano, Torino e Roma. Nelle province delle grandi città pesa probabilmente la quota di lavoro d'ufficio e nei servizi, ma anche questo il dato non lo misura. Roma, la provincia dove è morto Andrea Moretti, ha un tasso di 7,1: è novantacinquesima su 103. Un tasso basso non vuol dire che non si muoia. Vuol dire che il rischio, diviso su tanti occupati, pesa meno sulla media.
+## I settori non bastano
 
-## Le regioni, e un divario che si stringe
+Abbiamo preso dall'Istat la quota di occupati in agricoltura, industria e costruzioni di ogni provincia, e calcolato quale tasso di infortuni avrebbe ciascuna se contassero solo quelle quote. Il metodo è una regressione lineare sulle 103 province per cui l'Istat pubblica il dato. Ne esce che i tre settori spiegano poco più di un decimo delle differenze. A parità di punti di quota, l'edilizia è quello che pesa di più.
 
-Anche fra le regioni il rischio è più alto al centro e in parte del Sud: Umbria 17,8, Basilicata 16,8, Abruzzo 16,7, Marche 15,3. In fondo Piemonte 8,0, Lombardia 8,1 e Lazio 8,2.
+<!-- figura: settori-infortuni -->
 
-<!-- figura: regioni-2022 -->
+Le province in cima restano lontanissime da quello che i settori farebbero prevedere. Arezzo, in base ai settori, dovrebbe avere 12,3 infortuni gravi ogni 10.000 occupati, e ne ha 20,3. Massa-Carrara 12,1 e ne ha 19,8. Perugia 11,8 e ne ha 18,3. Potenza 13,7 e ne ha 20,1. Dall'altra parte Mantova dovrebbe avere 11,7 e ne ha 5,8, Pavia 11,6 e ne ha 5,9, il Verbano-Cusio-Ossola 12,0 e ne ha 4,7.
 
-Dal 2018 al 2022 la media delle regioni del Mezzogiorno è scesa da 16,31 a 13,85, quella del Centro-Nord da 12,47 a 11,47. La distanza si è ridotta, ma il Sud resta sopra. In alcune province il calo è stato forte: Arezzo era a 30,5 nel 2018, Potenza a 29,6.
+Questo non vuol dire che il tipo di lavoro non conti. I tre settori dell'Istat sono larghi: dentro l'industria ci sono le cave di marmo e gli uffici delle aziende. La Consulta interassociativa italiana per la prevenzione, che lavora sugli open data Inail, scrive che è corretto confrontare i tassi solo dentro un comparto omogeneo. È il passo successivo, e servono i dati per comparto. Che cosa pesi nel resto, oggi i dati pubblici non lo dicono. Le ipotesi sono la dimensione delle imprese, l'età dei lavoratori, i controlli, la sottodenuncia. Sono ipotesi, non risultati.
+
+## Chi si fa male
+
+L'Istat calcola il tasso anche per sesso, età e cittadinanza. Nel 2022 gli uomini avevano 14,8 infortuni gravi ogni 10.000 occupati, le donne 5,8. Fra gli uomini stranieri il tasso era 24,1, fra gli italiani 13,7. Fra i 50 e i 64 anni era 15,8, fra i 65 e gli 89 anni 26,0. Il tasso sale con l'età, e per gli uomini stranieri è quasi il doppio che per gli italiani.
+
+## Il divario nel tempo
+
+Dal 2018 al 2022 il Mezzogiorno scende da 14,6 a 13,0, il Centro da 12,6 a 11,9, il Nord da 10,5 a 9,6. La distanza si riduce, ma il Sud resta sopra.
 
 <!-- figura: serie-2018-2022 -->
 
-## Che cosa dicono i dati di quest'anno
+Per il 2026 ci sono solo le denunce all'Inail, provvisorie. Da gennaio a luglio le morti avvenute durante il lavoro, senza contare gli studenti e i tragitti casa-lavoro, sono 422, contro 432 nello stesso periodo del 2025. Nelle costruzioni sono salite da 67 a 76.
 
-Il dato Istat si ferma al 2022. Per il 2026 ci sono solo le denunce all'Inail, che sono un'altra misura: contano i casi segnalati, non quelli riconosciuti, e sono provvisorie. Da gennaio a luglio 2026 le denunce di infortunio con esito mortale sono state 595, contro 607 nello stesso periodo del 2025. Di queste, 422 sono avvenute durante il lavoro, senza contare il tragitto casa-lavoro e gli studenti. Nelle costruzioni i casi mortali sono saliti da 67 a 76.
+## Che cosa cambia
 
-Chi lavora in provincia di Arezzo o di Potenza ha, in media, un rischio di infortunio mortale o invalidante circa tre volte quello di chi lavora in provincia di Milano. Una media nasconde mestieri molto diversi fra loro. Ma dice dove la prevenzione e i controlli hanno più strada da fare.
+Ad Arezzo o a Potenza il tasso di infortuni che cambiano la vita è circa tre volte quello di Milano, e i grandi settori ne spiegano solo una parte. Vuol dire che quella distanza non è una fatalità legata al tipo di economia. È uno spazio in cui la prevenzione può ancora fare differenza.
 
-Il dato regione per regione e provincia per provincia è nella [scheda degli infortuni sul lavoro mortali e con inabilità permanente](/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007).
+Il dato per regione e provincia è nella [scheda degli infortuni sul lavoro mortali e con inabilità permanente](/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007).
 
 ## Dati usati
 
-- **Fonte:** Istat, Benessere equo e sostenibile (regioni) e BES dei Territori (province), su dati Inail. Per il 2026, denunce Inail provvisorie.
-- **Periodo:** dal 2018 al 2022.
-- **Unità:** infortuni sul lavoro mortali e con inabilità permanente ogni 10.000 occupati, esclusi i militari.
-- **Metodo:** i valori sono quelli Istat. Le medie di Centro-Nord e Mezzogiorno sono medie semplici fra regioni, non pesate per il numero di occupati: non sono la media nazionale.
-- **Limite:** l'indicatore non distingue i settori e i mestieri, e non vede il lavoro irregolare. Si ferma al 2022, e non dice quindi se nel frattempo la mappa è cambiata.
+- **Infortuni:** Istat, Benessere equo e sostenibile (regioni e ripartizioni ufficiali) e BES dei Territori (province), su dati Inail, 2018-2022. Per il 2026 denunce Inail provvisorie.
+- **Settori:** Istat, Conti territoriali, persone occupate per branca e provincia, 2022.
+- **Metodo:** regressione lineare del tasso provinciale sulle quote di occupati in agricoltura, industria in senso stretto e costruzioni. Script `scripts/articoli_trend/elab_settori_infortuni.py`.
+- **Limite:** è un confronto fra province, non fra lavoratori. Le branche sono larghe. Il tasso divide gli infortuni per gli occupati residenti, mentre la regressione usa gli occupati per luogo di lavoro: nelle province da cui molti lavorano altrove il confronto è meno preciso. Gli infortuni non denunciati, più probabili nel lavoro irregolare, non sono contati.
 
 ## Fonti
 
-- Inail, [Denunce di infortuni e malattie professionali, i dati di luglio](https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html), comunicato dell'8 settembre 2026.
 - Istat, [Benessere equo e sostenibile, appendice statistica](https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip), maggio 2026.
+- Istat, [Il benessere equo e sostenibile in Italia, Rapporto Bes 2025](https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf).
+- Istat, [Conti territoriali, occupati per branca](https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/all?startPeriod=2021).
+- Inail, [Denunce di infortuni e malattie professionali, i dati di luglio](https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html), 8 settembre 2026.
+- CIIP, [Utilizzi degli open data Inail](https://ciip-consulta.it/wp-content/uploads/2025/09/Utilizzi_Open_Data_Inail.pdf), settembre 2025.

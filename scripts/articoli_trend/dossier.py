@@ -33,6 +33,8 @@ def pagina_indicatore(meta: dict) -> str | None:
     """Il percorso canonico della scheda, chiesto all'app: segue il 301."""
     from app import app
 
+    if meta["famiglia"] == "ext":
+        return None  # un'elaborazione non ha una scheda sul sito
     sigla = {"ter": "ter", "bes": "bes", "ims": "ims", "prov": "bes"}[meta["famiglia"]]
     codice = meta["codice"]
     client = app.test_client()
@@ -61,6 +63,10 @@ def analizza(chiave: str) -> dict:
     def cifra(valore: float, cosa: str, decimali: int = dec) -> str:
         testo = comuni.fmt(valore, decimali)
         cifre.append({"cifra": testo, "cosa": cosa, "indicatore": chiave})
+        # Sopra 100 i decimali non dicono niente al lettore: e' ammesso anche l'intero.
+        if abs(valore) >= 100 and decimali:
+            cifre.append({"cifra": comuni.fmt(valore, 0), "cosa": cosa + " (arrotondato)", "indicatore": chiave})
+            testo = comuni.fmt(valore, 0)
         return testo
 
     classifica = []
@@ -70,7 +76,9 @@ def analizza(chiave: str) -> dict:
                            "ripartizione": comuni.ripartizione(t, livello)})
 
     medie = {}
-    for anno in sorted({a for per in valori.values() for a in per}):
+    # Le ripartizioni ufficiali sono gia' medie pesate: non si fa la media delle medie.
+    anni_medie = [] if livello == "ripartizione" else sorted({a for per in valori.values() for a in per})
+    for anno in anni_medie:
         riga = [per[anno] for per in valori.values() if anno in per]
         if len(riga) < 3:
             continue

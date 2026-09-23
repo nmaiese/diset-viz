@@ -1,0 +1,14 @@
+{
+  "nome": "Alunni con cittadinanza non italiana in terza media",
+  "unita": "percentuale sugli alunni della terza classe della secondaria di primo grado",
+  "fonte": "Ministero dell'Istruzione e del Merito",
+  "archivio": "Open data, alunni per cittadinanza, scuola e anno di corso (statali e paritarie)",
+  "source_url": "https://dati.istruzione.it/opendata/opendata/catalogo/elements1/?area=Studenti",
+  "licenza": "IODL 2.0",
+  "method": "si tengono le righe con ORDINESCUOLA = \"SCUOLA SECONDARIA I GRADO\" e ANNOCORSO = 3, si attribuisce ogni scuola alla regione dalla sigla di provincia nelle prime due lettere del CODICESCUOLA, si sommano alunni totali e alunni con cittadinanza non italiana. La quota e' il rapporto, per cento.",
+  "script": "scripts/articoli_trend/elab_mim_stranieri.py",
+  "anni_scolastici": [
+    "201718",
+    "202425"
+  ]
+}

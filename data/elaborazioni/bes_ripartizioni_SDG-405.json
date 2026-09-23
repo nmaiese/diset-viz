@@ -1,0 +1,11 @@
+{
+  "nome": "Posti letto nei presidi residenziali socio-assistenziali e socio-sanitari, Italia e ripartizioni",
+  "unita": "Per 10.000 abitanti",
+  "fonte": "Istat",
+  "archivio": "Benessere equo e sostenibile, aggiornamento intermedio 2026, valori ufficiali per ripartizione",
+  "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+  "licenza": "CC BY 4.0",
+  "method": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni).",
+  "script": "scripts/articoli_trend/elab_bes_ripartizioni.py",
+  "codice_bes": "SDG-405"
+}

@@ -60,10 +60,10 @@
 <text class="fig__nome" x="182" y="470" text-anchor="end">Molise</text>
 <rect class="fig__barra" x="190" y="459" width="132.3" height="15"/>
 <text class="fig__valore" x="328.3" y="470">0,4</text>
-<text class="fig__nome is-on" x="182" y="492" text-anchor="end">Piemonte</text>
-<rect class="fig__barra is-on" x="190" y="481" width="132.3" height="15"/>
-<text class="fig__valore is-on" x="328.3" y="492">0,4</text>
-<line class="fig__rif" x1="416.6" y1="56" x2="416.6" y2="500"/>
-<text class="fig__rif-testo" x="420.6" y="514">media semplice 0,69</text>
+<text class="fig__nome" x="182" y="492" text-anchor="end">Piemonte</text>
+<rect class="fig__barra" x="190" y="481" width="132.3" height="15"/>
+<text class="fig__valore" x="328.3" y="492">0,4</text>
+<line class="fig__rif" x1="388.5" y1="56" x2="388.5" y2="500"/>
+<text class="fig__rif-testo" x="392.5" y="514">Italia 0,6</text>
 <text class="fig__fonte" x="0" y="544">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
 </svg>

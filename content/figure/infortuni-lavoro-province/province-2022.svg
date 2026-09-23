@@ -1,8 +1,8 @@
 <svg class="fig" viewBox="0 0 680 572" role="img" aria-labelledby="fig-province-2022-t fig-province-2022-d" xmlns="http://www.w3.org/2000/svg">
-<title id="fig-province-2022-t">Il rischio più alto non è nelle grandi città</title>
-<desc id="fig-province-2022-d">Le 10 province con il valore piu&#x27; alto e le 10 con il piu&#x27; basso nel 2022: prima Arezzo con 20,3, ultima Verbano-Cusio-Ossola con 4,7.</desc>
-<text class="fig__titolo" x="0" y="20">Il rischio più alto non è nelle grandi città</text>
-<text class="fig__sotto" x="0" y="40">Tasso di infortuni mortali e inabilità permanente, 2022. Le 10 province piu&#x27; alte e le 10 piu&#x27; basse su 103. per 10.000 occupati.</text>
+<title id="fig-province-2022-t">Il rischio più alto è nel centro Italia, il più basso nel Nord-Ovest</title>
+<desc id="fig-province-2022-d">Le 10 province con il valore più alto e le 10 con il più basso nel 2022: prima Arezzo con 20,3, ultima Verbano-Cusio-Ossola con 4,7.</desc>
+<text class="fig__titolo" x="0" y="20">Il rischio più alto è nel centro Italia, il più basso nel Nord-Ovest</text>
+<text class="fig__sotto" x="0" y="40">Tasso di infortuni mortali e inabilità permanente, 2022. Le 10 province più alte e le 10 più basse su 103. Per 10.000 occupati.</text>
 <text class="fig__nome is-on" x="182" y="74" text-anchor="end">Arezzo</text>
 <rect class="fig__barra is-on" x="190" y="63" width="430.0" height="15"/>
 <text class="fig__valore is-on" x="626.0" y="74">20,3</text>
@@ -64,7 +64,7 @@
 <text class="fig__nome" x="182" y="514" text-anchor="end">Verbano-Cusio-Ossola</text>
 <rect class="fig__barra" x="190" y="503" width="99.6" height="15"/>
 <text class="fig__valore" x="295.6" y="514">4,7</text>
-<line class="fig__rif" x1="451.7" y1="56" x2="451.7" y2="522"/>
-<text class="fig__rif-testo" x="455.7" y="536">media semplice 12,35</text>
+<line class="fig__rif" x1="423.0" y1="56" x2="423.0" y2="522"/>
+<text class="fig__rif-testo" x="427.0" y="536">Italia 11,0</text>
 <text class="fig__fonte" x="0" y="566">Fonte: Istat, BES dei Territori. Elaborazione Divario Italia.</text>
 </svg>

@@ -116,6 +116,8 @@ def verifica(percorso: Path) -> tuple[list[str], list[str]]:
             if not e.get("fonte") or not e.get("url"):
                 errori.append(f"cifre_esterne: {e.get('cifra')} senza fonte o url")
         ammesse |= {str(e.get("cifra")) for e in esterne}
+        # I denominatori delle unita' ("ogni 100.000 anziani") non sono cifre da verificare.
+        ammesse |= {"100", "1.000", "10.000", "100.000", "1.000.000"}
         pulito = _corpo_pulito(corpo) + " " + m.get("description", "") + " " + m.get("title", "")
         for n in sorted(set(NUMERO.findall(pulito))):
             if n in ammesse:
@@ -167,9 +169,11 @@ def verifica(percorso: Path) -> tuple[list[str], list[str]]:
             errori.append(f"figura {nome}: manca content/figure/{slug}/{nome}.svg")
 
     # 9. lunghezza
-    parole = len(re.findall(r"\w+", _corpo_pulito(re.sub(r"^\|.*\|$", "", corpo, flags=re.MULTILINE))))
+    # Si contano le parole della prosa: fuori le tabelle e l'elenco delle fonti.
+    prosa = corpo.split("## Fonti", 1)[0]
+    parole = len(re.findall(r"\w+", _corpo_pulito(re.sub(r"^\|.*\|$", "", prosa, flags=re.MULTILINE))))
     if parole > 1000:
-        avvisi.append(f"lunghezza: {parole} parole fuori dalle tabelle (REVIEW.md ne chiede al massimo mille)")
+        avvisi.append(f"lunghezza: {parole} parole di prosa, tabelle e fonti escluse (REVIEW.md ne chiede al massimo mille)")
     return errori, avvisi
 
 

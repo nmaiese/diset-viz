@@ -1,0 +1,9 @@
+{
+  "nome": "Mortalità stradale in ambito extraurbano, media delle province della regione, 2021-2023",
+  "unita": "%",
+  "fonte": "Istat",
+  "archivio": "BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07",
+  "source_url": "https://www.istat.it/wp-content/uploads/2024/07/Bes_dei_territori_edizione_2024_18122024_IT_EC.zip",
+  "method": "Media semplice dei valori provinciali di prov:07SIC008P per regione, mediati sugli anni 2021-2023. Non e' il valore regionale ufficiale.",
+  "script": "scripts/articoli_trend/elab_media_province.py"
+}

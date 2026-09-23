@@ -5481,6 +5481,3482 @@
     },
     {
       "meta": {
+        "chiave": "ext:bes_ripartizioni_03LAV007",
+        "famiglia": "ext",
+        "codice": "bes_ripartizioni_03LAV007",
+        "livello": "ripartizione",
+        "tema": "",
+        "nome": "Tasso di infortuni sul lavoro mortali e con inabilità permanente, Italia e ripartizioni",
+        "unita": "Per 10.000 occupati",
+        "fonte": "Istat",
+        "archivio": "Benessere equo e sostenibile, aggiornamento intermedio 2026, valori ufficiali per ripartizione",
+        "file": "data/elaborazioni/bes_ripartizioni_03LAV007.csv",
+        "method": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni).",
+        "script": "scripts/articoli_trend/elab_bes_ripartizioni.py",
+        "source_url_ext": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+        "anni": [
+          2018,
+          2022
+        ],
+        "territori": 4,
+        "definizione": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni).",
+        "fonti": "Istat",
+        "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+        "source_reference": "scripts/articoli_trend/elab_bes_ripartizioni.py",
+        "pagina": null,
+        "decimali": 1
+      },
+      "ultimo_anno": 2022,
+      "primo_anno": 2018,
+      "classifica": [
+        {
+          "posto": 1,
+          "territorio": "Mezzogiorno",
+          "valore": 13.0,
+          "testo": "13,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 2,
+          "territorio": "Centro",
+          "valore": 11.9,
+          "testo": "11,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 3,
+          "territorio": "Italia",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 4,
+          "territorio": "Nord",
+          "valore": 9.6,
+          "testo": "9,6",
+          "ripartizione": "Centro-Nord"
+        }
+      ],
+      "medie": {},
+      "variazioni": [
+        {
+          "territorio": "Mezzogiorno",
+          "da": 2018,
+          "a": 2022,
+          "delta": -1.6,
+          "testo": "1,6"
+        },
+        {
+          "territorio": "Italia",
+          "da": 2018,
+          "a": 2022,
+          "delta": -1.0,
+          "testo": "1,0"
+        },
+        {
+          "territorio": "Nord",
+          "da": 2018,
+          "a": 2022,
+          "delta": -0.9,
+          "testo": "0,9"
+        },
+        {
+          "territorio": "Centro",
+          "da": 2018,
+          "a": 2022,
+          "delta": -0.7,
+          "testo": "0,7"
+        }
+      ],
+      "serie": {
+        "Italia": {
+          "2018": 12.0,
+          "2019": 11.7,
+          "2020": 10.8,
+          "2021": 11.3,
+          "2022": 11.0
+        },
+        "Nord": {
+          "2018": 10.5,
+          "2019": 10.2,
+          "2020": 9.8,
+          "2021": 10.1,
+          "2022": 9.6
+        },
+        "Centro": {
+          "2018": 12.6,
+          "2019": 12.1,
+          "2020": 11.2,
+          "2021": 11.7,
+          "2022": 11.9
+        },
+        "Mezzogiorno": {
+          "2018": 14.6,
+          "2019": 14.3,
+          "2020": 12.4,
+          "2021": 13.4,
+          "2022": 13.0
+        }
+      },
+      "cifre": [
+        {
+          "cifra": "13,0",
+          "cosa": "Mezzogiorno, 2022",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "11,9",
+          "cosa": "Centro, 2022",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Italia, 2022",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "9,6",
+          "cosa": "Nord, 2022",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "1,0",
+          "cosa": "variazione Italia 2018-2022 (in valore assoluto)",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "0,9",
+          "cosa": "variazione Nord 2018-2022 (in valore assoluto)",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "0,7",
+          "cosa": "variazione Centro 2018-2022 (in valore assoluto)",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "1,6",
+          "cosa": "variazione Mezzogiorno 2018-2022 (in valore assoluto)",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "1,4",
+          "cosa": "rapporto fra primo (Mezzogiorno) e ultimo (Nord) nel 2022",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "12,0",
+          "cosa": "Italia, 2018",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "11,7",
+          "cosa": "Italia, 2019",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "10,8",
+          "cosa": "Italia, 2020",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Italia, 2021",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "10,5",
+          "cosa": "Nord, 2018",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "10,2",
+          "cosa": "Nord, 2019",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "9,8",
+          "cosa": "Nord, 2020",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "10,1",
+          "cosa": "Nord, 2021",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "12,6",
+          "cosa": "Centro, 2018",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "12,1",
+          "cosa": "Centro, 2019",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "11,2",
+          "cosa": "Centro, 2020",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "11,7",
+          "cosa": "Centro, 2021",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "14,6",
+          "cosa": "Mezzogiorno, 2018",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "14,3",
+          "cosa": "Mezzogiorno, 2019",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "12,4",
+          "cosa": "Mezzogiorno, 2020",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        },
+        {
+          "cifra": "13,4",
+          "cosa": "Mezzogiorno, 2021",
+          "indicatore": "ext:bes_ripartizioni_03LAV007"
+        }
+      ]
+    },
+    {
+      "meta": {
+        "chiave": "ext:infortuni_attesi_settori",
+        "famiglia": "ext",
+        "codice": "infortuni_attesi_settori",
+        "livello": "regione",
+        "tema": "",
+        "nome": "Tasso di infortuni atteso in base ai settori",
+        "unita": "per 10.000 occupati",
+        "fonte": "Istat",
+        "archivio": "BES dei territori (03LAV007) e Conti territoriali, occupati per branca (93_379_DF_DCCN_OCCTSEC2010_2)",
+        "file": "data/elaborazioni/infortuni_attesi_settori.csv",
+        "method": "per ogni provincia si calcola la quota di occupati in agricoltura (A), industria in senso stretto (B-E) e costruzioni (F). Si stima con i minimi quadrati il tasso di infortuni come combinazione lineare delle tre quote (una retta in tre dimensioni, con intercetta). Il tasso \"atteso\" e' quello che la provincia avrebbe se contassero solo i settori. La quota di variabilita' spiegata (R quadro) dice quanto delle differenze fra province i settori spiegano. Il resto dipende da altro: dimensione delle imprese, eta' dei lavoratori, controlli, sottodenuncia, caso.",
+        "script": "scripts/articoli_trend/elab_settori_infortuni.py",
+        "source_url_ext": "https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/A..PS......?startPeriod=2022&endPeriod=2022",
+        "anni": [
+          2022,
+          2022
+        ],
+        "territori": 103,
+        "definizione": "per ogni provincia si calcola la quota di occupati in agricoltura (A), industria in senso stretto (B-E) e costruzioni (F). Si stima con i minimi quadrati il tasso di infortuni come combinazione lineare delle tre quote (una retta in tre dimensioni, con intercetta). Il tasso \"atteso\" e' quello che la provincia avrebbe se contassero solo i settori. La quota di variabilita' spiegata (R quadro) dice quanto delle differenze fra province i settori spiegano. Il resto dipende da altro: dimensione delle imprese, eta' dei lavoratori, controlli, sottodenuncia, caso.",
+        "fonti": "Istat",
+        "source_url": "https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/A..PS......?startPeriod=2022&endPeriod=2022",
+        "source_reference": "scripts/articoli_trend/elab_settori_infortuni.py",
+        "pagina": null,
+        "decimali": 1
+      },
+      "ultimo_anno": 2022,
+      "primo_anno": 2022,
+      "classifica": [
+        {
+          "posto": 1,
+          "territorio": "Ragusa",
+          "valore": 15.9,
+          "testo": "15,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 2,
+          "territorio": "Benevento",
+          "valore": 15.0,
+          "testo": "15,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 3,
+          "territorio": "Crotone",
+          "valore": 14.8,
+          "testo": "14,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 4,
+          "territorio": "L'Aquila",
+          "valore": 14.8,
+          "testo": "14,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 5,
+          "territorio": "Matera",
+          "valore": 14.5,
+          "testo": "14,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 6,
+          "territorio": "Vibo Valentia",
+          "valore": 14.5,
+          "testo": "14,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 7,
+          "territorio": "Foggia",
+          "valore": 14.4,
+          "testo": "14,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 8,
+          "territorio": "Isernia",
+          "valore": 14.3,
+          "testo": "14,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 9,
+          "territorio": "Caltanissetta",
+          "valore": 14.2,
+          "testo": "14,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 10,
+          "territorio": "Siracusa",
+          "valore": 14.2,
+          "testo": "14,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 11,
+          "territorio": "Brindisi",
+          "valore": 14.1,
+          "testo": "14,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 12,
+          "territorio": "Agrigento",
+          "valore": 13.9,
+          "testo": "13,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 13,
+          "territorio": "Cosenza",
+          "valore": 13.9,
+          "testo": "13,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 14,
+          "territorio": "Imperia",
+          "valore": 13.9,
+          "testo": "13,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 15,
+          "territorio": "Reggio Calabria",
+          "valore": 13.9,
+          "testo": "13,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 16,
+          "territorio": "Campobasso",
+          "valore": 13.8,
+          "testo": "13,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 17,
+          "territorio": "Nuoro",
+          "valore": 13.8,
+          "testo": "13,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 18,
+          "territorio": "Caserta",
+          "valore": 13.7,
+          "testo": "13,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 19,
+          "territorio": "Catanzaro",
+          "valore": 13.7,
+          "testo": "13,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 20,
+          "territorio": "Frosinone",
+          "valore": 13.7,
+          "testo": "13,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 21,
+          "territorio": "Lecce",
+          "valore": 13.7,
+          "testo": "13,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 22,
+          "territorio": "Potenza",
+          "valore": 13.7,
+          "testo": "13,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 23,
+          "territorio": "Asti",
+          "valore": 13.6,
+          "testo": "13,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 24,
+          "territorio": "Latina",
+          "valore": 13.6,
+          "testo": "13,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 25,
+          "territorio": "Viterbo",
+          "valore": 13.6,
+          "testo": "13,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 26,
+          "territorio": "Avellino",
+          "valore": 13.5,
+          "testo": "13,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 27,
+          "territorio": "Enna",
+          "valore": 13.5,
+          "testo": "13,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 28,
+          "territorio": "Teramo",
+          "valore": 13.5,
+          "testo": "13,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 29,
+          "territorio": "Grosseto",
+          "valore": 13.4,
+          "testo": "13,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 30,
+          "territorio": "Rieti",
+          "valore": 13.4,
+          "testo": "13,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 31,
+          "territorio": "Savona",
+          "valore": 13.4,
+          "testo": "13,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 32,
+          "territorio": "Oristano",
+          "valore": 13.3,
+          "testo": "13,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 33,
+          "territorio": "Sassari",
+          "valore": 13.3,
+          "testo": "13,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 34,
+          "territorio": "Trapani",
+          "valore": 13.1,
+          "testo": "13,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 35,
+          "territorio": "Aosta",
+          "valore": 13.0,
+          "testo": "13,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 36,
+          "territorio": "Cuneo",
+          "valore": 13.0,
+          "testo": "13,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 37,
+          "territorio": "Bari",
+          "valore": 12.8,
+          "testo": "12,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 38,
+          "territorio": "Bolzano",
+          "valore": 12.8,
+          "testo": "12,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 39,
+          "territorio": "Bergamo",
+          "valore": 12.7,
+          "testo": "12,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 40,
+          "territorio": "Messina",
+          "valore": 12.7,
+          "testo": "12,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 41,
+          "territorio": "Salerno",
+          "valore": 12.7,
+          "testo": "12,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 42,
+          "territorio": "Rovigo",
+          "valore": 12.5,
+          "testo": "12,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 43,
+          "territorio": "Catania",
+          "valore": 12.4,
+          "testo": "12,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 44,
+          "territorio": "Alessandria",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 45,
+          "territorio": "Arezzo",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 46,
+          "territorio": "Ascoli Piceno",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 47,
+          "territorio": "Chieti",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 48,
+          "territorio": "Macerata",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 49,
+          "territorio": "Pistoia",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 50,
+          "territorio": "Siena",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 51,
+          "territorio": "Taranto",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 52,
+          "territorio": "Terni",
+          "valore": 12.3,
+          "testo": "12,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 53,
+          "territorio": "Lucca",
+          "valore": 12.2,
+          "testo": "12,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 54,
+          "territorio": "Sondrio",
+          "valore": 12.2,
+          "testo": "12,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 55,
+          "territorio": "Massa-Carrara",
+          "valore": 12.1,
+          "testo": "12,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 56,
+          "territorio": "Vercelli",
+          "valore": 12.1,
+          "testo": "12,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 57,
+          "territorio": "Brescia",
+          "valore": 12.0,
+          "testo": "12,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 58,
+          "territorio": "Forlì-Cesena",
+          "valore": 12.0,
+          "testo": "12,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 59,
+          "territorio": "Trento",
+          "valore": 12.0,
+          "testo": "12,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 60,
+          "territorio": "Verbano-Cusio-Ossola",
+          "valore": 12.0,
+          "testo": "12,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 61,
+          "territorio": "Pescara",
+          "valore": 11.9,
+          "testo": "11,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 62,
+          "territorio": "Ferrara",
+          "valore": 11.8,
+          "testo": "11,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 63,
+          "territorio": "Perugia",
+          "valore": 11.8,
+          "testo": "11,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 64,
+          "territorio": "Treviso",
+          "valore": 11.8,
+          "testo": "11,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 65,
+          "territorio": "Gorizia",
+          "valore": 11.7,
+          "testo": "11,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 66,
+          "territorio": "Lodi",
+          "valore": 11.7,
+          "testo": "11,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 67,
+          "territorio": "Mantova",
+          "valore": 11.7,
+          "testo": "11,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 68,
+          "territorio": "Palermo",
+          "valore": 11.6,
+          "testo": "11,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 69,
+          "territorio": "Pavia",
+          "valore": 11.6,
+          "testo": "11,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 70,
+          "territorio": "Ravenna",
+          "valore": 11.6,
+          "testo": "11,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 71,
+          "territorio": "Genova",
+          "valore": 11.5,
+          "testo": "11,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 72,
+          "territorio": "Verona",
+          "valore": 11.5,
+          "testo": "11,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 73,
+          "territorio": "Venezia",
+          "valore": 11.4,
+          "testo": "11,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 74,
+          "territorio": "Livorno",
+          "valore": 11.3,
+          "testo": "11,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 75,
+          "territorio": "Napoli",
+          "valore": 11.3,
+          "testo": "11,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 76,
+          "territorio": "Parma",
+          "valore": 11.3,
+          "testo": "11,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 77,
+          "territorio": "Pisa",
+          "valore": 11.3,
+          "testo": "11,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 78,
+          "territorio": "Reggio Emilia",
+          "valore": 11.3,
+          "testo": "11,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 79,
+          "territorio": "Rimini",
+          "valore": 11.3,
+          "testo": "11,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 80,
+          "territorio": "La Spezia",
+          "valore": 11.2,
+          "testo": "11,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 81,
+          "territorio": "Belluno",
+          "valore": 11.1,
+          "testo": "11,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 82,
+          "territorio": "Cremona",
+          "valore": 11.1,
+          "testo": "11,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 83,
+          "territorio": "Pesaro e Urbino",
+          "valore": 11.1,
+          "testo": "11,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 84,
+          "territorio": "Udine",
+          "valore": 11.1,
+          "testo": "11,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 85,
+          "territorio": "Cagliari",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 86,
+          "territorio": "Como",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 87,
+          "territorio": "Modena",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 88,
+          "territorio": "Novara",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 89,
+          "territorio": "Padova",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 90,
+          "territorio": "Piacenza",
+          "valore": 11.0,
+          "testo": "11,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 91,
+          "territorio": "Biella",
+          "valore": 10.9,
+          "testo": "10,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 92,
+          "territorio": "Lecco",
+          "valore": 10.9,
+          "testo": "10,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 93,
+          "territorio": "Pordenone",
+          "valore": 10.8,
+          "testo": "10,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 94,
+          "territorio": "Ancona",
+          "valore": 10.6,
+          "testo": "10,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 95,
+          "territorio": "Torino",
+          "valore": 10.5,
+          "testo": "10,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 96,
+          "territorio": "Trieste",
+          "valore": 10.5,
+          "testo": "10,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 97,
+          "territorio": "Firenze",
+          "valore": 10.4,
+          "testo": "10,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 98,
+          "territorio": "Vicenza",
+          "valore": 10.4,
+          "testo": "10,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 99,
+          "territorio": "Bologna",
+          "valore": 10.3,
+          "testo": "10,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 100,
+          "territorio": "Roma",
+          "valore": 10.3,
+          "testo": "10,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 101,
+          "territorio": "Varese",
+          "valore": 10.3,
+          "testo": "10,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 102,
+          "territorio": "Prato",
+          "valore": 10.1,
+          "testo": "10,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 103,
+          "territorio": "Milano",
+          "valore": 9.8,
+          "testo": "9,8",
+          "ripartizione": "Centro-Nord"
+        }
+      ],
+      "medie": {
+        "2022": {
+          "territori": 103,
+          "media_semplice": 12.3524,
+          "media_centro_nord": 12.3524
+        }
+      },
+      "variazioni": [],
+      "serie": {
+        "Agrigento": {
+          "2022": 13.9
+        },
+        "Alessandria": {
+          "2022": 12.3
+        },
+        "Ancona": {
+          "2022": 10.6
+        },
+        "Aosta": {
+          "2022": 13.0
+        },
+        "Arezzo": {
+          "2022": 12.3
+        },
+        "Ascoli Piceno": {
+          "2022": 12.3
+        },
+        "Asti": {
+          "2022": 13.6
+        },
+        "Avellino": {
+          "2022": 13.5
+        },
+        "Bari": {
+          "2022": 12.8
+        },
+        "Belluno": {
+          "2022": 11.1
+        },
+        "Benevento": {
+          "2022": 15.0
+        },
+        "Bergamo": {
+          "2022": 12.7
+        },
+        "Biella": {
+          "2022": 10.9
+        },
+        "Bologna": {
+          "2022": 10.3
+        },
+        "Bolzano": {
+          "2022": 12.8
+        },
+        "Brescia": {
+          "2022": 12.0
+        },
+        "Brindisi": {
+          "2022": 14.1
+        },
+        "Cagliari": {
+          "2022": 11.0
+        },
+        "Caltanissetta": {
+          "2022": 14.2
+        },
+        "Campobasso": {
+          "2022": 13.8
+        },
+        "Caserta": {
+          "2022": 13.7
+        },
+        "Catania": {
+          "2022": 12.4
+        },
+        "Catanzaro": {
+          "2022": 13.7
+        },
+        "Chieti": {
+          "2022": 12.3
+        },
+        "Como": {
+          "2022": 11.0
+        },
+        "Cosenza": {
+          "2022": 13.9
+        },
+        "Cremona": {
+          "2022": 11.1
+        },
+        "Crotone": {
+          "2022": 14.8
+        },
+        "Cuneo": {
+          "2022": 13.0
+        },
+        "Enna": {
+          "2022": 13.5
+        },
+        "Ferrara": {
+          "2022": 11.8
+        },
+        "Firenze": {
+          "2022": 10.4
+        },
+        "Foggia": {
+          "2022": 14.4
+        },
+        "Forlì-Cesena": {
+          "2022": 12.0
+        },
+        "Frosinone": {
+          "2022": 13.7
+        },
+        "Genova": {
+          "2022": 11.5
+        },
+        "Gorizia": {
+          "2022": 11.7
+        },
+        "Grosseto": {
+          "2022": 13.4
+        },
+        "Imperia": {
+          "2022": 13.9
+        },
+        "Isernia": {
+          "2022": 14.3
+        },
+        "L'Aquila": {
+          "2022": 14.8
+        },
+        "La Spezia": {
+          "2022": 11.2
+        },
+        "Latina": {
+          "2022": 13.6
+        },
+        "Lecce": {
+          "2022": 13.7
+        },
+        "Lecco": {
+          "2022": 10.9
+        },
+        "Livorno": {
+          "2022": 11.3
+        },
+        "Lodi": {
+          "2022": 11.7
+        },
+        "Lucca": {
+          "2022": 12.2
+        },
+        "Macerata": {
+          "2022": 12.3
+        },
+        "Mantova": {
+          "2022": 11.7
+        },
+        "Massa-Carrara": {
+          "2022": 12.1
+        },
+        "Matera": {
+          "2022": 14.5
+        },
+        "Messina": {
+          "2022": 12.7
+        },
+        "Milano": {
+          "2022": 9.8
+        },
+        "Modena": {
+          "2022": 11.0
+        },
+        "Napoli": {
+          "2022": 11.3
+        },
+        "Novara": {
+          "2022": 11.0
+        },
+        "Nuoro": {
+          "2022": 13.8
+        },
+        "Oristano": {
+          "2022": 13.3
+        },
+        "Padova": {
+          "2022": 11.0
+        },
+        "Palermo": {
+          "2022": 11.6
+        },
+        "Parma": {
+          "2022": 11.3
+        },
+        "Pavia": {
+          "2022": 11.6
+        },
+        "Perugia": {
+          "2022": 11.8
+        },
+        "Pesaro e Urbino": {
+          "2022": 11.1
+        },
+        "Pescara": {
+          "2022": 11.9
+        },
+        "Piacenza": {
+          "2022": 11.0
+        },
+        "Pisa": {
+          "2022": 11.3
+        },
+        "Pistoia": {
+          "2022": 12.3
+        },
+        "Pordenone": {
+          "2022": 10.8
+        },
+        "Potenza": {
+          "2022": 13.7
+        },
+        "Prato": {
+          "2022": 10.1
+        },
+        "Ragusa": {
+          "2022": 15.9
+        },
+        "Ravenna": {
+          "2022": 11.6
+        },
+        "Reggio Calabria": {
+          "2022": 13.9
+        },
+        "Reggio Emilia": {
+          "2022": 11.3
+        },
+        "Rieti": {
+          "2022": 13.4
+        },
+        "Rimini": {
+          "2022": 11.3
+        },
+        "Roma": {
+          "2022": 10.3
+        },
+        "Rovigo": {
+          "2022": 12.5
+        },
+        "Salerno": {
+          "2022": 12.7
+        },
+        "Sassari": {
+          "2022": 13.3
+        },
+        "Savona": {
+          "2022": 13.4
+        },
+        "Siena": {
+          "2022": 12.3
+        },
+        "Siracusa": {
+          "2022": 14.2
+        },
+        "Sondrio": {
+          "2022": 12.2
+        },
+        "Taranto": {
+          "2022": 12.3
+        },
+        "Teramo": {
+          "2022": 13.5
+        },
+        "Terni": {
+          "2022": 12.3
+        },
+        "Torino": {
+          "2022": 10.5
+        },
+        "Trapani": {
+          "2022": 13.1
+        },
+        "Trento": {
+          "2022": 12.0
+        },
+        "Treviso": {
+          "2022": 11.8
+        },
+        "Trieste": {
+          "2022": 10.5
+        },
+        "Udine": {
+          "2022": 11.1
+        },
+        "Varese": {
+          "2022": 10.3
+        },
+        "Venezia": {
+          "2022": 11.4
+        },
+        "Verbano-Cusio-Ossola": {
+          "2022": 12.0
+        },
+        "Vercelli": {
+          "2022": 12.1
+        },
+        "Verona": {
+          "2022": 11.5
+        },
+        "Vibo Valentia": {
+          "2022": 14.5
+        },
+        "Vicenza": {
+          "2022": 10.4
+        },
+        "Viterbo": {
+          "2022": 13.6
+        }
+      },
+      "cifre": [
+        {
+          "cifra": "15,9",
+          "cosa": "Ragusa, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "15,0",
+          "cosa": "Benevento, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,8",
+          "cosa": "Crotone, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,8",
+          "cosa": "L'Aquila, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,5",
+          "cosa": "Matera, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,5",
+          "cosa": "Vibo Valentia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,4",
+          "cosa": "Foggia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,3",
+          "cosa": "Isernia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,2",
+          "cosa": "Caltanissetta, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,2",
+          "cosa": "Siracusa, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "14,1",
+          "cosa": "Brindisi, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,9",
+          "cosa": "Agrigento, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,9",
+          "cosa": "Cosenza, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,9",
+          "cosa": "Imperia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,9",
+          "cosa": "Reggio Calabria, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,8",
+          "cosa": "Campobasso, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,8",
+          "cosa": "Nuoro, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,7",
+          "cosa": "Caserta, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,7",
+          "cosa": "Catanzaro, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,7",
+          "cosa": "Frosinone, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,7",
+          "cosa": "Lecce, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,7",
+          "cosa": "Potenza, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,6",
+          "cosa": "Asti, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,6",
+          "cosa": "Latina, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,6",
+          "cosa": "Viterbo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,5",
+          "cosa": "Avellino, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,5",
+          "cosa": "Enna, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,5",
+          "cosa": "Teramo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,4",
+          "cosa": "Grosseto, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,4",
+          "cosa": "Rieti, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,4",
+          "cosa": "Savona, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,3",
+          "cosa": "Oristano, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,3",
+          "cosa": "Sassari, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,1",
+          "cosa": "Trapani, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,0",
+          "cosa": "Aosta, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "13,0",
+          "cosa": "Cuneo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,8",
+          "cosa": "Bari, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,8",
+          "cosa": "Bolzano, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,7",
+          "cosa": "Bergamo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,7",
+          "cosa": "Messina, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,7",
+          "cosa": "Salerno, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,5",
+          "cosa": "Rovigo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,4",
+          "cosa": "Catania, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Alessandria, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Arezzo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Ascoli Piceno, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Chieti, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Macerata, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Pistoia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Siena, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Taranto, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,3",
+          "cosa": "Terni, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,2",
+          "cosa": "Lucca, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,2",
+          "cosa": "Sondrio, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,1",
+          "cosa": "Massa-Carrara, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,1",
+          "cosa": "Vercelli, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,0",
+          "cosa": "Brescia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,0",
+          "cosa": "Forlì-Cesena, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,0",
+          "cosa": "Trento, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,0",
+          "cosa": "Verbano-Cusio-Ossola, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,9",
+          "cosa": "Pescara, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,8",
+          "cosa": "Ferrara, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,8",
+          "cosa": "Perugia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,8",
+          "cosa": "Treviso, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,7",
+          "cosa": "Gorizia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,7",
+          "cosa": "Lodi, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,7",
+          "cosa": "Mantova, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,6",
+          "cosa": "Palermo, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,6",
+          "cosa": "Pavia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,6",
+          "cosa": "Ravenna, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,5",
+          "cosa": "Genova, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,5",
+          "cosa": "Verona, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,4",
+          "cosa": "Venezia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Livorno, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Napoli, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Parma, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Pisa, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Reggio Emilia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,3",
+          "cosa": "Rimini, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,2",
+          "cosa": "La Spezia, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,1",
+          "cosa": "Belluno, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,1",
+          "cosa": "Cremona, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,1",
+          "cosa": "Pesaro e Urbino, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,1",
+          "cosa": "Udine, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Cagliari, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Como, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Modena, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Novara, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Padova, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "11,0",
+          "cosa": "Piacenza, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,9",
+          "cosa": "Biella, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,9",
+          "cosa": "Lecco, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,8",
+          "cosa": "Pordenone, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,6",
+          "cosa": "Ancona, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,5",
+          "cosa": "Torino, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,5",
+          "cosa": "Trieste, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,4",
+          "cosa": "Firenze, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,4",
+          "cosa": "Vicenza, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,3",
+          "cosa": "Bologna, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,3",
+          "cosa": "Roma, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,3",
+          "cosa": "Varese, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "10,1",
+          "cosa": "Prato, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "9,8",
+          "cosa": "Milano, 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,4",
+          "cosa": "media semplice dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,35",
+          "cosa": "media semplice dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,4",
+          "cosa": "media centro nord dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "12,35",
+          "cosa": "media centro nord dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:infortuni_attesi_settori"
+        },
+        {
+          "cifra": "1,6",
+          "cosa": "rapporto fra primo (Ragusa) e ultimo (Milano) nel 2022",
+          "indicatore": "ext:infortuni_attesi_settori"
+        }
+      ]
+    },
+    {
+      "meta": {
+        "chiave": "ext:quota_occupati_agri_ind_costr",
+        "famiglia": "ext",
+        "codice": "quota_occupati_agri_ind_costr",
+        "livello": "regione",
+        "tema": "",
+        "nome": "Occupati in agricoltura, industria e costruzioni",
+        "unita": "percentuale sugli occupati totali",
+        "fonte": "Istat",
+        "archivio": "Conti territoriali, occupati per branca e provincia",
+        "file": "data/elaborazioni/quota_occupati_agri_ind_costr.csv",
+        "method": "Somma delle persone occupate nelle branche A, B-E e F divisa per il totale delle persone occupate, per provincia, 2022.",
+        "script": "scripts/articoli_trend/elab_settori_infortuni.py",
+        "source_url_ext": "https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/A..PS......?startPeriod=2022&endPeriod=2022",
+        "anni": [
+          2022,
+          2022
+        ],
+        "territori": 103,
+        "definizione": "Somma delle persone occupate nelle branche A, B-E e F divisa per il totale delle persone occupate, per provincia, 2022.",
+        "fonti": "Istat",
+        "source_url": "https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/A..PS......?startPeriod=2022&endPeriod=2022",
+        "source_reference": "scripts/articoli_trend/elab_settori_infortuni.py",
+        "pagina": null,
+        "decimali": 1
+      },
+      "ultimo_anno": 2022,
+      "primo_anno": 2022,
+      "classifica": [
+        {
+          "posto": 1,
+          "territorio": "Prato",
+          "valore": 42.8,
+          "testo": "42,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 2,
+          "territorio": "Vicenza",
+          "valore": 42.4,
+          "testo": "42,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 3,
+          "territorio": "Treviso",
+          "valore": 40.0,
+          "testo": "40,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 4,
+          "territorio": "Lecco",
+          "valore": 39.7,
+          "testo": "39,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 5,
+          "territorio": "Arezzo",
+          "valore": 39.6,
+          "testo": "39,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 6,
+          "territorio": "Pordenone",
+          "valore": 39.2,
+          "testo": "39,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 7,
+          "territorio": "Mantova",
+          "valore": 38.9,
+          "testo": "38,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 8,
+          "territorio": "Bergamo",
+          "valore": 38.8,
+          "testo": "38,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 9,
+          "territorio": "Cuneo",
+          "valore": 38.6,
+          "testo": "38,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 10,
+          "territorio": "Reggio Emilia",
+          "valore": 38.6,
+          "testo": "38,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 11,
+          "territorio": "Brescia",
+          "valore": 37.7,
+          "testo": "37,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 12,
+          "territorio": "Matera",
+          "valore": 37.4,
+          "testo": "37,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 13,
+          "territorio": "Ragusa",
+          "valore": 37.4,
+          "testo": "37,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 14,
+          "territorio": "Belluno",
+          "valore": 37.2,
+          "testo": "37,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 15,
+          "territorio": "Modena",
+          "valore": 37.2,
+          "testo": "37,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 16,
+          "territorio": "Macerata",
+          "valore": 36.3,
+          "testo": "36,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 17,
+          "territorio": "Pesaro e Urbino",
+          "valore": 36.3,
+          "testo": "36,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 18,
+          "territorio": "Teramo",
+          "valore": 36.1,
+          "testo": "36,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 19,
+          "territorio": "Cremona",
+          "valore": 35.7,
+          "testo": "35,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 20,
+          "territorio": "Rovigo",
+          "valore": 35.7,
+          "testo": "35,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 21,
+          "territorio": "Asti",
+          "valore": 35.3,
+          "testo": "35,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 22,
+          "territorio": "Vercelli",
+          "valore": 35.1,
+          "testo": "35,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 23,
+          "territorio": "Chieti",
+          "valore": 34.8,
+          "testo": "34,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 24,
+          "territorio": "Parma",
+          "valore": 34.4,
+          "testo": "34,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 25,
+          "territorio": "Forlì-Cesena",
+          "valore": 34.0,
+          "testo": "34,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 26,
+          "territorio": "Gorizia",
+          "valore": 33.8,
+          "testo": "33,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 27,
+          "territorio": "Potenza",
+          "valore": 33.2,
+          "testo": "33,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 28,
+          "territorio": "Biella",
+          "valore": 33.0,
+          "testo": "33,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 29,
+          "territorio": "Novara",
+          "valore": 32.9,
+          "testo": "32,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 30,
+          "territorio": "Alessandria",
+          "valore": 32.2,
+          "testo": "32,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 31,
+          "territorio": "Latina",
+          "valore": 32.1,
+          "testo": "32,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 32,
+          "territorio": "Avellino",
+          "valore": 32.0,
+          "testo": "32,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 33,
+          "territorio": "Benevento",
+          "valore": 32.0,
+          "testo": "32,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 34,
+          "territorio": "Padova",
+          "valore": 31.9,
+          "testo": "31,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 35,
+          "territorio": "Crotone",
+          "valore": 31.4,
+          "testo": "31,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 36,
+          "territorio": "Foggia",
+          "valore": 31.4,
+          "testo": "31,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 37,
+          "territorio": "Frosinone",
+          "valore": 31.4,
+          "testo": "31,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 38,
+          "territorio": "Varese",
+          "valore": 31.2,
+          "testo": "31,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 39,
+          "territorio": "Pistoia",
+          "valore": 31.0,
+          "testo": "31,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 40,
+          "territorio": "Ferrara",
+          "valore": 30.9,
+          "testo": "30,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 41,
+          "territorio": "Lodi",
+          "valore": 30.7,
+          "testo": "30,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 42,
+          "territorio": "Brindisi",
+          "valore": 30.6,
+          "testo": "30,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 43,
+          "territorio": "Campobasso",
+          "valore": 30.5,
+          "testo": "30,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 44,
+          "territorio": "Ravenna",
+          "valore": 30.5,
+          "testo": "30,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 45,
+          "territorio": "Como",
+          "valore": 30.3,
+          "testo": "30,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 46,
+          "territorio": "Ancona",
+          "valore": 30.1,
+          "testo": "30,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 47,
+          "territorio": "Lucca",
+          "valore": 30.1,
+          "testo": "30,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 48,
+          "territorio": "Ascoli Piceno",
+          "valore": 30.0,
+          "testo": "30,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 49,
+          "territorio": "Taranto",
+          "valore": 29.9,
+          "testo": "29,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 50,
+          "territorio": "Verona",
+          "valore": 29.7,
+          "testo": "29,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 51,
+          "territorio": "Perugia",
+          "valore": 29.4,
+          "testo": "29,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 52,
+          "territorio": "Siena",
+          "valore": 29.4,
+          "testo": "29,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 53,
+          "territorio": "Udine",
+          "valore": 29.3,
+          "testo": "29,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 54,
+          "territorio": "Vibo Valentia",
+          "valore": 29.3,
+          "testo": "29,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 55,
+          "territorio": "Piacenza",
+          "valore": 29.2,
+          "testo": "29,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 56,
+          "territorio": "Siracusa",
+          "valore": 28.7,
+          "testo": "28,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 57,
+          "territorio": "Sondrio",
+          "valore": 28.5,
+          "testo": "28,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 58,
+          "territorio": "Agrigento",
+          "valore": 28.4,
+          "testo": "28,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 59,
+          "territorio": "L'Aquila",
+          "valore": 27.9,
+          "testo": "27,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 60,
+          "territorio": "Pavia",
+          "valore": 27.8,
+          "testo": "27,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 61,
+          "territorio": "Lecce",
+          "valore": 27.6,
+          "testo": "27,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 62,
+          "territorio": "Nuoro",
+          "valore": 27.5,
+          "testo": "27,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 63,
+          "territorio": "Pisa",
+          "valore": 27.5,
+          "testo": "27,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 64,
+          "territorio": "Bolzano",
+          "valore": 27.4,
+          "testo": "27,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 65,
+          "territorio": "Reggio Calabria",
+          "valore": 27.4,
+          "testo": "27,4",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 66,
+          "territorio": "Isernia",
+          "valore": 27.2,
+          "testo": "27,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 67,
+          "territorio": "Salerno",
+          "valore": 27.0,
+          "testo": "27,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 68,
+          "territorio": "Caltanissetta",
+          "valore": 26.7,
+          "testo": "26,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 69,
+          "territorio": "Caserta",
+          "valore": 26.6,
+          "testo": "26,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 70,
+          "territorio": "Terni",
+          "valore": 26.6,
+          "testo": "26,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 71,
+          "territorio": "Cosenza",
+          "valore": 26.3,
+          "testo": "26,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 72,
+          "territorio": "Bari",
+          "valore": 26.2,
+          "testo": "26,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 73,
+          "territorio": "Trapani",
+          "valore": 26.2,
+          "testo": "26,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 74,
+          "territorio": "Bologna",
+          "valore": 26.1,
+          "testo": "26,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 75,
+          "territorio": "Trento",
+          "valore": 26.0,
+          "testo": "26,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 76,
+          "territorio": "Verbano-Cusio-Ossola",
+          "valore": 25.9,
+          "testo": "25,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 77,
+          "territorio": "Viterbo",
+          "valore": 25.9,
+          "testo": "25,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 78,
+          "territorio": "Grosseto",
+          "valore": 25.8,
+          "testo": "25,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 79,
+          "territorio": "Enna",
+          "valore": 25.7,
+          "testo": "25,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 80,
+          "territorio": "Firenze",
+          "valore": 25.6,
+          "testo": "25,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 81,
+          "territorio": "Oristano",
+          "valore": 25.6,
+          "testo": "25,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 82,
+          "territorio": "Torino",
+          "valore": 25.6,
+          "testo": "25,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 83,
+          "territorio": "Massa-Carrara",
+          "valore": 25.2,
+          "testo": "25,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 84,
+          "territorio": "Venezia",
+          "valore": 25.0,
+          "testo": "25,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 85,
+          "territorio": "Catanzaro",
+          "valore": 24.9,
+          "testo": "24,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 86,
+          "territorio": "Savona",
+          "valore": 23.9,
+          "testo": "23,9",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 87,
+          "territorio": "Pescara",
+          "valore": 22.7,
+          "testo": "22,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 88,
+          "territorio": "Rieti",
+          "valore": 22.5,
+          "testo": "22,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 89,
+          "territorio": "Rimini",
+          "valore": 22.2,
+          "testo": "22,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 90,
+          "territorio": "Catania",
+          "valore": 22.1,
+          "testo": "22,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 91,
+          "territorio": "Imperia",
+          "valore": 22.0,
+          "testo": "22,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 92,
+          "territorio": "Aosta",
+          "valore": 21.7,
+          "testo": "21,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 93,
+          "territorio": "Messina",
+          "valore": 21.5,
+          "testo": "21,5",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 94,
+          "territorio": "La Spezia",
+          "valore": 20.8,
+          "testo": "20,8",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 95,
+          "territorio": "Sassari",
+          "valore": 20.7,
+          "testo": "20,7",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 96,
+          "territorio": "Napoli",
+          "valore": 20.2,
+          "testo": "20,2",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 97,
+          "territorio": "Livorno",
+          "valore": 20.1,
+          "testo": "20,1",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 98,
+          "territorio": "Genova",
+          "valore": 18.6,
+          "testo": "18,6",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 99,
+          "territorio": "Milano",
+          "valore": 17.3,
+          "testo": "17,3",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 100,
+          "territorio": "Palermo",
+          "valore": 17.0,
+          "testo": "17,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 101,
+          "territorio": "Trieste",
+          "valore": 17.0,
+          "testo": "17,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 102,
+          "territorio": "Cagliari",
+          "valore": 15.0,
+          "testo": "15,0",
+          "ripartizione": "Centro-Nord"
+        },
+        {
+          "posto": 103,
+          "territorio": "Roma",
+          "valore": 11.6,
+          "testo": "11,6",
+          "ripartizione": "Centro-Nord"
+        }
+      ],
+      "medie": {
+        "2022": {
+          "territori": 103,
+          "media_semplice": 29.3621,
+          "media_centro_nord": 29.3621
+        }
+      },
+      "variazioni": [],
+      "serie": {
+        "Agrigento": {
+          "2022": 28.4
+        },
+        "Alessandria": {
+          "2022": 32.2
+        },
+        "Ancona": {
+          "2022": 30.1
+        },
+        "Aosta": {
+          "2022": 21.7
+        },
+        "Arezzo": {
+          "2022": 39.6
+        },
+        "Ascoli Piceno": {
+          "2022": 30.0
+        },
+        "Asti": {
+          "2022": 35.3
+        },
+        "Avellino": {
+          "2022": 32.0
+        },
+        "Bari": {
+          "2022": 26.2
+        },
+        "Belluno": {
+          "2022": 37.2
+        },
+        "Benevento": {
+          "2022": 32.0
+        },
+        "Bergamo": {
+          "2022": 38.8
+        },
+        "Biella": {
+          "2022": 33.0
+        },
+        "Bologna": {
+          "2022": 26.1
+        },
+        "Bolzano": {
+          "2022": 27.4
+        },
+        "Brescia": {
+          "2022": 37.7
+        },
+        "Brindisi": {
+          "2022": 30.6
+        },
+        "Cagliari": {
+          "2022": 15.0
+        },
+        "Caltanissetta": {
+          "2022": 26.7
+        },
+        "Campobasso": {
+          "2022": 30.5
+        },
+        "Caserta": {
+          "2022": 26.6
+        },
+        "Catania": {
+          "2022": 22.1
+        },
+        "Catanzaro": {
+          "2022": 24.9
+        },
+        "Chieti": {
+          "2022": 34.8
+        },
+        "Como": {
+          "2022": 30.3
+        },
+        "Cosenza": {
+          "2022": 26.3
+        },
+        "Cremona": {
+          "2022": 35.7
+        },
+        "Crotone": {
+          "2022": 31.4
+        },
+        "Cuneo": {
+          "2022": 38.6
+        },
+        "Enna": {
+          "2022": 25.7
+        },
+        "Ferrara": {
+          "2022": 30.9
+        },
+        "Firenze": {
+          "2022": 25.6
+        },
+        "Foggia": {
+          "2022": 31.4
+        },
+        "Forlì-Cesena": {
+          "2022": 34.0
+        },
+        "Frosinone": {
+          "2022": 31.4
+        },
+        "Genova": {
+          "2022": 18.6
+        },
+        "Gorizia": {
+          "2022": 33.8
+        },
+        "Grosseto": {
+          "2022": 25.8
+        },
+        "Imperia": {
+          "2022": 22.0
+        },
+        "Isernia": {
+          "2022": 27.2
+        },
+        "L'Aquila": {
+          "2022": 27.9
+        },
+        "La Spezia": {
+          "2022": 20.8
+        },
+        "Latina": {
+          "2022": 32.1
+        },
+        "Lecce": {
+          "2022": 27.6
+        },
+        "Lecco": {
+          "2022": 39.7
+        },
+        "Livorno": {
+          "2022": 20.1
+        },
+        "Lodi": {
+          "2022": 30.7
+        },
+        "Lucca": {
+          "2022": 30.1
+        },
+        "Macerata": {
+          "2022": 36.3
+        },
+        "Mantova": {
+          "2022": 38.9
+        },
+        "Massa-Carrara": {
+          "2022": 25.2
+        },
+        "Matera": {
+          "2022": 37.4
+        },
+        "Messina": {
+          "2022": 21.5
+        },
+        "Milano": {
+          "2022": 17.3
+        },
+        "Modena": {
+          "2022": 37.2
+        },
+        "Napoli": {
+          "2022": 20.2
+        },
+        "Novara": {
+          "2022": 32.9
+        },
+        "Nuoro": {
+          "2022": 27.5
+        },
+        "Oristano": {
+          "2022": 25.6
+        },
+        "Padova": {
+          "2022": 31.9
+        },
+        "Palermo": {
+          "2022": 17.0
+        },
+        "Parma": {
+          "2022": 34.4
+        },
+        "Pavia": {
+          "2022": 27.8
+        },
+        "Perugia": {
+          "2022": 29.4
+        },
+        "Pesaro e Urbino": {
+          "2022": 36.3
+        },
+        "Pescara": {
+          "2022": 22.7
+        },
+        "Piacenza": {
+          "2022": 29.2
+        },
+        "Pisa": {
+          "2022": 27.5
+        },
+        "Pistoia": {
+          "2022": 31.0
+        },
+        "Pordenone": {
+          "2022": 39.2
+        },
+        "Potenza": {
+          "2022": 33.2
+        },
+        "Prato": {
+          "2022": 42.8
+        },
+        "Ragusa": {
+          "2022": 37.4
+        },
+        "Ravenna": {
+          "2022": 30.5
+        },
+        "Reggio Calabria": {
+          "2022": 27.4
+        },
+        "Reggio Emilia": {
+          "2022": 38.6
+        },
+        "Rieti": {
+          "2022": 22.5
+        },
+        "Rimini": {
+          "2022": 22.2
+        },
+        "Roma": {
+          "2022": 11.6
+        },
+        "Rovigo": {
+          "2022": 35.7
+        },
+        "Salerno": {
+          "2022": 27.0
+        },
+        "Sassari": {
+          "2022": 20.7
+        },
+        "Savona": {
+          "2022": 23.9
+        },
+        "Siena": {
+          "2022": 29.4
+        },
+        "Siracusa": {
+          "2022": 28.7
+        },
+        "Sondrio": {
+          "2022": 28.5
+        },
+        "Taranto": {
+          "2022": 29.9
+        },
+        "Teramo": {
+          "2022": 36.1
+        },
+        "Terni": {
+          "2022": 26.6
+        },
+        "Torino": {
+          "2022": 25.6
+        },
+        "Trapani": {
+          "2022": 26.2
+        },
+        "Trento": {
+          "2022": 26.0
+        },
+        "Treviso": {
+          "2022": 40.0
+        },
+        "Trieste": {
+          "2022": 17.0
+        },
+        "Udine": {
+          "2022": 29.3
+        },
+        "Varese": {
+          "2022": 31.2
+        },
+        "Venezia": {
+          "2022": 25.0
+        },
+        "Verbano-Cusio-Ossola": {
+          "2022": 25.9
+        },
+        "Vercelli": {
+          "2022": 35.1
+        },
+        "Verona": {
+          "2022": 29.7
+        },
+        "Vibo Valentia": {
+          "2022": 29.3
+        },
+        "Vicenza": {
+          "2022": 42.4
+        },
+        "Viterbo": {
+          "2022": 25.9
+        }
+      },
+      "cifre": [
+        {
+          "cifra": "42,8",
+          "cosa": "Prato, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "42,4",
+          "cosa": "Vicenza, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "40,0",
+          "cosa": "Treviso, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "39,7",
+          "cosa": "Lecco, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "39,6",
+          "cosa": "Arezzo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "39,2",
+          "cosa": "Pordenone, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "38,9",
+          "cosa": "Mantova, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "38,8",
+          "cosa": "Bergamo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "38,6",
+          "cosa": "Cuneo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "38,6",
+          "cosa": "Reggio Emilia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "37,7",
+          "cosa": "Brescia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "37,4",
+          "cosa": "Matera, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "37,4",
+          "cosa": "Ragusa, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "37,2",
+          "cosa": "Belluno, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "37,2",
+          "cosa": "Modena, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "36,3",
+          "cosa": "Macerata, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "36,3",
+          "cosa": "Pesaro e Urbino, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "36,1",
+          "cosa": "Teramo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "35,7",
+          "cosa": "Cremona, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "35,7",
+          "cosa": "Rovigo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "35,3",
+          "cosa": "Asti, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "35,1",
+          "cosa": "Vercelli, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "34,8",
+          "cosa": "Chieti, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "34,4",
+          "cosa": "Parma, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "34,0",
+          "cosa": "Forlì-Cesena, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "33,8",
+          "cosa": "Gorizia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "33,2",
+          "cosa": "Potenza, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "33,0",
+          "cosa": "Biella, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "32,9",
+          "cosa": "Novara, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "32,2",
+          "cosa": "Alessandria, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "32,1",
+          "cosa": "Latina, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "32,0",
+          "cosa": "Avellino, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "32,0",
+          "cosa": "Benevento, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "31,9",
+          "cosa": "Padova, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "31,4",
+          "cosa": "Crotone, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "31,4",
+          "cosa": "Foggia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "31,4",
+          "cosa": "Frosinone, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "31,2",
+          "cosa": "Varese, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "31,0",
+          "cosa": "Pistoia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,9",
+          "cosa": "Ferrara, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,7",
+          "cosa": "Lodi, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,6",
+          "cosa": "Brindisi, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,5",
+          "cosa": "Campobasso, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,5",
+          "cosa": "Ravenna, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,3",
+          "cosa": "Como, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,1",
+          "cosa": "Ancona, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,1",
+          "cosa": "Lucca, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "30,0",
+          "cosa": "Ascoli Piceno, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,9",
+          "cosa": "Taranto, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,7",
+          "cosa": "Verona, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,4",
+          "cosa": "Perugia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,4",
+          "cosa": "Siena, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,3",
+          "cosa": "Udine, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,3",
+          "cosa": "Vibo Valentia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,2",
+          "cosa": "Piacenza, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "28,7",
+          "cosa": "Siracusa, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "28,5",
+          "cosa": "Sondrio, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "28,4",
+          "cosa": "Agrigento, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,9",
+          "cosa": "L'Aquila, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,8",
+          "cosa": "Pavia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,6",
+          "cosa": "Lecce, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,5",
+          "cosa": "Nuoro, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,5",
+          "cosa": "Pisa, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,4",
+          "cosa": "Bolzano, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,4",
+          "cosa": "Reggio Calabria, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,2",
+          "cosa": "Isernia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "27,0",
+          "cosa": "Salerno, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,7",
+          "cosa": "Caltanissetta, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,6",
+          "cosa": "Caserta, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,6",
+          "cosa": "Terni, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,3",
+          "cosa": "Cosenza, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,2",
+          "cosa": "Bari, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,2",
+          "cosa": "Trapani, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,1",
+          "cosa": "Bologna, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "26,0",
+          "cosa": "Trento, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,9",
+          "cosa": "Verbano-Cusio-Ossola, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,9",
+          "cosa": "Viterbo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,8",
+          "cosa": "Grosseto, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,7",
+          "cosa": "Enna, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,6",
+          "cosa": "Firenze, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,6",
+          "cosa": "Oristano, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,6",
+          "cosa": "Torino, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,2",
+          "cosa": "Massa-Carrara, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "25,0",
+          "cosa": "Venezia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "24,9",
+          "cosa": "Catanzaro, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "23,9",
+          "cosa": "Savona, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "22,7",
+          "cosa": "Pescara, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "22,5",
+          "cosa": "Rieti, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "22,2",
+          "cosa": "Rimini, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "22,1",
+          "cosa": "Catania, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "22,0",
+          "cosa": "Imperia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "21,7",
+          "cosa": "Aosta, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "21,5",
+          "cosa": "Messina, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "20,8",
+          "cosa": "La Spezia, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "20,7",
+          "cosa": "Sassari, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "20,2",
+          "cosa": "Napoli, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "20,1",
+          "cosa": "Livorno, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "18,6",
+          "cosa": "Genova, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "17,3",
+          "cosa": "Milano, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "17,0",
+          "cosa": "Palermo, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "17,0",
+          "cosa": "Trieste, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "15,0",
+          "cosa": "Cagliari, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "11,6",
+          "cosa": "Roma, 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,4",
+          "cosa": "media semplice dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,36",
+          "cosa": "media semplice dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,4",
+          "cosa": "media centro nord dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "29,36",
+          "cosa": "media centro nord dei territori, 2022 (media semplice, non pesata)",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        },
+        {
+          "cifra": "3,7",
+          "cosa": "rapporto fra primo (Prato) e ultimo (Roma) nel 2022",
+          "indicatore": "ext:quota_occupati_agri_ind_costr"
+        }
+      ]
+    },
+    {
+      "meta": {
         "chiave": "bes:03LAV007",
         "famiglia": "bes",
         "codice": "03LAV007",
