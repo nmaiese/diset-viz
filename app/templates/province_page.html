@@ -26,7 +26,7 @@
   "name": {{ ('Qualità della vita ' ~ (p.name | at_place)) | tojson }},
   "description": {{ ((p.name ~ ' è ' ~ p.rank ~ 'ª su ' ~ p.total ~ ' province per qualità della vita, con ' ~ (p.score | it_num) ~ ' su 100. ') ~ ('I valori di ' ~ (indicatori | length) ~ ' indicatori del BES dei Territori di Istat, con anno, posizione fra le province e confronto con le province della sua regione.' if indicatori else 'Punteggio e profilo per dimensione dal BES dei Territori di Istat.')) | tojson }},
   "url": {{ canonical | tojson }},
-  "spatialCoverage": { "@type": "Place", "name": {{ p.name | tojson }}{% if p.region %}, "containedInPlace": { "@type": "Place", "name": {{ p.region | tojson }} }{% endif %} },
+  "spatialCoverage": { "@type": "Place", "name": {{ p.name | tojson }}{% if p.region %}, "containedInPlace": { "@type": "Place", "name": {{ p.region | tojson }}{% if p.region_path %}, "url": {{ (site_url ~ p.region_path) | tojson }}{% endif %} }{% endif %} },
   {% if indicatori %}"temporalCoverage": "{{ indicatori | map(attribute='year_from') | min }}/{{ indicatori | map(attribute='year') | max }}",
   {% endif %}"creator": {{ organization_ref_jsonld | safe }},
   "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } },

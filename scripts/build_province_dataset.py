@@ -63,7 +63,8 @@ UNIT_LABELS = {
     "INHAB_5": "per 10.000 abitanti",
     "KG_PER_INHA": "kg per abitante",
     "VAL_PER_INHA": "valore per abitante",
-    "AVG_NUMB_USER": "numero medio di utenti",
+    # Istat: "numero medio per utente" (interruzioni del servizio elettrico).
+    "AVG_NUMB_USER": "numero medio per utente",
     "": "numero",
 }
 
@@ -76,6 +77,12 @@ UNIT_BY_INDICATOR = {
 # mean of its two autonomous provinces. TRENTINO_CODE is a synthetic area code.
 TRENTINO_PARTS = ("ITD10", "ITD20")  # Bolzano, Trento (NUTS3)
 TRENTINO_CODE = "_TRENTINO"
+# Nella codelist il genitore di Bolzano e di Trento e' la loro provincia
+# autonoma (ITD1, ITD2), non una regione: le due province finivano "nella
+# regione" Provincia Autonoma Bolzano, senza link al Trentino-Alto Adige e senza
+# confronto fra loro. Il nome e' quello di `app/data.py`.
+TRENTINO_REGION = "Trentino Alto Adige"
+TRENTINO_PARENTS = {"ITD1", "ITD2"}
 
 # The 14 metropolitan cities (città metropolitane), for a context flag.
 METRO_CITIES = {
@@ -146,9 +153,10 @@ LEVELS = {
     "province": {
         "pattern": province_sources.NUTS3_PATTERN,
         "area": "Provincia",
-        # 107 NUTS3 codes minus the 4 defunct pre-2016 Sardinian provinces we
-        # drop; Sud Sardegna is not in this BES vintage, so we rank 103.
-        "denom": 103,
+        # Il denominatore delle coperture e' il numero di province che hanno
+        # righe, calcolato in `build()`. Scritto a mano (103) e' diventato una
+        # frase falsa appena la causa delle assenze e' risultata un'altra.
+        "denom": None,
         "name_fn": normalize_province_name,
         "dataset": "Assoluti_Provincia.csv",
         "manifest": "province_manifest.csv",
@@ -226,6 +234,12 @@ def build(level="province"):
 
     # -- dataset rows --------------------------------------------------------
     defunct = province_sources.DEFUNCT_PROVINCES if level == "province" else set()
+    areas_with_data = {
+        area for (_dt, area, _y) in latest
+        if name_fn(territory.get(area, {}).get("name", area)) not in defunct
+    }
+    if denom is None:
+        denom = len(areas_with_data)
     dataset = []
     for (data_type, area, year), (_edition, row) in latest.items():
         name = name_fn(territory.get(area, {}).get("name", area))
@@ -296,14 +310,17 @@ def build(level="province"):
         province_rows = []
         seen = set()
         for code, info in territory.items():
-            if not pattern.match(code):
+            if not pattern.match(code) or code not in areas_with_data:
                 continue
             pname = name_fn(info["name"])
             if pname in seen or pname in province_sources.DEFUNCT_PROVINCES:
                 continue
             seen.add(pname)
             parent = info.get("parent", "")
-            region = _clean_region_name(territory.get(parent, {}).get("name", "")) if parent else ""
+            if parent in TRENTINO_PARENTS:
+                region = TRENTINO_REGION
+            else:
+                region = _clean_region_name(territory.get(parent, {}).get("name", "")) if parent else ""
             province_rows.append({
                 "code": code,
                 "name": pname,

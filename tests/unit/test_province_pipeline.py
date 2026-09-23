@@ -274,6 +274,15 @@ class ProposeDirectionTest(unittest.TestCase):
         self.assertTrue(province_sources.NUTS3_PATTERN.match("ITC11"))   # Torino
         self.assertFalse(province_sources.NUTS3_PATTERN.match("ITC1"))   # NUTS2 region
         self.assertTrue(province_sources.NUTS2_PATTERN.match("ITC1"))
+        # Le province nate dopo il 2004: fino al 23/9/2026 la regex le scartava.
+        for code in ("IT108", "IT109", "IT110", "IT111"):
+            self.assertTrue(province_sources.NUTS3_PATTERN.match(code), code)
+        for code in ("IT", "ITC", "IT1", "IT10", "IT1000"):
+            self.assertFalse(province_sources.NUTS3_PATTERN.match(code), code)
+
+    def test_discover_provinces_usa_la_stessa_definizione(self):
+        from scripts import discover_provinces
+        self.assertIs(discover_provinces.NUTS3_PATTERN, province_sources.NUTS3_PATTERN)
 
     def test_edition_variant_labels_and_units_are_resolved(self):
         indicators = {

@@ -257,5 +257,66 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
         self.assertGreater(len(dataset["variableMeasured"]), 50)
 
 
+class LeProvinceSonoQuelleDellaFonte(unittest.TestCase):
+    """Le invarianti del dataset provinciale, dopo la regex che ne perdeva
+    quattro e la nota pubblica che ne dava la colpa al BES."""
+
+    @classmethod
+    def setUpClass(cls):
+        import csv
+        dati = bes_data.PROVINCE_CODES.parent
+        with bes_data.PROVINCE_CODES.open(encoding="utf-8", newline="") as handle:
+            cls.codici = list(csv.DictReader(handle, delimiter=";"))
+        with (dati / "Assoluti_Provincia.csv").open(encoding="utf-8", newline="") as handle:
+            cls.righe = list(csv.DictReader(handle, delimiter=";"))
+
+    def test_sono_centosette_e_tutte_nuts3(self):
+        from scripts.province_sources import NUTS3_PATTERN
+        self.assertEqual(len(self.codici), 107)
+        for riga in self.codici:
+            with self.subTest(codice=riga["code"]):
+                self.assertRegex(riga["code"], NUTS3_PATTERN)
+
+    def test_ogni_provincia_sta_in_una_regione_vera(self):
+        from app.data import REGION_ORDER
+        for riga in self.codici:
+            with self.subTest(provincia=riga["name"]):
+                self.assertIn(riga["region"], REGION_ORDER)
+
+    def test_bolzano_e_trento_stanno_nel_trentino(self):
+        """Avevano come regione la loro provincia autonoma: niente link al
+        Trentino-Alto Adige e niente confronto fra loro."""
+        regione = {r["name"]: r["region"] for r in self.codici}
+        self.assertEqual(regione["Bolzano"], "Trentino Alto Adige")
+        self.assertEqual(regione["Trento"], "Trentino Alto Adige")
+        voci = {v["id"]: v for v in province_profile.indicatori("bolzano")}
+        self.assertTrue(any(v["in_regione"] and v["in_regione"]["quante"] == 2 for v in voci.values()))
+
+    def test_nessuna_riga_doppia(self):
+        chiavi = [(r["idIndicatore"], r["Territorio"], r["Anno"]) for r in self.righe]
+        self.assertEqual(len(chiavi), len(set(chiavi)))
+
+    def test_nessun_conteggio_di_province_scritto_a_mano(self):
+        """Un "103 province" scritto a mano e' diventato una frase falsa appena
+        la causa delle assenze e' risultata un'altra. Nei template il numero si
+        calcola; nei commenti Jinja, che raccontano la storia, puo' restare."""
+        from pathlib import Path
+        cartella = Path(app.root_path) / "templates"
+        for template in sorted(cartella.glob("*.html")):
+            testo = re.sub(r"\{#.*?#\}", "", template.read_text(encoding="utf-8"), flags=re.DOTALL)
+            with self.subTest(template=template.name):
+                self.assertNotRegex(testo, r"\b10[37] province\b")
+                self.assertNotIn("Sud Sardegna non è presente", testo)
+
+    def test_la_nota_di_copertura_e_calcolata(self):
+        client = app.test_client()
+        for percorso in ("/qualita-della-vita/classifica/province", "/metodologia"):
+            with self.subTest(pagina=percorso):
+                testo = client.get(percorso).get_data(as_text=True)
+                self.assertIn("107 province", testo)
+                for nome in province_profile.unmeasured_provinces():
+                    self.assertIn(nome, testo)
+
+
 if __name__ == "__main__":
     unittest.main()

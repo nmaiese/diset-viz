@@ -8,12 +8,13 @@ ITE34;Ascoli Piceno;ascoli-piceno;Marche;
 ITC17;Asti;asti;Piemonte;
 ITF34;Avellino;avellino;Campania;
 ITF42;Bari;bari;Puglia;1
+IT110;Barletta-Andria-Trani;barletta-andria-trani;Puglia;
 ITD33;Belluno;belluno;Veneto;
 ITF32;Benevento;benevento;Campania;
 ITC46;Bergamo;bergamo;Lombardia;
 ITC13;Biella;biella;Piemonte;
 ITD55;Bologna;bologna;Emilia-Romagna;1
-ITD10;Bolzano;bolzano;Provincia Autonoma Bolzano;
+ITD10;Bolzano;bolzano;Trentino Alto Adige;
 ITC47;Brescia;brescia;Lombardia;
 ITF44;Brindisi;brindisi;Puglia;
 ITG27;Cagliari;cagliari;Sardegna;1
@@ -29,6 +30,7 @@ ITC4A;Cremona;cremona;Lombardia;
 ITF62;Crotone;crotone;Calabria;
 ITC16;Cuneo;cuneo;Piemonte;
 ITG16;Enna;enna;Sicilia;
+IT109;Fermo;fermo;Marche;
 ITD56;Ferrara;ferrara;Emilia-Romagna;
 ITE14;Firenze;firenze;Toscana;1
 ITF41;Foggia;foggia;Puglia;
@@ -54,6 +56,7 @@ ITF52;Matera;matera;Basilicata;
 ITG13;Messina;messina;Sicilia;1
 ITC45;Milano;milano;Lombardia;1
 ITD54;Modena;modena;Emilia-Romagna;
+IT108;Monza e della Brianza;monza-e-della-brianza;Lombardia;
 ITF33;Napoli;napoli;Campania;1
 ITC15;Novara;novara;Piemonte;
 ITG26;Nuoro;nuoro;Sardegna;
@@ -85,12 +88,13 @@ ITC32;Savona;savona;Liguria;
 ITE19;Siena;siena;Toscana;
 ITG19;Siracusa;siracusa;Sicilia;
 ITC44;Sondrio;sondrio;Lombardia;
+IT111;Sud Sardegna;sud-sardegna;Sardegna;
 ITF43;Taranto;taranto;Puglia;
 ITF12;Teramo;teramo;Abruzzo;
 ITE22;Terni;terni;Umbria;
 ITC11;Torino;torino;Piemonte;1
 ITG11;Trapani;trapani;Sicilia;
-ITD20;Trento;trento;Provincia Autonoma Trento;
+ITD20;Trento;trento;Trentino Alto Adige;
 ITD34;Treviso;treviso;Veneto;
 ITD44;Trieste;trieste;Friuli-Venezia Giulia;
 ITD42;Udine;udine;Friuli-Venezia Giulia;

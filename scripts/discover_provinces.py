@@ -44,7 +44,9 @@ SHORTLIST_PATTERNS = re.compile(
 # Codelist ids that carry the Italian territory hierarchy (incl. NUTS3 provinces).
 TERRITORY_CODELIST_HINT = re.compile(r"(ITTER|TERRIT|REF_AREA|REGIO|PROV)", re.IGNORECASE)
 # NUTS3 province codes look like ITC11, ITF33, ITH10... (IT + letter + 2 digits).
-NUTS3_PATTERN = re.compile(r"^IT[A-Z]\d{2}$")
+# Una definizione sola, quella della pipeline: la copia locale non vedeva ne'
+# ITC4A (Cremona) ne' le province IT1xx.
+from scripts.province_sources import NUTS3_PATTERN
 
 
 def _codelist_id(urn):

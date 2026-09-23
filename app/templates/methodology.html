@@ -163,7 +163,7 @@
     </ul>
 
     <h3>I limiti, dichiarati</h3>
-    <p>La media di un territorio nasconde le differenze interne. Lo z-score misura una posizione relativa tra i territori, non una distanza dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente per poterla discutere. Sul livello provinciale resta un limite amministrativo: la provincia di Sud Sardegna non è presente nell'edizione usata, e le quattro province sarde soppresse prima del 2016 sono escluse.</p>
+    <p>La media di un territorio nasconde le differenze interne. Lo z-score misura una posizione relativa tra i territori, non una distanza dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente per poterla discutere. Sul livello provinciale si misurano {{ measured_provinces }} province, tutte quelle con dati nel BES dei Territori.{% if unmeasured_provinces %} Nella codifica Istat ci sono anche {{ unmeasured_provinces | join(' e ') }}, per cui il BES dei Territori non pubblica ancora dati.{% endif %} Le quattro province sarde soppresse prima del 2016 sono escluse.</p>
 
     <h3>In cosa siamo diversi dal Sole 24 Ore e da ItaliaOggi</h3>
     <p>La classifica Divario Italia è una sintesi autonoma su una selezione dichiarata di indicatori Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria. Il nostro obiettivo è far vedere come cambia il quadro quando cambiano categorie e pesi, e dove ogni territorio eccelle.</p>
