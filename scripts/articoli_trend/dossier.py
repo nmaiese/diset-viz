@@ -124,8 +124,7 @@ def scrivi_csv(slug: str, analisi: list[dict]) -> str:
     comuni.DOWNLOAD.mkdir(parents=True, exist_ok=True)
     percorso = comuni.DOWNLOAD / f"{slug}.csv"
     with percorso.open("w", encoding="utf-8", newline="") as file:
-        w = csv.writer(file, lineterminator="
-")
+        w = csv.writer(file, lineterminator="\n")
         w.writerow(["indicatore", "codice", "livello", "territorio", "anno", "valore", "unita", "fonte", "archivio"])
         for a in analisi:
             m = a["meta"]
