@@ -24,6 +24,7 @@ V1 = build.V1
 ROOT = build.ROOT
 OUT = V1 / "dist" / "artifact" / "divario-italia-1-0.html"
 PRIMA = V1 / "screens" / "prima" / "2026-09-23"
+ITER1 = V1 / "screens" / "iterazione-1"
 DOPO = V1 / "screens" / "dopo"
 
 ROUTER = r"""
@@ -37,6 +38,9 @@ ROUTER = r"""
     var page = target ? target.closest("[data-page-root]") : null;
     if (!page) { page = document.getElementById("copertina"); target = null; }
     pages.forEach(function (p) { p.hidden = p !== page; });
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches && page.animate) {
+      page.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "ease-out" });
+    }
     bar.forEach(function (a) {
       if (a.getAttribute("href") === "#" + page.id) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
@@ -55,7 +59,7 @@ COVER_CSS = """
 .cover__page { display: grid; gap: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--rule-strong); }
 .cover__page h2 { font-size: var(--fs-section); line-height: var(--lh-section); }
 .cover__pair { display: grid; gap: var(--space-6); }
-@media (min-width: 960px) { .cover__pair { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 960px) { .cover__pair { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .cover__pair figure { display: grid; gap: var(--space-2); }
 .cover__pair img { width: 100%; border: 1px solid var(--rule); }
 .cover__pair figcaption { font-size: var(--fs-label); font-weight: 600; color: var(--text-2); }
@@ -94,13 +98,13 @@ def cover(pages: list[str]) -> str:
     variants = [n for n in pages if build.PAGES[n].get("variant")]
     for name in [n for n in pages if not build.PAGES[n].get("variant")]:
         label = build.PAGES[name]["label"]
-        before = PRIMA / f"{name}-1440-chiaro-fold.webp"
-        after = DOPO / f"{name}-1440-chiaro-fold.webp"
         pair = []
-        if before.exists():
-            pair.append(f'<figure><img src="{image_data_uri(before)}" alt="{label}, il sito di oggi a 1440 pixel" loading="lazy"><figcaption>Oggi</figcaption></figure>')
-        if after.exists():
-            pair.append(f'<figure><img src="{image_data_uri(after)}" alt="{label}, il prototipo 1.0 a 1440 pixel" loading="lazy"><figcaption>Versione 1.0</figcaption></figure>')
+        for folder, caption, alt in ((PRIMA, "Oggi", "il sito di oggi"),
+                                     (ITER1, "Prima iterazione", "la prima iterazione della 1.0"),
+                                     (DOPO, "Seconda iterazione", "la seconda iterazione della 1.0")):
+            shot = folder / f"{name}-1440-chiaro-fold.webp"
+            if shot.exists():
+                pair.append(f'<figure><img src="{image_data_uri(shot, 720)}" alt="{label}, {alt} a 1440 pixel" loading="lazy"><figcaption>{caption}</figcaption></figure>')
         items.append(
             f'<article class="cover__page"><h2><a href="#{name}">{label}</a></h2>'
             f'<div class="cover__pair">{"".join(pair)}</div>'
@@ -114,10 +118,11 @@ def cover(pages: list[str]) -> str:
     <h1 class="h-display">Divario Italia 1.0</h1>
     <p class="lede">Le pagine chiave del sito nella direzione Cronaca, con i dati veri catturati dall'app. Ogni cifra viene dal contesto con cui la pagina di oggi è resa, o si calcola con le funzioni del sito.</p>
     <ul class="cover__points">
-      <li>Una griglia sola da 1200 pixel, dalla testata al piede, e tutto allineato a sinistra sotto il marchio.</li>
-      <li>Una famiglia sola, Source Sans 3, e undici ruoli tipografici al posto di 58 taglie.</li>
-      <li>Un accento solo, arancio bruciato, per ciò che si clicca e per l'elemento in evidenza. I dati sono blu, e nessun colore dice meglio o peggio.</li>
-      <li>Ogni pagina apre con la risposta, il numero e un grafico. Il metodo e la citazione stanno in fondo, fuori dal racconto.</li>
+      <li>La striscia del divario apre le pagine: ogni territorio un punto sulla stessa scala, nel colore della sua ripartizione, con gli estremi, la media e la distanza. Il divario si vede prima di leggerlo.</li>
+      <li>Nord, Centro e Mezzogiorno hanno un colore fisso, lo stesso in ogni grafico e nelle classifiche.</li>
+      <li>Le cifre hanno un sistema solo: stessi decimali per la stessa grandezza, il meno tipografico, l'unità più piccola, le colonne allineate.</li>
+      <li>Sofia Sans, con la sua versione semi-condensata per titoli e cifre. La barra in basso prova anche Schibsted Grotesk e un'opzione con titoli e prosa in Source Serif 4.</li>
+      <li>Una griglia sola da 1200 pixel, link in inchiostro fuori dalla prosa, e sul telefono una barra delle sezioni che resta sotto la testata.</li>
       <li>Tema scuro compreso: la barra in basso lo cambia, oppure segue il sistema.</li>
     </ul>
   </div>

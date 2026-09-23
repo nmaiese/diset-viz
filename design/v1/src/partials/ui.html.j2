@@ -30,7 +30,7 @@
   {%- for t in items %}
   <div class="tile">
     <dt>{{ t.label }}</dt>
-    <dd><span class="figure-num">{% if t.value is defined %}{{ t.value | num(t.unit, t.role or 'figure') }}{% else %}{{ t.num }}{% if t.unit %}<span class="u">{{ t.unit }}</span>{% endif %}{% endif %}</span>
+    <dd><span class="figure-num">{% if t.value is defined and t.role == 'rank' %}{{ t.value | rank(t.total) }}{% elif t.value is defined %}{{ t.value | num(t.unit, t.role or 'figure') }}{% else %}{{ t.num }}{% if t.unit %}<span class="u">{{ t.unit }}</span>{% endif %}{% endif %}</span>
       {%- if t.sub %}<span class="sub">{% if t.href %}<a href="{{ href(t.href) }}">{{ t.sub }}</a>{% else %}{{ t.sub }}{% endif %}</span>{% endif %}</dd>
   </div>
   {%- endfor %}
@@ -68,7 +68,7 @@
 
 {% macro arealegend(items) -%}
 <ul class="arealegend" aria-label="Ripartizioni">
-  {%- for a in items %}<li><span class="area-dot area-dot--{{ a.area }}" aria-hidden="true"></span><b>{{ a.label }}</b>{{ a.count }}</li>{% endfor %}
+  {%- for a in items %}<li><span class="area-dot area-dot--{{ a.area }}" aria-hidden="true"></span><b>{{ a.label }}</b>{{ a.count | num(None, 'count') }}</li>{% endfor %}
 </ul>
 {%- endmacro %}
 

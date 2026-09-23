@@ -7,16 +7,22 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400..800;1,400..700&display=swap">
-<script>try{var t=localStorage.getItem('proto-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia+Sans:ital,wght@0,300..900;1,300..700&family=Sofia+Sans+Semi+Condensed:wght@400..900&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..800;1,8..60,400..700&display=swap">
+<script>try{var t=localStorage.getItem('proto-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;var f=localStorage.getItem('proto-font');if(f==='schibsted'||f==='serif')document.documentElement.dataset.font=f}catch(e){}</script>
 <style>
 /* Generato da design/v1/tools/tokens.py a partire da tokens/tokens.json.
    Non si modifica a mano: si cambia il JSON e si rigenera. */
 
 :root {
   color-scheme: light;
-  --font-sans: "Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --fw-heading: 760;
+  --fw-num: 700;
   --fs-display: clamp(36px, 26.909px + 2.4242vw, 56px);
   --lh-display: 1.04;
   --fw-display: 800;
@@ -139,6 +145,28 @@
   --cat-3: #63591d;
   --cat-4: #33278d;
   --ad-bg: #f5f6f8;
+  --area-nord: #2466c3;
+  --area-centro: #504907;
+  --area-sud: #983c75;
+}
+
+:root[data-font="schibsted"] {
+  --font-ui: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Schibsted Grotesk", system-ui, sans-serif;
+  --font-num: "Schibsted Grotesk", system-ui, sans-serif;
+  --fw-heading: 760;
+  --fw-num: 700;
+}
+:root[data-font="serif"] {
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --fw-heading: 650;
+  --fw-num: 700;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -198,6 +226,9 @@
     --cat-3: #d6cc8f;
     --cat-4: #9281e1;
     --ad-bg: #1a1d21;
+    --area-nord: #5182e5;
+    --area-centro: #a48118;
+    --area-sud: #f7b1df;
   }
 }
 
@@ -257,6 +288,9 @@
   --cat-3: #d6cc8f;
   --cat-4: #9281e1;
   --ad-bg: #1a1d21;
+  --area-nord: #5182e5;
+  --area-centro: #a48118;
+  --area-sud: #f7b1df;
 }
 
 /* Divario Italia 1.0, direzione Cronaca: i componenti.
@@ -270,10 +304,13 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
   font-size: var(--fs-ui);
   line-height: var(--lh-ui);
   font-optical-sizing: auto;
+  /* Le taglie sono tarate su un occhio medio di 0,49: l'interruttore dei
+     caratteri cambia famiglia senza cambiare la grandezza percepita. */
+  font-size-adjust: 0.49;
   text-rendering: optimizeLegibility;
 }
 img, svg { max-width: 100%; }
@@ -282,11 +319,15 @@ h1, h2, h3, h4, p, dl, dd, figure, ul, ol { margin: 0; }
 ul, ol { padding: 0; }
 h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
-a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
-a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
+/* Link: in inchiostro, sottolineati, fuori dalla prosa. L'arancio resta alla
+   prosa, alle azioni e a cio' che e' in evidenza: su ogni elenco perdeva il
+   suo compito. */
+a { color: var(--ink); text-decoration-color: var(--rule-strong); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { color: var(--accent-strong); text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 ::selection { background: var(--accent-wash); }
 .num, td, .tile dd, .figure-num { font-variant-numeric: tabular-nums lining-nums; }
+h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family: var(--font-display); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 
@@ -404,7 +445,7 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .pagehead { padding-block: var(--space-6) var(--space-8); display: grid; gap: var(--space-4); }
 /* Un figlio di griglia prende come minimo la sua larghezza di contenuto: un campo
    di ricerca col suo bottone basta a sfondare i 320 pixel. */
-.pagehead > *, .module > *, .specs > div > *, .lanes > *, .cards > * { min-width: 0; }
+.pagehead > *, .module > *, .specs > div > *, .lanes > *, .cards > *, .layout > * { min-width: 0; }
 .eyebrow {
   font-size: var(--fs-label); line-height: var(--lh-label); font-weight: var(--fw-label); letter-spacing: var(--tr-label);
   color: var(--text-2);
@@ -412,10 +453,10 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .eyebrow a { color: var(--text-2); text-decoration-color: var(--rule-strong); }
 .eyebrow a:hover { color: var(--ink); }
 .eyebrow .sep { color: var(--rule-strong); padding-inline: 6px; }
-.h-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-display); letter-spacing: var(--tr-display); }
-.h-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }
-.answer { font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink); max-width: var(--measure); }
-.lede { font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); max-width: var(--measure); }
+.h-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-heading); letter-spacing: var(--tr-display); }
+.h-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.answer { font-family: var(--font-text); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink); max-width: var(--measure); }
+.lede { font-family: var(--font-text); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); max-width: var(--measure); }
 .answer a, .lede a { color: inherit; text-decoration-color: var(--rule-strong); }
 .answer a:hover, .lede a:hover { color: var(--accent-strong); text-decoration-color: currentColor; }
 .meta {
@@ -444,7 +485,7 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .section { padding-top: var(--space-12); }
 .section + .section { margin-top: var(--space-4); }
 .section > h2, .h-section {
-  font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-section); letter-spacing: var(--tr-section);
+  font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
   padding-top: var(--space-3); border-top: 1px solid var(--rule-strong);
   margin-bottom: var(--space-6);
 }
@@ -461,10 +502,30 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
 @media (max-width: 1199px) {
-  .toc ol { display: flex; flex-wrap: wrap; gap: var(--space-2); border: 0; }
-  .toc a { padding: 6px var(--space-3); margin: 0; border: 1px solid var(--rule-strong); border-radius: var(--radius-control); }
-  .toc a[aria-current] { border-color: var(--ink); }
+  /* Un elemento sticky resta dentro il suo contenitore: dentro l'aside (alto
+     quanto l'indice) o in una cella di griglia non resterebbe mai in alto.
+     Sotto i 1200 il layout e' un blocco e l'aside sparisce come scatola. */
+  .layout { display: block; }
+  .layout__aside { display: contents; }
+  .layout__main { margin-top: var(--space-6); }
 }
+@media (max-width: 1199px) {
+  /* Sotto i 1200 l'indice diventa una barra delle sezioni che resta sotto la
+     testata: sulle pagine lunghe (la regione passa i 36.000 pixel sul telefono)
+     e' il solo modo di sapere dove si e'. */
+  .toc {
+    position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20;
+    margin-inline: calc(-1 * var(--margin-s)); padding: var(--space-2) var(--margin-s);
+    background: var(--bg); border-bottom: 1px solid var(--rule);
+  }
+  .toc p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .toc ol { display: flex; flex-wrap: nowrap; gap: var(--space-4); border: 0; overflow-x: auto; scrollbar-width: none; }
+  .toc ol::-webkit-scrollbar { display: none; }
+  .toc a { padding: 6px 0; margin: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; white-space: nowrap; }
+  .toc a[aria-current] { border-bottom-color: var(--accent); }
+}
+@media (min-width: 600px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-m)); padding-inline: var(--margin-m); } }
+@media (min-width: 960px) and (max-width: 1199px) { .toc { top: var(--masthead-l); margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
 .aside-block { margin-top: var(--space-8); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .aside-block p + p { margin-top: var(--space-2); }
 @media (max-width: 1199px) { .aside-block { display: none; } }
@@ -620,7 +681,8 @@ details.more > summary { cursor: pointer; padding-block: var(--space-3); font-we
 details.more[open] > summary { color: var(--ink); }
 
 /* ---------- prosa ---------- */
-.prose { font-size: var(--fs-prose); line-height: var(--lh-prose); max-width: var(--measure); }
+.prose { font-family: var(--font-text); font-size: var(--fs-prose); line-height: var(--lh-prose); max-width: var(--measure); }
+.prose a { color: var(--link); text-decoration-color: currentColor; }
 .prose > * + * { margin-top: 1em; }
 .analysis .prose > h2:first-child { margin-top: 0; padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
 .prose h2 { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 700; letter-spacing: var(--tr-section); margin-top: 2em; }
@@ -660,6 +722,7 @@ details.more[open] > summary { color: var(--ink); }
 .fig__line { fill: none; stroke: var(--cmp); stroke-width: 2; }
 .fig__line.is-on, .fig__line--on { stroke: var(--data-focus); stroke-width: 3; }
 .fig__axis, .fig__grid, .fig__track { stroke: var(--rule); }
+.fig text { stroke: none; }
 .fig__name { fill: var(--ink); }
 .fig__source, .fig__note { fill: var(--muted); }
 .fig__value { fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -751,10 +814,11 @@ details.more[open] > summary { color: var(--ink); }
 /* ---------- pubblicita' ---------- */
 .ad {
   display: grid; place-items: center; min-height: 280px; margin-block: var(--space-12);
-  background: var(--ad-bg); color: var(--muted); font-size: var(--fs-label);
+  background: transparent; border: 1px dashed var(--rule-strong); color: var(--muted); font-size: var(--fs-label);
   position: relative;
 }
-.ad::before { content: "Pubblicità"; position: absolute; top: var(--space-2); left: var(--space-3); font-weight: 600; }
+.ad > span { opacity: 0.8; }
+.ad::before { content: "Pubblicità"; position: absolute; top: calc(-1 * var(--space-4)); left: 0; font-weight: 600; font-size: 12px; color: var(--muted); }
 @media (min-width: 960px) { .ad--leader { min-height: 120px; } }
 .ad--side { min-height: 600px; margin-block: var(--space-8) 0; }
 
@@ -793,134 +857,269 @@ main:has(> .band:last-child) + .foot { margin-top: 0; }
 .proto-bar :focus-visible { outline-color: var(--bg); }
 .proto-bar__pages { display: flex; flex-wrap: wrap; gap: 2px; }
 .proto-bar__theme { margin-left: auto; display: flex; gap: 2px; }
+.proto-bar__theme + .proto-bar__theme { margin-left: var(--space-4); }
+.tablewrap > .arealegend { margin-bottom: var(--space-3); }
 body.has-proto { padding-bottom: 96px; }
 [data-shot] .proto-bar { display: none; }
 [data-shot] body.has-proto { padding-bottom: 0; }
 
-/* Home 1.0: solo cio' che i componenti condivisi non hanno.
-   Legge solo token. I nomi hanno il prefisso home-: chi coordina decide se
-   qualcosa diventa un componente di components.css. */
+/* ==========================================================================
+   Seconda iterazione: cifre, grafici, componenti consolidati
+   ========================================================================== */
 
-/* ---------- larghezze nominate ---------- */
-/* "largo" = colonne 1-10 della griglia a 12, "testo" per il titolo fino alla 9 */
+/* ---------- le cifre: un componente, dai filtri num, rank, delta ---------- */
+/* Fuori dalle colonne le cifre sono proporzionali: in una tessera le cifre
+   tabellari lasciano buchi fra i caratteri. In colonna sono tabellari. */
+.n { font-family: var(--font-num); font-variant-numeric: lining-nums proportional-nums; white-space: nowrap; }
+.table .n, td .n, .rank .n, .n--cell { font-variant-numeric: lining-nums tabular-nums; }
+.n__u { font-family: var(--font-ui); font-weight: 400; color: var(--text-2); letter-spacing: 0; }
+.n__u--pct { font-family: var(--font-num); color: inherit; }
+.n__o { font-size: 0.72em; vertical-align: 0.28em; margin-left: 0.04em; }
+.n--nd, .n--nd abbr { color: var(--muted); text-decoration: none; }
+.tile .n, .figure-num .n {
+  font-size: var(--fs-figure-sm); line-height: var(--lh-figure-sm); font-weight: var(--fw-num); letter-spacing: -0.015em;
+}
+.tile .n__u, .bignum .n__u { font-size: 0.46em; margin-left: 0.12em; }
+.tile .n__u--pct, .bignum .n__u--pct { font-size: 0.7em; color: inherit; margin-left: 0; }
+.tile .n__o, .bignum .n__o { font-size: 0.55em; vertical-align: 0.62em; }
+.bignum .n, .bignum { font-size: var(--fs-figure); line-height: var(--lh-figure); font-weight: var(--fw-num); letter-spacing: -0.02em; }
+.table .val .n { font-weight: 400; }
+.table .rank .n__o { font-size: 0.8em; vertical-align: 0.2em; }
+.answer .n, .lede .n, .subline .n, .sub .n { font-family: inherit; font-weight: 600; }
+.answer .n__u, .lede .n__u { color: inherit; font-weight: 600; }
+
+/* ---------- le ripartizioni: un colore per Nord, Centro, Mezzogiorno ---------- */
+.area--nord { fill: var(--area-nord); } .area--centro { fill: var(--area-centro); } .area--sud { fill: var(--area-sud); } .area--none { fill: var(--cmp); }
+.area-line--nord { stroke: var(--area-nord); } .area-line--centro { stroke: var(--area-centro); } .area-line--sud { stroke: var(--area-sud); } .area-line--none { stroke: var(--cmp); }
+.area-text--nord { fill: var(--area-nord); } .area-text--centro { fill: var(--area-centro); } .area-text--sud { fill: var(--area-sud); } .area-text--none { fill: var(--text-2); }
+.area-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--cmp); }
+.area-dot--nord { background: var(--area-nord); } .area-dot--centro { background: var(--area-centro); } .area-dot--sud { background: var(--area-sud); }
+.arealegend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); list-style: none; font-size: var(--fs-small); color: var(--text-2); }
+.arealegend li { display: inline-flex; align-items: center; }
+.arealegend b { color: var(--ink); font-weight: 600; margin-right: 4px; }
+
+/* ---------- i grafici: testo a grandezza vera, colori solo da token ---------- */
+.chart { max-width: 920px; }
+.chart svg text { font-family: var(--font-num); font-variant-numeric: lining-nums tabular-nums; }
+.chart__l svg { max-width: 920px; }
+.chart--hero { margin-top: var(--space-2); }
+
+.strip__axis { stroke: var(--rule-strong); stroke-width: 1; }
+.strip__tick { font-size: 13px; fill: var(--muted); }
+.strip__avg { stroke: var(--data-reference); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.strip__avglab { font-size: 13px; fill: var(--text-2); font-weight: 600; }
+.strip__gap { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+.strip__gaplab { font-size: 15px; font-weight: 700; fill: var(--ink); }
+.strip__dot { stroke: var(--bg); stroke-width: 1.5; }
+.strip__dot.is-on { stroke: var(--accent); stroke-width: 3; }
+.strip__name { font-size: 13px; }
+.strip__nm { fill: var(--ink); font-weight: 700; }
+.strip__v { fill: var(--text-2); }
+.strip__name--on .strip__nm { fill: var(--accent); }
+
+.band__grid { stroke: var(--rule); stroke-width: 1; }
+.band__tick { font-size: 13px; fill: var(--muted); }
+.band__area { fill: var(--seq-1); opacity: 0.85; }
+.band__src { display: none; }
+.band__ext { fill: none; stroke-width: 2; }
+.band__avg { fill: none; stroke: var(--data-reference); stroke-width: 2; stroke-dasharray: 5 4; }
+.band__lab { font-size: 13px; font-weight: 700; }
+.band__lab--avg { fill: var(--text-2); }
+.band__hl { fill: none; stroke: var(--accent); stroke-width: 3; }
+.band__dot { fill: var(--accent); }
+.band__hllab { font-size: 13px; font-weight: 700; fill: var(--accent); }
+
+.callout line { stroke: var(--ink); stroke-width: 1; }
+.callout circle { fill: var(--ink); stroke: var(--bg); stroke-width: 1.5; }
+.callout text { font-family: var(--font-num); font-size: 21px; paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.callout__nm { font-weight: 700; fill: var(--ink); }
+.callout__v { fill: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* la figura che apre una pagina: il grafico prima delle parole */
+.lead-figure { display: grid; gap: var(--space-3); padding-block: var(--space-6) var(--space-4); border-top: 1px solid var(--rule); }
+.lead-figure__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-6); }
+.lead-figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); font-weight: var(--fw-heading); line-height: var(--lh-subsection); }
+
+/* ---------- componenti portati dalle pagine ---------- */
+
+/* traccia di posizione da 1 a N */
+.track { position: relative; display: block; height: 14px; min-width: 6rem; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: var(--cmp-track); }
+.track i { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--data-reference); transform: translate(-50%, -50%); }
+.is-on .track i, .track--on i { background: var(--accent); }
+.track__scale { display: flex; justify-content: space-between; gap: var(--space-2); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* barra divergente attorno a 50, su una scala fissa da 0 a 100 */
+.divbar { position: relative; display: block; height: 12px; background: var(--cmp-track); min-width: 6rem; }
+.divbar i { position: absolute; top: 0; bottom: 0; background: var(--seq-4); }
+.divbar::after { content: ""; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--ink); }
+.divbar__axis { display: grid; grid-template-columns: 1fr auto 1fr; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.divbar__axis > :last-child { text-align: right; }
+
+/* localizzatore: dice dove, non un dato. Il territorio in inchiostro. */
+.locator { display: grid; gap: var(--space-2); margin: 0; }
+.locator svg { display: block; width: 100%; max-width: 13rem; height: auto; }
+.locator path { fill: var(--rule-strong); stroke: var(--bg); stroke-width: 1.5; stroke-linejoin: round; }
+.locator path.is-on { fill: var(--ink); }
+.locator figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* tabella che sotto i 560 pixel del suo contenitore diventa blocchi etichettati */
+.stackwrap { container-type: inline-size; }
+@container (max-width: 560px) {
+  .table--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .table--stack, .table--stack tbody, .table--stack tr, .table--stack th, .table--stack td { display: block; }
+  .table--stack tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2) var(--space-4); padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .table--stack tr > * { padding: 0 !important; border: 0 !important; text-align: left !important; white-space: normal; }
+  .table--stack tbody th[scope="row"] { grid-column: 1 / -1; }
+  .table--stack td[data-label]::before { content: attr(data-label); display: block; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); }
+  .table--stack tr.group, .table--stack tr.group > * { display: block; grid-column: 1 / -1; }
+  /* dentro una tabella a blocchi la barra resta, a tutta riga */
+  .table--stack .barcell { width: auto; grid-column: 1 / -1; }
+}
+
+.table--stack tr.group > * { padding-top: var(--space-6); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); border-bottom: 1px solid var(--rule-strong); }
+.table--stack tbody tr.group:hover > * { background: transparent; }
+
+/* classifica con la barra del punteggio: righe in blocchi sotto i 720 pixel */
+.rankwrap { container: rank / inline-size; }
+.table--rank .rankcell-bar { width: 22%; min-width: 4rem; }
+.table--rank .where { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.table--rank .note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.table--rank tr.gap > td { padding-block: var(--space-2); font-size: var(--fs-small); color: var(--muted); border-bottom-style: dashed; }
+@container rank (max-width: 719px) {
+  .table--rank thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .table--rank tbody tr { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; column-gap: var(--space-3); align-items: baseline; padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .table--rank tbody th, .table--rank tbody td { display: block; padding: 0; border: 0; }
+  .table--rank .rank { grid-column: 1; grid-row: 1; width: auto; }
+  .table--rank .name { grid-column: 2; grid-row: 1; }
+  .table--rank .val { grid-column: 3; grid-row: 1; }
+  .table--rank .rankcell-bar { grid-column: 2 / 4; grid-row: 2; width: auto; min-width: 0; margin-top: var(--space-2); }
+  .table--rank .note { grid-column: 2 / 4; margin-top: var(--space-1); white-space: normal; }
+  .table--rank .note[data-label]::before { content: attr(data-label) ": "; color: var(--muted); }
+  .table--rank tr.gap { display: block; }
+}
+
+/* podio: le prime e le ultime, con la riga "altre N" in mezzo */
+.podiums { display: grid; gap: var(--space-8); }
+@media (min-width: 960px) { .podiums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8) var(--gutter-l); } }
+
+/* figura dell'articolo: titolo-tesi, grafico, fonte, i valori in tabella */
+.figure { display: grid; gap: var(--space-2); margin-block: var(--space-8); }
+.figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
+.figure__note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.figure__chart { container-type: inline-size; }
+
+/* ---------- immagini ---------- */
+.hero-img { margin: 0; display: grid; gap: var(--space-2); }
+.hero-img img { width: 100%; height: auto; background: var(--surface-1); }
+.hero-img figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.card__media { transition: filter var(--motion-base) var(--motion-ease); }
+.card__media img { transition: transform 400ms var(--motion-ease); }
+.card:hover .card__media img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .card:hover .card__media img { transform: none; } }
+
+/* ---------- ritmo ---------- */
+.section + .section { margin-top: var(--space-8); }
+.foot { margin-top: var(--space-16); }
+
+/* Home 1.0: solo l'impaginazione della home. Tutto il resto (striscia, mappa,
+   classifica, podio, schede, cifre) e' in components.css. Legge solo token. */
+
+/* "largo" = colonne 1-10 della griglia a 12: il dato e il podio non si stirano fino al margine */
+@media (min-width: 960px) { .home-wide { max-width: calc((100% + var(--gutter-l)) * 10 / 12 - var(--gutter-l)); } }
+.home-sectionlead { max-width: var(--measure); color: var(--text-2); margin: calc(-1 * var(--space-2)) 0 var(--space-6); }
+.home-more { margin-top: var(--space-6); }
+.home-cite { margin: var(--space-6) 0 0; }
+
+/* ---------- testata: il titolo sopra, la frase e la ricerca affiancate da 960 ---------- */
 @media (min-width: 960px) {
-  .home-wide { max-width: calc((100% + var(--gutter-l)) * 10 / 12 - var(--gutter-l)); }
-  .home-head .h-display { max-width: calc((100% + var(--gutter-l)) * 9 / 12 - var(--gutter-l)); }
-  .home-head { padding-top: var(--space-12); }
+  .home-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-16); align-items: end; padding-top: var(--space-12); }
+  .home-head > .eyebrow, .home-head > h1 { grid-column: 1 / -1; }
+  .home-head > h1 { max-width: 16em; }
 }
-
-/* ---------- apertura: trova il tuo territorio ---------- */
-.home-head .answer strong { font-weight: 700; }
-.home-find { display: grid; gap: var(--space-2); max-width: var(--measure); margin-top: var(--space-2); }
-.home-find__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-find { display: grid; gap: var(--space-2); }
+.home-find label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
 .home-find__row { display: flex; gap: var(--space-2); }
-.home-find__row input {
-  flex: 1; min-width: 0; width: 0; height: var(--space-12); padding: 0 var(--space-4);
-  font: inherit; font-size: var(--fs-ui); color: var(--ink); background: var(--bg);
-  border: 1px solid var(--control-border); border-radius: var(--radius-control);
+.home-find input {
+  flex: 1; min-width: 0; height: var(--space-12); padding: 0 var(--space-4); font: inherit; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
 }
-.home-find__row input::placeholder { color: var(--muted); }
-.home-find__row .btn { min-height: var(--space-12); flex: none; }
-.home-find__links { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.home-find__links a { color: var(--text-2); }
-.home-find__links a:hover { color: var(--accent-strong); }
+.home-find input::placeholder { color: var(--muted); }
+.home-find .btn { min-height: var(--space-12); }
+.home-find p { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
-/* ---------- il dato in evidenza ---------- */
-.home-feature .module__head { max-width: var(--measure); }
+/* ---------- il dato in evidenza: la striscia, poi mappa e classifica ---------- */
+.home-feature .lead-figure { border-top: 0; padding-top: 0; }
+.home-feature__what { display: grid; gap: var(--space-1); }
+.home-feature .module { margin-top: var(--space-8); }
+.home-feature .more { margin-top: 0; }
 .home-pick .seg > a { white-space: normal; padding-block: var(--space-2); }
 @container (max-width: 599px) {
-  .home-pick { width: 100%; }
-  .home-pick .seg { display: grid; }
+  .home-pick, .home-pick .seg { display: grid; width: 100%; }
   .home-pick .seg > a { border-left: 0; border-top: 1px solid var(--control-border); }
   .home-pick .seg > a:first-child { border-top: 0; }
 }
-/* finche' mappa e classifica non stanno affiancate, la classifica viene prima */
-@container (max-width: 719px) { .home-feature .module__map { order: 2; } }
-.home-feature .chart-note { margin-top: 0; }
-.home-feature__foot { display: grid; gap: var(--space-2); }
 
-/* ---------- testate di sezione ---------- */
-.home-sectionlead { max-width: var(--measure); color: var(--text-2); margin: calc(-1 * var(--space-2)) 0 var(--space-6); }
-.home-more { margin-top: var(--space-6); }
-
-/* ---------- regioni per ripartizione ---------- */
+/* ---------- regioni per ripartizione, nei colori della striscia ---------- */
 .home-regions { display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 960px) { .home-regions { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-.home-regions__group.is-wide { grid-column: span 2; }
-.home-regions__group.is-wide ul { column-count: 2; column-gap: var(--gutter-l); }
-.home-colhead {
-  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted);
-  padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
-}
+.home-regions .is-wide { grid-column: span 2; }
+.home-regions .is-wide ul { column-count: 2; column-gap: var(--gutter-l); }
+.home-regions h3 { font-family: var(--font-ui); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
 .home-regions ul { list-style: none; }
 .home-regions li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
-.home-regions li a {
-  display: flex; align-items: center; min-height: var(--target);
-  color: var(--ink); text-decoration: none;
-}
-.home-regions li a:hover { color: var(--accent-strong); text-decoration: underline; }
-.home-links { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-8); margin-top: var(--space-6); }
-.home-links a { display: inline-flex; align-items: center; min-height: var(--target); }
+.home-regions li a, .home-links a { display: inline-flex; align-items: center; min-height: var(--target); }
+.home-regions li a { display: flex; text-decoration: none; }
+.home-regions li a:hover { text-decoration: underline; }
 
-/* ---------- qualita' della vita: il doppio podio ---------- */
+/* ---------- qualita' della vita ---------- */
 .home-qol__head { display: grid; gap: var(--space-3); max-width: var(--measure); margin-bottom: var(--space-8); }
-.home-qol__head .lede { color: var(--ink); }
-.home-podiums { display: grid; gap: var(--space-12) var(--gutter-l); }
-@media (min-width: 960px) { .home-podiums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); } }
-.home-podium { display: grid; gap: var(--space-3); align-content: start; container-type: inline-size; }
-/* la barra del punteggio resta accanto al numero anche nella colonna stretta */
-.home-podium .barcell { display: table-cell; width: 34%; }
-@container (max-width: 359px) { .home-podium .barcell { display: none; } }
-.home-podium__gap td { color: var(--muted); font-size: var(--fs-small); padding-block: var(--space-2); }
+.home-qol__head .lede, .home-quiz .lede { color: var(--ink); }
+.home-podium { display: grid; gap: var(--space-3); align-content: start; }
 .home-qol__more { margin-top: var(--space-8); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
-/* ---------- quiz in evidenza ---------- */
-.home-quiz .h-section { margin-bottom: var(--space-6); }
-.home-quiz__grid { display: grid; gap: var(--space-8) var(--gutter-l); align-items: start; }
-@media (min-width: 960px) {
-  .home-quiz__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-  .home-quiz__intro { grid-column: 1 / span 6; }
-  .home-try { grid-column: 8 / span 5; }
-}
-.home-quiz__intro .lede { color: var(--ink); }
+/* ---------- quiz in evidenza, con una domanda da provare ---------- */
+.home-quiz__grid { display: grid; gap: var(--space-8) var(--space-16); align-items: start; }
+@media (min-width: 960px) { .home-quiz__grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); } }
 .home-quiz .actions { align-items: center; gap: var(--space-3) var(--space-6); }
 .home-try { margin: 0; padding: var(--space-3) 0 0; border: 0; border-top: 1px solid var(--rule); min-width: 0; }
-.home-try legend { padding: 0; }
-.home-try__kicker, .home-try__q { display: block; }
-.home-try__q { margin-top: var(--space-1); }
-.home-try__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
-.home-try__q { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; color: var(--ink); }
+.home-try legend { display: grid; gap: var(--space-1); padding: 0; }
 .home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
-.home-try__opt {
-  display: flex; align-items: center; gap: var(--space-2); min-height: var(--target);
-  padding: var(--space-2) var(--space-4); background: var(--bg); color: var(--ink); font-weight: 600;
-  border: 1px solid var(--control-border); border-radius: var(--radius-control); cursor: pointer;
+.home-try__opts label {
+  display: flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: var(--space-2) var(--space-4);
+  background: var(--bg); font-weight: 600; border: 1px solid var(--control-border); border-radius: var(--radius-control); cursor: pointer;
 }
-.home-try__opt:hover { border-color: var(--ink); }
-.home-try__opt:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.home-try__opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
-.home-try__opt input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+.home-try__opts label:hover { border-color: var(--ink); }
+.home-try__opts label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.home-try__opts label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.home-try__opts input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
 /* la risposta si vede solo dopo la scelta, senza JavaScript: la dice la parola, non un colore */
-.home-try__out p { display: none; margin-top: var(--space-4); font-size: var(--fs-ui); color: var(--ink); }
-.home-try:has(input[data-right]:checked) .home-try__ok { display: block; }
-.home-try:has(input:not([data-right]):checked) .home-try__no { display: block; }
+.home-try__out p { display: none; margin-top: var(--space-4); }
+.home-try:has(input[data-right]:checked) .home-try__ok, .home-try:has(input:not([data-right]):checked) .home-try__no { display: block; }
 .home-try .source { margin-top: var(--space-4); }
 .home-games { margin-top: var(--space-12); }
 
 /* ---------- temi: schede con piu' link, senza il link esteso a tutta la scheda ---------- */
 .home-theme { position: static; }
 .home-theme .card__title a::after { content: none; }
-.home-theme__list { list-style: none; margin-top: var(--space-1); }
-.home-theme__list li { border-top: 1px solid var(--rule); }
-.home-theme__list a { display: flex; align-items: center; min-height: var(--target); }
-.home-theme__ends { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.home-theme__ends div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
-.home-theme__ends dt { font-weight: 600; }
-.home-theme__ends dd { margin: 0; }
-.home-theme__ends a { color: var(--text-2); }
+.home-theme ul { list-style: none; }
+.home-theme li { border-top: 1px solid var(--rule); }
+.home-theme li a { display: flex; align-items: center; min-height: var(--target); }
+.home-theme dl { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.home-theme dl div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
+.home-theme dt { font-weight: 600; }
 
-/* ---------- fonti e citazione ---------- */
-.home-cite-lead { max-width: var(--measure); margin-top: var(--space-6); color: var(--text-2); }
+/* ---------- storie: la prima grande, le altre due accanto, foto con credito ---------- */
+@media (min-width: 600px) { .home-stories > .card--lead { grid-column: 1 / -1; } }
+@media (min-width: 960px) {
+  .home-stories { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .home-stories > .card--lead { grid-column: 1; grid-row: 1 / span 2; }
+}
+.home-story__fig { order: -1; display: grid; gap: var(--space-1); margin-bottom: var(--space-2); }
+.home-story__fig .card__media { margin-bottom: 0; }
+.home-story__fig figcaption { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
+/* i link del credito stanno sopra il link esteso del titolo */
+.home-story__fig a { position: relative; z-index: 1; color: inherit; }
 
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://divarioitalia.it/#site", "name": "Divario Italia", "url": "https://divarioitalia.it/", "inLanguage": "it-IT", "description": "Atlante interattivo degli indicatori territoriali Istat ed Eurostat: 594 indicatori, 20 regioni e 107 province, dal 1981 al 2026.", "publisher": {"@id": "https://divarioitalia.it/chi-siamo#organizzazione"}, "potentialAction": {"@type": "SearchAction", "target": "https://divarioitalia.it/ricerca?q={search_term_string}", "query-input": "required name=search_term_string"}}, {"@type": "Organization", "@id": "https://divarioitalia.it/chi-siamo#organizzazione", "name": "Divario Italia", "url": "https://divarioitalia.it/chi-siamo", "logo": {"@type": "ImageObject", "url": "https://divarioitalia.it/static/img/logo-mark.png"}, "contactPoint": {"@type": "ContactPoint", "contactType": "editorial", "email": "divarioitalia@protonmail.com", "url": "https://divarioitalia.it/contatti", "availableLanguage": "it"}}]}</script>
@@ -1001,24 +1200,40 @@ body.has-proto { padding-bottom: 96px; }
   <header class="pagehead home-head">
     <p class="eyebrow">L'Italia, regione per regione.</p>
     <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
-    <p class="answer">Divario Italia pubblica <strong>594</strong> indicatori di Istat ed Eurostat per le <strong>20</strong> regioni e le <strong>107</strong> province italiane, con serie dal 1981 al 2026. Ogni cifra porta la sua fonte e il suo anno.</p>
+    <p class="answer">Divario Italia pubblica <data class="n n--count" value="594">594</data> indicatori di Istat ed Eurostat per le <data class="n n--count" value="20">20</data> regioni e le <data class="n n--count" value="107">107</data> province italiane, con serie dal 1981 al 2026. Ogni cifra porta la sua fonte e il suo anno.</p>
     <form class="home-find" role="search" action="https://divarioitalia.it/ricerca" method="get" aria-labelledby="l-trova">
-      <label class="home-find__label" id="l-trova" for="trova">Trova il tuo territorio</label>
+      <label id="l-trova" for="trova">Trova il tuo territorio</label>
       <div class="home-find__row">
         <input id="trova" name="q" type="search" placeholder="Una regione, una provincia o un indicatore" autocomplete="off">
         <button class="btn btn--primary" type="submit"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg> Cerca</button>
       </div>
-      <p class="home-find__links">Oppure sfoglia <a href="https://divarioitalia.it/regioni">tutte le regioni</a> e <a href="https://divarioitalia.it/province">tutte le province</a>.</p>
+      <p>Oppure sfoglia <a href="https://divarioitalia.it/regioni">tutte le regioni</a> e <a href="https://divarioitalia.it/province">tutte le province</a>.</p>
     </form>
   </header>
 
 
   <section class="section home-feature" id="dato" aria-labelledby="h-dato">
     <h2 id="h-dato">Il dato in evidenza</h2>
-    <figure class="module home-wide" data-explore>
+    <div class="home-wide">
+
+    <figure class="lead-figure" aria-labelledby="dato-t">
+      <figcaption class="lead-figure__head">
+        <span class="home-feature__what">
+          <span class="eyebrow">PIL pro capite, in euro<span class="sep" aria-hidden="true">·</span>Meglio se alto</span>
+          <span class="lead-figure__title" id="dato-t">Nel 2024 nessuna regione del Mezzogiorno arriva al valore più basso del Centro-Nord</span>
+        </span>
+        <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b><data class="n n--count" value="8">8</data></li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b><data class="n n--count" value="4">4</data></li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b><data class="n n--count" value="8">8</data></li>
+</ul>
+      </figcaption>
+      <div class="chart chart--hero"><div class="chart__l"><svg viewBox="0 0 920 164" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="904" y1="102.0" y2="102.0"/><text class="strip__tick" x="16.0" y="158" text-anchor="start">20.000</text><text class="strip__tick" x="238.0" y="158" text-anchor="middle">30.000</text><text class="strip__tick" x="460.0" y="158" text-anchor="middle">40.000</text><text class="strip__tick" x="682.0" y="158" text-anchor="middle">50.000</text><text class="strip__tick" x="904.0" y="158" text-anchor="end">60.000</text><line class="strip__avg" x1="364.8" x2="364.8" y1="64" y2="140"/><text class="strip__avglab" x="369.8" y="142" text-anchor="start">Media semplice 35.710</text><path class="strip__gap" d="M53.8,28 V22 H784.9 V28"/><text class="strip__gaplab" x="419.4" y="16" text-anchor="middle">2,5 volte</text><circle class="strip__dot area--sud" data-key="calabria" cx="53.8" cy="102.0" r="6.5"><title>Calabria 21.702</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="89.5" cy="102.0" r="6.5"><title>Sicilia 23.309</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="112.1" cy="102.0" r="6.5"><title>Puglia 24.328</title></circle><circle class="strip__dot area--sud" data-key="campania" cx="117.3" cy="116.0" r="6.5"><title>Campania 24.564</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="186.9" cy="102.0" r="6.5"><title>Molise 27.698</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="187.6" cy="116.0" r="6.5"><title>Sardegna 27.731</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="202.8" cy="102.0" r="6.5"><title>Basilicata 28.416</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="284.8" cy="102.0" r="6.5"><title>Abruzzo 32.109</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="292.8" cy="116.0" r="6.5"><title>Umbria 32.467</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="330.1" cy="102.0" r="6.5"><title>Marche 34.149</title></circle><circle class="strip__dot area--nord" data-key="piemonte" cx="429.5" cy="102.0" r="6.5"><title>Piemonte 38.626</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="434.3" cy="116.0" r="6.5"><title>Liguria 38.842</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="437.9" cy="88.0" r="6.5"><title>Friuli-Venezia Giulia 39.005</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="443.6" cy="102.0" r="6.5"><title>Toscana 39.262</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="493.2" cy="102.0" r="6.5"><title>Veneto 41.496</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="530.3" cy="102.0" r="6.5"><title>Lazio 43.167</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="561.2" cy="102.0" r="6.5"><title>Emilia-Romagna 44.557</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="631.9" cy="102.0" r="6.5"><title>Valle d&#x27;Aosta 47.743</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="690.9" cy="102.0" r="6.5"><title>Lombardia 50.399</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="784.9" cy="102.0" r="6.5"><title>Trentino Alto Adige 54.637</title></circle><text class="strip__name" x="47.3" y="54" text-anchor="start" dy="0"><tspan class="strip__nm">Calabria</tspan> <tspan class="strip__v">21.702</tspan></text><text class="strip__name" x="791.4" y="54" text-anchor="end" dy="0"><tspan class="strip__nm">Trentino Alto Adige</tspan> <tspan class="strip__v">54.637</tspan></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 188" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="344" y1="112.0" y2="112.0"/><text class="strip__tick" x="16.0" y="182" text-anchor="start">20.000</text><text class="strip__tick" x="180.0" y="182" text-anchor="middle">40.000</text><text class="strip__tick" x="344.0" y="182" text-anchor="end">60.000</text><line class="strip__avg" x1="144.8" x2="144.8" y1="60" y2="164"/><text class="strip__avglab" x="149.8" y="166" text-anchor="start">Media 35.710</text><path class="strip__gap" d="M30.0,28 V22 H300.0 V28"/><text class="strip__gaplab" x="165.0" y="16" text-anchor="middle">2,5 volte</text><circle class="strip__dot area--sud" data-key="calabria" cx="30.0" cy="112.0" r="6.5"><title>Calabria 21.702</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="43.1" cy="126.0" r="6.5"><title>Sicilia 23.309</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="51.5" cy="112.0" r="6.5"><title>Puglia 24.328</title></circle><circle class="strip__dot area--sud" data-key="campania" cx="53.4" cy="98.0" r="6.5"><title>Campania 24.564</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="79.1" cy="112.0" r="6.5"><title>Molise 27.698</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="79.4" cy="126.0" r="6.5"><title>Sardegna 27.731</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="85.0" cy="98.0" r="6.5"><title>Basilicata 28.416</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="115.3" cy="112.0" r="6.5"><title>Abruzzo 32.109</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="118.2" cy="126.0" r="6.5"><title>Umbria 32.467</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="132.0" cy="112.0" r="6.5"><title>Marche 34.149</title></circle><circle class="strip__dot area--nord" data-key="piemonte" cx="168.7" cy="112.0" r="6.5"><title>Piemonte 38.626</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="170.5" cy="126.0" r="6.5"><title>Liguria 38.842</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="171.8" cy="98.0" r="6.5"><title>Friuli-Venezia Giulia 39.005</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="173.9" cy="140.0" r="6.5"><title>Toscana 39.262</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="192.3" cy="112.0" r="6.5"><title>Veneto 41.496</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="206.0" cy="126.0" r="6.5"><title>Lazio 43.167</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="217.4" cy="112.0" r="6.5"><title>Emilia-Romagna 44.557</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="243.5" cy="112.0" r="6.5"><title>Valle d&#x27;Aosta 47.743</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="265.3" cy="112.0" r="6.5"><title>Lombardia 50.399</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="300.0" cy="112.0" r="6.5"><title>Trentino Alto Adige 54.637</title></circle><text class="strip__name" x="23.5" y="50" text-anchor="start" dy="0"><tspan class="strip__nm">Calabria</tspan> <tspan class="strip__v">21.702</tspan></text><text class="strip__name" x="306.5" y="50" text-anchor="end" dy="0"><tspan class="strip__nm">Trentino A.A.</tspan> <tspan class="strip__v">54.637</tspan></text></svg></div></div>
+      <p class="source">Ogni punto è una regione, nel colore della sua ripartizione, valori in euro. Fonte: Istat, indicatori territoriali (2024). Tutte le cifre sono nella classifica qui sotto.</p>
+    </figure>
+
+
+    <figure class="module" data-explore>
       <figcaption class="module__head">
-        <h3 class="h-sub">Nel 2024 si va da 21.702 euro in Calabria a 54.637 euro in Trentino Alto Adige, 2,5 volte tanto</h3>
-        <p class="subline">PIL pro capite, in euro, 2024. Le 20 regioni dal valore più alto al più basso. <span class="direction">Meglio se alto</span>.</p>
+        <h3 class="h-sub">Sotto la media semplice stanno le otto regioni del Mezzogiorno, più le Marche e l'Umbria</h3>
+        <p class="subline">PIL pro capite, in euro, 2024. Le <data class="n n--count" value="20">20</data> regioni dal valore più alto al più basso, con la media semplice al suo posto.</p>
       </figcaption>
       <div class="toolbar">
         <div class="field home-pick"><span id="l-dato">Colora la mappa per</span>
@@ -1061,6 +1276,7 @@ body.has-proto { padding-bottom: 96px; }
     <path d="M412,431L412,430L412,429L412,428L411,423L410,422L411,422L411,421L410,418L410,417L410,416L411,415L412,414L414,413L414,414L415,414L416,414L417,414L418,414L419,414L420,414L421,414L420,416L421,417L420,418L421,418L422,419L423,419L424,418L425,419L426,418L428,419L428,418L429,418L431,417L432,417L434,419L434,418L434,417L434,416L434,415L436,413L436,411L437,409L436,407L437,407L437,406L437,407L439,406L440,407L441,407L444,406L445,407L446,407L444,409L444,411L445,416L442,420L440,424L440,427L441,428L441,431L441,432L441,431L443,433L445,434L450,434L451,434L453,435L454,437L455,438L459,440L462,441L463,443L465,445L467,445L466,447L465,450L465,453L466,456L465,459L465,461L465,462L466,462L466,461L466,462L466,463L466,464L468,465L469,465L468,466L467,467L467,468L467,469L464,472L464,471L462,471L461,471L460,470L456,470L451,472L444,476L442,482L442,483L443,494L443,496L439,501L433,503L433,504L426,512L426,517L424,520L422,522L420,523L416,522L410,523L407,521L405,518L406,516L405,516L406,515L405,515L405,514L406,512L406,511L405,509L405,506L407,506L410,505L412,503L413,500L414,499L416,495L417,491L417,490L416,489L413,487L413,486L413,485L414,484L418,482L419,481L421,481L424,482L425,481L427,479L429,475L428,470L426,469L425,466L424,465L422,459L422,451L420,443L417,439L415,437L413,431Z" data-key="calabria" data-name="Calabria" data-value="21.702 euro" class="q1"/>
     <path d="M275,529L274,529L276,528L276,525L275,523L277,521L277,519L278,518L277,518L278,517L280,515L281,515L283,514L284,514L284,513L284,512L285,513L286,513L287,511L286,510L286,509L287,509L288,509L288,511L289,512L289,513L290,514L292,516L292,517L293,517L296,516L301,514L300,512L300,511L301,510L302,509L304,509L304,510L305,510L307,509L307,508L309,508L310,507L311,508L312,509L313,510L313,512L312,512L313,513L316,514L318,513L318,512L319,513L319,514L320,515L319,515L320,516L324,519L326,519L327,519L326,519L326,520L328,520L331,519L336,517L338,517L339,516L340,516L340,517L341,518L343,518L344,517L345,518L350,518L352,518L353,518L356,516L357,517L359,516L361,515L362,515L364,515L366,513L369,510L370,511L374,510L376,508L376,509L378,511L381,511L381,512L383,512L386,510L388,509L389,506L388,504L389,506L389,507L390,508L391,508L396,506L400,503L401,503L404,504L406,505L403,506L402,509L402,508L400,511L399,515L393,522L393,523L391,525L391,526L390,527L390,528L388,531L387,532L388,534L387,535L387,536L386,537L386,540L385,541L385,542L384,543L383,544L383,551L383,554L385,554L386,555L386,556L387,555L389,557L389,558L388,558L388,559L388,558L388,557L387,558L386,559L386,560L387,561L387,562L388,562L389,562L388,562L388,563L389,564L390,564L391,564L391,566L391,567L390,567L390,568L391,568L392,568L393,570L392,570L391,569L390,570L390,571L387,572L385,574L384,577L383,578L383,579L383,580L383,582L384,583L384,585L385,586L384,587L384,586L382,588L382,587L381,587L381,586L380,585L377,585L375,584L374,584L372,584L372,585L372,584L370,585L369,584L366,584L364,582L362,581L358,581L357,579L356,576L354,572L352,569L349,567L345,565L341,564L337,564L335,565L334,565L332,564L332,563L331,562L328,562L327,561L324,560L324,558L320,555L319,555L318,555L317,555L316,555L315,554L314,553L312,552L310,551L309,550L308,550L308,548L304,545L304,544L303,545L301,544L298,544L297,542L296,541L294,540L292,540L288,540L284,541L282,539L282,537L280,536L278,536L276,534L276,532ZM256,578L257,579L259,580L259,582L258,583L256,583L254,580L254,578L255,578ZM377,491L377,493L378,493L377,494L377,495L377,496L376,495L375,494L375,493L375,492ZM373,488L374,489L374,491L373,491L371,489L371,488ZM377,497L378,497L379,498L379,499L379,500L377,499L376,498L377,496L378,496ZM278,644L282,645L282,646L281,646L280,645L278,645ZM268,522L268,521L268,522L269,521L270,522L271,522L272,522L272,523L271,523L270,523L268,523ZM388,478L387,477L388,476L389,477ZM259,519L259,520L260,521L258,521L258,519ZM362,490L361,490L360,488L362,488ZM305,481L306,482L305,482L304,482ZM271,519L270,519L270,517ZM275,524L275,526L274,524L275,523ZM292,627L293,628L292,628L291,627ZM352,491L352,490L353,490ZM381,486L381,485L382,485L382,486ZM276,525L275,525L275,524Z" data-key="sicilia" data-name="Sicilia" data-value="23.309 euro" class="q1"/>
     <path d="M102,382L102,381L102,380L101,382L100,382L100,384L100,383L100,380L101,379L102,377L101,376L100,376L99,374L100,373L100,371L101,370L103,366L102,365L101,365L101,364L102,362L103,362L103,364L103,365L106,368L108,368L109,368L108,368L108,369L110,369L112,370L114,370L118,368L119,367L119,366L122,365L126,364L129,360L130,358L131,358L132,357L135,353L136,352L137,353L138,353L139,353L139,352L141,352L141,350L141,349L141,348L141,347L140,347L141,347L142,346L142,347L144,346L144,347L145,347L146,348L145,349L146,350L146,348L147,349L146,350L147,350L147,349L147,350L148,350L148,349L149,349L149,350L150,350L152,350L152,351L151,351L152,352L152,354L154,353L153,352L155,352L156,352L156,353L157,353L156,354L158,354L157,355L157,356L156,355L156,356L156,358L155,359L156,359L156,358L157,358L157,360L158,360L159,359L160,360L161,360L162,360L161,361L159,360L158,361L159,362L158,363L158,364L156,364L155,364L156,364L155,364L155,365L157,364L158,365L158,364L158,365L160,364L161,364L160,366L160,367L161,366L161,367L161,368L162,368L162,367L163,368L164,368L164,369L162,369L162,370L163,370L162,370L162,372L164,373L164,376L165,377L165,380L165,381L166,383L167,384L168,385L168,386L166,393L165,393L164,394L162,396L160,399L160,400L160,403L161,406L162,408L164,409L163,412L163,414L162,414L162,416L163,417L164,417L163,418L162,419L162,420L163,421L162,422L162,425L162,429L161,430L161,432L161,436L160,440L161,441L161,442L159,446L159,448L159,450L160,450L160,451L159,451L158,452L157,456L158,457L158,458L157,459L156,459L156,460L156,461L155,461L155,460L154,459L152,460L152,459L150,459L150,458L150,457L149,457L148,456L147,456L146,455L143,454L141,456L141,457L140,457L139,456L139,455L138,455L136,458L135,460L135,462L136,463L135,465L135,466L135,467L134,467L130,471L130,472L128,473L127,472L126,472L125,471L123,470L121,471L121,472L120,472L120,473L120,474L120,472L118,472L119,470L118,468L118,469L118,468L117,466L117,465L117,464L114,463L113,463L112,465L112,467L112,468L110,469L110,468L108,464L108,462L108,461L109,460L109,461L111,461L112,462L113,463L114,462L113,460L111,460L111,458L110,457L110,458L110,456L109,455L108,454L111,452L111,451L111,450L111,449L110,449L109,447L110,444L110,443L109,442L112,438L113,435L112,433L112,431L112,429L112,428L112,426L114,428L114,429L114,428L115,427L114,427L116,424L116,421L117,421L116,421L116,420L115,419L114,418L113,419L112,420L112,421L111,421L111,420L110,419L110,416L110,415L110,414L110,413L110,412L109,412L110,411L112,411L114,409L113,407L112,406L112,404L113,403L112,402L113,398L112,398L112,396L112,397L111,396L109,396L109,395L109,394L110,394L110,392L110,391L109,387L107,386L107,385L106,384L107,383L106,382L105,382L104,382L104,383L103,383L102,383ZM103,358L104,357L104,356L105,356L105,354L106,354L107,354L108,355L107,356L107,357L105,356L104,357L104,358L103,359L104,358L104,360L104,361L102,360L103,359L102,359ZM106,457L106,461L105,461L104,461L104,459L103,459L103,458L105,457L106,457L106,456ZM151,348L150,349L150,348L151,347L151,346L151,345L152,346L152,347L153,347L152,348ZM154,347L154,348L153,350L154,350L153,350L152,350L152,349L153,349L153,348L153,347ZM164,364L165,365L163,366L162,366ZM148,346L149,347L148,348L148,347ZM151,350L150,350L151,349L152,349ZM164,367L165,367L164,368L163,367ZM150,343L150,344L149,344ZM149,345L148,345L149,344ZM148,343L149,344L148,344ZM103,362L102,362L102,361L103,361Z" data-key="sardegna" data-name="Sardegna" data-value="27.731 euro" class="q2"/>
+    <g class="callout"><line x1="227.5" y1="52.5" x2="333.0" y2="52.5"/><circle cx="227.5" cy="52.5" r="5"/><text x="552" y="48.5" text-anchor="end"><tspan class="callout__nm">Trentino Alto Adige</tspan><tspan x="552" dy="24" class="callout__v">54.637 euro</tspan></text></g><g class="callout"><line x1="434.0" y1="462.4" x2="421.0" y2="462.4"/><circle cx="434.0" cy="462.4" r="5"/><text x="552" y="458.4" text-anchor="end"><tspan class="callout__nm">Calabria</tspan><tspan x="552" dy="24" class="callout__v">21.702 euro</tspan></text></g>
   </svg>
   <div class="map__tip" data-map-tip hidden></div>
 </div>
@@ -1071,72 +1287,68 @@ body.has-proto { padding-bottom: 96px; }
   <span class="legend__nd"><i></i> n.d., dato non disponibile</span>
 </div>
         </div>
-        <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle regioni per PIL pro capite">
-          <table class="table table--compact">
-            <caption class="sr-only">PIL pro capite per regione nel 2024, in euro</caption>
-            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">Euro</th></tr></thead>
-            <tbody data-rank-body>
-              <tr data-key="trentino-alto-adige"><td class="rank">1</td><th scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val">54.637</td></tr>
-              <tr data-key="lombardia"><td class="rank">2</td><th scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 92.2%"></i></span></td><td class="val">50.399</td></tr>
-              <tr data-key="valle-d-aosta"><td class="rank">3</td><th scope="row"><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 87.4%"></i></span></td><td class="val">47.743</td></tr>
-              <tr data-key="emilia-romagna"><td class="rank">4</td><th scope="row"><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 81.6%"></i></span></td><td class="val">44.557</td></tr>
-              <tr data-key="lazio"><td class="rank">5</td><th scope="row"><a href="https://divarioitalia.it/regione/lazio">Lazio</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 79.0%"></i></span></td><td class="val">43.167</td></tr>
-              <tr data-key="veneto"><td class="rank">6</td><th scope="row"><a href="https://divarioitalia.it/regione/veneto">Veneto</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.9%"></i></span></td><td class="val">41.496</td></tr>
-              <tr data-key="toscana"><td class="rank">7</td><th scope="row"><a href="https://divarioitalia.it/regione/toscana">Toscana</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.9%"></i></span></td><td class="val">39.262</td></tr>
-              <tr data-key="friuli-venezia-giulia"><td class="rank">8</td><th scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.4%"></i></span></td><td class="val">39.005</td></tr>
-              <tr data-key="liguria"><td class="rank">9</td><th scope="row"><a href="https://divarioitalia.it/regione/liguria">Liguria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.1%"></i></span></td><td class="val">38.842</td></tr>
-              <tr data-key="piemonte"><td class="rank">10</td><th scope="row"><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 70.7%"></i></span></td><td class="val">38.626</td></tr>
-              <tr class="ref"><td></td><th scope="row">Media semplice delle 20 regioni</th><td class="barcell" aria-hidden="true"></td><td class="val">35.710</td></tr>
-              <tr data-key="marche"><td class="rank">11</td><th scope="row"><a href="https://divarioitalia.it/regione/marche">Marche</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 62.5%"></i></span></td><td class="val">34.149</td></tr>
-              <tr data-key="umbria"><td class="rank">12</td><th scope="row"><a href="https://divarioitalia.it/regione/umbria">Umbria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 59.4%"></i></span></td><td class="val">32.467</td></tr>
-              <tr data-key="abruzzo"><td class="rank">13</td><th scope="row"><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 58.8%"></i></span></td><td class="val">32.109</td></tr>
-              <tr data-key="basilicata"><td class="rank">14</td><th scope="row"><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 52.0%"></i></span></td><td class="val">28.416</td></tr>
-              <tr data-key="sardegna"><td class="rank">15</td><th scope="row"><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.8%"></i></span></td><td class="val">27.731</td></tr>
-              <tr data-key="molise"><td class="rank">16</td><th scope="row"><a href="https://divarioitalia.it/regione/molise">Molise</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.7%"></i></span></td><td class="val">27.698</td></tr>
-              <tr data-key="campania"><td class="rank">17</td><th scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 45.0%"></i></span></td><td class="val">24.564</td></tr>
-              <tr data-key="puglia"><td class="rank">18</td><th scope="row"><a href="regione.html">Puglia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 44.5%"></i></span></td><td class="val">24.328</td></tr>
-              <tr data-key="sicilia"><td class="rank">19</td><th scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 42.7%"></i></span></td><td class="val">23.309</td></tr>
-              <tr data-key="calabria"><td class="rank">20</td><th scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 39.7%"></i></span></td><td class="val">21.702</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <details class="more" data-collapse-mobile open>
+          <summary>La classifica delle <data class="n n--count" value="20">20</data> regioni</summary>
+          <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle regioni per PIL pro capite">
+            <table class="table table--compact">
+              <caption class="sr-only">PIL pro capite per regione nel 2024, in euro</caption>
+              <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">Euro</th></tr></thead>
+              <tbody data-rank-body>
+                <tr data-key="trentino-alto-adige"><td class="rank"><span class="n n--rank"><data value="1">1</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val"><data class="n n--cell" value="54636.7">54.637</data></td></tr>
+                <tr data-key="lombardia"><td class="rank"><span class="n n--rank"><data value="2">2</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 92.2%"></i></span></td><td class="val"><data class="n n--cell" value="50398.9">50.399</data></td></tr>
+                <tr data-key="valle-d-aosta"><td class="rank"><span class="n n--rank"><data value="3">3</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 87.4%"></i></span></td><td class="val"><data class="n n--cell" value="47742.8">47.743</data></td></tr>
+                <tr data-key="emilia-romagna"><td class="rank"><span class="n n--rank"><data value="4">4</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 81.6%"></i></span></td><td class="val"><data class="n n--cell" value="44557">44.557</data></td></tr>
+                <tr data-key="lazio"><td class="rank"><span class="n n--rank"><data value="5">5</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lazio">Lazio</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 79.0%"></i></span></td><td class="val"><data class="n n--cell" value="43166.9">43.167</data></td></tr>
+                <tr data-key="veneto"><td class="rank"><span class="n n--rank"><data value="6">6</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/veneto">Veneto</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.9%"></i></span></td><td class="val"><data class="n n--cell" value="41496.3">41.496</data></td></tr>
+                <tr data-key="toscana"><td class="rank"><span class="n n--rank"><data value="7">7</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/toscana">Toscana</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.9%"></i></span></td><td class="val"><data class="n n--cell" value="39262">39.262</data></td></tr>
+                <tr data-key="friuli-venezia-giulia"><td class="rank"><span class="n n--rank"><data value="8">8</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.4%"></i></span></td><td class="val"><data class="n n--cell" value="39005.1">39.005</data></td></tr>
+                <tr data-key="liguria"><td class="rank"><span class="n n--rank"><data value="9">9</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/liguria">Liguria</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.1%"></i></span></td><td class="val"><data class="n n--cell" value="38841.8">38.842</data></td></tr>
+                <tr data-key="piemonte"><td class="rank"><span class="n n--rank"><data value="10">10</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 70.7%"></i></span></td><td class="val"><data class="n n--cell" value="38625.5">38.626</data></td></tr>
+                <tr class="ref"><td></td><th scope="row">Media semplice delle <data class="n n--count" value="20">20</data> regioni</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="35710.3">35.710</data></td></tr>
+                <tr data-key="marche"><td class="rank"><span class="n n--rank"><data value="11">11</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/marche">Marche</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 62.5%"></i></span></td><td class="val"><data class="n n--cell" value="34149.1">34.149</data></td></tr>
+                <tr data-key="umbria"><td class="rank"><span class="n n--rank"><data value="12">12</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/umbria">Umbria</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 59.4%"></i></span></td><td class="val"><data class="n n--cell" value="32466.9">32.467</data></td></tr>
+                <tr data-key="abruzzo"><td class="rank"><span class="n n--rank"><data value="13">13</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 58.8%"></i></span></td><td class="val"><data class="n n--cell" value="32108.7">32.109</data></td></tr>
+                <tr data-key="basilicata"><td class="rank"><span class="n n--rank"><data value="14">14</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 52.0%"></i></span></td><td class="val"><data class="n n--cell" value="28416.3">28.416</data></td></tr>
+                <tr data-key="sardegna"><td class="rank"><span class="n n--rank"><data value="15">15</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.8%"></i></span></td><td class="val"><data class="n n--cell" value="27730.8">27.731</data></td></tr>
+                <tr data-key="molise"><td class="rank"><span class="n n--rank"><data value="16">16</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/molise">Molise</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.7%"></i></span></td><td class="val"><data class="n n--cell" value="27697.8">27.698</data></td></tr>
+                <tr data-key="campania"><td class="rank"><span class="n n--rank"><data value="17">17</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/campania">Campania</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 45.0%"></i></span></td><td class="val"><data class="n n--cell" value="24564.2">24.564</data></td></tr>
+                <tr data-key="puglia"><td class="rank"><span class="n n--rank"><data value="18">18</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="regione.html">Puglia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 44.5%"></i></span></td><td class="val"><data class="n n--cell" value="24327.7">24.328</data></td></tr>
+                <tr data-key="sicilia"><td class="rank"><span class="n n--rank"><data value="19">19</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 42.7%"></i></span></td><td class="val"><data class="n n--cell" value="23308.7">23.309</data></td></tr>
+                <tr data-key="calabria"><td class="rank"><span class="n n--rank"><data value="20">20</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/calabria">Calabria</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 39.7%"></i></span></td><td class="val"><data class="n n--cell" value="21702.2">21.702</data></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
       </div>
-      <p class="chart-note">Tutte le otto regioni del Mezzogiorno stanno sotto la media semplice delle 20 regioni.</p>
-      <div class="home-feature__foot">
-        <p class="source">Fonte: Istat, indicatori territoriali (2024). Elaborazione Divario Italia. Le barre partono da zero.</p>
-        <p><a class="linkarrow" href="indicatore.html">PIL pro capite, la scheda completa</a></p>
-      </div>
+      <p class="source">Fonte: Istat, indicatori territoriali (2024). Elaborazione Divario Italia. Le barre partono da zero. <a class="linkarrow" href="indicatore.html">PIL pro capite, la scheda completa</a></p>
       <p class="sr-only" role="status" aria-live="polite" data-live></p>
     </figure>
+    </div>
   </section>
 
 
   <section class="section" id="territori" aria-labelledby="h-territori">
     <h2 id="h-territori">Regioni e province</h2>
-    <p class="home-sectionlead">Il profilo di ogni regione e di ogni provincia: dove stacca, dove resta indietro, i valori veri di ogni indicatore.</p>
+    <p class="home-sectionlead">Il profilo di ogni regione e di ogni provincia: dove stacca, dove resta indietro, i valori veri di ogni indicatore. Le ripartizioni hanno i colori della striscia qui sopra.</p>
     <div class="home-regions">
-      <div class="home-regions__group is-wide">
-        <h3 class="home-colhead">Nord</h3>
+      <div class="is-wide">
+        <h3><span class="area-dot area-dot--nord" aria-hidden="true"></span>Nord</h3>
         <ul><li><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a></li><li><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></li><li><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></li><li><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></li><li><a href="https://divarioitalia.it/regione/veneto">Veneto</a></li><li><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></li><li><a href="https://divarioitalia.it/regione/liguria">Liguria</a></li><li><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></li></ul>
       </div>
-      <div class="home-regions__group">
-        <h3 class="home-colhead">Centro</h3>
+      <div class="">
+        <h3><span class="area-dot area-dot--centro" aria-hidden="true"></span>Centro</h3>
         <ul><li><a href="https://divarioitalia.it/regione/toscana">Toscana</a></li><li><a href="https://divarioitalia.it/regione/umbria">Umbria</a></li><li><a href="https://divarioitalia.it/regione/marche">Marche</a></li><li><a href="https://divarioitalia.it/regione/lazio">Lazio</a></li></ul>
       </div>
-      <div class="home-regions__group is-wide">
-        <h3 class="home-colhead">Sud</h3>
-        <ul><li><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></li><li><a href="https://divarioitalia.it/regione/molise">Molise</a></li><li><a href="https://divarioitalia.it/regione/campania">Campania</a></li><li><a href="regione.html">Puglia</a></li><li><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></li><li><a href="https://divarioitalia.it/regione/calabria">Calabria</a></li></ul>
-      </div>
-      <div class="home-regions__group">
-        <h3 class="home-colhead">Isole</h3>
-        <ul><li><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></li><li><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></li></ul>
+      <div class="is-wide">
+        <h3><span class="area-dot area-dot--sud" aria-hidden="true"></span>Mezzogiorno</h3>
+        <ul><li><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></li><li><a href="https://divarioitalia.it/regione/molise">Molise</a></li><li><a href="https://divarioitalia.it/regione/campania">Campania</a></li><li><a href="regione.html">Puglia</a></li><li><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></li><li><a href="https://divarioitalia.it/regione/calabria">Calabria</a></li><li><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></li><li><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></li></ul>
       </div>
     </div>
-    <ul class="home-links">
-      <li><a class="linkarrow" href="https://divarioitalia.it/province">Tutte le province</a></li>
-      <li><a class="linkarrow" href="https://divarioitalia.it/confronto">Confronta fino a tre territori</a></li>
-      <li><a class="linkarrow" href="https://divarioitalia.it/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a></li>
-    </ul>
+    <p class="actions home-links">
+      <a class="linkarrow" href="https://divarioitalia.it/province">Tutte le province</a>
+      <a class="linkarrow" href="https://divarioitalia.it/confronto">Confronta fino a tre territori</a>
+      <a class="linkarrow" href="https://divarioitalia.it/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a>
+    </p>
   </section>
 
 
@@ -1144,24 +1356,24 @@ body.has-proto { padding-bottom: 96px; }
     <h2 id="h-qualita">Qualità della vita</h2>
     <div class="home-wide">
     <div class="home-qol__head">
-      <p class="lede">Con il profilo equilibrato, fra la prima e l'ultima regione ci sono 42 punti sulla scala da 0 a 100, fra la prima e l'ultima provincia 49.</p>
+      <p class="lede">Con il profilo equilibrato, fra la prima e l'ultima regione ci sono <data class="n n--score" value="41.8">41,8</data> punti sulla scala da 0 a 100, fra la prima e l'ultima provincia <data class="n n--score" value="49.3">49,3</data>.</p>
       <p class="status"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg> Indice sperimentale di Divario Italia, non un dato ufficiale. Profilo equilibrato: assegna lo stesso peso alle dodici dimensioni della qualità della vita.</p>
     </div>
-    <div class="home-podiums">
+    <div class="podiums">
       <div class="home-podium">
         <h3 class="h-sub">Regioni</h3>
-        <div class="tablewrap" tabindex="0" role="region" aria-label="Qualità della vita, regioni in testa e in coda">
-          <table class="table table--compact">
-            <caption>Le prime tre e le ultime tre delle 20 regioni, punteggio da 0 a 100</caption>
-            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
+        <div class="tablewrap rankwrap" tabindex="0" role="region" aria-label="Qualità della vita, regioni in testa e in coda">
+          <table class="table table--rank">
+            <caption>Le prime tre e le ultime tre delle <data class="n n--count" value="20">20</data> regioni, punteggio da 0 a 100</caption>
+            <thead><tr><th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th><th scope="col">Regione</th><th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
             <tbody>
-              <tr><td class="rank">1ª</td><th scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 72%"></i></span></td><td class="val">72</td></tr>
-              <tr><td class="rank">2ª</td><th scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 63%"></i></span></td><td class="val">63</td></tr>
-              <tr><td class="rank">3ª</td><th scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 62%"></i></span></td><td class="val">62</td></tr>
-              <tr class="home-podium__gap"><td></td><td colspan="3">Altre 14 regioni</td></tr>
-              <tr><td class="rank">18ª</td><th scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 31%"></i></span></td><td class="val">31</td></tr>
-              <tr><td class="rank">19ª</td><th scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 30%"></i></span></td><td class="val">30</td></tr>
-              <tr><td class="rank">20ª</td><th scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 30%"></i></span></td><td class="val">30</td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="1">1</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 71.6%"></i></span></td><td class="val"><data class="n n--score" value="71.6">71,6</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="2">2</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 63.4%"></i></span></td><td class="val"><data class="n n--score" value="63.4">63,4</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="3">3</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 62.5%"></i></span></td><td class="val"><data class="n n--score" value="62.5">62,5</data></td></tr>
+              <tr class="gap"><td></td><td colspan="3">Altre <data class="n n--count" value="14">14</data> regioni, dalla <span class="n n--rank"><data value="4">4</data><span class="n__o">ª</span></span> alla <span class="n n--rank"><data value="17">17</data><span class="n__o">ª</span></span></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="18">18</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 31.2%"></i></span></td><td class="val"><data class="n n--score" value="31.2">31,2</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="19">19</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 30.1%"></i></span></td><td class="val"><data class="n n--score" value="30.1">30,1</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="20">20</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 29.8%"></i></span></td><td class="val"><data class="n n--score" value="29.8">29,8</data></td></tr>
             </tbody>
           </table>
         </div>
@@ -1169,18 +1381,18 @@ body.has-proto { padding-bottom: 96px; }
       </div>
       <div class="home-podium">
         <h3 class="h-sub">Province</h3>
-        <div class="tablewrap" tabindex="0" role="region" aria-label="Qualità della vita, province in testa e in coda">
-          <table class="table table--compact">
-            <caption>Le prime tre e le ultime tre delle 107 province, punteggio da 0 a 100</caption>
-            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Provincia</th><th class="barcell" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
+        <div class="tablewrap rankwrap" tabindex="0" role="region" aria-label="Qualità della vita, province in testa e in coda">
+          <table class="table table--rank">
+            <caption>Le prime tre e le ultime tre delle <data class="n n--count" value="107">107</data> province, punteggio da 0 a 100</caption>
+            <thead><tr><th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th><th scope="col">Provincia</th><th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
             <tbody>
-              <tr><td class="rank">1ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/monza-e-della-brianza">Monza e della Brianza</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 74%"></i></span></td><td class="val">74</td></tr>
-              <tr><td class="rank">2ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/milano">Milano</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 72%"></i></span></td><td class="val">72</td></tr>
-              <tr><td class="rank">3ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/bologna">Bologna</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 71%"></i></span></td><td class="val">71</td></tr>
-              <tr class="home-podium__gap"><td></td><td colspan="3">Altre 101 province</td></tr>
-              <tr><td class="rank">105ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/sud-sardegna">Sud Sardegna</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 27%"></i></span></td><td class="val">27</td></tr>
-              <tr><td class="rank">106ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/caserta">Caserta</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 26%"></i></span></td><td class="val">26</td></tr>
-              <tr><td class="rank">107ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/reggio-calabria">Reggio Calabria</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 24%"></i></span></td><td class="val">24</td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="1">1</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/provincia/monza-e-della-brianza">Monza e della Brianza</a><span class="where">Lombardia</span></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 73.6%"></i></span></td><td class="val"><data class="n n--score" value="73.6">73,6</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="2">2</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/provincia/milano">Milano</a><span class="where">Lombardia</span></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 72.0%"></i></span></td><td class="val"><data class="n n--score" value="72">72,0</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="3">3</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/provincia/bologna">Bologna</a><span class="where">Emilia-Romagna</span></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 71.1%"></i></span></td><td class="val"><data class="n n--score" value="71.1">71,1</data></td></tr>
+              <tr class="gap"><td></td><td colspan="3">Altre <data class="n n--count" value="101">101</data> province, dalla <span class="n n--rank"><data value="4">4</data><span class="n__o">ª</span></span> alla <span class="n n--rank"><data value="104">104</data><span class="n__o">ª</span></span></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="105">105</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/provincia/sud-sardegna">Sud Sardegna</a><span class="where">Sardegna</span></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 26.6%"></i></span></td><td class="val"><data class="n n--score" value="26.6">26,6</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="106">106</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/provincia/caserta">Caserta</a><span class="where">Campania</span></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 26.0%"></i></span></td><td class="val"><data class="n n--score" value="26">26,0</data></td></tr>
+              <tr><td class="rank"><span class="n n--rank"><data value="107">107</data><span class="n__o">ª</span></span></td><th class="name" scope="row"><a href="https://divarioitalia.it/provincia/reggio-calabria">Reggio Calabria</a><span class="where">Calabria</span></th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: 24.3%"></i></span></td><td class="val"><data class="n n--score" value="24.3">24,3</data></td></tr>
             </tbody>
           </table>
         </div>
@@ -1189,8 +1401,8 @@ body.has-proto { padding-bottom: 96px; }
     </div>
 
     <p class="home-qol__more">Altre priorità, altre classifiche delle regioni: <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=opportunita">Opportunità economica</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=accessibilita">Accessibilità quotidiana</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=famiglie">Famiglie</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=giovani">Giovani</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=servizi">Servizi e territorio</a>.</p>
-    <p class="home-more"><a class="linkarrow" href="qualita-della-vita.html">Dove si vive meglio</a></p>
 
+    <p class="home-more"><a class="linkarrow" href="qualita-della-vita.html">Dove si vive meglio</a></p>
     </div>
   </section>
 
@@ -1201,26 +1413,27 @@ body.has-proto { padding-bottom: 96px; }
   <div class="wrap">
     <h2 class="h-section" id="h-quiz">Quiz: quanto conosci l'Italia?</h2>
     <div class="home-quiz__grid">
-      <div class="home-quiz__intro">
+      <div>
         <p class="lede">Tre giochi costruiti sugli stessi indicatori di Istat ed Eurostat che trovi nell'atlante. Si gioca senza registrarsi.</p>
         <div class="actions">
           <a class="btn btn--primary" href="https://divarioitalia.it/quiz">Gioca al quiz</a>
-          <a class="linkarrow home-quiz__side" href="https://divarioitalia.it/quiz/classifica">La classifica dei giocatori</a>
+          <a class="linkarrow" href="https://divarioitalia.it/quiz/classifica">La classifica dei giocatori</a>
         </div>
       </div>
 
       <fieldset class="home-try">
         <legend>
-          <span class="home-try__kicker">Prova una domanda di «Chi è maggiore?»</span>
-          <span class="home-try__q">Tasso giovani NEET (totale), 2024: quale delle due regioni ha il valore più alto?</span>
+          <span class="card__kicker">Prova una domanda di «Chi è maggiore?»</span>
+          <span class="h-sub">Tasso giovani NEET (totale), 2024: quale delle due regioni ha il valore più alto?</span>
         </legend>
         <div class="home-try__opts">
-          <label class="home-try__opt"><input type="radio" name="prova" value="1" data-right> Calabria</label>
-          <label class="home-try__opt"><input type="radio" name="prova" value="2"> Trentino Alto Adige</label>
+          <label><input type="radio" name="prova" value="1" data-right> Calabria</label>
+          <label><input type="radio" name="prova" value="2"> Trentino Alto Adige</label>
         </div>
+
         <div class="home-try__out" role="status">
-          <p class="home-try__ok"><strong>Giusto.</strong> Calabria 26,2%, Trentino Alto Adige 7,7%.</p>
-          <p class="home-try__no"><strong>Non è così.</strong> Calabria 26,2%, Trentino Alto Adige 7,7%.</p>
+          <p class="home-try__ok"><strong>Giusto.</strong> Calabria <data class="n n--figure" value="26.23">26,23<span class="n__u n__u--pct">%</span></data>, Trentino Alto Adige <data class="n n--figure" value="7.65">7,65<span class="n__u n__u--pct">%</span></data>.</p>
+          <p class="home-try__no"><strong>Non è così.</strong> Calabria <data class="n n--figure" value="26.23">26,23<span class="n__u n__u--pct">%</span></data>, Trentino Alto Adige <data class="n n--figure" value="7.65">7,65<span class="n__u n__u--pct">%</span></data>.</p>
         </div>
         <p class="source">Fonte: Istat, indicatori territoriali (2024). <a href="https://divarioitalia.it/indicatore/tasso-giovani-neet-totale/ter-408">Tasso giovani NEET (totale), la scheda</a></p>
       </fieldset>
@@ -1252,39 +1465,39 @@ body.has-proto { padding-bottom: 96px; }
   <section class="section" id="temi" aria-labelledby="h-temi">
     <h2 id="h-temi">I temi</h2>
     <p class="home-sectionlead">Per ogni area, la regione con la posizione media migliore e quella con la peggiore sugli indicatori che hanno un verso.</p>
-    <ul class="cards cards--4 home-themes">
+    <ul class="cards cards--4">
       <li class="card home-theme">
-        <p class="card__kicker">187 indicatori, 3 temi</p>
+        <p class="card__kicker"><data class="n n--count" value="187">187</data> indicatori, <data class="n n--count" value="3">3</data> temi</p>
         <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-economia-e-opportunita">Economia e opportunità</a></h3>
-        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/imprese-e-competitivita">Imprese e competitività</a></li><li><a href="https://divarioitalia.it/tema/lavoro-e-conciliazione">Lavoro e conciliazione</a></li><li><a href="https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita">Reddito, inclusione e accessibilità</a></li></ul>
-        <dl class="home-theme__ends">
+        <ul><li><a href="https://divarioitalia.it/tema/imprese-e-competitivita">Imprese e competitività</a></li><li><a href="https://divarioitalia.it/tema/lavoro-e-conciliazione">Lavoro e conciliazione</a></li><li><a href="https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita">Reddito, inclusione e accessibilità</a></li></ul>
+        <dl>
           <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></dd></div>
           <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></dd></div>
         </dl>
       </li>
       <li class="card home-theme">
-        <p class="card__kicker">162 indicatori, 3 temi</p>
+        <p class="card__kicker"><data class="n n--count" value="162">162</data> indicatori, <data class="n n--count" value="3">3</data> temi</p>
         <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-persone-e-conoscenza">Persone e conoscenza</a></h3>
-        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/istruzione-e-formazione">Istruzione e formazione</a></li><li><a href="https://divarioitalia.it/tema/ricerca-innovazione-e-digitale">Ricerca, innovazione e digitale</a></li><li><a href="https://divarioitalia.it/tema/salute-demografia-e-cura">Salute, demografia e cura</a></li></ul>
-        <dl class="home-theme__ends">
+        <ul><li><a href="https://divarioitalia.it/tema/istruzione-e-formazione">Istruzione e formazione</a></li><li><a href="https://divarioitalia.it/tema/ricerca-innovazione-e-digitale">Ricerca, innovazione e digitale</a></li><li><a href="https://divarioitalia.it/tema/salute-demografia-e-cura">Salute, demografia e cura</a></li></ul>
+        <dl>
           <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></dd></div>
           <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/calabria">Calabria</a></dd></div>
         </dl>
       </li>
       <li class="card home-theme">
-        <p class="card__kicker">180 indicatori, 3 temi</p>
+        <p class="card__kicker"><data class="n n--count" value="180">180</data> indicatori, <data class="n n--count" value="3">3</data> temi</p>
         <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-territorio-e-servizi">Territorio e servizi</a></h3>
-        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/ambiente-ed-energia">Ambiente ed energia</a></li><li><a href="https://divarioitalia.it/tema/cultura-patrimonio-e-turismo">Cultura, patrimonio e turismo</a></li><li><a href="https://divarioitalia.it/tema/mobilita-e-servizi-territoriali">Mobilità e servizi territoriali</a></li></ul>
-        <dl class="home-theme__ends">
+        <ul><li><a href="https://divarioitalia.it/tema/ambiente-ed-energia">Ambiente ed energia</a></li><li><a href="https://divarioitalia.it/tema/cultura-patrimonio-e-turismo">Cultura, patrimonio e turismo</a></li><li><a href="https://divarioitalia.it/tema/mobilita-e-servizi-territoriali">Mobilità e servizi territoriali</a></li></ul>
+        <dl>
           <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></dd></div>
           <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/molise">Molise</a></dd></div>
         </dl>
       </li>
       <li class="card home-theme">
-        <p class="card__kicker">65 indicatori, 3 temi</p>
+        <p class="card__kicker"><data class="n n--count" value="65">65</data> indicatori, <data class="n n--count" value="3">3</data> temi</p>
         <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-comunita-e-benessere">Comunità e benessere</a></h3>
-        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/benessere-soggettivo">Benessere soggettivo</a></li><li><a href="https://divarioitalia.it/tema/istituzioni-e-partecipazione">Istituzioni e partecipazione</a></li><li><a href="https://divarioitalia.it/tema/sicurezza-e-legalita">Sicurezza e legalità</a></li></ul>
-        <dl class="home-theme__ends">
+        <ul><li><a href="https://divarioitalia.it/tema/benessere-soggettivo">Benessere soggettivo</a></li><li><a href="https://divarioitalia.it/tema/istituzioni-e-partecipazione">Istituzioni e partecipazione</a></li><li><a href="https://divarioitalia.it/tema/sicurezza-e-legalita">Sicurezza e legalità</a></li></ul>
+        <dl>
           <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></dd></div>
           <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/campania">Campania</a></dd></div>
         </dl>
@@ -1297,29 +1510,44 @@ body.has-proto { padding-bottom: 96px; }
   <aside class="ad ad--leader" aria-label="Pubblicità"><span>Spazio pubblicitario riservato</span></aside>
 
 
-  <section class="section home-stories" id="storie" aria-labelledby="h-storie">
+  <section class="section" id="storie" aria-labelledby="h-storie">
     <h2 id="h-storie">Le ultime storie</h2>
-    <ul class="cards cards--3">
-      <li class="card">
-        <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/giovani-morti-in-strada-nord-sud.jpg" alt="Un lungo rettilineo della strada statale 131 in Sardegna, fra colline boscose, con un camion e alcune auto." width="640" height="360" loading="lazy"></div>
+    <ul class="cards home-stories">
+      <li class="card card--lead">
+
+        <figure class="home-story__fig">
+          <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/giovani-morti-in-strada-nord-sud.jpg" alt="Un lungo rettilineo della strada statale 131 in Sardegna, fra colline boscose, con un camion e alcune auto." width="1200" height="630"></div>
+          <figcaption>La statale 131 Diramazione Centrale Nuorese, in Sardegna. Foto <a href="https://commons.wikimedia.org/wiki/File:SS131DCN-7602.jpg">m/m</a>, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></figcaption>
+        </figure>
+
         <p class="card__kicker">Salute</p>
         <h3 class="card__title"><a href="https://divarioitalia.it/blog/giovani-morti-in-strada-nord-sud">Giovani morti in strada: il Nord è migliorato di più, e al Sud un incidente uccide più spesso</a></h3>
         <p class="card__text">Mortalità stradale fra 15 e 34 anni giù di due terzi in vent'anni, più al Nord che al Sud. E al Sud un incidente fuori città è più spesso mortale.</p>
-        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, 6 minuti di lettura</p>
+        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, <data class="n n--count" value="6">6</data> minuti di lettura</p>
       </li>
       <li class="card">
-        <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/infortuni-lavoro-province.jpg" alt="Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere." width="640" height="360" loading="lazy"></div>
+
+        <figure class="home-story__fig">
+          <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/infortuni-lavoro-province.jpg" alt="Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere." width="1200" height="630" loading="lazy"></div>
+          <figcaption>Foto <a href="https://commons.wikimedia.org/wiki/File:Caduta_materiali_dall%27_alto,_San_Rocco_03.jpg">Herzi Pinki</a>, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></figcaption>
+        </figure>
+
         <p class="card__kicker">Lavoro</p>
         <h3 class="card__title"><a href="articolo.html">Infortuni gravi sul lavoro: i grandi settori non bastano a spiegare la mappa</a></h3>
-        <p class="card__text">Arezzo e Mantova hanno la stessa quota di lavoro in campi, fabbriche e cantieri, ma ad Arezzo gli infortuni gravi sono più di tre volte. Abbiamo cercato perché.</p>
-        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, 6 minuti di lettura</p>
+
+        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, <data class="n n--count" value="6">6</data> minuti di lettura</p>
       </li>
       <li class="card">
-        <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/scuola-media-competenze-nord-sud.jpg" alt="Un'aula scolastica vuota con banchi singoli e sedie colorate, una lavagna bianca e una lavagna interattiva." width="640" height="360" loading="lazy"></div>
+
+        <figure class="home-story__fig">
+          <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/scuola-media-competenze-nord-sud.jpg" alt="Un'aula scolastica vuota con banchi singoli e sedie colorate, una lavagna bianca e una lavagna interattiva." width="1200" height="630" loading="lazy"></div>
+          <figcaption>Foto <a href="https://commons.wikimedia.org/wiki/File:Aula_del_Liceo_linguistico_Sophie_M._Scholl,_Trento.jpg">GinevraBianchi</a>, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></figcaption>
+        </figure>
+
         <p class="card__kicker">Istruzione</p>
         <h3 class="card__title"><a href="https://divarioitalia.it/blog/scuola-media-competenze-nord-sud">Italiano in terza media: gli alunni stranieri non bastano a spiegare il calo del Nord</a></h3>
-        <p class="card__text">In terza media cresce ovunque la quota di studenti sotto la soglia in italiano, più al Nord. Gli alunni stranieri contano, ma il calo riguarda anche i nativi.</p>
-        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, 6 minuti di lettura</p>
+
+        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, <data class="n n--count" value="6">6</data> minuti di lettura</p>
       </li>
     </ul>
     <p class="home-more"><a class="linkarrow" href="https://divarioitalia.it/blog">Tutte le storie</a></p>
@@ -1337,7 +1565,7 @@ body.has-proto { padding-bottom: 96px; }
       <div><dt>Licenza</dt><dd>Dati pubblicati con licenza <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0</a>.</dd></div>
       <div><dt>Per assistenti e motori</dt><dd>Una versione in testo semplice del sito: <a href="https://divarioitalia.it/llms.txt">llms.txt</a></dd></div>
     </dl>
-    <p class="home-cite-lead">Per un dato, aggiungi la fonte primaria e l'anno che trovi nella sua scheda. Le regole per intero stanno in <a href="https://divarioitalia.it/chi-siamo#come-citare">Come citare</a>.</p>
+    <p class="home-sectionlead home-cite">Per un dato, aggiungi la fonte primaria e l'anno che trovi nella sua scheda. Le regole per intero stanno in <a href="https://divarioitalia.it/chi-siamo#come-citare">Come citare</a>.</p>
     <div class="cite">
   <p data-cite-text>Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati Istat ed Eurostat. https://divarioitalia.it/</p>
   <button class="btn" type="button" data-copy><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8" y="8" width="12" height="12"/><path d="M16 8V4H4v12h4"/></svg> <span>Copia la citazione</span></button>
@@ -1345,7 +1573,7 @@ body.has-proto { padding-bottom: 96px; }
 </div>
   </section>
 </div>
-<script type="application/json" data-explore-data>{"direction": "higher_better", "matrix": {"2024": {"abruzzo": 32108.7, "basilicata": 28416.3, "calabria": 21702.2, "campania": 24564.2, "emilia-romagna": 44557.0, "friuli-venezia-giulia": 39005.1, "lazio": 43166.9, "liguria": 38841.8, "lombardia": 50398.9, "marche": 34149.1, "molise": 27697.8, "piemonte": 38625.5, "puglia": 24327.7, "sardegna": 27730.8, "sicilia": 23308.7, "toscana": 39262.0, "trentino-alto-adige": 54636.7, "umbria": 32466.9, "valle-d-aosta": 47742.8, "veneto": 41496.3}}, "names": {"abruzzo": "Abruzzo", "basilicata": "Basilicata", "calabria": "Calabria", "campania": "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli-Venezia Giulia", "lazio": "Lazio", "liguria": "Liguria", "lombardia": "Lombardia", "marche": "Marche", "molise": "Molise", "piemonte": "Piemonte", "puglia": "Puglia", "sardegna": "Sardegna", "sicilia": "Sicilia", "toscana": "Toscana", "trentino-alto-adige": "Trentino Alto Adige", "umbria": "Umbria", "valle-d-aosta": "Valle d\u0027Aosta", "veneto": "Veneto"}, "plural": "regioni", "profile": "/regione/", "south": ["abruzzo", "basilicata", "calabria", "campania", "molise", "puglia", "sardegna", "sicilia"], "unit": "euro", "years": [2024]}</script>
+<script type="application/json" data-explore-data>{"areas": {"abruzzo": "sud", "basilicata": "sud", "calabria": "sud", "campania": "sud", "emilia-romagna": "nord", "friuli-venezia-giulia": "nord", "lazio": "centro", "liguria": "nord", "lombardia": "nord", "marche": "centro", "molise": "sud", "piemonte": "nord", "puglia": "sud", "sardegna": "sud", "sicilia": "sud", "toscana": "centro", "trentino-alto-adige": "nord", "umbria": "centro", "valle-d-aosta": "nord", "veneto": "nord"}, "decimals": 0, "direction": "higher_better", "matrix": {"2024": {"abruzzo": 32108.7, "basilicata": 28416.3, "calabria": 21702.2, "campania": 24564.2, "emilia-romagna": 44557.0, "friuli-venezia-giulia": 39005.1, "lazio": 43166.9, "liguria": 38841.8, "lombardia": 50398.9, "marche": 34149.1, "molise": 27697.8, "piemonte": 38625.5, "puglia": 24327.7, "sardegna": 27730.8, "sicilia": 23308.7, "toscana": 39262.0, "trentino-alto-adige": 54636.7, "umbria": 32466.9, "valle-d-aosta": 47742.8, "veneto": 41496.3}}, "names": {"abruzzo": "Abruzzo", "basilicata": "Basilicata", "calabria": "Calabria", "campania": "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli-Venezia Giulia", "lazio": "Lazio", "liguria": "Liguria", "lombardia": "Lombardia", "marche": "Marche", "molise": "Molise", "piemonte": "Piemonte", "puglia": "Puglia", "sardegna": "Sardegna", "sicilia": "Sicilia", "toscana": "Toscana", "trentino-alto-adige": "Trentino Alto Adige", "umbria": "Umbria", "valle-d-aosta": "Valle d\u0027Aosta", "veneto": "Veneto"}, "plural": "regioni", "profile": "/regione/", "south": ["abruzzo", "basilicata", "calabria", "campania", "molise", "puglia", "sardegna", "sicilia"], "unit": "euro", "years": [2024]}</script>
 
 </main>
 
@@ -1380,7 +1608,7 @@ body.has-proto { padding-bottom: 96px; }
     </div>
   </div>
 </footer>
-<div class="proto-bar" role="region" aria-label="Prototipo"><b>Divario Italia 1.0, prototipo</b><nav class="proto-bar__pages" aria-label="Pagine del prototipo"><a href="indicatore.html" data-page-link="indicatore">Scheda indicatore</a><a href="home.html" aria-current="page" data-page-link="home">Home</a><a href="regione.html" data-page-link="regione">Regione</a><a href="provincia.html" data-page-link="provincia">Provincia</a><a href="articolo.html" data-page-link="articolo">Articolo</a><a href="classifica.html" data-page-link="classifica">Classifica</a><a href="qualita-della-vita.html" data-page-link="qualita-della-vita">Qualità della vita</a></nav><div class="proto-bar__theme" role="group" aria-label="Tema"><button type="button" data-set-theme="" aria-pressed="true">Sistema</button><button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button><button type="button" data-set-theme="dark" aria-pressed="false">Scuro</button></div></div>
+<div class="proto-bar" role="region" aria-label="Prototipo"><b>Divario Italia 1.0, prototipo</b><nav class="proto-bar__pages" aria-label="Pagine del prototipo"><a href="indicatore.html" data-page-link="indicatore">Scheda indicatore</a><a href="home.html" aria-current="page" data-page-link="home">Home</a><a href="regione.html" data-page-link="regione">Regione</a><a href="provincia.html" data-page-link="provincia">Provincia</a><a href="articolo.html" data-page-link="articolo">Articolo</a><a href="classifica.html" data-page-link="classifica">Classifica</a><a href="qualita-della-vita.html" data-page-link="qualita-della-vita">Qualità della vita</a></nav><div class="proto-bar__theme" role="group" aria-label="Carattere"><button type="button" data-set-font="" aria-pressed="true">Sofia</button><button type="button" data-set-font="schibsted" aria-pressed="false">Schibsted</button><button type="button" data-set-font="serif" aria-pressed="false">Serif</button></div><div class="proto-bar__theme" role="group" aria-label="Tema"><button type="button" data-set-theme="" aria-pressed="true">Sistema</button><button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button><button type="button" data-set-theme="dark" aria-pressed="false">Scuro</button></div></div>
 <script>
 /* Divario Italia 1.0, prototipo: il poco JavaScript che serve.
    La pagina a riposo e' completa senza: mappa colorata, classifica, serie e
@@ -1396,10 +1624,13 @@ body.has-proto { padding-bottom: 96px; }
     if (m >= 10) return 1;
     return m < 1 ? 2 : 1;
   }
-  function fmt(v) {
+  // Come numfmt.text: meno tipografico (U+2212), non il trattino di Intl.
+  function fmt(v, d) {
     if (v === null || v === undefined || isNaN(v)) return "n.d.";
-    var d = decimals(v);
-    return new Intl.NumberFormat("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }).format(v);
+    if (d === undefined || d === null) d = decimals(v);
+    var s = new Intl.NumberFormat("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }).format(Math.abs(v));
+    var zero = Number(s.replace(/\./g, "").replace(",", ".")) === 0;
+    return (v < 0 && !zero ? "\u2212" : "") + s;
   }
   function withUnit(v, unit) {
     if (v === null || v === undefined) return "n.d.";
@@ -1425,6 +1656,20 @@ body.has-proto { padding-bottom: 96px; }
     }
   });
   setTheme(root.dataset.theme || "");
+
+  /* ---------- carattere ---------- */
+  function setFont(value) {
+    if (value) root.dataset.font = value; else delete root.dataset.font;
+    try { if (value) localStorage.setItem("proto-font", value); else localStorage.removeItem("proto-font"); } catch (e) {}
+    document.querySelectorAll("[data-set-font]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.dataset.setFont || "") === (value || "")));
+    });
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-set-font]");
+    if (b) setFont(b.dataset.setFont);
+  });
+  setFont(root.dataset.font || "");
 
   /* ---------- copia la citazione ---------- */
   document.addEventListener("click", function (ev) {
@@ -1519,12 +1764,13 @@ body.has-proto { padding-bottom: 96px; }
       list.forEach(function (r, i) {
         var crosses = lowerBetter ? r.value > avg : r.value < avg;
         if (!refDone && crosses) {
-          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val">' + fmt(avg) + "</td></tr>");
+          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
           refDone = true;
         }
-        var name = data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name);
-        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + (i + 1) + '</td><th scope="row">' + name +
-          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val">' + fmt(r.value) + "</td></tr>");
+        var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
+        var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
+        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
+          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
       });
       body.innerHTML = html.join("");
 
@@ -1557,21 +1803,21 @@ body.has-proto { padding-bottom: 96px; }
         tr.classList.toggle("is-on", on);
         if (on) tr.setAttribute("aria-current", "true"); else tr.removeAttribute("aria-current");
       });
-      if (series) {
-        series.querySelectorAll("svg").forEach(function (svg) {
-          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"]');
-          var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
-          if (src && key) {
-            var pts = src.getAttribute("points").trim().split(" ");
-            var last = pts[pts.length - 1].split(",");
-            hl.setAttribute("points", src.getAttribute("points"));
-            dot.setAttribute("cx", last[0]); dot.setAttribute("cy", last[1]); dot.setAttribute("r", 4);
-            lab.setAttribute("y", Number(last[1]) + 4); lab.textContent = data.names[key] || key;
-          } else {
-            hl.setAttribute("points", ""); dot.setAttribute("r", 0); lab.textContent = "";
-          }
-        });
-      }
+      page.querySelectorAll("[data-series] svg").forEach(function (svg) {
+        var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
+        if (!hl || !dot || !lab) return;
+        var src = key ? svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]') : null;
+        if (src) {
+          var pts = src.getAttribute("points").trim().split(" ");
+          var last = pts[pts.length - 1].split(",");
+          hl.setAttribute("points", src.getAttribute("points"));
+          dot.setAttribute("cx", last[0]); dot.setAttribute("cy", last[1]); dot.setAttribute("r", 4);
+          lab.setAttribute("y", Number(last[1]) + 4); lab.textContent = data.names[key] || key;
+        } else {
+          hl.setAttribute("points", ""); dot.setAttribute("r", 0); lab.textContent = "";
+        }
+      });
+      page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
       if (live && key) {
         var r = rows(current).filter(function (x) { return x.key === key; })[0];
         if (r) live.textContent = r.name + ": " + withUnit(r.value, data.unit) + " nel " + current + ".";
@@ -1584,6 +1830,14 @@ body.has-proto { padding-bottom: 96px; }
       highlight(select ? select.value : "");
     });
     if (select) select.addEventListener("change", function () { highlight(select.value); });
+    page.querySelectorAll(".strip").forEach(function (svg) {
+      svg.addEventListener("click", function (ev) {
+        var c = ev.target.closest(".strip__dot");
+        if (!c || !select) return;
+        select.value = select.value === c.dataset.key ? "" : c.dataset.key;
+        highlight(select.value);
+      });
+    });
     mod.addEventListener("click", function (ev) {
       var p = ev.target.closest("path[data-key]");
       if (!p || !select) return;
@@ -1592,22 +1846,32 @@ body.has-proto { padding-bottom: 96px; }
     });
   });
 
+  /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ---------- */
+  if (matchMedia("(max-width: 599px)").matches) {
+    document.querySelectorAll("details[data-collapse-mobile]").forEach(function (d) { d.open = false; });
+  }
+
   /* ---------- indice di pagina: la voce della sezione che si sta leggendo ---------- */
   document.querySelectorAll(".toc").forEach(function (toc) {
     var links = Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']"));
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
-    if (!("IntersectionObserver" in window)) return;
-    var visible = [];
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        var i = targets.indexOf(e.target);
-        if (e.isIntersecting && visible.indexOf(i) < 0) visible.push(i);
-        if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var cur = -1;
+      targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top < innerHeight * 0.3) cur = i; });
+      links.forEach(function (a, j) {
+        if (j === cur) {
+          if (a.getAttribute("aria-current") !== "location") {
+            a.setAttribute("aria-current", "location");
+            var ol = a.closest("ol");
+            if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+          }
+        } else a.removeAttribute("aria-current");
       });
-      var cur = visible.length ? Math.min.apply(null, visible) : -1;
-      links.forEach(function (a, j) { if (j === cur) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
-    }, { rootMargin: "-20% 0px -70% 0px" });
-    targets.forEach(function (t) { if (t) io.observe(t); });
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
   });
 })();
 

@@ -502,6 +502,14 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
 @media (max-width: 1199px) {
+  /* Un elemento sticky resta dentro il suo contenitore: dentro l'aside (alto
+     quanto l'indice) o in una cella di griglia non resterebbe mai in alto.
+     Sotto i 1200 il layout e' un blocco e l'aside sparisce come scatola. */
+  .layout { display: block; }
+  .layout__aside { display: contents; }
+  .layout__main { margin-top: var(--space-6); }
+}
+@media (max-width: 1199px) {
   /* Sotto i 1200 l'indice diventa una barra delle sezioni che resta sotto la
      testata: sulle pagine lunghe (la regione passa i 36.000 pixel sul telefono)
      e' il solo modo di sapere dove si e'. */
@@ -714,6 +722,7 @@ details.more[open] > summary { color: var(--ink); }
 .fig__line { fill: none; stroke: var(--cmp); stroke-width: 2; }
 .fig__line.is-on, .fig__line--on { stroke: var(--data-focus); stroke-width: 3; }
 .fig__axis, .fig__grid, .fig__track { stroke: var(--rule); }
+.fig text { stroke: none; }
 .fig__name { fill: var(--ink); }
 .fig__source, .fig__note { fill: var(--muted); }
 .fig__value { fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -906,6 +915,7 @@ body.has-proto { padding-bottom: 96px; }
 .strip__name { font-size: 13px; }
 .strip__nm { fill: var(--ink); font-weight: 700; }
 .strip__v { fill: var(--text-2); }
+.strip__name--on .strip__nm { fill: var(--accent); }
 
 .band__grid { stroke: var(--rule); stroke-width: 1; }
 .band__tick { font-size: 13px; fill: var(--muted); }
@@ -963,7 +973,12 @@ body.has-proto { padding-bottom: 96px; }
   .table--stack tbody th[scope="row"] { grid-column: 1 / -1; }
   .table--stack td[data-label]::before { content: attr(data-label); display: block; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); }
   .table--stack tr.group, .table--stack tr.group > * { display: block; grid-column: 1 / -1; }
+  /* dentro una tabella a blocchi la barra resta, a tutta riga */
+  .table--stack .barcell { width: auto; grid-column: 1 / -1; }
 }
+
+.table--stack tr.group > * { padding-top: var(--space-6); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); border-bottom: 1px solid var(--rule-strong); }
+.table--stack tbody tr.group:hover > * { background: transparent; }
 
 /* classifica con la barra del punteggio: righe in blocchi sotto i 720 pixel */
 .rankwrap { container: rank / inline-size; }
@@ -996,7 +1011,7 @@ body.has-proto { padding-bottom: 96px; }
 
 /* ---------- immagini ---------- */
 .hero-img { margin: 0; display: grid; gap: var(--space-2); }
-.hero-img img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-1); }
+.hero-img img { width: 100%; height: auto; background: var(--surface-1); }
 .hero-img figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .card__media { transition: filter var(--motion-base) var(--motion-ease); }
 .card__media img { transition: transform 400ms var(--motion-ease); }
@@ -1109,10 +1124,10 @@ body.has-proto { padding-bottom: 96px; }
   <figure class="lead-figure" aria-labelledby="divario-t">
     <figcaption class="lead-figure__head">
       <span class="lead-figure__title" id="divario-t">Il divario nel 2022: le 20 regioni sulla stessa scala</span>
-      <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b>8</li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b>4</li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b>8</li>
+      <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b><data class="n n--count" value="8">8</data></li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b><data class="n n--count" value="4">4</data></li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b><data class="n n--count" value="8">8</data></li>
 </ul>
     </figcaption>
-    <div class="chart chart--hero" data-series><div class="chart__l"><svg viewBox="0 0 920 164" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="904" y1="102.0" y2="102.0"/><text class="strip__tick" x="16.0" y="158" text-anchor="start">8</text><text class="strip__tick" x="238.0" y="158" text-anchor="middle">10</text><text class="strip__tick" x="460.0" y="158" text-anchor="middle">12</text><text class="strip__tick" x="682.0" y="158" text-anchor="middle">15</text><text class="strip__tick" x="904.0" y="158" text-anchor="end">18</text><line class="strip__avg" x1="452.9" x2="452.9" y1="64" y2="140"/><text class="strip__avglab" x="457.9" y="142" text-anchor="start">Media semplice 12,4</text><path class="strip__gap" d="M60.4,28 V22 H930.6 V28"/><text class="strip__gaplab" x="495.5" y="16" text-anchor="middle">2,2 volte</text><circle class="strip__dot area--nord" data-key="piemonte" cx="60.4" cy="102.0" r="6.5"><title>Piemonte 8,0</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="69.3" cy="116.0" r="6.5"><title>Lombardia 8,1</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="78.2" cy="102.0" r="6.5"><title>Lazio 8,2</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="131.4" cy="102.0" r="6.5"><title>Friuli-Venezia Giulia 8,8</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="255.8" cy="102.0" r="6.5"><title>Valle d&#x27;Aosta 10,2</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="273.5" cy="102.0" r="6.5"><title>Veneto 10,4</title></circle><circle class="strip__dot area--sud" data-key="campania" cx="344.6" cy="102.0" r="6.5"><title>Campania 11,2</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="415.6" cy="102.0" r="6.5"><title>Liguria 12,0</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="424.5" cy="116.0" r="6.5"><title>Emilia-Romagna 12,1</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="442.2" cy="102.0" r="6.5"><title>Trentino Alto Adige 12,3</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="451.1" cy="116.0" r="6.5"><title>Sardegna 12,4</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="504.4" cy="102.0" r="6.5"><title>Puglia 13,0</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="539.9" cy="102.0" r="6.5"><title>Sicilia 13,4</title></circle><circle class="strip__dot area--sud" data-key="calabria" cx="548.8" cy="116.0" r="6.5"><title>Calabria 13,5</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="575.4" cy="102.0" r="6.5"><title>Molise 13,8</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="628.7" cy="102.0" r="6.5"><title>Toscana 14,4</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="708.6" cy="102.0" r="6.5"><title>Marche 15,3</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="833.0" cy="102.0" r="6.5"><title>Abruzzo 16,7</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="841.8" cy="116.0" r="6.5"><title>Basilicata 16,8</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="930.6" cy="102.0" r="6.5"><title>Umbria 17,8</title></circle><text class="strip__name" x="53.9" y="54" text-anchor="start" dy="0"><tspan class="strip__nm">Piemonte</tspan> <tspan class="strip__v">8,0</tspan></text><text class="strip__name" x="937.1" y="54" text-anchor="end" dy="0"><tspan class="strip__nm">Umbria</tspan> <tspan class="strip__v">17,8</tspan></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 188" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="344" y1="112.0" y2="112.0"/><text class="strip__tick" x="16.0" y="182" text-anchor="start">5</text><text class="strip__tick" x="125.3" y="182" text-anchor="middle">10</text><text class="strip__tick" x="234.7" y="182" text-anchor="middle">15</text><text class="strip__tick" x="344.0" y="182" text-anchor="end">20</text><line class="strip__avg" x1="178.3" x2="178.3" y1="60" y2="164"/><text class="strip__avglab" x="183.3" y="166" text-anchor="start">Media 12,4</text><path class="strip__gap" d="M81.6,28 V22 H295.9 V28"/><text class="strip__gaplab" x="188.7" y="16" text-anchor="middle">2,2 volte</text><circle class="strip__dot area--nord" data-key="piemonte" cx="81.6" cy="112.0" r="6.5"><title>Piemonte 8,0</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="83.8" cy="126.0" r="6.5"><title>Lombardia 8,1</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="86.0" cy="98.0" r="6.5"><title>Lazio 8,2</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="99.1" cy="112.0" r="6.5"><title>Friuli-Venezia Giulia 8,8</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="129.7" cy="112.0" r="6.5"><title>Valle d&#x27;Aosta 10,2</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="134.1" cy="126.0" r="6.5"><title>Veneto 10,4</title></circle><circle class="strip__dot area--sud" data-key="campania" cx="151.6" cy="112.0" r="6.5"><title>Campania 11,2</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="169.1" cy="112.0" r="6.5"><title>Liguria 12,0</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="171.3" cy="126.0" r="6.5"><title>Emilia-Romagna 12,1</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="175.6" cy="98.0" r="6.5"><title>Trentino Alto Adige 12,3</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="177.8" cy="140.0" r="6.5"><title>Sardegna 12,4</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="190.9" cy="112.0" r="6.5"><title>Puglia 13,0</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="199.7" cy="126.0" r="6.5"><title>Sicilia 13,4</title></circle><circle class="strip__dot area--sud" data-key="calabria" cx="201.9" cy="98.0" r="6.5"><title>Calabria 13,5</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="208.4" cy="112.0" r="6.5"><title>Molise 13,8</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="221.5" cy="126.0" r="6.5"><title>Toscana 14,4</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="241.2" cy="112.0" r="6.5"><title>Marche 15,3</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="271.8" cy="112.0" r="6.5"><title>Abruzzo 16,7</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="274.0" cy="126.0" r="6.5"><title>Basilicata 16,8</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="295.9" cy="112.0" r="6.5"><title>Umbria 17,8</title></circle><text class="strip__name" x="75.1" y="50" text-anchor="start" dy="0"><tspan class="strip__nm">Piemonte</tspan> <tspan class="strip__v">8,0</tspan></text><text class="strip__name" x="302.4" y="50" text-anchor="end" dy="0"><tspan class="strip__nm">Umbria</tspan> <tspan class="strip__v">17,8</tspan></text></svg></div></div>
+    <div class="chart chart--hero" data-series><div class="chart__l"><svg viewBox="0 0 920 164" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="904" y1="102.0" y2="102.0"/><text class="strip__tick" x="16.0" y="158" text-anchor="start">8</text><text class="strip__tick" x="193.6" y="158" text-anchor="middle">10</text><text class="strip__tick" x="371.2" y="158" text-anchor="middle">12</text><text class="strip__tick" x="548.8" y="158" text-anchor="middle">15</text><text class="strip__tick" x="726.4" y="158" text-anchor="middle">18</text><text class="strip__tick" x="904.0" y="158" text-anchor="end">20</text><line class="strip__avg" x1="365.5" x2="365.5" y1="64" y2="140"/><text class="strip__avglab" x="370.5" y="142" text-anchor="start">Media semplice 12,4</text><path class="strip__gap" d="M51.5,28 V22 H747.7 V28"/><text class="strip__gaplab" x="399.6" y="16" text-anchor="middle">2,2 volte</text><circle class="strip__dot area--nord" data-key="piemonte" cx="51.5" cy="102.0" r="6.5"><title>Piemonte 8,0</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="58.6" cy="116.0" r="6.5"><title>Lombardia 8,1</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="65.7" cy="102.0" r="6.5"><title>Lazio 8,2</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="108.4" cy="102.0" r="6.5"><title>Friuli-Venezia Giulia 8,8</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="207.8" cy="102.0" r="6.5"><title>Valle d&#x27;Aosta 10,2</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="222.0" cy="102.0" r="6.5"><title>Veneto 10,4</title></circle><circle class="strip__dot area--sud" data-key="campania" cx="278.8" cy="102.0" r="6.5"><title>Campania 11,2</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="335.7" cy="102.0" r="6.5"><title>Liguria 12,0</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="342.8" cy="116.0" r="6.5"><title>Emilia-Romagna 12,1</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="357.0" cy="102.0" r="6.5"><title>Trentino Alto Adige 12,3</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="364.1" cy="116.0" r="6.5"><title>Sardegna 12,4</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="406.7" cy="102.0" r="6.5"><title>Puglia 13,0</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="435.1" cy="102.0" r="6.5"><title>Sicilia 13,4</title></circle><circle class="strip__dot area--sud" data-key="calabria" cx="442.2" cy="116.0" r="6.5"><title>Calabria 13,5</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="463.6" cy="102.0" r="6.5"><title>Molise 13,8</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="506.2" cy="102.0" r="6.5"><title>Toscana 14,4</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="570.1" cy="102.0" r="6.5"><title>Marche 15,3</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="669.6" cy="102.0" r="6.5"><title>Abruzzo 16,7</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="676.7" cy="116.0" r="6.5"><title>Basilicata 16,8</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="747.7" cy="102.0" r="6.5"><title>Umbria 17,8</title></circle><text class="strip__name" x="45.0" y="54" text-anchor="start" dy="0"><tspan class="strip__nm">Piemonte</tspan> <tspan class="strip__v">8,0</tspan></text><text class="strip__name" x="754.2" y="54" text-anchor="end" dy="0"><tspan class="strip__nm">Umbria</tspan> <tspan class="strip__v">17,8</tspan></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 188" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="344" y1="112.0" y2="112.0"/><text class="strip__tick" x="16.0" y="182" text-anchor="start">5</text><text class="strip__tick" x="125.3" y="182" text-anchor="middle">10</text><text class="strip__tick" x="234.7" y="182" text-anchor="middle">15</text><text class="strip__tick" x="344.0" y="182" text-anchor="end">20</text><line class="strip__avg" x1="178.3" x2="178.3" y1="60" y2="164"/><text class="strip__avglab" x="183.3" y="166" text-anchor="start">Media 12,4</text><path class="strip__gap" d="M81.6,28 V22 H295.9 V28"/><text class="strip__gaplab" x="188.7" y="16" text-anchor="middle">2,2 volte</text><circle class="strip__dot area--nord" data-key="piemonte" cx="81.6" cy="112.0" r="6.5"><title>Piemonte 8,0</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="83.8" cy="126.0" r="6.5"><title>Lombardia 8,1</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="86.0" cy="98.0" r="6.5"><title>Lazio 8,2</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="99.1" cy="112.0" r="6.5"><title>Friuli-Venezia Giulia 8,8</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="129.7" cy="112.0" r="6.5"><title>Valle d&#x27;Aosta 10,2</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="134.1" cy="126.0" r="6.5"><title>Veneto 10,4</title></circle><circle class="strip__dot area--sud" data-key="campania" cx="151.6" cy="112.0" r="6.5"><title>Campania 11,2</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="169.1" cy="112.0" r="6.5"><title>Liguria 12,0</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="171.3" cy="126.0" r="6.5"><title>Emilia-Romagna 12,1</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="175.6" cy="98.0" r="6.5"><title>Trentino Alto Adige 12,3</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="177.8" cy="140.0" r="6.5"><title>Sardegna 12,4</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="190.9" cy="112.0" r="6.5"><title>Puglia 13,0</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="199.7" cy="126.0" r="6.5"><title>Sicilia 13,4</title></circle><circle class="strip__dot area--sud" data-key="calabria" cx="201.9" cy="98.0" r="6.5"><title>Calabria 13,5</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="208.4" cy="112.0" r="6.5"><title>Molise 13,8</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="221.5" cy="126.0" r="6.5"><title>Toscana 14,4</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="241.2" cy="112.0" r="6.5"><title>Marche 15,3</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="271.8" cy="112.0" r="6.5"><title>Abruzzo 16,7</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="274.0" cy="126.0" r="6.5"><title>Basilicata 16,8</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="295.9" cy="112.0" r="6.5"><title>Umbria 17,8</title></circle><text class="strip__name" x="75.1" y="50" text-anchor="start" dy="0"><tspan class="strip__nm">Piemonte</tspan> <tspan class="strip__v">8,0</tspan></text><text class="strip__name" x="302.4" y="50" text-anchor="end" dy="0"><tspan class="strip__nm">Umbria</tspan> <tspan class="strip__v">17,8</tspan></text></svg></div></div>
     <p class="source">Ogni punto è una regione, nel colore della sua ripartizione, valori in per 10.000 occupati. Tutte le cifre sono nella classifica qui sotto.</p>
   </figure>
 
@@ -1225,7 +1240,7 @@ body.has-proto { padding-bottom: 96px; }
             </div>
 
             <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle regioni">
-              <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b>8</li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b>4</li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b>8</li>
+              <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b><data class="n n--count" value="8">8</data></li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b><data class="n n--count" value="4">4</data></li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b><data class="n n--count" value="8">8</data></li>
 </ul>
               <table class="table">
                 <caption class="sr-only">Tasso di infortuni sul lavoro mortali e con inabilità permanente per regione nel <span data-year-label>2022</span>, per 10.000 occupati</caption>
@@ -1233,47 +1248,47 @@ body.has-proto { padding-bottom: 96px; }
                 <tbody data-rank-body>
 
 
-                  <tr data-key="piemonte"><td class="rank">1</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 44.9%"></i></span></td><td class="val"><data class="n n--cell" value="8">8,0</data></td></tr>
+                  <tr data-key="piemonte"><td class="rank"><span class="n n--rank"><data value="1">1</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 44.9%"></i></span></td><td class="val"><data class="n n--cell" value="8">8,0</data></td></tr>
 
 
 
-                  <tr data-key="lombardia"><td class="rank">2</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 45.5%"></i></span></td><td class="val"><data class="n n--cell" value="8.1">8,1</data></td></tr>
+                  <tr data-key="lombardia"><td class="rank"><span class="n n--rank"><data value="2">2</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 45.5%"></i></span></td><td class="val"><data class="n n--cell" value="8.1">8,1</data></td></tr>
 
 
 
-                  <tr data-key="lazio"><td class="rank">3</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lazio">Lazio</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 46.1%"></i></span></td><td class="val"><data class="n n--cell" value="8.2">8,2</data></td></tr>
+                  <tr data-key="lazio"><td class="rank"><span class="n n--rank"><data value="3">3</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lazio">Lazio</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 46.1%"></i></span></td><td class="val"><data class="n n--cell" value="8.2">8,2</data></td></tr>
 
 
 
-                  <tr data-key="friuli-venezia-giulia"><td class="rank">4</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 49.4%"></i></span></td><td class="val"><data class="n n--cell" value="8.8">8,8</data></td></tr>
+                  <tr data-key="friuli-venezia-giulia"><td class="rank"><span class="n n--rank"><data value="4">4</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 49.4%"></i></span></td><td class="val"><data class="n n--cell" value="8.8">8,8</data></td></tr>
 
 
 
-                  <tr data-key="valle-d-aosta"><td class="rank">5</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 57.3%"></i></span></td><td class="val"><data class="n n--cell" value="10.2">10,2</data></td></tr>
+                  <tr data-key="valle-d-aosta"><td class="rank"><span class="n n--rank"><data value="5">5</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 57.3%"></i></span></td><td class="val"><data class="n n--cell" value="10.2">10,2</data></td></tr>
 
 
 
-                  <tr data-key="veneto"><td class="rank">6</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/veneto">Veneto</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 58.4%"></i></span></td><td class="val"><data class="n n--cell" value="10.4">10,4</data></td></tr>
+                  <tr data-key="veneto"><td class="rank"><span class="n n--rank"><data value="6">6</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/veneto">Veneto</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 58.4%"></i></span></td><td class="val"><data class="n n--cell" value="10.4">10,4</data></td></tr>
 
 
 
-                  <tr data-key="campania"><td class="rank">7</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/campania">Campania</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 62.9%"></i></span></td><td class="val"><data class="n n--cell" value="11.2">11,2</data></td></tr>
+                  <tr data-key="campania"><td class="rank"><span class="n n--rank"><data value="7">7</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/campania">Campania</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 62.9%"></i></span></td><td class="val"><data class="n n--cell" value="11.2">11,2</data></td></tr>
 
 
 
-                  <tr data-key="liguria"><td class="rank">8</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/liguria">Liguria</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 67.4%"></i></span></td><td class="val"><data class="n n--cell" value="12">12,0</data></td></tr>
+                  <tr data-key="liguria"><td class="rank"><span class="n n--rank"><data value="8">8</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/liguria">Liguria</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 67.4%"></i></span></td><td class="val"><data class="n n--cell" value="12">12,0</data></td></tr>
 
 
 
-                  <tr data-key="emilia-romagna"><td class="rank">9</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 68.0%"></i></span></td><td class="val"><data class="n n--cell" value="12.1">12,1</data></td></tr>
+                  <tr data-key="emilia-romagna"><td class="rank"><span class="n n--rank"><data value="9">9</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 68.0%"></i></span></td><td class="val"><data class="n n--cell" value="12.1">12,1</data></td></tr>
 
 
 
-                  <tr data-key="trentino-alto-adige"><td class="rank">10</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 69.1%"></i></span></td><td class="val"><data class="n n--cell" value="12.3">12,3</data></td></tr>
+                  <tr data-key="trentino-alto-adige"><td class="rank"><span class="n n--rank"><data value="10">10</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 69.1%"></i></span></td><td class="val"><data class="n n--cell" value="12.3">12,3</data></td></tr>
 
 
 
-                  <tr data-key="sardegna"><td class="rank">11</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 69.7%"></i></span></td><td class="val"><data class="n n--cell" value="12.4">12,4</data></td></tr>
+                  <tr data-key="sardegna"><td class="rank"><span class="n n--rank"><data value="11">11</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 69.7%"></i></span></td><td class="val"><data class="n n--cell" value="12.4">12,4</data></td></tr>
 
 
 
@@ -1281,39 +1296,39 @@ body.has-proto { padding-bottom: 96px; }
 
 
 
-                  <tr data-key="puglia"><td class="rank">12</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="regione.html">Puglia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 73.0%"></i></span></td><td class="val"><data class="n n--cell" value="13">13,0</data></td></tr>
+                  <tr data-key="puglia"><td class="rank"><span class="n n--rank"><data value="12">12</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="regione.html">Puglia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 73.0%"></i></span></td><td class="val"><data class="n n--cell" value="13">13,0</data></td></tr>
 
 
 
-                  <tr data-key="sicilia"><td class="rank">13</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.3%"></i></span></td><td class="val"><data class="n n--cell" value="13.4">13,4</data></td></tr>
+                  <tr data-key="sicilia"><td class="rank"><span class="n n--rank"><data value="13">13</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.3%"></i></span></td><td class="val"><data class="n n--cell" value="13.4">13,4</data></td></tr>
 
 
 
-                  <tr data-key="calabria"><td class="rank">14</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/calabria">Calabria</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.8%"></i></span></td><td class="val"><data class="n n--cell" value="13.5">13,5</data></td></tr>
+                  <tr data-key="calabria"><td class="rank"><span class="n n--rank"><data value="14">14</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/calabria">Calabria</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.8%"></i></span></td><td class="val"><data class="n n--cell" value="13.5">13,5</data></td></tr>
 
 
 
-                  <tr data-key="molise"><td class="rank">15</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/molise">Molise</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 77.5%"></i></span></td><td class="val"><data class="n n--cell" value="13.8">13,8</data></td></tr>
+                  <tr data-key="molise"><td class="rank"><span class="n n--rank"><data value="15">15</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/molise">Molise</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 77.5%"></i></span></td><td class="val"><data class="n n--cell" value="13.8">13,8</data></td></tr>
 
 
 
-                  <tr data-key="toscana"><td class="rank">16</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/toscana">Toscana</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 80.9%"></i></span></td><td class="val"><data class="n n--cell" value="14.4">14,4</data></td></tr>
+                  <tr data-key="toscana"><td class="rank"><span class="n n--rank"><data value="16">16</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/toscana">Toscana</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 80.9%"></i></span></td><td class="val"><data class="n n--cell" value="14.4">14,4</data></td></tr>
 
 
 
-                  <tr data-key="marche"><td class="rank">17</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/marche">Marche</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 86.0%"></i></span></td><td class="val"><data class="n n--cell" value="15.3">15,3</data></td></tr>
+                  <tr data-key="marche"><td class="rank"><span class="n n--rank"><data value="17">17</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/marche">Marche</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 86.0%"></i></span></td><td class="val"><data class="n n--cell" value="15.3">15,3</data></td></tr>
 
 
 
-                  <tr data-key="abruzzo"><td class="rank">18</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 93.8%"></i></span></td><td class="val"><data class="n n--cell" value="16.7">16,7</data></td></tr>
+                  <tr data-key="abruzzo"><td class="rank"><span class="n n--rank"><data value="18">18</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 93.8%"></i></span></td><td class="val"><data class="n n--cell" value="16.7">16,7</data></td></tr>
 
 
 
-                  <tr data-key="basilicata"><td class="rank">19</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 94.4%"></i></span></td><td class="val"><data class="n n--cell" value="16.8">16,8</data></td></tr>
+                  <tr data-key="basilicata"><td class="rank"><span class="n n--rank"><data value="19">19</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 94.4%"></i></span></td><td class="val"><data class="n n--cell" value="16.8">16,8</data></td></tr>
 
 
 
-                  <tr data-key="umbria"><td class="rank">20</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/umbria">Umbria</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val"><data class="n n--cell" value="17.8">17,8</data></td></tr>
+                  <tr data-key="umbria"><td class="rank"><span class="n n--rank"><data value="20">20</data><span class="n__o">ª</span></span></td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/umbria">Umbria</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val"><data class="n n--cell" value="17.8">17,8</data></td></tr>
 
 
                 </tbody>
@@ -1704,7 +1719,7 @@ body.has-proto { padding-bottom: 96px; }
         }
         var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
         var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
-        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + (i + 1) + '</td><th scope="row">' + name +
+        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
           '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
       });
       body.innerHTML = html.join("");
@@ -1738,21 +1753,20 @@ body.has-proto { padding-bottom: 96px; }
         tr.classList.toggle("is-on", on);
         if (on) tr.setAttribute("aria-current", "true"); else tr.removeAttribute("aria-current");
       });
-      if (series) {
-        series.querySelectorAll("svg").forEach(function (svg) {
-          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]');
-          var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
-          if (src && key) {
-            var pts = src.getAttribute("points").trim().split(" ");
-            var last = pts[pts.length - 1].split(",");
-            hl.setAttribute("points", src.getAttribute("points"));
-            dot.setAttribute("cx", last[0]); dot.setAttribute("cy", last[1]); dot.setAttribute("r", 4);
-            lab.setAttribute("y", Number(last[1]) + 4); lab.textContent = data.names[key] || key;
-          } else {
-            hl.setAttribute("points", ""); dot.setAttribute("r", 0); lab.textContent = "";
-          }
-        });
-      }
+      page.querySelectorAll("[data-series] svg").forEach(function (svg) {
+        var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
+        if (!hl || !dot || !lab) return;
+        var src = key ? svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]') : null;
+        if (src) {
+          var pts = src.getAttribute("points").trim().split(" ");
+          var last = pts[pts.length - 1].split(",");
+          hl.setAttribute("points", src.getAttribute("points"));
+          dot.setAttribute("cx", last[0]); dot.setAttribute("cy", last[1]); dot.setAttribute("r", 4);
+          lab.setAttribute("y", Number(last[1]) + 4); lab.textContent = data.names[key] || key;
+        } else {
+          hl.setAttribute("points", ""); dot.setAttribute("r", 0); lab.textContent = "";
+        }
+      });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
       if (live && key) {
         var r = rows(current).filter(function (x) { return x.key === key; })[0];
@@ -1791,24 +1805,23 @@ body.has-proto { padding-bottom: 96px; }
   document.querySelectorAll(".toc").forEach(function (toc) {
     var links = Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']"));
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
-    if (!("IntersectionObserver" in window)) return;
-    var visible = [];
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        var i = targets.indexOf(e.target);
-        if (e.isIntersecting && visible.indexOf(i) < 0) visible.push(i);
-        if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
-      });
-      var cur = visible.length ? Math.min.apply(null, visible) : -1;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var cur = -1;
+      targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top < innerHeight * 0.3) cur = i; });
       links.forEach(function (a, j) {
         if (j === cur) {
-          a.setAttribute("aria-current", "location");
-          var ol = a.closest("ol");
-          if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+          if (a.getAttribute("aria-current") !== "location") {
+            a.setAttribute("aria-current", "location");
+            var ol = a.closest("ol");
+            if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+          }
         } else a.removeAttribute("aria-current");
       });
-    }, { rootMargin: "-20% 0px -70% 0px" });
-    targets.forEach(function (t) { if (t) io.observe(t); });
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
   });
 })();
 

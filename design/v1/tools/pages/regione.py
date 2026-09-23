@@ -4,28 +4,35 @@ Il contesto della rotta /regione/<key> porta il profilo della regione (posizione
 media, temi, indicatori, movimenti, regioni simili) e le sue province. Non porta
 la qualita' della vita della regione ne' il numero delle province italiane: per
 mostrarli si leggono dal contesto catturato, nello stesso momento, delle pagine
-della qualita' della vita. Se quel contesto manca, la tessera e il denominatore
-spariscono invece di diventare cifre inventate. Nella 1.0 la rotta della regione
-dovra' portarli da se'.
+della qualita' della vita. Se quel contesto manca, la figura d'apertura e il
+denominatore spariscono invece di diventare cifre inventate. Nella 1.0 la rotta
+della regione dovra' portarli da se'.
+
+Qui le cifre restano grezze: le scrivono i filtri `num`, `rank` e `delta` nel
+template. Le frasi composte qui (il titolo della figura, le etichette della
+striscia) passano da `derive.num`, e i conteggi da `numfmt.text(n, 0)`, perche'
+`derive.num(20)` scriverebbe "20,0".
 """
 
 from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from pathlib import Path
 
+import charts
 import derive as common
+import numfmt
 
-from app.data import REGION_GEO_AREA, REGION_ORDER
+from app.data import REGION_GEO_AREA
 from app.indicator_notes import is_percentage_unit
-from app.profiles import MIN_THEME_INDICATORS, region_key_for
+from app.profiles import MIN_THEME_INDICATORS
 from app.seo_titles import of_region
 from app.taxonomy import CATEGORY_NAME_TO_SLUG, MACRO_AREAS
 
 V1 = Path(__file__).resolve().parents[2]
 DATA = V1 / "data"
-PATHS = V1 / "src" / "partials" / "italy_paths.json"
 
 DIRECTION_WORDS = {
     "higher_better": "meglio se alto",
@@ -60,20 +67,20 @@ def _scale(methodology: dict) -> dict | None:
     return {"min": lo, "max": hi, "mid": mid}
 
 
+def _divbar(score, scale: dict | None) -> dict | None:
+    """La barra attorno al centro della scala: da dove parte e quanto e' lunga, in percentuale."""
+    if score is None or not scale:
+        return None
+    span = (scale["max"] - scale["min"]) or 1
+    return {"left": round((min(score, scale["mid"]) - scale["min"]) / span * 100, 1),
+            "width": round(abs(score - scale["mid"]) / span * 100, 1)}
+
+
 def _unit(unit: str | None) -> str:
-    """L'unita' come va nella colonna: la percentuale diventa %, il resto resta
-    com'e' nella fonte."""
+    """L'unita' come va accanto alla cifra: la percentuale diventa %, il resto
+    resta com'e' nella fonte. `numfmt.short_unit` non riconosce "percentuale"."""
     unit = (unit or "").strip()
     return "%" if unit and is_percentage_unit(unit) else unit
-
-
-def _value_with_unit(value, unit: str | None) -> str:
-    """`60,2%`, `24.328 euro`, `0,32 indice (0-1)`: la cifra isolata porta la sua unita'."""
-    text = common.num(value)
-    u = _unit(unit)
-    if u == "%":
-        return f"{text}%"
-    return f"{text} {u}" if u else text
 
 
 def _article(name: str, prep: str = "") -> str:
@@ -99,8 +106,13 @@ def _lower_first(text: str) -> str:
     return text
 
 
-def _position(rank, total) -> str | None:
-    return f"{common.ordinal(rank)} su {total}" if rank is not None and total else None
+def _track(rank, total) -> float | None:
+    """Dove cade una posizione sulla traccia da 1 a N, in percentuale."""
+    return round((rank - 1) / (total - 1) * 100, 1) if rank and total and total > 1 else None
+
+
+def _join(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " e " + names[-1]
 
 
 def _theme_order() -> dict[str, int]:
@@ -117,14 +129,15 @@ def _indicator_row(ind: dict, region_total: int) -> dict:
         # L'anno di confronto e' per costruzione uno con i dati di tutte le
         # regioni (`_core_stats`): il suo denominatore e' il totale, anche
         # quando l'ultimo anno ne copre meno.
-        before = {"rank": rank + movement, "ordinal": common.ordinal(rank + movement),
-                  "position": _position(rank + movement, region_total),
-                  "year": ind["year_from"], "same": movement == 0}
+        before = {"rank": rank + movement, "total": region_total, "year": ind["year_from"], "same": movement == 0}
+    unit = _unit(ind.get("unit"))
     return {
         "id": ind["id"], "name": ind["name"], "path": ind["path"], "theme": ind["theme"],
-        "value": common.num(ind.get("value")), "value_unit": _value_with_unit(ind.get("value"), ind.get("unit")),
-        "unit": _unit(ind.get("unit")), "year": ind.get("year"),
-        "rank": rank, "count": count, "position": _position(rank, count),
+        "value": ind.get("value"), "unit": unit,
+        # L'unita' troppo lunga per stare accanto alla cifra si scrive a parte.
+        "unit_apart": unit if unit and numfmt.short_unit(unit) is None else None,
+        "year": ind.get("year"),
+        "rank": rank, "count": count, "track": _track(rank, count),
         "partial": count is not None and count != region_total,
         "movement": movement, "before": before,
         "verso": DIRECTION_WORDS.get(ind.get("direction")),
@@ -150,27 +163,64 @@ def _answer(profile: dict) -> dict:
     out = {"strong": None, "weak": None, "netto": bool(top.get("netto"))}
     if strong:
         out["strong"] = {"theme": strong["theme"], "path": strong["theme_path"],
-                         "position": _position(strong["rank"], strong.get("rank_total") or total)}
+                         "rank": strong["rank"], "total": strong.get("rank_total") or total}
     if weak and weak is not strong:
         out["weak"] = {"theme": weak["theme"], "path": weak["theme_path"],
-                       "position": _position(weak["rank"], weak.get("rank_total") or total)}
+                       "rank": weak["rank"], "total": weak.get("rank_total") or total}
     return out
 
 
-def _quality(key: str, classifica: dict) -> dict | None:
-    """La riga della regione nella classifica della qualita' della vita, se c'e'."""
+def _quality_claim(the_name: str, row: dict, ranking: list[dict], mean: float) -> str:
+    """Il titolo della figura d'apertura: un fatto sulla posizione, verificato
+    sulla classifica. Nomina chi sta dietro o davanti solo quando sono pochi."""
+    total = len(ranking)
+    rank = row["rank"]
+    head = f"Qualità della vita: {the_name} è"
+    of_total = numfmt.text(total, 0)
+    if rank == 1:
+        return f"{head} al primo posto fra le {of_total} regioni"
+    if rank == total:
+        return f"{head} all'ultimo posto fra le {of_total} regioni"
+    lead = f"{head} {common.ordinal(rank)} su {of_total}"
+    after = [r["name"] for r in sorted(ranking, key=lambda r: r["rank"]) if r["rank"] > rank]
+    ahead = [r["name"] for r in sorted(ranking, key=lambda r: r["rank"]) if r["rank"] < rank]
+    if len(after) <= 3:
+        return f"{lead}, davanti solo a {_join(after)}"
+    if len(ahead) <= 3:
+        return f"{lead}, dietro solo a {_join(ahead)}"
+    return f"{lead}, {'sopra' if row['score'] > mean else 'sotto'} la media delle regioni"
+
+
+def _quality(key: str, the_name: str, classifica: dict) -> dict | None:
+    """La qualita' della vita delle 20 regioni, con questa in evidenza: la
+    striscia d'apertura, il suo titolo e la tabella con gli stessi dati."""
     data = classifica.get("data") or {}
-    ranking = data.get("ranking") or []
+    ranking = [r for r in data.get("ranking") or [] if r.get("score") is not None]
     row = next((r for r in ranking if r.get("key") == key), None)
-    if not row or row.get("score") is None:
+    if not row or len(ranking) < 2:
         return None
     scale = _scale(data.get("methodology"))
-    width = round(row["score"] / scale["max"] * 100, 1) if scale else None
+    areas = charts.area_map()
+    scores = [r["score"] for r in ranking]
+    mean = sum(scores) / len(scores)
+    gap = max(scores) - min(scores)
+    strip = charts.divario_strip(
+        [{"key": r["key"], "name": r["name"], "value": r["score"], "area": areas.get(r["key"])} for r in ranking],
+        mean, None, highlight=key,
+        gap_label=f"{common.num(gap)} punti fra prima e ultima",
+        avg_label=f"Media delle regioni {common.num(mean)}",
+    )
+    rows = [{"rank": r["rank"], "key": r["key"], "name": r["name"], "score": r["score"],
+             "area": areas.get(r["key"]), "area_label": charts.AREA_LABEL.get(areas.get(r["key"])),
+             "bar": _divbar(r["score"], scale), "on": r["key"] == key}
+            for r in sorted(ranking, key=lambda r: r["rank"])]
     return {
-        "rank": row.get("rank"), "ordinal": common.ordinal(row["rank"]) if row.get("rank") else None,
-        "total": len(ranking), "score": common.num(row["score"]), "width": width, "scale": scale,
+        "rank": row.get("rank"), "total": len(ranking), "score": row["score"], "mean": mean,
+        "scale": scale, "strip": strip, "rows": rows,
+        "claim": _quality_claim(the_name, row, ranking, mean),
         "profile": ((data.get("profile") or {}).get("name") or "").lower() or None,
         "dimensions": len(data.get("categories") or []) or None,
+        "source": (data.get("methodology") or {}).get("source"),
         "path": "/qualita-della-vita/classifica/regioni",
     }
 
@@ -181,14 +231,14 @@ def derive(ctx: dict) -> dict:
     total = p.get("region_total")
     indicators = p.get("all_indicators") or []
     by_id = {i["id"]: i for i in indicators}
+    the_name = _article(name)
 
     classifica = _sibling("classifica")
     qdv = _sibling("qualita-della-vita")
-    province_rows = (_sibling("classifica-province").get("data") or {}).get("ranking") or []
-    province_total = qdv.get("province_total") or len(province_rows) or None
-    quality = _quality(key, classifica)
-    qranks = {r["key"]: r for r in (classifica.get("data") or {}).get("ranking") or []}
     pdata = _sibling("classifica-province").get("data") or {}
+    province_total = qdv.get("province_total") or len(pdata.get("ranking") or []) or None
+    quality = _quality(key, the_name, classifica)
+    qranks = {r["key"]: r for r in (classifica.get("data") or {}).get("ranking") or []}
     pscale = _scale(pdata.get("methodology"))
 
     years = sorted({i["year"] for i in indicators if i.get("year")})
@@ -207,9 +257,8 @@ def derive(ctx: dict) -> dict:
         rank, n = t.get("rank"), t.get("rank_total") or total
         themes.append({
             "theme": t["theme"], "path": t["theme_path"], "count": t["count"], "rated": t.get("rated"),
-            "rank": rank, "position": _position(rank, n),
-            "track": round((rank - 1) / (n - 1) * 100, 1) if rank and n and n > 1 else None,
-            "percentile": common.num(round(t["score"] * 100, 1)) if t.get("score") is not None else None,
+            "rank": rank, "total": n, "track": _track(rank, n),
+            "percentile": t["score"] * 100 if t.get("score") is not None else None,
         })
 
     # Dove stacca e dove resta indietro: gli indicatori del profilo con i
@@ -225,13 +274,15 @@ def derive(ctx: dict) -> dict:
     moved_down = sum(1 for i in indicators if (i.get("movement") or 0) < 0)
     moved_same = sum(1 for i in indicators if i.get("movement") == 0)
 
+    # Le ultime cinque posizioni con lo stesso criterio di `top5_count` in
+    # app/profiles.py: solo gli indicatori con i dati di tutte le regioni.
+    comparable = [i["rank"] for i in indicators if i.get("rank") is not None and i.get("region_count") == total]
+    bottom5 = sum(1 for r in comparable if total and r > total - 5) if comparable else None
+    bottom5_share = bottom5 / len(comparable) * 100 if comparable else None
+
     # Le province per qualita' della vita, dalla prima all'ultima.
-    provinces = []
-    for pr in sorted(ctx.get("provinces") or [], key=lambda r: (r.get("rank") is None, r.get("rank") or 0)):
-        width = round(pr["score"] / pscale["max"] * 100, 1) if pscale and pr.get("score") is not None else None
-        provinces.append({**pr, "position": _position(pr.get("rank"), province_total) if province_total else None,
-                          "ordinal": common.ordinal(pr["rank"]) if pr.get("rank") else None,
-                          "score_text": common.num(pr.get("score")), "width": width})
+    provinces = [{**pr, "bar": _divbar(pr.get("score"), pscale)}
+                 for pr in sorted(ctx.get("provinces") or [], key=lambda r: (r.get("rank") is None, r.get("rank") or 0))]
 
     # Tutti gli indicatori per macro-area, e dentro per tema nell'ordine della
     # tassonomia. Dentro il tema, dalla posizione migliore alla peggiore.
@@ -249,22 +300,17 @@ def derive(ctx: dict) -> dict:
                            key=lambda i: (i.get("rank") is None, i.get("rank") or 0, i["name"]))
             groups.append({"theme": theme, "path": theme_paths.get(theme),
                            "rows": [_indicator_row(i, total) for i in items]})
-        areas.append({"name": area, "slug": re.sub(r"[^a-z]+", "-", area.lower()).strip("-"),
+        plain = unicodedata.normalize("NFKD", area.lower()).encode("ascii", "ignore").decode()
+        areas.append({"name": area, "slug": re.sub(r"[^a-z]+", "-", plain).strip("-"),
                       "count": len(rows), "groups": groups})
 
-    # Il localizzatore: tutte le regioni della mappa nel grigio di contesto,
-    # solo questa nel colore dell'elemento in evidenza. Le chiavi vengono dai
-    # tracciati stessi, cosi' nessuna regione cade nel tratteggio del dato mancante.
-    names = {region_key_for(r): r for r in REGION_ORDER}
-    map_keys = list(json.loads(PATHS.read_text(encoding="utf-8")))
-    locator = {k: ("regione-loc__on" if k == key else "regione-loc__ctx") for k in map_keys}
-
+    area_of = charts.area_map()
     similar = []
     for s in p.get("similar_regions") or []:
         q = qranks.get(s["region_key"])
-        similar.append({"name": s["region"], "key": s["region_key"], "area": REGION_GEO_AREA.get(s["region_key"]),
-                        "path": f"/regione/{s['region_key']}",
-                        "quality": _position(q.get("rank"), len(qranks)) if q and q.get("rank") else None})
+        similar.append({"name": s["region"], "key": s["region_key"], "path": f"/regione/{s['region_key']}",
+                        "geo": REGION_GEO_AREA.get(s["region_key"]), "area": area_of.get(s["region_key"]),
+                        "q_rank": q.get("rank") if q else None, "q_total": len(qranks)})
 
     institutions = list(dict.fromkeys(s["label"].split(",")[0].strip() for s in sources))
     institution = " e ".join(institutions) if institutions else None
@@ -274,27 +320,26 @@ def derive(ctx: dict) -> dict:
                 f"{span}. {ctx.get('canonical')}")
 
     best = excels[0] if excels else None
-    best_pick = {**best, "name_lc": _lower_first(best["name"])} if best and best.get("position") else None
+    best_pick = {**best, "name_lc": _lower_first(best["name"])} if best and best.get("rank") else None
 
-    area = p.get("geo_area")
+    geo = p.get("geo_area")
     return {
-        "name": name, "key": key, "area": area, "total": total,
-        "area_in": ("nelle " if area == "Isole" else "nel ") + area if area else None,
-        "the_name": _article(name), "to_name": _article(name, "a"), "of_name": of_region(name),
+        "name": name, "key": key, "geo": geo, "area": area_of.get(key), "total": total,
+        "area_in": ("nelle " if geo == "Isole" else "nel ") + geo if geo else None,
+        "the_name": the_name, "to_name": _article(name, "a"), "of_name": of_region(name),
         "institution": institution,
-        "avg_rank": p.get("avg_rank"), "avg_ordinal": common.ordinal(p["avg_rank"]) if p.get("avg_rank") else None,
-        "comparable": p.get("comparable_count"), "top5": p.get("top5_count"), "scored": p.get("scored_count"),
+        "avg_rank": p.get("avg_rank"),
+        "comparable": p.get("comparable_count"), "top5": p.get("top5_count"), "bottom5": bottom5, "bottom5_share": bottom5_share,
+        "scored": p.get("scored_count"),
         "indicator_count": len(indicators), "contextual_count": sum(1 for i in indicators if i.get("rank") is None),
         "year_min": year_min, "year_max": year_max, "sources": sources,
         "answer": _answer(p), "best_pick": best_pick, "quality": quality, "themes": themes,
-        "track_first": common.ordinal(1) if total else None, "track_last": common.ordinal(total) if total else None,
         "excels": excels, "lags": lags,
         "gains": gains, "losses": losses, "moved_up": moved_up, "moved_down": moved_down, "moved_same": moved_same,
         "provinces": provinces, "province_total": province_total,
         "province_profile": ((pdata.get("profile") or {}).get("name") or "").lower() or None,
         "province_scale": pscale,
-        "areas": areas, "names": names, "locator": locator, "similar": similar,
-        "map_values": {k: REGION_GEO_AREA.get(k, "") for k in map_keys},
+        "areas": areas, "similar": similar,
         "min_theme": MIN_THEME_INDICATORS, "citation": citation,
-        "count_word": common.count_word, "ordinal": common.ordinal,
+        "count_word": common.count_word,
     }

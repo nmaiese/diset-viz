@@ -229,9 +229,10 @@ regione), le vicine e le sorelle, fonti.
 ### Articolo
 
 Briciole Home / Storie / tema / titolo, titolo con sommario visibile, firma e
-data, la risposta in breve, la copertina, il corpo a misura di lettura con
-figure e tabelle, il rimando alla scheda dopo la prima figura, dati e metodo in
-un blocco solo, continua a esplorare.
+data, la copertina larga quanto il contenitore e sopra la piega (con le sue
+proporzioni, didascalia e credito), la risposta in breve, il corpo a misura di
+lettura con figure e tabelle, il rimando alla scheda dopo la prima figura, dati
+e metodo in un blocco solo, continua a esplorare.
 
 ### Classifica della qualita' della vita
 

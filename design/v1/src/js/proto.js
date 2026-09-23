@@ -157,7 +157,7 @@
         }
         var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
         var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
-        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + (i + 1) + '</td><th scope="row">' + name +
+        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
           '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
       });
       body.innerHTML = html.join("");
@@ -191,21 +191,20 @@
         tr.classList.toggle("is-on", on);
         if (on) tr.setAttribute("aria-current", "true"); else tr.removeAttribute("aria-current");
       });
-      if (series) {
-        series.querySelectorAll("svg").forEach(function (svg) {
-          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]');
-          var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
-          if (src && key) {
-            var pts = src.getAttribute("points").trim().split(" ");
-            var last = pts[pts.length - 1].split(",");
-            hl.setAttribute("points", src.getAttribute("points"));
-            dot.setAttribute("cx", last[0]); dot.setAttribute("cy", last[1]); dot.setAttribute("r", 4);
-            lab.setAttribute("y", Number(last[1]) + 4); lab.textContent = data.names[key] || key;
-          } else {
-            hl.setAttribute("points", ""); dot.setAttribute("r", 0); lab.textContent = "";
-          }
-        });
-      }
+      page.querySelectorAll("[data-series] svg").forEach(function (svg) {
+        var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
+        if (!hl || !dot || !lab) return;
+        var src = key ? svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]') : null;
+        if (src) {
+          var pts = src.getAttribute("points").trim().split(" ");
+          var last = pts[pts.length - 1].split(",");
+          hl.setAttribute("points", src.getAttribute("points"));
+          dot.setAttribute("cx", last[0]); dot.setAttribute("cy", last[1]); dot.setAttribute("r", 4);
+          lab.setAttribute("y", Number(last[1]) + 4); lab.textContent = data.names[key] || key;
+        } else {
+          hl.setAttribute("points", ""); dot.setAttribute("r", 0); lab.textContent = "";
+        }
+      });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
       if (live && key) {
         var r = rows(current).filter(function (x) { return x.key === key; })[0];
@@ -244,23 +243,22 @@
   document.querySelectorAll(".toc").forEach(function (toc) {
     var links = Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']"));
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
-    if (!("IntersectionObserver" in window)) return;
-    var visible = [];
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        var i = targets.indexOf(e.target);
-        if (e.isIntersecting && visible.indexOf(i) < 0) visible.push(i);
-        if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
-      });
-      var cur = visible.length ? Math.min.apply(null, visible) : -1;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var cur = -1;
+      targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top < innerHeight * 0.3) cur = i; });
       links.forEach(function (a, j) {
         if (j === cur) {
-          a.setAttribute("aria-current", "location");
-          var ol = a.closest("ol");
-          if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+          if (a.getAttribute("aria-current") !== "location") {
+            a.setAttribute("aria-current", "location");
+            var ol = a.closest("ol");
+            if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+          }
         } else a.removeAttribute("aria-current");
       });
-    }, { rootMargin: "-20% 0px -70% 0px" });
-    targets.forEach(function (t) { if (t) io.observe(t); });
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
   });
 })();

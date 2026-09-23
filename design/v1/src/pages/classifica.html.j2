@@ -1,8 +1,9 @@
 {% extends "base.html.j2" %}
 {% import "partials/ui.html.j2" as ui %}
 {#- La classifica della qualita' della vita nella 1.0. Stesso contenuto di
-    quality_life_classifica.html, un'altra regia: prima chi e' in testa e di
-    quanto, poi la tabella con la mappa accanto, poi dove eccelle ogni
+    quality_life_classifica.html, un'altra regia: la risposta, poi la striscia
+    dei punteggi con il titolo sul Mezzogiorno, poi le tessere che la striscia
+    non dice, poi la tabella con la mappa accanto, dove eccelle ogni
     territorio, e il metodo in fondo. Regge i due livelli: le 20 regioni con la
     mappa, le 107 province con prime e ultime 10 e le altre in un details. -#}
 {% set s = d.spec %}
@@ -13,31 +14,31 @@
 ] %}
 {% block main %}
 {%- macro rank_table(rows, caption, ident, visible_caption=false) -%}
-<div class="tablewrap qdv-rankbox" id="{{ aid(ident) }}" tabindex="0" role="region" aria-label="{{ caption }}">
-  <table class="table qdv-rank">
-    <caption class="{{ 'qdv-caption' if visible_caption else 'sr-only' }}">{{ caption }}</caption>
+<div class="tablewrap rankwrap" id="{{ aid(ident) }}" tabindex="0" role="region" aria-label="{{ caption }}">
+  <table class="table table--rank">
+    <caption{% if not visible_caption %} class="sr-only"{% endif %}>{{ caption }}</caption>
     <thead><tr>
       <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
       <th scope="col">{{ s.singular | capitalize }}</th>
-      <th class="qdv-bar" scope="col"><span class="sr-only">Barra del punteggio</span></th>
+      <th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio</span></th>
       <th class="r" scope="col">Punteggio</th>
-      <th class="qdv-note" scope="col">Punto forte</th>
-      <th class="qdv-note" scope="col">Punto debole</th>
-      {%- if not d.is_default %}<th class="qdv-delta" scope="col">Rispetto a {{ d.default_name }}</th>{% endif %}
+      <th scope="col">Punto forte</th>
+      <th scope="col">Punto debole</th>
+      {%- if not d.is_default %}<th scope="col">Rispetto a {{ d.default_name }}</th>{% endif %}
     </tr></thead>
     <tbody>
       {%- for row in rows %}
       <tr data-key="{{ row.key }}">
-        <td class="rank">{{ row.rank }}</td>
-        <th class="qdv-name" scope="row"><a href="{{ href(row.href) }}">{{ row.name }}</a>
-          {%- if row.region or row.metro %}<span class="qdv-where">
+        <td class="rank">{{ row.rank | rank }}</td>
+        <th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ href(row.href) }}">{{ row.name }}</a>
+          {%- if row.region or row.metro %}<span class="where">
           {%- if row.region %}{% if row.region.href %}<a href="{{ href(row.region.href) }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}{% endif %}
-          {%- if row.metro %}{{ ', città metropolitana' if row.region else 'Città metropolitana' }}{% endif %}</span>{% endif %}</th>
-        <td class="qdv-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td>
-        <td class="val">{{ row.score }}</td>
-        <td class="qdv-note" data-label="Punto forte">{{ row.strong or 'n.d.' }}</td>
-        <td class="qdv-note" data-label="Punto debole">{{ row.weak or 'n.d.' }}</td>
-        {%- if not d.is_default %}<td class="qdv-delta" data-label="Rispetto a {{ d.default_name }}">{% if row.delta.dir %}{{ ui.icon(row.delta.dir) }} {% endif %}{{ row.delta.text }}</td>{% endif %}
+          {%- if row.metro %}{{ ', città metropolitana' if row.region else 'Città metropolitana' }}{% endif %}</span>{% endif %}{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}</th>
+        <td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td>
+        <td class="val">{{ row.score | num(None, 'score') }}</td>
+        <td class="note" data-label="Punto forte">{{ row.strong or 'n.d.' }}</td>
+        <td class="note" data-label="Punto debole">{{ row.weak or 'n.d.' }}</td>
+        {%- if not d.is_default %}<td class="note" data-label="Rispetto a {{ d.default_name }}">{% if row.delta.dir %}<span class="status">{{ ui.icon(row.delta.dir) }} {{ row.delta.verb }} da {{ row.delta.before | rank }} a {{ row.delta.after | rank }}</span>{% else %}stessa posizione{% endif %}</td>{% endif %}
       </tr>
       {%- endfor %}
     </tbody>
@@ -50,7 +51,7 @@
   <header class="pagehead">
     <p class="eyebrow"><a href="{{ href('/qualita-della-vita') }}">Qualità della vita</a><span class="sep" aria-hidden="true">·</span>{{ d.institutions }}<span class="sep" aria-hidden="true">·</span>{{ d.n }} {{ s.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ d.years_span }}</p>
     <h1 class="h-title">{{ d.h1 }}</h1>
-    <p class="answer">Il punteggio più alto è {{ d.first.prep }}<a href="{{ href(d.first.href) }}">{{ d.first.name }}</a>, {{ d.first.score }} su 100, il più basso {{ d.last.prep }}<a href="{{ href(d.last.href) }}">{{ d.last.name }}</a>, {{ d.last.score }}: fra prima e ultima corrono {{ d.gap }} punti.
+    <p class="answer">Il punteggio più alto è {{ d.first.prep }}<a href="{{ href(d.first.href) }}">{{ d.first.name }}</a>, {{ d.first.score | num(None, 'score') }} su 100, il più basso {{ d.last.prep }}<a href="{{ href(d.last.href) }}">{{ d.last.name }}</a>, {{ d.last.score | num(None, 'score') }}: fra prima e ultima corrono {{ d.gap | num('punti', 'score') }}.
       {%- if d.movers and d.movers.up %} Rispetto al profilo {{ d.default_name }} {{ d.movers.up.text }}{% if d.movers.down %}, e {{ d.movers.down.text }}{% endif %}.{% endif %} I dati degli indicatori vanno {{ d.years_text }}.</p>
     <p class="meta">
       <span>Non è la classifica del Sole 24 Ore</span>
@@ -59,37 +60,41 @@
     </p>
   </header>
 
+  {% if d.strip.svg %}
+  {{ ui.leadfigure('striscia', d.claim or ('Le ' ~ d.n ~ ' ' ~ s.plural ~ ' sulla scala da 0 a 100'), d.strip,
+     'Ogni punto è una ' ~ s.singular ~ ', nel colore della sua ripartizione, con il punteggio da 0 a 100 del profilo ' ~ d.profile.name ~ '. Tutti i punteggi sono nella classifica qui sotto. Fonte: ' ~ d.institutions ~ ' (' ~ d.years_span ~ '). Elaborazione Divario Italia.') }}
+  {% endif %}
   {{ ui.tiles(d.tiles) }}
 
   <section class="section" id="{{ aid('classifica') }}" aria-labelledby="{{ aid('h-classifica') }}">
     <h2 id="{{ aid('h-classifica') }}">La classifica</h2>
-    <figure class="module qdv-module">
+    <figure class="module">
       <figcaption class="module__head">
-        {% if d.claim %}<h3 class="h-sub">{{ d.claim }}</h3>{% endif %}
-        <p class="subline">Punteggio da 0 a 100 con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso.</p>
+        {% if d.table_claim %}<h3 class="h-sub">{{ d.table_claim }}</h3>{% endif %}
+        <p class="subline">Punteggio da 0 a 100 con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso, con il punto forte e il punto debole di ognuna.</p>
       </figcaption>
-      <div class="toolbar qdv-toolbar">
+      <div class="toolbar cl-toolbar">
         <div class="field"><span>Livello</span>
           <div class="seg" role="group" aria-label="Livello territoriale">
             {%- for item in d.levels %}<a href="{{ href(item.href) }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor -%}
           </div>
         </div>
-        <div class="field qdv-field"><span>Profilo dei pesi</span>
-          <div class="seg qdv-profiles" role="group" aria-label="Profilo dei pesi">
+        <div class="field cl-field"><span>Profilo dei pesi</span>
+          <div class="seg cl-profiles" role="group" aria-label="Profilo dei pesi">
             {%- for item in d.profiles %}<a href="{{ href(item.href) }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.name }}</a>{% endfor -%}
           </div>
         </div>
       </div>
-      <p class="qdv-profile-note"><b>{{ d.profile.name }}.</b> {{ d.profile.description }}{% if d.dims_short %} {{ d.dims_short }}{% endif %} <a href="#{{ aid('metodo') }}">Come pesano le dimensioni</a></p>
+      <p class="cl-profile-note"><b>{{ d.profile.name }}.</b> {{ d.profile.description }}{% if d.dims_short %} {{ d.dims_short }}{% endif %} <a href="#{{ aid('metodo') }}">Come pesano le dimensioni</a></p>
 
       <div class="cl-body">
         <div class="cl-tables">
+          {% if d.strip.legend %}{{ ui.arealegend(d.strip.legend) }}{% endif %}
           {% if d.rows.middle %}
-          {% set middle = d.rows.middle %}
           {{ rank_table(d.rows.head, 'Le prime ' ~ d.rows.head | length ~ ' ' ~ s.plural, 'classifica-prime', true) }}
-          <details class="rank-more qdv-more">
+          <details class="more">
             <summary>{{ d.rows.middle_label }}</summary>
-            {{ rank_table(middle, d.rows.middle_label, 'classifica-centro') }}
+            {{ rank_table(d.rows.middle, d.rows.middle_label, 'classifica-centro') }}
           </details>
           {{ rank_table(d.rows.tail, 'Le ultime ' ~ d.rows.tail | length ~ ' ' ~ s.plural, 'classifica-ultime', true) }}
           {% else %}
@@ -98,7 +103,7 @@
         </div>
         <div class="cl-side">
           {% if d.map %}
-          {{ ui.map(d.map.classes, 'qdv', d.map.names, d.map.tips) }}
+          {{ ui.map(d.map.classes, 'punteggio', d.map.names, d.map.tips, overlay=d.map.callouts) }}
           {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto. Sei gradini uguali fra il più basso e il più alto.') }}
           {% else %}
           <div class="cl-find">
@@ -122,23 +127,24 @@
         {% if d.champions_claim %}<h3 class="h-sub">{{ d.champions_claim }}</h3>{% endif %}
         <p class="subline">Per ognuna delle {{ d.dims_total }} dimensioni le tre {{ s.plural }} con il punteggio più alto e l'ultima. Il punteggio di una dimensione va da 0 a 100 e non cambia con il profilo.</p>
       </figcaption>
-      <div class="tablewrap qdv-catbox" tabindex="0" role="region" aria-label="Le prime {{ s.plural }} per dimensione">
-        <table class="table table--compact qdv-cats">
-          <caption class="sr-only">Le tre {{ s.plural }} con il punteggio più alto e l'ultima, per dimensione</caption>
+      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="Le prime {{ s.plural }} per dimensione">
+        <table class="table table--compact table--stack cl-cats">
+          <caption class="sr-only">Le tre {{ s.plural }} con il punteggio più alto e l'ultima, per dimensione, punteggio da 0 a 100</caption>
           <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima</th><th scope="col">Seconda</th><th scope="col">Terza</th><th scope="col">Ultima</th></tr></thead>
           <tbody>
             {%- for c in d.categories %}
             <tr>
               <th scope="row"><a href="{{ href(c.href) }}">{{ c.name }}</a></th>
               {%- for t in c.top %}
-              <td data-label="{{ ['Prima', 'Seconda', 'Terza'][loop.index0] }}"><span class="qdv-pair"><a href="{{ href(t.href) }}">{{ t.name }}</a><span class="qdv-pts">{{ t.score }}</span></span></td>
+              <td data-label="{{ ['Prima', 'Seconda', 'Terza'][loop.index0] }}"><span class="cl-pair"><a href="{{ href(t.href) }}">{{ t.name }}</a>{{ t.score | num(None, 'score') }}</span></td>
               {%- endfor %}
-              <td data-label="Ultima">{% if c.last %}<span class="qdv-pair"><a href="{{ href(c.last.href) }}">{{ c.last.name }}</a><span class="qdv-pts">{{ c.last.score }}</span></span>{% else %}n.d.{% endif %}</td>
+              <td data-label="Ultima">{% if c.last %}<span class="cl-pair"><a href="{{ href(c.last.href) }}">{{ c.last.name }}</a>{{ c.last.score | num(None, 'score') }}</span>{% else %}n.d.{% endif %}</td>
             </tr>
             {%- endfor %}
           </tbody>
         </table>
       </div>
+      <p class="source">Fonte: {{ d.institutions }} ({{ d.years_span }}). Elaborazione Divario Italia.</p>
     </figure>
   </section>
 
@@ -165,8 +171,8 @@
   <section class="section" id="{{ aid('fonti-dati') }}" aria-labelledby="{{ aid('h-fonti') }}">
     <h2 id="{{ aid('h-fonti') }}">Fonti, dati e citazione</h2>
     <dl class="specs">
-      <div><dt>Da dove vengono i dati</dt><dd><ul class="reflist">{% for b in d.breakdown %}<li>{{ b.label }}: {{ b.count }} indicatori</li>{% endfor %}</ul></dd></div>
-      <div><dt>Anni dei dati</dt><dd>{% if d.year_counts %}{% for y in d.year_counts %}{% if loop.first %}{{ y.n }} {{ 'indicatore ha' if y.n == 1 else 'indicatori hanno' }} il dato più recente del {{ y.year }}{% else %}, {{ y.n }} del {{ y.year }}{% endif %}{% endfor %}.{% else %}{{ d.years_span }}{% endif %}</dd></div>
+      <div><dt>Da dove vengono i dati</dt><dd><ul class="reflist">{% for b in d.breakdown %}<li>{{ b.label }}: {{ b.count | num(None, 'count') }} indicatori</li>{% endfor %}</ul></dd></div>
+      <div><dt>Anni dei dati</dt><dd>{% if d.year_counts %}{% for y in d.year_counts %}{% if loop.first %}{{ y.n | num(None, 'count') }} {{ 'indicatore ha' if y.n == 1 else 'indicatori hanno' }} il dato più recente del {{ y.year }}{% else %}, {{ y.n | num(None, 'count') }} del {{ y.year }}{% endif %}{% endfor %}.{% else %}{{ d.years_span }}{% endif %}</dd></div>
       {% if d.coverage %}<div><dt>Copertura</dt><dd>{{ d.coverage }}</dd></div>{% endif %}
       {% if d.unrated %}<div><dt>Non valutate</dt><dd>Mancano dati recenti per {{ d.unrated | join(', ') }}.</dd></div>{% endif %}
       <div><dt>Metodologia</dt><dd><a href="{{ href('/metodologia#qualita-della-vita') }}">Come si calcola la qualità della vita</a> e <a href="{{ href('/metodologia#indicatori-usati') }}">quali indicatori entrano nel punteggio</a></dd></div>
@@ -179,7 +185,6 @@
     {{ ui.cite(d.citation) }}
   </section>
 </div>
-
 <section class="band" aria-labelledby="{{ aid('continua-da-qui') }}">
   <div class="wrap">
     <h2 class="h-section" id="{{ aid('continua-da-qui') }}">Continua da qui</h2>

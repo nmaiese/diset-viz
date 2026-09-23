@@ -8,10 +8,18 @@ nell'ordine di SISTEMA.md.
   risposta in breve.
 - "Dati usati", "Fonti" e la riga finale "Dati: ..." scendono nel blocco unico
   "Dati e metodo".
-- Ogni figura di `scripts/trend_articles/figures.py` perde titolo, sottotitolo,
-  nota e fonte dentro l'SVG, che tornano come testo HTML sopra e sotto il
-  disegno, e guadagna la tabella dei valori letti dal disegno stesso.
+- Ogni figura di `scripts/trend_articles/figures.py` diventa la figura comune
+  (`.figure`): titolo, sottotitolo, nota e fonte escono dall'SVG e tornano
+  come testo HTML, il disegno esce in due tagli (largo a 680, stretto a 360)
+  perche' il testo resti a 13 pixel veri anche sul telefono, e i valori letti
+  dal disegno stanno in una tabella sotto.
 - Le tabelle Markdown prendono didascalia, `scope` e la riga di riferimento.
+- Ogni cifra di una tabella passa da `numfmt`, con i decimali che la fonte ha
+  scritto. La prosa della redazione non si tocca.
+- La copertina fotografica diventa l'immagine d'apertura, con didascalia e
+  credito. Una copertina che e' un grafico (le vecchie schede social in SVG)
+  non si ritaglia come una foto: al suo posto la pagina apre con la striscia
+  del divario disegnata dagli stessi dati.
 - Il rimando alla scheda va alla fine della sezione della prima figura o della
   prima tabella, e comunque prima di ogni altro link a una scheda: la guardia
   sulla collisione dei titoli legge il primo `href` verso `/indicatore/`.
@@ -27,12 +35,20 @@ from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
 
+import charts
 import derive as shared
+import numfmt
+from markupsafe import Markup
 
 ROOT = Path(__file__).resolve().parents[4]
 MARK = "__aid__"
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 NUMBER = r"-?\d[\d.]*(?:,\d+)?"
+SOURCE_NUMBER = re.compile(r"^([+\-−]?)(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d+))?(\s?%)?$")
+NARROW = 360
+# Larghezza media di un carattere a 13 pixel, con un po' di margine: serve a
+# non far toccare le etichette quando il disegno si stringe.
+CHAR = 6.6
 
 
 # ---------------------------------------------------------------- blocchi
@@ -116,7 +132,71 @@ def mark_ids(html: str) -> str:
                   lambda m: 'aria-labelledby="' + " ".join(MARK + t for t in m.group(1).split()) + '"', html)
 
 
-# ---------------------------------------------------------------- figure
+# ---------------------------------------------------------------- cifre della fonte
+
+def _source_number(text: str) -> tuple[float, int, bool, bool] | None:
+    """`"20,3"` -> (20.3, 1 decimale, non percentuale, senza +). None se non e' solo una cifra."""
+    m = SOURCE_NUMBER.match((text or "").strip())
+    if not m:
+        return None
+    sign, whole, dec, pct = m.groups()
+    value = float(whole.replace(".", "") + (f".{dec}" if dec else ""))
+    return (-value if sign in ("-", "−") else value), len(dec or ""), bool(pct), sign == "+"
+
+
+def _is_year(text: str) -> bool:
+    return bool(re.fullmatch(r"(19|20)\d\d", (text or "").strip()))
+
+
+def cell(text, decimals: int | None = None) -> Markup:
+    """Una cifra della fonte come la scrive il sistema: `numfmt`, con i decimali
+    della fonte (o della sua colonna). Un anno o un testo restano com'erano."""
+    if isinstance(text, Markup):
+        return text
+    parsed = None if _is_year(text) else _source_number(text)
+    if not parsed:
+        return Markup(escape(text))
+    value, own, pct, plus = parsed
+    return numfmt.num(value, "%" if pct else None, "delta" if plus else "cell", own if decimals is None else decimals)
+
+
+def _column_decimals(rows: list[list], i: int) -> tuple[bool, int | None]:
+    """Se la colonna e' di cifre, e con quanti decimali: i piu' fini che la fonte scrive."""
+    values = [r[i] for r in rows if i < len(r) and str(r[i]).strip()]
+    if not values:
+        return False, None
+    parsed = [None if isinstance(v, Markup) or _is_year(v) else _source_number(v) for v in values]
+    numeric = all(p or isinstance(v, Markup) for p, v in zip(parsed, values))
+    return numeric, max((p[1] for p in parsed if p), default=None)
+
+
+def _table(caption: str, head: list[str], rows: list[list], label: str, ref_rows: set[int] = frozenset(),
+           visible_caption: bool = False) -> str:
+    """Una tabella dati del sistema: didascalia, scope, cifre a destra con decimali
+    uniformi per colonna. Da quattro colonne in su, sul telefono, blocchi etichettati."""
+    columns = [_column_decimals(rows, i) for i in range(len(head))]
+    stack = len(head) >= 4
+    right = ' class="r"'
+    th = "".join(f'<th scope="col"{right if i and columns[i][0] else ""}>{escape(h)}</th>' for i, h in enumerate(head))
+    body = []
+    for n, row in enumerate(rows):
+        cells = []
+        for i, c in enumerate(row[1:], 1):
+            numeric, dec = columns[i] if i < len(columns) else (False, None)
+            label_attr = f' data-label="{escape(head[i])}"' if stack and i < len(head) else ""
+            cls = ' class="val"' if numeric else ""
+            cells.append(f"<td{cls}{label_attr}>{cell(c, dec) if numeric else escape(str(c))}</td>")
+        tr = ' class="ref"' if n in ref_rows else ""
+        body.append(f'<tr{tr}><th scope="row">{escape(str(row[0]))}</th>{"".join(cells)}</tr>')
+    wrap = "stackwrap tablewrap" if stack else "tablewrap"
+    table_cls = "table table--compact" + (" table--stack" if stack else "")
+    cap = "<caption>" if visible_caption else '<caption class="sr-only">'
+    return (f'<div class="{wrap}" tabindex="0" role="region" aria-label="{escape(label)}">'
+            f'<table class="{table_cls}">{cap}{escape(caption)}</caption>'
+            f'<thead><tr>{th}</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
+
+
+# ---------------------------------------------------------------- figure: lettura
 
 def _svg_text(svg: str, cls: str) -> list[str]:
     return [text_of(m) for m in re.findall(rf'<text class="{cls}(?: [^"]*)?"[^>]*>(.*?)</text>', svg, re.DOTALL)]
@@ -126,68 +206,244 @@ def _drop_text(svg: str, cls: str) -> str:
     return re.sub(rf'\s*<text class="{cls}"[^>]*>.*?</text>', "", svg, flags=re.DOTALL)
 
 
-def _it_number(text: str) -> float | None:
-    m = re.search(NUMBER, text or "")
-    if not m:
+def _attr(tag: str, name: str) -> str | None:
+    m = re.search(rf'\s{name}="([^"]*)"', tag)
+    return m.group(1) if m else None
+
+
+def _num_attr(tag: str, name: str) -> float:
+    return float(_attr(tag, name) or 0)
+
+
+def _set(tag: str, name: str, value: float | str) -> str:
+    text = f"{value:.1f}" if isinstance(value, float) else str(value)
+    return re.sub(rf'(\s{name}=")[^"]*(")', lambda m: m.group(1) + text + m.group(2), tag, count=1)
+
+
+def _each(svg: str, fn) -> str:
+    """Applica `fn(tag_aperto, testo, classe)` a ogni elemento del disegno.
+
+    `testo` e' il contenuto di un `<text>`, None per le forme. `fn` restituisce
+    l'elemento intero riscritto, o una stringa vuota per toglierlo."""
+    def one(m):
+        tag, content = m.group(1), m.group(2)
+        cls = _attr(tag, "class") or ""
+        return fn(tag, content, cls, m.group(0))
+    return re.sub(r"(<text\b[^>]*>)(.*?)</text>|(<(?:rect|line|circle|polyline)\b[^>]*>)",
+                  lambda m: one(m) if m.group(1) else fn(m.group(3), None, _attr(m.group(3), "class") or "", m.group(3)),
+                  svg, flags=re.DOTALL)
+
+
+def _bar_rows(svg: str) -> list[tuple[bool, str, float, str]]:
+    return [(bool(on), text_of(name), float(width), text_of(value)) for on, name, width, value in re.findall(
+        r'<text class="fig__name( is-on)?"[^>]*>(.*?)</text>\s*'
+        r'<rect class="fig__bar(?: is-on)?"[^>]*\bwidth="([\d.]+)"[^>]*/>\s*'
+        r'<text class="fig__value(?: is-on)?"[^>]*>(.*?)</text>', svg, re.DOTALL)]
+
+
+def _ref_label(svg: str) -> tuple[str, str] | None:
+    """La riga di riferimento del disegno ("Italia 11,0"): nome e cifra."""
+    ref = _svg_text(svg, "fig__ref-label")
+    m = re.match(rf"(.*\S)\s+({NUMBER})$", ref[0]) if ref else None
+    if not m or _source_number(m.group(2)) is None:
+        return None
+    return m.group(1)[:1].upper() + m.group(1)[1:], m.group(2)
+
+
+# ---------------------------------------------------------------- figure: il taglio stretto
+
+def _narrow_bars(svg: str) -> str:
+    """Le barre a 360: la colonna dei nomi quanto il nome piu' lungo, le barre
+    scalate nello spazio che resta, le cifre in fondo alla barra."""
+    rects = re.findall(r'<rect class="fig__bar[^"]*"[^>]*>', svg)
+    names = _svg_text(svg, "fig__name")
+    values = _svg_text(svg, "fig__value")
+    left = _num_attr(rects[0], "x")
+    widest = max(_num_attr(r, "width") for r in rects) or 1
+    longest = min(24, max(len(n) for n in names))
+    nl = round(max(90, longest * CHAR + 14))
+    k = (NARROW - nl - max(len(v) for v in values) * CHAR - 10) / widest
+
+    def px(x):
+        return nl + (x - left) * k
+
+    def fix(tag, content, cls, whole):
+        if content is not None:
+            if cls.startswith("fig__name"):
+                short = content if len(text_of(content)) <= 24 else escape(text_of(content)[:22].rstrip() + ".")
+                return f"{_set(tag, 'x', float(nl - 8))}{short}</text>"
+            if cls.startswith(("fig__value", "fig__ref-label")):
+                return f"{_set(tag, 'x', px(_num_attr(tag, 'x') - 6) + 6)}{content}</text>"
+            if cls.startswith("fig__gap"):
+                return f"{_set(tag, 'x', float(nl))}{content}</text>"
+            return whole
+        if cls.startswith("fig__bar"):
+            return _set(_set(tag, "x", float(nl)), "width", _num_attr(tag, "width") * k)
+        if cls.startswith("fig__ref"):
+            return _set(_set(tag, "x1", px(_num_attr(tag, "x1"))), "x2", px(_num_attr(tag, "x2")))
+        return whole
+    return _each(svg, fix)
+
+
+def _narrow_lines(svg: str) -> str:
+    """Le linee a 360: l'asse delle cifre a sinistra, le etichette a fine linea a
+    destra, gli anni diradati perche' non si tocchino."""
+    grid = re.search(r'<line class="fig__grid"[^>]*>', svg)
+    left, right = _num_attr(grid.group(0), "x1"), _num_attr(grid.group(0), "x2")
+    labels = _svg_text(svg, "fig__label")
+    nl, nr = 40, NARROW - (max((len(t) for t in labels), default=6) * CHAR + 12)
+    k = (nr - nl) / ((right - left) or 1)
+
+    def px(x):
+        return nl + (x - left) * k
+
+    # Gli anni: il primo, l'ultimo e quelli a 36 unita' dal precedente.
+    years = [px(_num_attr(t, "x")) for t in re.findall(r'<text class="fig__axis"[^>]*text-anchor="middle"[^>]*>', svg)]
+    keep, last = set(), None
+    for i, x in enumerate(years):
+        if last is None or x - last >= 36:
+            keep.add(i)
+            last = x
+    if years and len(years) - 1 not in keep:
+        if keep and years[-1] - years[max(keep)] < 36:
+            keep.discard(max(keep))
+        keep.add(len(years) - 1)
+    seen = {"year": -1}
+
+    def fix(tag, content, cls, whole):
+        if content is not None:
+            if cls == "fig__axis" and _attr(tag, "text-anchor") == "middle":
+                seen["year"] += 1
+                return f"{_set(tag, 'x', px(_num_attr(tag, 'x')))}{content}</text>" if seen["year"] in keep else ""
+            if cls == "fig__axis":
+                return f"{_set(tag, 'x', float(nl - 6))}{content}</text>"
+            if cls.startswith("fig__label"):
+                return f"{_set(tag, 'x', px(_num_attr(tag, 'x') - 8) + 8)}{content}</text>"
+            return whole
+        if cls.startswith("fig__grid"):
+            return _set(_set(tag, "x1", float(nl)), "x2", float(nr))
+        if cls.startswith("fig__line"):
+            points = " ".join(f"{px(float(a)):.1f},{b}" for a, b in re.findall(r"([\d.]+),([\d.]+)", _attr(tag, "points")))
+            return _set(tag, "points", points)
+        if cls.startswith("fig__dot"):
+            return _set(tag, "cx", px(_num_attr(tag, "cx")))
+        return whole
+    return _each(svg, fix)
+
+
+def _narrow_scatter(svg: str) -> str:
+    """La dispersione a 360: i punti riproiettati in orizzontale, e i nomi dei
+    territori ricollocati perche' non si sovrappongano nel disegno piu' stretto."""
+    ytick = re.search(r'<text class="fig__axis"[^>]*text-anchor="end"[^>]*>', svg)
+    xname = re.search(r'<text class="fig__axis-name"[^>]*text-anchor="end"[^>]*>', svg)
+    left = _num_attr(ytick.group(0), "x") + 6
+    right = _num_attr(xname.group(0), "x")
+    nl, nr = 40, NARROW - 12
+    k = (nr - nl) / ((right - left) or 1)
+
+    def px(x):
+        return nl + (x - left) * k
+
+    # Ogni nome col suo punto: il generatore lo mette a 7 unita' dal centro e,
+    # se tocca un altro nome, lo fa scivolare in basso di una riga.
+    points = [(_num_attr(t, "cx"), _num_attr(t, "cy"), "is-on" in t) for t in re.findall(r"<circle class=\"fig__pt[^\"]*\"[^>]*>", svg)]
+    points += [(_num_attr(t, "x") + 4, _num_attr(t, "y") + 4, "is-on" in t) for t in re.findall(r"<rect class=\"fig__pt[^\"]*\"[^>]*>", svg)]
+    labels = []
+    for tag, content in re.findall(r'(<text class="fig__pt-name[^"]*"[^>]*>)(.*?)</text>', svg, re.DOTALL):
+        on = "is-on" in (_attr(tag, "class") or "")
+        x, y = _num_attr(tag, "x"), _num_attr(tag, "y")
+        bx = x + 7 if _attr(tag, "text-anchor") == "end" else x - 7
+        near = [p for p in points if p[2] == on and abs(p[0] - bx) < 0.3 and p[1] <= y - 4 + 0.3]
+        if not near:
+            continue
+        cx, cy, _ = max(near, key=lambda p: p[1])
+        labels.append((cy, px(cx), text_of(content), on))
+    placed, out = [], []
+
+    def hits(ly, x0, width):
+        return any(abs(ly - p[0]) < 13 and x0 < p[1] + p[2] and p[1] < x0 + width for p in placed)
+
+    for cy, cx, name, on in sorted(labels):
+        width = len(name) * CHAR
+        fits_right, fits_left = cx + 7 + width <= NARROW, cx - 7 - width >= 0
+        right_side = fits_right or not fits_left
+        ly = cy + 4
+        # Se il lato preferito e' occupato e l'altro e' libero, il nome cambia lato
+        # invece di scivolare lontano dal suo punto.
+        here, there = (cx + 7, cx - 7 - width) if right_side else (cx - 7 - width, cx + 7)
+        if hits(ly, here, width) and (fits_left if right_side else fits_right) and not hits(ly, there, width):
+            right_side = not right_side
+        x0 = cx + 7 if right_side else cx - 7 - width
+        while hits(ly, x0, width):
+            ly += 13
+        placed.append((ly, x0, width))
+        anchor = "" if right_side else ' text-anchor="end"'
+        tx = cx + 7 if right_side else cx - 7
+        out.append(f'<text class="fig__pt-name{" is-on" if on else ""}" x="{tx:.1f}" y="{ly:.1f}"{anchor}>{escape(name)}</text>')
+
+    def fix(tag, content, cls, whole):
+        if content is not None:
+            if cls.startswith("fig__pt-name"):
+                return ""
+            if cls == "fig__axis" and _attr(tag, "text-anchor") == "middle":
+                return f"{_set(tag, 'x', px(_num_attr(tag, 'x')))}{content}</text>"
+            if cls == "fig__axis":
+                return f"{_set(tag, 'x', float(nl - 6))}{content}</text>"
+            if cls.startswith("fig__axis-name"):
+                return f"{_set(tag, 'x', float(nr if _attr(tag, 'text-anchor') == 'end' else nl))}{content}</text>"
+            return whole
+        if cls.startswith("fig__pt") and tag.startswith("<circle"):
+            return _set(tag, "cx", px(_num_attr(tag, "cx")))
+        if cls.startswith("fig__pt"):
+            return _set(tag, "x", px(_num_attr(tag, "x") + 4) - 4)
+        if cls.startswith("fig__grid"):
+            if _attr(tag, "x1") == _attr(tag, "x2"):
+                x = px(_num_attr(tag, "x1"))
+                return _set(_set(tag, "x1", x), "x2", x)
+            return _set(_set(tag, "x1", float(nl)), "x2", float(nr))
+        return whole
+    return _each(svg, fix).replace("</svg>", "".join(out) + "</svg>")
+
+
+def _narrow(svg: str, kind: str, width: int) -> str | None:
+    """Il taglio stretto del disegno, con gli id propri (i due tagli stanno nella stessa pagina)."""
+    draw = {"bars": _narrow_bars, "lines": _narrow_lines, "scatter": _narrow_scatter}.get(kind)
+    if not draw:
         return None
     try:
-        return float(m.group(0).replace(".", "").replace(",", "."))
-    except ValueError:
+        narrow = draw(svg)
+    except (AttributeError, ValueError, IndexError):
         return None
+    narrow = re.sub(rf'viewBox="0 ([\d.]+) {width} ', rf'viewBox="0 \1 {NARROW} ', narrow, count=1)
+    narrow = re.sub(r'(<(?:title|desc)\b[^>]*\bid=")([^"]+)"', r'\1\2-s"', narrow)
+    return re.sub(r'aria-labelledby="([^"]+)"', lambda m: 'aria-labelledby="' + " ".join(t + "-s" for t in m.group(1).split()) + '"',
+                  narrow, count=1)
 
 
-def _table(caption: str, head: list[str], rows: list[list[str]], label: str, ref_rows: set[int] = frozenset()) -> str:
-    """Una tabella dati del sistema: didascalia, scope, cifre a destra."""
-    right = ' class="r"'
-    th = "".join(f'<th scope="col"{right if i else ""}>{escape(h)}</th>' for i, h in enumerate(head))
-    body = []
-    for n, row in enumerate(rows):
-        cells = "".join(f'<td class="val">{escape(c)}</td>' for c in row[1:])
-        cls = ' class="ref"' if n in ref_rows else ""
-        body.append(f'<tr{cls}><th scope="row">{escape(row[0])}</th>{cells}</tr>')
-    return (f'<div class="tablewrap" tabindex="0" role="region" aria-label="{escape(label)}">'
-            f'<table class="table table--compact"><caption class="sr-only">{escape(caption)}</caption>'
-            f'<thead><tr>{th}</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
+# ---------------------------------------------------------------- figure: i valori in tabella
 
-
-def _bars(svg: str, caption: str) -> str | None:
-    """La classifica a barre del disegno come tabella con le barre: la veste del
-    telefono, dove il testo dell'SVG scenderebbe a sei pixel."""
-    rows = re.findall(r'<text class="fig__name( is-on)?"[^>]*>(.*?)</text>\s*'
-                      r'<rect class="fig__bar(?: is-on)?"[^>]*\bwidth="([\d.]+)"[^>]*/>\s*'
-                      r'<text class="fig__value(?: is-on)?"[^>]*>(.*?)</text>', svg, re.DOTALL)
+def _bars_values(svg: str, caption: str) -> str | None:
+    rows = _bar_rows(svg)
     if not rows:
         return None
-    widest = max(float(w) for _, _, w, _ in rows) or 1
-    ref = _svg_text(svg, "fig__ref-label")
-    ref_row = None
+    ref = _ref_label(svg)
+    ref_value = _source_number(ref[1])[0] if ref else None
+    out, refs = [], set()
+    for _, name, _, value in rows:
+        number = _source_number(value)
+        if ref and ref_value is not None and number and number[0] < ref_value:
+            refs.add(len(out))
+            out.append([ref[0], ref[1]])
+            ref = None
+        out.append([name, value])
     if ref:
-        m = re.match(rf"(.*\S)\s+({NUMBER})$", ref[0])
-        if m and _it_number(m.group(2)) is not None:
-            ref_row = (m.group(1)[:1].upper() + m.group(1)[1:], m.group(2), _it_number(m.group(2)))
-    out = []
-    for on, name, width, value in rows:
-        number = _it_number(text_of(value))
-        if ref_row and number is not None and number < ref_row[2]:
-            out.append(f'<tr class="ref"><th scope="row">{escape(ref_row[0])}</th><td class="barcell" aria-hidden="true"></td>'
-                       f'<td class="val">{escape(ref_row[1])}</td></tr>')
-            ref_row = None
-        pct = round(float(width) / widest * 100, 1)
-        cls = ' class="is-on"' if on else ""
-        out.append(f'<tr{cls}><th scope="row">{escape(text_of(name))}</th>'
-                   f'<td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {pct}%"></i></span></td>'
-                   f'<td class="val">{escape(text_of(value))}</td></tr>')
-    if ref_row:
-        out.append(f'<tr class="ref"><th scope="row">{escape(ref_row[0])}</th><td class="barcell" aria-hidden="true"></td>'
-                   f'<td class="val">{escape(ref_row[1])}</td></tr>')
+        refs.add(len(out))
+        out.append([ref[0], ref[1]])
     # L'unita' e' l'ultima frase del sottotitolo quando non porta l'anno.
     sentences = [x.strip() for x in caption.rstrip(".").split(". ") if x.strip()]
     unit = sentences[-1] if len(sentences) > 1 and not re.search(r"\b(19|20)\d\d\b", sentences[-1]) else "Valore"
     who = "Provincia" if "provinc" in caption.lower() else "Territorio"
-    return ('<div class="art-bars"><table class="table table--compact">'
-            f'<caption class="sr-only">{escape(caption)}</caption>'
-            f'<thead><tr><th scope="col">{who}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th>'
-            f'<th class="r" scope="col">{escape(unit[:1].upper() + unit[1:])}</th></tr></thead><tbody>{"".join(out)}</tbody></table></div>')
+    return _table(caption, [who, unit[:1].upper() + unit[1:]], out, "I valori del grafico", refs)
 
 
 def _values(svg: str, caption: str, note: str) -> str | None:
@@ -202,7 +458,8 @@ def _values(svg: str, caption: str, note: str) -> str | None:
             rows = [[m.group(1), m.group(2), m.group(4)] for m in lines]
         else:
             head = ["Serie", "Primo anno", "Ultimo anno"]
-            rows = [[m.group(1), f"{m.group(2)} nel {m.group(3)}", f"{m.group(4)} nel {m.group(5)}"] for m in lines]
+            rows = [[m.group(1), Markup(f"{cell(m.group(2))} nel {m.group(3)}"), Markup(f"{cell(m.group(4))} nel {m.group(5)}")]
+                    for m in lines]
         return _table(caption, head, rows, "I valori del grafico")
     points = [re.match(rf"(.+?): ({NUMBER}) e ({NUMBER})$", p) for p in parts]
     if parts and all(points):
@@ -217,7 +474,7 @@ def _values(svg: str, caption: str, note: str) -> str | None:
 
 
 def figure(block: str) -> str:
-    """Una figura del generatore nella grammatica della 1.0; ogni altra passa com'e'."""
+    """Una figura del generatore nella figura comune della 1.0; ogni altra passa com'e'."""
     m = re.search(r"<svg\b[^>]*\bclass=\"fig\"[^>]*>.*?</svg>", block, re.DOTALL)
     if not m:
         return block
@@ -230,6 +487,12 @@ def figure(block: str) -> str:
     subtitle = (_svg_text(svg, "fig__subtitle") or [""])[0]
     note = (_svg_text(svg, "fig__note") or [""])[0]
     source = (_svg_text(svg, "fig__source") or [""])[0]
+    title_id = re.search(r'<title id="([^"]+)"', svg)
+    base = re.sub(r"-t$", "", title_id.group(1)) if title_id else "fig-" + re.sub(r"\W+", "-", title.lower()).strip("-")[:40]
+    # I valori si leggono dal disegno com'e' uscito dal generatore.
+    kind = "bars" if "fig__bar" in svg else "scatter" if "fig__pt" in svg else "lines" if "fig__line" in svg else None
+    caption = subtitle or title
+    values = _bars_values(svg, caption) if kind == "bars" else _values(svg, caption, note)
     # Le righe tolte stanno a posti fissi (figures.py): titolo a 20, sottotitolo
     # a 40, nota a height-26, fonte a height-6. Il disegno resta fra le due.
     top = 40
@@ -244,17 +507,17 @@ def figure(block: str) -> str:
     # dato ufficiale e si disegna pieno.
     if (_svg_text(svg, "fig__ref-label") or [""])[0].startswith("Italia"):
         svg = svg.replace('class="fig__ref"', 'class="fig__ref fig__ref--official"')
-    caption = subtitle or title
-    bars = _bars(svg, caption)
-    values = None if bars else _values(m.group(0), caption, note)
-    kind = "bars" if bars else "chart"
-    out = [f'<figure class="art-fig art-fig--{kind}">',
-           f'<figcaption class="art-fig__head"><h3 class="h-sub">{escape(title)}</h3>'
-           + (f'<p class="subline">{escape(subtitle)}</p>' if subtitle else "") + "</figcaption>",
-           f'<div class="art-fig__chart">{svg}</div>' if not bars else
-           f'<div class="art-fig__chart"><div class="art-fig__l">{svg}</div>{bars}</div>']
+    narrow = _narrow(svg, kind, width)
+    out = [f'<figure class="figure art-fig" aria-labelledby="{base}-h">',
+           f'<h3 class="figure__title" id="{base}-h">{escape(title)}</h3>']
+    if subtitle:
+        out.append(f'<p class="figure__note">{escape(subtitle)}</p>')
+    if narrow:
+        out.append(f'<div class="figure__chart chart"><div class="chart__l">{svg}</div><div class="chart__s">{narrow}</div></div>')
+    else:
+        out.append(f'<div class="figure__chart">{svg}</div>')
     if note:
-        out.append(f'<p class="art-fig__note">{escape(note)}</p>')
+        out.append(f'<p class="figure__note">{escape(note)}</p>')
     if source:
         out.append(f'<p class="source">{escape(source)}</p>')
     if values:
@@ -266,13 +529,13 @@ def figure(block: str) -> str:
 # ---------------------------------------------------------------- tabelle e citazioni
 
 def table(block: str) -> str:
-    """Una tabella Markdown con didascalia, scope e la riga di riferimento."""
+    """Una tabella Markdown con didascalia, scope, la riga di riferimento e le cifre di numfmt."""
     head = [text_of(h) for h in re.findall(r"<th[^>]*>(.*?)</th>", block.split("</thead>")[0], re.DOTALL)]
     body_rows = re.findall(r"<tr>(.*?)</tr>", block.split("</thead>")[-1], re.DOTALL)
     if not head or not body_rows:
         return block
     rows, refs = [], set()
-    for n, row in enumerate(body_rows):
+    for row in body_rows:
         cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
         if not cells:
             continue
@@ -283,7 +546,7 @@ def table(block: str) -> str:
         caption = f"{head[1]}, per {head[0][:1].lower()}{head[0][1:]}"
     else:
         caption = ", ".join(head)
-    return _table(caption, head, rows, caption, refs).replace('<caption class="sr-only">', "<caption>", 1)
+    return _table(caption, head, rows, caption, refs, visible_caption=True)
 
 
 def quote(block: str) -> str:
@@ -314,6 +577,91 @@ def image_size(path: str | None) -> tuple[int, int] | None:
         return None
 
 
+def hero(post: dict) -> dict | None:
+    """La copertina fotografica: l'immagine, le sue proporzioni, didascalia e credito."""
+    cover = post.get("cover")
+    if not cover or cover.endswith(".svg"):
+        return None
+    return {"src": cover, "alt": post.get("cover_alt") or "", "size": image_size(cover),
+            "caption": post.get("cover_caption") or None, "credit": post.get("cover_credit") or None}
+
+
+def _source_decimals(values: list[float]) -> int:
+    """I decimali che la fonte scrive: quelli del valore che ne ha di piu', fino a due."""
+    return max((len(f"{round(v, 6):g}".partition(".")[2]) for v in values), default=0) if values else 0
+
+
+def _unit_from_tables(items: list[str], name: str) -> str | None:
+    """L'unita' che la redazione scrive nell'intestazione della sua tabella:
+    "Indice di vecchiaia 2026 (anziani per 100 giovani)" -> "anziani per 100 giovani"."""
+    for block in items:
+        if tag_of(block)[0] != "table":
+            continue
+        for th in re.findall(r"<th[^>]*>(.*?)</th>", block, re.DOTALL):
+            m = re.search(r"\(([^)]+)\)\s*$", text_of(th))
+            if m and name.lower()[:12] in text_of(th).lower():
+                return m.group(1)
+    return None
+
+
+def lead_strip(post: dict, items: list[str]) -> dict | None:
+    """La figura d'apertura quando la copertina e' un grafico: la striscia del
+    divario dello stesso indicatore, nell'anno piu' recente, dai dati dell'app."""
+    meta = post.get("indicator_meta") or {}
+    ident, year = post.get("indicator"), meta.get("year_max")
+    if not ident or not year:
+        return None
+    from app.data import get_indicator_year
+
+    data = get_indicator_year(str(ident), int(year))
+    values = [v for v in (data or {}).get("values") or [] if v.get("value") is not None]
+    if len(values) < 5:
+        return None
+    areas = charts.area_map()
+    rows = [{"key": v["region_key"], "name": v["region"], "value": v["value"], "area": areas.get(v["region_key"])} for v in values]
+    avg = sum(r["value"] for r in rows) / len(rows)
+    dec = min(2, _source_decimals([r["value"] for r in rows]))
+    lo, hi = min(r["value"] for r in rows), max(r["value"] for r in rows)
+    strip = charts.divario_strip(rows, avg, meta.get("unit"), hi / lo if lo > 0 else None,
+                                 avg_label=f"Media semplice {numfmt.text(avg, dec)}")
+    # La striscia scrive le cifre con i decimali della grandezza: qui tornano
+    # quelli della fonte, gli stessi della tabella e del pezzo.
+    written = {}
+    for r in rows:
+        written[r["name"]] = numfmt.text(r["value"], dec)
+        written[r["name"][:13].rstrip() + "."] = written[r["name"]]
+    svg = re.sub(r'(<tspan class="strip__nm">)([^<]*)(</tspan> <tspan class="strip__v">)[^<]*(</tspan>)',
+                 lambda m: m.group(1) + m.group(2) + m.group(3) + escape(written.get(unescape(m.group(2)), "")) + m.group(4),
+                 strip["svg"])
+    for r in rows:
+        svg = re.sub(rf"(<title>{re.escape(escape(r['name']))} )[^<]*(</title>)", lambda m, r=r: m.group(1) + written[r["name"]] + m.group(2), svg)
+    strip = {**strip, "svg": svg}
+
+    south = [r for r in rows if r["area"] == "sud"]
+    above = [r for r in south if r["value"] > avg]
+    n = len(south)
+    if not south:
+        title = f"Nel {year} {len([r for r in rows if r['value'] > avg])} regioni su {len(rows)} stanno sopra la media semplice"
+    elif len(above) == n:
+        title = f"Nel {year} tutte le {shared.count_word(n)} regioni del Mezzogiorno stanno sopra la media semplice"
+    elif not above:
+        title = f"Nel {year} tutte le {shared.count_word(n)} regioni del Mezzogiorno stanno sotto la media semplice"
+    else:
+        below = n - len(above)
+        verb_a = "sta" if len(above) == 1 else "stanno"
+        noun = "regione" if len(above) == 1 else "regioni"
+        title = (f"Nel {year} {shared.count_word(len(above))} {noun} del Mezzogiorno su {shared.count_word(n)} {verb_a} "
+                 f"sopra la media semplice, {shared.count_word(below)} sotto")
+    unit = _unit_from_tables(items, meta.get("name") or "")
+    ranking = sorted(rows, key=lambda r: -r["value"])
+    return {
+        "title": title, "strip": strip, "unit": unit, "decimals": dec, "year": year, "avg": avg,
+        "rows": ranking, "area_label": charts.AREA_LABEL,
+        "note": (f"Ogni punto è una regione, nel colore della sua ripartizione{', ' + unit if unit else ''}, {year}. "
+                 f"Fonte: {meta.get('source_label') or meta.get('source')}. Elaborazione Divario Italia."),
+    }
+
+
 # ---------------------------------------------------------------- pagina
 
 def derive(ctx: dict) -> dict:
@@ -339,12 +687,15 @@ def derive(ctx: dict) -> dict:
     if items and re.match(r"<p>\s*<em>\s*Dati:", items[-1]):
         data_note = items.pop()
 
+    cover = hero(post)
+    lead = None if cover else lead_strip(post, items)
+
     items = [figure(b) if tag_of(b)[0] == "figure" else table(b) if tag_of(b)[0] == "table"
              else quote(b) if tag_of(b)[0] == "blockquote" else b for b in items]
 
     # Il rimando: alla fine della sezione della prima figura o tabella, e mai
     # dopo un altro link a una scheda.
-    anchor = next((i for i, b in enumerate(items) if b.startswith(("<figure", '<div class="tablewrap"'))), None)
+    anchor = next((i for i, b in enumerate(items) if b.startswith(("<figure", '<div class="tablewrap"', '<div class="stackwrap'))), None)
     if anchor is None:
         anchor = next((i for i, b in enumerate(items) if tag_of(b)[0] == "h2"), 0)
     split = section(items, anchor) if items else 0
@@ -366,7 +717,6 @@ def derive(ctx: dict) -> dict:
         kind = "indicatore" if path.startswith("/indicatore/") else "blog" if path.startswith("/blog/") else "territorio"
         named[kind].append({"path": path, "label": text[:1].upper() + text[1:]})
 
-    cover_size = image_size(post.get("cover"))
     related = []
     for item in ctx.get("related") or []:
         if item["slug"] == post["slug"]:
@@ -375,7 +725,6 @@ def derive(ctx: dict) -> dict:
 
     period = (dataset.get("temporal") or "").replace("/", "-") or (str(meta["year_max"]) if meta.get("year_max") else None)
     institution = dataset.get("creator") or meta.get("source_label") or meta.get("source")
-    read = post.get("read_time")
     # La licenza dei dati del pezzo: quella del sito se coincide, altrimenti
     # il link della fonte con il suo nome generico.
     license_url = dataset.get("license") or ctx.get("data_license_url")
@@ -396,11 +745,11 @@ def derive(ctx: dict) -> dict:
         "data_note": re.sub(r"</?em>", "", data_note) if data_note else None,
         "named": named,
         "related": related[:3],
-        "cover_size": cover_size,
+        "hero": cover,
+        "lead": lead,
         "published": shared.date_it(post.get("date")),
         "modified": shared.date_it(post.get("date_modified")) if post.get("date_modified") != post.get("date") else None,
         "reviewed": shared.date_it(post.get("date_modified") or post.get("date")),
-        "read_label": (f"{read} minuto di lettura" if read == 1 else f"{read} minuti di lettura") if read else None,
         "period": period,
         "institution": institution,
         "theme_path": f"/tema/{meta['theme_slug']}" if meta.get("theme_slug") else None,

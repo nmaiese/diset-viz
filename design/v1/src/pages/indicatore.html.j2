@@ -108,7 +108,7 @@
                   {% if row.ref %}
                   <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
                   {% else %}
-                  <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank }}</td><th scope="row">{% if d.areas.get(row.key) %}<span class="area-dot area-dot--{{ d.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if level.profile_path %}<a href="{{ href(level.profile_path ~ row.key) }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if d.areas.get(row.key) %}<span class="sr-only">, {{ d.area_label[d.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
+                  <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if d.areas.get(row.key) %}<span class="area-dot area-dot--{{ d.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if level.profile_path %}<a href="{{ href(level.profile_path ~ row.key) }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if d.areas.get(row.key) %}<span class="sr-only">, {{ d.area_label[d.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
                   {% endif %}
                   {% endfor %}
                 </tbody>

@@ -15,9 +15,17 @@ Due cose il contesto non le porta e si chiedono all'app:
 Se una verifica non torna, la cifra diventa `helpers.PLACEHOLDER` e
 `check_pages.py` la segnala: meglio un buco visibile di un anno sbagliato.
 
-I punteggi da 0 a 100 si scrivono con un decimale fisso, con la regola del
-filtro `it_num` del sito (`app.it_numbers.number`), perche' in colonna i
-decimali devono essere uniformi: `format_number` darebbe "0,00" e "100".
+Le cifre non si scrivono qui: le righe portano i valori grezzi e il template
+li passa ai filtri `num` e `rank` di `numfmt`. I punteggi da 0 a 100 hanno il
+ruolo `score`, un decimale fisso, cosi' la colonna resta uniforme ("0,0",
+"100,0"). Dove la cifra sta dentro una frase composta qui, o in un testo che
+non e' HTML (i richiami della mappa, il suggerimento al passaggio del mouse, la
+legenda), passa da `points`, che e' lo stesso ruolo di `numfmt`.
+
+La pagina apre con la striscia del divario (`charts.divario_strip`): ogni
+territorio un punto, nel colore della sua ripartizione, la distanza fra primo e
+ultimo in punti. Il suo titolo e' l'affermazione sul Mezzogiorno, verificata
+sulle righe.
 """
 
 from __future__ import annotations
@@ -28,10 +36,12 @@ import statistics
 from collections import Counter
 from pathlib import Path
 
+import charts
 import derive as helpers
+import numfmt
 
 from app import app as flask_app
-from app import it_numbers, sources
+from app import sources
 from app.data import REGION_GEO_AREA
 from app.external_data import count_freshness
 from app.quality_life_bes import _DISPLAY_SPREAD
@@ -58,10 +68,10 @@ BASE = "/qualita-della-vita/classifica/"
 # ---------------------------------------------------------------- cifre e parole
 
 def points(value) -> str:
-    """Un punteggio 0-100 con un decimale fisso: 71,6, 0,0, 100,0."""
+    """Un punteggio 0-100 come testo, con il ruolo `score` di numfmt: 71,6, 0,0, 100,0."""
     if value is None:
         return helpers.PLACEHOLDER
-    return it_numbers.number(value, 1)
+    return numfmt.text(value, numfmt.FIXED["score"])
 
 
 def bar_width(value) -> float:
@@ -125,8 +135,10 @@ def is_south(row: dict, level: str, region_paths: dict) -> bool | None:
 
 
 def table_rows(ranking: list[dict], level: str, region_paths: dict, with_delta: bool) -> list[dict]:
-    """Le righe della classifica, pronte per il template."""
+    """Le righe della classifica, pronte per il template: il punteggio resta
+    grezzo, lo scrive il filtro `num` con il ruolo `score`."""
     spec = LEVELS[level]
+    areas = charts.area_map()
     out = []
     for row in ranking:
         strong = (row.get("strongest_categories") or [None])[0]
@@ -134,7 +146,8 @@ def table_rows(ranking: list[dict], level: str, region_paths: dict, with_delta: 
         item = {
             "rank": row["rank"], "key": row["key"], "name": row["name"],
             "href": spec["profile"] + row["key"],
-            "score": points(row["score"]), "width": bar_width(row["score"]),
+            "score": row["score"], "width": bar_width(row["score"]),
+            "area": areas.get(row["key"]),
             "strong": strong["name"] if strong else None,
             "weak": weak["name"] if weak else None,
             "region": None, "metro": bool(row.get("metro_city")),
@@ -149,13 +162,14 @@ def table_rows(ranking: list[dict], level: str, region_paths: dict, with_delta: 
 
 
 def movement(rank: int, delta: int) -> dict:
-    """Il segno di movimento rispetto al profilo Equilibrato, a parole."""
+    """Il segno di movimento rispetto al profilo Equilibrato: la direzione e le
+    due posizioni, che il template scrive con il filtro `rank`."""
     before = rank + delta
     if delta > 0:
-        return {"dir": "up", "text": f"sale da {helpers.ordinal(before)} a {helpers.ordinal(rank)}"}
+        return {"dir": "up", "verb": "sale", "before": before, "after": rank}
     if delta < 0:
-        return {"dir": "down", "text": f"scende da {helpers.ordinal(before)} a {helpers.ordinal(rank)}"}
-    return {"dir": None, "text": "stessa posizione"}
+        return {"dir": "down", "verb": "scende", "before": before, "after": rank}
+    return {"dir": None, "verb": None, "before": before, "after": rank}
 
 
 def from_to(first: int, last: int) -> str:
@@ -350,7 +364,7 @@ def category_table(data: dict, level: str, top: int = 3) -> list[dict]:
     spec = LEVELS[level]
     rankings = data.get("category_rankings") or {}
     def cell(entry):
-        return {"name": entry["territory"], "href": spec["profile"] + entry["key"], "score": points(entry["score"])}
+        return {"name": entry["territory"], "href": spec["profile"] + entry["key"], "score": entry["score"]}
 
     out = []
     for cat in measured_categories(data):
@@ -455,18 +469,90 @@ def map_block(ranking: list[dict]) -> dict:
             classes[row["key"]] = f"q{m.group(1)}"
     scores = [r["score"] for r in ranking]
     lo, hi = min(scores), max(scores)
+    first, last = ranking[0], ranking[-1]
+    # I due estremi nominati sulla mappa, con il filo dal baricentro.
+    callouts = charts.map_callouts(helpers.PATHS, [(r["key"], r["name"], f"{points(r['score'])} punti")
+                                                   for r in (first, last)])
     return {
         "classes": classes,
         "names": {r["key"]: r["name"] for r in ranking},
-        "tips": {r["key"]: points(r["score"]) for r in ranking},
+        "tips": {r["key"]: f"{points(r['score'])} punti" for r in ranking},
         "legend": {"min": points(lo), "mid": points(lo + (hi - lo) / 2), "max": points(hi), "unit": None},
+        "callouts": callouts,
     }
 
 
 def display_spread() -> str:
     """Quanti punti della scala 0-100 vale una deviazione standard, dall'app."""
     value = float(_DISPLAY_SPREAD)
-    return str(int(value)) if value.is_integer() else helpers.num(value)
+    return numfmt.text(value, 0 if value.is_integer() else None)
+
+
+def score_strip(ranking: list[dict]) -> dict:
+    """La striscia dei punteggi: ogni territorio un punto nel colore della sua
+    ripartizione, la distanza fra primo e ultimo in punti, la media semplice
+    con il decimale dei punteggi."""
+    areas = charts.area_map()
+    rows = [{"key": r["key"], "name": r["name"], "value": r["score"], "area": areas.get(r["key"])} for r in ranking]
+    scores = [r["score"] for r in ranking]
+    avg = statistics.fmean(scores)
+    return charts.divario_strip(rows, avg, None,
+                                gap_label=f"{points(max(scores) - min(scores))} punti",
+                                avg_label=f"Media semplice {points(avg)}")
+
+
+def group_mean_tiles(groups: dict, spec: dict) -> list[dict]:
+    """Le medie semplici di Centro-Nord e Mezzogiorno: la striscia le colora ma
+    non le dice."""
+    if not (groups["north"]["n"] and groups["south"]["n"]) or groups["unknown"]["n"]:
+        return []
+    return [
+        {"label": "Media semplice del Centro-Nord", "value": groups["north"]["mean"], "unit": "punti",
+         "role": "score", "sub": f"{groups['north']['n']} {spec['plural']}"},
+        {"label": "Media semplice del Mezzogiorno", "value": groups["south"]["mean"], "unit": "punti",
+         "role": "score", "sub": f"{groups['south']['n']} {spec['plural']}"},
+    ]
+
+
+def count_tile(label: str, value, sub: str) -> dict:
+    """Una tessera di conteggio. Se il conteggio manca resta il segnaposto
+    visibile, non un "n.d." che check_pages non vede."""
+    if value is None:
+        return {"label": label, "num": helpers.PLACEHOLDER, "unit": None, "sub": sub}
+    return {"label": label, "value": value, "unit": None, "role": "count", "sub": sub}
+
+
+def dimensions_claim(ranking: list[dict], level: str) -> str | None:
+    """Il titolo-affermazione della tabella, dalle due colonne che mostra: la
+    dimensione che e' piu' spesso il punto forte, e per quanti altri territori
+    e' il punto debole. Con un pari merito in testa non si afferma niente."""
+    spec = LEVELS[level]
+    def first_name(row, key):
+        return ((row.get(key) or [None])[0] or {}).get("name")
+
+    strong = Counter(first_name(r, "strongest_categories") for r in ranking)
+    weak = Counter(first_name(r, "weakest_categories") for r in ranking)
+    strong.pop(None, None)
+    if not strong:
+        return None
+    top = max(strong.values())
+    leaders = [name for name, c in strong.items() if c == top]
+    if len(leaders) != 1 or top < 2:
+        return None
+    dim, others = leaders[0], weak.get(leaders[0], 0)
+    # Dove la prima e la seconda dimensione hanno lo stesso punteggio la scelta
+    # dell'app e' arbitraria: se il pari merito tocca la dimensione del titolo,
+    # il conteggio non e' un fatto e il titolo non si scrive.
+    for row in ranking:
+        for key in ("strongest_categories", "weakest_categories"):
+            cats = row.get(key) or []
+            tied = [c["name"] for c in cats if cats and c.get("score") == cats[0].get("score")]
+            if len(tied) > 1 and dim in tied:
+                return None
+    k = helpers.count_word(top)
+    if others:
+        return f"{dim} è il punto forte di {k} {spec['plural']} e il punto debole di altre {helpers.count_word(others)}"
+    return f"{dim} è il punto forte più frequente, di {k} {spec['plural']} su {len(ranking)}"
 
 
 def mean_is_fifty(ranking: list[dict]) -> bool:
@@ -501,19 +587,16 @@ def derive(ctx: dict) -> dict:
     def ends(row):
         phrase = of_place(row["name"], level)
         return {"prep": split_prep(phrase, row["name"]), "name": row["name"],
-                "href": spec["profile"] + row["key"], "score": points(row["score"])}
+                "href": spec["profile"] + row["key"], "score": row["score"]}
 
     move = None if is_default else movers(ranking, level)
     default_name = next((p["name"] for p in ctx.get("profiles") or [] if p["slug"] == default), "Equilibrato")
 
-    tiles = []
-    if groups["north"]["n"] and groups["south"]["n"] and not groups["unknown"]["n"]:
-        tiles.append({"label": "Media semplice del Centro-Nord", "num": points(groups["north"]["mean"]),
-                      "unit": "punti", "sub": f"{groups['north']['n']} {spec['plural']}"})
-        tiles.append({"label": "Media semplice del Mezzogiorno", "num": points(groups["south"]["mean"]),
-                      "unit": "punti", "sub": f"{groups['south']['n']} {spec['plural']}"})
-    tiles.append({"label": "Indicatori nel punteggio", "num": str(method.get("total_indicators") or helpers.PLACEHOLDER),
-                  "unit": None, "sub": f"in {len(categories)} dimensioni"})
+    # La striscia dice estremi, media e distanza: le tessere dicono le medie
+    # delle due parti del paese, che la striscia colora ma non scrive.
+    tiles = group_mean_tiles(groups, spec)
+    tiles.append(count_tile("Indicatori nel punteggio", method.get("total_indicators"),
+                            f"in {len(categories)} dimensioni"))
 
     levels = [{"label": LEVELS[k]["label"], "href": profile_href(k, active, default), "current": k == level}
               for k in ("regione", "provincia")]
@@ -546,9 +629,11 @@ def derive(ctx: dict) -> dict:
         "level": level, "spec": spec, "n": n, "is_default": is_default, "default_name": default_name,
         "h1": h1, "crumb": f"Classifica {spec['plural']}", "path": BASE + spec["url"],
         "institutions": institutions, "years": years, "years_text": years_text(years), "years_span": years_note,
-        "first": ends(first), "last": ends(last), "gap": points(first["score"] - last["score"]),
+        "first": ends(first), "last": ends(last), "gap": first["score"] - last["score"],
         "movers": move, "fifty": fifty, "tiles": tiles,
         "claim": south_claim(ranking, level, region_paths),
+        "strip": score_strip(ranking), "area_label": charts.AREA_LABEL,
+        "table_claim": dimensions_claim(ranking, level),
         "levels": levels, "profiles": profiles, "profile": profile,
         "dims_total": len(categories), "dims_note": dims_note, "dims_short": dims_short,
         "rows": split(rows, spec["plural"]),

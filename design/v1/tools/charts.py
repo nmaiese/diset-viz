@@ -45,6 +45,31 @@ def area_map() -> dict[str, str]:
     return out
 
 
+SHORT_NAMES = {
+    "Trentino Alto Adige": "Trentino A.A.", "Trentino-Alto Adige": "Trentino A.A.",
+    "Friuli-Venezia Giulia": "Friuli V.G.", "Friuli Venezia Giulia": "Friuli V.G.",
+    "Monza e della Brianza": "Monza Brianza", "Reggio Calabria": "Reggio Cal.",
+    "Reggio nell'Emilia": "Reggio Emilia", "Barletta-Andria-Trani": "Barletta A.T.",
+    "Verbano-Cusio-Ossola": "Verbano C.O.", "Pesaro e Urbino": "Pesaro Urbino",
+    "Valle d'Aosta": "Valle d'Aosta", "Emilia-Romagna": "Emilia-Romagna",
+}
+
+
+def short_name(name: str, limit: int = 14) -> str:
+    """Il nome per il taglio stretto: intero se ci sta, altrimenti l'abbreviazione
+    d'uso, altrimenti le parole intere che ci stanno. Mai un taglio a meta' parola."""
+    if len(name) <= limit:
+        return name
+    if name in SHORT_NAMES:
+        return SHORT_NAMES[name]
+    out = ""
+    for word in re.split(r"(?<=[ -])", name):
+        if len(out + word) > limit:
+            break
+        out += word
+    return (out.strip(" -") or name[:limit]) + "."
+
+
 def _nice(lo: float, hi: float, target: int = 4) -> list[float]:
     span = (hi - lo) or abs(hi) or 1
     raw = span / target
@@ -52,7 +77,7 @@ def _nice(lo: float, hi: float, target: int = 4) -> list[float]:
     step = min((s * mag for s in (1, 2, 2.5, 5, 10) if s * mag >= raw), default=10 * mag)
     t = math.floor(lo / step) * step
     ticks = []
-    while t <= hi + step * 0.5:
+    while not ticks or ticks[-1] < hi:
         ticks.append(round(t, 10))
         t += step
     return ticks
@@ -66,7 +91,7 @@ def _tick(v: float, ticks: list[float]) -> str:
 
 # ---------------------------------------------------------------- striscia del divario
 
-def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=None):
+def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=None, decimals=None):
     left, right = (16, 16)
     top = 74 if not short else 70
     r = 6.5 if len(rows) <= 30 else 4.2
@@ -89,7 +114,7 @@ def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=
         placed.append((cx, level, row))
     depth = max(abs(pl) for _, pl, _ in placed)
     mid = top + (depth + 1) * (2 * r + 1)
-    height = int(mid + (depth + 1) * (2 * r + 1) + (54 if highlight else 34))
+    height = int(mid + (depth + 1) * (2 * r + 1) + 34)
     parts = [f'<svg viewBox="0 0 {width} {height}" aria-hidden="true" focusable="false" class="strip">']
     parts.append(f'<line class="strip__axis" x1="{left}" x2="{width - right}" y1="{mid:.1f}" y2="{mid:.1f}"/>')
     for t in ticks:
@@ -111,29 +136,31 @@ def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=
         cy = mid + level * (2 * r + 1)
         area = row.get("area") or "none"
         on = " is-on" if highlight and row["key"] == highlight else ""
-        parts.append(f'<circle class="strip__dot area--{area}{on}" data-key="{escape(row["key"])}" cx="{cx:.1f}" cy="{cy:.1f}" r="{r}"><title>{escape(row["name"])} {escape(n.text(row["value"]))}</title></circle>')
+        parts.append(f'<circle class="strip__dot area--{area}{on}" data-key="{escape(row["key"])}" cx="{cx:.1f}" cy="{cy:.1f}" r="{r}"><title>{escape(row["name"])} {escape(n.text(row["value"], decimals))}</title></circle>')
     # Il territorio della pagina, se c'e', nominato sotto l'asse.
     low, high = min(rows, key=lambda q: q["value"]), max(rows, key=lambda q: q["value"])
     if highlight and highlight not in (low["key"], high["key"]):
         hit = next((q for q in placed if q[2]["key"] == highlight), None)
         if hit:
             hx, _, hrow = hit
-            anchor = "start" if hx < width * 0.5 else "end"
-            parts.append(f'<text class="strip__name strip__name--on" x="{hx:.1f}" y="{height - 26}" text-anchor="{anchor}">'
-                         f'<tspan class="strip__nm">{escape(hrow["name"])}</tspan> <tspan class="strip__v">{escape(n.text(hrow["value"]))}</tspan></text>')
+            label_w = (len(hrow["name"]) + 6) * 7.2
+            lx = min(max(hx, left + label_w / 2), width - right - label_w / 2)
+            parts.append(f'<text class="strip__name strip__name--on" x="{lx:.1f}" y="{top - 3}" text-anchor="middle">'
+                         f'<tspan class="strip__nm">{escape(hrow["name"])}</tspan> <tspan class="strip__v">{escape(n.text(hrow["value"], decimals))}</tspan></text>')
     # I due estremi con nome e valore, sotto la graffa.
     for row, anchor in ((low, "start"), (high, "end")):
         cx = x(row["value"])
-        name = row["name"] if not short or len(row["name"]) <= 14 else row["name"][:13].rstrip() + "."
+        name = short_name(row["name"]) if short else row["name"]
         tx = cx - r if anchor == "start" else cx + r
         parts.append(f'<text class="strip__name" x="{tx:.1f}" y="{top - 20}" text-anchor="{anchor}" dy="0">'
-                     f'<tspan class="strip__nm">{escape(name)}</tspan> <tspan class="strip__v">{escape(n.text(row["value"]))}</tspan></text>')
+                     f'<tspan class="strip__nm">{escape(name)}</tspan> <tspan class="strip__v">{escape(n.text(row["value"], decimals))}</tspan></text>')
     parts.append("</svg>")
     return "".join(parts)
 
 
 def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_ratio: float | None = None,
-                  highlight: str | None = None, gap_label: str | None = None, avg_label: str | None = None) -> dict:
+                  highlight: str | None = None, gap_label: str | None = None, avg_label: str | None = None,
+                  decimals: int | None = None) -> dict:
     """La striscia del divario in due tagli, piu' la legenda delle ripartizioni presenti.
 
     `highlight` e' la chiave del territorio della pagina: il suo punto prende
@@ -150,8 +177,8 @@ def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_rat
         ratio = f"{n.text(gap_ratio, 1)} volte"
     else:
         ratio = f"distanza {n.text(hi - lo)}"
-    wide = _strip(rows, avg, unit, 920, False, ratio, highlight, avg_label)
-    narrow = _strip(rows, avg, unit, 360, True, ratio, highlight, avg_label)
+    wide = _strip(rows, avg, unit, 920, False, ratio, highlight, avg_label, decimals)
+    narrow = _strip(rows, avg, unit, 360, True, ratio, highlight, avg_label, decimals)
     counts = {}
     for row in rows:
         counts[row.get("area")] = counts.get(row.get("area"), 0) + 1
@@ -216,7 +243,7 @@ def _band(level, areas, width, height, right, short):
             area = areas.get(key, "none")
             parts.append(f'<polyline class="band__ext area-line--{area}" points="{pts(series)}"/>')
             nm = names.get(key, key)
-            nm = nm if not short or len(nm) <= 13 else nm[:12].rstrip() + "."
+            nm = short_name(nm, 13) if short else nm
             labels.append((y(ends[key]), f"{nm} {n.text(ends[key])}", f"band__lab area-text--{area}"))
     avg_series = [(yr, means.get(yr)) for yr in years]
     parts.append(f'<polyline class="band__avg" points="{pts(avg_series)}"/>')

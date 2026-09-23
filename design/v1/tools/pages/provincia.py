@@ -2,22 +2,31 @@
 
 Tutto parte dal contesto catturato dalla rotta `/provincia/<key>`: il profilo
 della qualita' della vita (`profile`), i valori veri degli indicatori
-(`indicatori`), le vicine in classifica e le sorelle della stessa regione. Qui
-si contano e si mettono in ordine le cose; i valori della fonte restano numeri
-e li scrive il template con `it_num` e `it_change`, con i decimali della fonte,
-gli stessi che le prove della pagina di oggi fissano.
+(`indicatori`), le vicine in classifica e le sorelle della stessa regione. La
+striscia d'apertura mette la provincia fra tutte le altre, e le altre stanno
+nel contesto catturato della classifica delle province, che si legge qui e si
+confronta col profilo prima di usarlo.
 
-Le cifre calcolate qui (punteggi, scarti da 50, conteggi) passano da
-`derive.num` (qui `common.num`), cioe' da `seo_titles.format_number`.
+Qui si contano e si mettono in ordine le cose, e i valori restano numeri: li
+scrive il template con i filtri `num`, `rank` e `delta` di `numfmt`, con i
+decimali della fonte quando il valore e' della fonte. Nelle frasi composte qui
+i conteggi passano da `derive.count_word` e le posizioni da `derive.ordinal`.
 """
 
 from __future__ import annotations
 
-import derive as common
+import json
+from pathlib import Path
 
-from app import it_numbers, sources
+import charts
+import derive as common
+import numfmt
+
+from app import sources
 from app.seo_titles import at_place, of_region
 from app.taxonomy import CANONICAL_CATEGORIES, slugify_taxonomy
+
+RANKING = Path(__file__).resolve().parents[2] / "data" / "classifica-province.context.json"
 
 
 def _plain_id(ident: str) -> str:
@@ -31,22 +40,6 @@ def _join(names: list[str]) -> str:
     if len(names) < 2:
         return "".join(names)
     return ", ".join(names[:-1]) + " e " + names[-1]
-
-
-def _score(value: float) -> str:
-    """Un punteggio 0-100 in colonna: un decimale sempre, come nel dato.
-
-    `common.num` calibra i decimali sulla grandezza e scriverebbe 0,50 accanto
-    a 5,9, e una colonna di punteggi vuole i decimali uniformi (SISTEMA.md).
-    Stessa funzione del filtro `it_num`."""
-    return it_numbers.number(value, 1)
-
-
-def _signed_score(value: float) -> str:
-    """Lo scarto da 50 col segno, un decimale; lo zero senza segno."""
-    value = round(value, 1)
-    sign = "+" if value > 0 else "-" if value < 0 else ""
-    return sign + it_numbers.number(abs(value), 1)
 
 
 def _source_label(methodology: dict) -> str:
@@ -63,6 +56,82 @@ def _share(row: dict) -> float:
     return row["rank"] / (row.get("province_count") or 1)
 
 
+def _track(position: int, total: int | None) -> float:
+    """Dove cade una posizione sulla traccia da 1 a N, in percentuale."""
+    if not total or total < 2:
+        return 0.0
+    return round((position - 1) / (total - 1) * 100, 1)
+
+
+def _ranking(profile: dict) -> list[dict]:
+    """Tutte le province col loro punteggio, dal contesto della classifica.
+
+    Le due catture sono indipendenti: se il profilo, il numero di province o
+    la posizione e il punteggio della provincia non coincidono, una delle due
+    e' vecchia e la pagina si ferma invece di mostrare due classifiche.
+    """
+    payload = json.loads(RANKING.read_text(encoding="utf-8"))["context"]
+    data = payload.get("data") or {}
+    rows = data.get("ranking") or []
+    slug = (profile.get("profile") or {}).get("slug")
+    me = next((r for r in rows if r.get("key") == profile["key"]), None)
+    if (payload.get("active_profile") != slug or len(rows) != profile.get("total") or me is None
+            or me.get("rank") != profile.get("rank") or me.get("score") != profile.get("score")):
+        raise ValueError(
+            f"{RANKING.name} non corrisponde al profilo di {profile['name']}: profilo "
+            f"{payload.get('active_profile')!r} contro {slug!r}, {len(rows)} province contro "
+            f"{profile.get('total')}, riga {me!r}. Ricattura le due pagine insieme.")
+    return rows
+
+
+def _strip(profile: dict) -> dict:
+    """La striscia delle province per punteggio, con la provincia in evidenza.
+
+    Ogni provincia ha il colore della ripartizione della sua regione, la
+    distanza fra prima e ultima si legge in punti, e il titolo e' un fatto
+    contato sulla ripartizione della provincia: la sua posizione fra le
+    province della stessa ripartizione e quante di queste stanno sotto la media.
+    """
+    ranking = _ranking(profile)
+    areas = charts.area_map()
+    prefix = profile["path"][: -len(profile["key"])]
+    rows = [{"key": r["key"], "name": r["name"], "value": r["score"], "area": areas.get(r["key"])} for r in ranking]
+    values = [r["value"] for r in rows]
+    avg = sum(values) / len(values)
+    gap = max(values) - min(values)
+    strip = charts.divario_strip(rows, avg, None, highlight=profile["key"],
+                                 gap_label=f"{numfmt.text(gap, 1)} punti fra prima e ultima")
+
+    name, total = profile["name"], len(rows)
+    area = areas.get(profile["key"])
+    title = f"Le {common.count_word(total)} province sulla stessa scala, e {name} fra loro"
+    if area:
+        same = sorted((r for r in ranking if areas.get(r["key"]) == area), key=lambda r: r["rank"])
+        pos = next(i for i, r in enumerate(same, 1) if r["key"] == profile["key"])
+        below = sum(1 for r in same if r["score"] < avg)
+        where = f"province del {charts.AREA_LABEL[area]}"
+        if profile["score"] < avg:
+            tail = ("e tutte stanno sotto la media" if below == len(same)
+                    else f"dove {common.count_word(below)} stanno sotto la media")
+        else:
+            above = len(same) - below
+            tail = ("e tutte stanno sopra la media" if above == len(same)
+                    else f"dove {common.count_word(above)} stanno sopra la media")
+        title = f"{name} è {common.ordinal(pos)} fra le {common.count_word(len(same))} {where}, {tail}"
+
+    table = [{"rank": r["rank"], "key": r["key"], "name": r["name"], "path": prefix + r["key"],
+              "region": r.get("region"), "metro_city": r.get("metro_city"), "score": r["score"],
+              "width": round(max(0, min(r["score"], 100)), 1), "is_me": r["key"] == profile["key"]}
+             for r in ranking]
+    # charts.py scrive il nome della provincia verso destra quando il punto sta
+    # nella meta' sinistra: sotto la media quel nome attraversa la linea della
+    # media e, nel taglio stretto, finisce sull'etichetta "Media". Si gira
+    # verso sinistra, lontano dalla media, se a sinistra c'e' posto.
+    lo, hi = min(values), max(values)
+    label_left = profile["score"] < avg and (profile["score"] - lo) / ((hi - lo) or 1) > 0.2
+    return {**strip, "title": title, "rows": table, "count": total, "label_left": label_left}
+
+
 def _dimensions(profile: dict) -> dict:
     """Le dimensioni misurate, con la barra divergente attorno a 50 sulla scala
     fissa 0-100: la stessa scala per tutte le province, cosi' due pagine si
@@ -70,33 +139,35 @@ def _dimensions(profile: dict) -> dict:
     rows = []
     for cat in profile.get("categories") or []:
         score = cat["score"]
-        diff = score - 50
+        diff = round(score - 50, 1)
         rows.append({
             "name": cat["name"],
             "slug": cat["slug"],
-            "score": _score(score),
-            "diff": _signed_score(diff),
+            "score": score,
+            "diff": diff,
             "left": round(min(score, 50), 1),
-            "width": round(abs(diff), 1),
+            "width": round(abs(score - 50), 1),
         })
     measured = {cat["slug"] for cat in profile.get("categories") or []}
     weights = (profile.get("profile") or {}).get("weights") or {}
     missing = [CANONICAL_CATEGORIES[slug]["name"] for slug in weights
                if slug not in measured and slug in CANONICAL_CATEGORIES]
     above = [c for c in profile.get("categories") or [] if c["score"] > 50]
-    n, total = len(rows), profile.get("total")
+    n, total = len(rows), common.count_word(profile.get("total") or 0)
+    dims = common.count_word(n)
     if not rows:
         claim = None
     elif not above:
-        claim = f"Nessuna delle {n} dimensioni supera la media delle {total} province"
+        claim = f"Nessuna delle {dims} dimensioni supera la media delle {total} province"
     elif len(above) == n:
-        claim = f"Tutte le {n} dimensioni stanno sopra la media delle {total} province"
+        claim = f"Tutte le {dims} dimensioni stanno sopra la media delle {total} province"
     elif len(above) == 1:
-        claim = f"{above[0]['name']} è l'unica delle {n} dimensioni sopra la media delle {total} province"
+        claim = f"{above[0]['name']} è l'unica delle {dims} dimensioni sopra la media delle {total} province"
     else:
-        claim = f"{len(above)} dimensioni su {n} stanno sopra la media delle {total} province"
+        claim = f"{common.count_word(len(above))} dimensioni su {dims} stanno sopra la media delle {total} province"
+        claim = claim[:1].upper() + claim[1:]
     lead = ("Manca una dimensione del profilo," if len(missing) == 1
-            else f"Mancano {common.count_word(len(missing), feminine=True)} dimensioni del profilo,")
+            else f"Mancano {common.count_word(len(missing))} dimensioni del profilo,")
     return {"rows": rows, "count": n, "missing": missing, "missing_text": _join([f"«{m}»" for m in missing]),
             "missing_lead": lead, "claim": claim}
 
@@ -145,8 +216,8 @@ def _moves(ctx: dict, rows: list[dict]) -> dict:
     same = [r for r in rows if r.get("movement") == 0]
     claim = None
     if up or down:
-        claim = (f"Nell'ultima rilevazione è salita in classifica su {len(up)} "
-                 f"{'indicatore' if len(up) == 1 else 'indicatori'} e scesa su {len(down)}")
+        claim = (f"Nell'ultima rilevazione è salita in classifica su {common.count_word(len(up), feminine=False)} "
+                 f"{'indicatore' if len(up) == 1 else 'indicatori'} e scesa su {common.count_word(len(down), feminine=False)}")
     return {
         "up": enrich(ctx.get("movimenti_su") or []),
         "down": enrich(ctx.get("movimenti_giu") or []),
@@ -166,8 +237,7 @@ def _neighbours(ctx: dict) -> dict:
     def with_me(items):
         rows = [{**x, "is_me": False} for x in items] + [me]
         rows.sort(key=lambda r: (r["rank"], r["name"]))
-        return [{**r, "score_text": _score(r["score"]), "width": round(max(0, min(r["score"], 100)), 1)}
-                for r in rows]
+        return [{**r, "width": round(max(0, min(r["score"], 100)), 1)} for r in rows]
 
     near = with_me(ctx.get("vicine") or []) if ctx.get("vicine") else []
     sisters = with_me(ctx.get("sister_provinces") or []) if ctx.get("sister_provinces") else []
@@ -175,38 +245,49 @@ def _neighbours(ctx: dict) -> dict:
 
 
 def _tiles(ctx: dict, rows: list[dict], sisters: list[dict]) -> list[dict]:
-    """Tre cifre che l'H1 e la frase-risposta non dicono."""
+    """Tre cifre che l'H1, la risposta e la striscia non dicono.
+
+    La posizione in regione e' un `numfmt.rank` gia' composto: la macro delle
+    tessere lo stampa com'e' dal campo `num`, perche' il suo ramo `value`
+    scriverebbe la posizione senza la ª.
+    """
     profile = ctx["profile"]
     tiles = []
     if sisters:
         place = next(i for i, r in enumerate(sisters, 1) if r["is_me"])
         before = sisters[place - 2] if place > 1 else None
         after = sisters[place] if place < len(sisters) else None
-        tile = {"label": f"Fra le province {of_region(profile['region'])}",
-                "num": common.ordinal(place), "unit": f"su {len(sisters)}"}
+        tile = {"label": f"Fra le province {of_region(profile['region'])}", "num": numfmt.rank(place, len(sisters))}
         if before:
-            tile["pre"], tile["link"] = "dopo ", before
+            tile["sub"], tile["href"] = f"dopo {before['name']}", before["path"]
         elif after:
-            tile["pre"], tile["link"] = "davanti a ", after
+            tile["sub"], tile["href"] = f"davanti a {after['name']}", after["path"]
         tiles.append(tile)
     compared = [r for r in rows if r.get("in_regione")]
     if compared:
         first = sum(1 for r in compared if r["in_regione"]["posizione"] == 1)
         last = sum(1 for r in compared if r["in_regione"]["posizione"] == r["in_regione"]["quante"])
-        tiles.append({"label": f"Prima in {profile['region']}",
-                      "num": str(first),
+        tiles.append({"label": f"Prima in {profile['region']}", "value": first, "role": "count",
                       "unit": "indicatore" if first == 1 else "indicatori",
-                      "sub": f"e ultima in {last}, fra le province che hanno un dato"})
+                      "sub": f"e ultima in {common.count_word(last, feminine=False)}, fra le province che hanno un dato"})
     methodology = profile.get("methodology") or {}
     in_score = methodology.get("score_indicators_total")
-    tiles.append({"label": "Indicatori misurati", "num": str(len(rows)), "unit": None,
-                  "sub": f"{in_score} entrano nel punteggio" if in_score else None})
+    tiles.append({"label": "Indicatori misurati", "value": len(rows), "role": "count", "unit": None,
+                  "sub": f"{common.count_word(in_score, feminine=False)} entrano nel punteggio" if in_score else None})
     return tiles
+
+
+def _with_units(rows: list[dict]) -> list[dict]:
+    """Ogni valore con la posizione sulla traccia da 1 a N, e con l'unita'
+    intera quando la forma corta di `numfmt` non la puo' scrivere accanto alla
+    cifra ("tasso standardizzato per 10.000")."""
+    return [{**r, "unit_after": r.get("unit") if r.get("unit") and not numfmt.short_unit(r["unit"]) else None,
+             "track": _track(r["rank"], r.get("province_count"))} for r in rows]
 
 
 def derive(ctx: dict) -> dict:
     profile = ctx["profile"]
-    rows = ctx.get("indicatori") or []
+    rows = _with_units(ctx.get("indicatori") or [])
     by_id = {r["id"]: r for r in rows}
     methodology = profile.get("methodology") or {}
 
@@ -240,11 +321,10 @@ def derive(ctx: dict) -> dict:
 
     region_path = profile.get("region_path")
     return {
-        "score": common.num(profile["score"]),
-        "best": {"name": best["name"], "score": common.num(best["score"])} if best else None,
-        "worst": {"name": worst["name"], "score": common.num(worst["score"])} if worst else None,
+        "best": best, "worst": worst,
         "profile_name": ((profile.get("profile") or {}).get("name") or "").lower(),
         "region_key": region_path.rstrip("/").rsplit("/", 1)[-1] if region_path else None,
+        "strip": _strip(profile),
         "tiles": _tiles(ctx, rows, neighbours["sisters"]),
         "dims": _dimensions(profile),
         "synthesis": _synthesis(ctx, by_id),
@@ -253,7 +333,6 @@ def derive(ctx: dict) -> dict:
         "near": neighbours["near"],
         "sisters": neighbours["sisters"],
         "year_from": year_from, "year_to": year_to,
-        "latest_min": min(years) if years else None,
         "source": source,
         "dataset": methodology.get("source"),
         "in_score": in_score, "covered": covered,

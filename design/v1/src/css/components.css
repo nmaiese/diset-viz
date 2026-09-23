@@ -207,6 +207,14 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
 @media (max-width: 1199px) {
+  /* Un elemento sticky resta dentro il suo contenitore: dentro l'aside (alto
+     quanto l'indice) o in una cella di griglia non resterebbe mai in alto.
+     Sotto i 1200 il layout e' un blocco e l'aside sparisce come scatola. */
+  .layout { display: block; }
+  .layout__aside { display: contents; }
+  .layout__main { margin-top: var(--space-6); }
+}
+@media (max-width: 1199px) {
   /* Sotto i 1200 l'indice diventa una barra delle sezioni che resta sotto la
      testata: sulle pagine lunghe (la regione passa i 36.000 pixel sul telefono)
      e' il solo modo di sapere dove si e'. */
@@ -419,6 +427,7 @@ details.more[open] > summary { color: var(--ink); }
 .fig__line { fill: none; stroke: var(--cmp); stroke-width: 2; }
 .fig__line.is-on, .fig__line--on { stroke: var(--data-focus); stroke-width: 3; }
 .fig__axis, .fig__grid, .fig__track { stroke: var(--rule); }
+.fig text { stroke: none; }
 .fig__name { fill: var(--ink); }
 .fig__source, .fig__note { fill: var(--muted); }
 .fig__value { fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -669,7 +678,12 @@ body.has-proto { padding-bottom: 96px; }
   .table--stack tbody th[scope="row"] { grid-column: 1 / -1; }
   .table--stack td[data-label]::before { content: attr(data-label); display: block; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); }
   .table--stack tr.group, .table--stack tr.group > * { display: block; grid-column: 1 / -1; }
+  /* dentro una tabella a blocchi la barra resta, a tutta riga */
+  .table--stack .barcell { width: auto; grid-column: 1 / -1; }
 }
+
+.table--stack tr.group > * { padding-top: var(--space-6); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); border-bottom: 1px solid var(--rule-strong); }
+.table--stack tbody tr.group:hover > * { background: transparent; }
 
 /* classifica con la barra del punteggio: righe in blocchi sotto i 720 pixel */
 .rankwrap { container: rank / inline-size; }
@@ -702,7 +716,7 @@ body.has-proto { padding-bottom: 96px; }
 
 /* ---------- immagini ---------- */
 .hero-img { margin: 0; display: grid; gap: var(--space-2); }
-.hero-img img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-1); }
+.hero-img img { width: 100%; height: auto; background: var(--surface-1); }
 .hero-img figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .card__media { transition: filter var(--motion-base) var(--motion-ease); }
 .card__media img { transition: transform 400ms var(--motion-ease); }

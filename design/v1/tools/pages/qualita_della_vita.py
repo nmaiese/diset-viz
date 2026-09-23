@@ -10,7 +10,12 @@ solo se le prime tre righe e i conteggi coincidono con quelli dell'indice. Nella
 
 Chi sale di piu' con ogni profilo si chiede all'app (`build_bes_ranking`), con
 la stessa verifica sul profilo Equilibrato. I pezzi comuni alla classifica
-stanno in `classifica.py`.
+stanno in `classifica.py`: le righe portano i punteggi grezzi, e le cifre le
+scrive il template con i filtri di `numfmt`.
+
+La pagina apre con due strisce, le regioni e le province, ognuna sulla sua
+scala: i punteggi dei due livelli si calcolano separatamente e non si
+confrontano. Ogni striscia ha sotto la sua tabella completa, chiusa.
 """
 
 from __future__ import annotations
@@ -62,14 +67,17 @@ def _level_block(ctx_level: dict, level: str) -> dict:
     def end(row):
         phrase = cl.of_place(row["name"], level)
         return {"prep": cl.split_prep(phrase, row["name"]), "name": row["name"],
-                "href": spec["profile"] + row["key"], "score": cl.points(row["score"])}
+                "href": spec["profile"] + row["key"], "score": row["score"]}
 
     return {
-        "level": level, "spec": spec, "n": n, "data": data, "ranking": ranking,
+        "level": level, "spec": spec, "n": n, "data": data, "ranking": ranking, "rows": rows,
         "top": rows[:PODIUM_TOP], "bottom": rows[-PODIUM_BOTTOM:] if hidden else rows[PODIUM_TOP:],
         "gap_label": (f"{cl.from_to(hidden[0]['rank'], hidden[-1]['rank'])}: "
                       f"altre {len(hidden)} {spec['plural']}") if hidden else None,
-        "first": end(first), "last": end(last), "gap": cl.points(first["score"] - last["score"]),
+        "first": end(first), "last": end(last), "gap": first["score"] - last["score"],
+        "strip": cl.score_strip(ranking),
+        "strip_claim": cl.south_claim(ranking, level, region_paths),
+        "groups": cl.south_split(ranking, level, region_paths),
         "years": years, "years_text": cl.years_text(years), "years_span": cl.years_span(years),
         "indicators": method.get("total_indicators"),
         "institutions": method.get("catalog_institutions") or "Istat",
@@ -123,7 +131,7 @@ def _champions(regions: dict, provinces: dict) -> list[dict]:
 
     def cells(group, level):
         spec = cl.LEVELS[level]
-        return [{"name": e["territory"], "href": spec["profile"] + e["key"], "score": cl.points(e["score"]),
+        return [{"name": e["territory"], "href": spec["profile"] + e["key"], "score": e["score"],
                  "where": e.get("region") if level == "provincia" else None,
                  "where_href": region_paths.get(e.get("region") or "")} for e in group]
 
@@ -157,14 +165,16 @@ def derive(ctx: dict) -> dict:
     else:
         years_span = helpers.PLACEHOLDER
 
-    tiles = [
-        {"label": "Fra prima e ultima regione", "num": regions["gap"], "unit": "punti", "sub": "su una scala da 0 a 100"},
-        {"label": "Fra prima e ultima provincia", "num": provinces["gap"], "unit": "punti", "sub": "su una scala da 0 a 100"},
-        {"label": "Indicatori per le regioni", "num": str(regions["indicators"] or helpers.PLACEHOLDER), "unit": None,
-         "sub": f"dati {regions['years_text']}"},
-        {"label": "Indicatori per le province", "num": str(provinces["indicators"] or helpers.PLACEHOLDER), "unit": None,
-         "sub": f"dati {provinces['years_text']}"},
-    ]
+    # Le strisce dicono estremi, media e distanza: le tessere dicono quanto
+    # sta indietro il Mezzogiorno a ogni livello, e su quanti indicatori.
+    tiles = []
+    for b, label in ((regions, "delle regioni"), (provinces, "delle province")):
+        g = b["groups"]
+        if g["north"]["n"] and g["south"]["n"] and not g["unknown"]["n"]:
+            tiles.append({"label": f"Mezzogiorno, media semplice {label}", "value": g["south"]["mean"], "unit": "punti",
+                          "role": "score", "sub": f"contro {cl.points(g['north']['mean'])} del Centro-Nord"})
+    tiles.append(cl.count_tile("Indicatori per le regioni", regions["indicators"], f"dati {regions['years_text']}"))
+    tiles.append(cl.count_tile("Indicatori per le province", provinces["indicators"], f"dati {provinces['years_text']}"))
     institutions = regions["institutions"]
     default_name = next((p["name"] for p in ctx.get("profiles") or [] if p["slug"] == ctx.get("default_profile")),
                         "Equilibrato")
@@ -172,7 +182,7 @@ def derive(ctx: dict) -> dict:
                  for level in ("regione", "provincia")}
     return {
         "regions": regions, "provinces": provinces, "levels": [regions, provinces],
-        "tiles": tiles, "institutions": institutions, "years_span": years_span, "default_name": default_name,
+        "tiles": tiles, "institutions": institutions, "area_label": cl.charts.AREA_LABEL, "years_span": years_span, "default_name": default_name,
         "profiles": _profile_rows(ctx, regions, provinces),
         "champions": _champions(regions_ctx, provinces_ctx),
         "downloads": downloads,
