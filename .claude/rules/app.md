@@ -29,10 +29,15 @@ paths:
   un anno la pagina ha mostrato solo punteggi standardizzati, e chi cercava
   "speranza di vita provincia di Lecce" trovava una pagina senza il numero di
   anni. Il confronto dentro la regione e' sempre fra province, mai con il
-  valore regionale. Non c'e' un indice `/province`: l'indice e'
-  la classifica, `/qualita-della-vita/classifica/province`, e il percorso passa
-  di li'. Il profilo lo monta `app/province_profile.py`, che non calcola niente
+  valore regionale. Il profilo lo monta `app/province_profile.py`, che non calcola niente
   di nuovo: mette in forma il payload di `quality_life_bes.build_bes_territory`.
+- `/province` — l'indice geografico delle province, regione per regione, dal
+  23 settembre 2026. Prima l'indice era la classifica: la classifica risponde a
+  "chi e' prima", l'indice a "dov'e' la mia provincia". La briciola di una
+  provincia passa dalla sua regione (Italia, regione, provincia), ogni pagina
+  regione elenca le sue province, e `/provincia` e `/provincia/` fanno 301 qui.
+  I raggruppamenti li fa `province_profile.by_region`, che solleva un errore se
+  una provincia cade in una regione senza pagina.
 - `/catalogo-dati` — l'elenco piatto di ogni indicatore indicizzabile.
 - `/chi-siamo`, `/contatti`, `/termini`, `/privacy` — le quattro pagine di
   fiducia. Stanno nel contratto di `PUBLIC_DISCOVERABILITY_EXPECTATIONS`, dove
