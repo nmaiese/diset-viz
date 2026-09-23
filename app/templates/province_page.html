@@ -23,22 +23,27 @@
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  "name": "Qualità della vita a {{ p.name }}",
-  "description": {{ ('Punteggio, posizione fra le ' ~ p.total ~ ' province italiane e profilo per dimensione di ' ~ p.name ~ ', dal BES dei Territori di Istat.') | tojson }},
+  "name": {{ ('Qualità della vita ' ~ (p.name | at_place)) | tojson }},
+  "description": {{ ((p.name ~ ' è ' ~ p.rank ~ 'ª su ' ~ p.total ~ ' province per qualità della vita, con ' ~ (p.score | it_num) ~ ' su 100. ') ~ ('I valori di ' ~ (indicatori | length) ~ ' indicatori del BES dei Territori di Istat, con anno, posizione fra le province e confronto con le province della sua regione.' if indicatori else 'Punteggio e profilo per dimensione dal BES dei Territori di Istat.')) | tojson }},
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": {{ p.name | tojson }}{% if p.region %}, "containedInPlace": { "@type": "Place", "name": {{ p.region | tojson }} }{% endif %} },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  {% if indicatori %}"temporalCoverage": "{{ indicatori | map(attribute='year_from') | min }}/{{ indicatori | map(attribute='year') | max }}",
+  {% endif %}"creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } },
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ data_license_url | tojson }},
-  "variableMeasured": {
-    "@type": "PropertyValue",
-    "name": "Punteggio qualità della vita, profilo {{ p.profile.name }}",
-    "value": {{ p.score }},
-    "minValue": 0,
-    "maxValue": 100,
-    "measurementTechnique": {{ (p.methodology.source or 'Istat, BES dei Territori') | tojson }}
-  },
+  "variableMeasured": [
+    {
+      "@type": "PropertyValue",
+      "name": {{ ('Punteggio qualità della vita, profilo ' ~ p.profile.name) | tojson }},
+      "value": {{ p.score }},
+      "minValue": 0,
+      "maxValue": 100,
+      "measurementTechnique": {{ (p.methodology.source or 'Istat, BES dei Territori') | tojson }}
+    }{% for i in indicatori %},
+    { "@type": "PropertyValue", "name": {{ i.name | tojson }}, "value": {{ i.value }}{% if i.unit %}, "unitText": {{ i.unit | tojson }}{% endif %} }{% endfor %}
+  ],
   "keywords": [{{ p.name | tojson }}, "qualità della vita", "province italiane", "Istat"]
 }
 </script>
@@ -50,14 +55,14 @@
 {% endblock %}
 
 {% block content %}
-<main class="wrap" id="contenuto">
+<main class="wrap page-province" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
 
   <header class="article-hero">
     <p class="eyebrow">Qualità della vita{% if p.region %} · {{ p.region }}{% endif %}{% if p.metro_city %} · Città metropolitana{% endif %}</p>
     <h1>{{ p.name }} è {{ p.rank }}ª su {{ p.total }} province</h1>
     <p class="page-lead">
-      Con il profilo {{ p.profile.name | lower }}, {{ p.name }} ottiene {{ p.score | replace('.', ',') }} su 100.
+      Con il profilo {{ p.profile.name | lower }}, {{ p.name }} ottiene {{ p.score | it_num }} su 100.
       {% if p.strongest %}Va meglio su {{ p.strongest[0].name | lower }}{% endif %}{% if p.weakest %} e peggio su {{ p.weakest[0].name | lower }}{% endif %}.
       {% if p.region_path %}Il profilo della sua regione è in <a href="{{ p.region_path }}">{{ p.region }}</a>.{% endif %}
       {% if indicatori %}Più sotto ci sono i valori veri di tutti i {{ indicatori | length }} indicatori misurati qui, con l'anno e la posizione fra le province.{% endif %}
@@ -66,7 +71,7 @@
 
   <div class="region-facts" aria-label="I numeri di {{ p.name }}">
     <div><small>Posizione</small><strong>{{ p.rank }}ª / {{ p.total }}</strong></div>
-    <div><small>Punteggio</small><strong>{{ p.score | replace('.', ',') }}</strong></div>
+    <div><small>Punteggio</small><strong>{{ p.score | it_num }}</strong></div>
     {% if p.strongest %}<div><small>Forza</small><strong>{{ p.strongest[0].name }}</strong></div>{% endif %}
     {% if p.weakest %}<div><small>Debole</small><strong>{{ p.weakest[0].name }}</strong></div>{% endif %}
   </div>
@@ -85,7 +90,7 @@
           <th scope="row">{{ voce.name }}</th>
           <td class="num">
             <span class="score-bar" aria-hidden="true"><span style="transform: scaleX({{ (voce.score / 100) | round(3) }}); transform-origin: left;"></span></span>
-            {{ voce.score | replace('.', ',') }}
+            {{ voce.score | it_num }}
           </td>
         </tr>
         {% endfor %}
@@ -101,16 +106,15 @@
      103 province: dicono dove sta rispetto alle altre, non quanto vale. Il
      dato era gia' in casa, 479 righe per ogni provincia nel BES dei
      Territori, e non lo leggeva nessuno. #}
-  {% set aree = indicatori | map(attribute='macro_area') | unique | sort | list %}
   {% set temi = indicatori | map(attribute='theme') | unique | sort | list %}
   <section class="profile-explorer" id="explorer" data-region="{{ p.name }}">
-    <h2>Tutti gli indicatori misurati a {{ p.name }}</h2>
-    <p class="page-note">I {{ indicatori | length }} indicatori del BES dei Territori con un dato per {{ p.name }}: quanto valgono, in che anno, e in che posizione fra le province che quell'anno hanno un dato (1 è la migliore). Sotto il valore c'è quanto è cambiato dal primo anno della serie, nella stessa unità. Accanto alla posizione c'è quella fra le province della sua regione, con la media delle altre. Il movimento invece è di posizione, non di valore, e confronta l'ultimo anno disponibile con quello prima.</p>
+    <h2>Tutti gli indicatori misurati {{ p.name | at_place }}</h2>
+    <p class="page-note">I {{ indicatori | length }} indicatori del BES dei Territori con un dato per {{ p.name }}: quanto valgono, in che anno, e in che posizione fra le province che quell'anno hanno un dato (1 è la migliore). Sotto il valore c'è quanto è cambiato dal primo anno della serie, nella stessa unità.{% if indicatori | selectattr('in_regione') | first %} Accanto alla posizione c'è quella fra le province della sua regione, con la media delle altre.{% endif %} Il movimento invece è di posizione, non di valore, e confronta l'ultimo anno disponibile con quello prima.</p>
 
     <div class="explorer-toolbar">
       <div class="macro-pills" role="group" aria-label="Filtra per area">
         <button type="button" class="macro-pill is-active" data-macro="">Tutte le aree</button>
-        {% for area in aree %}
+        {% for area in macro_aree %}
         <button type="button" class="macro-pill" data-macro="{{ area }}">{{ area }}</button>
         {% endfor %}
       </div>
@@ -151,11 +155,11 @@
             data-rank="{{ i.rank if i.rank is not none else '' }}">
           <td><a href="{{ i.path }}">{{ i.name }}</a></td>
           <td class="explorer-theme">{{ i.theme }}</td>
-          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }}</small>
-            {%- if i.variazione is not none %}<small>dal {{ i.year_from }}: {{ '+' if i.variazione > 0 else '' }}{{ i.variazione | it_num }}</small>{% endif %}</td>
+          <td class="num">{{ i.value | it_num(i.decimals) }} <small>{{ i.unit }} · {{ i.year }}</small>
+            {% if i.variazione is not none %}<small>dal {{ i.year_from }} {{ i.variazione | it_change(i.decimals) }}</small>{% endif %}</td>
           <td class="num">
             <strong>{{ i.rank }}</strong><small>/{{ i.province_count }}</small>
-            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}, media {{ i.in_regione.media | it_num }}</small>{% endif %}
+            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}, media delle altre {{ i.in_regione.quante - 1 }}: {{ i.in_regione.media | it_num(i.decimals) }}</small>{% endif %}
           </td>
           <td class="num">
             {% if i.movement %}<span class="movement-tag {{ 'is-up' if i.movement > 0 else 'is-down' }}">{{ '+' if i.movement > 0 else '' }}{{ i.movement }}</span>
@@ -183,7 +187,7 @@
       {% if prime_in_regione %}
       <ul class="theme-chips">
         {% for i in prime_in_regione %}
-        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num }} {{ i.unit }}, {{ i.year }}</small></li>
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num(i.decimals) }} {{ i.unit }}, {{ i.year }}</small></li>
         {% endfor %}
       </ul>
       {% else %}
@@ -195,7 +199,7 @@
       {% if ultime_in_regione %}
       <ul class="theme-chips">
         {% for i in ultime_in_regione %}
-        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num }} {{ i.unit }}, {{ i.year }}</small></li>
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num(i.decimals) }} {{ i.unit }}, {{ i.year }}</small></li>
         {% endfor %}
       </ul>
       {% else %}
@@ -253,7 +257,7 @@
     <h2 class="section-label" id="vicine">Le province che le stanno intorno in classifica</h2>
     <ul class="theme-chips">
       {% for voce in vicine %}
-      <li><a href="{{ voce.path }}">{{ voce.rank }}ª {{ voce.name }}</a> <small>{{ voce.score | replace('.', ',') }}</small></li>
+      <li><a href="{{ voce.path }}">{{ voce.rank }}ª {{ voce.name }}</a> <small>{{ voce.score | it_num }}</small></li>
       {% endfor %}
     </ul>
   </section>

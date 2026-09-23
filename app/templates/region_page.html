@@ -20,11 +20,12 @@
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  "name": "Profilo territoriale di {{ p.region }}",
+  "name": {{ ('Profilo territoriale di ' ~ p.region) | tojson }},
   "description": {{ ('Punti di forza e di debolezza di ' ~ p.region ~ ' sugli indicatori territoriali Istat, con confronto tra le regioni italiane.') | tojson }},
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }} },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "creator": { "@type": "Organization", "name": "Istat" } },
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ data_license_url | tojson }},
@@ -193,7 +194,7 @@
             <em class="movement-delta is-up">+{{ m.movement }}</em>
           </span>
           <span class="movement-bar"><span class="is-up" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
-          <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
+          <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status | freshness_label | lower }}</small>
         </li>
         {% endfor %}
       </ul>
@@ -211,7 +212,7 @@
             <em class="movement-delta is-down">{{ m.movement }}</em>
           </span>
           <span class="movement-bar"><span class="is-down" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
-          <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
+          <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status | freshness_label | lower }}</small>
         </li>
         {% endfor %}
       </ul>
@@ -276,7 +277,7 @@
                 data-rank="{{ i.rank if i.rank is not none else '' }}">
               <td><a href="{{ i.path }}">{{ i.name }}</a></td>
               <td class="explorer-theme">{{ i.theme }}</td>
-              <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status }}</small></td>
+              <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status | freshness_label | lower }}</small></td>
               <td class="num">
                 {% if i.rank is not none %}<strong>{{ i.rank }}</strong><small>/{{ i.region_count }}</small>
                 {% else %}<span class="page-note">n.v.</span>{% endif %}

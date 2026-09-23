@@ -881,6 +881,8 @@ class LePagineProvincia(unittest.TestCase):
                 markdown = self.client.get(
                     f"/provincia/{chiave}", headers={"Accept": "text/markdown"}).get_data(as_text=True)
                 profilo = self.province.profilo(chiave)
-                self.assertIn(str(profilo["rank"]), markdown)
-                self.assertIn(str(profilo["score"]), markdown)
+                self.assertIn(f"{profilo['rank']}ª su {profilo['total']}", markdown)
+                # Il punteggio scritto come nell'HTML, con la virgola: il
+                # `str(score)` di prima fissava il punto decimale.
+                self.assertIn(app.jinja_env.filters["it_num"](profilo["score"]), markdown)
                 self.assertIn("## Le dimensioni", markdown)

@@ -458,6 +458,34 @@ body.ds {
   margin: 0;
 }
 
+/* Le etichette di sezione e gli occhielli, una volta sola e qui. Un
+ * `h2.section-label` perdeva contro `.ds h2` qui sopra, che e' piu' specifica,
+ * e usciva in Newsreader grande invece che in mono piccolo. L'occhiello non
+ * aveva stile fuori dalla home e dalle testate del blog: sulle province, su
+ * /ricerca e su /divari-regionali era testo semplice. */
+.ds .section-label,
+.ds .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-label-sm);
+  font-weight: var(--w-semibold);
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: var(--leading-snug);
+  text-transform: uppercase;
+}
+.ds .section-label { color: var(--text-muted); }
+.ds .eyebrow { color: var(--accent-text); }
+
+/* Un'intestazione di riga e' il nome della riga, non l'intestazione di una
+ * colonna: senza questa regola prendeva il maiuscoletto grigio di `th`. */
+.ds .data-table tbody th[scope="row"] {
+  font-family: var(--font-body);
+  font-size: inherit;
+  font-weight: var(--w-medium);
+  letter-spacing: var(--tracking-normal);
+  text-transform: none;
+  color: var(--text-strong);
+}
+
 /* AA-safe coral link, underlined on hover. The bright brand coral is reserved
  * for fills and large text; --text-link is the deep coral that clears 4.5:1. */
 .ds a { color: var(--text-link); text-decoration: none; transition: color var(--dur) var(--ease); }

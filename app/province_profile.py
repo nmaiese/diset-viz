@@ -29,7 +29,8 @@ from collections import defaultdict
 from app import bes_data, profiles
 from app import quality_life_bes as qb
 from app.cache import cache
-from app.external_data import freshness_status
+from app.external_data import freshness_label, freshness_status
+from app.taxonomy import CANONICAL_CATEGORIES
 
 LIVELLO = "provincia"
 
@@ -130,9 +131,10 @@ def vicine(chiave, quante=6):
     if chiave not in posizioni:
         return []
     centro = posizioni[chiave]
-    meta = max(1, quante // 2)
-    inizio = max(0, centro - meta)
-    finestra = righe[inizio: inizio + quante + 1]
+    # Sempre `quante` vicine, anche in cima e in fondo alla classifica: la
+    # finestra centrata sull'ultima ne dava tre, la meta' di tutte le altre.
+    start = max(0, min(centro - max(1, quante // 2), len(righe) - quante - 1))
+    finestra = righe[start: start + quante + 1]
     return [
         {
             "key": riga["key"],
@@ -205,6 +207,12 @@ def _serie():
     return serie
 
 
+def _macro_area(category):
+    if category not in CANONICAL_CATEGORIES:
+        raise LookupError(f"categoria {category!r} senza macro-area in taxonomy.CANONICAL_CATEGORIES")
+    return CANONICAL_CATEGORIES[category]["macro_area"]
+
+
 def _regione_di():
     return {chiave: info.get("region") or ""
             for chiave, info in bes_data.get_bes_territories(LIVELLO).items()}
@@ -232,6 +240,7 @@ def indicatori(chiave):
     lo stesso motivo per cui questo modulo non riusa `region_profile`.
     """
     manifesto = bes_data.get_bes_manifest(LIVELLO)
+    decimals = bes_data.source_decimals(LIVELLO)
     serie = _serie()
     regione_di = _regione_di()
     mia_regione = regione_di.get(chiave) or ""
@@ -283,7 +292,10 @@ def indicatori(chiave):
             "id": id_indicatore,
             "name": info["name"],
             "theme": info.get("category_name") or info.get("domain_name") or "",
-            "macro_area": info.get("domain_name") or "",
+            # Le quattro macro-aree del sito, come sulla pagina regione. Il
+            # dominio BES ne dava undici, che si sovrapponevano quasi voce per
+            # voce al filtro Tema e alzavano la barra dei filtri a 564 px.
+            "macro_area": _macro_area(info.get("category")),
             "path": bes_data.bes_path(id_indicatore),
             "unit": info.get("unit") or "",
             "direction": info.get("direction"),
@@ -291,6 +303,8 @@ def indicatori(chiave):
             "year": ultimo,
             "year_from": anni[0],
             "freshness_status": freshness_status(ultimo),
+            "freshness_label": freshness_label(freshness_status(ultimo)),
+            "decimals": decimals.get(id_indicatore, 1),
             "rank": posizione,
             "province_count": len(dati["valori"]),
             "movement": movimento,
