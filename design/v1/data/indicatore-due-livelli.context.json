@@ -1,0 +1,4749 @@
+{
+ "template": "indicator_page.html",
+ "route": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+ "context": {
+  "meta": {
+   "id": "bes:03LAV007",
+   "raw_id": "03LAV007",
+   "family": "bes",
+   "family_label": "Istat, benessere e qualità della vita",
+   "name": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+   "unit": "Per 10.000 occupati",
+   "value_unit": "Per 10.000 occupati",
+   "change_unit": "Per 10.000 occupati",
+   "percentage_like": false,
+   "direction": "lower_better",
+   "scoreable": true,
+   "explain": {
+    "plain": "Rapporta il tasso di infortuni sul lavoro mortali e con inabilità permanente a 10.000 occupati, così territori di dimensioni diverse sono confrontabili.",
+    "example": "Un valore di 12 corrisponde a 12 casi ogni 10.000 occupati.",
+    "scope": "Il confronto applica la stessa definizione in tutte le regioni e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore.",
+    "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra regioni descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "lower_better"
+   },
+   "theme": "Lavoro e conciliazione",
+   "theme_path": "/tema/lavoro-e-conciliazione",
+   "source_theme": "Lavoro e conciliazione dei tempi di vita",
+   "macro_area": "Economia e opportunità",
+   "source": "Inail",
+   "source_label": "Istat, BES nazionale, aggiornamento intermedio 2026",
+   "source_url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/",
+   "source_data_url": null,
+   "source_dataflow": null,
+   "institution": "Istat",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "archive": "Benessere equo e sostenibile, aggiornamento intermedio 2026",
+   "quality_life_scored": false,
+   "quality_life_category_label": null,
+   "indexable": false,
+   "indexable_reason": "vecchia",
+   "canonical_path": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+   "downloads": {
+    "csv": "/download/indicator/bes:03LAV007.csv",
+    "json": "/download/indicator/bes:03LAV007.json"
+   },
+   "year_min": 2018,
+   "year_max": 2022,
+   "freshness_status": "dated",
+   "freshness_label": "Da aggiornare"
+  },
+  "levels": [
+   {
+    "key": "regione",
+    "label": "Regioni",
+    "singular": "regione",
+    "plural": "regioni",
+    "profile_path": "/regione/",
+    "has_map": true,
+    "explain": {
+     "plain": "Rapporta il tasso di infortuni sul lavoro mortali e con inabilità permanente a 10.000 occupati, così territori di dimensioni diverse sono confrontabili.",
+     "example": "Un valore di 12 corrisponde a 12 casi ogni 10.000 occupati.",
+     "scope": "Il confronto applica la stessa definizione in tutte le regioni e per ciascun anno.",
+     "reading": "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore.",
+     "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra regioni descrive una differenza osservata, ma non ne dimostra le cause.",
+     "direction": "lower_better"
+    },
+    "years": [
+     2018,
+     2019,
+     2020,
+     2021,
+     2022
+    ],
+    "year_min": 2018,
+    "year_max": 2022,
+    "observations": [
+     {
+      "key": "piemonte",
+      "name": "Piemonte",
+      "value": 8.0
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia",
+      "value": 8.1
+     },
+     {
+      "key": "lazio",
+      "name": "Lazio",
+      "value": 8.2
+     },
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia",
+      "value": 8.8
+     },
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta",
+      "value": 10.2
+     },
+     {
+      "key": "veneto",
+      "name": "Veneto",
+      "value": 10.4
+     },
+     {
+      "key": "campania",
+      "name": "Campania",
+      "value": 11.2
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria",
+      "value": 12.0
+     },
+     {
+      "key": "emilia-romagna",
+      "name": "Emilia-Romagna",
+      "value": 12.1
+     },
+     {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige",
+      "value": 12.3
+     },
+     {
+      "key": "sardegna",
+      "name": "Sardegna",
+      "value": 12.4
+     },
+     {
+      "key": "puglia",
+      "name": "Puglia",
+      "value": 13.0
+     },
+     {
+      "key": "sicilia",
+      "name": "Sicilia",
+      "value": 13.4
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria",
+      "value": 13.5
+     },
+     {
+      "key": "molise",
+      "name": "Molise",
+      "value": 13.8
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana",
+      "value": 14.4
+     },
+     {
+      "key": "marche",
+      "name": "Marche",
+      "value": 15.3
+     },
+     {
+      "key": "abruzzo",
+      "name": "Abruzzo",
+      "value": 16.7
+     },
+     {
+      "key": "basilicata",
+      "name": "Basilicata",
+      "value": 16.8
+     },
+     {
+      "key": "umbria",
+      "name": "Umbria",
+      "value": 17.8
+     }
+    ],
+    "best": {
+     "key": "piemonte",
+     "name": "Piemonte",
+     "value": 8.0
+    },
+    "worst": {
+     "key": "umbria",
+     "name": "Umbria",
+     "value": 17.8
+    },
+    "stats": {
+     "year": 2022,
+     "year_avg": 12.42,
+     "year_count": 20,
+     "median": 12.350000000000001,
+     "above_avg_count": 9,
+     "below_avg_count": 11,
+     "year_min": 2018,
+     "year_min_avg": 14.01,
+     "year_max": 2022,
+     "has_multi_year": true,
+     "avg_change_abs": -1.5899999999999999,
+     "avg_change_pct": -11.349036402569594,
+     "gap_abs": 9.8,
+     "gap_ratio": 2.225,
+     "year_min_gap_abs": 16.200000000000003,
+     "gap_trend": -6.400000000000002,
+     "highest_delta": {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta",
+      "value": null,
+      "delta": 0.29999999999999893,
+      "kind": "aumento"
+     },
+     "lowest_delta": {
+      "key": "basilicata",
+      "name": "Basilicata",
+      "value": null,
+      "delta": -7.300000000000001,
+      "kind": "calo"
+     }
+    },
+    "annual_change": {
+     "year": 2022,
+     "previous_year": 2021,
+     "year_gap": 1,
+     "common_count": 20,
+     "current_count": 20,
+     "previous_count": 20,
+     "same_coverage": true,
+     "previous_avg": 13.025,
+     "current_avg": 12.42,
+     "average_delta": -0.6050000000000004,
+     "average_delta_pct": -4.644913627639158,
+     "increase_count": 3,
+     "decrease_count": 15,
+     "stable_count": 2,
+     "largest_increases": [
+      {
+       "key": "umbria",
+       "name": "Umbria",
+       "value": null,
+       "delta": 1.3000000000000007,
+       "kind": "aumento",
+       "previous_value": 16.5,
+       "current_value": 17.8
+      },
+      {
+       "key": "campania",
+       "name": "Campania",
+       "value": null,
+       "delta": 0.6999999999999993,
+       "kind": "aumento",
+       "previous_value": 10.5,
+       "current_value": 11.2
+      },
+      {
+       "key": "toscana",
+       "name": "Toscana",
+       "value": null,
+       "delta": 0.5,
+       "kind": "aumento",
+       "previous_value": 13.9,
+       "current_value": 14.4
+      }
+     ],
+     "largest_decreases": [
+      {
+       "key": "basilicata",
+       "name": "Basilicata",
+       "value": null,
+       "delta": -3.8000000000000007,
+       "kind": "calo",
+       "previous_value": 20.6,
+       "current_value": 16.8
+      },
+      {
+       "key": "calabria",
+       "name": "Calabria",
+       "value": null,
+       "delta": -2.0,
+       "kind": "calo",
+       "previous_value": 15.5,
+       "current_value": 13.5
+      },
+      {
+       "key": "liguria",
+       "name": "Liguria",
+       "value": null,
+       "delta": -1.8000000000000007,
+       "kind": "calo",
+       "previous_value": 13.8,
+       "current_value": 12.0
+      }
+     ]
+    },
+    "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+    "trend_note": "una variazione media favorevole",
+    "coverage": null,
+    "territory_total": 20,
+    "territories": [
+     {
+      "key": "abruzzo",
+      "name": "Abruzzo"
+     },
+     {
+      "key": "basilicata",
+      "name": "Basilicata"
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria"
+     },
+     {
+      "key": "campania",
+      "name": "Campania"
+     },
+     {
+      "key": "emilia-romagna",
+      "name": "Emilia-Romagna"
+     },
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia"
+     },
+     {
+      "key": "lazio",
+      "name": "Lazio"
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria"
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia"
+     },
+     {
+      "key": "marche",
+      "name": "Marche"
+     },
+     {
+      "key": "molise",
+      "name": "Molise"
+     },
+     {
+      "key": "piemonte",
+      "name": "Piemonte"
+     },
+     {
+      "key": "puglia",
+      "name": "Puglia"
+     },
+     {
+      "key": "sardegna",
+      "name": "Sardegna"
+     },
+     {
+      "key": "sicilia",
+      "name": "Sicilia"
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana"
+     },
+     {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige"
+     },
+     {
+      "key": "umbria",
+      "name": "Umbria"
+     },
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta"
+     },
+     {
+      "key": "veneto",
+      "name": "Veneto"
+     }
+    ],
+    "default_territory": {
+     "key": "piemonte",
+     "name": "Piemonte",
+     "value": 8.0
+    },
+    "matrix": {
+     "2018": {
+      "piemonte": 8.2,
+      "valle-d-aosta": 9.9,
+      "lombardia": 7.9,
+      "trentino-alto-adige": 12.5,
+      "veneto": 12.7,
+      "friuli-venezia-giulia": 9.9,
+      "liguria": 15.3,
+      "emilia-romagna": 14.0,
+      "toscana": 16.1,
+      "umbria": 18.2,
+      "marche": 16.8,
+      "lazio": 8.2,
+      "abruzzo": 18.1,
+      "molise": 13.8,
+      "campania": 10.9,
+      "puglia": 13.6,
+      "basilicata": 24.1,
+      "calabria": 18.3,
+      "sicilia": 14.8,
+      "sardegna": 16.9
+     },
+     "2019": {
+      "piemonte": 8.2,
+      "valle-d-aosta": 9.5,
+      "lombardia": 7.9,
+      "trentino-alto-adige": 13.0,
+      "veneto": 11.3,
+      "friuli-venezia-giulia": 10.8,
+      "liguria": 14.5,
+      "emilia-romagna": 13.8,
+      "toscana": 14.9,
+      "umbria": 17.4,
+      "marche": 15.9,
+      "lazio": 8.3,
+      "abruzzo": 17.6,
+      "molise": 12.9,
+      "campania": 11.6,
+      "puglia": 13.1,
+      "basilicata": 23.3,
+      "calabria": 16.6,
+      "sicilia": 14.7,
+      "sardegna": 15.5
+     },
+     "2020": {
+      "piemonte": 7.7,
+      "valle-d-aosta": 9.9,
+      "lombardia": 7.9,
+      "trentino-alto-adige": 11.8,
+      "veneto": 11.3,
+      "friuli-venezia-giulia": 9.5,
+      "liguria": 13.5,
+      "emilia-romagna": 12.7,
+      "toscana": 12.9,
+      "umbria": 15.7,
+      "marche": 15.0,
+      "lazio": 8.3,
+      "abruzzo": 14.9,
+      "molise": 14.1,
+      "campania": 10.7,
+      "puglia": 12.2,
+      "basilicata": 17.1,
+      "calabria": 13.9,
+      "sicilia": 12.2,
+      "sardegna": 12.8
+     },
+     "2021": {
+      "piemonte": 8.2,
+      "valle-d-aosta": 10.5,
+      "lombardia": 8.3,
+      "trentino-alto-adige": 12.7,
+      "veneto": 11.5,
+      "friuli-venezia-giulia": 9.2,
+      "liguria": 13.8,
+      "emilia-romagna": 13.1,
+      "toscana": 13.9,
+      "umbria": 16.5,
+      "marche": 16.6,
+      "lazio": 8.2,
+      "abruzzo": 16.8,
+      "molise": 14.0,
+      "campania": 10.5,
+      "puglia": 14.0,
+      "basilicata": 20.6,
+      "calabria": 15.5,
+      "sicilia": 13.4,
+      "sardegna": 13.2
+     },
+     "2022": {
+      "piemonte": 8.0,
+      "valle-d-aosta": 10.2,
+      "lombardia": 8.1,
+      "trentino-alto-adige": 12.3,
+      "veneto": 10.4,
+      "friuli-venezia-giulia": 8.8,
+      "liguria": 12.0,
+      "emilia-romagna": 12.1,
+      "toscana": 14.4,
+      "umbria": 17.8,
+      "marche": 15.3,
+      "lazio": 8.2,
+      "abruzzo": 16.7,
+      "molise": 13.8,
+      "campania": 11.2,
+      "puglia": 13.0,
+      "basilicata": 16.8,
+      "calabria": 13.5,
+      "sicilia": 13.4,
+      "sardegna": 12.4
+     }
+    },
+    "annual_means": [
+     {
+      "year": 2018,
+      "avg": 14.01
+     },
+     {
+      "year": 2019,
+      "avg": 13.540000000000001
+     },
+     {
+      "year": 2020,
+      "avg": 12.205
+     },
+     {
+      "year": 2021,
+      "avg": 13.025
+     },
+     {
+      "year": 2022,
+      "avg": 12.42
+     }
+    ],
+    "map_colors": {
+     "piemonte": "var(--seq-1)",
+     "lombardia": "var(--seq-1)",
+     "lazio": "var(--seq-1)",
+     "friuli-venezia-giulia": "var(--seq-1)",
+     "valle-d-aosta": "var(--seq-2)",
+     "veneto": "var(--seq-2)",
+     "campania": "var(--seq-2)",
+     "liguria": "var(--seq-3)",
+     "emilia-romagna": "var(--seq-3)",
+     "trentino-alto-adige": "var(--seq-3)",
+     "sardegna": "var(--seq-3)",
+     "puglia": "var(--seq-4)",
+     "sicilia": "var(--seq-4)",
+     "calabria": "var(--seq-4)",
+     "molise": "var(--seq-4)",
+     "toscana": "var(--seq-4)",
+     "marche": "var(--seq-5)",
+     "abruzzo": "var(--seq-6)",
+     "basilicata": "var(--seq-6)",
+     "umbria": "var(--seq-6)"
+    },
+    "cover_bars": [
+     {
+      "region": "Piemonte",
+      "region_key": "piemonte",
+      "value": 8.0,
+      "width_pct": 6,
+      "is_best": true,
+      "is_worst": false
+     },
+     {
+      "region": "Lombardia",
+      "region_key": "lombardia",
+      "value": 8.1,
+      "width_pct": 7,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Lazio",
+      "region_key": "lazio",
+      "value": 8.2,
+      "width_pct": 8,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Friuli-Venezia Giulia",
+      "region_key": "friuli-venezia-giulia",
+      "value": 8.8,
+      "width_pct": 14,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Umbria",
+      "region_key": "umbria",
+      "value": 17.8,
+      "width_pct": 100,
+      "is_best": false,
+      "is_worst": true
+     }
+    ],
+    "bar_max": 17.8,
+    "query_map": [
+     {
+      "intent": "definizione",
+      "label": "Che cosa misura Tasso di infortuni sul lavoro mortali e con inabilità permanente?",
+      "target": "sezione-definizione"
+     },
+     {
+      "intent": "dato",
+      "label": "Qual è il dato più recente, nel 2022?",
+      "target": "esplora"
+     },
+     {
+      "intent": "classifica",
+      "label": "Qual è la classifica delle regioni nel 2022?",
+      "target": "classifica-dati"
+     },
+     {
+      "intent": "confronto",
+      "label": "Che cosa è cambiato dal 2021 al 2022?",
+      "target": "sezione-dinamica"
+     },
+     {
+      "intent": "andamento",
+      "label": "Come è cambiato dal 2018 al 2022?",
+      "target": "serie-storica"
+     },
+     {
+      "intent": "metodologia",
+      "label": "Come sono calcolati confronti e medie?",
+      "target": "fonti-verifica"
+     },
+     {
+      "intent": "download",
+      "label": "Dove posso scaricare la serie?",
+      "target": "download-dati"
+     }
+    ]
+   },
+   {
+    "key": "provincia",
+    "label": "Province",
+    "singular": "provincia",
+    "plural": "province",
+    "profile_path": "/provincia/",
+    "has_map": false,
+    "explain": {
+     "plain": "Rapporta il tasso di infortuni sul lavoro mortali e con inabilità permanente a 10.000 occupati, così territori di dimensioni diverse sono confrontabili.",
+     "example": "Un valore di 12 corrisponde a 12 casi ogni 10.000 occupati.",
+     "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+     "reading": "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore.",
+     "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+     "direction": "lower_better"
+    },
+    "years": [
+     2018,
+     2019,
+     2020,
+     2021,
+     2022
+    ],
+    "year_min": 2018,
+    "year_max": 2022,
+    "observations": [
+     {
+      "key": "verbano-cusio-ossola",
+      "name": "Verbano-Cusio-Ossola",
+      "value": 4.7
+     },
+     {
+      "key": "novara",
+      "name": "Novara",
+      "value": 4.8
+     },
+     {
+      "key": "mantova",
+      "name": "Mantova",
+      "value": 5.8
+     },
+     {
+      "key": "pavia",
+      "name": "Pavia",
+      "value": 5.9
+     },
+     {
+      "key": "biella",
+      "name": "Biella",
+      "value": 6.3
+     },
+     {
+      "key": "milano",
+      "name": "Milano",
+      "value": 6.4
+     },
+     {
+      "key": "torino",
+      "name": "Torino",
+      "value": 6.6
+     },
+     {
+      "key": "como",
+      "name": "Como",
+      "value": 6.7
+     },
+     {
+      "key": "monza-e-della-brianza",
+      "name": "Monza e della Brianza",
+      "value": 7.0
+     },
+     {
+      "key": "roma",
+      "name": "Roma",
+      "value": 7.1
+     },
+     {
+      "key": "catanzaro",
+      "name": "Catanzaro",
+      "value": 8.0
+     },
+     {
+      "key": "pordenone",
+      "name": "Pordenone",
+      "value": 8.0
+     },
+     {
+      "key": "venezia",
+      "name": "Venezia",
+      "value": 8.1
+     },
+     {
+      "key": "belluno",
+      "name": "Belluno",
+      "value": 8.4
+     },
+     {
+      "key": "cagliari",
+      "name": "Cagliari",
+      "value": 8.4
+     },
+     {
+      "key": "sondrio",
+      "name": "Sondrio",
+      "value": 8.5
+     },
+     {
+      "key": "bologna",
+      "name": "Bologna",
+      "value": 8.6
+     },
+     {
+      "key": "trieste",
+      "name": "Trieste",
+      "value": 8.6
+     },
+     {
+      "key": "vicenza",
+      "name": "Vicenza",
+      "value": 8.6
+     },
+     {
+      "key": "lecco",
+      "name": "Lecco",
+      "value": 8.9
+     },
+     {
+      "key": "firenze",
+      "name": "Firenze",
+      "value": 9.0
+     },
+     {
+      "key": "gorizia",
+      "name": "Gorizia",
+      "value": 9.0
+     },
+     {
+      "key": "ravenna",
+      "name": "Ravenna",
+      "value": 9.1
+     },
+     {
+      "key": "udine",
+      "name": "Udine",
+      "value": 9.1
+     },
+     {
+      "key": "imperia",
+      "name": "Imperia",
+      "value": 9.4
+     },
+     {
+      "key": "lodi",
+      "name": "Lodi",
+      "value": 9.4
+     },
+     {
+      "key": "napoli",
+      "name": "Napoli",
+      "value": 9.6
+     },
+     {
+      "key": "caserta",
+      "name": "Caserta",
+      "value": 9.8
+     },
+     {
+      "key": "latina",
+      "name": "Latina",
+      "value": 9.8
+     },
+     {
+      "key": "asti",
+      "name": "Asti",
+      "value": 9.9
+     },
+     {
+      "key": "cremona",
+      "name": "Cremona",
+      "value": 9.9
+     },
+     {
+      "key": "barletta-andria-trani",
+      "name": "Barletta-Andria-Trani",
+      "value": 10.0
+     },
+     {
+      "key": "fermo",
+      "name": "Fermo",
+      "value": 10.0
+     },
+     {
+      "key": "prato",
+      "name": "Prato",
+      "value": 10.0
+     },
+     {
+      "key": "bergamo",
+      "name": "Bergamo",
+      "value": 10.1
+     },
+     {
+      "key": "varese",
+      "name": "Varese",
+      "value": 10.1
+     },
+     {
+      "key": "aosta",
+      "name": "Aosta",
+      "value": 10.2
+     },
+     {
+      "key": "frosinone",
+      "name": "Frosinone",
+      "value": 10.6
+     },
+     {
+      "key": "padova",
+      "name": "Padova",
+      "value": 10.6
+     },
+     {
+      "key": "matera",
+      "name": "Matera",
+      "value": 10.8
+     },
+     {
+      "key": "cuneo",
+      "name": "Cuneo",
+      "value": 11.1
+     },
+     {
+      "key": "brescia",
+      "name": "Brescia",
+      "value": 11.2
+     },
+     {
+      "key": "parma",
+      "name": "Parma",
+      "value": 11.5
+     },
+     {
+      "key": "treviso",
+      "name": "Treviso",
+      "value": 11.5
+     },
+     {
+      "key": "alessandria",
+      "name": "Alessandria",
+      "value": 11.7
+     },
+     {
+      "key": "genova",
+      "name": "Genova",
+      "value": 11.8
+     },
+     {
+      "key": "savona",
+      "name": "Savona",
+      "value": 11.9
+     },
+     {
+      "key": "vibo-valentia",
+      "name": "Vibo Valentia",
+      "value": 11.9
+     },
+     {
+      "key": "palermo",
+      "name": "Palermo",
+      "value": 12.0
+     },
+     {
+      "key": "trento",
+      "name": "Trento",
+      "value": 12.0
+     },
+     {
+      "key": "rovigo",
+      "name": "Rovigo",
+      "value": 12.1
+     },
+     {
+      "key": "modena",
+      "name": "Modena",
+      "value": 12.2
+     },
+     {
+      "key": "siracusa",
+      "name": "Siracusa",
+      "value": 12.4
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano",
+      "value": 12.5
+     },
+     {
+      "key": "nuoro",
+      "name": "Nuoro",
+      "value": 12.5
+     },
+     {
+      "key": "piacenza",
+      "name": "Piacenza",
+      "value": 12.6
+     },
+     {
+      "key": "pistoia",
+      "name": "Pistoia",
+      "value": 12.7
+     },
+     {
+      "key": "trapani",
+      "name": "Trapani",
+      "value": 12.7
+     },
+     {
+      "key": "catania",
+      "name": "Catania",
+      "value": 12.8
+     },
+     {
+      "key": "ferrara",
+      "name": "Ferrara",
+      "value": 12.8
+     },
+     {
+      "key": "foggia",
+      "name": "Foggia",
+      "value": 12.8
+     },
+     {
+      "key": "l-aquila",
+      "name": "L'Aquila",
+      "value": 12.8
+     },
+     {
+      "key": "verona",
+      "name": "Verona",
+      "value": 12.8
+     },
+     {
+      "key": "enna",
+      "name": "Enna",
+      "value": 12.9
+     },
+     {
+      "key": "lecce",
+      "name": "Lecce",
+      "value": 12.9
+     },
+     {
+      "key": "agrigento",
+      "name": "Agrigento",
+      "value": 13.0
+     },
+     {
+      "key": "sud-sardegna",
+      "name": "Sud Sardegna",
+      "value": 13.0
+     },
+     {
+      "key": "campobasso",
+      "name": "Campobasso",
+      "value": 13.1
+     },
+     {
+      "key": "oristano",
+      "name": "Oristano",
+      "value": 13.2
+     },
+     {
+      "key": "bari",
+      "name": "Bari",
+      "value": 13.4
+     },
+     {
+      "key": "brindisi",
+      "name": "Brindisi",
+      "value": 13.5
+     },
+     {
+      "key": "taranto",
+      "name": "Taranto",
+      "value": 13.6
+     },
+     {
+      "key": "benevento",
+      "name": "Benevento",
+      "value": 13.7
+     },
+     {
+      "key": "cosenza",
+      "name": "Cosenza",
+      "value": 13.9
+     },
+     {
+      "key": "crotone",
+      "name": "Crotone",
+      "value": 14.0
+     },
+     {
+      "key": "salerno",
+      "name": "Salerno",
+      "value": 14.1
+     },
+     {
+      "key": "reggio-emilia",
+      "name": "Reggio Emilia",
+      "value": 14.2
+     },
+     {
+      "key": "avellino",
+      "name": "Avellino",
+      "value": 14.4
+     },
+     {
+      "key": "viterbo",
+      "name": "Viterbo",
+      "value": 14.4
+     },
+     {
+      "key": "vercelli",
+      "name": "Vercelli",
+      "value": 14.5
+     },
+     {
+      "key": "ragusa",
+      "name": "Ragusa",
+      "value": 15.0
+     },
+     {
+      "key": "pesaro-e-urbino",
+      "name": "Pesaro e Urbino",
+      "value": 15.1
+     },
+     {
+      "key": "la-spezia",
+      "name": "La Spezia",
+      "value": 15.4
+     },
+     {
+      "key": "sassari",
+      "name": "Sassari",
+      "value": 15.4
+     },
+     {
+      "key": "caltanissetta",
+      "name": "Caltanissetta",
+      "value": 15.5
+     },
+     {
+      "key": "macerata",
+      "name": "Macerata",
+      "value": 15.5
+     },
+     {
+      "key": "rimini",
+      "name": "Rimini",
+      "value": 15.5
+     },
+     {
+      "key": "isernia",
+      "name": "Isernia",
+      "value": 15.6
+     },
+     {
+      "key": "ascoli-piceno",
+      "name": "Ascoli Piceno",
+      "value": 15.7
+     },
+     {
+      "key": "pisa",
+      "name": "Pisa",
+      "value": 16.0
+     },
+     {
+      "key": "livorno",
+      "name": "Livorno",
+      "value": 16.3
+     },
+     {
+      "key": "terni",
+      "name": "Terni",
+      "value": 16.3
+     },
+     {
+      "key": "messina",
+      "name": "Messina",
+      "value": 16.4
+     },
+     {
+      "key": "pescara",
+      "name": "Pescara",
+      "value": 16.5
+     },
+     {
+      "key": "ancona",
+      "name": "Ancona",
+      "value": 16.7
+     },
+     {
+      "key": "rieti",
+      "name": "Rieti",
+      "value": 17.0
+     },
+     {
+      "key": "reggio-calabria",
+      "name": "Reggio Calabria",
+      "value": 17.3
+     },
+     {
+      "key": "forli-cesena",
+      "name": "Forlì-Cesena",
+      "value": 17.6
+     },
+     {
+      "key": "siena",
+      "name": "Siena",
+      "value": 17.8
+     },
+     {
+      "key": "chieti",
+      "name": "Chieti",
+      "value": 18.1
+     },
+     {
+      "key": "lucca",
+      "name": "Lucca",
+      "value": 18.2
+     },
+     {
+      "key": "perugia",
+      "name": "Perugia",
+      "value": 18.3
+     },
+     {
+      "key": "grosseto",
+      "name": "Grosseto",
+      "value": 18.4
+     },
+     {
+      "key": "teramo",
+      "name": "Teramo",
+      "value": 18.7
+     },
+     {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara",
+      "value": 19.8
+     },
+     {
+      "key": "potenza",
+      "name": "Potenza",
+      "value": 20.1
+     },
+     {
+      "key": "arezzo",
+      "name": "Arezzo",
+      "value": 20.3
+     }
+    ],
+    "best": {
+     "key": "verbano-cusio-ossola",
+     "name": "Verbano-Cusio-Ossola",
+     "value": 4.7
+    },
+    "worst": {
+     "key": "arezzo",
+     "name": "Arezzo",
+     "value": 20.3
+    },
+    "stats": {
+     "year": 2022,
+     "year_avg": 12.265420560747664,
+     "year_count": 107,
+     "median": 12.5,
+     "above_avg_count": 55,
+     "below_avg_count": 52,
+     "year_min": 2018,
+     "year_min_avg": 13.883177570093459,
+     "year_max": 2022,
+     "has_multi_year": true,
+     "avg_change_abs": -1.6177570093457945,
+     "avg_change_pct": -11.65264220801077,
+     "gap_abs": 15.600000000000001,
+     "gap_ratio": 4.319148936170213,
+     "year_min_gap_abs": 25.7,
+     "gap_trend": -10.099999999999998,
+     "highest_delta": {
+      "key": "vercelli",
+      "name": "Vercelli",
+      "value": null,
+      "delta": 5.199999999999999,
+      "kind": "aumento"
+     },
+     "lowest_delta": {
+      "key": "arezzo",
+      "name": "Arezzo",
+      "value": null,
+      "delta": -10.2,
+      "kind": "calo"
+     }
+    },
+    "annual_change": {
+     "year": 2022,
+     "previous_year": 2021,
+     "year_gap": 1,
+     "common_count": 107,
+     "current_count": 107,
+     "previous_count": 107,
+     "same_coverage": true,
+     "previous_avg": 12.855140186915888,
+     "current_avg": 12.265420560747664,
+     "average_delta": -0.5897196261682236,
+     "average_delta_pct": -4.587422755361682,
+     "increase_count": 45,
+     "decrease_count": 61,
+     "stable_count": 1,
+     "largest_increases": [
+      {
+       "key": "isernia",
+       "name": "Isernia",
+       "value": null,
+       "delta": 3.5999999999999996,
+       "kind": "aumento",
+       "previous_value": 12.0,
+       "current_value": 15.6
+      },
+      {
+       "key": "massa-carrara",
+       "name": "Massa-Carrara",
+       "value": null,
+       "delta": 2.8000000000000007,
+       "kind": "aumento",
+       "previous_value": 17.0,
+       "current_value": 19.8
+      },
+      {
+       "key": "avellino",
+       "name": "Avellino",
+       "value": null,
+       "delta": 2.5999999999999996,
+       "kind": "aumento",
+       "previous_value": 11.8,
+       "current_value": 14.4
+      }
+     ],
+     "largest_decreases": [
+      {
+       "key": "ascoli-piceno",
+       "name": "Ascoli Piceno",
+       "value": null,
+       "delta": -6.5,
+       "kind": "calo",
+       "previous_value": 22.2,
+       "current_value": 15.7
+      },
+      {
+       "key": "oristano",
+       "name": "Oristano",
+       "value": null,
+       "delta": -5.800000000000001,
+       "kind": "calo",
+       "previous_value": 19.0,
+       "current_value": 13.2
+      },
+      {
+       "key": "potenza",
+       "name": "Potenza",
+       "value": null,
+       "delta": -5.0,
+       "kind": "calo",
+       "previous_value": 25.1,
+       "current_value": 20.1
+      }
+     ]
+    },
+    "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+    "trend_note": "una variazione media favorevole",
+    "coverage": 1.0,
+    "territory_total": 107,
+    "territories": [
+     {
+      "key": "agrigento",
+      "name": "Agrigento"
+     },
+     {
+      "key": "alessandria",
+      "name": "Alessandria"
+     },
+     {
+      "key": "ancona",
+      "name": "Ancona"
+     },
+     {
+      "key": "aosta",
+      "name": "Aosta"
+     },
+     {
+      "key": "arezzo",
+      "name": "Arezzo"
+     },
+     {
+      "key": "ascoli-piceno",
+      "name": "Ascoli Piceno"
+     },
+     {
+      "key": "asti",
+      "name": "Asti"
+     },
+     {
+      "key": "avellino",
+      "name": "Avellino"
+     },
+     {
+      "key": "bari",
+      "name": "Bari"
+     },
+     {
+      "key": "barletta-andria-trani",
+      "name": "Barletta-Andria-Trani"
+     },
+     {
+      "key": "belluno",
+      "name": "Belluno"
+     },
+     {
+      "key": "benevento",
+      "name": "Benevento"
+     },
+     {
+      "key": "bergamo",
+      "name": "Bergamo"
+     },
+     {
+      "key": "biella",
+      "name": "Biella"
+     },
+     {
+      "key": "bologna",
+      "name": "Bologna"
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano"
+     },
+     {
+      "key": "brescia",
+      "name": "Brescia"
+     },
+     {
+      "key": "brindisi",
+      "name": "Brindisi"
+     },
+     {
+      "key": "cagliari",
+      "name": "Cagliari"
+     },
+     {
+      "key": "caltanissetta",
+      "name": "Caltanissetta"
+     },
+     {
+      "key": "campobasso",
+      "name": "Campobasso"
+     },
+     {
+      "key": "caserta",
+      "name": "Caserta"
+     },
+     {
+      "key": "catania",
+      "name": "Catania"
+     },
+     {
+      "key": "catanzaro",
+      "name": "Catanzaro"
+     },
+     {
+      "key": "chieti",
+      "name": "Chieti"
+     },
+     {
+      "key": "como",
+      "name": "Como"
+     },
+     {
+      "key": "cosenza",
+      "name": "Cosenza"
+     },
+     {
+      "key": "cremona",
+      "name": "Cremona"
+     },
+     {
+      "key": "crotone",
+      "name": "Crotone"
+     },
+     {
+      "key": "cuneo",
+      "name": "Cuneo"
+     },
+     {
+      "key": "enna",
+      "name": "Enna"
+     },
+     {
+      "key": "fermo",
+      "name": "Fermo"
+     },
+     {
+      "key": "ferrara",
+      "name": "Ferrara"
+     },
+     {
+      "key": "firenze",
+      "name": "Firenze"
+     },
+     {
+      "key": "foggia",
+      "name": "Foggia"
+     },
+     {
+      "key": "forli-cesena",
+      "name": "Forlì-Cesena"
+     },
+     {
+      "key": "frosinone",
+      "name": "Frosinone"
+     },
+     {
+      "key": "genova",
+      "name": "Genova"
+     },
+     {
+      "key": "gorizia",
+      "name": "Gorizia"
+     },
+     {
+      "key": "grosseto",
+      "name": "Grosseto"
+     },
+     {
+      "key": "imperia",
+      "name": "Imperia"
+     },
+     {
+      "key": "isernia",
+      "name": "Isernia"
+     },
+     {
+      "key": "l-aquila",
+      "name": "L'Aquila"
+     },
+     {
+      "key": "la-spezia",
+      "name": "La Spezia"
+     },
+     {
+      "key": "latina",
+      "name": "Latina"
+     },
+     {
+      "key": "lecce",
+      "name": "Lecce"
+     },
+     {
+      "key": "lecco",
+      "name": "Lecco"
+     },
+     {
+      "key": "livorno",
+      "name": "Livorno"
+     },
+     {
+      "key": "lodi",
+      "name": "Lodi"
+     },
+     {
+      "key": "lucca",
+      "name": "Lucca"
+     },
+     {
+      "key": "macerata",
+      "name": "Macerata"
+     },
+     {
+      "key": "mantova",
+      "name": "Mantova"
+     },
+     {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara"
+     },
+     {
+      "key": "matera",
+      "name": "Matera"
+     },
+     {
+      "key": "messina",
+      "name": "Messina"
+     },
+     {
+      "key": "milano",
+      "name": "Milano"
+     },
+     {
+      "key": "modena",
+      "name": "Modena"
+     },
+     {
+      "key": "monza-e-della-brianza",
+      "name": "Monza e della Brianza"
+     },
+     {
+      "key": "napoli",
+      "name": "Napoli"
+     },
+     {
+      "key": "novara",
+      "name": "Novara"
+     },
+     {
+      "key": "nuoro",
+      "name": "Nuoro"
+     },
+     {
+      "key": "oristano",
+      "name": "Oristano"
+     },
+     {
+      "key": "padova",
+      "name": "Padova"
+     },
+     {
+      "key": "palermo",
+      "name": "Palermo"
+     },
+     {
+      "key": "parma",
+      "name": "Parma"
+     },
+     {
+      "key": "pavia",
+      "name": "Pavia"
+     },
+     {
+      "key": "perugia",
+      "name": "Perugia"
+     },
+     {
+      "key": "pesaro-e-urbino",
+      "name": "Pesaro e Urbino"
+     },
+     {
+      "key": "pescara",
+      "name": "Pescara"
+     },
+     {
+      "key": "piacenza",
+      "name": "Piacenza"
+     },
+     {
+      "key": "pisa",
+      "name": "Pisa"
+     },
+     {
+      "key": "pistoia",
+      "name": "Pistoia"
+     },
+     {
+      "key": "pordenone",
+      "name": "Pordenone"
+     },
+     {
+      "key": "potenza",
+      "name": "Potenza"
+     },
+     {
+      "key": "prato",
+      "name": "Prato"
+     },
+     {
+      "key": "ragusa",
+      "name": "Ragusa"
+     },
+     {
+      "key": "ravenna",
+      "name": "Ravenna"
+     },
+     {
+      "key": "reggio-calabria",
+      "name": "Reggio Calabria"
+     },
+     {
+      "key": "reggio-emilia",
+      "name": "Reggio Emilia"
+     },
+     {
+      "key": "rieti",
+      "name": "Rieti"
+     },
+     {
+      "key": "rimini",
+      "name": "Rimini"
+     },
+     {
+      "key": "roma",
+      "name": "Roma"
+     },
+     {
+      "key": "rovigo",
+      "name": "Rovigo"
+     },
+     {
+      "key": "salerno",
+      "name": "Salerno"
+     },
+     {
+      "key": "sassari",
+      "name": "Sassari"
+     },
+     {
+      "key": "savona",
+      "name": "Savona"
+     },
+     {
+      "key": "siena",
+      "name": "Siena"
+     },
+     {
+      "key": "siracusa",
+      "name": "Siracusa"
+     },
+     {
+      "key": "sondrio",
+      "name": "Sondrio"
+     },
+     {
+      "key": "sud-sardegna",
+      "name": "Sud Sardegna"
+     },
+     {
+      "key": "taranto",
+      "name": "Taranto"
+     },
+     {
+      "key": "teramo",
+      "name": "Teramo"
+     },
+     {
+      "key": "terni",
+      "name": "Terni"
+     },
+     {
+      "key": "torino",
+      "name": "Torino"
+     },
+     {
+      "key": "trapani",
+      "name": "Trapani"
+     },
+     {
+      "key": "trento",
+      "name": "Trento"
+     },
+     {
+      "key": "treviso",
+      "name": "Treviso"
+     },
+     {
+      "key": "trieste",
+      "name": "Trieste"
+     },
+     {
+      "key": "udine",
+      "name": "Udine"
+     },
+     {
+      "key": "varese",
+      "name": "Varese"
+     },
+     {
+      "key": "venezia",
+      "name": "Venezia"
+     },
+     {
+      "key": "verbano-cusio-ossola",
+      "name": "Verbano-Cusio-Ossola"
+     },
+     {
+      "key": "vercelli",
+      "name": "Vercelli"
+     },
+     {
+      "key": "verona",
+      "name": "Verona"
+     },
+     {
+      "key": "vibo-valentia",
+      "name": "Vibo Valentia"
+     },
+     {
+      "key": "vicenza",
+      "name": "Vicenza"
+     },
+     {
+      "key": "viterbo",
+      "name": "Viterbo"
+     }
+    ],
+    "default_territory": {
+     "key": "verbano-cusio-ossola",
+     "name": "Verbano-Cusio-Ossola",
+     "value": 4.7
+    },
+    "matrix": {
+     "2018": {
+      "agrigento": 13.5,
+      "alessandria": 12.9,
+      "ancona": 14.9,
+      "aosta": 9.9,
+      "arezzo": 30.5,
+      "ascoli-piceno": 23.9,
+      "asti": 9.3,
+      "avellino": 15.4,
+      "bari": 12.5,
+      "barletta-andria-trani": 11.0,
+      "belluno": 9.4,
+      "benevento": 20.4,
+      "bergamo": 12.4,
+      "biella": 4.8,
+      "bologna": 10.7,
+      "bolzano": 14.4,
+      "brescia": 10.8,
+      "brindisi": 14.3,
+      "cagliari": 14.3,
+      "caltanissetta": 18.7,
+      "campobasso": 13.5,
+      "caserta": 11.9,
+      "catania": 16.9,
+      "catanzaro": 13.3,
+      "chieti": 21.6,
+      "como": 6.5,
+      "cosenza": 17.8,
+      "cremona": 8.2,
+      "crotone": 16.9,
+      "cuneo": 13.2,
+      "enna": 16.2,
+      "fermo": 11.7,
+      "ferrara": 10.5,
+      "firenze": 10.6,
+      "foggia": 13.8,
+      "forli-cesena": 20.2,
+      "frosinone": 10.1,
+      "genova": 16.2,
+      "gorizia": 10.2,
+      "grosseto": 20.6,
+      "imperia": 9.4,
+      "isernia": 14.6,
+      "l-aquila": 17.3,
+      "la-spezia": 20.3,
+      "latina": 11.3,
+      "lecce": 13.9,
+      "lecco": 8.4,
+      "livorno": 19.7,
+      "lodi": 9.4,
+      "lucca": 18.7,
+      "macerata": 17.4,
+      "mantova": 8.9,
+      "massa-carrara": 17.0,
+      "matera": 13.7,
+      "messina": 12.6,
+      "milano": 5.3,
+      "modena": 13.1,
+      "monza-e-della-brianza": 6.9,
+      "napoli": 8.3,
+      "novara": 6.2,
+      "nuoro": 20.9,
+      "oristano": 21.6,
+      "padova": 13.4,
+      "palermo": 13.2,
+      "parma": 13.3,
+      "pavia": 7.2,
+      "perugia": 18.0,
+      "pesaro-e-urbino": 17.4,
+      "pescara": 16.9,
+      "piacenza": 14.1,
+      "pisa": 16.7,
+      "pistoia": 11.6,
+      "pordenone": 9.5,
+      "potenza": 29.6,
+      "prato": 9.5,
+      "ragusa": 18.4,
+      "ravenna": 12.8,
+      "reggio-calabria": 24.1,
+      "reggio-emilia": 20.8,
+      "rieti": 18.3,
+      "rimini": 14.3,
+      "roma": 7.1,
+      "rovigo": 11.3,
+      "salerno": 12.4,
+      "sassari": 13.0,
+      "savona": 12.9,
+      "siena": 18.7,
+      "siracusa": 13.0,
+      "sondrio": 10.2,
+      "sud-sardegna": 21.8,
+      "taranto": 17.6,
+      "teramo": 16.0,
+      "terni": 19.0,
+      "torino": 6.5,
+      "trapani": 14.3,
+      "trento": 10.4,
+      "treviso": 13.4,
+      "trieste": 9.9,
+      "udine": 10.2,
+      "varese": 8.7,
+      "venezia": 10.2,
+      "verbano-cusio-ossola": 7.3,
+      "vercelli": 9.3,
+      "verona": 14.9,
+      "vibo-valentia": 15.7,
+      "vicenza": 12.5,
+      "viterbo": 11.3
+     },
+     "2019": {
+      "agrigento": 13.3,
+      "alessandria": 13.0,
+      "ancona": 14.6,
+      "aosta": 9.5,
+      "arezzo": 22.6,
+      "ascoli-piceno": 26.0,
+      "asti": 10.4,
+      "avellino": 15.2,
+      "bari": 11.7,
+      "barletta-andria-trani": 9.0,
+      "belluno": 7.5,
+      "benevento": 17.2,
+      "bergamo": 10.9,
+      "biella": 4.0,
+      "bologna": 10.0,
+      "bolzano": 14.0,
+      "brescia": 10.5,
+      "brindisi": 12.3,
+      "cagliari": 12.2,
+      "caltanissetta": 19.9,
+      "campobasso": 11.4,
+      "caserta": 11.5,
+      "catania": 16.9,
+      "catanzaro": 11.0,
+      "chieti": 20.9,
+      "como": 5.8,
+      "cosenza": 17.2,
+      "cremona": 8.7,
+      "crotone": 12.7,
+      "cuneo": 12.6,
+      "enna": 14.4,
+      "fermo": 10.1,
+      "ferrara": 9.9,
+      "firenze": 9.7,
+      "foggia": 13.4,
+      "forli-cesena": 16.6,
+      "frosinone": 11.0,
+      "genova": 13.5,
+      "gorizia": 11.3,
+      "grosseto": 19.7,
+      "imperia": 10.2,
+      "isernia": 16.8,
+      "l-aquila": 17.4,
+      "la-spezia": 22.1,
+      "latina": 10.8,
+      "lecce": 15.7,
+      "lecco": 6.8,
+      "livorno": 22.5,
+      "lodi": 8.6,
+      "lucca": 18.1,
+      "macerata": 15.1,
+      "mantova": 10.2,
+      "massa-carrara": 14.7,
+      "matera": 12.1,
+      "messina": 13.5,
+      "milano": 5.3,
+      "modena": 12.9,
+      "monza-e-della-brianza": 6.9,
+      "napoli": 9.1,
+      "novara": 6.1,
+      "nuoro": 19.7,
+      "oristano": 17.6,
+      "padova": 11.9,
+      "palermo": 14.0,
+      "parma": 12.4,
+      "pavia": 7.7,
+      "perugia": 17.4,
+      "pesaro-e-urbino": 15.7,
+      "pescara": 16.8,
+      "piacenza": 14.9,
+      "pisa": 15.4,
+      "pistoia": 11.7,
+      "pordenone": 9.8,
+      "potenza": 29.7,
+      "prato": 10.1,
+      "ragusa": 18.1,
+      "ravenna": 12.5,
+      "reggio-calabria": 20.2,
+      "reggio-emilia": 22.7,
+      "rieti": 13.4,
+      "rimini": 15.6,
+      "roma": 7.2,
+      "rovigo": 10.2,
+      "salerno": 14.7,
+      "sassari": 12.8,
+      "savona": 14.2,
+      "siena": 15.5,
+      "siracusa": 12.0,
+      "sondrio": 12.1,
+      "sud-sardegna": 20.8,
+      "taranto": 15.9,
+      "teramo": 14.6,
+      "terni": 17.1,
+      "torino": 6.5,
+      "trapani": 10.1,
+      "trento": 11.9,
+      "treviso": 12.4,
+      "trieste": 11.6,
+      "udine": 10.9,
+      "varese": 10.3,
+      "venezia": 8.7,
+      "verbano-cusio-ossola": 5.7,
+      "vercelli": 8.4,
+      "verona": 13.5,
+      "vibo-valentia": 19.2,
+      "vicenza": 10.7,
+      "viterbo": 15.1
+     },
+     "2020": {
+      "agrigento": 11.2,
+      "alessandria": 11.6,
+      "ancona": 14.4,
+      "aosta": 9.9,
+      "arezzo": 19.5,
+      "ascoli-piceno": 21.1,
+      "asti": 7.9,
+      "avellino": 13.2,
+      "bari": 10.4,
+      "barletta-andria-trani": 9.6,
+      "belluno": 9.8,
+      "benevento": 13.5,
+      "bergamo": 12.2,
+      "biella": 5.2,
+      "bologna": 9.6,
+      "bolzano": 13.6,
+      "brescia": 10.8,
+      "brindisi": 14.7,
+      "cagliari": 10.1,
+      "caltanissetta": 15.0,
+      "campobasso": 13.2,
+      "caserta": 10.6,
+      "catania": 11.3,
+      "catanzaro": 10.6,
+      "chieti": 16.7,
+      "como": 5.0,
+      "cosenza": 14.5,
+      "cremona": 11.5,
+      "crotone": 13.8,
+      "cuneo": 11.8,
+      "enna": 13.9,
+      "fermo": 12.9,
+      "ferrara": 9.7,
+      "firenze": 8.1,
+      "foggia": 13.9,
+      "forli-cesena": 15.6,
+      "frosinone": 9.3,
+      "genova": 12.0,
+      "gorizia": 10.9,
+      "grosseto": 15.8,
+      "imperia": 12.9,
+      "isernia": 15.6,
+      "l-aquila": 14.8,
+      "la-spezia": 19.8,
+      "latina": 10.6,
+      "lecce": 14.3,
+      "lecco": 8.4,
+      "livorno": 19.5,
+      "lodi": 10.9,
+      "lucca": 17.4,
+      "macerata": 13.3,
+      "mantova": 7.6,
+      "massa-carrara": 13.9,
+      "matera": 12.1,
+      "messina": 15.9,
+      "milano": 5.1,
+      "modena": 11.4,
+      "monza-e-della-brianza": 6.6,
+      "napoli": 8.6,
+      "novara": 5.3,
+      "nuoro": 14.3,
+      "oristano": 19.3,
+      "padova": 10.7,
+      "palermo": 10.3,
+      "parma": 13.3,
+      "pavia": 6.5,
+      "perugia": 15.6,
+      "pesaro-e-urbino": 14.6,
+      "pescara": 13.2,
+      "piacenza": 13.9,
+      "pisa": 13.4,
+      "pistoia": 11.6,
+      "pordenone": 8.3,
+      "potenza": 19.7,
+      "prato": 8.5,
+      "ragusa": 16.5,
+      "ravenna": 11.5,
+      "reggio-calabria": 14.1,
+      "reggio-emilia": 19.0,
+      "rieti": 15.4,
+      "rimini": 13.4,
+      "roma": 7.3,
+      "rovigo": 11.4,
+      "salerno": 13.4,
+      "sassari": 11.6,
+      "savona": 13.5,
+      "siena": 11.5,
+      "siracusa": 9.3,
+      "sondrio": 13.0,
+      "sud-sardegna": 14.7,
+      "taranto": 12.0,
+      "teramo": 14.4,
+      "terni": 16.1,
+      "torino": 6.4,
+      "trapani": 10.6,
+      "trento": 9.9,
+      "treviso": 11.7,
+      "trieste": 9.7,
+      "udine": 9.5,
+      "varese": 9.9,
+      "venezia": 10.0,
+      "verbano-cusio-ossola": 6.2,
+      "vercelli": 9.9,
+      "verona": 13.6,
+      "vibo-valentia": 18.7,
+      "vicenza": 10.6,
+      "viterbo": 15.4
+     },
+     "2021": {
+      "agrigento": 14.0,
+      "alessandria": 11.0,
+      "ancona": 16.3,
+      "aosta": 10.5,
+      "arezzo": 19.7,
+      "ascoli-piceno": 22.2,
+      "asti": 10.9,
+      "avellino": 11.8,
+      "bari": 12.6,
+      "barletta-andria-trani": 12.0,
+      "belluno": 10.2,
+      "benevento": 12.7,
+      "bergamo": 12.2,
+      "biella": 4.9,
+      "bologna": 9.9,
+      "bolzano": 13.9,
+      "brescia": 11.8,
+      "brindisi": 18.0,
+      "cagliari": 9.3,
+      "caltanissetta": 13.0,
+      "campobasso": 14.8,
+      "caserta": 9.2,
+      "catania": 12.1,
+      "catanzaro": 11.1,
+      "chieti": 17.6,
+      "como": 6.6,
+      "cosenza": 16.3,
+      "cremona": 8.8,
+      "crotone": 17.6,
+      "cuneo": 11.4,
+      "enna": 16.9,
+      "fermo": 13.0,
+      "ferrara": 11.1,
+      "firenze": 8.8,
+      "foggia": 14.0,
+      "forli-cesena": 17.0,
+      "frosinone": 8.1,
+      "genova": 12.8,
+      "gorizia": 11.9,
+      "grosseto": 17.5,
+      "imperia": 12.3,
+      "isernia": 12.0,
+      "l-aquila": 16.7,
+      "la-spezia": 19.9,
+      "latina": 10.2,
+      "lecce": 13.6,
+      "lecco": 8.2,
+      "livorno": 18.8,
+      "lodi": 9.7,
+      "lucca": 17.8,
+      "macerata": 15.2,
+      "mantova": 8.8,
+      "massa-carrara": 17.0,
+      "matera": 12.2,
+      "messina": 15.8,
+      "milano": 6.0,
+      "modena": 12.5,
+      "monza-e-della-brianza": 6.4,
+      "napoli": 9.8,
+      "novara": 4.8,
+      "nuoro": 13.8,
+      "oristano": 19.0,
+      "padova": 12.2,
+      "palermo": 11.8,
+      "parma": 12.5,
+      "pavia": 6.6,
+      "perugia": 16.4,
+      "pesaro-e-urbino": 16.8,
+      "pescara": 16.3,
+      "piacenza": 16.6,
+      "pisa": 14.4,
+      "pistoia": 11.1,
+      "pordenone": 8.4,
+      "potenza": 25.1,
+      "prato": 9.3,
+      "ragusa": 17.0,
+      "ravenna": 8.4,
+      "reggio-calabria": 17.6,
+      "reggio-emilia": 19.2,
+      "rieti": 18.1,
+      "rimini": 14.7,
+      "roma": 7.3,
+      "rovigo": 10.6,
+      "salerno": 11.7,
+      "sassari": 15.2,
+      "savona": 12.9,
+      "siena": 15.8,
+      "siracusa": 12.0,
+      "sondrio": 9.1,
+      "sud-sardegna": 12.5,
+      "taranto": 16.4,
+      "teramo": 16.4,
+      "terni": 16.4,
+      "torino": 6.9,
+      "trapani": 13.5,
+      "trento": 11.4,
+      "treviso": 12.2,
+      "trieste": 9.2,
+      "udine": 9.0,
+      "varese": 10.0,
+      "venezia": 8.6,
+      "verbano-cusio-ossola": 6.3,
+      "vercelli": 14.9,
+      "verona": 13.9,
+      "vibo-valentia": 13.3,
+      "vicenza": 10.1,
+      "viterbo": 13.4
+     },
+     "2022": {
+      "agrigento": 13.0,
+      "alessandria": 11.7,
+      "ancona": 16.7,
+      "aosta": 10.2,
+      "arezzo": 20.3,
+      "ascoli-piceno": 15.7,
+      "asti": 9.9,
+      "avellino": 14.4,
+      "bari": 13.4,
+      "barletta-andria-trani": 10.0,
+      "belluno": 8.4,
+      "benevento": 13.7,
+      "bergamo": 10.1,
+      "biella": 6.3,
+      "bologna": 8.6,
+      "bolzano": 12.5,
+      "brescia": 11.2,
+      "brindisi": 13.5,
+      "cagliari": 8.4,
+      "caltanissetta": 15.5,
+      "campobasso": 13.1,
+      "caserta": 9.8,
+      "catania": 12.8,
+      "catanzaro": 8.0,
+      "chieti": 18.1,
+      "como": 6.7,
+      "cosenza": 13.9,
+      "cremona": 9.9,
+      "crotone": 14.0,
+      "cuneo": 11.1,
+      "enna": 12.9,
+      "fermo": 10.0,
+      "ferrara": 12.8,
+      "firenze": 9.0,
+      "foggia": 12.8,
+      "forli-cesena": 17.6,
+      "frosinone": 10.6,
+      "genova": 11.8,
+      "gorizia": 9.0,
+      "grosseto": 18.4,
+      "imperia": 9.4,
+      "isernia": 15.6,
+      "l-aquila": 12.8,
+      "la-spezia": 15.4,
+      "latina": 9.8,
+      "lecce": 12.9,
+      "lecco": 8.9,
+      "livorno": 16.3,
+      "lodi": 9.4,
+      "lucca": 18.2,
+      "macerata": 15.5,
+      "mantova": 5.8,
+      "massa-carrara": 19.8,
+      "matera": 10.8,
+      "messina": 16.4,
+      "milano": 6.4,
+      "modena": 12.2,
+      "monza-e-della-brianza": 7.0,
+      "napoli": 9.6,
+      "novara": 4.8,
+      "nuoro": 12.5,
+      "oristano": 13.2,
+      "padova": 10.6,
+      "palermo": 12.0,
+      "parma": 11.5,
+      "pavia": 5.9,
+      "perugia": 18.3,
+      "pesaro-e-urbino": 15.1,
+      "pescara": 16.5,
+      "piacenza": 12.6,
+      "pisa": 16.0,
+      "pistoia": 12.7,
+      "pordenone": 8.0,
+      "potenza": 20.1,
+      "prato": 10.0,
+      "ragusa": 15.0,
+      "ravenna": 9.1,
+      "reggio-calabria": 17.3,
+      "reggio-emilia": 14.2,
+      "rieti": 17.0,
+      "rimini": 15.5,
+      "roma": 7.1,
+      "rovigo": 12.1,
+      "salerno": 14.1,
+      "sassari": 15.4,
+      "savona": 11.9,
+      "siena": 17.8,
+      "siracusa": 12.4,
+      "sondrio": 8.5,
+      "sud-sardegna": 13.0,
+      "taranto": 13.6,
+      "teramo": 18.7,
+      "terni": 16.3,
+      "torino": 6.6,
+      "trapani": 12.7,
+      "trento": 12.0,
+      "treviso": 11.5,
+      "trieste": 8.6,
+      "udine": 9.1,
+      "varese": 10.1,
+      "venezia": 8.1,
+      "verbano-cusio-ossola": 4.7,
+      "vercelli": 14.5,
+      "verona": 12.8,
+      "vibo-valentia": 11.9,
+      "vicenza": 8.6,
+      "viterbo": 14.4
+     }
+    },
+    "annual_means": [
+     {
+      "year": 2018,
+      "avg": 13.883177570093459
+     },
+     {
+      "year": 2019,
+      "avg": 13.330841121495327
+     },
+     {
+      "year": 2020,
+      "avg": 12.25981308411215
+     },
+     {
+      "year": 2021,
+      "avg": 12.855140186915888
+     },
+     {
+      "year": 2022,
+      "avg": 12.265420560747664
+     }
+    ],
+    "map_colors": null,
+    "cover_bars": null,
+    "bar_max": 20.3,
+    "query_map": [
+     {
+      "intent": "definizione",
+      "label": "Che cosa misura Tasso di infortuni sul lavoro mortali e con inabilità permanente?",
+      "target": "sezione-definizione"
+     },
+     {
+      "intent": "dato",
+      "label": "Qual è il dato più recente, nel 2022?",
+      "target": "esplora"
+     },
+     {
+      "intent": "classifica",
+      "label": "Qual è la classifica delle province nel 2022?",
+      "target": "classifica-dati"
+     },
+     {
+      "intent": "confronto",
+      "label": "Che cosa è cambiato dal 2021 al 2022?",
+      "target": "sezione-dinamica"
+     },
+     {
+      "intent": "andamento",
+      "label": "Come è cambiato dal 2018 al 2022?",
+      "target": "serie-storica"
+     },
+     {
+      "intent": "metodologia",
+      "label": "Come sono calcolati confronti e medie?",
+      "target": "fonti-verifica"
+     }
+    ]
+   }
+  ],
+  "level": {
+   "key": "regione",
+   "label": "Regioni",
+   "singular": "regione",
+   "plural": "regioni",
+   "profile_path": "/regione/",
+   "has_map": true,
+   "explain": {
+    "plain": "Rapporta il tasso di infortuni sul lavoro mortali e con inabilità permanente a 10.000 occupati, così territori di dimensioni diverse sono confrontabili.",
+    "example": "Un valore di 12 corrisponde a 12 casi ogni 10.000 occupati.",
+    "scope": "Il confronto applica la stessa definizione in tutte le regioni e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore.",
+    "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra regioni descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "lower_better"
+   },
+   "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+   ],
+   "year_min": 2018,
+   "year_max": 2022,
+   "observations": [
+    {
+     "key": "piemonte",
+     "name": "Piemonte",
+     "value": 8.0
+    },
+    {
+     "key": "lombardia",
+     "name": "Lombardia",
+     "value": 8.1
+    },
+    {
+     "key": "lazio",
+     "name": "Lazio",
+     "value": 8.2
+    },
+    {
+     "key": "friuli-venezia-giulia",
+     "name": "Friuli-Venezia Giulia",
+     "value": 8.8
+    },
+    {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta",
+     "value": 10.2
+    },
+    {
+     "key": "veneto",
+     "name": "Veneto",
+     "value": 10.4
+    },
+    {
+     "key": "campania",
+     "name": "Campania",
+     "value": 11.2
+    },
+    {
+     "key": "liguria",
+     "name": "Liguria",
+     "value": 12.0
+    },
+    {
+     "key": "emilia-romagna",
+     "name": "Emilia-Romagna",
+     "value": 12.1
+    },
+    {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 12.3
+    },
+    {
+     "key": "sardegna",
+     "name": "Sardegna",
+     "value": 12.4
+    },
+    {
+     "key": "puglia",
+     "name": "Puglia",
+     "value": 13.0
+    },
+    {
+     "key": "sicilia",
+     "name": "Sicilia",
+     "value": 13.4
+    },
+    {
+     "key": "calabria",
+     "name": "Calabria",
+     "value": 13.5
+    },
+    {
+     "key": "molise",
+     "name": "Molise",
+     "value": 13.8
+    },
+    {
+     "key": "toscana",
+     "name": "Toscana",
+     "value": 14.4
+    },
+    {
+     "key": "marche",
+     "name": "Marche",
+     "value": 15.3
+    },
+    {
+     "key": "abruzzo",
+     "name": "Abruzzo",
+     "value": 16.7
+    },
+    {
+     "key": "basilicata",
+     "name": "Basilicata",
+     "value": 16.8
+    },
+    {
+     "key": "umbria",
+     "name": "Umbria",
+     "value": 17.8
+    }
+   ],
+   "best": {
+    "key": "piemonte",
+    "name": "Piemonte",
+    "value": 8.0
+   },
+   "worst": {
+    "key": "umbria",
+    "name": "Umbria",
+    "value": 17.8
+   },
+   "stats": {
+    "year": 2022,
+    "year_avg": 12.42,
+    "year_count": 20,
+    "median": 12.350000000000001,
+    "above_avg_count": 9,
+    "below_avg_count": 11,
+    "year_min": 2018,
+    "year_min_avg": 14.01,
+    "year_max": 2022,
+    "has_multi_year": true,
+    "avg_change_abs": -1.5899999999999999,
+    "avg_change_pct": -11.349036402569594,
+    "gap_abs": 9.8,
+    "gap_ratio": 2.225,
+    "year_min_gap_abs": 16.200000000000003,
+    "gap_trend": -6.400000000000002,
+    "highest_delta": {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta",
+     "value": null,
+     "delta": 0.29999999999999893,
+     "kind": "aumento"
+    },
+    "lowest_delta": {
+     "key": "basilicata",
+     "name": "Basilicata",
+     "value": null,
+     "delta": -7.300000000000001,
+     "kind": "calo"
+    }
+   },
+   "annual_change": {
+    "year": 2022,
+    "previous_year": 2021,
+    "year_gap": 1,
+    "common_count": 20,
+    "current_count": 20,
+    "previous_count": 20,
+    "same_coverage": true,
+    "previous_avg": 13.025,
+    "current_avg": 12.42,
+    "average_delta": -0.6050000000000004,
+    "average_delta_pct": -4.644913627639158,
+    "increase_count": 3,
+    "decrease_count": 15,
+    "stable_count": 2,
+    "largest_increases": [
+     {
+      "key": "umbria",
+      "name": "Umbria",
+      "value": null,
+      "delta": 1.3000000000000007,
+      "kind": "aumento",
+      "previous_value": 16.5,
+      "current_value": 17.8
+     },
+     {
+      "key": "campania",
+      "name": "Campania",
+      "value": null,
+      "delta": 0.6999999999999993,
+      "kind": "aumento",
+      "previous_value": 10.5,
+      "current_value": 11.2
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana",
+      "value": null,
+      "delta": 0.5,
+      "kind": "aumento",
+      "previous_value": 13.9,
+      "current_value": 14.4
+     }
+    ],
+    "largest_decreases": [
+     {
+      "key": "basilicata",
+      "name": "Basilicata",
+      "value": null,
+      "delta": -3.8000000000000007,
+      "kind": "calo",
+      "previous_value": 20.6,
+      "current_value": 16.8
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria",
+      "value": null,
+      "delta": -2.0,
+      "kind": "calo",
+      "previous_value": 15.5,
+      "current_value": 13.5
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria",
+      "value": null,
+      "delta": -1.8000000000000007,
+      "kind": "calo",
+      "previous_value": 13.8,
+      "current_value": 12.0
+     }
+    ]
+   },
+   "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+   "trend_note": "una variazione media favorevole",
+   "coverage": null,
+   "territory_total": 20,
+   "territories": [
+    {
+     "key": "abruzzo",
+     "name": "Abruzzo"
+    },
+    {
+     "key": "basilicata",
+     "name": "Basilicata"
+    },
+    {
+     "key": "calabria",
+     "name": "Calabria"
+    },
+    {
+     "key": "campania",
+     "name": "Campania"
+    },
+    {
+     "key": "emilia-romagna",
+     "name": "Emilia-Romagna"
+    },
+    {
+     "key": "friuli-venezia-giulia",
+     "name": "Friuli-Venezia Giulia"
+    },
+    {
+     "key": "lazio",
+     "name": "Lazio"
+    },
+    {
+     "key": "liguria",
+     "name": "Liguria"
+    },
+    {
+     "key": "lombardia",
+     "name": "Lombardia"
+    },
+    {
+     "key": "marche",
+     "name": "Marche"
+    },
+    {
+     "key": "molise",
+     "name": "Molise"
+    },
+    {
+     "key": "piemonte",
+     "name": "Piemonte"
+    },
+    {
+     "key": "puglia",
+     "name": "Puglia"
+    },
+    {
+     "key": "sardegna",
+     "name": "Sardegna"
+    },
+    {
+     "key": "sicilia",
+     "name": "Sicilia"
+    },
+    {
+     "key": "toscana",
+     "name": "Toscana"
+    },
+    {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige"
+    },
+    {
+     "key": "umbria",
+     "name": "Umbria"
+    },
+    {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta"
+    },
+    {
+     "key": "veneto",
+     "name": "Veneto"
+    }
+   ],
+   "default_territory": {
+    "key": "piemonte",
+    "name": "Piemonte",
+    "value": 8.0
+   },
+   "matrix": {
+    "2018": {
+     "piemonte": 8.2,
+     "valle-d-aosta": 9.9,
+     "lombardia": 7.9,
+     "trentino-alto-adige": 12.5,
+     "veneto": 12.7,
+     "friuli-venezia-giulia": 9.9,
+     "liguria": 15.3,
+     "emilia-romagna": 14.0,
+     "toscana": 16.1,
+     "umbria": 18.2,
+     "marche": 16.8,
+     "lazio": 8.2,
+     "abruzzo": 18.1,
+     "molise": 13.8,
+     "campania": 10.9,
+     "puglia": 13.6,
+     "basilicata": 24.1,
+     "calabria": 18.3,
+     "sicilia": 14.8,
+     "sardegna": 16.9
+    },
+    "2019": {
+     "piemonte": 8.2,
+     "valle-d-aosta": 9.5,
+     "lombardia": 7.9,
+     "trentino-alto-adige": 13.0,
+     "veneto": 11.3,
+     "friuli-venezia-giulia": 10.8,
+     "liguria": 14.5,
+     "emilia-romagna": 13.8,
+     "toscana": 14.9,
+     "umbria": 17.4,
+     "marche": 15.9,
+     "lazio": 8.3,
+     "abruzzo": 17.6,
+     "molise": 12.9,
+     "campania": 11.6,
+     "puglia": 13.1,
+     "basilicata": 23.3,
+     "calabria": 16.6,
+     "sicilia": 14.7,
+     "sardegna": 15.5
+    },
+    "2020": {
+     "piemonte": 7.7,
+     "valle-d-aosta": 9.9,
+     "lombardia": 7.9,
+     "trentino-alto-adige": 11.8,
+     "veneto": 11.3,
+     "friuli-venezia-giulia": 9.5,
+     "liguria": 13.5,
+     "emilia-romagna": 12.7,
+     "toscana": 12.9,
+     "umbria": 15.7,
+     "marche": 15.0,
+     "lazio": 8.3,
+     "abruzzo": 14.9,
+     "molise": 14.1,
+     "campania": 10.7,
+     "puglia": 12.2,
+     "basilicata": 17.1,
+     "calabria": 13.9,
+     "sicilia": 12.2,
+     "sardegna": 12.8
+    },
+    "2021": {
+     "piemonte": 8.2,
+     "valle-d-aosta": 10.5,
+     "lombardia": 8.3,
+     "trentino-alto-adige": 12.7,
+     "veneto": 11.5,
+     "friuli-venezia-giulia": 9.2,
+     "liguria": 13.8,
+     "emilia-romagna": 13.1,
+     "toscana": 13.9,
+     "umbria": 16.5,
+     "marche": 16.6,
+     "lazio": 8.2,
+     "abruzzo": 16.8,
+     "molise": 14.0,
+     "campania": 10.5,
+     "puglia": 14.0,
+     "basilicata": 20.6,
+     "calabria": 15.5,
+     "sicilia": 13.4,
+     "sardegna": 13.2
+    },
+    "2022": {
+     "piemonte": 8.0,
+     "valle-d-aosta": 10.2,
+     "lombardia": 8.1,
+     "trentino-alto-adige": 12.3,
+     "veneto": 10.4,
+     "friuli-venezia-giulia": 8.8,
+     "liguria": 12.0,
+     "emilia-romagna": 12.1,
+     "toscana": 14.4,
+     "umbria": 17.8,
+     "marche": 15.3,
+     "lazio": 8.2,
+     "abruzzo": 16.7,
+     "molise": 13.8,
+     "campania": 11.2,
+     "puglia": 13.0,
+     "basilicata": 16.8,
+     "calabria": 13.5,
+     "sicilia": 13.4,
+     "sardegna": 12.4
+    }
+   },
+   "annual_means": [
+    {
+     "year": 2018,
+     "avg": 14.01
+    },
+    {
+     "year": 2019,
+     "avg": 13.540000000000001
+    },
+    {
+     "year": 2020,
+     "avg": 12.205
+    },
+    {
+     "year": 2021,
+     "avg": 13.025
+    },
+    {
+     "year": 2022,
+     "avg": 12.42
+    }
+   ],
+   "map_colors": {
+    "piemonte": "var(--seq-1)",
+    "lombardia": "var(--seq-1)",
+    "lazio": "var(--seq-1)",
+    "friuli-venezia-giulia": "var(--seq-1)",
+    "valle-d-aosta": "var(--seq-2)",
+    "veneto": "var(--seq-2)",
+    "campania": "var(--seq-2)",
+    "liguria": "var(--seq-3)",
+    "emilia-romagna": "var(--seq-3)",
+    "trentino-alto-adige": "var(--seq-3)",
+    "sardegna": "var(--seq-3)",
+    "puglia": "var(--seq-4)",
+    "sicilia": "var(--seq-4)",
+    "calabria": "var(--seq-4)",
+    "molise": "var(--seq-4)",
+    "toscana": "var(--seq-4)",
+    "marche": "var(--seq-5)",
+    "abruzzo": "var(--seq-6)",
+    "basilicata": "var(--seq-6)",
+    "umbria": "var(--seq-6)"
+   },
+   "cover_bars": [
+    {
+     "region": "Piemonte",
+     "region_key": "piemonte",
+     "value": 8.0,
+     "width_pct": 6,
+     "is_best": true,
+     "is_worst": false
+    },
+    {
+     "region": "Lombardia",
+     "region_key": "lombardia",
+     "value": 8.1,
+     "width_pct": 7,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Lazio",
+     "region_key": "lazio",
+     "value": 8.2,
+     "width_pct": 8,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Friuli-Venezia Giulia",
+     "region_key": "friuli-venezia-giulia",
+     "value": 8.8,
+     "width_pct": 14,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Umbria",
+     "region_key": "umbria",
+     "value": 17.8,
+     "width_pct": 100,
+     "is_best": false,
+     "is_worst": true
+    }
+   ],
+   "bar_max": 17.8,
+   "query_map": [
+    {
+     "intent": "definizione",
+     "label": "Che cosa misura Tasso di infortuni sul lavoro mortali e con inabilità permanente?",
+     "target": "sezione-definizione"
+    },
+    {
+     "intent": "dato",
+     "label": "Qual è il dato più recente, nel 2022?",
+     "target": "esplora"
+    },
+    {
+     "intent": "classifica",
+     "label": "Qual è la classifica delle regioni nel 2022?",
+     "target": "classifica-dati"
+    },
+    {
+     "intent": "confronto",
+     "label": "Che cosa è cambiato dal 2021 al 2022?",
+     "target": "sezione-dinamica"
+    },
+    {
+     "intent": "andamento",
+     "label": "Come è cambiato dal 2018 al 2022?",
+     "target": "serie-storica"
+    },
+    {
+     "intent": "metodologia",
+     "label": "Come sono calcolati confronti e medie?",
+     "target": "fonti-verifica"
+    },
+    {
+     "intent": "download",
+     "label": "Dove posso scaricare la serie?",
+     "target": "download-dati"
+    }
+   ]
+  },
+  "query_map": [
+   {
+    "intent": "definizione",
+    "label": "Che cosa misura Tasso di infortuni sul lavoro mortali e con inabilità permanente?",
+    "target": "sezione-definizione"
+   },
+   {
+    "intent": "dato",
+    "label": "Qual è il dato più recente, nel 2022?",
+    "target": "esplora"
+   },
+   {
+    "intent": "classifica",
+    "label": "Qual è la classifica delle regioni nel 2022?",
+    "target": "classifica-dati"
+   },
+   {
+    "intent": "confronto",
+    "label": "Che cosa è cambiato dal 2021 al 2022?",
+    "target": "sezione-dinamica"
+   },
+   {
+    "intent": "andamento",
+    "label": "Come è cambiato dal 2018 al 2022?",
+    "target": "serie-storica"
+   },
+   {
+    "intent": "metodologia",
+    "label": "Come sono calcolati confronti e medie?",
+    "target": "fonti-verifica"
+   },
+   {
+    "intent": "download",
+    "label": "Dove posso scaricare la serie?",
+    "target": "download-dati"
+   }
+  ],
+  "page_h1": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+  "related": [
+   {
+    "id": "bes:03LAV002-N22",
+    "name": "Tasso di mancata partecipazione al lavoro",
+    "path": "/indicatore/tasso-di-mancata-partecipazione-al-lavoro/bes-03LAV002-N22",
+    "direction": "lower_better",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2025,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 19.895
+     },
+     {
+      "year": 2019,
+      "value": 19.09
+     },
+     {
+      "year": 2020,
+      "value": 19.89
+     },
+     {
+      "year": 2021,
+      "value": 19.485
+     },
+     {
+      "year": 2022,
+      "value": 16.445
+     },
+     {
+      "year": 2023,
+      "value": 14.985
+     },
+     {
+      "year": 2024,
+      "value": 13.485
+     },
+     {
+      "year": 2025,
+      "value": 12.88
+     }
+    ],
+    "latest": 12.88
+   },
+   {
+    "id": "bes:03LAV001-N22",
+    "name": "Tasso di occupazione (20-64 anni)",
+    "path": "/indicatore/tasso-di-occupazione-20-64-anni/bes-03LAV001-N22",
+    "direction": "higher_better",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2025,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 63.14
+     },
+     {
+      "year": 2019,
+      "value": 63.78
+     },
+     {
+      "year": 2020,
+      "value": 62.205
+     },
+     {
+      "year": 2021,
+      "value": 63.105
+     },
+     {
+      "year": 2022,
+      "value": 65.1
+     },
+     {
+      "year": 2023,
+      "value": 66.62
+     },
+     {
+      "year": 2024,
+      "value": 67.46
+     },
+     {
+      "year": 2025,
+      "value": 68.015
+     }
+    ],
+    "latest": 68.015
+   },
+   {
+    "id": "bes:03LAV022-N22",
+    "name": "Soddisfazione per il lavoro svolto",
+    "path": "/indicatore/soddisfazione-per-il-lavoro-svolto/bes-03LAV022-N22",
+    "direction": "higher_better",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2025,
+    "unit": "Per 100 occupati",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 44.335
+     },
+     {
+      "year": 2019,
+      "value": 46.51
+     },
+     {
+      "year": 2020,
+      "value": 49.435
+     },
+     {
+      "year": 2021,
+      "value": 50.335
+     },
+     {
+      "year": 2022,
+      "value": 50.345
+     },
+     {
+      "year": 2023,
+      "value": 51.85
+     },
+     {
+      "year": 2024,
+      "value": 51.37
+     },
+     {
+      "year": 2025,
+      "value": 48.02
+     }
+    ],
+    "latest": 48.02
+   },
+   {
+    "id": "bes:03LAV010",
+    "name": "Occupati (15-64 anni) che svolgono più di 60 ore settimanali di lavoro retribuito e/o familiare",
+    "path": "/indicatore/occupati-15-64-anni-che-svolgono-piu-di-60-ore-settimanali-di-lavoro-retribuito-e-o-familiare/bes-03LAV010",
+    "direction": "contextual",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2014,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2009,
+      "value": 51.715
+     },
+     {
+      "year": 2014,
+      "value": 49.58
+     }
+    ],
+    "latest": 49.58
+   },
+   {
+    "id": "bes:03LAV005",
+    "name": "Dipendenti con bassa paga",
+    "path": "/indicatore/dipendenti-con-bassa-paga/bes-03LAV005",
+    "direction": "contextual",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2020,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2008,
+      "value": 10.885
+     },
+     {
+      "year": 2009,
+      "value": 11.285
+     },
+     {
+      "year": 2010,
+      "value": 12.0
+     },
+     {
+      "year": 2011,
+      "value": 11.425
+     },
+     {
+      "year": 2012,
+      "value": 11.485
+     },
+     {
+      "year": 2013,
+      "value": 11.225
+     },
+     {
+      "year": 2014,
+      "value": 11.275
+     },
+     {
+      "year": 2015,
+      "value": 11.32
+     },
+     {
+      "year": 2016,
+      "value": 11.085
+     },
+     {
+      "year": 2017,
+      "value": 10.73
+     },
+     {
+      "year": 2018,
+      "value": 10.745
+     },
+     {
+      "year": 2019,
+      "value": 10.23
+     },
+     {
+      "year": 2020,
+      "value": 10.65
+     }
+    ],
+    "latest": 10.65
+   },
+   {
+    "id": "bes:03LAV021-N22",
+    "name": "Occupati che lavorano da casa",
+    "path": "/indicatore/occupati-che-lavorano-da-casa/bes-03LAV021-N22",
+    "direction": "contextual",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2025,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 4.67
+     },
+     {
+      "year": 2019,
+      "value": 4.59
+     },
+     {
+      "year": 2020,
+      "value": 12.515
+     },
+     {
+      "year": 2021,
+      "value": 12.865
+     },
+     {
+      "year": 2022,
+      "value": 10.305
+     },
+     {
+      "year": 2023,
+      "value": 10.055
+     },
+     {
+      "year": 2024,
+      "value": 8.645
+     },
+     {
+      "year": 2025,
+      "value": 6.965
+     }
+    ],
+    "latest": 6.965
+   },
+   {
+    "id": "bes:03LAV004-N22",
+    "name": "Occupati in lavori a termine da almeno 5 anni",
+    "path": "/indicatore/occupati-in-lavori-a-termine-da-almeno-5-anni/bes-03LAV004-N22",
+    "direction": "lower_better",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2025,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 18.075
+     },
+     {
+      "year": 2019,
+      "value": 18.0
+     },
+     {
+      "year": 2020,
+      "value": 18.43
+     },
+     {
+      "year": 2021,
+      "value": 17.61
+     },
+     {
+      "year": 2022,
+      "value": 17.22
+     },
+     {
+      "year": 2023,
+      "value": 18.26
+     },
+     {
+      "year": 2024,
+      "value": 19.275
+     },
+     {
+      "year": 2025,
+      "value": 21.25
+     }
+    ],
+    "latest": 21.25
+   },
+   {
+    "id": "bes:03LAV008",
+    "name": "Occupati non regolari",
+    "path": "/indicatore/occupati-non-regolari/bes-03LAV008",
+    "direction": "contextual",
+    "source_theme": "Lavoro e conciliazione dei tempi di vita",
+    "year_max": 2022,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2021,
+      "value": 10.395
+     },
+     {
+      "year": 2022,
+      "value": 10.185
+     }
+    ],
+    "latest": 10.185
+   }
+  ],
+  "related_posts": [
+   {
+    "slug": "infortuni-lavoro-province",
+    "title": "Infortuni gravi sul lavoro: i grandi settori non bastano a spiegare la mappa",
+    "seo_title": "Infortuni gravi sul lavoro: perché Arezzo non è Mantova",
+    "description": "Arezzo e Mantova hanno la stessa quota di lavoro in campi, fabbriche e cantieri, ma ad Arezzo gli infortuni gravi sono più di tre volte. Abbiamo cercato perché.",
+    "date": "2026-09-23",
+    "date_modified": "2026-09-23",
+    "author": "Redazione Divario Italia",
+    "cover": "/static/img/blog/infortuni-lavoro-province.jpg",
+    "cover_alt": "Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere.",
+    "cover_credit": {
+     "author": "Herzi Pinki",
+     "license": "CC BY-SA 4.0",
+     "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+     "source_url": "https://commons.wikimedia.org/wiki/File:Caduta_materiali_dall%27_alto,_San_Rocco_03.jpg",
+     "source_name": "Wikimedia Commons",
+     "changes": "Ritagliata e ridimensionata"
+    },
+    "cover_caption": "Un cartello di cantiere a Pontebba, in Friuli-Venezia Giulia.",
+    "dataset": {
+     "name": "Infortuni sul lavoro mortali e con inabilità permanente e composizione settoriale dell'occupazione, per provincia",
+     "description": "Infortuni sul lavoro mortali e con inabilità permanente ogni 10.000 occupati per provincia, regione e ripartizione (2018-2022), quota di occupati in agricoltura, industria e costruzioni per provincia (2022) e tasso atteso in base ai soli settori.",
+     "license": "https://creativecommons.org/licenses/by/4.0/",
+     "creator": "Istat, Inail",
+     "method": "Tassi: dati Istat su fonte Inail, senza rielaborazione, compresi i valori ufficiali per ripartizione. Tasso atteso: regressione lineare del tasso provinciale 2022 sulle quote di occupati in agricoltura, industria in senso stretto e costruzioni (Istat, Conti territoriali), elaborazione Divario Italia con lo script scripts/articoli_trend/elab_settori_infortuni.py.",
+     "temporal": "2018/2022",
+     "spatial": "Italia, ripartizioni, regioni e province",
+     "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+     "download": "/static/data/articles/infortuni-lavoro-province.csv",
+     "download_abs": "https://divarioitalia.it/static/data/articles/infortuni-lavoro-province.csv",
+     "url": "https://divarioitalia.it/blog/infortuni-lavoro-province"
+    },
+    "social_image": "/static/img/blog/infortuni-lavoro-province.jpg",
+    "social_image_size": null,
+    "tags": [
+     "Lavoro",
+     "Sicurezza sul lavoro",
+     "Province"
+    ],
+    "indicator": "bes:03LAV007",
+    "indicator_label": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+    "read_time": 6,
+    "body_markdown": "Andrea Moretti aveva 22 anni ed è morto nella notte dentro il Colosseo, mentre lavorava al nuovo impianto di illuminazione. La notizia è arrivata il 23 settembre. Nei giorni precedenti erano morti un operaio nel Parmense e uno nel Potentino. La domanda è sempre la stessa: dove si rischia di più, e perché?\n\nLa risposta che sembra ovvia è: dove si lavora di più nei campi, nelle fabbriche e nei cantieri. Abbiamo verificato provincia per provincia, con i grandi settori dell'Istat. Spiegano poco.\n\nArezzo e Mantova hanno quasi la stessa quota di occupati in agricoltura, industria e costruzioni, il **39,6% e il 38,9%**. Ad Arezzo gli infortuni mortali o invalidanti sono 20,3 ogni 10.000 occupati, a Mantova 5,8.\n{: .data-callout}\n\n## In breve\n\n- Nel 2022 in Italia ci sono stati 11,0 infortuni sul lavoro mortali o con invalidità permanente ogni 10.000 occupati. Nel Mezzogiorno 13,0, al Centro 11,9, al Nord 9,6.\n- Le province più colpite sono in Toscana, Umbria, Abruzzo e Basilicata. Le meno colpite sono quasi tutte nel Nord-Ovest.\n- Agricoltura, industria e costruzioni, prese come grandi settori, spiegano poco più di un decimo delle differenze fra province.\n\n## Che cosa conta questo indicatore\n\nNon conta solo i morti. Conta gli infortuni che hanno ucciso qualcuno o gli hanno lasciato un danno permanente, divisi per il numero degli occupati. Il dato è dell'Istat su fonte Inail e arriva al 2022. Una nota dell'Istat avverte che i dati di quell'anno sono provvisori.\n\n## Una mappa che passa per il centro Italia\n\nIn cima ci sono Arezzo con 20,3, Potenza con 20,1 e Massa-Carrara con 19,8, poi Teramo, Grosseto, Perugia, Lucca, Chieti e Siena. In fondo non ci sono soltanto le grandi città. C'è quasi tutto il Nord-Ovest: Verbano-Cusio-Ossola 4,7, Novara 4,8, Mantova 5,8, Pavia 5,9, Biella 6,3, Milano 6,4, Torino 6,6.\n\n<!-- figura: province-2022 -->\n\n## I settori non bastano\n\nAbbiamo preso dall'Istat la quota di occupati in agricoltura, industria e costruzioni di ogni provincia, e calcolato quale tasso di infortuni avrebbe ciascuna se contassero solo quelle quote. Il metodo è una regressione lineare sulle 103 province per cui l'Istat pubblica il dato. Ne esce che i tre settori spiegano poco più di un decimo delle differenze. A parità di punti di quota, l'edilizia è quello che pesa di più.\n\n<!-- figura: settori-infortuni -->\n\nLe province in cima restano lontanissime da quello che i settori farebbero prevedere. Arezzo, in base ai settori, dovrebbe avere 12,3 infortuni gravi ogni 10.000 occupati, e ne ha 20,3. Massa-Carrara 12,1 e ne ha 19,8. Perugia 11,8 e ne ha 18,3. Potenza 13,7 e ne ha 20,1. Dall'altra parte Mantova dovrebbe avere 11,7 e ne ha 5,8, Pavia 11,6 e ne ha 5,9, il Verbano-Cusio-Ossola 12,0 e ne ha 4,7.\n\nQuesto non vuol dire che il tipo di lavoro non conti. I tre settori dell'Istat sono larghi: dentro l'industria ci sono le cave di marmo e gli uffici delle aziende. La Consulta interassociativa italiana per la prevenzione, che lavora sugli open data Inail, scrive che è corretto confrontare i tassi solo dentro un comparto omogeneo. È il passo successivo, e servono i dati per comparto. Che cosa pesi nel resto, oggi i dati pubblici non lo dicono. Le ipotesi sono la dimensione delle imprese, l'età dei lavoratori, i controlli, la sottodenuncia. Sono ipotesi, non risultati.\n\n## Chi si fa male\n\nL'Istat calcola il tasso anche per sesso, età e cittadinanza. Nel 2022 gli uomini avevano 14,8 infortuni gravi ogni 10.000 occupati, le donne 5,8. Fra gli uomini stranieri il tasso era 24,1, fra gli italiani 13,7. Fra i 50 e i 64 anni era 15,8, fra i 65 e gli 89 anni 26,0. Il tasso sale con l'età, e per gli uomini stranieri è quasi il doppio che per gli italiani.\n\n## Il divario nel tempo\n\nDal 2018 al 2022 il Mezzogiorno scende da 14,6 a 13,0, il Centro da 12,6 a 11,9, il Nord da 10,5 a 9,6. La distanza si riduce, ma il Sud resta sopra.\n\n<!-- figura: serie-2018-2022 -->\n\nPer il 2026 ci sono solo le denunce all'Inail, provvisorie. Da gennaio a luglio le morti avvenute durante il lavoro, senza contare gli studenti e i tragitti casa-lavoro, sono 422, contro 432 nello stesso periodo del 2025. Nelle costruzioni sono salite da 67 a 76.\n\n## Che cosa cambia\n\nAd Arezzo o a Potenza il tasso di infortuni che cambiano la vita è circa tre volte quello di Milano, e i grandi settori ne spiegano solo una parte. Vuol dire che quella distanza non è una fatalità legata al tipo di economia. È uno spazio in cui la prevenzione può ancora fare differenza.\n\nIl dato per regione e provincia è nella [scheda degli infortuni sul lavoro mortali e con inabilità permanente](/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007).\n\n## Dati usati\n\n- **Infortuni:** Istat, Benessere equo e sostenibile (regioni e ripartizioni ufficiali) e BES dei Territori (province), su dati Inail, 2018-2022. Per il 2026 denunce Inail provvisorie.\n- **Settori:** Istat, Conti territoriali, persone occupate per branca e provincia, 2022.\n- **Metodo:** regressione lineare del tasso provinciale sulle quote di occupati in agricoltura, industria in senso stretto e costruzioni. Script `scripts/articoli_trend/elab_settori_infortuni.py`.\n- **Limite:** è un confronto fra province, non fra lavoratori. Le branche sono larghe. Il tasso divide gli infortuni per gli occupati residenti, mentre la regressione usa gli occupati per luogo di lavoro: nelle province da cui molti lavorano altrove il confronto è meno preciso. Gli infortuni non denunciati, più probabili nel lavoro irregolare, non sono contati.\n\n## Fonti\n\n- Istat, [Benessere equo e sostenibile, appendice statistica](https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip), maggio 2026.\n- Istat, [Il benessere equo e sostenibile in Italia, Rapporto Bes 2025](https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf).\n- Istat, [Conti territoriali, occupati per branca](https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/all?startPeriod=2021).\n- Inail, [Denunce di infortuni e malattie professionali, i dati di luglio](https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html), 8 settembre 2026.\n- CIIP, [Utilizzi degli open data Inail](https://ciip-consulta.it/wp-content/uploads/2025/09/Utilizzi_Open_Data_Inail.pdf), settembre 2025.",
+    "body_html": "<p>Andrea Moretti aveva 22 anni ed è morto nella notte dentro il Colosseo, mentre lavorava al nuovo impianto di illuminazione. La notizia è arrivata il 23 settembre. Nei giorni precedenti erano morti un operaio nel Parmense e uno nel Potentino. La domanda è sempre la stessa: dove si rischia di più, e perché?</p>\n<p>La risposta che sembra ovvia è: dove si lavora di più nei campi, nelle fabbriche e nei cantieri. Abbiamo verificato provincia per provincia, con i grandi settori dell'Istat. Spiegano poco.</p>\n<p class=\"data-callout\">Arezzo e Mantova hanno quasi la stessa quota di occupati in agricoltura, industria e costruzioni, il <strong>39,6% e il 38,9%</strong>. Ad Arezzo gli infortuni mortali o invalidanti sono 20,3 ogni 10.000 occupati, a Mantova 5,8.</p>\n<h2 id=\"in-breve\">In breve</h2>\n<ul>\n<li>Nel 2022 in Italia ci sono stati 11,0 infortuni sul lavoro mortali o con invalidità permanente ogni 10.000 occupati. Nel Mezzogiorno 13,0, al Centro 11,9, al Nord 9,6.</li>\n<li>Le province più colpite sono in Toscana, Umbria, Abruzzo e Basilicata. Le meno colpite sono quasi tutte nel Nord-Ovest.</li>\n<li>Agricoltura, industria e costruzioni, prese come grandi settori, spiegano poco più di un decimo delle differenze fra province.</li>\n</ul>\n<h2 id=\"che-cosa-conta-questo-indicatore\">Che cosa conta questo indicatore</h2>\n<p>Non conta solo i morti. Conta gli infortuni che hanno ucciso qualcuno o gli hanno lasciato un danno permanente, divisi per il numero degli occupati. Il dato è dell'Istat su fonte Inail e arriva al 2022. Una nota dell'Istat avverte che i dati di quell'anno sono provvisori.</p>\n<h2 id=\"una-mappa-che-passa-per-il-centro-italia\">Una mappa che passa per il centro Italia</h2>\n<p>In cima ci sono Arezzo con 20,3, Potenza con 20,1 e Massa-Carrara con 19,8, poi Teramo, Grosseto, Perugia, Lucca, Chieti e Siena. In fondo non ci sono soltanto le grandi città. C'è quasi tutto il Nord-Ovest: Verbano-Cusio-Ossola 4,7, Novara 4,8, Mantova 5,8, Pavia 5,9, Biella 6,3, Milano 6,4, Torino 6,6.</p>\n<figure class=\"article-figure\"><svg class=\"fig\" viewBox=\"0 0 680 572\" role=\"img\" aria-labelledby=\"fig-province-2022-t fig-province-2022-d\" xmlns=\"http://www.w3.org/2000/svg\">\n<title id=\"fig-province-2022-t\">Il rischio più alto è nel centro Italia, il più basso nel Nord-Ovest</title>\n<desc id=\"fig-province-2022-d\">Le 10 province con il valore più alto e le 10 con il più basso nel 2022: prima Arezzo con 20,3, ultima Verbano-Cusio-Ossola con 4,7.</desc>\n<text class=\"fig__title\" x=\"0\" y=\"20\">Il rischio più alto è nel centro Italia, il più basso nel Nord-Ovest</text>\n<text class=\"fig__subtitle\" x=\"0\" y=\"40\">Tasso di infortuni mortali e inabilità permanente, 2022. Le 10 province più alte e le 10 più basse su 103. Per 10.000 occupati.</text>\n<text class=\"fig__name is-on\" x=\"182\" y=\"74\" text-anchor=\"end\">Arezzo</text>\n<rect class=\"fig__bar is-on\" x=\"190\" y=\"63\" width=\"430.0\" height=\"15\"/>\n<text class=\"fig__value is-on\" x=\"626.0\" y=\"74\">20,3</text>\n<text class=\"fig__name is-on\" x=\"182\" y=\"96\" text-anchor=\"end\">Potenza</text>\n<rect class=\"fig__bar is-on\" x=\"190\" y=\"85\" width=\"425.8\" height=\"15\"/>\n<text class=\"fig__value is-on\" x=\"621.8\" y=\"96\">20,1</text>\n<text class=\"fig__name\" x=\"182\" y=\"118\" text-anchor=\"end\">Massa-Carrara</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"107\" width=\"419.4\" height=\"15\"/>\n<text class=\"fig__value\" x=\"615.4\" y=\"118\">19,8</text>\n<text class=\"fig__name\" x=\"182\" y=\"140\" text-anchor=\"end\">Teramo</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"129\" width=\"396.1\" height=\"15\"/>\n<text class=\"fig__value\" x=\"592.1\" y=\"140\">18,7</text>\n<text class=\"fig__name\" x=\"182\" y=\"162\" text-anchor=\"end\">Grosseto</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"151\" width=\"389.8\" height=\"15\"/>\n<text class=\"fig__value\" x=\"585.8\" y=\"162\">18,4</text>\n<text class=\"fig__name\" x=\"182\" y=\"184\" text-anchor=\"end\">Perugia</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"173\" width=\"387.6\" height=\"15\"/>\n<text class=\"fig__value\" x=\"583.6\" y=\"184\">18,3</text>\n<text class=\"fig__name\" x=\"182\" y=\"206\" text-anchor=\"end\">Lucca</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"195\" width=\"385.5\" height=\"15\"/>\n<text class=\"fig__value\" x=\"581.5\" y=\"206\">18,2</text>\n<text class=\"fig__name\" x=\"182\" y=\"228\" text-anchor=\"end\">Chieti</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"217\" width=\"383.4\" height=\"15\"/>\n<text class=\"fig__value\" x=\"579.4\" y=\"228\">18,1</text>\n<text class=\"fig__name\" x=\"182\" y=\"250\" text-anchor=\"end\">Siena</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"239\" width=\"377.0\" height=\"15\"/>\n<text class=\"fig__value\" x=\"573.0\" y=\"250\">17,8</text>\n<text class=\"fig__name\" x=\"182\" y=\"272\" text-anchor=\"end\">Forlì-Cesena</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"261\" width=\"372.8\" height=\"15\"/>\n<text class=\"fig__value\" x=\"568.8\" y=\"272\">17,6</text>\n<text class=\"fig__gap\" x=\"190\" y=\"294\">· · ·</text>\n<text class=\"fig__name\" x=\"182\" y=\"316\" text-anchor=\"end\">Pordenone</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"305\" width=\"169.5\" height=\"15\"/>\n<text class=\"fig__value\" x=\"365.5\" y=\"316\">8,0</text>\n<text class=\"fig__name\" x=\"182\" y=\"338\" text-anchor=\"end\">Roma</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"327\" width=\"150.4\" height=\"15\"/>\n<text class=\"fig__value\" x=\"346.4\" y=\"338\">7,1</text>\n<text class=\"fig__name\" x=\"182\" y=\"360\" text-anchor=\"end\">Como</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"349\" width=\"141.9\" height=\"15\"/>\n<text class=\"fig__value\" x=\"337.9\" y=\"360\">6,7</text>\n<text class=\"fig__name\" x=\"182\" y=\"382\" text-anchor=\"end\">Torino</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"371\" width=\"139.8\" height=\"15\"/>\n<text class=\"fig__value\" x=\"335.8\" y=\"382\">6,6</text>\n<text class=\"fig__name is-on\" x=\"182\" y=\"404\" text-anchor=\"end\">Milano</text>\n<rect class=\"fig__bar is-on\" x=\"190\" y=\"393\" width=\"135.6\" height=\"15\"/>\n<text class=\"fig__value is-on\" x=\"331.6\" y=\"404\">6,4</text>\n<text class=\"fig__name\" x=\"182\" y=\"426\" text-anchor=\"end\">Biella</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"415\" width=\"133.4\" height=\"15\"/>\n<text class=\"fig__value\" x=\"329.4\" y=\"426\">6,3</text>\n<text class=\"fig__name\" x=\"182\" y=\"448\" text-anchor=\"end\">Pavia</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"437\" width=\"125.0\" height=\"15\"/>\n<text class=\"fig__value\" x=\"321.0\" y=\"448\">5,9</text>\n<text class=\"fig__name\" x=\"182\" y=\"470\" text-anchor=\"end\">Mantova</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"459\" width=\"122.9\" height=\"15\"/>\n<text class=\"fig__value\" x=\"318.9\" y=\"470\">5,8</text>\n<text class=\"fig__name\" x=\"182\" y=\"492\" text-anchor=\"end\">Novara</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"481\" width=\"101.7\" height=\"15\"/>\n<text class=\"fig__value\" x=\"297.7\" y=\"492\">4,8</text>\n<text class=\"fig__name\" x=\"182\" y=\"514\" text-anchor=\"end\">Verbano-Cusio-Ossola</text>\n<rect class=\"fig__bar\" x=\"190\" y=\"503\" width=\"99.6\" height=\"15\"/>\n<text class=\"fig__value\" x=\"295.6\" y=\"514\">4,7</text>\n<line class=\"fig__ref\" x1=\"423.0\" y1=\"56\" x2=\"423.0\" y2=\"522\"/>\n<text class=\"fig__ref-label\" x=\"427.0\" y=\"536\">Italia 11,0</text>\n<text class=\"fig__source\" x=\"0\" y=\"566\">Fonte: Istat, BES dei Territori. Elaborazione Divario Italia.</text>\n</svg>\n</figure>\n\n<h2 id=\"i-settori-non-bastano\">I settori non bastano</h2>\n<p>Abbiamo preso dall'Istat la quota di occupati in agricoltura, industria e costruzioni di ogni provincia, e calcolato quale tasso di infortuni avrebbe ciascuna se contassero solo quelle quote. Il metodo è una regressione lineare sulle 103 province per cui l'Istat pubblica il dato. Ne esce che i tre settori spiegano poco più di un decimo delle differenze. A parità di punti di quota, l'edilizia è quello che pesa di più.</p>\n<figure class=\"article-figure\"><svg class=\"fig\" viewBox=\"0 0 680 440\" role=\"img\" aria-labelledby=\"fig-settori-infortuni-t fig-settori-infortuni-d\" xmlns=\"http://www.w3.org/2000/svg\">\n<title id=\"fig-settori-infortuni-t\">I grandi settori spiegano poco</title>\n<desc id=\"fig-settori-infortuni-d\">Agrigento: 28,4 e 13,0; Alessandria: 32,2 e 11,7; Ancona: 30,1 e 16,7; Aosta: 21,7 e 10,2; Arezzo: 39,6 e 20,3; Ascoli Piceno: 30,0 e 15,7; Asti: 35,3 e 9,9; Avellino: 32,0 e 14,4; Bari: 26,2 e 13,4; Belluno: 37,2 e 8,4; Benevento: 32,0 e 13,7; Bergamo: 38,8 e 10,1; Biella: 33,0 e 6,3; Bologna: 26,1 e 8,6; Bolzano: 27,4 e 12,5; Brescia: 37,7 e 11,2; Brindisi: 30,6 e 13,5; Cagliari: 15,0 e 8,4; Caltanissetta: 26,7 e 15,5; Campobasso: 30,5 e 13,1; Caserta: 26,6 e 9,8; Catania: 22,1 e 12,8; Catanzaro: 24,9 e 8,0; Chieti: 34,8 e 18,1; Como: 30,3 e 6,7; Cosenza: 26,3 e 13,9; Cremona: 35,7 e 9,9; Crotone: 31,4 e 14,0; Cuneo: 38,6 e 11,1; Enna: 25,7 e 12,9; Ferrara: 30,9 e 12,8; Firenze: 25,6 e 9,0; Foggia: 31,4 e 12,8; Forlì-Cesena: 34,0 e 17,6; Frosinone: 31,4 e 10,6; Genova: 18,6 e 11,8; Gorizia: 33,8 e 9,0; Grosseto: 25,8 e 18,4; Imperia: 22,0 e 9,4; Isernia: 27,2 e 15,6; L&#x27;Aquila: 27,9 e 12,8; La Spezia: 20,8 e 15,4; Latina: 32,1 e 9,8; Lecce: 27,6 e 12,9; Lecco: 39,7 e 8,9; Livorno: 20,1 e 16,3; Lodi: 30,7 e 9,4; Lucca: 30,1 e 18,2; Macerata: 36,3 e 15,5; Mantova: 38,9 e 5,8; Massa-Carrara: 25,2 e 19,8; Matera: 37,4 e 10,8; Messina: 21,5 e 16,4; Milano: 17,3 e 6,4; Modena: 37,2 e 12,2; Napoli: 20,2 e 9,6; Novara: 32,9 e 4,8; Nuoro: 27,5 e 12,5; Oristano: 25,6 e 13,2; Padova: 31,9 e 10,6; Palermo: 17,0 e 12,0; Parma: 34,4 e 11,5; Pavia: 27,8 e 5,9; Perugia: 29,4 e 18,3; Pesaro e Urbino: 36,3 e 15,1; Pescara: 22,7 e 16,5; Piacenza: 29,2 e 12,6; Pisa: 27,5 e 16,0; Pistoia: 31,0 e 12,7; Pordenone: 39,2 e 8,0; Potenza: 33,2 e 20,1; Prato: 42,8 e 10,0; Ragusa: 37,4 e 15,0; Ravenna: 30,5 e 9,1; Reggio Calabria: 27,4 e 17,3; Reggio Emilia: 38,6 e 14,2; Rieti: 22,5 e 17,0; Rimini: 22,2 e 15,5; Roma: 11,6 e 7,1; Rovigo: 35,7 e 12,1; Salerno: 27,0 e 14,1; Sassari: 20,7 e 15,4; Savona: 23,9 e 11,9; Siena: 29,4 e 17,8; Siracusa: 28,7 e 12,4; Sondrio: 28,5 e 8,5; Taranto: 29,9 e 13,6; Teramo: 36,1 e 18,7; Terni: 26,6 e 16,3; Torino: 25,6 e 6,6; Trapani: 26,2 e 12,7; Trento: 26,0 e 12,0; Treviso: 40,0 e 11,5; Trieste: 17,0 e 8,6; Udine: 29,3 e 9,1; Varese: 31,2 e 10,1; Venezia: 25,0 e 8,1; Verbano-Cusio-Ossola: 25,9 e 4,7; Vercelli: 35,1 e 14,5; Verona: 29,7 e 12,8; Vibo Valentia: 29,3 e 11,9; Vicenza: 42,4 e 8,6; Viterbo: 25,9 e 14,4</desc>\n<text class=\"fig__title\" x=\"0\" y=\"20\">I grandi settori spiegano poco</text>\n<text class=\"fig__subtitle\" x=\"0\" y=\"40\">Quota di occupati nei settori più esposti e tasso di infortuni gravi, 2022.</text>\n<text class=\"fig__axis\" x=\"56.0\" y=\"370\" text-anchor=\"middle\">9,1</text>\n<text class=\"fig__axis\" x=\"50\" y=\"358.0\" text-anchor=\"end\">3,5</text>\n<text class=\"fig__axis\" x=\"206.0\" y=\"370\" text-anchor=\"middle\">18,2</text>\n<text class=\"fig__axis\" x=\"50\" y=\"284.5\" text-anchor=\"end\">8,0</text>\n<text class=\"fig__axis\" x=\"356.0\" y=\"370\" text-anchor=\"middle\">27,2</text>\n<text class=\"fig__axis\" x=\"50\" y=\"211.0\" text-anchor=\"end\">12,5</text>\n<text class=\"fig__axis\" x=\"506.0\" y=\"370\" text-anchor=\"middle\">36,2</text>\n<text class=\"fig__axis\" x=\"50\" y=\"137.5\" text-anchor=\"end\">17,0</text>\n<text class=\"fig__axis\" x=\"656.0\" y=\"370\" text-anchor=\"middle\">45,3</text>\n<text class=\"fig__axis\" x=\"50\" y=\"64.0\" text-anchor=\"end\">21,5</text>\n<text class=\"fig__axis-name\" x=\"656\" y=\"388\" text-anchor=\"end\">occupati in agricoltura, industria e costruzioni, % →</text>\n<text class=\"fig__axis-name\" x=\"56\" y=\"52\">↑ infortuni gravi ogni 10.000 occupati</text>\n<rect class=\"fig__pt fig__pt--south\" x=\"371.9\" y=\"194.9\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"438.9\" cy=\"220.0\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"404.1\" cy=\"138.8\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"264.8\" cy=\"244.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn is-on\" cx=\"561.6\" cy=\"80.3\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"402.4\" cy=\"155.0\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"490.3\" cy=\"249.2\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"431.6\" y=\"172.1\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"335.4\" y=\"188.4\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"521.8\" cy=\"273.6\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"431.6\" y=\"183.5\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"548.3\" cy=\"246.0\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"452.2\" cy=\"307.7\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"337.8\" cy=\"270.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"359.3\" cy=\"207.0\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"530.1\" cy=\"228.1\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"408.4\" y=\"186.8\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"149.7\" y=\"269.6\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"343.7\" y=\"154.3\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"406.7\" y=\"193.3\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"342.1\" y=\"246.9\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"267.5\" y=\"198.1\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"313.9\" y=\"276.1\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"478.0\" y=\"112.0\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"407.4\" cy=\"301.2\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"337.1\" y=\"180.3\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"496.9\" cy=\"249.2\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"421.6\" y=\"178.6\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"545.0\" cy=\"229.7\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"327.1\" y=\"196.5\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"417.3\" cy=\"202.1\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"329.5\" cy=\"263.9\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"421.6\" y=\"198.1\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"468.7\" cy=\"124.1\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"425.6\" cy=\"237.9\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"213.4\" cy=\"218.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"465.4\" cy=\"263.9\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"332.8\" cy=\"111.1\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"269.8\" cy=\"257.4\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"352.0\" y=\"152.6\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"363.6\" y=\"198.1\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"249.9\" cy=\"159.9\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"437.2\" cy=\"250.9\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"358.6\" y=\"196.5\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"563.2\" cy=\"265.5\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"238.3\" cy=\"145.3\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"414.0\" cy=\"257.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"404.1\" cy=\"114.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"506.9\" cy=\"158.3\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn is-on\" cx=\"550.0\" cy=\"315.9\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn is-on\" cx=\"322.8\" cy=\"88.4\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"521.1\" y=\"230.6\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"257.5\" y=\"139.6\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"191.9\" cy=\"306.1\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"521.8\" cy=\"211.9\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"236.0\" y=\"250.1\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"450.5\" cy=\"332.1\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"357.0\" y=\"203.0\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"325.5\" y=\"191.6\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"433.9\" cy=\"237.9\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"182.9\" y=\"211.1\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"475.4\" cy=\"223.2\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn is-on\" cx=\"365.9\" cy=\"314.2\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn is-on\" cx=\"392.5\" cy=\"112.8\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"506.9\" cy=\"164.8\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"277.4\" y=\"138.0\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"389.2\" cy=\"205.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"361.0\" cy=\"150.1\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"419.0\" cy=\"203.8\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"554.9\" cy=\"280.1\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south is-on\" x=\"451.5\" y=\"79.5\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"614.6\" cy=\"247.6\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"521.1\" y=\"162.4\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"410.7\" cy=\"262.2\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"355.3\" y=\"125.0\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"545.0\" cy=\"179.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"278.1\" cy=\"133.9\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"273.1\" cy=\"158.3\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"97.4\" cy=\"294.7\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"496.9\" cy=\"213.5\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"348.7\" y=\"177.0\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"244.2\" y=\"155.9\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"301.3\" cy=\"216.7\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"392.5\" cy=\"120.9\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"376.9\" y=\"204.6\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"377.6\" cy=\"272.0\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"396.8\" y=\"185.1\" width=\"8\" height=\"8\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"499.5\" y=\"102.3\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"346.1\" cy=\"145.3\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"329.5\" cy=\"302.9\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"335.4\" y=\"199.8\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"336.1\" cy=\"215.1\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"568.2\" cy=\"223.2\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"186.9\" cy=\"270.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"390.8\" cy=\"262.2\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"422.3\" cy=\"246.0\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"319.5\" cy=\"278.5\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn is-on\" cx=\"334.4\" cy=\"333.7\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"487.0\" cy=\"174.5\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"397.4\" cy=\"202.1\" r=\"4.5\"/>\n<rect class=\"fig__pt fig__pt--south\" x=\"386.8\" y=\"212.7\" width=\"8\" height=\"8\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"608.0\" cy=\"270.4\" r=\"4.5\"/>\n<circle class=\"fig__pt fig__pt--cn\" cx=\"334.4\" cy=\"176.1\" r=\"4.5\"/>\n<text class=\"fig__pt-name is-on\" x=\"554.6\" y=\"84.3\" text-anchor=\"end\">Arezzo</text>\n<text class=\"fig__pt-name is-on\" x=\"462.5\" y=\"87.5\">Potenza</text>\n<text class=\"fig__pt-name is-on\" x=\"329.8\" y=\"92.4\">Massa-Carrara</text>\n<text class=\"fig__pt-name is-on\" x=\"399.5\" y=\"116.8\">Perugia</text>\n<text class=\"fig__pt-name is-on\" x=\"372.9\" y=\"318.2\">Pavia</text>\n<text class=\"fig__pt-name is-on\" x=\"543.0\" y=\"319.9\" text-anchor=\"end\">Mantova</text>\n<text class=\"fig__pt-name is-on\" x=\"341.4\" y=\"337.7\">Verbano-Cusio-Ossola</text>\n<text class=\"fig__note\" x=\"0\" y=\"414\">Una provincia per punto. Cerchi: Centro-Nord. Quadrati: Mezzogiorno.</text>\n<text class=\"fig__source\" x=\"0\" y=\"434\">Fonte: Istat. Elaborazione Divario Italia.</text>\n</svg>\n</figure>\n\n<p>Le province in cima restano lontanissime da quello che i settori farebbero prevedere. Arezzo, in base ai settori, dovrebbe avere 12,3 infortuni gravi ogni 10.000 occupati, e ne ha 20,3. Massa-Carrara 12,1 e ne ha 19,8. Perugia 11,8 e ne ha 18,3. Potenza 13,7 e ne ha 20,1. Dall'altra parte Mantova dovrebbe avere 11,7 e ne ha 5,8, Pavia 11,6 e ne ha 5,9, il Verbano-Cusio-Ossola 12,0 e ne ha 4,7.</p>\n<p>Questo non vuol dire che il tipo di lavoro non conti. I tre settori dell'Istat sono larghi: dentro l'industria ci sono le cave di marmo e gli uffici delle aziende. La Consulta interassociativa italiana per la prevenzione, che lavora sugli open data Inail, scrive che è corretto confrontare i tassi solo dentro un comparto omogeneo. È il passo successivo, e servono i dati per comparto. Che cosa pesi nel resto, oggi i dati pubblici non lo dicono. Le ipotesi sono la dimensione delle imprese, l'età dei lavoratori, i controlli, la sottodenuncia. Sono ipotesi, non risultati.</p>\n<h2 id=\"chi-si-fa-male\">Chi si fa male</h2>\n<p>L'Istat calcola il tasso anche per sesso, età e cittadinanza. Nel 2022 gli uomini avevano 14,8 infortuni gravi ogni 10.000 occupati, le donne 5,8. Fra gli uomini stranieri il tasso era 24,1, fra gli italiani 13,7. Fra i 50 e i 64 anni era 15,8, fra i 65 e gli 89 anni 26,0. Il tasso sale con l'età, e per gli uomini stranieri è quasi il doppio che per gli italiani.</p>\n<h2 id=\"il-divario-nel-tempo\">Il divario nel tempo</h2>\n<p>Dal 2018 al 2022 il Mezzogiorno scende da 14,6 a 13,0, il Centro da 12,6 a 11,9, il Nord da 10,5 a 9,6. La distanza si riduce, ma il Sud resta sopra.</p>\n<figure class=\"article-figure\"><svg class=\"fig\" viewBox=\"0 0 680 360\" role=\"img\" aria-labelledby=\"fig-serie-2018-2022-t fig-serie-2018-2022-d\" xmlns=\"http://www.w3.org/2000/svg\">\n<title id=\"fig-serie-2018-2022-t\">Il Mezzogiorno scende più in fretta, ma resta sopra</title>\n<desc id=\"fig-serie-2018-2022-d\">Nord: da 10,5 nel 2018 a 9,6 nel 2022; Centro: da 12,6 nel 2018 a 11,9 nel 2022; Mezzogiorno: da 14,6 nel 2018 a 13,0 nel 2022; Italia: da 12,0 nel 2018 a 11,0 nel 2022</desc>\n<text class=\"fig__title\" x=\"0\" y=\"20\">Il Mezzogiorno scende più in fretta, ma resta sopra</text>\n<text class=\"fig__subtitle\" x=\"0\" y=\"40\">Tasso di infortuni sul lavoro mortali e con inabilità permanente, 2018-2022. Per 10.000 occupati.</text>\n<line class=\"fig__grid\" x1=\"48\" y1=\"290.0\" x2=\"530\" y2=\"290.0\"/>\n<text class=\"fig__axis\" x=\"42\" y=\"294.0\" text-anchor=\"end\">9,2</text>\n<line class=\"fig__grid\" x1=\"48\" y1=\"232.5\" x2=\"530\" y2=\"232.5\"/>\n<text class=\"fig__axis\" x=\"42\" y=\"236.5\" text-anchor=\"end\">10,6</text>\n<line class=\"fig__grid\" x1=\"48\" y1=\"175.0\" x2=\"530\" y2=\"175.0\"/>\n<text class=\"fig__axis\" x=\"42\" y=\"179.0\" text-anchor=\"end\">12,1</text>\n<line class=\"fig__grid\" x1=\"48\" y1=\"117.5\" x2=\"530\" y2=\"117.5\"/>\n<text class=\"fig__axis\" x=\"42\" y=\"121.5\" text-anchor=\"end\">13,6</text>\n<line class=\"fig__grid\" x1=\"48\" y1=\"60.0\" x2=\"530\" y2=\"60.0\"/>\n<text class=\"fig__axis\" x=\"42\" y=\"64.0\" text-anchor=\"end\">15,0</text>\n<text class=\"fig__axis\" x=\"48.0\" y=\"308\" text-anchor=\"middle\">2018</text>\n<text class=\"fig__axis\" x=\"168.5\" y=\"308\" text-anchor=\"middle\">2019</text>\n<text class=\"fig__axis\" x=\"289.0\" y=\"308\" text-anchor=\"middle\">2020</text>\n<text class=\"fig__axis\" x=\"409.5\" y=\"308\" text-anchor=\"middle\">2021</text>\n<text class=\"fig__axis\" x=\"530.0\" y=\"308\" text-anchor=\"middle\">2022</text>\n<polyline class=\"fig__line fig__line--north\" points=\"48.0,238.4 168.5,250.3 289.0,266.2 409.5,254.3 530.0,274.1\"/>\n<circle class=\"fig__dot fig__dot--north\" cx=\"530.0\" cy=\"274.1\" r=\"3.5\"/>\n<polyline class=\"fig__line fig__line--centre\" points=\"48.0,155.2 168.5,175.0 289.0,210.7 409.5,190.9 530.0,182.9\"/>\n<circle class=\"fig__dot fig__dot--centre\" cx=\"530.0\" cy=\"182.9\" r=\"3.5\"/>\n<polyline class=\"fig__line fig__line--south\" points=\"48.0,75.9 168.5,87.8 289.0,163.1 409.5,123.4 530.0,139.3\"/>\n<circle class=\"fig__dot fig__dot--south\" cx=\"530.0\" cy=\"139.3\" r=\"3.5\"/>\n<polyline class=\"fig__line fig__line--italy\" points=\"48.0,179.0 168.5,190.9 289.0,226.6 409.5,206.7 530.0,218.6\"/>\n<circle class=\"fig__dot fig__dot--italy\" cx=\"530.0\" cy=\"218.6\" r=\"3.5\"/>\n<text class=\"fig__label fig__label--south\" x=\"538.0\" y=\"143.3\">Mezzogiorno 13,0</text>\n<text class=\"fig__label fig__label--centre\" x=\"538.0\" y=\"186.9\">Centro 11,9</text>\n<text class=\"fig__label fig__label--italy\" x=\"538.0\" y=\"222.6\">Italia 11,0</text>\n<text class=\"fig__label fig__label--north\" x=\"538.0\" y=\"278.1\">Nord 9,6</text>\n<text class=\"fig__note\" x=\"0\" y=\"334\">Italia, Nord, Centro e Mezzogiorno: valori calcolati dall'Istat.</text>\n<text class=\"fig__source\" x=\"0\" y=\"354\">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>\n</svg>\n</figure>\n\n<p>Per il 2026 ci sono solo le denunce all'Inail, provvisorie. Da gennaio a luglio le morti avvenute durante il lavoro, senza contare gli studenti e i tragitti casa-lavoro, sono 422, contro 432 nello stesso periodo del 2025. Nelle costruzioni sono salite da 67 a 76.</p>\n<h2 id=\"che-cosa-cambia\">Che cosa cambia</h2>\n<p>Ad Arezzo o a Potenza il tasso di infortuni che cambiano la vita è circa tre volte quello di Milano, e i grandi settori ne spiegano solo una parte. Vuol dire che quella distanza non è una fatalità legata al tipo di economia. È uno spazio in cui la prevenzione può ancora fare differenza.</p>\n<p>Il dato per regione e provincia è nella <a href=\"/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007\">scheda degli infortuni sul lavoro mortali e con inabilità permanente</a>.</p>\n<h2 id=\"dati-usati\">Dati usati</h2>\n<ul>\n<li><strong>Infortuni:</strong> Istat, Benessere equo e sostenibile (regioni e ripartizioni ufficiali) e BES dei Territori (province), su dati Inail, 2018-2022. Per il 2026 denunce Inail provvisorie.</li>\n<li><strong>Settori:</strong> Istat, Conti territoriali, persone occupate per branca e provincia, 2022.</li>\n<li><strong>Metodo:</strong> regressione lineare del tasso provinciale sulle quote di occupati in agricoltura, industria in senso stretto e costruzioni. Script <code>scripts/articoli_trend/elab_settori_infortuni.py</code>.</li>\n<li><strong>Limite:</strong> è un confronto fra province, non fra lavoratori. Le branche sono larghe. Il tasso divide gli infortuni per gli occupati residenti, mentre la regressione usa gli occupati per luogo di lavoro: nelle province da cui molti lavorano altrove il confronto è meno preciso. Gli infortuni non denunciati, più probabili nel lavoro irregolare, non sono contati.</li>\n</ul>\n<h2 id=\"fonti\">Fonti</h2>\n<ul>\n<li>Istat, <a href=\"https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip\">Benessere equo e sostenibile, appendice statistica</a>, maggio 2026.</li>\n<li>Istat, <a href=\"https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf\">Il benessere equo e sostenibile in Italia, Rapporto Bes 2025</a>.</li>\n<li>Istat, <a href=\"https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/all?startPeriod=2021\">Conti territoriali, occupati per branca</a>.</li>\n<li>Inail, <a href=\"https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html\">Denunce di infortuni e malattie professionali, i dati di luglio</a>, 8 settembre 2026.</li>\n<li>CIIP, <a href=\"https://ciip-consulta.it/wp-content/uploads/2025/09/Utilizzi_Open_Data_Inail.pdf\">Utilizzi degli open data Inail</a>, settembre 2025.</li>\n</ul>",
+    "url": "https://divarioitalia.it/blog/infortuni-lavoro-province"
+   }
+  ],
+  "siblings": {
+   "prev": {
+    "id": "230",
+    "name": "Tasso di disoccupazione giovanile (maschi)",
+    "path": "/indicatore/tasso-di-disoccupazione-giovanile-maschi/ter-230",
+    "direction": "lower_better",
+    "source_theme": "Lavoro",
+    "year_max": 2025,
+    "unit": "percentuale",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 29.848
+     },
+     {
+      "year": 2019,
+      "value": 28.647
+     },
+     {
+      "year": 2020,
+      "value": 28.697
+     },
+     {
+      "year": 2021,
+      "value": 27.843
+     },
+     {
+      "year": 2022,
+      "value": 22.666
+     },
+     {
+      "year": 2023,
+      "value": 21.273
+     },
+     {
+      "year": 2024,
+      "value": 20.527
+     },
+     {
+      "year": 2025,
+      "value": 19.174
+     }
+    ],
+    "latest": 19.174
+   },
+   "next": {
+    "id": "113",
+    "name": "Tasso di irregolarità del lavoro",
+    "path": "/indicatore/tasso-di-irregolarita-del-lavoro/ter-113",
+    "direction": "lower_better",
+    "source_theme": "Lavoro",
+    "year_max": 2012,
+    "unit": "percentuale",
+    "spark": [
+     {
+      "year": 2001,
+      "value": 14.681
+     },
+     {
+      "year": 2002,
+      "value": 13.844
+     },
+     {
+      "year": 2003,
+      "value": 12.899
+     },
+     {
+      "year": 2004,
+      "value": 13.023
+     },
+     {
+      "year": 2005,
+      "value": 13.455
+     },
+     {
+      "year": 2006,
+      "value": 13.589
+     },
+     {
+      "year": 2007,
+      "value": 13.347
+     },
+     {
+      "year": 2008,
+      "value": 13.549
+     },
+     {
+      "year": 2009,
+      "value": 14.043
+     },
+     {
+      "year": 2010,
+      "value": 14.02
+     },
+     {
+      "year": 2011,
+      "value": 14.051
+     },
+     {
+      "year": 2012,
+      "value": 14.32
+     }
+    ],
+    "latest": 14.32
+   }
+  },
+  "dimension_siblings": [],
+  "explore": {
+   "id": "bes:03LAV007",
+   "unit": "Per 10.000 occupati",
+   "changeUnit": "Per 10.000 occupati",
+   "direction": "lower_better",
+   "higherBetter": false,
+   "scoreable": true,
+   "rampStops": [
+    "var(--seq-1)",
+    "var(--seq-2)",
+    "var(--seq-3)",
+    "var(--seq-4)",
+    "var(--seq-5)",
+    "var(--seq-6)"
+   ],
+   "defaultLevel": "regione",
+   "levels": [
+    {
+     "key": "regione",
+     "label": "Regioni",
+     "singular": "regione",
+     "plural": "regioni",
+     "profilePath": "/regione/",
+     "hasMap": true,
+     "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+     ],
+     "yearMin": 2018,
+     "yearMax": 2022,
+     "defaultYear": 2022,
+     "territories": [
+      {
+       "key": "abruzzo",
+       "name": "Abruzzo"
+      },
+      {
+       "key": "basilicata",
+       "name": "Basilicata"
+      },
+      {
+       "key": "calabria",
+       "name": "Calabria"
+      },
+      {
+       "key": "campania",
+       "name": "Campania"
+      },
+      {
+       "key": "emilia-romagna",
+       "name": "Emilia-Romagna"
+      },
+      {
+       "key": "friuli-venezia-giulia",
+       "name": "Friuli-Venezia Giulia"
+      },
+      {
+       "key": "lazio",
+       "name": "Lazio"
+      },
+      {
+       "key": "liguria",
+       "name": "Liguria"
+      },
+      {
+       "key": "lombardia",
+       "name": "Lombardia"
+      },
+      {
+       "key": "marche",
+       "name": "Marche"
+      },
+      {
+       "key": "molise",
+       "name": "Molise"
+      },
+      {
+       "key": "piemonte",
+       "name": "Piemonte"
+      },
+      {
+       "key": "puglia",
+       "name": "Puglia"
+      },
+      {
+       "key": "sardegna",
+       "name": "Sardegna"
+      },
+      {
+       "key": "sicilia",
+       "name": "Sicilia"
+      },
+      {
+       "key": "toscana",
+       "name": "Toscana"
+      },
+      {
+       "key": "trentino-alto-adige",
+       "name": "Trentino Alto Adige"
+      },
+      {
+       "key": "umbria",
+       "name": "Umbria"
+      },
+      {
+       "key": "valle-d-aosta",
+       "name": "Valle d'Aosta"
+      },
+      {
+       "key": "veneto",
+       "name": "Veneto"
+      }
+     ],
+     "defaultTerritory": "piemonte",
+     "matrix": {
+      "2018": {
+       "piemonte": 8.2,
+       "valle-d-aosta": 9.9,
+       "lombardia": 7.9,
+       "trentino-alto-adige": 12.5,
+       "veneto": 12.7,
+       "friuli-venezia-giulia": 9.9,
+       "liguria": 15.3,
+       "emilia-romagna": 14.0,
+       "toscana": 16.1,
+       "umbria": 18.2,
+       "marche": 16.8,
+       "lazio": 8.2,
+       "abruzzo": 18.1,
+       "molise": 13.8,
+       "campania": 10.9,
+       "puglia": 13.6,
+       "basilicata": 24.1,
+       "calabria": 18.3,
+       "sicilia": 14.8,
+       "sardegna": 16.9
+      },
+      "2019": {
+       "piemonte": 8.2,
+       "valle-d-aosta": 9.5,
+       "lombardia": 7.9,
+       "trentino-alto-adige": 13.0,
+       "veneto": 11.3,
+       "friuli-venezia-giulia": 10.8,
+       "liguria": 14.5,
+       "emilia-romagna": 13.8,
+       "toscana": 14.9,
+       "umbria": 17.4,
+       "marche": 15.9,
+       "lazio": 8.3,
+       "abruzzo": 17.6,
+       "molise": 12.9,
+       "campania": 11.6,
+       "puglia": 13.1,
+       "basilicata": 23.3,
+       "calabria": 16.6,
+       "sicilia": 14.7,
+       "sardegna": 15.5
+      },
+      "2020": {
+       "piemonte": 7.7,
+       "valle-d-aosta": 9.9,
+       "lombardia": 7.9,
+       "trentino-alto-adige": 11.8,
+       "veneto": 11.3,
+       "friuli-venezia-giulia": 9.5,
+       "liguria": 13.5,
+       "emilia-romagna": 12.7,
+       "toscana": 12.9,
+       "umbria": 15.7,
+       "marche": 15.0,
+       "lazio": 8.3,
+       "abruzzo": 14.9,
+       "molise": 14.1,
+       "campania": 10.7,
+       "puglia": 12.2,
+       "basilicata": 17.1,
+       "calabria": 13.9,
+       "sicilia": 12.2,
+       "sardegna": 12.8
+      },
+      "2021": {
+       "piemonte": 8.2,
+       "valle-d-aosta": 10.5,
+       "lombardia": 8.3,
+       "trentino-alto-adige": 12.7,
+       "veneto": 11.5,
+       "friuli-venezia-giulia": 9.2,
+       "liguria": 13.8,
+       "emilia-romagna": 13.1,
+       "toscana": 13.9,
+       "umbria": 16.5,
+       "marche": 16.6,
+       "lazio": 8.2,
+       "abruzzo": 16.8,
+       "molise": 14.0,
+       "campania": 10.5,
+       "puglia": 14.0,
+       "basilicata": 20.6,
+       "calabria": 15.5,
+       "sicilia": 13.4,
+       "sardegna": 13.2
+      },
+      "2022": {
+       "piemonte": 8.0,
+       "valle-d-aosta": 10.2,
+       "lombardia": 8.1,
+       "trentino-alto-adige": 12.3,
+       "veneto": 10.4,
+       "friuli-venezia-giulia": 8.8,
+       "liguria": 12.0,
+       "emilia-romagna": 12.1,
+       "toscana": 14.4,
+       "umbria": 17.8,
+       "marche": 15.3,
+       "lazio": 8.2,
+       "abruzzo": 16.7,
+       "molise": 13.8,
+       "campania": 11.2,
+       "puglia": 13.0,
+       "basilicata": 16.8,
+       "calabria": 13.5,
+       "sicilia": 13.4,
+       "sardegna": 12.4
+      }
+     }
+    },
+    {
+     "key": "provincia",
+     "label": "Province",
+     "singular": "provincia",
+     "plural": "province",
+     "profilePath": "/provincia/",
+     "hasMap": false,
+     "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+     ],
+     "yearMin": 2018,
+     "yearMax": 2022,
+     "defaultYear": 2022,
+     "territories": [
+      {
+       "key": "agrigento",
+       "name": "Agrigento"
+      },
+      {
+       "key": "alessandria",
+       "name": "Alessandria"
+      },
+      {
+       "key": "ancona",
+       "name": "Ancona"
+      },
+      {
+       "key": "aosta",
+       "name": "Aosta"
+      },
+      {
+       "key": "arezzo",
+       "name": "Arezzo"
+      },
+      {
+       "key": "ascoli-piceno",
+       "name": "Ascoli Piceno"
+      },
+      {
+       "key": "asti",
+       "name": "Asti"
+      },
+      {
+       "key": "avellino",
+       "name": "Avellino"
+      },
+      {
+       "key": "bari",
+       "name": "Bari"
+      },
+      {
+       "key": "barletta-andria-trani",
+       "name": "Barletta-Andria-Trani"
+      },
+      {
+       "key": "belluno",
+       "name": "Belluno"
+      },
+      {
+       "key": "benevento",
+       "name": "Benevento"
+      },
+      {
+       "key": "bergamo",
+       "name": "Bergamo"
+      },
+      {
+       "key": "biella",
+       "name": "Biella"
+      },
+      {
+       "key": "bologna",
+       "name": "Bologna"
+      },
+      {
+       "key": "bolzano",
+       "name": "Bolzano"
+      },
+      {
+       "key": "brescia",
+       "name": "Brescia"
+      },
+      {
+       "key": "brindisi",
+       "name": "Brindisi"
+      },
+      {
+       "key": "cagliari",
+       "name": "Cagliari"
+      },
+      {
+       "key": "caltanissetta",
+       "name": "Caltanissetta"
+      },
+      {
+       "key": "campobasso",
+       "name": "Campobasso"
+      },
+      {
+       "key": "caserta",
+       "name": "Caserta"
+      },
+      {
+       "key": "catania",
+       "name": "Catania"
+      },
+      {
+       "key": "catanzaro",
+       "name": "Catanzaro"
+      },
+      {
+       "key": "chieti",
+       "name": "Chieti"
+      },
+      {
+       "key": "como",
+       "name": "Como"
+      },
+      {
+       "key": "cosenza",
+       "name": "Cosenza"
+      },
+      {
+       "key": "cremona",
+       "name": "Cremona"
+      },
+      {
+       "key": "crotone",
+       "name": "Crotone"
+      },
+      {
+       "key": "cuneo",
+       "name": "Cuneo"
+      },
+      {
+       "key": "enna",
+       "name": "Enna"
+      },
+      {
+       "key": "fermo",
+       "name": "Fermo"
+      },
+      {
+       "key": "ferrara",
+       "name": "Ferrara"
+      },
+      {
+       "key": "firenze",
+       "name": "Firenze"
+      },
+      {
+       "key": "foggia",
+       "name": "Foggia"
+      },
+      {
+       "key": "forli-cesena",
+       "name": "Forlì-Cesena"
+      },
+      {
+       "key": "frosinone",
+       "name": "Frosinone"
+      },
+      {
+       "key": "genova",
+       "name": "Genova"
+      },
+      {
+       "key": "gorizia",
+       "name": "Gorizia"
+      },
+      {
+       "key": "grosseto",
+       "name": "Grosseto"
+      },
+      {
+       "key": "imperia",
+       "name": "Imperia"
+      },
+      {
+       "key": "isernia",
+       "name": "Isernia"
+      },
+      {
+       "key": "l-aquila",
+       "name": "L'Aquila"
+      },
+      {
+       "key": "la-spezia",
+       "name": "La Spezia"
+      },
+      {
+       "key": "latina",
+       "name": "Latina"
+      },
+      {
+       "key": "lecce",
+       "name": "Lecce"
+      },
+      {
+       "key": "lecco",
+       "name": "Lecco"
+      },
+      {
+       "key": "livorno",
+       "name": "Livorno"
+      },
+      {
+       "key": "lodi",
+       "name": "Lodi"
+      },
+      {
+       "key": "lucca",
+       "name": "Lucca"
+      },
+      {
+       "key": "macerata",
+       "name": "Macerata"
+      },
+      {
+       "key": "mantova",
+       "name": "Mantova"
+      },
+      {
+       "key": "massa-carrara",
+       "name": "Massa-Carrara"
+      },
+      {
+       "key": "matera",
+       "name": "Matera"
+      },
+      {
+       "key": "messina",
+       "name": "Messina"
+      },
+      {
+       "key": "milano",
+       "name": "Milano"
+      },
+      {
+       "key": "modena",
+       "name": "Modena"
+      },
+      {
+       "key": "monza-e-della-brianza",
+       "name": "Monza e della Brianza"
+      },
+      {
+       "key": "napoli",
+       "name": "Napoli"
+      },
+      {
+       "key": "novara",
+       "name": "Novara"
+      },
+      {
+       "key": "nuoro",
+       "name": "Nuoro"
+      },
+      {
+       "key": "oristano",
+       "name": "Oristano"
+      },
+      {
+       "key": "padova",
+       "name": "Padova"
+      },
+      {
+       "key": "palermo",
+       "name": "Palermo"
+      },
+      {
+       "key": "parma",
+       "name": "Parma"
+      },
+      {
+       "key": "pavia",
+       "name": "Pavia"
+      },
+      {
+       "key": "perugia",
+       "name": "Perugia"
+      },
+      {
+       "key": "pesaro-e-urbino",
+       "name": "Pesaro e Urbino"
+      },
+      {
+       "key": "pescara",
+       "name": "Pescara"
+      },
+      {
+       "key": "piacenza",
+       "name": "Piacenza"
+      },
+      {
+       "key": "pisa",
+       "name": "Pisa"
+      },
+      {
+       "key": "pistoia",
+       "name": "Pistoia"
+      },
+      {
+       "key": "pordenone",
+       "name": "Pordenone"
+      },
+      {
+       "key": "potenza",
+       "name": "Potenza"
+      },
+      {
+       "key": "prato",
+       "name": "Prato"
+      },
+      {
+       "key": "ragusa",
+       "name": "Ragusa"
+      },
+      {
+       "key": "ravenna",
+       "name": "Ravenna"
+      },
+      {
+       "key": "reggio-calabria",
+       "name": "Reggio Calabria"
+      },
+      {
+       "key": "reggio-emilia",
+       "name": "Reggio Emilia"
+      },
+      {
+       "key": "rieti",
+       "name": "Rieti"
+      },
+      {
+       "key": "rimini",
+       "name": "Rimini"
+      },
+      {
+       "key": "roma",
+       "name": "Roma"
+      },
+      {
+       "key": "rovigo",
+       "name": "Rovigo"
+      },
+      {
+       "key": "salerno",
+       "name": "Salerno"
+      },
+      {
+       "key": "sassari",
+       "name": "Sassari"
+      },
+      {
+       "key": "savona",
+       "name": "Savona"
+      },
+      {
+       "key": "siena",
+       "name": "Siena"
+      },
+      {
+       "key": "siracusa",
+       "name": "Siracusa"
+      },
+      {
+       "key": "sondrio",
+       "name": "Sondrio"
+      },
+      {
+       "key": "sud-sardegna",
+       "name": "Sud Sardegna"
+      },
+      {
+       "key": "taranto",
+       "name": "Taranto"
+      },
+      {
+       "key": "teramo",
+       "name": "Teramo"
+      },
+      {
+       "key": "terni",
+       "name": "Terni"
+      },
+      {
+       "key": "torino",
+       "name": "Torino"
+      },
+      {
+       "key": "trapani",
+       "name": "Trapani"
+      },
+      {
+       "key": "trento",
+       "name": "Trento"
+      },
+      {
+       "key": "treviso",
+       "name": "Treviso"
+      },
+      {
+       "key": "trieste",
+       "name": "Trieste"
+      },
+      {
+       "key": "udine",
+       "name": "Udine"
+      },
+      {
+       "key": "varese",
+       "name": "Varese"
+      },
+      {
+       "key": "venezia",
+       "name": "Venezia"
+      },
+      {
+       "key": "verbano-cusio-ossola",
+       "name": "Verbano-Cusio-Ossola"
+      },
+      {
+       "key": "vercelli",
+       "name": "Vercelli"
+      },
+      {
+       "key": "verona",
+       "name": "Verona"
+      },
+      {
+       "key": "vibo-valentia",
+       "name": "Vibo Valentia"
+      },
+      {
+       "key": "vicenza",
+       "name": "Vicenza"
+      },
+      {
+       "key": "viterbo",
+       "name": "Viterbo"
+      }
+     ],
+     "defaultTerritory": "verbano-cusio-ossola",
+     "matrix": {
+      "2018": {
+       "agrigento": 13.5,
+       "alessandria": 12.9,
+       "ancona": 14.9,
+       "aosta": 9.9,
+       "arezzo": 30.5,
+       "ascoli-piceno": 23.9,
+       "asti": 9.3,
+       "avellino": 15.4,
+       "bari": 12.5,
+       "barletta-andria-trani": 11.0,
+       "belluno": 9.4,
+       "benevento": 20.4,
+       "bergamo": 12.4,
+       "biella": 4.8,
+       "bologna": 10.7,
+       "bolzano": 14.4,
+       "brescia": 10.8,
+       "brindisi": 14.3,
+       "cagliari": 14.3,
+       "caltanissetta": 18.7,
+       "campobasso": 13.5,
+       "caserta": 11.9,
+       "catania": 16.9,
+       "catanzaro": 13.3,
+       "chieti": 21.6,
+       "como": 6.5,
+       "cosenza": 17.8,
+       "cremona": 8.2,
+       "crotone": 16.9,
+       "cuneo": 13.2,
+       "enna": 16.2,
+       "fermo": 11.7,
+       "ferrara": 10.5,
+       "firenze": 10.6,
+       "foggia": 13.8,
+       "forli-cesena": 20.2,
+       "frosinone": 10.1,
+       "genova": 16.2,
+       "gorizia": 10.2,
+       "grosseto": 20.6,
+       "imperia": 9.4,
+       "isernia": 14.6,
+       "l-aquila": 17.3,
+       "la-spezia": 20.3,
+       "latina": 11.3,
+       "lecce": 13.9,
+       "lecco": 8.4,
+       "livorno": 19.7,
+       "lodi": 9.4,
+       "lucca": 18.7,
+       "macerata": 17.4,
+       "mantova": 8.9,
+       "massa-carrara": 17.0,
+       "matera": 13.7,
+       "messina": 12.6,
+       "milano": 5.3,
+       "modena": 13.1,
+       "monza-e-della-brianza": 6.9,
+       "napoli": 8.3,
+       "novara": 6.2,
+       "nuoro": 20.9,
+       "oristano": 21.6,
+       "padova": 13.4,
+       "palermo": 13.2,
+       "parma": 13.3,
+       "pavia": 7.2,
+       "perugia": 18.0,
+       "pesaro-e-urbino": 17.4,
+       "pescara": 16.9,
+       "piacenza": 14.1,
+       "pisa": 16.7,
+       "pistoia": 11.6,
+       "pordenone": 9.5,
+       "potenza": 29.6,
+       "prato": 9.5,
+       "ragusa": 18.4,
+       "ravenna": 12.8,
+       "reggio-calabria": 24.1,
+       "reggio-emilia": 20.8,
+       "rieti": 18.3,
+       "rimini": 14.3,
+       "roma": 7.1,
+       "rovigo": 11.3,
+       "salerno": 12.4,
+       "sassari": 13.0,
+       "savona": 12.9,
+       "siena": 18.7,
+       "siracusa": 13.0,
+       "sondrio": 10.2,
+       "sud-sardegna": 21.8,
+       "taranto": 17.6,
+       "teramo": 16.0,
+       "terni": 19.0,
+       "torino": 6.5,
+       "trapani": 14.3,
+       "trento": 10.4,
+       "treviso": 13.4,
+       "trieste": 9.9,
+       "udine": 10.2,
+       "varese": 8.7,
+       "venezia": 10.2,
+       "verbano-cusio-ossola": 7.3,
+       "vercelli": 9.3,
+       "verona": 14.9,
+       "vibo-valentia": 15.7,
+       "vicenza": 12.5,
+       "viterbo": 11.3
+      },
+      "2019": {
+       "agrigento": 13.3,
+       "alessandria": 13.0,
+       "ancona": 14.6,
+       "aosta": 9.5,
+       "arezzo": 22.6,
+       "ascoli-piceno": 26.0,
+       "asti": 10.4,
+       "avellino": 15.2,
+       "bari": 11.7,
+       "barletta-andria-trani": 9.0,
+       "belluno": 7.5,
+       "benevento": 17.2,
+       "bergamo": 10.9,
+       "biella": 4.0,
+       "bologna": 10.0,
+       "bolzano": 14.0,
+       "brescia": 10.5,
+       "brindisi": 12.3,
+       "cagliari": 12.2,
+       "caltanissetta": 19.9,
+       "campobasso": 11.4,
+       "caserta": 11.5,
+       "catania": 16.9,
+       "catanzaro": 11.0,
+       "chieti": 20.9,
+       "como": 5.8,
+       "cosenza": 17.2,
+       "cremona": 8.7,
+       "crotone": 12.7,
+       "cuneo": 12.6,
+       "enna": 14.4,
+       "fermo": 10.1,
+       "ferrara": 9.9,
+       "firenze": 9.7,
+       "foggia": 13.4,
+       "forli-cesena": 16.6,
+       "frosinone": 11.0,
+       "genova": 13.5,
+       "gorizia": 11.3,
+       "grosseto": 19.7,
+       "imperia": 10.2,
+       "isernia": 16.8,
+       "l-aquila": 17.4,
+       "la-spezia": 22.1,
+       "latina": 10.8,
+       "lecce": 15.7,
+       "lecco": 6.8,
+       "livorno": 22.5,
+       "lodi": 8.6,
+       "lucca": 18.1,
+       "macerata": 15.1,
+       "mantova": 10.2,
+       "massa-carrara": 14.7,
+       "matera": 12.1,
+       "messina": 13.5,
+       "milano": 5.3,
+       "modena": 12.9,
+       "monza-e-della-brianza": 6.9,
+       "napoli": 9.1,
+       "novara": 6.1,
+       "nuoro": 19.7,
+       "oristano": 17.6,
+       "padova": 11.9,
+       "palermo": 14.0,
+       "parma": 12.4,
+       "pavia": 7.7,
+       "perugia": 17.4,
+       "pesaro-e-urbino": 15.7,
+       "pescara": 16.8,
+       "piacenza": 14.9,
+       "pisa": 15.4,
+       "pistoia": 11.7,
+       "pordenone": 9.8,
+       "potenza": 29.7,
+       "prato": 10.1,
+       "ragusa": 18.1,
+       "ravenna": 12.5,
+       "reggio-calabria": 20.2,
+       "reggio-emilia": 22.7,
+       "rieti": 13.4,
+       "rimini": 15.6,
+       "roma": 7.2,
+       "rovigo": 10.2,
+       "salerno": 14.7,
+       "sassari": 12.8,
+       "savona": 14.2,
+       "siena": 15.5,
+       "siracusa": 12.0,
+       "sondrio": 12.1,
+       "sud-sardegna": 20.8,
+       "taranto": 15.9,
+       "teramo": 14.6,
+       "terni": 17.1,
+       "torino": 6.5,
+       "trapani": 10.1,
+       "trento": 11.9,
+       "treviso": 12.4,
+       "trieste": 11.6,
+       "udine": 10.9,
+       "varese": 10.3,
+       "venezia": 8.7,
+       "verbano-cusio-ossola": 5.7,
+       "vercelli": 8.4,
+       "verona": 13.5,
+       "vibo-valentia": 19.2,
+       "vicenza": 10.7,
+       "viterbo": 15.1
+      },
+      "2020": {
+       "agrigento": 11.2,
+       "alessandria": 11.6,
+       "ancona": 14.4,
+       "aosta": 9.9,
+       "arezzo": 19.5,
+       "ascoli-piceno": 21.1,
+       "asti": 7.9,
+       "avellino": 13.2,
+       "bari": 10.4,
+       "barletta-andria-trani": 9.6,
+       "belluno": 9.8,
+       "benevento": 13.5,
+       "bergamo": 12.2,
+       "biella": 5.2,
+       "bologna": 9.6,
+       "bolzano": 13.6,
+       "brescia": 10.8,
+       "brindisi": 14.7,
+       "cagliari": 10.1,
+       "caltanissetta": 15.0,
+       "campobasso": 13.2,
+       "caserta": 10.6,
+       "catania": 11.3,
+       "catanzaro": 10.6,
+       "chieti": 16.7,
+       "como": 5.0,
+       "cosenza": 14.5,
+       "cremona": 11.5,
+       "crotone": 13.8,
+       "cuneo": 11.8,
+       "enna": 13.9,
+       "fermo": 12.9,
+       "ferrara": 9.7,
+       "firenze": 8.1,
+       "foggia": 13.9,
+       "forli-cesena": 15.6,
+       "frosinone": 9.3,
+       "genova": 12.0,
+       "gorizia": 10.9,
+       "grosseto": 15.8,
+       "imperia": 12.9,
+       "isernia": 15.6,
+       "l-aquila": 14.8,
+       "la-spezia": 19.8,
+       "latina": 10.6,
+       "lecce": 14.3,
+       "lecco": 8.4,
+       "livorno": 19.5,
+       "lodi": 10.9,
+       "lucca": 17.4,
+       "macerata": 13.3,
+       "mantova": 7.6,
+       "massa-carrara": 13.9,
+       "matera": 12.1,
+       "messina": 15.9,
+       "milano": 5.1,
+       "modena": 11.4,
+       "monza-e-della-brianza": 6.6,
+       "napoli": 8.6,
+       "novara": 5.3,
+       "nuoro": 14.3,
+       "oristano": 19.3,
+       "padova": 10.7,
+       "palermo": 10.3,
+       "parma": 13.3,
+       "pavia": 6.5,
+       "perugia": 15.6,
+       "pesaro-e-urbino": 14.6,
+       "pescara": 13.2,
+       "piacenza": 13.9,
+       "pisa": 13.4,
+       "pistoia": 11.6,
+       "pordenone": 8.3,
+       "potenza": 19.7,
+       "prato": 8.5,
+       "ragusa": 16.5,
+       "ravenna": 11.5,
+       "reggio-calabria": 14.1,
+       "reggio-emilia": 19.0,
+       "rieti": 15.4,
+       "rimini": 13.4,
+       "roma": 7.3,
+       "rovigo": 11.4,
+       "salerno": 13.4,
+       "sassari": 11.6,
+       "savona": 13.5,
+       "siena": 11.5,
+       "siracusa": 9.3,
+       "sondrio": 13.0,
+       "sud-sardegna": 14.7,
+       "taranto": 12.0,
+       "teramo": 14.4,
+       "terni": 16.1,
+       "torino": 6.4,
+       "trapani": 10.6,
+       "trento": 9.9,
+       "treviso": 11.7,
+       "trieste": 9.7,
+       "udine": 9.5,
+       "varese": 9.9,
+       "venezia": 10.0,
+       "verbano-cusio-ossola": 6.2,
+       "vercelli": 9.9,
+       "verona": 13.6,
+       "vibo-valentia": 18.7,
+       "vicenza": 10.6,
+       "viterbo": 15.4
+      },
+      "2021": {
+       "agrigento": 14.0,
+       "alessandria": 11.0,
+       "ancona": 16.3,
+       "aosta": 10.5,
+       "arezzo": 19.7,
+       "ascoli-piceno": 22.2,
+       "asti": 10.9,
+       "avellino": 11.8,
+       "bari": 12.6,
+       "barletta-andria-trani": 12.0,
+       "belluno": 10.2,
+       "benevento": 12.7,
+       "bergamo": 12.2,
+       "biella": 4.9,
+       "bologna": 9.9,
+       "bolzano": 13.9,
+       "brescia": 11.8,
+       "brindisi": 18.0,
+       "cagliari": 9.3,
+       "caltanissetta": 13.0,
+       "campobasso": 14.8,
+       "caserta": 9.2,
+       "catania": 12.1,
+       "catanzaro": 11.1,
+       "chieti": 17.6,
+       "como": 6.6,
+       "cosenza": 16.3,
+       "cremona": 8.8,
+       "crotone": 17.6,
+       "cuneo": 11.4,
+       "enna": 16.9,
+       "fermo": 13.0,
+       "ferrara": 11.1,
+       "firenze": 8.8,
+       "foggia": 14.0,
+       "forli-cesena": 17.0,
+       "frosinone": 8.1,
+       "genova": 12.8,
+       "gorizia": 11.9,
+       "grosseto": 17.5,
+       "imperia": 12.3,
+       "isernia": 12.0,
+       "l-aquila": 16.7,
+       "la-spezia": 19.9,
+       "latina": 10.2,
+       "lecce": 13.6,
+       "lecco": 8.2,
+       "livorno": 18.8,
+       "lodi": 9.7,
+       "lucca": 17.8,
+       "macerata": 15.2,
+       "mantova": 8.8,
+       "massa-carrara": 17.0,
+       "matera": 12.2,
+       "messina": 15.8,
+       "milano": 6.0,
+       "modena": 12.5,
+       "monza-e-della-brianza": 6.4,
+       "napoli": 9.8,
+       "novara": 4.8,
+       "nuoro": 13.8,
+       "oristano": 19.0,
+       "padova": 12.2,
+       "palermo": 11.8,
+       "parma": 12.5,
+       "pavia": 6.6,
+       "perugia": 16.4,
+       "pesaro-e-urbino": 16.8,
+       "pescara": 16.3,
+       "piacenza": 16.6,
+       "pisa": 14.4,
+       "pistoia": 11.1,
+       "pordenone": 8.4,
+       "potenza": 25.1,
+       "prato": 9.3,
+       "ragusa": 17.0,
+       "ravenna": 8.4,
+       "reggio-calabria": 17.6,
+       "reggio-emilia": 19.2,
+       "rieti": 18.1,
+       "rimini": 14.7,
+       "roma": 7.3,
+       "rovigo": 10.6,
+       "salerno": 11.7,
+       "sassari": 15.2,
+       "savona": 12.9,
+       "siena": 15.8,
+       "siracusa": 12.0,
+       "sondrio": 9.1,
+       "sud-sardegna": 12.5,
+       "taranto": 16.4,
+       "teramo": 16.4,
+       "terni": 16.4,
+       "torino": 6.9,
+       "trapani": 13.5,
+       "trento": 11.4,
+       "treviso": 12.2,
+       "trieste": 9.2,
+       "udine": 9.0,
+       "varese": 10.0,
+       "venezia": 8.6,
+       "verbano-cusio-ossola": 6.3,
+       "vercelli": 14.9,
+       "verona": 13.9,
+       "vibo-valentia": 13.3,
+       "vicenza": 10.1,
+       "viterbo": 13.4
+      },
+      "2022": {
+       "agrigento": 13.0,
+       "alessandria": 11.7,
+       "ancona": 16.7,
+       "aosta": 10.2,
+       "arezzo": 20.3,
+       "ascoli-piceno": 15.7,
+       "asti": 9.9,
+       "avellino": 14.4,
+       "bari": 13.4,
+       "barletta-andria-trani": 10.0,
+       "belluno": 8.4,
+       "benevento": 13.7,
+       "bergamo": 10.1,
+       "biella": 6.3,
+       "bologna": 8.6,
+       "bolzano": 12.5,
+       "brescia": 11.2,
+       "brindisi": 13.5,
+       "cagliari": 8.4,
+       "caltanissetta": 15.5,
+       "campobasso": 13.1,
+       "caserta": 9.8,
+       "catania": 12.8,
+       "catanzaro": 8.0,
+       "chieti": 18.1,
+       "como": 6.7,
+       "cosenza": 13.9,
+       "cremona": 9.9,
+       "crotone": 14.0,
+       "cuneo": 11.1,
+       "enna": 12.9,
+       "fermo": 10.0,
+       "ferrara": 12.8,
+       "firenze": 9.0,
+       "foggia": 12.8,
+       "forli-cesena": 17.6,
+       "frosinone": 10.6,
+       "genova": 11.8,
+       "gorizia": 9.0,
+       "grosseto": 18.4,
+       "imperia": 9.4,
+       "isernia": 15.6,
+       "l-aquila": 12.8,
+       "la-spezia": 15.4,
+       "latina": 9.8,
+       "lecce": 12.9,
+       "lecco": 8.9,
+       "livorno": 16.3,
+       "lodi": 9.4,
+       "lucca": 18.2,
+       "macerata": 15.5,
+       "mantova": 5.8,
+       "massa-carrara": 19.8,
+       "matera": 10.8,
+       "messina": 16.4,
+       "milano": 6.4,
+       "modena": 12.2,
+       "monza-e-della-brianza": 7.0,
+       "napoli": 9.6,
+       "novara": 4.8,
+       "nuoro": 12.5,
+       "oristano": 13.2,
+       "padova": 10.6,
+       "palermo": 12.0,
+       "parma": 11.5,
+       "pavia": 5.9,
+       "perugia": 18.3,
+       "pesaro-e-urbino": 15.1,
+       "pescara": 16.5,
+       "piacenza": 12.6,
+       "pisa": 16.0,
+       "pistoia": 12.7,
+       "pordenone": 8.0,
+       "potenza": 20.1,
+       "prato": 10.0,
+       "ragusa": 15.0,
+       "ravenna": 9.1,
+       "reggio-calabria": 17.3,
+       "reggio-emilia": 14.2,
+       "rieti": 17.0,
+       "rimini": 15.5,
+       "roma": 7.1,
+       "rovigo": 12.1,
+       "salerno": 14.1,
+       "sassari": 15.4,
+       "savona": 11.9,
+       "siena": 17.8,
+       "siracusa": 12.4,
+       "sondrio": 8.5,
+       "sud-sardegna": 13.0,
+       "taranto": 13.6,
+       "teramo": 18.7,
+       "terni": 16.3,
+       "torino": 6.6,
+       "trapani": 12.7,
+       "trento": 12.0,
+       "treviso": 11.5,
+       "trieste": 8.6,
+       "udine": 9.1,
+       "varese": 10.1,
+       "venezia": 8.1,
+       "verbano-cusio-ossola": 4.7,
+       "vercelli": 14.5,
+       "verona": 12.8,
+       "vibo-valentia": 11.9,
+       "vicenza": 8.6,
+       "viterbo": 14.4
+      }
+     }
+    }
+   ]
+  },
+  "page_article": {
+   "lead": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria. La media delle regioni è del 12,4, e la mappa non ricalca quella dell'occupazione.",
+   "sections": [
+    {
+     "role": "definizione",
+     "anchor": "sezione-definizione",
+     "heading": "Che cosa misura, in concreto",
+     "body": null,
+     "authored": false
+    },
+    {
+     "role": "quadro",
+     "anchor": "sezione-quadro",
+     "heading": "Come si distribuisce oggi",
+     "body": "Gli infortuni dipendono soprattutto da come è fatto il lavoro di un territorio: agricoltura, edilizia e manifattura pesante rischiano più dei servizi. Per questo alcune regioni piccole e industriali stanno in alto, e la posizione dice più della struttura produttiva che della virtù di una regione. Il calo di lungo periodo c'è, ma ogni infortunio grave resta un fallimento.",
+     "authored": true
+    },
+    {
+     "role": "dinamica",
+     "anchor": "sezione-dinamica",
+     "heading": "Come è cambiato nel tempo",
+     "body": null,
+     "authored": false
+    },
+    {
+     "role": "limiti",
+     "anchor": "sezione-limiti",
+     "heading": "Che cosa questo dato non dice",
+     "body": "Rapporta gli infortuni gravi agli occupati, ma risente della struttura produttiva e della sotto-denuncia in alcuni settori. Non conta gli infortuni lievi né le malattie professionali, che emergono anni dopo e sfuggono a questa misura.",
+     "authored": true
+    }
+   ],
+   "come_leggere": false,
+   "h1": null,
+   "seo_title": null,
+   "fonti": [],
+   "vintage": 2022,
+   "authored_count": 2
+  },
+  "page_lead": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria. La media delle regioni è del 12,4, e la mappa non ricalca quella dell'occupazione.",
+  "noindex": true,
+  "seo_title": "Tasso di infortuni sul lavoro mortali e, da 17,8 a 8,0",
+  "seo_description": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria.",
+  "dataset_description": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria. La media delle regioni è del 12,4, e la mappa non ricalca quella dell'occupazione.",
+  "dataset_updated": "2026-05-25",
+  "estremi": {
+   "alto": {
+    "key": "umbria",
+    "name": "Umbria",
+    "value": 17.8
+   },
+   "basso": {
+    "key": "piemonte",
+    "name": "Piemonte",
+    "value": 8.0
+   }
+  },
+  "site_url": "https://divarioitalia.it",
+  "site_name": "Divario Italia",
+  "canonical": "https://divarioitalia.it/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+  "SITE_NAME": "Divario Italia",
+  "SITE_URL": "https://divarioitalia.it",
+  "data_license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "data_license_label": "Creative Commons BY 4.0",
+  "publisher": {
+   "@type": "Organization",
+   "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+   "name": "Divario Italia",
+   "url": "https://divarioitalia.it/chi-siamo",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://divarioitalia.it/static/img/logo-mark.png"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "editorial",
+    "email": "divarioitalia@protonmail.com",
+    "url": "https://divarioitalia.it/contatti",
+    "availableLanguage": "it"
+   }
+  },
+  "publisher_jsonld": "{\"@type\": \"Organization\", \"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\", \"name\": \"Divario Italia\", \"url\": \"https://divarioitalia.it/chi-siamo\", \"logo\": {\"@type\": \"ImageObject\", \"url\": \"https://divarioitalia.it/static/img/logo-mark.png\"}, \"contactPoint\": {\"@type\": \"ContactPoint\", \"contactType\": \"editorial\", \"email\": \"divarioitalia@protonmail.com\", \"url\": \"https://divarioitalia.it/contatti\", \"availableLanguage\": \"it\"}}",
+  "organization_ref_jsonld": "{\"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\"}",
+  "corrections_url": "https://github.com/nmaiese/diset-viz/issues/new",
+  "contact_email": "divarioitalia@protonmail.com",
+  "consent_cmp_name": "Iubenda",
+  "consent_cmp_url": "https://www.iubenda.com/privacy-policy/"
+ }
+}

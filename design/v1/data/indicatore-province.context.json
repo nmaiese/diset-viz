@@ -1,0 +1,6371 @@
+{
+ "template": "indicator_page.html",
+ "route": "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+ "context": {
+  "meta": {
+   "id": "04BEC002P",
+   "raw_id": "04BEC002P",
+   "family": "bes",
+   "family_label": "Istat, benessere e qualità della vita",
+   "name": "Retribuzione media annua dei lavoratori dipendenti",
+   "unit": "euro",
+   "value_unit": "euro",
+   "change_unit": "euro",
+   "percentage_like": false,
+   "direction": "higher_better",
+   "scoreable": true,
+   "explain": {
+    "plain": "Esprime in euro la retribuzione media annua dei lavoratori dipendenti, nel perimetro medio definito dalla fonte.",
+    "example": "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.",
+    "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+    "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "higher_better"
+   },
+   "theme": "Reddito, inclusione e accessibilità",
+   "theme_path": "/tema/reddito-inclusione-e-accessibilita",
+   "source_theme": null,
+   "macro_area": null,
+   "source": null,
+   "source_label": "Istat, benessere e qualità della vita",
+   "source_url": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/",
+   "source_data_url": null,
+   "source_dataflow": null,
+   "institution": "Istat",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "archive": null,
+   "quality_life_scored": false,
+   "quality_life_category_label": null,
+   "indexable": true,
+   "indexable_reason": null,
+   "canonical_path": "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+   "downloads": null,
+   "year_min": 2015,
+   "year_max": 2023,
+   "freshness_status": "recent",
+   "freshness_label": "Recente"
+  },
+  "levels": [
+   {
+    "key": "provincia",
+    "label": "Province",
+    "singular": "provincia",
+    "plural": "province",
+    "profile_path": "/provincia/",
+    "has_map": false,
+    "explain": {
+     "plain": "Esprime in euro la retribuzione media annua dei lavoratori dipendenti, nel perimetro medio definito dalla fonte.",
+     "example": "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.",
+     "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+     "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+     "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+     "direction": "higher_better"
+    },
+    "years": [
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023
+    ],
+    "year_min": 2015,
+    "year_max": 2023,
+    "observations": [
+     {
+      "key": "milano",
+      "name": "Milano",
+      "value": 34343.0
+     },
+     {
+      "key": "monza-e-della-brianza",
+      "name": "Monza e della Brianza",
+      "value": 28833.1
+     },
+     {
+      "key": "parma",
+      "name": "Parma",
+      "value": 27869.1
+     },
+     {
+      "key": "modena",
+      "name": "Modena",
+      "value": 27671.5
+     },
+     {
+      "key": "bologna",
+      "name": "Bologna",
+      "value": 27603.1
+     },
+     {
+      "key": "reggio-emilia",
+      "name": "Reggio Emilia",
+      "value": 26936.9
+     },
+     {
+      "key": "lecco",
+      "name": "Lecco",
+      "value": 26766.8
+     },
+     {
+      "key": "torino",
+      "name": "Torino",
+      "value": 26426.4
+     },
+     {
+      "key": "bergamo",
+      "name": "Bergamo",
+      "value": 26083.3
+     },
+     {
+      "key": "varese",
+      "name": "Varese",
+      "value": 26059.0
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano",
+      "value": 26020.3
+     },
+     {
+      "key": "trieste",
+      "name": "Trieste",
+      "value": 25925.8
+     },
+     {
+      "key": "vicenza",
+      "name": "Vicenza",
+      "value": 25652.2
+     },
+     {
+      "key": "genova",
+      "name": "Genova",
+      "value": 25579.5
+     },
+     {
+      "key": "padova",
+      "name": "Padova",
+      "value": 25486.2
+     },
+     {
+      "key": "lodi",
+      "name": "Lodi",
+      "value": 25459.9
+     },
+     {
+      "key": "treviso",
+      "name": "Treviso",
+      "value": 25358.3
+     },
+     {
+      "key": "roma",
+      "name": "Roma",
+      "value": 25293.8
+     },
+     {
+      "key": "novara",
+      "name": "Novara",
+      "value": 25246.5
+     },
+     {
+      "key": "biella",
+      "name": "Biella",
+      "value": 24889.8
+     },
+     {
+      "key": "cremona",
+      "name": "Cremona",
+      "value": 24743.4
+     },
+     {
+      "key": "pordenone",
+      "name": "Pordenone",
+      "value": 24687.6
+     },
+     {
+      "key": "alessandria",
+      "name": "Alessandria",
+      "value": 24681.8
+     },
+     {
+      "key": "vercelli",
+      "name": "Vercelli",
+      "value": 24671.4
+     },
+     {
+      "key": "brescia",
+      "name": "Brescia",
+      "value": 24587.7
+     },
+     {
+      "key": "firenze",
+      "name": "Firenze",
+      "value": 24515.4
+     },
+     {
+      "key": "piacenza",
+      "name": "Piacenza",
+      "value": 24380.1
+     },
+     {
+      "key": "mantova",
+      "name": "Mantova",
+      "value": 24358.6
+     },
+     {
+      "key": "como",
+      "name": "Como",
+      "value": 24241.2
+     },
+     {
+      "key": "verona",
+      "name": "Verona",
+      "value": 24239.0
+     },
+     {
+      "key": "cuneo",
+      "name": "Cuneo",
+      "value": 24153.0
+     },
+     {
+      "key": "belluno",
+      "name": "Belluno",
+      "value": 23776.0
+     },
+     {
+      "key": "udine",
+      "name": "Udine",
+      "value": 23670.0
+     },
+     {
+      "key": "asti",
+      "name": "Asti",
+      "value": 23558.9
+     },
+     {
+      "key": "pisa",
+      "name": "Pisa",
+      "value": 23202.2
+     },
+     {
+      "key": "ravenna",
+      "name": "Ravenna",
+      "value": 23068.8
+     },
+     {
+      "key": "siena",
+      "name": "Siena",
+      "value": 23055.0
+     },
+     {
+      "key": "pavia",
+      "name": "Pavia",
+      "value": 22843.5
+     },
+     {
+      "key": "venezia",
+      "name": "Venezia",
+      "value": 22466.4
+     },
+     {
+      "key": "trento",
+      "name": "Trento",
+      "value": 22434.9
+     },
+     {
+      "key": "gorizia",
+      "name": "Gorizia",
+      "value": 22220.4
+     },
+     {
+      "key": "ancona",
+      "name": "Ancona",
+      "value": 22171.3
+     },
+     {
+      "key": "arezzo",
+      "name": "Arezzo",
+      "value": 22152.7
+     },
+     {
+      "key": "lucca",
+      "name": "Lucca",
+      "value": 22094.2
+     },
+     {
+      "key": "forli-cesena",
+      "name": "Forlì-Cesena",
+      "value": 22057.7
+     },
+     {
+      "key": "la-spezia",
+      "name": "La Spezia",
+      "value": 21891.5
+     },
+     {
+      "key": "sondrio",
+      "name": "Sondrio",
+      "value": 21771.5
+     },
+     {
+      "key": "pesaro-e-urbino",
+      "name": "Pesaro e Urbino",
+      "value": 21626.7
+     },
+     {
+      "key": "ferrara",
+      "name": "Ferrara",
+      "value": 21600.4
+     },
+     {
+      "key": "rovigo",
+      "name": "Rovigo",
+      "value": 21233.8
+     },
+     {
+      "key": "pistoia",
+      "name": "Pistoia",
+      "value": 21035.1
+     },
+     {
+      "key": "perugia",
+      "name": "Perugia",
+      "value": 21013.8
+     },
+     {
+      "key": "terni",
+      "name": "Terni",
+      "value": 20923.0
+     },
+     {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara",
+      "value": 20917.3
+     },
+     {
+      "key": "chieti",
+      "name": "Chieti",
+      "value": 20778.8
+     },
+     {
+      "key": "verbano-cusio-ossola",
+      "name": "Verbano-Cusio-Ossola",
+      "value": 20722.0
+     },
+     {
+      "key": "livorno",
+      "name": "Livorno",
+      "value": 20404.2
+     },
+     {
+      "key": "frosinone",
+      "name": "Frosinone",
+      "value": 20333.2
+     },
+     {
+      "key": "cagliari",
+      "name": "Cagliari",
+      "value": 20229.7
+     },
+     {
+      "key": "savona",
+      "name": "Savona",
+      "value": 20107.8
+     },
+     {
+      "key": "aosta",
+      "name": "Aosta",
+      "value": 19918.3
+     },
+     {
+      "key": "macerata",
+      "name": "Macerata",
+      "value": 19912.4
+     },
+     {
+      "key": "ascoli-piceno",
+      "name": "Ascoli Piceno",
+      "value": 19805.2
+     },
+     {
+      "key": "prato",
+      "name": "Prato",
+      "value": 19647.8
+     },
+     {
+      "key": "l-aquila",
+      "name": "L'Aquila",
+      "value": 19573.5
+     },
+     {
+      "key": "potenza",
+      "name": "Potenza",
+      "value": 19471.6
+     },
+     {
+      "key": "pescara",
+      "name": "Pescara",
+      "value": 19456.9
+     },
+     {
+      "key": "bari",
+      "name": "Bari",
+      "value": 19379.3
+     },
+     {
+      "key": "latina",
+      "name": "Latina",
+      "value": 19338.5
+     },
+     {
+      "key": "fermo",
+      "name": "Fermo",
+      "value": 18885.0
+     },
+     {
+      "key": "campobasso",
+      "name": "Campobasso",
+      "value": 18565.2
+     },
+     {
+      "key": "rieti",
+      "name": "Rieti",
+      "value": 18480.3
+     },
+     {
+      "key": "napoli",
+      "name": "Napoli",
+      "value": 18405.9
+     },
+     {
+      "key": "catania",
+      "name": "Catania",
+      "value": 18303.3
+     },
+     {
+      "key": "siracusa",
+      "name": "Siracusa",
+      "value": 18227.1
+     },
+     {
+      "key": "taranto",
+      "name": "Taranto",
+      "value": 18219.0
+     },
+     {
+      "key": "teramo",
+      "name": "Teramo",
+      "value": 18193.5
+     },
+     {
+      "key": "avellino",
+      "name": "Avellino",
+      "value": 18030.5
+     },
+     {
+      "key": "caltanissetta",
+      "name": "Caltanissetta",
+      "value": 18014.6
+     },
+     {
+      "key": "palermo",
+      "name": "Palermo",
+      "value": 17910.7
+     },
+     {
+      "key": "rimini",
+      "name": "Rimini",
+      "value": 17809.2
+     },
+     {
+      "key": "viterbo",
+      "name": "Viterbo",
+      "value": 17740.2
+     },
+     {
+      "key": "imperia",
+      "name": "Imperia",
+      "value": 17682.2
+     },
+     {
+      "key": "brindisi",
+      "name": "Brindisi",
+      "value": 17606.7
+     },
+     {
+      "key": "grosseto",
+      "name": "Grosseto",
+      "value": 17271.8
+     },
+     {
+      "key": "oristano",
+      "name": "Oristano",
+      "value": 17164.2
+     },
+     {
+      "key": "isernia",
+      "name": "Isernia",
+      "value": 17133.2
+     },
+     {
+      "key": "matera",
+      "name": "Matera",
+      "value": 17002.5
+     },
+     {
+      "key": "sassari",
+      "name": "Sassari",
+      "value": 16625.8
+     },
+     {
+      "key": "caserta",
+      "name": "Caserta",
+      "value": 16625.1
+     },
+     {
+      "key": "sud-sardegna",
+      "name": "Sud Sardegna",
+      "value": 16593.6
+     },
+     {
+      "key": "reggio-calabria",
+      "name": "Reggio Calabria",
+      "value": 16410.8
+     },
+     {
+      "key": "enna",
+      "name": "Enna",
+      "value": 16321.9
+     },
+     {
+      "key": "foggia",
+      "name": "Foggia",
+      "value": 16282.4
+     },
+     {
+      "key": "catanzaro",
+      "name": "Catanzaro",
+      "value": 15991.5
+     },
+     {
+      "key": "benevento",
+      "name": "Benevento",
+      "value": 15983.1
+     },
+     {
+      "key": "salerno",
+      "name": "Salerno",
+      "value": 15845.7
+     },
+     {
+      "key": "messina",
+      "name": "Messina",
+      "value": 15684.0
+     },
+     {
+      "key": "lecce",
+      "name": "Lecce",
+      "value": 15675.5
+     },
+     {
+      "key": "barletta-andria-trani",
+      "name": "Barletta-Andria-Trani",
+      "value": 15666.4
+     },
+     {
+      "key": "ragusa",
+      "name": "Ragusa",
+      "value": 15589.8
+     },
+     {
+      "key": "agrigento",
+      "name": "Agrigento",
+      "value": 15211.1
+     },
+     {
+      "key": "crotone",
+      "name": "Crotone",
+      "value": 14873.6
+     },
+     {
+      "key": "trapani",
+      "name": "Trapani",
+      "value": 14853.6
+     },
+     {
+      "key": "cosenza",
+      "name": "Cosenza",
+      "value": 14816.9
+     },
+     {
+      "key": "nuoro",
+      "name": "Nuoro",
+      "value": 14675.6
+     },
+     {
+      "key": "vibo-valentia",
+      "name": "Vibo Valentia",
+      "value": 13387.8
+     }
+    ],
+    "best": {
+     "key": "milano",
+     "name": "Milano",
+     "value": 34343.0
+    },
+    "worst": {
+     "key": "vibo-valentia",
+     "name": "Vibo Valentia",
+     "value": 13387.8
+    },
+    "stats": {
+     "year": 2023,
+     "year_avg": 21031.657009345792,
+     "year_count": 107,
+     "median": 20917.3,
+     "above_avg_count": 51,
+     "below_avg_count": 56,
+     "year_min": 2015,
+     "year_min_avg": 19104.319417475726,
+     "year_max": 2023,
+     "has_multi_year": true,
+     "avg_change_abs": 1927.3375918700658,
+     "avg_change_pct": 10.088491245110928,
+     "gap_abs": 20955.2,
+     "gap_ratio": 2.565245970211685,
+     "year_min_gap_abs": 16961.8,
+     "gap_trend": 3993.4000000000015,
+     "highest_delta": {
+      "key": "milano",
+      "name": "Milano",
+      "value": null,
+      "delta": 5574.200000000001,
+      "kind": "aumento"
+     },
+     "lowest_delta": {
+      "key": "aosta",
+      "name": "Aosta",
+      "value": null,
+      "delta": 174.70000000000073,
+      "kind": "aumento"
+     }
+    },
+    "annual_change": {
+     "year": 2023,
+     "previous_year": 2022,
+     "year_gap": 1,
+     "common_count": 107,
+     "current_count": 107,
+     "previous_count": 107,
+     "same_coverage": true,
+     "previous_avg": 20321.92710280374,
+     "current_avg": 21031.657009345792,
+     "average_delta": 709.729906542052,
+     "average_delta_pct": 3.4924340735585715,
+     "increase_count": 107,
+     "decrease_count": 0,
+     "stable_count": 0,
+     "largest_increases": [
+      {
+       "key": "potenza",
+       "name": "Potenza",
+       "value": null,
+       "delta": 1339.699999999997,
+       "kind": "aumento",
+       "previous_value": 18131.9,
+       "current_value": 19471.6
+      },
+      {
+       "key": "milano",
+       "name": "Milano",
+       "value": null,
+       "delta": 1102.5999999999985,
+       "kind": "aumento",
+       "previous_value": 33240.4,
+       "current_value": 34343.0
+      },
+      {
+       "key": "bolzano",
+       "name": "Bolzano",
+       "value": null,
+       "delta": 1063.2999999999993,
+       "kind": "aumento",
+       "previous_value": 24957.0,
+       "current_value": 26020.3
+      }
+     ],
+     "largest_decreases": []
+    },
+    "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+    "trend_note": "una variazione media favorevole",
+    "coverage": 1.0,
+    "territory_total": 107,
+    "territories": [
+     {
+      "key": "agrigento",
+      "name": "Agrigento"
+     },
+     {
+      "key": "alessandria",
+      "name": "Alessandria"
+     },
+     {
+      "key": "ancona",
+      "name": "Ancona"
+     },
+     {
+      "key": "aosta",
+      "name": "Aosta"
+     },
+     {
+      "key": "arezzo",
+      "name": "Arezzo"
+     },
+     {
+      "key": "ascoli-piceno",
+      "name": "Ascoli Piceno"
+     },
+     {
+      "key": "asti",
+      "name": "Asti"
+     },
+     {
+      "key": "avellino",
+      "name": "Avellino"
+     },
+     {
+      "key": "bari",
+      "name": "Bari"
+     },
+     {
+      "key": "barletta-andria-trani",
+      "name": "Barletta-Andria-Trani"
+     },
+     {
+      "key": "belluno",
+      "name": "Belluno"
+     },
+     {
+      "key": "benevento",
+      "name": "Benevento"
+     },
+     {
+      "key": "bergamo",
+      "name": "Bergamo"
+     },
+     {
+      "key": "biella",
+      "name": "Biella"
+     },
+     {
+      "key": "bologna",
+      "name": "Bologna"
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano"
+     },
+     {
+      "key": "brescia",
+      "name": "Brescia"
+     },
+     {
+      "key": "brindisi",
+      "name": "Brindisi"
+     },
+     {
+      "key": "cagliari",
+      "name": "Cagliari"
+     },
+     {
+      "key": "caltanissetta",
+      "name": "Caltanissetta"
+     },
+     {
+      "key": "campobasso",
+      "name": "Campobasso"
+     },
+     {
+      "key": "caserta",
+      "name": "Caserta"
+     },
+     {
+      "key": "catania",
+      "name": "Catania"
+     },
+     {
+      "key": "catanzaro",
+      "name": "Catanzaro"
+     },
+     {
+      "key": "chieti",
+      "name": "Chieti"
+     },
+     {
+      "key": "como",
+      "name": "Como"
+     },
+     {
+      "key": "cosenza",
+      "name": "Cosenza"
+     },
+     {
+      "key": "cremona",
+      "name": "Cremona"
+     },
+     {
+      "key": "crotone",
+      "name": "Crotone"
+     },
+     {
+      "key": "cuneo",
+      "name": "Cuneo"
+     },
+     {
+      "key": "enna",
+      "name": "Enna"
+     },
+     {
+      "key": "fermo",
+      "name": "Fermo"
+     },
+     {
+      "key": "ferrara",
+      "name": "Ferrara"
+     },
+     {
+      "key": "firenze",
+      "name": "Firenze"
+     },
+     {
+      "key": "foggia",
+      "name": "Foggia"
+     },
+     {
+      "key": "forli-cesena",
+      "name": "Forlì-Cesena"
+     },
+     {
+      "key": "frosinone",
+      "name": "Frosinone"
+     },
+     {
+      "key": "genova",
+      "name": "Genova"
+     },
+     {
+      "key": "gorizia",
+      "name": "Gorizia"
+     },
+     {
+      "key": "grosseto",
+      "name": "Grosseto"
+     },
+     {
+      "key": "imperia",
+      "name": "Imperia"
+     },
+     {
+      "key": "isernia",
+      "name": "Isernia"
+     },
+     {
+      "key": "l-aquila",
+      "name": "L'Aquila"
+     },
+     {
+      "key": "la-spezia",
+      "name": "La Spezia"
+     },
+     {
+      "key": "latina",
+      "name": "Latina"
+     },
+     {
+      "key": "lecce",
+      "name": "Lecce"
+     },
+     {
+      "key": "lecco",
+      "name": "Lecco"
+     },
+     {
+      "key": "livorno",
+      "name": "Livorno"
+     },
+     {
+      "key": "lodi",
+      "name": "Lodi"
+     },
+     {
+      "key": "lucca",
+      "name": "Lucca"
+     },
+     {
+      "key": "macerata",
+      "name": "Macerata"
+     },
+     {
+      "key": "mantova",
+      "name": "Mantova"
+     },
+     {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara"
+     },
+     {
+      "key": "matera",
+      "name": "Matera"
+     },
+     {
+      "key": "messina",
+      "name": "Messina"
+     },
+     {
+      "key": "milano",
+      "name": "Milano"
+     },
+     {
+      "key": "modena",
+      "name": "Modena"
+     },
+     {
+      "key": "monza-e-della-brianza",
+      "name": "Monza e della Brianza"
+     },
+     {
+      "key": "napoli",
+      "name": "Napoli"
+     },
+     {
+      "key": "novara",
+      "name": "Novara"
+     },
+     {
+      "key": "nuoro",
+      "name": "Nuoro"
+     },
+     {
+      "key": "oristano",
+      "name": "Oristano"
+     },
+     {
+      "key": "padova",
+      "name": "Padova"
+     },
+     {
+      "key": "palermo",
+      "name": "Palermo"
+     },
+     {
+      "key": "parma",
+      "name": "Parma"
+     },
+     {
+      "key": "pavia",
+      "name": "Pavia"
+     },
+     {
+      "key": "perugia",
+      "name": "Perugia"
+     },
+     {
+      "key": "pesaro-e-urbino",
+      "name": "Pesaro e Urbino"
+     },
+     {
+      "key": "pescara",
+      "name": "Pescara"
+     },
+     {
+      "key": "piacenza",
+      "name": "Piacenza"
+     },
+     {
+      "key": "pisa",
+      "name": "Pisa"
+     },
+     {
+      "key": "pistoia",
+      "name": "Pistoia"
+     },
+     {
+      "key": "pordenone",
+      "name": "Pordenone"
+     },
+     {
+      "key": "potenza",
+      "name": "Potenza"
+     },
+     {
+      "key": "prato",
+      "name": "Prato"
+     },
+     {
+      "key": "ragusa",
+      "name": "Ragusa"
+     },
+     {
+      "key": "ravenna",
+      "name": "Ravenna"
+     },
+     {
+      "key": "reggio-calabria",
+      "name": "Reggio Calabria"
+     },
+     {
+      "key": "reggio-emilia",
+      "name": "Reggio Emilia"
+     },
+     {
+      "key": "rieti",
+      "name": "Rieti"
+     },
+     {
+      "key": "rimini",
+      "name": "Rimini"
+     },
+     {
+      "key": "roma",
+      "name": "Roma"
+     },
+     {
+      "key": "rovigo",
+      "name": "Rovigo"
+     },
+     {
+      "key": "salerno",
+      "name": "Salerno"
+     },
+     {
+      "key": "sassari",
+      "name": "Sassari"
+     },
+     {
+      "key": "savona",
+      "name": "Savona"
+     },
+     {
+      "key": "siena",
+      "name": "Siena"
+     },
+     {
+      "key": "siracusa",
+      "name": "Siracusa"
+     },
+     {
+      "key": "sondrio",
+      "name": "Sondrio"
+     },
+     {
+      "key": "sud-sardegna",
+      "name": "Sud Sardegna"
+     },
+     {
+      "key": "taranto",
+      "name": "Taranto"
+     },
+     {
+      "key": "teramo",
+      "name": "Teramo"
+     },
+     {
+      "key": "terni",
+      "name": "Terni"
+     },
+     {
+      "key": "torino",
+      "name": "Torino"
+     },
+     {
+      "key": "trapani",
+      "name": "Trapani"
+     },
+     {
+      "key": "trento",
+      "name": "Trento"
+     },
+     {
+      "key": "treviso",
+      "name": "Treviso"
+     },
+     {
+      "key": "trieste",
+      "name": "Trieste"
+     },
+     {
+      "key": "udine",
+      "name": "Udine"
+     },
+     {
+      "key": "varese",
+      "name": "Varese"
+     },
+     {
+      "key": "venezia",
+      "name": "Venezia"
+     },
+     {
+      "key": "verbano-cusio-ossola",
+      "name": "Verbano-Cusio-Ossola"
+     },
+     {
+      "key": "vercelli",
+      "name": "Vercelli"
+     },
+     {
+      "key": "verona",
+      "name": "Verona"
+     },
+     {
+      "key": "vibo-valentia",
+      "name": "Vibo Valentia"
+     },
+     {
+      "key": "vicenza",
+      "name": "Vicenza"
+     },
+     {
+      "key": "viterbo",
+      "name": "Viterbo"
+     }
+    ],
+    "default_territory": {
+     "key": "milano",
+     "name": "Milano",
+     "value": 34343.0
+    },
+    "matrix": {
+     "2015": {
+      "agrigento": 14114.5,
+      "alessandria": 22403.8,
+      "ancona": 20542.8,
+      "aosta": 19743.6,
+      "arezzo": 19917.1,
+      "ascoli-piceno": 17528.3,
+      "asti": 21725.3,
+      "avellino": 15230.9,
+      "bari": 16468.9,
+      "belluno": 21316.1,
+      "benevento": 13676.5,
+      "bergamo": 23900.2,
+      "biella": 22553.9,
+      "bologna": 25347.5,
+      "bolzano": 23022.8,
+      "brescia": 22299.9,
+      "brindisi": 15986.8,
+      "cagliari": 17290.4,
+      "caltanissetta": 15743.1,
+      "campobasso": 16218.9,
+      "caserta": 14349.0,
+      "catania": 16199.4,
+      "catanzaro": 14942.2,
+      "chieti": 19360.1,
+      "como": 23060.0,
+      "cosenza": 13393.6,
+      "cremona": 22777.1,
+      "crotone": 13560.4,
+      "cuneo": 22479.3,
+      "enna": 13946.5,
+      "ferrara": 20534.3,
+      "firenze": 22125.5,
+      "foggia": 14565.2,
+      "forli-cesena": 20392.1,
+      "frosinone": 17820.5,
+      "genova": 23643.0,
+      "gorizia": 20463.1,
+      "grosseto": 15608.4,
+      "imperia": 16539.6,
+      "isernia": 14965.3,
+      "l-aquila": 16834.6,
+      "la-spezia": 19939.3,
+      "latina": 17116.4,
+      "lecce": 13354.9,
+      "lecco": 24736.1,
+      "livorno": 18858.8,
+      "lodi": 23471.5,
+      "lucca": 20232.1,
+      "macerata": 17951.6,
+      "mantova": 21904.1,
+      "massa-carrara": 19045.3,
+      "matera": 14823.1,
+      "messina": 14106.7,
+      "milano": 28768.8,
+      "modena": 24779.9,
+      "napoli": 16527.9,
+      "novara": 23453.7,
+      "nuoro": 13539.4,
+      "oristano": 15571.5,
+      "padova": 22718.1,
+      "palermo": 17096.7,
+      "parma": 25219.6,
+      "pavia": 21163.4,
+      "perugia": 18884.2,
+      "pesaro-e-urbino": 19230.3,
+      "pescara": 17291.4,
+      "piacenza": 22403.1,
+      "pisa": 20997.6,
+      "pistoia": 18980.8,
+      "pordenone": 22720.9,
+      "potenza": 17664.6,
+      "prato": 17357.4,
+      "ragusa": 13464.0,
+      "ravenna": 21581.3,
+      "reggio-calabria": 14845.1,
+      "reggio-emilia": 24744.9,
+      "rieti": 16311.5,
+      "rimini": 15685.3,
+      "roma": 22614.6,
+      "rovigo": 19424.9,
+      "salerno": 13539.2,
+      "sassari": 14918.8,
+      "savona": 19326.3,
+      "siena": 21825.9,
+      "siracusa": 16933.8,
+      "sondrio": 20384.9,
+      "taranto": 16663.5,
+      "teramo": 15882.4,
+      "terni": 18671.1,
+      "torino": 24229.7,
+      "trapani": 13247.2,
+      "trento": 20613.2,
+      "treviso": 22979.0,
+      "trieste": 24749.5,
+      "udine": 21812.2,
+      "varese": 24311.3,
+      "venezia": 20713.6,
+      "verbano-cusio-ossola": 19922.2,
+      "vercelli": 22636.7,
+      "verona": 21974.5,
+      "vibo-valentia": 11807.0,
+      "vicenza": 23491.9,
+      "viterbo": 15939.7
+     },
+     "2016": {
+      "agrigento": 14608.3,
+      "alessandria": 22580.7,
+      "ancona": 20899.3,
+      "aosta": 19507.0,
+      "arezzo": 20193.6,
+      "ascoli-piceno": 17871.1,
+      "asti": 21982.1,
+      "avellino": 15909.1,
+      "bari": 16997.6,
+      "belluno": 21596.7,
+      "benevento": 14453.7,
+      "bergamo": 24286.6,
+      "biella": 22898.1,
+      "bologna": 25665.2,
+      "bolzano": 23237.6,
+      "brescia": 22593.1,
+      "brindisi": 16409.3,
+      "cagliari": 17705.2,
+      "caltanissetta": 16303.4,
+      "campobasso": 17089.7,
+      "caserta": 14875.8,
+      "catania": 16535.7,
+      "catanzaro": 15212.1,
+      "chieti": 19618.3,
+      "como": 23302.7,
+      "cosenza": 13814.8,
+      "cremona": 23103.3,
+      "crotone": 13951.4,
+      "cuneo": 22510.5,
+      "enna": 14598.1,
+      "ferrara": 20850.3,
+      "firenze": 22510.9,
+      "foggia": 14973.4,
+      "forli-cesena": 20689.3,
+      "frosinone": 18611.4,
+      "genova": 23896.5,
+      "gorizia": 20669.3,
+      "grosseto": 16032.8,
+      "imperia": 16741.3,
+      "isernia": 15599.9,
+      "l-aquila": 17524.6,
+      "la-spezia": 20202.5,
+      "latina": 17441.8,
+      "lecce": 13797.3,
+      "lecco": 25159.3,
+      "livorno": 19190.7,
+      "lodi": 24002.0,
+      "lucca": 20517.2,
+      "macerata": 18222.9,
+      "mantova": 22208.0,
+      "massa-carrara": 19394.3,
+      "matera": 15258.0,
+      "messina": 14644.3,
+      "milano": 29650.8,
+      "modena": 25318.9,
+      "napoli": 17020.0,
+      "novara": 23871.2,
+      "nuoro": 13849.7,
+      "oristano": 16116.1,
+      "padova": 23079.2,
+      "palermo": 17321.8,
+      "parma": 25441.9,
+      "pavia": 21363.3,
+      "perugia": 19214.9,
+      "pesaro-e-urbino": 19835.4,
+      "pescara": 17793.2,
+      "piacenza": 22155.0,
+      "pisa": 21430.2,
+      "pistoia": 19188.5,
+      "pordenone": 22931.0,
+      "potenza": 18185.8,
+      "prato": 18011.4,
+      "ragusa": 13728.3,
+      "ravenna": 21609.2,
+      "reggio-calabria": 15272.3,
+      "reggio-emilia": 25134.8,
+      "rieti": 16635.9,
+      "rimini": 16097.9,
+      "roma": 23308.1,
+      "rovigo": 19712.4,
+      "salerno": 14085.0,
+      "sassari": 15189.2,
+      "savona": 19469.6,
+      "siena": 22037.2,
+      "siracusa": 17487.6,
+      "sondrio": 20818.3,
+      "taranto": 17601.8,
+      "teramo": 16366.2,
+      "terni": 19021.0,
+      "torino": 24596.5,
+      "trapani": 13512.9,
+      "trento": 20831.5,
+      "treviso": 23219.1,
+      "trieste": 25088.9,
+      "udine": 22019.7,
+      "varese": 24774.4,
+      "venezia": 21000.8,
+      "verbano-cusio-ossola": 20016.7,
+      "vercelli": 23036.3,
+      "verona": 22355.1,
+      "vibo-valentia": 12138.4,
+      "vicenza": 23906.4,
+      "viterbo": 16571.7
+     },
+     "2017": {
+      "agrigento": 14535.6,
+      "alessandria": 22500.5,
+      "ancona": 20459.5,
+      "aosta": 18941.4,
+      "arezzo": 19837.1,
+      "ascoli-piceno": 17426.2,
+      "asti": 21713.4,
+      "avellino": 15706.2,
+      "bari": 16662.4,
+      "belluno": 21720.9,
+      "benevento": 14285.8,
+      "bergamo": 24017.4,
+      "biella": 22474.0,
+      "bologna": 25514.1,
+      "bolzano": 22841.2,
+      "brescia": 22341.3,
+      "brindisi": 15643.1,
+      "cagliari": 17341.1,
+      "caltanissetta": 16299.3,
+      "campobasso": 16735.7,
+      "caserta": 14791.2,
+      "catania": 16497.7,
+      "catanzaro": 14823.9,
+      "chieti": 19285.7,
+      "como": 23081.7,
+      "cosenza": 13501.6,
+      "cremona": 22758.6,
+      "crotone": 13750.8,
+      "cuneo": 22087.9,
+      "enna": 14404.6,
+      "ferrara": 20277.8,
+      "firenze": 22245.6,
+      "foggia": 14704.8,
+      "forli-cesena": 20138.5,
+      "frosinone": 18601.9,
+      "genova": 23541.6,
+      "gorizia": 20656.2,
+      "grosseto": 15664.5,
+      "imperia": 16332.6,
+      "isernia": 15014.0,
+      "l-aquila": 17290.8,
+      "la-spezia": 19831.6,
+      "latina": 17173.3,
+      "lecce": 13433.5,
+      "lecco": 24911.0,
+      "livorno": 18802.3,
+      "lodi": 23874.1,
+      "lucca": 20120.4,
+      "macerata": 17816.8,
+      "mantova": 21886.9,
+      "massa-carrara": 18995.0,
+      "matera": 14817.7,
+      "messina": 14374.2,
+      "milano": 29727.0,
+      "modena": 24986.8,
+      "napoli": 16927.0,
+      "novara": 23538.4,
+      "nuoro": 13333.5,
+      "oristano": 15375.0,
+      "padova": 22767.6,
+      "palermo": 17141.7,
+      "parma": 25170.0,
+      "pavia": 21096.0,
+      "perugia": 18997.9,
+      "pesaro-e-urbino": 19482.8,
+      "pescara": 17209.3,
+      "piacenza": 22156.7,
+      "pisa": 21300.3,
+      "pistoia": 18909.1,
+      "pordenone": 22771.5,
+      "potenza": 17540.1,
+      "prato": 18165.1,
+      "ragusa": 13664.9,
+      "ravenna": 20965.8,
+      "reggio-calabria": 15034.4,
+      "reggio-emilia": 24793.5,
+      "rieti": 15245.9,
+      "rimini": 15873.3,
+      "roma": 23093.1,
+      "rovigo": 19350.9,
+      "salerno": 13989.9,
+      "sassari": 14878.7,
+      "savona": 18786.0,
+      "siena": 21477.6,
+      "siracusa": 17103.9,
+      "sondrio": 20426.3,
+      "taranto": 16982.8,
+      "teramo": 15904.7,
+      "terni": 19070.4,
+      "torino": 24426.6,
+      "trapani": 13344.1,
+      "trento": 20473.9,
+      "treviso": 23056.7,
+      "trieste": 24632.3,
+      "udine": 21602.5,
+      "varese": 24323.8,
+      "venezia": 20773.4,
+      "verbano-cusio-ossola": 19466.4,
+      "vercelli": 22663.2,
+      "verona": 22041.1,
+      "vibo-valentia": 11734.7,
+      "vicenza": 23580.7,
+      "viterbo": 16247.7
+     },
+     "2018": {
+      "agrigento": 14168.8,
+      "alessandria": 22708.2,
+      "ancona": 20606.5,
+      "aosta": 18951.2,
+      "arezzo": 20041.1,
+      "ascoli-piceno": 17520.7,
+      "asti": 22259.5,
+      "avellino": 15541.5,
+      "bari": 16724.5,
+      "belluno": 21940.4,
+      "benevento": 14045.1,
+      "bergamo": 24303.7,
+      "biella": 22954.2,
+      "bologna": 25761.1,
+      "bolzano": 23180.8,
+      "brescia": 22660.3,
+      "brindisi": 15710.4,
+      "cagliari": 17415.6,
+      "caltanissetta": 16148.1,
+      "campobasso": 16926.5,
+      "caserta": 14718.0,
+      "catania": 16550.9,
+      "catanzaro": 14899.5,
+      "chieti": 19320.6,
+      "como": 23050.6,
+      "cosenza": 13484.4,
+      "cremona": 22923.2,
+      "crotone": 13607.5,
+      "cuneo": 22306.9,
+      "enna": 14610.5,
+      "ferrara": 20532.9,
+      "firenze": 22543.2,
+      "foggia": 14734.9,
+      "forli-cesena": 20256.1,
+      "frosinone": 18417.0,
+      "genova": 23725.5,
+      "gorizia": 20604.3,
+      "grosseto": 15844.6,
+      "imperia": 16515.8,
+      "isernia": 14977.3,
+      "l-aquila": 17624.1,
+      "la-spezia": 20092.8,
+      "latina": 17345.3,
+      "lecce": 13527.6,
+      "lecco": 25180.2,
+      "livorno": 18998.7,
+      "lodi": 24118.0,
+      "lucca": 20394.0,
+      "macerata": 18044.2,
+      "mantova": 22264.8,
+      "massa-carrara": 19048.6,
+      "matera": 15019.9,
+      "messina": 14263.4,
+      "milano": 30111.9,
+      "modena": 25315.7,
+      "napoli": 16885.6,
+      "novara": 23710.5,
+      "nuoro": 13372.7,
+      "oristano": 15534.0,
+      "padova": 23050.9,
+      "palermo": 16922.3,
+      "parma": 25485.5,
+      "pavia": 21419.3,
+      "perugia": 19129.1,
+      "pesaro-e-urbino": 19771.9,
+      "pescara": 17382.9,
+      "piacenza": 22227.6,
+      "pisa": 21436.0,
+      "pistoia": 19144.2,
+      "pordenone": 22933.1,
+      "potenza": 17644.6,
+      "prato": 18113.0,
+      "ragusa": 13651.3,
+      "ravenna": 21074.9,
+      "reggio-calabria": 15099.5,
+      "reggio-emilia": 25115.9,
+      "rieti": 16022.1,
+      "rimini": 15940.2,
+      "roma": 23021.4,
+      "rovigo": 19593.4,
+      "salerno": 13897.6,
+      "sassari": 14841.1,
+      "savona": 18892.7,
+      "siena": 21205.6,
+      "siracusa": 17028.2,
+      "sondrio": 20452.8,
+      "taranto": 17160.9,
+      "teramo": 16112.6,
+      "terni": 19509.1,
+      "torino": 24458.8,
+      "trapani": 13390.2,
+      "trento": 20590.7,
+      "treviso": 23310.9,
+      "trieste": 24746.0,
+      "udine": 21953.2,
+      "varese": 24760.2,
+      "venezia": 21032.0,
+      "verbano-cusio-ossola": 19634.9,
+      "vercelli": 22798.9,
+      "verona": 22249.9,
+      "vibo-valentia": 11992.6,
+      "vicenza": 23709.9,
+      "viterbo": 16296.9
+     },
+     "2019": {
+      "agrigento": 14001.6,
+      "alessandria": 22938.0,
+      "ancona": 20941.8,
+      "aosta": 18928.2,
+      "arezzo": 20355.6,
+      "ascoli-piceno": 17820.9,
+      "asti": 22299.6,
+      "avellino": 15587.8,
+      "bari": 16821.8,
+      "belluno": 22190.1,
+      "benevento": 14116.6,
+      "bergamo": 24534.0,
+      "biella": 22963.0,
+      "bologna": 25907.2,
+      "bolzano": 23712.3,
+      "brescia": 22940.5,
+      "brindisi": 15974.1,
+      "cagliari": 17546.7,
+      "caltanissetta": 16017.6,
+      "campobasso": 16793.6,
+      "caserta": 14732.5,
+      "catania": 16572.4,
+      "catanzaro": 14847.1,
+      "chieti": 19595.8,
+      "como": 23097.1,
+      "cosenza": 13329.5,
+      "cremona": 23181.8,
+      "crotone": 13691.1,
+      "cuneo": 22570.9,
+      "enna": 14805.3,
+      "ferrara": 20702.1,
+      "firenze": 22788.8,
+      "foggia": 14662.8,
+      "forli-cesena": 20553.4,
+      "frosinone": 18441.6,
+      "genova": 23792.0,
+      "gorizia": 21076.4,
+      "grosseto": 15996.5,
+      "imperia": 16461.3,
+      "isernia": 15056.9,
+      "l-aquila": 17535.3,
+      "la-spezia": 20188.5,
+      "latina": 17645.4,
+      "lecce": 13791.4,
+      "lecco": 25469.3,
+      "livorno": 19233.1,
+      "lodi": 24275.8,
+      "lucca": 20703.2,
+      "macerata": 18350.6,
+      "mantova": 22677.7,
+      "massa-carrara": 19229.7,
+      "matera": 15105.7,
+      "messina": 14178.0,
+      "milano": 30408.1,
+      "modena": 25762.5,
+      "napoli": 16952.7,
+      "novara": 24013.4,
+      "nuoro": 13411.7,
+      "oristano": 15408.9,
+      "padova": 23617.9,
+      "palermo": 16707.5,
+      "parma": 25786.4,
+      "pavia": 21643.4,
+      "perugia": 19351.3,
+      "pesaro-e-urbino": 20120.9,
+      "pescara": 17760.9,
+      "piacenza": 22413.3,
+      "pisa": 21629.2,
+      "pistoia": 19431.9,
+      "pordenone": 23297.9,
+      "potenza": 17245.6,
+      "prato": 18302.9,
+      "ragusa": 13714.6,
+      "ravenna": 21356.6,
+      "reggio-calabria": 15008.8,
+      "reggio-emilia": 25410.0,
+      "rieti": 16241.5,
+      "rimini": 16212.6,
+      "roma": 23304.5,
+      "rovigo": 19874.5,
+      "salerno": 14015.8,
+      "sassari": 14928.3,
+      "savona": 19092.0,
+      "siena": 21712.7,
+      "siracusa": 16990.3,
+      "sondrio": 20461.2,
+      "taranto": 17165.7,
+      "teramo": 16522.8,
+      "terni": 19744.9,
+      "torino": 24573.6,
+      "trapani": 13518.7,
+      "trento": 20865.9,
+      "treviso": 23599.8,
+      "trieste": 24746.4,
+      "udine": 22192.6,
+      "varese": 24990.3,
+      "venezia": 21148.0,
+      "verbano-cusio-ossola": 19772.0,
+      "vercelli": 23021.6,
+      "verona": 22594.3,
+      "vibo-valentia": 11770.8,
+      "vicenza": 24095.5,
+      "viterbo": 16530.4
+     },
+     "2020": {
+      "agrigento": 12718.2,
+      "alessandria": 21680.2,
+      "ancona": 19538.3,
+      "aosta": 17665.2,
+      "arezzo": 18707.5,
+      "ascoli-piceno": 16332.4,
+      "asti": 20924.5,
+      "avellino": 14163.1,
+      "bari": 15606.7,
+      "belluno": 20963.7,
+      "benevento": 12894.3,
+      "bergamo": 22855.1,
+      "biella": 21165.1,
+      "bologna": 24633.1,
+      "bolzano": 22370.6,
+      "brescia": 21365.0,
+      "brindisi": 14830.8,
+      "cagliari": 16651.9,
+      "caltanissetta": 14857.2,
+      "campobasso": 15949.4,
+      "caserta": 13595.4,
+      "catania": 15269.9,
+      "catanzaro": 13476.5,
+      "chieti": 18272.2,
+      "como": 21275.7,
+      "cosenza": 12100.0,
+      "cremona": 22154.2,
+      "crotone": 12687.2,
+      "cuneo": 21419.7,
+      "enna": 13649.0,
+      "ferrara": 19320.5,
+      "firenze": 21055.1,
+      "foggia": 13646.8,
+      "forli-cesena": 19621.1,
+      "frosinone": 17062.9,
+      "genova": 22773.0,
+      "gorizia": 19622.4,
+      "grosseto": 14819.0,
+      "imperia": 15273.7,
+      "isernia": 14249.8,
+      "l-aquila": 16517.5,
+      "la-spezia": 18931.9,
+      "latina": 16741.9,
+      "lecce": 12655.7,
+      "lecco": 23621.8,
+      "livorno": 18124.5,
+      "lodi": 22844.7,
+      "lucca": 19572.0,
+      "macerata": 16921.5,
+      "mantova": 21558.7,
+      "massa-carrara": 17982.7,
+      "matera": 13988.1,
+      "messina": 12766.4,
+      "milano": 29588.8,
+      "modena": 24450.3,
+      "napoli": 15203.1,
+      "novara": 22576.2,
+      "nuoro": 12484.3,
+      "oristano": 14694.1,
+      "padova": 22313.4,
+      "palermo": 15312.7,
+      "parma": 24782.7,
+      "pavia": 20466.0,
+      "perugia": 18060.1,
+      "pesaro-e-urbino": 18676.2,
+      "pescara": 16528.4,
+      "piacenza": 21228.4,
+      "pisa": 19971.5,
+      "pistoia": 17899.4,
+      "pordenone": 21898.0,
+      "potenza": 16017.1,
+      "prato": 16276.9,
+      "ragusa": 12705.8,
+      "ravenna": 20602.0,
+      "reggio-calabria": 13903.7,
+      "reggio-emilia": 24010.2,
+      "rieti": 14726.9,
+      "rimini": 14926.3,
+      "roma": 21895.2,
+      "rovigo": 18696.8,
+      "salerno": 12815.0,
+      "sassari": 13966.4,
+      "savona": 17926.0,
+      "siena": 20411.0,
+      "siracusa": 15926.5,
+      "sondrio": 19342.4,
+      "taranto": 15406.0,
+      "teramo": 15239.6,
+      "terni": 18407.4,
+      "torino": 22972.1,
+      "trapani": 12058.3,
+      "trento": 20092.2,
+      "treviso": 22163.6,
+      "trieste": 23848.9,
+      "udine": 20936.5,
+      "varese": 22788.1,
+      "venezia": 19177.1,
+      "verbano-cusio-ossola": 18211.3,
+      "vercelli": 21733.1,
+      "verona": 21404.0,
+      "vibo-valentia": 10894.2,
+      "vicenza": 22667.6,
+      "viterbo": 15076.8
+     },
+     "2021": {
+      "agrigento": 13820.6,
+      "alessandria": 23215.7,
+      "ancona": 20911.1,
+      "aosta": 18059.4,
+      "arezzo": 20261.4,
+      "ascoli-piceno": 17690.1,
+      "asti": 22245.3,
+      "avellino": 16129.5,
+      "bari": 17034.0,
+      "belluno": 21780.7,
+      "benevento": 14393.0,
+      "bergamo": 24420.9,
+      "biella": 22558.9,
+      "bologna": 25832.7,
+      "bolzano": 23459.6,
+      "brescia": 23017.8,
+      "brindisi": 16066.1,
+      "cagliari": 17598.0,
+      "caltanissetta": 16158.9,
+      "campobasso": 16974.4,
+      "caserta": 14981.9,
+      "catania": 16389.0,
+      "catanzaro": 14712.0,
+      "chieti": 19462.6,
+      "como": 22719.6,
+      "cosenza": 13333.3,
+      "cremona": 23354.8,
+      "crotone": 13811.5,
+      "cuneo": 22632.5,
+      "enna": 14685.4,
+      "ferrara": 20478.3,
+      "firenze": 22621.2,
+      "foggia": 14856.6,
+      "forli-cesena": 20835.8,
+      "frosinone": 18682.8,
+      "genova": 24087.6,
+      "gorizia": 20894.2,
+      "grosseto": 15908.1,
+      "imperia": 16283.1,
+      "isernia": 15670.5,
+      "l-aquila": 17763.6,
+      "la-spezia": 20219.5,
+      "latina": 17864.3,
+      "lecce": 13956.2,
+      "lecco": 25224.3,
+      "livorno": 19126.7,
+      "lodi": 24217.9,
+      "lucca": 20724.5,
+      "macerata": 18380.7,
+      "mantova": 22860.2,
+      "massa-carrara": 19616.2,
+      "matera": 15453.5,
+      "messina": 13915.8,
+      "milano": 31232.1,
+      "modena": 25760.5,
+      "napoli": 16569.6,
+      "novara": 23673.9,
+      "nuoro": 13487.2,
+      "oristano": 15689.1,
+      "padova": 23819.6,
+      "palermo": 16473.5,
+      "parma": 25939.0,
+      "pavia": 21760.3,
+      "perugia": 19427.9,
+      "pesaro-e-urbino": 20191.6,
+      "pescara": 17696.7,
+      "piacenza": 22531.0,
+      "pisa": 21472.3,
+      "pistoia": 19311.0,
+      "pordenone": 23491.3,
+      "potenza": 17322.8,
+      "prato": 17998.6,
+      "ragusa": 13882.7,
+      "ravenna": 21652.0,
+      "reggio-calabria": 15251.4,
+      "reggio-emilia": 25584.1,
+      "rieti": 16476.0,
+      "rimini": 16126.0,
+      "roma": 23048.8,
+      "rovigo": 19882.2,
+      "salerno": 14144.0,
+      "sassari": 15066.1,
+      "savona": 18993.7,
+      "siena": 21585.7,
+      "siracusa": 16676.4,
+      "sondrio": 20344.2,
+      "taranto": 16632.0,
+      "teramo": 16631.8,
+      "terni": 19723.8,
+      "torino": 24526.6,
+      "trapani": 13281.9,
+      "trento": 20752.5,
+      "treviso": 23802.5,
+      "trieste": 24728.6,
+      "udine": 22151.1,
+      "varese": 24275.6,
+      "venezia": 20486.8,
+      "verbano-cusio-ossola": 19499.1,
+      "vercelli": 22956.6,
+      "verona": 22756.6,
+      "vibo-valentia": 12054.2,
+      "vicenza": 24144.7,
+      "viterbo": 16537.4
+     },
+     "2022": {
+      "agrigento": 14968.2,
+      "alessandria": 23951.1,
+      "ancona": 21498.1,
+      "aosta": 19516.4,
+      "arezzo": 21285.7,
+      "ascoli-piceno": 19237.1,
+      "asti": 22945.6,
+      "avellino": 17245.8,
+      "bari": 18583.7,
+      "barletta-andria-trani": 15163.2,
+      "belluno": 22942.4,
+      "benevento": 15448.6,
+      "bergamo": 25266.0,
+      "biella": 23935.8,
+      "bologna": 26618.8,
+      "bolzano": 24957.0,
+      "brescia": 23817.5,
+      "brindisi": 17023.8,
+      "cagliari": 19427.3,
+      "caltanissetta": 17159.4,
+      "campobasso": 17669.3,
+      "caserta": 16071.2,
+      "catania": 17556.7,
+      "catanzaro": 15707.9,
+      "chieti": 19858.4,
+      "como": 23601.1,
+      "cosenza": 14325.8,
+      "cremona": 24070.7,
+      "crotone": 14682.8,
+      "cuneo": 23329.9,
+      "enna": 15789.9,
+      "fermo": 18107.7,
+      "ferrara": 21060.0,
+      "firenze": 23696.8,
+      "foggia": 15799.1,
+      "forli-cesena": 21397.3,
+      "frosinone": 19630.6,
+      "genova": 24758.2,
+      "gorizia": 21390.5,
+      "grosseto": 16713.6,
+      "imperia": 17159.9,
+      "isernia": 16577.9,
+      "l-aquila": 18806.2,
+      "la-spezia": 21041.0,
+      "latina": 18606.9,
+      "lecce": 15053.4,
+      "lecco": 26027.8,
+      "livorno": 19786.3,
+      "lodi": 24789.1,
+      "lucca": 21268.1,
+      "macerata": 19345.4,
+      "mantova": 23541.9,
+      "massa-carrara": 20321.9,
+      "matera": 16418.1,
+      "messina": 15195.4,
+      "milano": 33240.4,
+      "modena": 26774.4,
+      "monza-e-della-brianza": 27977.5,
+      "napoli": 17816.9,
+      "novara": 24532.5,
+      "nuoro": 14159.5,
+      "oristano": 16456.9,
+      "padova": 24621.5,
+      "palermo": 17298.0,
+      "parma": 26883.6,
+      "pavia": 22255.0,
+      "perugia": 20226.0,
+      "pesaro-e-urbino": 20870.1,
+      "pescara": 18668.2,
+      "piacenza": 23433.7,
+      "pisa": 22484.1,
+      "pistoia": 20286.8,
+      "pordenone": 23979.4,
+      "potenza": 18131.9,
+      "prato": 19081.1,
+      "ragusa": 14893.8,
+      "ravenna": 22091.2,
+      "reggio-calabria": 16082.0,
+      "reggio-emilia": 26110.6,
+      "rieti": 17726.3,
+      "rimini": 17100.9,
+      "roma": 24278.6,
+      "rovigo": 20587.6,
+      "salerno": 15179.2,
+      "sassari": 16017.4,
+      "savona": 19598.2,
+      "siena": 22302.1,
+      "siracusa": 17615.0,
+      "sondrio": 21031.5,
+      "sud-sardegna": 16002.9,
+      "taranto": 17570.7,
+      "teramo": 17472.9,
+      "terni": 20230.8,
+      "torino": 25437.7,
+      "trapani": 14375.2,
+      "trento": 21556.6,
+      "treviso": 24535.7,
+      "trieste": 25175.3,
+      "udine": 22612.6,
+      "varese": 25183.0,
+      "venezia": 21729.9,
+      "verbano-cusio-ossola": 20227.6,
+      "vercelli": 23876.8,
+      "verona": 23476.8,
+      "vibo-valentia": 12944.1,
+      "vicenza": 24845.6,
+      "viterbo": 17251.8
+     },
+     "2023": {
+      "agrigento": 15211.1,
+      "alessandria": 24681.8,
+      "ancona": 22171.3,
+      "aosta": 19918.3,
+      "arezzo": 22152.7,
+      "ascoli-piceno": 19805.2,
+      "asti": 23558.9,
+      "avellino": 18030.5,
+      "bari": 19379.3,
+      "barletta-andria-trani": 15666.4,
+      "belluno": 23776.0,
+      "benevento": 15983.1,
+      "bergamo": 26083.3,
+      "biella": 24889.8,
+      "bologna": 27603.1,
+      "bolzano": 26020.3,
+      "brescia": 24587.7,
+      "brindisi": 17606.7,
+      "cagliari": 20229.7,
+      "caltanissetta": 18014.6,
+      "campobasso": 18565.2,
+      "caserta": 16625.1,
+      "catania": 18303.3,
+      "catanzaro": 15991.5,
+      "chieti": 20778.8,
+      "como": 24241.2,
+      "cosenza": 14816.9,
+      "cremona": 24743.4,
+      "crotone": 14873.6,
+      "cuneo": 24153.0,
+      "enna": 16321.9,
+      "fermo": 18885.0,
+      "ferrara": 21600.4,
+      "firenze": 24515.4,
+      "foggia": 16282.4,
+      "forli-cesena": 22057.7,
+      "frosinone": 20333.2,
+      "genova": 25579.5,
+      "gorizia": 22220.4,
+      "grosseto": 17271.8,
+      "imperia": 17682.2,
+      "isernia": 17133.2,
+      "l-aquila": 19573.5,
+      "la-spezia": 21891.5,
+      "latina": 19338.5,
+      "lecce": 15675.5,
+      "lecco": 26766.8,
+      "livorno": 20404.2,
+      "lodi": 25459.9,
+      "lucca": 22094.2,
+      "macerata": 19912.4,
+      "mantova": 24358.6,
+      "massa-carrara": 20917.3,
+      "matera": 17002.5,
+      "messina": 15684.0,
+      "milano": 34343.0,
+      "modena": 27671.5,
+      "monza-e-della-brianza": 28833.1,
+      "napoli": 18405.9,
+      "novara": 25246.5,
+      "nuoro": 14675.6,
+      "oristano": 17164.2,
+      "padova": 25486.2,
+      "palermo": 17910.7,
+      "parma": 27869.1,
+      "pavia": 22843.5,
+      "perugia": 21013.8,
+      "pesaro-e-urbino": 21626.7,
+      "pescara": 19456.9,
+      "piacenza": 24380.1,
+      "pisa": 23202.2,
+      "pistoia": 21035.1,
+      "pordenone": 24687.6,
+      "potenza": 19471.6,
+      "prato": 19647.8,
+      "ragusa": 15589.8,
+      "ravenna": 23068.8,
+      "reggio-calabria": 16410.8,
+      "reggio-emilia": 26936.9,
+      "rieti": 18480.3,
+      "rimini": 17809.2,
+      "roma": 25293.8,
+      "rovigo": 21233.8,
+      "salerno": 15845.7,
+      "sassari": 16625.8,
+      "savona": 20107.8,
+      "siena": 23055.0,
+      "siracusa": 18227.1,
+      "sondrio": 21771.5,
+      "sud-sardegna": 16593.6,
+      "taranto": 18219.0,
+      "teramo": 18193.5,
+      "terni": 20923.0,
+      "torino": 26426.4,
+      "trapani": 14853.6,
+      "trento": 22434.9,
+      "treviso": 25358.3,
+      "trieste": 25925.8,
+      "udine": 23670.0,
+      "varese": 26059.0,
+      "venezia": 22466.4,
+      "verbano-cusio-ossola": 20722.0,
+      "vercelli": 24671.4,
+      "verona": 24239.0,
+      "vibo-valentia": 13387.8,
+      "vicenza": 25652.2,
+      "viterbo": 17740.2
+     }
+    },
+    "annual_means": [
+     {
+      "year": 2015,
+      "avg": 19104.319417475726
+     },
+     {
+      "year": 2016,
+      "avg": 19484.17087378641
+     },
+     {
+      "year": 2017,
+      "avg": 19165.922330097088
+     },
+     {
+      "year": 2018,
+      "avg": 19303.385436893204
+     },
+     {
+      "year": 2019,
+      "avg": 19467.7
+     },
+     {
+      "year": 2020,
+      "avg": 18182.547572815532
+     },
+     {
+      "year": 2021,
+      "avg": 19464.61553398058
+     },
+     {
+      "year": 2022,
+      "avg": 20321.92710280374
+     },
+     {
+      "year": 2023,
+      "avg": 21031.657009345792
+     }
+    ],
+    "map_colors": null,
+    "cover_bars": null,
+    "bar_max": 34343.0,
+    "query_map": [
+     {
+      "intent": "definizione",
+      "label": "Che cosa misura Retribuzione media annua dei lavoratori dipendenti?",
+      "target": "sezione-definizione"
+     },
+     {
+      "intent": "dato",
+      "label": "Qual è il dato più recente, nel 2023?",
+      "target": "esplora"
+     },
+     {
+      "intent": "classifica",
+      "label": "Qual è la classifica delle province nel 2023?",
+      "target": "classifica-dati"
+     },
+     {
+      "intent": "confronto",
+      "label": "Che cosa è cambiato dal 2022 al 2023?",
+      "target": "sezione-dinamica"
+     },
+     {
+      "intent": "andamento",
+      "label": "Come è cambiato dal 2015 al 2023?",
+      "target": "serie-storica"
+     },
+     {
+      "intent": "metodologia",
+      "label": "Come sono calcolati confronti e medie?",
+      "target": "fonti-verifica"
+     }
+    ]
+   }
+  ],
+  "level": {
+   "key": "provincia",
+   "label": "Province",
+   "singular": "provincia",
+   "plural": "province",
+   "profile_path": "/provincia/",
+   "has_map": false,
+   "explain": {
+    "plain": "Esprime in euro la retribuzione media annua dei lavoratori dipendenti, nel perimetro medio definito dalla fonte.",
+    "example": "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.",
+    "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+    "caveat": "Il dato va letto insieme a unità di misura, anno e copertura. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "higher_better"
+   },
+   "years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+   ],
+   "year_min": 2015,
+   "year_max": 2023,
+   "observations": [
+    {
+     "key": "milano",
+     "name": "Milano",
+     "value": 34343.0
+    },
+    {
+     "key": "monza-e-della-brianza",
+     "name": "Monza e della Brianza",
+     "value": 28833.1
+    },
+    {
+     "key": "parma",
+     "name": "Parma",
+     "value": 27869.1
+    },
+    {
+     "key": "modena",
+     "name": "Modena",
+     "value": 27671.5
+    },
+    {
+     "key": "bologna",
+     "name": "Bologna",
+     "value": 27603.1
+    },
+    {
+     "key": "reggio-emilia",
+     "name": "Reggio Emilia",
+     "value": 26936.9
+    },
+    {
+     "key": "lecco",
+     "name": "Lecco",
+     "value": 26766.8
+    },
+    {
+     "key": "torino",
+     "name": "Torino",
+     "value": 26426.4
+    },
+    {
+     "key": "bergamo",
+     "name": "Bergamo",
+     "value": 26083.3
+    },
+    {
+     "key": "varese",
+     "name": "Varese",
+     "value": 26059.0
+    },
+    {
+     "key": "bolzano",
+     "name": "Bolzano",
+     "value": 26020.3
+    },
+    {
+     "key": "trieste",
+     "name": "Trieste",
+     "value": 25925.8
+    },
+    {
+     "key": "vicenza",
+     "name": "Vicenza",
+     "value": 25652.2
+    },
+    {
+     "key": "genova",
+     "name": "Genova",
+     "value": 25579.5
+    },
+    {
+     "key": "padova",
+     "name": "Padova",
+     "value": 25486.2
+    },
+    {
+     "key": "lodi",
+     "name": "Lodi",
+     "value": 25459.9
+    },
+    {
+     "key": "treviso",
+     "name": "Treviso",
+     "value": 25358.3
+    },
+    {
+     "key": "roma",
+     "name": "Roma",
+     "value": 25293.8
+    },
+    {
+     "key": "novara",
+     "name": "Novara",
+     "value": 25246.5
+    },
+    {
+     "key": "biella",
+     "name": "Biella",
+     "value": 24889.8
+    },
+    {
+     "key": "cremona",
+     "name": "Cremona",
+     "value": 24743.4
+    },
+    {
+     "key": "pordenone",
+     "name": "Pordenone",
+     "value": 24687.6
+    },
+    {
+     "key": "alessandria",
+     "name": "Alessandria",
+     "value": 24681.8
+    },
+    {
+     "key": "vercelli",
+     "name": "Vercelli",
+     "value": 24671.4
+    },
+    {
+     "key": "brescia",
+     "name": "Brescia",
+     "value": 24587.7
+    },
+    {
+     "key": "firenze",
+     "name": "Firenze",
+     "value": 24515.4
+    },
+    {
+     "key": "piacenza",
+     "name": "Piacenza",
+     "value": 24380.1
+    },
+    {
+     "key": "mantova",
+     "name": "Mantova",
+     "value": 24358.6
+    },
+    {
+     "key": "como",
+     "name": "Como",
+     "value": 24241.2
+    },
+    {
+     "key": "verona",
+     "name": "Verona",
+     "value": 24239.0
+    },
+    {
+     "key": "cuneo",
+     "name": "Cuneo",
+     "value": 24153.0
+    },
+    {
+     "key": "belluno",
+     "name": "Belluno",
+     "value": 23776.0
+    },
+    {
+     "key": "udine",
+     "name": "Udine",
+     "value": 23670.0
+    },
+    {
+     "key": "asti",
+     "name": "Asti",
+     "value": 23558.9
+    },
+    {
+     "key": "pisa",
+     "name": "Pisa",
+     "value": 23202.2
+    },
+    {
+     "key": "ravenna",
+     "name": "Ravenna",
+     "value": 23068.8
+    },
+    {
+     "key": "siena",
+     "name": "Siena",
+     "value": 23055.0
+    },
+    {
+     "key": "pavia",
+     "name": "Pavia",
+     "value": 22843.5
+    },
+    {
+     "key": "venezia",
+     "name": "Venezia",
+     "value": 22466.4
+    },
+    {
+     "key": "trento",
+     "name": "Trento",
+     "value": 22434.9
+    },
+    {
+     "key": "gorizia",
+     "name": "Gorizia",
+     "value": 22220.4
+    },
+    {
+     "key": "ancona",
+     "name": "Ancona",
+     "value": 22171.3
+    },
+    {
+     "key": "arezzo",
+     "name": "Arezzo",
+     "value": 22152.7
+    },
+    {
+     "key": "lucca",
+     "name": "Lucca",
+     "value": 22094.2
+    },
+    {
+     "key": "forli-cesena",
+     "name": "Forlì-Cesena",
+     "value": 22057.7
+    },
+    {
+     "key": "la-spezia",
+     "name": "La Spezia",
+     "value": 21891.5
+    },
+    {
+     "key": "sondrio",
+     "name": "Sondrio",
+     "value": 21771.5
+    },
+    {
+     "key": "pesaro-e-urbino",
+     "name": "Pesaro e Urbino",
+     "value": 21626.7
+    },
+    {
+     "key": "ferrara",
+     "name": "Ferrara",
+     "value": 21600.4
+    },
+    {
+     "key": "rovigo",
+     "name": "Rovigo",
+     "value": 21233.8
+    },
+    {
+     "key": "pistoia",
+     "name": "Pistoia",
+     "value": 21035.1
+    },
+    {
+     "key": "perugia",
+     "name": "Perugia",
+     "value": 21013.8
+    },
+    {
+     "key": "terni",
+     "name": "Terni",
+     "value": 20923.0
+    },
+    {
+     "key": "massa-carrara",
+     "name": "Massa-Carrara",
+     "value": 20917.3
+    },
+    {
+     "key": "chieti",
+     "name": "Chieti",
+     "value": 20778.8
+    },
+    {
+     "key": "verbano-cusio-ossola",
+     "name": "Verbano-Cusio-Ossola",
+     "value": 20722.0
+    },
+    {
+     "key": "livorno",
+     "name": "Livorno",
+     "value": 20404.2
+    },
+    {
+     "key": "frosinone",
+     "name": "Frosinone",
+     "value": 20333.2
+    },
+    {
+     "key": "cagliari",
+     "name": "Cagliari",
+     "value": 20229.7
+    },
+    {
+     "key": "savona",
+     "name": "Savona",
+     "value": 20107.8
+    },
+    {
+     "key": "aosta",
+     "name": "Aosta",
+     "value": 19918.3
+    },
+    {
+     "key": "macerata",
+     "name": "Macerata",
+     "value": 19912.4
+    },
+    {
+     "key": "ascoli-piceno",
+     "name": "Ascoli Piceno",
+     "value": 19805.2
+    },
+    {
+     "key": "prato",
+     "name": "Prato",
+     "value": 19647.8
+    },
+    {
+     "key": "l-aquila",
+     "name": "L'Aquila",
+     "value": 19573.5
+    },
+    {
+     "key": "potenza",
+     "name": "Potenza",
+     "value": 19471.6
+    },
+    {
+     "key": "pescara",
+     "name": "Pescara",
+     "value": 19456.9
+    },
+    {
+     "key": "bari",
+     "name": "Bari",
+     "value": 19379.3
+    },
+    {
+     "key": "latina",
+     "name": "Latina",
+     "value": 19338.5
+    },
+    {
+     "key": "fermo",
+     "name": "Fermo",
+     "value": 18885.0
+    },
+    {
+     "key": "campobasso",
+     "name": "Campobasso",
+     "value": 18565.2
+    },
+    {
+     "key": "rieti",
+     "name": "Rieti",
+     "value": 18480.3
+    },
+    {
+     "key": "napoli",
+     "name": "Napoli",
+     "value": 18405.9
+    },
+    {
+     "key": "catania",
+     "name": "Catania",
+     "value": 18303.3
+    },
+    {
+     "key": "siracusa",
+     "name": "Siracusa",
+     "value": 18227.1
+    },
+    {
+     "key": "taranto",
+     "name": "Taranto",
+     "value": 18219.0
+    },
+    {
+     "key": "teramo",
+     "name": "Teramo",
+     "value": 18193.5
+    },
+    {
+     "key": "avellino",
+     "name": "Avellino",
+     "value": 18030.5
+    },
+    {
+     "key": "caltanissetta",
+     "name": "Caltanissetta",
+     "value": 18014.6
+    },
+    {
+     "key": "palermo",
+     "name": "Palermo",
+     "value": 17910.7
+    },
+    {
+     "key": "rimini",
+     "name": "Rimini",
+     "value": 17809.2
+    },
+    {
+     "key": "viterbo",
+     "name": "Viterbo",
+     "value": 17740.2
+    },
+    {
+     "key": "imperia",
+     "name": "Imperia",
+     "value": 17682.2
+    },
+    {
+     "key": "brindisi",
+     "name": "Brindisi",
+     "value": 17606.7
+    },
+    {
+     "key": "grosseto",
+     "name": "Grosseto",
+     "value": 17271.8
+    },
+    {
+     "key": "oristano",
+     "name": "Oristano",
+     "value": 17164.2
+    },
+    {
+     "key": "isernia",
+     "name": "Isernia",
+     "value": 17133.2
+    },
+    {
+     "key": "matera",
+     "name": "Matera",
+     "value": 17002.5
+    },
+    {
+     "key": "sassari",
+     "name": "Sassari",
+     "value": 16625.8
+    },
+    {
+     "key": "caserta",
+     "name": "Caserta",
+     "value": 16625.1
+    },
+    {
+     "key": "sud-sardegna",
+     "name": "Sud Sardegna",
+     "value": 16593.6
+    },
+    {
+     "key": "reggio-calabria",
+     "name": "Reggio Calabria",
+     "value": 16410.8
+    },
+    {
+     "key": "enna",
+     "name": "Enna",
+     "value": 16321.9
+    },
+    {
+     "key": "foggia",
+     "name": "Foggia",
+     "value": 16282.4
+    },
+    {
+     "key": "catanzaro",
+     "name": "Catanzaro",
+     "value": 15991.5
+    },
+    {
+     "key": "benevento",
+     "name": "Benevento",
+     "value": 15983.1
+    },
+    {
+     "key": "salerno",
+     "name": "Salerno",
+     "value": 15845.7
+    },
+    {
+     "key": "messina",
+     "name": "Messina",
+     "value": 15684.0
+    },
+    {
+     "key": "lecce",
+     "name": "Lecce",
+     "value": 15675.5
+    },
+    {
+     "key": "barletta-andria-trani",
+     "name": "Barletta-Andria-Trani",
+     "value": 15666.4
+    },
+    {
+     "key": "ragusa",
+     "name": "Ragusa",
+     "value": 15589.8
+    },
+    {
+     "key": "agrigento",
+     "name": "Agrigento",
+     "value": 15211.1
+    },
+    {
+     "key": "crotone",
+     "name": "Crotone",
+     "value": 14873.6
+    },
+    {
+     "key": "trapani",
+     "name": "Trapani",
+     "value": 14853.6
+    },
+    {
+     "key": "cosenza",
+     "name": "Cosenza",
+     "value": 14816.9
+    },
+    {
+     "key": "nuoro",
+     "name": "Nuoro",
+     "value": 14675.6
+    },
+    {
+     "key": "vibo-valentia",
+     "name": "Vibo Valentia",
+     "value": 13387.8
+    }
+   ],
+   "best": {
+    "key": "milano",
+    "name": "Milano",
+    "value": 34343.0
+   },
+   "worst": {
+    "key": "vibo-valentia",
+    "name": "Vibo Valentia",
+    "value": 13387.8
+   },
+   "stats": {
+    "year": 2023,
+    "year_avg": 21031.657009345792,
+    "year_count": 107,
+    "median": 20917.3,
+    "above_avg_count": 51,
+    "below_avg_count": 56,
+    "year_min": 2015,
+    "year_min_avg": 19104.319417475726,
+    "year_max": 2023,
+    "has_multi_year": true,
+    "avg_change_abs": 1927.3375918700658,
+    "avg_change_pct": 10.088491245110928,
+    "gap_abs": 20955.2,
+    "gap_ratio": 2.565245970211685,
+    "year_min_gap_abs": 16961.8,
+    "gap_trend": 3993.4000000000015,
+    "highest_delta": {
+     "key": "milano",
+     "name": "Milano",
+     "value": null,
+     "delta": 5574.200000000001,
+     "kind": "aumento"
+    },
+    "lowest_delta": {
+     "key": "aosta",
+     "name": "Aosta",
+     "value": null,
+     "delta": 174.70000000000073,
+     "kind": "aumento"
+    }
+   },
+   "annual_change": {
+    "year": 2023,
+    "previous_year": 2022,
+    "year_gap": 1,
+    "common_count": 107,
+    "current_count": 107,
+    "previous_count": 107,
+    "same_coverage": true,
+    "previous_avg": 20321.92710280374,
+    "current_avg": 21031.657009345792,
+    "average_delta": 709.729906542052,
+    "average_delta_pct": 3.4924340735585715,
+    "increase_count": 107,
+    "decrease_count": 0,
+    "stable_count": 0,
+    "largest_increases": [
+     {
+      "key": "potenza",
+      "name": "Potenza",
+      "value": null,
+      "delta": 1339.699999999997,
+      "kind": "aumento",
+      "previous_value": 18131.9,
+      "current_value": 19471.6
+     },
+     {
+      "key": "milano",
+      "name": "Milano",
+      "value": null,
+      "delta": 1102.5999999999985,
+      "kind": "aumento",
+      "previous_value": 33240.4,
+      "current_value": 34343.0
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano",
+      "value": null,
+      "delta": 1063.2999999999993,
+      "kind": "aumento",
+      "previous_value": 24957.0,
+      "current_value": 26020.3
+     }
+    ],
+    "largest_decreases": []
+   },
+   "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+   "trend_note": "una variazione media favorevole",
+   "coverage": 1.0,
+   "territory_total": 107,
+   "territories": [
+    {
+     "key": "agrigento",
+     "name": "Agrigento"
+    },
+    {
+     "key": "alessandria",
+     "name": "Alessandria"
+    },
+    {
+     "key": "ancona",
+     "name": "Ancona"
+    },
+    {
+     "key": "aosta",
+     "name": "Aosta"
+    },
+    {
+     "key": "arezzo",
+     "name": "Arezzo"
+    },
+    {
+     "key": "ascoli-piceno",
+     "name": "Ascoli Piceno"
+    },
+    {
+     "key": "asti",
+     "name": "Asti"
+    },
+    {
+     "key": "avellino",
+     "name": "Avellino"
+    },
+    {
+     "key": "bari",
+     "name": "Bari"
+    },
+    {
+     "key": "barletta-andria-trani",
+     "name": "Barletta-Andria-Trani"
+    },
+    {
+     "key": "belluno",
+     "name": "Belluno"
+    },
+    {
+     "key": "benevento",
+     "name": "Benevento"
+    },
+    {
+     "key": "bergamo",
+     "name": "Bergamo"
+    },
+    {
+     "key": "biella",
+     "name": "Biella"
+    },
+    {
+     "key": "bologna",
+     "name": "Bologna"
+    },
+    {
+     "key": "bolzano",
+     "name": "Bolzano"
+    },
+    {
+     "key": "brescia",
+     "name": "Brescia"
+    },
+    {
+     "key": "brindisi",
+     "name": "Brindisi"
+    },
+    {
+     "key": "cagliari",
+     "name": "Cagliari"
+    },
+    {
+     "key": "caltanissetta",
+     "name": "Caltanissetta"
+    },
+    {
+     "key": "campobasso",
+     "name": "Campobasso"
+    },
+    {
+     "key": "caserta",
+     "name": "Caserta"
+    },
+    {
+     "key": "catania",
+     "name": "Catania"
+    },
+    {
+     "key": "catanzaro",
+     "name": "Catanzaro"
+    },
+    {
+     "key": "chieti",
+     "name": "Chieti"
+    },
+    {
+     "key": "como",
+     "name": "Como"
+    },
+    {
+     "key": "cosenza",
+     "name": "Cosenza"
+    },
+    {
+     "key": "cremona",
+     "name": "Cremona"
+    },
+    {
+     "key": "crotone",
+     "name": "Crotone"
+    },
+    {
+     "key": "cuneo",
+     "name": "Cuneo"
+    },
+    {
+     "key": "enna",
+     "name": "Enna"
+    },
+    {
+     "key": "fermo",
+     "name": "Fermo"
+    },
+    {
+     "key": "ferrara",
+     "name": "Ferrara"
+    },
+    {
+     "key": "firenze",
+     "name": "Firenze"
+    },
+    {
+     "key": "foggia",
+     "name": "Foggia"
+    },
+    {
+     "key": "forli-cesena",
+     "name": "Forlì-Cesena"
+    },
+    {
+     "key": "frosinone",
+     "name": "Frosinone"
+    },
+    {
+     "key": "genova",
+     "name": "Genova"
+    },
+    {
+     "key": "gorizia",
+     "name": "Gorizia"
+    },
+    {
+     "key": "grosseto",
+     "name": "Grosseto"
+    },
+    {
+     "key": "imperia",
+     "name": "Imperia"
+    },
+    {
+     "key": "isernia",
+     "name": "Isernia"
+    },
+    {
+     "key": "l-aquila",
+     "name": "L'Aquila"
+    },
+    {
+     "key": "la-spezia",
+     "name": "La Spezia"
+    },
+    {
+     "key": "latina",
+     "name": "Latina"
+    },
+    {
+     "key": "lecce",
+     "name": "Lecce"
+    },
+    {
+     "key": "lecco",
+     "name": "Lecco"
+    },
+    {
+     "key": "livorno",
+     "name": "Livorno"
+    },
+    {
+     "key": "lodi",
+     "name": "Lodi"
+    },
+    {
+     "key": "lucca",
+     "name": "Lucca"
+    },
+    {
+     "key": "macerata",
+     "name": "Macerata"
+    },
+    {
+     "key": "mantova",
+     "name": "Mantova"
+    },
+    {
+     "key": "massa-carrara",
+     "name": "Massa-Carrara"
+    },
+    {
+     "key": "matera",
+     "name": "Matera"
+    },
+    {
+     "key": "messina",
+     "name": "Messina"
+    },
+    {
+     "key": "milano",
+     "name": "Milano"
+    },
+    {
+     "key": "modena",
+     "name": "Modena"
+    },
+    {
+     "key": "monza-e-della-brianza",
+     "name": "Monza e della Brianza"
+    },
+    {
+     "key": "napoli",
+     "name": "Napoli"
+    },
+    {
+     "key": "novara",
+     "name": "Novara"
+    },
+    {
+     "key": "nuoro",
+     "name": "Nuoro"
+    },
+    {
+     "key": "oristano",
+     "name": "Oristano"
+    },
+    {
+     "key": "padova",
+     "name": "Padova"
+    },
+    {
+     "key": "palermo",
+     "name": "Palermo"
+    },
+    {
+     "key": "parma",
+     "name": "Parma"
+    },
+    {
+     "key": "pavia",
+     "name": "Pavia"
+    },
+    {
+     "key": "perugia",
+     "name": "Perugia"
+    },
+    {
+     "key": "pesaro-e-urbino",
+     "name": "Pesaro e Urbino"
+    },
+    {
+     "key": "pescara",
+     "name": "Pescara"
+    },
+    {
+     "key": "piacenza",
+     "name": "Piacenza"
+    },
+    {
+     "key": "pisa",
+     "name": "Pisa"
+    },
+    {
+     "key": "pistoia",
+     "name": "Pistoia"
+    },
+    {
+     "key": "pordenone",
+     "name": "Pordenone"
+    },
+    {
+     "key": "potenza",
+     "name": "Potenza"
+    },
+    {
+     "key": "prato",
+     "name": "Prato"
+    },
+    {
+     "key": "ragusa",
+     "name": "Ragusa"
+    },
+    {
+     "key": "ravenna",
+     "name": "Ravenna"
+    },
+    {
+     "key": "reggio-calabria",
+     "name": "Reggio Calabria"
+    },
+    {
+     "key": "reggio-emilia",
+     "name": "Reggio Emilia"
+    },
+    {
+     "key": "rieti",
+     "name": "Rieti"
+    },
+    {
+     "key": "rimini",
+     "name": "Rimini"
+    },
+    {
+     "key": "roma",
+     "name": "Roma"
+    },
+    {
+     "key": "rovigo",
+     "name": "Rovigo"
+    },
+    {
+     "key": "salerno",
+     "name": "Salerno"
+    },
+    {
+     "key": "sassari",
+     "name": "Sassari"
+    },
+    {
+     "key": "savona",
+     "name": "Savona"
+    },
+    {
+     "key": "siena",
+     "name": "Siena"
+    },
+    {
+     "key": "siracusa",
+     "name": "Siracusa"
+    },
+    {
+     "key": "sondrio",
+     "name": "Sondrio"
+    },
+    {
+     "key": "sud-sardegna",
+     "name": "Sud Sardegna"
+    },
+    {
+     "key": "taranto",
+     "name": "Taranto"
+    },
+    {
+     "key": "teramo",
+     "name": "Teramo"
+    },
+    {
+     "key": "terni",
+     "name": "Terni"
+    },
+    {
+     "key": "torino",
+     "name": "Torino"
+    },
+    {
+     "key": "trapani",
+     "name": "Trapani"
+    },
+    {
+     "key": "trento",
+     "name": "Trento"
+    },
+    {
+     "key": "treviso",
+     "name": "Treviso"
+    },
+    {
+     "key": "trieste",
+     "name": "Trieste"
+    },
+    {
+     "key": "udine",
+     "name": "Udine"
+    },
+    {
+     "key": "varese",
+     "name": "Varese"
+    },
+    {
+     "key": "venezia",
+     "name": "Venezia"
+    },
+    {
+     "key": "verbano-cusio-ossola",
+     "name": "Verbano-Cusio-Ossola"
+    },
+    {
+     "key": "vercelli",
+     "name": "Vercelli"
+    },
+    {
+     "key": "verona",
+     "name": "Verona"
+    },
+    {
+     "key": "vibo-valentia",
+     "name": "Vibo Valentia"
+    },
+    {
+     "key": "vicenza",
+     "name": "Vicenza"
+    },
+    {
+     "key": "viterbo",
+     "name": "Viterbo"
+    }
+   ],
+   "default_territory": {
+    "key": "milano",
+    "name": "Milano",
+    "value": 34343.0
+   },
+   "matrix": {
+    "2015": {
+     "agrigento": 14114.5,
+     "alessandria": 22403.8,
+     "ancona": 20542.8,
+     "aosta": 19743.6,
+     "arezzo": 19917.1,
+     "ascoli-piceno": 17528.3,
+     "asti": 21725.3,
+     "avellino": 15230.9,
+     "bari": 16468.9,
+     "belluno": 21316.1,
+     "benevento": 13676.5,
+     "bergamo": 23900.2,
+     "biella": 22553.9,
+     "bologna": 25347.5,
+     "bolzano": 23022.8,
+     "brescia": 22299.9,
+     "brindisi": 15986.8,
+     "cagliari": 17290.4,
+     "caltanissetta": 15743.1,
+     "campobasso": 16218.9,
+     "caserta": 14349.0,
+     "catania": 16199.4,
+     "catanzaro": 14942.2,
+     "chieti": 19360.1,
+     "como": 23060.0,
+     "cosenza": 13393.6,
+     "cremona": 22777.1,
+     "crotone": 13560.4,
+     "cuneo": 22479.3,
+     "enna": 13946.5,
+     "ferrara": 20534.3,
+     "firenze": 22125.5,
+     "foggia": 14565.2,
+     "forli-cesena": 20392.1,
+     "frosinone": 17820.5,
+     "genova": 23643.0,
+     "gorizia": 20463.1,
+     "grosseto": 15608.4,
+     "imperia": 16539.6,
+     "isernia": 14965.3,
+     "l-aquila": 16834.6,
+     "la-spezia": 19939.3,
+     "latina": 17116.4,
+     "lecce": 13354.9,
+     "lecco": 24736.1,
+     "livorno": 18858.8,
+     "lodi": 23471.5,
+     "lucca": 20232.1,
+     "macerata": 17951.6,
+     "mantova": 21904.1,
+     "massa-carrara": 19045.3,
+     "matera": 14823.1,
+     "messina": 14106.7,
+     "milano": 28768.8,
+     "modena": 24779.9,
+     "napoli": 16527.9,
+     "novara": 23453.7,
+     "nuoro": 13539.4,
+     "oristano": 15571.5,
+     "padova": 22718.1,
+     "palermo": 17096.7,
+     "parma": 25219.6,
+     "pavia": 21163.4,
+     "perugia": 18884.2,
+     "pesaro-e-urbino": 19230.3,
+     "pescara": 17291.4,
+     "piacenza": 22403.1,
+     "pisa": 20997.6,
+     "pistoia": 18980.8,
+     "pordenone": 22720.9,
+     "potenza": 17664.6,
+     "prato": 17357.4,
+     "ragusa": 13464.0,
+     "ravenna": 21581.3,
+     "reggio-calabria": 14845.1,
+     "reggio-emilia": 24744.9,
+     "rieti": 16311.5,
+     "rimini": 15685.3,
+     "roma": 22614.6,
+     "rovigo": 19424.9,
+     "salerno": 13539.2,
+     "sassari": 14918.8,
+     "savona": 19326.3,
+     "siena": 21825.9,
+     "siracusa": 16933.8,
+     "sondrio": 20384.9,
+     "taranto": 16663.5,
+     "teramo": 15882.4,
+     "terni": 18671.1,
+     "torino": 24229.7,
+     "trapani": 13247.2,
+     "trento": 20613.2,
+     "treviso": 22979.0,
+     "trieste": 24749.5,
+     "udine": 21812.2,
+     "varese": 24311.3,
+     "venezia": 20713.6,
+     "verbano-cusio-ossola": 19922.2,
+     "vercelli": 22636.7,
+     "verona": 21974.5,
+     "vibo-valentia": 11807.0,
+     "vicenza": 23491.9,
+     "viterbo": 15939.7
+    },
+    "2016": {
+     "agrigento": 14608.3,
+     "alessandria": 22580.7,
+     "ancona": 20899.3,
+     "aosta": 19507.0,
+     "arezzo": 20193.6,
+     "ascoli-piceno": 17871.1,
+     "asti": 21982.1,
+     "avellino": 15909.1,
+     "bari": 16997.6,
+     "belluno": 21596.7,
+     "benevento": 14453.7,
+     "bergamo": 24286.6,
+     "biella": 22898.1,
+     "bologna": 25665.2,
+     "bolzano": 23237.6,
+     "brescia": 22593.1,
+     "brindisi": 16409.3,
+     "cagliari": 17705.2,
+     "caltanissetta": 16303.4,
+     "campobasso": 17089.7,
+     "caserta": 14875.8,
+     "catania": 16535.7,
+     "catanzaro": 15212.1,
+     "chieti": 19618.3,
+     "como": 23302.7,
+     "cosenza": 13814.8,
+     "cremona": 23103.3,
+     "crotone": 13951.4,
+     "cuneo": 22510.5,
+     "enna": 14598.1,
+     "ferrara": 20850.3,
+     "firenze": 22510.9,
+     "foggia": 14973.4,
+     "forli-cesena": 20689.3,
+     "frosinone": 18611.4,
+     "genova": 23896.5,
+     "gorizia": 20669.3,
+     "grosseto": 16032.8,
+     "imperia": 16741.3,
+     "isernia": 15599.9,
+     "l-aquila": 17524.6,
+     "la-spezia": 20202.5,
+     "latina": 17441.8,
+     "lecce": 13797.3,
+     "lecco": 25159.3,
+     "livorno": 19190.7,
+     "lodi": 24002.0,
+     "lucca": 20517.2,
+     "macerata": 18222.9,
+     "mantova": 22208.0,
+     "massa-carrara": 19394.3,
+     "matera": 15258.0,
+     "messina": 14644.3,
+     "milano": 29650.8,
+     "modena": 25318.9,
+     "napoli": 17020.0,
+     "novara": 23871.2,
+     "nuoro": 13849.7,
+     "oristano": 16116.1,
+     "padova": 23079.2,
+     "palermo": 17321.8,
+     "parma": 25441.9,
+     "pavia": 21363.3,
+     "perugia": 19214.9,
+     "pesaro-e-urbino": 19835.4,
+     "pescara": 17793.2,
+     "piacenza": 22155.0,
+     "pisa": 21430.2,
+     "pistoia": 19188.5,
+     "pordenone": 22931.0,
+     "potenza": 18185.8,
+     "prato": 18011.4,
+     "ragusa": 13728.3,
+     "ravenna": 21609.2,
+     "reggio-calabria": 15272.3,
+     "reggio-emilia": 25134.8,
+     "rieti": 16635.9,
+     "rimini": 16097.9,
+     "roma": 23308.1,
+     "rovigo": 19712.4,
+     "salerno": 14085.0,
+     "sassari": 15189.2,
+     "savona": 19469.6,
+     "siena": 22037.2,
+     "siracusa": 17487.6,
+     "sondrio": 20818.3,
+     "taranto": 17601.8,
+     "teramo": 16366.2,
+     "terni": 19021.0,
+     "torino": 24596.5,
+     "trapani": 13512.9,
+     "trento": 20831.5,
+     "treviso": 23219.1,
+     "trieste": 25088.9,
+     "udine": 22019.7,
+     "varese": 24774.4,
+     "venezia": 21000.8,
+     "verbano-cusio-ossola": 20016.7,
+     "vercelli": 23036.3,
+     "verona": 22355.1,
+     "vibo-valentia": 12138.4,
+     "vicenza": 23906.4,
+     "viterbo": 16571.7
+    },
+    "2017": {
+     "agrigento": 14535.6,
+     "alessandria": 22500.5,
+     "ancona": 20459.5,
+     "aosta": 18941.4,
+     "arezzo": 19837.1,
+     "ascoli-piceno": 17426.2,
+     "asti": 21713.4,
+     "avellino": 15706.2,
+     "bari": 16662.4,
+     "belluno": 21720.9,
+     "benevento": 14285.8,
+     "bergamo": 24017.4,
+     "biella": 22474.0,
+     "bologna": 25514.1,
+     "bolzano": 22841.2,
+     "brescia": 22341.3,
+     "brindisi": 15643.1,
+     "cagliari": 17341.1,
+     "caltanissetta": 16299.3,
+     "campobasso": 16735.7,
+     "caserta": 14791.2,
+     "catania": 16497.7,
+     "catanzaro": 14823.9,
+     "chieti": 19285.7,
+     "como": 23081.7,
+     "cosenza": 13501.6,
+     "cremona": 22758.6,
+     "crotone": 13750.8,
+     "cuneo": 22087.9,
+     "enna": 14404.6,
+     "ferrara": 20277.8,
+     "firenze": 22245.6,
+     "foggia": 14704.8,
+     "forli-cesena": 20138.5,
+     "frosinone": 18601.9,
+     "genova": 23541.6,
+     "gorizia": 20656.2,
+     "grosseto": 15664.5,
+     "imperia": 16332.6,
+     "isernia": 15014.0,
+     "l-aquila": 17290.8,
+     "la-spezia": 19831.6,
+     "latina": 17173.3,
+     "lecce": 13433.5,
+     "lecco": 24911.0,
+     "livorno": 18802.3,
+     "lodi": 23874.1,
+     "lucca": 20120.4,
+     "macerata": 17816.8,
+     "mantova": 21886.9,
+     "massa-carrara": 18995.0,
+     "matera": 14817.7,
+     "messina": 14374.2,
+     "milano": 29727.0,
+     "modena": 24986.8,
+     "napoli": 16927.0,
+     "novara": 23538.4,
+     "nuoro": 13333.5,
+     "oristano": 15375.0,
+     "padova": 22767.6,
+     "palermo": 17141.7,
+     "parma": 25170.0,
+     "pavia": 21096.0,
+     "perugia": 18997.9,
+     "pesaro-e-urbino": 19482.8,
+     "pescara": 17209.3,
+     "piacenza": 22156.7,
+     "pisa": 21300.3,
+     "pistoia": 18909.1,
+     "pordenone": 22771.5,
+     "potenza": 17540.1,
+     "prato": 18165.1,
+     "ragusa": 13664.9,
+     "ravenna": 20965.8,
+     "reggio-calabria": 15034.4,
+     "reggio-emilia": 24793.5,
+     "rieti": 15245.9,
+     "rimini": 15873.3,
+     "roma": 23093.1,
+     "rovigo": 19350.9,
+     "salerno": 13989.9,
+     "sassari": 14878.7,
+     "savona": 18786.0,
+     "siena": 21477.6,
+     "siracusa": 17103.9,
+     "sondrio": 20426.3,
+     "taranto": 16982.8,
+     "teramo": 15904.7,
+     "terni": 19070.4,
+     "torino": 24426.6,
+     "trapani": 13344.1,
+     "trento": 20473.9,
+     "treviso": 23056.7,
+     "trieste": 24632.3,
+     "udine": 21602.5,
+     "varese": 24323.8,
+     "venezia": 20773.4,
+     "verbano-cusio-ossola": 19466.4,
+     "vercelli": 22663.2,
+     "verona": 22041.1,
+     "vibo-valentia": 11734.7,
+     "vicenza": 23580.7,
+     "viterbo": 16247.7
+    },
+    "2018": {
+     "agrigento": 14168.8,
+     "alessandria": 22708.2,
+     "ancona": 20606.5,
+     "aosta": 18951.2,
+     "arezzo": 20041.1,
+     "ascoli-piceno": 17520.7,
+     "asti": 22259.5,
+     "avellino": 15541.5,
+     "bari": 16724.5,
+     "belluno": 21940.4,
+     "benevento": 14045.1,
+     "bergamo": 24303.7,
+     "biella": 22954.2,
+     "bologna": 25761.1,
+     "bolzano": 23180.8,
+     "brescia": 22660.3,
+     "brindisi": 15710.4,
+     "cagliari": 17415.6,
+     "caltanissetta": 16148.1,
+     "campobasso": 16926.5,
+     "caserta": 14718.0,
+     "catania": 16550.9,
+     "catanzaro": 14899.5,
+     "chieti": 19320.6,
+     "como": 23050.6,
+     "cosenza": 13484.4,
+     "cremona": 22923.2,
+     "crotone": 13607.5,
+     "cuneo": 22306.9,
+     "enna": 14610.5,
+     "ferrara": 20532.9,
+     "firenze": 22543.2,
+     "foggia": 14734.9,
+     "forli-cesena": 20256.1,
+     "frosinone": 18417.0,
+     "genova": 23725.5,
+     "gorizia": 20604.3,
+     "grosseto": 15844.6,
+     "imperia": 16515.8,
+     "isernia": 14977.3,
+     "l-aquila": 17624.1,
+     "la-spezia": 20092.8,
+     "latina": 17345.3,
+     "lecce": 13527.6,
+     "lecco": 25180.2,
+     "livorno": 18998.7,
+     "lodi": 24118.0,
+     "lucca": 20394.0,
+     "macerata": 18044.2,
+     "mantova": 22264.8,
+     "massa-carrara": 19048.6,
+     "matera": 15019.9,
+     "messina": 14263.4,
+     "milano": 30111.9,
+     "modena": 25315.7,
+     "napoli": 16885.6,
+     "novara": 23710.5,
+     "nuoro": 13372.7,
+     "oristano": 15534.0,
+     "padova": 23050.9,
+     "palermo": 16922.3,
+     "parma": 25485.5,
+     "pavia": 21419.3,
+     "perugia": 19129.1,
+     "pesaro-e-urbino": 19771.9,
+     "pescara": 17382.9,
+     "piacenza": 22227.6,
+     "pisa": 21436.0,
+     "pistoia": 19144.2,
+     "pordenone": 22933.1,
+     "potenza": 17644.6,
+     "prato": 18113.0,
+     "ragusa": 13651.3,
+     "ravenna": 21074.9,
+     "reggio-calabria": 15099.5,
+     "reggio-emilia": 25115.9,
+     "rieti": 16022.1,
+     "rimini": 15940.2,
+     "roma": 23021.4,
+     "rovigo": 19593.4,
+     "salerno": 13897.6,
+     "sassari": 14841.1,
+     "savona": 18892.7,
+     "siena": 21205.6,
+     "siracusa": 17028.2,
+     "sondrio": 20452.8,
+     "taranto": 17160.9,
+     "teramo": 16112.6,
+     "terni": 19509.1,
+     "torino": 24458.8,
+     "trapani": 13390.2,
+     "trento": 20590.7,
+     "treviso": 23310.9,
+     "trieste": 24746.0,
+     "udine": 21953.2,
+     "varese": 24760.2,
+     "venezia": 21032.0,
+     "verbano-cusio-ossola": 19634.9,
+     "vercelli": 22798.9,
+     "verona": 22249.9,
+     "vibo-valentia": 11992.6,
+     "vicenza": 23709.9,
+     "viterbo": 16296.9
+    },
+    "2019": {
+     "agrigento": 14001.6,
+     "alessandria": 22938.0,
+     "ancona": 20941.8,
+     "aosta": 18928.2,
+     "arezzo": 20355.6,
+     "ascoli-piceno": 17820.9,
+     "asti": 22299.6,
+     "avellino": 15587.8,
+     "bari": 16821.8,
+     "belluno": 22190.1,
+     "benevento": 14116.6,
+     "bergamo": 24534.0,
+     "biella": 22963.0,
+     "bologna": 25907.2,
+     "bolzano": 23712.3,
+     "brescia": 22940.5,
+     "brindisi": 15974.1,
+     "cagliari": 17546.7,
+     "caltanissetta": 16017.6,
+     "campobasso": 16793.6,
+     "caserta": 14732.5,
+     "catania": 16572.4,
+     "catanzaro": 14847.1,
+     "chieti": 19595.8,
+     "como": 23097.1,
+     "cosenza": 13329.5,
+     "cremona": 23181.8,
+     "crotone": 13691.1,
+     "cuneo": 22570.9,
+     "enna": 14805.3,
+     "ferrara": 20702.1,
+     "firenze": 22788.8,
+     "foggia": 14662.8,
+     "forli-cesena": 20553.4,
+     "frosinone": 18441.6,
+     "genova": 23792.0,
+     "gorizia": 21076.4,
+     "grosseto": 15996.5,
+     "imperia": 16461.3,
+     "isernia": 15056.9,
+     "l-aquila": 17535.3,
+     "la-spezia": 20188.5,
+     "latina": 17645.4,
+     "lecce": 13791.4,
+     "lecco": 25469.3,
+     "livorno": 19233.1,
+     "lodi": 24275.8,
+     "lucca": 20703.2,
+     "macerata": 18350.6,
+     "mantova": 22677.7,
+     "massa-carrara": 19229.7,
+     "matera": 15105.7,
+     "messina": 14178.0,
+     "milano": 30408.1,
+     "modena": 25762.5,
+     "napoli": 16952.7,
+     "novara": 24013.4,
+     "nuoro": 13411.7,
+     "oristano": 15408.9,
+     "padova": 23617.9,
+     "palermo": 16707.5,
+     "parma": 25786.4,
+     "pavia": 21643.4,
+     "perugia": 19351.3,
+     "pesaro-e-urbino": 20120.9,
+     "pescara": 17760.9,
+     "piacenza": 22413.3,
+     "pisa": 21629.2,
+     "pistoia": 19431.9,
+     "pordenone": 23297.9,
+     "potenza": 17245.6,
+     "prato": 18302.9,
+     "ragusa": 13714.6,
+     "ravenna": 21356.6,
+     "reggio-calabria": 15008.8,
+     "reggio-emilia": 25410.0,
+     "rieti": 16241.5,
+     "rimini": 16212.6,
+     "roma": 23304.5,
+     "rovigo": 19874.5,
+     "salerno": 14015.8,
+     "sassari": 14928.3,
+     "savona": 19092.0,
+     "siena": 21712.7,
+     "siracusa": 16990.3,
+     "sondrio": 20461.2,
+     "taranto": 17165.7,
+     "teramo": 16522.8,
+     "terni": 19744.9,
+     "torino": 24573.6,
+     "trapani": 13518.7,
+     "trento": 20865.9,
+     "treviso": 23599.8,
+     "trieste": 24746.4,
+     "udine": 22192.6,
+     "varese": 24990.3,
+     "venezia": 21148.0,
+     "verbano-cusio-ossola": 19772.0,
+     "vercelli": 23021.6,
+     "verona": 22594.3,
+     "vibo-valentia": 11770.8,
+     "vicenza": 24095.5,
+     "viterbo": 16530.4
+    },
+    "2020": {
+     "agrigento": 12718.2,
+     "alessandria": 21680.2,
+     "ancona": 19538.3,
+     "aosta": 17665.2,
+     "arezzo": 18707.5,
+     "ascoli-piceno": 16332.4,
+     "asti": 20924.5,
+     "avellino": 14163.1,
+     "bari": 15606.7,
+     "belluno": 20963.7,
+     "benevento": 12894.3,
+     "bergamo": 22855.1,
+     "biella": 21165.1,
+     "bologna": 24633.1,
+     "bolzano": 22370.6,
+     "brescia": 21365.0,
+     "brindisi": 14830.8,
+     "cagliari": 16651.9,
+     "caltanissetta": 14857.2,
+     "campobasso": 15949.4,
+     "caserta": 13595.4,
+     "catania": 15269.9,
+     "catanzaro": 13476.5,
+     "chieti": 18272.2,
+     "como": 21275.7,
+     "cosenza": 12100.0,
+     "cremona": 22154.2,
+     "crotone": 12687.2,
+     "cuneo": 21419.7,
+     "enna": 13649.0,
+     "ferrara": 19320.5,
+     "firenze": 21055.1,
+     "foggia": 13646.8,
+     "forli-cesena": 19621.1,
+     "frosinone": 17062.9,
+     "genova": 22773.0,
+     "gorizia": 19622.4,
+     "grosseto": 14819.0,
+     "imperia": 15273.7,
+     "isernia": 14249.8,
+     "l-aquila": 16517.5,
+     "la-spezia": 18931.9,
+     "latina": 16741.9,
+     "lecce": 12655.7,
+     "lecco": 23621.8,
+     "livorno": 18124.5,
+     "lodi": 22844.7,
+     "lucca": 19572.0,
+     "macerata": 16921.5,
+     "mantova": 21558.7,
+     "massa-carrara": 17982.7,
+     "matera": 13988.1,
+     "messina": 12766.4,
+     "milano": 29588.8,
+     "modena": 24450.3,
+     "napoli": 15203.1,
+     "novara": 22576.2,
+     "nuoro": 12484.3,
+     "oristano": 14694.1,
+     "padova": 22313.4,
+     "palermo": 15312.7,
+     "parma": 24782.7,
+     "pavia": 20466.0,
+     "perugia": 18060.1,
+     "pesaro-e-urbino": 18676.2,
+     "pescara": 16528.4,
+     "piacenza": 21228.4,
+     "pisa": 19971.5,
+     "pistoia": 17899.4,
+     "pordenone": 21898.0,
+     "potenza": 16017.1,
+     "prato": 16276.9,
+     "ragusa": 12705.8,
+     "ravenna": 20602.0,
+     "reggio-calabria": 13903.7,
+     "reggio-emilia": 24010.2,
+     "rieti": 14726.9,
+     "rimini": 14926.3,
+     "roma": 21895.2,
+     "rovigo": 18696.8,
+     "salerno": 12815.0,
+     "sassari": 13966.4,
+     "savona": 17926.0,
+     "siena": 20411.0,
+     "siracusa": 15926.5,
+     "sondrio": 19342.4,
+     "taranto": 15406.0,
+     "teramo": 15239.6,
+     "terni": 18407.4,
+     "torino": 22972.1,
+     "trapani": 12058.3,
+     "trento": 20092.2,
+     "treviso": 22163.6,
+     "trieste": 23848.9,
+     "udine": 20936.5,
+     "varese": 22788.1,
+     "venezia": 19177.1,
+     "verbano-cusio-ossola": 18211.3,
+     "vercelli": 21733.1,
+     "verona": 21404.0,
+     "vibo-valentia": 10894.2,
+     "vicenza": 22667.6,
+     "viterbo": 15076.8
+    },
+    "2021": {
+     "agrigento": 13820.6,
+     "alessandria": 23215.7,
+     "ancona": 20911.1,
+     "aosta": 18059.4,
+     "arezzo": 20261.4,
+     "ascoli-piceno": 17690.1,
+     "asti": 22245.3,
+     "avellino": 16129.5,
+     "bari": 17034.0,
+     "belluno": 21780.7,
+     "benevento": 14393.0,
+     "bergamo": 24420.9,
+     "biella": 22558.9,
+     "bologna": 25832.7,
+     "bolzano": 23459.6,
+     "brescia": 23017.8,
+     "brindisi": 16066.1,
+     "cagliari": 17598.0,
+     "caltanissetta": 16158.9,
+     "campobasso": 16974.4,
+     "caserta": 14981.9,
+     "catania": 16389.0,
+     "catanzaro": 14712.0,
+     "chieti": 19462.6,
+     "como": 22719.6,
+     "cosenza": 13333.3,
+     "cremona": 23354.8,
+     "crotone": 13811.5,
+     "cuneo": 22632.5,
+     "enna": 14685.4,
+     "ferrara": 20478.3,
+     "firenze": 22621.2,
+     "foggia": 14856.6,
+     "forli-cesena": 20835.8,
+     "frosinone": 18682.8,
+     "genova": 24087.6,
+     "gorizia": 20894.2,
+     "grosseto": 15908.1,
+     "imperia": 16283.1,
+     "isernia": 15670.5,
+     "l-aquila": 17763.6,
+     "la-spezia": 20219.5,
+     "latina": 17864.3,
+     "lecce": 13956.2,
+     "lecco": 25224.3,
+     "livorno": 19126.7,
+     "lodi": 24217.9,
+     "lucca": 20724.5,
+     "macerata": 18380.7,
+     "mantova": 22860.2,
+     "massa-carrara": 19616.2,
+     "matera": 15453.5,
+     "messina": 13915.8,
+     "milano": 31232.1,
+     "modena": 25760.5,
+     "napoli": 16569.6,
+     "novara": 23673.9,
+     "nuoro": 13487.2,
+     "oristano": 15689.1,
+     "padova": 23819.6,
+     "palermo": 16473.5,
+     "parma": 25939.0,
+     "pavia": 21760.3,
+     "perugia": 19427.9,
+     "pesaro-e-urbino": 20191.6,
+     "pescara": 17696.7,
+     "piacenza": 22531.0,
+     "pisa": 21472.3,
+     "pistoia": 19311.0,
+     "pordenone": 23491.3,
+     "potenza": 17322.8,
+     "prato": 17998.6,
+     "ragusa": 13882.7,
+     "ravenna": 21652.0,
+     "reggio-calabria": 15251.4,
+     "reggio-emilia": 25584.1,
+     "rieti": 16476.0,
+     "rimini": 16126.0,
+     "roma": 23048.8,
+     "rovigo": 19882.2,
+     "salerno": 14144.0,
+     "sassari": 15066.1,
+     "savona": 18993.7,
+     "siena": 21585.7,
+     "siracusa": 16676.4,
+     "sondrio": 20344.2,
+     "taranto": 16632.0,
+     "teramo": 16631.8,
+     "terni": 19723.8,
+     "torino": 24526.6,
+     "trapani": 13281.9,
+     "trento": 20752.5,
+     "treviso": 23802.5,
+     "trieste": 24728.6,
+     "udine": 22151.1,
+     "varese": 24275.6,
+     "venezia": 20486.8,
+     "verbano-cusio-ossola": 19499.1,
+     "vercelli": 22956.6,
+     "verona": 22756.6,
+     "vibo-valentia": 12054.2,
+     "vicenza": 24144.7,
+     "viterbo": 16537.4
+    },
+    "2022": {
+     "agrigento": 14968.2,
+     "alessandria": 23951.1,
+     "ancona": 21498.1,
+     "aosta": 19516.4,
+     "arezzo": 21285.7,
+     "ascoli-piceno": 19237.1,
+     "asti": 22945.6,
+     "avellino": 17245.8,
+     "bari": 18583.7,
+     "barletta-andria-trani": 15163.2,
+     "belluno": 22942.4,
+     "benevento": 15448.6,
+     "bergamo": 25266.0,
+     "biella": 23935.8,
+     "bologna": 26618.8,
+     "bolzano": 24957.0,
+     "brescia": 23817.5,
+     "brindisi": 17023.8,
+     "cagliari": 19427.3,
+     "caltanissetta": 17159.4,
+     "campobasso": 17669.3,
+     "caserta": 16071.2,
+     "catania": 17556.7,
+     "catanzaro": 15707.9,
+     "chieti": 19858.4,
+     "como": 23601.1,
+     "cosenza": 14325.8,
+     "cremona": 24070.7,
+     "crotone": 14682.8,
+     "cuneo": 23329.9,
+     "enna": 15789.9,
+     "fermo": 18107.7,
+     "ferrara": 21060.0,
+     "firenze": 23696.8,
+     "foggia": 15799.1,
+     "forli-cesena": 21397.3,
+     "frosinone": 19630.6,
+     "genova": 24758.2,
+     "gorizia": 21390.5,
+     "grosseto": 16713.6,
+     "imperia": 17159.9,
+     "isernia": 16577.9,
+     "l-aquila": 18806.2,
+     "la-spezia": 21041.0,
+     "latina": 18606.9,
+     "lecce": 15053.4,
+     "lecco": 26027.8,
+     "livorno": 19786.3,
+     "lodi": 24789.1,
+     "lucca": 21268.1,
+     "macerata": 19345.4,
+     "mantova": 23541.9,
+     "massa-carrara": 20321.9,
+     "matera": 16418.1,
+     "messina": 15195.4,
+     "milano": 33240.4,
+     "modena": 26774.4,
+     "monza-e-della-brianza": 27977.5,
+     "napoli": 17816.9,
+     "novara": 24532.5,
+     "nuoro": 14159.5,
+     "oristano": 16456.9,
+     "padova": 24621.5,
+     "palermo": 17298.0,
+     "parma": 26883.6,
+     "pavia": 22255.0,
+     "perugia": 20226.0,
+     "pesaro-e-urbino": 20870.1,
+     "pescara": 18668.2,
+     "piacenza": 23433.7,
+     "pisa": 22484.1,
+     "pistoia": 20286.8,
+     "pordenone": 23979.4,
+     "potenza": 18131.9,
+     "prato": 19081.1,
+     "ragusa": 14893.8,
+     "ravenna": 22091.2,
+     "reggio-calabria": 16082.0,
+     "reggio-emilia": 26110.6,
+     "rieti": 17726.3,
+     "rimini": 17100.9,
+     "roma": 24278.6,
+     "rovigo": 20587.6,
+     "salerno": 15179.2,
+     "sassari": 16017.4,
+     "savona": 19598.2,
+     "siena": 22302.1,
+     "siracusa": 17615.0,
+     "sondrio": 21031.5,
+     "sud-sardegna": 16002.9,
+     "taranto": 17570.7,
+     "teramo": 17472.9,
+     "terni": 20230.8,
+     "torino": 25437.7,
+     "trapani": 14375.2,
+     "trento": 21556.6,
+     "treviso": 24535.7,
+     "trieste": 25175.3,
+     "udine": 22612.6,
+     "varese": 25183.0,
+     "venezia": 21729.9,
+     "verbano-cusio-ossola": 20227.6,
+     "vercelli": 23876.8,
+     "verona": 23476.8,
+     "vibo-valentia": 12944.1,
+     "vicenza": 24845.6,
+     "viterbo": 17251.8
+    },
+    "2023": {
+     "agrigento": 15211.1,
+     "alessandria": 24681.8,
+     "ancona": 22171.3,
+     "aosta": 19918.3,
+     "arezzo": 22152.7,
+     "ascoli-piceno": 19805.2,
+     "asti": 23558.9,
+     "avellino": 18030.5,
+     "bari": 19379.3,
+     "barletta-andria-trani": 15666.4,
+     "belluno": 23776.0,
+     "benevento": 15983.1,
+     "bergamo": 26083.3,
+     "biella": 24889.8,
+     "bologna": 27603.1,
+     "bolzano": 26020.3,
+     "brescia": 24587.7,
+     "brindisi": 17606.7,
+     "cagliari": 20229.7,
+     "caltanissetta": 18014.6,
+     "campobasso": 18565.2,
+     "caserta": 16625.1,
+     "catania": 18303.3,
+     "catanzaro": 15991.5,
+     "chieti": 20778.8,
+     "como": 24241.2,
+     "cosenza": 14816.9,
+     "cremona": 24743.4,
+     "crotone": 14873.6,
+     "cuneo": 24153.0,
+     "enna": 16321.9,
+     "fermo": 18885.0,
+     "ferrara": 21600.4,
+     "firenze": 24515.4,
+     "foggia": 16282.4,
+     "forli-cesena": 22057.7,
+     "frosinone": 20333.2,
+     "genova": 25579.5,
+     "gorizia": 22220.4,
+     "grosseto": 17271.8,
+     "imperia": 17682.2,
+     "isernia": 17133.2,
+     "l-aquila": 19573.5,
+     "la-spezia": 21891.5,
+     "latina": 19338.5,
+     "lecce": 15675.5,
+     "lecco": 26766.8,
+     "livorno": 20404.2,
+     "lodi": 25459.9,
+     "lucca": 22094.2,
+     "macerata": 19912.4,
+     "mantova": 24358.6,
+     "massa-carrara": 20917.3,
+     "matera": 17002.5,
+     "messina": 15684.0,
+     "milano": 34343.0,
+     "modena": 27671.5,
+     "monza-e-della-brianza": 28833.1,
+     "napoli": 18405.9,
+     "novara": 25246.5,
+     "nuoro": 14675.6,
+     "oristano": 17164.2,
+     "padova": 25486.2,
+     "palermo": 17910.7,
+     "parma": 27869.1,
+     "pavia": 22843.5,
+     "perugia": 21013.8,
+     "pesaro-e-urbino": 21626.7,
+     "pescara": 19456.9,
+     "piacenza": 24380.1,
+     "pisa": 23202.2,
+     "pistoia": 21035.1,
+     "pordenone": 24687.6,
+     "potenza": 19471.6,
+     "prato": 19647.8,
+     "ragusa": 15589.8,
+     "ravenna": 23068.8,
+     "reggio-calabria": 16410.8,
+     "reggio-emilia": 26936.9,
+     "rieti": 18480.3,
+     "rimini": 17809.2,
+     "roma": 25293.8,
+     "rovigo": 21233.8,
+     "salerno": 15845.7,
+     "sassari": 16625.8,
+     "savona": 20107.8,
+     "siena": 23055.0,
+     "siracusa": 18227.1,
+     "sondrio": 21771.5,
+     "sud-sardegna": 16593.6,
+     "taranto": 18219.0,
+     "teramo": 18193.5,
+     "terni": 20923.0,
+     "torino": 26426.4,
+     "trapani": 14853.6,
+     "trento": 22434.9,
+     "treviso": 25358.3,
+     "trieste": 25925.8,
+     "udine": 23670.0,
+     "varese": 26059.0,
+     "venezia": 22466.4,
+     "verbano-cusio-ossola": 20722.0,
+     "vercelli": 24671.4,
+     "verona": 24239.0,
+     "vibo-valentia": 13387.8,
+     "vicenza": 25652.2,
+     "viterbo": 17740.2
+    }
+   },
+   "annual_means": [
+    {
+     "year": 2015,
+     "avg": 19104.319417475726
+    },
+    {
+     "year": 2016,
+     "avg": 19484.17087378641
+    },
+    {
+     "year": 2017,
+     "avg": 19165.922330097088
+    },
+    {
+     "year": 2018,
+     "avg": 19303.385436893204
+    },
+    {
+     "year": 2019,
+     "avg": 19467.7
+    },
+    {
+     "year": 2020,
+     "avg": 18182.547572815532
+    },
+    {
+     "year": 2021,
+     "avg": 19464.61553398058
+    },
+    {
+     "year": 2022,
+     "avg": 20321.92710280374
+    },
+    {
+     "year": 2023,
+     "avg": 21031.657009345792
+    }
+   ],
+   "map_colors": null,
+   "cover_bars": null,
+   "bar_max": 34343.0,
+   "query_map": [
+    {
+     "intent": "definizione",
+     "label": "Che cosa misura Retribuzione media annua dei lavoratori dipendenti?",
+     "target": "sezione-definizione"
+    },
+    {
+     "intent": "dato",
+     "label": "Qual è il dato più recente, nel 2023?",
+     "target": "esplora"
+    },
+    {
+     "intent": "classifica",
+     "label": "Qual è la classifica delle province nel 2023?",
+     "target": "classifica-dati"
+    },
+    {
+     "intent": "confronto",
+     "label": "Che cosa è cambiato dal 2022 al 2023?",
+     "target": "sezione-dinamica"
+    },
+    {
+     "intent": "andamento",
+     "label": "Come è cambiato dal 2015 al 2023?",
+     "target": "serie-storica"
+    },
+    {
+     "intent": "metodologia",
+     "label": "Come sono calcolati confronti e medie?",
+     "target": "fonti-verifica"
+    }
+   ]
+  },
+  "query_map": [
+   {
+    "intent": "definizione",
+    "label": "Che cosa misura Retribuzione media annua dei lavoratori dipendenti?",
+    "target": "come-leggere"
+   },
+   {
+    "intent": "dato",
+    "label": "Qual è il dato più recente, nel 2023?",
+    "target": "esplora"
+   },
+   {
+    "intent": "classifica",
+    "label": "Qual è la classifica delle province nel 2023?",
+    "target": "classifica-dati"
+   },
+   {
+    "intent": "andamento",
+    "label": "Come è cambiato dal 2015 al 2023?",
+    "target": "serie-storica"
+   },
+   {
+    "intent": "metodologia",
+    "label": "Come sono calcolati confronti e medie?",
+    "target": "fonti-verifica"
+   }
+  ],
+  "page_h1": "La retribuzione media annua non è uno stipendio, e compra meno di nove anni fa",
+  "related": [
+   {
+    "id": "multiscopo:MULTI_ABIT_SPESA_EURO",
+    "name": "Spesa media mensile per l'abitazione",
+    "path": "/indicatore/spesa-media-mensile-per-l-abitazione/ims-MULTI_ABIT_SPESA_EURO",
+    "direction": "contextual",
+    "source_theme": "Abitazione",
+    "year_max": 2025,
+    "unit": "euro",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 283.226
+     },
+     {
+      "year": 2019,
+      "value": 297.703
+     },
+     {
+      "year": 2020,
+      "value": 291.062
+     },
+     {
+      "year": 2021,
+      "value": 304.587
+     },
+     {
+      "year": 2022,
+      "value": 312.186
+     },
+     {
+      "year": 2023,
+      "value": 319.946
+     },
+     {
+      "year": 2024,
+      "value": 301.762
+     },
+     {
+      "year": 2025,
+      "value": 331.298
+     }
+    ],
+    "latest": 331.298
+   },
+   {
+    "id": "multiscopo:MULTI_ABIT_SPESA_REDDITO",
+    "name": "Spesa media mensile per l'abitazione (per 100 euro di reddito medio mensile)",
+    "path": "/indicatore/spesa-media-mensile-per-l-abitazione-per-100-euro-di-reddito-medio-mensile/ims-MULTI_ABIT_SPESA_REDDITO",
+    "direction": "lower_better",
+    "source_theme": "Abitazione",
+    "year_max": 2025,
+    "unit": "per 100 euro di reddito",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 11.104
+     },
+     {
+      "year": 2019,
+      "value": 11.617
+     },
+     {
+      "year": 2020,
+      "value": 10.95
+     },
+     {
+      "year": 2021,
+      "value": 11.477
+     },
+     {
+      "year": 2022,
+      "value": 11.46
+     },
+     {
+      "year": 2023,
+      "value": 10.923
+     },
+     {
+      "year": 2024,
+      "value": 9.815
+     },
+     {
+      "year": 2025,
+      "value": 10.215
+     }
+    ],
+    "latest": 10.215
+   },
+   {
+    "id": "630",
+    "name": "Alunni con disabilità (totale)",
+    "path": "/indicatore/alunni-con-disabilita-totale/ter-630",
+    "direction": "contextual",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2022,
+    "unit": "percentuale",
+    "spark": [
+     {
+      "year": 2007,
+      "value": 2.02
+     },
+     {
+      "year": 2008,
+      "value": 2.028
+     },
+     {
+      "year": 2009,
+      "value": 2.075
+     },
+     {
+      "year": 2010,
+      "value": 2.172
+     },
+     {
+      "year": 2011,
+      "value": 2.257
+     },
+     {
+      "year": 2012,
+      "value": 2.356
+     },
+     {
+      "year": 2013,
+      "value": 2.461
+     },
+     {
+      "year": 2014,
+      "value": 2.518
+     },
+     {
+      "year": 2015,
+      "value": 2.61
+     },
+     {
+      "year": 2016,
+      "value": 2.721
+     },
+     {
+      "year": 2017,
+      "value": 2.876
+     },
+     {
+      "year": 2018,
+      "value": 3.031
+     },
+     {
+      "year": 2019,
+      "value": 3.244
+     },
+     {
+      "year": 2020,
+      "value": 3.446
+     },
+     {
+      "year": 2021,
+      "value": 3.542
+     },
+     {
+      "year": 2022,
+      "value": 3.764
+     }
+    ],
+    "latest": 3.764
+   },
+   {
+    "id": "627",
+    "name": "Alunni con disabilità motoria",
+    "path": "/indicatore/alunni-con-disabilita-motoria/ter-627",
+    "direction": "contextual",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2022,
+    "unit": "numero",
+    "spark": [
+     {
+      "year": 2012,
+      "value": 476.2
+     },
+     {
+      "year": 2013,
+      "value": 456.65
+     },
+     {
+      "year": 2014,
+      "value": 424.2
+     },
+     {
+      "year": 2015,
+      "value": 404.0
+     },
+     {
+      "year": 2016,
+      "value": 416.45
+     },
+     {
+      "year": 2017,
+      "value": 430.1
+     },
+     {
+      "year": 2018,
+      "value": 427.85
+     },
+     {
+      "year": 2019,
+      "value": 454.4
+     },
+     {
+      "year": 2020,
+      "value": 436.3
+     },
+     {
+      "year": 2021,
+      "value": 415.8
+     },
+     {
+      "year": 2022,
+      "value": 438.05
+     }
+    ],
+    "latest": 438.05
+   },
+   {
+    "id": "628",
+    "name": "Alunni con disabilità uditiva",
+    "path": "/indicatore/alunni-con-disabilita-uditiva/ter-628",
+    "direction": "contextual",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2022,
+    "unit": "numero",
+    "spark": [
+     {
+      "year": 2007,
+      "value": 347.55
+     },
+     {
+      "year": 2008,
+      "value": 345.15
+     },
+     {
+      "year": 2009,
+      "value": 342.15
+     },
+     {
+      "year": 2010,
+      "value": 338.45
+     },
+     {
+      "year": 2011,
+      "value": 344.6
+     },
+     {
+      "year": 2012,
+      "value": 327.2
+     },
+     {
+      "year": 2013,
+      "value": 323.35
+     },
+     {
+      "year": 2014,
+      "value": 318.6
+     },
+     {
+      "year": 2015,
+      "value": 310.85
+     },
+     {
+      "year": 2016,
+      "value": 310.05
+     },
+     {
+      "year": 2017,
+      "value": 299.8
+     },
+     {
+      "year": 2018,
+      "value": 302.0
+     },
+     {
+      "year": 2019,
+      "value": 297.65
+     },
+     {
+      "year": 2020,
+      "value": 293.25
+     },
+     {
+      "year": 2021,
+      "value": 283.95
+     },
+     {
+      "year": 2022,
+      "value": 288.8
+     }
+    ],
+    "latest": 288.8
+   },
+   {
+    "id": "629",
+    "name": "Alunni con disabilità visiva",
+    "path": "/indicatore/alunni-con-disabilita-visiva/ter-629",
+    "direction": "contextual",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2022,
+    "unit": "numero",
+    "spark": [
+     {
+      "year": 2007,
+      "value": 169.95
+     },
+     {
+      "year": 2008,
+      "value": 173.3
+     },
+     {
+      "year": 2009,
+      "value": 185.5
+     },
+     {
+      "year": 2010,
+      "value": 187.35
+     },
+     {
+      "year": 2011,
+      "value": 190.0
+     },
+     {
+      "year": 2012,
+      "value": 181.65
+     },
+     {
+      "year": 2013,
+      "value": 188.15
+     },
+     {
+      "year": 2014,
+      "value": 185.05
+     },
+     {
+      "year": 2015,
+      "value": 181.9
+     },
+     {
+      "year": 2016,
+      "value": 186.6
+     },
+     {
+      "year": 2017,
+      "value": 193.421
+     },
+     {
+      "year": 2018,
+      "value": 192.9
+     },
+     {
+      "year": 2019,
+      "value": 205.6
+     },
+     {
+      "year": 2020,
+      "value": 192.8
+     },
+     {
+      "year": 2021,
+      "value": 195.85
+     },
+     {
+      "year": 2022,
+      "value": 188.1
+     }
+    ],
+    "latest": 188.1
+   },
+   {
+    "id": "bes:04BEC010-N23",
+    "name": "Bassa intensità di lavoro - Europa 2030",
+    "path": "/indicatore/bassa-intensita-di-lavoro-europa-2030/bes-04BEC010-N23",
+    "direction": "lower_better",
+    "source_theme": "Benessere economico",
+    "year_max": 2025,
+    "unit": "Valori percentuali",
+    "spark": [
+     {
+      "year": 2021,
+      "value": 10.194
+     },
+     {
+      "year": 2022,
+      "value": 10.465
+     },
+     {
+      "year": 2023,
+      "value": 9.441
+     },
+     {
+      "year": 2024,
+      "value": 9.382
+     },
+     {
+      "year": 2025,
+      "value": 8.653
+     }
+    ],
+    "latest": 8.653
+   },
+   {
+    "id": "635",
+    "name": "Dimissioni ospedaliere di pazienti affetti da disturbi psichici per centomila abitanti",
+    "path": "/indicatore/dimissioni-ospedaliere-di-pazienti-affetti-da-disturbi-psichici-per-centomila-ab/ter-635",
+    "direction": "contextual",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2022,
+    "unit": "centomila dimessi",
+    "spark": [
+     {
+      "year": 2004,
+      "value": 573.222
+     },
+     {
+      "year": 2005,
+      "value": 567.145
+     },
+     {
+      "year": 2006,
+      "value": 552.569
+     },
+     {
+      "year": 2007,
+      "value": 524.7
+     },
+     {
+      "year": 2008,
+      "value": 496.722
+     },
+     {
+      "year": 2009,
+      "value": 461.44
+     },
+     {
+      "year": 2010,
+      "value": 453.419
+     },
+     {
+      "year": 2011,
+      "value": 447.14
+     },
+     {
+      "year": 2012,
+      "value": 435.466
+     },
+     {
+      "year": 2013,
+      "value": 417.118
+     },
+     {
+      "year": 2014,
+      "value": 402.066
+     },
+     {
+      "year": 2015,
+      "value": 388.616
+     },
+     {
+      "year": 2016,
+      "value": 376.298
+     },
+     {
+      "year": 2017,
+      "value": 364.078
+     },
+     {
+      "year": 2018,
+      "value": 353.752
+     },
+     {
+      "year": 2019,
+      "value": 349.847
+     },
+     {
+      "year": 2020,
+      "value": 266.06
+     },
+     {
+      "year": 2021,
+      "value": 290.441
+     },
+     {
+      "year": 2022,
+      "value": 294.04
+     }
+    ],
+    "latest": 294.04
+   }
+  ],
+  "related_posts": [],
+  "siblings": {
+   "prev": null,
+   "next": null
+  },
+  "dimension_siblings": [],
+  "explore": {
+   "id": "04BEC002P",
+   "unit": "euro",
+   "changeUnit": "euro",
+   "direction": "higher_better",
+   "higherBetter": true,
+   "scoreable": true,
+   "rampStops": [
+    "var(--seq-1)",
+    "var(--seq-2)",
+    "var(--seq-3)",
+    "var(--seq-4)",
+    "var(--seq-5)",
+    "var(--seq-6)"
+   ],
+   "defaultLevel": "provincia",
+   "levels": [
+    {
+     "key": "provincia",
+     "label": "Province",
+     "singular": "provincia",
+     "plural": "province",
+     "profilePath": "/provincia/",
+     "hasMap": false,
+     "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+     ],
+     "yearMin": 2015,
+     "yearMax": 2023,
+     "defaultYear": 2023,
+     "territories": [
+      {
+       "key": "agrigento",
+       "name": "Agrigento"
+      },
+      {
+       "key": "alessandria",
+       "name": "Alessandria"
+      },
+      {
+       "key": "ancona",
+       "name": "Ancona"
+      },
+      {
+       "key": "aosta",
+       "name": "Aosta"
+      },
+      {
+       "key": "arezzo",
+       "name": "Arezzo"
+      },
+      {
+       "key": "ascoli-piceno",
+       "name": "Ascoli Piceno"
+      },
+      {
+       "key": "asti",
+       "name": "Asti"
+      },
+      {
+       "key": "avellino",
+       "name": "Avellino"
+      },
+      {
+       "key": "bari",
+       "name": "Bari"
+      },
+      {
+       "key": "barletta-andria-trani",
+       "name": "Barletta-Andria-Trani"
+      },
+      {
+       "key": "belluno",
+       "name": "Belluno"
+      },
+      {
+       "key": "benevento",
+       "name": "Benevento"
+      },
+      {
+       "key": "bergamo",
+       "name": "Bergamo"
+      },
+      {
+       "key": "biella",
+       "name": "Biella"
+      },
+      {
+       "key": "bologna",
+       "name": "Bologna"
+      },
+      {
+       "key": "bolzano",
+       "name": "Bolzano"
+      },
+      {
+       "key": "brescia",
+       "name": "Brescia"
+      },
+      {
+       "key": "brindisi",
+       "name": "Brindisi"
+      },
+      {
+       "key": "cagliari",
+       "name": "Cagliari"
+      },
+      {
+       "key": "caltanissetta",
+       "name": "Caltanissetta"
+      },
+      {
+       "key": "campobasso",
+       "name": "Campobasso"
+      },
+      {
+       "key": "caserta",
+       "name": "Caserta"
+      },
+      {
+       "key": "catania",
+       "name": "Catania"
+      },
+      {
+       "key": "catanzaro",
+       "name": "Catanzaro"
+      },
+      {
+       "key": "chieti",
+       "name": "Chieti"
+      },
+      {
+       "key": "como",
+       "name": "Como"
+      },
+      {
+       "key": "cosenza",
+       "name": "Cosenza"
+      },
+      {
+       "key": "cremona",
+       "name": "Cremona"
+      },
+      {
+       "key": "crotone",
+       "name": "Crotone"
+      },
+      {
+       "key": "cuneo",
+       "name": "Cuneo"
+      },
+      {
+       "key": "enna",
+       "name": "Enna"
+      },
+      {
+       "key": "fermo",
+       "name": "Fermo"
+      },
+      {
+       "key": "ferrara",
+       "name": "Ferrara"
+      },
+      {
+       "key": "firenze",
+       "name": "Firenze"
+      },
+      {
+       "key": "foggia",
+       "name": "Foggia"
+      },
+      {
+       "key": "forli-cesena",
+       "name": "Forlì-Cesena"
+      },
+      {
+       "key": "frosinone",
+       "name": "Frosinone"
+      },
+      {
+       "key": "genova",
+       "name": "Genova"
+      },
+      {
+       "key": "gorizia",
+       "name": "Gorizia"
+      },
+      {
+       "key": "grosseto",
+       "name": "Grosseto"
+      },
+      {
+       "key": "imperia",
+       "name": "Imperia"
+      },
+      {
+       "key": "isernia",
+       "name": "Isernia"
+      },
+      {
+       "key": "l-aquila",
+       "name": "L'Aquila"
+      },
+      {
+       "key": "la-spezia",
+       "name": "La Spezia"
+      },
+      {
+       "key": "latina",
+       "name": "Latina"
+      },
+      {
+       "key": "lecce",
+       "name": "Lecce"
+      },
+      {
+       "key": "lecco",
+       "name": "Lecco"
+      },
+      {
+       "key": "livorno",
+       "name": "Livorno"
+      },
+      {
+       "key": "lodi",
+       "name": "Lodi"
+      },
+      {
+       "key": "lucca",
+       "name": "Lucca"
+      },
+      {
+       "key": "macerata",
+       "name": "Macerata"
+      },
+      {
+       "key": "mantova",
+       "name": "Mantova"
+      },
+      {
+       "key": "massa-carrara",
+       "name": "Massa-Carrara"
+      },
+      {
+       "key": "matera",
+       "name": "Matera"
+      },
+      {
+       "key": "messina",
+       "name": "Messina"
+      },
+      {
+       "key": "milano",
+       "name": "Milano"
+      },
+      {
+       "key": "modena",
+       "name": "Modena"
+      },
+      {
+       "key": "monza-e-della-brianza",
+       "name": "Monza e della Brianza"
+      },
+      {
+       "key": "napoli",
+       "name": "Napoli"
+      },
+      {
+       "key": "novara",
+       "name": "Novara"
+      },
+      {
+       "key": "nuoro",
+       "name": "Nuoro"
+      },
+      {
+       "key": "oristano",
+       "name": "Oristano"
+      },
+      {
+       "key": "padova",
+       "name": "Padova"
+      },
+      {
+       "key": "palermo",
+       "name": "Palermo"
+      },
+      {
+       "key": "parma",
+       "name": "Parma"
+      },
+      {
+       "key": "pavia",
+       "name": "Pavia"
+      },
+      {
+       "key": "perugia",
+       "name": "Perugia"
+      },
+      {
+       "key": "pesaro-e-urbino",
+       "name": "Pesaro e Urbino"
+      },
+      {
+       "key": "pescara",
+       "name": "Pescara"
+      },
+      {
+       "key": "piacenza",
+       "name": "Piacenza"
+      },
+      {
+       "key": "pisa",
+       "name": "Pisa"
+      },
+      {
+       "key": "pistoia",
+       "name": "Pistoia"
+      },
+      {
+       "key": "pordenone",
+       "name": "Pordenone"
+      },
+      {
+       "key": "potenza",
+       "name": "Potenza"
+      },
+      {
+       "key": "prato",
+       "name": "Prato"
+      },
+      {
+       "key": "ragusa",
+       "name": "Ragusa"
+      },
+      {
+       "key": "ravenna",
+       "name": "Ravenna"
+      },
+      {
+       "key": "reggio-calabria",
+       "name": "Reggio Calabria"
+      },
+      {
+       "key": "reggio-emilia",
+       "name": "Reggio Emilia"
+      },
+      {
+       "key": "rieti",
+       "name": "Rieti"
+      },
+      {
+       "key": "rimini",
+       "name": "Rimini"
+      },
+      {
+       "key": "roma",
+       "name": "Roma"
+      },
+      {
+       "key": "rovigo",
+       "name": "Rovigo"
+      },
+      {
+       "key": "salerno",
+       "name": "Salerno"
+      },
+      {
+       "key": "sassari",
+       "name": "Sassari"
+      },
+      {
+       "key": "savona",
+       "name": "Savona"
+      },
+      {
+       "key": "siena",
+       "name": "Siena"
+      },
+      {
+       "key": "siracusa",
+       "name": "Siracusa"
+      },
+      {
+       "key": "sondrio",
+       "name": "Sondrio"
+      },
+      {
+       "key": "sud-sardegna",
+       "name": "Sud Sardegna"
+      },
+      {
+       "key": "taranto",
+       "name": "Taranto"
+      },
+      {
+       "key": "teramo",
+       "name": "Teramo"
+      },
+      {
+       "key": "terni",
+       "name": "Terni"
+      },
+      {
+       "key": "torino",
+       "name": "Torino"
+      },
+      {
+       "key": "trapani",
+       "name": "Trapani"
+      },
+      {
+       "key": "trento",
+       "name": "Trento"
+      },
+      {
+       "key": "treviso",
+       "name": "Treviso"
+      },
+      {
+       "key": "trieste",
+       "name": "Trieste"
+      },
+      {
+       "key": "udine",
+       "name": "Udine"
+      },
+      {
+       "key": "varese",
+       "name": "Varese"
+      },
+      {
+       "key": "venezia",
+       "name": "Venezia"
+      },
+      {
+       "key": "verbano-cusio-ossola",
+       "name": "Verbano-Cusio-Ossola"
+      },
+      {
+       "key": "vercelli",
+       "name": "Vercelli"
+      },
+      {
+       "key": "verona",
+       "name": "Verona"
+      },
+      {
+       "key": "vibo-valentia",
+       "name": "Vibo Valentia"
+      },
+      {
+       "key": "vicenza",
+       "name": "Vicenza"
+      },
+      {
+       "key": "viterbo",
+       "name": "Viterbo"
+      }
+     ],
+     "defaultTerritory": "milano",
+     "matrix": {
+      "2015": {
+       "agrigento": 14114.5,
+       "alessandria": 22403.8,
+       "ancona": 20542.8,
+       "aosta": 19743.6,
+       "arezzo": 19917.1,
+       "ascoli-piceno": 17528.3,
+       "asti": 21725.3,
+       "avellino": 15230.9,
+       "bari": 16468.9,
+       "belluno": 21316.1,
+       "benevento": 13676.5,
+       "bergamo": 23900.2,
+       "biella": 22553.9,
+       "bologna": 25347.5,
+       "bolzano": 23022.8,
+       "brescia": 22299.9,
+       "brindisi": 15986.8,
+       "cagliari": 17290.4,
+       "caltanissetta": 15743.1,
+       "campobasso": 16218.9,
+       "caserta": 14349.0,
+       "catania": 16199.4,
+       "catanzaro": 14942.2,
+       "chieti": 19360.1,
+       "como": 23060.0,
+       "cosenza": 13393.6,
+       "cremona": 22777.1,
+       "crotone": 13560.4,
+       "cuneo": 22479.3,
+       "enna": 13946.5,
+       "ferrara": 20534.3,
+       "firenze": 22125.5,
+       "foggia": 14565.2,
+       "forli-cesena": 20392.1,
+       "frosinone": 17820.5,
+       "genova": 23643.0,
+       "gorizia": 20463.1,
+       "grosseto": 15608.4,
+       "imperia": 16539.6,
+       "isernia": 14965.3,
+       "l-aquila": 16834.6,
+       "la-spezia": 19939.3,
+       "latina": 17116.4,
+       "lecce": 13354.9,
+       "lecco": 24736.1,
+       "livorno": 18858.8,
+       "lodi": 23471.5,
+       "lucca": 20232.1,
+       "macerata": 17951.6,
+       "mantova": 21904.1,
+       "massa-carrara": 19045.3,
+       "matera": 14823.1,
+       "messina": 14106.7,
+       "milano": 28768.8,
+       "modena": 24779.9,
+       "napoli": 16527.9,
+       "novara": 23453.7,
+       "nuoro": 13539.4,
+       "oristano": 15571.5,
+       "padova": 22718.1,
+       "palermo": 17096.7,
+       "parma": 25219.6,
+       "pavia": 21163.4,
+       "perugia": 18884.2,
+       "pesaro-e-urbino": 19230.3,
+       "pescara": 17291.4,
+       "piacenza": 22403.1,
+       "pisa": 20997.6,
+       "pistoia": 18980.8,
+       "pordenone": 22720.9,
+       "potenza": 17664.6,
+       "prato": 17357.4,
+       "ragusa": 13464.0,
+       "ravenna": 21581.3,
+       "reggio-calabria": 14845.1,
+       "reggio-emilia": 24744.9,
+       "rieti": 16311.5,
+       "rimini": 15685.3,
+       "roma": 22614.6,
+       "rovigo": 19424.9,
+       "salerno": 13539.2,
+       "sassari": 14918.8,
+       "savona": 19326.3,
+       "siena": 21825.9,
+       "siracusa": 16933.8,
+       "sondrio": 20384.9,
+       "taranto": 16663.5,
+       "teramo": 15882.4,
+       "terni": 18671.1,
+       "torino": 24229.7,
+       "trapani": 13247.2,
+       "trento": 20613.2,
+       "treviso": 22979.0,
+       "trieste": 24749.5,
+       "udine": 21812.2,
+       "varese": 24311.3,
+       "venezia": 20713.6,
+       "verbano-cusio-ossola": 19922.2,
+       "vercelli": 22636.7,
+       "verona": 21974.5,
+       "vibo-valentia": 11807.0,
+       "vicenza": 23491.9,
+       "viterbo": 15939.7
+      },
+      "2016": {
+       "agrigento": 14608.3,
+       "alessandria": 22580.7,
+       "ancona": 20899.3,
+       "aosta": 19507.0,
+       "arezzo": 20193.6,
+       "ascoli-piceno": 17871.1,
+       "asti": 21982.1,
+       "avellino": 15909.1,
+       "bari": 16997.6,
+       "belluno": 21596.7,
+       "benevento": 14453.7,
+       "bergamo": 24286.6,
+       "biella": 22898.1,
+       "bologna": 25665.2,
+       "bolzano": 23237.6,
+       "brescia": 22593.1,
+       "brindisi": 16409.3,
+       "cagliari": 17705.2,
+       "caltanissetta": 16303.4,
+       "campobasso": 17089.7,
+       "caserta": 14875.8,
+       "catania": 16535.7,
+       "catanzaro": 15212.1,
+       "chieti": 19618.3,
+       "como": 23302.7,
+       "cosenza": 13814.8,
+       "cremona": 23103.3,
+       "crotone": 13951.4,
+       "cuneo": 22510.5,
+       "enna": 14598.1,
+       "ferrara": 20850.3,
+       "firenze": 22510.9,
+       "foggia": 14973.4,
+       "forli-cesena": 20689.3,
+       "frosinone": 18611.4,
+       "genova": 23896.5,
+       "gorizia": 20669.3,
+       "grosseto": 16032.8,
+       "imperia": 16741.3,
+       "isernia": 15599.9,
+       "l-aquila": 17524.6,
+       "la-spezia": 20202.5,
+       "latina": 17441.8,
+       "lecce": 13797.3,
+       "lecco": 25159.3,
+       "livorno": 19190.7,
+       "lodi": 24002.0,
+       "lucca": 20517.2,
+       "macerata": 18222.9,
+       "mantova": 22208.0,
+       "massa-carrara": 19394.3,
+       "matera": 15258.0,
+       "messina": 14644.3,
+       "milano": 29650.8,
+       "modena": 25318.9,
+       "napoli": 17020.0,
+       "novara": 23871.2,
+       "nuoro": 13849.7,
+       "oristano": 16116.1,
+       "padova": 23079.2,
+       "palermo": 17321.8,
+       "parma": 25441.9,
+       "pavia": 21363.3,
+       "perugia": 19214.9,
+       "pesaro-e-urbino": 19835.4,
+       "pescara": 17793.2,
+       "piacenza": 22155.0,
+       "pisa": 21430.2,
+       "pistoia": 19188.5,
+       "pordenone": 22931.0,
+       "potenza": 18185.8,
+       "prato": 18011.4,
+       "ragusa": 13728.3,
+       "ravenna": 21609.2,
+       "reggio-calabria": 15272.3,
+       "reggio-emilia": 25134.8,
+       "rieti": 16635.9,
+       "rimini": 16097.9,
+       "roma": 23308.1,
+       "rovigo": 19712.4,
+       "salerno": 14085.0,
+       "sassari": 15189.2,
+       "savona": 19469.6,
+       "siena": 22037.2,
+       "siracusa": 17487.6,
+       "sondrio": 20818.3,
+       "taranto": 17601.8,
+       "teramo": 16366.2,
+       "terni": 19021.0,
+       "torino": 24596.5,
+       "trapani": 13512.9,
+       "trento": 20831.5,
+       "treviso": 23219.1,
+       "trieste": 25088.9,
+       "udine": 22019.7,
+       "varese": 24774.4,
+       "venezia": 21000.8,
+       "verbano-cusio-ossola": 20016.7,
+       "vercelli": 23036.3,
+       "verona": 22355.1,
+       "vibo-valentia": 12138.4,
+       "vicenza": 23906.4,
+       "viterbo": 16571.7
+      },
+      "2017": {
+       "agrigento": 14535.6,
+       "alessandria": 22500.5,
+       "ancona": 20459.5,
+       "aosta": 18941.4,
+       "arezzo": 19837.1,
+       "ascoli-piceno": 17426.2,
+       "asti": 21713.4,
+       "avellino": 15706.2,
+       "bari": 16662.4,
+       "belluno": 21720.9,
+       "benevento": 14285.8,
+       "bergamo": 24017.4,
+       "biella": 22474.0,
+       "bologna": 25514.1,
+       "bolzano": 22841.2,
+       "brescia": 22341.3,
+       "brindisi": 15643.1,
+       "cagliari": 17341.1,
+       "caltanissetta": 16299.3,
+       "campobasso": 16735.7,
+       "caserta": 14791.2,
+       "catania": 16497.7,
+       "catanzaro": 14823.9,
+       "chieti": 19285.7,
+       "como": 23081.7,
+       "cosenza": 13501.6,
+       "cremona": 22758.6,
+       "crotone": 13750.8,
+       "cuneo": 22087.9,
+       "enna": 14404.6,
+       "ferrara": 20277.8,
+       "firenze": 22245.6,
+       "foggia": 14704.8,
+       "forli-cesena": 20138.5,
+       "frosinone": 18601.9,
+       "genova": 23541.6,
+       "gorizia": 20656.2,
+       "grosseto": 15664.5,
+       "imperia": 16332.6,
+       "isernia": 15014.0,
+       "l-aquila": 17290.8,
+       "la-spezia": 19831.6,
+       "latina": 17173.3,
+       "lecce": 13433.5,
+       "lecco": 24911.0,
+       "livorno": 18802.3,
+       "lodi": 23874.1,
+       "lucca": 20120.4,
+       "macerata": 17816.8,
+       "mantova": 21886.9,
+       "massa-carrara": 18995.0,
+       "matera": 14817.7,
+       "messina": 14374.2,
+       "milano": 29727.0,
+       "modena": 24986.8,
+       "napoli": 16927.0,
+       "novara": 23538.4,
+       "nuoro": 13333.5,
+       "oristano": 15375.0,
+       "padova": 22767.6,
+       "palermo": 17141.7,
+       "parma": 25170.0,
+       "pavia": 21096.0,
+       "perugia": 18997.9,
+       "pesaro-e-urbino": 19482.8,
+       "pescara": 17209.3,
+       "piacenza": 22156.7,
+       "pisa": 21300.3,
+       "pistoia": 18909.1,
+       "pordenone": 22771.5,
+       "potenza": 17540.1,
+       "prato": 18165.1,
+       "ragusa": 13664.9,
+       "ravenna": 20965.8,
+       "reggio-calabria": 15034.4,
+       "reggio-emilia": 24793.5,
+       "rieti": 15245.9,
+       "rimini": 15873.3,
+       "roma": 23093.1,
+       "rovigo": 19350.9,
+       "salerno": 13989.9,
+       "sassari": 14878.7,
+       "savona": 18786.0,
+       "siena": 21477.6,
+       "siracusa": 17103.9,
+       "sondrio": 20426.3,
+       "taranto": 16982.8,
+       "teramo": 15904.7,
+       "terni": 19070.4,
+       "torino": 24426.6,
+       "trapani": 13344.1,
+       "trento": 20473.9,
+       "treviso": 23056.7,
+       "trieste": 24632.3,
+       "udine": 21602.5,
+       "varese": 24323.8,
+       "venezia": 20773.4,
+       "verbano-cusio-ossola": 19466.4,
+       "vercelli": 22663.2,
+       "verona": 22041.1,
+       "vibo-valentia": 11734.7,
+       "vicenza": 23580.7,
+       "viterbo": 16247.7
+      },
+      "2018": {
+       "agrigento": 14168.8,
+       "alessandria": 22708.2,
+       "ancona": 20606.5,
+       "aosta": 18951.2,
+       "arezzo": 20041.1,
+       "ascoli-piceno": 17520.7,
+       "asti": 22259.5,
+       "avellino": 15541.5,
+       "bari": 16724.5,
+       "belluno": 21940.4,
+       "benevento": 14045.1,
+       "bergamo": 24303.7,
+       "biella": 22954.2,
+       "bologna": 25761.1,
+       "bolzano": 23180.8,
+       "brescia": 22660.3,
+       "brindisi": 15710.4,
+       "cagliari": 17415.6,
+       "caltanissetta": 16148.1,
+       "campobasso": 16926.5,
+       "caserta": 14718.0,
+       "catania": 16550.9,
+       "catanzaro": 14899.5,
+       "chieti": 19320.6,
+       "como": 23050.6,
+       "cosenza": 13484.4,
+       "cremona": 22923.2,
+       "crotone": 13607.5,
+       "cuneo": 22306.9,
+       "enna": 14610.5,
+       "ferrara": 20532.9,
+       "firenze": 22543.2,
+       "foggia": 14734.9,
+       "forli-cesena": 20256.1,
+       "frosinone": 18417.0,
+       "genova": 23725.5,
+       "gorizia": 20604.3,
+       "grosseto": 15844.6,
+       "imperia": 16515.8,
+       "isernia": 14977.3,
+       "l-aquila": 17624.1,
+       "la-spezia": 20092.8,
+       "latina": 17345.3,
+       "lecce": 13527.6,
+       "lecco": 25180.2,
+       "livorno": 18998.7,
+       "lodi": 24118.0,
+       "lucca": 20394.0,
+       "macerata": 18044.2,
+       "mantova": 22264.8,
+       "massa-carrara": 19048.6,
+       "matera": 15019.9,
+       "messina": 14263.4,
+       "milano": 30111.9,
+       "modena": 25315.7,
+       "napoli": 16885.6,
+       "novara": 23710.5,
+       "nuoro": 13372.7,
+       "oristano": 15534.0,
+       "padova": 23050.9,
+       "palermo": 16922.3,
+       "parma": 25485.5,
+       "pavia": 21419.3,
+       "perugia": 19129.1,
+       "pesaro-e-urbino": 19771.9,
+       "pescara": 17382.9,
+       "piacenza": 22227.6,
+       "pisa": 21436.0,
+       "pistoia": 19144.2,
+       "pordenone": 22933.1,
+       "potenza": 17644.6,
+       "prato": 18113.0,
+       "ragusa": 13651.3,
+       "ravenna": 21074.9,
+       "reggio-calabria": 15099.5,
+       "reggio-emilia": 25115.9,
+       "rieti": 16022.1,
+       "rimini": 15940.2,
+       "roma": 23021.4,
+       "rovigo": 19593.4,
+       "salerno": 13897.6,
+       "sassari": 14841.1,
+       "savona": 18892.7,
+       "siena": 21205.6,
+       "siracusa": 17028.2,
+       "sondrio": 20452.8,
+       "taranto": 17160.9,
+       "teramo": 16112.6,
+       "terni": 19509.1,
+       "torino": 24458.8,
+       "trapani": 13390.2,
+       "trento": 20590.7,
+       "treviso": 23310.9,
+       "trieste": 24746.0,
+       "udine": 21953.2,
+       "varese": 24760.2,
+       "venezia": 21032.0,
+       "verbano-cusio-ossola": 19634.9,
+       "vercelli": 22798.9,
+       "verona": 22249.9,
+       "vibo-valentia": 11992.6,
+       "vicenza": 23709.9,
+       "viterbo": 16296.9
+      },
+      "2019": {
+       "agrigento": 14001.6,
+       "alessandria": 22938.0,
+       "ancona": 20941.8,
+       "aosta": 18928.2,
+       "arezzo": 20355.6,
+       "ascoli-piceno": 17820.9,
+       "asti": 22299.6,
+       "avellino": 15587.8,
+       "bari": 16821.8,
+       "belluno": 22190.1,
+       "benevento": 14116.6,
+       "bergamo": 24534.0,
+       "biella": 22963.0,
+       "bologna": 25907.2,
+       "bolzano": 23712.3,
+       "brescia": 22940.5,
+       "brindisi": 15974.1,
+       "cagliari": 17546.7,
+       "caltanissetta": 16017.6,
+       "campobasso": 16793.6,
+       "caserta": 14732.5,
+       "catania": 16572.4,
+       "catanzaro": 14847.1,
+       "chieti": 19595.8,
+       "como": 23097.1,
+       "cosenza": 13329.5,
+       "cremona": 23181.8,
+       "crotone": 13691.1,
+       "cuneo": 22570.9,
+       "enna": 14805.3,
+       "ferrara": 20702.1,
+       "firenze": 22788.8,
+       "foggia": 14662.8,
+       "forli-cesena": 20553.4,
+       "frosinone": 18441.6,
+       "genova": 23792.0,
+       "gorizia": 21076.4,
+       "grosseto": 15996.5,
+       "imperia": 16461.3,
+       "isernia": 15056.9,
+       "l-aquila": 17535.3,
+       "la-spezia": 20188.5,
+       "latina": 17645.4,
+       "lecce": 13791.4,
+       "lecco": 25469.3,
+       "livorno": 19233.1,
+       "lodi": 24275.8,
+       "lucca": 20703.2,
+       "macerata": 18350.6,
+       "mantova": 22677.7,
+       "massa-carrara": 19229.7,
+       "matera": 15105.7,
+       "messina": 14178.0,
+       "milano": 30408.1,
+       "modena": 25762.5,
+       "napoli": 16952.7,
+       "novara": 24013.4,
+       "nuoro": 13411.7,
+       "oristano": 15408.9,
+       "padova": 23617.9,
+       "palermo": 16707.5,
+       "parma": 25786.4,
+       "pavia": 21643.4,
+       "perugia": 19351.3,
+       "pesaro-e-urbino": 20120.9,
+       "pescara": 17760.9,
+       "piacenza": 22413.3,
+       "pisa": 21629.2,
+       "pistoia": 19431.9,
+       "pordenone": 23297.9,
+       "potenza": 17245.6,
+       "prato": 18302.9,
+       "ragusa": 13714.6,
+       "ravenna": 21356.6,
+       "reggio-calabria": 15008.8,
+       "reggio-emilia": 25410.0,
+       "rieti": 16241.5,
+       "rimini": 16212.6,
+       "roma": 23304.5,
+       "rovigo": 19874.5,
+       "salerno": 14015.8,
+       "sassari": 14928.3,
+       "savona": 19092.0,
+       "siena": 21712.7,
+       "siracusa": 16990.3,
+       "sondrio": 20461.2,
+       "taranto": 17165.7,
+       "teramo": 16522.8,
+       "terni": 19744.9,
+       "torino": 24573.6,
+       "trapani": 13518.7,
+       "trento": 20865.9,
+       "treviso": 23599.8,
+       "trieste": 24746.4,
+       "udine": 22192.6,
+       "varese": 24990.3,
+       "venezia": 21148.0,
+       "verbano-cusio-ossola": 19772.0,
+       "vercelli": 23021.6,
+       "verona": 22594.3,
+       "vibo-valentia": 11770.8,
+       "vicenza": 24095.5,
+       "viterbo": 16530.4
+      },
+      "2020": {
+       "agrigento": 12718.2,
+       "alessandria": 21680.2,
+       "ancona": 19538.3,
+       "aosta": 17665.2,
+       "arezzo": 18707.5,
+       "ascoli-piceno": 16332.4,
+       "asti": 20924.5,
+       "avellino": 14163.1,
+       "bari": 15606.7,
+       "belluno": 20963.7,
+       "benevento": 12894.3,
+       "bergamo": 22855.1,
+       "biella": 21165.1,
+       "bologna": 24633.1,
+       "bolzano": 22370.6,
+       "brescia": 21365.0,
+       "brindisi": 14830.8,
+       "cagliari": 16651.9,
+       "caltanissetta": 14857.2,
+       "campobasso": 15949.4,
+       "caserta": 13595.4,
+       "catania": 15269.9,
+       "catanzaro": 13476.5,
+       "chieti": 18272.2,
+       "como": 21275.7,
+       "cosenza": 12100.0,
+       "cremona": 22154.2,
+       "crotone": 12687.2,
+       "cuneo": 21419.7,
+       "enna": 13649.0,
+       "ferrara": 19320.5,
+       "firenze": 21055.1,
+       "foggia": 13646.8,
+       "forli-cesena": 19621.1,
+       "frosinone": 17062.9,
+       "genova": 22773.0,
+       "gorizia": 19622.4,
+       "grosseto": 14819.0,
+       "imperia": 15273.7,
+       "isernia": 14249.8,
+       "l-aquila": 16517.5,
+       "la-spezia": 18931.9,
+       "latina": 16741.9,
+       "lecce": 12655.7,
+       "lecco": 23621.8,
+       "livorno": 18124.5,
+       "lodi": 22844.7,
+       "lucca": 19572.0,
+       "macerata": 16921.5,
+       "mantova": 21558.7,
+       "massa-carrara": 17982.7,
+       "matera": 13988.1,
+       "messina": 12766.4,
+       "milano": 29588.8,
+       "modena": 24450.3,
+       "napoli": 15203.1,
+       "novara": 22576.2,
+       "nuoro": 12484.3,
+       "oristano": 14694.1,
+       "padova": 22313.4,
+       "palermo": 15312.7,
+       "parma": 24782.7,
+       "pavia": 20466.0,
+       "perugia": 18060.1,
+       "pesaro-e-urbino": 18676.2,
+       "pescara": 16528.4,
+       "piacenza": 21228.4,
+       "pisa": 19971.5,
+       "pistoia": 17899.4,
+       "pordenone": 21898.0,
+       "potenza": 16017.1,
+       "prato": 16276.9,
+       "ragusa": 12705.8,
+       "ravenna": 20602.0,
+       "reggio-calabria": 13903.7,
+       "reggio-emilia": 24010.2,
+       "rieti": 14726.9,
+       "rimini": 14926.3,
+       "roma": 21895.2,
+       "rovigo": 18696.8,
+       "salerno": 12815.0,
+       "sassari": 13966.4,
+       "savona": 17926.0,
+       "siena": 20411.0,
+       "siracusa": 15926.5,
+       "sondrio": 19342.4,
+       "taranto": 15406.0,
+       "teramo": 15239.6,
+       "terni": 18407.4,
+       "torino": 22972.1,
+       "trapani": 12058.3,
+       "trento": 20092.2,
+       "treviso": 22163.6,
+       "trieste": 23848.9,
+       "udine": 20936.5,
+       "varese": 22788.1,
+       "venezia": 19177.1,
+       "verbano-cusio-ossola": 18211.3,
+       "vercelli": 21733.1,
+       "verona": 21404.0,
+       "vibo-valentia": 10894.2,
+       "vicenza": 22667.6,
+       "viterbo": 15076.8
+      },
+      "2021": {
+       "agrigento": 13820.6,
+       "alessandria": 23215.7,
+       "ancona": 20911.1,
+       "aosta": 18059.4,
+       "arezzo": 20261.4,
+       "ascoli-piceno": 17690.1,
+       "asti": 22245.3,
+       "avellino": 16129.5,
+       "bari": 17034.0,
+       "belluno": 21780.7,
+       "benevento": 14393.0,
+       "bergamo": 24420.9,
+       "biella": 22558.9,
+       "bologna": 25832.7,
+       "bolzano": 23459.6,
+       "brescia": 23017.8,
+       "brindisi": 16066.1,
+       "cagliari": 17598.0,
+       "caltanissetta": 16158.9,
+       "campobasso": 16974.4,
+       "caserta": 14981.9,
+       "catania": 16389.0,
+       "catanzaro": 14712.0,
+       "chieti": 19462.6,
+       "como": 22719.6,
+       "cosenza": 13333.3,
+       "cremona": 23354.8,
+       "crotone": 13811.5,
+       "cuneo": 22632.5,
+       "enna": 14685.4,
+       "ferrara": 20478.3,
+       "firenze": 22621.2,
+       "foggia": 14856.6,
+       "forli-cesena": 20835.8,
+       "frosinone": 18682.8,
+       "genova": 24087.6,
+       "gorizia": 20894.2,
+       "grosseto": 15908.1,
+       "imperia": 16283.1,
+       "isernia": 15670.5,
+       "l-aquila": 17763.6,
+       "la-spezia": 20219.5,
+       "latina": 17864.3,
+       "lecce": 13956.2,
+       "lecco": 25224.3,
+       "livorno": 19126.7,
+       "lodi": 24217.9,
+       "lucca": 20724.5,
+       "macerata": 18380.7,
+       "mantova": 22860.2,
+       "massa-carrara": 19616.2,
+       "matera": 15453.5,
+       "messina": 13915.8,
+       "milano": 31232.1,
+       "modena": 25760.5,
+       "napoli": 16569.6,
+       "novara": 23673.9,
+       "nuoro": 13487.2,
+       "oristano": 15689.1,
+       "padova": 23819.6,
+       "palermo": 16473.5,
+       "parma": 25939.0,
+       "pavia": 21760.3,
+       "perugia": 19427.9,
+       "pesaro-e-urbino": 20191.6,
+       "pescara": 17696.7,
+       "piacenza": 22531.0,
+       "pisa": 21472.3,
+       "pistoia": 19311.0,
+       "pordenone": 23491.3,
+       "potenza": 17322.8,
+       "prato": 17998.6,
+       "ragusa": 13882.7,
+       "ravenna": 21652.0,
+       "reggio-calabria": 15251.4,
+       "reggio-emilia": 25584.1,
+       "rieti": 16476.0,
+       "rimini": 16126.0,
+       "roma": 23048.8,
+       "rovigo": 19882.2,
+       "salerno": 14144.0,
+       "sassari": 15066.1,
+       "savona": 18993.7,
+       "siena": 21585.7,
+       "siracusa": 16676.4,
+       "sondrio": 20344.2,
+       "taranto": 16632.0,
+       "teramo": 16631.8,
+       "terni": 19723.8,
+       "torino": 24526.6,
+       "trapani": 13281.9,
+       "trento": 20752.5,
+       "treviso": 23802.5,
+       "trieste": 24728.6,
+       "udine": 22151.1,
+       "varese": 24275.6,
+       "venezia": 20486.8,
+       "verbano-cusio-ossola": 19499.1,
+       "vercelli": 22956.6,
+       "verona": 22756.6,
+       "vibo-valentia": 12054.2,
+       "vicenza": 24144.7,
+       "viterbo": 16537.4
+      },
+      "2022": {
+       "agrigento": 14968.2,
+       "alessandria": 23951.1,
+       "ancona": 21498.1,
+       "aosta": 19516.4,
+       "arezzo": 21285.7,
+       "ascoli-piceno": 19237.1,
+       "asti": 22945.6,
+       "avellino": 17245.8,
+       "bari": 18583.7,
+       "barletta-andria-trani": 15163.2,
+       "belluno": 22942.4,
+       "benevento": 15448.6,
+       "bergamo": 25266.0,
+       "biella": 23935.8,
+       "bologna": 26618.8,
+       "bolzano": 24957.0,
+       "brescia": 23817.5,
+       "brindisi": 17023.8,
+       "cagliari": 19427.3,
+       "caltanissetta": 17159.4,
+       "campobasso": 17669.3,
+       "caserta": 16071.2,
+       "catania": 17556.7,
+       "catanzaro": 15707.9,
+       "chieti": 19858.4,
+       "como": 23601.1,
+       "cosenza": 14325.8,
+       "cremona": 24070.7,
+       "crotone": 14682.8,
+       "cuneo": 23329.9,
+       "enna": 15789.9,
+       "fermo": 18107.7,
+       "ferrara": 21060.0,
+       "firenze": 23696.8,
+       "foggia": 15799.1,
+       "forli-cesena": 21397.3,
+       "frosinone": 19630.6,
+       "genova": 24758.2,
+       "gorizia": 21390.5,
+       "grosseto": 16713.6,
+       "imperia": 17159.9,
+       "isernia": 16577.9,
+       "l-aquila": 18806.2,
+       "la-spezia": 21041.0,
+       "latina": 18606.9,
+       "lecce": 15053.4,
+       "lecco": 26027.8,
+       "livorno": 19786.3,
+       "lodi": 24789.1,
+       "lucca": 21268.1,
+       "macerata": 19345.4,
+       "mantova": 23541.9,
+       "massa-carrara": 20321.9,
+       "matera": 16418.1,
+       "messina": 15195.4,
+       "milano": 33240.4,
+       "modena": 26774.4,
+       "monza-e-della-brianza": 27977.5,
+       "napoli": 17816.9,
+       "novara": 24532.5,
+       "nuoro": 14159.5,
+       "oristano": 16456.9,
+       "padova": 24621.5,
+       "palermo": 17298.0,
+       "parma": 26883.6,
+       "pavia": 22255.0,
+       "perugia": 20226.0,
+       "pesaro-e-urbino": 20870.1,
+       "pescara": 18668.2,
+       "piacenza": 23433.7,
+       "pisa": 22484.1,
+       "pistoia": 20286.8,
+       "pordenone": 23979.4,
+       "potenza": 18131.9,
+       "prato": 19081.1,
+       "ragusa": 14893.8,
+       "ravenna": 22091.2,
+       "reggio-calabria": 16082.0,
+       "reggio-emilia": 26110.6,
+       "rieti": 17726.3,
+       "rimini": 17100.9,
+       "roma": 24278.6,
+       "rovigo": 20587.6,
+       "salerno": 15179.2,
+       "sassari": 16017.4,
+       "savona": 19598.2,
+       "siena": 22302.1,
+       "siracusa": 17615.0,
+       "sondrio": 21031.5,
+       "sud-sardegna": 16002.9,
+       "taranto": 17570.7,
+       "teramo": 17472.9,
+       "terni": 20230.8,
+       "torino": 25437.7,
+       "trapani": 14375.2,
+       "trento": 21556.6,
+       "treviso": 24535.7,
+       "trieste": 25175.3,
+       "udine": 22612.6,
+       "varese": 25183.0,
+       "venezia": 21729.9,
+       "verbano-cusio-ossola": 20227.6,
+       "vercelli": 23876.8,
+       "verona": 23476.8,
+       "vibo-valentia": 12944.1,
+       "vicenza": 24845.6,
+       "viterbo": 17251.8
+      },
+      "2023": {
+       "agrigento": 15211.1,
+       "alessandria": 24681.8,
+       "ancona": 22171.3,
+       "aosta": 19918.3,
+       "arezzo": 22152.7,
+       "ascoli-piceno": 19805.2,
+       "asti": 23558.9,
+       "avellino": 18030.5,
+       "bari": 19379.3,
+       "barletta-andria-trani": 15666.4,
+       "belluno": 23776.0,
+       "benevento": 15983.1,
+       "bergamo": 26083.3,
+       "biella": 24889.8,
+       "bologna": 27603.1,
+       "bolzano": 26020.3,
+       "brescia": 24587.7,
+       "brindisi": 17606.7,
+       "cagliari": 20229.7,
+       "caltanissetta": 18014.6,
+       "campobasso": 18565.2,
+       "caserta": 16625.1,
+       "catania": 18303.3,
+       "catanzaro": 15991.5,
+       "chieti": 20778.8,
+       "como": 24241.2,
+       "cosenza": 14816.9,
+       "cremona": 24743.4,
+       "crotone": 14873.6,
+       "cuneo": 24153.0,
+       "enna": 16321.9,
+       "fermo": 18885.0,
+       "ferrara": 21600.4,
+       "firenze": 24515.4,
+       "foggia": 16282.4,
+       "forli-cesena": 22057.7,
+       "frosinone": 20333.2,
+       "genova": 25579.5,
+       "gorizia": 22220.4,
+       "grosseto": 17271.8,
+       "imperia": 17682.2,
+       "isernia": 17133.2,
+       "l-aquila": 19573.5,
+       "la-spezia": 21891.5,
+       "latina": 19338.5,
+       "lecce": 15675.5,
+       "lecco": 26766.8,
+       "livorno": 20404.2,
+       "lodi": 25459.9,
+       "lucca": 22094.2,
+       "macerata": 19912.4,
+       "mantova": 24358.6,
+       "massa-carrara": 20917.3,
+       "matera": 17002.5,
+       "messina": 15684.0,
+       "milano": 34343.0,
+       "modena": 27671.5,
+       "monza-e-della-brianza": 28833.1,
+       "napoli": 18405.9,
+       "novara": 25246.5,
+       "nuoro": 14675.6,
+       "oristano": 17164.2,
+       "padova": 25486.2,
+       "palermo": 17910.7,
+       "parma": 27869.1,
+       "pavia": 22843.5,
+       "perugia": 21013.8,
+       "pesaro-e-urbino": 21626.7,
+       "pescara": 19456.9,
+       "piacenza": 24380.1,
+       "pisa": 23202.2,
+       "pistoia": 21035.1,
+       "pordenone": 24687.6,
+       "potenza": 19471.6,
+       "prato": 19647.8,
+       "ragusa": 15589.8,
+       "ravenna": 23068.8,
+       "reggio-calabria": 16410.8,
+       "reggio-emilia": 26936.9,
+       "rieti": 18480.3,
+       "rimini": 17809.2,
+       "roma": 25293.8,
+       "rovigo": 21233.8,
+       "salerno": 15845.7,
+       "sassari": 16625.8,
+       "savona": 20107.8,
+       "siena": 23055.0,
+       "siracusa": 18227.1,
+       "sondrio": 21771.5,
+       "sud-sardegna": 16593.6,
+       "taranto": 18219.0,
+       "teramo": 18193.5,
+       "terni": 20923.0,
+       "torino": 26426.4,
+       "trapani": 14853.6,
+       "trento": 22434.9,
+       "treviso": 25358.3,
+       "trieste": 25925.8,
+       "udine": 23670.0,
+       "varese": 26059.0,
+       "venezia": 22466.4,
+       "verbano-cusio-ossola": 20722.0,
+       "vercelli": 24671.4,
+       "verona": 24239.0,
+       "vibo-valentia": 13387.8,
+       "vicenza": 25652.2,
+       "viterbo": 17740.2
+      }
+     }
+    }
+   ]
+  },
+  "page_article": {
+   "lead": "A [Milano](/provincia/milano) la retribuzione media annua vale 34.343 euro nel 2023, l'ultimo anno del Bes dei territori. È una cifra lorda per testa, non uno stipendio, e fra il 2015 e il 2023 questo indicatore è cresciuto in euro molto meno dei prezzi.",
+   "sections": [
+    {
+     "role": "libera",
+     "anchor": "sezione-quei-34-343-euro-esistono-e-non-sono-lo-stipendio-di-nessuno",
+     "heading": "Quei 34.343 euro esistono, e non sono lo stipendio di nessuno",
+     "body": "Il valore che circola per Milano è vero: nel 2023 quella provincia sta a 34.343 euro, come [pubblica Istat nel report della Lombardia](https://www.istat.it/wp-content/uploads/2025/12/BesT2025_Lombardia.pdf).\n\nQuello che cambia tutto è [la frazione](https://www.istat.it/wp-content/uploads/2025/12/Appendice_Sicilia_2025.xlsx). Sopra c'è la retribuzione annua al lordo dell'Irpef pagata dai datori privati non agricoli, sotto il numero dei lavoratori: le teste, non le ore e nemmeno i posti a tempo pieno. Una giornata retribuita in tutto l'anno basta per entrarci con peso uno, e [nel 2023 solo il 54,7 per cento dei dipendenti ha avuto un periodo retribuito pari a un anno intero](https://servizi2.inps.it/servizi/osservatoristatistici/api/getAllegato/?idAllegato=1043), registra l'Osservatorio INPS. Part time e stagionali stanno lì dentro interi, mentre restano fuori quasi tutto il pubblico impiego, l'agricoltura, il lavoro domestico e gli autonomi. Milano poi è [la provincia dove si lavora](https://servizi2.inps.it/servizi/osservatoristatistici/api/getAllegato/?idAllegato=1045), non quella dove si abita: nella sua media c'è anche chi prende il treno da Bergamo o da Pavia.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-piu-dieci-per-cento-in-euro-piu-venti-nei-prezzi",
+     "heading": "Più dieci per cento in euro, più venti nei prezzi",
+     "body": "Seguita nel tempo, quella media dice la cosa che la pagina non mostra. Fra il 2015 e il 2023 la media delle province passa da 19.104,3 a 21.031,7 euro, il 10,1 per cento in più. Nello stesso intervallo l'indice dei prezzi al consumo per l'intera collettività sale del 19,6 per cento, e i tre quarti di quel salto stanno nel 2022 e nel 2023, [cresciuti dell'8,1 e del 5,7 per cento](https://www.istat.it/it/files//2024/01/CS_Prezzi-al-consumo_Def_Dic2023.pdf).\n\nCosì i 21.031,7 euro del 2023 valgono 17.583,5 euro del 2015: in nove anni la media perde l'8,0 per cento di potere d'acquisto. Ed è la media semplice delle province, dove Milano pesa come Isernia, non la retribuzione media italiana, che nel 2023 Istat fissa a 23.630,3 euro.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-l-anno-in-cui-quel-numero-comprava-di-piu-e-il-2016",
+     "heading": "L'anno in cui quel numero comprava di più è il 2016",
+     "body": "Il massimo, allora, non è il 2023. In euro del 2015 il punto più alto è il 2016, a 19.507,6 euro, e il più basso è il 2023, l'ultimo anno della serie Bes dei territori. Gli ultimi due anni sono quelli in cui le due letture si separano di più: fra il 2021 e il 2023 la media guadagna 1.567 euro, l'8,1 per cento, mentre i prezzi salgono del 14,3 per cento. Il numero in pagina sale e quello in euro del 2015 scende, nello stesso anno.\n\nNon è una particolarità di queste province, e Istat lo vede su un'altra misura: fra gennaio 2021 e dicembre 2023 [le retribuzioni contrattuali orarie sono aumentate del 4,7 per cento e l'indice armonizzato dei prezzi al consumo del 17,3 per cento](https://www.istat.it/wp-content/uploads/2024/05/Rapporto-Annuale-in-pillole.pdf), con il sorpasso delle retribuzioni sui prezzi ricominciato da ottobre 2023.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-anche-il-conto-di-istat-per-l-italia-va-nello-stesso-verso",
+     "heading": "Anche il conto di Istat per l'Italia va nello stesso verso",
+     "body": "Quella media, dove ogni provincia pesa uno, è fragile. Ma il verso non cambia quando si esce da quel conto. Il valore nazionale pesato sui dipendenti [Istat lo pubblica dal 2019](https://www.istat.it/wp-content/uploads/2025/12/Appendice_Sicilia_2025.xlsx), e fra quell'anno e il 2023 passa da 21.945,2 a 23.630,3 euro: il 7,7 per cento in più in euro, il 7,4 per cento in meno una volta tolto l'aumento dei prezzi al consumo per l'intera collettività.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-quanto-si-prende-e-per-quanti-giorni-si-e-pagati",
+     "heading": "Quanto si prende e per quanti giorni si è pagati",
+     "body": "Resta la domanda che uno si fa guardando la propria provincia, e la risposta non sta tutta nella paga oraria. In una media annua per testa conta anche per quanti giorni si viene pagati: nel 2023 le giornate retribuite valgono il 78,9 per cento del tempo pieno teorico in Italia e il 72,7 [in Sicilia](https://www.istat.it/wp-content/uploads/2025/12/BesT2025_Sicilia.pdf). L'[Osservatorio INPS](https://servizi2.inps.it/servizi/osservatoristatistici/api/getAllegato/?idAllegato=1043) trova la stessa cosa sul 2024: le ripartizioni con le retribuzioni più basse sono anche quelle con meno giornate retribuite.\n\nPer questo la cifra da tenere accanto è [quante persone un lavoro ce l'hanno](/indicatore/tasso-di-occupazione-20-64-anni/bes-03LAV001-N22), o [quante restano fuori dal mercato](/indicatore/tasso-di-mancata-partecipazione-al-lavoro/bes-03LAV002-N22). Una media alta dove lavorano in pochi non racconta lo stesso territorio di una dove lavorano quasi tutti.",
+     "authored": true
+    }
+   ],
+   "come_leggere": true,
+   "h1": "La retribuzione media annua non è uno stipendio, e compra meno di nove anni fa",
+   "seo_title": "Retribuzione media annua 2023: sale in euro, compra di meno",
+   "fonti": [
+    {
+     "testo": "Istat, Bes dei territori 2025, report regionale Lombardia (valore provinciale 2023)",
+     "url": "https://www.istat.it/wp-content/uploads/2025/12/BesT2025_Lombardia.pdf"
+    },
+    {
+     "testo": "Istat, Bes dei territori 2025, appendice statistica regionale (foglio Glossario per la definizione dell'indicatore 04-02, foglio Dominio 04 riga Italia per il valore nazionale)",
+     "url": "https://www.istat.it/wp-content/uploads/2025/12/Appendice_Sicilia_2025.xlsx"
+    },
+    {
+     "testo": "INPS, Osservatorio statistico sui lavoratori dipendenti del settore privato non agricolo, anno 2024",
+     "url": "https://servizi2.inps.it/servizi/osservatoristatistici/api/getAllegato/?idAllegato=1043"
+    },
+    {
+     "testo": "INPS, Osservatorio sui lavoratori dipendenti, nota metodologica (provincia di lavoro)",
+     "url": "https://servizi2.inps.it/servizi/osservatoristatistici/api/getAllegato/?idAllegato=1045"
+    },
+    {
+     "testo": "Istat, prezzi al consumo, comunicato definitivo dicembre 2023",
+     "url": "https://www.istat.it/it/files//2024/01/CS_Prezzi-al-consumo_Def_Dic2023.pdf"
+    },
+    {
+     "testo": "Istat, Rapporto annuale 2024, sintesi",
+     "url": "https://www.istat.it/wp-content/uploads/2024/05/Rapporto-Annuale-in-pillole.pdf"
+    },
+    {
+     "testo": "Istat, Bes dei territori 2025, report regionale Sicilia (giornate retribuite nell'anno)",
+     "url": "https://www.istat.it/wp-content/uploads/2025/12/BesT2025_Sicilia.pdf"
+    }
+   ],
+   "vintage": 2023,
+   "authored_count": 1
+  },
+  "page_lead": "A [Milano](/provincia/milano) la retribuzione media annua vale 34.343 euro nel 2023, l'ultimo anno del Bes dei territori. È una cifra lorda per testa, non uno stipendio, e fra il 2015 e il 2023 questo indicatore è cresciuto in euro molto meno dei prezzi.",
+  "noindex": false,
+  "seo_title": "Retribuzione media annua 2023: sale in euro, compra di meno",
+  "seo_description": "A Milano la retribuzione media annua vale 34.343 euro nel 2023, l'ultimo anno del Bes dei territori.",
+  "dataset_description": "A [Milano](/provincia/milano) la retribuzione media annua vale 34.343 euro nel 2023, l'ultimo anno del Bes dei territori. È una cifra lorda per testa, non uno stipendio, e fra il 2015 e il 2023 questo indicatore è cresciuto in euro molto meno dei prezzi.",
+  "dataset_updated": "2026-05-25",
+  "estremi": {
+   "alto": {
+    "key": "milano",
+    "name": "Milano",
+    "value": 34343.0
+   },
+   "basso": {
+    "key": "vibo-valentia",
+    "name": "Vibo Valentia",
+    "value": 13387.8
+   }
+  },
+  "site_url": "https://divarioitalia.it",
+  "site_name": "Divario Italia",
+  "canonical": "https://divarioitalia.it/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+  "SITE_NAME": "Divario Italia",
+  "SITE_URL": "https://divarioitalia.it",
+  "data_license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "data_license_label": "Creative Commons BY 4.0",
+  "publisher": {
+   "@type": "Organization",
+   "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+   "name": "Divario Italia",
+   "url": "https://divarioitalia.it/chi-siamo",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://divarioitalia.it/static/img/logo-mark.png"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "editorial",
+    "email": "divarioitalia@protonmail.com",
+    "url": "https://divarioitalia.it/contatti",
+    "availableLanguage": "it"
+   }
+  },
+  "publisher_jsonld": "{\"@type\": \"Organization\", \"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\", \"name\": \"Divario Italia\", \"url\": \"https://divarioitalia.it/chi-siamo\", \"logo\": {\"@type\": \"ImageObject\", \"url\": \"https://divarioitalia.it/static/img/logo-mark.png\"}, \"contactPoint\": {\"@type\": \"ContactPoint\", \"contactType\": \"editorial\", \"email\": \"divarioitalia@protonmail.com\", \"url\": \"https://divarioitalia.it/contatti\", \"availableLanguage\": \"it\"}}",
+  "organization_ref_jsonld": "{\"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\"}",
+  "corrections_url": "https://github.com/nmaiese/diset-viz/issues/new",
+  "contact_email": "divarioitalia@protonmail.com",
+  "consent_cmp_name": "Iubenda",
+  "consent_cmp_url": "https://www.iubenda.com/privacy-policy/"
+ }
+}

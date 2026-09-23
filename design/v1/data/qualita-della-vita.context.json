@@ -1,0 +1,1198 @@
+{
+ "template": "quality_life_index.html",
+ "route": "/qualita-della-vita",
+ "context": {
+  "province_preview": [
+   {
+    "name": "Monza e della Brianza",
+    "key": "monza-e-della-brianza",
+    "region": "Lombardia",
+    "metro_city": false,
+    "score": 73.6,
+    "coverage": 1.0,
+    "category_scores": {
+     "reddito_accessibilita": 69.9,
+     "lavoro_opportunita": 64.3,
+     "salute_cura": 65.0,
+     "istruzione_capitale_umano": 60.0,
+     "ricerca_innovazione_digitale": 71.6,
+     "ambiente_energia": 40.7,
+     "mobilita_servizi_territoriali": 58.2,
+     "sicurezza_legalita": 61.3,
+     "istituzioni_partecipazione": 51.1,
+     "cultura_patrimonio_turismo": 96.8
+    },
+    "strongest_categories": [
+     {
+      "slug": "cultura_patrimonio_turismo",
+      "name": "Cultura, patrimonio e turismo",
+      "score": 96.8
+     },
+     {
+      "slug": "ricerca_innovazione_digitale",
+      "name": "Ricerca, innovazione e digitale",
+      "score": 71.6
+     },
+     {
+      "slug": "reddito_accessibilita",
+      "name": "Reddito, inclusione e accessibilità",
+      "score": 69.9
+     }
+    ],
+    "weakest_categories": [
+     {
+      "slug": "ambiente_energia",
+      "name": "Ambiente ed energia",
+      "score": 40.7
+     },
+     {
+      "slug": "istituzioni_partecipazione",
+      "name": "Istituzioni e partecipazione",
+      "score": 51.1
+     },
+     {
+      "slug": "mobilita_servizi_territoriali",
+      "name": "Mobilità e servizi territoriali",
+      "score": 58.2
+     }
+    ],
+    "top_positive_indicators": [
+     {
+      "id": "bes:09PAE009-N25",
+      "name": "Densità di verde storico",
+      "theme": "Cultura, patrimonio e turismo",
+      "score": 100.0,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/densita-di-verde-storico/bes-09PAE009-N25"
+     },
+     {
+      "id": "bes:11RIC022",
+      "name": "Comuni con servizi per le famiglie interamente on line",
+      "theme": "Ricerca, innovazione e digitale",
+      "score": 80.5,
+      "year_max": 2018,
+      "direction": "higher_better",
+      "path": "/indicatore/comuni-con-servizi-per-le-famiglie-interamente-online/bes-11RIC022"
+     },
+     {
+      "id": "bes:04BEC001P",
+      "name": "Reddito medio disponibile pro capite",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 75.1,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/reddito-medio-disponibile-pro-capite/bes-04BEC001P"
+     },
+     {
+      "id": "bes:04BEC002P",
+      "name": "Retribuzione media annua dei lavoratori dipendenti",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 73.7,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
+     },
+     {
+      "id": "bes:07SIC007P",
+      "name": "Altri delitti mortali denunciati",
+      "theme": "Sicurezza e legalità",
+      "score": 70.7,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/altri-delitti-mortali-denunciati/bes-07SIC007P"
+     }
+    ],
+    "top_negative_indicators": [
+     {
+      "id": "bes:10AMB018P",
+      "name": "Impermeabilizzazione del suolo da copertura artificiale",
+      "theme": "Ambiente ed energia",
+      "score": 0.0,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/impermeabilizzazione-del-suolo-da-copertura-artificiale/bes-10AMB018P"
+     },
+     {
+      "id": "bes:05REL008",
+      "name": "Organizzazioni non profit",
+      "theme": "Istituzioni e partecipazione",
+      "score": 29.9,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/organizzazioni-non-profit/bes-05REL008"
+     },
+     {
+      "id": "bes:07SIC004P",
+      "name": "Denunce di furto in abitazione",
+      "theme": "Sicurezza e legalità",
+      "score": 33.7,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/denunce-di-furto-in-abitazione/bes-07SIC004P"
+     },
+     {
+      "id": "bes:10AMB014",
+      "name": "Aree protette",
+      "theme": "Ambiente ed energia",
+      "score": 35.9,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/aree-protette/bes-10AMB014"
+     },
+     {
+      "id": "bes:02IST001",
+      "name": "Partecipazione al sistema scolastico dei bambini di 4-5 anni",
+      "theme": "Istruzione e formazione",
+      "score": 36.7,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/partecipazione-al-sistema-scolastico-dei-bambini-di-4-5-anni/bes-02IST001"
+     }
+    ],
+    "rank": 1,
+    "delta_rank": 0,
+    "path": "/provincia/monza-e-della-brianza"
+   },
+   {
+    "name": "Milano",
+    "key": "milano",
+    "region": "Lombardia",
+    "metro_city": true,
+    "score": 72.0,
+    "coverage": 1.0,
+    "category_scores": {
+     "reddito_accessibilita": 81.2,
+     "lavoro_opportunita": 63.4,
+     "salute_cura": 62.8,
+     "istruzione_capitale_umano": 68.0,
+     "ricerca_innovazione_digitale": 83.1,
+     "ambiente_energia": 36.9,
+     "mobilita_servizi_territoriali": 64.7,
+     "sicurezza_legalita": 17.5,
+     "istituzioni_partecipazione": 48.5,
+     "cultura_patrimonio_turismo": 83.6
+    },
+    "strongest_categories": [
+     {
+      "slug": "cultura_patrimonio_turismo",
+      "name": "Cultura, patrimonio e turismo",
+      "score": 83.6
+     },
+     {
+      "slug": "ricerca_innovazione_digitale",
+      "name": "Ricerca, innovazione e digitale",
+      "score": 83.1
+     },
+     {
+      "slug": "reddito_accessibilita",
+      "name": "Reddito, inclusione e accessibilità",
+      "score": 81.2
+     }
+    ],
+    "weakest_categories": [
+     {
+      "slug": "sicurezza_legalita",
+      "name": "Sicurezza e legalità",
+      "score": 17.5
+     },
+     {
+      "slug": "ambiente_energia",
+      "name": "Ambiente ed energia",
+      "score": 36.9
+     },
+     {
+      "slug": "istituzioni_partecipazione",
+      "name": "Istituzioni e partecipazione",
+      "score": 48.5
+     }
+    ],
+    "top_positive_indicators": [
+     {
+      "id": "bes:11RIC004P",
+      "name": "Addetti nelle imprese culturali",
+      "theme": "Cultura, patrimonio e turismo",
+      "score": 100.0,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/addetti-nelle-imprese-culturali/bes-11RIC004P"
+     },
+     {
+      "id": "bes:04BEC001P",
+      "name": "Reddito medio disponibile pro capite",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 91.4,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/reddito-medio-disponibile-pro-capite/bes-04BEC001P"
+     },
+     {
+      "id": "bes:04BEC002P",
+      "name": "Retribuzione media annua dei lavoratori dipendenti",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 90.4,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
+     },
+     {
+      "id": "bes:02IST007-N22",
+      "name": "Partecipazione alla formazione continua",
+      "theme": "Istruzione e formazione",
+      "score": 81.7,
+      "year_max": 2024,
+      "direction": "higher_better",
+      "path": "/indicatore/partecipazione-alla-formazione-continua/bes-02IST007-N22"
+     },
+     {
+      "id": "bes:02IST003P-N22",
+      "name": "Laureati e altri titoli terziari (25-39 anni)",
+      "theme": "Istruzione e formazione",
+      "score": 80.7,
+      "year_max": 2024,
+      "direction": "higher_better",
+      "path": "/indicatore/laureati-e-altri-titoli-terziari-25-39-anni/bes-02IST003P-N22"
+     }
+    ],
+    "top_negative_indicators": [
+     {
+      "id": "bes:07SIC005P",
+      "name": "Denunce di borseggio",
+      "theme": "Sicurezza e legalità",
+      "score": 0.0,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/denunce-di-borseggio/bes-07SIC005P"
+     },
+     {
+      "id": "bes:10AMB018P",
+      "name": "Impermeabilizzazione del suolo da copertura artificiale",
+      "theme": "Ambiente ed energia",
+      "score": 3.7,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/impermeabilizzazione-del-suolo-da-copertura-artificiale/bes-10AMB018P"
+     },
+     {
+      "id": "bes:07SIC006P",
+      "name": "Denunce di rapina",
+      "theme": "Sicurezza e legalità",
+      "score": 4.1,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/denunce-di-rapina/bes-07SIC006P"
+     },
+     {
+      "id": "bes:02IST001",
+      "name": "Partecipazione al sistema scolastico dei bambini di 4-5 anni",
+      "theme": "Istruzione e formazione",
+      "score": 29.7,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/partecipazione-al-sistema-scolastico-dei-bambini-di-4-5-anni/bes-02IST001"
+     },
+     {
+      "id": "bes:10AMB014",
+      "name": "Aree protette",
+      "theme": "Ambiente ed energia",
+      "score": 33.6,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/aree-protette/bes-10AMB014"
+     }
+    ],
+    "rank": 2,
+    "delta_rank": 0,
+    "path": "/provincia/milano"
+   },
+   {
+    "name": "Bologna",
+    "key": "bologna",
+    "region": "Emilia-Romagna",
+    "metro_city": true,
+    "score": 71.1,
+    "coverage": 1.0,
+    "category_scores": {
+     "reddito_accessibilita": 71.8,
+     "lavoro_opportunita": 60.7,
+     "salute_cura": 60.4,
+     "istruzione_capitale_umano": 75.1,
+     "ricerca_innovazione_digitale": 89.7,
+     "ambiente_energia": 42.3,
+     "mobilita_servizi_territoriali": 72.9,
+     "sicurezza_legalita": 29.0,
+     "istituzioni_partecipazione": 60.7,
+     "cultura_patrimonio_turismo": 54.8
+    },
+    "strongest_categories": [
+     {
+      "slug": "ricerca_innovazione_digitale",
+      "name": "Ricerca, innovazione e digitale",
+      "score": 89.7
+     },
+     {
+      "slug": "istruzione_capitale_umano",
+      "name": "Istruzione e formazione",
+      "score": 75.1
+     },
+     {
+      "slug": "mobilita_servizi_territoriali",
+      "name": "Mobilità e servizi territoriali",
+      "score": 72.9
+     }
+    ],
+    "weakest_categories": [
+     {
+      "slug": "sicurezza_legalita",
+      "name": "Sicurezza e legalità",
+      "score": 29.0
+     },
+     {
+      "slug": "ambiente_energia",
+      "name": "Ambiente ed energia",
+      "score": 42.3
+     },
+     {
+      "slug": "cultura_patrimonio_turismo",
+      "name": "Cultura, patrimonio e turismo",
+      "score": 54.8
+     }
+    ],
+    "top_positive_indicators": [
+     {
+      "id": "bes:11RIC002",
+      "name": "Propensione alla brevettazione",
+      "theme": "Ricerca, innovazione e digitale",
+      "score": 88.8,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/propensione-alla-brevettazione/bes-11RIC002"
+     },
+     {
+      "id": "bes:02IST003P-N22",
+      "name": "Laureati e altri titoli terziari (25-39 anni)",
+      "theme": "Istruzione e formazione",
+      "score": 86.7,
+      "year_max": 2024,
+      "direction": "higher_better",
+      "path": "/indicatore/laureati-e-altri-titoli-terziari-25-39-anni/bes-02IST003P-N22"
+     },
+     {
+      "id": "bes:11RIC022",
+      "name": "Comuni con servizi per le famiglie interamente on line",
+      "theme": "Ricerca, innovazione e digitale",
+      "score": 84.1,
+      "year_max": 2018,
+      "direction": "higher_better",
+      "path": "/indicatore/comuni-con-servizi-per-le-famiglie-interamente-online/bes-11RIC022"
+     },
+     {
+      "id": "bes:11RIC025",
+      "name": "Mobilità dei laureati italiani (25-39 anni)",
+      "theme": "Ricerca, innovazione e digitale",
+      "score": 80.9,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/mobilita-dei-laureati-italiani-25-39-anni/bes-11RIC025"
+     },
+     {
+      "id": "bes:12SER002",
+      "name": "Bambini che hanno usufruito dei servizi comunali per l'infanzia",
+      "theme": "Istruzione e formazione",
+      "score": 78.1,
+      "year_max": 2022,
+      "direction": "higher_better",
+      "path": "/indicatore/bambini-che-hanno-usufruito-dei-servizi-comunali-per-l-infanzia/bes-12SER002"
+     }
+    ],
+    "top_negative_indicators": [
+     {
+      "id": "bes:10AMB012",
+      "name": "Popolazione esposta al rischio di alluvioni",
+      "theme": "Ambiente ed energia",
+      "score": 21.6,
+      "year_max": 2020,
+      "direction": "lower_better",
+      "path": "/indicatore/popolazione-esposta-al-rischio-di-alluvioni/bes-10AMB012"
+     },
+     {
+      "id": "bes:07SIC006P",
+      "name": "Denunce di rapina",
+      "theme": "Sicurezza e legalità",
+      "score": 25.3,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/denunce-di-rapina/bes-07SIC006P"
+     },
+     {
+      "id": "bes:07SIC005P",
+      "name": "Denunce di borseggio",
+      "theme": "Sicurezza e legalità",
+      "score": 29.5,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/denunce-di-borseggio/bes-07SIC005P"
+     },
+     {
+      "id": "bes:07SIC004P",
+      "name": "Denunce di furto in abitazione",
+      "theme": "Sicurezza e legalità",
+      "score": 35.6,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/denunce-di-furto-in-abitazione/bes-07SIC004P"
+     },
+     {
+      "id": "bes:06POL012P",
+      "name": "Affollamento degli istituti di pena",
+      "theme": "Istituzioni e partecipazione",
+      "score": 38.9,
+      "year_max": 2024,
+      "direction": "lower_better",
+      "path": "/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012P"
+     }
+    ],
+    "rank": 3,
+    "delta_rank": 0,
+    "path": "/provincia/bologna"
+   }
+  ],
+  "categories": [
+   {
+    "slug": "reddito_accessibilita",
+    "name": "Reddito, inclusione e accessibilità",
+    "description": "Reddito, condizioni economiche, inclusione sociale e accesso alle opportunità offerte dai territori.",
+    "themes": [
+     "Benessere economico",
+     "Reddito e ricchezza",
+     "Inclusione sociale",
+     "Abitazione",
+     "Conti economici regionali (Eurostat)"
+    ]
+   },
+   {
+    "slug": "lavoro_opportunita",
+    "name": "Lavoro e conciliazione",
+    "description": "Occupazione, continuità del lavoro, partecipazione e possibilità di conciliare tempi di vita e attività professionale.",
+    "themes": [
+     "Lavoro",
+     "Lavoro e conciliazione dei tempi di vita"
+    ]
+   },
+   {
+    "slug": "imprese_competitivita",
+    "name": "Imprese e competitività",
+    "description": "Struttura produttiva, dinamica delle imprese, internazionalizzazione e accesso ai capitali.",
+    "themes": [
+     "Competitività",
+     "Demografia di impresa",
+     "Dinamiche settoriali",
+     "Internazionalizzazione",
+     "Mercato dei capitali e finanza d'impresa"
+    ]
+   },
+   {
+    "slug": "salute_cura",
+    "name": "Salute, demografia e cura",
+    "description": "Condizioni di salute, struttura demografica, assistenza e servizi di cura disponibili sul territorio.",
+    "themes": [
+     "Salute",
+     "Servizi di cura",
+     "Demografia e popolazione",
+     "Indicatori demografici (Istat)"
+    ]
+   },
+   {
+    "slug": "istruzione_capitale_umano",
+    "name": "Istruzione e formazione",
+    "description": "Percorsi scolastici, competenze, partecipazione all'istruzione e apprendimento lungo tutto l'arco della vita.",
+    "themes": [
+     "Istruzione e formazione"
+    ]
+   },
+   {
+    "slug": "ricerca_innovazione_digitale",
+    "name": "Ricerca, innovazione e digitale",
+    "description": "Ricerca, capacità innovativa, creatività e accesso alle reti e ai servizi digitali.",
+    "themes": [
+     "Innovazione, ricerca e creatività",
+     "Ricerca ed innovazione",
+     "Società dell'informazione",
+     "Ricerca e sviluppo (Eurostat)"
+    ]
+   },
+   {
+    "slug": "ambiente_energia",
+    "name": "Ambiente ed energia",
+    "description": "Qualità dell'ambiente, aria, acqua, rifiuti, risorse naturali ed energia.",
+    "themes": [
+     "Ambiente",
+     "Ambiente, altro",
+     "Energia",
+     "Qualità dell'aria",
+     "Rifiuti",
+     "Risorse idriche"
+    ]
+   },
+   {
+    "slug": "mobilita_servizi_territoriali",
+    "name": "Mobilità e servizi territoriali",
+    "description": "Trasporti, mobilità, servizi essenziali e condizioni di accesso alle funzioni urbane.",
+    "themes": [
+     "Trasporti e mobilità",
+     "Qualità dei servizi",
+     "Città"
+    ]
+   },
+   {
+    "slug": "sicurezza_legalita",
+    "name": "Sicurezza e legalità",
+    "description": "Criminalità, sicurezza personale, legalità e condizioni che incidono sulla vita quotidiana.",
+    "themes": [
+     "Sicurezza",
+     "Legalità e sicurezza"
+    ]
+   },
+   {
+    "slug": "istituzioni_partecipazione",
+    "name": "Istituzioni e partecipazione",
+    "description": "Qualità delle amministrazioni, partecipazione civica, fiducia, reti sociali e capitale sociale.",
+    "themes": [
+     "Politica e istituzioni",
+     "Pubblica Amministrazione",
+     "Relazioni sociali",
+     "Capitale sociale"
+    ]
+   },
+   {
+    "slug": "cultura_patrimonio_turismo",
+    "name": "Cultura, patrimonio e turismo",
+    "description": "Offerta e partecipazione culturale, tutela del patrimonio, paesaggio e attività turistiche.",
+    "themes": [
+     "Cultura",
+     "Paesaggio e patrimonio culturale",
+     "Turismo"
+    ]
+   },
+   {
+    "slug": "benessere_soggettivo",
+    "name": "Benessere soggettivo",
+    "description": "Soddisfazione per la vita, il tempo libero, le relazioni e le aspettative dichiarate per il futuro.",
+    "themes": [
+     "Benessere soggettivo"
+    ]
+   }
+  ],
+  "profiles": [
+   {
+    "slug": "standard",
+    "name": "Equilibrato",
+    "description": "Assegna lo stesso peso alle dodici dimensioni della qualità della vita.",
+    "weights": {
+     "reddito_accessibilita": 0.08333333333333333,
+     "lavoro_opportunita": 0.08333333333333333,
+     "imprese_competitivita": 0.08333333333333333,
+     "salute_cura": 0.08333333333333333,
+     "istruzione_capitale_umano": 0.08333333333333333,
+     "ricerca_innovazione_digitale": 0.08333333333333333,
+     "ambiente_energia": 0.08333333333333333,
+     "mobilita_servizi_territoriali": 0.08333333333333333,
+     "sicurezza_legalita": 0.08333333333333333,
+     "istituzioni_partecipazione": 0.08333333333333333,
+     "cultura_patrimonio_turismo": 0.08333333333333333,
+     "benessere_soggettivo": 0.08333333333333333
+    }
+   },
+   {
+    "slug": "opportunita",
+    "name": "Opportunità economica",
+    "description": "Aumenta il peso di lavoro, reddito, istruzione e capacità produttiva.",
+    "weights": {
+     "reddito_accessibilita": 0.1111111111111111,
+     "lavoro_opportunita": 0.1349206349206349,
+     "imprese_competitivita": 0.11904761904761905,
+     "salute_cura": 0.0634920634920635,
+     "istruzione_capitale_umano": 0.10317460317460318,
+     "ricerca_innovazione_digitale": 0.10317460317460318,
+     "ambiente_energia": 0.05555555555555555,
+     "mobilita_servizi_territoriali": 0.05555555555555555,
+     "sicurezza_legalita": 0.05555555555555555,
+     "istituzioni_partecipazione": 0.05555555555555555,
+     "cultura_patrimonio_turismo": 0.07936507936507936,
+     "benessere_soggettivo": 0.0634920634920635
+    }
+   },
+   {
+    "slug": "accessibilita",
+    "name": "Accessibilità quotidiana",
+    "description": "Riduce il peso della sola ricchezza e dà più importanza a servizi, ambiente, inclusione e sicurezza.",
+    "weights": {
+     "reddito_accessibilita": 0.08461538461538462,
+     "lavoro_opportunita": 0.06153846153846154,
+     "imprese_competitivita": 0.05384615384615384,
+     "salute_cura": 0.1,
+     "istruzione_capitale_umano": 0.06923076923076923,
+     "ricerca_innovazione_digitale": 0.06153846153846154,
+     "ambiente_energia": 0.11538461538461539,
+     "mobilita_servizi_territoriali": 0.11538461538461539,
+     "sicurezza_legalita": 0.1,
+     "istituzioni_partecipazione": 0.0923076923076923,
+     "cultura_patrimonio_turismo": 0.06153846153846154,
+     "benessere_soggettivo": 0.08461538461538462
+    }
+   },
+   {
+    "slug": "famiglie",
+    "name": "Famiglie",
+    "description": "Aumenta il peso di salute, cura, istruzione, ambiente e sicurezza.",
+    "weights": {
+     "reddito_accessibilita": 0.078125,
+     "lavoro_opportunita": 0.0703125,
+     "imprese_competitivita": 0.05468749999999999,
+     "salute_cura": 0.1171875,
+     "istruzione_capitale_umano": 0.10937499999999999,
+     "ricerca_innovazione_digitale": 0.0625,
+     "ambiente_energia": 0.09374999999999999,
+     "mobilita_servizi_territoriali": 0.09374999999999999,
+     "sicurezza_legalita": 0.09374999999999999,
+     "istituzioni_partecipazione": 0.078125,
+     "cultura_patrimonio_turismo": 0.0625,
+     "benessere_soggettivo": 0.0859375
+    }
+   },
+   {
+    "slug": "giovani",
+    "name": "Giovani",
+    "description": "Aumenta il peso di lavoro, formazione, digitale, cultura e opportunità.",
+    "weights": {
+     "reddito_accessibilita": 0.06818181818181819,
+     "lavoro_opportunita": 0.12121212121212123,
+     "imprese_competitivita": 0.0984848484848485,
+     "salute_cura": 0.05303030303030303,
+     "istruzione_capitale_umano": 0.11363636363636365,
+     "ricerca_innovazione_digitale": 0.10606060606060606,
+     "ambiente_energia": 0.06818181818181819,
+     "mobilita_servizi_territoriali": 0.07575757575757576,
+     "sicurezza_legalita": 0.060606060606060615,
+     "istituzioni_partecipazione": 0.060606060606060615,
+     "cultura_patrimonio_turismo": 0.0984848484848485,
+     "benessere_soggettivo": 0.07575757575757576
+    }
+   },
+   {
+    "slug": "servizi",
+    "name": "Servizi e territorio",
+    "description": "Aumenta il peso di servizi essenziali, mobilità, ambiente, sicurezza e istituzioni.",
+    "weights": {
+     "reddito_accessibilita": 0.05223880597014925,
+     "lavoro_opportunita": 0.05223880597014925,
+     "imprese_competitivita": 0.05223880597014925,
+     "salute_cura": 0.09701492537313433,
+     "istruzione_capitale_umano": 0.06716417910447761,
+     "ricerca_innovazione_digitale": 0.05970149253731343,
+     "ambiente_energia": 0.12686567164179105,
+     "mobilita_servizi_territoriali": 0.12686567164179105,
+     "sicurezza_legalita": 0.11194029850746269,
+     "istituzioni_partecipazione": 0.11194029850746269,
+     "cultura_patrimonio_turismo": 0.07462686567164178,
+     "benessere_soggettivo": 0.06716417910447761
+    }
+   }
+  ],
+  "default_profile": "standard",
+  "preview_rows": [
+   {
+    "name": "Trentino Alto Adige",
+    "key": "trentino-alto-adige",
+    "region": "",
+    "metro_city": false,
+    "score": 71.6,
+    "coverage": 1.0,
+    "category_scores": {
+     "reddito_accessibilita": 57.9,
+     "lavoro_opportunita": 65.3,
+     "imprese_competitivita": 65.8,
+     "salute_cura": 73.5,
+     "istruzione_capitale_umano": 65.0,
+     "ricerca_innovazione_digitale": 65.9,
+     "ambiente_energia": 70.5,
+     "mobilita_servizi_territoriali": 58.7,
+     "sicurezza_legalita": 57.9,
+     "istituzioni_partecipazione": 81.3,
+     "cultura_patrimonio_turismo": 51.4,
+     "benessere_soggettivo": 75.8
+    },
+    "strongest_categories": [
+     {
+      "slug": "istituzioni_partecipazione",
+      "name": "Istituzioni e partecipazione",
+      "score": 81.3
+     },
+     {
+      "slug": "benessere_soggettivo",
+      "name": "Benessere soggettivo",
+      "score": 75.8
+     },
+     {
+      "slug": "salute_cura",
+      "name": "Salute, demografia e cura",
+      "score": 73.5
+     }
+    ],
+    "weakest_categories": [
+     {
+      "slug": "cultura_patrimonio_turismo",
+      "name": "Cultura, patrimonio e turismo",
+      "score": 51.4
+     },
+     {
+      "slug": "sicurezza_legalita",
+      "name": "Sicurezza e legalità",
+      "score": 57.9
+     },
+     {
+      "slug": "reddito_accessibilita",
+      "name": "Reddito, inclusione e accessibilità",
+      "score": 57.9
+     }
+    ],
+    "top_positive_indicators": [
+     {
+      "id": "bes:11RIC023",
+      "name": "Imprese con almeno 10 addetti con vendite via web a clienti finali",
+      "theme": "Ricerca, innovazione e digitale",
+      "score": 89.1,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/imprese-con-almeno-10-addetti-con-vendite-via-web-a-clienti-finali/bes-11RIC023"
+     },
+     {
+      "id": "bes:05REL009",
+      "name": "Fiducia generalizzata",
+      "theme": "Istituzioni e partecipazione",
+      "score": 87.0,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/fiducia-generalizzata/bes-05REL009"
+     },
+     {
+      "id": "bes:05REL006",
+      "name": "Attività di volontariato",
+      "theme": "Istituzioni e partecipazione",
+      "score": 86.2,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/attivita-di-volontariato/bes-05REL006"
+     },
+     {
+      "id": "bes:05REL007",
+      "name": "Finanziamento delle associazioni",
+      "theme": "Istituzioni e partecipazione",
+      "score": 83.4,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/finanziamento-delle-associazioni/bes-05REL007"
+     },
+     {
+      "id": "multiscopo:MULTI_ELETTR_TOT",
+      "name": "Famiglie molto o abbastanza soddisfatte del servizio elettrico nel complesso",
+      "theme": "Ambiente ed energia",
+      "score": 81.8,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/famiglie-molto-o-abbastanza-soddisfatte-del-servizio-elettrico-nel-complesso/ims-MULTI_ELETTR_TOT"
+     }
+    ],
+    "top_negative_indicators": [
+     {
+      "id": "multiscopo:MULTI_SPESA_GINI",
+      "name": "Indice di concentrazione di Gini della spesa per consumi",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 18.2,
+      "year_max": 2024,
+      "direction": "lower_better",
+      "path": "/indicatore/indice-di-concentrazione-di-gini-della-spesa-per-consumi/ims-MULTI_SPESA_GINI"
+     },
+     {
+      "id": "642",
+      "name": "Percentuale di scuole dotate di un accesso con rampe",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 22.7,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/percentuale-di-scuole-dotate-di-un-accesso-con-rampe/ter-642"
+     },
+     {
+      "id": "bes:01SAL011",
+      "name": "Alcol (tassi standardizzati)",
+      "theme": "Salute, demografia e cura",
+      "score": 24.7,
+      "year_max": 2025,
+      "direction": "lower_better",
+      "path": "/indicatore/alcol-tassi-standardizzati/bes-01SAL011"
+     },
+     {
+      "id": "402",
+      "name": "Imprenditorialità femminile",
+      "theme": "Lavoro e conciliazione",
+      "score": 25.8,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/imprenditorialita-femminile/ter-402"
+     },
+     {
+      "id": "641",
+      "name": "Percentuale di scuole con alunni con disabilità nelle quali sono presenti postazioni informatiche adattate",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 29.4,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/percentuale-di-scuole-con-alunni-con-disabilita-nelle-quali-sono-presenti-postaz/ter-641"
+     }
+    ],
+    "rank": 1,
+    "delta_rank": 0,
+    "color": "var(--seq-6)"
+   },
+   {
+    "name": "Lombardia",
+    "key": "lombardia",
+    "region": "",
+    "metro_city": false,
+    "score": 63.4,
+    "coverage": 1.0,
+    "category_scores": {
+     "reddito_accessibilita": 60.5,
+     "lavoro_opportunita": 60.4,
+     "imprese_competitivita": 66.2,
+     "salute_cura": 58.2,
+     "istruzione_capitale_umano": 57.8,
+     "ricerca_innovazione_digitale": 62.1,
+     "ambiente_energia": 52.0,
+     "mobilita_servizi_territoriali": 74.4,
+     "sicurezza_legalita": 34.1,
+     "istituzioni_partecipazione": 54.1,
+     "cultura_patrimonio_turismo": 65.9,
+     "benessere_soggettivo": 66.5
+    },
+    "strongest_categories": [
+     {
+      "slug": "mobilita_servizi_territoriali",
+      "name": "Mobilità e servizi territoriali",
+      "score": 74.4
+     },
+     {
+      "slug": "benessere_soggettivo",
+      "name": "Benessere soggettivo",
+      "score": 66.5
+     },
+     {
+      "slug": "imprese_competitivita",
+      "name": "Imprese e competitività",
+      "score": 66.2
+     }
+    ],
+    "weakest_categories": [
+     {
+      "slug": "sicurezza_legalita",
+      "name": "Sicurezza e legalità",
+      "score": 34.1
+     },
+     {
+      "slug": "ambiente_energia",
+      "name": "Ambiente ed energia",
+      "score": 52.0
+     },
+     {
+      "slug": "istituzioni_partecipazione",
+      "name": "Istituzioni e partecipazione",
+      "score": 54.1
+     }
+    ],
+    "top_positive_indicators": [
+     {
+      "id": "269",
+      "name": "Posti-km offerti dal TPL nei comuni capoluogo di provincia",
+      "theme": "Mobilità e servizi territoriali",
+      "score": 90.0,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/posti-km-offerti-dal-tpl-nei-comuni-capoluogo-di-provincia/ter-269"
+     },
+     {
+      "id": "130",
+      "name": "Produttività del lavoro nel commercio",
+      "theme": "Imprese e competitività",
+      "score": 78.9,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/produttivita-del-lavoro-nel-commercio/ter-130"
+     },
+     {
+      "id": "25",
+      "name": "Spesa del pubblico per spettacoli teatrali e musicali",
+      "theme": "Cultura, patrimonio e turismo",
+      "score": 77.7,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/spesa-del-pubblico-per-spettacoli-teatrali-e-musicali/ter-25"
+     },
+     {
+      "id": "1",
+      "name": "Produttività del lavoro in agricoltura",
+      "theme": "Imprese e competitività",
+      "score": 75.9,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/produttivita-del-lavoro-in-agricoltura/ter-1"
+     },
+     {
+      "id": "596",
+      "name": "Produttività del lavoro nei settori culturali e creativi",
+      "theme": "Cultura, patrimonio e turismo",
+      "score": 73.4,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/produttivita-del-lavoro-nei-settori-culturali-e-creativi/ter-596"
+     }
+    ],
+    "top_negative_indicators": [
+     {
+      "id": "bes:07SIC004",
+      "name": "Rapine",
+      "theme": "Sicurezza e legalità",
+      "score": 30.0,
+      "year_max": 2025,
+      "direction": "lower_better",
+      "path": "/indicatore/rapine/bes-07SIC004"
+     },
+     {
+      "id": "33",
+      "name": "Elementi fertilizzanti usati in agricoltura",
+      "theme": "Ambiente ed energia",
+      "score": 30.5,
+      "year_max": 2024,
+      "direction": "higher_worse",
+      "path": "/indicatore/elementi-fertilizzanti-usati-in-agricoltura/ter-33"
+     },
+     {
+      "id": "bes:07SIC020",
+      "name": "Percezione di sicurezza camminando da soli quando è buio",
+      "theme": "Sicurezza e legalità",
+      "score": 30.6,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/percezione-di-sicurezza-camminando-da-soli-quando-e-buio/bes-07SIC020"
+     },
+     {
+      "id": "280",
+      "name": "Tasso di rapine denunciate",
+      "theme": "Sicurezza e legalità",
+      "score": 32.4,
+      "year_max": 2023,
+      "direction": "lower_better",
+      "path": "/indicatore/tasso-di-rapine-denunciate/ter-280"
+     },
+     {
+      "id": "bes:07SIC021",
+      "name": "Presenza di elementi di degrado nella zona in cui si vive",
+      "theme": "Sicurezza e legalità",
+      "score": 33.0,
+      "year_max": 2025,
+      "direction": "lower_better",
+      "path": "/indicatore/presenza-di-elementi-di-degrado-nella-zona-in-cui-si-vive/bes-07SIC021"
+     }
+    ],
+    "rank": 2,
+    "delta_rank": 0,
+    "color": "var(--seq-5)"
+   },
+   {
+    "name": "Friuli-Venezia Giulia",
+    "key": "friuli-venezia-giulia",
+    "region": "",
+    "metro_city": false,
+    "score": 62.5,
+    "coverage": 1.0,
+    "category_scores": {
+     "reddito_accessibilita": 60.6,
+     "lavoro_opportunita": 57.5,
+     "imprese_competitivita": 45.0,
+     "salute_cura": 65.3,
+     "istruzione_capitale_umano": 61.8,
+     "ricerca_innovazione_digitale": 62.6,
+     "ambiente_energia": 59.5,
+     "mobilita_servizi_territoriali": 57.1,
+     "sicurezza_legalita": 56.0,
+     "istituzioni_partecipazione": 57.0,
+     "cultura_patrimonio_turismo": 63.8,
+     "benessere_soggettivo": 58.6
+    },
+    "strongest_categories": [
+     {
+      "slug": "salute_cura",
+      "name": "Salute, demografia e cura",
+      "score": 65.3
+     },
+     {
+      "slug": "cultura_patrimonio_turismo",
+      "name": "Cultura, patrimonio e turismo",
+      "score": 63.8
+     },
+     {
+      "slug": "ricerca_innovazione_digitale",
+      "name": "Ricerca, innovazione e digitale",
+      "score": 62.6
+     }
+    ],
+    "weakest_categories": [
+     {
+      "slug": "imprese_competitivita",
+      "name": "Imprese e competitività",
+      "score": 45.0
+     },
+     {
+      "slug": "sicurezza_legalita",
+      "name": "Sicurezza e legalità",
+      "score": 56.0
+     },
+     {
+      "slug": "istituzioni_partecipazione",
+      "name": "Istituzioni e partecipazione",
+      "score": 57.0
+     }
+    ],
+    "top_positive_indicators": [
+     {
+      "id": "53",
+      "name": "Quantità di frazione umida trattata in impianti di compostaggio per la produzione di compost di qualità",
+      "theme": "Ambiente ed energia",
+      "score": 78.5,
+      "year_max": 2024,
+      "direction": "higher_better",
+      "path": "/indicatore/quantita-di-frazione-umida-trattata-in-impianti-di-compostaggio-per-la-produzion/ter-53"
+     },
+     {
+      "id": "414",
+      "name": "Presa in carico di tutti gli utenti dei servizi per l'infanzia",
+      "theme": "Salute, demografia e cura",
+      "score": 75.3,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414"
+     },
+     {
+      "id": "595",
+      "name": "Incidenza del valore aggiunto dei settori culturali e creativi sul totale",
+      "theme": "Cultura, patrimonio e turismo",
+      "score": 71.0,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/incidenza-del-valore-aggiunto-dei-settori-culturali-e-creativi-sul-totale/ter-595"
+     },
+     {
+      "id": "374",
+      "name": "Consumi di energia elettrica per illuminazione pubblica per superficie dei centri abitati",
+      "theme": "Ambiente ed energia",
+      "score": 70.5,
+      "year_max": 2024,
+      "direction": "higher_worse",
+      "path": "/indicatore/consumi-di-energia-elettrica-per-illuminazione-pubblica-per-superficie-dei-centr/ter-374"
+     },
+     {
+      "id": "bes:01SAL003",
+      "name": "Indice di salute mentale (MH)",
+      "theme": "Salute, demografia e cura",
+      "score": 69.6,
+      "year_max": 2025,
+      "direction": "higher_better",
+      "path": "/indicatore/indice-di-salute-mentale-mh/bes-01SAL003"
+     }
+    ],
+    "top_negative_indicators": [
+     {
+      "id": "multiscopo:MULTI_ABIT_PROBLEMI",
+      "name": "Famiglie con scarsa luminosità nell'abitazione",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 30.2,
+      "year_max": 2025,
+      "direction": "lower_better",
+      "path": "/indicatore/famiglie-con-scarsa-luminosita-nell-abitazione/ims-MULTI_ABIT_PROBLEMI"
+     },
+     {
+      "id": "multiscopo:MULTI_ABIT_UMIDITA",
+      "name": "Famiglie con umidità nell'abitazione",
+      "theme": "Reddito, inclusione e accessibilità",
+      "score": 33.4,
+      "year_max": 2025,
+      "direction": "lower_better",
+      "path": "/indicatore/famiglie-con-umidita-nell-abitazione/ims-MULTI_ABIT_UMIDITA"
+     },
+     {
+      "id": "600",
+      "name": "Addetti delle nuove imprese nei settori culturali e creativi",
+      "theme": "Cultura, patrimonio e turismo",
+      "score": 33.7,
+      "year_max": 2023,
+      "direction": "higher_better",
+      "path": "/indicatore/addetti-delle-nuove-imprese-nei-settori-culturali-e-creativi/ter-600"
+     },
+     {
+      "id": "33",
+      "name": "Elementi fertilizzanti usati in agricoltura",
+      "theme": "Ambiente ed energia",
+      "score": 33.8,
+      "year_max": 2024,
+      "direction": "higher_worse",
+      "path": "/indicatore/elementi-fertilizzanti-usati-in-agricoltura/ter-33"
+     },
+     {
+      "id": "373",
+      "name": "Consumi di energia elettrica della PA per ULA",
+      "theme": "Ambiente ed energia",
+      "score": 34.0,
+      "year_max": 2023,
+      "direction": "higher_worse",
+      "path": "/indicatore/consumi-di-energia-elettrica-della-pa-per-ula/ter-373"
+     }
+    ],
+    "rank": 3,
+    "delta_rank": 0,
+    "color": "var(--seq-5)"
+   }
+  ],
+  "has_province_data": true,
+  "region_total": 20,
+  "province_total": 107,
+  "site_url": "https://divarioitalia.it",
+  "site_name": "Divario Italia",
+  "canonical": "https://divarioitalia.it/qualita-della-vita",
+  "SITE_NAME": "Divario Italia",
+  "SITE_URL": "https://divarioitalia.it",
+  "data_license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "data_license_label": "Creative Commons BY 4.0",
+  "publisher": {
+   "@type": "Organization",
+   "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+   "name": "Divario Italia",
+   "url": "https://divarioitalia.it/chi-siamo",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://divarioitalia.it/static/img/logo-mark.png"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "editorial",
+    "email": "divarioitalia@protonmail.com",
+    "url": "https://divarioitalia.it/contatti",
+    "availableLanguage": "it"
+   }
+  },
+  "publisher_jsonld": "{\"@type\": \"Organization\", \"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\", \"name\": \"Divario Italia\", \"url\": \"https://divarioitalia.it/chi-siamo\", \"logo\": {\"@type\": \"ImageObject\", \"url\": \"https://divarioitalia.it/static/img/logo-mark.png\"}, \"contactPoint\": {\"@type\": \"ContactPoint\", \"contactType\": \"editorial\", \"email\": \"divarioitalia@protonmail.com\", \"url\": \"https://divarioitalia.it/contatti\", \"availableLanguage\": \"it\"}}",
+  "organization_ref_jsonld": "{\"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\"}",
+  "corrections_url": "https://github.com/nmaiese/diset-viz/issues/new",
+  "contact_email": "divarioitalia@protonmail.com",
+  "consent_cmp_name": "Iubenda",
+  "consent_cmp_url": "https://www.iubenda.com/privacy-policy/"
+ }
+}

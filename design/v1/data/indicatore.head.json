@@ -1,0 +1,110 @@
+{
+ "title": "PIL pro capite per regione, da 54.637 a 21.702 euro",
+ "description": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane.",
+ "canonical": "https://divarioitalia.it/indicatore/pil-pro-capite/ter-901",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "PIL pro capite per regione: di che cosa è fatta la distanza fra Trentino e Calabria",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "PIL pro capite",
+   "description": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane. Chi cerca questa cifra di solito vuole sapere anche la seconda cosa, cioè perché sia così lontana dalle altre. La risposta sta dentro una divisione, e i pezzi sono due: quanta parte degli abitanti lavora, e quanto vale quello che produce chi lavora.",
+   "url": "https://divarioitalia.it/indicatore/pil-pro-capite/ter-901",
+   "temporalCoverage": "1995/2024",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Italia"
+   },
+   "creator": {
+    "@type": "Organization",
+    "name": "Istat, Conti economici territoriali",
+    "url": "https://www.istat.it/it/archivio/conti+territoriali"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "dateModified": "2026-07-17",
+   "isBasedOn": "https://www.istat.it/it/archivio/conti+territoriali",
+   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
+   "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": "PIL pro capite",
+    "unitText": "euro",
+    "minValue": 21702.2,
+    "maxValue": 54636.7,
+    "measurementTechnique": "Istat, Conti economici territoriali",
+    "description": "Prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025"
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "keywords": [
+    "Reddito, inclusione e accessibilità",
+    "regioni italiane",
+    "Istat"
+   ],
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "name": "Download CSV",
+     "description": "Serie dell'indicatore in formato CSV",
+     "encodingFormat": "text/csv",
+     "contentUrl": "https://divarioitalia.it/download/indicator/901.csv"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "Download JSON",
+     "description": "Serie dell'indicatore in formato JSON",
+     "encodingFormat": "application/json",
+     "contentUrl": "https://divarioitalia.it/download/indicator/901.json"
+    }
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Temi",
+     "item": "https://divarioitalia.it/temi"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Reddito, inclusione e accessibilità",
+     "item": "https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "name": "PIL pro capite",
+     "item": "https://divarioitalia.it/indicatore/pil-pro-capite/ter-901"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 161411
+}

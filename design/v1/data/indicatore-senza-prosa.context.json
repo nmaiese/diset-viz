@@ -1,0 +1,7277 @@
+{
+ "template": "indicator_page.html",
+ "route": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+ "context": {
+  "meta": {
+   "id": "bes:01SAL001",
+   "raw_id": "01SAL001",
+   "family": "bes",
+   "family_label": "Istat, benessere e qualità della vita",
+   "name": "Speranza di vita alla nascita",
+   "unit": "Numero medio di anni",
+   "value_unit": "Numero medio di anni",
+   "change_unit": "Numero medio di anni",
+   "percentage_like": false,
+   "direction": "higher_better",
+   "scoreable": true,
+   "explain": {
+    "plain": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato.",
+    "example": "Il valore indica un numero medio di anni, non la durata garantita per ogni persona.",
+    "scope": "Il confronto applica la stessa definizione in tutte le regioni e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+    "caveat": "La media può nascondere differenze importanti tra persone e aree dello stesso territorio. Il confronto tra regioni descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "higher_better"
+   },
+   "theme": "Salute, demografia e cura",
+   "theme_path": "/tema/salute-demografia-e-cura",
+   "source_theme": "Salute",
+   "macro_area": "Persone e conoscenza",
+   "source": "Istat - Tavole di mortalità della popolazione italiana",
+   "source_label": "Istat, BES nazionale, aggiornamento intermedio 2026",
+   "source_url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/",
+   "source_data_url": null,
+   "source_dataflow": null,
+   "institution": "Istat",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "archive": "Benessere equo e sostenibile, aggiornamento intermedio 2026",
+   "quality_life_scored": true,
+   "quality_life_category_label": "Salute, demografia e cura",
+   "indexable": true,
+   "indexable_reason": null,
+   "canonical_path": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+   "downloads": {
+    "csv": "/download/indicator/bes:01SAL001.csv",
+    "json": "/download/indicator/bes:01SAL001.json"
+   },
+   "year_min": 2004,
+   "year_max": 2025,
+   "freshness_status": "current",
+   "freshness_label": "Aggiornato"
+  },
+  "levels": [
+   {
+    "key": "regione",
+    "label": "Regioni",
+    "singular": "regione",
+    "plural": "regioni",
+    "profile_path": "/regione/",
+    "has_map": true,
+    "explain": {
+     "plain": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato.",
+     "example": "Il valore indica un numero medio di anni, non la durata garantita per ogni persona.",
+     "scope": "Il confronto applica la stessa definizione in tutte le regioni e per ciascun anno.",
+     "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+     "caveat": "La media può nascondere differenze importanti tra persone e aree dello stesso territorio. Il confronto tra regioni descrive una differenza osservata, ma non ne dimostra le cause.",
+     "direction": "higher_better"
+    },
+    "years": [
+     2004,
+     2005,
+     2006,
+     2007,
+     2008,
+     2009,
+     2010,
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "year_min": 2004,
+    "year_max": 2025,
+    "observations": [
+     {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige",
+      "value": 84.8
+     },
+     {
+      "key": "marche",
+      "name": "Marche",
+      "value": 84.4
+     },
+     {
+      "key": "veneto",
+      "name": "Veneto",
+      "value": 84.4
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia",
+      "value": 84.3
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana",
+      "value": 84.3
+     },
+     {
+      "key": "emilia-romagna",
+      "name": "Emilia-Romagna",
+      "value": 84.2
+     },
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia",
+      "value": 84.1
+     },
+     {
+      "key": "umbria",
+      "name": "Umbria",
+      "value": 84.1
+     },
+     {
+      "key": "abruzzo",
+      "name": "Abruzzo",
+      "value": 83.7
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria",
+      "value": 83.7
+     },
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta",
+      "value": 83.7
+     },
+     {
+      "key": "lazio",
+      "name": "Lazio",
+      "value": 83.6
+     },
+     {
+      "key": "piemonte",
+      "name": "Piemonte",
+      "value": 83.6
+     },
+     {
+      "key": "puglia",
+      "name": "Puglia",
+      "value": 83.5
+     },
+     {
+      "key": "basilicata",
+      "name": "Basilicata",
+      "value": 83.1
+     },
+     {
+      "key": "sardegna",
+      "name": "Sardegna",
+      "value": 83.1
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria",
+      "value": 82.9
+     },
+     {
+      "key": "molise",
+      "name": "Molise",
+      "value": 82.6
+     },
+     {
+      "key": "sicilia",
+      "name": "Sicilia",
+      "value": 82.6
+     },
+     {
+      "key": "campania",
+      "name": "Campania",
+      "value": 82.1
+     }
+    ],
+    "best": {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 84.8
+    },
+    "worst": {
+     "key": "campania",
+     "name": "Campania",
+     "value": 82.1
+    },
+    "stats": {
+     "year": 2025,
+     "year_avg": 83.64,
+     "year_count": 20,
+     "median": 83.7,
+     "above_avg_count": 11,
+     "below_avg_count": 9,
+     "year_min": 2004,
+     "year_min_avg": 80.72999999999999,
+     "year_max": 2025,
+     "has_multi_year": true,
+     "avg_change_abs": 2.910000000000011,
+     "avg_change_pct": 3.604607952434053,
+     "gap_abs": 2.700000000000003,
+     "gap_ratio": null,
+     "year_min_gap_abs": 2.5999999999999943,
+     "gap_trend": 0.10000000000000853,
+     "highest_delta": {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta",
+      "value": null,
+      "delta": 3.799999999999997,
+      "kind": "aumento"
+     },
+     "lowest_delta": {
+      "key": "molise",
+      "name": "Molise",
+      "value": null,
+      "delta": 2.1999999999999886,
+      "kind": "aumento"
+     }
+    },
+    "annual_change": {
+     "year": 2025,
+     "previous_year": 2024,
+     "year_gap": 1,
+     "common_count": 20,
+     "current_count": 20,
+     "previous_count": 20,
+     "same_coverage": true,
+     "previous_avg": 83.455,
+     "current_avg": 83.64,
+     "average_delta": 0.18500000000000227,
+     "average_delta_pct": 0.22167635252531578,
+     "increase_count": 19,
+     "decrease_count": 1,
+     "stable_count": 0,
+     "largest_increases": [
+      {
+       "key": "valle-d-aosta",
+       "name": "Valle d'Aosta",
+       "value": null,
+       "delta": 0.9000000000000057,
+       "kind": "aumento",
+       "previous_value": 82.8,
+       "current_value": 83.7
+      },
+      {
+       "key": "calabria",
+       "name": "Calabria",
+       "value": null,
+       "delta": 0.30000000000001137,
+       "kind": "aumento",
+       "previous_value": 82.6,
+       "current_value": 82.9
+      },
+      {
+       "key": "campania",
+       "name": "Campania",
+       "value": null,
+       "delta": 0.29999999999999716,
+       "kind": "aumento",
+       "previous_value": 81.8,
+       "current_value": 82.1
+      }
+     ],
+     "largest_decreases": [
+      {
+       "key": "basilicata",
+       "name": "Basilicata",
+       "value": null,
+       "delta": -0.10000000000000853,
+       "kind": "calo",
+       "previous_value": 83.2,
+       "current_value": 83.1
+      }
+     ]
+    },
+    "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+    "trend_note": "una variazione media favorevole",
+    "coverage": null,
+    "territory_total": 20,
+    "territories": [
+     {
+      "key": "abruzzo",
+      "name": "Abruzzo"
+     },
+     {
+      "key": "basilicata",
+      "name": "Basilicata"
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria"
+     },
+     {
+      "key": "campania",
+      "name": "Campania"
+     },
+     {
+      "key": "emilia-romagna",
+      "name": "Emilia-Romagna"
+     },
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia"
+     },
+     {
+      "key": "lazio",
+      "name": "Lazio"
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria"
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia"
+     },
+     {
+      "key": "marche",
+      "name": "Marche"
+     },
+     {
+      "key": "molise",
+      "name": "Molise"
+     },
+     {
+      "key": "piemonte",
+      "name": "Piemonte"
+     },
+     {
+      "key": "puglia",
+      "name": "Puglia"
+     },
+     {
+      "key": "sardegna",
+      "name": "Sardegna"
+     },
+     {
+      "key": "sicilia",
+      "name": "Sicilia"
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana"
+     },
+     {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige"
+     },
+     {
+      "key": "umbria",
+      "name": "Umbria"
+     },
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta"
+     },
+     {
+      "key": "veneto",
+      "name": "Veneto"
+     }
+    ],
+    "default_territory": {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 84.8
+    },
+    "matrix": {
+     "2004": {
+      "piemonte": 80.5,
+      "valle-d-aosta": 79.9,
+      "lombardia": 80.9,
+      "trentino-alto-adige": 81.1,
+      "veneto": 81.2,
+      "friuli-venezia-giulia": 80.6,
+      "liguria": 80.7,
+      "emilia-romagna": 81.2,
+      "toscana": 81.5,
+      "umbria": 81.5,
+      "marche": 81.8,
+      "lazio": 80.1,
+      "abruzzo": 81.0,
+      "molise": 80.4,
+      "campania": 79.2,
+      "puglia": 81.1,
+      "basilicata": 80.4,
+      "calabria": 80.7,
+      "sicilia": 80.1,
+      "sardegna": 80.7
+     },
+     "2005": {
+      "piemonte": 80.6,
+      "valle-d-aosta": 79.7,
+      "lombardia": 80.9,
+      "trentino-alto-adige": 81.4,
+      "veneto": 81.3,
+      "friuli-venezia-giulia": 80.7,
+      "liguria": 80.7,
+      "emilia-romagna": 81.3,
+      "toscana": 81.5,
+      "umbria": 81.1,
+      "marche": 82.1,
+      "lazio": 80.4,
+      "abruzzo": 81.1,
+      "molise": 80.6,
+      "campania": 79.1,
+      "puglia": 81.0,
+      "basilicata": 80.6,
+      "calabria": 80.5,
+      "sicilia": 80.0,
+      "sardegna": 80.6
+     },
+     "2006": {
+      "piemonte": 80.8,
+      "valle-d-aosta": 80.5,
+      "lombardia": 81.3,
+      "trentino-alto-adige": 81.6,
+      "veneto": 81.7,
+      "friuli-venezia-giulia": 81.0,
+      "liguria": 81.0,
+      "emilia-romagna": 81.7,
+      "toscana": 81.9,
+      "umbria": 81.7,
+      "marche": 82.1,
+      "lazio": 80.8,
+      "abruzzo": 81.4,
+      "molise": 80.7,
+      "campania": 79.5,
+      "puglia": 81.3,
+      "basilicata": 80.9,
+      "calabria": 81.0,
+      "sicilia": 80.4,
+      "sardegna": 81.1
+     },
+     "2007": {
+      "piemonte": 81.1,
+      "valle-d-aosta": 80.5,
+      "lombardia": 81.6,
+      "trentino-alto-adige": 82.0,
+      "veneto": 81.8,
+      "friuli-venezia-giulia": 81.3,
+      "liguria": 81.2,
+      "emilia-romagna": 81.8,
+      "toscana": 81.9,
+      "umbria": 81.8,
+      "marche": 82.4,
+      "lazio": 80.9,
+      "abruzzo": 81.4,
+      "molise": 81.5,
+      "campania": 79.5,
+      "puglia": 81.2,
+      "basilicata": 81.1,
+      "calabria": 80.9,
+      "sicilia": 80.2,
+      "sardegna": 81.2
+     },
+     "2008": {
+      "piemonte": 81.1,
+      "valle-d-aosta": 81.1,
+      "lombardia": 81.5,
+      "trentino-alto-adige": 82.1,
+      "veneto": 81.8,
+      "friuli-venezia-giulia": 81.3,
+      "liguria": 81.2,
+      "emilia-romagna": 81.9,
+      "toscana": 81.9,
+      "umbria": 81.7,
+      "marche": 82.3,
+      "lazio": 81.0,
+      "abruzzo": 81.5,
+      "molise": 81.1,
+      "campania": 79.7,
+      "puglia": 81.6,
+      "basilicata": 81.6,
+      "calabria": 81.0,
+      "sicilia": 80.5,
+      "sardegna": 81.3
+     },
+     "2009": {
+      "piemonte": 81.3,
+      "valle-d-aosta": 81.1,
+      "lombardia": 81.7,
+      "trentino-alto-adige": 82.5,
+      "veneto": 82.1,
+      "friuli-venezia-giulia": 81.5,
+      "liguria": 81.2,
+      "emilia-romagna": 82.1,
+      "toscana": 82.1,
+      "umbria": 82.2,
+      "marche": 82.5,
+      "lazio": 81.0,
+      "abruzzo": 81.2,
+      "molise": 81.6,
+      "campania": 79.9,
+      "puglia": 81.6,
+      "basilicata": 81.7,
+      "calabria": 81.0,
+      "sicilia": 80.5,
+      "sardegna": 81.3
+     },
+     "2010": {
+      "piemonte": 81.7,
+      "valle-d-aosta": 81.3,
+      "lombardia": 82.0,
+      "trentino-alto-adige": 82.6,
+      "veneto": 82.4,
+      "friuli-venezia-giulia": 81.8,
+      "liguria": 81.7,
+      "emilia-romagna": 82.4,
+      "toscana": 82.5,
+      "umbria": 82.3,
+      "marche": 82.8,
+      "lazio": 81.3,
+      "abruzzo": 81.7,
+      "molise": 81.6,
+      "campania": 80.1,
+      "puglia": 82.1,
+      "basilicata": 81.8,
+      "calabria": 81.6,
+      "sicilia": 80.9,
+      "sardegna": 81.8
+     },
+     "2011": {
+      "piemonte": 81.9,
+      "valle-d-aosta": 81.7,
+      "lombardia": 82.5,
+      "trentino-alto-adige": 83.1,
+      "veneto": 82.6,
+      "friuli-venezia-giulia": 82.0,
+      "liguria": 81.8,
+      "emilia-romagna": 82.6,
+      "toscana": 82.7,
+      "umbria": 82.7,
+      "marche": 82.9,
+      "lazio": 81.5,
+      "abruzzo": 81.9,
+      "molise": 81.6,
+      "campania": 80.2,
+      "puglia": 82.1,
+      "basilicata": 82.0,
+      "calabria": 81.6,
+      "sicilia": 80.9,
+      "sardegna": 81.8
+     },
+     "2012": {
+      "piemonte": 82.1,
+      "valle-d-aosta": 81.9,
+      "lombardia": 82.4,
+      "trentino-alto-adige": 83.1,
+      "veneto": 82.6,
+      "friuli-venezia-giulia": 82.0,
+      "liguria": 82.0,
+      "emilia-romagna": 82.6,
+      "toscana": 82.6,
+      "umbria": 82.6,
+      "marche": 83.0,
+      "lazio": 81.6,
+      "abruzzo": 82.2,
+      "molise": 81.9,
+      "campania": 80.4,
+      "puglia": 82.3,
+      "basilicata": 82.1,
+      "calabria": 81.6,
+      "sicilia": 81.0,
+      "sardegna": 81.9
+     },
+     "2013": {
+      "piemonte": 82.2,
+      "valle-d-aosta": 82.1,
+      "lombardia": 82.8,
+      "trentino-alto-adige": 83.3,
+      "veneto": 82.9,
+      "friuli-venezia-giulia": 82.2,
+      "liguria": 82.1,
+      "emilia-romagna": 83.0,
+      "toscana": 83.0,
+      "umbria": 82.8,
+      "marche": 83.2,
+      "lazio": 82.1,
+      "abruzzo": 82.4,
+      "molise": 82.2,
+      "campania": 80.6,
+      "puglia": 82.5,
+      "basilicata": 82.2,
+      "calabria": 81.9,
+      "sicilia": 81.4,
+      "sardegna": 82.2
+     },
+     "2014": {
+      "piemonte": 82.6,
+      "valle-d-aosta": 82.1,
+      "lombardia": 83.2,
+      "trentino-alto-adige": 83.5,
+      "veneto": 83.2,
+      "friuli-venezia-giulia": 82.7,
+      "liguria": 82.6,
+      "emilia-romagna": 83.2,
+      "toscana": 83.2,
+      "umbria": 83.2,
+      "marche": 83.3,
+      "lazio": 82.3,
+      "abruzzo": 82.6,
+      "molise": 82.3,
+      "campania": 80.9,
+      "puglia": 82.6,
+      "basilicata": 82.4,
+      "calabria": 81.9,
+      "sicilia": 81.6,
+      "sardegna": 82.5
+     },
+     "2015": {
+      "piemonte": 82.1,
+      "valle-d-aosta": 81.1,
+      "lombardia": 82.8,
+      "trentino-alto-adige": 83.4,
+      "veneto": 82.9,
+      "friuli-venezia-giulia": 82.4,
+      "liguria": 82.2,
+      "emilia-romagna": 82.9,
+      "toscana": 82.8,
+      "umbria": 82.8,
+      "marche": 83.0,
+      "lazio": 82.0,
+      "abruzzo": 82.3,
+      "molise": 82.0,
+      "campania": 80.4,
+      "puglia": 82.3,
+      "basilicata": 82.0,
+      "calabria": 81.7,
+      "sicilia": 81.2,
+      "sardegna": 82.2
+     },
+     "2016": {
+      "piemonte": 82.7,
+      "valle-d-aosta": 82.2,
+      "lombardia": 83.3,
+      "trentino-alto-adige": 83.6,
+      "veneto": 83.4,
+      "friuli-venezia-giulia": 82.9,
+      "liguria": 82.8,
+      "emilia-romagna": 83.2,
+      "toscana": 83.4,
+      "umbria": 83.4,
+      "marche": 83.4,
+      "lazio": 82.4,
+      "abruzzo": 82.9,
+      "molise": 82.7,
+      "campania": 81.1,
+      "puglia": 82.9,
+      "basilicata": 82.6,
+      "calabria": 82.3,
+      "sicilia": 81.8,
+      "sardegna": 82.6
+     },
+     "2017": {
+      "piemonte": 82.5,
+      "valle-d-aosta": 82.0,
+      "lombardia": 83.3,
+      "trentino-alto-adige": 83.8,
+      "veneto": 83.4,
+      "friuli-venezia-giulia": 83.0,
+      "liguria": 82.6,
+      "emilia-romagna": 83.2,
+      "toscana": 83.3,
+      "umbria": 83.3,
+      "marche": 83.2,
+      "lazio": 82.3,
+      "abruzzo": 82.5,
+      "molise": 82.2,
+      "campania": 80.9,
+      "puglia": 82.6,
+      "basilicata": 82.2,
+      "calabria": 81.9,
+      "sicilia": 81.4,
+      "sardegna": 82.7
+     },
+     "2018": {
+      "piemonte": 82.6,
+      "valle-d-aosta": 82.1,
+      "lombardia": 83.4,
+      "trentino-alto-adige": 84.0,
+      "veneto": 83.6,
+      "friuli-venezia-giulia": 83.1,
+      "liguria": 82.6,
+      "emilia-romagna": 83.5,
+      "toscana": 83.6,
+      "umbria": 83.8,
+      "marche": 83.8,
+      "lazio": 82.9,
+      "abruzzo": 83.1,
+      "molise": 82.7,
+      "campania": 81.4,
+      "puglia": 83.0,
+      "basilicata": 82.6,
+      "calabria": 82.5,
+      "sicilia": 81.8,
+      "sardegna": 83.0
+     },
+     "2019": {
+      "piemonte": 82.9,
+      "valle-d-aosta": 82.7,
+      "lombardia": 83.6,
+      "trentino-alto-adige": 84.2,
+      "veneto": 83.8,
+      "friuli-venezia-giulia": 83.5,
+      "liguria": 83.1,
+      "emilia-romagna": 83.6,
+      "toscana": 83.6,
+      "umbria": 84.0,
+      "marche": 84.0,
+      "lazio": 83.2,
+      "abruzzo": 83.3,
+      "molise": 83.0,
+      "campania": 81.6,
+      "puglia": 83.2,
+      "basilicata": 82.5,
+      "calabria": 82.4,
+      "sicilia": 82.0,
+      "sardegna": 83.0
+     },
+     "2020": {
+      "piemonte": 81.4,
+      "valle-d-aosta": 80.9,
+      "lombardia": 81.4,
+      "trentino-alto-adige": 82.8,
+      "veneto": 82.9,
+      "friuli-venezia-giulia": 82.6,
+      "liguria": 81.7,
+      "emilia-romagna": 82.5,
+      "toscana": 83.1,
+      "umbria": 83.4,
+      "marche": 83.0,
+      "lazio": 82.6,
+      "abruzzo": 82.6,
+      "molise": 82.2,
+      "campania": 80.9,
+      "puglia": 82.3,
+      "basilicata": 82.2,
+      "calabria": 82.1,
+      "sicilia": 81.5,
+      "sardegna": 82.3
+     },
+     "2021": {
+      "piemonte": 82.5,
+      "valle-d-aosta": 82.3,
+      "lombardia": 83.1,
+      "trentino-alto-adige": 83.6,
+      "veneto": 83.3,
+      "friuli-venezia-giulia": 82.3,
+      "liguria": 82.7,
+      "emilia-romagna": 83.0,
+      "toscana": 83.2,
+      "umbria": 83.2,
+      "marche": 83.1,
+      "lazio": 82.6,
+      "abruzzo": 82.6,
+      "molise": 81.4,
+      "campania": 80.7,
+      "puglia": 82.0,
+      "basilicata": 82.3,
+      "calabria": 81.6,
+      "sicilia": 81.2,
+      "sardegna": 82.6
+     },
+     "2022": {
+      "piemonte": 82.5,
+      "valle-d-aosta": 82.3,
+      "lombardia": 83.2,
+      "trentino-alto-adige": 83.8,
+      "veneto": 83.4,
+      "friuli-venezia-giulia": 83.0,
+      "liguria": 82.5,
+      "emilia-romagna": 83.3,
+      "toscana": 83.3,
+      "umbria": 83.3,
+      "marche": 83.3,
+      "lazio": 82.9,
+      "abruzzo": 82.6,
+      "molise": 81.9,
+      "campania": 81.0,
+      "puglia": 82.6,
+      "basilicata": 82.1,
+      "calabria": 81.7,
+      "sicilia": 81.4,
+      "sardegna": 82.0
+     },
+     "2023": {
+      "piemonte": 83.0,
+      "valle-d-aosta": 83.2,
+      "lombardia": 83.8,
+      "trentino-alto-adige": 84.4,
+      "veneto": 83.8,
+      "friuli-venezia-giulia": 83.4,
+      "liguria": 83.1,
+      "emilia-romagna": 83.6,
+      "toscana": 83.8,
+      "umbria": 83.7,
+      "marche": 83.9,
+      "lazio": 82.9,
+      "abruzzo": 83.0,
+      "molise": 82.3,
+      "campania": 81.3,
+      "puglia": 82.8,
+      "basilicata": 82.5,
+      "calabria": 81.9,
+      "sicilia": 81.6,
+      "sardegna": 82.5
+     },
+     "2024": {
+      "piemonte": 83.5,
+      "valle-d-aosta": 82.8,
+      "lombardia": 84.1,
+      "trentino-alto-adige": 84.7,
+      "veneto": 84.3,
+      "friuli-venezia-giulia": 83.9,
+      "liguria": 83.6,
+      "emilia-romagna": 84.1,
+      "toscana": 84.1,
+      "umbria": 84.0,
+      "marche": 84.3,
+      "lazio": 83.4,
+      "abruzzo": 83.5,
+      "molise": 82.5,
+      "campania": 81.8,
+      "puglia": 83.3,
+      "basilicata": 83.2,
+      "calabria": 82.6,
+      "sicilia": 82.4,
+      "sardegna": 83.0
+     },
+     "2025": {
+      "piemonte": 83.6,
+      "valle-d-aosta": 83.7,
+      "lombardia": 84.3,
+      "trentino-alto-adige": 84.8,
+      "veneto": 84.4,
+      "friuli-venezia-giulia": 84.1,
+      "liguria": 83.7,
+      "emilia-romagna": 84.2,
+      "toscana": 84.3,
+      "umbria": 84.1,
+      "marche": 84.4,
+      "lazio": 83.6,
+      "abruzzo": 83.7,
+      "molise": 82.6,
+      "campania": 82.1,
+      "puglia": 83.5,
+      "basilicata": 83.1,
+      "calabria": 82.9,
+      "sicilia": 82.6,
+      "sardegna": 83.1
+     }
+    },
+    "annual_means": [
+     {
+      "year": 2004,
+      "avg": 80.72999999999999
+     },
+     {
+      "year": 2005,
+      "avg": 80.76
+     },
+     {
+      "year": 2006,
+      "avg": 81.12
+     },
+     {
+      "year": 2007,
+      "avg": 81.265
+     },
+     {
+      "year": 2008,
+      "avg": 81.36
+     },
+     {
+      "year": 2009,
+      "avg": 81.505
+     },
+     {
+      "year": 2010,
+      "avg": 81.82000000000001
+     },
+     {
+      "year": 2011,
+      "avg": 82.005
+     },
+     {
+      "year": 2012,
+      "avg": 82.095
+     },
+     {
+      "year": 2013,
+      "avg": 82.35499999999999
+     },
+     {
+      "year": 2014,
+      "avg": 82.595
+     },
+     {
+      "year": 2015,
+      "avg": 82.225
+     },
+     {
+      "year": 2016,
+      "avg": 82.78
+     },
+     {
+      "year": 2017,
+      "avg": 82.615
+     },
+     {
+      "year": 2018,
+      "avg": 82.955
+     },
+     {
+      "year": 2019,
+      "avg": 83.16
+     },
+     {
+      "year": 2020,
+      "avg": 82.22
+     },
+     {
+      "year": 2021,
+      "avg": 82.465
+     },
+     {
+      "year": 2022,
+      "avg": 82.60499999999999
+     },
+     {
+      "year": 2023,
+      "avg": 83.025
+     },
+     {
+      "year": 2024,
+      "avg": 83.455
+     },
+     {
+      "year": 2025,
+      "avg": 83.64
+     }
+    ],
+    "map_colors": {
+     "trentino-alto-adige": "var(--seq-6)",
+     "marche": "var(--seq-6)",
+     "veneto": "var(--seq-6)",
+     "lombardia": "var(--seq-5)",
+     "toscana": "var(--seq-5)",
+     "emilia-romagna": "var(--seq-5)",
+     "friuli-venezia-giulia": "var(--seq-5)",
+     "umbria": "var(--seq-5)",
+     "abruzzo": "var(--seq-4)",
+     "liguria": "var(--seq-4)",
+     "valle-d-aosta": "var(--seq-4)",
+     "lazio": "var(--seq-4)",
+     "piemonte": "var(--seq-4)",
+     "puglia": "var(--seq-4)",
+     "basilicata": "var(--seq-3)",
+     "sardegna": "var(--seq-3)",
+     "calabria": "var(--seq-2)",
+     "molise": "var(--seq-2)",
+     "sicilia": "var(--seq-2)",
+     "campania": "var(--seq-1)"
+    },
+    "cover_bars": [
+     {
+      "region": "Trentino Alto Adige",
+      "region_key": "trentino-alto-adige",
+      "value": 84.8,
+      "width_pct": 100,
+      "is_best": true,
+      "is_worst": false
+     },
+     {
+      "region": "Marche",
+      "region_key": "marche",
+      "value": 84.4,
+      "width_pct": 86,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Veneto",
+      "region_key": "veneto",
+      "value": 84.4,
+      "width_pct": 86,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Lombardia",
+      "region_key": "lombardia",
+      "value": 84.3,
+      "width_pct": 83,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Campania",
+      "region_key": "campania",
+      "value": 82.1,
+      "width_pct": 6,
+      "is_best": false,
+      "is_worst": true
+     }
+    ],
+    "bar_max": 84.8,
+    "query_map": [
+     {
+      "intent": "definizione",
+      "label": "Che cosa misura Speranza di vita alla nascita?",
+      "target": "sezione-definizione"
+     },
+     {
+      "intent": "dato",
+      "label": "Qual è il dato più recente, nel 2025?",
+      "target": "esplora"
+     },
+     {
+      "intent": "classifica",
+      "label": "Qual è la classifica delle regioni nel 2025?",
+      "target": "classifica-dati"
+     },
+     {
+      "intent": "confronto",
+      "label": "Che cosa è cambiato dal 2024 al 2025?",
+      "target": "sezione-dinamica"
+     },
+     {
+      "intent": "andamento",
+      "label": "Come è cambiato dal 2004 al 2025?",
+      "target": "serie-storica"
+     },
+     {
+      "intent": "metodologia",
+      "label": "Come sono calcolati confronti e medie?",
+      "target": "fonti-verifica"
+     },
+     {
+      "intent": "download",
+      "label": "Dove posso scaricare la serie?",
+      "target": "download-dati"
+     }
+    ]
+   },
+   {
+    "key": "provincia",
+    "label": "Province",
+    "singular": "provincia",
+    "plural": "province",
+    "profile_path": "/provincia/",
+    "has_map": false,
+    "explain": {
+     "plain": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato.",
+     "example": "Il valore indica un numero medio di anni, non la durata garantita per ogni persona.",
+     "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+     "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+     "caveat": "La media può nascondere differenze importanti tra persone e aree dello stesso territorio. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+     "direction": "higher_better"
+    },
+    "years": [
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024
+    ],
+    "year_min": 2015,
+    "year_max": 2024,
+    "observations": [
+     {
+      "key": "lecco",
+      "name": "Lecco",
+      "value": 84.9
+     },
+     {
+      "key": "treviso",
+      "name": "Treviso",
+      "value": 84.9
+     },
+     {
+      "key": "monza-e-della-brianza",
+      "name": "Monza e della Brianza",
+      "value": 84.8
+     },
+     {
+      "key": "firenze",
+      "name": "Firenze",
+      "value": 84.7
+     },
+     {
+      "key": "milano",
+      "name": "Milano",
+      "value": 84.7
+     },
+     {
+      "key": "trento",
+      "name": "Trento",
+      "value": 84.7
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano",
+      "value": 84.6
+     },
+     {
+      "key": "forli-cesena",
+      "name": "Forlì-Cesena",
+      "value": 84.6
+     },
+     {
+      "key": "rimini",
+      "name": "Rimini",
+      "value": 84.6
+     },
+     {
+      "key": "verona",
+      "name": "Verona",
+      "value": 84.6
+     },
+     {
+      "key": "vicenza",
+      "name": "Vicenza",
+      "value": 84.6
+     },
+     {
+      "key": "ancona",
+      "name": "Ancona",
+      "value": 84.5
+     },
+     {
+      "key": "brescia",
+      "name": "Brescia",
+      "value": 84.5
+     },
+     {
+      "key": "pordenone",
+      "name": "Pordenone",
+      "value": 84.5
+     },
+     {
+      "key": "prato",
+      "name": "Prato",
+      "value": 84.5
+     },
+     {
+      "key": "siena",
+      "name": "Siena",
+      "value": 84.5
+     },
+     {
+      "key": "como",
+      "name": "Como",
+      "value": 84.4
+     },
+     {
+      "key": "padova",
+      "name": "Padova",
+      "value": 84.4
+     },
+     {
+      "key": "pesaro-e-urbino",
+      "name": "Pesaro e Urbino",
+      "value": 84.4
+     },
+     {
+      "key": "pistoia",
+      "name": "Pistoia",
+      "value": 84.4
+     },
+     {
+      "key": "ravenna",
+      "name": "Ravenna",
+      "value": 84.4
+     },
+     {
+      "key": "bologna",
+      "name": "Bologna",
+      "value": 84.3
+     },
+     {
+      "key": "parma",
+      "name": "Parma",
+      "value": 84.3
+     },
+     {
+      "key": "perugia",
+      "name": "Perugia",
+      "value": 84.3
+     },
+     {
+      "key": "reggio-emilia",
+      "name": "Reggio Emilia",
+      "value": 84.3
+     },
+     {
+      "key": "arezzo",
+      "name": "Arezzo",
+      "value": 84.2
+     },
+     {
+      "key": "modena",
+      "name": "Modena",
+      "value": 84.2
+     },
+     {
+      "key": "varese",
+      "name": "Varese",
+      "value": 84.2
+     },
+     {
+      "key": "ascoli-piceno",
+      "name": "Ascoli Piceno",
+      "value": 84.1
+     },
+     {
+      "key": "bergamo",
+      "name": "Bergamo",
+      "value": 84.0
+     },
+     {
+      "key": "fermo",
+      "name": "Fermo",
+      "value": 84.0
+     },
+     {
+      "key": "gorizia",
+      "name": "Gorizia",
+      "value": 84.0
+     },
+     {
+      "key": "macerata",
+      "name": "Macerata",
+      "value": 84.0
+     },
+     {
+      "key": "pisa",
+      "name": "Pisa",
+      "value": 84.0
+     },
+     {
+      "key": "udine",
+      "name": "Udine",
+      "value": 84.0
+     },
+     {
+      "key": "venezia",
+      "name": "Venezia",
+      "value": 84.0
+     },
+     {
+      "key": "barletta-andria-trani",
+      "name": "Barletta-Andria-Trani",
+      "value": 83.8
+     },
+     {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara",
+      "value": 83.8
+     },
+     {
+      "key": "piacenza",
+      "name": "Piacenza",
+      "value": 83.8
+     },
+     {
+      "key": "savona",
+      "name": "Savona",
+      "value": 83.8
+     },
+     {
+      "key": "torino",
+      "name": "Torino",
+      "value": 83.8
+     },
+     {
+      "key": "bari",
+      "name": "Bari",
+      "value": 83.7
+     },
+     {
+      "key": "cagliari",
+      "name": "Cagliari",
+      "value": 83.7
+     },
+     {
+      "key": "genova",
+      "name": "Genova",
+      "value": 83.7
+     },
+     {
+      "key": "livorno",
+      "name": "Livorno",
+      "value": 83.7
+     },
+     {
+      "key": "lodi",
+      "name": "Lodi",
+      "value": 83.7
+     },
+     {
+      "key": "lucca",
+      "name": "Lucca",
+      "value": 83.7
+     },
+     {
+      "key": "novara",
+      "name": "Novara",
+      "value": 83.7
+     },
+     {
+      "key": "cremona",
+      "name": "Cremona",
+      "value": 83.6
+     },
+     {
+      "key": "cuneo",
+      "name": "Cuneo",
+      "value": 83.6
+     },
+     {
+      "key": "la-spezia",
+      "name": "La Spezia",
+      "value": 83.6
+     },
+     {
+      "key": "matera",
+      "name": "Matera",
+      "value": 83.6
+     },
+     {
+      "key": "roma",
+      "name": "Roma",
+      "value": 83.6
+     },
+     {
+      "key": "l-aquila",
+      "name": "L'Aquila",
+      "value": 83.5
+     },
+     {
+      "key": "pescara",
+      "name": "Pescara",
+      "value": 83.5
+     },
+     {
+      "key": "teramo",
+      "name": "Teramo",
+      "value": 83.5
+     },
+     {
+      "key": "mantova",
+      "name": "Mantova",
+      "value": 83.4
+     },
+     {
+      "key": "terni",
+      "name": "Terni",
+      "value": 83.4
+     },
+     {
+      "key": "belluno",
+      "name": "Belluno",
+      "value": 83.3
+     },
+     {
+      "key": "chieti",
+      "name": "Chieti",
+      "value": 83.3
+     },
+     {
+      "key": "ferrara",
+      "name": "Ferrara",
+      "value": 83.3
+     },
+     {
+      "key": "vibo-valentia",
+      "name": "Vibo Valentia",
+      "value": 83.3
+     },
+     {
+      "key": "asti",
+      "name": "Asti",
+      "value": 83.2
+     },
+     {
+      "key": "imperia",
+      "name": "Imperia",
+      "value": 83.2
+     },
+     {
+      "key": "lecce",
+      "name": "Lecce",
+      "value": 83.2
+     },
+     {
+      "key": "rovigo",
+      "name": "Rovigo",
+      "value": 83.2
+     },
+     {
+      "key": "verbano-cusio-ossola",
+      "name": "Verbano-Cusio-Ossola",
+      "value": 83.2
+     },
+     {
+      "key": "biella",
+      "name": "Biella",
+      "value": 83.1
+     },
+     {
+      "key": "grosseto",
+      "name": "Grosseto",
+      "value": 83.1
+     },
+     {
+      "key": "ragusa",
+      "name": "Ragusa",
+      "value": 83.1
+     },
+     {
+      "key": "sondrio",
+      "name": "Sondrio",
+      "value": 83.1
+     },
+     {
+      "key": "aosta",
+      "name": "Aosta",
+      "value": 82.9
+     },
+     {
+      "key": "brindisi",
+      "name": "Brindisi",
+      "value": 82.9
+     },
+     {
+      "key": "catanzaro",
+      "name": "Catanzaro",
+      "value": 82.9
+     },
+     {
+      "key": "nuoro",
+      "name": "Nuoro",
+      "value": 82.9
+     },
+     {
+      "key": "potenza",
+      "name": "Potenza",
+      "value": 82.9
+     },
+     {
+      "key": "trieste",
+      "name": "Trieste",
+      "value": 82.9
+     },
+     {
+      "key": "frosinone",
+      "name": "Frosinone",
+      "value": 82.8
+     },
+     {
+      "key": "latina",
+      "name": "Latina",
+      "value": 82.8
+     },
+     {
+      "key": "oristano",
+      "name": "Oristano",
+      "value": 82.8
+     },
+     {
+      "key": "sassari",
+      "name": "Sassari",
+      "value": 82.8
+     },
+     {
+      "key": "taranto",
+      "name": "Taranto",
+      "value": 82.8
+     },
+     {
+      "key": "alessandria",
+      "name": "Alessandria",
+      "value": 82.7
+     },
+     {
+      "key": "campobasso",
+      "name": "Campobasso",
+      "value": 82.7
+     },
+     {
+      "key": "enna",
+      "name": "Enna",
+      "value": 82.7
+     },
+     {
+      "key": "foggia",
+      "name": "Foggia",
+      "value": 82.7
+     },
+     {
+      "key": "sud-sardegna",
+      "name": "Sud Sardegna",
+      "value": 82.7
+     },
+     {
+      "key": "pavia",
+      "name": "Pavia",
+      "value": 82.6
+     },
+     {
+      "key": "rieti",
+      "name": "Rieti",
+      "value": 82.6
+     },
+     {
+      "key": "salerno",
+      "name": "Salerno",
+      "value": 82.6
+     },
+     {
+      "key": "avellino",
+      "name": "Avellino",
+      "value": 82.5
+     },
+     {
+      "key": "vercelli",
+      "name": "Vercelli",
+      "value": 82.5
+     },
+     {
+      "key": "catania",
+      "name": "Catania",
+      "value": 82.4
+     },
+     {
+      "key": "crotone",
+      "name": "Crotone",
+      "value": 82.4
+     },
+     {
+      "key": "palermo",
+      "name": "Palermo",
+      "value": 82.4
+     },
+     {
+      "key": "reggio-calabria",
+      "name": "Reggio Calabria",
+      "value": 82.4
+     },
+     {
+      "key": "trapani",
+      "name": "Trapani",
+      "value": 82.4
+     },
+     {
+      "key": "viterbo",
+      "name": "Viterbo",
+      "value": 82.4
+     },
+     {
+      "key": "benevento",
+      "name": "Benevento",
+      "value": 82.3
+     },
+     {
+      "key": "cosenza",
+      "name": "Cosenza",
+      "value": 82.2
+     },
+     {
+      "key": "isernia",
+      "name": "Isernia",
+      "value": 82.2
+     },
+     {
+      "key": "messina",
+      "name": "Messina",
+      "value": 82.2
+     },
+     {
+      "key": "agrigento",
+      "name": "Agrigento",
+      "value": 82.0
+     },
+     {
+      "key": "caltanissetta",
+      "name": "Caltanissetta",
+      "value": 81.9
+     },
+     {
+      "key": "caserta",
+      "name": "Caserta",
+      "value": 81.5
+     },
+     {
+      "key": "siracusa",
+      "name": "Siracusa",
+      "value": 81.5
+     },
+     {
+      "key": "napoli",
+      "name": "Napoli",
+      "value": 81.4
+     }
+    ],
+    "best": {
+     "key": "lecco",
+     "name": "Lecco",
+     "value": 84.9
+    },
+    "worst": {
+     "key": "napoli",
+     "name": "Napoli",
+     "value": 81.4
+    },
+    "stats": {
+     "year": 2024,
+     "year_avg": 83.45046728971964,
+     "year_count": 107,
+     "median": 83.5,
+     "above_avg_count": 56,
+     "below_avg_count": 51,
+     "year_min": 2015,
+     "year_min_avg": 82.22990654205609,
+     "year_max": 2024,
+     "has_multi_year": true,
+     "avg_change_abs": 1.220560747663555,
+     "avg_change_pct": 1.484327052031009,
+     "gap_abs": 3.5,
+     "gap_ratio": null,
+     "year_min_gap_abs": 3.6999999999999886,
+     "gap_trend": -0.19999999999998863,
+     "highest_delta": {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara",
+      "value": null,
+      "delta": 2.0999999999999943,
+      "kind": "aumento"
+     },
+     "lowest_delta": {
+      "key": "sassari",
+      "name": "Sassari",
+      "value": null,
+      "delta": 0.20000000000000284,
+      "kind": "aumento"
+     }
+    },
+    "annual_change": {
+     "year": 2024,
+     "previous_year": 2023,
+     "year_gap": 1,
+     "common_count": 107,
+     "current_count": 107,
+     "previous_count": 107,
+     "same_coverage": true,
+     "previous_avg": 83.06728971962617,
+     "current_avg": 83.45046728971964,
+     "average_delta": 0.38317757009346565,
+     "average_delta_pct": 0.46128574964560676,
+     "increase_count": 97,
+     "decrease_count": 3,
+     "stable_count": 7,
+     "largest_increases": [
+      {
+       "key": "enna",
+       "name": "Enna",
+       "value": null,
+       "delta": 1.4000000000000057,
+       "kind": "aumento",
+       "previous_value": 81.3,
+       "current_value": 82.7
+      },
+      {
+       "key": "massa-carrara",
+       "name": "Massa-Carrara",
+       "value": null,
+       "delta": 1.0,
+       "kind": "aumento",
+       "previous_value": 82.8,
+       "current_value": 83.8
+      },
+      {
+       "key": "vibo-valentia",
+       "name": "Vibo Valentia",
+       "value": null,
+       "delta": 1.0,
+       "kind": "aumento",
+       "previous_value": 82.3,
+       "current_value": 83.3
+      }
+     ],
+     "largest_decreases": [
+      {
+       "key": "sondrio",
+       "name": "Sondrio",
+       "value": null,
+       "delta": -0.30000000000001137,
+       "kind": "calo",
+       "previous_value": 83.4,
+       "current_value": 83.1
+      },
+      {
+       "key": "aosta",
+       "name": "Aosta",
+       "value": null,
+       "delta": -0.29999999999999716,
+       "kind": "calo",
+       "previous_value": 83.2,
+       "current_value": 82.9
+      },
+      {
+       "key": "grosseto",
+       "name": "Grosseto",
+       "value": null,
+       "delta": -0.20000000000000284,
+       "kind": "calo",
+       "previous_value": 83.3,
+       "current_value": 83.1
+      }
+     ]
+    },
+    "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+    "trend_note": "una variazione media favorevole",
+    "coverage": 1.0,
+    "territory_total": 107,
+    "territories": [
+     {
+      "key": "agrigento",
+      "name": "Agrigento"
+     },
+     {
+      "key": "alessandria",
+      "name": "Alessandria"
+     },
+     {
+      "key": "ancona",
+      "name": "Ancona"
+     },
+     {
+      "key": "aosta",
+      "name": "Aosta"
+     },
+     {
+      "key": "arezzo",
+      "name": "Arezzo"
+     },
+     {
+      "key": "ascoli-piceno",
+      "name": "Ascoli Piceno"
+     },
+     {
+      "key": "asti",
+      "name": "Asti"
+     },
+     {
+      "key": "avellino",
+      "name": "Avellino"
+     },
+     {
+      "key": "bari",
+      "name": "Bari"
+     },
+     {
+      "key": "barletta-andria-trani",
+      "name": "Barletta-Andria-Trani"
+     },
+     {
+      "key": "belluno",
+      "name": "Belluno"
+     },
+     {
+      "key": "benevento",
+      "name": "Benevento"
+     },
+     {
+      "key": "bergamo",
+      "name": "Bergamo"
+     },
+     {
+      "key": "biella",
+      "name": "Biella"
+     },
+     {
+      "key": "bologna",
+      "name": "Bologna"
+     },
+     {
+      "key": "bolzano",
+      "name": "Bolzano"
+     },
+     {
+      "key": "brescia",
+      "name": "Brescia"
+     },
+     {
+      "key": "brindisi",
+      "name": "Brindisi"
+     },
+     {
+      "key": "cagliari",
+      "name": "Cagliari"
+     },
+     {
+      "key": "caltanissetta",
+      "name": "Caltanissetta"
+     },
+     {
+      "key": "campobasso",
+      "name": "Campobasso"
+     },
+     {
+      "key": "caserta",
+      "name": "Caserta"
+     },
+     {
+      "key": "catania",
+      "name": "Catania"
+     },
+     {
+      "key": "catanzaro",
+      "name": "Catanzaro"
+     },
+     {
+      "key": "chieti",
+      "name": "Chieti"
+     },
+     {
+      "key": "como",
+      "name": "Como"
+     },
+     {
+      "key": "cosenza",
+      "name": "Cosenza"
+     },
+     {
+      "key": "cremona",
+      "name": "Cremona"
+     },
+     {
+      "key": "crotone",
+      "name": "Crotone"
+     },
+     {
+      "key": "cuneo",
+      "name": "Cuneo"
+     },
+     {
+      "key": "enna",
+      "name": "Enna"
+     },
+     {
+      "key": "fermo",
+      "name": "Fermo"
+     },
+     {
+      "key": "ferrara",
+      "name": "Ferrara"
+     },
+     {
+      "key": "firenze",
+      "name": "Firenze"
+     },
+     {
+      "key": "foggia",
+      "name": "Foggia"
+     },
+     {
+      "key": "forli-cesena",
+      "name": "Forlì-Cesena"
+     },
+     {
+      "key": "frosinone",
+      "name": "Frosinone"
+     },
+     {
+      "key": "genova",
+      "name": "Genova"
+     },
+     {
+      "key": "gorizia",
+      "name": "Gorizia"
+     },
+     {
+      "key": "grosseto",
+      "name": "Grosseto"
+     },
+     {
+      "key": "imperia",
+      "name": "Imperia"
+     },
+     {
+      "key": "isernia",
+      "name": "Isernia"
+     },
+     {
+      "key": "l-aquila",
+      "name": "L'Aquila"
+     },
+     {
+      "key": "la-spezia",
+      "name": "La Spezia"
+     },
+     {
+      "key": "latina",
+      "name": "Latina"
+     },
+     {
+      "key": "lecce",
+      "name": "Lecce"
+     },
+     {
+      "key": "lecco",
+      "name": "Lecco"
+     },
+     {
+      "key": "livorno",
+      "name": "Livorno"
+     },
+     {
+      "key": "lodi",
+      "name": "Lodi"
+     },
+     {
+      "key": "lucca",
+      "name": "Lucca"
+     },
+     {
+      "key": "macerata",
+      "name": "Macerata"
+     },
+     {
+      "key": "mantova",
+      "name": "Mantova"
+     },
+     {
+      "key": "massa-carrara",
+      "name": "Massa-Carrara"
+     },
+     {
+      "key": "matera",
+      "name": "Matera"
+     },
+     {
+      "key": "messina",
+      "name": "Messina"
+     },
+     {
+      "key": "milano",
+      "name": "Milano"
+     },
+     {
+      "key": "modena",
+      "name": "Modena"
+     },
+     {
+      "key": "monza-e-della-brianza",
+      "name": "Monza e della Brianza"
+     },
+     {
+      "key": "napoli",
+      "name": "Napoli"
+     },
+     {
+      "key": "novara",
+      "name": "Novara"
+     },
+     {
+      "key": "nuoro",
+      "name": "Nuoro"
+     },
+     {
+      "key": "oristano",
+      "name": "Oristano"
+     },
+     {
+      "key": "padova",
+      "name": "Padova"
+     },
+     {
+      "key": "palermo",
+      "name": "Palermo"
+     },
+     {
+      "key": "parma",
+      "name": "Parma"
+     },
+     {
+      "key": "pavia",
+      "name": "Pavia"
+     },
+     {
+      "key": "perugia",
+      "name": "Perugia"
+     },
+     {
+      "key": "pesaro-e-urbino",
+      "name": "Pesaro e Urbino"
+     },
+     {
+      "key": "pescara",
+      "name": "Pescara"
+     },
+     {
+      "key": "piacenza",
+      "name": "Piacenza"
+     },
+     {
+      "key": "pisa",
+      "name": "Pisa"
+     },
+     {
+      "key": "pistoia",
+      "name": "Pistoia"
+     },
+     {
+      "key": "pordenone",
+      "name": "Pordenone"
+     },
+     {
+      "key": "potenza",
+      "name": "Potenza"
+     },
+     {
+      "key": "prato",
+      "name": "Prato"
+     },
+     {
+      "key": "ragusa",
+      "name": "Ragusa"
+     },
+     {
+      "key": "ravenna",
+      "name": "Ravenna"
+     },
+     {
+      "key": "reggio-calabria",
+      "name": "Reggio Calabria"
+     },
+     {
+      "key": "reggio-emilia",
+      "name": "Reggio Emilia"
+     },
+     {
+      "key": "rieti",
+      "name": "Rieti"
+     },
+     {
+      "key": "rimini",
+      "name": "Rimini"
+     },
+     {
+      "key": "roma",
+      "name": "Roma"
+     },
+     {
+      "key": "rovigo",
+      "name": "Rovigo"
+     },
+     {
+      "key": "salerno",
+      "name": "Salerno"
+     },
+     {
+      "key": "sassari",
+      "name": "Sassari"
+     },
+     {
+      "key": "savona",
+      "name": "Savona"
+     },
+     {
+      "key": "siena",
+      "name": "Siena"
+     },
+     {
+      "key": "siracusa",
+      "name": "Siracusa"
+     },
+     {
+      "key": "sondrio",
+      "name": "Sondrio"
+     },
+     {
+      "key": "sud-sardegna",
+      "name": "Sud Sardegna"
+     },
+     {
+      "key": "taranto",
+      "name": "Taranto"
+     },
+     {
+      "key": "teramo",
+      "name": "Teramo"
+     },
+     {
+      "key": "terni",
+      "name": "Terni"
+     },
+     {
+      "key": "torino",
+      "name": "Torino"
+     },
+     {
+      "key": "trapani",
+      "name": "Trapani"
+     },
+     {
+      "key": "trento",
+      "name": "Trento"
+     },
+     {
+      "key": "treviso",
+      "name": "Treviso"
+     },
+     {
+      "key": "trieste",
+      "name": "Trieste"
+     },
+     {
+      "key": "udine",
+      "name": "Udine"
+     },
+     {
+      "key": "varese",
+      "name": "Varese"
+     },
+     {
+      "key": "venezia",
+      "name": "Venezia"
+     },
+     {
+      "key": "verbano-cusio-ossola",
+      "name": "Verbano-Cusio-Ossola"
+     },
+     {
+      "key": "vercelli",
+      "name": "Vercelli"
+     },
+     {
+      "key": "verona",
+      "name": "Verona"
+     },
+     {
+      "key": "vibo-valentia",
+      "name": "Vibo Valentia"
+     },
+     {
+      "key": "vicenza",
+      "name": "Vicenza"
+     },
+     {
+      "key": "viterbo",
+      "name": "Viterbo"
+     }
+    ],
+    "default_territory": {
+     "key": "lecco",
+     "name": "Lecco",
+     "value": 84.9
+    },
+    "matrix": {
+     "2015": {
+      "agrigento": 81.5,
+      "alessandria": 81.6,
+      "ancona": 83.2,
+      "aosta": 81.1,
+      "arezzo": 83.1,
+      "ascoli-piceno": 82.9,
+      "asti": 81.6,
+      "avellino": 81.5,
+      "bari": 82.8,
+      "barletta-andria-trani": 82.3,
+      "belluno": 82.0,
+      "benevento": 81.1,
+      "bergamo": 82.4,
+      "biella": 81.4,
+      "bologna": 83.0,
+      "bolzano": 83.2,
+      "brescia": 82.8,
+      "brindisi": 82.0,
+      "cagliari": 82.9,
+      "caltanissetta": 81.0,
+      "campobasso": 82.0,
+      "caserta": 80.4,
+      "catania": 81.2,
+      "catanzaro": 82.1,
+      "chieti": 82.5,
+      "como": 83.0,
+      "cosenza": 81.8,
+      "cremona": 82.0,
+      "crotone": 81.4,
+      "cuneo": 82.0,
+      "enna": 81.3,
+      "fermo": 82.5,
+      "ferrara": 81.5,
+      "firenze": 83.4,
+      "foggia": 82.0,
+      "forli-cesena": 83.2,
+      "frosinone": 81.9,
+      "genova": 82.1,
+      "gorizia": 82.1,
+      "grosseto": 82.2,
+      "imperia": 82.2,
+      "isernia": 81.7,
+      "l-aquila": 82.3,
+      "la-spezia": 82.3,
+      "latina": 82.0,
+      "lecce": 82.4,
+      "lecco": 82.9,
+      "livorno": 82.2,
+      "lodi": 81.9,
+      "lucca": 82.0,
+      "macerata": 82.9,
+      "mantova": 82.6,
+      "massa-carrara": 81.7,
+      "matera": 82.1,
+      "messina": 81.1,
+      "milano": 83.3,
+      "modena": 83.3,
+      "monza-e-della-brianza": 83.3,
+      "napoli": 79.9,
+      "novara": 82.4,
+      "nuoro": 81.7,
+      "oristano": 82.0,
+      "padova": 83.2,
+      "palermo": 81.4,
+      "parma": 82.9,
+      "pavia": 81.6,
+      "perugia": 83.1,
+      "pesaro-e-urbino": 83.2,
+      "pescara": 82.3,
+      "piacenza": 82.3,
+      "pisa": 82.7,
+      "pistoia": 83.2,
+      "pordenone": 83.2,
+      "potenza": 82.0,
+      "prato": 83.4,
+      "ragusa": 81.9,
+      "ravenna": 83.2,
+      "reggio-calabria": 81.6,
+      "reggio-emilia": 82.8,
+      "rieti": 81.7,
+      "rimini": 83.6,
+      "roma": 82.3,
+      "rovigo": 81.9,
+      "salerno": 81.2,
+      "sassari": 82.6,
+      "savona": 82.2,
+      "siena": 83.2,
+      "siracusa": 80.7,
+      "sondrio": 82.4,
+      "sud-sardegna": 80.9,
+      "taranto": 82.6,
+      "teramo": 82.1,
+      "terni": 82.2,
+      "torino": 82.5,
+      "trapani": 81.6,
+      "trento": 83.5,
+      "treviso": 83.5,
+      "trieste": 81.8,
+      "udine": 82.3,
+      "varese": 82.9,
+      "venezia": 82.8,
+      "verbano-cusio-ossola": 81.6,
+      "vercelli": 81.6,
+      "verona": 82.8,
+      "vibo-valentia": 81.8,
+      "vicenza": 83.0,
+      "viterbo": 81.1
+     },
+     "2017": {
+      "agrigento": 81.2,
+      "alessandria": 81.9,
+      "ancona": 83.5,
+      "aosta": 82.0,
+      "arezzo": 83.3,
+      "ascoli-piceno": 83.3,
+      "asti": 82.1,
+      "avellino": 82.1,
+      "bari": 83.2,
+      "barletta-andria-trani": 82.5,
+      "belluno": 82.5,
+      "benevento": 81.7,
+      "bergamo": 82.9,
+      "biella": 82.7,
+      "bologna": 83.5,
+      "bolzano": 83.7,
+      "brescia": 83.5,
+      "brindisi": 82.4,
+      "cagliari": 83.4,
+      "caltanissetta": 80.9,
+      "campobasso": 82.3,
+      "caserta": 80.7,
+      "catania": 81.5,
+      "catanzaro": 82.0,
+      "chieti": 82.6,
+      "como": 83.3,
+      "cosenza": 81.8,
+      "cremona": 82.8,
+      "crotone": 81.8,
+      "cuneo": 82.5,
+      "enna": 81.4,
+      "fermo": 82.4,
+      "ferrara": 82.1,
+      "firenze": 84.0,
+      "foggia": 82.3,
+      "forli-cesena": 83.7,
+      "frosinone": 82.0,
+      "genova": 82.6,
+      "gorizia": 83.1,
+      "grosseto": 83.0,
+      "imperia": 82.6,
+      "isernia": 82.2,
+      "l-aquila": 82.5,
+      "la-spezia": 83.1,
+      "latina": 82.3,
+      "lecce": 82.6,
+      "lecco": 83.7,
+      "livorno": 83.1,
+      "lodi": 82.7,
+      "lucca": 82.5,
+      "macerata": 82.9,
+      "mantova": 83.3,
+      "massa-carrara": 82.6,
+      "matera": 82.6,
+      "messina": 81.4,
+      "milano": 83.8,
+      "modena": 83.6,
+      "monza-e-della-brianza": 83.9,
+      "napoli": 80.5,
+      "novara": 82.9,
+      "nuoro": 82.2,
+      "oristano": 82.6,
+      "padova": 83.7,
+      "palermo": 81.5,
+      "parma": 83.3,
+      "pavia": 82.0,
+      "perugia": 83.5,
+      "pesaro-e-urbino": 83.9,
+      "pescara": 83.0,
+      "piacenza": 82.8,
+      "pisa": 83.3,
+      "pistoia": 83.2,
+      "pordenone": 83.6,
+      "potenza": 82.1,
+      "prato": 84.0,
+      "ragusa": 82.1,
+      "ravenna": 83.5,
+      "reggio-calabria": 82.0,
+      "reggio-emilia": 83.3,
+      "rieti": 81.9,
+      "rimini": 83.9,
+      "roma": 82.6,
+      "rovigo": 82.4,
+      "salerno": 81.6,
+      "sassari": 82.8,
+      "savona": 82.6,
+      "siena": 83.4,
+      "siracusa": 81.3,
+      "sondrio": 82.4,
+      "sud-sardegna": 81.7,
+      "taranto": 82.4,
+      "teramo": 82.3,
+      "terni": 82.9,
+      "torino": 82.8,
+      "trapani": 81.5,
+      "trento": 83.9,
+      "treviso": 84.0,
+      "trieste": 82.7,
+      "udine": 83.0,
+      "varese": 83.4,
+      "venezia": 83.3,
+      "verbano-cusio-ossola": 82.3,
+      "vercelli": 81.4,
+      "verona": 83.4,
+      "vibo-valentia": 82.4,
+      "vicenza": 83.5,
+      "viterbo": 81.4
+     },
+     "2018": {
+      "agrigento": 81.9,
+      "alessandria": 82.0,
+      "ancona": 84.0,
+      "aosta": 82.1,
+      "arezzo": 83.6,
+      "ascoli-piceno": 83.4,
+      "asti": 82.2,
+      "avellino": 82.5,
+      "bari": 83.6,
+      "barletta-andria-trani": 82.8,
+      "belluno": 82.8,
+      "benevento": 82.2,
+      "bergamo": 83.3,
+      "biella": 82.3,
+      "bologna": 83.7,
+      "bolzano": 83.9,
+      "brescia": 83.5,
+      "brindisi": 82.6,
+      "cagliari": 84.1,
+      "caltanissetta": 81.1,
+      "campobasso": 82.8,
+      "caserta": 81.0,
+      "catania": 81.8,
+      "catanzaro": 82.2,
+      "chieti": 82.9,
+      "como": 83.5,
+      "cosenza": 82.6,
+      "cremona": 82.8,
+      "crotone": 82.6,
+      "cuneo": 82.6,
+      "enna": 82.0,
+      "fermo": 83.8,
+      "ferrara": 82.4,
+      "firenze": 84.3,
+      "foggia": 82.6,
+      "forli-cesena": 84.2,
+      "frosinone": 82.5,
+      "genova": 82.7,
+      "gorizia": 82.3,
+      "grosseto": 83.5,
+      "imperia": 82.3,
+      "isernia": 82.5,
+      "l-aquila": 83.3,
+      "la-spezia": 83.1,
+      "latina": 83.0,
+      "lecce": 83.3,
+      "lecco": 83.8,
+      "livorno": 83.1,
+      "lodi": 82.7,
+      "lucca": 82.9,
+      "macerata": 84.1,
+      "mantova": 83.1,
+      "massa-carrara": 83.0,
+      "matera": 82.9,
+      "messina": 82.0,
+      "milano": 84.1,
+      "modena": 84.0,
+      "monza-e-della-brianza": 83.8,
+      "napoli": 81.0,
+      "novara": 82.6,
+      "nuoro": 82.6,
+      "oristano": 82.8,
+      "padova": 84.0,
+      "palermo": 81.9,
+      "parma": 83.8,
+      "pavia": 82.2,
+      "perugia": 84.2,
+      "pesaro-e-urbino": 84.2,
+      "pescara": 83.0,
+      "piacenza": 82.8,
+      "pisa": 83.4,
+      "pistoia": 83.8,
+      "pordenone": 83.7,
+      "potenza": 82.5,
+      "prato": 83.5,
+      "ragusa": 82.2,
+      "ravenna": 83.8,
+      "reggio-calabria": 82.5,
+      "reggio-emilia": 83.5,
+      "rieti": 83.4,
+      "rimini": 84.2,
+      "roma": 83.2,
+      "rovigo": 82.4,
+      "salerno": 82.1,
+      "sassari": 82.7,
+      "savona": 82.6,
+      "siena": 84.0,
+      "siracusa": 81.5,
+      "sondrio": 82.5,
+      "sud-sardegna": 82.6,
+      "taranto": 82.8,
+      "teramo": 83.4,
+      "terni": 83.3,
+      "torino": 83.0,
+      "trapani": 82.1,
+      "trento": 84.2,
+      "treviso": 84.1,
+      "trieste": 82.6,
+      "udine": 83.4,
+      "varese": 83.4,
+      "venezia": 83.5,
+      "verbano-cusio-ossola": 82.6,
+      "vercelli": 82.1,
+      "verona": 83.9,
+      "vibo-valentia": 82.7,
+      "vicenza": 83.6,
+      "viterbo": 81.8
+     },
+     "2019": {
+      "agrigento": 81.8,
+      "alessandria": 82.2,
+      "ancona": 84.3,
+      "aosta": 82.7,
+      "arezzo": 83.8,
+      "ascoli-piceno": 84.1,
+      "asti": 82.4,
+      "avellino": 82.3,
+      "bari": 83.7,
+      "barletta-andria-trani": 83.0,
+      "belluno": 83.3,
+      "benevento": 82.5,
+      "bergamo": 83.4,
+      "biella": 82.8,
+      "bologna": 84.0,
+      "bolzano": 83.9,
+      "brescia": 83.7,
+      "brindisi": 82.8,
+      "cagliari": 83.5,
+      "caltanissetta": 81.1,
+      "campobasso": 83.3,
+      "caserta": 81.5,
+      "catania": 82.0,
+      "catanzaro": 82.8,
+      "chieti": 83.4,
+      "como": 83.6,
+      "cosenza": 82.4,
+      "cremona": 83.4,
+      "crotone": 82.3,
+      "cuneo": 82.9,
+      "enna": 82.3,
+      "fermo": 83.5,
+      "ferrara": 82.7,
+      "firenze": 84.3,
+      "foggia": 82.7,
+      "forli-cesena": 83.8,
+      "frosinone": 82.5,
+      "genova": 83.1,
+      "gorizia": 83.0,
+      "grosseto": 83.2,
+      "imperia": 82.7,
+      "isernia": 82.5,
+      "l-aquila": 83.0,
+      "la-spezia": 83.5,
+      "latina": 83.3,
+      "lecce": 83.6,
+      "lecco": 84.3,
+      "livorno": 83.0,
+      "lodi": 83.7,
+      "lucca": 83.2,
+      "macerata": 84.1,
+      "mantova": 83.2,
+      "massa-carrara": 83.2,
+      "matera": 83.0,
+      "messina": 82.1,
+      "milano": 84.2,
+      "modena": 84.0,
+      "monza-e-della-brianza": 84.2,
+      "napoli": 81.3,
+      "novara": 83.0,
+      "nuoro": 82.9,
+      "oristano": 83.2,
+      "padova": 84.3,
+      "palermo": 82.1,
+      "parma": 83.6,
+      "pavia": 82.3,
+      "perugia": 84.4,
+      "pesaro-e-urbino": 84.0,
+      "pescara": 83.6,
+      "piacenza": 83.4,
+      "pisa": 83.4,
+      "pistoia": 83.9,
+      "pordenone": 84.4,
+      "potenza": 82.3,
+      "prato": 84.5,
+      "ragusa": 82.6,
+      "ravenna": 83.6,
+      "reggio-calabria": 82.4,
+      "reggio-emilia": 83.5,
+      "rieti": 83.1,
+      "rimini": 84.3,
+      "roma": 83.5,
+      "rovigo": 83.2,
+      "salerno": 82.2,
+      "sassari": 83.0,
+      "savona": 83.1,
+      "siena": 83.7,
+      "siracusa": 81.5,
+      "sondrio": 82.5,
+      "sud-sardegna": 82.8,
+      "taranto": 83.0,
+      "teramo": 83.2,
+      "terni": 83.5,
+      "torino": 83.3,
+      "trapani": 82.1,
+      "trento": 84.3,
+      "treviso": 84.3,
+      "trieste": 83.0,
+      "udine": 83.6,
+      "varese": 83.7,
+      "venezia": 83.6,
+      "verbano-cusio-ossola": 83.1,
+      "vercelli": 82.4,
+      "verona": 84.0,
+      "vibo-valentia": 82.5,
+      "vicenza": 84.0,
+      "viterbo": 82.2
+     },
+     "2020": {
+      "agrigento": 81.8,
+      "alessandria": 80.3,
+      "ancona": 83.4,
+      "aosta": 80.9,
+      "arezzo": 83.3,
+      "ascoli-piceno": 83.4,
+      "asti": 80.9,
+      "avellino": 81.4,
+      "bari": 82.8,
+      "barletta-andria-trani": 81.7,
+      "belluno": 82.3,
+      "benevento": 82.2,
+      "bergamo": 79.7,
+      "biella": 81.3,
+      "bologna": 83.1,
+      "bolzano": 82.8,
+      "brescia": 81.2,
+      "brindisi": 82.4,
+      "cagliari": 83.4,
+      "caltanissetta": 81.3,
+      "campobasso": 82.4,
+      "caserta": 80.7,
+      "catania": 81.6,
+      "catanzaro": 82.6,
+      "chieti": 82.9,
+      "como": 81.9,
+      "cosenza": 82.1,
+      "cremona": 79.7,
+      "crotone": 81.5,
+      "cuneo": 81.7,
+      "enna": 81.4,
+      "fermo": 83.2,
+      "ferrara": 82.1,
+      "firenze": 83.6,
+      "foggia": 81.2,
+      "forli-cesena": 83.1,
+      "frosinone": 82.1,
+      "genova": 81.5,
+      "gorizia": 82.3,
+      "grosseto": 83.3,
+      "imperia": 81.6,
+      "isernia": 81.8,
+      "l-aquila": 82.6,
+      "la-spezia": 82.3,
+      "latina": 82.7,
+      "lecce": 83.2,
+      "lecco": 82.2,
+      "livorno": 82.7,
+      "lodi": 80.0,
+      "lucca": 82.7,
+      "macerata": 83.3,
+      "mantova": 81.7,
+      "massa-carrara": 81.8,
+      "matera": 82.7,
+      "messina": 81.9,
+      "milano": 82.2,
+      "modena": 83.1,
+      "monza-e-della-brianza": 82.5,
+      "napoli": 80.4,
+      "novara": 81.6,
+      "nuoro": 82.2,
+      "oristano": 82.0,
+      "padova": 83.6,
+      "palermo": 81.5,
+      "parma": 81.4,
+      "pavia": 80.0,
+      "perugia": 83.8,
+      "pesaro-e-urbino": 82.4,
+      "pescara": 82.5,
+      "piacenza": 80.2,
+      "pisa": 83.0,
+      "pistoia": 83.5,
+      "pordenone": 83.2,
+      "potenza": 82.1,
+      "prato": 83.3,
+      "ragusa": 82.0,
+      "ravenna": 83.3,
+      "reggio-calabria": 82.2,
+      "reggio-emilia": 82.5,
+      "rieti": 82.3,
+      "rimini": 82.7,
+      "roma": 82.9,
+      "rovigo": 82.2,
+      "salerno": 82.0,
+      "sassari": 82.0,
+      "savona": 82.1,
+      "siena": 83.9,
+      "siracusa": 81.1,
+      "sondrio": 80.8,
+      "sud-sardegna": 82.4,
+      "taranto": 82.7,
+      "teramo": 82.4,
+      "terni": 82.9,
+      "torino": 81.8,
+      "trapani": 82.2,
+      "trento": 82.8,
+      "treviso": 83.6,
+      "trieste": 82.2,
+      "udine": 82.8,
+      "varese": 82.1,
+      "venezia": 82.6,
+      "verbano-cusio-ossola": 81.9,
+      "vercelli": 80.2,
+      "verona": 82.6,
+      "vibo-valentia": 82.3,
+      "vicenza": 82.8,
+      "viterbo": 82.1
+     },
+     "2021": {
+      "agrigento": 81.2,
+      "alessandria": 82.2,
+      "ancona": 83.1,
+      "aosta": 82.3,
+      "ascoli-piceno": 83.1,
+      "avellino": 81.6,
+      "bari": 82.2,
+      "barletta-andria-trani": 81.9,
+      "benevento": 81.7,
+      "biella": 82.2,
+      "bologna": 83.3,
+      "bolzano": 83.4,
+      "brescia": 83.0,
+      "brindisi": 82.6,
+      "cagliari": 83.8,
+      "campobasso": 81.4,
+      "caserta": 80.7,
+      "catanzaro": 82.3,
+      "chieti": 82.7,
+      "como": 83.1,
+      "cosenza": 81.5,
+      "cremona": 82.8,
+      "crotone": 81.0,
+      "cuneo": 82.4,
+      "enna": 81.2,
+      "fermo": 82.7,
+      "ferrara": 81.8,
+      "foggia": 81.3,
+      "forli-cesena": 82.9,
+      "frosinone": 81.4,
+      "gorizia": 82.2,
+      "imperia": 82.2,
+      "isernia": 81.5,
+      "la-spezia": 82.9,
+      "latina": 82.7,
+      "lecco": 83.4,
+      "livorno": 83.0,
+      "lodi": 82.6,
+      "lucca": 82.7,
+      "macerata": 82.9,
+      "mantova": 82.4,
+      "matera": 82.9,
+      "messina": 81.2,
+      "milano": 83.7,
+      "napoli": 80.3,
+      "nuoro": 82.0,
+      "padova": 83.7,
+      "palermo": 81.3,
+      "parma": 83.2,
+      "pavia": 81.8,
+      "perugia": 83.2,
+      "pesaro-e-urbino": 83.7,
+      "piacenza": 82.9,
+      "pisa": 83.3,
+      "pistoia": 83.0,
+      "pordenone": 83.2,
+      "potenza": 82.1,
+      "prato": 82.5,
+      "ravenna": 83.1,
+      "reggio-calabria": 81.6,
+      "reggio-emilia": 83.2,
+      "rieti": 82.5,
+      "rovigo": 82.1,
+      "salerno": 81.5,
+      "sassari": 82.7,
+      "savona": 82.5,
+      "siracusa": 80.4,
+      "sondrio": 82.6,
+      "sud-sardegna": 82.2,
+      "taranto": 81.7,
+      "teramo": 82.8,
+      "terni": 83.2,
+      "trento": 83.9,
+      "treviso": 83.9,
+      "udine": 82.2,
+      "venezia": 83.0,
+      "verbano-cusio-ossola": 83.0,
+      "vercelli": 81.6,
+      "viterbo": 82.1
+     },
+     "2022": {
+      "agrigento": 81.4,
+      "alessandria": 81.6,
+      "ancona": 83.4,
+      "aosta": 82.3,
+      "arezzo": 83.2,
+      "ascoli-piceno": 83.2,
+      "asti": 82.0,
+      "avellino": 81.7,
+      "bari": 83.1,
+      "barletta-andria-trani": 82.9,
+      "belluno": 82.3,
+      "benevento": 81.8,
+      "bergamo": 82.9,
+      "biella": 82.4,
+      "bologna": 83.5,
+      "bolzano": 83.4,
+      "brescia": 83.5,
+      "brindisi": 82.4,
+      "cagliari": 82.7,
+      "caltanissetta": 81.1,
+      "campobasso": 82.1,
+      "caserta": 80.8,
+      "catania": 81.4,
+      "catanzaro": 82.1,
+      "chieti": 82.8,
+      "como": 83.3,
+      "cosenza": 81.7,
+      "cremona": 82.7,
+      "crotone": 80.8,
+      "cuneo": 82.5,
+      "enna": 80.9,
+      "fermo": 83.8,
+      "ferrara": 82.1,
+      "firenze": 83.9,
+      "foggia": 82.0,
+      "forli-cesena": 83.4,
+      "frosinone": 82.0,
+      "genova": 82.6,
+      "gorizia": 82.7,
+      "grosseto": 83.2,
+      "imperia": 81.7,
+      "isernia": 81.6,
+      "l-aquila": 82.3,
+      "la-spezia": 82.6,
+      "latina": 82.5,
+      "lecce": 82.7,
+      "lecco": 83.4,
+      "livorno": 82.7,
+      "lodi": 82.5,
+      "lucca": 83.1,
+      "macerata": 83.2,
+      "mantova": 82.8,
+      "massa-carrara": 82.5,
+      "matera": 82.6,
+      "messina": 81.0,
+      "milano": 83.6,
+      "modena": 83.5,
+      "monza-e-della-brianza": 83.8,
+      "napoli": 80.7,
+      "novara": 82.7,
+      "nuoro": 81.6,
+      "oristano": 82.0,
+      "padova": 83.7,
+      "palermo": 81.8,
+      "parma": 83.3,
+      "pavia": 81.9,
+      "perugia": 83.5,
+      "pesaro-e-urbino": 83.4,
+      "pescara": 82.6,
+      "piacenza": 83.0,
+      "pisa": 83.1,
+      "pistoia": 83.6,
+      "pordenone": 83.6,
+      "potenza": 81.9,
+      "prato": 83.5,
+      "ragusa": 82.1,
+      "ravenna": 83.4,
+      "reggio-calabria": 81.6,
+      "reggio-emilia": 83.2,
+      "rieti": 82.0,
+      "rimini": 83.6,
+      "roma": 83.2,
+      "rovigo": 81.9,
+      "salerno": 81.8,
+      "sassari": 81.8,
+      "savona": 82.7,
+      "siena": 83.5,
+      "siracusa": 80.6,
+      "sondrio": 82.8,
+      "sud-sardegna": 82.1,
+      "taranto": 82.4,
+      "teramo": 82.7,
+      "terni": 82.8,
+      "torino": 82.8,
+      "trapani": 81.5,
+      "trento": 84.2,
+      "treviso": 84.1,
+      "trieste": 82.6,
+      "udine": 83.0,
+      "varese": 83.2,
+      "venezia": 83.1,
+      "verbano-cusio-ossola": 82.4,
+      "vercelli": 81.7,
+      "verona": 83.6,
+      "vibo-valentia": 81.8,
+      "vicenza": 83.6,
+      "viterbo": 81.8
+     },
+     "2023": {
+      "agrigento": 81.4,
+      "alessandria": 82.3,
+      "ancona": 84.0,
+      "aosta": 83.2,
+      "arezzo": 83.6,
+      "ascoli-piceno": 83.9,
+      "asti": 82.8,
+      "avellino": 82.4,
+      "bari": 83.3,
+      "barletta-andria-trani": 83.1,
+      "belluno": 83.1,
+      "benevento": 82.2,
+      "bergamo": 83.6,
+      "biella": 82.7,
+      "bologna": 83.9,
+      "bolzano": 84.2,
+      "brescia": 84.1,
+      "brindisi": 82.4,
+      "cagliari": 83.1,
+      "caltanissetta": 81.4,
+      "campobasso": 82.7,
+      "caserta": 80.9,
+      "catania": 81.7,
+      "catanzaro": 82.6,
+      "chieti": 82.6,
+      "como": 84.1,
+      "cosenza": 81.7,
+      "cremona": 83.5,
+      "crotone": 81.8,
+      "cuneo": 83.2,
+      "enna": 81.3,
+      "fermo": 83.9,
+      "ferrara": 82.9,
+      "firenze": 84.7,
+      "foggia": 82.4,
+      "forli-cesena": 84.0,
+      "frosinone": 82.2,
+      "genova": 83.3,
+      "gorizia": 83.2,
+      "grosseto": 83.3,
+      "imperia": 82.3,
+      "isernia": 81.7,
+      "l-aquila": 82.8,
+      "la-spezia": 83.4,
+      "latina": 82.6,
+      "lecce": 83.0,
+      "lecco": 84.4,
+      "livorno": 83.5,
+      "lodi": 83.4,
+      "lucca": 83.3,
+      "macerata": 84.0,
+      "mantova": 83.1,
+      "massa-carrara": 82.8,
+      "matera": 83.0,
+      "messina": 81.7,
+      "milano": 84.2,
+      "modena": 83.8,
+      "monza-e-della-brianza": 84.5,
+      "napoli": 81.1,
+      "novara": 83.6,
+      "nuoro": 82.6,
+      "oristano": 82.8,
+      "padova": 84.1,
+      "palermo": 81.8,
+      "parma": 83.9,
+      "pavia": 82.3,
+      "perugia": 84.0,
+      "pesaro-e-urbino": 84.1,
+      "pescara": 83.5,
+      "piacenza": 83.0,
+      "pisa": 83.7,
+      "pistoia": 83.9,
+      "pordenone": 84.0,
+      "potenza": 82.3,
+      "prato": 84.5,
+      "ragusa": 82.3,
+      "ravenna": 83.9,
+      "reggio-calabria": 82.0,
+      "reggio-emilia": 83.7,
+      "rieti": 82.3,
+      "rimini": 84.5,
+      "roma": 83.2,
+      "rovigo": 82.8,
+      "salerno": 82.1,
+      "sassari": 82.6,
+      "savona": 83.2,
+      "siena": 84.2,
+      "siracusa": 81.5,
+      "sondrio": 83.4,
+      "sud-sardegna": 82.1,
+      "taranto": 82.6,
+      "teramo": 83.4,
+      "terni": 83.0,
+      "torino": 83.4,
+      "trapani": 81.8,
+      "trento": 84.5,
+      "treviso": 84.4,
+      "trieste": 82.8,
+      "udine": 83.7,
+      "varese": 83.9,
+      "venezia": 83.7,
+      "verbano-cusio-ossola": 83.0,
+      "vercelli": 82.0,
+      "verona": 84.0,
+      "vibo-valentia": 82.3,
+      "vicenza": 84.2,
+      "viterbo": 82.3
+     },
+     "2024": {
+      "agrigento": 82.0,
+      "alessandria": 82.7,
+      "ancona": 84.5,
+      "aosta": 82.9,
+      "arezzo": 84.2,
+      "ascoli-piceno": 84.1,
+      "asti": 83.2,
+      "avellino": 82.5,
+      "bari": 83.7,
+      "barletta-andria-trani": 83.8,
+      "belluno": 83.3,
+      "benevento": 82.3,
+      "bergamo": 84.0,
+      "biella": 83.1,
+      "bologna": 84.3,
+      "bolzano": 84.6,
+      "brescia": 84.5,
+      "brindisi": 82.9,
+      "cagliari": 83.7,
+      "caltanissetta": 81.9,
+      "campobasso": 82.7,
+      "caserta": 81.5,
+      "catania": 82.4,
+      "catanzaro": 82.9,
+      "chieti": 83.3,
+      "como": 84.4,
+      "cosenza": 82.2,
+      "cremona": 83.6,
+      "crotone": 82.4,
+      "cuneo": 83.6,
+      "enna": 82.7,
+      "fermo": 84.0,
+      "ferrara": 83.3,
+      "firenze": 84.7,
+      "foggia": 82.7,
+      "forli-cesena": 84.6,
+      "frosinone": 82.8,
+      "genova": 83.7,
+      "gorizia": 84.0,
+      "grosseto": 83.1,
+      "imperia": 83.2,
+      "isernia": 82.2,
+      "l-aquila": 83.5,
+      "la-spezia": 83.6,
+      "latina": 82.8,
+      "lecce": 83.2,
+      "lecco": 84.9,
+      "livorno": 83.7,
+      "lodi": 83.7,
+      "lucca": 83.7,
+      "macerata": 84.0,
+      "mantova": 83.4,
+      "massa-carrara": 83.8,
+      "matera": 83.6,
+      "messina": 82.2,
+      "milano": 84.7,
+      "modena": 84.2,
+      "monza-e-della-brianza": 84.8,
+      "napoli": 81.4,
+      "novara": 83.7,
+      "nuoro": 82.9,
+      "oristano": 82.8,
+      "padova": 84.4,
+      "palermo": 82.4,
+      "parma": 84.3,
+      "pavia": 82.6,
+      "perugia": 84.3,
+      "pesaro-e-urbino": 84.4,
+      "pescara": 83.5,
+      "piacenza": 83.8,
+      "pisa": 84.0,
+      "pistoia": 84.4,
+      "pordenone": 84.5,
+      "potenza": 82.9,
+      "prato": 84.5,
+      "ragusa": 83.1,
+      "ravenna": 84.4,
+      "reggio-calabria": 82.4,
+      "reggio-emilia": 84.3,
+      "rieti": 82.6,
+      "rimini": 84.6,
+      "roma": 83.6,
+      "rovigo": 83.2,
+      "salerno": 82.6,
+      "sassari": 82.8,
+      "savona": 83.8,
+      "siena": 84.5,
+      "siracusa": 81.5,
+      "sondrio": 83.1,
+      "sud-sardegna": 82.7,
+      "taranto": 82.8,
+      "teramo": 83.5,
+      "terni": 83.4,
+      "torino": 83.8,
+      "trapani": 82.4,
+      "trento": 84.7,
+      "treviso": 84.9,
+      "trieste": 82.9,
+      "udine": 84.0,
+      "varese": 84.2,
+      "venezia": 84.0,
+      "verbano-cusio-ossola": 83.2,
+      "vercelli": 82.5,
+      "verona": 84.6,
+      "vibo-valentia": 83.3,
+      "vicenza": 84.6,
+      "viterbo": 82.4
+     },
+     "2016": {
+      "alessandria": 82.0,
+      "ancona": 83.7,
+      "ascoli-piceno": 83.2,
+      "avellino": 82.2,
+      "bari": 83.4,
+      "benevento": 82.1,
+      "bergamo": 83.2,
+      "bolzano": 83.4,
+      "cagliari": 83.5,
+      "caltanissetta": 81.1,
+      "campobasso": 82.7,
+      "como": 83.4,
+      "cosenza": 82.3,
+      "crotone": 82.2,
+      "enna": 81.7,
+      "firenze": 84.2,
+      "foggia": 82.7,
+      "gorizia": 82.5,
+      "grosseto": 83.1,
+      "imperia": 82.7,
+      "l-aquila": 82.6,
+      "latina": 82.4,
+      "lecce": 83.1,
+      "livorno": 82.9,
+      "lodi": 82.8,
+      "macerata": 83.2,
+      "massa-carrara": 82.9,
+      "messina": 82.0,
+      "napoli": 80.7,
+      "nuoro": 82.0,
+      "palermo": 81.8,
+      "perugia": 83.7,
+      "pesaro-e-urbino": 83.9,
+      "pisa": 83.4,
+      "pistoia": 83.5,
+      "potenza": 82.5,
+      "prato": 83.7,
+      "rieti": 81.8,
+      "roma": 82.7,
+      "rovigo": 82.2,
+      "savona": 82.8,
+      "siena": 83.6,
+      "taranto": 82.5,
+      "teramo": 83.1,
+      "torino": 83.2,
+      "trento": 83.9,
+      "treviso": 84.0,
+      "varese": 83.5,
+      "verbano-cusio-ossola": 82.8
+     }
+    },
+    "annual_means": [
+     {
+      "year": 2015,
+      "avg": 82.22990654205609
+     },
+     {
+      "year": 2016,
+      "avg": 82.8265306122449
+     },
+     {
+      "year": 2017,
+      "avg": 82.65233644859812
+     },
+     {
+      "year": 2018,
+      "avg": 82.9663551401869
+     },
+     {
+      "year": 2019,
+      "avg": 83.1607476635514
+     },
+     {
+      "year": 2020,
+      "avg": 82.17383177570093
+     },
+     {
+      "year": 2021,
+      "avg": 82.41898734177215
+     },
+     {
+      "year": 2022,
+      "avg": 82.57196261682243
+     },
+     {
+      "year": 2023,
+      "avg": 83.06728971962617
+     },
+     {
+      "year": 2024,
+      "avg": 83.45046728971964
+     }
+    ],
+    "map_colors": null,
+    "cover_bars": null,
+    "bar_max": 84.9,
+    "query_map": [
+     {
+      "intent": "definizione",
+      "label": "Che cosa misura Speranza di vita alla nascita?",
+      "target": "sezione-definizione"
+     },
+     {
+      "intent": "dato",
+      "label": "Qual è il dato più recente, nel 2024?",
+      "target": "esplora"
+     },
+     {
+      "intent": "classifica",
+      "label": "Qual è la classifica delle province nel 2024?",
+      "target": "classifica-dati"
+     },
+     {
+      "intent": "confronto",
+      "label": "Che cosa è cambiato dal 2023 al 2024?",
+      "target": "sezione-dinamica"
+     },
+     {
+      "intent": "andamento",
+      "label": "Come è cambiato dal 2015 al 2024?",
+      "target": "serie-storica"
+     },
+     {
+      "intent": "metodologia",
+      "label": "Come sono calcolati confronti e medie?",
+      "target": "fonti-verifica"
+     }
+    ]
+   }
+  ],
+  "level": {
+   "key": "regione",
+   "label": "Regioni",
+   "singular": "regione",
+   "plural": "regioni",
+   "profile_path": "/regione/",
+   "has_map": true,
+   "explain": {
+    "plain": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato.",
+    "example": "Il valore indica un numero medio di anni, non la durata garantita per ogni persona.",
+    "scope": "Il confronto applica la stessa definizione in tutte le regioni e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+    "caveat": "La media può nascondere differenze importanti tra persone e aree dello stesso territorio. Il confronto tra regioni descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "higher_better"
+   },
+   "years": [
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "year_min": 2004,
+   "year_max": 2025,
+   "observations": [
+    {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 84.8
+    },
+    {
+     "key": "marche",
+     "name": "Marche",
+     "value": 84.4
+    },
+    {
+     "key": "veneto",
+     "name": "Veneto",
+     "value": 84.4
+    },
+    {
+     "key": "lombardia",
+     "name": "Lombardia",
+     "value": 84.3
+    },
+    {
+     "key": "toscana",
+     "name": "Toscana",
+     "value": 84.3
+    },
+    {
+     "key": "emilia-romagna",
+     "name": "Emilia-Romagna",
+     "value": 84.2
+    },
+    {
+     "key": "friuli-venezia-giulia",
+     "name": "Friuli-Venezia Giulia",
+     "value": 84.1
+    },
+    {
+     "key": "umbria",
+     "name": "Umbria",
+     "value": 84.1
+    },
+    {
+     "key": "abruzzo",
+     "name": "Abruzzo",
+     "value": 83.7
+    },
+    {
+     "key": "liguria",
+     "name": "Liguria",
+     "value": 83.7
+    },
+    {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta",
+     "value": 83.7
+    },
+    {
+     "key": "lazio",
+     "name": "Lazio",
+     "value": 83.6
+    },
+    {
+     "key": "piemonte",
+     "name": "Piemonte",
+     "value": 83.6
+    },
+    {
+     "key": "puglia",
+     "name": "Puglia",
+     "value": 83.5
+    },
+    {
+     "key": "basilicata",
+     "name": "Basilicata",
+     "value": 83.1
+    },
+    {
+     "key": "sardegna",
+     "name": "Sardegna",
+     "value": 83.1
+    },
+    {
+     "key": "calabria",
+     "name": "Calabria",
+     "value": 82.9
+    },
+    {
+     "key": "molise",
+     "name": "Molise",
+     "value": 82.6
+    },
+    {
+     "key": "sicilia",
+     "name": "Sicilia",
+     "value": 82.6
+    },
+    {
+     "key": "campania",
+     "name": "Campania",
+     "value": 82.1
+    }
+   ],
+   "best": {
+    "key": "trentino-alto-adige",
+    "name": "Trentino Alto Adige",
+    "value": 84.8
+   },
+   "worst": {
+    "key": "campania",
+    "name": "Campania",
+    "value": 82.1
+   },
+   "stats": {
+    "year": 2025,
+    "year_avg": 83.64,
+    "year_count": 20,
+    "median": 83.7,
+    "above_avg_count": 11,
+    "below_avg_count": 9,
+    "year_min": 2004,
+    "year_min_avg": 80.72999999999999,
+    "year_max": 2025,
+    "has_multi_year": true,
+    "avg_change_abs": 2.910000000000011,
+    "avg_change_pct": 3.604607952434053,
+    "gap_abs": 2.700000000000003,
+    "gap_ratio": null,
+    "year_min_gap_abs": 2.5999999999999943,
+    "gap_trend": 0.10000000000000853,
+    "highest_delta": {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta",
+     "value": null,
+     "delta": 3.799999999999997,
+     "kind": "aumento"
+    },
+    "lowest_delta": {
+     "key": "molise",
+     "name": "Molise",
+     "value": null,
+     "delta": 2.1999999999999886,
+     "kind": "aumento"
+    }
+   },
+   "annual_change": {
+    "year": 2025,
+    "previous_year": 2024,
+    "year_gap": 1,
+    "common_count": 20,
+    "current_count": 20,
+    "previous_count": 20,
+    "same_coverage": true,
+    "previous_avg": 83.455,
+    "current_avg": 83.64,
+    "average_delta": 0.18500000000000227,
+    "average_delta_pct": 0.22167635252531578,
+    "increase_count": 19,
+    "decrease_count": 1,
+    "stable_count": 0,
+    "largest_increases": [
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta",
+      "value": null,
+      "delta": 0.9000000000000057,
+      "kind": "aumento",
+      "previous_value": 82.8,
+      "current_value": 83.7
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria",
+      "value": null,
+      "delta": 0.30000000000001137,
+      "kind": "aumento",
+      "previous_value": 82.6,
+      "current_value": 82.9
+     },
+     {
+      "key": "campania",
+      "name": "Campania",
+      "value": null,
+      "delta": 0.29999999999999716,
+      "kind": "aumento",
+      "previous_value": 81.8,
+      "current_value": 82.1
+     }
+    ],
+    "largest_decreases": [
+     {
+      "key": "basilicata",
+      "name": "Basilicata",
+      "value": null,
+      "delta": -0.10000000000000853,
+      "kind": "calo",
+      "previous_value": 83.2,
+      "current_value": 83.1
+     }
+    ]
+   },
+   "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+   "trend_note": "una variazione media favorevole",
+   "coverage": null,
+   "territory_total": 20,
+   "territories": [
+    {
+     "key": "abruzzo",
+     "name": "Abruzzo"
+    },
+    {
+     "key": "basilicata",
+     "name": "Basilicata"
+    },
+    {
+     "key": "calabria",
+     "name": "Calabria"
+    },
+    {
+     "key": "campania",
+     "name": "Campania"
+    },
+    {
+     "key": "emilia-romagna",
+     "name": "Emilia-Romagna"
+    },
+    {
+     "key": "friuli-venezia-giulia",
+     "name": "Friuli-Venezia Giulia"
+    },
+    {
+     "key": "lazio",
+     "name": "Lazio"
+    },
+    {
+     "key": "liguria",
+     "name": "Liguria"
+    },
+    {
+     "key": "lombardia",
+     "name": "Lombardia"
+    },
+    {
+     "key": "marche",
+     "name": "Marche"
+    },
+    {
+     "key": "molise",
+     "name": "Molise"
+    },
+    {
+     "key": "piemonte",
+     "name": "Piemonte"
+    },
+    {
+     "key": "puglia",
+     "name": "Puglia"
+    },
+    {
+     "key": "sardegna",
+     "name": "Sardegna"
+    },
+    {
+     "key": "sicilia",
+     "name": "Sicilia"
+    },
+    {
+     "key": "toscana",
+     "name": "Toscana"
+    },
+    {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige"
+    },
+    {
+     "key": "umbria",
+     "name": "Umbria"
+    },
+    {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta"
+    },
+    {
+     "key": "veneto",
+     "name": "Veneto"
+    }
+   ],
+   "default_territory": {
+    "key": "trentino-alto-adige",
+    "name": "Trentino Alto Adige",
+    "value": 84.8
+   },
+   "matrix": {
+    "2004": {
+     "piemonte": 80.5,
+     "valle-d-aosta": 79.9,
+     "lombardia": 80.9,
+     "trentino-alto-adige": 81.1,
+     "veneto": 81.2,
+     "friuli-venezia-giulia": 80.6,
+     "liguria": 80.7,
+     "emilia-romagna": 81.2,
+     "toscana": 81.5,
+     "umbria": 81.5,
+     "marche": 81.8,
+     "lazio": 80.1,
+     "abruzzo": 81.0,
+     "molise": 80.4,
+     "campania": 79.2,
+     "puglia": 81.1,
+     "basilicata": 80.4,
+     "calabria": 80.7,
+     "sicilia": 80.1,
+     "sardegna": 80.7
+    },
+    "2005": {
+     "piemonte": 80.6,
+     "valle-d-aosta": 79.7,
+     "lombardia": 80.9,
+     "trentino-alto-adige": 81.4,
+     "veneto": 81.3,
+     "friuli-venezia-giulia": 80.7,
+     "liguria": 80.7,
+     "emilia-romagna": 81.3,
+     "toscana": 81.5,
+     "umbria": 81.1,
+     "marche": 82.1,
+     "lazio": 80.4,
+     "abruzzo": 81.1,
+     "molise": 80.6,
+     "campania": 79.1,
+     "puglia": 81.0,
+     "basilicata": 80.6,
+     "calabria": 80.5,
+     "sicilia": 80.0,
+     "sardegna": 80.6
+    },
+    "2006": {
+     "piemonte": 80.8,
+     "valle-d-aosta": 80.5,
+     "lombardia": 81.3,
+     "trentino-alto-adige": 81.6,
+     "veneto": 81.7,
+     "friuli-venezia-giulia": 81.0,
+     "liguria": 81.0,
+     "emilia-romagna": 81.7,
+     "toscana": 81.9,
+     "umbria": 81.7,
+     "marche": 82.1,
+     "lazio": 80.8,
+     "abruzzo": 81.4,
+     "molise": 80.7,
+     "campania": 79.5,
+     "puglia": 81.3,
+     "basilicata": 80.9,
+     "calabria": 81.0,
+     "sicilia": 80.4,
+     "sardegna": 81.1
+    },
+    "2007": {
+     "piemonte": 81.1,
+     "valle-d-aosta": 80.5,
+     "lombardia": 81.6,
+     "trentino-alto-adige": 82.0,
+     "veneto": 81.8,
+     "friuli-venezia-giulia": 81.3,
+     "liguria": 81.2,
+     "emilia-romagna": 81.8,
+     "toscana": 81.9,
+     "umbria": 81.8,
+     "marche": 82.4,
+     "lazio": 80.9,
+     "abruzzo": 81.4,
+     "molise": 81.5,
+     "campania": 79.5,
+     "puglia": 81.2,
+     "basilicata": 81.1,
+     "calabria": 80.9,
+     "sicilia": 80.2,
+     "sardegna": 81.2
+    },
+    "2008": {
+     "piemonte": 81.1,
+     "valle-d-aosta": 81.1,
+     "lombardia": 81.5,
+     "trentino-alto-adige": 82.1,
+     "veneto": 81.8,
+     "friuli-venezia-giulia": 81.3,
+     "liguria": 81.2,
+     "emilia-romagna": 81.9,
+     "toscana": 81.9,
+     "umbria": 81.7,
+     "marche": 82.3,
+     "lazio": 81.0,
+     "abruzzo": 81.5,
+     "molise": 81.1,
+     "campania": 79.7,
+     "puglia": 81.6,
+     "basilicata": 81.6,
+     "calabria": 81.0,
+     "sicilia": 80.5,
+     "sardegna": 81.3
+    },
+    "2009": {
+     "piemonte": 81.3,
+     "valle-d-aosta": 81.1,
+     "lombardia": 81.7,
+     "trentino-alto-adige": 82.5,
+     "veneto": 82.1,
+     "friuli-venezia-giulia": 81.5,
+     "liguria": 81.2,
+     "emilia-romagna": 82.1,
+     "toscana": 82.1,
+     "umbria": 82.2,
+     "marche": 82.5,
+     "lazio": 81.0,
+     "abruzzo": 81.2,
+     "molise": 81.6,
+     "campania": 79.9,
+     "puglia": 81.6,
+     "basilicata": 81.7,
+     "calabria": 81.0,
+     "sicilia": 80.5,
+     "sardegna": 81.3
+    },
+    "2010": {
+     "piemonte": 81.7,
+     "valle-d-aosta": 81.3,
+     "lombardia": 82.0,
+     "trentino-alto-adige": 82.6,
+     "veneto": 82.4,
+     "friuli-venezia-giulia": 81.8,
+     "liguria": 81.7,
+     "emilia-romagna": 82.4,
+     "toscana": 82.5,
+     "umbria": 82.3,
+     "marche": 82.8,
+     "lazio": 81.3,
+     "abruzzo": 81.7,
+     "molise": 81.6,
+     "campania": 80.1,
+     "puglia": 82.1,
+     "basilicata": 81.8,
+     "calabria": 81.6,
+     "sicilia": 80.9,
+     "sardegna": 81.8
+    },
+    "2011": {
+     "piemonte": 81.9,
+     "valle-d-aosta": 81.7,
+     "lombardia": 82.5,
+     "trentino-alto-adige": 83.1,
+     "veneto": 82.6,
+     "friuli-venezia-giulia": 82.0,
+     "liguria": 81.8,
+     "emilia-romagna": 82.6,
+     "toscana": 82.7,
+     "umbria": 82.7,
+     "marche": 82.9,
+     "lazio": 81.5,
+     "abruzzo": 81.9,
+     "molise": 81.6,
+     "campania": 80.2,
+     "puglia": 82.1,
+     "basilicata": 82.0,
+     "calabria": 81.6,
+     "sicilia": 80.9,
+     "sardegna": 81.8
+    },
+    "2012": {
+     "piemonte": 82.1,
+     "valle-d-aosta": 81.9,
+     "lombardia": 82.4,
+     "trentino-alto-adige": 83.1,
+     "veneto": 82.6,
+     "friuli-venezia-giulia": 82.0,
+     "liguria": 82.0,
+     "emilia-romagna": 82.6,
+     "toscana": 82.6,
+     "umbria": 82.6,
+     "marche": 83.0,
+     "lazio": 81.6,
+     "abruzzo": 82.2,
+     "molise": 81.9,
+     "campania": 80.4,
+     "puglia": 82.3,
+     "basilicata": 82.1,
+     "calabria": 81.6,
+     "sicilia": 81.0,
+     "sardegna": 81.9
+    },
+    "2013": {
+     "piemonte": 82.2,
+     "valle-d-aosta": 82.1,
+     "lombardia": 82.8,
+     "trentino-alto-adige": 83.3,
+     "veneto": 82.9,
+     "friuli-venezia-giulia": 82.2,
+     "liguria": 82.1,
+     "emilia-romagna": 83.0,
+     "toscana": 83.0,
+     "umbria": 82.8,
+     "marche": 83.2,
+     "lazio": 82.1,
+     "abruzzo": 82.4,
+     "molise": 82.2,
+     "campania": 80.6,
+     "puglia": 82.5,
+     "basilicata": 82.2,
+     "calabria": 81.9,
+     "sicilia": 81.4,
+     "sardegna": 82.2
+    },
+    "2014": {
+     "piemonte": 82.6,
+     "valle-d-aosta": 82.1,
+     "lombardia": 83.2,
+     "trentino-alto-adige": 83.5,
+     "veneto": 83.2,
+     "friuli-venezia-giulia": 82.7,
+     "liguria": 82.6,
+     "emilia-romagna": 83.2,
+     "toscana": 83.2,
+     "umbria": 83.2,
+     "marche": 83.3,
+     "lazio": 82.3,
+     "abruzzo": 82.6,
+     "molise": 82.3,
+     "campania": 80.9,
+     "puglia": 82.6,
+     "basilicata": 82.4,
+     "calabria": 81.9,
+     "sicilia": 81.6,
+     "sardegna": 82.5
+    },
+    "2015": {
+     "piemonte": 82.1,
+     "valle-d-aosta": 81.1,
+     "lombardia": 82.8,
+     "trentino-alto-adige": 83.4,
+     "veneto": 82.9,
+     "friuli-venezia-giulia": 82.4,
+     "liguria": 82.2,
+     "emilia-romagna": 82.9,
+     "toscana": 82.8,
+     "umbria": 82.8,
+     "marche": 83.0,
+     "lazio": 82.0,
+     "abruzzo": 82.3,
+     "molise": 82.0,
+     "campania": 80.4,
+     "puglia": 82.3,
+     "basilicata": 82.0,
+     "calabria": 81.7,
+     "sicilia": 81.2,
+     "sardegna": 82.2
+    },
+    "2016": {
+     "piemonte": 82.7,
+     "valle-d-aosta": 82.2,
+     "lombardia": 83.3,
+     "trentino-alto-adige": 83.6,
+     "veneto": 83.4,
+     "friuli-venezia-giulia": 82.9,
+     "liguria": 82.8,
+     "emilia-romagna": 83.2,
+     "toscana": 83.4,
+     "umbria": 83.4,
+     "marche": 83.4,
+     "lazio": 82.4,
+     "abruzzo": 82.9,
+     "molise": 82.7,
+     "campania": 81.1,
+     "puglia": 82.9,
+     "basilicata": 82.6,
+     "calabria": 82.3,
+     "sicilia": 81.8,
+     "sardegna": 82.6
+    },
+    "2017": {
+     "piemonte": 82.5,
+     "valle-d-aosta": 82.0,
+     "lombardia": 83.3,
+     "trentino-alto-adige": 83.8,
+     "veneto": 83.4,
+     "friuli-venezia-giulia": 83.0,
+     "liguria": 82.6,
+     "emilia-romagna": 83.2,
+     "toscana": 83.3,
+     "umbria": 83.3,
+     "marche": 83.2,
+     "lazio": 82.3,
+     "abruzzo": 82.5,
+     "molise": 82.2,
+     "campania": 80.9,
+     "puglia": 82.6,
+     "basilicata": 82.2,
+     "calabria": 81.9,
+     "sicilia": 81.4,
+     "sardegna": 82.7
+    },
+    "2018": {
+     "piemonte": 82.6,
+     "valle-d-aosta": 82.1,
+     "lombardia": 83.4,
+     "trentino-alto-adige": 84.0,
+     "veneto": 83.6,
+     "friuli-venezia-giulia": 83.1,
+     "liguria": 82.6,
+     "emilia-romagna": 83.5,
+     "toscana": 83.6,
+     "umbria": 83.8,
+     "marche": 83.8,
+     "lazio": 82.9,
+     "abruzzo": 83.1,
+     "molise": 82.7,
+     "campania": 81.4,
+     "puglia": 83.0,
+     "basilicata": 82.6,
+     "calabria": 82.5,
+     "sicilia": 81.8,
+     "sardegna": 83.0
+    },
+    "2019": {
+     "piemonte": 82.9,
+     "valle-d-aosta": 82.7,
+     "lombardia": 83.6,
+     "trentino-alto-adige": 84.2,
+     "veneto": 83.8,
+     "friuli-venezia-giulia": 83.5,
+     "liguria": 83.1,
+     "emilia-romagna": 83.6,
+     "toscana": 83.6,
+     "umbria": 84.0,
+     "marche": 84.0,
+     "lazio": 83.2,
+     "abruzzo": 83.3,
+     "molise": 83.0,
+     "campania": 81.6,
+     "puglia": 83.2,
+     "basilicata": 82.5,
+     "calabria": 82.4,
+     "sicilia": 82.0,
+     "sardegna": 83.0
+    },
+    "2020": {
+     "piemonte": 81.4,
+     "valle-d-aosta": 80.9,
+     "lombardia": 81.4,
+     "trentino-alto-adige": 82.8,
+     "veneto": 82.9,
+     "friuli-venezia-giulia": 82.6,
+     "liguria": 81.7,
+     "emilia-romagna": 82.5,
+     "toscana": 83.1,
+     "umbria": 83.4,
+     "marche": 83.0,
+     "lazio": 82.6,
+     "abruzzo": 82.6,
+     "molise": 82.2,
+     "campania": 80.9,
+     "puglia": 82.3,
+     "basilicata": 82.2,
+     "calabria": 82.1,
+     "sicilia": 81.5,
+     "sardegna": 82.3
+    },
+    "2021": {
+     "piemonte": 82.5,
+     "valle-d-aosta": 82.3,
+     "lombardia": 83.1,
+     "trentino-alto-adige": 83.6,
+     "veneto": 83.3,
+     "friuli-venezia-giulia": 82.3,
+     "liguria": 82.7,
+     "emilia-romagna": 83.0,
+     "toscana": 83.2,
+     "umbria": 83.2,
+     "marche": 83.1,
+     "lazio": 82.6,
+     "abruzzo": 82.6,
+     "molise": 81.4,
+     "campania": 80.7,
+     "puglia": 82.0,
+     "basilicata": 82.3,
+     "calabria": 81.6,
+     "sicilia": 81.2,
+     "sardegna": 82.6
+    },
+    "2022": {
+     "piemonte": 82.5,
+     "valle-d-aosta": 82.3,
+     "lombardia": 83.2,
+     "trentino-alto-adige": 83.8,
+     "veneto": 83.4,
+     "friuli-venezia-giulia": 83.0,
+     "liguria": 82.5,
+     "emilia-romagna": 83.3,
+     "toscana": 83.3,
+     "umbria": 83.3,
+     "marche": 83.3,
+     "lazio": 82.9,
+     "abruzzo": 82.6,
+     "molise": 81.9,
+     "campania": 81.0,
+     "puglia": 82.6,
+     "basilicata": 82.1,
+     "calabria": 81.7,
+     "sicilia": 81.4,
+     "sardegna": 82.0
+    },
+    "2023": {
+     "piemonte": 83.0,
+     "valle-d-aosta": 83.2,
+     "lombardia": 83.8,
+     "trentino-alto-adige": 84.4,
+     "veneto": 83.8,
+     "friuli-venezia-giulia": 83.4,
+     "liguria": 83.1,
+     "emilia-romagna": 83.6,
+     "toscana": 83.8,
+     "umbria": 83.7,
+     "marche": 83.9,
+     "lazio": 82.9,
+     "abruzzo": 83.0,
+     "molise": 82.3,
+     "campania": 81.3,
+     "puglia": 82.8,
+     "basilicata": 82.5,
+     "calabria": 81.9,
+     "sicilia": 81.6,
+     "sardegna": 82.5
+    },
+    "2024": {
+     "piemonte": 83.5,
+     "valle-d-aosta": 82.8,
+     "lombardia": 84.1,
+     "trentino-alto-adige": 84.7,
+     "veneto": 84.3,
+     "friuli-venezia-giulia": 83.9,
+     "liguria": 83.6,
+     "emilia-romagna": 84.1,
+     "toscana": 84.1,
+     "umbria": 84.0,
+     "marche": 84.3,
+     "lazio": 83.4,
+     "abruzzo": 83.5,
+     "molise": 82.5,
+     "campania": 81.8,
+     "puglia": 83.3,
+     "basilicata": 83.2,
+     "calabria": 82.6,
+     "sicilia": 82.4,
+     "sardegna": 83.0
+    },
+    "2025": {
+     "piemonte": 83.6,
+     "valle-d-aosta": 83.7,
+     "lombardia": 84.3,
+     "trentino-alto-adige": 84.8,
+     "veneto": 84.4,
+     "friuli-venezia-giulia": 84.1,
+     "liguria": 83.7,
+     "emilia-romagna": 84.2,
+     "toscana": 84.3,
+     "umbria": 84.1,
+     "marche": 84.4,
+     "lazio": 83.6,
+     "abruzzo": 83.7,
+     "molise": 82.6,
+     "campania": 82.1,
+     "puglia": 83.5,
+     "basilicata": 83.1,
+     "calabria": 82.9,
+     "sicilia": 82.6,
+     "sardegna": 83.1
+    }
+   },
+   "annual_means": [
+    {
+     "year": 2004,
+     "avg": 80.72999999999999
+    },
+    {
+     "year": 2005,
+     "avg": 80.76
+    },
+    {
+     "year": 2006,
+     "avg": 81.12
+    },
+    {
+     "year": 2007,
+     "avg": 81.265
+    },
+    {
+     "year": 2008,
+     "avg": 81.36
+    },
+    {
+     "year": 2009,
+     "avg": 81.505
+    },
+    {
+     "year": 2010,
+     "avg": 81.82000000000001
+    },
+    {
+     "year": 2011,
+     "avg": 82.005
+    },
+    {
+     "year": 2012,
+     "avg": 82.095
+    },
+    {
+     "year": 2013,
+     "avg": 82.35499999999999
+    },
+    {
+     "year": 2014,
+     "avg": 82.595
+    },
+    {
+     "year": 2015,
+     "avg": 82.225
+    },
+    {
+     "year": 2016,
+     "avg": 82.78
+    },
+    {
+     "year": 2017,
+     "avg": 82.615
+    },
+    {
+     "year": 2018,
+     "avg": 82.955
+    },
+    {
+     "year": 2019,
+     "avg": 83.16
+    },
+    {
+     "year": 2020,
+     "avg": 82.22
+    },
+    {
+     "year": 2021,
+     "avg": 82.465
+    },
+    {
+     "year": 2022,
+     "avg": 82.60499999999999
+    },
+    {
+     "year": 2023,
+     "avg": 83.025
+    },
+    {
+     "year": 2024,
+     "avg": 83.455
+    },
+    {
+     "year": 2025,
+     "avg": 83.64
+    }
+   ],
+   "map_colors": {
+    "trentino-alto-adige": "var(--seq-6)",
+    "marche": "var(--seq-6)",
+    "veneto": "var(--seq-6)",
+    "lombardia": "var(--seq-5)",
+    "toscana": "var(--seq-5)",
+    "emilia-romagna": "var(--seq-5)",
+    "friuli-venezia-giulia": "var(--seq-5)",
+    "umbria": "var(--seq-5)",
+    "abruzzo": "var(--seq-4)",
+    "liguria": "var(--seq-4)",
+    "valle-d-aosta": "var(--seq-4)",
+    "lazio": "var(--seq-4)",
+    "piemonte": "var(--seq-4)",
+    "puglia": "var(--seq-4)",
+    "basilicata": "var(--seq-3)",
+    "sardegna": "var(--seq-3)",
+    "calabria": "var(--seq-2)",
+    "molise": "var(--seq-2)",
+    "sicilia": "var(--seq-2)",
+    "campania": "var(--seq-1)"
+   },
+   "cover_bars": [
+    {
+     "region": "Trentino Alto Adige",
+     "region_key": "trentino-alto-adige",
+     "value": 84.8,
+     "width_pct": 100,
+     "is_best": true,
+     "is_worst": false
+    },
+    {
+     "region": "Marche",
+     "region_key": "marche",
+     "value": 84.4,
+     "width_pct": 86,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Veneto",
+     "region_key": "veneto",
+     "value": 84.4,
+     "width_pct": 86,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Lombardia",
+     "region_key": "lombardia",
+     "value": 84.3,
+     "width_pct": 83,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Campania",
+     "region_key": "campania",
+     "value": 82.1,
+     "width_pct": 6,
+     "is_best": false,
+     "is_worst": true
+    }
+   ],
+   "bar_max": 84.8,
+   "query_map": [
+    {
+     "intent": "definizione",
+     "label": "Che cosa misura Speranza di vita alla nascita?",
+     "target": "sezione-definizione"
+    },
+    {
+     "intent": "dato",
+     "label": "Qual è il dato più recente, nel 2025?",
+     "target": "esplora"
+    },
+    {
+     "intent": "classifica",
+     "label": "Qual è la classifica delle regioni nel 2025?",
+     "target": "classifica-dati"
+    },
+    {
+     "intent": "confronto",
+     "label": "Che cosa è cambiato dal 2024 al 2025?",
+     "target": "sezione-dinamica"
+    },
+    {
+     "intent": "andamento",
+     "label": "Come è cambiato dal 2004 al 2025?",
+     "target": "serie-storica"
+    },
+    {
+     "intent": "metodologia",
+     "label": "Come sono calcolati confronti e medie?",
+     "target": "fonti-verifica"
+    },
+    {
+     "intent": "download",
+     "label": "Dove posso scaricare la serie?",
+     "target": "download-dati"
+    }
+   ]
+  },
+  "query_map": [
+   {
+    "intent": "definizione",
+    "label": "Che cosa misura Speranza di vita alla nascita?",
+    "target": "sezione-definizione"
+   },
+   {
+    "intent": "dato",
+    "label": "Qual è il dato più recente, nel 2025?",
+    "target": "esplora"
+   },
+   {
+    "intent": "classifica",
+    "label": "Qual è la classifica delle regioni nel 2025?",
+    "target": "classifica-dati"
+   },
+   {
+    "intent": "confronto",
+    "label": "Che cosa è cambiato dal 2024 al 2025?",
+    "target": "sezione-dinamica"
+   },
+   {
+    "intent": "andamento",
+    "label": "Come è cambiato dal 2004 al 2025?",
+    "target": "serie-storica"
+   },
+   {
+    "intent": "metodologia",
+    "label": "Come sono calcolati confronti e medie?",
+    "target": "fonti-verifica"
+   },
+   {
+    "intent": "download",
+    "label": "Dove posso scaricare la serie?",
+    "target": "download-dati"
+   }
+  ],
+  "page_h1": "Speranza di vita alla nascita",
+  "related": [
+   {
+    "id": "910",
+    "name": "Speranza di vita alla nascita",
+    "path": "/indicatore/speranza-di-vita-alla-nascita/ter-910",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "anni",
+    "spark": [
+     {
+      "year": 2002,
+      "value": 80.105
+     },
+     {
+      "year": 2003,
+      "value": 80.06
+     },
+     {
+      "year": 2004,
+      "value": 80.73
+     },
+     {
+      "year": 2005,
+      "value": 80.76
+     },
+     {
+      "year": 2006,
+      "value": 81.12
+     },
+     {
+      "year": 2007,
+      "value": 81.265
+     },
+     {
+      "year": 2008,
+      "value": 81.36
+     },
+     {
+      "year": 2009,
+      "value": 81.505
+     },
+     {
+      "year": 2010,
+      "value": 81.82
+     },
+     {
+      "year": 2011,
+      "value": 82.005
+     },
+     {
+      "year": 2012,
+      "value": 82.095
+     },
+     {
+      "year": 2013,
+      "value": 82.355
+     },
+     {
+      "year": 2014,
+      "value": 82.595
+     },
+     {
+      "year": 2015,
+      "value": 82.225
+     },
+     {
+      "year": 2016,
+      "value": 82.78
+     },
+     {
+      "year": 2017,
+      "value": 82.615
+     },
+     {
+      "year": 2018,
+      "value": 82.955
+     },
+     {
+      "year": 2019,
+      "value": 83.16
+     },
+     {
+      "year": 2020,
+      "value": 82.22
+     },
+     {
+      "year": 2021,
+      "value": 82.465
+     },
+     {
+      "year": 2022,
+      "value": 82.605
+     },
+     {
+      "year": 2023,
+      "value": 83.025
+     },
+     {
+      "year": 2024,
+      "value": 83.455
+     },
+     {
+      "year": 2025,
+      "value": 83.64
+     }
+    ],
+    "latest": 83.64
+   },
+   {
+    "id": "912",
+    "name": "Speranza di vita alla nascita (femmine)",
+    "path": "/indicatore/speranza-di-vita-alla-nascita-femmine/ter-912",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "anni",
+    "spark": [
+     {
+      "year": 2002,
+      "value": 83.09
+     },
+     {
+      "year": 2003,
+      "value": 82.985
+     },
+     {
+      "year": 2004,
+      "value": 83.62
+     },
+     {
+      "year": 2005,
+      "value": 83.62
+     },
+     {
+      "year": 2006,
+      "value": 83.91
+     },
+     {
+      "year": 2007,
+      "value": 84.01
+     },
+     {
+      "year": 2008,
+      "value": 84.035
+     },
+     {
+      "year": 2009,
+      "value": 84.13
+     },
+     {
+      "year": 2010,
+      "value": 84.44
+     },
+     {
+      "year": 2011,
+      "value": 84.56
+     },
+     {
+      "year": 2012,
+      "value": 84.555
+     },
+     {
+      "year": 2013,
+      "value": 84.835
+     },
+     {
+      "year": 2014,
+      "value": 85.035
+     },
+     {
+      "year": 2015,
+      "value": 84.585
+     },
+     {
+      "year": 2016,
+      "value": 85.15
+     },
+     {
+      "year": 2017,
+      "value": 84.885
+     },
+     {
+      "year": 2018,
+      "value": 85.25
+     },
+     {
+      "year": 2019,
+      "value": 85.455
+     },
+     {
+      "year": 2020,
+      "value": 84.625
+     },
+     {
+      "year": 2021,
+      "value": 84.79
+     },
+     {
+      "year": 2022,
+      "value": 84.79
+     },
+     {
+      "year": 2023,
+      "value": 85.185
+     },
+     {
+      "year": 2024,
+      "value": 85.56
+     },
+     {
+      "year": 2025,
+      "value": 85.705
+     }
+    ],
+    "latest": 85.705
+   },
+   {
+    "id": "911",
+    "name": "Speranza di vita alla nascita (maschi)",
+    "path": "/indicatore/speranza-di-vita-alla-nascita-maschi/ter-911",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "anni",
+    "spark": [
+     {
+      "year": 2002,
+      "value": 77.24
+     },
+     {
+      "year": 2003,
+      "value": 77.305
+     },
+     {
+      "year": 2004,
+      "value": 77.955
+     },
+     {
+      "year": 2005,
+      "value": 78.04
+     },
+     {
+      "year": 2006,
+      "value": 78.445
+     },
+     {
+      "year": 2007,
+      "value": 78.65
+     },
+     {
+      "year": 2008,
+      "value": 78.805
+     },
+     {
+      "year": 2009,
+      "value": 78.97
+     },
+     {
+      "year": 2010,
+      "value": 79.305
+     },
+     {
+      "year": 2011,
+      "value": 79.535
+     },
+     {
+      "year": 2012,
+      "value": 79.745
+     },
+     {
+      "year": 2013,
+      "value": 79.975
+     },
+     {
+      "year": 2014,
+      "value": 80.26
+     },
+     {
+      "year": 2015,
+      "value": 79.98
+     },
+     {
+      "year": 2016,
+      "value": 80.525
+     },
+     {
+      "year": 2017,
+      "value": 80.45
+     },
+     {
+      "year": 2018,
+      "value": 80.755
+     },
+     {
+      "year": 2019,
+      "value": 80.97
+     },
+     {
+      "year": 2020,
+      "value": 79.96
+     },
+     {
+      "year": 2021,
+      "value": 80.255
+     },
+     {
+      "year": 2022,
+      "value": 80.5
+     },
+     {
+      "year": 2023,
+      "value": 80.945
+     },
+     {
+      "year": 2024,
+      "value": 81.46
+     },
+     {
+      "year": 2025,
+      "value": 81.68
+     }
+    ],
+    "latest": 81.68
+   },
+   {
+    "id": "913",
+    "name": "Speranza di vita a 65 anni",
+    "path": "/indicatore/speranza-di-vita-a-65-anni/ter-913",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "anni",
+    "spark": [
+     {
+      "year": 2002,
+      "value": 19.0
+     },
+     {
+      "year": 2003,
+      "value": 18.825
+     },
+     {
+      "year": 2004,
+      "value": 19.445
+     },
+     {
+      "year": 2005,
+      "value": 19.355
+     },
+     {
+      "year": 2006,
+      "value": 19.66
+     },
+     {
+      "year": 2007,
+      "value": 19.725
+     },
+     {
+      "year": 2008,
+      "value": 19.77
+     },
+     {
+      "year": 2009,
+      "value": 19.865
+     },
+     {
+      "year": 2010,
+      "value": 20.105
+     },
+     {
+      "year": 2011,
+      "value": 20.25
+     },
+     {
+      "year": 2012,
+      "value": 20.255
+     },
+     {
+      "year": 2013,
+      "value": 20.515
+     },
+     {
+      "year": 2014,
+      "value": 20.72
+     },
+     {
+      "year": 2015,
+      "value": 20.355
+     },
+     {
+      "year": 2016,
+      "value": 20.83
+     },
+     {
+      "year": 2017,
+      "value": 20.625
+     },
+     {
+      "year": 2018,
+      "value": 20.94
+     },
+     {
+      "year": 2019,
+      "value": 21.095
+     },
+     {
+      "year": 2020,
+      "value": 20.22
+     },
+     {
+      "year": 2021,
+      "value": 20.435
+     },
+     {
+      "year": 2022,
+      "value": 20.485
+     },
+     {
+      "year": 2023,
+      "value": 20.93
+     },
+     {
+      "year": 2024,
+      "value": 21.32
+     },
+     {
+      "year": 2025,
+      "value": 21.475
+     }
+    ],
+    "latest": 21.475
+   },
+   {
+    "id": "bes:01SAL002",
+    "name": "Speranza di vita in buona salute alla nascita",
+    "path": "/indicatore/speranza-di-vita-in-buona-salute-alla-nascita/bes-01SAL002",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "Numero medio di anni",
+    "spark": [
+     {
+      "year": 2009,
+      "value": 56.37
+     },
+     {
+      "year": 2010,
+      "value": 57.57
+     },
+     {
+      "year": 2011,
+      "value": 58.43
+     },
+     {
+      "year": 2012,
+      "value": 58.685
+     },
+     {
+      "year": 2013,
+      "value": 58.15
+     },
+     {
+      "year": 2014,
+      "value": 58.08
+     },
+     {
+      "year": 2015,
+      "value": 58.41
+     },
+     {
+      "year": 2016,
+      "value": 58.37
+     },
+     {
+      "year": 2017,
+      "value": 58.86
+     },
+     {
+      "year": 2018,
+      "value": 58.675
+     },
+     {
+      "year": 2019,
+      "value": 58.32
+     },
+     {
+      "year": 2020,
+      "value": 61.19
+     },
+     {
+      "year": 2021,
+      "value": 60.465
+     },
+     {
+      "year": 2022,
+      "value": 59.985
+     },
+     {
+      "year": 2023,
+      "value": 58.98
+     },
+     {
+      "year": 2024,
+      "value": 58.485
+     },
+     {
+      "year": 2025,
+      "value": 59.09
+     }
+    ],
+    "latest": 59.09
+   },
+   {
+    "id": "bes:01SAL008",
+    "name": "Speranza di vita senza limitazioni nelle attività a 65 anni",
+    "path": "/indicatore/speranza-di-vita-senza-limitazioni-nelle-attivita-a-65-anni/bes-01SAL008",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "Numero medio di anni",
+    "spark": [
+     {
+      "year": 2008,
+      "value": 8.905
+     },
+     {
+      "year": 2009,
+      "value": 8.885
+     },
+     {
+      "year": 2010,
+      "value": 9.13
+     },
+     {
+      "year": 2011,
+      "value": 9.395
+     },
+     {
+      "year": 2012,
+      "value": 9.64
+     },
+     {
+      "year": 2013,
+      "value": 9.15
+     },
+     {
+      "year": 2014,
+      "value": 9.765
+     },
+     {
+      "year": 2015,
+      "value": 9.605
+     },
+     {
+      "year": 2016,
+      "value": 9.665
+     },
+     {
+      "year": 2017,
+      "value": 9.705
+     },
+     {
+      "year": 2018,
+      "value": 9.795
+     },
+     {
+      "year": 2019,
+      "value": 10.045
+     },
+     {
+      "year": 2020,
+      "value": 9.645
+     },
+     {
+      "year": 2021,
+      "value": 9.7
+     },
+     {
+      "year": 2022,
+      "value": 9.96
+     },
+     {
+      "year": 2023,
+      "value": 10.605
+     },
+     {
+      "year": 2024,
+      "value": 10.375
+     },
+     {
+      "year": 2025,
+      "value": 10.58
+     }
+    ],
+    "latest": 10.58
+   },
+   {
+    "id": "bes:01SAL013",
+    "name": "Adeguata alimentazione (tassi standardizzati)",
+    "path": "/indicatore/adeguata-alimentazione-tassi-standardizzati/bes-01SAL013",
+    "direction": "higher_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "Tassi standardizzati per 100 persone",
+    "spark": [
+     {
+      "year": 2005,
+      "value": 18.34
+     },
+     {
+      "year": 2006,
+      "value": 18.68
+     },
+     {
+      "year": 2007,
+      "value": 19.505
+     },
+     {
+      "year": 2008,
+      "value": 19.885
+     },
+     {
+      "year": 2009,
+      "value": 18.29
+     },
+     {
+      "year": 2010,
+      "value": 19.375
+     },
+     {
+      "year": 2011,
+      "value": 18.835
+     },
+     {
+      "year": 2012,
+      "value": 17.75
+     },
+     {
+      "year": 2013,
+      "value": 17.16
+     },
+     {
+      "year": 2014,
+      "value": 17.69
+     },
+     {
+      "year": 2015,
+      "value": 17.9
+     },
+     {
+      "year": 2016,
+      "value": 18.91
+     },
+     {
+      "year": 2017,
+      "value": 19.01
+     },
+     {
+      "year": 2018,
+      "value": 19.64
+     },
+     {
+      "year": 2019,
+      "value": 17.745
+     },
+     {
+      "year": 2020,
+      "value": 18.725
+     },
+     {
+      "year": 2021,
+      "value": 17.505
+     },
+     {
+      "year": 2022,
+      "value": 16.435
+     },
+     {
+      "year": 2023,
+      "value": 16.31
+     },
+     {
+      "year": 2024,
+      "value": 16.615
+     },
+     {
+      "year": 2025,
+      "value": 16.56
+     }
+    ],
+    "latest": 16.56
+   },
+   {
+    "id": "bes:01SAL011",
+    "name": "Alcol (tassi standardizzati)",
+    "path": "/indicatore/alcol-tassi-standardizzati/bes-01SAL011",
+    "direction": "lower_better",
+    "source_theme": "Salute",
+    "year_max": 2025,
+    "unit": "Tassi standardizzati per 100 persone",
+    "spark": [
+     {
+      "year": 2007,
+      "value": 23.515
+     },
+     {
+      "year": 2008,
+      "value": 21.96
+     },
+     {
+      "year": 2009,
+      "value": 21.63
+     },
+     {
+      "year": 2010,
+      "value": 21.955
+     },
+     {
+      "year": 2011,
+      "value": 20.095
+     },
+     {
+      "year": 2012,
+      "value": 18.535
+     },
+     {
+      "year": 2013,
+      "value": 17.71
+     },
+     {
+      "year": 2014,
+      "value": 16.965
+     },
+     {
+      "year": 2015,
+      "value": 17.42
+     },
+     {
+      "year": 2016,
+      "value": 18.015
+     },
+     {
+      "year": 2017,
+      "value": 17.695
+     },
+     {
+      "year": 2018,
+      "value": 17.85
+     },
+     {
+      "year": 2019,
+      "value": 17.005
+     },
+     {
+      "year": 2020,
+      "value": 17.89
+     },
+     {
+      "year": 2021,
+      "value": 15.83
+     },
+     {
+      "year": 2022,
+      "value": 16.72
+     },
+     {
+      "year": 2023,
+      "value": 16.465
+     },
+     {
+      "year": 2024,
+      "value": 16.93
+     },
+     {
+      "year": 2025,
+      "value": 16.77
+     }
+    ],
+    "latest": 16.77
+   }
+  ],
+  "related_posts": [],
+  "siblings": {
+   "prev": null,
+   "next": null
+  },
+  "dimension_siblings": [],
+  "explore": {
+   "id": "bes:01SAL001",
+   "unit": "Numero medio di anni",
+   "changeUnit": "Numero medio di anni",
+   "direction": "higher_better",
+   "higherBetter": true,
+   "scoreable": true,
+   "rampStops": [
+    "var(--seq-1)",
+    "var(--seq-2)",
+    "var(--seq-3)",
+    "var(--seq-4)",
+    "var(--seq-5)",
+    "var(--seq-6)"
+   ],
+   "defaultLevel": "regione",
+   "levels": [
+    {
+     "key": "regione",
+     "label": "Regioni",
+     "singular": "regione",
+     "plural": "regioni",
+     "profilePath": "/regione/",
+     "hasMap": true,
+     "years": [
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+     ],
+     "yearMin": 2004,
+     "yearMax": 2025,
+     "defaultYear": 2025,
+     "territories": [
+      {
+       "key": "abruzzo",
+       "name": "Abruzzo"
+      },
+      {
+       "key": "basilicata",
+       "name": "Basilicata"
+      },
+      {
+       "key": "calabria",
+       "name": "Calabria"
+      },
+      {
+       "key": "campania",
+       "name": "Campania"
+      },
+      {
+       "key": "emilia-romagna",
+       "name": "Emilia-Romagna"
+      },
+      {
+       "key": "friuli-venezia-giulia",
+       "name": "Friuli-Venezia Giulia"
+      },
+      {
+       "key": "lazio",
+       "name": "Lazio"
+      },
+      {
+       "key": "liguria",
+       "name": "Liguria"
+      },
+      {
+       "key": "lombardia",
+       "name": "Lombardia"
+      },
+      {
+       "key": "marche",
+       "name": "Marche"
+      },
+      {
+       "key": "molise",
+       "name": "Molise"
+      },
+      {
+       "key": "piemonte",
+       "name": "Piemonte"
+      },
+      {
+       "key": "puglia",
+       "name": "Puglia"
+      },
+      {
+       "key": "sardegna",
+       "name": "Sardegna"
+      },
+      {
+       "key": "sicilia",
+       "name": "Sicilia"
+      },
+      {
+       "key": "toscana",
+       "name": "Toscana"
+      },
+      {
+       "key": "trentino-alto-adige",
+       "name": "Trentino Alto Adige"
+      },
+      {
+       "key": "umbria",
+       "name": "Umbria"
+      },
+      {
+       "key": "valle-d-aosta",
+       "name": "Valle d'Aosta"
+      },
+      {
+       "key": "veneto",
+       "name": "Veneto"
+      }
+     ],
+     "defaultTerritory": "trentino-alto-adige",
+     "matrix": {
+      "2004": {
+       "piemonte": 80.5,
+       "valle-d-aosta": 79.9,
+       "lombardia": 80.9,
+       "trentino-alto-adige": 81.1,
+       "veneto": 81.2,
+       "friuli-venezia-giulia": 80.6,
+       "liguria": 80.7,
+       "emilia-romagna": 81.2,
+       "toscana": 81.5,
+       "umbria": 81.5,
+       "marche": 81.8,
+       "lazio": 80.1,
+       "abruzzo": 81.0,
+       "molise": 80.4,
+       "campania": 79.2,
+       "puglia": 81.1,
+       "basilicata": 80.4,
+       "calabria": 80.7,
+       "sicilia": 80.1,
+       "sardegna": 80.7
+      },
+      "2005": {
+       "piemonte": 80.6,
+       "valle-d-aosta": 79.7,
+       "lombardia": 80.9,
+       "trentino-alto-adige": 81.4,
+       "veneto": 81.3,
+       "friuli-venezia-giulia": 80.7,
+       "liguria": 80.7,
+       "emilia-romagna": 81.3,
+       "toscana": 81.5,
+       "umbria": 81.1,
+       "marche": 82.1,
+       "lazio": 80.4,
+       "abruzzo": 81.1,
+       "molise": 80.6,
+       "campania": 79.1,
+       "puglia": 81.0,
+       "basilicata": 80.6,
+       "calabria": 80.5,
+       "sicilia": 80.0,
+       "sardegna": 80.6
+      },
+      "2006": {
+       "piemonte": 80.8,
+       "valle-d-aosta": 80.5,
+       "lombardia": 81.3,
+       "trentino-alto-adige": 81.6,
+       "veneto": 81.7,
+       "friuli-venezia-giulia": 81.0,
+       "liguria": 81.0,
+       "emilia-romagna": 81.7,
+       "toscana": 81.9,
+       "umbria": 81.7,
+       "marche": 82.1,
+       "lazio": 80.8,
+       "abruzzo": 81.4,
+       "molise": 80.7,
+       "campania": 79.5,
+       "puglia": 81.3,
+       "basilicata": 80.9,
+       "calabria": 81.0,
+       "sicilia": 80.4,
+       "sardegna": 81.1
+      },
+      "2007": {
+       "piemonte": 81.1,
+       "valle-d-aosta": 80.5,
+       "lombardia": 81.6,
+       "trentino-alto-adige": 82.0,
+       "veneto": 81.8,
+       "friuli-venezia-giulia": 81.3,
+       "liguria": 81.2,
+       "emilia-romagna": 81.8,
+       "toscana": 81.9,
+       "umbria": 81.8,
+       "marche": 82.4,
+       "lazio": 80.9,
+       "abruzzo": 81.4,
+       "molise": 81.5,
+       "campania": 79.5,
+       "puglia": 81.2,
+       "basilicata": 81.1,
+       "calabria": 80.9,
+       "sicilia": 80.2,
+       "sardegna": 81.2
+      },
+      "2008": {
+       "piemonte": 81.1,
+       "valle-d-aosta": 81.1,
+       "lombardia": 81.5,
+       "trentino-alto-adige": 82.1,
+       "veneto": 81.8,
+       "friuli-venezia-giulia": 81.3,
+       "liguria": 81.2,
+       "emilia-romagna": 81.9,
+       "toscana": 81.9,
+       "umbria": 81.7,
+       "marche": 82.3,
+       "lazio": 81.0,
+       "abruzzo": 81.5,
+       "molise": 81.1,
+       "campania": 79.7,
+       "puglia": 81.6,
+       "basilicata": 81.6,
+       "calabria": 81.0,
+       "sicilia": 80.5,
+       "sardegna": 81.3
+      },
+      "2009": {
+       "piemonte": 81.3,
+       "valle-d-aosta": 81.1,
+       "lombardia": 81.7,
+       "trentino-alto-adige": 82.5,
+       "veneto": 82.1,
+       "friuli-venezia-giulia": 81.5,
+       "liguria": 81.2,
+       "emilia-romagna": 82.1,
+       "toscana": 82.1,
+       "umbria": 82.2,
+       "marche": 82.5,
+       "lazio": 81.0,
+       "abruzzo": 81.2,
+       "molise": 81.6,
+       "campania": 79.9,
+       "puglia": 81.6,
+       "basilicata": 81.7,
+       "calabria": 81.0,
+       "sicilia": 80.5,
+       "sardegna": 81.3
+      },
+      "2010": {
+       "piemonte": 81.7,
+       "valle-d-aosta": 81.3,
+       "lombardia": 82.0,
+       "trentino-alto-adige": 82.6,
+       "veneto": 82.4,
+       "friuli-venezia-giulia": 81.8,
+       "liguria": 81.7,
+       "emilia-romagna": 82.4,
+       "toscana": 82.5,
+       "umbria": 82.3,
+       "marche": 82.8,
+       "lazio": 81.3,
+       "abruzzo": 81.7,
+       "molise": 81.6,
+       "campania": 80.1,
+       "puglia": 82.1,
+       "basilicata": 81.8,
+       "calabria": 81.6,
+       "sicilia": 80.9,
+       "sardegna": 81.8
+      },
+      "2011": {
+       "piemonte": 81.9,
+       "valle-d-aosta": 81.7,
+       "lombardia": 82.5,
+       "trentino-alto-adige": 83.1,
+       "veneto": 82.6,
+       "friuli-venezia-giulia": 82.0,
+       "liguria": 81.8,
+       "emilia-romagna": 82.6,
+       "toscana": 82.7,
+       "umbria": 82.7,
+       "marche": 82.9,
+       "lazio": 81.5,
+       "abruzzo": 81.9,
+       "molise": 81.6,
+       "campania": 80.2,
+       "puglia": 82.1,
+       "basilicata": 82.0,
+       "calabria": 81.6,
+       "sicilia": 80.9,
+       "sardegna": 81.8
+      },
+      "2012": {
+       "piemonte": 82.1,
+       "valle-d-aosta": 81.9,
+       "lombardia": 82.4,
+       "trentino-alto-adige": 83.1,
+       "veneto": 82.6,
+       "friuli-venezia-giulia": 82.0,
+       "liguria": 82.0,
+       "emilia-romagna": 82.6,
+       "toscana": 82.6,
+       "umbria": 82.6,
+       "marche": 83.0,
+       "lazio": 81.6,
+       "abruzzo": 82.2,
+       "molise": 81.9,
+       "campania": 80.4,
+       "puglia": 82.3,
+       "basilicata": 82.1,
+       "calabria": 81.6,
+       "sicilia": 81.0,
+       "sardegna": 81.9
+      },
+      "2013": {
+       "piemonte": 82.2,
+       "valle-d-aosta": 82.1,
+       "lombardia": 82.8,
+       "trentino-alto-adige": 83.3,
+       "veneto": 82.9,
+       "friuli-venezia-giulia": 82.2,
+       "liguria": 82.1,
+       "emilia-romagna": 83.0,
+       "toscana": 83.0,
+       "umbria": 82.8,
+       "marche": 83.2,
+       "lazio": 82.1,
+       "abruzzo": 82.4,
+       "molise": 82.2,
+       "campania": 80.6,
+       "puglia": 82.5,
+       "basilicata": 82.2,
+       "calabria": 81.9,
+       "sicilia": 81.4,
+       "sardegna": 82.2
+      },
+      "2014": {
+       "piemonte": 82.6,
+       "valle-d-aosta": 82.1,
+       "lombardia": 83.2,
+       "trentino-alto-adige": 83.5,
+       "veneto": 83.2,
+       "friuli-venezia-giulia": 82.7,
+       "liguria": 82.6,
+       "emilia-romagna": 83.2,
+       "toscana": 83.2,
+       "umbria": 83.2,
+       "marche": 83.3,
+       "lazio": 82.3,
+       "abruzzo": 82.6,
+       "molise": 82.3,
+       "campania": 80.9,
+       "puglia": 82.6,
+       "basilicata": 82.4,
+       "calabria": 81.9,
+       "sicilia": 81.6,
+       "sardegna": 82.5
+      },
+      "2015": {
+       "piemonte": 82.1,
+       "valle-d-aosta": 81.1,
+       "lombardia": 82.8,
+       "trentino-alto-adige": 83.4,
+       "veneto": 82.9,
+       "friuli-venezia-giulia": 82.4,
+       "liguria": 82.2,
+       "emilia-romagna": 82.9,
+       "toscana": 82.8,
+       "umbria": 82.8,
+       "marche": 83.0,
+       "lazio": 82.0,
+       "abruzzo": 82.3,
+       "molise": 82.0,
+       "campania": 80.4,
+       "puglia": 82.3,
+       "basilicata": 82.0,
+       "calabria": 81.7,
+       "sicilia": 81.2,
+       "sardegna": 82.2
+      },
+      "2016": {
+       "piemonte": 82.7,
+       "valle-d-aosta": 82.2,
+       "lombardia": 83.3,
+       "trentino-alto-adige": 83.6,
+       "veneto": 83.4,
+       "friuli-venezia-giulia": 82.9,
+       "liguria": 82.8,
+       "emilia-romagna": 83.2,
+       "toscana": 83.4,
+       "umbria": 83.4,
+       "marche": 83.4,
+       "lazio": 82.4,
+       "abruzzo": 82.9,
+       "molise": 82.7,
+       "campania": 81.1,
+       "puglia": 82.9,
+       "basilicata": 82.6,
+       "calabria": 82.3,
+       "sicilia": 81.8,
+       "sardegna": 82.6
+      },
+      "2017": {
+       "piemonte": 82.5,
+       "valle-d-aosta": 82.0,
+       "lombardia": 83.3,
+       "trentino-alto-adige": 83.8,
+       "veneto": 83.4,
+       "friuli-venezia-giulia": 83.0,
+       "liguria": 82.6,
+       "emilia-romagna": 83.2,
+       "toscana": 83.3,
+       "umbria": 83.3,
+       "marche": 83.2,
+       "lazio": 82.3,
+       "abruzzo": 82.5,
+       "molise": 82.2,
+       "campania": 80.9,
+       "puglia": 82.6,
+       "basilicata": 82.2,
+       "calabria": 81.9,
+       "sicilia": 81.4,
+       "sardegna": 82.7
+      },
+      "2018": {
+       "piemonte": 82.6,
+       "valle-d-aosta": 82.1,
+       "lombardia": 83.4,
+       "trentino-alto-adige": 84.0,
+       "veneto": 83.6,
+       "friuli-venezia-giulia": 83.1,
+       "liguria": 82.6,
+       "emilia-romagna": 83.5,
+       "toscana": 83.6,
+       "umbria": 83.8,
+       "marche": 83.8,
+       "lazio": 82.9,
+       "abruzzo": 83.1,
+       "molise": 82.7,
+       "campania": 81.4,
+       "puglia": 83.0,
+       "basilicata": 82.6,
+       "calabria": 82.5,
+       "sicilia": 81.8,
+       "sardegna": 83.0
+      },
+      "2019": {
+       "piemonte": 82.9,
+       "valle-d-aosta": 82.7,
+       "lombardia": 83.6,
+       "trentino-alto-adige": 84.2,
+       "veneto": 83.8,
+       "friuli-venezia-giulia": 83.5,
+       "liguria": 83.1,
+       "emilia-romagna": 83.6,
+       "toscana": 83.6,
+       "umbria": 84.0,
+       "marche": 84.0,
+       "lazio": 83.2,
+       "abruzzo": 83.3,
+       "molise": 83.0,
+       "campania": 81.6,
+       "puglia": 83.2,
+       "basilicata": 82.5,
+       "calabria": 82.4,
+       "sicilia": 82.0,
+       "sardegna": 83.0
+      },
+      "2020": {
+       "piemonte": 81.4,
+       "valle-d-aosta": 80.9,
+       "lombardia": 81.4,
+       "trentino-alto-adige": 82.8,
+       "veneto": 82.9,
+       "friuli-venezia-giulia": 82.6,
+       "liguria": 81.7,
+       "emilia-romagna": 82.5,
+       "toscana": 83.1,
+       "umbria": 83.4,
+       "marche": 83.0,
+       "lazio": 82.6,
+       "abruzzo": 82.6,
+       "molise": 82.2,
+       "campania": 80.9,
+       "puglia": 82.3,
+       "basilicata": 82.2,
+       "calabria": 82.1,
+       "sicilia": 81.5,
+       "sardegna": 82.3
+      },
+      "2021": {
+       "piemonte": 82.5,
+       "valle-d-aosta": 82.3,
+       "lombardia": 83.1,
+       "trentino-alto-adige": 83.6,
+       "veneto": 83.3,
+       "friuli-venezia-giulia": 82.3,
+       "liguria": 82.7,
+       "emilia-romagna": 83.0,
+       "toscana": 83.2,
+       "umbria": 83.2,
+       "marche": 83.1,
+       "lazio": 82.6,
+       "abruzzo": 82.6,
+       "molise": 81.4,
+       "campania": 80.7,
+       "puglia": 82.0,
+       "basilicata": 82.3,
+       "calabria": 81.6,
+       "sicilia": 81.2,
+       "sardegna": 82.6
+      },
+      "2022": {
+       "piemonte": 82.5,
+       "valle-d-aosta": 82.3,
+       "lombardia": 83.2,
+       "trentino-alto-adige": 83.8,
+       "veneto": 83.4,
+       "friuli-venezia-giulia": 83.0,
+       "liguria": 82.5,
+       "emilia-romagna": 83.3,
+       "toscana": 83.3,
+       "umbria": 83.3,
+       "marche": 83.3,
+       "lazio": 82.9,
+       "abruzzo": 82.6,
+       "molise": 81.9,
+       "campania": 81.0,
+       "puglia": 82.6,
+       "basilicata": 82.1,
+       "calabria": 81.7,
+       "sicilia": 81.4,
+       "sardegna": 82.0
+      },
+      "2023": {
+       "piemonte": 83.0,
+       "valle-d-aosta": 83.2,
+       "lombardia": 83.8,
+       "trentino-alto-adige": 84.4,
+       "veneto": 83.8,
+       "friuli-venezia-giulia": 83.4,
+       "liguria": 83.1,
+       "emilia-romagna": 83.6,
+       "toscana": 83.8,
+       "umbria": 83.7,
+       "marche": 83.9,
+       "lazio": 82.9,
+       "abruzzo": 83.0,
+       "molise": 82.3,
+       "campania": 81.3,
+       "puglia": 82.8,
+       "basilicata": 82.5,
+       "calabria": 81.9,
+       "sicilia": 81.6,
+       "sardegna": 82.5
+      },
+      "2024": {
+       "piemonte": 83.5,
+       "valle-d-aosta": 82.8,
+       "lombardia": 84.1,
+       "trentino-alto-adige": 84.7,
+       "veneto": 84.3,
+       "friuli-venezia-giulia": 83.9,
+       "liguria": 83.6,
+       "emilia-romagna": 84.1,
+       "toscana": 84.1,
+       "umbria": 84.0,
+       "marche": 84.3,
+       "lazio": 83.4,
+       "abruzzo": 83.5,
+       "molise": 82.5,
+       "campania": 81.8,
+       "puglia": 83.3,
+       "basilicata": 83.2,
+       "calabria": 82.6,
+       "sicilia": 82.4,
+       "sardegna": 83.0
+      },
+      "2025": {
+       "piemonte": 83.6,
+       "valle-d-aosta": 83.7,
+       "lombardia": 84.3,
+       "trentino-alto-adige": 84.8,
+       "veneto": 84.4,
+       "friuli-venezia-giulia": 84.1,
+       "liguria": 83.7,
+       "emilia-romagna": 84.2,
+       "toscana": 84.3,
+       "umbria": 84.1,
+       "marche": 84.4,
+       "lazio": 83.6,
+       "abruzzo": 83.7,
+       "molise": 82.6,
+       "campania": 82.1,
+       "puglia": 83.5,
+       "basilicata": 83.1,
+       "calabria": 82.9,
+       "sicilia": 82.6,
+       "sardegna": 83.1
+      }
+     }
+    },
+    {
+     "key": "provincia",
+     "label": "Province",
+     "singular": "provincia",
+     "plural": "province",
+     "profilePath": "/provincia/",
+     "hasMap": false,
+     "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+     ],
+     "yearMin": 2015,
+     "yearMax": 2024,
+     "defaultYear": 2024,
+     "territories": [
+      {
+       "key": "agrigento",
+       "name": "Agrigento"
+      },
+      {
+       "key": "alessandria",
+       "name": "Alessandria"
+      },
+      {
+       "key": "ancona",
+       "name": "Ancona"
+      },
+      {
+       "key": "aosta",
+       "name": "Aosta"
+      },
+      {
+       "key": "arezzo",
+       "name": "Arezzo"
+      },
+      {
+       "key": "ascoli-piceno",
+       "name": "Ascoli Piceno"
+      },
+      {
+       "key": "asti",
+       "name": "Asti"
+      },
+      {
+       "key": "avellino",
+       "name": "Avellino"
+      },
+      {
+       "key": "bari",
+       "name": "Bari"
+      },
+      {
+       "key": "barletta-andria-trani",
+       "name": "Barletta-Andria-Trani"
+      },
+      {
+       "key": "belluno",
+       "name": "Belluno"
+      },
+      {
+       "key": "benevento",
+       "name": "Benevento"
+      },
+      {
+       "key": "bergamo",
+       "name": "Bergamo"
+      },
+      {
+       "key": "biella",
+       "name": "Biella"
+      },
+      {
+       "key": "bologna",
+       "name": "Bologna"
+      },
+      {
+       "key": "bolzano",
+       "name": "Bolzano"
+      },
+      {
+       "key": "brescia",
+       "name": "Brescia"
+      },
+      {
+       "key": "brindisi",
+       "name": "Brindisi"
+      },
+      {
+       "key": "cagliari",
+       "name": "Cagliari"
+      },
+      {
+       "key": "caltanissetta",
+       "name": "Caltanissetta"
+      },
+      {
+       "key": "campobasso",
+       "name": "Campobasso"
+      },
+      {
+       "key": "caserta",
+       "name": "Caserta"
+      },
+      {
+       "key": "catania",
+       "name": "Catania"
+      },
+      {
+       "key": "catanzaro",
+       "name": "Catanzaro"
+      },
+      {
+       "key": "chieti",
+       "name": "Chieti"
+      },
+      {
+       "key": "como",
+       "name": "Como"
+      },
+      {
+       "key": "cosenza",
+       "name": "Cosenza"
+      },
+      {
+       "key": "cremona",
+       "name": "Cremona"
+      },
+      {
+       "key": "crotone",
+       "name": "Crotone"
+      },
+      {
+       "key": "cuneo",
+       "name": "Cuneo"
+      },
+      {
+       "key": "enna",
+       "name": "Enna"
+      },
+      {
+       "key": "fermo",
+       "name": "Fermo"
+      },
+      {
+       "key": "ferrara",
+       "name": "Ferrara"
+      },
+      {
+       "key": "firenze",
+       "name": "Firenze"
+      },
+      {
+       "key": "foggia",
+       "name": "Foggia"
+      },
+      {
+       "key": "forli-cesena",
+       "name": "Forlì-Cesena"
+      },
+      {
+       "key": "frosinone",
+       "name": "Frosinone"
+      },
+      {
+       "key": "genova",
+       "name": "Genova"
+      },
+      {
+       "key": "gorizia",
+       "name": "Gorizia"
+      },
+      {
+       "key": "grosseto",
+       "name": "Grosseto"
+      },
+      {
+       "key": "imperia",
+       "name": "Imperia"
+      },
+      {
+       "key": "isernia",
+       "name": "Isernia"
+      },
+      {
+       "key": "l-aquila",
+       "name": "L'Aquila"
+      },
+      {
+       "key": "la-spezia",
+       "name": "La Spezia"
+      },
+      {
+       "key": "latina",
+       "name": "Latina"
+      },
+      {
+       "key": "lecce",
+       "name": "Lecce"
+      },
+      {
+       "key": "lecco",
+       "name": "Lecco"
+      },
+      {
+       "key": "livorno",
+       "name": "Livorno"
+      },
+      {
+       "key": "lodi",
+       "name": "Lodi"
+      },
+      {
+       "key": "lucca",
+       "name": "Lucca"
+      },
+      {
+       "key": "macerata",
+       "name": "Macerata"
+      },
+      {
+       "key": "mantova",
+       "name": "Mantova"
+      },
+      {
+       "key": "massa-carrara",
+       "name": "Massa-Carrara"
+      },
+      {
+       "key": "matera",
+       "name": "Matera"
+      },
+      {
+       "key": "messina",
+       "name": "Messina"
+      },
+      {
+       "key": "milano",
+       "name": "Milano"
+      },
+      {
+       "key": "modena",
+       "name": "Modena"
+      },
+      {
+       "key": "monza-e-della-brianza",
+       "name": "Monza e della Brianza"
+      },
+      {
+       "key": "napoli",
+       "name": "Napoli"
+      },
+      {
+       "key": "novara",
+       "name": "Novara"
+      },
+      {
+       "key": "nuoro",
+       "name": "Nuoro"
+      },
+      {
+       "key": "oristano",
+       "name": "Oristano"
+      },
+      {
+       "key": "padova",
+       "name": "Padova"
+      },
+      {
+       "key": "palermo",
+       "name": "Palermo"
+      },
+      {
+       "key": "parma",
+       "name": "Parma"
+      },
+      {
+       "key": "pavia",
+       "name": "Pavia"
+      },
+      {
+       "key": "perugia",
+       "name": "Perugia"
+      },
+      {
+       "key": "pesaro-e-urbino",
+       "name": "Pesaro e Urbino"
+      },
+      {
+       "key": "pescara",
+       "name": "Pescara"
+      },
+      {
+       "key": "piacenza",
+       "name": "Piacenza"
+      },
+      {
+       "key": "pisa",
+       "name": "Pisa"
+      },
+      {
+       "key": "pistoia",
+       "name": "Pistoia"
+      },
+      {
+       "key": "pordenone",
+       "name": "Pordenone"
+      },
+      {
+       "key": "potenza",
+       "name": "Potenza"
+      },
+      {
+       "key": "prato",
+       "name": "Prato"
+      },
+      {
+       "key": "ragusa",
+       "name": "Ragusa"
+      },
+      {
+       "key": "ravenna",
+       "name": "Ravenna"
+      },
+      {
+       "key": "reggio-calabria",
+       "name": "Reggio Calabria"
+      },
+      {
+       "key": "reggio-emilia",
+       "name": "Reggio Emilia"
+      },
+      {
+       "key": "rieti",
+       "name": "Rieti"
+      },
+      {
+       "key": "rimini",
+       "name": "Rimini"
+      },
+      {
+       "key": "roma",
+       "name": "Roma"
+      },
+      {
+       "key": "rovigo",
+       "name": "Rovigo"
+      },
+      {
+       "key": "salerno",
+       "name": "Salerno"
+      },
+      {
+       "key": "sassari",
+       "name": "Sassari"
+      },
+      {
+       "key": "savona",
+       "name": "Savona"
+      },
+      {
+       "key": "siena",
+       "name": "Siena"
+      },
+      {
+       "key": "siracusa",
+       "name": "Siracusa"
+      },
+      {
+       "key": "sondrio",
+       "name": "Sondrio"
+      },
+      {
+       "key": "sud-sardegna",
+       "name": "Sud Sardegna"
+      },
+      {
+       "key": "taranto",
+       "name": "Taranto"
+      },
+      {
+       "key": "teramo",
+       "name": "Teramo"
+      },
+      {
+       "key": "terni",
+       "name": "Terni"
+      },
+      {
+       "key": "torino",
+       "name": "Torino"
+      },
+      {
+       "key": "trapani",
+       "name": "Trapani"
+      },
+      {
+       "key": "trento",
+       "name": "Trento"
+      },
+      {
+       "key": "treviso",
+       "name": "Treviso"
+      },
+      {
+       "key": "trieste",
+       "name": "Trieste"
+      },
+      {
+       "key": "udine",
+       "name": "Udine"
+      },
+      {
+       "key": "varese",
+       "name": "Varese"
+      },
+      {
+       "key": "venezia",
+       "name": "Venezia"
+      },
+      {
+       "key": "verbano-cusio-ossola",
+       "name": "Verbano-Cusio-Ossola"
+      },
+      {
+       "key": "vercelli",
+       "name": "Vercelli"
+      },
+      {
+       "key": "verona",
+       "name": "Verona"
+      },
+      {
+       "key": "vibo-valentia",
+       "name": "Vibo Valentia"
+      },
+      {
+       "key": "vicenza",
+       "name": "Vicenza"
+      },
+      {
+       "key": "viterbo",
+       "name": "Viterbo"
+      }
+     ],
+     "defaultTerritory": "lecco",
+     "matrix": {
+      "2015": {
+       "agrigento": 81.5,
+       "alessandria": 81.6,
+       "ancona": 83.2,
+       "aosta": 81.1,
+       "arezzo": 83.1,
+       "ascoli-piceno": 82.9,
+       "asti": 81.6,
+       "avellino": 81.5,
+       "bari": 82.8,
+       "barletta-andria-trani": 82.3,
+       "belluno": 82.0,
+       "benevento": 81.1,
+       "bergamo": 82.4,
+       "biella": 81.4,
+       "bologna": 83.0,
+       "bolzano": 83.2,
+       "brescia": 82.8,
+       "brindisi": 82.0,
+       "cagliari": 82.9,
+       "caltanissetta": 81.0,
+       "campobasso": 82.0,
+       "caserta": 80.4,
+       "catania": 81.2,
+       "catanzaro": 82.1,
+       "chieti": 82.5,
+       "como": 83.0,
+       "cosenza": 81.8,
+       "cremona": 82.0,
+       "crotone": 81.4,
+       "cuneo": 82.0,
+       "enna": 81.3,
+       "fermo": 82.5,
+       "ferrara": 81.5,
+       "firenze": 83.4,
+       "foggia": 82.0,
+       "forli-cesena": 83.2,
+       "frosinone": 81.9,
+       "genova": 82.1,
+       "gorizia": 82.1,
+       "grosseto": 82.2,
+       "imperia": 82.2,
+       "isernia": 81.7,
+       "l-aquila": 82.3,
+       "la-spezia": 82.3,
+       "latina": 82.0,
+       "lecce": 82.4,
+       "lecco": 82.9,
+       "livorno": 82.2,
+       "lodi": 81.9,
+       "lucca": 82.0,
+       "macerata": 82.9,
+       "mantova": 82.6,
+       "massa-carrara": 81.7,
+       "matera": 82.1,
+       "messina": 81.1,
+       "milano": 83.3,
+       "modena": 83.3,
+       "monza-e-della-brianza": 83.3,
+       "napoli": 79.9,
+       "novara": 82.4,
+       "nuoro": 81.7,
+       "oristano": 82.0,
+       "padova": 83.2,
+       "palermo": 81.4,
+       "parma": 82.9,
+       "pavia": 81.6,
+       "perugia": 83.1,
+       "pesaro-e-urbino": 83.2,
+       "pescara": 82.3,
+       "piacenza": 82.3,
+       "pisa": 82.7,
+       "pistoia": 83.2,
+       "pordenone": 83.2,
+       "potenza": 82.0,
+       "prato": 83.4,
+       "ragusa": 81.9,
+       "ravenna": 83.2,
+       "reggio-calabria": 81.6,
+       "reggio-emilia": 82.8,
+       "rieti": 81.7,
+       "rimini": 83.6,
+       "roma": 82.3,
+       "rovigo": 81.9,
+       "salerno": 81.2,
+       "sassari": 82.6,
+       "savona": 82.2,
+       "siena": 83.2,
+       "siracusa": 80.7,
+       "sondrio": 82.4,
+       "sud-sardegna": 80.9,
+       "taranto": 82.6,
+       "teramo": 82.1,
+       "terni": 82.2,
+       "torino": 82.5,
+       "trapani": 81.6,
+       "trento": 83.5,
+       "treviso": 83.5,
+       "trieste": 81.8,
+       "udine": 82.3,
+       "varese": 82.9,
+       "venezia": 82.8,
+       "verbano-cusio-ossola": 81.6,
+       "vercelli": 81.6,
+       "verona": 82.8,
+       "vibo-valentia": 81.8,
+       "vicenza": 83.0,
+       "viterbo": 81.1
+      },
+      "2017": {
+       "agrigento": 81.2,
+       "alessandria": 81.9,
+       "ancona": 83.5,
+       "aosta": 82.0,
+       "arezzo": 83.3,
+       "ascoli-piceno": 83.3,
+       "asti": 82.1,
+       "avellino": 82.1,
+       "bari": 83.2,
+       "barletta-andria-trani": 82.5,
+       "belluno": 82.5,
+       "benevento": 81.7,
+       "bergamo": 82.9,
+       "biella": 82.7,
+       "bologna": 83.5,
+       "bolzano": 83.7,
+       "brescia": 83.5,
+       "brindisi": 82.4,
+       "cagliari": 83.4,
+       "caltanissetta": 80.9,
+       "campobasso": 82.3,
+       "caserta": 80.7,
+       "catania": 81.5,
+       "catanzaro": 82.0,
+       "chieti": 82.6,
+       "como": 83.3,
+       "cosenza": 81.8,
+       "cremona": 82.8,
+       "crotone": 81.8,
+       "cuneo": 82.5,
+       "enna": 81.4,
+       "fermo": 82.4,
+       "ferrara": 82.1,
+       "firenze": 84.0,
+       "foggia": 82.3,
+       "forli-cesena": 83.7,
+       "frosinone": 82.0,
+       "genova": 82.6,
+       "gorizia": 83.1,
+       "grosseto": 83.0,
+       "imperia": 82.6,
+       "isernia": 82.2,
+       "l-aquila": 82.5,
+       "la-spezia": 83.1,
+       "latina": 82.3,
+       "lecce": 82.6,
+       "lecco": 83.7,
+       "livorno": 83.1,
+       "lodi": 82.7,
+       "lucca": 82.5,
+       "macerata": 82.9,
+       "mantova": 83.3,
+       "massa-carrara": 82.6,
+       "matera": 82.6,
+       "messina": 81.4,
+       "milano": 83.8,
+       "modena": 83.6,
+       "monza-e-della-brianza": 83.9,
+       "napoli": 80.5,
+       "novara": 82.9,
+       "nuoro": 82.2,
+       "oristano": 82.6,
+       "padova": 83.7,
+       "palermo": 81.5,
+       "parma": 83.3,
+       "pavia": 82.0,
+       "perugia": 83.5,
+       "pesaro-e-urbino": 83.9,
+       "pescara": 83.0,
+       "piacenza": 82.8,
+       "pisa": 83.3,
+       "pistoia": 83.2,
+       "pordenone": 83.6,
+       "potenza": 82.1,
+       "prato": 84.0,
+       "ragusa": 82.1,
+       "ravenna": 83.5,
+       "reggio-calabria": 82.0,
+       "reggio-emilia": 83.3,
+       "rieti": 81.9,
+       "rimini": 83.9,
+       "roma": 82.6,
+       "rovigo": 82.4,
+       "salerno": 81.6,
+       "sassari": 82.8,
+       "savona": 82.6,
+       "siena": 83.4,
+       "siracusa": 81.3,
+       "sondrio": 82.4,
+       "sud-sardegna": 81.7,
+       "taranto": 82.4,
+       "teramo": 82.3,
+       "terni": 82.9,
+       "torino": 82.8,
+       "trapani": 81.5,
+       "trento": 83.9,
+       "treviso": 84.0,
+       "trieste": 82.7,
+       "udine": 83.0,
+       "varese": 83.4,
+       "venezia": 83.3,
+       "verbano-cusio-ossola": 82.3,
+       "vercelli": 81.4,
+       "verona": 83.4,
+       "vibo-valentia": 82.4,
+       "vicenza": 83.5,
+       "viterbo": 81.4
+      },
+      "2018": {
+       "agrigento": 81.9,
+       "alessandria": 82.0,
+       "ancona": 84.0,
+       "aosta": 82.1,
+       "arezzo": 83.6,
+       "ascoli-piceno": 83.4,
+       "asti": 82.2,
+       "avellino": 82.5,
+       "bari": 83.6,
+       "barletta-andria-trani": 82.8,
+       "belluno": 82.8,
+       "benevento": 82.2,
+       "bergamo": 83.3,
+       "biella": 82.3,
+       "bologna": 83.7,
+       "bolzano": 83.9,
+       "brescia": 83.5,
+       "brindisi": 82.6,
+       "cagliari": 84.1,
+       "caltanissetta": 81.1,
+       "campobasso": 82.8,
+       "caserta": 81.0,
+       "catania": 81.8,
+       "catanzaro": 82.2,
+       "chieti": 82.9,
+       "como": 83.5,
+       "cosenza": 82.6,
+       "cremona": 82.8,
+       "crotone": 82.6,
+       "cuneo": 82.6,
+       "enna": 82.0,
+       "fermo": 83.8,
+       "ferrara": 82.4,
+       "firenze": 84.3,
+       "foggia": 82.6,
+       "forli-cesena": 84.2,
+       "frosinone": 82.5,
+       "genova": 82.7,
+       "gorizia": 82.3,
+       "grosseto": 83.5,
+       "imperia": 82.3,
+       "isernia": 82.5,
+       "l-aquila": 83.3,
+       "la-spezia": 83.1,
+       "latina": 83.0,
+       "lecce": 83.3,
+       "lecco": 83.8,
+       "livorno": 83.1,
+       "lodi": 82.7,
+       "lucca": 82.9,
+       "macerata": 84.1,
+       "mantova": 83.1,
+       "massa-carrara": 83.0,
+       "matera": 82.9,
+       "messina": 82.0,
+       "milano": 84.1,
+       "modena": 84.0,
+       "monza-e-della-brianza": 83.8,
+       "napoli": 81.0,
+       "novara": 82.6,
+       "nuoro": 82.6,
+       "oristano": 82.8,
+       "padova": 84.0,
+       "palermo": 81.9,
+       "parma": 83.8,
+       "pavia": 82.2,
+       "perugia": 84.2,
+       "pesaro-e-urbino": 84.2,
+       "pescara": 83.0,
+       "piacenza": 82.8,
+       "pisa": 83.4,
+       "pistoia": 83.8,
+       "pordenone": 83.7,
+       "potenza": 82.5,
+       "prato": 83.5,
+       "ragusa": 82.2,
+       "ravenna": 83.8,
+       "reggio-calabria": 82.5,
+       "reggio-emilia": 83.5,
+       "rieti": 83.4,
+       "rimini": 84.2,
+       "roma": 83.2,
+       "rovigo": 82.4,
+       "salerno": 82.1,
+       "sassari": 82.7,
+       "savona": 82.6,
+       "siena": 84.0,
+       "siracusa": 81.5,
+       "sondrio": 82.5,
+       "sud-sardegna": 82.6,
+       "taranto": 82.8,
+       "teramo": 83.4,
+       "terni": 83.3,
+       "torino": 83.0,
+       "trapani": 82.1,
+       "trento": 84.2,
+       "treviso": 84.1,
+       "trieste": 82.6,
+       "udine": 83.4,
+       "varese": 83.4,
+       "venezia": 83.5,
+       "verbano-cusio-ossola": 82.6,
+       "vercelli": 82.1,
+       "verona": 83.9,
+       "vibo-valentia": 82.7,
+       "vicenza": 83.6,
+       "viterbo": 81.8
+      },
+      "2019": {
+       "agrigento": 81.8,
+       "alessandria": 82.2,
+       "ancona": 84.3,
+       "aosta": 82.7,
+       "arezzo": 83.8,
+       "ascoli-piceno": 84.1,
+       "asti": 82.4,
+       "avellino": 82.3,
+       "bari": 83.7,
+       "barletta-andria-trani": 83.0,
+       "belluno": 83.3,
+       "benevento": 82.5,
+       "bergamo": 83.4,
+       "biella": 82.8,
+       "bologna": 84.0,
+       "bolzano": 83.9,
+       "brescia": 83.7,
+       "brindisi": 82.8,
+       "cagliari": 83.5,
+       "caltanissetta": 81.1,
+       "campobasso": 83.3,
+       "caserta": 81.5,
+       "catania": 82.0,
+       "catanzaro": 82.8,
+       "chieti": 83.4,
+       "como": 83.6,
+       "cosenza": 82.4,
+       "cremona": 83.4,
+       "crotone": 82.3,
+       "cuneo": 82.9,
+       "enna": 82.3,
+       "fermo": 83.5,
+       "ferrara": 82.7,
+       "firenze": 84.3,
+       "foggia": 82.7,
+       "forli-cesena": 83.8,
+       "frosinone": 82.5,
+       "genova": 83.1,
+       "gorizia": 83.0,
+       "grosseto": 83.2,
+       "imperia": 82.7,
+       "isernia": 82.5,
+       "l-aquila": 83.0,
+       "la-spezia": 83.5,
+       "latina": 83.3,
+       "lecce": 83.6,
+       "lecco": 84.3,
+       "livorno": 83.0,
+       "lodi": 83.7,
+       "lucca": 83.2,
+       "macerata": 84.1,
+       "mantova": 83.2,
+       "massa-carrara": 83.2,
+       "matera": 83.0,
+       "messina": 82.1,
+       "milano": 84.2,
+       "modena": 84.0,
+       "monza-e-della-brianza": 84.2,
+       "napoli": 81.3,
+       "novara": 83.0,
+       "nuoro": 82.9,
+       "oristano": 83.2,
+       "padova": 84.3,
+       "palermo": 82.1,
+       "parma": 83.6,
+       "pavia": 82.3,
+       "perugia": 84.4,
+       "pesaro-e-urbino": 84.0,
+       "pescara": 83.6,
+       "piacenza": 83.4,
+       "pisa": 83.4,
+       "pistoia": 83.9,
+       "pordenone": 84.4,
+       "potenza": 82.3,
+       "prato": 84.5,
+       "ragusa": 82.6,
+       "ravenna": 83.6,
+       "reggio-calabria": 82.4,
+       "reggio-emilia": 83.5,
+       "rieti": 83.1,
+       "rimini": 84.3,
+       "roma": 83.5,
+       "rovigo": 83.2,
+       "salerno": 82.2,
+       "sassari": 83.0,
+       "savona": 83.1,
+       "siena": 83.7,
+       "siracusa": 81.5,
+       "sondrio": 82.5,
+       "sud-sardegna": 82.8,
+       "taranto": 83.0,
+       "teramo": 83.2,
+       "terni": 83.5,
+       "torino": 83.3,
+       "trapani": 82.1,
+       "trento": 84.3,
+       "treviso": 84.3,
+       "trieste": 83.0,
+       "udine": 83.6,
+       "varese": 83.7,
+       "venezia": 83.6,
+       "verbano-cusio-ossola": 83.1,
+       "vercelli": 82.4,
+       "verona": 84.0,
+       "vibo-valentia": 82.5,
+       "vicenza": 84.0,
+       "viterbo": 82.2
+      },
+      "2020": {
+       "agrigento": 81.8,
+       "alessandria": 80.3,
+       "ancona": 83.4,
+       "aosta": 80.9,
+       "arezzo": 83.3,
+       "ascoli-piceno": 83.4,
+       "asti": 80.9,
+       "avellino": 81.4,
+       "bari": 82.8,
+       "barletta-andria-trani": 81.7,
+       "belluno": 82.3,
+       "benevento": 82.2,
+       "bergamo": 79.7,
+       "biella": 81.3,
+       "bologna": 83.1,
+       "bolzano": 82.8,
+       "brescia": 81.2,
+       "brindisi": 82.4,
+       "cagliari": 83.4,
+       "caltanissetta": 81.3,
+       "campobasso": 82.4,
+       "caserta": 80.7,
+       "catania": 81.6,
+       "catanzaro": 82.6,
+       "chieti": 82.9,
+       "como": 81.9,
+       "cosenza": 82.1,
+       "cremona": 79.7,
+       "crotone": 81.5,
+       "cuneo": 81.7,
+       "enna": 81.4,
+       "fermo": 83.2,
+       "ferrara": 82.1,
+       "firenze": 83.6,
+       "foggia": 81.2,
+       "forli-cesena": 83.1,
+       "frosinone": 82.1,
+       "genova": 81.5,
+       "gorizia": 82.3,
+       "grosseto": 83.3,
+       "imperia": 81.6,
+       "isernia": 81.8,
+       "l-aquila": 82.6,
+       "la-spezia": 82.3,
+       "latina": 82.7,
+       "lecce": 83.2,
+       "lecco": 82.2,
+       "livorno": 82.7,
+       "lodi": 80.0,
+       "lucca": 82.7,
+       "macerata": 83.3,
+       "mantova": 81.7,
+       "massa-carrara": 81.8,
+       "matera": 82.7,
+       "messina": 81.9,
+       "milano": 82.2,
+       "modena": 83.1,
+       "monza-e-della-brianza": 82.5,
+       "napoli": 80.4,
+       "novara": 81.6,
+       "nuoro": 82.2,
+       "oristano": 82.0,
+       "padova": 83.6,
+       "palermo": 81.5,
+       "parma": 81.4,
+       "pavia": 80.0,
+       "perugia": 83.8,
+       "pesaro-e-urbino": 82.4,
+       "pescara": 82.5,
+       "piacenza": 80.2,
+       "pisa": 83.0,
+       "pistoia": 83.5,
+       "pordenone": 83.2,
+       "potenza": 82.1,
+       "prato": 83.3,
+       "ragusa": 82.0,
+       "ravenna": 83.3,
+       "reggio-calabria": 82.2,
+       "reggio-emilia": 82.5,
+       "rieti": 82.3,
+       "rimini": 82.7,
+       "roma": 82.9,
+       "rovigo": 82.2,
+       "salerno": 82.0,
+       "sassari": 82.0,
+       "savona": 82.1,
+       "siena": 83.9,
+       "siracusa": 81.1,
+       "sondrio": 80.8,
+       "sud-sardegna": 82.4,
+       "taranto": 82.7,
+       "teramo": 82.4,
+       "terni": 82.9,
+       "torino": 81.8,
+       "trapani": 82.2,
+       "trento": 82.8,
+       "treviso": 83.6,
+       "trieste": 82.2,
+       "udine": 82.8,
+       "varese": 82.1,
+       "venezia": 82.6,
+       "verbano-cusio-ossola": 81.9,
+       "vercelli": 80.2,
+       "verona": 82.6,
+       "vibo-valentia": 82.3,
+       "vicenza": 82.8,
+       "viterbo": 82.1
+      },
+      "2021": {
+       "agrigento": 81.2,
+       "alessandria": 82.2,
+       "ancona": 83.1,
+       "aosta": 82.3,
+       "ascoli-piceno": 83.1,
+       "avellino": 81.6,
+       "bari": 82.2,
+       "barletta-andria-trani": 81.9,
+       "benevento": 81.7,
+       "biella": 82.2,
+       "bologna": 83.3,
+       "bolzano": 83.4,
+       "brescia": 83.0,
+       "brindisi": 82.6,
+       "cagliari": 83.8,
+       "campobasso": 81.4,
+       "caserta": 80.7,
+       "catanzaro": 82.3,
+       "chieti": 82.7,
+       "como": 83.1,
+       "cosenza": 81.5,
+       "cremona": 82.8,
+       "crotone": 81.0,
+       "cuneo": 82.4,
+       "enna": 81.2,
+       "fermo": 82.7,
+       "ferrara": 81.8,
+       "foggia": 81.3,
+       "forli-cesena": 82.9,
+       "frosinone": 81.4,
+       "gorizia": 82.2,
+       "imperia": 82.2,
+       "isernia": 81.5,
+       "la-spezia": 82.9,
+       "latina": 82.7,
+       "lecco": 83.4,
+       "livorno": 83.0,
+       "lodi": 82.6,
+       "lucca": 82.7,
+       "macerata": 82.9,
+       "mantova": 82.4,
+       "matera": 82.9,
+       "messina": 81.2,
+       "milano": 83.7,
+       "napoli": 80.3,
+       "nuoro": 82.0,
+       "padova": 83.7,
+       "palermo": 81.3,
+       "parma": 83.2,
+       "pavia": 81.8,
+       "perugia": 83.2,
+       "pesaro-e-urbino": 83.7,
+       "piacenza": 82.9,
+       "pisa": 83.3,
+       "pistoia": 83.0,
+       "pordenone": 83.2,
+       "potenza": 82.1,
+       "prato": 82.5,
+       "ravenna": 83.1,
+       "reggio-calabria": 81.6,
+       "reggio-emilia": 83.2,
+       "rieti": 82.5,
+       "rovigo": 82.1,
+       "salerno": 81.5,
+       "sassari": 82.7,
+       "savona": 82.5,
+       "siracusa": 80.4,
+       "sondrio": 82.6,
+       "sud-sardegna": 82.2,
+       "taranto": 81.7,
+       "teramo": 82.8,
+       "terni": 83.2,
+       "trento": 83.9,
+       "treviso": 83.9,
+       "udine": 82.2,
+       "venezia": 83.0,
+       "verbano-cusio-ossola": 83.0,
+       "vercelli": 81.6,
+       "viterbo": 82.1
+      },
+      "2022": {
+       "agrigento": 81.4,
+       "alessandria": 81.6,
+       "ancona": 83.4,
+       "aosta": 82.3,
+       "arezzo": 83.2,
+       "ascoli-piceno": 83.2,
+       "asti": 82.0,
+       "avellino": 81.7,
+       "bari": 83.1,
+       "barletta-andria-trani": 82.9,
+       "belluno": 82.3,
+       "benevento": 81.8,
+       "bergamo": 82.9,
+       "biella": 82.4,
+       "bologna": 83.5,
+       "bolzano": 83.4,
+       "brescia": 83.5,
+       "brindisi": 82.4,
+       "cagliari": 82.7,
+       "caltanissetta": 81.1,
+       "campobasso": 82.1,
+       "caserta": 80.8,
+       "catania": 81.4,
+       "catanzaro": 82.1,
+       "chieti": 82.8,
+       "como": 83.3,
+       "cosenza": 81.7,
+       "cremona": 82.7,
+       "crotone": 80.8,
+       "cuneo": 82.5,
+       "enna": 80.9,
+       "fermo": 83.8,
+       "ferrara": 82.1,
+       "firenze": 83.9,
+       "foggia": 82.0,
+       "forli-cesena": 83.4,
+       "frosinone": 82.0,
+       "genova": 82.6,
+       "gorizia": 82.7,
+       "grosseto": 83.2,
+       "imperia": 81.7,
+       "isernia": 81.6,
+       "l-aquila": 82.3,
+       "la-spezia": 82.6,
+       "latina": 82.5,
+       "lecce": 82.7,
+       "lecco": 83.4,
+       "livorno": 82.7,
+       "lodi": 82.5,
+       "lucca": 83.1,
+       "macerata": 83.2,
+       "mantova": 82.8,
+       "massa-carrara": 82.5,
+       "matera": 82.6,
+       "messina": 81.0,
+       "milano": 83.6,
+       "modena": 83.5,
+       "monza-e-della-brianza": 83.8,
+       "napoli": 80.7,
+       "novara": 82.7,
+       "nuoro": 81.6,
+       "oristano": 82.0,
+       "padova": 83.7,
+       "palermo": 81.8,
+       "parma": 83.3,
+       "pavia": 81.9,
+       "perugia": 83.5,
+       "pesaro-e-urbino": 83.4,
+       "pescara": 82.6,
+       "piacenza": 83.0,
+       "pisa": 83.1,
+       "pistoia": 83.6,
+       "pordenone": 83.6,
+       "potenza": 81.9,
+       "prato": 83.5,
+       "ragusa": 82.1,
+       "ravenna": 83.4,
+       "reggio-calabria": 81.6,
+       "reggio-emilia": 83.2,
+       "rieti": 82.0,
+       "rimini": 83.6,
+       "roma": 83.2,
+       "rovigo": 81.9,
+       "salerno": 81.8,
+       "sassari": 81.8,
+       "savona": 82.7,
+       "siena": 83.5,
+       "siracusa": 80.6,
+       "sondrio": 82.8,
+       "sud-sardegna": 82.1,
+       "taranto": 82.4,
+       "teramo": 82.7,
+       "terni": 82.8,
+       "torino": 82.8,
+       "trapani": 81.5,
+       "trento": 84.2,
+       "treviso": 84.1,
+       "trieste": 82.6,
+       "udine": 83.0,
+       "varese": 83.2,
+       "venezia": 83.1,
+       "verbano-cusio-ossola": 82.4,
+       "vercelli": 81.7,
+       "verona": 83.6,
+       "vibo-valentia": 81.8,
+       "vicenza": 83.6,
+       "viterbo": 81.8
+      },
+      "2023": {
+       "agrigento": 81.4,
+       "alessandria": 82.3,
+       "ancona": 84.0,
+       "aosta": 83.2,
+       "arezzo": 83.6,
+       "ascoli-piceno": 83.9,
+       "asti": 82.8,
+       "avellino": 82.4,
+       "bari": 83.3,
+       "barletta-andria-trani": 83.1,
+       "belluno": 83.1,
+       "benevento": 82.2,
+       "bergamo": 83.6,
+       "biella": 82.7,
+       "bologna": 83.9,
+       "bolzano": 84.2,
+       "brescia": 84.1,
+       "brindisi": 82.4,
+       "cagliari": 83.1,
+       "caltanissetta": 81.4,
+       "campobasso": 82.7,
+       "caserta": 80.9,
+       "catania": 81.7,
+       "catanzaro": 82.6,
+       "chieti": 82.6,
+       "como": 84.1,
+       "cosenza": 81.7,
+       "cremona": 83.5,
+       "crotone": 81.8,
+       "cuneo": 83.2,
+       "enna": 81.3,
+       "fermo": 83.9,
+       "ferrara": 82.9,
+       "firenze": 84.7,
+       "foggia": 82.4,
+       "forli-cesena": 84.0,
+       "frosinone": 82.2,
+       "genova": 83.3,
+       "gorizia": 83.2,
+       "grosseto": 83.3,
+       "imperia": 82.3,
+       "isernia": 81.7,
+       "l-aquila": 82.8,
+       "la-spezia": 83.4,
+       "latina": 82.6,
+       "lecce": 83.0,
+       "lecco": 84.4,
+       "livorno": 83.5,
+       "lodi": 83.4,
+       "lucca": 83.3,
+       "macerata": 84.0,
+       "mantova": 83.1,
+       "massa-carrara": 82.8,
+       "matera": 83.0,
+       "messina": 81.7,
+       "milano": 84.2,
+       "modena": 83.8,
+       "monza-e-della-brianza": 84.5,
+       "napoli": 81.1,
+       "novara": 83.6,
+       "nuoro": 82.6,
+       "oristano": 82.8,
+       "padova": 84.1,
+       "palermo": 81.8,
+       "parma": 83.9,
+       "pavia": 82.3,
+       "perugia": 84.0,
+       "pesaro-e-urbino": 84.1,
+       "pescara": 83.5,
+       "piacenza": 83.0,
+       "pisa": 83.7,
+       "pistoia": 83.9,
+       "pordenone": 84.0,
+       "potenza": 82.3,
+       "prato": 84.5,
+       "ragusa": 82.3,
+       "ravenna": 83.9,
+       "reggio-calabria": 82.0,
+       "reggio-emilia": 83.7,
+       "rieti": 82.3,
+       "rimini": 84.5,
+       "roma": 83.2,
+       "rovigo": 82.8,
+       "salerno": 82.1,
+       "sassari": 82.6,
+       "savona": 83.2,
+       "siena": 84.2,
+       "siracusa": 81.5,
+       "sondrio": 83.4,
+       "sud-sardegna": 82.1,
+       "taranto": 82.6,
+       "teramo": 83.4,
+       "terni": 83.0,
+       "torino": 83.4,
+       "trapani": 81.8,
+       "trento": 84.5,
+       "treviso": 84.4,
+       "trieste": 82.8,
+       "udine": 83.7,
+       "varese": 83.9,
+       "venezia": 83.7,
+       "verbano-cusio-ossola": 83.0,
+       "vercelli": 82.0,
+       "verona": 84.0,
+       "vibo-valentia": 82.3,
+       "vicenza": 84.2,
+       "viterbo": 82.3
+      },
+      "2024": {
+       "agrigento": 82.0,
+       "alessandria": 82.7,
+       "ancona": 84.5,
+       "aosta": 82.9,
+       "arezzo": 84.2,
+       "ascoli-piceno": 84.1,
+       "asti": 83.2,
+       "avellino": 82.5,
+       "bari": 83.7,
+       "barletta-andria-trani": 83.8,
+       "belluno": 83.3,
+       "benevento": 82.3,
+       "bergamo": 84.0,
+       "biella": 83.1,
+       "bologna": 84.3,
+       "bolzano": 84.6,
+       "brescia": 84.5,
+       "brindisi": 82.9,
+       "cagliari": 83.7,
+       "caltanissetta": 81.9,
+       "campobasso": 82.7,
+       "caserta": 81.5,
+       "catania": 82.4,
+       "catanzaro": 82.9,
+       "chieti": 83.3,
+       "como": 84.4,
+       "cosenza": 82.2,
+       "cremona": 83.6,
+       "crotone": 82.4,
+       "cuneo": 83.6,
+       "enna": 82.7,
+       "fermo": 84.0,
+       "ferrara": 83.3,
+       "firenze": 84.7,
+       "foggia": 82.7,
+       "forli-cesena": 84.6,
+       "frosinone": 82.8,
+       "genova": 83.7,
+       "gorizia": 84.0,
+       "grosseto": 83.1,
+       "imperia": 83.2,
+       "isernia": 82.2,
+       "l-aquila": 83.5,
+       "la-spezia": 83.6,
+       "latina": 82.8,
+       "lecce": 83.2,
+       "lecco": 84.9,
+       "livorno": 83.7,
+       "lodi": 83.7,
+       "lucca": 83.7,
+       "macerata": 84.0,
+       "mantova": 83.4,
+       "massa-carrara": 83.8,
+       "matera": 83.6,
+       "messina": 82.2,
+       "milano": 84.7,
+       "modena": 84.2,
+       "monza-e-della-brianza": 84.8,
+       "napoli": 81.4,
+       "novara": 83.7,
+       "nuoro": 82.9,
+       "oristano": 82.8,
+       "padova": 84.4,
+       "palermo": 82.4,
+       "parma": 84.3,
+       "pavia": 82.6,
+       "perugia": 84.3,
+       "pesaro-e-urbino": 84.4,
+       "pescara": 83.5,
+       "piacenza": 83.8,
+       "pisa": 84.0,
+       "pistoia": 84.4,
+       "pordenone": 84.5,
+       "potenza": 82.9,
+       "prato": 84.5,
+       "ragusa": 83.1,
+       "ravenna": 84.4,
+       "reggio-calabria": 82.4,
+       "reggio-emilia": 84.3,
+       "rieti": 82.6,
+       "rimini": 84.6,
+       "roma": 83.6,
+       "rovigo": 83.2,
+       "salerno": 82.6,
+       "sassari": 82.8,
+       "savona": 83.8,
+       "siena": 84.5,
+       "siracusa": 81.5,
+       "sondrio": 83.1,
+       "sud-sardegna": 82.7,
+       "taranto": 82.8,
+       "teramo": 83.5,
+       "terni": 83.4,
+       "torino": 83.8,
+       "trapani": 82.4,
+       "trento": 84.7,
+       "treviso": 84.9,
+       "trieste": 82.9,
+       "udine": 84.0,
+       "varese": 84.2,
+       "venezia": 84.0,
+       "verbano-cusio-ossola": 83.2,
+       "vercelli": 82.5,
+       "verona": 84.6,
+       "vibo-valentia": 83.3,
+       "vicenza": 84.6,
+       "viterbo": 82.4
+      },
+      "2016": {
+       "alessandria": 82.0,
+       "ancona": 83.7,
+       "ascoli-piceno": 83.2,
+       "avellino": 82.2,
+       "bari": 83.4,
+       "benevento": 82.1,
+       "bergamo": 83.2,
+       "bolzano": 83.4,
+       "cagliari": 83.5,
+       "caltanissetta": 81.1,
+       "campobasso": 82.7,
+       "como": 83.4,
+       "cosenza": 82.3,
+       "crotone": 82.2,
+       "enna": 81.7,
+       "firenze": 84.2,
+       "foggia": 82.7,
+       "gorizia": 82.5,
+       "grosseto": 83.1,
+       "imperia": 82.7,
+       "l-aquila": 82.6,
+       "latina": 82.4,
+       "lecce": 83.1,
+       "livorno": 82.9,
+       "lodi": 82.8,
+       "macerata": 83.2,
+       "massa-carrara": 82.9,
+       "messina": 82.0,
+       "napoli": 80.7,
+       "nuoro": 82.0,
+       "palermo": 81.8,
+       "perugia": 83.7,
+       "pesaro-e-urbino": 83.9,
+       "pisa": 83.4,
+       "pistoia": 83.5,
+       "potenza": 82.5,
+       "prato": 83.7,
+       "rieti": 81.8,
+       "roma": 82.7,
+       "rovigo": 82.2,
+       "savona": 82.8,
+       "siena": 83.6,
+       "taranto": 82.5,
+       "teramo": 83.1,
+       "torino": 83.2,
+       "trento": 83.9,
+       "treviso": 84.0,
+       "varese": 83.5,
+       "verbano-cusio-ossola": 82.8
+      }
+     }
+    }
+   ]
+  },
+  "page_article": {
+   "lead": null,
+   "sections": [
+    {
+     "role": "definizione",
+     "anchor": "sezione-definizione",
+     "heading": "Che cosa misura, in concreto",
+     "body": null,
+     "authored": false
+    },
+    {
+     "role": "quadro",
+     "anchor": "sezione-quadro",
+     "heading": "Come si distribuisce oggi",
+     "body": null,
+     "authored": false
+    },
+    {
+     "role": "dinamica",
+     "anchor": "sezione-dinamica",
+     "heading": "Come è cambiato nel tempo",
+     "body": null,
+     "authored": false
+    },
+    {
+     "role": "limiti",
+     "anchor": "sezione-limiti",
+     "heading": "Che cosa questo dato non dice",
+     "body": null,
+     "authored": false
+    }
+   ],
+   "come_leggere": false,
+   "h1": null,
+   "seo_title": null,
+   "fonti": [],
+   "vintage": null,
+   "authored_count": 0
+  },
+  "page_lead": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato. Dati Istat per 20 regioni, dal 2004 al 2025, con mappa, classifica e serie storica.",
+  "noindex": false,
+  "seo_title": "Speranza di vita alla nascita per regione, da 84,8 a 82,1",
+  "seo_description": "Speranza di vita alla nascita, 2025: da 84,8 in Trentino Alto Adige a 82,1 in Campania. 20 regioni a confronto, dati Istat.",
+  "dataset_description": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato. Dati Istat per 20 regioni, dal 2004 al 2025, con mappa, classifica e serie storica.",
+  "dataset_updated": "2026-05-25",
+  "estremi": {
+   "alto": {
+    "key": "trentino-alto-adige",
+    "name": "Trentino Alto Adige",
+    "value": 84.8
+   },
+   "basso": {
+    "key": "campania",
+    "name": "Campania",
+    "value": 82.1
+   }
+  },
+  "site_url": "https://divarioitalia.it",
+  "site_name": "Divario Italia",
+  "canonical": "https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+  "SITE_NAME": "Divario Italia",
+  "SITE_URL": "https://divarioitalia.it",
+  "data_license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "data_license_label": "Creative Commons BY 4.0",
+  "publisher": {
+   "@type": "Organization",
+   "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+   "name": "Divario Italia",
+   "url": "https://divarioitalia.it/chi-siamo",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://divarioitalia.it/static/img/logo-mark.png"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "editorial",
+    "email": "divarioitalia@protonmail.com",
+    "url": "https://divarioitalia.it/contatti",
+    "availableLanguage": "it"
+   }
+  },
+  "publisher_jsonld": "{\"@type\": \"Organization\", \"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\", \"name\": \"Divario Italia\", \"url\": \"https://divarioitalia.it/chi-siamo\", \"logo\": {\"@type\": \"ImageObject\", \"url\": \"https://divarioitalia.it/static/img/logo-mark.png\"}, \"contactPoint\": {\"@type\": \"ContactPoint\", \"contactType\": \"editorial\", \"email\": \"divarioitalia@protonmail.com\", \"url\": \"https://divarioitalia.it/contatti\", \"availableLanguage\": \"it\"}}",
+  "organization_ref_jsonld": "{\"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\"}",
+  "corrections_url": "https://github.com/nmaiese/diset-viz/issues/new",
+  "contact_email": "divarioitalia@protonmail.com",
+  "consent_cmp_name": "Iubenda",
+  "consent_cmp_url": "https://www.iubenda.com/privacy-policy/"
+ }
+}

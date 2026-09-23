@@ -1,0 +1,110 @@
+{
+ "title": "Speranza di vita alla nascita per regione, da 84,8 a 82,1",
+ "description": "Speranza di vita alla nascita, 2025: da 84,8 in Trentino Alto Adige a 82,1 in Campania. 20 regioni a confronto, dati Istat.",
+ "canonical": "https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "Speranza di vita alla nascita",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Speranza di vita alla nascita",
+   "description": "Esprime in anni la speranza di vita alla nascita come valore medio per il gruppo osservato. Dati Istat per 20 regioni, dal 2004 al 2025, con mappa, classifica e serie storica.",
+   "url": "https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+   "temporalCoverage": "2004/2025",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Italia"
+   },
+   "creator": {
+    "@type": "Organization",
+    "name": "Istat, BES nazionale, aggiornamento intermedio 2026",
+    "url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "dateModified": "2026-05-25",
+   "isBasedOn": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/",
+   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
+   "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": "Speranza di vita alla nascita",
+    "unitText": "Numero medio di anni",
+    "minValue": 82.1,
+    "maxValue": 84.8,
+    "measurementTechnique": "Istat, BES nazionale, aggiornamento intermedio 2026",
+    "description": "Benessere equo e sostenibile, aggiornamento intermedio 2026"
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "keywords": [
+    "Salute, demografia e cura",
+    "regioni italiane",
+    "Istat"
+   ],
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "name": "Download CSV",
+     "description": "Serie dell'indicatore in formato CSV",
+     "encodingFormat": "text/csv",
+     "contentUrl": "https://divarioitalia.it/download/indicator/bes:01SAL001.csv"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "Download JSON",
+     "description": "Serie dell'indicatore in formato JSON",
+     "encodingFormat": "application/json",
+     "contentUrl": "https://divarioitalia.it/download/indicator/bes:01SAL001.json"
+    }
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Temi",
+     "item": "https://divarioitalia.it/temi"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Salute, demografia e cura",
+     "item": "https://divarioitalia.it/tema/salute-demografia-e-cura"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "name": "Speranza di vita alla nascita",
+     "item": "https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 171792
+}

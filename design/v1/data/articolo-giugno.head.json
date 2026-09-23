@@ -1,0 +1,78 @@
+{
+ "title": "233 anziani ogni 100 giovani: l&#39;Italia che invecchia",
+ "description": "All&#39;inizio del 2026 in Italia ci sono 233 anziani ogni 100 giovani. In Sardegna quasi 300, in Trentino-Alto Adige 168. La mappa dell&#39;invecchiamento per regione.",
+ "canonical": "https://divarioitalia.it/blog/italia-che-invecchia-indice-vecchiaia-2026",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "L&#39;Italia che invecchia: l&#39;indice di vecchiaia per regione nel 2026",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Article",
+   "headline": "L'Italia che invecchia: l'indice di vecchiaia per regione nel 2026",
+   "description": "All'inizio del 2026 in Italia ci sono 233 anziani ogni 100 giovani. In Sardegna quasi 300, in Trentino-Alto Adige 168. La mappa dell'invecchiamento per regione.",
+   "image": [
+    "https://divarioitalia.it/static/img/blog/indice-vecchiaia.png"
+   ],
+   "datePublished": "2026-06-30",
+   "dateModified": "2026-06-30",
+   "author": {
+    "@type": "Organization",
+    "name": "Redazione Divario Italia"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://divarioitalia.it/blog/italia-che-invecchia-indice-vecchiaia-2026"
+   },
+   "about": {
+    "@type": "Thing",
+    "name": "Indice di vecchiaia",
+    "description": "Misura il rapporto tra popolazione di 65 anni e oltre e popolazione di 0-14 anni, per cento.",
+    "url": "https://divarioitalia.it/indicatore/indice-di-vecchiaia/ter-921"
+   },
+   "isAccessibleForFree": true
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Blog",
+     "item": "https://divarioitalia.it/blog"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "L'Italia che invecchia: l'indice di vecchiaia per regione nel 2026",
+     "item": "https://divarioitalia.it/blog/italia-che-invecchia-indice-vecchiaia-2026"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 24940
+}

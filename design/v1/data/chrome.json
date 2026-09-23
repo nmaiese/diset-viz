@@ -1,0 +1,228 @@
+{
+ "primary": [
+  {
+   "label": "Esplora",
+   "key": "esplora",
+   "group": [
+    {
+     "label": "Atlante",
+     "path": "/atlante",
+     "active": "atlas"
+    },
+    {
+     "label": "Regioni",
+     "path": "/regioni",
+     "active": "regioni"
+    },
+    {
+     "label": "Province",
+     "path": "/province",
+     "active": "province"
+    },
+    {
+     "label": "Temi",
+     "path": "/temi",
+     "active": "temi"
+    },
+    {
+     "label": "Confronta",
+     "path": "/confronto",
+     "active": "confronto"
+    },
+    {
+     "label": "Divari regionali",
+     "path": "/divari-regionali",
+     "active": "divari"
+    }
+   ]
+  },
+  {
+   "label": "Classifiche",
+   "key": "classifiche",
+   "group": [
+    {
+     "label": "Qualità della vita, regioni",
+     "path": "/qualita-della-vita/classifica/regioni",
+     "active": "qualita-della-vita"
+    },
+    {
+     "label": "Qualità della vita, province",
+     "path": "/qualita-della-vita/classifica/province",
+     "active": "qualita-della-vita"
+    },
+    {
+     "label": "Metodologia dell'indice",
+     "path": "/metodologia",
+     "active": "metodologia"
+    }
+   ]
+  },
+  {
+   "label": "Progetto",
+   "key": "progetto",
+   "group": [
+    {
+     "label": "Chi siamo",
+     "path": "/chi-siamo",
+     "active": "progetto"
+    },
+    {
+     "label": "Contatti",
+     "path": "/contatti",
+     "active": "progetto"
+    },
+    {
+     "label": "Privacy e cookie",
+     "path": "/privacy",
+     "active": "progetto"
+    }
+   ]
+  },
+  {
+   "label": "Storie",
+   "path": "/blog",
+   "active": "blog"
+  },
+  {
+   "label": "Quiz",
+   "path": "/quiz",
+   "active": "gioco"
+  },
+  {
+   "label": "Metodologia",
+   "path": "/metodologia",
+   "active": "metodologia"
+  }
+ ],
+ "footer_groups": [
+  {
+   "label": "Esplora",
+   "items": [
+    {
+     "label": "Atlante",
+     "path": "/atlante"
+    },
+    {
+     "label": "Regioni",
+     "path": "/regioni"
+    },
+    {
+     "label": "Province",
+     "path": "/province"
+    },
+    {
+     "label": "Temi",
+     "path": "/temi"
+    },
+    {
+     "label": "Confronta",
+     "path": "/confronto"
+    },
+    {
+     "label": "Divari regionali",
+     "path": "/divari-regionali"
+    }
+   ]
+  },
+  {
+   "label": "Classifiche",
+   "items": [
+    {
+     "label": "Qualità della vita, regioni",
+     "path": "/qualita-della-vita/classifica/regioni"
+    },
+    {
+     "label": "Qualità della vita, province",
+     "path": "/qualita-della-vita/classifica/province"
+    },
+    {
+     "label": "Metodologia della classifica",
+     "path": "/metodologia"
+    }
+   ]
+  },
+  {
+   "label": "Contenuti",
+   "items": [
+    {
+     "label": "Storie e analisi",
+     "path": "/blog"
+    },
+    {
+     "label": "Quiz",
+     "path": "/quiz"
+    },
+    {
+     "label": "Cerca nel sito",
+     "path": "/ricerca"
+    },
+    {
+     "label": "Catalogo dati",
+     "path": "/catalogo-dati"
+    }
+   ]
+  },
+  {
+   "label": "Progetto",
+   "items": [
+    {
+     "label": "Chi siamo",
+     "path": "/chi-siamo"
+    },
+    {
+     "label": "Contatti",
+     "path": "/contatti"
+    },
+    {
+     "label": "Metodologia e fonti",
+     "path": "/metodologia"
+    },
+    {
+     "label": "Privacy e cookie",
+     "path": "/privacy"
+    },
+    {
+     "label": "Cookie policy",
+     "path": "/privacy",
+     "anchor": "#cookie"
+    },
+    {
+     "label": "Termini",
+     "path": "/termini"
+    }
+   ]
+  }
+ ],
+ "drawer_other": [
+  {
+   "label": "Storie",
+   "path": "/blog",
+   "active": "blog"
+  },
+  {
+   "label": "Quiz",
+   "path": "/quiz",
+   "active": "gioco"
+  },
+  {
+   "label": "Metodologia",
+   "path": "/metodologia",
+   "active": "metodologia"
+  },
+  {
+   "label": "Cerca nel sito",
+   "path": "/ricerca"
+  },
+  {
+   "label": "Catalogo dati",
+   "path": "/catalogo-dati"
+  },
+  {
+   "label": "Termini",
+   "path": "/termini"
+  }
+ ],
+ "short": {
+  "/qualita-della-vita/classifica/regioni": "Qualità della vita"
+ }
+}

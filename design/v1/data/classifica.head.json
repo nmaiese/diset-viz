@@ -1,0 +1,98 @@
+{
+ "title": "Qualità regioni: Equilibrato | Divario Italia",
+ "description": "Classifica della qualità della vita per regioni: indicatori Istat su scala 0-100, profilo Equilibrato, categorie e metodo trasparenti.",
+ "canonical": "https://divarioitalia.it/qualita-della-vita/classifica/regioni",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "Qualità della vita: regioni italiane",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Classifica qualità della vita per regioni, profilo Equilibrato",
+   "description": "Punteggi di qualità della vita delle regioni italiane su indicatori istituzionali selezionati (Istat ed Eurostat), normalizzati con z-score orientato e display 0-100.",
+   "url": "https://divarioitalia.it/qualita-della-vita/classifica/regioni",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Italia"
+   },
+   "creator": {
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione"
+   },
+   "isBasedOn": [
+    {
+     "@type": "Dataset",
+     "name": "BES dei Territori",
+     "creator": {
+      "@type": "Organization",
+      "name": "Istat"
+     }
+    },
+    {
+     "@type": "Dataset",
+     "name": "Eurostat, statistiche regionali",
+     "creator": {
+      "@type": "Organization",
+      "name": "Eurostat"
+     }
+    }
+   ],
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "isAccessibleForFree": true,
+   "license": "CC BY 4.0 (Istat) e CC BY 4.0 (Eurostat)",
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "encodingFormat": "text/csv",
+     "contentUrl": "https://divarioitalia.it/download/quality-life/regioni"
+    },
+    {
+     "@type": "DataDownload",
+     "encodingFormat": "application/json",
+     "contentUrl": "https://divarioitalia.it/download/quality-life/regioni.json"
+    }
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Qualità della vita",
+     "item": "https://divarioitalia.it/qualita-della-vita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Classifica regioni",
+     "item": "https://divarioitalia.it/qualita-della-vita/classifica/regioni"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 144534
+}
