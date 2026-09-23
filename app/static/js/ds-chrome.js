@@ -174,7 +174,7 @@
           html += '<div class="sg"><div class="sg__label">Territori</div>';
           territories.slice(0, 4).forEach(function (item) {
             html +=
-              '<a class="sg__item" role="option" href="' + item.path + '">' +
+              '<a class="sg__item" role="option" href="' + escapeHtml(item.path) + '">' +
               "<span>" + escapeHtml(item.name) + "</span>" +
               '<span class="sg__kind">' + escapeHtml(item.context || "") + "</span>" +
               "</a>";
@@ -185,7 +185,7 @@
           html += '<div class="sg"><div class="sg__label">Indicatori</div>';
           results.slice(0, territories.length ? 4 : 6).forEach(function (item) {
             html +=
-              '<a class="sg__item" role="option" href="' + item.path + '">' +
+              '<a class="sg__item" role="option" href="' + escapeHtml(item.path) + '">' +
               "<span>" + escapeHtml(item.name) + "</span>" +
               '<span class="sg__kind">' + escapeHtml(item.theme || "Indicatore") + "</span>" +
               "</a>";

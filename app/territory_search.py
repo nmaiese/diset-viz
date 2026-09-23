@@ -71,22 +71,24 @@ def _entries():
             }
 
 
-def _score(names, query):
-    """3 se un nome e' la domanda, 2 se la apre, 1 se la contiene o ci sta dentro."""
-    best = 0
+def _score(name, aliases, query):
+    """3 se il nome o una variante e' la domanda, 2 se il nome la apre, 1 se il
+    nome la contiene o sta dentro una domanda piu' lunga.
+
+    Le varianti contano solo intere: "sudtirol" non deve rispondere a "sud",
+    che cerca il Sud Sardegna.
+    """
+    if name == query or query in aliases:
+        return 3
+    if name.startswith(query):
+        return 2
+    if len(query) >= 3 and query in name:
+        return 1
     words = f" {query} "
-    for name in names:
-        if name == query:
-            return 3
-        if name.startswith(query):
-            best = max(best, 2)
-        elif len(query) >= 3 and query in name:
-            best = max(best, 1)
-        elif len(name) >= 4 and f" {name} " in words:
-            # "disoccupazione lecce": il territorio sta dentro una domanda
-            # piu' lunga.
-            best = max(best, 1)
-    return best
+    # "disoccupazione lecce": il territorio sta dentro una domanda piu' lunga.
+    if any(len(candidate) >= 4 and f" {candidate} " in words for candidate in (name, *aliases)):
+        return 1
+    return 0
 
 
 def search_territories(query, limit=10):
@@ -101,8 +103,7 @@ def search_territories(query, limit=10):
         return []
     found = []
     for position, entry in enumerate(_entries()):
-        names = (fold(entry["name"]), *ALIASES.get(entry["key"], ()))
-        score = _score(names, cleaned)
+        score = _score(fold(entry["name"]), ALIASES.get(entry["key"], ()), cleaned)
         if score:
             found.append((-score, 0 if entry["kind"] == "provincia" else 1, position, entry))
     found.sort(key=lambda row: row[:3])
