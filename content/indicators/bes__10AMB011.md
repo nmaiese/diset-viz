@@ -8,7 +8,7 @@ Il dato BES esprime la popolazione a rischio frane in percentuale: è massima in
 
 <!-- sezione: quadro -->
 
-In percentuale sulla popolazione, il rischio frane premia le regioni montane e appenniniche, dove più persone vivono su versanti instabili. Il BES lo tratta come descrittivo, dato che l'esposizione dipende dalla geografia, non dalla virtù di una regione. Ma quanto rischio si trasformi in disastro dipende anche da prevenzione e manutenzione.
+In percentuale sulla popolazione, il rischio frane pesa di più sulle regioni montane e appenniniche, dove più persone vivono su versanti instabili. L'esposizione dipende soprattutto dalla geografia, non dalla virtù di una regione. Ma quanto rischio si trasformi in disastro dipende anche da prevenzione e manutenzione.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi
 
 <!-- sezione: quadro -->
 
-Gli infortuni dipendono soprattutto da come è fatto il lavoro di un territorio: agricoltura, edilizia e manifattura pesante rischiano più dei servizi. Per questo alcune regioni piccole e industriali stanno in alto, e l'indicatore è descrittivo, senza un verso che dipenda dalla virtù di una regione. Il calo di lungo periodo c'è, ma ogni infortunio grave resta un fallimento.
+Gli infortuni dipendono soprattutto da come è fatto il lavoro di un territorio: agricoltura, edilizia e manifattura pesante rischiano più dei servizi. Per questo alcune regioni piccole e industriali stanno in alto, e la posizione dice più della struttura produttiva che della virtù di una regione. Il calo di lungo periodo c'è, ma ogni infortunio grave resta un fallimento.
 
 <!-- sezione: limiti -->
 

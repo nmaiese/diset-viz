@@ -8,7 +8,7 @@ I brevetti sono il segno più visibile dell'innovazione, e in Italia sono fortem
 
 <!-- sezione: quadro -->
 
-Un divario di trenta volte racconta un Paese in cui l'innovazione formale vive quasi solo in alcuni distretti industriali del Nord. Ma non tutta l'innovazione passa dai brevetti, e molte piccole imprese innovano senza registrarli, per costo o cultura. Il dato è contestuale, e va letto come segnale di dove si concentra la ricerca applicata, non come mappa completa della creatività.
+Un divario di trenta volte racconta un Paese in cui l'innovazione formale vive quasi solo in alcuni distretti industriali del Nord. Ma non tutta l'innovazione passa dai brevetti, e molte piccole imprese innovano senza registrarli, per costo o cultura. Il dato va letto come segnale di dove si concentra la ricerca applicata, non come mappa completa della creatività.
 
 <!-- sezione: limiti -->
 

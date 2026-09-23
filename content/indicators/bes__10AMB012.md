@@ -8,7 +8,7 @@ In percentuale, la popolazione esposta al rischio alluvioni è altissima in Emil
 
 <!-- sezione: quadro -->
 
-Che in Emilia-Romagna quasi due terzi degli abitanti vivano in aree a rischio alluvione dice quanto sviluppo e acqua si intreccino nelle grandi pianure. Il BES lo tratta come descrittivo, ma il fenomeno è tra i più concreti del cambiamento climatico. L'esposizione cresce con l'urbanizzazione e con eventi meteo più estremi.
+Che in Emilia-Romagna quasi due terzi degli abitanti vivano in aree a rischio alluvione dice quanto sviluppo e acqua si intreccino nelle grandi pianure. Il fenomeno è tra i più concreti del cambiamento climatico. L'esposizione cresce con l'urbanizzazione e con eventi meteo più estremi.
 
 <!-- sezione: limiti -->
 

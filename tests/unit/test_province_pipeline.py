@@ -295,6 +295,21 @@ class ProposeDirectionTest(unittest.TestCase):
                                        cwd=radice, capture_output=True, text=True, check=False)
                 self.assertEqual(esito.returncode, 0, esito.stderr[-500:])
 
+    def test_un_indicatore_ha_un_verso_solo_sui_due_livelli(self):
+        """Su 18 indicatori il manifest provinciale e quello regionale davano
+        versi opposti, e 1.027 posizioni erano speculari fra la pagina
+        provincia e la scheda. D1, 23/9/2026: il verso e' uno."""
+        import csv
+        from pathlib import Path
+        dati = Path(__file__).resolve().parents[2] / "app" / "static" / "data"
+        def versi(nome):
+            with (dati / nome).open(encoding="utf-8", newline="") as handle:
+                return {r["id"]: r["proposed_direction"] for r in csv.DictReader(handle, delimiter=";")}
+        provincia, regione = versi("province_manifest.csv"), versi("bes_regione_manifest.csv")
+        for indicatore in sorted(set(provincia) & set(regione)):
+            with self.subTest(indicatore=indicatore):
+                self.assertEqual(provincia[indicatore], regione[indicatore])
+
     def test_discover_provinces_usa_la_stessa_definizione(self):
         from scripts import discover_provinces
         self.assertIs(discover_provinces.NUTS3_PATTERN, province_sources.NUTS3_PATTERN)

@@ -8,7 +8,7 @@ L'irregolarità del servizio elettrico, misurata dalle interruzioni per utente, 
 
 <!-- sezione: quadro -->
 
-Le interruzioni frequenti sono un divario di qualità di un servizio essenziale, e pesano su famiglie e imprese del Sud, dove reti più vecchie e territori difficili le rendono più comuni. Il BES lo tratta come descrittivo, ma il fenomeno è concreto e misurabile. Un'elettricità che si interrompe spesso frena anche lo sviluppo economico.
+Le interruzioni frequenti sono un divario di qualità di un servizio essenziale, e pesano su famiglie e imprese del Sud, dove reti più vecchie e territori difficili le rendono più comuni. Il fenomeno è concreto e misurabile. Un'elettricità che si interrompe spesso frena anche lo sviluppo economico.
 
 <!-- sezione: limiti -->
 
