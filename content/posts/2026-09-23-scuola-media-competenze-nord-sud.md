@@ -131,7 +131,7 @@ cifre_esterne:
 
 In questi giorni il dibattito sulla scuola è sugli stranieri. Il 21 settembre, aprendo l'anno scolastico ad Amatrice, Sergio Mattarella ha detto che la scuola deve creare legami e non ghetti. Il governo prepara un decreto che fissa un tetto del 30% per classe agli alunni stranieri che non parlano adeguatamente l'italiano. E l'Ismu ha contato 930mila alunni senza cittadinanza italiana, l'11,6% del totale.
 
-In terza media gli studenti sotto la soglia in italiano aumentano, più al Nord che al Sud. Dipende dagli alunni stranieri? Abbiamo incrociato i dati Istat e Invalsi con quelli del ministero dell'Istruzione. La risposta è: in parte, ma non basta.
+In terza media gli studenti sotto la soglia in italiano aumentano, più al Nord che al Sud. Dipende dagli alunni stranieri? Abbiamo incrociato i dati Istat e Invalsi con quelli del ministero: in parte, ma non basta.
 
 Nel 2025 il **41,4% degli studenti di terza media** non raggiunge un livello adeguato in italiano. Nel 2018 era il 34,4%. Fra i soli ragazzi nati in Italia da genitori italiani la quota è oggi del 37,0%: più di quanto fosse fra tutti gli studenti sette anni fa.
 {: .data-callout}
@@ -139,12 +139,12 @@ Nel 2025 il **41,4% degli studenti di terza media** non raggiunge un livello ade
 ## In breve
 
 - Dal 2018 al 2025 gli studenti sotto la soglia salgono di 9,2 punti al Nord, dal 28,7% al 37,9%, e di 4,6 punti nel Mezzogiorno, dal 43,1% al 47,7%.
-- Fra le regioni del Centro-Nord, dove gli alunni stranieri sono cresciuti di più l'italiano è peggiorato di più. Il legame c'è.
+- Fra le regioni del Centro-Nord, dove gli alunni stranieri sono cresciuti di più l'italiano è peggiorato di più.
 - Ma il calo riguarda anche i nativi, e c'è anche nelle regioni dove gli alunni stranieri non sono aumentati.
 
 ## Il Nord che scivola
 
-L'Istat conta gli studenti che nelle prove Invalsi restano nei primi due livelli su cinque, sotto quello considerato adeguato alla fine del primo ciclo. In Italia la quota sale già prima della pandemia, fa un salto con la pandemia, resta ferma fra il 2021 e il 2023 e poi riprende a salire. Al Nord passa dal 28,7% del 2018 al 37,9% del 2025, al Centro dal 30,6% al 38,4%, nel Mezzogiorno dal 43,1% al 47,7%. La distanza fra Nord e Sud si stringe per la ragione sbagliata, come avevano già notato Gavosto e Romano, della Fondazione Agnelli, su lavoce.info nell'agosto 2025.
+In Italia la quota sale già prima della pandemia, fa un salto con la pandemia, resta ferma fra il 2021 e il 2023 e poi riprende a salire. Al Nord passa dal 28,7% del 2018 al 37,9% del 2025, al Centro dal 30,6% al 38,4%, nel Mezzogiorno dal 43,1% al 47,7%. La distanza fra Nord e Sud si stringe per la ragione sbagliata, come avevano già notato Gavosto e Romano, della Fondazione Agnelli, su lavoce.info nell'agosto 2025.
 
 <!-- figura: italiano-2018-2025 -->
 
@@ -156,11 +156,11 @@ Dagli open data del ministero dell'Istruzione abbiamo calcolato quanti alunni di
 
 <!-- figura: stranieri-competenze -->
 
-Fra le dieci regioni del Centro-Nord il legame è forte: dove gli alunni stranieri sono cresciuti di più, l'italiano è peggiorato di più, e più di quanto spiegherebbe la sola presenza in classe di ragazzi in difficoltà con la lingua. Può contare come gli alunni si distribuiscono fra le scuole, oppure può agire qualcos'altro nelle stesse regioni. Nel Mezzogiorno il legame non c'è. Tre verifiche aiutano a dargli la misura giusta.
+Fra le dieci regioni del Centro-Nord il legame è forte: dove gli alunni stranieri sono cresciuti di più, l'italiano è peggiorato di più, e più di quanto spiegherebbe la sola presenza in classe di ragazzi in difficoltà con la lingua. Può contare come gli alunni si distribuiscono fra le scuole, oppure può agire qualcos'altro nelle stesse regioni. Nel Mezzogiorno il legame non c'è. Tre verifiche lo ridimensionano.
 
 **L'effetto diretto.** Se ogni alunno straniero in più fosse sotto la soglia e prendesse il posto di un compagno che la supera, l'aumento degli stranieri sposterebbe il dato di 3,66 punti in Liguria, contro i 12,1 persi. In Friuli-Venezia Giulia 2,25 contro 11,2, in Lombardia 1,38 contro 9,4. Il resto passa per altre strade: l'effetto sui compagni, la concentrazione in alcune scuole, fattori estranei alla cittadinanza.
 
-**Le regioni senza nuovi alunni stranieri.** Nelle Marche la quota è passata dal 10,70% al 10,74%, in Sardegna dal 2,87% al 3,04%. Hanno perso 7,6 e 9,2 punti. Qualcos'altro sta spingendo in basso i risultati.
+**Le regioni senza nuovi alunni stranieri.** Nelle Marche la quota è passata dal 10,70% al 10,74%, in Sardegna dal 2,87% al 3,04%. Hanno perso 7,6 e 9,2 punti.
 
 **I nativi.** L'Istat divide gli studenti per origine. Nel 2025 è sotto la soglia il 75,0% dei ragazzi nati all'estero, il 57,2% di quelli nati in Italia da genitori stranieri e il 37,0% dei nativi. Nel 2018 i nativi erano per forza sotto il 34,4% di tutti gli studenti, perché vanno meglio della media. Quindi sono peggiorati anche loro.
 
@@ -176,9 +176,9 @@ Il Mezzogiorno resta l'area con la quota più alta: in Sicilia nel 2025 è sotto
 
 ## Che cosa dicono questi numeri al dibattito
 
-Il decreto riguarda gli alunni che non parlano adeguatamente l'italiano, soprattutto chi è appena arrivato: il gruppo con i risultati più bassi. Ma il calo riguarda tutti, nativi compresi, anche dove gli alunni stranieri non sono aumentati. Quanto possa cambiare le cose un tetto per classe, i dati regionali non lo dicono.
+Il decreto riguarda gli alunni che non parlano adeguatamente l'italiano, soprattutto chi è appena arrivato: il gruppo con i risultati più bassi. Ma il calo riguarda tutti, nativi compresi. Quanto possa cambiare le cose un tetto per classe, i dati regionali non lo dicono.
 
-Il dato regione per regione è nella [scheda della competenza alfabetica non adeguata](/indicatore/competenza-alfabetica-non-adeguata-studenti-classi-iii-scuola-secondaria-primo-grado/bes-SDG-311), quello di matematica nella [scheda della competenza numerica](/indicatore/competenza-numerica-non-adeguata-studenti-classi-iii-scuola-secondaria-primo-grado/bes-SDG-310).
+Il dato per regione è nella [scheda della competenza alfabetica non adeguata](/indicatore/competenza-alfabetica-non-adeguata-studenti-classi-iii-scuola-secondaria-primo-grado/bes-SDG-311), quello di matematica nella [scheda della competenza numerica](/indicatore/competenza-numerica-non-adeguata-studenti-classi-iii-scuola-secondaria-primo-grado/bes-SDG-310).
 
 ## Dati usati
 

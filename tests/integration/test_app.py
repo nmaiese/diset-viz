@@ -175,18 +175,18 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b'content="noindex, follow"', missing.data)
 
     def test_every_published_post_has_a_valid_indicator_page_and_cover(self):
+        # Il catalogo dell'atlante, non app.data: un post puo' dichiarare un
+        # indicatore di qualunque famiglia (`indicator: bes-SDG-311`), come
+        # documenta app/blog.py, e app.data conosce solo i territoriali.
+        from app.atlas_catalog import get_atlas_indicator
         from app.blog import get_posts
-        from app.data import get_indicator
-        from app import profiles
 
         client = app.test_client()
         for post in get_posts():
             self.assertTrue(post.get("indicator"), post["slug"])
-            payload = get_indicator(str(post["indicator"]))
+            payload = get_atlas_indicator(str(post["indicator"]))
             self.assertIsNotNone(payload, post["slug"])
-            indicator_path = profiles.indicator_path(
-                post["indicator"], payload["metadata"]["name"]
-            )
+            indicator_path = payload["metadata"]["path"]
             self.assertEqual(client.get(indicator_path).status_code, 200, post["slug"])
             cover = Path(app.root_path) / "static" / post["cover"].removeprefix("/static/")
             self.assertTrue(cover.is_file(), post["slug"])
