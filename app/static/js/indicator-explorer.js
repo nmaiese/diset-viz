@@ -11,7 +11,7 @@
  * Two things it must get right, both learned from the previous version:
  *
  * 1. Levels. A BES indicator has regions AND provinces, with different years and
- *    different territories, and provinces have no profile page and no map. The
+ *    different territories, and provinces have their own page but no map. The
  *    old script hardcoded "region" in six places, including the /regione/ link.
  *    Everything territorial is read off the active level here.
  * 2. Failing loudly is better than failing silently. The old script dereferenced

@@ -18,7 +18,7 @@ import re
 import unittest
 from pathlib import Path
 
-from app import app, sources
+from app import app, province_profile, sources
 from app.indicator_texts import LIBERA, ROLE_ORDER, get_text
 from app.indicator_view import build_indicator_view
 
@@ -327,9 +327,18 @@ class LaCodaDellaSchedaNonEUnMenu(unittest.TestCase):
         self.assertLess(apparato, cover)
         self.assertLess(cover, continua)
 
-    def test_a_livello_provincia_non_si_promettono_profili_che_non_esistono(self):
+    def test_a_livello_provincia_i_territori_portano_alla_loro_pagina(self):
+        """Le province hanno una pagina dal 22/9, e le schede continuavano a
+        nominarle come testo: 33 indicatori solo provinciali, e la vista
+        provinciale degli altri, non portavano a nessuna delle 103."""
         html = self.client.get(
             "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
         ).get_data(as_text=True)
         self.assertIn('class="indicator-next"', html)
-        self.assertNotIn('href="/provincia/', html)
+        link = set(re.findall(r'href="(/provincia/[^"#?]+)"', html))
+        with app.app_context():
+            chiavi = set(province_profile.chiavi())
+        self.assertEqual({percorso.split("/")[2] for percorso in link}, chiavi)
+        for percorso in sorted(link)[:10]:
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
