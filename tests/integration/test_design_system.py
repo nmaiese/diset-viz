@@ -43,7 +43,8 @@ SPA_ROUTES = ("/atlante", "/confronto")
 JINJA_PAGES = ("/", "/blog", "/regioni", "/temi", "/metodologia",
                "/qualita-della-vita", "/quiz", "/ricerca?q=lavoro",
                "/divari-regionali", "/chi-siamo", "/privacy", "/catalogo-dati",
-               "/regione/lombardia", "/blog/divario-turistico-nord-sud-2024",
+               "/regione/lombardia", "/province", "/provincia/lecce",
+               "/blog/divario-turistico-nord-sud-2024",
                "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99")
 
 # Tutte. Le shell della SPA hanno un chrome proprio (il masthead React, che

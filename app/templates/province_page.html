@@ -1,13 +1,23 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set active_nav = 'qualita-della-vita' %}
+{% set active_nav = 'province' %}
 {% set p = profile %}
+{# Italia, regione, provincia: la briciola passava dalla qualita' della vita,
+   come se la provincia fosse una riga di classifica e non un territorio. #}
+{% if p.region_path %}
 {% set percorso = [
   {"name": "Home", "path": "/"},
-  {"name": "Qualità della vita", "path": "/qualita-della-vita"},
-  {"name": "Province", "path": "/qualita-della-vita/classifica/province"},
+  {"name": "Regioni", "path": "/regioni"},
+  {"name": p.region, "path": p.region_path},
   {"name": p.name, "path": p.path},
 ] %}
+{% else %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Province", "path": "/province"},
+  {"name": p.name, "path": p.path},
+] %}
+{% endif %}
 
 {# Titolo e descrizione li misura la view, come fa la pagina tema: in un
    template non si conta niente, e tutti e due sforavano il budget su un nome
@@ -260,6 +270,18 @@
       <li><a href="{{ voce.path }}">{{ voce.rank }}ª {{ voce.name }}</a> <small>{{ voce.score | it_num }}</small></li>
       {% endfor %}
     </ul>
+  </section>
+  {% endif %}
+
+  {% if sister_provinces %}
+  <section class="panel-card" aria-labelledby="altre-province">
+    <h2 class="section-label" id="altre-province">{{ 'L\'altra provincia' if sister_provinces | length == 1 else 'Le altre province' }} {{ p.region | of_region }}</h2>
+    <ul class="theme-chips">
+      {% for voce in sister_provinces %}
+      <li><a href="{{ voce.path }}">{{ voce.name }}</a> <small>{{ voce.rank }}ª</small></li>
+      {% endfor %}
+    </ul>
+    <p class="page-note">Tutte le province, regione per regione, sono in <a href="/province">province italiane</a>.</p>
   </section>
   {% endif %}
 

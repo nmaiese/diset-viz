@@ -23,7 +23,7 @@
   "name": {{ ('Profilo territoriale di ' ~ p.region) | tojson }},
   "description": {{ ('Punti di forza e di debolezza di ' ~ p.region ~ ' sugli indicatori territoriali Istat, con confronto tra le regioni italiane.') | tojson }},
   "url": {{ canonical | tojson }},
-  "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }} },
+  "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }}{% if provinces %}, "containsPlace": [{% for pr in provinces %}{ "@type": "Place", "name": {{ pr.name | tojson }}, "url": {{ (site_url ~ pr.path) | tojson }} }{{ "," if not loop.last }}{% endfor %}]{% endif %} },
   "creator": {{ organization_ref_jsonld | safe }},
   "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "creator": { "@type": "Organization", "name": "Istat" } },
   "publisher": {{ publisher_jsonld | safe }},
@@ -222,6 +222,21 @@
   </div>
   {% if has_movement %}
   <p class="page-note region-movement-note">Movimento: quante posizioni {{ p.region }} ha guadagnato o perso rispetto alle altre regioni, confrontando l'ultimo anno disponibile con l'anno comparabile più recente. Calcolato solo sugli indicatori direzionali e completi su tutte e 20 le regioni in entrambi gli anni.</p>
+  {% endif %}
+
+  {% if provinces %}
+  {# Le province della regione, prima degli indicatori: dalla pagina regione
+     non si arrivava a nessuna provincia, e il collegamento andava solo dalla
+     provincia alla regione. #}
+  <section class="panel-card region-provinces" id="province" aria-labelledby="province-titolo">
+    <h2 class="section-label" id="province-titolo">{{ 'La provincia' if provinces | length == 1 else 'Le province' }} {{ p.region | of_region }}</h2>
+    <ul class="theme-chips">
+      {% for pr in provinces %}
+      <li><a href="{{ pr.path }}">{{ pr.name }}</a> <small>{{ pr.rank }}ª per qualità della vita</small></li>
+      {% endfor %}
+    </ul>
+    <p class="page-note">Il profilo di ogni provincia porta i valori veri degli indicatori del BES dei Territori. Tutte le province sono in <a href="/province">province italiane</a>.</p>
+  </section>
   {% endif %}
 
   <div class="region-content">

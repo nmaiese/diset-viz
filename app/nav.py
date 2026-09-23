@@ -26,6 +26,7 @@ PRIMARY = (
         "group": (
             {"label": "Atlante", "path": "/atlante", "active": "atlas"},
             {"label": "Regioni", "path": "/regioni", "active": "regioni"},
+            {"label": "Province", "path": "/province", "active": "province"},
             {"label": "Temi", "path": "/temi", "active": "temi"},
             {"label": "Confronta", "path": "/confronto", "active": "confronto"},
             {"label": "Divari regionali", "path": "/divari-regionali", "active": "divari"},
@@ -73,6 +74,7 @@ FOOTER_GROUPS = (
         "items": (
             {"label": "Atlante", "path": "/atlante"},
             {"label": "Regioni", "path": "/regioni"},
+            {"label": "Province", "path": "/province"},
             {"label": "Temi", "path": "/temi"},
             {"label": "Confronta", "path": "/confronto"},
             {"label": "Divari regionali", "path": "/divari-regionali"},
@@ -201,6 +203,22 @@ def flat(items=PRIMARY):
         else:
             uscita.append(voce)
     return uscita
+
+
+def group_of(active):
+    """La tendina che contiene la voce attiva, per accenderla nella testata.
+
+    `_ds_header.html` scriveva a mano quali voci accendono "Esplora", e ogni
+    voce nuova andava ricordata in due posti. Si ricava da `PRIMARY`.
+    """
+    # Una voce che ha anche un posto suo in testata (Metodologia) si accende
+    # li', non nella tendina che la ripete.
+    if any(entry.get("active") == active for entry in PRIMARY if "group" not in entry):
+        return None
+    for entry in PRIMARY:
+        if any(item.get("active") == active for item in entry.get("group", ())):
+            return entry["key"]
+    return None
 
 
 def paths():

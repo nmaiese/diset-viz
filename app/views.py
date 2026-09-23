@@ -141,6 +141,9 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         # loro 404 in produzione non l'avrebbe visto nessuno. I marcatori non
         # portano la posizione, che cambia con i dati.
         {"path": "/provincia/lecce", "content_type": "text/html", "marker": "<h1>Lecce è ", "kind": "html", "markdown_marker": "# Lecce"},
+        # L'indice geografico delle province, dal 23/9/2026. Il marcatore non
+        # porta il numero, che segue il dato.
+        {"path": "/province", "content_type": "text/html", "marker": "province italiane, regione per regione</h1>", "kind": "html", "markdown_marker": "province italiane, regione per regione"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
         {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
@@ -220,6 +223,12 @@ def freshness_label_filter(status):
     """`recent` -> `Recente`. Le pagine regione stampavano il codice inglese."""
     from app.external_data import freshness_label
     return freshness_label(status)
+
+
+@app.template_filter("of_region")
+def of_region_filter(name):
+    """`{{ region | of_region }}`: "della Puglia", "del Veneto", "delle Marche"."""
+    return seo_titles.of_region(name)
 
 
 @app.template_filter("at_place")
@@ -1118,9 +1127,13 @@ def region_page(region_key):
     profile = profiles.region_profile(region_key)
     if profile is None:
         abort(404)
+    # Le province della regione, prima della tabella degli indicatori: dalla
+    # regione non si arrivava a nessuna delle sue province, e il collegamento
+    # andava in un senso solo.
+    provinces = province_profile.by_region().get(region_key, [])
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
-            agent_discovery.region_markdown(profile, SITE_URL),
+            agent_discovery.region_markdown(profile, SITE_URL, provinces=provinces),
             f"{SITE_URL}/regione/{region_key}",
         )
     # `charts` si importa qui e non in cima come fa gia' la scheda: il modulo
@@ -1130,6 +1143,7 @@ def region_page(region_key):
     return render_template(
         "region_page.html",
         profile=profile,
+        provinces=provinces,
         portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -1220,6 +1234,11 @@ def province_page(province_key):
     return render_template(
         "province_page.html",
         profile=profilo,
+        sister_provinces=[
+            entry for entry in province_profile.by_region().get(
+                profiles.region_key_for(profilo.get("region") or ""), [])
+            if entry["key"] != province_key
+        ],
         vicine=province_profile.vicine(province_key),
         indicatori=righe,
         # Le quattro macro-aree nell'ordine del sito, lo stesso filtro della
@@ -1258,7 +1277,9 @@ def region_api(region_key):
     profile = profiles.region_profile(region_key)
     if profile is None:
         abort(404)
-    return jsonify(profile)
+    # Campo additivo: la vista regione dell'atlante lo legge per mostrare le
+    # province, chi lo ignora non si accorge di niente.
+    return jsonify({**profile, "provinces": province_profile.by_region().get(region_key, [])})
 
 
 @app.route("/tema/<theme_slug>")
@@ -1281,13 +1302,16 @@ def theme_page(theme_slug):
     ]
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
-            agent_discovery.theme_markdown(profile, SITE_URL, standings=standings),
+            agent_discovery.theme_markdown(profile, SITE_URL, standings=standings,
+                                           province_total=province_profile.total()),
             f"{SITE_URL}{profile['theme_path']}",
         )
     return render_template(
         "theme_page.html",
         profile=profile,
         standings=standings,
+        region_total=len(profiles.regions_overview()),
+        province_total=province_profile.total(),
         siblings=siblings,
         map_colors=indicator_notes.ds_choropleth_colors(
             [{"region_key": r["region_key"], "value": r["score"]} for r in standings["rows"]]
@@ -1405,14 +1429,56 @@ def _misura_di(nome):
 def regions_index():
     overview = profiles.regions_overview()
     regions = list(overview.values())
+    provinces = province_profile.by_region()
     return render_template(
         "regions_index.html",
         regions=regions,
+        province_counts={key: len(items) for key, items in provinces.items()},
+        province_total=sum(len(items) for items in provinces.values()),
         overview=overview,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regioni",
     )
+
+
+@app.route("/province")
+def provinces_index():
+    """L'indice delle province, in ordine geografico.
+
+    Fino al 23/9/2026 l'indice delle province era la classifica: per trovare
+    la propria si scorreva una graduatoria per punteggio. La classifica
+    risponde a "chi e' prima", questa pagina a "dov'e' la mia provincia":
+    Italia, regione, provincia, come il resto del sito.
+    """
+    grouped = province_profile.by_region()
+    regions = [
+        {**region, "provinces": grouped.get(region["region_key"], [])}
+        for region in profiles.regions_overview().values()
+    ]
+    total = sum(len(region["provinces"]) for region in regions)
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.provinces_index_markdown(regions, total, SITE_URL),
+            f"{SITE_URL}/province",
+        )
+    return render_template(
+        "provinces_index.html",
+        regions=regions,
+        provinces=[entry for region in regions for entry in region["provinces"]],
+        total=total,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/province",
+    )
+
+
+@app.route("/provincia")
+@app.route("/provincia/")
+def provinces_index_redirect():
+    """`/provincia/<key>` e' una pagina, `/provincia` da solo portava a una 404:
+    chi accorcia l'indirizzo cerca l'elenco."""
+    return redirect("/province", code=301)
 
 
 @app.route("/temi")
@@ -2213,6 +2279,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/contatti", "priority": "0.5"},
         {"loc": f"{SITE_URL}/termini", "priority": "0.3"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/province", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/indovina-la-regione", "priority": "0.7"},
@@ -2222,7 +2289,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     pages.extend({"loc": item["loc"], "priority": "0.8"} for item in public_urls.quality_life_public_urls())
-    # Le 103 province. La sorgente e' la classifica, non un elenco scritto a
+    # Le province. La sorgente e' la classifica, non un elenco scritto a
     # mano: una provincia che entra o esce dal dato non deve lasciare in
     # sitemap una URL che risponde 404.
     pages.extend({"loc": f"{SITE_URL}/provincia/{chiave}", "priority": "0.6"}

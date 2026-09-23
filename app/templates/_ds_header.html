@@ -6,9 +6,9 @@
    Tutto funziona senza JavaScript. I menu a tendina sono <details>, la ricerca
    e un form verso /ricerca. ds-chrome.js aggiunge soltanto i suggerimenti, la
    chiusura con Escape e il tema scuro. #}
-{% set nav_explore = active_nav in ('atlas', 'regioni', 'temi', 'divari', 'confronto') %}
-{% set nav_rank = active_nav == 'qualita-della-vita' %}
-{% set nav_project = active_nav == 'progetto' %}
+{# La tendina da accendere la ricava `nav.group_of` da `app/nav.py`: una voce
+   nuova nel menu non va piu' ricordata anche qui. #}
+{% set nav_active_group = nav.group_of(active_nav) %}
 
 <a class="skiplink" href="#contenuto">Vai al contenuto</a>
 
@@ -31,7 +31,7 @@
       {% for voce in nav.PRIMARY %}
       {% if voce.group %}
       <details class="navlink" name="hdr-nav">
-        <summary{% if (voce.key == 'esplora' and nav_explore) or (voce.key == 'classifiche' and nav_rank) or (voce.key == 'progetto' and nav_project) %} class="is-active"{% endif %}>{{ voce.label }}
+        <summary{% if voce.key == nav_active_group %} class="is-active"{% endif %}>{{ voce.label }}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="dropdown">
@@ -47,7 +47,7 @@
 
     <div class="hdr__right">
       <form class="hdr__search desktop-only" role="search" action="/ricerca" method="get" data-ds-search>
-        <label class="sr-only" for="ds-search">Cerca un indicatore, una regione o un tema</label>
+        <label class="sr-only" for="ds-search">Cerca un indicatore, un tema o un articolo</label>
         <div class="searchbox">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
           <input id="ds-search" type="search" name="q" placeholder="Cerca" autocomplete="off"
@@ -76,10 +76,10 @@
   </div>
 
   <form class="msearch mobile-only" role="search" action="/ricerca" method="get">
-    <label class="sr-only" for="ds-msearch">Cerca un indicatore, una regione o un tema</label>
+    <label class="sr-only" for="ds-msearch">Cerca un indicatore, un tema o un articolo</label>
     <div class="searchbox">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <input id="ds-msearch" type="search" name="q" placeholder="Cerca un indicatore, una regione o un tema">
+      <input id="ds-msearch" type="search" name="q" placeholder="Cerca un indicatore, un tema o un articolo">
     </div>
   </form>
 

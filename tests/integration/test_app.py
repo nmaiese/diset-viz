@@ -1830,7 +1830,8 @@ class NessunaAnteprimaSocialeEUnSvg(unittest.TestCase):
     """
 
     PAGINE = (
-        "/", "/atlante", "/confronto", "/temi", "/regioni",
+        "/", "/atlante", "/confronto", "/temi", "/regioni", "/province",
+        "/provincia/lecce",
         "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita", "/blog",
         "/divari-regionali", "/catalogo-dati", "/metodologia",
     )
@@ -2042,7 +2043,8 @@ class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
     testata non puo' sapere: la barra del telefono e il pulsante di ritorno.
     """
 
-    PAGINE = ("/", "/atlante", "/confronto", "/temi", "/regioni", "/blog",
+    PAGINE = ("/", "/atlante", "/confronto", "/temi", "/regioni", "/province",
+              "/provincia/lecce", "/blog",
               "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita",
               "/divari-regionali", "/catalogo-dati", "/metodologia", "/quiz")
 

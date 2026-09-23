@@ -1,0 +1,75 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Province", "path": "/province"}] %}
+{% set active_nav = 'province' %}
+
+{% block title %}Le {{ total }} province italiane, regione per regione{% endblock %}
+{% block description %}Trova la tua provincia fra le {{ total }} misurate dal BES dei Territori di Istat: il profilo, i valori veri di ogni indicatore e la posizione per qualità della vita.{% endblock %}
+
+{# L'indice geografico delle province. Fino al 23/9/2026 non c'era: l'indice era
+   la classifica, e per trovare la propria provincia si scorreva una
+   graduatoria. L'`ItemList` e' lo stesso elenco che si vede, nello stesso
+   ordine, come chiede `.claude/rules/app.md`. #}
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ ('Le ' ~ total ~ ' province italiane, regione per regione') | tojson }},
+  "description": {{ ('Il profilo di ognuna delle ' ~ total ~ ' province italiane misurate dal BES dei Territori di Istat.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": {{ site_name | tojson }}, "url": {{ (site_url ~ '/') | tojson }} }
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Le province italiane",
+  "numberOfItems": {{ total }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- for p in provinces %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ p.name | tojson }},
+      "url": {{ (site_url ~ p.path) | tojson }}
+    }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+<script src="{{ url_for('static', filename='js/list-filter.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<article class="page page-index wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+  <h1>Le {{ total }} province italiane, regione per regione</h1>
+  <p class="page-lead">Il profilo di ognuna delle {{ total }} province misurate dal BES dei Territori di Istat: i valori veri di tutti gli indicatori, dove sta meglio e peggio delle altre province della sua regione, e la sua posizione per qualità della vita. Qui sono in ordine geografico. Per l'ordine di punteggio c'è la <a href="/qualita-della-vita/classifica/province">classifica delle province</a>.</p>
+
+  <div class="province-filter" hidden>
+    <label class="explorer-search">
+      <input type="search" data-list-filter="#province-per-regione" placeholder="Cerca una provincia..." aria-label="Cerca una provincia">
+    </label>
+  </div>
+
+  <div id="province-per-regione" class="province-index">
+    {% for r in regions if r.provinces %}
+    <section class="province-index__region" data-filter-group aria-labelledby="regione-{{ r.region_key }}">
+      <h2 id="regione-{{ r.region_key }}"><a href="{{ r.path }}">{{ r.region }}</a></h2>
+      <ul class="theme-chips">
+        {% for p in r.provinces %}
+        <li data-filter-name="{{ p.name }}"><a href="{{ p.path }}">{{ p.name }}</a> <small>{{ p.rank }}ª</small></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+    <p class="page-note" data-filter-empty hidden>Nessuna provincia con questo nome.</p>
+  </div>
+
+  <p class="page-note">La posizione accanto al nome è quella della classifica della qualità della vita, profilo equilibrato, su {{ total }} province. Il metodo è in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
+</article>
+{% endblock %}

@@ -33,11 +33,11 @@
     {% if pages > 1 %}Pagina {{ page }} di {{ pages }}, righe dalla {{ first_index }} alla {{ last_index }}.{% endif %}
     {% if truncated %}La ricerca si ferma ai primi {{ total }} risultati, quindi restringi la query per vedere il resto.{% endif %}
     {% else %}
-    Nessun risultato. Prova con una parola sola, oppure sfoglia i <a href="/temi">temi</a> e le <a href="/regioni">regioni</a>.
+    Nessun risultato. Prova con una parola sola, oppure sfoglia i <a href="/temi">temi</a>, le <a href="/regioni">regioni</a> e le <a href="/province">province</a>.
     {% endif %}
   </p>
   {% else %}
-  <p class="page-note">Scrivi una parola per cercare tra gli indicatori del catalogo e gli articoli del blog. Se preferisci sfogliare, parti dai <a href="/temi">temi</a>, dalle <a href="/regioni">schede regione</a> o dall'<a href="/atlante">atlante interattivo</a>.</p>
+  <p class="page-note">Scrivi una parola per cercare tra gli indicatori del catalogo e gli articoli del blog. Se preferisci sfogliare, parti dai <a href="/temi">temi</a>, dalle <a href="/regioni">schede regione</a>, dalle <a href="/province">province</a> o dall'<a href="/atlante">atlante interattivo</a>.</p>
   {% endif %}
 
   {% if results %}

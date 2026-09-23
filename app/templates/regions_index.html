@@ -50,7 +50,7 @@
   {{ breadcrumb.trail(percorso) }}
   <h1>Le regioni a confronto</h1>
   <p class="page-lead">Venti regioni, venti profili territoriali. Per ognuna trovi i temi in cui emerge o fatica, dove ha recuperato o perso terreno nell'ultimo anno e le regioni dal profilo più simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
-  <p class="page-note"><a href="/atlante?view=regioni">Apri l'atlante interattivo per regione →</a></p>
+  <p class="page-note"><a href="/atlante?view=regioni">Apri l'atlante interattivo per regione →</a> · <a href="/province">Tutte le {{ province_total }} province, regione per regione →</a></p>
 
   <div class="regions-layout">
     <div class="regions-map-wrap">
@@ -64,6 +64,7 @@
         <a class="region-index-card" href="{{ r.path }}">
           <span class="region-index-card__body">
             <strong>{{ r.region }}</strong>
+            {% if province_counts.get(r.region_key) %}<small class="region-index-card__provinces">{{ province_counts[r.region_key] }} {{ province_counts[r.region_key] | it_plural('provincia', 'province') }}</small>{% endif %}
             <span class="region-index-card__themes">
               {% if r.strong %}
               <em class="is-strong">Forte: {{ r.strong | join(', ') }}</em>

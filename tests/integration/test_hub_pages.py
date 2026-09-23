@@ -687,7 +687,7 @@ class IlPercorsoVisibileEQuelloDichiarato(unittest.TestCase):
         "/regioni", "/temi", "/tema/lavoro-e-conciliazione", "/regione/molise",
         "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita/classifica/regioni",
         "/divari-regionali", "/quiz", "/quiz/indovina-la-regione", "/metodologia",
-        "/confronto", "/catalogo-dati",
+        "/confronto", "/catalogo-dati", "/province", "/provincia/lecce",
     )
 
     def setUp(self):
@@ -888,3 +888,71 @@ class LePagineProvincia(unittest.TestCase):
                 # `str(score)` di prima fissava il punto decimale.
                 self.assertIn(app.jinja_env.filters["it_num"](profilo["score"]), markdown)
                 self.assertIn("## Le dimensioni", markdown)
+
+
+class ItaliaRegioneProvincia(unittest.TestCase):
+    """Le province sono il terzo livello della geografia del sito.
+
+    Il 22/9/2026 le linkavano in mediana 7 pagine, contro le 611 di una
+    regione: arrivava un link solo dalla classifica e dalle altre province.
+    Nessuna regione linkava le sue, non c'era un indice, e la briciola le
+    metteva sotto la qualita' della vita.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from app import profiles, province_profile
+        cls.client = app.test_client()
+        with app.app_context():
+            cls.chiavi = province_profile.chiavi()
+            cls.per_regione = province_profile.by_region()
+            cls.regioni = profiles.regions_overview()
+
+    def _link(self, percorso, prefisso="/provincia/"):
+        html = self.client.get(percorso).get_data(as_text=True)
+        return set(re.findall(rf'href="({re.escape(prefisso)}[a-z0-9-]+)"', html))
+
+    def test_l_indice_porta_a_ogni_provincia(self):
+        self.assertEqual(self.client.get("/province").status_code, 200)
+        self.assertEqual(self._link("/province"), {f"/provincia/{k}" for k in self.chiavi})
+
+    def test_ogni_regione_porta_alle_sue_province(self):
+        for chiave_regione, province in self.per_regione.items():
+            with self.subTest(regione=chiave_regione):
+                self.assertTrue(province, f"{chiave_regione} senza province")
+                self.assertTrue({p["path"] for p in province} <= self._link(f"/regione/{chiave_regione}"))
+
+    def test_ogni_provincia_porta_alla_sua_regione(self):
+        regione_di = {p["key"]: k for k, province in self.per_regione.items() for p in province}
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                self.assertIn(f"/regione/{regione_di[chiave]}",
+                              self._link(f"/provincia/{chiave}", "/regione/"))
+
+    def test_provincia_senza_chiave_porta_all_indice(self):
+        for percorso in ("/provincia", "/provincia/"):
+            with self.subTest(percorso=percorso):
+                risposta = self.client.get(percorso)
+                self.assertEqual(risposta.status_code, 301)
+                self.assertTrue(risposta.headers["Location"].endswith("/province"))
+
+    def test_l_indice_e_nel_menu_nella_sitemap_e_in_markdown(self):
+        from app import nav
+        esplora = next(voce for voce in nav.PRIMARY if voce.get("key") == "esplora")
+        self.assertIn("/province", [voce["path"] for voce in esplora["group"]])
+        self.assertIn("/province<", self.client.get("/sitemap.xml").get_data(as_text=True))
+        markdown = self.client.get("/province", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn(f"# Le {len(self.chiavi)} province italiane", markdown)
+
+    def test_la_regione_si_chiama_allo_stesso_modo_dappertutto(self):
+        """Il Trentino era "Provincia Autonoma Bolzano" per le sue province."""
+        from app import province_profile
+        nome = self.regioni["trentino-alto-adige"]["region"]
+        for chiave in ("bolzano", "trento"):
+            with self.subTest(provincia=chiave):
+                self.assertEqual(province_profile.profilo(chiave)["region"], nome)
+
+    def test_l_api_della_regione_porta_le_province(self):
+        dati = self.client.get("/api/region/puglia").get_json()
+        self.assertEqual({p["key"] for p in dati["provinces"]},
+                         {p["key"] for p in self.per_regione["puglia"]})
