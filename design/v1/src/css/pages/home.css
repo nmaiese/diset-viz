@@ -16,7 +16,7 @@
 .home-find__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
 .home-find__row { display: flex; gap: var(--space-2); }
 .home-find__row input {
-  flex: 1; min-width: 0; height: var(--space-12); padding: 0 var(--space-4);
+  flex: 1; min-width: 0; width: 0; height: var(--space-12); padding: 0 var(--space-4);
   font: inherit; font-size: var(--fs-ui); color: var(--ink); background: var(--bg);
   border: 1px solid var(--control-border); border-radius: var(--radius-control);
 }

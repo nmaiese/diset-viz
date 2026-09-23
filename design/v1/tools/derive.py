@@ -397,7 +397,7 @@ def indicator(ctx: dict) -> dict:
     return {
         "fmt": num, "fmt_unit": with_unit, "date_it": date_it, "citation": citation,
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
-        "unit": unit, "short_unit": short_unit(unit), "tiles": tiles, "verso": verso,
+        "unit": (unit[:1].lower() + unit[1:]) if unit else unit, "short_unit": short_unit(unit), "tiles": tiles, "verso": verso,
         "claim": claim, "map_classes": map_classes(level),
         "legend": legend(values, unit) if values else None,
         "ranking": ranking(level, unit), "series": series, "series_claim": series_claim, "series_note": series_note,

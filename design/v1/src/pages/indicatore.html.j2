@@ -56,7 +56,7 @@
         <figure class="module" data-explore>
           <figcaption class="module__head">
             <h3 class="h-sub" data-claim>{{ d.claim }}</h3>
-            <p class="subline">{{ meta.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} {% if meta.direction in ('lower_better', 'higher_worse') %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} {% if meta.direction in ('lower_better', 'higher_worse') %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
           </figcaption>
           <div class="toolbar">
             {% if levels | length > 1 %}
@@ -90,7 +90,7 @@
             {% endif %}
             <div class="tablewrap" id="{{ aid('classifica-dati') }}" tabindex="0" role="region" aria-label="Classifica delle {{ level.plural }}">
               <table class="table">
-                <caption class="sr-only">{{ meta.name }} per {{ level.singular }} nel <span data-year-label>{{ year }}</span>{% if d.unit %}, in {{ d.unit }}{% endif %}</caption>
+                <caption class="sr-only">{{ meta.name }} per {{ level.singular }} nel <span data-year-label>{{ year }}</span>{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}</caption>
                 <thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ level.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (d.short_unit or 'Valore') | capitalize }}</th></tr></thead>
                 <tbody data-rank-body>
                   {% for row in d.ranking %}
@@ -115,7 +115,7 @@
         <figure class="module">
           <figcaption class="module__head">
             <h3 class="h-sub">{{ d.series_claim }}</h3>
-            <p class="subline">{{ meta.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. In grigio le {{ n }} {{ level.plural }}, tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. In grigio le {{ n }} {{ level.plural }}, tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
@@ -124,7 +124,7 @@
             <summary>La serie in tabella</summary>
             <div class="tablewrap" tabindex="0" role="region" aria-label="Serie storica in tabella">
               <table class="table table--compact trend-table">
-                <caption>Media semplice delle {{ level.plural }} per anno{% if d.unit %}, in {{ d.unit }}{% endif %}</caption>
+                <caption>Media semplice delle {{ level.plural }} per anno{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}</caption>
                 <thead><tr><th scope="col">Anno</th><th class="r" scope="col">Media semplice</th></tr></thead>
                 <tbody>{% for p in level.annual_means %}<tr><th scope="row">{{ p.year }}</th><td class="val">{{ d.fmt(p.avg) }}</td></tr>{% endfor %}</tbody>
               </table>

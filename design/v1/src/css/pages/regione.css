@@ -13,8 +13,10 @@
 .regione-loc { display: none; margin: 0; padding-top: var(--space-8); }
 @media (min-width: 600px) { .regione-loc { display: grid; gap: var(--space-2); } }
 .regione-loc .map svg { max-height: 16rem; }
-.regione-loc .map path.regione-loc__ctx { fill: var(--cmp-track); }
-.regione-loc .map path.regione-loc__on { fill: var(--data-focus); }
+/* Il localizzatore dice dove, non un dato: la regione in inchiostro, come sulla
+   provincia. In mappa la selezione non e' mai arancio. */
+.regione-loc .map path.regione-loc__ctx { fill: var(--rule-strong); }
+.regione-loc .map path.regione-loc__on { fill: var(--ink); }
 .regione-loc figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
 /* ---------- tessera con la barra del punteggio ---------- */

@@ -98,7 +98,12 @@ async function launch() {
     };
     listeners.push(l);
   });
-  const close = () => { try { ws.close(); } catch {} proc.kill("SIGKILL"); rmSync(profile, { recursive: true, force: true }); };
+  const close = () => {
+    try { ws.close(); } catch {}
+    proc.kill("SIGKILL");
+    // Chrome puo' scrivere nel profilo ancora per un attimo dopo il kill.
+    try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch {}
+  };
   return { send, waitFor, close };
 }
 
@@ -208,8 +213,11 @@ const OVERFLOW = `(() => {
 const FOCUS = `(() => {
   const el = document.activeElement;
   if (!el || el === document.body) return null;
-  const cs = getComputedStyle(el);
-  const visible = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || (cs.boxShadow && cs.boxShadow !== "none");
+  // L'anello puo' stare sull'elemento o su un contenitore con :focus-within
+  // (il campo di ricerca della testata lo disegna sulla sua cornice).
+  const ring = (n) => { const c = getComputedStyle(n); return (c.outlineStyle !== "none" && parseFloat(c.outlineWidth) >= 2) || (c.boxShadow && c.boxShadow !== "none"); };
+  let visible = ring(el);
+  for (let p = el.parentElement, i = 0; !visible && p && i < 3; p = p.parentElement, i++) visible = p.matches(":focus-within") && ring(p);
   const r = el.getBoundingClientRect();
   return { tag: el.tagName, cls: String(el.className).slice(0, 40), text: (el.textContent || "").trim().slice(0, 30),
            visible, inView: r.bottom > 0 && r.top < innerHeight };

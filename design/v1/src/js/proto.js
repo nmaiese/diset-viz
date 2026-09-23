@@ -213,12 +213,15 @@
     var links = Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']"));
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
     if (!("IntersectionObserver" in window)) return;
+    var visible = [];
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
         var i = targets.indexOf(e.target);
-        links.forEach(function (a, j) { if (j === i) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+        if (e.isIntersecting && visible.indexOf(i) < 0) visible.push(i);
+        if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
       });
+      var cur = visible.length ? Math.min.apply(null, visible) : -1;
+      links.forEach(function (a, j) { if (j === cur) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
     }, { rootMargin: "-20% 0px -70% 0px" });
     targets.forEach(function (t) { if (t) io.observe(t); });
   });

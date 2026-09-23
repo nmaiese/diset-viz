@@ -48,6 +48,8 @@ PAGES = {
     "indicatore-senza-prosa": {"label": "Scheda senza prosa", "active": "temi", "template": "indicatore", "variant": True},
     "indicatore-due-livelli": {"label": "Scheda a due livelli", "active": "temi", "template": "indicatore", "variant": True},
     "indicatore-province": {"label": "Scheda solo provinciale", "active": "temi", "template": "indicatore", "variant": True},
+    "classifica-province": {"label": "Classifica delle province", "active": "qualita", "template": "classifica", "variant": True},
+    "articolo-giugno": {"label": "Articolo di giugno", "active": "storie", "template": "articolo", "variant": True},
 }
 
 

@@ -80,6 +80,8 @@ def inline_images(html: str) -> str:
     def repl(m):
         rel = m.group(2)
         local = ROOT / "app" / rel.lstrip("/")
+        if local.exists() and local.suffix.lower() == ".svg":
+            return f'{m.group(1)}"data:image/svg+xml;base64,{base64.b64encode(local.read_bytes()).decode()}"'
         if not local.exists() or local.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
             return m.group(0)
         return f'{m.group(1)}"{image_data_uri(local, 1200, 72)}"'
@@ -89,7 +91,8 @@ def inline_images(html: str) -> str:
 
 def cover(pages: list[str]) -> str:
     items = []
-    for name in pages:
+    variants = [n for n in pages if build.PAGES[n].get("variant")]
+    for name in [n for n in pages if not build.PAGES[n].get("variant")]:
         label = build.PAGES[name]["label"]
         before = PRIMA / f"{name}-1440-chiaro-fold.webp"
         after = DOPO / f"{name}-1440-chiaro-fold.webp"
@@ -119,6 +122,11 @@ def cover(pages: list[str]) -> str:
     </ul>
   </div>
   <div class="cover__grid">{"".join(items)}</div>
+  <div class="cover__open">
+    <h2 class="h-section">Gli stati difficili</h2>
+    <p class="lede">Gli stessi template con i contesti che li mettono alla prova.</p>
+    <ul class="cover__points">{"".join(f'<li><a href="#{v}">{build.PAGES[v]["label"]}</a></li>' for v in variants)}</ul>
+  </div>
   <div class="cover__open prose">
     <h2>Da decidere guardando i prototipi</h2>
     <p>Il numero chiave della regione: oggi è la posizione media sugli indicatori, il prototipo mostra la posizione nella qualità della vita, come per le province. Cambia il titolo di venti pagine.</p>
@@ -131,7 +139,7 @@ def cover(pages: list[str]) -> str:
 def main() -> None:
     env, flask_app, state, href = build.make_env("artifact")
     fonts, css, js, _ = build.assets()
-    pages = [n for n in build.PAGES if (build.SRC / "pages" / f"{n}.html.j2").exists()]
+    pages = [n for n in build.PAGES if (build.SRC / "pages" / f"{build.template_of(n)}.html.j2").exists()]
     sections, page_css = [], []
     rendered = []
     for name in pages:
@@ -143,7 +151,9 @@ def main() -> None:
             continue
         rendered.append(name)
         sections.append(f'<section id="{name}" data-page-root data-page="{name}" hidden>\n{inline_images(body)}\n</section>')
-        page_css.append(build.page_css(name))
+        css_name = build.template_of(name)
+        if css_name == name:
+            page_css.append(build.page_css(css_name))
     doc = (
         "<title>Divario Italia 1.0</title>\n"
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'

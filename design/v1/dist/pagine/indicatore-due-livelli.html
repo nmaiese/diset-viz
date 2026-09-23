@@ -402,6 +402,9 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .crumbs [aria-current] { color: var(--muted); }
 
 .pagehead { padding-block: var(--space-6) var(--space-8); display: grid; gap: var(--space-4); }
+/* Un figlio di griglia prende come minimo la sua larghezza di contenuto: un campo
+   di ricerca col suo bottone basta a sfondare i 320 pixel. */
+.pagehead > *, .module > *, .specs > div > *, .lanes > *, .cards > * { min-width: 0; }
 .eyebrow {
   font-size: var(--fs-label); line-height: var(--lh-label); font-weight: var(--fw-label); letter-spacing: var(--tr-label);
   color: var(--text-2);
@@ -677,7 +680,7 @@ details.more[open] > summary { color: var(--ink); }
 .specs > div { display: grid; gap: var(--space-1) var(--space-6); padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
 @media (min-width: 720px) { .specs > div { grid-template-columns: 12rem minmax(0, 1fr); } }
 .specs dt { font-size: var(--fs-label); font-weight: 600; color: var(--text-2); padding-top: 2px; }
-.specs dd { margin: 0; font-size: var(--fs-ui); }
+.specs dd { margin: 0; font-size: var(--fs-ui); overflow-wrap: anywhere; }
 .specs code { font-family: var(--font-mono); font-size: 14px; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .btn {
@@ -760,7 +763,7 @@ main:has(> .band:last-child) { padding-bottom: 0; }
 main:has(> .band:last-child) + .foot { margin-top: 0; }
 .linklike { padding: 0; border: 0; background: none; font: inherit; color: var(--text-2); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; cursor: pointer; }
 .linklike:hover { color: var(--ink); }
-.reflist { list-style: none; display: grid; gap: var(--space-3); }
+.reflist { list-style: none; display: grid; gap: var(--space-3); overflow-wrap: anywhere; }
 .reflist small { display: block; color: var(--muted); font-size: var(--fs-small); margin-top: 2px; }
 .foot { margin-top: var(--space-24); background: var(--surface-1); border-top: 1px solid var(--rule-strong); padding-block: var(--space-12) var(--space-8); }
 .foot__trust { max-width: 46rem; font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink); }
@@ -815,7 +818,7 @@ body.has-proto { padding-bottom: 96px; }
       <a href="https://divarioitalia.it/temi" aria-current="page">Temi</a>
       <details>
         <summary>Qualità della vita <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
-        <div class="nav__menu"><a href="qualita-della-vita.html">Dove si vive meglio</a><a href="classifica.html">Classifica delle regioni</a><a href="https://divarioitalia.it/qualita-della-vita/classifica/province">Classifica delle province</a>
+        <div class="nav__menu"><a href="qualita-della-vita.html">Dove si vive meglio</a><a href="classifica.html">Classifica delle regioni</a><a href="classifica-province.html">Classifica delle province</a>
         </div>
       </details>
       <details>
@@ -850,7 +853,7 @@ body.has-proto { padding-bottom: 96px; }
             <a href="https://divarioitalia.it/temi">Temi</a>
           </div>
           <div class="drawer__group">
-            <p>Qualità della vita</p><a href="qualita-della-vita.html">Dove si vive meglio</a><a href="classifica.html">Classifica delle regioni</a><a href="https://divarioitalia.it/qualita-della-vita/classifica/province">Classifica delle province</a>
+            <p>Qualità della vita</p><a href="qualita-della-vita.html">Dove si vive meglio</a><a href="classifica.html">Classifica delle regioni</a><a href="classifica-province.html">Classifica delle province</a>
           </div>
           <div class="drawer__group">
             <p>Atlante e dati</p><a href="https://divarioitalia.it/atlante">Atlante</a><a href="https://divarioitalia.it/divari-regionali">Divari regionali</a><a href="https://divarioitalia.it/catalogo-dati">Catalogo dati</a><a href="https://divarioitalia.it/metodologia">Metodologia</a>
@@ -933,7 +936,7 @@ body.has-proto { padding-bottom: 96px; }
         <figure class="module" data-explore>
           <figcaption class="module__head">
             <h3 class="h-sub" data-claim>Nel 2022 due regioni del Mezzogiorno su otto stanno sotto la media semplice</h3>
-            <p class="subline">Tasso di infortuni sul lavoro mortali e con inabilità permanente, in Per 10.000 occupati, <span data-year-label>2022</span>. Le 20 regioni dal valore più basso, che qui è il migliore, al più alto.</p>
+            <p class="subline">Tasso di infortuni sul lavoro mortali e con inabilità permanente, per 10.000 occupati, <span data-year-label>2022</span>. Le 20 regioni dal valore più basso, che qui è il migliore, al più alto.</p>
           </figcaption>
           <div class="toolbar">
             
@@ -1001,7 +1004,7 @@ body.has-proto { padding-bottom: 96px; }
             
             <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle regioni">
               <table class="table">
-                <caption class="sr-only">Tasso di infortuni sul lavoro mortali e con inabilità permanente per regione nel <span data-year-label>2022</span>, in Per 10.000 occupati</caption>
+                <caption class="sr-only">Tasso di infortuni sul lavoro mortali e con inabilità permanente per regione nel <span data-year-label>2022</span>, per 10.000 occupati</caption>
                 <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">Per 10.000 occupati</th></tr></thead>
                 <tbody data-rank-body>
                   
@@ -1104,7 +1107,7 @@ body.has-proto { padding-bottom: 96px; }
         <figure class="module">
           <figcaption class="module__head">
             <h3 class="h-sub">Dal 2018 al 2022 la media semplice è scesa dell'11,3%, e la distanza fra prima e ultima si è ridotta di 6,4 per 10.000 occupati</h3>
-            <p class="subline">Tasso di infortuni sul lavoro mortali e con inabilità permanente, in Per 10.000 occupati, dal 2018 al 2022. In grigio le 20 regioni, tratteggiata la media semplice. Scegli una regione qui sopra per vederla.</p>
+            <p class="subline">Tasso di infortuni sul lavoro mortali e con inabilità permanente, per 10.000 occupati, dal 2018 al 2022. In grigio le 20 regioni, tratteggiata la media semplice. Scegli una regione qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series><div class="chart__l"><svg viewBox="0 0 760 300" aria-hidden="true" focusable="false"><g class="grid"><line x1="64" x2="584" y1="270.0" y2="270.0"/><line x1="64" x2="584" y1="206.0" y2="206.0"/><line x1="64" x2="584" y1="142.0" y2="142.0"/><line x1="64" x2="584" y1="78.0" y2="78.0"/><line x1="64" x2="584" y1="14.0" y2="14.0"/></g><g class="axis"><text x="56" y="274.0" text-anchor="end">5</text><text x="56" y="210.0" text-anchor="end">10</text><text x="56" y="146.0" text-anchor="end">15</text><text x="56" y="82.0" text-anchor="end">20</text><text x="56" y="18.0" text-anchor="end">25</text><text x="64.0" y="292" text-anchor="start">2018</text><text x="194.0" y="292" text-anchor="middle">2019</text><text x="324.0" y="292" text-anchor="middle">2020</text><text x="454.0" y="292" text-anchor="middle">2021</text><text x="584.0" y="292" text-anchor="end">2022</text></g><g class="ctxlines"><polyline class="ctx" data-key="abruzzo" points="64.0,102.3 194.0,108.7 324.0,143.3 454.0,119.0 584.0,120.2"/><polyline class="ctx" data-key="basilicata" points="64.0,25.5 194.0,35.8 324.0,115.1 454.0,70.3 584.0,119.0"/><polyline class="ctx" data-key="calabria" points="64.0,99.8 194.0,121.5 324.0,156.1 454.0,135.6 584.0,161.2"/><polyline class="ctx" data-key="campania" points="64.0,194.5 194.0,185.5 324.0,197.0 454.0,199.6 584.0,190.6"/><polyline class="ctx" data-key="emilia-romagna" points="64.0,154.8 194.0,157.4 324.0,171.4 454.0,166.3 584.0,179.1"/><polyline class="ctx" data-key="friuli-venezia-giulia" points="64.0,207.3 194.0,195.8 324.0,212.4 454.0,216.2 584.0,221.4"/><polyline class="ctx" data-key="lazio" points="64.0,229.0 194.0,227.8 324.0,227.8 454.0,229.0 584.0,229.0"/><polyline class="ctx" data-key="liguria" points="64.0,138.2 194.0,148.4 324.0,161.2 454.0,157.4 584.0,180.4"/><polyline class="ctx" data-key="lombardia" points="64.0,232.9 194.0,232.9 324.0,232.9 454.0,227.8 584.0,230.3"/><polyline class="ctx" data-key="marche" points="64.0,119.0 194.0,130.5 324.0,142.0 454.0,121.5 584.0,138.2"/><polyline class="ctx" data-key="molise" points="64.0,157.4 194.0,168.9 324.0,153.5 454.0,154.8 584.0,157.4"/><polyline class="ctx" data-key="piemonte" points="64.0,229.0 194.0,229.0 324.0,235.4 454.0,229.0 584.0,231.6"/><polyline class="ctx" data-key="puglia" points="64.0,159.9 194.0,166.3 324.0,177.8 454.0,154.8 584.0,167.6"/><polyline class="ctx" data-key="sardegna" points="64.0,117.7 194.0,135.6 324.0,170.2 454.0,165.0 584.0,175.3"/><polyline class="ctx" data-key="sicilia" points="64.0,144.6 194.0,145.8 324.0,177.8 454.0,162.5 584.0,162.5"/><polyline class="ctx" data-key="toscana" points="64.0,127.9 194.0,143.3 324.0,168.9 454.0,156.1 584.0,149.7"/><polyline class="ctx" data-key="trentino-alto-adige" points="64.0,174.0 194.0,167.6 324.0,183.0 454.0,171.4 584.0,176.6"/><polyline class="ctx" data-key="umbria" points="64.0,101.0 194.0,111.3 324.0,133.0 454.0,122.8 584.0,106.2"/><polyline class="ctx" data-key="valle-d-aosta" points="64.0,207.3 194.0,212.4 324.0,207.3 454.0,199.6 584.0,203.4"/><polyline class="ctx" data-key="veneto" points="64.0,171.4 194.0,189.4 324.0,189.4 454.0,186.8 584.0,200.9"/></g><polyline class="avg" points="64.0,154.7 194.0,160.7 324.0,177.8 454.0,167.3 584.0,175.0"/><text class="lab" x="592" y="110.2">Umbria</text><text class="lab lab--strong" x="592" y="179.0">Media semplice 12,4</text><text class="lab" x="592" y="235.6">Piemonte</text><polyline class="hl" points="" data-hl/><circle class="dot" r="0" cx="0" cy="0" data-hl-dot/><text class="hl-lab" x="592" y="-10" data-hl-lab></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 280" aria-hidden="true" focusable="false"><g class="grid"><line x1="48" x2="256" y1="250.0" y2="250.0"/><line x1="48" x2="256" y1="191.0" y2="191.0"/><line x1="48" x2="256" y1="132.0" y2="132.0"/><line x1="48" x2="256" y1="73.0" y2="73.0"/><line x1="48" x2="256" y1="14.0" y2="14.0"/></g><g class="axis"><text x="40" y="254.0" text-anchor="end">5</text><text x="40" y="195.0" text-anchor="end">10</text><text x="40" y="136.0" text-anchor="end">15</text><text x="40" y="77.0" text-anchor="end">20</text><text x="40" y="18.0" text-anchor="end">25</text><text x="48.0" y="272" text-anchor="start">2018</text><text x="100.0" y="272" text-anchor="middle">2019</text><text x="152.0" y="272" text-anchor="middle">2020</text><text x="204.0" y="272" text-anchor="middle">2021</text><text x="256.0" y="272" text-anchor="end">2022</text></g><g class="ctxlines"><polyline class="ctx" data-key="abruzzo" points="48.0,95.4 100.0,101.3 152.0,133.2 204.0,110.8 256.0,111.9"/><polyline class="ctx" data-key="basilicata" points="48.0,24.6 100.0,34.1 152.0,107.2 204.0,65.9 256.0,110.8"/><polyline class="ctx" data-key="calabria" points="48.0,93.1 100.0,113.1 152.0,145.0 204.0,126.1 256.0,149.7"/><polyline class="ctx" data-key="campania" points="48.0,180.4 100.0,172.1 152.0,182.7 204.0,185.1 256.0,176.8"/><polyline class="ctx" data-key="emilia-romagna" points="48.0,143.8 100.0,146.2 152.0,159.1 204.0,154.4 256.0,166.2"/><polyline class="ctx" data-key="friuli-venezia-giulia" points="48.0,192.2 100.0,181.6 152.0,196.9 204.0,200.4 256.0,205.2"/><polyline class="ctx" data-key="lazio" points="48.0,212.2 100.0,211.1 152.0,211.1 204.0,212.2 256.0,212.2"/><polyline class="ctx" data-key="liguria" points="48.0,128.5 100.0,137.9 152.0,149.7 204.0,146.2 256.0,167.4"/><polyline class="ctx" data-key="lombardia" points="48.0,215.8 100.0,215.8 152.0,215.8 204.0,211.1 256.0,213.4"/><polyline class="ctx" data-key="marche" points="48.0,110.8 100.0,121.4 152.0,132.0 204.0,113.1 256.0,128.5"/><polyline class="ctx" data-key="molise" points="48.0,146.2 100.0,156.8 152.0,142.6 204.0,143.8 256.0,146.2"/><polyline class="ctx" data-key="piemonte" points="48.0,212.2 100.0,212.2 152.0,218.1 204.0,212.2 256.0,214.6"/><polyline class="ctx" data-key="puglia" points="48.0,148.5 100.0,154.4 152.0,165.0 204.0,143.8 256.0,155.6"/><polyline class="ctx" data-key="sardegna" points="48.0,109.6 100.0,126.1 152.0,158.0 204.0,153.2 256.0,162.7"/><polyline class="ctx" data-key="sicilia" points="48.0,134.4 100.0,135.5 152.0,165.0 204.0,150.9 256.0,150.9"/><polyline class="ctx" data-key="toscana" points="48.0,119.0 100.0,133.2 152.0,156.8 204.0,145.0 256.0,139.1"/><polyline class="ctx" data-key="trentino-alto-adige" points="48.0,161.5 100.0,155.6 152.0,169.8 204.0,159.1 256.0,163.9"/><polyline class="ctx" data-key="umbria" points="48.0,94.2 100.0,103.7 152.0,123.7 204.0,114.3 256.0,99.0"/><polyline class="ctx" data-key="valle-d-aosta" points="48.0,192.2 100.0,196.9 152.0,192.2 204.0,185.1 256.0,188.6"/><polyline class="ctx" data-key="veneto" points="48.0,159.1 100.0,175.7 152.0,175.7 204.0,173.3 256.0,186.3"/></g><polyline class="avg" points="48.0,143.7 100.0,149.2 152.0,165.0 204.0,155.3 256.0,162.4"/><text class="lab" x="264" y="103.0">Umbria</text><text class="lab lab--strong" x="264" y="166.4">Media 12,4</text><text class="lab" x="264" y="218.6">Piemonte</text><polyline class="hl" points="" data-hl/><circle class="dot" r="0" cx="0" cy="0" data-hl-dot/><text class="hl-lab" x="264" y="-10" data-hl-lab></text></svg></div></div>
           <p class="chart-note">Su tutto il periodo la variazione va da -7,3 per 10.000 occupati della Basilicata a +0,30 per 10.000 occupati della Valle d'Aosta.</p>
@@ -1113,7 +1116,7 @@ body.has-proto { padding-bottom: 96px; }
             <summary>La serie in tabella</summary>
             <div class="tablewrap" tabindex="0" role="region" aria-label="Serie storica in tabella">
               <table class="table table--compact trend-table">
-                <caption>Media semplice delle regioni per anno, in Per 10.000 occupati</caption>
+                <caption>Media semplice delle regioni per anno, per 10.000 occupati</caption>
                 <thead><tr><th scope="col">Anno</th><th class="r" scope="col">Media semplice</th></tr></thead>
                 <tbody><tr><th scope="row">2018</th><td class="val">14,0</td></tr><tr><th scope="row">2019</th><td class="val">13,5</td></tr><tr><th scope="row">2020</th><td class="val">12,2</td></tr><tr><th scope="row">2021</th><td class="val">13,0</td></tr><tr><th scope="row">2022</th><td class="val">12,4</td></tr></tbody>
               </table>
@@ -1296,7 +1299,7 @@ body.has-proto { padding-bottom: 96px; }
       </div>
       <div>
         <p>Qualità della vita</p>
-        <ul><li><a href="qualita-della-vita.html">Dove si vive meglio</a></li><li><a href="classifica.html">Classifica delle regioni</a></li><li><a href="https://divarioitalia.it/qualita-della-vita/classifica/province">Classifica delle province</a></li></ul>
+        <ul><li><a href="qualita-della-vita.html">Dove si vive meglio</a></li><li><a href="classifica.html">Classifica delle regioni</a></li><li><a href="classifica-province.html">Classifica delle province</a></li></ul>
       </div>
       <div>
         <p>Atlante e dati</p>
@@ -1533,12 +1536,15 @@ body.has-proto { padding-bottom: 96px; }
     var links = Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']"));
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
     if (!("IntersectionObserver" in window)) return;
+    var visible = [];
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
         var i = targets.indexOf(e.target);
-        links.forEach(function (a, j) { if (j === i) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+        if (e.isIntersecting && visible.indexOf(i) < 0) visible.push(i);
+        if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
       });
+      var cur = visible.length ? Math.min.apply(null, visible) : -1;
+      links.forEach(function (a, j) { if (j === cur) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
     }, { rootMargin: "-20% 0px -70% 0px" });
     targets.forEach(function (t) { if (t) io.observe(t); });
   });
