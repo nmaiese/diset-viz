@@ -140,6 +140,19 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
   colorata ("Serie ferma al 2015", "Citta' metropolitana", "n.d.").
 - **Slot pubblicitario**: vedi sotto.
 
+### Dove stanno oggi
+
+Il foglio comune e' `src/css/components.css`. Alcuni componenti del catalogo sono
+nati dentro una pagina e stanno ancora nel suo foglio in `src/css/pages/`, con il
+prefisso della pagina: la classifica con la barra del punteggio e le righe che
+diventano blocchi sotto i 720 pixel (`qdv-rank`), la tabella che sotto i 560
+pixel diventa blocchi etichettati (`regione-all`, `provincia-*`), la traccia di
+posizione da 1 a N (`regione-track`), il localizzatore (`regione-loc`,
+`provincia-loc`), la barra divergente attorno a 50 (`provincia-div`), la figura
+dell'articolo con la tabella dei valori (`art-fig`, `art-bars`). Sono lo stesso
+componente scritto una volta: nella migrazione passano nel foglio comune col
+nome del catalogo.
+
 ## Pagine
 
 ### Scheda indicatore

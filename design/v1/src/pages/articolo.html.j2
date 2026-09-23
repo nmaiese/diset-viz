@@ -96,7 +96,7 @@
         </dl>
         {% if ds.download %}
         <div class="actions">
-          <a class="btn btn--primary" href="{{ href(ds.download) }}" download>{{ ui.icon('download') }} Scarica i dati in CSV</a>
+          <a class="btn btn--primary" href="{{ href(ds.download) }}">{{ ui.icon('download') }} Scarica i dati in CSV</a>
         </div>
         {% endif %}
         {{ ui.cite(d.citation) }}
@@ -117,7 +117,7 @@
       {% endif %}
       <div class="aside-block">
         {% if d.institution %}<p>Dati: {{ d.institution }}. Elaborazione Divario Italia.</p>{% endif %}
-        {% if ds.download %}<p><a class="linkarrow" href="{{ href(ds.download) }}" download>Scarica i dati in CSV</a></p>{% endif %}
+        {% if ds.download %}<p><a class="linkarrow" href="{{ href(ds.download) }}">Scarica i dati in CSV</a></p>{% endif %}
         <p><a class="linkarrow" href="#{{ aid('dati-metodo') }}">Cita questo articolo</a></p>
       </div>
     </aside>
