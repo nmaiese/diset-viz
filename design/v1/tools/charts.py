@@ -66,7 +66,7 @@ def _tick(v: float, ticks: list[float]) -> str:
 
 # ---------------------------------------------------------------- striscia del divario
 
-def _strip(rows, avg, unit, width, short, ratio_text):
+def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=None):
     left, right = (16, 16)
     top = 74 if not short else 70
     r = 6.5 if len(rows) <= 30 else 4.2
@@ -89,7 +89,7 @@ def _strip(rows, avg, unit, width, short, ratio_text):
         placed.append((cx, level, row))
     depth = max(abs(pl) for _, pl, _ in placed)
     mid = top + (depth + 1) * (2 * r + 1)
-    height = int(mid + (depth + 1) * (2 * r + 1) + 34)
+    height = int(mid + (depth + 1) * (2 * r + 1) + (54 if highlight else 34))
     parts = [f'<svg viewBox="0 0 {width} {height}" aria-hidden="true" focusable="false" class="strip">']
     parts.append(f'<line class="strip__axis" x1="{left}" x2="{width - right}" y1="{mid:.1f}" y2="{mid:.1f}"/>')
     for t in ticks:
@@ -98,7 +98,7 @@ def _strip(rows, avg, unit, width, short, ratio_text):
     if avg is not None:
         ax = x(avg)
         parts.append(f'<line class="strip__avg" x1="{ax:.1f}" x2="{ax:.1f}" y1="{top - 10}" y2="{height - 24}"/>')
-        label = ("Media " if short else "Media semplice ") + n.text(avg)
+        label = avg_label or (("Media " if short else "Media semplice ") + n.text(avg))
         anchor = "start" if ax < width * 0.7 else "end"
         dx = 5 if anchor == "start" else -5
         parts.append(f'<text class="strip__avglab" x="{ax + dx:.1f}" y="{height - 22}" text-anchor="{anchor}">{escape(label)}</text>')
@@ -110,9 +110,19 @@ def _strip(rows, avg, unit, width, short, ratio_text):
     for cx, level, row in placed:
         cy = mid + level * (2 * r + 1)
         area = row.get("area") or "none"
-        parts.append(f'<circle class="strip__dot area--{area}" data-key="{escape(row["key"])}" cx="{cx:.1f}" cy="{cy:.1f}" r="{r}"><title>{escape(row["name"])} {escape(n.text(row["value"]))}</title></circle>')
+        on = " is-on" if highlight and row["key"] == highlight else ""
+        parts.append(f'<circle class="strip__dot area--{area}{on}" data-key="{escape(row["key"])}" cx="{cx:.1f}" cy="{cy:.1f}" r="{r}"><title>{escape(row["name"])} {escape(n.text(row["value"]))}</title></circle>')
+    # Il territorio della pagina, se c'e', nominato sotto l'asse.
+    low, high = min(rows, key=lambda q: q["value"]), max(rows, key=lambda q: q["value"])
+    if highlight and highlight not in (low["key"], high["key"]):
+        hit = next((q for q in placed if q[2]["key"] == highlight), None)
+        if hit:
+            hx, _, hrow = hit
+            anchor = "start" if hx < width * 0.5 else "end"
+            parts.append(f'<text class="strip__name strip__name--on" x="{hx:.1f}" y="{height - 26}" text-anchor="{anchor}">'
+                         f'<tspan class="strip__nm">{escape(hrow["name"])}</tspan> <tspan class="strip__v">{escape(n.text(hrow["value"]))}</tspan></text>')
     # I due estremi con nome e valore, sotto la graffa.
-    for row, anchor in ((min(rows, key=lambda q: q["value"]), "start"), (max(rows, key=lambda q: q["value"]), "end")):
+    for row, anchor in ((low, "start"), (high, "end")):
         cx = x(row["value"])
         name = row["name"] if not short or len(row["name"]) <= 14 else row["name"][:13].rstrip() + "."
         tx = cx - r if anchor == "start" else cx + r
@@ -122,18 +132,26 @@ def _strip(rows, avg, unit, width, short, ratio_text):
     return "".join(parts)
 
 
-def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_ratio: float | None) -> dict:
-    """La striscia del divario in due tagli, piu' la legenda delle ripartizioni presenti."""
+def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_ratio: float | None = None,
+                  highlight: str | None = None, gap_label: str | None = None, avg_label: str | None = None) -> dict:
+    """La striscia del divario in due tagli, piu' la legenda delle ripartizioni presenti.
+
+    `highlight` e' la chiave del territorio della pagina: il suo punto prende
+    l'anello dell'accento e il suo nome. `gap_label` sostituisce "2,5 volte"
+    quando il rapporto non ha senso (un punteggio da 0 a 100 si legge in punti).
+    """
     rows = [row for row in rows if row.get("value") is not None]
     if len(rows) < 2:
         return {"svg": "", "legend": []}
     lo, hi = min(r["value"] for r in rows), max(r["value"] for r in rows)
-    if gap_ratio and lo > 0:
+    if gap_label:
+        ratio = gap_label
+    elif gap_ratio and lo > 0:
         ratio = f"{n.text(gap_ratio, 1)} volte"
     else:
         ratio = f"distanza {n.text(hi - lo)}"
-    wide = _strip(rows, avg, unit, 920, False, ratio)
-    narrow = _strip(rows, avg, unit, 360, True, ratio)
+    wide = _strip(rows, avg, unit, 920, False, ratio, highlight, avg_label)
+    narrow = _strip(rows, avg, unit, 360, True, ratio, highlight, avg_label)
     counts = {}
     for row in rows:
         counts[row.get("area")] = counts.get(row.get("area"), 0) + 1

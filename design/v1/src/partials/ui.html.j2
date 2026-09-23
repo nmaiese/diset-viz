@@ -83,3 +83,28 @@
   <span class="sr-only" role="status" data-copy-status></span>
 </div>
 {%- endmacro %}
+
+
+{#- Il localizzatore: dice dove, non un dato. Il territorio (una regione, o la
+    regione di una provincia) in inchiostro, le altre nel filetto. -#}
+{% macro locator(key, caption) -%}
+<figure class="locator">
+  <svg viewBox="0 0 560 660" aria-hidden="true" focusable="false">
+    {%- for k, d in paths.items() %}<path d="{{ d }}"{% if k == key %} class="is-on"{% endif %}/>{% endfor %}
+  </svg>
+  <figcaption>{{ caption }}</figcaption>
+</figure>
+{%- endmacro %}
+
+{#- La figura che apre una pagina: il grafico prima delle parole. `strip` e' il
+    dizionario di charts.divario_strip. -#}
+{% macro leadfigure(id, title, strip, note) -%}
+<figure class="lead-figure" aria-labelledby="{{ aid(id) }}">
+  <figcaption class="lead-figure__head">
+    <span class="lead-figure__title" id="{{ aid(id) }}">{{ title }}</span>
+    {{ arealegend(strip.legend) }}
+  </figcaption>
+  <div class="chart chart--hero" data-series>{{ strip.svg | safe }}</div>
+  {% if note %}<p class="source">{{ note }}</p>{% endif %}
+</figure>
+{%- endmacro %}
