@@ -245,6 +245,8 @@ def build_pages(only: list[str] | None = None) -> list[Path]:
             f'<body class="has-proto" data-page="{name}">\n{body}\n{proto_bar("pagine", name)}\n<script>\n{js}\n</script>\n</body>\n</html>\n'
         )
         target = out / f"{name}.html"
+        # Jinja lascia spazi in coda alle righe: via, cosi' git diff --check resta pulito.
+        doc = "\n".join(line.rstrip() for line in doc.split("\n"))
         target.write_text(doc, encoding="utf-8")
         written.append(target)
         print(f"{target.relative_to(V1)}: {len(doc.encode()) // 1024} KB")

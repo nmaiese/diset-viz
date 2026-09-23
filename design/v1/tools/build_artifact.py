@@ -165,7 +165,7 @@ def main() -> None:
         f"<script>\n{js}\n{ROUTER}\n</script>\n"
     )
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(doc, encoding="utf-8")
+    OUT.write_text("\n".join(line.rstrip() for line in doc.split("\n")), encoding="utf-8")
     print(f"{OUT.relative_to(V1)}: {len(doc.encode()) // 1024} KB, {len(rendered)} pagine")
 
 
