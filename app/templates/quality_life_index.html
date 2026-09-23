@@ -13,7 +13,8 @@
   "description": {{ 'Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori Istat selezionati.' | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } },
   "isAccessibleForFree": true
 }
 </script>
