@@ -1,0 +1,25 @@
+{
+  "x": "ext:employment_share_agri_ind_constr",
+  "y": "prov:03LAV007",
+  "years_x": [
+    2022
+  ],
+  "years_y": [
+    2022
+  ],
+  "links": {
+    "tutti": {
+      "points": 103,
+      "correlation": 0.01
+    },
+    "Centro-Nord": {
+      "points": 67,
+      "correlation": -0.02
+    },
+    "Mezzogiorno": {
+      "points": 36,
+      "correlation": 0.39
+    }
+  },
+  "note": "Correlazione di Pearson fra territori. Misura se due grandezze si muovono insieme, non una causa."
+}

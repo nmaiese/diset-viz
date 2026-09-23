@@ -1,0 +1,40 @@
+<svg class="fig" viewBox="0 0 680 360" role="img" aria-labelledby="fig-adi-2015-2024-t fig-adi-2015-2024-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-adi-2015-2024-t">L&#x27;assistenza a casa raddoppia ovunque</title>
+<desc id="fig-adi-2015-2024-d">Nord: da 2,6 nel 2015 a 4,1 nel 2024; Centro: da 1,8 nel 2015 a 5,4 nel 2024; Mezzogiorno: da 2,0 nel 2015 a 4,3 nel 2024; Italia: da 2,2 nel 2015 a 4,4 nel 2024</desc>
+<text class="fig__title" x="0" y="20">L&#x27;assistenza a casa raddoppia ovunque</text>
+<text class="fig__subtitle" x="0" y="40">Anziani trattati in assistenza domiciliare integrata, 2015-2024. Valori percentuali.</text>
+<line class="fig__grid" x1="48" y1="290.0" x2="530" y2="290.0"/>
+<text class="fig__axis" x="42" y="294.0" text-anchor="end">1,5</text>
+<line class="fig__grid" x1="48" y1="232.5" x2="530" y2="232.5"/>
+<text class="fig__axis" x="42" y="236.5" text-anchor="end">2,6</text>
+<line class="fig__grid" x1="48" y1="175.0" x2="530" y2="175.0"/>
+<text class="fig__axis" x="42" y="179.0" text-anchor="end">3,6</text>
+<line class="fig__grid" x1="48" y1="117.5" x2="530" y2="117.5"/>
+<text class="fig__axis" x="42" y="121.5" text-anchor="end">4,6</text>
+<line class="fig__grid" x1="48" y1="60.0" x2="530" y2="60.0"/>
+<text class="fig__axis" x="42" y="64.0" text-anchor="end">5,7</text>
+<text class="fig__axis" x="48.0" y="308" text-anchor="middle">2015</text>
+<text class="fig__axis" x="101.6" y="308" text-anchor="middle">2016</text>
+<text class="fig__axis" x="155.1" y="308" text-anchor="middle">2017</text>
+<text class="fig__axis" x="208.7" y="308" text-anchor="middle">2018</text>
+<text class="fig__axis" x="262.2" y="308" text-anchor="middle">2019</text>
+<text class="fig__axis" x="315.8" y="308" text-anchor="middle">2020</text>
+<text class="fig__axis" x="369.3" y="308" text-anchor="middle">2021</text>
+<text class="fig__axis" x="422.9" y="308" text-anchor="middle">2022</text>
+<text class="fig__axis" x="476.4" y="308" text-anchor="middle">2023</text>
+<text class="fig__axis" x="530.0" y="308" text-anchor="middle">2024</text>
+<polyline class="fig__line fig__line--north" points="48.0,230.1 101.6,219.1 155.1,213.6 208.7,208.0 262.2,202.5 315.8,208.0 369.3,202.5 422.9,191.5 476.4,153.0 530.0,147.5"/>
+<circle class="fig__dot fig__dot--north" cx="530.0" cy="147.5" r="3.5"/>
+<polyline class="fig__line fig__line--centre" points="48.0,274.1 101.6,263.1 155.1,252.1 208.7,230.1 262.2,224.6 315.8,219.1 369.3,197.0 422.9,175.0 476.4,142.0 530.0,75.9"/>
+<circle class="fig__dot fig__dot--centre" cx="530.0" cy="75.9" r="3.5"/>
+<polyline class="fig__line fig__line--south" points="48.0,263.1 101.6,246.6 155.1,235.6 208.7,219.1 262.2,219.1 315.8,230.1 369.3,224.6 422.9,213.6 476.4,186.0 530.0,136.4"/>
+<circle class="fig__dot fig__dot--south" cx="530.0" cy="136.4" r="3.5"/>
+<polyline class="fig__line fig__line--italy" points="48.0,252.1 101.6,235.6 155.1,230.1 208.7,219.1 262.2,213.6 315.8,213.6 369.3,208.0 422.9,191.5 476.4,164.0 530.0,130.9"/>
+<circle class="fig__dot fig__dot--italy" cx="530.0" cy="130.9" r="3.5"/>
+<text class="fig__label fig__label--centre" x="538.0" y="79.9">Centro 5,4</text>
+<text class="fig__label fig__label--italy" x="538.0" y="134.9">Italia 4,4</text>
+<text class="fig__label fig__label--south" x="538.0" y="148.9">Mezzogiorno 4,3</text>
+<text class="fig__label fig__label--north" x="538.0" y="162.9">Nord 4,1</text>
+<text class="fig__note" x="0" y="334">Italia, Nord, Centro e Mezzogiorno: valori calcolati dall'Istat.</text>
+<text class="fig__source" x="0" y="354">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
+</svg>

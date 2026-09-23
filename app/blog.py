@@ -18,6 +18,8 @@ from app.cache import cache
 from app.config import SITE_NAME, SITE_URL
 
 POSTS_DIR = Path(__file__).resolve().parents[1] / "content" / "posts"
+FIGURES_DIR = Path(__file__).resolve().parents[1] / "content" / "figures"
+_FIGURE_MARKER = re.compile(r"<!--\s*figura:\s*([a-z0-9][a-z0-9-]*)\s*-->")
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 # La figura di ripiego per chi condivide una pagina senza copertina propria.
@@ -142,6 +144,72 @@ def _normalize_indicator(value):
     return raw
 
 
+def _inline_figures(body_html, slug):
+    """`<!-- figura: nome -->` -> l'SVG di `content/figures/<slug>/<nome>.svg`.
+
+    Le figure le scrive `scripts/trend_articles/figures.py` dai numeri del
+    dossier del pezzo. Vanno in linea e non in un `<img>` perche' i loro
+    colori sono classi che leggono i token del design system: in un `<img>`
+    la figura resterebbe chiara sotto il tema scuro. Un marcatore senza file
+    sparisce e il testo resta intero, come per le figure delle schede. Il
+    marcatore e' in italiano perche' lo scrive chi redige, come `grafico:`.
+    """
+
+    def replace(match):
+        path = FIGURES_DIR / slug / f"{match.group(1)}.svg"
+        if not path.is_file():
+            return ""
+        return f'<figure class="article-figure">{path.read_text(encoding="utf-8")}</figure>'
+
+    return _FIGURE_MARKER.sub(replace, body_html)
+
+
+def _cover_credit(meta):
+    """L'attribuzione della foto di copertina, o None.
+
+    Una foto con licenza CC BY o CC BY-SA si usa solo dicendo chi l'ha fatta,
+    con che licenza e dove sta l'originale: e' la condizione della licenza,
+    non una cortesia. I campi li scrive `scripts/trend_articles/photo.py`
+    leggendoli da Wikimedia Commons, non chi redige.
+    """
+    credit = meta.get("cover_credit")
+    if not isinstance(credit, dict) or not credit.get("author") or not credit.get("license"):
+        return None
+    return {
+        "author": str(credit["author"]).strip(),
+        "license": str(credit["license"]).strip(),
+        "license_url": str(credit.get("license_url") or "").strip(),
+        "source_url": str(credit.get("source_url") or "").strip(),
+        "source_name": str(credit.get("source_name") or "Wikimedia Commons").strip(),
+        "changes": str(credit.get("changes") or "").strip(),
+    }
+
+
+def _dataset(meta, slug):
+    """Il blocco `dataset:` del frontmatter, pronto per lo schema `Dataset`.
+
+    Un articolo che mostra dati li dichiara: che cosa sono, da dove vengono,
+    con che licenza, come sono stati elaborati e dove si scaricano.
+    """
+    ds = meta.get("dataset")
+    if not isinstance(ds, dict) or not ds.get("name"):
+        return None
+    download = str(ds.get("download") or "").strip()
+    return {
+        "name": str(ds["name"]).strip(),
+        "description": str(ds.get("description") or "").strip(),
+        "license": str(ds.get("license") or sources.LICENSE_URL).strip(),
+        "creator": str(ds.get("creator") or "Istat").strip(),
+        "method": str(ds.get("method") or "").strip(),
+        "temporal": str(ds.get("temporal") or "").strip(),
+        "spatial": str(ds.get("spatial") or "Italia").strip(),
+        "source_url": str(ds.get("source_url") or "").strip(),
+        "download": download,
+        "download_abs": f"{SITE_URL}{download}" if download.startswith("/") else download,
+        "url": f"{SITE_URL}/blog/{slug}",
+    }
+
+
 def _load_post(path):
     post = frontmatter.load(path)
     meta = post.metadata
@@ -151,7 +219,7 @@ def _load_post(path):
     title = (meta.get("title") or path.stem).strip()
     slug = _slugify(meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-", "", path.stem))
     md = markdown.Markdown(extensions=_MD_EXTENSIONS, output_format="html5")
-    body_html = md.convert(post.content)
+    body_html = _inline_figures(md.convert(post.content), slug)
 
     tags = meta.get("tags") or []
     if isinstance(tags, str):
@@ -171,6 +239,9 @@ def _load_post(path):
         "author": (meta.get("author") or SITE_NAME).strip(),
         "cover": meta.get("cover"),
         "cover_alt": meta.get("cover_alt") or title,
+        "cover_credit": _cover_credit(meta),
+        "cover_caption": (meta.get("cover_caption") or "").strip(),
+        "dataset": _dataset(meta, slug),
         # La stessa figura in un formato che un social e uno schema sanno
         # leggere: `cover` resta l'SVG che va in pagina.
         "social_image": social_image(meta.get("cover")),

@@ -51,3 +51,8 @@ data/lab/bozze/
 # La narrativa (`motore narrativa`): stessa natura del dossier, derivata dagli
 # stessi dati con una scansione del catalogo, e si rifà con un comando.
 data/lab/narrativa/
+
+# Workflow articoli dai trend (docs/WORKFLOW_ARTICOLI_TREND.md): le anteprime delle
+# foto candidate servono a scegliere, non entrano nel repo. La scelta resta
+# registrata nella scheda <slug>.photo.json accanto alla copertina.
+data/articles/*/photo-candidates/

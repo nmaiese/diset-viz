@@ -1396,6 +1396,61 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .portrait__name { font-family: var(--font-body); font-size: 9.5px; fill: var(--ink-soft); }
 .portrait__end { font-family: var(--font-mono); font-size: 8px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 
+/* Le figure degli articoli del blog (scripts/trend_articles/figures.py): SVG in
+   linea, colori solo da token. Barre neutre, corallo ai territori di cui il
+   testo parla. Centro-Nord e Mezzogiorno si distinguono anche per tratto, cosi'
+   la figura si legge senza distinguere i colori. */
+.article-figure { margin: 1.8em 0; }
+.fig { width: 100%; height: auto; display: block; overflow: visible; }
+.fig__title { font-family: var(--font-display); font-size: 17px; font-weight: 600; fill: var(--ink); }
+.fig__subtitle { font-family: var(--font-body); font-size: 12px; fill: var(--muted); }
+.fig__name { font-family: var(--font-body); font-size: 12px; fill: var(--ink-soft); }
+.fig__name.is-on { fill: var(--accent-text); font-weight: 600; }
+.fig__bar { fill: var(--cmp-2); }
+.fig__bar.is-on { fill: var(--accent); }
+.fig__value { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+.fig__value.is-on { fill: var(--accent-text); font-weight: 600; }
+.fig__gap { font-family: var(--font-mono); font-size: 12px; fill: var(--muted); }
+.fig__ref { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.6; }
+.fig__ref-label { font-family: var(--font-mono); font-size: 10.5px; fill: var(--ink-soft); }
+.fig__grid { stroke: var(--line); stroke-width: 1; }
+.fig__axis { font-family: var(--font-mono); font-size: 10.5px; fill: var(--muted); }
+.fig__line { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.fig__line--cn { stroke: var(--brand-teal); }
+.fig__line--south { stroke: var(--ink); stroke-dasharray: 6 4; }
+.fig__line--on { stroke: var(--accent); stroke-width: 3; }
+.fig__dot--cn { fill: var(--brand-teal); }
+.fig__dot--south { fill: var(--ink); }
+.fig__dot--on { fill: var(--accent); }
+.fig__label { font-family: var(--font-body); font-size: 12px; font-weight: 600; }
+.fig__label--cn { fill: var(--brand-teal-text); }
+.fig__label--south { fill: var(--ink); }
+.fig__label--on { fill: var(--accent-text); }
+.fig__note, .fig__source { font-family: var(--font-body); font-size: 10.5px; fill: var(--muted); }
+/* Le ripartizioni ufficiali Istat: tratti diversi oltre ai colori. Italia e'
+   il riferimento, sottile e neutro; il Mezzogiorno tratteggiato come sopra. */
+.fig__line--north { stroke: var(--brand-teal); }
+.fig__line--centre { stroke: var(--brand-teal); stroke-dasharray: 2 4; }
+.fig__line--italy { stroke: var(--cmp-3); stroke-width: 1.5; }
+.fig__dot--north, .fig__dot--centre { fill: var(--brand-teal); }
+.fig__dot--italy { fill: var(--cmp-3); }
+.fig__label--north, .fig__label--centre { fill: var(--brand-teal-text); }
+.fig__label--italy { fill: var(--muted); }
+/* La dispersione: cerchi per il Centro-Nord, quadrati per il Mezzogiorno. */
+.fig__pt { fill: var(--cmp-2); }
+.fig__pt--cn { fill: var(--brand-teal); }
+.fig__pt--south { fill: var(--ink); opacity: 0.7; }
+.fig__pt.is-on { fill: var(--accent); opacity: 1; }
+.fig__pt-name { font-family: var(--font-body); font-size: 11px; fill: var(--ink-soft); }
+.fig__pt-name.is-on { fill: var(--accent-text); font-weight: 600; }
+.fig__axis-name { font-family: var(--font-mono); font-size: 10.5px; fill: var(--muted); }
+
+/* L'attribuzione della foto e il riquadro "I dati di questo articolo". */
+.article-cover .article-cover__credit { text-align: left; font-size: 12.5px; }
+.article-cover__credit a { color: inherit; }
+.article-dataset { border-top: 1px solid var(--line); margin-top: 2.4em; padding-top: 1em; font-size: 15px; }
+.article-dataset h2 { font-size: 18px; margin: 0 0 0.4em; }
+
 /* Pagina account (Fase 5.3). Solo site.css (pagina SSR, niente game.css). */
 .account-block { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
 .account-block h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
