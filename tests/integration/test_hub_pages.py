@@ -995,3 +995,18 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         self.assertIn("<h1>Qualità della vita nelle regioni e nelle province italiane</h1>", html)
         self.assertNotIn("in revisione", html)
         self.assertIn('href="/province"', html)
+
+    def test_la_faq_dichiarata_e_quella_che_si_legge(self):
+        """Il JSON-LD della FAQ era scritto senza accenti ("qualita", "Si"),
+        la pagina con: due testi diversi per la stessa risposta."""
+        import html as html_lib
+        import json
+        pagina = self.client.get("/metodologia").get_data(as_text=True)
+        faq = next(json.loads(b) for b in re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', pagina, re.DOTALL) if '"FAQPage"' in b)
+        visibile = html_lib.unescape(re.sub(r"<[^>]+>", "", pagina[pagina.index('class="prose faq"'):]))
+        visibile = " ".join(visibile.split())
+        for voce in faq["mainEntity"]:
+            with self.subTest(domanda=voce["name"]):
+                self.assertIn(voce["name"], visibile)
+                self.assertIn(" ".join(voce["acceptedAnswer"]["text"].split()), visibile)
