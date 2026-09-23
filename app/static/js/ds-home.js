@@ -477,7 +477,13 @@
       level.profiles.forEach(function (candidate) {
         if (candidate.slug === state.slug) profile = candidate;
       });
-      if (!profile) return;
+      // Un profilo che manca su questo livello non lascia le righe di prima:
+      // si passa al primo che c'e'.
+      if (!profile) {
+        profile = level.profiles[0];
+        if (!profile) return;
+        state.slug = profile.slug;
+      }
       top.innerHTML = rowsHtml(profile.top);
       bottom.innerHTML = rowsHtml(profile.bottom);
       if (topLabel) topLabel.textContent = "Punteggi più alti · profilo " + profile.name;
