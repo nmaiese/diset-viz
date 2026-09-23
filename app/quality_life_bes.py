@@ -46,7 +46,7 @@ from app.external_data import count_freshness
 from app.profiles import SCOREABLE_DIRECTIONS, indicator_path
 from app.bes_data import (
     MIN_PUBLIC_COVERAGE,
-    bes_indicator_path,
+    bes_path,
     get_bes_manifest,
     get_bes_rows,
     get_bes_territories,
@@ -167,7 +167,7 @@ def _matrix_and_meta(level):
             "direction": info["direction"],
             "year_max": year_max,
             "unit": info["unit"],
-            "path": bes_indicator_path(ind_id, info["name"]),
+            "path": bes_path(ind_id),
             "source_family": "bes",
         }
 
