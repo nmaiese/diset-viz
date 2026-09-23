@@ -429,22 +429,30 @@
     var section = document.querySelector("[data-ds-qol]");
     if (!section) return;
     var data = parseJSON(section, "data-profiles");
-    if (!data || !data.profiles) return;
+    if (!data || !data.levels) return;
 
-    var buttons = Array.prototype.slice.call(section.querySelectorAll("[data-ds-profile]"));
+    var profileButtons = Array.prototype.slice.call(section.querySelectorAll("[data-ds-profile]"));
+    var levelButtons = Array.prototype.slice.call(section.querySelectorAll("[data-ds-level]"));
     var top = section.querySelector("[data-ds-qol-top]");
     var bottom = section.querySelector("[data-ds-qol-bottom]");
     var topLabel = section.querySelector("[data-ds-qol-toplabel]");
     var bottomLabel = section.querySelector("[data-ds-qol-bottomlabel]");
     var description = section.querySelector("[data-ds-qol-desc]");
     var gap = section.querySelector("[data-ds-qol-gap]");
+    var cta = section.querySelector("[data-ds-qol-cta]");
     if (!top || !bottom) return;
 
-    var byslug = {};
-    data.profiles.forEach(function (profile) { byslug[profile.slug] = profile; });
+    // Regioni o province, e il profilo di pesi: due scelte indipendenti.
+    var state = { level: data.default_level, slug: data.default_slug };
 
     function pad(value) {
       return value < 10 ? "0" + value : String(value);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, function (character) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+      });
     }
 
     function rowsHtml(rows) {
@@ -453,17 +461,22 @@
           return (
             '<div class="qolrow qolrow--anim">' +
             '<span class="qolrow__rank">' + pad(row.rank) + "</span>" +
-            '<span class="qolrow__name">' + row.name + "</span>" +
-            '<span class="qolrow__bar"><span class="qolrow__fill" style="width: ' + row.score + '%"></span></span>' +
-            '<span class="qolrow__score">' + row.score + "</span>" +
+            '<a class="qolrow__name" href="' + escapeHtml(row.path) + '">' + escapeHtml(row.name) + "</a>" +
+            '<span class="qolrow__bar"><span class="qolrow__fill" style="width: ' + Number(row.score) + '%"></span></span>' +
+            '<span class="qolrow__score">' + Number(row.score) + "</span>" +
             "</div>"
           );
         })
         .join("");
     }
 
-    function select(slug) {
-      var profile = byslug[slug];
+    function render() {
+      var level = data.levels[state.level];
+      if (!level) return;
+      var profile = null;
+      level.profiles.forEach(function (candidate) {
+        if (candidate.slug === state.slug) profile = candidate;
+      });
       if (!profile) return;
       top.innerHTML = rowsHtml(profile.top);
       bottom.innerHTML = rowsHtml(profile.bottom);
@@ -471,17 +484,28 @@
       if (bottomLabel) bottomLabel.textContent = "Punteggi più bassi · profilo " + profile.name;
       if (description) description.textContent = profile.description;
       if (gap) gap.textContent = profile.gap + " punti";
-      buttons.forEach(function (button) {
-        button.setAttribute(
-          "aria-pressed",
-          button.getAttribute("data-ds-profile") === slug ? "true" : "false"
-        );
+      if (cta) {
+        cta.setAttribute("href", level.classifica);
+        cta.textContent = level.cta;
+      }
+      profileButtons.forEach(function (button) {
+        button.setAttribute("aria-pressed", button.getAttribute("data-ds-profile") === state.slug ? "true" : "false");
+      });
+      levelButtons.forEach(function (button) {
+        button.setAttribute("aria-pressed", button.getAttribute("data-ds-level") === state.level ? "true" : "false");
       });
     }
 
-    buttons.forEach(function (button) {
+    profileButtons.forEach(function (button) {
       button.addEventListener("click", function () {
-        select(button.getAttribute("data-ds-profile"));
+        state.slug = button.getAttribute("data-ds-profile");
+        render();
+      });
+    });
+    levelButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        state.level = button.getAttribute("data-ds-level");
+        render();
       });
     });
   })();

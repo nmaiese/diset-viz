@@ -357,6 +357,7 @@
 .home .qolrow--anim:nth-child(3) { animation-delay: .14s; }
 @keyframes dsQolIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .home .qol__foot { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 18px 22px; border-top: 1px solid var(--line); background: var(--surface-page); }
+.home .qol__provinces { margin: 0; padding: 14px 22px; border-top: 1px solid var(--line); color: var(--text-body); }
 .home .qolgap { display: flex; flex-direction: column; gap: 4px; margin-right: auto; min-width: 210px; }
 .home .qolgap__label { white-space: nowrap; }
 .home .qolgap__val { font-family: var(--font-display); font-size: 24px; line-height: 1; color: var(--text-strong); }

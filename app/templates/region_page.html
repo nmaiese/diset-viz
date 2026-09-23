@@ -221,7 +221,7 @@
     {% endif %}
   </div>
   {% if has_movement %}
-  <p class="page-note region-movement-note">Movimento: quante posizioni {{ p.region }} ha guadagnato o perso rispetto alle altre regioni, confrontando l'ultimo anno disponibile con l'anno comparabile più recente. Calcolato solo sugli indicatori direzionali e completi su tutte e 20 le regioni in entrambi gli anni.</p>
+  <p class="page-note region-movement-note">Movimento: quante posizioni {{ p.region }} ha guadagnato o perso rispetto alle altre regioni, confrontando l'ultimo anno disponibile con l'anno comparabile più recente. Calcolato solo sugli indicatori direzionali e completi su tutte e {{ p.region_total }} le regioni in entrambi gli anni.</p>
   {% endif %}
 
   {% if provinces %}
@@ -246,7 +246,7 @@
       {% set themes = p.all_indicators | map(attribute='theme') | unique | sort | list %}
       <section class="profile-explorer" id="explorer" data-region="{{ p.region }}">
         <h2>Esplora gli indicatori di {{ p.region }}</h2>
-        <p class="page-note">Tutti gli {{ p.all_indicators | length }} indicatori completi e aggiornati per {{ p.region }}, con la posizione tra le 20 regioni (1 = migliore) e il movimento sull'ultimo anno. Filtra per area, tema o forza per andare a fondo.</p>
+        <p class="page-note">Tutti gli {{ p.all_indicators | length }} indicatori completi e aggiornati per {{ p.region }}, con la posizione tra le {{ p.region_total }} regioni (1 = migliore) e il movimento sull'ultimo anno. Filtra per area, tema o forza per andare a fondo.</p>
 
         <div class="explorer-toolbar">
           <div class="macro-pills" role="group" aria-label="Filtra per area">

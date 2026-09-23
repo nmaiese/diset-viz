@@ -10,7 +10,7 @@
    coda tagliata era proprio quella che nominava le fonti. Un conteggio al suo
    posto e' piu' corto, non cresce, e dice quanto e' grande l'atlante. #}
 {% block title %}{{ site_name }}: {{ total_indicators }} indicatori territoriali per regione{% endblock %}
-{% block description %}{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}
+{% block description %}{{ total_indicators }} indicatori {{ sources_label }}, {{ territories.regions }} regioni e {{ territories.provinces }} province, dal {{ year_min }} al {{ year_max }}. Mappa, profili dei territori, confronti, qualità della vita e storie dai dati.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -23,7 +23,7 @@
       "name": "{{ site_name }}",
       "url": "{{ SITE_URL }}/",
       "inLanguage": "it-IT",
-      "description": {{ ("Atlante interattivo degli indicatori territoriali " ~ sources_label ~ ": " ~ total_indicators ~ " indicatori, 20 regioni, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
+      "description": {{ ("Atlante interattivo degli indicatori territoriali " ~ sources_label ~ ": " ~ total_indicators ~ " indicatori, " ~ territories.regions ~ " regioni e " ~ territories.provinces ~ " province, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
       "publisher": { "@id": {{ publisher['@id'] | tojson }} },
       "potentialAction": {
         "@type": "SearchAction",
@@ -60,7 +60,8 @@
       <div class="hero-cover">
         <div class="hero-cover__stats">
           <span><strong>{{ total_indicators }}</strong> indicatori</span>
-          <span><strong>20</strong> regioni</span>
+          <span><strong>{{ territories.regions }}</strong> regioni</span>
+          <span><strong>{{ territories.provinces }}</strong> province</span>
           <span><strong>{{ year_min }}-{{ year_max }}</strong></span>
         </div>
         <p class="meta">Dati {{ sources_label }} e altre fonti ufficiali</p>
@@ -418,6 +419,13 @@
       <p class="body qol__lede" data-ds-qol-desc>La classifica combina indicatori di reddito, lavoro, salute, istruzione, ambiente e altre dimensioni. Pesi e metodo sono pubblici.</p>
     </div>
 
+    <div class="qol__profiles" role="group" aria-label="Regioni o province">
+      {% for key, lvl in qol_module.levels.items() %}
+      <button type="button" class="chip" data-ds-level="{{ key }}"
+              aria-pressed="{{ 'true' if key == qol_module.default_level else 'false' }}">{{ lvl.label }}</button>
+      {% endfor %}
+    </div>
+
     <div class="qol__profiles" role="group" aria-label="Profilo di priorità">
       {% for profile in qol_module.profiles %}
       <button type="button" class="chip" data-ds-profile="{{ profile.slug }}"
@@ -433,7 +441,7 @@
           {% for row in active.top %}
           <div class="qolrow qolrow--anim">
             <span class="qolrow__rank">{{ '%02d' | format(row.rank) }}</span>
-            <span class="qolrow__name">{{ row.name }}</span>
+            <a class="qolrow__name" href="{{ row.path }}">{{ row.name }}</a>
             <span class="qolrow__bar"><span class="qolrow__fill" style="width: {{ row.score }}%"></span></span>
             <span class="qolrow__score">{{ row.score }}</span>
           </div>
@@ -446,7 +454,7 @@
           {% for row in active.bottom %}
           <div class="qolrow qolrow--anim">
             <span class="qolrow__rank">{{ '%02d' | format(row.rank) }}</span>
-            <span class="qolrow__name">{{ row.name }}</span>
+            <a class="qolrow__name" href="{{ row.path }}">{{ row.name }}</a>
             <span class="qolrow__bar"><span class="qolrow__fill" style="width: {{ row.score }}%"></span></span>
             <span class="qolrow__score">{{ row.score }}</span>
           </div>
@@ -455,6 +463,16 @@
       </div>
     </div>
 
+    {% if qol_module.levels.province %}
+    {# Resa dal server, per chi non ha JavaScript e per i motori: le province
+       nel modulo arrivano solo dal JSON, e senza questa riga la home non
+       linkava nessuna provincia. #}
+    {% set prov = (qol_module.levels.province.profiles | selectattr('slug', 'equalto', qol_module.default_slug) | list | first) or qol_module.levels.province.profiles[0] %}
+    <p class="body qol__provinces">Fra le province, con il profilo {{ prov.name | lower }}, in testa ci sono
+      {% for row in prov.top %}<a href="{{ row.path }}">{{ row.name }}</a>{{ ', ' if not loop.last and loop.revindex > 2 else (' e ' if not loop.last else '.') }}{% endfor %}
+    </p>
+    {% endif %}
+
     <div class="qol__foot">
       <div class="qolgap">
         <span class="meta qolgap__label">Distanza massima di punteggio</span>
@@ -462,7 +480,8 @@
       </div>
       <span class="meta meta--warning">Indice sperimentale e non ufficiale</span>
       <a class="linkcta linkcta--quiet" href="/metodologia">Metodo e pesi &rarr;</a>
-      <a class="btn btn--primary btn--sm" href="/qualita-della-vita/classifica/regioni">Esplora la classifica</a>
+      <a class="btn btn--primary btn--sm" data-ds-qol-cta href="{{ qol_module.levels[qol_module.default_level].classifica }}">{{ qol_module.levels[qol_module.default_level].cta }}</a>
+      {% if qol_module.levels.province %}<a class="linkcta linkcta--quiet" href="/province">Trova la tua provincia &rarr;</a>{% endif %}
     </div>
   </div>
 </section>
