@@ -46,6 +46,7 @@ direttamente su `master`.
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
+| **la versione 1.0**: griglia, tipografia, componenti, pagine, direzione "Cronaca", prototipi | [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md), [`design/README.md`](design/README.md) |
 | deploy su Cloud Run | [`DEPLOY.md`](DEPLOY.md) |
 
 ## Che cos'è
