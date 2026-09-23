@@ -25,9 +25,9 @@ Two consequences worth knowing:
 - BES and Multiscopo pages gain aggregates they never had (median, gap and gap
   ratio, biggest movers, gap trend). Nothing they had changes: that is pinned by
   ``tests/integration/test_indicator_view.py`` against a fixture dumped from the old code.
-- Provinces have no profile page (there is no ``/provincia/<key>`` route), so a
-  level declares whether its territories are linkable rather than the template
-  guessing from the level name.
+- A level declares the profile page of its territories (``profile_path``)
+  rather than the template guessing from the level name: regions live at
+  ``/regione/<key>``, provinces at ``/provincia/<key>``.
 """
 
 import re
@@ -79,7 +79,7 @@ LEVELS = {
         "label": "Province",
         "singular": "provincia",
         "plural": "province",
-        "profile_path": None,
+        "profile_path": "/provincia/",
         "has_map": False,
     },
 }

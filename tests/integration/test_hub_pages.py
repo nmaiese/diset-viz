@@ -872,16 +872,6 @@ class LePagineProvincia(unittest.TestCase):
                 for percorso in re.findall(r'href="(/regione/[a-z0-9-]+)"', html):
                     self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
 
-    def test_ogni_link_interno_risponde(self):
-        for chiave in ("lecce", "milano", "trieste"):
-            with self.subTest(provincia=chiave):
-                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
-                interni = {h for h in re.findall(r'href="(/[a-z0-9/_.-]+)"', html)
-                           if not h.startswith("/static/")}
-                for percorso in interni:
-                    with self.subTest(percorso=percorso):
-                        self.assertIn(self.client.get(percorso).status_code, (200, 301), percorso)
-
     def test_la_variante_markdown_porta_la_stessa_risposta(self):
         """HTML e Markdown sono lo stesso documento alla stessa URL: se la
         variante non porta posizione e punteggio e' una pagina diversa sotto lo

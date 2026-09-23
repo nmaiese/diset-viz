@@ -1,11 +1,9 @@
 """Il profilo di una provincia, come `app/profiles.py` fa per una regione.
 
-Il buco che chiude. Il sito misura 103 province nella classifica della qualita'
-della vita, e nessuna di loro aveva una pagina. Il commento in `views.py` che
-costruisce quella classifica lo dice gia': "Le province non hanno un profilo,
-ma la loro regione si', quindi il nome della regione diventa la porta". Cioe'
-chi cercava "qualita' della vita provincia di Lecce" arrivava, nel migliore dei
-casi, su una tabella di 103 righe, e da li' poteva solo salire alla Puglia.
+Il buco che ha chiuso. Il sito misurava le province nella classifica della
+qualita' della vita, e nessuna aveva una pagina: chi cercava "qualita' della
+vita provincia di Lecce" arrivava, nel migliore dei casi, su una tabella di 103
+righe, e da li' poteva solo salire alla Puglia.
 
 Non e' un buco di disegno, e' un buco di superficie: il dato c'e' tutto.
 `quality_life_bes.build_bes_territory` restituisce gia' punteggio, posizione,
@@ -41,16 +39,6 @@ LIVELLO = "provincia"
 QUANTI_INDICATORI = 5
 
 
-def _indicatore_path(voce):
-    """Il link canonico alla scheda di un indicatore dell'elenco.
-
-    `id` arriva namespacizzato (`bes:09PAE002`), e `profiles.indicator_path`
-    vuole id e nome: e' la stessa funzione che usano le pagine regione, cosi'
-    un link provinciale e uno regionale non possono divergere di forma.
-    """
-    return profiles.indicator_path(voce.get("id"), voce.get("name") or "")
-
-
 def _indicatori(voci):
     return [
         {
@@ -59,7 +47,9 @@ def _indicatori(voci):
             "theme": voce.get("theme"),
             "score": voce.get("score"),
             "year_max": voce.get("year_max"),
-            "path": _indicatore_path(voce),
+            # Gia' `bes_path` dell'id: lo calcola `quality_life_bes` una volta
+            # per indicatore, dentro la matrice memoizzata.
+            "path": voce["path"],
         }
         for voce in (voci or [])[:QUANTI_INDICATORI]
     ]
@@ -294,7 +284,7 @@ def indicatori(chiave):
             "name": info["name"],
             "theme": info.get("category_name") or info.get("domain_name") or "",
             "macro_area": info.get("domain_name") or "",
-            "path": bes_data.bes_indicator_path(id_indicatore, info["name"]),
+            "path": bes_data.bes_path(id_indicatore),
             "unit": info.get("unit") or "",
             "direction": info.get("direction"),
             "value": valore,

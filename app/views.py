@@ -124,10 +124,10 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html", "markdown_marker": "# Storie dai dati"},
         {"path": "/blog/pil-pro-capite-regioni-divario-2024", "content_type": "text/html", "marker": "PIL pro capite per regione", "kind": "html", "markdown_marker": "# PIL pro capite per regione"},
         {"path": "/metodologia", "content_type": "text/html", "marker": "Metodologia e fonti", "kind": "html", "markdown_marker": "# Metodologia e fonti"},
-        # Le tre pagine di fiducia. Mancavano da questo contratto, quindi
+        # Le quattro pagine di fiducia. Mancavano da questo contratto, quindi
         # l'audit contro produzione non si sarebbe accorto se una fosse tornata
-        # 404 o noindex, ed e' proprio il terzetto che un revisore esterno apre
-        # per primo.
+        # 404 o noindex, e sono le pagine che un revisore esterno apre per
+        # prime. /termini e' arrivata per ultima, il 23/9.
         {"path": "/chi-siamo", "content_type": "text/html", "marker": "Responsabilità editoriale", "kind": "html"},
                 # Il marcatore e' il `mailto:`, non l'indirizzo nudo. L'indirizzo nudo
         # sopravvive nel JSON-LD anche quando Cloudflare offusca il link
@@ -135,6 +135,11 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         # cui nessuno riesce piu' a scrivere.
         {"path": "/contatti", "content_type": "text/html", "marker": "mailto:divarioitalia@protonmail.com", "kind": "html"},
         {"path": "/privacy", "content_type": "text/html", "marker": "Pubblicità", "kind": "html"},
+        {"path": "/termini", "content_type": "text/html", "marker": "<h1>Termini di uso</h1>", "kind": "html"},
+        # Una provincia, perche' le 103 pagine erano fuori dal contratto e un
+        # loro 404 in produzione non l'avrebbe visto nessuno. I marcatori non
+        # portano la posizione, che cambia con i dati.
+        {"path": "/provincia/lecce", "content_type": "text/html", "marker": "<h1>Lecce è ", "kind": "html", "markdown_marker": "# Lecce"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
         {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
@@ -1611,10 +1616,10 @@ def quality_life_classifica(url_level):
     canonical = public_matches[0]["loc"]
     # I territori della classifica erano testo nudo: venti regioni e 103
     # province su una pagina che sta in posizione 4,1 per "classifica regioni
-    # italiane per qualita' della vita", e non portavano da nessuna parte. Le
-    # province non hanno un profilo, ma la loro regione si', quindi il nome
-    # della regione diventa la porta. Si calcola qui e non nel template perche'
-    # `payload["ranking"]` e' memoizzato: mutarlo avvelenerebbe la cache.
+    # italiane per qualita' della vita", e non portavano da nessuna parte. Ora
+    # ogni riga porta al suo territorio (il template), e la colonna Regione di
+    # una provincia porta alla sua regione. Si calcola qui e non nel template
+    # perche' `payload["ranking"]` e' memoizzato: mutarlo avvelenerebbe la cache.
     # `region_key_for` slugifica qualunque stringa, anche una che non e' una
     # regione: le province di Bolzano e Trento dichiarano "Provincia Autonoma
     # Bolzano", da cui usciva un link a una pagina che non esiste. Si valida

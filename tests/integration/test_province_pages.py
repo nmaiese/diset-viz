@@ -127,10 +127,16 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
             self.assertIn(misura, testo)
 
     def test_ogni_indicatore_porta_al_suo_indicatore(self):
+        """Il link e' il canonico della scheda, non un path ricostruito: lo slug
+        dal nome provinciale portava tre schede su un 301. Che il link risponda
+        lo controlla `test_link_interni`."""
         html = self.client.get("/provincia/lecce").get_data(as_text=True)
-        for voce in province_profile.indicatori("lecce")[:8]:
-            with self.subTest(indicatore=voce["id"]):
-                self.assertIn(f'href="{voce["path"]}"', html)
+        with app.app_context():
+            voci = province_profile.indicatori("lecce")
+            for voce in voci:
+                with self.subTest(indicatore=voce["id"]):
+                    self.assertEqual(voce["path"], bes_data.bes_path(voce["id"]))
+                    self.assertIn(f'href="{voce["path"]}"', html)
 
     def test_due_province_non_sono_la_stessa_pagina(self):
         """Prima della tabella dei valori due province condividevano il 62% del

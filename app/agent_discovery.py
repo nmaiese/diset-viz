@@ -678,7 +678,7 @@ def province_markdown(profilo, vicine, site_url, indicatori=None):
               profilo["profile"].get("description", ""),
               "",
               f"Classifica completa: {_absolute(site_url, '/qualita-della-vita/classifica/province')}",
-              f"Metodologia: {_absolute(site_url, '/qualita-della-vita/metodologia')}"]
+              f"Metodologia: {_absolute(site_url, '/metodologia#qualita-della-vita')}"]
     return "\n".join(lines)
 
 

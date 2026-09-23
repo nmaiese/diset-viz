@@ -532,8 +532,8 @@
           <li><a href="/blog/{{ post.slug }}">{{ post.title }}</a> <small>{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min</small></li>
           {% endfor %}
           {# I due territori agli estremi: la pagina li nomina nel cruscotto e
-             non ci ha mai portato. A livello provincia non c'e' un profilo, e
-             `profile_path` e' vuoto. #}
+             non ci ha mai portato. `profile_path` e' il prefisso della pagina
+             del territorio, per regioni e province. #}
           {% if level.profile_path and level.best %}
           <li><a href="{{ level.profile_path }}{{ level.best.key }}">Il profilo di {{ level.best.name }}, in testa</a></li>
           {% endif %}

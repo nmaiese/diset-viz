@@ -157,6 +157,40 @@ def bes_indicator_path(indicator_id, name):
     return sources.indicator_url("bes", indicator_id, slugify(name))
 
 
+def bes_path(indicator_id):
+    """Il path canonico della scheda di un indicatore BES, dato il solo id.
+
+    Accetta l'id grezzo (`09PAE002`) o quello del catalogo (`bes:09PAE002`).
+    Il path lo prende da `all_bes_indicators`, cioe' dallo stesso posto da cui
+    la scheda ricava il suo canonico: lo slug nasce dal nome regionale quando
+    l'indicatore ha anche il livello regionale, e dal nome provinciale solo se
+    non ce l'ha. Ricostruirlo altrove con il nome del livello che si ha in mano
+    e' il modo in cui le pagine provincia hanno pubblicato 513 link in 404 e 929
+    in 301: da `profiles.indicator_path`, che forza la famiglia territoriale e
+    produce `ter-bes:<id>`, e da `bes_indicator_path` col nome provinciale.
+    """
+    raw_id = str(indicator_id).removeprefix(sources.SOURCES["bes"]["internal_prefix"])
+    try:
+        return _bes_paths()[raw_id]
+    except KeyError:
+        raise LookupError(f"indicatore BES {indicator_id!r} assente da all_bes_indicators") from None
+
+
+@synchronized_cache(maxsize=1)
+def _bes_paths():
+    """`{id: path}` di tutte le schede BES, costruito una volta per processo.
+
+    Non si scorre `all_bes_indicators()` a ogni chiamata: sta in una
+    `SimpleCache`, che a ogni lettura ripickla l'intera lista (250 KB), e una
+    pagina provincia chiama `bes_path` 77 volte, quindi il render passava da
+    7 a 44 ms. Non si memoizza nemmeno `bes_path` per id, che aggiungerebbe
+    centinaia di voci alla stessa cache e sfratterebbe le altre (vedi
+    `province_profile.indicatori`). I path dipendono solo dai manifest, statici
+    per deploy, come le righe di `get_bes_rows`.
+    """
+    return {item["id"]: item["path"] for item in all_bes_indicators()}
+
+
 @cache.memoize(timeout=3600)
 def all_bes_indicators():
     """One public catalog entry for every BES indicator used by the rankings."""
