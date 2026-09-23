@@ -58,7 +58,7 @@ Upshot per il testo che accompagna il dato.
 
 ## Tipografia
 
-Una scala di ruoli, nominati per funzione:
+Una scala di undici ruoli, nominati per funzione:
 
 | ruolo | desktop | telefono | uso |
 | --- | --- | --- | --- |
@@ -71,7 +71,8 @@ Una scala di ruoli, nominati per funzione:
 | interfaccia | 16/24 | 16/24 | controlli, celle, schede |
 | piccolo | 14/20 | 14/20 | riga fonte, meta, briciole, didascalie |
 | etichetta | 13/18, peso 600 | 13/18 | occhielli, intestazioni di tabella, legende |
-| cifra chiave | 64/64, peso 700 | 44/44 | tessere e numero di pagina |
+| cifra chiave | 64/64, peso 700 | 44/44 | il numero di una pagina |
+| cifra di tessera | 36/38, peso 700 | 28/30 | tessere numero |
 
 - Le etichette sono in minuscolo con l'iniziale maiuscola: mai tutto maiuscolo,
   mai monospazio. 13px e' il minimo, perche' Source Sans ha l'occhio medio

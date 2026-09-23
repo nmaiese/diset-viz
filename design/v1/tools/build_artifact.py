@@ -115,7 +115,7 @@ def cover(pages: list[str]) -> str:
     <p class="lede">Le pagine chiave del sito nella direzione Cronaca, con i dati veri catturati dall'app. Ogni cifra viene dal contesto con cui la pagina di oggi è resa, o si calcola con le funzioni del sito.</p>
     <ul class="cover__points">
       <li>Una griglia sola da 1200 pixel, dalla testata al piede, e tutto allineato a sinistra sotto il marchio.</li>
-      <li>Una famiglia sola, Source Sans 3, e dieci ruoli tipografici al posto di 58 taglie.</li>
+      <li>Una famiglia sola, Source Sans 3, e undici ruoli tipografici al posto di 58 taglie.</li>
       <li>Un accento solo, arancio bruciato, per ciò che si clicca e per l'elemento in evidenza. I dati sono blu, e nessun colore dice meglio o peggio.</li>
       <li>Ogni pagina apre con la risposta, il numero e un grafico. Il metodo e la citazione stanno in fondo, fuori dal racconto.</li>
       <li>Tema scuro compreso: la barra in basso lo cambia, oppure segue il sistema.</li>
@@ -129,7 +129,7 @@ def cover(pages: list[str]) -> str:
   </div>
   <div class="cover__open prose">
     <h2>Da decidere guardando i prototipi</h2>
-    <p>Il numero chiave della regione: oggi è la posizione media sugli indicatori, il prototipo mostra la posizione nella qualità della vita, come per le province. Cambia il titolo di venti pagine.</p>
+    <p>Il numero chiave della regione. Il titolo della Puglia usa ancora la posizione media sugli indicatori, come oggi, e la prima tessera mostra la posizione nella qualità della vita, che è il numero chiave delle province. Le due forme sono sulla stessa pagina per sceglierne una: cambia il titolo di venti pagine.</p>
     <p>Gli spazi pubblicitari sono segnaposto. Perché restino dove sono disegnati, gli annunci automatici di AdSense vanno spenti dalla console.</p>
   </div>
 </main>
