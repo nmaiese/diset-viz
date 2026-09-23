@@ -5,8 +5,8 @@ che dia a quella ricerca il contesto dei dati: un indicatore completo, con
 grafici, fonti, metodo e una foto vera con licenza.
 
 Questo documento possiede il processo. Gli strumenti stanno in
-`scripts/articoli_trend/`, uno per fase, e la mappa dei temi in
-`config/trend_temi.json`. Non usa la catena della redazione
+`scripts/trend_articles/`, uno per fase, e la mappa dei temi in
+`config/trend_topics.json`. Non usa la catena della redazione
 (`nmaiese/redazione-ai`): e' un canale diverso, piu' corto, per un altro tipo
 di pezzo. La catena scrive la prosa delle **schede indicatore**
 (`content/indicators/`), che restano la risposta di riferimento a "che cos'e'
@@ -31,20 +31,21 @@ Tutti i comandi si lanciano dalla radice del repo, con `bin/py`.
 
 | fase | strumento | produce |
 | --- | --- | --- |
-| 1. segnali | `raccogli` | `data/trend/<giorno>/segnali.json` |
-| 2. interesse | `interesse` (con uv) | `data/trend/<giorno>/interesse.json` |
-| 3. classifica | `classifica` | `data/trend/<giorno>/classifica.{json,md}` |
-| 4. dossier | `dossier` | `data/articoli/<slug>/dossier.json`, `app/static/data/articoli/<slug>.csv` |
-| 5. grafici | `grafici` | `content/figure/<slug>/*.svg` |
-| 6. foto | `foto cerca` / `foto scegli` | `app/static/img/blog/<slug>.jpg` e `.foto.json` |
+| 1. segnali | `collect` | `data/trend/<giorno>/signals.json` |
+| 2. interesse | `interest` (con uv) | `data/trend/<giorno>/interest.json` |
+| 3. classifica | `rank` | `data/trend/<giorno>/ranking.{json,md}` |
+| 4. dossier | `dossier` | `data/articles/<slug>/dossier.json`, `app/static/data/articles/<slug>.csv` |
+| 4b. elaborazioni | `derive_*` | `data/derived/<nome>.{csv,json}` |
+| 5. grafici | `figures` | `content/figures/<slug>/*.svg` |
+| 6. foto | `photo search` / `photo choose` | `app/static/img/blog/<slug>.jpg` e `.photo.json` |
 | 7. scrittura | chi redige | `content/posts/<data>-<slug>.md` |
-| 8. verifica | `verifica` | esito, errori e avvisi |
+| 8. verifica | `verify` | esito, errori e avvisi |
 | 9. pubblicazione | PR, merge umano | il pezzo in produzione |
 
 ### 1. Segnali: che cosa si cerca e di che cosa si parla
 
 ```bash
-bin/py -m scripts.articoli_trend.raccogli
+bin/py -m scripts.trend_articles.collect   # --day AAAA-MM-GG, --skip-topics
 ```
 
 Legge, senza chiavi e da fonti aperte:
@@ -58,7 +59,7 @@ Legge, senza chiavi e da fonti aperte:
   dato appena uscito e' un trend: e' il giorno in cui qualcuno lo cerca.
 
 Ogni segnale e' salvato com'e' arrivato, con fonte, URL e data. Ai segnali si
-abbinano i temi di `config/trend_temi.json` con parole intere (`rsa` non si
+abbinano i temi di `config/trend_topics.json` con parole intere (`rsa` non si
 accende in `borsa`). Il file si committa: e' la prova del perche'.
 
 Il feed delle tendenze e' dominato da sport, spettacolo e cronaca: e' normale.
@@ -72,7 +73,7 @@ per la ragione sbagliata.
 
 ```bash
 ~/.local/bin/uv run --no-project --with pytrends --with "urllib3<2" \
-    --with pandas python -m scripts.articoli_trend.interesse
+    --with pandas python -m scripts.trend_articles.interest
 ```
 
 Per ogni query di ogni tema: la **crescita** (ultimi 7 giorni sugli 83
@@ -84,7 +85,7 @@ regione** negli ultimi 7 giorni.
 `pytrends` non e' una dipendenza del sito e non deve diventarlo: gira in un
 ambiente usa-e-getta. E' lento apposta (una pausa fra le richieste) e fa
 anche 30 minuti per tutta la mappa: si lancia in background, oppure solo su
-alcuni temi con `--temi`. Se Google risponde 429 riprova; se fallisce, il
+alcuni temi con `--topics`. Se Google risponde 429 riprova; se fallisce, il
 tema resta senza misura e la classifica ridistribuisce il peso sugli altri
 segnali, **non** lo tratta come zero. Il ripiego va scritto nel rapporto.
 
@@ -99,7 +100,7 @@ deve stare nello stesso ordine di grandezza dei temi che misura.
 ### 3. Classifica: dal tema all'indicatore
 
 ```bash
-bin/py -m scripts.articoli_trend.classifica
+bin/py -m scripts.trend_articles.rank      # --day AAAA-MM-GG
 ```
 
 Per ogni coppia tema-indicatore della mappa, tre punteggi fra 0 e 1, ognuno
@@ -127,14 +128,14 @@ distingue poco. Serve a scartare le coppie senza storia, non a ordinare
 quelle che ce l'hanno: l'ordine lo fanno interesse e dato. La soglia
 dell'outlier (oggi z >= 1,8) va rivista dopo qualche giornata di classifiche.
 
-Aggiungere un tema: una voce in `config/trend_temi.json` con le parole, le
+Aggiungere un tema: una voce in `config/trend_topics.json` con le parole, le
 query, gli indicatori e le query per le foto. Un tema senza un indicatore del
 sito non entra: e' il sito che da' il contesto, non la notizia.
 
 ### 4. Dossier: tutti i numeri, con la loro provenienza
 
 ```bash
-bin/py -m scripts.articoli_trend.dossier <slug> bes:03LAV007 prov:03LAV007
+bin/py -m scripts.trend_articles.dossier <slug> bes:03LAV007 prov:03LAV007 --date AAAA-MM-GG
 ```
 
 Il primo indicatore e' il principale, gli altri sono i parenti (lo stesso
@@ -152,7 +153,7 @@ stesso numero che il lettore trova nella scheda.
 **Le medie del dossier sono medie semplici dei territori**, non pesate per
 popolazione. Non sono la media nazionale e non si chiamano cosi'. Se il
 pezzo ha bisogno del valore Italia, lo prende dalla pubblicazione Istat e lo
-dichiara fra le `cifre_esterne`, con URL.
+dichiara fra le `external_figures`, con URL.
 
 ### 4b. Contesto e prova delle tesi
 
@@ -164,15 +165,15 @@ Un dossier con i numeri giusti non basta. Prima di scrivere, per ogni pezzo:
    l'angolo che nessuno ha coperto.
 2. **Valori ufficiali, non medie semplici.** Per Italia, Nord, Centro e
    Mezzogiorno si usano i valori calcolati dall'Istat
-   (`elab_bes_ripartizioni`), che pesano la popolazione. La media semplice
+   (`derive_bes_areas`, che scrive `ext:bes_areas_<codice>`), che pesano la popolazione. La media semplice
    delle regioni sbaglia: sui posti letto il Centro (60 per 10.000) spariva
    dentro un "Centro-Nord" a 97.
 3. **Le ipotesi alternative, con i dati.** Ogni tesi causale ("il Nord peggiora
    perché ci sono più alunni stranieri") si mette alla prova con un indicatore
    che la possa smentire, in un'elaborazione versionata in
-   `data/elaborazioni/` con `method` e script (`elab_mim_stranieri`,
-   `elab_settori_infortuni`, `elab_media_province`). Il grafico di dispersione
-   salva le correlazioni in `data/articoli/<slug>/legame_*.json`, **anche
+   `data/derived/` con `method` e script (`derive_foreign_pupils`,
+   `derive_sector_injuries`, `derive_province_mean`). Il grafico di dispersione
+   salva le correlazioni in `data/articles/<slug>/link_<x>_<y>.json`, **anche
    dentro ciascun gruppo**: un legame che esiste solo fra Nord e Sud può
    dipendere da qualunque cosa distingua le due aree, e va scritto così.
 4. **Quello che non regge si scrive.** Un test che fallisce è un'informazione
@@ -188,16 +189,22 @@ tutte parzialmente sbagliate o non dimostrabili.
 ### 5. Grafici
 
 ```bash
-bin/py -m scripts.articoli_trend.grafici <slug> dispersione ext:X --con bes:Y --anni-x 2018,2025 --anni-y 2018,2025 --titolo "..." --nome legame
-bin/py -m scripts.articoli_trend.grafici <slug> barre   bes:03LAV007 --evidenzia Umbria,Lombardia --titolo "..." --nome classifica
-bin/py -m scripts.articoli_trend.grafici <slug> estremi prov:03LAV007 --quanti 10 --titolo "..." --nome province
-bin/py -m scripts.articoli_trend.grafici <slug> linee   bes:03LAV007 --territori Umbria --titolo "..." --nome serie
+bin/py -m scripts.trend_articles.figures <slug> scatter  ext:X --with bes:Y --years-x 2018,2025 --years-y 2018,2025 --title "..." --name legame
+bin/py -m scripts.trend_articles.figures <slug> bars     bes:03LAV007 --reference ext:bes_areas_03LAV007 --highlight Umbria,Lombardia --title "..." --name classifica
+bin/py -m scripts.trend_articles.figures <slug> extremes prov:03LAV007 --count 10 --title "..." --name province
+bin/py -m scripts.trend_articles.figures <slug> lines    ext:bes_areas_03LAV007 --with bes:03LAV007 --territories Umbria --title "..." --name serie
 ```
 
-Tre forme, perche' tre sono le domande: **dove** (barre, tutte le regioni
-con la media semplice come riferimento), **gli estremi** (le province piu'
-alte e piu' basse, senza stampare 107 barre), **come cambia** (linee, con
-Centro-Nord e Mezzogiorno e i territori di cui il testo parla).
+Quattro forme, perche' quattro sono le domande: **dove** (`bars`, tutte le
+regioni con il valore Italia dell'Istat come riferimento), **gli estremi**
+(`extremes`, le province piu' alte e piu' basse, senza stampare 107 barre),
+**come cambia** (`lines`, con le ripartizioni e i territori di cui il testo
+parla), **che cosa ci va insieme** (`scatter`, due indicatori, con le
+correlazioni in totale e dentro ciascun gruppo).
+
+L'esempio completo, con tutti i comandi dei quattro pezzi del 23 settembre
+2026, e' `data/articles/rebuild_2026-09-23.sh`: rifa' elaborazioni, dossier,
+figure e classifica a partire dalle fonti.
 
 Le figure sono SVG in linea, che l'articolo richiama con
 `<!-- figura: nome -->` su una riga sua. I colori sono classi CSS sui token
@@ -211,8 +218,8 @@ per colore, e le etichette stanno in fondo alla linea invece che in legenda.
 ### 6. Foto
 
 ```bash
-bin/py -m scripts.articoli_trend.foto cerca  <slug> "cantiere edile" "construction site Italy"
-bin/py -m scripts.articoli_trend.foto scegli <slug> "File:Nome del file.jpg" --fuoco 0.5,0.4
+bin/py -m scripts.trend_articles.photo search <slug> "cantiere edile" "construction site Italy"
+bin/py -m scripts.trend_articles.photo choose <slug> "File:Nome del file.jpg" --focus 0.5,0.4 --date AAAA-MM-GG
 ```
 
 **Solo fotografie vere, con una licenza che ne permetta l'uso.** Niente
@@ -221,18 +228,18 @@ immagini generate, niente illustrazioni, niente foto prese da un giornale.
 La fonte e' **Wikimedia Commons**: la sua API restituisce autore, licenza e
 URL della licenza in forma leggibile da una macchina, quindi l'attribuzione
 non la copia a mano nessuno. Sono ammesse CC0, pubblico dominio, CC BY e
-CC BY-SA. `cerca` scarta il resto, scarta i file che non sono foto (mappe,
+CC BY-SA. `search` scarta il resto, scarta i file che non sono foto (mappe,
 loghi, grafici, disegni, scansioni) e quelli troppo piccoli, e salva le
-anteprime in `data/articoli/<slug>/foto-candidate/`. **Le anteprime vanno
+anteprime in `data/articles/<slug>/photo-candidates/` (ignorata da git). **Le anteprime vanno
 guardate**: la pertinenza la decide un occhio, non una query. Criteri:
 - la foto mostra il tema, non un simbolo generico, e non ritrae una persona
   riconoscibile in una situazione che il pezzo potrebbe associarle (vittime,
   indagati, pazienti);
 - e' italiana quando il tema e' territoriale;
-- regge il ritaglio 1200x630 (`--fuoco` dice quale punto tenere al centro).
+- regge il ritaglio 1200x630 (`--focus` dice quale punto tenere al centro).
 
-`scegli` scarica l'originale, ritaglia, salva il JPG e la **scheda della
-foto** (`<slug>.foto.json`): file, pagina originale, autore, licenza con URL,
+`choose` scarica l'originale, ritaglia, salva il JPG e la **scheda della
+foto** (`<slug>.photo.json`): file, pagina originale, autore, licenza con URL,
 modifiche fatte. Il campo `cover_credit` del pezzo si copia dalla scheda, e
 la pagina lo mostra sotto la foto come "Foto: autore, licenza, via Wikimedia
 Commons. Ritagliata e ridimensionata." La CC BY-SA sulla foto non si estende
@@ -266,25 +273,25 @@ Il frontmatter, oltre ai campi del blog:
 cover: /static/img/blog/<slug>.jpg
 cover_alt: "Descrizione di cio' che si vede nella foto"
 cover_caption: "Una riga su che cosa mostra la foto, se serve."
-cover_credit:            # copiato da <slug>.foto.json
-  autore: "..."
-  licenza: "CC BY-SA 4.0"
-  licenza_url: "https://creativecommons.org/licenses/by-sa/4.0"
-  fonte_url: "https://commons.wikimedia.org/wiki/File:..."
-  fonte_nome: "Wikimedia Commons"
-  modifiche: "Ritagliata e ridimensionata"
+cover_credit:            # copiato da <slug>.photo.json
+  author: "..."
+  license: "CC BY-SA 4.0"
+  license_url: "https://creativecommons.org/licenses/by-sa/4.0"
+  source_url: "https://commons.wikimedia.org/wiki/File:..."
+  source_name: "Wikimedia Commons"
+  changes: "Ritagliata e ridimensionata"
 indicator: bes-03LAV007  # obbligatorio: aggancia il pezzo alla scheda
 trend:                   # perche' questo pezzo, oggi
-  tema: sicurezza-lavoro
-  rilevato: 2026-09-23
-  classifica: data/trend/2026-09-23/classifica.json
-  punteggio: {interesse: 0.9, dato: 0.8, storia: 1.0}
-  segnali:
-    - tipo: google_news_principali
-      testo: "titolo della notizia"
-      fonte: "Google News Italia"
+  topic: sicurezza-lavoro
+  detected: 2026-09-23
+  ranking: data/trend/2026-09-23/ranking.json
+  score: {interest: 0.9, data: 0.8, story: 1.0}
+  signals:
+    - type: google_news_principali
+      text: "titolo della notizia"
+      source: "Google News Italia"
       url: "https://..."
-      data: 2026-09-22
+      date: 2026-09-22
 dataset:                 # lo schema Dataset della pagina
   name: "..."
   description: "..."
@@ -293,11 +300,11 @@ dataset:                 # lo schema Dataset della pagina
   spatial: "Italia, regioni e province"
   creator: "Istat"
   source_url: "https://esploradati.istat.it/..."
-  download: /static/data/articoli/<slug>.csv
-cifre_esterne:           # ogni numero che non viene dal dossier
-  - cifra: "1.090"
-    cosa: "morti sul lavoro denunciate nel 2024"
-    fonte: "Inail, Relazione annuale 2025"
+  download: /static/data/articles/<slug>.csv
+external_figures:        # ogni numero che non viene dal dossier
+  - value: "1.090"
+    what: "morti sul lavoro denunciate nel 2024"
+    source: "Inail, Relazione annuale 2025"
     url: "https://..."
 ```
 
@@ -308,19 +315,19 @@ download) e il riquadro "I dati di questo articolo" in fondo al pezzo.
 ### 8. Verifica
 
 ```bash
-bin/py -m scripts.articoli_trend.verifica content/posts/<file>.md
+bin/py -m scripts.trend_articles.verify content/posts/<file>.md
 ```
 
 Ferma il pezzo su: frontmatter incompleto (trend, dataset, credito foto),
 foto senza scheda o con licenza non ammessa, credito diverso dalla scheda,
 caratteri vietati, **una cifra che non sta nel dossier ne' fra le
-`cifre_esterne`**, "media nazionale" detta di una media semplice, un link
+`external_figures`**, "media nazionale" detta di una media semplice, un link
 interno che non risponde 200, una fonte citata nel testo che non risponde o
 che manca dalla sezione "## Fonti", una figura senza file. Gli avvisi (un
 piccolo numero che non e' nel dossier, piu' di mille parole) si leggono.
 
 Poi la suite: `bin/py -m unittest discover -s tests -v`. I test
-`tests/integration/test_blog_articoli_trend.py` controllano credito foto,
+`tests/integration/test_blog_trend_articles.py` controllano credito foto,
 figure e `Dataset` su tutti i pezzi.
 
 La verifica automatica non legge il senso. Prima della PR una seconda

@@ -1,0 +1,27 @@
+{
+  "x": "ext:foreign_pupils_grade8",
+  "y": "bes:SDG-311",
+  "years_x": [
+    2018,
+    2025
+  ],
+  "years_y": [
+    2018,
+    2025
+  ],
+  "links": {
+    "tutti": {
+      "points": 18,
+      "correlation": 0.47
+    },
+    "Centro-Nord": {
+      "points": 10,
+      "correlation": 0.94
+    },
+    "Mezzogiorno": {
+      "points": 8,
+      "correlation": -0.53
+    }
+  },
+  "note": "Correlazione di Pearson fra territori. Misura se due grandezze si muovono insieme, non una causa."
+}

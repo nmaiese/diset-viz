@@ -1,9 +1,0 @@
-{
-  "nome": "Occupati in agricoltura, industria e costruzioni",
-  "unita": "percentuale sugli occupati totali",
-  "fonte": "Istat",
-  "archivio": "Conti territoriali, occupati per branca e provincia",
-  "source_url": "https://esploradati.istat.it/SDMXWS/rest/data/IT1,93_379_DF_DCCN_OCCTSEC2010_2,1.0/A..PS......?startPeriod=2022&endPeriod=2022",
-  "method": "Somma delle persone occupate nelle branche A, B-E e F divisa per il totale delle persone occupate, per provincia, 2022.",
-  "script": "scripts/articoli_trend/elab_settori_infortuni.py"
-}

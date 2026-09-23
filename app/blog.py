@@ -18,8 +18,8 @@ from app.cache import cache
 from app.config import SITE_NAME, SITE_URL
 
 POSTS_DIR = Path(__file__).resolve().parents[1] / "content" / "posts"
-FIGURE_DIR = Path(__file__).resolve().parents[1] / "content" / "figure"
-_FIGURA_RE = re.compile(r"<!--\s*figura:\s*([a-z0-9][a-z0-9-]*)\s*-->")
+FIGURES_DIR = Path(__file__).resolve().parents[1] / "content" / "figures"
+_FIGURE_MARKER = re.compile(r"<!--\s*figura:\s*([a-z0-9][a-z0-9-]*)\s*-->")
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 # La figura di ripiego per chi condivide una pagina senza copertina propria.
@@ -144,23 +144,24 @@ def _normalize_indicator(value):
     return raw
 
 
-def _figure(body_html, slug):
-    """`<!-- figura: nome -->` -> l'SVG di `content/figure/<slug>/<nome>.svg`.
+def _inline_figures(body_html, slug):
+    """`<!-- figura: nome -->` -> l'SVG di `content/figures/<slug>/<nome>.svg`.
 
-    Le figure le scrive `scripts/articoli_trend/grafici.py` dai numeri del
+    Le figure le scrive `scripts/trend_articles/figures.py` dai numeri del
     dossier del pezzo. Vanno in linea e non in un `<img>` perche' i loro
     colori sono classi che leggono i token del design system: in un `<img>`
     la figura resterebbe chiara sotto il tema scuro. Un marcatore senza file
-    sparisce e il testo resta intero, come per le figure delle schede.
+    sparisce e il testo resta intero, come per le figure delle schede. Il
+    marcatore e' in italiano perche' lo scrive chi redige, come `grafico:`.
     """
 
-    def sostituisci(match):
-        percorso = FIGURE_DIR / slug / f"{match.group(1)}.svg"
-        if not percorso.is_file():
+    def replace(match):
+        path = FIGURES_DIR / slug / f"{match.group(1)}.svg"
+        if not path.is_file():
             return ""
-        return f'<figure class="fig-articolo">{percorso.read_text(encoding="utf-8")}</figure>'
+        return f'<figure class="article-figure">{path.read_text(encoding="utf-8")}</figure>'
 
-    return _FIGURA_RE.sub(sostituisci, body_html)
+    return _FIGURE_MARKER.sub(replace, body_html)
 
 
 def _cover_credit(meta):
@@ -168,19 +169,19 @@ def _cover_credit(meta):
 
     Una foto con licenza CC BY o CC BY-SA si usa solo dicendo chi l'ha fatta,
     con che licenza e dove sta l'originale: e' la condizione della licenza,
-    non una cortesia. I campi li scrive `scripts/articoli_trend/foto.py`
+    non una cortesia. I campi li scrive `scripts/trend_articles/photo.py`
     leggendoli da Wikimedia Commons, non chi redige.
     """
     credit = meta.get("cover_credit")
-    if not isinstance(credit, dict) or not credit.get("autore") or not credit.get("licenza"):
+    if not isinstance(credit, dict) or not credit.get("author") or not credit.get("license"):
         return None
     return {
-        "autore": str(credit["autore"]).strip(),
-        "licenza": str(credit["licenza"]).strip(),
-        "licenza_url": str(credit.get("licenza_url") or "").strip(),
-        "fonte_url": str(credit.get("fonte_url") or "").strip(),
-        "fonte_nome": str(credit.get("fonte_nome") or "Wikimedia Commons").strip(),
-        "modifiche": str(credit.get("modifiche") or "").strip(),
+        "author": str(credit["author"]).strip(),
+        "license": str(credit["license"]).strip(),
+        "license_url": str(credit.get("license_url") or "").strip(),
+        "source_url": str(credit.get("source_url") or "").strip(),
+        "source_name": str(credit.get("source_name") or "Wikimedia Commons").strip(),
+        "changes": str(credit.get("changes") or "").strip(),
     }
 
 
@@ -218,7 +219,7 @@ def _load_post(path):
     title = (meta.get("title") or path.stem).strip()
     slug = _slugify(meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-", "", path.stem))
     md = markdown.Markdown(extensions=_MD_EXTENSIONS, output_format="html5")
-    body_html = _figure(md.convert(post.content), slug)
+    body_html = _inline_figures(md.convert(post.content), slug)
 
     tags = meta.get("tags") or []
     if isinstance(tags, str):

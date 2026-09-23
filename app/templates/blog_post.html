@@ -112,7 +112,7 @@
     {# Una foto con licenza porta la sua attribuzione: autore, licenza, originale.
        Senza credito la didascalia resta l'alt, come per le copertine disegnate. #}
     {% if post.cover_credit %}{% set c = post.cover_credit %}
-    <figcaption class="article-cover__credit">{% if post.cover_caption %}{{ post.cover_caption }} {% endif %}Foto: {{ c.autore }}, {% if c.licenza_url %}<a href="{{ c.licenza_url }}" rel="license noopener" target="_blank">{{ c.licenza }}</a>{% else %}{{ c.licenza }}{% endif %}{% if c.fonte_url %}, via <a href="{{ c.fonte_url }}" rel="noopener" target="_blank">{{ c.fonte_nome }}</a>{% endif %}{% if c.modifiche %}. {{ c.modifiche }}{% endif %}.</figcaption>
+    <figcaption class="article-cover__credit">{% if post.cover_caption %}{{ post.cover_caption }} {% endif %}Foto: {{ c.author }}, {% if c.license_url %}<a href="{{ c.license_url }}" rel="license noopener" target="_blank">{{ c.license }}</a>{% else %}{{ c.license }}{% endif %}{% if c.source_url %}, via <a href="{{ c.source_url }}" rel="noopener" target="_blank">{{ c.source_name }}</a>{% endif %}{% if c.changes %}. {{ c.changes }}{% endif %}.</figcaption>
     {% elif post.cover_alt %}<figcaption>{{ post.cover_alt }}</figcaption>{% endif %}
   </figure>
   {% endif %}

@@ -1,0 +1,25 @@
+{
+  "x": "ext:emergency_response_2022",
+  "y": "ext:extraurban_lethality_regions",
+  "years_x": [
+    2022
+  ],
+  "years_y": [
+    2023
+  ],
+  "links": {
+    "tutti": {
+      "points": 19,
+      "correlation": 0.64
+    },
+    "Centro-Nord": {
+      "points": 11,
+      "correlation": 0.02
+    },
+    "Mezzogiorno": {
+      "points": 8,
+      "correlation": -0.11
+    }
+  },
+  "note": "Correlazione di Pearson fra territori. Misura se due grandezze si muovono insieme, non una causa."
+}

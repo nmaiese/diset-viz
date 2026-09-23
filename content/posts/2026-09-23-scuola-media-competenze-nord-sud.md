@@ -9,12 +9,12 @@ cover: /static/img/blog/scuola-media-competenze-nord-sud.jpg
 cover_alt: Un'aula scolastica vuota con banchi singoli e sedie colorate, una lavagna bianca e una lavagna interattiva.
 cover_caption: Un'aula del liceo linguistico Sophie M. Scholl di Trento.
 cover_credit:
-  autore: GinevraBianchi
-  licenza: CC BY-SA 4.0
-  licenza_url: https://creativecommons.org/licenses/by-sa/4.0
-  fonte_url: https://commons.wikimedia.org/wiki/File:Aula_del_Liceo_linguistico_Sophie_M._Scholl,_Trento.jpg
-  fonte_nome: Wikimedia Commons
-  modifiche: Ritagliata e ridimensionata
+  author: GinevraBianchi
+  license: CC BY-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  source_url: https://commons.wikimedia.org/wiki/File:Aula_del_Liceo_linguistico_Sophie_M._Scholl,_Trento.jpg
+  source_name: Wikimedia Commons
+  changes: Ritagliata e ridimensionata
 tags:
 - Istruzione
 - Scuola
@@ -22,41 +22,41 @@ tags:
 indicator: bes-SDG-311
 indicator_label: Competenza alfabetica non adeguata (terza media)
 trend:
-  tema: scuola-competenze
-  rilevato: 2026-09-23
-  classifica: data/trend/2026-09-23/classifica.json
-  punteggio:
-    interesse: 0.85
-    dato: 0.92
-    storia: 0.88
-    totale: 0.765
-    posto: 6
-  segnali:
-  - tipo: google_news_tema
-    testo: 'Mattarella ad Amatrice: La scuola è aperta a tutti. Stabilisce legami, non ghetti (RaiNews)'
-    fonte: Google News Italia, ricerca degli ultimi 7 giorni
+  topic: scuola-competenze
+  detected: 2026-09-23
+  ranking: data/trend/2026-09-23/ranking.json
+  score:
+    interest: 0.85
+    data: 0.92
+    story: 0.88
+    total: 0.765
+    rank: 6
+  signals:
+  - type: google_news_tema
+    text: 'Mattarella ad Amatrice: La scuola è aperta a tutti. Stabilisce legami, non ghetti (RaiNews)'
+    source: Google News Italia, ricerca degli ultimi 7 giorni
     url: https://news.google.com/rss/articles/CBMi7wFBVV95cUxNY1Jyd0EtSHRzLWpyaDVBZ2ZwTm9YYnVpRFVyS285b3ExRVhTM1BhQ1I3Vi0yeGRWU08yNXpxQTNmYklVV1F1b0l6WUlsRTJHZE5IQ2FhUUJKbUx5OEVxSFN2enBuTGE4T3NzXzhrQ21nX2NfZ3dmSldOSlhuWEROYmJoS2s1Um1Ob2lZV19tS0ZGNVVseEpCNHZnUHV5b193UTZQc1FfMDN6b1kzbU8wb0NsdFBPZGJuWFBFZ05OOExzRHhkRXE0VTR2Wk9yalU0VXhjSWw4RmZ6ZENRa0dQWkI4UTdtTXB1WG1hbmV4NNIB9AFBVV95cUxNQ2hmWjkxT05VZHhZLWRsNEhaRE1Nb2ctX1BYSFZIUGVJYnBxYzAtM3NiemJhRWVJaXhIUHBJNnlHNGFreVlmODNZWk5PQTh6eFFGVGU3bTZmTmhSTFZLd05DYUFkejJvSzZmMXNZSUplU2RXUjNSRTZLd0VOb0t6Z0ZSYW41Z3Y1TXZKb1VoUWRoTy1yMnhEUEo5S2dNaFlNRkNTUVg3MWJOV1JNR3FtdjF4RnVUUkRMZjAzVTFQVzNBTnV1OFd1ZFRWLXRvRFMteG9UamtMcmJTSWxEeVVQYlJOVVVUQ0lzTnpMeWZZZ0phWTV0?oc=5
-    data: 2026-09-21
-  - tipo: google_news_tema
-    testo: 'Meloni: Tetto 30% di stranieri nelle classi (RaiNews)'
-    fonte: Google News Italia, ricerca degli ultimi 7 giorni
+    date: 2026-09-21
+  - type: google_news_tema
+    text: 'Meloni: Tetto 30% di stranieri nelle classi (RaiNews)'
+    source: Google News Italia, ricerca degli ultimi 7 giorni
     url: https://news.google.com/rss/articles/CBMihwJBVV95cUxPdkVmYVJnTi1PU0Y5Mi1FZ1JSOEs3Nk9XaDBEc2VUaHVLUGZXakFMZXVCVlluRTRGeFFUSmlFOUJic1Z4eVFkWm85ZWJLT2R3MDJYX0Q0dTNBR2otaDR1RUEtaHlIcjkyOWZUclptMWt6dzJKWW54ZjRIMmRicXlad21vYmdWZFlqWmxXVFYzU3V6S0pMT09BaVV0V0pQbGh3cnBxWE5QeTFKV2w4WW04Rk4yVXkwaENTRldkdkNTZ3cxbXk4Mk90Q0FpLTd4MDhnUDc3RmFaVGNBcktLVDdwSlc2UUVJUzhULXM4clFyNHV2TzJWRDlJZVVoVWR4ZmNpcVlON0xmUdIBjAJBVV95cUxNQzZab0h4REZvQ2lqcFlTeFdYLWV4ZWJ1NURpMHVFT09heWIwTWNvT1FJeXRzc0RnMm8tQUNxRFd1UkxUVE1yMmc0Uk5KaVZjNWlBb1ZoZUFPdWJrRmlicFNlTVFwVVc4Q1R4b0o4TGlBNHNQSFZaaC1lVTNHNm5SVVVhZ0UyaHNxU1pTZFFLTXNPZWRyTzhEbTNROWZXRXI5aE5EZnZYWTVPQ2h6OTBOczVFc2RUYUNlRnRBVjM5U3Aya3N0eWVaRUphNEg0RDJxTnRuYTZndkJhUGR5UGlNX2JsNEdBTEJ1ZVRrMVJtanJncnZXbm1UMHF1Zi1lUnMyUHRIWmVTdzlickda?oc=5
-    data: 2026-09-21
-  - tipo: google_trends_tendenza
-    testo: luisa ranieri (2000+ ricerche), collegata all'inaugurazione dell'anno scolastico Tutti a scuola
-    fonte: Google Trends, ricerche di tendenza, Italia
+    date: 2026-09-21
+  - type: google_trends_tendenza
+    text: luisa ranieri (2000+ ricerche), collegata all'inaugurazione dell'anno scolastico Tutti a scuola
+    source: Google Trends, ricerche di tendenza, Italia
     url: https://trends.google.com/trending?geo=IT
-    data: 2026-09-22
-  - tipo: google_trends_interesse
-    testo: 'scuola: interesse degli ultimi 7 giorni 1,72 volte la media degli 83 precedenti. Regioni con piu'' interesse: Calabria, Campania, Basilicata'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-22
+  - type: google_trends_interesse
+    text: 'scuola: interesse degli ultimi 7 giorni 1,72 volte la media degli 83 precedenti. Regioni con piu'' interesse: Calabria, Campania, Basilicata'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=scuola
-    data: 2026-09-23
-  - tipo: google_trends_interesse
-    testo: 'invalsi: interesse degli ultimi 7 giorni 1,63 volte la media degli 83 precedenti. Regioni con piu'' interesse: Abruzzo, Umbria, Molise'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-23
+  - type: google_trends_interesse
+    text: 'invalsi: interesse degli ultimi 7 giorni 1,63 volte la media degli 83 precedenti. Regioni con piu'' interesse: Abruzzo, Umbria, Molise'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=invalsi
-    data: 2026-09-23
+    date: 2026-09-23
 dataset:
   name: Competenze in italiano in terza media e alunni con cittadinanza non italiana, per regione
   description: Quota di studenti di terza media che non raggiungono un livello adeguato nelle prove Invalsi di italiano (livelli 1 e 2 su 5), per regione (2018-2025) e per Italia, Nord, Centro e Mezzogiorno; quota di alunni con cittadinanza non italiana in terza media per regione (anni scolastici 2017/18 e 2024/25).
@@ -65,67 +65,67 @@ dataset:
   spatial: Italia, ripartizioni, regioni e province
   creator: Istat, Invalsi, Ministero dell'Istruzione e del Merito
   source_url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
-  download: /static/data/articoli/scuola-media-competenze-nord-sud.csv
-cifre_esterne:
-- cifra: '930'
-  cosa: migliaia di alunni senza cittadinanza italiana
-  fonte: Ismu, via ANSA, 21 settembre 2026
+  download: /static/data/articles/scuola-media-competenze-nord-sud.csv
+external_figures:
+- value: '930'
+  what: migliaia di alunni senza cittadinanza italiana
+  source: Ismu, via ANSA, 21 settembre 2026
   url: https://www.ansa.it/sito/notizie/cronaca/2026/09/20/in-italia-930mila-alunni-stranieri-sono-oltre-l11_d061dbc4-b6a2-409b-8ee9-1dab1317329a.html
-- cifra: 11,6
-  cosa: quota percentuale di alunni senza cittadinanza italiana
-  fonte: Ismu, via ANSA, 21 settembre 2026
+- value: 11,6
+  what: quota percentuale di alunni senza cittadinanza italiana
+  source: Ismu, via ANSA, 21 settembre 2026
   url: https://www.ansa.it/sito/notizie/cronaca/2026/09/20/in-italia-930mila-alunni-stranieri-sono-oltre-l11_d061dbc4-b6a2-409b-8ee9-1dab1317329a.html
-- cifra: 65,2
-  cosa: quota percentuale di alunni stranieri nati in Italia
-  fonte: Ismu, via ANSA, 21 settembre 2026
+- value: 65,2
+  what: quota percentuale di alunni stranieri nati in Italia
+  source: Ismu, via ANSA, 21 settembre 2026
   url: https://www.ansa.it/sito/notizie/cronaca/2026/09/20/in-italia-930mila-alunni-stranieri-sono-oltre-l11_d061dbc4-b6a2-409b-8ee9-1dab1317329a.html
-- cifra: '30'
-  cosa: tetto percentuale per classe di alunni stranieri che non parlano adeguatamente l'italiano, nel decreto annunciato
-  fonte: LaPresse, 23 settembre 2026
+- value: '30'
+  what: tetto percentuale per classe di alunni stranieri che non parlano adeguatamente l'italiano, nel decreto annunciato
+  source: LaPresse, 23 settembre 2026
   url: https://www.lapresse.it/politica/2026/09/23/scuola-tetto-del-30-agli-studenti-stranieri-il-limite-riguardera-solo-chi-non-parla-adeguatamente-litaliano/
-- cifra: 37,0
-  cosa: quota percentuale di nativi con competenza alfabetica non adeguata, 2024/25
-  fonte: Istat, Rapporto Bes 2025, capitolo Istruzione e formazione
+- value: 37,0
+  what: quota percentuale di nativi con competenza alfabetica non adeguata, 2024/25
+  source: Istat, Rapporto Bes 2025, capitolo Istruzione e formazione
   url: https://www.istat.it/wp-content/uploads/2025/11/02-Istruzione-e-formazione.pdf
-- cifra: 57,2
-  cosa: quota percentuale di seconde generazioni con competenza alfabetica non adeguata, 2024/25
-  fonte: Istat, Rapporto Bes 2025, capitolo Istruzione e formazione
+- value: 57,2
+  what: quota percentuale di seconde generazioni con competenza alfabetica non adeguata, 2024/25
+  source: Istat, Rapporto Bes 2025, capitolo Istruzione e formazione
   url: https://www.istat.it/wp-content/uploads/2025/11/02-Istruzione-e-formazione.pdf
-- cifra: 75,0
-  cosa: quota percentuale di prime generazioni con competenza alfabetica non adeguata, 2024/25
-  fonte: Istat, Rapporto Bes 2025, capitolo Istruzione e formazione
+- value: 75,0
+  what: quota percentuale di prime generazioni con competenza alfabetica non adeguata, 2024/25
+  source: Istat, Rapporto Bes 2025, capitolo Istruzione e formazione
   url: https://www.istat.it/wp-content/uploads/2025/11/02-Istruzione-e-formazione.pdf
-- cifra: '57'
-  cosa: quota percentuale di studenti di terza media che raggiungono i traguardi in italiano, 2026
-  fonte: Invalsi, Rapporto nazionale 2026, p. 59
+- value: '57'
+  what: quota percentuale di studenti di terza media che raggiungono i traguardi in italiano, 2026
+  source: Invalsi, Rapporto nazionale 2026, p. 59
   url: https://www.invalsi.it/wp-content/uploads/2026/07/Rapporto-Prove-INVALSI-2026.pdf
-- cifra: '2'
-  cosa: calo in punti dal 2025 al 2026 della quota che raggiunge i traguardi in italiano
-  fonte: Invalsi, Rapporto nazionale 2026, p. 59
+- value: '2'
+  what: calo in punti dal 2025 al 2026 della quota che raggiunge i traguardi in italiano
+  source: Invalsi, Rapporto nazionale 2026, p. 59
   url: https://www.invalsi.it/wp-content/uploads/2026/07/Rapporto-Prove-INVALSI-2026.pdf
-- cifra: '9'
-  cosa: calo in punti dal 2018 al 2026
-  fonte: Invalsi, Rapporto nazionale 2026, p. 59
+- value: '9'
+  what: calo in punti dal 2018 al 2026
+  source: Invalsi, Rapporto nazionale 2026, p. 59
   url: https://www.invalsi.it/wp-content/uploads/2026/07/Rapporto-Prove-INVALSI-2026.pdf
-- cifra: '13'
-  cosa: calo in punti della Liguria dal 2018 al 2026
-  fonte: Invalsi, Rapporto nazionale 2026, p. 59
+- value: '13'
+  what: calo in punti della Liguria dal 2018 al 2026
+  source: Invalsi, Rapporto nazionale 2026, p. 59
   url: https://www.invalsi.it/wp-content/uploads/2026/07/Rapporto-Prove-INVALSI-2026.pdf
-- cifra: '17'
-  cosa: calo in punti della provincia di Bolzano, scuole in lingua italiana, dal 2018 al 2026
-  fonte: Invalsi, Rapporto nazionale 2026, p. 59
+- value: '17'
+  what: calo in punti della provincia di Bolzano, scuole in lingua italiana, dal 2018 al 2026
+  source: Invalsi, Rapporto nazionale 2026, p. 59
   url: https://www.invalsi.it/wp-content/uploads/2026/07/Rapporto-Prove-INVALSI-2026.pdf
-- cifra: 22,6
-  cosa: punti in meno in italiano per gli alunni di prima generazione a parità di condizioni
-  fonte: Invalsi, Rapporto nazionale 2025
+- value: 22,6
+  what: punti in meno in italiano per gli alunni di prima generazione a parità di condizioni
+  source: Invalsi, Rapporto nazionale 2025
   url: https://invalsi-areaprove.cineca.it/docs/2025/Rilevazioni_Nazionali/Rapporto/Rapporto%20prove%20INVALSI%202025.pdf
-- cifra: 13,3
-  cosa: punti in meno in italiano per gli alunni di seconda generazione a parità di condizioni
-  fonte: Invalsi, Rapporto nazionale 2025
+- value: 13,3
+  what: punti in meno in italiano per gli alunni di seconda generazione a parità di condizioni
+  source: Invalsi, Rapporto nazionale 2025
   url: https://invalsi-areaprove.cineca.it/docs/2025/Rilevazioni_Nazionali/Rapporto/Rapporto%20prove%20INVALSI%202025.pdf
-- cifra: 10,3
-  cosa: punti di vantaggio legati al contesto socio-economico medio della scuola
-  fonte: Invalsi, Rapporto nazionale 2025
+- value: 10,3
+  what: punti di vantaggio legati al contesto socio-economico medio della scuola
+  source: Invalsi, Rapporto nazionale 2025
   url: https://invalsi-areaprove.cineca.it/docs/2025/Rilevazioni_Nazionali/Rapporto/Rapporto%20prove%20INVALSI%202025.pdf
 ---
 

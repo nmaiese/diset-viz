@@ -9,12 +9,12 @@ cover: /static/img/blog/infortuni-lavoro-province.jpg
 cover_alt: Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere.
 cover_caption: Un cartello di cantiere a Pontebba, in Friuli-Venezia Giulia.
 cover_credit:
-  autore: Herzi Pinki
-  licenza: CC BY-SA 4.0
-  licenza_url: https://creativecommons.org/licenses/by-sa/4.0
-  fonte_url: https://commons.wikimedia.org/wiki/File:Caduta_materiali_dall%27_alto,_San_Rocco_03.jpg
-  fonte_nome: Wikimedia Commons
-  modifiche: Ritagliata e ridimensionata
+  author: Herzi Pinki
+  license: CC BY-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  source_url: https://commons.wikimedia.org/wiki/File:Caduta_materiali_dall%27_alto,_San_Rocco_03.jpg
+  source_name: Wikimedia Commons
+  changes: Ritagliata e ridimensionata
 tags:
 - Lavoro
 - Sicurezza sul lavoro
@@ -22,36 +22,36 @@ tags:
 indicator: bes-03LAV007
 indicator_label: Tasso di infortuni sul lavoro mortali e con inabilità permanente
 trend:
-  tema: sicurezza-lavoro
-  rilevato: 2026-09-23
-  classifica: data/trend/2026-09-23/classifica.json
-  punteggio:
-    interesse: 0.95
-    dato: 0.68
-    storia: 0.89
-    totale: 0.746
-    posto: 7
-  segnali:
-  - tipo: google_news_principali
-    testo: Tragedia al Colosseo, Andrea Moretti morto a 22 anni mentre installava il nuovo impianto di illuminazione (RomaToday)
-    fonte: Google News Italia, notizie principali
+  topic: sicurezza-lavoro
+  detected: 2026-09-23
+  ranking: data/trend/2026-09-23/ranking.json
+  score:
+    interest: 0.95
+    data: 0.68
+    story: 0.89
+    total: 0.746
+    rank: 7
+  signals:
+  - type: google_news_principali
+    text: Tragedia al Colosseo, Andrea Moretti morto a 22 anni mentre installava il nuovo impianto di illuminazione (RomaToday)
+    source: Google News Italia, notizie principali
     url: https://news.google.com/rss/articles/CBMidkFVX3lxTE1WNmhmVG9RdXY5c1lzelp6blhMWWZPMDdUWm1jQUxYTWh5cHpFWS1XZ0FmWkFZNFdvVEVPejR4SzJTc3pWSXp5VVFrVFJrSm1RWG5Bb2lGTG5QSTRNY0JIREVNTTFyOXhCQUc5SEw1QWw2d3lycFE?oc=5
-    data: 2026-09-23
-  - tipo: google_news_tema
-    testo: 56 titoli sulle morti e gli infortuni sul lavoro negli ultimi sette giorni, fra cui Sant'Arcangelo (Potenza) e Polesine Parmense
-    fonte: Google News Italia, ricerca degli ultimi 7 giorni
+    date: 2026-09-23
+  - type: google_news_tema
+    text: 56 titoli sulle morti e gli infortuni sul lavoro negli ultimi sette giorni, fra cui Sant'Arcangelo (Potenza) e Polesine Parmense
+    source: Google News Italia, ricerca degli ultimi 7 giorni
     url: https://news.google.com/rss/search?q=(morto%20sul%20lavoro%20OR%20incidente%20sul%20lavoro%20OR%20infortuni)%20when:7d&hl=it&gl=IT&ceid=IT:it
-    data: 2026-09-23
-  - tipo: google_trends_interesse
-    testo: 'morti sul lavoro: interesse degli ultimi 7 giorni 11,49 volte la media degli 83 precedenti. Regioni con piu'' interesse: Lombardia, Emilia-Romagna, Toscana'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-23
+  - type: google_trends_interesse
+    text: 'morti sul lavoro: interesse degli ultimi 7 giorni 11,49 volte la media degli 83 precedenti. Regioni con piu'' interesse: Lombardia, Emilia-Romagna, Toscana'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=morti%20sul%20lavoro
-    data: 2026-09-23
-  - tipo: google_trends_interesse
-    testo: 'incidente sul lavoro: interesse degli ultimi 7 giorni 2,45 volte la media degli 83 precedenti. Regioni con piu'' interesse: Basilicata, Emilia-Romagna, Lombardia'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-23
+  - type: google_trends_interesse
+    text: 'incidente sul lavoro: interesse degli ultimi 7 giorni 2,45 volte la media degli 83 precedenti. Regioni con piu'' interesse: Basilicata, Emilia-Romagna, Lombardia'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=incidente%20sul%20lavoro
-    data: 2026-09-23
+    date: 2026-09-23
 dataset:
   name: Infortuni sul lavoro mortali e con inabilità permanente e composizione settoriale dell'occupazione, per provincia
   description: Infortuni sul lavoro mortali e con inabilità permanente ogni 10.000 occupati per provincia, regione e ripartizione (2018-2022), quota di occupati in agricoltura, industria e costruzioni per provincia (2022) e tasso atteso in base ai soli settori.
@@ -60,47 +60,47 @@ dataset:
   spatial: Italia, ripartizioni, regioni e province
   creator: Istat, Inail
   source_url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
-  download: /static/data/articoli/infortuni-lavoro-province.csv
-cifre_esterne:
-- cifra: 14,8
-  cosa: tasso di infortuni gravi degli uomini, 2022
-  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+  download: /static/data/articles/infortuni-lavoro-province.csv
+external_figures:
+- value: 14,8
+  what: tasso di infortuni gravi degli uomini, 2022
+  source: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
   url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
-- cifra: 5,8
-  cosa: tasso di infortuni gravi delle donne, 2022
-  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+- value: 5,8
+  what: tasso di infortuni gravi delle donne, 2022
+  source: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
   url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
-- cifra: 24,1
-  cosa: tasso di infortuni gravi degli uomini stranieri, 2022
-  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+- value: 24,1
+  what: tasso di infortuni gravi degli uomini stranieri, 2022
+  source: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
   url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
-- cifra: 13,7
-  cosa: tasso di infortuni gravi degli uomini italiani, 2022
-  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+- value: 13,7
+  what: tasso di infortuni gravi degli uomini italiani, 2022
+  source: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
   url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
-- cifra: 26,0
-  cosa: tasso di infortuni gravi fra 65 e 89 anni, 2022
-  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+- value: 26,0
+  what: tasso di infortuni gravi fra 65 e 89 anni, 2022
+  source: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
   url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
-- cifra: '67'
-  cosa: denunce mortali nelle costruzioni, gennaio-luglio 2025
-  fonte: Inail, comunicato dell'8 settembre 2026
+- value: '67'
+  what: denunce mortali nelle costruzioni, gennaio-luglio 2025
+  source: Inail, comunicato dell'8 settembre 2026
   url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
-- cifra: '76'
-  cosa: denunce mortali nelle costruzioni, gennaio-luglio 2026
-  fonte: Inail, comunicato dell'8 settembre 2026
+- value: '76'
+  what: denunce mortali nelle costruzioni, gennaio-luglio 2026
+  source: Inail, comunicato dell'8 settembre 2026
   url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
-- cifra: 15,8
-  cosa: tasso di infortuni gravi fra 50 e 64 anni, 2022
-  fonte: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
+- value: 15,8
+  what: tasso di infortuni gravi fra 50 e 64 anni, 2022
+  source: Istat, Il benessere equo e sostenibile in Italia, Rapporto Bes 2025
   url: https://www.istat.it/wp-content/uploads/2025/11/Bes-2024-Ebook.pdf
-- cifra: '422'
-  cosa: denunce mortali in occasione di lavoro, esclusi studenti e tragitti, gennaio-luglio 2026
-  fonte: Inail, comunicato dell'8 settembre 2026
+- value: '422'
+  what: denunce mortali in occasione di lavoro, esclusi studenti e tragitti, gennaio-luglio 2026
+  source: Inail, comunicato dell'8 settembre 2026
   url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
-- cifra: '432'
-  cosa: denunce mortali in occasione di lavoro, esclusi studenti e tragitti, gennaio-luglio 2025
-  fonte: Inail, comunicato dell'8 settembre 2026
+- value: '432'
+  what: denunce mortali in occasione di lavoro, esclusi studenti e tragitti, gennaio-luglio 2025
+  source: Inail, comunicato dell'8 settembre 2026
   url: https://www.inail.it/portale/it/inail-comunica/comunicati-stampa/comunicato-stampa.2026.09.denunce-di-infortuni-e-malattie-professionali-i-dati-inail-di-luglio.html
 ---
 

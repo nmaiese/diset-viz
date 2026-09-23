@@ -1,0 +1,11 @@
+{
+  "name": "Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado), Italia e ripartizioni",
+  "unit": "Valori percentuali",
+  "source": "Istat",
+  "archive": "Benessere equo e sostenibile, aggiornamento intermedio 2026, valori ufficiali per ripartizione",
+  "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+  "license": "CC BY 4.0",
+  "method": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni).",
+  "script": "scripts/trend_articles/derive_bes_areas.py",
+  "bes_code": "SDG-310"
+}

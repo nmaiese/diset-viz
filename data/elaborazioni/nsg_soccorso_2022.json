@@ -1,9 +1,0 @@
-{
-  "nome": "Tempo di arrivo dei mezzi di soccorso (intervallo allarme-target)",
-  "unita": "minuti",
-  "fonte": "Ministero della Salute",
-  "archivio": "Nuovo sistema di garanzia dei LEA, indicatore D09Z, Relazione 2022, tabella 6a",
-  "source_url": "https://www.camera.it/temiap/2024/09/23/OCD177-7562.pdf",
-  "method": "Valori trascritti senza rielaborazione dalla tabella 6a (area distrettuale, anno 2022) della Relazione NSG 2022 del Ministero della Salute. Il Trentino-Alto Adige non c'e': la tabella riporta separatamente Bolzano (15) e Trento (19). Italia 19 minuti.",
-  "script": "trascrizione manuale verificabile sulla tabella 6a del PDF"
-}

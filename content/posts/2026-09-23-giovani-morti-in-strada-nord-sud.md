@@ -9,12 +9,12 @@ cover: /static/img/blog/giovani-morti-in-strada-nord-sud.jpg
 cover_alt: Un lungo rettilineo della strada statale 131 in Sardegna, fra colline boscose, con un camion e alcune auto.
 cover_caption: La statale 131 Diramazione Centrale Nuorese, in Sardegna.
 cover_credit:
-  autore: m/m
-  licenza: CC BY-SA 4.0
-  licenza_url: https://creativecommons.org/licenses/by-sa/4.0
-  fonte_url: https://commons.wikimedia.org/wiki/File:SS131DCN-7602.jpg
-  fonte_nome: Wikimedia Commons
-  modifiche: Ritagliata e ridimensionata
+  author: m/m
+  license: CC BY-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  source_url: https://commons.wikimedia.org/wiki/File:SS131DCN-7602.jpg
+  source_name: Wikimedia Commons
+  changes: Ritagliata e ridimensionata
 tags:
 - Salute
 - Sicurezza stradale
@@ -22,36 +22,36 @@ tags:
 indicator: bes-01SAL005
 indicator_label: Mortalità per incidenti stradali (15-34 anni)
 trend:
-  tema: sicurezza-stradale
-  rilevato: 2026-09-23
-  classifica: data/trend/2026-09-23/classifica.json
-  punteggio:
-    interesse: 0.71
-    dato: 0.9
-    storia: 1.0
-    totale: 0.674
-    posto: 11
-  segnali:
-  - tipo: google_trends_tendenza
-    testo: autovelox (500+ ricerche, fra le tendenze del giorno)
-    fonte: Google Trends, ricerche di tendenza, Italia
+  topic: sicurezza-stradale
+  detected: 2026-09-23
+  ranking: data/trend/2026-09-23/ranking.json
+  score:
+    interest: 0.71
+    data: 0.9
+    story: 1.0
+    total: 0.674
+    rank: 11
+  signals:
+  - type: google_trends_tendenza
+    text: autovelox (500+ ricerche, fra le tendenze del giorno)
+    source: Google Trends, ricerche di tendenza, Italia
     url: https://trends.google.com/trending?geo=IT
-    data: 2026-09-22
-  - tipo: google_news_principali
-    testo: Torino, morto bambino di 7 anni investito mentre era in bici (Sky TG24)
-    fonte: Google News Italia, notizie principali
+    date: 2026-09-22
+  - type: google_news_principali
+    text: Torino, morto bambino di 7 anni investito mentre era in bici (Sky TG24)
+    source: Google News Italia, notizie principali
     url: https://news.google.com/rss/articles/CBMif0FVX3lxTE1BVDB6dGdCeDZuUms3S0ZSME5hZWZIRUwtTHZqb2N6aG1QT1RpaHdOTVdFa0I2N044N0FESTFCVjdBQ0RjdUNWTEJabjFNckZnRF9POUxjTC03b1dyNlhaeGhDTXRzMHkyd00tVUpsYnhFNEJlbnB
-    data: 2026-09-22
-  - tipo: google_trends_interesse
-    testo: 'autovelox: interesse degli ultimi 7 giorni 0,65 volte la media degli 83 precedenti. Regioni con piu'' interesse: Abruzzo, Sardegna, Molise'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-22
+  - type: google_trends_interesse
+    text: 'autovelox: interesse degli ultimi 7 giorni 0,65 volte la media degli 83 precedenti. Regioni con piu'' interesse: Abruzzo, Sardegna, Molise'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=autovelox
-    data: 2026-09-23
-  - tipo: google_trends_interesse
-    testo: 'incidente stradale: interesse degli ultimi 7 giorni 0,85 volte la media degli 83 precedenti. Regioni con piu'' interesse: Calabria, Sardegna, Puglia'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-23
+  - type: google_trends_interesse
+    text: 'incidente stradale: interesse degli ultimi 7 giorni 0,85 volte la media degli 83 precedenti. Regioni con piu'' interesse: Calabria, Sardegna, Puglia'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=incidente%20stradale
-    data: 2026-09-23
+    date: 2026-09-23
 dataset:
   name: Mortalità stradale dei giovani, letalità degli incidenti extraurbani e tempi dei soccorsi, per regione
   description: Tasso di mortalità per incidenti stradali fra i 15 e i 34 anni per regione e ripartizione (2004-2024), morti ogni 100 incidenti sulle strade extraurbane per provincia (2015-2023) e media per regione (2021-2023), tempo di arrivo dei mezzi di soccorso per regione (2022).
@@ -60,59 +60,59 @@ dataset:
   spatial: Italia, ripartizioni, regioni e province
   creator: Istat, Ministero della Salute
   source_url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
-  download: /static/data/articoli/giovani-morti-in-strada-nord-sud.csv
-cifre_esterne:
-- cifra: 11,8
-  cosa: calo percentuale dei morti in incidenti stradali nel Sud continentale (Isole escluse), tutte le età, 2025
-  fonte: Istat, Incidenti stradali anno 2025, 24 luglio 2026
+  download: /static/data/articles/giovani-morti-in-strada-nord-sud.csv
+external_figures:
+- value: 11,8
+  what: calo percentuale dei morti in incidenti stradali nel Sud continentale (Isole escluse), tutte le età, 2025
+  source: Istat, Incidenti stradali anno 2025, 24 luglio 2026
   url: https://www.istat.it/wp-content/uploads/2026/07/REPORT_INCIDENTI_STRADALI_2025.pdf
-- cifra: 3,6
-  cosa: morti ogni 100 incidenti sulle strade extraurbane, 2025
-  fonte: Istat, Incidenti stradali anno 2025, 24 luglio 2026
+- value: 3,6
+  what: morti ogni 100 incidenti sulle strade extraurbane, 2025
+  source: Istat, Incidenti stradali anno 2025, 24 luglio 2026
   url: https://www.istat.it/wp-content/uploads/2026/07/REPORT_INCIDENTI_STRADALI_2025.pdf
-- cifra: 0,9
-  cosa: morti ogni 100 incidenti sulle strade urbane, 2025
-  fonte: Istat, Incidenti stradali anno 2025, 24 luglio 2026
+- value: 0,9
+  what: morti ogni 100 incidenti sulle strade urbane, 2025
+  source: Istat, Incidenti stradali anno 2025, 24 luglio 2026
   url: https://www.istat.it/wp-content/uploads/2026/07/REPORT_INCIDENTI_STRADALI_2025.pdf
-- cifra: 3,1
-  cosa: morti ogni 100 incidenti nei comuni delle aree interne, 2024
-  fonte: Istat, convegno del 16 dicembre 2025, relazione Palumbo e Carucci
+- value: 3,1
+  what: morti ogni 100 incidenti nei comuni delle aree interne, 2024
+  source: Istat, convegno del 16 dicembre 2025, relazione Palumbo e Carucci
   url: https://www.istat.it/wp-content/uploads/2025/12/PALUMBO_CARUCCI16dicembre2025.pdf
-- cifra: 1,5
-  cosa: morti ogni 100 incidenti nei comuni dei centri, 2024
-  fonte: Istat, convegno del 16 dicembre 2025, relazione Palumbo e Carucci
+- value: 1,5
+  what: morti ogni 100 incidenti nei comuni dei centri, 2024
+  source: Istat, convegno del 16 dicembre 2025, relazione Palumbo e Carucci
   url: https://www.istat.it/wp-content/uploads/2025/12/PALUMBO_CARUCCI16dicembre2025.pdf
-- cifra: '18'
-  cosa: quota percentuale che usa sempre la cintura posteriore al Sud, PASSI 2023-2024
-  fonte: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
+- value: '18'
+  what: quota percentuale che usa sempre la cintura posteriore al Sud, PASSI 2023-2024
+  source: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
   url: https://www.quotidianosanita.it/studi-e-analisi/sicurezza-stradale-iss-solo-uno-su-usa-cinture-posteriori-cresce-uso-dispositivi-per-i-beb/
-- cifra: '54'
-  cosa: quota percentuale che usa sempre la cintura posteriore al Nord, PASSI 2023-2024
-  fonte: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
+- value: '54'
+  what: quota percentuale che usa sempre la cintura posteriore al Nord, PASSI 2023-2024
+  source: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
   url: https://www.quotidianosanita.it/studi-e-analisi/sicurezza-stradale-iss-solo-uno-su-usa-cinture-posteriori-cresce-uso-dispositivi-per-i-beb/
-- cifra: '93'
-  cosa: quota percentuale che usa sempre il casco al Sud, PASSI 2023-2024
-  fonte: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
+- value: '93'
+  what: quota percentuale che usa sempre il casco al Sud, PASSI 2023-2024
+  source: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
   url: https://www.quotidianosanita.it/studi-e-analisi/sicurezza-stradale-iss-solo-uno-su-usa-cinture-posteriori-cresce-uso-dispositivi-per-i-beb/
-- cifra: '98'
-  cosa: quota percentuale che usa sempre il casco al Nord, PASSI 2023-2024
-  fonte: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
+- value: '98'
+  what: quota percentuale che usa sempre il casco al Nord, PASSI 2023-2024
+  source: Istituto superiore di sanità, sorveglianza PASSI, via Quotidiano Sanità, 24 ottobre 2025
   url: https://www.quotidianosanita.it/studi-e-analisi/sicurezza-stradale-iss-solo-uno-su-usa-cinture-posteriori-cresce-uso-dispositivi-per-i-beb/
-- cifra: '37'
-  cosa: quota percentuale della velocità eccessiva sulle violazioni sanzionate, 2025
-  fonte: Istat, Incidenti stradali in Italia, anno 2025, 24 luglio 2026
+- value: '37'
+  what: quota percentuale della velocità eccessiva sulle violazioni sanzionate, 2025
+  source: Istat, Incidenti stradali in Italia, anno 2025, 24 luglio 2026
   url: https://www.istat.it/comunicato-stampa/incidenti-stradali-in-italia-2025/
-- cifra: 5,5
-  cosa: morti ogni 100 incidenti su strade extraurbane in Sardegna, 2023
-  fonte: Istat, BesT 2025, Sardegna
+- value: 5,5
+  what: morti ogni 100 incidenti su strade extraurbane in Sardegna, 2023
+  source: Istat, BesT 2025, Sardegna
   url: https://www.istat.it/wp-content/uploads/2025/12/BesT2025_Sardegna.pdf
-- cifra: 4,1
-  cosa: morti ogni 100 incidenti su strade extraurbane in Italia, 2023
-  fonte: Istat, BesT 2025, Sardegna
+- value: 4,1
+  what: morti ogni 100 incidenti su strade extraurbane in Italia, 2023
+  source: Istat, BesT 2025, Sardegna
   url: https://www.istat.it/wp-content/uploads/2025/12/BesT2025_Sardegna.pdf
-- cifra: 2,8
-  cosa: calo percentuale dei morti in incidenti stradali nelle Isole, tutte le età, 2025
-  fonte: Istat, Incidenti stradali anno 2025, 24 luglio 2026
+- value: 2,8
+  what: calo percentuale dei morti in incidenti stradali nelle Isole, tutte le età, 2025
+  source: Istat, Incidenti stradali anno 2025, 24 luglio 2026
   url: https://www.istat.it/wp-content/uploads/2026/07/REPORT_INCIDENTI_STRADALI_2025.pdf
 ---
 

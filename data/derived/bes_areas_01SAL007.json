@@ -1,0 +1,11 @@
+{
+  "name": "Mortalità per demenze e malattie del sistema nervoso (65 anni e più), Italia e ripartizioni",
+  "unit": "Tassi standardizzati per 10.000 residenti",
+  "source": "Istat",
+  "archive": "Benessere equo e sostenibile, aggiornamento intermedio 2026, valori ufficiali per ripartizione",
+  "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+  "license": "CC BY 4.0",
+  "method": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni).",
+  "script": "scripts/trend_articles/derive_bes_areas.py",
+  "bes_code": "01SAL007"
+}

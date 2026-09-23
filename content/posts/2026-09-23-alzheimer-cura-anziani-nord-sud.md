@@ -2,18 +2,18 @@
 title: 'Anziani non autosufficienti: al Sud meno posti e meno aiuti, e la cura resta alle famiglie'
 seo_title: 'Anziani non autosufficienti: il divario nella cura'
 slug: alzheimer-cura-anziani-nord-sud
-description: "Anziani non autosufficienti in una struttura: in Trentino-Alto Adige sedici volte più che in Campania. E al Sud l'aiuto a pagamento è meno diffuso, non di più."
+description: 'Anziani non autosufficienti in una struttura: in Trentino-Alto Adige sedici volte più che in Campania. E al Sud l''aiuto a pagamento è meno diffuso, non di più.'
 date: 2026-09-23
 author: Redazione Divario Italia
 cover: /static/img/blog/alzheimer-cura-anziani-nord-sud.jpg
 cover_alt: Una donna in camice si regge a un deambulatore accanto a un letto, in una stanza illuminata dal sole. Il volto non si vede.
 cover_credit:
-  autore: rawpixel.com
-  licenza: CC0
-  licenza_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
-  fonte_url: https://commons.wikimedia.org/wiki/File:A_woman_supporting_herself_with_a_walking_frame.jpg
-  fonte_nome: Wikimedia Commons
-  modifiche: Ritagliata e ridimensionata
+  author: rawpixel.com
+  license: CC0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  source_url: https://commons.wikimedia.org/wiki/File:A_woman_supporting_herself_with_a_walking_frame.jpg
+  source_name: Wikimedia Commons
+  changes: Ritagliata e ridimensionata
 tags:
 - Salute
 - Anziani
@@ -21,31 +21,31 @@ tags:
 indicator: bes-SDG-405
 indicator_label: Posti letto nei presidi residenziali socio-assistenziali e socio-sanitari
 trend:
-  tema: demenze-anziani
-  rilevato: 2026-09-23
-  classifica: data/trend/2026-09-23/classifica.json
-  punteggio:
-    interesse: 0.77
-    dato: 0.82
-    storia: 0.9
-    totale: 0.662
-    posto: 16
-  segnali:
-  - tipo: google_news_principali
-    testo: Alzheimer, i 14 fattori di rischio da tenere d'occhio (Dica33)
-    fonte: Google News Italia, notizie principali
+  topic: demenze-anziani
+  detected: 2026-09-23
+  ranking: data/trend/2026-09-23/ranking.json
+  score:
+    interest: 0.77
+    data: 0.82
+    story: 0.9
+    total: 0.662
+    rank: 16
+  signals:
+  - type: google_news_principali
+    text: Alzheimer, i 14 fattori di rischio da tenere d'occhio (Dica33)
+    source: Google News Italia, notizie principali
     url: https://news.google.com/rss/articles/CBMihwFBVV95cUxQUTQwY3k3enZNdmI0VVByZk5UTHowM0F4STgtNVpBTjkwclpqa1ctSVVPWjBqUUFPMWZwcGQ0VDkzWElORkxWX0JFaGxhU0NwZm1haGdhZU5PYkRyOHZEc1pqQkk4ZFdFVExGQ0JCQzE5YmlwNFBaTjFDN1FjTkNrLXJ5VlU3WGM?oc=5
-    data: 2026-09-21
-  - tipo: google_news_tema
-    testo: 30 titoli negli ultimi sette giorni su Alzheimer, demenze e anziani non autosufficienti, con le liste d'attesa per le RSA in Veneto, Umbria, Emilia-Romagna e Marche
-    fonte: Google News Italia, ricerca degli ultimi 7 giorni
+    date: 2026-09-21
+  - type: google_news_tema
+    text: 30 titoli negli ultimi sette giorni su Alzheimer, demenze e anziani non autosufficienti, con le liste d'attesa per le RSA in Veneto, Umbria, Emilia-Romagna e Marche
+    source: Google News Italia, ricerca degli ultimi 7 giorni
     url: https://news.google.com/rss/search?q=(alzheimer%20OR%20demenza%20OR%20anziani%20non%20autosufficienti)%20when:7d&hl=it&gl=IT&ceid=IT:it
-    data: 2026-09-23
-  - tipo: google_trends_interesse
-    testo: 'alzheimer: interesse degli ultimi 7 giorni 1,45 volte la media degli 83 precedenti. Regioni con piu'' interesse: Abruzzo, Lombardia, Marche'
-    fonte: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
+    date: 2026-09-23
+  - type: google_trends_interesse
+    text: 'alzheimer: interesse degli ultimi 7 giorni 1,45 volte la media degli 83 precedenti. Regioni con piu'' interesse: Abruzzo, Lombardia, Marche'
+    source: Google Trends (pytrends), Italia, finestra today 3-m e now 7-d
     url: https://trends.google.com/trends/explore?geo=IT&q=alzheimer
-    data: 2026-09-23
+    date: 2026-09-23
 dataset:
   name: Strutture residenziali e assistenza domiciliare agli anziani, per regione e ripartizione
   description: Posti letto nei presidi residenziali socio-assistenziali e socio-sanitari ogni 10.000 abitanti (2009-2023), ospiti anziani non autosufficienti ogni 100.000 residenti di 65 anni e più (2009-2022), quota di persone di 65 anni e più in assistenza domiciliare integrata (2015-2024), per regione e con i valori ufficiali per ripartizione.
@@ -54,83 +54,83 @@ dataset:
   spatial: Italia, ripartizioni e regioni
   creator: Istat
   source_url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
-  download: /static/data/articoli/alzheimer-cura-anziani-nord-sud.csv
-cifre_esterne:
-- cifra: 1.200.000
-  cosa: casi di demenza stimati fra le persone di 65 anni e più
-  fonte: Istituto superiore di sanità, 19 settembre 2025
+  download: /static/data/articles/alzheimer-cura-anziani-nord-sud.csv
+external_figures:
+- value: 1.200.000
+  what: casi di demenza stimati fra le persone di 65 anni e più
+  source: Istituto superiore di sanità, 19 settembre 2025
   url: https://www.iss.it/en/-/world-alzheimer-s-day-in-italia-1-2-milioni-di-casi-di-demenza-le-attivita-dell-iss-dall-osservatorio-demenze-agli-studi-dei-meccanismi-della-memoria
-- cifra: '4'
-  cosa: milioni di familiari accanto a persone con un disturbo cognitivo
-  fonte: Istituto superiore di sanità, 19 settembre 2025
+- value: '4'
+  what: milioni di familiari accanto a persone con un disturbo cognitivo
+  source: Istituto superiore di sanità, 19 settembre 2025
   url: https://www.iss.it/en/-/world-alzheimer-s-day-in-italia-1-2-milioni-di-casi-di-demenza-le-attivita-dell-iss-dall-osservatorio-demenze-agli-studi-dei-meccanismi-della-memoria
-- cifra: '28'
-  cosa: posti letto per anziani non autosufficienti ogni 1.000 anziani, Nord-Ovest, 1 gennaio 2024
-  fonte: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
+- value: '28'
+  what: posti letto per anziani non autosufficienti ogni 1.000 anziani, Nord-Ovest, 1 gennaio 2024
+  source: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
   url: https://www.istat.it/wp-content/uploads/2026/01/Report-Presidi-2023.pdf
-- cifra: '32'
-  cosa: posti letto per anziani non autosufficienti ogni 1.000 anziani, Nord-Est, 1 gennaio 2024
-  fonte: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
+- value: '32'
+  what: posti letto per anziani non autosufficienti ogni 1.000 anziani, Nord-Est, 1 gennaio 2024
+  source: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
   url: https://www.istat.it/wp-content/uploads/2026/01/Report-Presidi-2023.pdf
-- cifra: '6'
-  cosa: posti letto per anziani non autosufficienti ogni 1.000 anziani, Sud (Isole escluse), 1 gennaio 2024
-  fonte: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
+- value: '6'
+  what: posti letto per anziani non autosufficienti ogni 1.000 anziani, Sud (Isole escluse), 1 gennaio 2024
+  source: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
   url: https://www.istat.it/wp-content/uploads/2026/01/Report-Presidi-2023.pdf
-- cifra: '75'
-  cosa: quota percentuale di ospiti delle strutture con 65 anni e più
-  fonte: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
+- value: '75'
+  what: quota percentuale di ospiti delle strutture con 65 anni e più
+  source: Istat, Le strutture residenziali socio-assistenziali e socio-sanitarie, 13 gennaio 2026
   url: https://www.istat.it/wp-content/uploads/2026/01/Report-Presidi-2023.pdf
-- cifra: 42,0
-  cosa: anziani con gravi limitazioni nella cura di sé che ricorrono ad assistenza privata, Nord, 2019
-  fonte: Istat, Le condizioni di salute della popolazione anziana, 2019
+- value: 42,0
+  what: anziani con gravi limitazioni nella cura di sé che ricorrono ad assistenza privata, Nord, 2019
+  source: Istat, Le condizioni di salute della popolazione anziana, 2019
   url: https://www.istat.it/wp-content/uploads/2021/07/Report-anziani-2019.pdf
-- cifra: 26,6
-  cosa: anziani con gravi limitazioni nella cura di sé che ricorrono ad assistenza privata, Sud e Isole, 2019
-  fonte: Istat, Le condizioni di salute della popolazione anziana, 2019
+- value: 26,6
+  what: anziani con gravi limitazioni nella cura di sé che ricorrono ad assistenza privata, Sud e Isole, 2019
+  source: Istat, Le condizioni di salute della popolazione anziana, 2019
   url: https://www.istat.it/wp-content/uploads/2021/07/Report-anziani-2019.pdf
-- cifra: 35,6
-  cosa: stima della quota di over 65 non autosufficienti in Calabria (prevalenze Istat 2019 sulla popolazione 2023)
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: 35,6
+  what: stima della quota di over 65 non autosufficienti in Calabria (prevalenze Istat 2019 sulla popolazione 2023)
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '34'
-  cosa: stima della quota di over 65 non autosufficienti in Campania (prevalenze Istat 2019 sulla popolazione 2023)
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '34'
+  what: stima della quota di over 65 non autosufficienti in Campania (prevalenze Istat 2019 sulla popolazione 2023)
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: 24,4
-  cosa: stima della quota di over 65 non autosufficienti in Lombardia (prevalenze Istat 2019 sulla popolazione 2023)
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: 24,4
+  what: stima della quota di over 65 non autosufficienti in Lombardia (prevalenze Istat 2019 sulla popolazione 2023)
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '31'
-  cosa: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Lombardia, 2023
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '31'
+  what: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Lombardia, 2023
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '20'
-  cosa: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Campania, 2023
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '20'
+  what: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Campania, 2023
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '11'
-  cosa: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Calabria, 2023
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '11'
+  what: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Calabria, 2023
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '10'
-  cosa: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Sardegna, 2023
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '10'
+  what: copertura dell'assistenza domiciliare sugli anziani non autosufficienti stimati, Sardegna, 2023
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '9'
-  cosa: over 65 presi in carico in assistenza domiciliare secondo l'Annuario del servizio sanitario, 2023
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '9'
+  what: over 65 presi in carico in assistenza domiciliare secondo l'Annuario del servizio sanitario, 2023
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '18'
-  cosa: ore medie all'anno di assistenza domiciliare per caso anziano, 2018
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '18'
+  what: ore medie all'anno di assistenza domiciliare per caso anziano, 2018
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '16'
-  cosa: ore medie all'anno di assistenza domiciliare per caso anziano, 2022
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '16'
+  what: ore medie all'anno di assistenza domiciliare per caso anziano, 2022
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
-- cifra: '14'
-  cosa: ore medie all'anno di assistenza domiciliare per caso anziano, 2023
-  fonte: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
+- value: '14'
+  what: ore medie all'anno di assistenza domiciliare per caso anziano, 2023
+  source: Cergas Bocconi, Rapporto OASI 2025, capitolo 5
   url: https://cergas.unibocconi.eu/sites/default/files/media/attach/05_Fosti_et_al_B2_OASI25.pdf
 ---
 
