@@ -32,7 +32,6 @@ from app.cache import cache
 from app.cache_util import synchronized_cache
 from app.external_data import freshness_label, freshness_status
 from app.taxonomy import CANONICAL_CATEGORIES
-from scripts.province_sources import DEFUNCT_PROVINCES, NUTS3_PATTERN
 
 LIVELLO = "provincia"
 
@@ -132,6 +131,11 @@ def unmeasured_provinces():
     un'assenza ma un'esclusione, e la nota le dice a parte.
     """
     import csv
+
+    # Qui dentro e non in testa: `scripts.province_sources` importa
+    # `app.taxonomy`, che carica il pacchetto `app` e con lui questo modulo, e
+    # l'import in testa rompeva `build_province_dataset.py` lanciato da solo.
+    from scripts.province_sources import DEFUNCT_PROVINCES, NUTS3_PATTERN
 
     measured = set()
     with bes_data.PROVINCE_CODES.open(encoding="utf-8", newline="") as handle:
