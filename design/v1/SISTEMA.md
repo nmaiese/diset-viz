@@ -19,20 +19,26 @@ dei clic da Google e l'84% delle impression: il sistema si misura su di loro.
 Giornalismo dati sul modello di Reuters Graphics, con l'attenzione di The
 Upshot per il testo che accompagna il dato.
 
-- **Fondo bianco, una sola famiglia**: Source Sans 3 variabile (OFL). Titoli,
-  prosa, interfaccia, numeri ed etichette dei grafici. Il monospazio resta solo
-  per i codici (id di serie, URL da copiare).
-- **Un solo accento**, arancio bruciato, per cio' che si clicca e per l'unico
-  elemento in evidenza in un grafico. Mai un colore dei dati, mai un giudizio.
+- **Fondo bianco, una famiglia con due larghezze**: Sofia Sans (OFL) per il testo
+  e l'interfaccia, Sofia Sans Semi Condensed per i titoli e le cifre. Scelta su
+  uno specimen col contenuto vero contro Mona Sans (in colonna lo zero diventa
+  barrato), Schibsted Grotesk e Source Serif 4. Il monospazio resta solo per i
+  codici.
+- **Un solo accento**, arancio bruciato, per la prosa linkata, l'azione
+  principale e l'unico elemento in evidenza in un grafico. I link degli elenchi,
+  delle schede e delle tabelle sono in inchiostro. Mai un colore dei dati, mai un
+  giudizio.
 - **I dati in blu**, rampa sequenziale a sei passi. Divergente blu e ocra solo
-  quando il centro e' il valore Italia. Nessun verde e nessun rosso fuori dal
+  quando il centro e' il valore Italia. **Le ripartizioni hanno un colore fisso**,
+  uguale in ogni grafico e nei pallini delle classifiche: Nord blu, Centro oliva,
+  Mezzogiorno prugna, verificati per i daltonici (`area-*` nei token). Nessun verde e nessun rosso fuori dal
   simbolo del marchio, cosi' una mappa non richiama mai il nord verde e il sud
   rosso del logo.
 - **Regia**: ogni pagina apre con la risposta, il numero e un grafico, non con
   un paragrafo. Allineamento a sinistra sotto il marchio. La struttura la fanno
   l'aria e i filetti, mai una scatola dentro l'altra.
 - **Marchio**: il simbolo (Italia verde e rossa con le barre) resta com'e'. Il
-  wordmark si compone in Source Sans 3, "Divario" a 700 e "Italia" a 400, sempre
+  wordmark si compone in Sofia Sans, "Divario" a 700 e "Italia" a 400, sempre
   in inchiostro. Niente accento a meno di 24px dal simbolo.
 
 ## Griglia
@@ -75,9 +81,18 @@ Una scala di undici ruoli, nominati per funzione:
 | cifra di tessera | 36/38, peso 700 | 28/30 | tessere numero |
 
 - Le etichette sono in minuscolo con l'iniziale maiuscola: mai tutto maiuscolo,
-  mai monospazio. 13px e' il minimo, perche' Source Sans ha l'occhio medio
-  piccolo.
-- Cifre tabellari in ogni colonna. **La riga in evidenza non va mai in
+  mai monospazio. 13px e' il minimo. La scala e' tarata su un occhio medio di
+  0,49 e `font-size-adjust` la tiene uguale se si cambia famiglia.
+- **Le cifre hanno un sistema solo**, `tools/numfmt.py`, per ruoli: cifra (tessere
+  e frasi, decimali dalla grandezza), cella (decimali uguali per tutta la
+  colonna), punteggio (un decimale), rapporto (un decimale), variazione (sempre
+  col segno, "invariato" sullo zero), posizione ("14ª su 20"), conteggio
+  (intero). Il segno negativo e' il meno tipografico. Ogni cifra e' un `<data
+  value>` col valore per le macchine. L'unita' segue piu' piccola e in
+  `--text-2`, la percentuale resta attaccata. I template non formattano mai: usano
+  i filtri `num`, `rank`, `delta`.
+- Fuori dalle colonne le cifre sono proporzionali (in una tessera le tabellari
+  lasciano buchi), in colonna sono tabellari. **La riga in evidenza non va mai in
   grassetto**: a peso 700 le cifre sono piu' larghe e rompono l'incolonnamento.
   L'evidenza la fanno il fondo e una barretta di 3px.
 - Corsivo vero, caricato solo dove serve.
@@ -141,18 +156,33 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
   colorata ("Serie ferma al 2015", "Citta' metropolitana", "n.d.").
 - **Slot pubblicitario**: vedi sotto.
 
+### I grafici
+
+- **La striscia del divario** e' il segno della 1.0: ogni territorio un punto
+  sulla stessa scala, nel colore della sua ripartizione, i due estremi nominati,
+  la media semplice, la distanza fra primo e ultimo (in volte, o in punti per i
+  punteggi). Apre ogni pagina il cui argomento e' un divario, e sulle pagine di
+  un territorio ne evidenzia il punto.
+- **La serie a fascia**: la fascia fra il valore piu' alto e il piu' basso di
+  ogni anno, la media semplice tratteggiata, i due territori agli estremi nel
+  colore della loro ripartizione. La larghezza della fascia e' il divario nel
+  tempo.
+- **La mappa nomina i suoi estremi** con un richiamo che parte dal baricentro
+  del pezzo piu' grande della regione.
+- Ogni grafico esce in due tagli, largo e stretto, perche' il testo resti a
+  12-13 pixel veri anche sul telefono, e ha accanto una tabella con gli stessi
+  dati. Si disegna lato server in `tools/charts.py`, i colori stanno nel CSS.
+
 ### Dove stanno oggi
 
-Il foglio comune e' `src/css/components.css`. Alcuni componenti del catalogo sono
-nati dentro una pagina e stanno ancora nel suo foglio in `src/css/pages/`, con il
-prefisso della pagina: la classifica con la barra del punteggio e le righe che
-diventano blocchi sotto i 720 pixel (`qdv-rank`), la tabella che sotto i 560
-pixel diventa blocchi etichettati (`regione-all`, `provincia-*`), la traccia di
-posizione da 1 a N (`regione-track`), il localizzatore (`regione-loc`,
-`provincia-loc`), la barra divergente attorno a 50 (`provincia-div`), la figura
-dell'articolo con la tabella dei valori (`art-fig`, `art-bars`). Sono lo stesso
-componente scritto una volta: nella migrazione passano nel foglio comune col
-nome del catalogo.
+Il foglio comune e' `src/css/components.css`. I componenti nati dentro una
+pagina nella prima iterazione hanno ora una versione comune: la classifica col
+punteggio (`.table--rank`), la tabella che sotto i 560 pixel diventa blocchi
+etichettati (`.table--stack`), la traccia di posizione (`.track`), il
+localizzatore (macro `locator`), la barra attorno a 50 (`.divbar`), il podio
+(`.podiums`), la figura dell'articolo (`.figure`), l'immagine d'apertura
+(`.hero-img`). I fogli in `src/css/pages/` tengono solo l'impaginazione propria
+di una pagina.
 
 ## Pagine
 
