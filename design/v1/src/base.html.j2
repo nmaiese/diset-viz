@@ -1,0 +1,83 @@
+{#- Il corpo di ogni prototipo: testata, contenuto, piede. L'involucro (documento
+    completo o sezione dell'Artifact) lo aggiunge build.py. -#}
+{%- import "partials/ui.html.j2" as ui -%}
+<a class="skip" href="#{{ aid('contenuto') }}">Vai al contenuto</a>
+<header class="mast">
+  <div class="wrap mast__bar">
+    <a class="brand" href="{{ href('/') }}" aria-label="Divario Italia, home">
+      <img src="{{ logo_src }}" alt="" width="30" height="31">
+      <span class="brand__word"><b>Divario</b> <span>Italia</span></span>
+    </a>
+    <nav class="nav" aria-label="Principale">
+      {%- for item in nav %}
+      {%- if item.group %}
+      <details>
+        <summary{% if item.key == active %} class="is-active"{% endif %}>{{ item.label }} {{ ui.icon('chevron') }}</summary>
+        <div class="nav__menu">
+          {%- for sub in item.group %}<a href="{{ href(sub.path) }}">{{ sub.label }}</a>{% endfor %}
+        </div>
+      </details>
+      {%- else %}
+      <a href="{{ href(item.path) }}"{% if item.key == active %} aria-current="page"{% endif %}>{{ item.label }}</a>
+      {%- endif %}
+      {%- endfor %}
+    </nav>
+    <div class="mast__tools">
+      <form class="search" role="search" action="https://divarioitalia.it/ricerca" method="get">
+        {{ ui.icon('search') }}
+        <label class="sr-only" for="{{ aid('q-testata') }}">Cerca un territorio o un indicatore</label>
+        <input id="{{ aid('q-testata') }}" name="q" type="search" placeholder="Cerca un territorio o un dato">
+      </form>
+      <a class="iconbtn search-toggle" href="https://divarioitalia.it/ricerca" aria-label="Cerca">{{ ui.icon('search') }}</a>
+      <button class="iconbtn" type="button" data-theme-toggle aria-label="Cambia tema chiaro o scuro">{{ ui.icon('theme') }}</button>
+      <a class="account" href="https://divarioitalia.it/account">Accedi</a>
+      <details class="drawer">
+        <summary class="iconbtn" aria-label="Menu">{{ ui.icon('menu') }}</summary>
+        <div class="drawer__panel">
+          <form role="search" action="https://divarioitalia.it/ricerca" method="get">
+            <label class="sr-only" for="{{ aid('q-cassetto') }}">Cerca</label>
+            <input id="{{ aid('q-cassetto') }}" name="q" type="search" placeholder="Regione, provincia, indicatore">
+            <button class="btn" type="submit">Cerca</button>
+          </form>
+          {%- for item in nav %}
+          <div class="drawer__group">
+            {%- if item.group %}
+            <p>{{ item.label }}</p>
+            {%- for sub in item.group %}<a href="{{ href(sub.path) }}">{{ sub.label }}</a>{% endfor %}
+            {%- else %}
+            <a href="{{ href(item.path) }}">{{ item.label }}</a>
+            {%- endif %}
+          </div>
+          {%- endfor %}
+          <div class="drawer__group"><a href="https://divarioitalia.it/account">Accedi</a></div>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<main id="{{ aid('contenuto') }}" tabindex="-1">
+{% block main %}{% endblock %}
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="foot__brand" href="{{ href('/') }}"><img src="{{ logo_src }}" alt="" width="26" height="27"><span class="brand__word"><b>Divario</b> <span>Italia</span></span></a>
+    <p class="foot__trust">{{ footer.trust | safe }}</p>
+    <nav class="foot__cols" aria-label="Mappa del sito">
+      {%- for col in footer.cols %}
+      <div>
+        <p>{{ col.label }}</p>
+        <ul>{% for l in col.links %}<li><a href="{{ href(l.path) }}">{{ l.label }}</a></li>{% endfor %}</ul>
+      </div>
+      {%- endfor %}
+    </nav>
+    <div class="foot__legal">
+      <span>Dati pubblicati con licenza {{ footer.license }}</span>
+      <a href="https://divarioitalia.it/privacy">Privacy e cookie</a>
+      <button class="linklike" type="button">Preferenze di consenso</button>
+      <a href="https://divarioitalia.it/termini">Termini</a>
+      <span>{{ footer.email }}</span>
+    </div>
+  </div>
+</footer>

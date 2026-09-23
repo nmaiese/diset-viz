@@ -1,0 +1,231 @@
+{% extends "base.html.j2" %}
+{% import "partials/ui.html.j2" as ui %}
+{% import "_indicator_article.html" as article %}
+{#- La scheda indicatore della 1.0. Stesso contenuto di indicator_page.html,
+    un'altra regia: la risposta e le cifre prima, poi il confronto, poi la
+    storia, poi il racconto, e il metodo in fondo, fuori dal racconto. -#}
+{% set year = level.year_max %}
+{% set n = level.observations | length %}
+{% set trail = [
+  {"name": "Home", "path": "/"},
+  {"name": "Temi", "path": "/temi"},
+  {"name": meta.theme, "path": meta.theme_path},
+  {"name": meta.name, "path": meta.canonical_path},
+] %}
+{% block main %}
+<div class="wrap">
+  {{ ui.crumbs(trail) }}
+
+  <header class="pagehead">
+    <p class="eyebrow"><a href="{{ href(meta.theme_path) }}">{{ meta.theme }}</a><span class="sep" aria-hidden="true">·</span>{{ meta.source_label }}<span class="sep" aria-hidden="true">·</span>{{ n }} {{ level.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ year }}</p>
+    <h1 class="h-title">{{ page_h1 }}</h1>
+    <p class="answer">{{ page_lead | analyst_html }}</p>
+    <p class="meta">
+      <span class="direction">{{ d.verso }}</span>
+      <span>Aggiornato il <time datetime="{{ dataset_updated }}">{{ d.updated }}</time></span>
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+      <button class="star" type="button" aria-pressed="false">{{ ui.icon('star') }} Salva</button>
+    </p>
+  </header>
+
+  {{ ui.tiles(d.tiles) }}
+
+  <div class="layout">
+    <aside class="layout__aside">
+      <nav class="toc" aria-label="In questa pagina">
+        <p>In questa pagina</p>
+        <ol>
+          <li><a href="#{{ aid('esplora') }}" data-query-intent="classifica">Chi è in testa</a></li>
+          {% if not d.series.single_year %}<li><a href="#{{ aid('serie-storica') }}" data-query-intent="andamento">Com'è cambiato</a></li>{% endif %}
+          {% if page_article.sections %}<li><a href="#{{ aid('analisi') }}">L'analisi</a></li>{% endif %}
+          <li><a href="#{{ aid('come-leggere') }}" data-query-intent="definizione">Che cosa misura</a></li>
+          <li><a href="#{{ aid('fonti-verifica') }}" data-query-intent="metodologia">Fonti e citazione</a></li>
+          {% if meta.downloads and level.key == 'regione' %}<li><a href="#{{ aid('download-dati') }}" data-query-intent="download">Scarica i dati</a></li>{% endif %}
+        </ol>
+      </nav>
+      <div class="aside-block">
+        <p>Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
+        <p><a class="linkarrow" href="#{{ aid('fonti-verifica') }}">Cita questa scheda</a></p>
+      </div>
+      <div class="aside-block">{{ ui.ad('side') }}</div>
+    </aside>
+
+    <div class="layout__main">
+      <section class="section" id="{{ aid('esplora') }}" aria-labelledby="{{ aid('h-esplora') }}">
+        <h2 id="{{ aid('h-esplora') }}">Chi è in testa</h2>
+        <figure class="module" data-explore>
+          <figcaption class="module__head">
+            <h3 class="h-sub" data-claim>{{ d.claim }}</h3>
+            <p class="subline">{{ meta.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} dal valore più alto al più basso{% if meta.direction in ('lower_better', 'higher_worse') %}, che qui è il migliore{% endif %}.</p>
+          </figcaption>
+          <div class="toolbar">
+            {% if levels | length > 1 %}
+            <div class="field"><span>Livello</span>
+              <div class="seg" role="group" aria-label="Livello territoriale">
+                {% for item in levels %}<a href="{{ href(meta.canonical_path ~ '?livello=' ~ item.key) }}"{% if item.key == level.key %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
+              </div>
+            </div>
+            {% endif %}
+            {% if level.years | length > 1 %}
+            <label class="field field--year" for="{{ aid('anno') }}">Anno <output data-year-out>{{ year }}</output>
+              <span class="year"><span>{{ level.year_min }}</span>
+                <input id="{{ aid('anno') }}" type="range" min="0" max="{{ level.years | length - 1 }}" step="1" value="{{ level.years | length - 1 }}" aria-valuetext="{{ year }}" data-year>
+              <span>{{ year }}</span></span>
+            </label>
+            {% endif %}
+            <label class="field" for="{{ aid('territorio') }}">Trova la tua {{ level.singular }}
+              <select id="{{ aid('territorio') }}" data-territory>
+                <option value="">Nessuna in evidenza</option>
+                {% for t in level.territories | sort(attribute='name') %}<option value="{{ t.key }}">{{ t.name }}</option>{% endfor %}
+              </select>
+            </label>
+          </div>
+
+          <div class="module__body">
+            {% if level.has_map %}
+            <div class="module__map">
+              {{ ui.map(d.map_classes, 'esplora', d.explore_js.names, d.map_values) }}
+              {{ ui.legend(d.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.') }}
+            </div>
+            {% endif %}
+            <div class="tablewrap" id="{{ aid('classifica-dati') }}" tabindex="0" role="region" aria-label="Classifica delle {{ level.plural }}">
+              <table class="table">
+                <caption class="sr-only">{{ meta.name }} per {{ level.singular }} nel <span data-year-label>{{ year }}</span>{% if d.unit %}, in {{ d.unit }}{% endif %}</caption>
+                <thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ level.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (d.short_unit or 'Valore') | capitalize }}</th></tr></thead>
+                <tbody data-rank-body>
+                  {% for row in d.ranking %}
+                  {% if row.ref %}
+                  <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value }}</td></tr>
+                  {% else %}
+                  <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank }}</td><th scope="row">{% if level.profile_path %}<a href="{{ href(level.profile_path ~ row.key) }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value }}</td></tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p class="source">Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a> ({{ year }}). Elaborazione Divario Italia.{% if meta.downloads and level.key == 'regione' %} <a href="{{ href(meta.downloads.csv) }}">Dati in CSV</a>{% endif %}</p>
+          <p class="sr-only" role="status" aria-live="polite" data-live></p>
+        </figure>
+      </section>
+
+      {% if not d.series.single_year %}
+      <section class="section" id="{{ aid('serie-storica') }}" aria-labelledby="{{ aid('h-serie') }}">
+        <h2 id="{{ aid('h-serie') }}">Com'è cambiato</h2>
+        <figure class="module">
+          <figcaption class="module__head">
+            <h3 class="h-sub">{{ d.series_claim }}</h3>
+            <p class="subline">{{ meta.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. In grigio le {{ n }} {{ level.plural }}, tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+          </figcaption>
+          <div class="chart" data-series>{{ d.series.svg | safe }}</div>
+          {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
+          <p class="source">Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
+          <details class="more">
+            <summary>La serie in tabella</summary>
+            <div class="tablewrap" tabindex="0" role="region" aria-label="Serie storica in tabella">
+              <table class="table table--compact trend-table">
+                <caption>Media semplice delle {{ level.plural }} per anno{% if d.unit %}, in {{ d.unit }}{% endif %}</caption>
+                <thead><tr><th scope="col">Anno</th><th class="r" scope="col">Media semplice</th></tr></thead>
+                <tbody>{% for p in level.annual_means %}<tr><th scope="row">{{ p.year }}</th><td class="val">{{ d.fmt(p.avg) }}</td></tr>{% endfor %}</tbody>
+              </table>
+            </div>
+          </details>
+        </figure>
+      </section>
+      {% endif %}
+
+      {{ ui.ad() }}
+
+      {% if page_article.sections %}
+      <div class="section analysis" id="{{ aid('analisi') }}">
+        {{ article.body(page_article, meta, level) }}
+      </div>
+      {% endif %}
+
+      {% set explain = level.explain or meta.explain %}
+      <section class="section" id="{{ aid('come-leggere') }}" aria-labelledby="{{ aid('h-leggere') }}">
+        <h2 id="{{ aid('h-leggere') }}">Che cosa misura e come si legge</h2>
+        <div class="method">
+          <div>
+            <h3>In parole semplici</h3>
+            {% if explain.plain and page_article.lead %}<p>{{ explain.plain }}</p>{% endif %}
+            {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
+            {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
+            {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
+          </div>
+          <div>
+            <h3>Secondo la fonte</h3>
+            <dl>
+              {% if meta.archive %}<div><dt>Definizione della fonte</dt><dd>{{ meta.archive }} <a href="{{ meta.source_url }}">Consulta la fonte {{ meta.institution or "Istat" }}</a></dd></div>{% endif %}
+              <div><dt>Verso</dt><dd>{{ d.verso }}{% if not meta.scoreable %}: un valore alto descrive più intensità del fenomeno, non un territorio migliore{% endif %}.</dd></div>
+              {% if explain.caveat %}<div><dt>Il limite principale</dt><dd>{{ explain.caveat }}</dd></div>{% endif %}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="{{ aid('fonti-verifica') }}" aria-labelledby="{{ aid('h-fonti') }}">
+        <h2 id="{{ aid('h-fonti') }}">Fonti, dati e citazione</h2>
+        <dl class="specs">
+          <div><dt>Dato più recente</dt><dd>{{ year }}{% if level.year_min != year %}, serie dal {{ level.year_min }}{% endif %}</dd></div>
+          <div><dt>Fonte</dt><dd><a href="{{ meta.source_url }}">{{ meta.source_label }}</a>{% if meta.source_dataflow %}, serie <code>{{ meta.source_dataflow }}</code>{% endif %}</dd></div>
+          <div><dt>Come è calcolato</dt><dd>Media semplice dei valori {{ 'regionali' if level.singular == 'regione' else 'provinciali' }}: ogni territorio pesa uguale, quindi non è un dato nazionale. Divario e classifica senza riponderazioni. <a href="{{ href('/metodologia') }}">Metodologia</a></dd></div>
+          <div><dt>Come nasce questa scheda</dt><dd>I dati vengono dalla fonte senza correzioni e le sintesi si ricalcolano a ogni caricamento.{% if page_article.authored_count or page_article.lead %} Il racconto è scritto con strumenti automatici e approvato da una persona, che ne risponde.{% endif %} <a href="{{ href('/metodologia#come-nasce-il-testo') }}">Come nasce il testo</a></dd></div>
+          {% if meta.quality_life_scored %}<div><dt>Qualità della vita</dt><dd>Entra nel punteggio della qualità della vita{% if meta.quality_life_category_label %}, categoria {{ meta.quality_life_category_label }}{% endif %}.</dd></div>{% endif %}
+          {% if page_article.fonti %}<div><dt>Fonti dell'analisi</dt><dd><ul class="reflist">{% for f in page_article.fonti %}{% set parts = f.testo.split(' «', 1) %}<li>{% if f.url %}<a href="{{ f.url }}">{{ parts[0] }}</a>{% else %}{{ parts[0] }}{% endif %}{% if parts | length > 1 %}<small>«{{ parts[1] | truncate(180, true, '') }}{{ '»' if parts[1] | length <= 180 else '' }}</small>{% endif %}</li>{% endfor %}</ul></dd></div>{% endif %}
+          <div><dt>Licenza</dt><dd><a href="{{ data_license_url }}">{{ data_license_label }}</a></dd></div>
+        </dl>
+        {% if meta.downloads and level.key == 'regione' %}
+        <div class="actions" id="{{ aid('download-dati') }}">
+          <a class="btn btn--primary" href="{{ href(meta.downloads.csv) }}">{{ ui.icon('download') }} Scarica i dati in CSV</a>
+          <a class="btn" href="{{ href(meta.downloads.json) }}">{{ ui.icon('download') }} JSON</a>
+        </div>
+        {% endif %}
+        {{ ui.cite(d.citation) }}
+      </section>
+    </div>
+  </div>
+</div>
+
+<section class="band" aria-labelledby="{{ aid('continua-da-qui') }}">
+  <div class="wrap">
+    <h2 class="h-section" id="{{ aid('continua-da-qui') }}">Continua da qui</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>Nello stesso tema</h3>
+        <ul>
+          {% for item in related[:3] %}
+          <li><a href="{{ href(item.path) }}" class="minicard">
+            <span class="minicard__title">{{ item.name }}</span>
+            <span class="minicard__meta">{% if item.latest is not none %}{{ d.fmt_unit(item.latest, item.unit) }}, {% endif %}dati {{ item.year_max }}</span>
+            <span class="minicard__spark">{{ item.spark | sparkline }}</span>
+          </a></li>
+          {% endfor %}
+          {% if siblings.prev %}<li><a href="{{ href(siblings.prev.path) }}">Precedente: {{ siblings.prev.name }}</a></li>{% endif %}
+          {% if siblings.next %}<li><a href="{{ href(siblings.next.path) }}">Successivo: {{ siblings.next.name }}</a></li>{% endif %}
+          <li><a href="{{ href(meta.theme_path) }}">Tutti gli indicatori del tema {{ meta.theme | lower }}</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Lo stesso dato, altre viste</h3>
+        <ul>
+          {% for item in dimension_siblings %}<li><a href="{{ href(item.path) }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>{% endfor %}
+          {% for other in levels if other.key != level.key %}<li><a href="{{ href(meta.canonical_path ~ '?livello=' ~ other.key) }}">Gli stessi dati per {{ other.label | lower }}</a></li>{% endfor %}
+          <li><a href="{{ href('/confronto') }}">Metti a confronto le {{ level.plural }}</a></li>
+          <li><a href="{{ href('/atlante') }}">Apri l'indicatore nell'atlante</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Da leggere</h3>
+        <ul>
+          {% for post in related_posts %}<li><a href="{{ href('/blog/' ~ post.slug) }}"><span class="minicard__title">{{ post.title }}</span><br><span class="minicard__meta">Storia, {{ d.date_it(post.date) }}</span></a></li>{% endfor %}
+          {% if level.profile_path and level.best %}<li><a href="{{ href(level.profile_path ~ level.best.key) }}">Il profilo di {{ level.best.name }}, in testa</a></li>{% endif %}
+          {% if level.profile_path and level.worst %}<li><a href="{{ href(level.profile_path ~ level.worst.key) }}">Il profilo di {{ level.worst.name }}, in coda</a></li>{% endif %}
+          <li><a href="{{ href('/divari-regionali') }}">I divari fra Nord, Centro e Mezzogiorno</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<script type="application/json" data-explore-data>{{ d.explore_js | tojson }}</script>
+{% endblock %}

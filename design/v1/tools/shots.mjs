@@ -144,6 +144,7 @@ async function capture(cdp, url, { viewport, theme, blocked, initScript }, outBa
   const loaded = cdp.waitFor("Page.loadEventFired", sessionId);
   await s("Page.navigate", { url });
   await loaded;
+  if (initScript) await evaluate(s, initScript);
   const info = await evaluate(s, SETTLE);
   const fold = await s("Page.captureScreenshot", { format: "webp", quality: 80 });
   writeFileSync(`${outBase}-fold.webp`, Buffer.from(fold.data, "base64"));
@@ -229,6 +230,7 @@ async function check() {
           const loaded = cdp.waitFor("Page.loadEventFired", sessionId);
           await s("Page.navigate", { url: pathToFileURL(file).href });
           await loaded;
+          await evaluate(s, "document.documentElement.dataset.shot='1'");
           await evaluate(s, "document.fonts.ready.then(() => 1)");
           const o = await evaluate(s, OVERFLOW);
           if (o.SW > o.W) { failures++; console.log(`SFORA ${name} ${width} ${tname}: ${o.SW} su ${o.W}`, o.bad); }
@@ -269,7 +271,9 @@ if (mode === "prima") {
   await shoot(join("prima", day), (_n, path) => PROD + path, { blocked: BLOCKED });
 } else if (mode === "dopo") {
   const dist = join(V1, "dist", "pagine");
+  const only = process.argv[3] ? process.argv[3].split(",") : null;
   await shoot("dopo", (name) => {
+    if (only && !only.includes(name)) return null;
     const f = join(dist, `${name}.html`);
     return existsSync(f) ? pathToFileURL(f).href : null;
   }, { initScript: "document.documentElement.dataset.shot='1'" });
