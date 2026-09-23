@@ -1,0 +1,124 @@
+/* Home 1.0: solo cio' che i componenti condivisi non hanno.
+   Legge solo token. I nomi hanno il prefisso home-: chi coordina decide se
+   qualcosa diventa un componente di components.css. */
+
+/* ---------- larghezze nominate ---------- */
+/* "largo" = colonne 1-10 della griglia a 12, "testo" per il titolo fino alla 9 */
+@media (min-width: 960px) {
+  .home-wide { max-width: calc((100% + var(--gutter-l)) * 10 / 12 - var(--gutter-l)); }
+  .home-head .h-display { max-width: calc((100% + var(--gutter-l)) * 9 / 12 - var(--gutter-l)); }
+  .home-head { padding-top: var(--space-12); }
+}
+
+/* ---------- apertura: trova il tuo territorio ---------- */
+.home-head .answer strong { font-weight: 700; }
+.home-find { display: grid; gap: var(--space-2); max-width: var(--measure); margin-top: var(--space-2); }
+.home-find__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-find__row { display: flex; gap: var(--space-2); }
+.home-find__row input {
+  flex: 1; min-width: 0; height: var(--space-12); padding: 0 var(--space-4);
+  font: inherit; font-size: var(--fs-ui); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--control-border); border-radius: var(--radius-control);
+}
+.home-find__row input::placeholder { color: var(--muted); }
+.home-find__row .btn { min-height: var(--space-12); flex: none; }
+.home-find__links { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.home-find__links a { color: var(--text-2); }
+.home-find__links a:hover { color: var(--accent-strong); }
+
+/* ---------- il dato in evidenza ---------- */
+.home-feature .module__head { max-width: var(--measure); }
+.home-pick .seg > a { white-space: normal; padding-block: var(--space-2); }
+@container (max-width: 599px) {
+  .home-pick { width: 100%; }
+  .home-pick .seg { display: grid; }
+  .home-pick .seg > a { border-left: 0; border-top: 1px solid var(--control-border); }
+  .home-pick .seg > a:first-child { border-top: 0; }
+}
+/* finche' mappa e classifica non stanno affiancate, la classifica viene prima */
+@container (max-width: 719px) { .home-feature .module__map { order: 2; } }
+.home-feature .chart-note { margin-top: 0; }
+.home-feature__foot { display: grid; gap: var(--space-2); }
+
+/* ---------- testate di sezione ---------- */
+.home-sectionlead { max-width: var(--measure); color: var(--text-2); margin: calc(-1 * var(--space-2)) 0 var(--space-6); }
+.home-more { margin-top: var(--space-6); }
+
+/* ---------- regioni per ripartizione ---------- */
+.home-regions { display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 960px) { .home-regions { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.home-regions__group.is-wide { grid-column: span 2; }
+.home-regions__group.is-wide ul { column-count: 2; column-gap: var(--gutter-l); }
+.home-colhead {
+  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted);
+  padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
+}
+.home-regions ul { list-style: none; }
+.home-regions li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
+.home-regions li a {
+  display: flex; align-items: center; min-height: var(--target);
+  color: var(--ink); text-decoration: none;
+}
+.home-regions li a:hover { color: var(--accent-strong); text-decoration: underline; }
+.home-links { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-8); margin-top: var(--space-6); }
+.home-links a { display: inline-flex; align-items: center; min-height: var(--target); }
+
+/* ---------- qualita' della vita: il doppio podio ---------- */
+.home-qol__head { display: grid; gap: var(--space-3); max-width: var(--measure); margin-bottom: var(--space-8); }
+.home-qol__head .lede { color: var(--ink); }
+.home-podiums { display: grid; gap: var(--space-12) var(--gutter-l); }
+@media (min-width: 960px) { .home-podiums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); } }
+.home-podium { display: grid; gap: var(--space-3); align-content: start; container-type: inline-size; }
+/* la barra del punteggio resta accanto al numero anche nella colonna stretta */
+.home-podium .barcell { display: table-cell; width: 34%; }
+@container (max-width: 359px) { .home-podium .barcell { display: none; } }
+.home-podium__gap td { color: var(--muted); font-size: var(--fs-small); padding-block: var(--space-2); }
+.home-qol__more { margin-top: var(--space-8); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* ---------- quiz in evidenza ---------- */
+.home-quiz .h-section { margin-bottom: var(--space-6); }
+.home-quiz__grid { display: grid; gap: var(--space-8) var(--gutter-l); align-items: start; }
+@media (min-width: 960px) {
+  .home-quiz__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .home-quiz__intro { grid-column: 1 / span 6; }
+  .home-try { grid-column: 8 / span 5; }
+}
+.home-quiz__intro .lede { color: var(--ink); }
+.home-quiz .actions { align-items: center; gap: var(--space-3) var(--space-6); }
+.home-try { margin: 0; padding: var(--space-3) 0 0; border: 0; border-top: 1px solid var(--rule); min-width: 0; }
+.home-try legend { padding: 0; }
+.home-try__kicker, .home-try__q { display: block; }
+.home-try__q { margin-top: var(--space-1); }
+.home-try__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-try__q { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; color: var(--ink); }
+.home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+.home-try__opt {
+  display: flex; align-items: center; gap: var(--space-2); min-height: var(--target);
+  padding: var(--space-2) var(--space-4); background: var(--bg); color: var(--ink); font-weight: 600;
+  border: 1px solid var(--control-border); border-radius: var(--radius-control); cursor: pointer;
+}
+.home-try__opt:hover { border-color: var(--ink); }
+.home-try__opt:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.home-try__opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.home-try__opt input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+/* la risposta si vede solo dopo la scelta, senza JavaScript: la dice la parola, non un colore */
+.home-try__out p { display: none; margin-top: var(--space-4); font-size: var(--fs-ui); color: var(--ink); }
+.home-try:has(input[data-right]:checked) .home-try__ok { display: block; }
+.home-try:has(input:not([data-right]):checked) .home-try__no { display: block; }
+.home-try .source { margin-top: var(--space-4); }
+.home-games { margin-top: var(--space-12); }
+
+/* ---------- temi: schede con piu' link, senza il link esteso a tutta la scheda ---------- */
+.home-theme { position: static; }
+.home-theme .card__title a::after { content: none; }
+.home-theme__list { list-style: none; margin-top: var(--space-1); }
+.home-theme__list li { border-top: 1px solid var(--rule); }
+.home-theme__list a { display: flex; align-items: center; min-height: var(--target); }
+.home-theme__ends { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.home-theme__ends div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
+.home-theme__ends dt { font-weight: 600; }
+.home-theme__ends dd { margin: 0; }
+.home-theme__ends a { color: var(--text-2); }
+
+/* ---------- fonti e citazione ---------- */
+.home-cite-lead { max-width: var(--measure); margin-top: var(--space-6); color: var(--text-2); }

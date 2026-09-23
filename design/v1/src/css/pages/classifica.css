@@ -1,0 +1,109 @@
+/* ==========================================================================
+   qdv: i pezzi condivisi dalle pagine della qualita' della vita (la classifica
+   e l'indice). Il blocco e' identico in classifica.css e in
+   qualita-della-vita.css: il CSS di pagina si carica solo sulla sua pagina, e
+   chi coordina lo portera' in components.css come componente del catalogo.
+   ========================================================================== */
+
+/* La classifica con la barra 0-100: una tabella vera sullo schermo largo,
+   righe in blocchi etichettati sotto i 720px del suo contenitore (sei colonne
+   non ci stanno), cosi' le 107 province si leggono sul telefono senza
+   scorrere di lato. Il podio ha quattro colonne e resta tabella fino a 420px:
+   si chiama qdv-rank-compact e ha la sua regola in fondo al blocco. */
+.qdv-rankbox, .qdv-catbox { container: qdv-rank / inline-size; }
+.qdv-rankbox--compact { container-name: qdv-rank-compact; }
+.qdv-rank .qdv-name a { color: var(--ink); }
+.qdv-where { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.qdv-where a { color: var(--text-2); }
+.qdv-rank .qdv-bar { width: 22%; min-width: 4rem; }
+.qdv-rank .score { min-width: 0; }
+.qdv-rank .qdv-note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.qdv-rank thead .qdv-note { color: var(--muted); }
+.qdv-rank .qdv-delta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink); }
+.qdv-rank .qdv-delta svg { vertical-align: -2px; }
+.table .qdv-caption { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); padding-bottom: var(--space-1); }
+.qdv-rank tr.qdv-gap > td { padding-block: var(--space-2); font-size: var(--fs-small); color: var(--muted); border-bottom-style: dashed; }
+.qdv-rank tbody tr.qdv-gap:hover > * { background: none; }
+
+@container qdv-rank (max-width: 719px) {
+  .qdv-rank thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .qdv-rank tbody tr {
+    display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto;
+    column-gap: var(--space-3); align-items: baseline;
+    padding-block: var(--space-3); border-bottom: 1px solid var(--rule);
+  }
+  .qdv-rank tbody th, .qdv-rank tbody td { display: block; padding: 0; border: 0; }
+  .qdv-rank .rank { grid-column: 1; grid-row: 1; width: auto; }
+  .qdv-rank .qdv-name { grid-column: 2; grid-row: 1; }
+  .qdv-rank .val { grid-column: 3; grid-row: 1; }
+  .qdv-rank .qdv-bar { grid-column: 2 / 4; grid-row: 2; width: auto; min-width: 0; margin-top: var(--space-2); }
+  .qdv-rank .qdv-note, .qdv-rank .qdv-delta { grid-column: 2 / 4; margin-top: var(--space-1); white-space: normal; }
+  .qdv-rank .qdv-note::before, .qdv-rank .qdv-delta::before { content: attr(data-label) ": "; color: var(--muted); }
+  .qdv-rank tr.qdv-gap { display: block; }
+  .qdv-rank tr.qdv-gap > td { padding-block: var(--space-2); border: 0; }
+}
+
+@container qdv-rank-compact (max-width: 419px) {
+  .qdv-rank thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .qdv-rank tbody tr {
+    display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto;
+    column-gap: var(--space-3); align-items: baseline;
+    padding-block: var(--space-3); border-bottom: 1px solid var(--rule);
+  }
+  .qdv-rank tbody th, .qdv-rank tbody td { display: block; padding: 0; border: 0; }
+  .qdv-rank .rank { grid-column: 1; grid-row: 1; width: auto; }
+  .qdv-rank .qdv-name { grid-column: 2; grid-row: 1; }
+  .qdv-rank .val { grid-column: 3; grid-row: 1; }
+  .qdv-rank .qdv-bar { grid-column: 2 / 4; grid-row: 2; width: auto; min-width: 0; margin-top: var(--space-2); }
+  .qdv-rank tr.qdv-gap { display: block; }
+  .qdv-rank tr.qdv-gap > td { padding-block: var(--space-2); border: 0; }
+}
+
+/* Dove eccelle: nome e punteggio nella stessa cella, il punteggio in colonna. */
+.qdv-pair { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.qdv-pts { flex: none; color: var(--text-2); font-variant-numeric: tabular-nums lining-nums; }
+.qdv-cats tbody th { font-weight: 600; }
+.qdv-cats tbody th a { color: var(--ink); }
+@container qdv-rank (max-width: 719px) {
+  .qdv-cats thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .qdv-cats tbody tr { display: block; padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .qdv-cats tbody th, .qdv-cats tbody td { display: flex; gap: var(--space-3); padding: 2px 0; border: 0; }
+  .qdv-cats tbody th { margin-bottom: var(--space-1); }
+  .qdv-cats tbody td::before { content: attr(data-label); flex: none; width: 4.5rem; color: var(--muted); }
+  .qdv-cats .qdv-pair { flex: 1; min-width: 0; }
+}
+
+/* I profili: link reali come il controllo segmentato, a griglia quando non
+   stanno su una riga, con bersagli da 44px. */
+.qdv-toolbar .qdv-field { flex: 1 1 100%; }
+.seg.qdv-profiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--control-border); }
+.seg.qdv-profiles > a { border-left: 0; min-height: var(--target, 44px); padding-block: var(--space-2); line-height: 1.25; }
+@container (min-width: 560px) { .seg.qdv-profiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@container (min-width: 1040px) {
+  .qdv-toolbar .qdv-field { flex: 0 1 auto; }
+  .seg.qdv-profiles { display: inline-flex; gap: 0; background: var(--bg); }
+  .seg.qdv-profiles > a { border-left: 1px solid var(--control-border); }
+  .seg.qdv-profiles > :first-child { border-left: 0; }
+}
+.qdv-profile-note { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.qdv-profile-note b { color: var(--ink); font-weight: 600; }
+
+/* ==========================================================================
+   cl: solo la classifica
+   ========================================================================== */
+
+/* Tabella e mappa affiancate, la mappa ferma: la tabella e' lunga e la mappa
+   la accompagna solo in apertura. Si affiancano solo quando alla tabella
+   restano i 720px che le servono per restare tabella, altrimenti la mappa
+   segue la tabella. */
+.cl-body { display: grid; gap: var(--space-8); align-items: start; }
+@container (min-width: 1120px) { .cl-body { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+.cl-tables { display: grid; gap: var(--space-6); min-width: 0; }
+.cl-side .map { max-width: 22rem; }
+@container (min-width: 1120px) { .cl-side .map { max-width: none; } }
+.cl-side .legend { max-width: 22rem; }
+.qdv-more { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.qdv-more[open] > summary { color: var(--ink); }
+.qdv-more > .tablewrap { padding-bottom: var(--space-4); }
+.cl-find { display: grid; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.cl-find__title { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); }

@@ -44,7 +44,9 @@ def check(path: Path) -> list[str]:
     problems = []
     text = visible_text(body) + " " + spoken_attributes(body)
     # Le versioni non sono cifre: "Creative Commons BY 4.0", "Divario Italia 1.0".
-    text_numbers = re.sub(r"\b(BY|Italia) \d+\.\d+\b", " ", text)
+    text_numbers = re.sub(r"\b(BY(?:-[A-Z]{2})*|Italia) \d+\.\d+\b", " ", text)
+    # I nomi delle grandezze non sono cifre: "PM2.5" e' il nome del particolato.
+    text_numbers = re.sub(r"\bPM\d+(?:\.\d+)?\b", " ", text_numbers)
     for ch in FORBIDDEN_CHARS:
         for m in re.finditer(re.escape(ch), text):
             problems.append(f"carattere vietato {ch!r}: ...{text[max(0, m.start() - 50):m.start() + 20].strip()}...")

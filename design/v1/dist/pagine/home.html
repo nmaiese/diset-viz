@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PIL pro capite per regione, da 54.637 a 21.702 euro</title>
+<title>Divario Italia: 594 indicatori territoriali per regione</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -794,11 +794,135 @@ body.has-proto { padding-bottom: 96px; }
 [data-shot] .proto-bar { display: none; }
 [data-shot] body.has-proto { padding-bottom: 0; }
 
+/* Home 1.0: solo cio' che i componenti condivisi non hanno.
+   Legge solo token. I nomi hanno il prefisso home-: chi coordina decide se
+   qualcosa diventa un componente di components.css. */
+
+/* ---------- larghezze nominate ---------- */
+/* "largo" = colonne 1-10 della griglia a 12, "testo" per il titolo fino alla 9 */
+@media (min-width: 960px) {
+  .home-wide { max-width: calc((100% + var(--gutter-l)) * 10 / 12 - var(--gutter-l)); }
+  .home-head .h-display { max-width: calc((100% + var(--gutter-l)) * 9 / 12 - var(--gutter-l)); }
+  .home-head { padding-top: var(--space-12); }
+}
+
+/* ---------- apertura: trova il tuo territorio ---------- */
+.home-head .answer strong { font-weight: 700; }
+.home-find { display: grid; gap: var(--space-2); max-width: var(--measure); margin-top: var(--space-2); }
+.home-find__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-find__row { display: flex; gap: var(--space-2); }
+.home-find__row input {
+  flex: 1; min-width: 0; height: var(--space-12); padding: 0 var(--space-4);
+  font: inherit; font-size: var(--fs-ui); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--control-border); border-radius: var(--radius-control);
+}
+.home-find__row input::placeholder { color: var(--muted); }
+.home-find__row .btn { min-height: var(--space-12); flex: none; }
+.home-find__links { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.home-find__links a { color: var(--text-2); }
+.home-find__links a:hover { color: var(--accent-strong); }
+
+/* ---------- il dato in evidenza ---------- */
+.home-feature .module__head { max-width: var(--measure); }
+.home-pick .seg > a { white-space: normal; padding-block: var(--space-2); }
+@container (max-width: 599px) {
+  .home-pick { width: 100%; }
+  .home-pick .seg { display: grid; }
+  .home-pick .seg > a { border-left: 0; border-top: 1px solid var(--control-border); }
+  .home-pick .seg > a:first-child { border-top: 0; }
+}
+/* finche' mappa e classifica non stanno affiancate, la classifica viene prima */
+@container (max-width: 719px) { .home-feature .module__map { order: 2; } }
+.home-feature .chart-note { margin-top: 0; }
+.home-feature__foot { display: grid; gap: var(--space-2); }
+
+/* ---------- testate di sezione ---------- */
+.home-sectionlead { max-width: var(--measure); color: var(--text-2); margin: calc(-1 * var(--space-2)) 0 var(--space-6); }
+.home-more { margin-top: var(--space-6); }
+
+/* ---------- regioni per ripartizione ---------- */
+.home-regions { display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 960px) { .home-regions { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.home-regions__group.is-wide { grid-column: span 2; }
+.home-regions__group.is-wide ul { column-count: 2; column-gap: var(--gutter-l); }
+.home-colhead {
+  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted);
+  padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
+}
+.home-regions ul { list-style: none; }
+.home-regions li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
+.home-regions li a {
+  display: flex; align-items: center; min-height: var(--target);
+  color: var(--ink); text-decoration: none;
+}
+.home-regions li a:hover { color: var(--accent-strong); text-decoration: underline; }
+.home-links { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-8); margin-top: var(--space-6); }
+.home-links a { display: inline-flex; align-items: center; min-height: var(--target); }
+
+/* ---------- qualita' della vita: il doppio podio ---------- */
+.home-qol__head { display: grid; gap: var(--space-3); max-width: var(--measure); margin-bottom: var(--space-8); }
+.home-qol__head .lede { color: var(--ink); }
+.home-podiums { display: grid; gap: var(--space-12) var(--gutter-l); }
+@media (min-width: 960px) { .home-podiums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); } }
+.home-podium { display: grid; gap: var(--space-3); align-content: start; container-type: inline-size; }
+/* la barra del punteggio resta accanto al numero anche nella colonna stretta */
+.home-podium .barcell { display: table-cell; width: 34%; }
+@container (max-width: 359px) { .home-podium .barcell { display: none; } }
+.home-podium__gap td { color: var(--muted); font-size: var(--fs-small); padding-block: var(--space-2); }
+.home-qol__more { margin-top: var(--space-8); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* ---------- quiz in evidenza ---------- */
+.home-quiz .h-section { margin-bottom: var(--space-6); }
+.home-quiz__grid { display: grid; gap: var(--space-8) var(--gutter-l); align-items: start; }
+@media (min-width: 960px) {
+  .home-quiz__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .home-quiz__intro { grid-column: 1 / span 6; }
+  .home-try { grid-column: 8 / span 5; }
+}
+.home-quiz__intro .lede { color: var(--ink); }
+.home-quiz .actions { align-items: center; gap: var(--space-3) var(--space-6); }
+.home-try { margin: 0; padding: var(--space-3) 0 0; border: 0; border-top: 1px solid var(--rule); min-width: 0; }
+.home-try legend { padding: 0; }
+.home-try__kicker, .home-try__q { display: block; }
+.home-try__q { margin-top: var(--space-1); }
+.home-try__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-try__q { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; color: var(--ink); }
+.home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+.home-try__opt {
+  display: flex; align-items: center; gap: var(--space-2); min-height: var(--target);
+  padding: var(--space-2) var(--space-4); background: var(--bg); color: var(--ink); font-weight: 600;
+  border: 1px solid var(--control-border); border-radius: var(--radius-control); cursor: pointer;
+}
+.home-try__opt:hover { border-color: var(--ink); }
+.home-try__opt:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.home-try__opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.home-try__opt input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+/* la risposta si vede solo dopo la scelta, senza JavaScript: la dice la parola, non un colore */
+.home-try__out p { display: none; margin-top: var(--space-4); font-size: var(--fs-ui); color: var(--ink); }
+.home-try:has(input[data-right]:checked) .home-try__ok { display: block; }
+.home-try:has(input:not([data-right]):checked) .home-try__no { display: block; }
+.home-try .source { margin-top: var(--space-4); }
+.home-games { margin-top: var(--space-12); }
+
+/* ---------- temi: schede con piu' link, senza il link esteso a tutta la scheda ---------- */
+.home-theme { position: static; }
+.home-theme .card__title a::after { content: none; }
+.home-theme__list { list-style: none; margin-top: var(--space-1); }
+.home-theme__list li { border-top: 1px solid var(--rule); }
+.home-theme__list a { display: flex; align-items: center; min-height: var(--target); }
+.home-theme__ends { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.home-theme__ends div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
+.home-theme__ends dt { font-weight: 600; }
+.home-theme__ends dd { margin: 0; }
+.home-theme__ends a { color: var(--text-2); }
+
+/* ---------- fonti e citazione ---------- */
+.home-cite-lead { max-width: var(--measure); margin-top: var(--space-6); color: var(--text-2); }
 
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "PIL pro capite", "description": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane. Chi cerca questa cifra di solito vuole sapere anche la seconda cosa, cioè perché sia così lontana dalle altre. La risposta sta dentro una divisione, e i pezzi sono due: quanta parte degli abitanti lavora, e quanto vale quello che produce chi lavora.", "url": "https://divarioitalia.it/indicatore/pil-pro-capite/ter-901", "temporalCoverage": "1995/2024", "spatialCoverage": {"@type": "Place", "name": "Italia"}, "creator": {"@type": "Organization", "name": "Istat, Conti economici territoriali", "url": "https://www.istat.it/it/archivio/conti+territoriali"}, "publisher": {"@type": "Organization", "@id": "https://divarioitalia.it/chi-siamo#organizzazione", "name": "Divario Italia", "url": "https://divarioitalia.it/chi-siamo", "logo": {"@type": "ImageObject", "url": "https://divarioitalia.it/static/img/logo-mark.png"}, "contactPoint": {"@type": "ContactPoint", "contactType": "editorial", "email": "divarioitalia@protonmail.com", "url": "https://divarioitalia.it/contatti", "availableLanguage": "it"}}, "dateModified": "2026-07-17", "isBasedOn": "https://www.istat.it/it/archivio/conti+territoriali", "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni", "variableMeasured": {"@type": "PropertyValue", "name": "PIL pro capite", "unitText": "euro", "minValue": 21702.2, "maxValue": 54636.7, "measurementTechnique": "Istat, Conti economici territoriali", "description": "Prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025"}, "isAccessibleForFree": true, "license": "https://creativecommons.org/licenses/by/4.0/", "keywords": ["Reddito, inclusione e accessibilità", "regioni italiane", "Istat"], "distribution": [{"@type": "DataDownload", "name": "Download CSV", "description": "Serie dell'indicatore in formato CSV", "encodingFormat": "text/csv", "contentUrl": "https://divarioitalia.it/download/indicator/901.csv"}, {"@type": "DataDownload", "name": "Download JSON", "description": "Serie dell'indicatore in formato JSON", "encodingFormat": "application/json", "contentUrl": "https://divarioitalia.it/download/indicator/901.json"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://divarioitalia.it/"}, {"@type": "ListItem", "position": 2, "name": "Temi", "item": "https://divarioitalia.it/temi"}, {"@type": "ListItem", "position": 3, "name": "Reddito, inclusione e accessibilità", "item": "https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita"}, {"@type": "ListItem", "position": 4, "name": "PIL pro capite", "item": "https://divarioitalia.it/indicatore/pil-pro-capite/ter-901"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://divarioitalia.it/#site", "name": "Divario Italia", "url": "https://divarioitalia.it/", "inLanguage": "it-IT", "description": "Atlante interattivo degli indicatori territoriali Istat ed Eurostat: 594 indicatori, 20 regioni e 107 province, dal 1981 al 2026.", "publisher": {"@id": "https://divarioitalia.it/chi-siamo#organizzazione"}, "potentialAction": {"@type": "SearchAction", "target": "https://divarioitalia.it/ricerca?q={search_term_string}", "query-input": "required name=search_term_string"}}, {"@type": "Organization", "@id": "https://divarioitalia.it/chi-siamo#organizzazione", "name": "Divario Italia", "url": "https://divarioitalia.it/chi-siamo", "logo": {"@type": "ImageObject", "url": "https://divarioitalia.it/static/img/logo-mark.png"}, "contactPoint": {"@type": "ContactPoint", "contactType": "editorial", "email": "divarioitalia@protonmail.com", "url": "https://divarioitalia.it/contatti", "availableLanguage": "it"}}]}</script>
 </head>
-<body class="has-proto" data-page="indicatore">
+<body class="has-proto" data-page="home">
 <a class="skip" href="#contenuto">Vai al contenuto</a>
 <header class="mast">
   <div class="wrap mast__bar">
@@ -812,7 +936,7 @@ body.has-proto { padding-bottom: 96px; }
         <div class="nav__menu"><a href="https://divarioitalia.it/regioni">Le 20 regioni</a><a href="https://divarioitalia.it/province">Le 107 province</a><a href="https://divarioitalia.it/confronto">Confronta i territori</a>
         </div>
       </details>
-      <a href="https://divarioitalia.it/temi" aria-current="page">Temi</a>
+      <a href="https://divarioitalia.it/temi">Temi</a>
       <details>
         <summary>Qualità della vita <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
         <div class="nav__menu"><a href="qualita-della-vita.html">Dove si vive meglio</a><a href="classifica.html">Classifica delle regioni</a><a href="https://divarioitalia.it/qualita-della-vita/classifica/province">Classifica delle province</a>
@@ -871,98 +995,46 @@ body.has-proto { padding-bottom: 96px; }
 <main id="contenuto" tabindex="-1">
 
 <div class="wrap">
-  <nav class="crumbs" aria-label="Percorso">
-  <ol>
-    <li><a href="home.html">Home</a></li>
-    <li><a href="https://divarioitalia.it/temi">Temi</a></li>
-    <li><a href="https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita">Reddito, inclusione e accessibilità</a></li>
-    <li><span aria-current="page">PIL pro capite</span></li>
-  </ol>
-</nav>
-
-  <header class="pagehead">
-    <p class="eyebrow"><a href="https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita">Reddito, inclusione e accessibilità</a><span class="sep" aria-hidden="true">·</span>Istat, Conti economici territoriali<span class="sep" aria-hidden="true">·</span>20 regioni<span class="sep" aria-hidden="true">·</span>dati 2024</p>
-    <h1 class="h-title">PIL pro capite per regione: di che cosa è fatta la distanza fra Trentino e Calabria</h1>
-    <p class="answer">Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane. Chi cerca questa cifra di solito vuole sapere anche la seconda cosa, cioè perché sia così lontana dalle altre. La risposta sta dentro una divisione, e i pezzi sono due: quanta parte degli abitanti lavora, e quanto vale quello che produce chi lavora.</p>
-    <p class="meta">
-      <span class="direction">Meglio se alto</span>
-      <span>Aggiornato il <time datetime="2026-07-17">17 luglio 2026</time></span>
-      <a href="https://github.com/nmaiese/diset-viz/issues/new">Segnala un errore</a>
-      <button class="star" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8L3.5 9.7l5.9-.9z"/></svg> Salva</button>
-    </p>
+  <header class="pagehead home-head">
+    <p class="eyebrow">L'Italia, regione per regione.</p>
+    <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
+    <p class="answer">Divario Italia pubblica <strong>594</strong> indicatori di Istat ed Eurostat per le <strong>20</strong> regioni e le <strong>107</strong> province italiane, con serie dal 1981 al 2026. Ogni cifra porta la sua fonte e il suo anno.</p>
+    <form class="home-find" role="search" action="https://divarioitalia.it/ricerca" method="get" aria-labelledby="l-trova">
+      <label class="home-find__label" id="l-trova" for="trova">Trova il tuo territorio</label>
+      <div class="home-find__row">
+        <input id="trova" name="q" type="search" placeholder="Una regione, una provincia o un indicatore" autocomplete="off">
+        <button class="btn btn--primary" type="submit"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg> Cerca</button>
+      </div>
+      <p class="home-find__links">Oppure sfoglia <a href="https://divarioitalia.it/regioni">tutte le regioni</a> e <a href="https://divarioitalia.it/province">tutte le province</a>.</p>
+    </form>
   </header>
 
-  <dl class="tiles" style="--tiles: 4">
-  <div class="tile">
-    <dt>In testa nel 2024</dt>
-    <dd><span class="figure-num">54.637<span class="u">euro</span></span><span class="sub"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></span></dd>
-  </div>
-  <div class="tile">
-    <dt>Media semplice delle 20 regioni</dt>
-    <dd><span class="figure-num">35.710<span class="u">euro</span></span><span class="sub">non pesata per popolazione</span></dd>
-  </div>
-  <div class="tile">
-    <dt>Fra prima e ultima</dt>
-    <dd><span class="figure-num">2,5<span class="u">volte</span></span><span class="sub">una distanza di 32.934 euro</span></dd>
-  </div>
-  <div class="tile">
-    <dt>Dal 2023 al 2024</dt>
-    <dd><span class="figure-num">+865<span class="u">euro</span></span><span class="sub">di media semplice, in aumento in 20 regioni su 20</span></dd>
-  </div>
-</dl>
-
-  <div class="layout">
-    <aside class="layout__aside">
-      <nav class="toc" aria-label="In questa pagina">
-        <p>In questa pagina</p>
-        <ol>
-          <li><a href="#esplora" data-query-intent="classifica">Chi è in testa</a></li>
-          <li><a href="#serie-storica" data-query-intent="andamento">Com'è cambiato</a></li>
-          <li><a href="#analisi">L'analisi</a></li>
-          <li><a href="#come-leggere" data-query-intent="definizione">Che cosa misura</a></li>
-          <li><a href="#fonti-verifica" data-query-intent="metodologia">Fonti e citazione</a></li>
-          <li><a href="#download-dati" data-query-intent="download">Scarica i dati</a></li>
-        </ol>
-      </nav>
-      <div class="aside-block">
-        <p>Fonte: <a href="https://www.istat.it/it/archivio/conti+territoriali">Istat, Conti economici territoriali</a>. Elaborazione Divario Italia.</p>
-        <p><a class="linkarrow" href="#fonti-verifica">Cita questa scheda</a></p>
+  
+  <section class="section home-feature" id="dato" aria-labelledby="h-dato">
+    <h2 id="h-dato">Il dato in evidenza</h2>
+    <figure class="module home-wide" data-explore>
+      <figcaption class="module__head">
+        <h3 class="h-sub">Nel 2024 si va da 21.702 euro in Calabria a 54.637 euro in Trentino Alto Adige, 2,5 volte tanto</h3>
+        <p class="subline">PIL pro capite, in euro, 2024. Le 20 regioni dal valore più alto al più basso. <span class="direction">Meglio se alto</span>.</p>
+      </figcaption>
+      <div class="toolbar">
+        <div class="field home-pick"><span id="l-dato">Colora la mappa per</span>
+          <div class="seg" role="group" aria-labelledby="l-dato"><a href="home.html" aria-current="page">PIL pro capite</a><a href="https://divarioitalia.it/?indicator=104">Livello di istruzione della popolazione adulta</a><a href="https://divarioitalia.it/?indicator=105">Tasso di turisticità</a><a href="https://divarioitalia.it/?indicator=910">Speranza di vita alla nascita</a></div>
+        </div>
+        <label class="field" for="territorio">Trova la tua regione
+          <select id="territorio" data-territory>
+            <option value="">Nessuna in evidenza</option>
+            <option value="abruzzo">Abruzzo</option><option value="basilicata">Basilicata</option><option value="calabria">Calabria</option><option value="campania">Campania</option><option value="emilia-romagna">Emilia-Romagna</option><option value="friuli-venezia-giulia">Friuli-Venezia Giulia</option><option value="lazio">Lazio</option><option value="liguria">Liguria</option><option value="lombardia">Lombardia</option><option value="marche">Marche</option><option value="molise">Molise</option><option value="piemonte">Piemonte</option><option value="puglia">Puglia</option><option value="sardegna">Sardegna</option><option value="sicilia">Sicilia</option><option value="toscana">Toscana</option><option value="trentino-alto-adige">Trentino Alto Adige</option><option value="umbria">Umbria</option><option value="valle-d-aosta">Valle d'Aosta</option><option value="veneto">Veneto</option>
+          </select>
+        </label>
       </div>
-      <div class="aside-block"><aside class="ad ad--side" aria-label="Pubblicità"><span>Spazio pubblicitario riservato</span></aside></div>
-    </aside>
 
-    <div class="layout__main">
-      <section class="section" id="esplora" aria-labelledby="h-esplora">
-        <h2 id="h-esplora">Chi è in testa</h2>
-        <figure class="module" data-explore>
-          <figcaption class="module__head">
-            <h3 class="h-sub" data-claim>Nel 2024 tutte le otto regioni del Mezzogiorno stanno sotto la media semplice</h3>
-            <p class="subline">PIL pro capite, in euro, <span data-year-label>2024</span>. Le 20 regioni dal valore più alto al più basso.</p>
-          </figcaption>
-          <div class="toolbar">
-            
-            
-            <label class="field field--year" for="anno">Anno <output data-year-out>2024</output>
-              <span class="year"><span>1995</span>
-                <input id="anno" type="range" min="0" max="29" step="1" value="29" aria-valuetext="2024" data-year>
-              <span>2024</span></span>
-            </label>
-            
-            <label class="field" for="territorio">Trova la tua regione
-              <select id="territorio" data-territory>
-                <option value="">Nessuna in evidenza</option>
-                <option value="abruzzo">Abruzzo</option><option value="basilicata">Basilicata</option><option value="calabria">Calabria</option><option value="campania">Campania</option><option value="emilia-romagna">Emilia-Romagna</option><option value="friuli-venezia-giulia">Friuli-Venezia Giulia</option><option value="lazio">Lazio</option><option value="liguria">Liguria</option><option value="lombardia">Lombardia</option><option value="marche">Marche</option><option value="molise">Molise</option><option value="piemonte">Piemonte</option><option value="puglia">Puglia</option><option value="sardegna">Sardegna</option><option value="sicilia">Sicilia</option><option value="toscana">Toscana</option><option value="trentino-alto-adige">Trentino Alto Adige</option><option value="umbria">Umbria</option><option value="valle-d-aosta">Valle d'Aosta</option><option value="veneto">Veneto</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="module__body">
-            
-            <div class="module__map">
-              <div class="map" data-map>
+      <div class="module__body">
+        <div class="module__map">
+          <div class="map" data-map>
   <svg viewBox="0 0 560 660" aria-hidden="true" focusable="false">
     <defs>
-      <pattern id="nd-esplora" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <pattern id="nd-dato" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="4" height="4" style="fill: var(--data-null)"/><line x1="0" y1="0" x2="0" y2="4" style="stroke: var(--data-null-stripe); stroke-width: 1"/>
       </pattern>
     </defs>
@@ -989,283 +1061,288 @@ body.has-proto { padding-bottom: 96px; }
   </svg>
   <div class="map__tip" data-map-tip hidden></div>
 </div>
-              <div class="legend" aria-hidden="true">
+          <div class="legend" aria-hidden="true">
   <div class="legend__ramp"><i class="q1" style="background: var(--seq-1)"></i><i class="q2" style="background: var(--seq-2)"></i><i class="q3" style="background: var(--seq-3)"></i><i class="q4" style="background: var(--seq-4)"></i><i class="q5" style="background: var(--seq-5)"></i><i class="q6" style="background: var(--seq-6)"></i></div>
   <div class="legend__scale"><span data-legend="min">21.702</span><span data-legend="mid">38.169</span><span data-legend="max">54.637</span></div>
   <span class="legend__caption">Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.</span>
   <span class="legend__nd"><i></i> n.d., dato non disponibile</span>
 </div>
-            </div>
-            
-            <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle regioni">
-              <table class="table">
-                <caption class="sr-only">PIL pro capite per regione nel <span data-year-label>2024</span>, in euro</caption>
-                <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">Euro</th></tr></thead>
-                <tbody data-rank-body>
-                  
-                  
-                  <tr data-key="trentino-alto-adige"><td class="rank">1</td><th scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val">54.637</td></tr>
-                  
-                  
-                  
-                  <tr data-key="lombardia"><td class="rank">2</td><th scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 92.2%"></i></span></td><td class="val">50.399</td></tr>
-                  
-                  
-                  
-                  <tr data-key="valle-d-aosta"><td class="rank">3</td><th scope="row"><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 87.4%"></i></span></td><td class="val">47.743</td></tr>
-                  
-                  
-                  
-                  <tr data-key="emilia-romagna"><td class="rank">4</td><th scope="row"><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 81.6%"></i></span></td><td class="val">44.557</td></tr>
-                  
-                  
-                  
-                  <tr data-key="lazio"><td class="rank">5</td><th scope="row"><a href="https://divarioitalia.it/regione/lazio">Lazio</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 79.0%"></i></span></td><td class="val">43.167</td></tr>
-                  
-                  
-                  
-                  <tr data-key="veneto"><td class="rank">6</td><th scope="row"><a href="https://divarioitalia.it/regione/veneto">Veneto</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.9%"></i></span></td><td class="val">41.496</td></tr>
-                  
-                  
-                  
-                  <tr data-key="toscana"><td class="rank">7</td><th scope="row"><a href="https://divarioitalia.it/regione/toscana">Toscana</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.9%"></i></span></td><td class="val">39.262</td></tr>
-                  
-                  
-                  
-                  <tr data-key="friuli-venezia-giulia"><td class="rank">8</td><th scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.4%"></i></span></td><td class="val">39.005</td></tr>
-                  
-                  
-                  
-                  <tr data-key="liguria"><td class="rank">9</td><th scope="row"><a href="https://divarioitalia.it/regione/liguria">Liguria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.1%"></i></span></td><td class="val">38.842</td></tr>
-                  
-                  
-                  
-                  <tr data-key="piemonte"><td class="rank">10</td><th scope="row"><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 70.7%"></i></span></td><td class="val">38.626</td></tr>
-                  
-                  
-                  
-                  <tr class="ref"><td></td><th scope="row">Media semplice delle 20 regioni</th><td class="barcell" aria-hidden="true"></td><td class="val">35.710</td></tr>
-                  
-                  
-                  
-                  <tr data-key="marche"><td class="rank">11</td><th scope="row"><a href="https://divarioitalia.it/regione/marche">Marche</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 62.5%"></i></span></td><td class="val">34.149</td></tr>
-                  
-                  
-                  
-                  <tr data-key="umbria"><td class="rank">12</td><th scope="row"><a href="https://divarioitalia.it/regione/umbria">Umbria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 59.4%"></i></span></td><td class="val">32.467</td></tr>
-                  
-                  
-                  
-                  <tr data-key="abruzzo"><td class="rank">13</td><th scope="row"><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 58.8%"></i></span></td><td class="val">32.109</td></tr>
-                  
-                  
-                  
-                  <tr data-key="basilicata"><td class="rank">14</td><th scope="row"><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 52.0%"></i></span></td><td class="val">28.416</td></tr>
-                  
-                  
-                  
-                  <tr data-key="sardegna"><td class="rank">15</td><th scope="row"><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.8%"></i></span></td><td class="val">27.731</td></tr>
-                  
-                  
-                  
-                  <tr data-key="molise"><td class="rank">16</td><th scope="row"><a href="https://divarioitalia.it/regione/molise">Molise</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.7%"></i></span></td><td class="val">27.698</td></tr>
-                  
-                  
-                  
-                  <tr data-key="campania"><td class="rank">17</td><th scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 45.0%"></i></span></td><td class="val">24.564</td></tr>
-                  
-                  
-                  
-                  <tr data-key="puglia"><td class="rank">18</td><th scope="row"><a href="regione.html">Puglia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 44.5%"></i></span></td><td class="val">24.328</td></tr>
-                  
-                  
-                  
-                  <tr data-key="sicilia"><td class="rank">19</td><th scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 42.7%"></i></span></td><td class="val">23.309</td></tr>
-                  
-                  
-                  
-                  <tr data-key="calabria"><td class="rank">20</td><th scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 39.7%"></i></span></td><td class="val">21.702</td></tr>
-                  
-                  
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <p class="source">Fonte: <a href="https://www.istat.it/it/archivio/conti+territoriali">Istat, Conti economici territoriali</a> (2024). Elaborazione Divario Italia. <a href="https://divarioitalia.it/download/indicator/901.csv">Dati in CSV</a></p>
-          <p class="sr-only" role="status" aria-live="polite" data-live></p>
-        </figure>
-      </section>
+        </div>
+        <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle regioni per PIL pro capite">
+          <table class="table table--compact">
+            <caption class="sr-only">PIL pro capite per regione nel 2024, in euro</caption>
+            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">Euro</th></tr></thead>
+            <tbody data-rank-body>
+              <tr data-key="trentino-alto-adige"><td class="rank">1</td><th scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val">54.637</td></tr>
+              <tr data-key="lombardia"><td class="rank">2</td><th scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 92.2%"></i></span></td><td class="val">50.399</td></tr>
+              <tr data-key="valle-d-aosta"><td class="rank">3</td><th scope="row"><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 87.4%"></i></span></td><td class="val">47.743</td></tr>
+              <tr data-key="emilia-romagna"><td class="rank">4</td><th scope="row"><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 81.6%"></i></span></td><td class="val">44.557</td></tr>
+              <tr data-key="lazio"><td class="rank">5</td><th scope="row"><a href="https://divarioitalia.it/regione/lazio">Lazio</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 79.0%"></i></span></td><td class="val">43.167</td></tr>
+              <tr data-key="veneto"><td class="rank">6</td><th scope="row"><a href="https://divarioitalia.it/regione/veneto">Veneto</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 75.9%"></i></span></td><td class="val">41.496</td></tr>
+              <tr data-key="toscana"><td class="rank">7</td><th scope="row"><a href="https://divarioitalia.it/regione/toscana">Toscana</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.9%"></i></span></td><td class="val">39.262</td></tr>
+              <tr data-key="friuli-venezia-giulia"><td class="rank">8</td><th scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.4%"></i></span></td><td class="val">39.005</td></tr>
+              <tr data-key="liguria"><td class="rank">9</td><th scope="row"><a href="https://divarioitalia.it/regione/liguria">Liguria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 71.1%"></i></span></td><td class="val">38.842</td></tr>
+              <tr data-key="piemonte"><td class="rank">10</td><th scope="row"><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 70.7%"></i></span></td><td class="val">38.626</td></tr>
+              <tr class="ref"><td></td><th scope="row">Media semplice delle 20 regioni</th><td class="barcell" aria-hidden="true"></td><td class="val">35.710</td></tr>
+              <tr data-key="marche"><td class="rank">11</td><th scope="row"><a href="https://divarioitalia.it/regione/marche">Marche</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 62.5%"></i></span></td><td class="val">34.149</td></tr>
+              <tr data-key="umbria"><td class="rank">12</td><th scope="row"><a href="https://divarioitalia.it/regione/umbria">Umbria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 59.4%"></i></span></td><td class="val">32.467</td></tr>
+              <tr data-key="abruzzo"><td class="rank">13</td><th scope="row"><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 58.8%"></i></span></td><td class="val">32.109</td></tr>
+              <tr data-key="basilicata"><td class="rank">14</td><th scope="row"><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 52.0%"></i></span></td><td class="val">28.416</td></tr>
+              <tr data-key="sardegna"><td class="rank">15</td><th scope="row"><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.8%"></i></span></td><td class="val">27.731</td></tr>
+              <tr data-key="molise"><td class="rank">16</td><th scope="row"><a href="https://divarioitalia.it/regione/molise">Molise</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 50.7%"></i></span></td><td class="val">27.698</td></tr>
+              <tr data-key="campania"><td class="rank">17</td><th scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 45.0%"></i></span></td><td class="val">24.564</td></tr>
+              <tr data-key="puglia"><td class="rank">18</td><th scope="row"><a href="regione.html">Puglia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 44.5%"></i></span></td><td class="val">24.328</td></tr>
+              <tr data-key="sicilia"><td class="rank">19</td><th scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 42.7%"></i></span></td><td class="val">23.309</td></tr>
+              <tr data-key="calabria"><td class="rank">20</td><th scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 39.7%"></i></span></td><td class="val">21.702</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="chart-note">Tutte le otto regioni del Mezzogiorno stanno sotto la media semplice delle 20 regioni.</p>
+      <div class="home-feature__foot">
+        <p class="source">Fonte: Istat, indicatori territoriali (2024). Elaborazione Divario Italia. Le barre partono da zero.</p>
+        <p><a class="linkarrow" href="indicatore.html">PIL pro capite, la scheda completa</a></p>
+      </div>
+      <p class="sr-only" role="status" aria-live="polite" data-live></p>
+    </figure>
+  </section>
+  
 
-      
-      <section class="section" id="serie-storica" aria-labelledby="h-serie">
-        <h2 id="h-serie">Com'è cambiato</h2>
-        <figure class="module">
-          <figcaption class="module__head">
-            <h3 class="h-sub">Dal 1995 al 2024 la media semplice è più che raddoppiata, e la distanza fra prima e ultima è cresciuta di 16.331 euro</h3>
-            <p class="subline">PIL pro capite, in euro, dal 1995 al 2024. In grigio le 20 regioni, tratteggiata la media semplice. Scegli una regione qui sopra per vederla.</p>
-          </figcaption>
-          <div class="chart" data-series><div class="chart__l"><svg viewBox="0 0 760 300" aria-hidden="true" focusable="false"><g class="grid"><line x1="64" x2="584" y1="270.0" y2="270.0"/><line x1="64" x2="584" y1="184.7" y2="184.7"/><line x1="64" x2="584" y1="99.3" y2="99.3"/><line x1="64" x2="584" y1="14.0" y2="14.0"/></g><g class="axis"><text x="56" y="274.0" text-anchor="end">0</text><text x="56" y="188.7" text-anchor="end">20.000</text><text x="56" y="103.3" text-anchor="end">40.000</text><text x="56" y="18.0" text-anchor="end">60.000</text><text x="64.0" y="292" text-anchor="start">1995</text><text x="153.7" y="292" text-anchor="middle">2000</text><text x="243.3" y="292" text-anchor="middle">2005</text><text x="333.0" y="292" text-anchor="middle">2010</text><text x="422.6" y="292" text-anchor="middle">2015</text><text x="512.3" y="292" text-anchor="middle">2020</text><text x="584.0" y="292" text-anchor="end">2024</text></g><g class="ctxlines"><polyline class="ctx" data-key="abruzzo" points="64.0,204.4 81.9,200.3 99.9,198.0 117.8,196.3 135.7,193.7 153.7,188.7 171.6,184.8 189.5,183.1 207.4,182.3 225.4,182.4 243.3,178.6 261.2,174.7 279.2,171.5 297.1,169.9 315.0,174.0 333.0,171.3 350.9,166.8 368.8,167.2 386.8,168.7 404.7,168.6 422.6,167.4 440.6,166.5 458.5,163.4 476.4,162.6 494.3,161.4 512.3,168.8 530.2,157.8 548.1,148.0 566.1,137.2 584.0,133.0"/><polyline class="ctx" data-key="basilicata" points="64.0,220.4 81.9,216.0 99.9,212.8 117.8,209.6 135.7,205.3 153.7,203.4 171.6,200.8 189.5,198.6 207.4,198.2 225.4,195.5 243.3,194.2 261.2,189.2 279.2,185.6 297.1,185.3 315.0,189.8 333.0,190.0 350.9,186.8 368.8,187.2 386.8,184.9 404.7,187.5 422.6,180.6 440.6,180.1 458.5,178.8 476.4,173.8 494.3,174.3 512.3,182.2 530.2,168.2 548.1,159.3 566.1,151.7 584.0,148.8"/><polyline class="ctx" data-key="calabria" points="64.0,227.4 81.9,225.0 99.9,222.3 117.8,220.1 135.7,217.1 153.7,214.9 171.6,211.6 189.5,209.8 207.4,207.7 225.4,204.6 243.3,202.6 261.2,199.5 279.2,197.6 297.1,196.3 315.0,198.1 333.0,198.1 350.9,197.4 368.8,198.6 386.8,199.8 404.7,200.2 422.6,199.4 440.6,197.9 458.5,196.0 476.4,196.1 494.3,194.9 512.3,199.2 530.2,191.8 548.1,186.1 566.1,179.8 584.0,177.4"/><polyline class="ctx" data-key="campania" points="64.0,221.3 81.9,219.1 99.9,216.0 117.8,213.5 135.7,211.6 153.7,208.3 171.6,204.7 189.5,201.9 207.4,200.6 225.4,198.6 243.3,196.9 261.2,194.1 279.2,191.7 297.1,191.4 315.0,193.7 333.0,194.6 350.9,194.3 368.8,194.9 386.8,196.0 404.7,195.7 422.6,193.9 440.6,192.3 458.5,190.6 476.4,189.5 494.3,187.4 512.3,192.9 530.2,185.1 548.1,177.0 566.1,168.8 584.0,165.2"/><polyline class="ctx" data-key="emilia-romagna" points="64.0,179.8 81.9,173.6 99.9,169.9 117.8,165.8 135.7,162.1 153.7,154.6 171.6,150.5 189.5,147.6 207.4,145.3 225.4,141.5 243.3,139.1 261.2,132.9 279.2,127.4 297.1,127.7 315.0,136.1 333.0,134.5 350.9,129.4 368.8,132.0 386.8,131.5 404.7,129.1 422.6,126.6 440.6,122.1 458.5,118.3 476.4,115.2 494.3,114.2 512.3,124.2 530.2,107.3 548.1,96.2 566.1,83.3 584.0,79.9"/><polyline class="ctx" data-key="friuli-venezia-giulia" points="64.0,190.9 81.9,187.1 99.9,183.7 117.8,181.4 135.7,177.5 153.7,170.7 171.6,165.3 189.5,162.5 207.4,162.2 225.4,158.9 243.3,154.4 261.2,149.2 279.2,144.6 297.1,146.4 315.0,153.6 333.0,149.6 350.9,146.7 368.8,149.8 386.8,148.9 404.7,148.3 422.6,144.5 440.6,142.5 458.5,139.6 476.4,135.9 494.3,132.3 512.3,141.0 530.2,125.9 548.1,117.5 566.1,109.0 584.0,103.6"/><polyline class="ctx" data-key="lazio" points="64.0,176.6 81.9,172.1 99.9,167.1 117.8,161.6 135.7,158.7 153.7,153.1 171.6,145.9 189.5,139.5 207.4,136.4 225.4,129.4 243.3,126.5 261.2,122.6 279.2,118.2 297.1,119.7 315.0,123.0 333.0,122.4 350.9,120.4 368.8,125.8 386.8,128.9 404.7,129.4 422.6,129.4 440.6,123.7 458.5,121.9 476.4,119.7 494.3,117.1 512.3,128.2 530.2,117.4 548.1,100.2 566.1,89.9 584.0,85.8"/><polyline class="ctx" data-key="liguria" points="64.0,194.0 81.9,189.3 99.9,185.3 117.8,181.3 135.7,178.4 153.7,171.8 171.6,165.0 189.5,163.5 207.4,159.5 225.4,155.7 243.3,152.7 261.2,148.9 279.2,142.2 297.1,139.6 315.0,146.1 333.0,148.0 350.9,144.5 368.8,146.7 386.8,147.6 404.7,144.8 422.6,142.3 440.6,139.2 458.5,135.7 476.4,134.6 494.3,131.7 512.3,143.9 530.2,130.8 548.1,120.0 566.1,105.7 584.0,104.3"/><polyline class="ctx" data-key="lombardia" points="64.0,167.6 81.9,161.6 99.9,157.5 117.8,152.7 135.7,150.4 153.7,144.3 171.6,138.2 189.5,133.1 207.4,129.7 225.4,126.6 243.3,124.2 261.2,120.6 279.2,115.5 297.1,110.8 315.0,119.5 333.0,113.6 350.9,110.9 368.8,114.7 386.8,117.1 404.7,114.5 422.6,111.5 440.6,107.1 458.5,103.1 476.4,99.0 494.3,97.5 512.3,107.9 530.2,88.3 548.1,73.9 566.1,60.3 584.0,55.0"/><polyline class="ctx" data-key="marche" points="64.0,200.5 81.9,195.6 99.9,192.7 117.8,190.5 135.7,186.8 153.7,182.4 171.6,177.3 189.5,172.4 207.4,171.0 225.4,167.7 243.3,165.3 261.2,160.2 279.2,156.3 297.1,157.9 315.0,162.1 333.0,162.0 350.9,160.3 368.8,162.8 386.8,164.4 404.7,161.4 422.6,160.6 440.6,158.0 458.5,155.1 476.4,152.8 494.3,150.2 512.3,158.8 530.2,146.4 548.1,136.8 566.1,127.8 584.0,124.3"/><polyline class="ctx" data-key="molise" points="64.0,213.1 81.9,209.5 99.9,204.6 117.8,202.2 135.7,200.9 153.7,197.6 171.6,193.7 189.5,191.5 207.4,190.2 225.4,186.6 243.3,184.2 261.2,178.2 279.2,174.5 297.1,176.5 315.0,178.7 333.0,178.3 350.9,177.7 368.8,180.4 386.8,185.7 404.7,186.3 422.6,184.3 440.6,182.6 458.5,180.0 476.4,177.7 494.3,174.9 512.3,180.5 530.2,170.4 548.1,163.3 566.1,154.1 584.0,151.8"/><polyline class="ctx" data-key="piemonte" points="64.0,189.7 81.9,185.7 99.9,181.5 117.8,178.4 135.7,174.9 153.7,170.4 171.6,165.9 189.5,162.2 207.4,159.1 225.4,155.6 243.3,152.9 261.2,148.3 279.2,145.3 297.1,146.3 315.0,155.0 333.0,151.2 350.9,148.3 368.8,152.4 386.8,151.5 404.7,151.4 422.6,148.6 440.6,144.9 458.5,140.2 476.4,137.0 494.3,135.9 512.3,146.0 530.2,132.4 548.1,122.7 566.1,110.3 584.0,105.2"/><polyline class="ctx" data-key="puglia" points="64.0,222.9 81.9,220.1 99.9,218.3 117.8,215.6 135.7,213.0 153.7,209.8 171.6,206.8 189.5,205.3 207.4,203.6 225.4,201.4 243.3,200.1 261.2,197.1 279.2,195.3 297.1,196.4 315.0,198.5 333.0,197.1 350.9,195.6 368.8,195.2 386.8,197.0 404.7,196.2 422.6,194.3 440.6,192.6 458.5,191.1 476.4,189.3 494.3,187.8 512.3,192.3 530.2,183.6 548.1,175.8 566.1,169.2 584.0,166.2"/><polyline class="ctx" data-key="sardegna" points="64.0,219.7 81.9,217.5 99.9,214.1 117.8,212.1 135.7,209.7 153.7,206.5 171.6,202.4 189.5,201.0 207.4,197.5 225.4,194.2 243.3,192.7 261.2,188.9 279.2,186.8 297.1,185.0 315.0,186.9 333.0,186.2 350.9,184.8 368.8,184.6 386.8,186.7 404.7,186.2 422.6,183.1 440.6,183.8 458.5,181.8 476.4,180.1 494.3,177.6 512.3,183.8 530.2,174.1 548.1,165.2 566.1,156.7 584.0,151.7"/><polyline class="ctx" data-key="sicilia" points="64.0,222.6 81.9,220.0 99.9,217.8 117.8,215.9 135.7,214.9 153.7,211.7 171.6,208.1 189.5,206.1 207.4,203.8 225.4,201.8 243.3,198.7 261.2,195.9 279.2,194.5 297.1,193.9 315.0,196.1 333.0,196.2 350.9,196.3 368.8,196.6 386.8,197.5 404.7,198.8 422.6,197.3 440.6,196.4 458.5,194.5 476.4,193.9 494.3,192.4 512.3,196.6 530.2,188.6 548.1,179.4 566.1,175.1 584.0,170.5"/><polyline class="ctx" data-key="toscana" points="64.0,192.1 81.9,187.6 99.9,184.1 117.8,180.1 135.7,176.4 153.7,171.0 171.6,166.1 189.5,162.6 207.4,159.7 225.4,156.3 243.3,154.8 261.2,150.1 279.2,146.0 297.1,146.1 315.0,149.3 333.0,148.5 350.9,145.8 368.8,146.8 386.8,148.0 404.7,145.6 422.6,144.1 440.6,141.0 458.5,138.0 476.4,134.6 494.3,128.9 512.3,145.1 530.2,131.3 548.1,117.9 566.1,107.2 584.0,102.5"/><polyline class="ctx" data-key="trentino-alto-adige" points="64.0,164.5 81.9,156.9 99.9,154.7 117.8,149.7 135.7,147.4 153.7,141.3 171.6,136.8 189.5,134.7 207.4,131.2 225.4,126.3 243.3,125.0 261.2,119.5 279.2,113.8 297.1,111.9 315.0,115.2 333.0,111.0 350.9,107.1 368.8,104.0 386.8,102.1 404.7,102.2 422.6,100.9 440.6,98.0 458.5,93.7 476.4,87.4 494.3,82.9 512.3,95.1 530.2,79.4 548.1,57.4 566.1,39.1 584.0,36.9"/><polyline class="ctx" data-key="umbria" points="64.0,197.5 81.9,194.4 99.9,190.5 117.8,188.4 135.7,184.7 153.7,180.1 171.6,175.5 189.5,173.8 207.4,171.5 225.4,168.4 243.3,167.1 261.2,162.5 279.2,159.2 297.1,159.3 315.0,166.8 333.0,164.9 350.9,163.9 368.8,166.9 386.8,168.6 404.7,170.2 422.6,166.8 440.6,165.9 458.5,163.0 476.4,159.5 494.3,158.3 512.3,166.9 530.2,156.1 548.1,147.0 566.1,135.8 584.0,131.5"/><polyline class="ctx" data-key="valle-d-aosta" points="64.0,156.5 81.9,152.7 99.9,152.4 117.8,148.1 135.7,147.4 153.7,145.0 171.6,138.5 189.5,134.2 207.4,125.6 225.4,122.6 243.3,119.8 261.2,115.2 279.2,112.1 297.1,108.5 315.0,117.7 333.0,110.7 350.9,107.7 368.8,106.8 386.8,113.7 404.7,115.4 422.6,114.4 440.6,115.4 458.5,109.0 476.4,107.1 494.3,104.9 512.3,118.1 530.2,105.0 548.1,83.1 566.1,68.9 584.0,66.3"/><polyline class="ctx" data-key="veneto" points="64.0,184.8 81.9,179.4 99.9,175.4 117.8,172.3 135.7,169.7 153.7,163.2 171.6,159.3 189.5,157.6 207.4,153.5 225.4,149.0 243.3,146.7 261.2,143.0 279.2,138.7 297.1,140.3 315.0,145.7 333.0,143.9 350.9,139.7 368.8,142.2 386.8,142.4 404.7,140.4 422.6,137.6 440.6,132.9 458.5,129.1 476.4,126.2 494.3,123.6 512.3,135.6 530.2,120.7 548.1,108.1 566.1,96.5 584.0,92.9"/></g><polyline class="avg" points="64.0,197.3 81.9,193.2 99.9,189.9 117.8,186.8 135.7,184.0 153.7,179.4 171.6,174.9 189.5,172.1 207.4,169.4 225.4,166.2 243.3,163.8 261.2,159.5 279.2,155.8 297.1,155.5 315.0,160.3 333.0,158.6 350.9,156.2 368.8,157.8 386.8,159.1 404.7,158.6 422.6,156.4 440.6,154.1 458.5,151.1 476.4,148.6 494.3,146.4 512.3,155.3 530.2,143.0 548.1,131.7 566.1,121.3 584.0,117.6"/><text class="lab" x="592" y="40.9">Trentino Alto Adige</text><text class="lab lab--strong" x="592" y="121.6">Media semplice 35.710</text><text class="lab" x="592" y="181.4">Calabria</text><polyline class="hl" points="" data-hl/><circle class="dot" r="0" cx="0" cy="0" data-hl-dot/><text class="hl-lab" x="592" y="-10" data-hl-lab></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 280" aria-hidden="true" focusable="false"><g class="grid"><line x1="48" x2="256" y1="250.0" y2="250.0"/><line x1="48" x2="256" y1="171.3" y2="171.3"/><line x1="48" x2="256" y1="92.7" y2="92.7"/><line x1="48" x2="256" y1="14.0" y2="14.0"/></g><g class="axis"><text x="40" y="254.0" text-anchor="end">0</text><text x="40" y="175.3" text-anchor="end">20.000</text><text x="40" y="96.7" text-anchor="end">40.000</text><text x="40" y="18.0" text-anchor="end">60.000</text><text x="48.0" y="272" text-anchor="start">1995</text><text x="119.7" y="272" text-anchor="middle">2005</text><text x="191.4" y="272" text-anchor="middle">2015</text><text x="256.0" y="272" text-anchor="end">2024</text></g><g class="ctxlines"><polyline class="ctx" data-key="abruzzo" points="48.0,189.5 55.2,185.7 62.3,183.6 69.5,182.1 76.7,179.7 83.9,175.0 91.0,171.5 98.2,169.9 105.4,169.1 112.6,169.2 119.7,165.7 126.9,162.2 134.1,159.2 141.2,157.8 148.4,161.5 155.6,159.0 162.8,154.8 169.9,155.2 177.1,156.6 184.3,156.5 191.4,155.5 198.6,154.6 205.8,151.7 213.0,151.0 220.1,149.9 227.3,156.7 234.5,146.6 241.7,137.5 248.8,127.6 256.0,123.7"/><polyline class="ctx" data-key="basilicata" points="48.0,204.3 55.2,200.3 62.3,197.2 69.5,194.4 76.7,190.3 83.9,188.6 91.0,186.2 98.2,184.2 105.4,183.8 112.6,181.3 119.7,180.1 126.9,175.5 134.1,172.2 141.2,171.9 148.4,176.0 155.6,176.2 162.8,173.3 169.9,173.7 177.1,171.5 184.3,173.9 191.4,167.6 198.6,167.1 205.8,165.9 213.0,161.3 220.1,161.7 227.3,169.0 234.5,156.2 241.7,148.0 248.8,141.0 256.0,138.2"/><polyline class="ctx" data-key="calabria" points="48.0,210.7 55.2,208.5 62.3,206.0 69.5,204.0 76.7,201.2 83.9,199.2 91.0,196.2 98.2,194.5 105.4,192.5 112.6,189.7 119.7,187.8 126.9,185.0 134.1,183.2 141.2,182.1 148.4,183.7 155.6,183.7 162.8,183.0 169.9,184.2 177.1,185.3 184.3,185.7 191.4,184.9 198.6,183.5 205.8,181.8 213.0,181.9 220.1,180.8 227.3,184.8 234.5,177.9 241.7,172.6 248.8,166.9 256.0,164.6"/><polyline class="ctx" data-key="campania" points="48.0,205.1 55.2,203.1 62.3,200.2 69.5,197.9 76.7,196.2 83.9,193.2 91.0,189.8 98.2,187.2 105.4,186.0 112.6,184.2 119.7,182.6 126.9,180.1 134.1,177.8 141.2,177.6 148.4,179.7 155.6,180.4 162.8,180.2 169.9,180.7 177.1,181.8 184.3,181.5 191.4,179.8 198.6,178.4 205.8,176.8 213.0,175.8 220.1,173.9 227.3,178.9 234.5,171.7 241.7,164.3 248.8,156.7 256.0,153.4"/><polyline class="ctx" data-key="emilia-romagna" points="48.0,166.9 55.2,161.1 62.3,157.7 69.5,153.9 76.7,150.5 83.9,143.6 91.0,139.8 98.2,137.2 105.4,135.0 112.6,131.6 119.7,129.3 126.9,123.6 134.1,118.6 141.2,118.8 148.4,126.6 155.6,125.0 162.8,120.4 169.9,122.8 177.1,122.3 184.3,120.1 191.4,117.8 198.6,113.7 205.8,110.1 213.0,107.3 220.1,106.4 227.3,115.5 234.5,100.0 241.7,89.7 248.8,77.9 256.0,74.7"/><polyline class="ctx" data-key="friuli-venezia-giulia" points="48.0,177.1 55.2,173.6 62.3,170.5 69.5,168.3 76.7,164.7 83.9,158.5 91.0,153.5 98.2,150.9 105.4,150.6 112.6,147.5 119.7,143.5 126.9,138.7 134.1,134.4 141.2,136.1 148.4,142.7 155.6,139.0 162.8,136.3 169.9,139.2 177.1,138.4 184.3,137.8 191.4,134.3 198.6,132.4 205.8,129.7 213.0,126.4 220.1,123.1 227.3,131.1 234.5,117.2 241.7,109.4 248.8,101.6 256.0,96.6"/><polyline class="ctx" data-key="lazio" points="48.0,163.9 55.2,159.8 62.3,155.1 69.5,150.1 76.7,147.4 83.9,142.2 91.0,135.6 98.2,129.7 105.4,126.8 112.6,120.4 119.7,117.7 126.9,114.2 134.1,110.0 141.2,111.4 148.4,114.5 155.6,113.9 162.8,112.1 169.9,117.0 177.1,119.9 184.3,120.4 191.4,120.4 198.6,115.1 205.8,113.5 213.0,111.5 220.1,109.0 227.3,119.2 234.5,109.4 241.7,93.5 248.8,84.0 256.0,80.2"/><polyline class="ctx" data-key="liguria" points="48.0,179.9 55.2,175.6 62.3,171.9 69.5,168.2 76.7,165.6 83.9,159.5 91.0,153.2 98.2,151.8 105.4,148.2 112.6,144.7 119.7,141.8 126.9,138.3 134.1,132.2 141.2,129.8 148.4,135.8 155.6,137.5 162.8,134.3 169.9,136.3 177.1,137.2 184.3,134.6 191.4,132.3 198.6,129.4 205.8,126.2 213.0,125.2 220.1,122.5 227.3,133.8 234.5,121.7 241.7,111.7 248.8,98.5 256.0,97.2"/><polyline class="ctx" data-key="lombardia" points="48.0,155.6 55.2,150.1 62.3,146.3 69.5,141.9 76.7,139.8 83.9,134.1 91.0,128.5 98.2,123.8 105.4,120.7 112.6,117.8 119.7,115.6 126.9,112.2 134.1,107.6 141.2,103.3 148.4,111.2 155.6,105.8 162.8,103.3 169.9,106.8 177.1,109.0 184.3,106.7 191.4,103.9 198.6,99.8 205.8,96.2 213.0,92.4 220.1,91.0 227.3,100.6 234.5,82.5 241.7,69.2 248.8,56.7 256.0,51.8"/><polyline class="ctx" data-key="marche" points="48.0,185.9 55.2,181.4 62.3,178.7 69.5,176.7 76.7,173.3 83.9,169.2 91.0,164.5 98.2,160.0 105.4,158.7 112.6,155.7 119.7,153.5 126.9,148.8 134.1,145.1 141.2,146.7 148.4,150.5 155.6,150.5 162.8,148.9 169.9,151.2 177.1,152.6 184.3,149.8 191.4,149.1 198.6,146.7 205.8,144.1 213.0,142.0 220.1,139.6 227.3,147.5 234.5,136.1 241.7,127.2 248.8,118.9 256.0,115.7"/><polyline class="ctx" data-key="molise" points="48.0,197.5 55.2,194.2 62.3,189.7 69.5,187.5 76.7,186.3 83.9,183.3 91.0,179.6 98.2,177.6 105.4,176.5 112.6,173.1 119.7,170.9 126.9,165.3 134.1,161.9 141.2,163.8 148.4,165.8 155.6,165.4 162.8,164.9 169.9,167.4 177.1,172.3 184.3,172.8 191.4,171.0 198.6,169.4 205.8,167.0 213.0,164.9 220.1,162.3 227.3,167.5 234.5,158.2 241.7,151.6 248.8,143.2 256.0,141.1"/><polyline class="ctx" data-key="piemonte" points="48.0,176.0 55.2,172.3 62.3,168.5 69.5,165.5 76.7,162.3 83.9,158.2 91.0,154.0 98.2,150.7 105.4,147.7 112.6,144.5 119.7,142.0 126.9,137.8 134.1,135.1 141.2,135.9 148.4,144.0 155.6,140.5 162.8,137.8 169.9,141.6 177.1,140.7 184.3,140.6 191.4,138.1 198.6,134.7 205.8,130.4 213.0,127.4 220.1,126.4 227.3,135.7 234.5,123.1 241.7,114.2 248.8,102.7 256.0,98.1"/><polyline class="ctx" data-key="puglia" points="48.0,206.6 55.2,204.0 62.3,202.3 69.5,199.9 76.7,197.4 83.9,194.5 91.0,191.7 98.2,190.4 105.4,188.8 112.6,186.8 119.7,185.6 126.9,182.8 134.1,181.1 141.2,182.1 148.4,184.1 155.6,182.8 162.8,181.4 169.9,181.1 177.1,182.7 184.3,181.9 191.4,180.2 198.6,178.6 205.8,177.3 213.0,175.6 220.1,174.2 227.3,178.3 234.5,170.3 241.7,163.2 248.8,157.0 256.0,154.3"/><polyline class="ctx" data-key="sardegna" points="48.0,203.6 55.2,201.6 62.3,198.4 69.5,196.6 76.7,194.4 83.9,191.5 91.0,187.7 98.2,186.4 105.4,183.2 112.6,180.1 119.7,178.7 126.9,175.2 134.1,173.3 141.2,171.6 148.4,173.4 155.6,172.7 162.8,171.5 169.9,171.2 177.1,173.2 184.3,172.7 191.4,169.9 198.6,170.5 205.8,168.7 213.0,167.1 220.1,164.9 227.3,170.5 234.5,161.6 241.7,153.4 248.8,145.6 256.0,140.9"/><polyline class="ctx" data-key="sicilia" points="48.0,206.3 55.2,203.9 62.3,201.9 69.5,200.1 76.7,199.2 83.9,196.3 91.0,193.0 98.2,191.1 105.4,188.9 112.6,187.1 119.7,184.3 126.9,181.7 134.1,180.4 141.2,179.8 148.4,181.9 155.6,182.0 162.8,182.1 169.9,182.3 177.1,183.1 184.3,184.4 191.4,183.0 198.6,182.2 205.8,180.4 213.0,179.8 220.1,178.5 227.3,182.3 234.5,175.0 241.7,166.5 248.8,162.5 256.0,158.3"/><polyline class="ctx" data-key="toscana" points="48.0,178.2 55.2,174.0 62.3,170.9 69.5,167.1 76.7,163.7 83.9,158.7 91.0,154.2 98.2,151.0 105.4,148.3 112.6,145.2 119.7,143.8 126.9,139.5 134.1,135.7 141.2,135.7 148.4,138.7 155.6,138.0 162.8,135.5 169.9,136.5 177.1,137.5 184.3,135.4 191.4,134.0 198.6,131.1 205.8,128.3 213.0,125.1 220.1,119.9 227.3,134.8 234.5,122.1 241.7,109.8 248.8,100.0 256.0,95.6"/><polyline class="ctx" data-key="trentino-alto-adige" points="48.0,152.7 55.2,145.7 62.3,143.7 69.5,139.1 76.7,137.0 83.9,131.4 91.0,127.2 98.2,125.3 105.4,122.1 112.6,117.5 119.7,116.3 126.9,111.2 134.1,106.0 141.2,104.3 148.4,107.3 155.6,103.4 162.8,99.9 169.9,97.0 177.1,95.2 184.3,95.3 191.4,94.1 198.6,91.5 205.8,87.5 213.0,81.7 220.1,77.5 227.3,88.8 234.5,74.3 241.7,54.0 248.8,37.1 256.0,35.1"/><polyline class="ctx" data-key="umbria" points="48.0,183.2 55.2,180.3 62.3,176.7 69.5,174.8 76.7,171.4 83.9,167.1 91.0,162.9 98.2,161.4 105.4,159.2 112.6,156.3 119.7,155.2 126.9,150.9 134.1,147.9 141.2,147.9 148.4,154.8 155.6,153.2 162.8,152.2 169.9,155.0 177.1,156.6 184.3,158.0 191.4,154.9 198.6,154.0 205.8,151.4 213.0,148.1 220.1,147.0 227.3,154.9 234.5,145.0 241.7,136.6 248.8,126.3 256.0,122.3"/><polyline class="ctx" data-key="valle-d-aosta" points="48.0,145.4 55.2,141.8 62.3,141.6 69.5,137.7 76.7,137.0 83.9,134.8 91.0,128.7 98.2,124.8 105.4,116.9 112.6,114.1 119.7,111.5 126.9,107.3 134.1,104.5 141.2,101.1 148.4,109.6 155.6,103.1 162.8,100.4 169.9,99.6 177.1,105.9 184.3,107.5 191.4,106.6 198.6,107.5 205.8,101.6 213.0,99.8 220.1,97.8 227.3,109.9 234.5,97.9 241.7,77.7 248.8,64.6 256.0,62.2"/><polyline class="ctx" data-key="veneto" points="48.0,171.5 55.2,166.5 62.3,162.8 69.5,160.0 76.7,157.5 83.9,151.5 91.0,148.0 98.2,146.4 105.4,142.6 112.6,138.4 119.7,136.3 126.9,132.9 134.1,129.0 141.2,130.4 148.4,135.4 155.6,133.8 162.8,129.9 169.9,132.2 177.1,132.4 184.3,130.5 191.4,127.9 198.6,123.6 205.8,120.1 213.0,117.5 220.1,115.1 227.3,126.1 234.5,112.4 241.7,100.7 248.8,90.0 256.0,86.8"/></g><polyline class="avg" points="48.0,183.0 55.2,179.2 62.3,176.2 69.5,173.3 76.7,170.7 83.9,166.5 91.0,162.3 98.2,159.7 105.4,157.3 112.6,154.3 119.7,152.1 126.9,148.2 134.1,144.8 141.2,144.4 148.4,148.9 155.6,147.3 162.8,145.1 169.9,146.5 177.1,147.7 184.3,147.3 191.4,145.3 198.6,143.2 205.8,140.4 213.0,138.1 220.1,136.1 227.3,144.3 234.5,133.0 241.7,122.5 248.8,112.9 256.0,109.5"/><text class="lab" x="264" y="39.1">Trentino Alt.</text><text class="lab lab--strong" x="264" y="113.5">Media 35.710</text><text class="lab" x="264" y="168.6">Calabria</text><polyline class="hl" points="" data-hl/><circle class="dot" r="0" cx="0" cy="0" data-hl-dot/><text class="hl-lab" x="264" y="-10" data-hl-lab></text></svg></div></div>
-          <p class="chart-note">Su tutto il periodo cresce di più il Trentino Alto Adige (+29.901 euro), di meno la Calabria (+11.707 euro).</p>
-          <p class="source">Fonte: <a href="https://www.istat.it/it/archivio/conti+territoriali">Istat, Conti economici territoriali</a>. Elaborazione Divario Italia.</p>
-          <details class="more">
-            <summary>La serie in tabella</summary>
-            <div class="tablewrap" tabindex="0" role="region" aria-label="Serie storica in tabella">
-              <table class="table table--compact trend-table">
-                <caption>Media semplice delle regioni per anno, in euro</caption>
-                <thead><tr><th scope="col">Anno</th><th class="r" scope="col">Media semplice</th></tr></thead>
-                <tbody><tr><th scope="row">1995</th><td class="val">17.035</td></tr><tr><th scope="row">1996</th><td class="val">18.008</td></tr><tr><th scope="row">1997</th><td class="val">18.766</td></tr><tr><th scope="row">1998</th><td class="val">19.504</td></tr><tr><th scope="row">1999</th><td class="val">20.148</td></tr><tr><th scope="row">2000</th><td class="val">21.225</td></tr><tr><th scope="row">2001</th><td class="val">22.297</td></tr><tr><th scope="row">2002</th><td class="val">22.956</td></tr><tr><th scope="row">2003</th><td class="val">23.572</td></tr><tr><th scope="row">2004</th><td class="val">24.339</td></tr><tr><th scope="row">2005</th><td class="val">24.886</td></tr><tr><th scope="row">2006</th><td class="val">25.890</td></tr><tr><th scope="row">2007</th><td class="val">26.757</td></tr><tr><th scope="row">2008</th><td class="val">26.845</td></tr><tr><th scope="row">2009</th><td class="val">25.713</td></tr><tr><th scope="row">2010</th><td class="val">26.109</td></tr><tr><th scope="row">2011</th><td class="val">26.667</td></tr><tr><th scope="row">2012</th><td class="val">26.302</td></tr><tr><th scope="row">2013</th><td class="val">26.002</td></tr><tr><th scope="row">2014</th><td class="val">26.108</td></tr><tr><th scope="row">2015</th><td class="val">26.628</td></tr><tr><th scope="row">2016</th><td class="val">27.154</td></tr><tr><th scope="row">2017</th><td class="val">27.857</td></tr><tr><th scope="row">2018</th><td class="val">28.453</td></tr><tr><th scope="row">2019</th><td class="val">28.966</td></tr><tr><th scope="row">2020</th><td class="val">26.873</td></tr><tr><th scope="row">2021</th><td class="val">29.757</td></tr><tr><th scope="row">2022</th><td class="val">32.403</td></tr><tr><th scope="row">2023</th><td class="val">34.845</td></tr><tr><th scope="row">2024</th><td class="val">35.710</td></tr></tbody>
-              </table>
-            </div>
-          </details>
-        </figure>
-      </section>
-      
+  <section class="section" id="territori" aria-labelledby="h-territori">
+    <h2 id="h-territori">Regioni e province</h2>
+    <p class="home-sectionlead">Il profilo di ogni regione e di ogni provincia: dove stacca, dove resta indietro, i valori veri di ogni indicatore.</p>
+    <div class="home-regions">
+      <div class="home-regions__group is-wide">
+        <h3 class="home-colhead">Nord</h3>
+        <ul><li><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a></li><li><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></li><li><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></li><li><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></li><li><a href="https://divarioitalia.it/regione/veneto">Veneto</a></li><li><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></li><li><a href="https://divarioitalia.it/regione/liguria">Liguria</a></li><li><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></li></ul>
+      </div>
+      <div class="home-regions__group">
+        <h3 class="home-colhead">Centro</h3>
+        <ul><li><a href="https://divarioitalia.it/regione/toscana">Toscana</a></li><li><a href="https://divarioitalia.it/regione/umbria">Umbria</a></li><li><a href="https://divarioitalia.it/regione/marche">Marche</a></li><li><a href="https://divarioitalia.it/regione/lazio">Lazio</a></li></ul>
+      </div>
+      <div class="home-regions__group is-wide">
+        <h3 class="home-colhead">Sud</h3>
+        <ul><li><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></li><li><a href="https://divarioitalia.it/regione/molise">Molise</a></li><li><a href="https://divarioitalia.it/regione/campania">Campania</a></li><li><a href="regione.html">Puglia</a></li><li><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></li><li><a href="https://divarioitalia.it/regione/calabria">Calabria</a></li></ul>
+      </div>
+      <div class="home-regions__group">
+        <h3 class="home-colhead">Isole</h3>
+        <ul><li><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></li><li><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></li></ul>
+      </div>
+    </div>
+    <ul class="home-links">
+      <li><a class="linkarrow" href="https://divarioitalia.it/province">Tutte le province</a></li>
+      <li><a class="linkarrow" href="https://divarioitalia.it/confronto">Confronta fino a tre territori</a></li>
+      <li><a class="linkarrow" href="https://divarioitalia.it/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a></li>
+    </ul>
+  </section>
 
-      <aside class="ad" aria-label="Pubblicità"><span>Spazio pubblicitario riservato</span></aside>
-
-      
-      <div class="section analysis" id="analisi">
-        
-<div class="indicator-article prose">
   
-  <h2 id="sezione-il-conto-si-divide-fra-tutti-non-fra-chi-lavora">Il conto si divide fra tutti, non fra chi lavora</h2>
-  
-  
-  <p>Il prodotto interno lordo di una regione è il valore di tutto quello che ci si produce in un anno. Per ottenere la cifra che finisce in classifica lo si divide per i residenti, tutti: i bambini, gli studenti, i pensionati, chi un lavoro lo cerca e chi ha smesso di cercarlo. Quel numero, quindi, non dice soltanto quanto vale il lavoro di chi lavora. Dice anche quanta parte degli abitanti un lavoro ce l'ha.</p>
-<p>Basta questo a distanziare i due capi della classifica. Se in due regioni ogni occupato producesse la stessa cifra, ma in una gli abitanti al lavoro fossero molti di più, le due finirebbero comunque lontane in classifica. Nel 2024 le regioni del Nord stanno in media a 44.413 euro per abitante e quelle del Mezzogiorno a 26.232, e la distanza fra le due medie vale più di quattro quinti di tutto quello che la Calabria produce in un anno per ogni suo abitante.</p>
-  
-  
-  <h2 id="sezione-quante-persone-hanno-un-lavoro">Quante persone hanno un lavoro</h2>
-  
-  
-  <p>La classifica del prodotto per abitante e quella di quante persone lavorano si somigliano molto, e ai due capi si sovrappongono. Il Trentino Alto Adige, primo qui, è primo in Italia anche per <a href="https://divarioitalia.it/indicatore/tasso-di-occupazione-20-64-anni/ter-345">quota di persone al lavoro fra i 20 e i 64 anni</a>, e la Calabria è ultima in tutte e due. Lo stesso vale per <a href="https://divarioitalia.it/indicatore/tasso-di-occupazione-totale/ter-13">il tasso di occupazione di tutte le età</a>. E non è solo la distanza fra Nord e Sud: il legame si vede anche fra regioni della stessa parte d'Italia.</p>
-<p><a href="https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/">Istat lo ha scritto</a> in un'analisi sui vent'anni di politiche di coesione nel Mezzogiorno, su un confronto diverso da questo: non le regioni italiane fra loro, ma le regioni italiane più indietro messe accanto alla media dei paesi dell'Unione europea. Lì il distacco di reddito, misurato tenendo conto dei prezzi diversi fra paesi, è spiegato interamente dal tasso di occupazione. E aggiunge subito dopo che a quel fattore se ne è aggiunto un secondo.</p>
-<figure class="scatter-figure"><svg class="scatter" viewBox="0 0 320 240" aria-hidden="true" focusable="false"><line class="scatter__axis" x1="26" y1="214" x2="307" y2="214"/><line class="scatter__axis" x1="26" y1="13" x2="26" y2="214"/><circle class="scatter__dot" cx="189.9" cy="146.5" r="3.0"/><circle class="scatter__dot" cx="141.9" cy="166.6" r="3.0"/><circle class="scatter__dot" cx="41.1" cy="203.2" r="3.0"/><circle class="scatter__dot" cx="44.9" cy="187.6" r="3.0"/><circle class="scatter__dot" cx="276.0" cy="78.7" r="3.0"/><circle class="scatter__dot" cx="255.5" cy="108.9" r="3.0"/><circle class="scatter__dot is-on" cx="208.6" cy="86.3" r="4.2"/><circle class="scatter__dot" cx="247.6" cy="109.8" r="3.0"/><circle class="scatter__dot" cx="259.2" cy="46.9" r="3.0"/><circle class="scatter__dot" cx="240.1" cy="135.4" r="3.0"/><circle class="scatter__dot" cx="146.3" cy="170.6" r="3.0"/><circle class="scatter__dot" cx="252.1" cy="111.0" r="3.0"/><circle class="scatter__dot" cx="83.7" cy="188.9" r="3.0"/><circle class="scatter__dot" cx="146.4" cy="170.4" r="3.0"/><circle class="scatter__dot" cx="50.7" cy="194.5" r="3.0"/><circle class="scatter__dot" cx="267.3" cy="107.5" r="3.0"/><circle class="scatter__dot" cx="291.9" cy="23.8" r="3.0"/><circle class="scatter__dot" cx="255.0" cy="144.6" r="3.0"/><circle class="scatter__dot" cx="283.1" cy="61.3" r="3.0"/><circle class="scatter__dot" cx="255.9" cy="95.4" r="3.0"/><text class="scatter__name" x="201.6" y="89.8" text-anchor="end">Lazio</text><text class="scatter__axis-name" x="307" y="232" text-anchor="end">Tasso di occupazione 20-64 anni (2025)</text><text class="scatter__axis-name" x="26" y="12">PIL pro capite (2024)</text></svg><figcaption>Ogni punto e&#39; una regione: dove lavora piu&#39; gente, il prodotto per abitante e&#39; piu&#39; alto. Il Lazio e&#39; quinto qui e dodicesimo per occupazione. Ogni punto è una regione: Tasso di occupazione 20-64 anni nel 2025 in orizzontale, PIL pro capite nel 2024 in verticale. 20 regioni con dati per entrambi. In evidenza: Lazio.</figcaption></figure>
-
-<p>Una regione però non ci sta. Il Lazio è quinto fra le regioni per prodotto per abitante e dodicesimo per quota di persone al lavoro fra i 20 e i 64 anni: sette posti di distanza.</p>
-  
-  
-  <h2 id="sezione-l-altra-meta-del-conto">L&#39;altra metà del conto</h2>
-  
-  
-  <p>Il conto però ha due pezzi. Uno è quante persone lavorano, l'altro è quanto vale quello che produce chi lavora. <a href="https://www.bancaditalia.it/pubblicazioni/economie-regionali/2018/2018-0023/1823-eco-regioni.pdf">La Banca d'Italia</a> ha scritto nel 2018, sui dati del 2017, che il distacco di prodotto per abitante fra le regioni meridionali e il resto del Paese si divide in parti quasi uguali fra i due, e che al Sud la seconda parte, la produttività, è più bassa.</p>
-<p>Il peso di quel secondo pezzo non è sempre stato lo stesso, e a datarlo è di nuovo <a href="https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/">Istat</a>, sempre nel confronto con l'Europa, che lo fa cominciare con i fondi europei fra il 2014 e il 2020. Per una regione la differenza non è una sottigliezza: portare al lavoro chi oggi non lavora e far valere di più il lavoro di chi già ce l'ha sono due strade diverse, e si percorrono in modi diversi.</p>
-  
-  
-  <h2 id="sezione-che-cosa-e-cambiato-in-dieci-anni">Che cosa è cambiato in dieci anni</h2>
-  
-  
-  <p>Dal 2014 al 2024 la media delle regioni è salita di 9.603 euro per abitante. Sono euro correnti, cioè dentro c'è anche l'aumento dei prezzi di quei dieci anni, e quindi non è tutta ricchezza in più. Quello che i prezzi non spostano è l'ordine: dieci anni fa i due capi della classifica erano già questi, il Trentino Alto Adige davanti e la Calabria dietro.</p>
-<p>Il prodotto per abitante, comunque, non è uno stipendio e non entra in nessun portafoglio: è quello che si produce diviso per chi ci vive. La misura che si sente in casa è un'altra, e nel 2024 in Calabria più di un quarto delle famiglie dice di <a href="https://divarioitalia.it/indicatore/famiglie-che-arrivano-a-fine-mese-con-difficolta/ims-MULTI_DISAGIO_DIFFICOLTA">arrivare a fine mese con difficoltà</a>.</p>
-  
+  <section class="section" id="qualita" aria-labelledby="h-qualita">
+    <h2 id="h-qualita">Qualità della vita</h2>
+    <div class="home-wide">
+    <div class="home-qol__head">
+      <p class="lede">Con il profilo equilibrato, fra la prima e l'ultima regione ci sono 42 punti sulla scala da 0 a 100, fra la prima e l'ultima provincia 49.</p>
+      <p class="status"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg> Indice sperimentale di Divario Italia, non un dato ufficiale. Profilo equilibrato: assegna lo stesso peso alle dodici dimensioni della qualità della vita.</p>
+    </div>
+    <div class="home-podiums">
+      <div class="home-podium">
+        <h3 class="h-sub">Regioni</h3>
+        <div class="tablewrap" tabindex="0" role="region" aria-label="Qualità della vita, regioni in testa e in coda">
+          <table class="table table--compact">
+            <caption>Le prime tre e le ultime tre delle 20 regioni, punteggio da 0 a 100</caption>
+            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1ª</td><th scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 72%"></i></span></td><td class="val">72</td></tr>
+              <tr><td class="rank">2ª</td><th scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 63%"></i></span></td><td class="val">63</td></tr>
+              <tr><td class="rank">3ª</td><th scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 62%"></i></span></td><td class="val">62</td></tr>
+              <tr class="home-podium__gap"><td></td><td colspan="3">Altre 14 regioni</td></tr>
+              <tr><td class="rank">18ª</td><th scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 31%"></i></span></td><td class="val">31</td></tr>
+              <tr><td class="rank">19ª</td><th scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 30%"></i></span></td><td class="val">30</td></tr>
+              <tr><td class="rank">20ª</td><th scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 30%"></i></span></td><td class="val">30</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><a class="linkarrow" href="classifica.html">Classifica delle regioni</a></p>
+      </div>
+      <div class="home-podium">
+        <h3 class="h-sub">Province</h3>
+        <div class="tablewrap" tabindex="0" role="region" aria-label="Qualità della vita, province in testa e in coda">
+          <table class="table table--compact">
+            <caption>Le prime tre e le ultime tre delle 107 province, punteggio da 0 a 100</caption>
+            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Provincia</th><th class="barcell" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/monza-e-della-brianza">Monza e della Brianza</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 74%"></i></span></td><td class="val">74</td></tr>
+              <tr><td class="rank">2ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/milano">Milano</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 72%"></i></span></td><td class="val">72</td></tr>
+              <tr><td class="rank">3ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/bologna">Bologna</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 71%"></i></span></td><td class="val">71</td></tr>
+              <tr class="home-podium__gap"><td></td><td colspan="3">Altre 101 province</td></tr>
+              <tr><td class="rank">105ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/sud-sardegna">Sud Sardegna</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 27%"></i></span></td><td class="val">27</td></tr>
+              <tr><td class="rank">106ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/caserta">Caserta</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 26%"></i></span></td><td class="val">26</td></tr>
+              <tr><td class="rank">107ª</td><th scope="row"><a href="https://divarioitalia.it/provincia/reggio-calabria">Reggio Calabria</a></th><td class="barcell" aria-hidden="true"><span class="score"><i style="width: 24%"></i></span></td><td class="val">24</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><a class="linkarrow" href="https://divarioitalia.it/qualita-della-vita/classifica/province">Classifica delle province</a></p>
+      </div>
+    </div>
+    
+    <p class="home-qol__more">Altre priorità, altre classifiche delle regioni: <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=opportunita">Opportunità economica</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=accessibilita">Accessibilità quotidiana</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=famiglie">Famiglie</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=giovani">Giovani</a>, <a href="https://divarioitalia.it/qualita-della-vita/classifica/regioni?profilo=servizi">Servizi e territorio</a>.</p>
+    <p class="home-more"><a class="linkarrow" href="qualita-della-vita.html">Dove si vive meglio</a></p>
+    
+    </div>
+  </section>
   
 </div>
 
+
+<section class="band home-quiz" id="quiz" aria-labelledby="h-quiz">
+  <div class="wrap">
+    <h2 class="h-section" id="h-quiz">Quiz: quanto conosci l'Italia?</h2>
+    <div class="home-quiz__grid">
+      <div class="home-quiz__intro">
+        <p class="lede">Tre giochi costruiti sugli stessi indicatori di Istat ed Eurostat che trovi nell'atlante. Si gioca senza registrarsi.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="https://divarioitalia.it/quiz">Gioca al quiz</a>
+          <a class="linkarrow home-quiz__side" href="https://divarioitalia.it/quiz/classifica">La classifica dei giocatori</a>
+        </div>
       </div>
       
-
+      <fieldset class="home-try">
+        <legend>
+          <span class="home-try__kicker">Prova una domanda di «Chi è maggiore?»</span>
+          <span class="home-try__q">Tasso giovani NEET (totale), 2024: quale delle due regioni ha il valore più alto?</span>
+        </legend>
+        <div class="home-try__opts">
+          <label class="home-try__opt"><input type="radio" name="prova" value="1" data-right> Calabria</label>
+          <label class="home-try__opt"><input type="radio" name="prova" value="2"> Trentino Alto Adige</label>
+        </div>
+        <div class="home-try__out" role="status">
+          <p class="home-try__ok"><strong>Giusto.</strong> Calabria 26,2%, Trentino Alto Adige 7,7%.</p>
+          <p class="home-try__no"><strong>Non è così.</strong> Calabria 26,2%, Trentino Alto Adige 7,7%.</p>
+        </div>
+        <p class="source">Fonte: Istat, indicatori territoriali (2024). <a href="https://divarioitalia.it/indicatore/tasso-giovani-neet-totale/ter-408">Tasso giovani NEET (totale), la scheda</a></p>
+      </fieldset>
       
-      <section class="section" id="come-leggere" aria-labelledby="h-leggere">
-        <h2 id="h-leggere">Che cosa misura e come si legge</h2>
-        <div class="method">
-          <div>
-            <h3>In parole semplici</h3>
-            <p>Misura il prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025.</p>
-            <p>Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.</p>
-            <p>Il confronto applica la stessa definizione in tutti i territori regionali e per ciascun anno.</p>
-            <p>Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.</p>
-          </div>
-          <div>
-            <h3>Secondo la fonte</h3>
-            <dl>
-              <div><dt>Definizione della fonte</dt><dd>Prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025 <a href="https://www.istat.it/it/archivio/conti+territoriali">Consulta la fonte Istat</a></dd></div>
-              <div><dt>Verso</dt><dd>Meglio se alto.</dd></div>
-              <div><dt>Il limite principale</dt><dd>Il valore pro capite va letto insieme al costo della vita, alle disuguaglianze interne e alla redistribuzione, perché la media regionale nasconde differenze tra persone e tra aree.</dd></div>
-            </dl>
-          </div>
-        </div>
-      </section>
+    </div>
+    <ul class="cards cards--3 home-games">
+      <li class="card">
+        <p class="card__kicker">Circa 2 minuti</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/quiz/indovina-la-regione">Indovina la Regione</a></h3>
+        <p class="card__text">Mappa e indizi Istat che si sbloccano a ogni tentativo sbagliato. Sei tentativi.</p>
+      </li>
+      <li class="card">
+        <p class="card__kicker">Testa a testa</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/quiz/chi-e-maggiore">Chi è maggiore?</a></h3>
+        <p class="card__text">Due regioni, un indicatore. Scegli quale ha il valore più alto.</p>
+      </li>
+      <li class="card">
+        <p class="card__kicker">Credito parziale</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/quiz/ordina">Ordina le regioni</a></h3>
+        <p class="card__text">Cinque regioni da ordinare dal valore più alto al più basso, con credito parziale.</p>
+      </li>
+    </ul>
+  </div>
+</section>
 
-      <section class="section" id="fonti-verifica" aria-labelledby="h-fonti">
-        <h2 id="h-fonti">Fonti, dati e citazione</h2>
-        <dl class="specs">
-          <div><dt>Dato più recente</dt><dd>2024, serie dal 1995</dd></div>
-          <div><dt>Fonte</dt><dd><a href="https://www.istat.it/it/archivio/conti+territoriali">Istat, Conti economici territoriali</a></dd></div>
-          <div><dt>Come è calcolato</dt><dd>Media semplice dei valori regionali: ogni territorio pesa uguale, quindi non è un dato nazionale. Divario e classifica senza riponderazioni. <a href="https://divarioitalia.it/metodologia">Metodologia</a></dd></div>
-          <div><dt>Come nasce questa scheda</dt><dd>I dati vengono dalla fonte senza correzioni e le sintesi si ricalcolano a ogni caricamento. Il racconto è scritto con strumenti automatici e approvato da una persona, che ne risponde. <a href="https://divarioitalia.it/metodologia#come-nasce-il-testo">Come nasce il testo</a></dd></div>
-          <div><dt>Qualità della vita</dt><dd>Entra nel punteggio della qualità della vita, categoria Reddito, inclusione e accessibilità.</dd></div>
-          <div><dt>Fonti dell'analisi</dt><dd><ul class="reflist"><li><a href="https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/">Istat, "La politica di coesione e il Mezzogiorno. Vent'anni di mancata convergenza", comunicato stampa del 13 giugno 2023, anni 2000-2021.</a><small>«Il divario crescente in termini di reddito (misurato in Pil pro capite in ppa) fra le regioni italiane economicamente meno avanzate e l'Ue27, è spiegato interamente dal tasso di oc</small></li><li><a href="https://www.bancaditalia.it/pubblicazioni/economie-regionali/2018/2018-0023/1823-eco-regioni.pdf">Banca d'Italia, "L'economia delle regioni italiane. Dinamiche recenti e aspetti strutturali", Economie regionali n. 23, novembre 2018</a></li></ul></dd></div>
-          <div><dt>Licenza</dt><dd><a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0</a></dd></div>
+
+<div class="wrap">
+  
+  <section class="section" id="temi" aria-labelledby="h-temi">
+    <h2 id="h-temi">I temi</h2>
+    <p class="home-sectionlead">Per ogni area, la regione con la posizione media migliore e quella con la peggiore sugli indicatori che hanno un verso.</p>
+    <ul class="cards cards--4 home-themes">
+      <li class="card home-theme">
+        <p class="card__kicker">187 indicatori, 3 temi</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-economia-e-opportunita">Economia e opportunità</a></h3>
+        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/imprese-e-competitivita">Imprese e competitività</a></li><li><a href="https://divarioitalia.it/tema/lavoro-e-conciliazione">Lavoro e conciliazione</a></li><li><a href="https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita">Reddito, inclusione e accessibilità</a></li></ul>
+        <dl class="home-theme__ends">
+          <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></dd></div>
+          <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></dd></div>
         </dl>
-        
-        <div class="actions" id="download-dati">
-          <a class="btn btn--primary" href="https://divarioitalia.it/download/indicator/901.csv"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg> Scarica i dati in CSV</a>
-          <a class="btn" href="https://divarioitalia.it/download/indicator/901.json"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg> JSON</a>
-        </div>
-        
-        <div class="cite">
-  <p data-cite-text>Divario Italia, «PIL pro capite», elaborazione su dati Istat, Conti economici territoriali (2024). https://divarioitalia.it/indicatore/pil-pro-capite/ter-901</p>
+      </li>
+      <li class="card home-theme">
+        <p class="card__kicker">162 indicatori, 3 temi</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-persone-e-conoscenza">Persone e conoscenza</a></h3>
+        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/istruzione-e-formazione">Istruzione e formazione</a></li><li><a href="https://divarioitalia.it/tema/ricerca-innovazione-e-digitale">Ricerca, innovazione e digitale</a></li><li><a href="https://divarioitalia.it/tema/salute-demografia-e-cura">Salute, demografia e cura</a></li></ul>
+        <dl class="home-theme__ends">
+          <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></dd></div>
+          <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/calabria">Calabria</a></dd></div>
+        </dl>
+      </li>
+      <li class="card home-theme">
+        <p class="card__kicker">180 indicatori, 3 temi</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-territorio-e-servizi">Territorio e servizi</a></h3>
+        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/ambiente-ed-energia">Ambiente ed energia</a></li><li><a href="https://divarioitalia.it/tema/cultura-patrimonio-e-turismo">Cultura, patrimonio e turismo</a></li><li><a href="https://divarioitalia.it/tema/mobilita-e-servizi-territoriali">Mobilità e servizi territoriali</a></li></ul>
+        <dl class="home-theme__ends">
+          <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></dd></div>
+          <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/molise">Molise</a></dd></div>
+        </dl>
+      </li>
+      <li class="card home-theme">
+        <p class="card__kicker">65 indicatori, 3 temi</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/temi#area-comunita-e-benessere">Comunità e benessere</a></h3>
+        <ul class="home-theme__list"><li><a href="https://divarioitalia.it/tema/benessere-soggettivo">Benessere soggettivo</a></li><li><a href="https://divarioitalia.it/tema/istituzioni-e-partecipazione">Istituzioni e partecipazione</a></li><li><a href="https://divarioitalia.it/tema/sicurezza-e-legalita">Sicurezza e legalità</a></li></ul>
+        <dl class="home-theme__ends">
+          <div><dt>In testa</dt><dd><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></dd></div>
+          <div><dt>In coda</dt><dd><a href="https://divarioitalia.it/regione/campania">Campania</a></dd></div>
+        </dl>
+      </li>
+    </ul>
+    <p class="home-more"><a class="linkarrow" href="https://divarioitalia.it/temi">Tutti i temi e i loro indicatori</a></p>
+  </section>
+  
+
+  <aside class="ad ad--leader" aria-label="Pubblicità"><span>Spazio pubblicitario riservato</span></aside>
+
+  
+  <section class="section home-stories" id="storie" aria-labelledby="h-storie">
+    <h2 id="h-storie">Le ultime storie</h2>
+    <ul class="cards cards--3">
+      <li class="card">
+        <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/giovani-morti-in-strada-nord-sud.jpg" alt="Un lungo rettilineo della strada statale 131 in Sardegna, fra colline boscose, con un camion e alcune auto." width="640" height="360" loading="lazy"></div>
+        <p class="card__kicker">Salute</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/blog/giovani-morti-in-strada-nord-sud">Giovani morti in strada: il Nord è migliorato di più, e al Sud un incidente uccide più spesso</a></h3>
+        <p class="card__text">Mortalità stradale fra 15 e 34 anni giù di due terzi in vent'anni, più al Nord che al Sud. E al Sud un incidente fuori città è più spesso mortale.</p>
+        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, 6 minuti di lettura</p>
+      </li>
+      <li class="card">
+        <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/infortuni-lavoro-province.jpg" alt="Un cartello bianco con la scritta Caduta materiali dall'alto, legato a una rete arancione da cantiere." width="640" height="360" loading="lazy"></div>
+        <p class="card__kicker">Lavoro</p>
+        <h3 class="card__title"><a href="articolo.html">Infortuni gravi sul lavoro: i grandi settori non bastano a spiegare la mappa</a></h3>
+        <p class="card__text">Arezzo e Mantova hanno la stessa quota di lavoro in campi, fabbriche e cantieri, ma ad Arezzo gli infortuni gravi sono più di tre volte. Abbiamo cercato perché.</p>
+        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, 6 minuti di lettura</p>
+      </li>
+      <li class="card">
+        <div class="card__media"><img src="https://divarioitalia.it/static/img/blog/scuola-media-competenze-nord-sud.jpg" alt="Un'aula scolastica vuota con banchi singoli e sedie colorate, una lavagna bianca e una lavagna interattiva." width="640" height="360" loading="lazy"></div>
+        <p class="card__kicker">Istruzione</p>
+        <h3 class="card__title"><a href="https://divarioitalia.it/blog/scuola-media-competenze-nord-sud">Italiano in terza media: gli alunni stranieri non bastano a spiegare il calo del Nord</a></h3>
+        <p class="card__text">In terza media cresce ovunque la quota di studenti sotto la soglia in italiano, più al Nord. Gli alunni stranieri contano, ma il calo riguarda anche i nativi.</p>
+        <p class="card__meta"><time datetime="2026-09-23">23 settembre 2026</time>, 6 minuti di lettura</p>
+      </li>
+    </ul>
+    <p class="home-more"><a class="linkarrow" href="https://divarioitalia.it/blog">Tutte le storie</a></p>
+  </section>
+  
+
+  
+  <section class="section" id="fonti" aria-labelledby="h-fonti">
+    <h2 id="h-fonti">Fonti, metodo e come citare</h2>
+    <dl class="specs">
+      <div><dt>Fonti</dt><dd>Istat ed Eurostat e altre fonti istituzionali. Ogni serie riporta l'ente che la produce e l'ultimo anno disponibile. <a href="https://divarioitalia.it/metodologia">Tutte le fonti</a></dd></div>
+      <div><dt>Catalogo</dt><dd>Il catalogo viene rivisto a ogni nuovo rilascio ufficiale. <a href="https://divarioitalia.it/catalogo-dati">Sfoglia il catalogo</a></dd></div>
+      <div><dt>Metodo</dt><dd>Definizione, unità, fonte e copertura restano su ogni indicatore. Le medie sono medie semplici delle regioni: ogni territorio pesa uguale, quindi non sono dati nazionali. <a href="https://divarioitalia.it/metodologia">Consulta la metodologia</a></dd></div>
+      <div><dt>Correzioni</dt><dd>Le rettifiche restano tracciate e pubbliche. <a href="https://github.com/nmaiese/diset-viz/issues/new">Segnala un errore</a> o scrivi alla redazione da <a href="https://divarioitalia.it/chi-siamo">Chi siamo</a>.</dd></div>
+      <div><dt>Licenza</dt><dd>Dati pubblicati con licenza <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons BY 4.0</a>.</dd></div>
+      <div><dt>Per assistenti e motori</dt><dd>Una versione in testo semplice del sito: <a href="https://divarioitalia.it/llms.txt">llms.txt</a></dd></div>
+    </dl>
+    <p class="home-cite-lead">Per un dato, aggiungi la fonte primaria e l'anno che trovi nella sua scheda. Le regole per intero stanno in <a href="https://divarioitalia.it/chi-siamo#come-citare">Come citare</a>.</p>
+    <div class="cite">
+  <p data-cite-text>Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati Istat ed Eurostat. https://divarioitalia.it/</p>
   <button class="btn" type="button" data-copy><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8" y="8" width="12" height="12"/><path d="M16 8V4H4v12h4"/></svg> <span>Copia la citazione</span></button>
   <span class="sr-only" role="status" data-copy-status></span>
 </div>
-      </section>
-    </div>
-  </div>
+  </section>
 </div>
-
-<section class="band" aria-labelledby="continua-da-qui">
-  <div class="wrap">
-    <h2 class="h-section" id="continua-da-qui">Continua da qui</h2>
-    <div class="lanes">
-      <div class="lane">
-        <h3>Nello stesso tema</h3>
-        <ul>
-          
-          <li><a href="https://divarioitalia.it/indicatore/famiglie-con-fonte-principale-di-reddito-da-capitale-e-altri-redditi/ims-MULTI_REDD_FONTE_CAPITALE" class="minicard">
-            <span class="minicard__title">Famiglie con fonte principale di reddito da capitale e altri redditi</span>
-            <span class="minicard__meta">2,4%, dati 2024</span>
-            <span class="minicard__spark"><svg class="spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="spark__line" fill="none" points="4.0,4.6 26.0,4.0 48.0,4.2 70.0,19.6 92.0,32.0 114.0,18.7 136.0,18.9"/><circle class="spark__dot" cx="136.0" cy="18.9" r="2"/></svg></span>
-          </a></li>
-          
-          <li><a href="https://divarioitalia.it/indicatore/famiglie-con-fonte-principale-di-reddito-da-lavoro-autonomo/ims-MULTI_REDD_FONTE_LAVAUT" class="minicard">
-            <span class="minicard__title">Famiglie con fonte principale di reddito da lavoro autonomo</span>
-            <span class="minicard__meta">12,9%, dati 2024</span>
-            <span class="minicard__spark"><svg class="spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="spark__line" fill="none" points="4.0,18.5 26.0,4.0 48.0,25.8 70.0,32.0 92.0,16.0 114.0,16.9 136.0,5.6"/><circle class="spark__dot" cx="136.0" cy="5.6" r="2"/></svg></span>
-          </a></li>
-          
-          <li><a href="https://divarioitalia.it/indicatore/famiglie-con-fonte-principale-di-reddito-da-lavoro-dipendente/ims-MULTI_REDD_FONTE_LAVDIP" class="minicard">
-            <span class="minicard__title">Famiglie con fonte principale di reddito da lavoro dipendente</span>
-            <span class="minicard__meta">43,4%, dati 2024</span>
-            <span class="minicard__spark"><svg class="spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="spark__line" fill="none" points="4.0,4.0 26.0,6.6 48.0,31.4 70.0,32.0 92.0,18.5 114.0,14.4 136.0,28.9"/><circle class="spark__dot" cx="136.0" cy="28.9" r="2"/></svg></span>
-          </a></li>
-          
-          <li><a href="https://divarioitalia.it/indicatore/persone-in-condizioni-di-grave-deprivazione-materiale-e-sociale-europa-2030-tota/ter-365">Precedente: Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030 (totale)</a></li>
-          <li><a href="https://divarioitalia.it/indicatore/popolazione-residente-nei-comuni-rurali/ter-245">Successivo: Popolazione residente nei comuni rurali</a></li>
-          <li><a href="https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita">Tutti gli indicatori del tema reddito, inclusione e accessibilità</a></li>
-        </ul>
-      </div>
-      <div class="lane">
-        <h3>Lo stesso dato, altre viste</h3>
-        <ul>
-          
-          
-          <li><a href="https://divarioitalia.it/confronto">Metti a confronto le regioni</a></li>
-          <li><a href="https://divarioitalia.it/atlante">Apri l'indicatore nell'atlante</a></li>
-        </ul>
-      </div>
-      <div class="lane">
-        <h3>Da leggere</h3>
-        <ul>
-          <li><a href="https://divarioitalia.it/blog/pil-pro-capite-regioni-divario-2024"><span class="minicard__title">PIL pro capite per regione: il divario Nord-Sud</span><br><span class="minicard__meta">Storia, 30 giugno 2026</span></a></li>
-          <li><a href="https://divarioitalia.it/regione/trentino-alto-adige">Il profilo di Trentino Alto Adige, in testa</a></li>
-          <li><a href="https://divarioitalia.it/regione/calabria">Il profilo di Calabria, in coda</a></li>
-          <li><a href="https://divarioitalia.it/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-<script type="application/json" data-explore-data>{"direction": "higher_better", "matrix": {"1995": {"abruzzo": 15377.5, "basilicata": 11629.5, "calabria": 9995.5, "campania": 11409.1, "emilia-romagna": 21133.7, "friuli-venezia-giulia": 18537.3, "lazio": 21900.4, "liguria": 17812.3, "lombardia": 23993.3, "marche": 16294.8, "molise": 13342.7, "piemonte": 18809.9, "puglia": 11027.9, "sardegna": 11791.2, "sicilia": 11102.5, "toscana": 18253.4, "trentino-alto-adige": 24735.4, "umbria": 16992.6, "valle-d-aosta": 26599.1, "veneto": 19966.8}, "1996": {"abruzzo": 16347.6, "basilicata": 12646.3, "calabria": 10546.6, "campania": 11927.0, "emilia-romagna": 22605.1, "friuli-venezia-giulia": 19427.5, "lazio": 22939.3, "liguria": 18915.7, "lombardia": 25404.9, "marche": 17444.0, "molise": 14186.3, "piemonte": 19752.2, "puglia": 11699.6, "sardegna": 12308.4, "sicilia": 11720.5, "toscana": 19321.5, "trentino-alto-adige": 26518.7, "umbria": 17723.7, "valle-d-aosta": 27502.4, "veneto": 21223.2}, "1997": {"abruzzo": 16881.9, "basilicata": 13416.1, "calabria": 11175.9, "campania": 12657.5, "emilia-romagna": 23458.1, "friuli-venezia-giulia": 20219.7, "lazio": 24125.9, "liguria": 19854.6, "lombardia": 26376.7, "marche": 18123.0, "molise": 15325.1, "piemonte": 20731.5, "puglia": 12117.0, "sardegna": 13109.6, "sicilia": 12228.7, "toscana": 20121.2, "trentino-alto-adige": 27034.5, "umbria": 18639.2, "valle-d-aosta": 27552.2, "veneto": 22175.0}, "1998": {"abruzzo": 17274.2, "basilicata": 14147.1, "calabria": 11693.6, "campania": 13243.0, "emilia-romagna": 24430.3, "friuli-venezia-giulia": 20758.8, "lazio": 25410.4, "liguria": 20785.1, "lombardia": 27484.6, "marche": 18635.9, "molise": 15891.6, "piemonte": 21479.2, "puglia": 12748.6, "sardegna": 13575.9, "sicilia": 12686.8, "toscana": 21074.7, "trentino-alto-adige": 28187.3, "umbria": 19119.9, "valle-d-aosta": 28561.8, "veneto": 22894.0}, "1999": {"abruzzo": 17880.1, "basilicata": 15174.3, "calabria": 12409.1, "campania": 13688.0, "emilia-romagna": 25295.2, "friuli-venezia-giulia": 21688.3, "lazio": 26075.6, "liguria": 21462.9, "lombardia": 28028.3, "marche": 19505.8, "molise": 16183.7, "piemonte": 22291.1, "puglia": 13363.7, "sardegna": 14126.0, "sicilia": 12909.7, "toscana": 21936.0, "trentino-alto-adige": 28727.6, "umbria": 19983.2, "valle-d-aosta": 28725.9, "veneto": 23512.7}, "2000": {"abruzzo": 19057.7, "basilicata": 15615.3, "calabria": 12911.9, "campania": 14452.9, "emilia-romagna": 27048.5, "friuli-venezia-giulia": 23265.1, "lazio": 27408.0, "liguria": 23015.5, "lombardia": 29458.7, "marche": 20532.8, "molise": 16962.9, "piemonte": 23346.2, "puglia": 14118.8, "sardegna": 14877.7, "sicilia": 13659.1, "toscana": 23208.5, "trentino-alto-adige": 30156.4, "umbria": 21077.5, "valle-d-aosta": 29291.9, "veneto": 25034.6}, "2001": {"abruzzo": 19967.7, "basilicata": 16209.1, "calabria": 13677.6, "campania": 15312.3, "emilia-romagna": 28015.6, "friuli-venezia-giulia": 24535.1, "lazio": 29074.6, "liguria": 24600.2, "lombardia": 30884.4, "marche": 21728.3, "molise": 17889.8, "piemonte": 24395.9, "puglia": 14812.0, "sardegna": 15848.1, "sicilia": 14499.3, "toscana": 24356.7, "trentino-alto-adige": 31222.7, "umbria": 22143.7, "valle-d-aosta": 30831.0, "veneto": 25934.9}, "2002": {"abruzzo": 20365.6, "basilicata": 16735.7, "calabria": 14097.9, "campania": 15969.8, "emilia-romagna": 28690.1, "friuli-venezia-giulia": 25192.7, "lazio": 30592.0, "liguria": 24965.0, "lombardia": 32080.9, "marche": 22876.0, "molise": 18397.8, "piemonte": 25255.7, "puglia": 15155.9, "sardegna": 16171.1, "sicilia": 14984.8, "toscana": 25180.0, "trentino-alto-adige": 31701.6, "umbria": 22537.3, "valle-d-aosta": 31833.1, "veneto": 26343.6}, "2003": {"abruzzo": 20564.3, "basilicata": 16817.8, "calabria": 14609.6, "campania": 16272.1, "emilia-romagna": 29225.6, "friuli-venezia-giulia": 25276.8, "lazio": 31310.3, "liguria": 25892.4, "lombardia": 32875.5, "marche": 23214.5, "molise": 18693.6, "piemonte": 25999.9, "puglia": 15555.7, "sardegna": 16991.7, "sicilia": 15525.4, "toscana": 25858.0, "trentino-alto-adige": 32521.1, "umbria": 23075.6, "valle-d-aosta": 33848.9, "veneto": 27310.5}, "2004": {"abruzzo": 20541.4, "basilicata": 17458.3, "calabria": 15328.2, "campania": 16728.5, "emilia-romagna": 30111.6, "friuli-venezia-giulia": 26047.8, "lazio": 32958.6, "liguria": 26777.6, "lombardia": 33607.9, "marche": 23977.7, "molise": 19538.2, "piemonte": 26819.2, "puglia": 16077.0, "sardegna": 17765.6, "sicilia": 15988.3, "toscana": 26646.1, "trentino-alto-adige": 33684.0, "umbria": 23817.0, "valle-d-aosta": 34541.4, "veneto": 28365.0}, "2005": {"abruzzo": 21421.9, "basilicata": 17771.7, "calabria": 15807.8, "campania": 17132.0, "emilia-romagna": 30686.4, "friuli-venezia-giulia": 27087.9, "lazio": 33639.9, "liguria": 27499.2, "lombardia": 34178.0, "marche": 24528.9, "molise": 20107.8, "piemonte": 27449.1, "puglia": 16373.8, "sardegna": 18122.3, "sicilia": 16703.5, "toscana": 27007.4, "trentino-alto-adige": 33995.1, "umbria": 24106.2, "valle-d-aosta": 35211.6, "veneto": 28895.5}, "2006": {"abruzzo": 22325.2, "basilicata": 18936.9, "calabria": 16520.6, "campania": 17778.2, "emilia-romagna": 32141.7, "friuli-venezia-giulia": 28308.3, "lazio": 34537.3, "liguria": 28388.1, "lombardia": 35024.2, "marche": 25740.2, "molise": 21525.6, "piemonte": 28519.3, "puglia": 17088.0, "sardegna": 19008.0, "sicilia": 17364.1, "toscana": 28091.9, "trentino-alto-adige": 35278.2, "umbria": 25190.3, "valle-d-aosta": 36271.3, "veneto": 29760.2}, "2007": {"abruzzo": 23074.9, "basilicata": 19778.9, "calabria": 16980.1, "campania": 18358.7, "emilia-romagna": 33411.3, "friuli-venezia-giulia": 29397.9, "lazio": 35586.0, "liguria": 29958.4, "lombardia": 36209.3, "marche": 26657.1, "molise": 22389.2, "piemonte": 29224.4, "puglia": 17506.9, "sardegna": 19505.8, "sicilia": 17685.2, "toscana": 29058.4, "trentino-alto-adige": 36620.4, "umbria": 25962.3, "valle-d-aosta": 37001.6, "veneto": 30768.4}, "2008": {"abruzzo": 23452.2, "basilicata": 19856.0, "calabria": 17262.0, "campania": 18411.5, "emilia-romagna": 33352.9, "friuli-venezia-giulia": 28966.4, "lazio": 35234.9, "liguria": 30562.2, "lombardia": 37307.4, "marche": 26268.9, "molise": 21913.4, "piemonte": 28999.5, "puglia": 17257.3, "sardegna": 19924.4, "sicilia": 17835.0, "toscana": 29047.9, "trentino-alto-adige": 37051.8, "umbria": 25948.9, "valle-d-aosta": 37859.9, "veneto": 30394.3}, "2009": {"abruzzo": 22507.9, "basilicata": 18805.6, "calabria": 16861.2, "campania": 17884.7, "emilia-romagna": 31381.5, "friuli-venezia-giulia": 27278.2, "lazio": 34448.5, "liguria": 29033.1, "lombardia": 35275.6, "marche": 25300.5, "molise": 21398.4, "piemonte": 26950.8, "puglia": 16747.2, "sardegna": 19472.0, "sicilia": 17317.6, "toscana": 28289.9, "trentino-alto-adige": 36291.0, "umbria": 24198.0, "valle-d-aosta": 35694.0, "veneto": 29128.3}, "2010": {"abruzzo": 23129.3, "basilicata": 18760.6, "calabria": 16855.1, "campania": 17682.6, "emilia-romagna": 31768.6, "friuli-venezia-giulia": 28210.0, "lazio": 34600.0, "liguria": 28601.2, "lombardia": 36651.4, "marche": 25307.7, "molise": 21499.0, "piemonte": 27832.6, "puglia": 17085.9, "sardegna": 19650.1, "sicilia": 17289.5, "toscana": 28481.4, "trentino-alto-adige": 37272.6, "umbria": 24622.5, "valle-d-aosta": 37335.2, "veneto": 29545.2}, "2011": {"abruzzo": 24197.8, "basilicata": 19494.6, "calabria": 17026.2, "campania": 17735.1, "emilia-romagna": 32950.6, "friuli-venezia-giulia": 28903.5, "lazio": 35054.9, "liguria": 29415.5, "lombardia": 37290.7, "marche": 25702.9, "molise": 21623.1, "piemonte": 28514.0, "puglia": 17445.7, "sardegna": 19961.2, "sicilia": 17275.0, "toscana": 29111.8, "trentino-alto-adige": 38173.4, "umbria": 24876.8, "valle-d-aosta": 38039.3, "veneto": 30543.2}, "2012": {"abruzzo": 24093.8, "basilicata": 19401.5, "calabria": 16734.8, "campania": 17608.5, "emilia-romagna": 32350.8, "friuli-venezia-giulia": 28181.7, "lazio": 33801.5, "liguria": 28907.5, "lombardia": 36407.8, "marche": 25129.7, "molise": 20993.7, "piemonte": 27552.5, "puglia": 17527.2, "sardegna": 20026.8, "sicilia": 17210.4, "toscana": 28865.4, "trentino-alto-adige": 38902.3, "umbria": 24158.0, "valle-d-aosta": 38248.0, "veneto": 29944.0}, "2013": {"abruzzo": 23736.0, "basilicata": 19947.0, "calabria": 16455.2, "campania": 17335.2, "emilia-romagna": 32454.8, "friuli-venezia-giulia": 28371.2, "lazio": 33081.3, "liguria": 28677.2, "lombardia": 35837.0, "marche": 24754.7, "molise": 19746.5, "piemonte": 27779.6, "puglia": 17109.5, "sardegna": 19529.1, "sicilia": 17003.0, "toscana": 28593.5, "trentino-alto-adige": 39352.1, "umbria": 23756.4, "valle-d-aosta": 36633.1, "veneto": 29897.0}, "2014": {"abruzzo": 23760.4, "basilicata": 19339.0, "calabria": 16353.2, "campania": 17418.8, "emilia-romagna": 33020.3, "friuli-venezia-giulia": 28528.1, "lazio": 32959.4, "liguria": 29338.9, "lombardia": 36435.2, "marche": 25463.0, "molise": 19625.5, "piemonte": 27801.7, "puglia": 17302.2, "sardegna": 19641.7, "sicilia": 16689.7, "toscana": 29145.1, "trentino-alto-adige": 39325.4, "umbria": 23383.0, "valle-d-aosta": 36239.0, "veneto": 30382.7}, "2015": {"abruzzo": 24036.8, "basilicata": 20959.9, "calabria": 16557.7, "campania": 17842.0, "emilia-romagna": 33602.3, "friuli-venezia-giulia": 29407.6, "lazio": 32950.9, "liguria": 29925.8, "lombardia": 37137.0, "marche": 25648.9, "molise": 20091.8, "piemonte": 28441.7, "puglia": 17733.6, "sardegna": 20363.3, "sicilia": 17043.6, "toscana": 29498.2, "trentino-alto-adige": 39628.9, "umbria": 24177.3, "valle-d-aosta": 36465.0, "veneto": 31038.8}, "2016": {"abruzzo": 24248.8, "basilicata": 21074.0, "calabria": 16907.1, "campania": 18199.6, "emilia-romagna": 34654.6, "friuli-venezia-giulia": 29890.2, "lazio": 34291.3, "liguria": 30665.8, "lombardia": 38174.9, "marche": 26251.5, "molise": 20491.6, "piemonte": 29308.6, "puglia": 18144.5, "sardegna": 20213.5, "sicilia": 17242.8, "toscana": 30236.0, "trentino-alto-adige": 40305.7, "umbria": 24397.7, "valle-d-aosta": 36238.2, "veneto": 32138.8}, "2017": {"abruzzo": 24987.3, "basilicata": 21375.2, "calabria": 17336.8, "campania": 18620.2, "emilia-romagna": 35565.0, "friuli-venezia-giulia": 30572.3, "lazio": 34707.7, "liguria": 31474.9, "lombardia": 39114.3, "marche": 26930.1, "molise": 21094.5, "piemonte": 30418.0, "puglia": 18494.6, "sardegna": 20670.5, "sicilia": 17696.0, "toscana": 30942.8, "trentino-alto-adige": 41317.4, "umbria": 25077.1, "valle-d-aosta": 37725.3, "veneto": 33014.4}, "2018": {"abruzzo": 25163.9, "basilicata": 22548.2, "calabria": 17317.1, "campania": 18871.5, "emilia-romagna": 36283.4, "friuli-venezia-giulia": 31436.2, "lazio": 35215.4, "liguria": 31728.5, "lombardia": 40078.6, "marche": 27465.9, "molise": 21641.2, "piemonte": 31161.6, "puglia": 18920.3, "sardegna": 21076.0, "sicilia": 17837.5, "toscana": 31744.8, "trentino-alto-adige": 42798.7, "umbria": 25908.4, "valle-d-aosta": 38180.5, "veneto": 33691.5}, "2019": {"abruzzo": 25460.6, "basilicata": 22437.5, "calabria": 17597.6, "campania": 19353.4, "emilia-romagna": 36521.0, "friuli-venezia-giulia": 32264.6, "lazio": 35843.3, "liguria": 32403.7, "lombardia": 40425.6, "marche": 28072.9, "molise": 22293.5, "piemonte": 31429.8, "puglia": 19269.7, "sardegna": 21646.1, "sicilia": 18187.7, "toscana": 33072.6, "trentino-alto-adige": 43860.2, "umbria": 26177.6, "valle-d-aosta": 38688.9, "veneto": 34308.9}, "2020": {"abruzzo": 23728.4, "basilicata": 20583.5, "calabria": 16588.6, "campania": 18078.6, "emilia-romagna": 34182.7, "friuli-venezia-giulia": 30239.0, "lazio": 33246.0, "liguria": 29545.6, "lombardia": 37986.5, "marche": 26070.2, "molise": 20971.9, "piemonte": 29059.9, "puglia": 18217.5, "sardegna": 20199.7, "sicilia": 17214.5, "toscana": 29276.3, "trentino-alto-adige": 40981.0, "umbria": 24175.4, "valle-d-aosta": 35610.6, "veneto": 31494.3}, "2021": {"abruzzo": 26292.5, "basilicata": 23859.9, "calabria": 18335.4, "campania": 19908.2, "emilia-romagna": 38128.0, "friuli-venezia-giulia": 33767.4, "lazio": 35754.7, "liguria": 32620.0, "lombardia": 42584.3, "marche": 28959.4, "molise": 23332.4, "piemonte": 32261.6, "puglia": 20255.1, "sardegna": 22472.7, "sicilia": 19076.2, "toscana": 32512.3, "trentino-alto-adige": 44670.4, "umbria": 26692.9, "valle-d-aosta": 38666.0, "veneto": 34994.5}, "2022": {"abruzzo": 28600.1, "basilicata": 25934.1, "calabria": 19667.1, "campania": 21791.1, "emilia-romagna": 40744.9, "friuli-venezia-giulia": 35735.2, "lazio": 39786.3, "liguria": 35164.6, "lombardia": 45964.0, "marche": 31227.4, "molise": 25009.0, "piemonte": 34514.2, "puglia": 22069.0, "sardegna": 24558.2, "sicilia": 21229.9, "toscana": 35647.7, "trentino-alto-adige": 49824.9, "umbria": 28830.5, "valle-d-aosta": 43799.0, "veneto": 37956.3}, "2023": {"abruzzo": 31120.4, "basilicata": 27718.9, "calabria": 21131.1, "campania": 23725.2, "emilia-romagna": 43757.2, "friuli-venezia-giulia": 37729.4, "lazio": 42202.6, "liguria": 38505.2, "lombardia": 49144.2, "marche": 33331.5, "molise": 27161.1, "piemonte": 37439.3, "puglia": 23636.3, "sardegna": 26551.1, "sicilia": 22241.2, "toscana": 38144.6, "trentino-alto-adige": 54120.3, "umbria": 31442.9, "valle-d-aosta": 47123.4, "veneto": 40671.5}, "2024": {"abruzzo": 32108.7, "basilicata": 28416.3, "calabria": 21702.2, "campania": 24564.2, "emilia-romagna": 44557.0, "friuli-venezia-giulia": 39005.1, "lazio": 43166.9, "liguria": 38841.8, "lombardia": 50398.9, "marche": 34149.1, "molise": 27697.8, "piemonte": 38625.5, "puglia": 24327.7, "sardegna": 27730.8, "sicilia": 23308.7, "toscana": 39262.0, "trentino-alto-adige": 54636.7, "umbria": 32466.9, "valle-d-aosta": 47742.8, "veneto": 41496.3}}, "names": {"abruzzo": "Abruzzo", "basilicata": "Basilicata", "calabria": "Calabria", "campania": "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli-Venezia Giulia", "lazio": "Lazio", "liguria": "Liguria", "lombardia": "Lombardia", "marche": "Marche", "molise": "Molise", "piemonte": "Piemonte", "puglia": "Puglia", "sardegna": "Sardegna", "sicilia": "Sicilia", "toscana": "Toscana", "trentino-alto-adige": "Trentino Alto Adige", "umbria": "Umbria", "valle-d-aosta": "Valle d\u0027Aosta", "veneto": "Veneto"}, "plural": "regioni", "profile": "/regione/", "south": ["abruzzo", "basilicata", "calabria", "campania", "molise", "puglia", "sardegna", "sicilia"], "unit": "euro", "years": [1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]}</script>
+<script type="application/json" data-explore-data>{"direction": "higher_better", "matrix": {"2024": {"abruzzo": 32108.7, "basilicata": 28416.3, "calabria": 21702.2, "campania": 24564.2, "emilia-romagna": 44557.0, "friuli-venezia-giulia": 39005.1, "lazio": 43166.9, "liguria": 38841.8, "lombardia": 50398.9, "marche": 34149.1, "molise": 27697.8, "piemonte": 38625.5, "puglia": 24327.7, "sardegna": 27730.8, "sicilia": 23308.7, "toscana": 39262.0, "trentino-alto-adige": 54636.7, "umbria": 32466.9, "valle-d-aosta": 47742.8, "veneto": 41496.3}}, "names": {"abruzzo": "Abruzzo", "basilicata": "Basilicata", "calabria": "Calabria", "campania": "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli-Venezia Giulia", "lazio": "Lazio", "liguria": "Liguria", "lombardia": "Lombardia", "marche": "Marche", "molise": "Molise", "piemonte": "Piemonte", "puglia": "Puglia", "sardegna": "Sardegna", "sicilia": "Sicilia", "toscana": "Toscana", "trentino-alto-adige": "Trentino Alto Adige", "umbria": "Umbria", "valle-d-aosta": "Valle d\u0027Aosta", "veneto": "Veneto"}, "plural": "regioni", "profile": "/regione/", "south": ["abruzzo", "basilicata", "calabria", "campania", "molise", "puglia", "sardegna", "sicilia"], "unit": "euro", "years": [2024]}</script>
 
 </main>
 
@@ -1300,7 +1377,7 @@ body.has-proto { padding-bottom: 96px; }
     </div>
   </div>
 </footer>
-<div class="proto-bar" role="region" aria-label="Prototipo"><b>Divario Italia 1.0, prototipo</b><nav class="proto-bar__pages" aria-label="Pagine del prototipo"><a href="indicatore.html" aria-current="page" data-page-link="indicatore">Scheda indicatore</a><a href="home.html" data-page-link="home">Home</a><a href="regione.html" data-page-link="regione">Regione</a><a href="provincia.html" data-page-link="provincia">Provincia</a><a href="articolo.html" data-page-link="articolo">Articolo</a><a href="classifica.html" data-page-link="classifica">Classifica</a><a href="qualita-della-vita.html" data-page-link="qualita-della-vita">Qualità della vita</a></nav><div class="proto-bar__theme" role="group" aria-label="Tema"><button type="button" data-set-theme="" aria-pressed="true">Sistema</button><button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button><button type="button" data-set-theme="dark" aria-pressed="false">Scuro</button></div></div>
+<div class="proto-bar" role="region" aria-label="Prototipo"><b>Divario Italia 1.0, prototipo</b><nav class="proto-bar__pages" aria-label="Pagine del prototipo"><a href="indicatore.html" data-page-link="indicatore">Scheda indicatore</a><a href="home.html" aria-current="page" data-page-link="home">Home</a><a href="regione.html" data-page-link="regione">Regione</a><a href="provincia.html" data-page-link="provincia">Provincia</a><a href="articolo.html" data-page-link="articolo">Articolo</a><a href="classifica.html" data-page-link="classifica">Classifica</a><a href="qualita-della-vita.html" data-page-link="qualita-della-vita">Qualità della vita</a></nav><div class="proto-bar__theme" role="group" aria-label="Tema"><button type="button" data-set-theme="" aria-pressed="true">Sistema</button><button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button><button type="button" data-set-theme="dark" aria-pressed="false">Scuro</button></div></div>
 <script>
 /* Divario Italia 1.0, prototipo: il poco JavaScript che serve.
    La pagina a riposo e' completa senza: mappa colorata, classifica, serie e
