@@ -1097,6 +1097,8 @@ function IndicatorIndex({ items, onOpen }) {
     return (
       <p className="card-empty">
         Nessun indicatore corrisponde ai filtri. Prova a cambiare tema o ad attivare i dati parziali.
+        {" "}L'atlante è regionale: gli indicatori misurati solo per provincia sono nelle
+        {" "}<a href="/province">pagine delle province</a>.
       </p>
     );
   }
@@ -1499,6 +1501,22 @@ function RegionProfile({ profile, onOpenIndicator, onSelectRegion, onRandomRegio
               >
                 {s.region}
               </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Le province della regione, dal campo `provinces` di /api/region:
+          dall'atlante non si raggiungeva nessuna provincia. Sono link veri alle
+          pagine Flask, non una vista della SPA. */}
+      {!!(profile.provinces && profile.provinces.length) && (
+        <section className="region-card region-similar">
+          <h3><MapPinned size={16} /> {profile.provinces.length === 1 ? "La provincia" : `Le ${profile.provinces.length} province`}</h3>
+          <div className="region-similar__grid">
+            {profile.provinces.map((p) => (
+              <a key={p.key} className="region-similar__card" href={p.path}>
+                {p.name}
+              </a>
             ))}
           </div>
         </section>

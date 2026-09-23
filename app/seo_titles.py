@@ -335,6 +335,30 @@ def _preposition(name, level):
     return at_place(name) if level.get("key") == "provincia" else f"in {name}"
 
 
+_MASCULINE_REGIONS = {
+    "Piemonte", "Veneto", "Lazio", "Molise", "Trentino Alto Adige",
+    "Trentino-Alto Adige", "Friuli-Venezia Giulia",
+}
+_PLURAL_REGIONS = {"Marche"}
+
+
+def of_region(name):
+    """"del Veneto", "della Puglia", "dell'Umbria", "delle Marche".
+
+    Le regioni prendono l'articolo, e "Le province di Puglia" non e' come lo
+    si dice. Il genere non si indovina dalla desinenza (il Piemonte, il
+    Molise), quindi i maschili e il plurale sono scritti qui.
+    """
+    name = (name or "").strip()
+    if name in _PLURAL_REGIONS:
+        return f"delle {name}"
+    if name in _MASCULINE_REGIONS:
+        return f"dell'{name}" if name[:1].lower() in "aeiou" else f"del {name}"
+    if name[:1].lower() in "aeiou":
+        return f"dell'{name}"
+    return f"della {name}"
+
+
 def at_place(name):
     """"a Milano", "ad Aosta", "all'Aquila", "alla Spezia".
 

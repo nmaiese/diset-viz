@@ -150,6 +150,46 @@ def unmeasured_provinces():
     return sorted(names)
 
 
+def by_region():
+    """`{region_key: [provincia, ...]}`: le province di ogni regione.
+
+    Le regioni nell'ordine geografico del sito, quello di
+    `profiles.regions_overview`, le province in ordine alfabetico: e' l'indice
+    che risponde a "dov'e' la mia provincia", non a "chi e' prima", che e'
+    la classifica. Ogni provincia porta posizione e punteggio del profilo
+    predefinito, per chi vuole il numero senza aprire la pagina.
+
+    Una provincia la cui regione non ha una pagina e' un errore, non una riga
+    saltata: e' cosi' che Bolzano e Trento sono rimaste per mesi nella
+    "regione" Provincia Autonoma, senza che niente lo dicesse.
+    """
+    ranking = qb.build_bes_ranking(LIVELLO, qb.DEFAULT_PROFILE)
+    if not ranking:
+        return {}
+    grouped = {key: [] for key in profiles.regions_overview()}
+    for row in ranking["ranking"]:
+        region_key = profiles.region_key_for(row.get("region") or "")
+        if region_key not in grouped:
+            raise LookupError(
+                f"provincia {row.get('key')!r}: la regione {row.get('region')!r} non ha una pagina")
+        grouped[region_key].append({
+            "key": row["key"],
+            "name": row["name"],
+            "path": f"/provincia/{row['key']}",
+            "rank": row.get("rank"),
+            "score": row.get("score"),
+            "metro_city": bool(row.get("metro_city")),
+        })
+    for provinces in grouped.values():
+        provinces.sort(key=lambda entry: entry["name"])
+    return grouped
+
+
+def total():
+    """Quante province sono misurate: il numero che le pagine scrivono."""
+    return len(chiavi())
+
+
 def vicine(chiave, quante=6):
     """Le province vicine in classifica, per non chiudere la pagina in fondo.
 

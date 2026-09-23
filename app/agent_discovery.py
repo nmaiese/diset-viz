@@ -27,6 +27,7 @@ _MARKDOWN_EXACT_PATHS = {
     "/blog",
     "/catalogo-dati",
     "/metodologia",
+    "/province",
 }
 _MARKDOWN_PREFIXES = ("/blog/", "/indicatore/", "/provincia/", "/regione/", "/tema/")
 
@@ -560,7 +561,7 @@ def indicator_markdown(meta, level, article, site_url):
     return "\n".join(lines)
 
 
-def region_markdown(profile, site_url):
+def region_markdown(profile, site_url, provinces=()):
     lines = [
         f"# {profile['region']}: profilo territoriale",
         "",
@@ -578,6 +579,13 @@ def region_markdown(profile, site_url):
         lines += ["", "## Temi in cui la regione si colloca più in basso", ""]
         for item in profile["themes_weak"]:
             lines.append(f"- [{item['theme']}]({_absolute(site_url, item['theme_path'])}), {item['count']} indicatori confrontabili")
+    if provinces:
+        from app.seo_titles import of_region
+        title = "La provincia" if len(provinces) == 1 else "Le province"
+        lines += ["", f"## {title} {of_region(profile['region'])}", ""]
+        for item in provinces:
+            lines.append(f"- [{item['name']}]({_absolute(site_url, item['path'])}), "
+                         f"{item['rank']}ª per qualità della vita")
     lines += ["", "## Indicatori in evidenza", ""]
     for item in (profile.get("top_excels") or [])[:6]:
         lines.append(f"- [{item['name']}]({_absolute(site_url, item['path'])})")
@@ -748,7 +756,30 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
     return "\n".join(lines)
 
 
-def theme_markdown(profile, site_url, standings=None):
+def provinces_index_markdown(regions, total, site_url):
+    """L'indice delle province, regione per regione, come la pagina HTML."""
+    lines = [
+        f"# Le {total} province italiane, regione per regione",
+        "",
+        (f"Il profilo di ognuna delle {total} province misurate dal BES dei Territori di Istat, "
+         "in ordine geografico. La posizione è quella della classifica della qualità della vita, "
+         "profilo equilibrato."),
+        "",
+        f"URL canonica: {site_url}/province",
+        f"Classifica: {site_url}/qualita-della-vita/classifica/province",
+    ]
+    for region in regions:
+        if not region["provinces"]:
+            continue
+        lines += ["", f"## {region['region']}", "",
+                  f"Profilo della regione: {_absolute(site_url, region['path'])}", ""]
+        for item in region["provinces"]:
+            lines.append(f"- [{item['name']}]({_absolute(site_url, item['path'])}), "
+                         f"{item['rank']}ª su {total}")
+    return "\n".join(lines)
+
+
+def theme_markdown(profile, site_url, standings=None, province_total=None):
     lines = [
         f"# {profile['theme']}",
         "",
@@ -789,4 +820,8 @@ def theme_markdown(profile, site_url, standings=None):
             f"- [{item['name']}]({_absolute(site_url, item['path'])}), "
             f"dal {item['year_min']} al {item['year_max']}. {_clean(item.get('plain'))}"
         )
+    if province_total:
+        lines += ["", "## Gli altri modi di guardare", "",
+                  f"- [Il profilo di ognuna delle regioni]({site_url}/regioni)",
+                  f"- [Il profilo di ognuna delle {province_total} province]({site_url}/province)"]
     return "\n".join(lines)

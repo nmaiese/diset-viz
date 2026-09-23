@@ -69,7 +69,7 @@
       {% else %}
       <h1>{{ p.theme }}</h1>
       <p class="page-lead">{{ p.description }}</p>
-      <p class="page-intro">Su questo tema non esce una classifica regionale: gli indicatori direzionali con dati completi su tutte e venti le regioni non bastano, e un confronto su copertura parziale direbbe più di quello che i dati sanno. Qui sotto ci sono tutte le serie disponibili.</p>
+      <p class="page-intro">Su questo tema non esce una classifica regionale: gli indicatori direzionali con dati completi su tutte e {{ region_total }} le regioni non bastano, e un confronto su copertura parziale direbbe più di quello che i dati sanno. Qui sotto ci sono tutte le serie disponibili.</p>
       {% endif %}
       <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
     </div>
@@ -204,7 +204,8 @@
       <div class="panel-card">
         <p class="section-label">Gli altri modi di guardare</p>
         <ul class="indicator-list">
-          <li><a href="/regioni">Il profilo di ognuna delle venti regioni</a></li>
+          <li><a href="/regioni">Il profilo di ognuna delle {{ region_total }} regioni</a></li>
+          <li><a href="/province">Il profilo di ognuna delle {{ province_total }} province</a></li>
           <li><a href="/confronto">Mettere due o tre territori sullo stesso piano</a></li>
           <li><a href="/divari-regionali">Quanto pesa davvero il divario Nord-Sud</a></li>
           <li><a href="/atlante">L'atlante, con mappa e serie storica</a></li>
