@@ -85,11 +85,11 @@ def _head(html: str, headers) -> dict:
     """Il contratto SEO della pagina di oggi."""
 
     def first(pattern):
-        m = re.search(pattern, html, flags=re.S | re.I)
+        m = re.search(pattern, html, flags=re.DOTALL | re.IGNORECASE)
         return m.group(1).strip() if m else None
 
     jsonld = []
-    for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, flags=re.S):
+    for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, flags=re.DOTALL):
         try:
             jsonld.append(json.loads(block))
         except json.JSONDecodeError as exc:
@@ -110,8 +110,8 @@ def _head(html: str, headers) -> dict:
 def main() -> None:
     from flask import template_rendered
 
-    from app import app as flask_app  # non `import app`: app.views ribalta il nome
     import app.views  # noqa: F401  registra rotte e filtri
+    from app import app as flask_app  # non `import app`: app.views ribalta il nome
     from app import nav
     from app.cache import cache
 
@@ -126,7 +126,7 @@ def main() -> None:
     template_rendered.connect(on_render, flask_app, weak=False)
     client = flask_app.test_client()
     manifest = {
-        "commit": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip(),
+        "commit": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=ROOT, check=True).stdout.strip(),
         "pages": {},
     }
 

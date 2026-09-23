@@ -1,5 +1,5 @@
 {
- "commit": "0a325792e3b7c96d2d627d2a3109ce11bede689b",
+ "commit": "d4d1195ff6208eb20203c62e2911bc5800b0ddba",
  "pages": {
   "home": {
    "route": "/",
@@ -69,7 +69,7 @@
    "final_url": "/qualita-della-vita/classifica/regioni",
    "template": "quality_life_classifica.html",
    "markdown": false,
-   "html_bytes": 144534
+   "html_bytes": 144529
   },
   "classifica-province": {
    "route": "/qualita-della-vita/classifica/province",

@@ -1141,15 +1141,6 @@
        "path": "/indicatore/spesa-in-ricerca-e-sviluppo-sul-pil-eurostat-nuts2/eur-rd_e_gerdreg"
       },
       {
-       "id": "167",
-       "name": "Intensità di accumulazione del capitale",
-       "theme": "Imprese e competitività",
-       "score": 74.0,
-       "year_max": 2023,
-       "direction": "higher_better",
-       "path": "/indicatore/intensita-di-accumulazione-del-capitale/ter-167"
-      },
-      {
        "id": "471",
        "name": "Investimenti privati sul PIL",
        "theme": "Imprese e competitività",
@@ -1157,6 +1148,15 @@
        "year_max": 2023,
        "direction": "higher_better",
        "path": "/indicatore/investimenti-privati-sul-pil/ter-471"
+      },
+      {
+       "id": "167",
+       "name": "Intensità di accumulazione del capitale",
+       "theme": "Imprese e competitività",
+       "score": 74.0,
+       "year_max": 2023,
+       "direction": "higher_better",
+       "path": "/indicatore/intensita-di-accumulazione-del-capitale/ter-167"
       },
       {
        "id": "644",
@@ -2365,15 +2365,6 @@
        "path": "/indicatore/consumi-di-energia-elettrica-coperti-da-fonti-rinnovabili-escluso-idro/ter-86"
       },
       {
-       "id": "167",
-       "name": "Intensità di accumulazione del capitale",
-       "theme": "Imprese e competitività",
-       "score": 81.5,
-       "year_max": 2023,
-       "direction": "higher_better",
-       "path": "/indicatore/intensita-di-accumulazione-del-capitale/ter-167"
-      },
-      {
        "id": "471",
        "name": "Investimenti privati sul PIL",
        "theme": "Imprese e competitività",
@@ -2381,6 +2372,15 @@
        "year_max": 2023,
        "direction": "higher_better",
        "path": "/indicatore/investimenti-privati-sul-pil/ter-471"
+      },
+      {
+       "id": "167",
+       "name": "Intensità di accumulazione del capitale",
+       "theme": "Imprese e competitività",
+       "score": 81.5,
+       "year_max": 2023,
+       "direction": "higher_better",
+       "path": "/indicatore/intensita-di-accumulazione-del-capitale/ter-167"
       },
       {
        "id": "600",
@@ -3255,8 +3255,8 @@
     {
      "slug": "istruzione_capitale_umano",
      "name": "Istruzione e formazione",
-     "territory": "Trentino Alto Adige",
-     "key": "trentino-alto-adige",
+     "territory": "Emilia-Romagna",
+     "key": "emilia-romagna",
      "region": "",
      "score": 65.0
     },
@@ -3462,14 +3462,14 @@
        "score": 69.8
       },
       {
-       "territory": "Lazio",
-       "key": "lazio",
+       "territory": "Lombardia",
+       "key": "lombardia",
        "region": "",
        "score": 66.2
       },
       {
-       "territory": "Lombardia",
-       "key": "lombardia",
+       "territory": "Lazio",
+       "key": "lazio",
        "region": "",
        "score": 66.2
       },
@@ -3590,14 +3590,14 @@
      "name": "Istruzione e formazione",
      "top": [
       {
-       "territory": "Trentino Alto Adige",
-       "key": "trentino-alto-adige",
+       "territory": "Emilia-Romagna",
+       "key": "emilia-romagna",
        "region": "",
        "score": 65.0
       },
       {
-       "territory": "Emilia-Romagna",
-       "key": "emilia-romagna",
+       "territory": "Trentino Alto Adige",
+       "key": "trentino-alto-adige",
        "region": "",
        "score": 65.0
       },
@@ -3742,14 +3742,14 @@
        "score": 59.5
       },
       {
-       "territory": "Valle d'Aosta",
-       "key": "valle-d-aosta",
+       "territory": "Piemonte",
+       "key": "piemonte",
        "region": "",
        "score": 57.5
       },
       {
-       "territory": "Piemonte",
-       "key": "piemonte",
+       "territory": "Valle d'Aosta",
+       "key": "valle-d-aosta",
        "region": "",
        "score": 57.5
       }
@@ -3998,14 +3998,14 @@
        "score": 68.7
       },
       {
-       "territory": "Lazio",
-       "key": "lazio",
+       "territory": "Lombardia",
+       "key": "lombardia",
        "region": "",
        "score": 65.9
       },
       {
-       "territory": "Lombardia",
-       "key": "lombardia",
+       "territory": "Lazio",
+       "key": "lazio",
        "region": "",
        "score": 65.9
       },

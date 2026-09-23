@@ -15,7 +15,16 @@ import json
 import sys
 from pathlib import Path
 
-from colors import VISIONS, contrast, distance, from_oklch, hue_gap, luminance, min_distance, oklch
+from colors import (
+    VISIONS,
+    contrast,
+    distance,
+    from_oklch,
+    hue_gap,
+    luminance,
+    min_distance,
+    oklch,
+)
 
 TOKENS = Path(__file__).resolve().parents[1] / "tokens" / "tokens.json"
 
@@ -63,12 +72,12 @@ def check(tokens: dict) -> list[str]:
         print("rampa sequenziale")
         seq = [t[f"seq-{i}"] for i in range(1, 7)]
         lums = [luminance(c) for c in seq]
-        monotone = all(a > b for a, b in zip(lums, lums[1:])) if theme == "light" else all(a < b for a, b in zip(lums, lums[1:]))
+        monotone = all(a > b for a, b in itertools.pairwise(lums)) if theme == "light" else all(a < b for a, b in itertools.pairwise(lums))
         need(monotone, f"{theme} rampa monotona dal poco al molto contrasto col fondo")
         r = contrast(seq[0], t["bg"])
         need(r >= 1.15, f"{theme} primo passo staccato dal fondo: {r:.2f}")
         need(contrast(seq[-1], t["bg"]) >= 3, f"{theme} ultimo passo a 3:1 sul fondo: {contrast(seq[-1], t['bg']):.2f}")
-        steps = [min_distance(a, b) for a, b in zip(seq, seq[1:])]
+        steps = [min_distance(a, b) for a, b in itertools.pairwise(seq)]
         need(min(steps) >= SEQ_STEP_MIN, f"{theme} passi vicini distinguibili in ogni visione: minimo {min(steps):.3f}")
         d = min(min_distance(seq[0], t["data-null"]), 9)
         print(f"  info {theme} primo passo contro dato mancante: {d:.3f} (il tratteggio li separa)")
