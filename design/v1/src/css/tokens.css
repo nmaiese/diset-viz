@@ -3,8 +3,14 @@
 
 :root {
   color-scheme: light;
-  --font-sans: "Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --fw-heading: 760;
+  --fw-num: 700;
   --fs-display: clamp(36px, 26.909px + 2.4242vw, 56px);
   --lh-display: 1.04;
   --fw-display: 800;
@@ -127,6 +133,28 @@
   --cat-3: #63591d;
   --cat-4: #33278d;
   --ad-bg: #f5f6f8;
+  --area-nord: #2466c3;
+  --area-centro: #504907;
+  --area-sud: #983c75;
+}
+
+:root[data-font="schibsted"] {
+  --font-ui: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Schibsted Grotesk", system-ui, sans-serif;
+  --font-num: "Schibsted Grotesk", system-ui, sans-serif;
+  --fw-heading: 760;
+  --fw-num: 700;
+}
+:root[data-font="serif"] {
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --fw-heading: 650;
+  --fw-num: 700;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -186,6 +214,9 @@
     --cat-3: #d6cc8f;
     --cat-4: #9281e1;
     --ad-bg: #1a1d21;
+    --area-nord: #5182e5;
+    --area-centro: #a48118;
+    --area-sud: #f7b1df;
   }
 }
 
@@ -245,4 +276,7 @@
   --cat-3: #d6cc8f;
   --cat-4: #9281e1;
   --ad-bg: #1a1d21;
+  --area-nord: #5182e5;
+  --area-centro: #a48118;
+  --area-sud: #f7b1df;
 }

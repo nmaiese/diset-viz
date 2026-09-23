@@ -103,6 +103,15 @@ def check(tokens: dict) -> list[str]:
         worst = min(((min_distance(a, b), i, j) for (i, a), (j, b) in itertools.combinations(enumerate(cats, 1), 2)))
         need(worst[0] >= CAT_MIN, f"{theme} categoriale, coppia piu' vicina cat-{worst[1]}/cat-{worst[2]}: {worst[0]:.3f}")
 
+        print("ripartizioni (Nord, Centro, Mezzogiorno)")
+        areas = [t["area-nord"], t["area-centro"], t["area-sud"]]
+        for name, c in zip(("nord", "centro", "sud"), areas):
+            need(min(contrast(c, t[s]) for s in ("bg", "surface-1")) >= 3, f"{theme} area-{name} {c} a 3:1 sui fondi")
+            need(min_distance(c, t["cmp"]) >= 0.1, f"{theme} area-{name} lontana dal grigio di contesto: {min_distance(c, t['cmp']):.3f}")
+            need(distance(c, t["accent"]) >= 0.12, f"{theme} area-{name} lontana dall'accento: {distance(c, t['accent']):.3f}")
+        worst = min(min_distance(a, b) for a, b in itertools.combinations(areas, 2))
+        need(worst >= 0.12, f"{theme} ripartizioni distinguibili in ogni visione: minimo {worst:.3f}")
+
     print("\n== convivenza col simbolo ==")
     for theme in ("light", "dark"):
         acc = tokens[theme]["accent"]

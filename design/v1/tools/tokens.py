@@ -28,6 +28,19 @@ def fluid(mobile: float, desktop: float) -> str:
     return f"clamp({mobile}px, {base:.3f}px + {slope * 100:.4f}vw, {desktop}px)"
 
 
+def font_block(option: dict, indent: str) -> list[str]:
+    """I ruoli del carattere: interfaccia, testo lungo, titoli, cifre."""
+    return [
+        f"{indent}--font-ui: {option['ui']};",
+        f"{indent}--font-sans: {option['ui']};",
+        f"{indent}--font-text: {option['text']};",
+        f"{indent}--font-display: {option['display']};",
+        f"{indent}--font-num: {option['num']};",
+        f"{indent}--fw-heading: {option['fw-heading']};",
+        f"{indent}--fw-num: {option['fw-num']};",
+    ]
+
+
 def colors(block: dict, indent: str) -> str:
     return "\n".join(f"{indent}--{name}: {value};" for name, value in block.items())
 
@@ -39,9 +52,10 @@ def build(tokens: dict) -> str:
         "",
         ":root {",
         "  color-scheme: light;",
-        f"  --font-sans: {tokens['fonts']['sans']};",
         f"  --font-mono: {tokens['fonts']['mono']};",
     ]
+    fonts = tokens["fonts"]
+    lines += font_block(fonts["options"][fonts["default"]], "  ")
     for role, spec in tokens["type"].items():
         lines += [
             f"  --fs-{role}: {fluid(spec['mobile'], spec['desktop'])};",
@@ -58,6 +72,12 @@ def build(tokens: dict) -> str:
     lines.append(colors(tokens["light"], "  "))
     lines += [
         "}",
+        "",
+    ]
+    for key, option in fonts["options"].items():
+        if key != fonts["default"]:
+            lines += [f':root[data-font="{key}"] {{', *font_block(option, "  "), "}"]
+    lines += [
         "",
         "@media (prefers-color-scheme: dark) {",
         '  :root:not([data-theme="light"]) {',

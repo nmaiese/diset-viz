@@ -28,6 +28,16 @@
     </p>
   </header>
 
+  {% if d.strip.svg %}
+  <figure class="lead-figure" aria-labelledby="{{ aid('divario-t') }}">
+    <figcaption class="lead-figure__head">
+      <span class="lead-figure__title" id="{{ aid('divario-t') }}">Il divario nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
+      {{ ui.arealegend(d.strip.legend) }}
+    </figcaption>
+    <div class="chart chart--hero" data-series>{{ d.strip.svg | safe }}</div>
+    <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.unit %}, valori in {{ d.unit }}{% endif %}. Tutte le cifre sono nella classifica qui sotto.</p>
+  </figure>
+  {% endif %}
   {{ ui.tiles(d.tiles) }}
 
   <div class="layout">
@@ -84,20 +94,21 @@
           <div class="module__body">
             {% if level.has_map %}
             <div class="module__map">
-              {{ ui.map(d.map_classes, 'esplora', d.explore_js.names, d.map_values) }}
+              {{ ui.map(d.map_classes, 'esplora', d.explore_js.names, d.map_values, overlay=d.callouts) }}
               {{ ui.legend(d.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.') }}
             </div>
             {% endif %}
             <div class="tablewrap" id="{{ aid('classifica-dati') }}" tabindex="0" role="region" aria-label="Classifica delle {{ level.plural }}">
+              {% if d.strip.legend %}{{ ui.arealegend(d.strip.legend) }}{% endif %}
               <table class="table">
                 <caption class="sr-only">{{ meta.name }} per {{ level.singular }} nel <span data-year-label>{{ year }}</span>{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}</caption>
                 <thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ level.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (d.short_unit or 'Valore') | capitalize }}</th></tr></thead>
                 <tbody data-rank-body>
                   {% for row in d.ranking %}
                   {% if row.ref %}
-                  <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value }}</td></tr>
+                  <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
                   {% else %}
-                  <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank }}</td><th scope="row">{% if level.profile_path %}<a href="{{ href(level.profile_path ~ row.key) }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value }}</td></tr>
+                  <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank }}</td><th scope="row">{% if d.areas.get(row.key) %}<span class="area-dot area-dot--{{ d.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if level.profile_path %}<a href="{{ href(level.profile_path ~ row.key) }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if d.areas.get(row.key) %}<span class="sr-only">, {{ d.area_label[d.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
                   {% endif %}
                   {% endfor %}
                 </tbody>
@@ -115,7 +126,7 @@
         <figure class="module">
           <figcaption class="module__head">
             <h3 class="h-sub">{{ d.series_claim }}</h3>
-            <p class="subline">{{ meta.name }}{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. In grigio le {{ n }} {{ level.plural }}, tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
@@ -126,7 +137,7 @@
               <table class="table table--compact trend-table">
                 <caption>Media semplice delle {{ level.plural }} per anno{% if d.unit %}, {{ '' if d.unit.startswith('per ') else 'in ' }}{{ d.unit }}{% endif %}</caption>
                 <thead><tr><th scope="col">Anno</th><th class="r" scope="col">Media semplice</th></tr></thead>
-                <tbody>{% for p in level.annual_means %}<tr><th scope="row">{{ p.year }}</th><td class="val">{{ d.fmt(p.avg) }}</td></tr>{% endfor %}</tbody>
+                <tbody>{% set dec = column_decimals(level.annual_means | map(attribute='avg') | list) %}{% for p in level.annual_means %}<tr><th scope="row">{{ p.year }}</th><td class="val">{{ p.avg | num(None, 'cell', dec) }}</td></tr>{% endfor %}</tbody>
               </table>
             </div>
           </details>
@@ -197,7 +208,7 @@
           {% for item in related[:3] %}
           <li><a href="{{ href(item.path) }}" class="minicard">
             <span class="minicard__title">{{ item.name }}</span>
-            <span class="minicard__meta">{% if item.latest is not none %}{{ d.fmt_unit(item.latest, item.unit) }}, {% endif %}dati {{ item.year_max }}</span>
+            <span class="minicard__meta">{% if item.latest is not none %}{{ item.latest | num(item.unit) }}, {% endif %}dati {{ item.year_max }}</span>
             <span class="minicard__spark">{{ item.spark | sparkline }}</span>
           </a></li>
           {% endfor %}

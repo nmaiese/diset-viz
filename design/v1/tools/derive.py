@@ -12,14 +12,20 @@ la pagina mostra cosi' com'e' e che `check_pages.py` elenca.
 
 from __future__ import annotations
 
+import json
 import math
 import re
 from html import escape
+from pathlib import Path
+
+import charts
+import numfmt
 
 from app.data import REGION_GEO_AREA
 from app.seo_titles import format_number, of_region
 
 PLACEHOLDER = "[dato da calcolare]"
+PATHS = json.loads((Path(__file__).resolve().parents[1] / "src" / "partials" / "italy_paths.json").read_text())
 MEZZOGIORNO = {key for key, area in REGION_GEO_AREA.items() if area in ("Sud", "Isole")}
 LOWER_BETTER = ("lower_better", "higher_worse")
 MONTHS = ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio",
@@ -27,34 +33,12 @@ MONTHS = ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio"
 
 
 def num(value) -> str:
-    """La cifra all'italiana con i decimali calibrati sulla grandezza."""
-    text = format_number(value)
-    return text if text is not None else PLACEHOLDER
+    """La cifra all'italiana con i decimali calibrati sulla grandezza (numfmt)."""
+    return PLACEHOLDER if value is None else numfmt.text(value)
 
 
 def short_unit(unit: str | None) -> str | None:
-    """L'unita' come si scrive accanto a una cifra.
-
-    "euro" resta "euro", "Numero medio di anni" diventa "anni", "Per 10.000
-    occupati" diventa "per 10.000 occupati", che accanto a "12,4" si legge. Le
-    unita' piu' lunghe non si accorciano a occhio: restano nel sottotitolo.
-    """
-    unit = (unit or "").strip()
-    if not unit:
-        return None
-    if unit == "%" or unit.startswith("%"):
-        return "%"
-    m = re.match(r"(?i)numero medio di (.+)", unit)
-    if m:
-        return m.group(1)
-    lowered = unit[:1].lower() + unit[1:]
-    if lowered.startswith("per "):
-        return lowered
-    if len(unit) <= 14:
-        return unit
-    if len(unit) <= 24:
-        return lowered
-    return None
+    return numfmt.short_unit(unit)
 
 
 def of_place(name: str, level_key: str) -> str:
@@ -95,8 +79,11 @@ def with_unit(value, unit: str | None) -> str:
 def signed(value, unit: str | None) -> str:
     if value is None:
         return PLACEHOLDER
-    sign = "+" if value > 0 else ("-" if value < 0 else "")
-    return sign + with_unit(abs(value), unit)
+    text = numfmt.text(value, sign=True)
+    u = short_unit(unit)
+    if u == "%":
+        return text + "%"
+    return f"{text}\u00a0{u}" if u else text
 
 
 def figure(value, unit: str | None, sign: bool = False) -> dict:
@@ -171,9 +158,9 @@ def ranking(level: dict, unit: str | None) -> list[dict]:
         crosses = (o["value"] < avg) if descending else (o["value"] > avg) if avg is not None else False
         if not ref_done and crosses:
             rows.append({"ref": True, "label": f"Media semplice delle {len(obs)} {level['plural']}",
-                         "value": num(avg), "width": round(max(avg, 0) / bar_max * 100, 1)})
+                         "value": avg, "width": round(max(avg, 0) / bar_max * 100, 1)})
             ref_done = True
-        rows.append({"rank": i, "key": o["key"], "name": o["name"], "value": num(o["value"]),
+        rows.append({"rank": i, "key": o["key"], "name": o["name"], "value": o["value"],
                      "width": round(max(o["value"], 0) / bar_max * 100, 1)})
     return rows
 
@@ -315,21 +302,21 @@ def indicator(ctx: dict) -> dict:
 
     tiles = []
     if best and best["name"] not in lede:
-        tiles.append({"label": f"In testa nel {year}", **figure(best["value"], unit),
+        tiles.append({"label": f"In testa nel {year}", "value": best["value"], "unit": unit, "role": "figure",
                       "sub": best["name"], "href": (level.get("profile_path") or "") + best["key"] if level.get("profile_path") else None})
     if worst and worst["name"] not in lede:
-        tiles.append({"label": f"In coda nel {year}", **figure(worst["value"], unit),
+        tiles.append({"label": f"In coda nel {year}", "value": worst["value"], "unit": unit, "role": "figure",
                       "sub": worst["name"], "href": (level.get("profile_path") or "") + worst["key"] if level.get("profile_path") else None})
     if stats.get("year_avg") is not None:
-        tiles.append({"label": f"Media semplice delle {stats.get('year_count', n)} {plural}", **figure(stats["year_avg"], unit),
+        tiles.append({"label": f"Media semplice delle {stats.get('year_count', n)} {plural}", "value": stats["year_avg"], "unit": unit, "role": "figure",
                       "sub": "non pesata per popolazione"})
     if stats.get("gap_ratio"):
-        tiles.append({"label": "Fra prima e ultima", "num": ratio_text(stats["gap_ratio"]), "unit": "volte",
+        tiles.append({"label": "Fra prima e ultima", "value": stats["gap_ratio"], "unit": "volte", "role": "ratio",
                       "sub": f"una distanza di {with_unit(stats['gap_abs'], unit)}"})
     if annual:
         more, less = annual.get("increase_count", 0), annual.get("decrease_count", 0)
         trend = f"in aumento in {more} {plural} su {annual['common_count']}" if more >= less else f"in calo in {less} {plural} su {annual['common_count']}"
-        tiles.append({"label": f"Dal {annual['previous_year']} al {annual['year']}", **figure(annual["average_delta"], change_unit, sign=True),
+        tiles.append({"label": f"Dal {annual['previous_year']} al {annual['year']}", "value": annual["average_delta"], "unit": change_unit, "role": "delta",
                       "sub": f"di media semplice, {trend}"})
     tiles = tiles[:4]
 
@@ -350,7 +337,15 @@ def indicator(ctx: dict) -> dict:
     if claim is None and stats.get("above_avg_count") is not None:
         claim = f"Nel {year} {stats['above_avg_count']} {plural} stanno sopra la media semplice e {stats['below_avg_count']} sotto"
 
-    series = series_svg(level, unit)
+    areas = charts.area_map()
+    obs = level.get("observations") or []
+    rows = [{**o, "area": areas.get(o["key"])} for o in obs]
+    series = charts.band_series(level, areas) if len(level.get("matrix") or {}) >= 2 else {"svg": "", "single_year": True}
+    strip = charts.divario_strip(rows, stats.get("year_avg"), unit, stats.get("gap_ratio"))
+    callouts = ""
+    if level.get("has_map") and best and worst:
+        callouts = charts.map_callouts(PATHS, [(best["key"], best["name"], with_unit(best["value"], unit)),
+                                              (worst["key"], worst["name"], with_unit(worst["value"], unit))])
     series_claim = None
     if stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
         r = 1 + stats["avg_change_pct"] / 100
@@ -390,8 +385,21 @@ def indicator(ctx: dict) -> dict:
         "matrix": level.get("matrix") or {},
         "names": {t["key"]: t["name"] for t in level.get("territories") or []},
         "unit": short_unit(unit), "direction": direction, "plural": plural,
+        "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
         "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
     }
+    # Con la striscia del divario gli estremi, la media e la distanza stanno nel
+    # grafico: le tessere dicono solo cio' che il grafico non dice.
+    if strip.get("svg"):
+        facts = [t for t in tiles if t["role"] == "delta"]
+        if stats.get("above_avg_count") is not None:
+            facts.append({"label": "Sopra la media semplice", "value": stats["above_avg_count"], "unit": None, "role": "count",
+                          "sub": f"{plural} su {stats.get('year_count', n)}, le altre sotto"})
+        years_n = len(level.get("years") or [])
+        if years_n > 1:
+            facts.append({"label": "Anni della serie", "value": years_n, "unit": None, "role": "count",
+                          "sub": f"dal {level['year_min']} al {level['year_max']}"})
+        tiles = facts
     citation = (f"Divario Italia, «{meta['name']}», elaborazione su dati {meta.get('source_label') or meta.get('source')} "
                 f"({year}). {ctx.get('canonical')}")
     return {
@@ -400,7 +408,9 @@ def indicator(ctx: dict) -> dict:
         "unit": (unit[:1].lower() + unit[1:]) if unit else unit, "short_unit": short_unit(unit), "tiles": tiles, "verso": verso,
         "claim": claim, "map_classes": map_classes(level),
         "legend": legend(values, unit) if values else None,
-        "ranking": ranking(level, unit), "series": series, "series_claim": series_claim, "series_note": series_note,
+        "ranking": ranking(level, unit), "series": series, "strip": strip, "callouts": callouts,
+        "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
+        "decimals": numfmt.column_decimals([o["value"] for o in obs]), "series_claim": series_claim, "series_note": series_note,
         "updated": date_it(ctx.get("dataset_updated")), "explore_js": explore_js,
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),
     }

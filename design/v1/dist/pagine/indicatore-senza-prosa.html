@@ -7,16 +7,22 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400..800;1,400..700&display=swap">
-<script>try{var t=localStorage.getItem('proto-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia+Sans:ital,wght@0,300..900;1,300..700&family=Sofia+Sans+Semi+Condensed:wght@400..900&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..800;1,8..60,400..700&display=swap">
+<script>try{var t=localStorage.getItem('proto-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;var f=localStorage.getItem('proto-font');if(f==='schibsted'||f==='serif')document.documentElement.dataset.font=f}catch(e){}</script>
 <style>
 /* Generato da design/v1/tools/tokens.py a partire da tokens/tokens.json.
    Non si modifica a mano: si cambia il JSON e si rigenera. */
 
 :root {
   color-scheme: light;
-  --font-sans: "Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --fw-heading: 760;
+  --fw-num: 700;
   --fs-display: clamp(36px, 26.909px + 2.4242vw, 56px);
   --lh-display: 1.04;
   --fw-display: 800;
@@ -139,6 +145,28 @@
   --cat-3: #63591d;
   --cat-4: #33278d;
   --ad-bg: #f5f6f8;
+  --area-nord: #2466c3;
+  --area-centro: #504907;
+  --area-sud: #983c75;
+}
+
+:root[data-font="schibsted"] {
+  --font-ui: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Schibsted Grotesk", system-ui, sans-serif;
+  --font-num: "Schibsted Grotesk", system-ui, sans-serif;
+  --fw-heading: 760;
+  --fw-num: 700;
+}
+:root[data-font="serif"] {
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --fw-heading: 650;
+  --fw-num: 700;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -198,6 +226,9 @@
     --cat-3: #d6cc8f;
     --cat-4: #9281e1;
     --ad-bg: #1a1d21;
+    --area-nord: #5182e5;
+    --area-centro: #a48118;
+    --area-sud: #f7b1df;
   }
 }
 
@@ -257,6 +288,9 @@
   --cat-3: #d6cc8f;
   --cat-4: #9281e1;
   --ad-bg: #1a1d21;
+  --area-nord: #5182e5;
+  --area-centro: #a48118;
+  --area-sud: #f7b1df;
 }
 
 /* Divario Italia 1.0, direzione Cronaca: i componenti.
@@ -270,10 +304,13 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
   font-size: var(--fs-ui);
   line-height: var(--lh-ui);
   font-optical-sizing: auto;
+  /* Le taglie sono tarate su un occhio medio di 0,49: l'interruttore dei
+     caratteri cambia famiglia senza cambiare la grandezza percepita. */
+  font-size-adjust: 0.49;
   text-rendering: optimizeLegibility;
 }
 img, svg { max-width: 100%; }
@@ -282,11 +319,15 @@ h1, h2, h3, h4, p, dl, dd, figure, ul, ol { margin: 0; }
 ul, ol { padding: 0; }
 h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
-a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
-a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
+/* Link: in inchiostro, sottolineati, fuori dalla prosa. L'arancio resta alla
+   prosa, alle azioni e a cio' che e' in evidenza: su ogni elenco perdeva il
+   suo compito. */
+a { color: var(--ink); text-decoration-color: var(--rule-strong); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { color: var(--accent-strong); text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 ::selection { background: var(--accent-wash); }
 .num, td, .tile dd, .figure-num { font-variant-numeric: tabular-nums lining-nums; }
+h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family: var(--font-display); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 
@@ -404,7 +445,7 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .pagehead { padding-block: var(--space-6) var(--space-8); display: grid; gap: var(--space-4); }
 /* Un figlio di griglia prende come minimo la sua larghezza di contenuto: un campo
    di ricerca col suo bottone basta a sfondare i 320 pixel. */
-.pagehead > *, .module > *, .specs > div > *, .lanes > *, .cards > * { min-width: 0; }
+.pagehead > *, .module > *, .specs > div > *, .lanes > *, .cards > *, .layout > * { min-width: 0; }
 .eyebrow {
   font-size: var(--fs-label); line-height: var(--lh-label); font-weight: var(--fw-label); letter-spacing: var(--tr-label);
   color: var(--text-2);
@@ -412,10 +453,10 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .eyebrow a { color: var(--text-2); text-decoration-color: var(--rule-strong); }
 .eyebrow a:hover { color: var(--ink); }
 .eyebrow .sep { color: var(--rule-strong); padding-inline: 6px; }
-.h-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-display); letter-spacing: var(--tr-display); }
-.h-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }
-.answer { font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink); max-width: var(--measure); }
-.lede { font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); max-width: var(--measure); }
+.h-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-heading); letter-spacing: var(--tr-display); }
+.h-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.answer { font-family: var(--font-text); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink); max-width: var(--measure); }
+.lede { font-family: var(--font-text); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); max-width: var(--measure); }
 .answer a, .lede a { color: inherit; text-decoration-color: var(--rule-strong); }
 .answer a:hover, .lede a:hover { color: var(--accent-strong); text-decoration-color: currentColor; }
 .meta {
@@ -444,7 +485,7 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .section { padding-top: var(--space-12); }
 .section + .section { margin-top: var(--space-4); }
 .section > h2, .h-section {
-  font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-section); letter-spacing: var(--tr-section);
+  font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
   padding-top: var(--space-3); border-top: 1px solid var(--rule-strong);
   margin-bottom: var(--space-6);
 }
@@ -461,10 +502,22 @@ a:hover { color: var(--accent-strong); text-decoration-thickness: 2px; }
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
 @media (max-width: 1199px) {
-  .toc ol { display: flex; flex-wrap: wrap; gap: var(--space-2); border: 0; }
-  .toc a { padding: 6px var(--space-3); margin: 0; border: 1px solid var(--rule-strong); border-radius: var(--radius-control); }
-  .toc a[aria-current] { border-color: var(--ink); }
+  /* Sotto i 1200 l'indice diventa una barra delle sezioni che resta sotto la
+     testata: sulle pagine lunghe (la regione passa i 36.000 pixel sul telefono)
+     e' il solo modo di sapere dove si e'. */
+  .toc {
+    position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20;
+    margin-inline: calc(-1 * var(--margin-s)); padding: var(--space-2) var(--margin-s);
+    background: var(--bg); border-bottom: 1px solid var(--rule);
+  }
+  .toc p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .toc ol { display: flex; flex-wrap: nowrap; gap: var(--space-4); border: 0; overflow-x: auto; scrollbar-width: none; }
+  .toc ol::-webkit-scrollbar { display: none; }
+  .toc a { padding: 6px 0; margin: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; white-space: nowrap; }
+  .toc a[aria-current] { border-bottom-color: var(--accent); }
 }
+@media (min-width: 600px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-m)); padding-inline: var(--margin-m); } }
+@media (min-width: 960px) and (max-width: 1199px) { .toc { top: var(--masthead-l); margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
 .aside-block { margin-top: var(--space-8); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .aside-block p + p { margin-top: var(--space-2); }
 @media (max-width: 1199px) { .aside-block { display: none; } }
@@ -620,7 +673,8 @@ details.more > summary { cursor: pointer; padding-block: var(--space-3); font-we
 details.more[open] > summary { color: var(--ink); }
 
 /* ---------- prosa ---------- */
-.prose { font-size: var(--fs-prose); line-height: var(--lh-prose); max-width: var(--measure); }
+.prose { font-family: var(--font-text); font-size: var(--fs-prose); line-height: var(--lh-prose); max-width: var(--measure); }
+.prose a { color: var(--link); text-decoration-color: currentColor; }
 .prose > * + * { margin-top: 1em; }
 .analysis .prose > h2:first-child { margin-top: 0; padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
 .prose h2 { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 700; letter-spacing: var(--tr-section); margin-top: 2em; }
@@ -751,10 +805,11 @@ details.more[open] > summary { color: var(--ink); }
 /* ---------- pubblicita' ---------- */
 .ad {
   display: grid; place-items: center; min-height: 280px; margin-block: var(--space-12);
-  background: var(--ad-bg); color: var(--muted); font-size: var(--fs-label);
+  background: transparent; border: 1px dashed var(--rule-strong); color: var(--muted); font-size: var(--fs-label);
   position: relative;
 }
-.ad::before { content: "Pubblicità"; position: absolute; top: var(--space-2); left: var(--space-3); font-weight: 600; }
+.ad > span { opacity: 0.8; }
+.ad::before { content: "Pubblicità"; position: absolute; top: calc(-1 * var(--space-4)); left: 0; font-weight: 600; font-size: 12px; color: var(--muted); }
 @media (min-width: 960px) { .ad--leader { min-height: 120px; } }
 .ad--side { min-height: 600px; margin-block: var(--space-8) 0; }
 
@@ -793,9 +848,164 @@ main:has(> .band:last-child) + .foot { margin-top: 0; }
 .proto-bar :focus-visible { outline-color: var(--bg); }
 .proto-bar__pages { display: flex; flex-wrap: wrap; gap: 2px; }
 .proto-bar__theme { margin-left: auto; display: flex; gap: 2px; }
+.proto-bar__theme + .proto-bar__theme { margin-left: var(--space-4); }
+.tablewrap > .arealegend { margin-bottom: var(--space-3); }
 body.has-proto { padding-bottom: 96px; }
 [data-shot] .proto-bar { display: none; }
 [data-shot] body.has-proto { padding-bottom: 0; }
+
+/* ==========================================================================
+   Seconda iterazione: cifre, grafici, componenti consolidati
+   ========================================================================== */
+
+/* ---------- le cifre: un componente, dai filtri num, rank, delta ---------- */
+/* Fuori dalle colonne le cifre sono proporzionali: in una tessera le cifre
+   tabellari lasciano buchi fra i caratteri. In colonna sono tabellari. */
+.n { font-family: var(--font-num); font-variant-numeric: lining-nums proportional-nums; white-space: nowrap; }
+.table .n, td .n, .rank .n, .n--cell { font-variant-numeric: lining-nums tabular-nums; }
+.n__u { font-family: var(--font-ui); font-weight: 400; color: var(--text-2); letter-spacing: 0; }
+.n__u--pct { font-family: var(--font-num); color: inherit; }
+.n__o { font-size: 0.72em; vertical-align: 0.28em; margin-left: 0.04em; }
+.n--nd, .n--nd abbr { color: var(--muted); text-decoration: none; }
+.tile .n, .figure-num .n {
+  font-size: var(--fs-figure-sm); line-height: var(--lh-figure-sm); font-weight: var(--fw-num); letter-spacing: -0.015em;
+}
+.tile .n__u, .bignum .n__u { font-size: 0.46em; margin-left: 0.12em; }
+.tile .n__u--pct, .bignum .n__u--pct { font-size: 0.7em; color: inherit; margin-left: 0; }
+.tile .n__o, .bignum .n__o { font-size: 0.55em; vertical-align: 0.62em; }
+.bignum .n, .bignum { font-size: var(--fs-figure); line-height: var(--lh-figure); font-weight: var(--fw-num); letter-spacing: -0.02em; }
+.table .val .n { font-weight: 400; }
+.table .rank .n__o { font-size: 0.8em; vertical-align: 0.2em; }
+.answer .n, .lede .n, .subline .n, .sub .n { font-family: inherit; font-weight: 600; }
+.answer .n__u, .lede .n__u { color: inherit; font-weight: 600; }
+
+/* ---------- le ripartizioni: un colore per Nord, Centro, Mezzogiorno ---------- */
+.area--nord { fill: var(--area-nord); } .area--centro { fill: var(--area-centro); } .area--sud { fill: var(--area-sud); } .area--none { fill: var(--cmp); }
+.area-line--nord { stroke: var(--area-nord); } .area-line--centro { stroke: var(--area-centro); } .area-line--sud { stroke: var(--area-sud); } .area-line--none { stroke: var(--cmp); }
+.area-text--nord { fill: var(--area-nord); } .area-text--centro { fill: var(--area-centro); } .area-text--sud { fill: var(--area-sud); } .area-text--none { fill: var(--text-2); }
+.area-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--cmp); }
+.area-dot--nord { background: var(--area-nord); } .area-dot--centro { background: var(--area-centro); } .area-dot--sud { background: var(--area-sud); }
+.arealegend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); list-style: none; font-size: var(--fs-small); color: var(--text-2); }
+.arealegend li { display: inline-flex; align-items: center; }
+.arealegend b { color: var(--ink); font-weight: 600; margin-right: 4px; }
+
+/* ---------- i grafici: testo a grandezza vera, colori solo da token ---------- */
+.chart { max-width: 920px; }
+.chart svg text { font-family: var(--font-num); font-variant-numeric: lining-nums tabular-nums; }
+.chart__l svg { max-width: 920px; }
+.chart--hero { margin-top: var(--space-2); }
+
+.strip__axis { stroke: var(--rule-strong); stroke-width: 1; }
+.strip__tick { font-size: 13px; fill: var(--muted); }
+.strip__avg { stroke: var(--data-reference); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.strip__avglab { font-size: 13px; fill: var(--text-2); font-weight: 600; }
+.strip__gap { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+.strip__gaplab { font-size: 15px; font-weight: 700; fill: var(--ink); }
+.strip__dot { stroke: var(--bg); stroke-width: 1.5; }
+.strip__dot.is-on { stroke: var(--accent); stroke-width: 3; }
+.strip__name { font-size: 13px; }
+.strip__nm { fill: var(--ink); font-weight: 700; }
+.strip__v { fill: var(--text-2); }
+
+.band__grid { stroke: var(--rule); stroke-width: 1; }
+.band__tick { font-size: 13px; fill: var(--muted); }
+.band__area { fill: var(--seq-1); opacity: 0.85; }
+.band__src { display: none; }
+.band__ext { fill: none; stroke-width: 2; }
+.band__avg { fill: none; stroke: var(--data-reference); stroke-width: 2; stroke-dasharray: 5 4; }
+.band__lab { font-size: 13px; font-weight: 700; }
+.band__lab--avg { fill: var(--text-2); }
+.band__hl { fill: none; stroke: var(--accent); stroke-width: 3; }
+.band__dot { fill: var(--accent); }
+.band__hllab { font-size: 13px; font-weight: 700; fill: var(--accent); }
+
+.callout line { stroke: var(--ink); stroke-width: 1; }
+.callout circle { fill: var(--ink); stroke: var(--bg); stroke-width: 1.5; }
+.callout text { font-family: var(--font-num); font-size: 21px; paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.callout__nm { font-weight: 700; fill: var(--ink); }
+.callout__v { fill: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* la figura che apre una pagina: il grafico prima delle parole */
+.lead-figure { display: grid; gap: var(--space-3); padding-block: var(--space-6) var(--space-4); border-top: 1px solid var(--rule); }
+.lead-figure__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-6); }
+.lead-figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); font-weight: var(--fw-heading); line-height: var(--lh-subsection); }
+
+/* ---------- componenti portati dalle pagine ---------- */
+
+/* traccia di posizione da 1 a N */
+.track { position: relative; display: block; height: 14px; min-width: 6rem; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: var(--cmp-track); }
+.track i { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--data-reference); transform: translate(-50%, -50%); }
+.is-on .track i, .track--on i { background: var(--accent); }
+.track__scale { display: flex; justify-content: space-between; gap: var(--space-2); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* barra divergente attorno a 50, su una scala fissa da 0 a 100 */
+.divbar { position: relative; display: block; height: 12px; background: var(--cmp-track); min-width: 6rem; }
+.divbar i { position: absolute; top: 0; bottom: 0; background: var(--seq-4); }
+.divbar::after { content: ""; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--ink); }
+.divbar__axis { display: grid; grid-template-columns: 1fr auto 1fr; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.divbar__axis > :last-child { text-align: right; }
+
+/* localizzatore: dice dove, non un dato. Il territorio in inchiostro. */
+.locator { display: grid; gap: var(--space-2); margin: 0; }
+.locator svg { display: block; width: 100%; max-width: 13rem; height: auto; }
+.locator path { fill: var(--rule-strong); stroke: var(--bg); stroke-width: 1.5; stroke-linejoin: round; }
+.locator path.is-on { fill: var(--ink); }
+.locator figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* tabella che sotto i 560 pixel del suo contenitore diventa blocchi etichettati */
+.stackwrap { container-type: inline-size; }
+@container (max-width: 560px) {
+  .table--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .table--stack, .table--stack tbody, .table--stack tr, .table--stack th, .table--stack td { display: block; }
+  .table--stack tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2) var(--space-4); padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .table--stack tr > * { padding: 0 !important; border: 0 !important; text-align: left !important; white-space: normal; }
+  .table--stack tbody th[scope="row"] { grid-column: 1 / -1; }
+  .table--stack td[data-label]::before { content: attr(data-label); display: block; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); }
+  .table--stack tr.group, .table--stack tr.group > * { display: block; grid-column: 1 / -1; }
+}
+
+/* classifica con la barra del punteggio: righe in blocchi sotto i 720 pixel */
+.rankwrap { container: rank / inline-size; }
+.table--rank .rankcell-bar { width: 22%; min-width: 4rem; }
+.table--rank .where { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.table--rank .note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.table--rank tr.gap > td { padding-block: var(--space-2); font-size: var(--fs-small); color: var(--muted); border-bottom-style: dashed; }
+@container rank (max-width: 719px) {
+  .table--rank thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .table--rank tbody tr { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; column-gap: var(--space-3); align-items: baseline; padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .table--rank tbody th, .table--rank tbody td { display: block; padding: 0; border: 0; }
+  .table--rank .rank { grid-column: 1; grid-row: 1; width: auto; }
+  .table--rank .name { grid-column: 2; grid-row: 1; }
+  .table--rank .val { grid-column: 3; grid-row: 1; }
+  .table--rank .rankcell-bar { grid-column: 2 / 4; grid-row: 2; width: auto; min-width: 0; margin-top: var(--space-2); }
+  .table--rank .note { grid-column: 2 / 4; margin-top: var(--space-1); white-space: normal; }
+  .table--rank .note[data-label]::before { content: attr(data-label) ": "; color: var(--muted); }
+  .table--rank tr.gap { display: block; }
+}
+
+/* podio: le prime e le ultime, con la riga "altre N" in mezzo */
+.podiums { display: grid; gap: var(--space-8); }
+@media (min-width: 960px) { .podiums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8) var(--gutter-l); } }
+
+/* figura dell'articolo: titolo-tesi, grafico, fonte, i valori in tabella */
+.figure { display: grid; gap: var(--space-2); margin-block: var(--space-8); }
+.figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
+.figure__note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.figure__chart { container-type: inline-size; }
+
+/* ---------- immagini ---------- */
+.hero-img { margin: 0; display: grid; gap: var(--space-2); }
+.hero-img img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-1); }
+.hero-img figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.card__media { transition: filter var(--motion-base) var(--motion-ease); }
+.card__media img { transition: transform 400ms var(--motion-ease); }
+.card:hover .card__media img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .card:hover .card__media img { transform: none; } }
+
+/* ---------- ritmo ---------- */
+.section + .section { margin-top: var(--space-8); }
+.foot { margin-top: var(--space-16); }
 
 
 </style>
@@ -895,22 +1105,29 @@ body.has-proto { padding-bottom: 96px; }
     </p>
   </header>
 
-  <dl class="tiles" style="--tiles: 4">
-  <div class="tile">
-    <dt>In testa nel 2025</dt>
-    <dd><span class="figure-num">84,8<span class="u">anni</span></span><span class="sub"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></span></dd>
-  </div>
-  <div class="tile">
-    <dt>In coda nel 2025</dt>
-    <dd><span class="figure-num">82,1<span class="u">anni</span></span><span class="sub"><a href="https://divarioitalia.it/regione/campania">Campania</a></span></dd>
-  </div>
-  <div class="tile">
-    <dt>Media semplice delle 20 regioni</dt>
-    <dd><span class="figure-num">83,6<span class="u">anni</span></span><span class="sub">non pesata per popolazione</span></dd>
-  </div>
+
+  <figure class="lead-figure" aria-labelledby="divario-t">
+    <figcaption class="lead-figure__head">
+      <span class="lead-figure__title" id="divario-t">Il divario nel 2025: le 20 regioni sulla stessa scala</span>
+      <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b>8</li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b>4</li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b>8</li>
+</ul>
+    </figcaption>
+    <div class="chart chart--hero" data-series><div class="chart__l"><svg viewBox="0 0 920 164" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="904" y1="102.0" y2="102.0"/><text class="strip__tick" x="16.0" y="158" text-anchor="start">82</text><text class="strip__tick" x="312.0" y="158" text-anchor="middle">83</text><text class="strip__tick" x="608.0" y="158" text-anchor="middle">84</text><text class="strip__tick" x="904.0" y="158" text-anchor="end">85</text><line class="strip__avg" x1="501.4" x2="501.4" y1="64" y2="140"/><text class="strip__avglab" x="506.4" y="142" text-anchor="start">Media semplice 83,6</text><path class="strip__gap" d="M45.6,28 V22 H844.8 V28"/><text class="strip__gaplab" x="445.2" y="16" text-anchor="middle">distanza 2,7</text><circle class="strip__dot area--sud" data-key="campania" cx="45.6" cy="102.0" r="6.5"><title>Campania 82,1</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="193.6" cy="102.0" r="6.5"><title>Molise 82,6</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="193.6" cy="116.0" r="6.5"><title>Sicilia 82,6</title></circle><circle class="strip__dot area--sud" data-key="calabria" cx="282.4" cy="102.0" r="6.5"><title>Calabria 82,9</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="341.6" cy="102.0" r="6.5"><title>Basilicata 83,1</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="341.6" cy="116.0" r="6.5"><title>Sardegna 83,1</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="460.0" cy="102.0" r="6.5"><title>Puglia 83,5</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="489.6" cy="102.0" r="6.5"><title>Lazio 83,6</title></circle><circle class="strip__dot area--nord" data-key="piemonte" cx="489.6" cy="116.0" r="6.5"><title>Piemonte 83,6</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="519.2" cy="102.0" r="6.5"><title>Abruzzo 83,7</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="519.2" cy="116.0" r="6.5"><title>Liguria 83,7</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="519.2" cy="88.0" r="6.5"><title>Valle d&#x27;Aosta 83,7</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="637.6" cy="102.0" r="6.5"><title>Friuli-Venezia Giulia 84,1</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="637.6" cy="116.0" r="6.5"><title>Umbria 84,1</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="667.2" cy="102.0" r="6.5"><title>Emilia-Romagna 84,2</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="696.8" cy="102.0" r="6.5"><title>Lombardia 84,3</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="696.8" cy="116.0" r="6.5"><title>Toscana 84,3</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="726.4" cy="102.0" r="6.5"><title>Marche 84,4</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="726.4" cy="116.0" r="6.5"><title>Veneto 84,4</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="844.8" cy="102.0" r="6.5"><title>Trentino Alto Adige 84,8</title></circle><text class="strip__name" x="39.1" y="54" text-anchor="start" dy="0"><tspan class="strip__nm">Campania</tspan> <tspan class="strip__v">82,1</tspan></text><text class="strip__name" x="851.3" y="54" text-anchor="end" dy="0"><tspan class="strip__nm">Trentino Alto Adige</tspan> <tspan class="strip__v">84,8</tspan></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 188" aria-hidden="true" focusable="false" class="strip"><line class="strip__axis" x1="16" x2="344" y1="112.0" y2="112.0"/><text class="strip__tick" x="16.0" y="182" text-anchor="start">82</text><text class="strip__tick" x="125.3" y="182" text-anchor="middle">83</text><text class="strip__tick" x="234.7" y="182" text-anchor="middle">84</text><text class="strip__tick" x="344.0" y="182" text-anchor="end">85</text><line class="strip__avg" x1="195.3" x2="195.3" y1="60" y2="164"/><text class="strip__avglab" x="200.3" y="166" text-anchor="start">Media 83,6</text><path class="strip__gap" d="M26.9,28 V22 H322.1 V28"/><text class="strip__gaplab" x="174.5" y="16" text-anchor="middle">distanza 2,7</text><circle class="strip__dot area--sud" data-key="campania" cx="26.9" cy="112.0" r="6.5"><title>Campania 82,1</title></circle><circle class="strip__dot area--sud" data-key="molise" cx="81.6" cy="112.0" r="6.5"><title>Molise 82,6</title></circle><circle class="strip__dot area--sud" data-key="sicilia" cx="81.6" cy="126.0" r="6.5"><title>Sicilia 82,6</title></circle><circle class="strip__dot area--sud" data-key="calabria" cx="114.4" cy="112.0" r="6.5"><title>Calabria 82,9</title></circle><circle class="strip__dot area--sud" data-key="basilicata" cx="136.3" cy="112.0" r="6.5"><title>Basilicata 83,1</title></circle><circle class="strip__dot area--sud" data-key="sardegna" cx="136.3" cy="126.0" r="6.5"><title>Sardegna 83,1</title></circle><circle class="strip__dot area--sud" data-key="puglia" cx="180.0" cy="112.0" r="6.5"><title>Puglia 83,5</title></circle><circle class="strip__dot area--centro" data-key="lazio" cx="190.9" cy="126.0" r="6.5"><title>Lazio 83,6</title></circle><circle class="strip__dot area--nord" data-key="piemonte" cx="190.9" cy="98.0" r="6.5"><title>Piemonte 83,6</title></circle><circle class="strip__dot area--sud" data-key="abruzzo" cx="201.9" cy="112.0" r="6.5"><title>Abruzzo 83,7</title></circle><circle class="strip__dot area--nord" data-key="liguria" cx="201.9" cy="140.0" r="6.5"><title>Liguria 83,7</title></circle><circle class="strip__dot area--nord" data-key="valle-d-aosta" cx="201.9" cy="84.0" r="6.5"><title>Valle d&#x27;Aosta 83,7</title></circle><circle class="strip__dot area--nord" data-key="friuli-venezia-giulia" cx="245.6" cy="112.0" r="6.5"><title>Friuli-Venezia Giulia 84,1</title></circle><circle class="strip__dot area--centro" data-key="umbria" cx="245.6" cy="126.0" r="6.5"><title>Umbria 84,1</title></circle><circle class="strip__dot area--nord" data-key="emilia-romagna" cx="256.5" cy="98.0" r="6.5"><title>Emilia-Romagna 84,2</title></circle><circle class="strip__dot area--nord" data-key="lombardia" cx="267.5" cy="112.0" r="6.5"><title>Lombardia 84,3</title></circle><circle class="strip__dot area--centro" data-key="toscana" cx="267.5" cy="126.0" r="6.5"><title>Toscana 84,3</title></circle><circle class="strip__dot area--centro" data-key="marche" cx="278.4" cy="98.0" r="6.5"><title>Marche 84,4</title></circle><circle class="strip__dot area--nord" data-key="veneto" cx="278.4" cy="140.0" r="6.5"><title>Veneto 84,4</title></circle><circle class="strip__dot area--nord" data-key="trentino-alto-adige" cx="322.1" cy="112.0" r="6.5"><title>Trentino Alto Adige 84,8</title></circle><text class="strip__name" x="20.4" y="50" text-anchor="start" dy="0"><tspan class="strip__nm">Campania</tspan> <tspan class="strip__v">82,1</tspan></text><text class="strip__name" x="328.6" y="50" text-anchor="end" dy="0"><tspan class="strip__nm">Trentino Alto.</tspan> <tspan class="strip__v">84,8</tspan></text></svg></div></div>
+    <p class="source">Ogni punto è una regione, nel colore della sua ripartizione, valori in numero medio di anni. Tutte le cifre sono nella classifica qui sotto.</p>
+  </figure>
+
+  <dl class="tiles" style="--tiles: 3">
   <div class="tile">
     <dt>Dal 2024 al 2025</dt>
-    <dd><span class="figure-num">+0,19<span class="u">anni</span></span><span class="sub">di media semplice, in aumento in 19 regioni su 20</span></dd>
+    <dd><span class="figure-num"><data class="n n--delta" value="0.185">+0,19<span class="n__u"> anni</span></data></span><span class="sub">di media semplice, in aumento in 19 regioni su 20</span></dd>
+  </div>
+  <div class="tile">
+    <dt>Sopra la media semplice</dt>
+    <dd><span class="figure-num"><data class="n n--count" value="11">11</data></span><span class="sub">regioni su 20, le altre sotto</span></dd>
+  </div>
+  <div class="tile">
+    <dt>Anni della serie</dt>
+    <dd><span class="figure-num"><data class="n n--count" value="22">22</data></span><span class="sub">dal 2004 al 2025</span></dd>
   </div>
 </dl>
 
@@ -995,6 +1212,7 @@ body.has-proto { padding-bottom: 96px; }
     <path d="M412,431L412,430L412,429L412,428L411,423L410,422L411,422L411,421L410,418L410,417L410,416L411,415L412,414L414,413L414,414L415,414L416,414L417,414L418,414L419,414L420,414L421,414L420,416L421,417L420,418L421,418L422,419L423,419L424,418L425,419L426,418L428,419L428,418L429,418L431,417L432,417L434,419L434,418L434,417L434,416L434,415L436,413L436,411L437,409L436,407L437,407L437,406L437,407L439,406L440,407L441,407L444,406L445,407L446,407L444,409L444,411L445,416L442,420L440,424L440,427L441,428L441,431L441,432L441,431L443,433L445,434L450,434L451,434L453,435L454,437L455,438L459,440L462,441L463,443L465,445L467,445L466,447L465,450L465,453L466,456L465,459L465,461L465,462L466,462L466,461L466,462L466,463L466,464L468,465L469,465L468,466L467,467L467,468L467,469L464,472L464,471L462,471L461,471L460,470L456,470L451,472L444,476L442,482L442,483L443,494L443,496L439,501L433,503L433,504L426,512L426,517L424,520L422,522L420,523L416,522L410,523L407,521L405,518L406,516L405,516L406,515L405,515L405,514L406,512L406,511L405,509L405,506L407,506L410,505L412,503L413,500L414,499L416,495L417,491L417,490L416,489L413,487L413,486L413,485L414,484L418,482L419,481L421,481L424,482L425,481L427,479L429,475L428,470L426,469L425,466L424,465L422,459L422,451L420,443L417,439L415,437L413,431Z" data-key="calabria" data-name="Calabria" data-value="82,9 anni" class="q2"/>
     <path d="M275,529L274,529L276,528L276,525L275,523L277,521L277,519L278,518L277,518L278,517L280,515L281,515L283,514L284,514L284,513L284,512L285,513L286,513L287,511L286,510L286,509L287,509L288,509L288,511L289,512L289,513L290,514L292,516L292,517L293,517L296,516L301,514L300,512L300,511L301,510L302,509L304,509L304,510L305,510L307,509L307,508L309,508L310,507L311,508L312,509L313,510L313,512L312,512L313,513L316,514L318,513L318,512L319,513L319,514L320,515L319,515L320,516L324,519L326,519L327,519L326,519L326,520L328,520L331,519L336,517L338,517L339,516L340,516L340,517L341,518L343,518L344,517L345,518L350,518L352,518L353,518L356,516L357,517L359,516L361,515L362,515L364,515L366,513L369,510L370,511L374,510L376,508L376,509L378,511L381,511L381,512L383,512L386,510L388,509L389,506L388,504L389,506L389,507L390,508L391,508L396,506L400,503L401,503L404,504L406,505L403,506L402,509L402,508L400,511L399,515L393,522L393,523L391,525L391,526L390,527L390,528L388,531L387,532L388,534L387,535L387,536L386,537L386,540L385,541L385,542L384,543L383,544L383,551L383,554L385,554L386,555L386,556L387,555L389,557L389,558L388,558L388,559L388,558L388,557L387,558L386,559L386,560L387,561L387,562L388,562L389,562L388,562L388,563L389,564L390,564L391,564L391,566L391,567L390,567L390,568L391,568L392,568L393,570L392,570L391,569L390,570L390,571L387,572L385,574L384,577L383,578L383,579L383,580L383,582L384,583L384,585L385,586L384,587L384,586L382,588L382,587L381,587L381,586L380,585L377,585L375,584L374,584L372,584L372,585L372,584L370,585L369,584L366,584L364,582L362,581L358,581L357,579L356,576L354,572L352,569L349,567L345,565L341,564L337,564L335,565L334,565L332,564L332,563L331,562L328,562L327,561L324,560L324,558L320,555L319,555L318,555L317,555L316,555L315,554L314,553L312,552L310,551L309,550L308,550L308,548L304,545L304,544L303,545L301,544L298,544L297,542L296,541L294,540L292,540L288,540L284,541L282,539L282,537L280,536L278,536L276,534L276,532ZM256,578L257,579L259,580L259,582L258,583L256,583L254,580L254,578L255,578ZM377,491L377,493L378,493L377,494L377,495L377,496L376,495L375,494L375,493L375,492ZM373,488L374,489L374,491L373,491L371,489L371,488ZM377,497L378,497L379,498L379,499L379,500L377,499L376,498L377,496L378,496ZM278,644L282,645L282,646L281,646L280,645L278,645ZM268,522L268,521L268,522L269,521L270,522L271,522L272,522L272,523L271,523L270,523L268,523ZM388,478L387,477L388,476L389,477ZM259,519L259,520L260,521L258,521L258,519ZM362,490L361,490L360,488L362,488ZM305,481L306,482L305,482L304,482ZM271,519L270,519L270,517ZM275,524L275,526L274,524L275,523ZM292,627L293,628L292,628L291,627ZM352,491L352,490L353,490ZM381,486L381,485L382,485L382,486ZM276,525L275,525L275,524Z" data-key="sicilia" data-name="Sicilia" data-value="82,6 anni" class="q2"/>
     <path d="M102,382L102,381L102,380L101,382L100,382L100,384L100,383L100,380L101,379L102,377L101,376L100,376L99,374L100,373L100,371L101,370L103,366L102,365L101,365L101,364L102,362L103,362L103,364L103,365L106,368L108,368L109,368L108,368L108,369L110,369L112,370L114,370L118,368L119,367L119,366L122,365L126,364L129,360L130,358L131,358L132,357L135,353L136,352L137,353L138,353L139,353L139,352L141,352L141,350L141,349L141,348L141,347L140,347L141,347L142,346L142,347L144,346L144,347L145,347L146,348L145,349L146,350L146,348L147,349L146,350L147,350L147,349L147,350L148,350L148,349L149,349L149,350L150,350L152,350L152,351L151,351L152,352L152,354L154,353L153,352L155,352L156,352L156,353L157,353L156,354L158,354L157,355L157,356L156,355L156,356L156,358L155,359L156,359L156,358L157,358L157,360L158,360L159,359L160,360L161,360L162,360L161,361L159,360L158,361L159,362L158,363L158,364L156,364L155,364L156,364L155,364L155,365L157,364L158,365L158,364L158,365L160,364L161,364L160,366L160,367L161,366L161,367L161,368L162,368L162,367L163,368L164,368L164,369L162,369L162,370L163,370L162,370L162,372L164,373L164,376L165,377L165,380L165,381L166,383L167,384L168,385L168,386L166,393L165,393L164,394L162,396L160,399L160,400L160,403L161,406L162,408L164,409L163,412L163,414L162,414L162,416L163,417L164,417L163,418L162,419L162,420L163,421L162,422L162,425L162,429L161,430L161,432L161,436L160,440L161,441L161,442L159,446L159,448L159,450L160,450L160,451L159,451L158,452L157,456L158,457L158,458L157,459L156,459L156,460L156,461L155,461L155,460L154,459L152,460L152,459L150,459L150,458L150,457L149,457L148,456L147,456L146,455L143,454L141,456L141,457L140,457L139,456L139,455L138,455L136,458L135,460L135,462L136,463L135,465L135,466L135,467L134,467L130,471L130,472L128,473L127,472L126,472L125,471L123,470L121,471L121,472L120,472L120,473L120,474L120,472L118,472L119,470L118,468L118,469L118,468L117,466L117,465L117,464L114,463L113,463L112,465L112,467L112,468L110,469L110,468L108,464L108,462L108,461L109,460L109,461L111,461L112,462L113,463L114,462L113,460L111,460L111,458L110,457L110,458L110,456L109,455L108,454L111,452L111,451L111,450L111,449L110,449L109,447L110,444L110,443L109,442L112,438L113,435L112,433L112,431L112,429L112,428L112,426L114,428L114,429L114,428L115,427L114,427L116,424L116,421L117,421L116,421L116,420L115,419L114,418L113,419L112,420L112,421L111,421L111,420L110,419L110,416L110,415L110,414L110,413L110,412L109,412L110,411L112,411L114,409L113,407L112,406L112,404L113,403L112,402L113,398L112,398L112,396L112,397L111,396L109,396L109,395L109,394L110,394L110,392L110,391L109,387L107,386L107,385L106,384L107,383L106,382L105,382L104,382L104,383L103,383L102,383ZM103,358L104,357L104,356L105,356L105,354L106,354L107,354L108,355L107,356L107,357L105,356L104,357L104,358L103,359L104,358L104,360L104,361L102,360L103,359L102,359ZM106,457L106,461L105,461L104,461L104,459L103,459L103,458L105,457L106,457L106,456ZM151,348L150,349L150,348L151,347L151,346L151,345L152,346L152,347L153,347L152,348ZM154,347L154,348L153,350L154,350L153,350L152,350L152,349L153,349L153,348L153,347ZM164,364L165,365L163,366L162,366ZM148,346L149,347L148,348L148,347ZM151,350L150,350L151,349L152,349ZM164,367L165,367L164,368L163,367ZM150,343L150,344L149,344ZM149,345L148,345L149,344ZM148,343L149,344L148,344ZM103,362L102,362L102,361L103,361Z" data-key="sardegna" data-name="Sardegna" data-value="83,1 anni" class="q3"/>
+    <g class="callout"><line x1="227.5" y1="52.5" x2="333.0" y2="52.5"/><circle cx="227.5" cy="52.5" r="5"/><text x="552" y="48.5" text-anchor="end"><tspan class="callout__nm">Trentino Alto Adige</tspan><tspan x="552" dy="24" class="callout__v">84,8 anni</tspan></text></g><g class="callout"><line x1="372.5" y1="367.3" x2="443.0" y2="367.3"/><circle cx="372.5" cy="367.3" r="5"/><text x="552" y="363.3" text-anchor="end"><tspan class="callout__nm">Campania</tspan><tspan x="552" dy="24" class="callout__v">82,1 anni</tspan></text></g>
   </svg>
   <div class="map__tip" data-map-tip hidden></div>
 </div>
@@ -1007,93 +1225,95 @@ body.has-proto { padding-bottom: 96px; }
             </div>
 
             <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle regioni">
+              <ul class="arealegend" aria-label="Ripartizioni"><li><span class="area-dot area-dot--nord" aria-hidden="true"></span><b>Nord</b>8</li><li><span class="area-dot area-dot--centro" aria-hidden="true"></span><b>Centro</b>4</li><li><span class="area-dot area-dot--sud" aria-hidden="true"></span><b>Mezzogiorno</b>8</li>
+</ul>
               <table class="table">
                 <caption class="sr-only">Speranza di vita alla nascita per regione nel <span data-year-label>2025</span>, in numero medio di anni</caption>
                 <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">Anni</th></tr></thead>
                 <tbody data-rank-body>
 
 
-                  <tr data-key="trentino-alto-adige"><td class="rank">1</td><th scope="row"><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val">84,8</td></tr>
+                  <tr data-key="trentino-alto-adige"><td class="rank">1</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/trentino-alto-adige">Trentino Alto Adige</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 100.0%"></i></span></td><td class="val"><data class="n n--cell" value="84.8">84,8</data></td></tr>
 
 
 
-                  <tr data-key="marche"><td class="rank">2</td><th scope="row"><a href="https://divarioitalia.it/regione/marche">Marche</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.5%"></i></span></td><td class="val">84,4</td></tr>
+                  <tr data-key="marche"><td class="rank">2</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/marche">Marche</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.5%"></i></span></td><td class="val"><data class="n n--cell" value="84.4">84,4</data></td></tr>
 
 
 
-                  <tr data-key="veneto"><td class="rank">3</td><th scope="row"><a href="https://divarioitalia.it/regione/veneto">Veneto</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.5%"></i></span></td><td class="val">84,4</td></tr>
+                  <tr data-key="veneto"><td class="rank">3</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/veneto">Veneto</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.5%"></i></span></td><td class="val"><data class="n n--cell" value="84.4">84,4</data></td></tr>
 
 
 
-                  <tr data-key="lombardia"><td class="rank">4</td><th scope="row"><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.4%"></i></span></td><td class="val">84,3</td></tr>
+                  <tr data-key="lombardia"><td class="rank">4</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lombardia">Lombardia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.4%"></i></span></td><td class="val"><data class="n n--cell" value="84.3">84,3</data></td></tr>
 
 
 
-                  <tr data-key="toscana"><td class="rank">5</td><th scope="row"><a href="https://divarioitalia.it/regione/toscana">Toscana</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.4%"></i></span></td><td class="val">84,3</td></tr>
+                  <tr data-key="toscana"><td class="rank">5</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/toscana">Toscana</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.4%"></i></span></td><td class="val"><data class="n n--cell" value="84.3">84,3</data></td></tr>
 
 
 
-                  <tr data-key="emilia-romagna"><td class="rank">6</td><th scope="row"><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.3%"></i></span></td><td class="val">84,2</td></tr>
+                  <tr data-key="emilia-romagna"><td class="rank">6</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/emilia-romagna">Emilia-Romagna</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.3%"></i></span></td><td class="val"><data class="n n--cell" value="84.2">84,2</data></td></tr>
 
 
 
-                  <tr data-key="friuli-venezia-giulia"><td class="rank">7</td><th scope="row"><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.2%"></i></span></td><td class="val">84,1</td></tr>
+                  <tr data-key="friuli-venezia-giulia"><td class="rank">7</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/friuli-venezia-giulia">Friuli-Venezia Giulia</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.2%"></i></span></td><td class="val"><data class="n n--cell" value="84.1">84,1</data></td></tr>
 
 
 
-                  <tr data-key="umbria"><td class="rank">8</td><th scope="row"><a href="https://divarioitalia.it/regione/umbria">Umbria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.2%"></i></span></td><td class="val">84,1</td></tr>
+                  <tr data-key="umbria"><td class="rank">8</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/umbria">Umbria</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 99.2%"></i></span></td><td class="val"><data class="n n--cell" value="84.1">84,1</data></td></tr>
 
 
 
-                  <tr data-key="abruzzo"><td class="rank">9</td><th scope="row"><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.7%"></i></span></td><td class="val">83,7</td></tr>
+                  <tr data-key="abruzzo"><td class="rank">9</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/abruzzo">Abruzzo</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.7%"></i></span></td><td class="val"><data class="n n--cell" value="83.7">83,7</data></td></tr>
 
 
 
-                  <tr data-key="liguria"><td class="rank">10</td><th scope="row"><a href="https://divarioitalia.it/regione/liguria">Liguria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.7%"></i></span></td><td class="val">83,7</td></tr>
+                  <tr data-key="liguria"><td class="rank">10</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/liguria">Liguria</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.7%"></i></span></td><td class="val"><data class="n n--cell" value="83.7">83,7</data></td></tr>
 
 
 
-                  <tr data-key="valle-d-aosta"><td class="rank">11</td><th scope="row"><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.7%"></i></span></td><td class="val">83,7</td></tr>
+                  <tr data-key="valle-d-aosta"><td class="rank">11</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/valle-d-aosta">Valle d'Aosta</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.7%"></i></span></td><td class="val"><data class="n n--cell" value="83.7">83,7</data></td></tr>
 
 
 
-                  <tr class="ref"><td></td><th scope="row">Media semplice delle 20 regioni</th><td class="barcell" aria-hidden="true"></td><td class="val">83,6</td></tr>
+                  <tr class="ref"><td></td><th scope="row">Media semplice delle 20 regioni</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="83.64">83,6</data></td></tr>
 
 
 
-                  <tr data-key="lazio"><td class="rank">12</td><th scope="row"><a href="https://divarioitalia.it/regione/lazio">Lazio</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.6%"></i></span></td><td class="val">83,6</td></tr>
+                  <tr data-key="lazio"><td class="rank">12</td><th scope="row"><span class="area-dot area-dot--centro" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/lazio">Lazio</a><span class="sr-only">, Centro</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.6%"></i></span></td><td class="val"><data class="n n--cell" value="83.6">83,6</data></td></tr>
 
 
 
-                  <tr data-key="piemonte"><td class="rank">13</td><th scope="row"><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.6%"></i></span></td><td class="val">83,6</td></tr>
+                  <tr data-key="piemonte"><td class="rank">13</td><th scope="row"><span class="area-dot area-dot--nord" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/piemonte">Piemonte</a><span class="sr-only">, Nord</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.6%"></i></span></td><td class="val"><data class="n n--cell" value="83.6">83,6</data></td></tr>
 
 
 
-                  <tr data-key="puglia"><td class="rank">14</td><th scope="row"><a href="regione.html">Puglia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.5%"></i></span></td><td class="val">83,5</td></tr>
+                  <tr data-key="puglia"><td class="rank">14</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="regione.html">Puglia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.5%"></i></span></td><td class="val"><data class="n n--cell" value="83.5">83,5</data></td></tr>
 
 
 
-                  <tr data-key="basilicata"><td class="rank">15</td><th scope="row"><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.0%"></i></span></td><td class="val">83,1</td></tr>
+                  <tr data-key="basilicata"><td class="rank">15</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/basilicata">Basilicata</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.0%"></i></span></td><td class="val"><data class="n n--cell" value="83.1">83,1</data></td></tr>
 
 
 
-                  <tr data-key="sardegna"><td class="rank">16</td><th scope="row"><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.0%"></i></span></td><td class="val">83,1</td></tr>
+                  <tr data-key="sardegna"><td class="rank">16</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sardegna">Sardegna</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 98.0%"></i></span></td><td class="val"><data class="n n--cell" value="83.1">83,1</data></td></tr>
 
 
 
-                  <tr data-key="calabria"><td class="rank">17</td><th scope="row"><a href="https://divarioitalia.it/regione/calabria">Calabria</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 97.8%"></i></span></td><td class="val">82,9</td></tr>
+                  <tr data-key="calabria"><td class="rank">17</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/calabria">Calabria</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 97.8%"></i></span></td><td class="val"><data class="n n--cell" value="82.9">82,9</data></td></tr>
 
 
 
-                  <tr data-key="molise"><td class="rank">18</td><th scope="row"><a href="https://divarioitalia.it/regione/molise">Molise</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 97.4%"></i></span></td><td class="val">82,6</td></tr>
+                  <tr data-key="molise"><td class="rank">18</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/molise">Molise</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 97.4%"></i></span></td><td class="val"><data class="n n--cell" value="82.6">82,6</data></td></tr>
 
 
 
-                  <tr data-key="sicilia"><td class="rank">19</td><th scope="row"><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 97.4%"></i></span></td><td class="val">82,6</td></tr>
+                  <tr data-key="sicilia"><td class="rank">19</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/sicilia">Sicilia</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 97.4%"></i></span></td><td class="val"><data class="n n--cell" value="82.6">82,6</data></td></tr>
 
 
 
-                  <tr data-key="campania"><td class="rank">20</td><th scope="row"><a href="https://divarioitalia.it/regione/campania">Campania</a></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 96.8%"></i></span></td><td class="val">82,1</td></tr>
+                  <tr data-key="campania"><td class="rank">20</td><th scope="row"><span class="area-dot area-dot--sud" aria-hidden="true"></span><a href="https://divarioitalia.it/regione/campania">Campania</a><span class="sr-only">, Mezzogiorno</span></th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: 96.8%"></i></span></td><td class="val"><data class="n n--cell" value="82.1">82,1</data></td></tr>
 
 
                 </tbody>
@@ -1111,9 +1331,9 @@ body.has-proto { padding-bottom: 96px; }
         <figure class="module">
           <figcaption class="module__head">
             <h3 class="h-sub">Dal 2004 al 2025 la media semplice è cresciuta del 3,6%, e la distanza fra prima e ultima è cresciuta di 0,10 anni</h3>
-            <p class="subline">Speranza di vita alla nascita, in numero medio di anni, dal 2004 al 2025. In grigio le 20 regioni, tratteggiata la media semplice. Scegli una regione qui sopra per vederla.</p>
+            <p class="subline">Speranza di vita alla nascita, in numero medio di anni, dal 2004 al 2025. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la media semplice. Scegli una regione qui sopra per vederla.</p>
           </figcaption>
-          <div class="chart" data-series><div class="chart__l"><svg viewBox="0 0 760 300" aria-hidden="true" focusable="false"><g class="grid"><line x1="64" x2="584" y1="270.0" y2="270.0"/><line x1="64" x2="584" y1="184.7" y2="184.7"/><line x1="64" x2="584" y1="99.3" y2="99.3"/><line x1="64" x2="584" y1="14.0" y2="14.0"/></g><g class="axis"><text x="56" y="274.0" text-anchor="end">78</text><text x="56" y="188.7" text-anchor="end">80</text><text x="56" y="103.3" text-anchor="end">82</text><text x="56" y="18.0" text-anchor="end">84</text><text x="64.0" y="292" text-anchor="start">2004</text><text x="187.8" y="292" text-anchor="middle">2009</text><text x="311.6" y="292" text-anchor="middle">2014</text><text x="435.4" y="292" text-anchor="middle">2019</text><text x="584.0" y="292" text-anchor="end">2025</text></g><g class="ctxlines"><polyline class="ctx" data-key="abruzzo" points="64.0,142.0 88.8,137.7 113.5,124.9 138.3,124.9 163.0,120.7 187.8,133.5 212.6,112.1 237.3,103.6 262.1,90.8 286.9,82.3 311.6,73.7 336.4,86.5 361.1,60.9 385.9,78.0 410.7,52.4 435.4,43.9 460.2,73.7 485.0,73.7 509.7,73.7 534.5,56.7 559.2,35.3 584.0,26.8"/><polyline class="ctx" data-key="basilicata" points="64.0,167.6 88.8,159.1 113.5,146.3 138.3,137.7 163.0,116.4 187.8,112.1 212.6,107.9 237.3,99.3 262.1,95.1 286.9,90.8 311.6,82.3 336.4,99.3 361.1,73.7 385.9,90.8 410.7,73.7 435.4,78.0 460.2,90.8 485.0,86.5 509.7,95.1 534.5,78.0 559.2,48.1 584.0,52.4"/><polyline class="ctx" data-key="calabria" points="64.0,154.8 88.8,163.3 113.5,142.0 138.3,146.3 163.0,142.0 187.8,142.0 212.6,116.4 237.3,116.4 262.1,116.4 286.9,103.6 311.6,103.6 336.4,112.1 361.1,86.5 385.9,103.6 410.7,78.0 435.4,82.3 460.2,95.1 485.0,116.4 509.7,112.1 534.5,103.6 559.2,73.7 584.0,60.9"/><polyline class="ctx" data-key="campania" points="64.0,218.8 88.8,223.1 113.5,206.0 138.3,206.0 163.0,197.5 187.8,188.9 212.6,180.4 237.3,176.1 262.1,167.6 286.9,159.1 311.6,146.3 336.4,167.6 361.1,137.7 385.9,146.3 410.7,124.9 435.4,116.4 460.2,146.3 485.0,154.8 509.7,142.0 534.5,129.2 559.2,107.9 584.0,95.1"/><polyline class="ctx" data-key="emilia-romagna" points="64.0,133.5 88.8,129.2 113.5,112.1 138.3,107.9 163.0,103.6 187.8,95.1 212.6,82.3 237.3,73.7 262.1,73.7 286.9,56.7 311.6,48.1 336.4,60.9 361.1,48.1 385.9,48.1 410.7,35.3 435.4,31.1 460.2,78.0 485.0,56.7 509.7,43.9 534.5,31.1 559.2,9.7 584.0,5.5"/><polyline class="ctx" data-key="friuli-venezia-giulia" points="64.0,159.1 88.8,154.8 113.5,142.0 138.3,129.2 163.0,129.2 187.8,120.7 212.6,107.9 237.3,99.3 262.1,99.3 286.9,90.8 311.6,69.5 336.4,82.3 361.1,60.9 385.9,56.7 410.7,52.4 435.4,35.3 460.2,73.7 485.0,86.5 509.7,56.7 534.5,39.6 559.2,18.3 584.0,9.7"/><polyline class="ctx" data-key="lazio" points="64.0,180.4 88.8,167.6 113.5,150.5 138.3,146.3 163.0,142.0 187.8,142.0 212.6,129.2 237.3,120.7 262.1,116.4 286.9,95.1 311.6,86.5 336.4,99.3 361.1,82.3 385.9,86.5 410.7,60.9 435.4,48.1 460.2,73.7 485.0,73.7 509.7,60.9 534.5,60.9 559.2,39.6 584.0,31.1"/><polyline class="ctx" data-key="liguria" points="64.0,154.8 88.8,154.8 113.5,142.0 138.3,133.5 163.0,133.5 187.8,133.5 212.6,112.1 237.3,107.9 262.1,99.3 286.9,95.1 311.6,73.7 336.4,90.8 361.1,65.2 385.9,73.7 410.7,73.7 435.4,52.4 460.2,112.1 485.0,69.5 509.7,78.0 534.5,52.4 559.2,31.1 584.0,26.8"/><polyline class="ctx" data-key="lombardia" points="64.0,146.3 88.8,146.3 113.5,129.2 138.3,116.4 163.0,120.7 187.8,112.1 212.6,99.3 237.3,78.0 262.1,82.3 286.9,65.2 311.6,48.1 336.4,65.2 361.1,43.9 385.9,43.9 410.7,39.6 435.4,31.1 460.2,124.9 485.0,52.4 509.7,48.1 534.5,22.5 559.2,9.7 584.0,1.2"/><polyline class="ctx" data-key="marche" points="64.0,107.9 88.8,95.1 113.5,95.1 138.3,82.3 163.0,86.5 187.8,78.0 212.6,65.2 237.3,60.9 262.1,56.7 286.9,48.1 311.6,43.9 336.4,56.7 361.1,39.6 385.9,48.1 410.7,22.5 435.4,14.0 460.2,56.7 485.0,52.4 509.7,43.9 534.5,18.3 559.2,1.2 584.0,-3.1"/><polyline class="ctx" data-key="molise" points="64.0,167.6 88.8,159.1 113.5,154.8 138.3,120.7 163.0,137.7 187.8,116.4 212.6,116.4 237.3,116.4 262.1,103.6 286.9,90.8 311.6,86.5 336.4,99.3 361.1,69.5 385.9,90.8 410.7,69.5 435.4,56.7 460.2,90.8 485.0,124.9 509.7,103.6 534.5,86.5 559.2,78.0 584.0,73.7"/><polyline class="ctx" data-key="piemonte" points="64.0,163.3 88.8,159.1 113.5,150.5 138.3,137.7 163.0,137.7 187.8,129.2 212.6,112.1 237.3,103.6 262.1,95.1 286.9,90.8 311.6,73.7 336.4,95.1 361.1,69.5 385.9,78.0 410.7,73.7 435.4,60.9 460.2,124.9 485.0,78.0 509.7,78.0 534.5,56.7 559.2,35.3 584.0,31.1"/><polyline class="ctx" data-key="puglia" points="64.0,137.7 88.8,142.0 113.5,129.2 138.3,133.5 163.0,116.4 187.8,116.4 212.6,95.1 237.3,95.1 262.1,86.5 286.9,78.0 311.6,73.7 336.4,86.5 361.1,60.9 385.9,73.7 410.7,56.7 435.4,48.1 460.2,86.5 485.0,99.3 509.7,73.7 534.5,65.2 559.2,43.9 584.0,35.3"/><polyline class="ctx" data-key="sardegna" points="64.0,154.8 88.8,159.1 113.5,137.7 138.3,133.5 163.0,129.2 187.8,129.2 212.6,107.9 237.3,107.9 262.1,103.6 286.9,90.8 311.6,78.0 336.4,90.8 361.1,73.7 385.9,69.5 410.7,56.7 435.4,56.7 460.2,86.5 485.0,73.7 509.7,99.3 534.5,78.0 559.2,56.7 584.0,52.4"/><polyline class="ctx" data-key="sicilia" points="64.0,180.4 88.8,184.7 113.5,167.6 138.3,176.1 163.0,163.3 187.8,163.3 212.6,146.3 237.3,146.3 262.1,142.0 286.9,124.9 311.6,116.4 336.4,133.5 361.1,107.9 385.9,124.9 410.7,107.9 435.4,99.3 460.2,120.7 485.0,133.5 509.7,124.9 534.5,116.4 559.2,82.3 584.0,73.7"/><polyline class="ctx" data-key="toscana" points="64.0,120.7 88.8,120.7 113.5,103.6 138.3,103.6 163.0,103.6 187.8,95.1 212.6,78.0 237.3,69.5 262.1,73.7 286.9,56.7 311.6,48.1 336.4,65.2 361.1,39.6 385.9,43.9 410.7,31.1 435.4,31.1 460.2,52.4 485.0,48.1 509.7,43.9 534.5,22.5 559.2,9.7 584.0,1.2"/><polyline class="ctx" data-key="trentino-alto-adige" points="64.0,137.7 88.8,124.9 113.5,116.4 138.3,99.3 163.0,95.1 187.8,78.0 212.6,73.7 237.3,52.4 262.1,52.4 286.9,43.9 311.6,35.3 336.4,39.6 361.1,31.1 385.9,22.5 410.7,14.0 435.4,5.5 460.2,65.2 485.0,31.1 509.7,22.5 534.5,-3.1 559.2,-15.9 584.0,-20.1"/><polyline class="ctx" data-key="umbria" points="64.0,120.7 88.8,137.7 113.5,112.1 138.3,107.9 163.0,112.1 187.8,90.8 212.6,86.5 237.3,69.5 262.1,73.7 286.9,65.2 311.6,48.1 336.4,65.2 361.1,39.6 385.9,43.9 410.7,22.5 435.4,14.0 460.2,39.6 485.0,48.1 509.7,43.9 534.5,26.8 559.2,14.0 584.0,9.7"/><polyline class="ctx" data-key="valle-d-aosta" points="64.0,188.9 88.8,197.5 113.5,163.3 138.3,163.3 163.0,137.7 187.8,137.7 212.6,129.2 237.3,112.1 262.1,103.6 286.9,95.1 311.6,95.1 336.4,137.7 361.1,90.8 385.9,99.3 410.7,95.1 435.4,69.5 460.2,146.3 485.0,86.5 509.7,86.5 534.5,48.1 559.2,65.2 584.0,26.8"/><polyline class="ctx" data-key="veneto" points="64.0,133.5 88.8,129.2 113.5,112.1 138.3,107.9 163.0,107.9 187.8,95.1 212.6,82.3 237.3,73.7 262.1,73.7 286.9,60.9 311.6,48.1 336.4,60.9 361.1,39.6 385.9,39.6 410.7,31.1 435.4,22.5 460.2,60.9 485.0,43.9 509.7,39.6 534.5,22.5 559.2,1.2 584.0,-3.1"/></g><polyline class="avg" points="64.0,153.5 88.8,152.2 113.5,136.9 138.3,130.7 163.0,126.6 187.8,120.5 212.6,107.0 237.3,99.1 262.1,95.3 286.9,84.2 311.6,73.9 336.4,89.7 361.1,66.1 385.9,73.1 410.7,58.6 435.4,49.8 460.2,89.9 485.0,79.5 509.7,73.5 534.5,55.6 559.2,37.3 584.0,29.4"/><text class="lab" x="592" y="-16.1">Trentino Alto Adige</text><text class="lab lab--strong" x="592" y="33.4">Media semplice 83,6</text><text class="lab" x="592" y="99.1">Campania</text><polyline class="hl" points="" data-hl/><circle class="dot" r="0" cx="0" cy="0" data-hl-dot/><text class="hl-lab" x="592" y="-10" data-hl-lab></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 280" aria-hidden="true" focusable="false"><g class="grid"><line x1="48" x2="256" y1="250.0" y2="250.0"/><line x1="48" x2="256" y1="171.3" y2="171.3"/><line x1="48" x2="256" y1="92.7" y2="92.7"/><line x1="48" x2="256" y1="14.0" y2="14.0"/></g><g class="axis"><text x="40" y="254.0" text-anchor="end">78</text><text x="40" y="175.3" text-anchor="end">80</text><text x="40" y="96.7" text-anchor="end">82</text><text x="40" y="18.0" text-anchor="end">84</text><text x="48.0" y="272" text-anchor="start">2004</text><text x="147.0" y="272" text-anchor="middle">2014</text><text x="256.0" y="272" text-anchor="end">2025</text></g><g class="ctxlines"><polyline class="ctx" data-key="abruzzo" points="48.0,132.0 57.9,128.1 67.8,116.3 77.7,116.3 87.6,112.3 97.5,124.1 107.4,104.5 117.3,96.6 127.2,84.8 137.1,76.9 147.0,69.1 157.0,80.9 166.9,57.3 176.8,73.0 186.7,49.4 196.6,41.5 206.5,69.1 216.4,69.1 226.3,69.1 236.2,53.3 246.1,33.7 256.0,25.8"/><polyline class="ctx" data-key="basilicata" points="48.0,155.6 57.9,147.7 67.8,135.9 77.7,128.1 87.6,108.4 97.5,104.5 107.4,100.5 117.3,92.7 127.2,88.7 137.1,84.8 147.0,76.9 157.0,92.7 166.9,69.1 176.8,84.8 186.7,69.1 196.6,73.0 206.5,84.8 216.4,80.9 226.3,88.7 236.2,73.0 246.1,45.5 256.0,49.4"/><polyline class="ctx" data-key="calabria" points="48.0,143.8 57.9,151.7 67.8,132.0 77.7,135.9 87.6,132.0 97.5,132.0 107.4,108.4 117.3,108.4 127.2,108.4 137.1,96.6 147.0,96.6 157.0,104.5 166.9,80.9 176.8,96.6 186.7,73.0 196.6,76.9 206.5,88.7 216.4,108.4 226.3,104.5 236.2,96.6 246.1,69.1 256.0,57.3"/><polyline class="ctx" data-key="campania" points="48.0,202.8 57.9,206.7 67.8,191.0 77.7,191.0 87.6,183.1 97.5,175.3 107.4,167.4 117.3,163.5 127.2,155.6 137.1,147.7 147.0,135.9 157.0,155.6 166.9,128.1 176.8,135.9 186.7,116.3 196.6,108.4 206.5,135.9 216.4,143.8 226.3,132.0 236.2,120.2 246.1,100.5 256.0,88.7"/><polyline class="ctx" data-key="emilia-romagna" points="48.0,124.1 57.9,120.2 67.8,104.5 77.7,100.5 87.6,96.6 97.5,88.7 107.4,76.9 117.3,69.1 127.2,69.1 137.1,53.3 147.0,45.5 157.0,57.3 166.9,45.5 176.8,45.5 186.7,33.7 196.6,29.7 206.5,73.0 216.4,53.3 226.3,41.5 236.2,29.7 246.1,10.1 256.0,6.1"/><polyline class="ctx" data-key="friuli-venezia-giulia" points="48.0,147.7 57.9,143.8 67.8,132.0 77.7,120.2 87.6,120.2 97.5,112.3 107.4,100.5 117.3,92.7 127.2,92.7 137.1,84.8 147.0,65.1 157.0,76.9 166.9,57.3 176.8,53.3 186.7,49.4 196.6,33.7 206.5,69.1 216.4,80.9 226.3,53.3 236.2,37.6 246.1,17.9 256.0,10.1"/><polyline class="ctx" data-key="lazio" points="48.0,167.4 57.9,155.6 67.8,139.9 77.7,135.9 87.6,132.0 97.5,132.0 107.4,120.2 117.3,112.3 127.2,108.4 137.1,88.7 147.0,80.9 157.0,92.7 166.9,76.9 176.8,80.9 186.7,57.3 196.6,45.5 206.5,69.1 216.4,69.1 226.3,57.3 236.2,57.3 246.1,37.6 256.0,29.7"/><polyline class="ctx" data-key="liguria" points="48.0,143.8 57.9,143.8 67.8,132.0 77.7,124.1 87.6,124.1 97.5,124.1 107.4,104.5 117.3,100.5 127.2,92.7 137.1,88.7 147.0,69.1 157.0,84.8 166.9,61.2 176.8,69.1 186.7,69.1 196.6,49.4 206.5,104.5 216.4,65.1 226.3,73.0 236.2,49.4 246.1,29.7 256.0,25.8"/><polyline class="ctx" data-key="lombardia" points="48.0,135.9 57.9,135.9 67.8,120.2 77.7,108.4 87.6,112.3 97.5,104.5 107.4,92.7 117.3,73.0 127.2,76.9 137.1,61.2 147.0,45.5 157.0,61.2 166.9,41.5 176.8,41.5 186.7,37.6 196.6,29.7 206.5,116.3 216.4,49.4 226.3,45.5 236.2,21.9 246.1,10.1 256.0,2.2"/><polyline class="ctx" data-key="marche" points="48.0,100.5 57.9,88.7 67.8,88.7 77.7,76.9 87.6,80.9 97.5,73.0 107.4,61.2 117.3,57.3 127.2,53.3 137.1,45.5 147.0,41.5 157.0,53.3 166.9,37.6 176.8,45.5 186.7,21.9 196.6,14.0 206.5,53.3 216.4,49.4 226.3,41.5 236.2,17.9 246.1,2.2 256.0,-1.7"/><polyline class="ctx" data-key="molise" points="48.0,155.6 57.9,147.7 67.8,143.8 77.7,112.3 87.6,128.1 97.5,108.4 107.4,108.4 117.3,108.4 127.2,96.6 137.1,84.8 147.0,80.9 157.0,92.7 166.9,65.1 176.8,84.8 186.7,65.1 196.6,53.3 206.5,84.8 216.4,116.3 226.3,96.6 236.2,80.9 246.1,73.0 256.0,69.1"/><polyline class="ctx" data-key="piemonte" points="48.0,151.7 57.9,147.7 67.8,139.9 77.7,128.1 87.6,128.1 97.5,120.2 107.4,104.5 117.3,96.6 127.2,88.7 137.1,84.8 147.0,69.1 157.0,88.7 166.9,65.1 176.8,73.0 186.7,69.1 196.6,57.3 206.5,116.3 216.4,73.0 226.3,73.0 236.2,53.3 246.1,33.7 256.0,29.7"/><polyline class="ctx" data-key="puglia" points="48.0,128.1 57.9,132.0 67.8,120.2 77.7,124.1 87.6,108.4 97.5,108.4 107.4,88.7 117.3,88.7 127.2,80.9 137.1,73.0 147.0,69.1 157.0,80.9 166.9,57.3 176.8,69.1 186.7,53.3 196.6,45.5 206.5,80.9 216.4,92.7 226.3,69.1 236.2,61.2 246.1,41.5 256.0,33.7"/><polyline class="ctx" data-key="sardegna" points="48.0,143.8 57.9,147.7 67.8,128.1 77.7,124.1 87.6,120.2 97.5,120.2 107.4,100.5 117.3,100.5 127.2,96.6 137.1,84.8 147.0,73.0 157.0,84.8 166.9,69.1 176.8,65.1 186.7,53.3 196.6,53.3 206.5,80.9 216.4,69.1 226.3,92.7 236.2,73.0 246.1,53.3 256.0,49.4"/><polyline class="ctx" data-key="sicilia" points="48.0,167.4 57.9,171.3 67.8,155.6 77.7,163.5 87.6,151.7 97.5,151.7 107.4,135.9 117.3,135.9 127.2,132.0 137.1,116.3 147.0,108.4 157.0,124.1 166.9,100.5 176.8,116.3 186.7,100.5 196.6,92.7 206.5,112.3 216.4,124.1 226.3,116.3 236.2,108.4 246.1,76.9 256.0,69.1"/><polyline class="ctx" data-key="toscana" points="48.0,112.3 57.9,112.3 67.8,96.6 77.7,96.6 87.6,96.6 97.5,88.7 107.4,73.0 117.3,65.1 127.2,69.1 137.1,53.3 147.0,45.5 157.0,61.2 166.9,37.6 176.8,41.5 186.7,29.7 196.6,29.7 206.5,49.4 216.4,45.5 226.3,41.5 236.2,21.9 246.1,10.1 256.0,2.2"/><polyline class="ctx" data-key="trentino-alto-adige" points="48.0,128.1 57.9,116.3 67.8,108.4 77.7,92.7 87.6,88.7 97.5,73.0 107.4,69.1 117.3,49.4 127.2,49.4 137.1,41.5 147.0,33.7 157.0,37.6 166.9,29.7 176.8,21.9 186.7,14.0 196.6,6.1 206.5,61.2 216.4,29.7 226.3,21.9 236.2,-1.7 246.1,-13.5 256.0,-17.5"/><polyline class="ctx" data-key="umbria" points="48.0,112.3 57.9,128.1 67.8,104.5 77.7,100.5 87.6,104.5 97.5,84.8 107.4,80.9 117.3,65.1 127.2,69.1 137.1,61.2 147.0,45.5 157.0,61.2 166.9,37.6 176.8,41.5 186.7,21.9 196.6,14.0 206.5,37.6 216.4,45.5 226.3,41.5 236.2,25.8 246.1,14.0 256.0,10.1"/><polyline class="ctx" data-key="valle-d-aosta" points="48.0,175.3 57.9,183.1 67.8,151.7 77.7,151.7 87.6,128.1 97.5,128.1 107.4,120.2 117.3,104.5 127.2,96.6 137.1,88.7 147.0,88.7 157.0,128.1 166.9,84.8 176.8,92.7 186.7,88.7 196.6,65.1 206.5,135.9 216.4,80.9 226.3,80.9 236.2,45.5 246.1,61.2 256.0,25.8"/><polyline class="ctx" data-key="veneto" points="48.0,124.1 57.9,120.2 67.8,104.5 77.7,100.5 87.6,100.5 97.5,88.7 107.4,76.9 117.3,69.1 127.2,69.1 137.1,57.3 147.0,45.5 157.0,57.3 166.9,37.6 176.8,37.6 186.7,29.7 196.6,21.9 206.5,57.3 216.4,41.5 226.3,37.6 236.2,21.9 246.1,2.2 256.0,-1.7"/></g><polyline class="avg" points="48.0,142.6 57.9,141.4 67.8,127.3 77.7,121.6 87.6,117.8 97.5,112.1 107.4,99.7 117.3,92.5 127.2,88.9 137.1,78.7 147.0,69.3 157.0,83.8 166.9,62.0 176.8,68.5 186.7,55.1 196.6,47.0 206.5,84.0 216.4,74.4 226.3,68.9 236.2,52.3 246.1,35.4 256.0,28.2"/><text class="lab" x="264" y="-13.5">Trentino Alt.</text><text class="lab lab--strong" x="264" y="32.2">Media 83,6</text><text class="lab" x="264" y="92.7">Campania</text><polyline class="hl" points="" data-hl/><circle class="dot" r="0" cx="0" cy="0" data-hl-dot/><text class="hl-lab" x="264" y="-10" data-hl-lab></text></svg></div></div>
+          <div class="chart" data-series><div class="chart__l"><svg viewBox="0 0 920 340" aria-hidden="true" focusable="false" class="band"><line class="band__grid" x1="60" x2="720" y1="310.0" y2="310.0"/><text class="band__tick" x="52" y="314.0" text-anchor="end">78</text><line class="band__grid" x1="60" x2="720" y1="212.0" y2="212.0"/><text class="band__tick" x="52" y="216.0" text-anchor="end">80</text><line class="band__grid" x1="60" x2="720" y1="114.0" y2="114.0"/><text class="band__tick" x="52" y="118.0" text-anchor="end">82</text><line class="band__grid" x1="60" x2="720" y1="16.0" y2="16.0"/><text class="band__tick" x="52" y="20.0" text-anchor="end">84</text><text class="band__tick" x="60.0" y="332" text-anchor="start">2004</text><text class="band__tick" x="217.1" y="332" text-anchor="middle">2009</text><text class="band__tick" x="374.3" y="332" text-anchor="middle">2014</text><text class="band__tick" x="531.4" y="332" text-anchor="middle">2019</text><text class="band__tick" x="720.0" y="332" text-anchor="end">2025</text><polygon class="band__area" points="60.0,123.8 91.4,109.1 122.9,109.1 154.3,94.4 185.7,99.3 217.1,89.5 248.6,74.8 280.0,60.1 311.4,60.1 342.9,50.3 374.3,40.5 405.7,45.4 437.1,35.6 468.6,25.8 500.0,16.0 531.4,6.2 562.9,45.4 594.3,35.6 625.7,25.8 657.1,-3.6 688.6,-18.3 720.0,-23.2 720.0,109.1 688.6,123.8 657.1,148.3 625.7,163.0 594.3,177.7 562.9,167.9 531.4,133.6 500.0,143.4 468.6,167.9 437.1,158.1 405.7,192.4 374.3,167.9 342.9,182.6 311.4,192.4 280.0,202.2 248.6,207.1 217.1,216.9 185.7,226.7 154.3,236.5 122.9,236.5 91.4,256.1 60.0,251.2"/><polyline class="band__src" data-key="abruzzo" points="60.0,163.0 91.4,158.1 122.9,143.4 154.3,143.4 185.7,138.5 217.1,153.2 248.6,128.7 280.0,118.9 311.4,104.2 342.9,94.4 374.3,84.6 405.7,99.3 437.1,69.9 468.6,89.5 500.0,60.1 531.4,50.3 562.9,84.6 594.3,84.6 625.7,84.6 657.1,65.0 688.6,40.5 720.0,30.7"/><polyline class="band__src" data-key="basilicata" points="60.0,192.4 91.4,182.6 122.9,167.9 154.3,158.1 185.7,133.6 217.1,128.7 248.6,123.8 280.0,114.0 311.4,109.1 342.9,104.2 374.3,94.4 405.7,114.0 437.1,84.6 468.6,104.2 500.0,84.6 531.4,89.5 562.9,104.2 594.3,99.3 625.7,109.1 657.1,89.5 688.6,55.2 720.0,60.1"/><polyline class="band__src" data-key="calabria" points="60.0,177.7 91.4,187.5 122.9,163.0 154.3,167.9 185.7,163.0 217.1,163.0 248.6,133.6 280.0,133.6 311.4,133.6 342.9,118.9 374.3,118.9 405.7,128.7 437.1,99.3 468.6,118.9 500.0,89.5 531.4,94.4 562.9,109.1 594.3,133.6 625.7,128.7 657.1,118.9 688.6,84.6 720.0,69.9"/><polyline class="band__src" data-key="campania" points="60.0,251.2 91.4,256.1 122.9,236.5 154.3,236.5 185.7,226.7 217.1,216.9 248.6,207.1 280.0,202.2 311.4,192.4 342.9,182.6 374.3,167.9 405.7,192.4 437.1,158.1 468.6,167.9 500.0,143.4 531.4,133.6 562.9,167.9 594.3,177.7 625.7,163.0 657.1,148.3 688.6,123.8 720.0,109.1"/><polyline class="band__src" data-key="emilia-romagna" points="60.0,153.2 91.4,148.3 122.9,128.7 154.3,123.8 185.7,118.9 217.1,109.1 248.6,94.4 280.0,84.6 311.4,84.6 342.9,65.0 374.3,55.2 405.7,69.9 437.1,55.2 468.6,55.2 500.0,40.5 531.4,35.6 562.9,89.5 594.3,65.0 625.7,50.3 657.1,35.6 688.6,11.1 720.0,6.2"/><polyline class="band__src" data-key="friuli-venezia-giulia" points="60.0,182.6 91.4,177.7 122.9,163.0 154.3,148.3 185.7,148.3 217.1,138.5 248.6,123.8 280.0,114.0 311.4,114.0 342.9,104.2 374.3,79.7 405.7,94.4 437.1,69.9 468.6,65.0 500.0,60.1 531.4,40.5 562.9,84.6 594.3,99.3 625.7,65.0 657.1,45.4 688.6,20.9 720.0,11.1"/><polyline class="band__src" data-key="lazio" points="60.0,207.1 91.4,192.4 122.9,172.8 154.3,167.9 185.7,163.0 217.1,163.0 248.6,148.3 280.0,138.5 311.4,133.6 342.9,109.1 374.3,99.3 405.7,114.0 437.1,94.4 468.6,99.3 500.0,69.9 531.4,55.2 562.9,84.6 594.3,84.6 625.7,69.9 657.1,69.9 688.6,45.4 720.0,35.6"/><polyline class="band__src" data-key="liguria" points="60.0,177.7 91.4,177.7 122.9,163.0 154.3,153.2 185.7,153.2 217.1,153.2 248.6,128.7 280.0,123.8 311.4,114.0 342.9,109.1 374.3,84.6 405.7,104.2 437.1,74.8 468.6,84.6 500.0,84.6 531.4,60.1 562.9,128.7 594.3,79.7 625.7,89.5 657.1,60.1 688.6,35.6 720.0,30.7"/><polyline class="band__src" data-key="lombardia" points="60.0,167.9 91.4,167.9 122.9,148.3 154.3,133.6 185.7,138.5 217.1,128.7 248.6,114.0 280.0,89.5 311.4,94.4 342.9,74.8 374.3,55.2 405.7,74.8 437.1,50.3 468.6,50.3 500.0,45.4 531.4,35.6 562.9,143.4 594.3,60.1 625.7,55.2 657.1,25.8 688.6,11.1 720.0,1.3"/><polyline class="band__src" data-key="marche" points="60.0,123.8 91.4,109.1 122.9,109.1 154.3,94.4 185.7,99.3 217.1,89.5 248.6,74.8 280.0,69.9 311.4,65.0 342.9,55.2 374.3,50.3 405.7,65.0 437.1,45.4 468.6,55.2 500.0,25.8 531.4,16.0 562.9,65.0 594.3,60.1 625.7,50.3 657.1,20.9 688.6,1.3 720.0,-3.6"/><polyline class="band__src" data-key="molise" points="60.0,192.4 91.4,182.6 122.9,177.7 154.3,138.5 185.7,158.1 217.1,133.6 248.6,133.6 280.0,133.6 311.4,118.9 342.9,104.2 374.3,99.3 405.7,114.0 437.1,79.7 468.6,104.2 500.0,79.7 531.4,65.0 562.9,104.2 594.3,143.4 625.7,118.9 657.1,99.3 688.6,89.5 720.0,84.6"/><polyline class="band__src" data-key="piemonte" points="60.0,187.5 91.4,182.6 122.9,172.8 154.3,158.1 185.7,158.1 217.1,148.3 248.6,128.7 280.0,118.9 311.4,109.1 342.9,104.2 374.3,84.6 405.7,109.1 437.1,79.7 468.6,89.5 500.0,84.6 531.4,69.9 562.9,143.4 594.3,89.5 625.7,89.5 657.1,65.0 688.6,40.5 720.0,35.6"/><polyline class="band__src" data-key="puglia" points="60.0,158.1 91.4,163.0 122.9,148.3 154.3,153.2 185.7,133.6 217.1,133.6 248.6,109.1 280.0,109.1 311.4,99.3 342.9,89.5 374.3,84.6 405.7,99.3 437.1,69.9 468.6,84.6 500.0,65.0 531.4,55.2 562.9,99.3 594.3,114.0 625.7,84.6 657.1,74.8 688.6,50.3 720.0,40.5"/><polyline class="band__src" data-key="sardegna" points="60.0,177.7 91.4,182.6 122.9,158.1 154.3,153.2 185.7,148.3 217.1,148.3 248.6,123.8 280.0,123.8 311.4,118.9 342.9,104.2 374.3,89.5 405.7,104.2 437.1,84.6 468.6,79.7 500.0,65.0 531.4,65.0 562.9,99.3 594.3,84.6 625.7,114.0 657.1,89.5 688.6,65.0 720.0,60.1"/><polyline class="band__src" data-key="sicilia" points="60.0,207.1 91.4,212.0 122.9,192.4 154.3,202.2 185.7,187.5 217.1,187.5 248.6,167.9 280.0,167.9 311.4,163.0 342.9,143.4 374.3,133.6 405.7,153.2 437.1,123.8 468.6,143.4 500.0,123.8 531.4,114.0 562.9,138.5 594.3,153.2 625.7,143.4 657.1,133.6 688.6,94.4 720.0,84.6"/><polyline class="band__src" data-key="toscana" points="60.0,138.5 91.4,138.5 122.9,118.9 154.3,118.9 185.7,118.9 217.1,109.1 248.6,89.5 280.0,79.7 311.4,84.6 342.9,65.0 374.3,55.2 405.7,74.8 437.1,45.4 468.6,50.3 500.0,35.6 531.4,35.6 562.9,60.1 594.3,55.2 625.7,50.3 657.1,25.8 688.6,11.1 720.0,1.3"/><polyline class="band__src" data-key="trentino-alto-adige" points="60.0,158.1 91.4,143.4 122.9,133.6 154.3,114.0 185.7,109.1 217.1,89.5 248.6,84.6 280.0,60.1 311.4,60.1 342.9,50.3 374.3,40.5 405.7,45.4 437.1,35.6 468.6,25.8 500.0,16.0 531.4,6.2 562.9,74.8 594.3,35.6 625.7,25.8 657.1,-3.6 688.6,-18.3 720.0,-23.2"/><polyline class="band__src" data-key="umbria" points="60.0,138.5 91.4,158.1 122.9,128.7 154.3,123.8 185.7,128.7 217.1,104.2 248.6,99.3 280.0,79.7 311.4,84.6 342.9,74.8 374.3,55.2 405.7,74.8 437.1,45.4 468.6,50.3 500.0,25.8 531.4,16.0 562.9,45.4 594.3,55.2 625.7,50.3 657.1,30.7 688.6,16.0 720.0,11.1"/><polyline class="band__src" data-key="valle-d-aosta" points="60.0,216.9 91.4,226.7 122.9,187.5 154.3,187.5 185.7,158.1 217.1,158.1 248.6,148.3 280.0,128.7 311.4,118.9 342.9,109.1 374.3,109.1 405.7,158.1 437.1,104.2 468.6,114.0 500.0,109.1 531.4,79.7 562.9,167.9 594.3,99.3 625.7,99.3 657.1,55.2 688.6,74.8 720.0,30.7"/><polyline class="band__src" data-key="veneto" points="60.0,153.2 91.4,148.3 122.9,128.7 154.3,123.8 185.7,123.8 217.1,109.1 248.6,94.4 280.0,84.6 311.4,84.6 342.9,69.9 374.3,55.2 405.7,69.9 437.1,45.4 468.6,45.4 500.0,35.6 531.4,25.8 562.9,69.9 594.3,50.3 625.7,45.4 657.1,25.8 688.6,1.3 720.0,-3.6"/><polyline class="band__ext area-line--nord" points="60.0,158.1 91.4,143.4 122.9,133.6 154.3,114.0 185.7,109.1 217.1,89.5 248.6,84.6 280.0,60.1 311.4,60.1 342.9,50.3 374.3,40.5 405.7,45.4 437.1,35.6 468.6,25.8 500.0,16.0 531.4,6.2 562.9,74.8 594.3,35.6 625.7,25.8 657.1,-3.6 688.6,-18.3 720.0,-23.2"/><polyline class="band__ext area-line--sud" points="60.0,251.2 91.4,256.1 122.9,236.5 154.3,236.5 185.7,226.7 217.1,216.9 248.6,207.1 280.0,202.2 311.4,192.4 342.9,182.6 374.3,167.9 405.7,192.4 437.1,158.1 468.6,167.9 500.0,143.4 531.4,133.6 562.9,167.9 594.3,177.7 625.7,163.0 657.1,148.3 688.6,123.8 720.0,109.1"/><polyline class="band__avg" points="60.0,176.2 91.4,174.8 122.9,157.1 154.3,150.0 185.7,145.4 217.1,138.3 248.6,122.8 280.0,113.8 311.4,109.3 342.9,96.6 374.3,84.8 405.7,103.0 437.1,75.8 468.6,83.9 500.0,67.2 531.4,57.2 562.9,103.2 594.3,91.2 625.7,84.4 657.1,63.8 688.6,42.7 720.0,33.6"/><text class="band__lab area-text--nord" x="728" y="-19.2">Trentino Alto Adige 84,8</text><text class="band__lab band__lab--avg" x="728" y="37.6">Media semplice 83,6</text><text class="band__lab area-text--sud" x="728" y="113.1">Campania 82,1</text><polyline class="band__hl" points="" data-hl/><circle class="band__dot" r="0" cx="0" cy="0" data-hl-dot/><text class="band__hllab" x="728" y="-20" data-hl-lab></text></svg></div><div class="chart__s"><svg viewBox="0 0 360 280" aria-hidden="true" focusable="false" class="band"><line class="band__grid" x1="46" x2="248" y1="250.0" y2="250.0"/><text class="band__tick" x="38" y="254.0" text-anchor="end">78</text><line class="band__grid" x1="46" x2="248" y1="172.0" y2="172.0"/><text class="band__tick" x="38" y="176.0" text-anchor="end">80</text><line class="band__grid" x1="46" x2="248" y1="94.0" y2="94.0"/><text class="band__tick" x="38" y="98.0" text-anchor="end">82</text><line class="band__grid" x1="46" x2="248" y1="16.0" y2="16.0"/><text class="band__tick" x="38" y="20.0" text-anchor="end">84</text><text class="band__tick" x="46.0" y="272" text-anchor="start">2004</text><text class="band__tick" x="142.2" y="272" text-anchor="middle">2014</text><text class="band__tick" x="248.0" y="272" text-anchor="end">2025</text><polygon class="band__area" points="46.0,101.8 55.6,90.1 65.2,90.1 74.9,78.4 84.5,82.3 94.1,74.5 103.7,62.8 113.3,51.1 123.0,51.1 132.6,43.3 142.2,35.5 151.8,39.4 161.4,31.6 171.0,23.8 180.7,16.0 190.3,8.2 199.9,39.4 209.5,31.6 219.1,23.8 228.8,0.4 238.4,-11.3 248.0,-15.2 248.0,90.1 238.4,101.8 228.8,121.3 219.1,133.0 209.5,144.7 199.9,136.9 190.3,109.6 180.7,117.4 171.0,136.9 161.4,129.1 151.8,156.4 142.2,136.9 132.6,148.6 123.0,156.4 113.3,164.2 103.7,168.1 94.1,175.9 84.5,183.7 74.9,191.5 65.2,191.5 55.6,207.1 46.0,203.2"/><polyline class="band__src" data-key="abruzzo" points="46.0,133.0 55.6,129.1 65.2,117.4 74.9,117.4 84.5,113.5 94.1,125.2 103.7,105.7 113.3,97.9 123.0,86.2 132.6,78.4 142.2,70.6 151.8,82.3 161.4,58.9 171.0,74.5 180.7,51.1 190.3,43.3 199.9,70.6 209.5,70.6 219.1,70.6 228.8,55.0 238.4,35.5 248.0,27.7"/><polyline class="band__src" data-key="basilicata" points="46.0,156.4 55.6,148.6 65.2,136.9 74.9,129.1 84.5,109.6 94.1,105.7 103.7,101.8 113.3,94.0 123.0,90.1 132.6,86.2 142.2,78.4 151.8,94.0 161.4,70.6 171.0,86.2 180.7,70.6 190.3,74.5 199.9,86.2 209.5,82.3 219.1,90.1 228.8,74.5 238.4,47.2 248.0,51.1"/><polyline class="band__src" data-key="calabria" points="46.0,144.7 55.6,152.5 65.2,133.0 74.9,136.9 84.5,133.0 94.1,133.0 103.7,109.6 113.3,109.6 123.0,109.6 132.6,97.9 142.2,97.9 151.8,105.7 161.4,82.3 171.0,97.9 180.7,74.5 190.3,78.4 199.9,90.1 209.5,109.6 219.1,105.7 228.8,97.9 238.4,70.6 248.0,58.9"/><polyline class="band__src" data-key="campania" points="46.0,203.2 55.6,207.1 65.2,191.5 74.9,191.5 84.5,183.7 94.1,175.9 103.7,168.1 113.3,164.2 123.0,156.4 132.6,148.6 142.2,136.9 151.8,156.4 161.4,129.1 171.0,136.9 180.7,117.4 190.3,109.6 199.9,136.9 209.5,144.7 219.1,133.0 228.8,121.3 238.4,101.8 248.0,90.1"/><polyline class="band__src" data-key="emilia-romagna" points="46.0,125.2 55.6,121.3 65.2,105.7 74.9,101.8 84.5,97.9 94.1,90.1 103.7,78.4 113.3,70.6 123.0,70.6 132.6,55.0 142.2,47.2 151.8,58.9 161.4,47.2 171.0,47.2 180.7,35.5 190.3,31.6 199.9,74.5 209.5,55.0 219.1,43.3 228.8,31.6 238.4,12.1 248.0,8.2"/><polyline class="band__src" data-key="friuli-venezia-giulia" points="46.0,148.6 55.6,144.7 65.2,133.0 74.9,121.3 84.5,121.3 94.1,113.5 103.7,101.8 113.3,94.0 123.0,94.0 132.6,86.2 142.2,66.7 151.8,78.4 161.4,58.9 171.0,55.0 180.7,51.1 190.3,35.5 199.9,70.6 209.5,82.3 219.1,55.0 228.8,39.4 238.4,19.9 248.0,12.1"/><polyline class="band__src" data-key="lazio" points="46.0,168.1 55.6,156.4 65.2,140.8 74.9,136.9 84.5,133.0 94.1,133.0 103.7,121.3 113.3,113.5 123.0,109.6 132.6,90.1 142.2,82.3 151.8,94.0 161.4,78.4 171.0,82.3 180.7,58.9 190.3,47.2 199.9,70.6 209.5,70.6 219.1,58.9 228.8,58.9 238.4,39.4 248.0,31.6"/><polyline class="band__src" data-key="liguria" points="46.0,144.7 55.6,144.7 65.2,133.0 74.9,125.2 84.5,125.2 94.1,125.2 103.7,105.7 113.3,101.8 123.0,94.0 132.6,90.1 142.2,70.6 151.8,86.2 161.4,62.8 171.0,70.6 180.7,70.6 190.3,51.1 199.9,105.7 209.5,66.7 219.1,74.5 228.8,51.1 238.4,31.6 248.0,27.7"/><polyline class="band__src" data-key="lombardia" points="46.0,136.9 55.6,136.9 65.2,121.3 74.9,109.6 84.5,113.5 94.1,105.7 103.7,94.0 113.3,74.5 123.0,78.4 132.6,62.8 142.2,47.2 151.8,62.8 161.4,43.3 171.0,43.3 180.7,39.4 190.3,31.6 199.9,117.4 209.5,51.1 219.1,47.2 228.8,23.8 238.4,12.1 248.0,4.3"/><polyline class="band__src" data-key="marche" points="46.0,101.8 55.6,90.1 65.2,90.1 74.9,78.4 84.5,82.3 94.1,74.5 103.7,62.8 113.3,58.9 123.0,55.0 132.6,47.2 142.2,43.3 151.8,55.0 161.4,39.4 171.0,47.2 180.7,23.8 190.3,16.0 199.9,55.0 209.5,51.1 219.1,43.3 228.8,19.9 238.4,4.3 248.0,0.4"/><polyline class="band__src" data-key="molise" points="46.0,156.4 55.6,148.6 65.2,144.7 74.9,113.5 84.5,129.1 94.1,109.6 103.7,109.6 113.3,109.6 123.0,97.9 132.6,86.2 142.2,82.3 151.8,94.0 161.4,66.7 171.0,86.2 180.7,66.7 190.3,55.0 199.9,86.2 209.5,117.4 219.1,97.9 228.8,82.3 238.4,74.5 248.0,70.6"/><polyline class="band__src" data-key="piemonte" points="46.0,152.5 55.6,148.6 65.2,140.8 74.9,129.1 84.5,129.1 94.1,121.3 103.7,105.7 113.3,97.9 123.0,90.1 132.6,86.2 142.2,70.6 151.8,90.1 161.4,66.7 171.0,74.5 180.7,70.6 190.3,58.9 199.9,117.4 209.5,74.5 219.1,74.5 228.8,55.0 238.4,35.5 248.0,31.6"/><polyline class="band__src" data-key="puglia" points="46.0,129.1 55.6,133.0 65.2,121.3 74.9,125.2 84.5,109.6 94.1,109.6 103.7,90.1 113.3,90.1 123.0,82.3 132.6,74.5 142.2,70.6 151.8,82.3 161.4,58.9 171.0,70.6 180.7,55.0 190.3,47.2 199.9,82.3 209.5,94.0 219.1,70.6 228.8,62.8 238.4,43.3 248.0,35.5"/><polyline class="band__src" data-key="sardegna" points="46.0,144.7 55.6,148.6 65.2,129.1 74.9,125.2 84.5,121.3 94.1,121.3 103.7,101.8 113.3,101.8 123.0,97.9 132.6,86.2 142.2,74.5 151.8,86.2 161.4,70.6 171.0,66.7 180.7,55.0 190.3,55.0 199.9,82.3 209.5,70.6 219.1,94.0 228.8,74.5 238.4,55.0 248.0,51.1"/><polyline class="band__src" data-key="sicilia" points="46.0,168.1 55.6,172.0 65.2,156.4 74.9,164.2 84.5,152.5 94.1,152.5 103.7,136.9 113.3,136.9 123.0,133.0 132.6,117.4 142.2,109.6 151.8,125.2 161.4,101.8 171.0,117.4 180.7,101.8 190.3,94.0 199.9,113.5 209.5,125.2 219.1,117.4 228.8,109.6 238.4,78.4 248.0,70.6"/><polyline class="band__src" data-key="toscana" points="46.0,113.5 55.6,113.5 65.2,97.9 74.9,97.9 84.5,97.9 94.1,90.1 103.7,74.5 113.3,66.7 123.0,70.6 132.6,55.0 142.2,47.2 151.8,62.8 161.4,39.4 171.0,43.3 180.7,31.6 190.3,31.6 199.9,51.1 209.5,47.2 219.1,43.3 228.8,23.8 238.4,12.1 248.0,4.3"/><polyline class="band__src" data-key="trentino-alto-adige" points="46.0,129.1 55.6,117.4 65.2,109.6 74.9,94.0 84.5,90.1 94.1,74.5 103.7,70.6 113.3,51.1 123.0,51.1 132.6,43.3 142.2,35.5 151.8,39.4 161.4,31.6 171.0,23.8 180.7,16.0 190.3,8.2 199.9,62.8 209.5,31.6 219.1,23.8 228.8,0.4 238.4,-11.3 248.0,-15.2"/><polyline class="band__src" data-key="umbria" points="46.0,113.5 55.6,129.1 65.2,105.7 74.9,101.8 84.5,105.7 94.1,86.2 103.7,82.3 113.3,66.7 123.0,70.6 132.6,62.8 142.2,47.2 151.8,62.8 161.4,39.4 171.0,43.3 180.7,23.8 190.3,16.0 199.9,39.4 209.5,47.2 219.1,43.3 228.8,27.7 238.4,16.0 248.0,12.1"/><polyline class="band__src" data-key="valle-d-aosta" points="46.0,175.9 55.6,183.7 65.2,152.5 74.9,152.5 84.5,129.1 94.1,129.1 103.7,121.3 113.3,105.7 123.0,97.9 132.6,90.1 142.2,90.1 151.8,129.1 161.4,86.2 171.0,94.0 180.7,90.1 190.3,66.7 199.9,136.9 209.5,82.3 219.1,82.3 228.8,47.2 238.4,62.8 248.0,27.7"/><polyline class="band__src" data-key="veneto" points="46.0,125.2 55.6,121.3 65.2,105.7 74.9,101.8 84.5,101.8 94.1,90.1 103.7,78.4 113.3,70.6 123.0,70.6 132.6,58.9 142.2,47.2 151.8,58.9 161.4,39.4 171.0,39.4 180.7,31.6 190.3,23.8 199.9,58.9 209.5,43.3 219.1,39.4 228.8,23.8 238.4,4.3 248.0,0.4"/><polyline class="band__ext area-line--nord" points="46.0,129.1 55.6,117.4 65.2,109.6 74.9,94.0 84.5,90.1 94.1,74.5 103.7,70.6 113.3,51.1 123.0,51.1 132.6,43.3 142.2,35.5 151.8,39.4 161.4,31.6 171.0,23.8 180.7,16.0 190.3,8.2 199.9,62.8 209.5,31.6 219.1,23.8 228.8,0.4 238.4,-11.3 248.0,-15.2"/><polyline class="band__ext area-line--sud" points="46.0,203.2 55.6,207.1 65.2,191.5 74.9,191.5 84.5,183.7 94.1,175.9 103.7,168.1 113.3,164.2 123.0,156.4 132.6,148.6 142.2,136.9 151.8,156.4 161.4,129.1 171.0,136.9 180.7,117.4 190.3,109.6 199.9,136.9 209.5,144.7 219.1,133.0 228.8,121.3 238.4,101.8 248.0,90.1"/><polyline class="band__avg" points="46.0,143.5 55.6,142.4 65.2,128.3 74.9,122.7 84.5,119.0 94.1,113.3 103.7,101.0 113.3,93.8 123.0,90.3 132.6,80.2 142.2,70.8 151.8,85.2 161.4,63.6 171.0,70.0 180.7,56.8 190.3,48.8 199.9,85.4 209.5,75.9 219.1,70.4 228.8,54.0 238.4,37.3 248.0,30.0"/><text class="band__lab area-text--nord" x="256" y="-11.2">Trentino Alt. 84,8</text><text class="band__lab band__lab--avg" x="256" y="34.0">Media 83,6</text><text class="band__lab area-text--sud" x="256" y="94.1">Campania 82,1</text><polyline class="band__hl" points="" data-hl/><circle class="band__dot" r="0" cx="0" cy="0" data-hl-dot/><text class="band__hllab" x="256" y="-20" data-hl-lab></text></svg></div></div>
           <p class="chart-note">Su tutto il periodo cresce di più la Valle d'Aosta (+3,8 anni), di meno il Molise (+2,2 anni).</p>
           <p class="source">Fonte: <a href="https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/">Istat, BES nazionale, aggiornamento intermedio 2026</a>. Elaborazione Divario Italia.</p>
           <details class="more">
@@ -1122,7 +1342,7 @@ body.has-proto { padding-bottom: 96px; }
               <table class="table table--compact trend-table">
                 <caption>Media semplice delle regioni per anno, in numero medio di anni</caption>
                 <thead><tr><th scope="col">Anno</th><th class="r" scope="col">Media semplice</th></tr></thead>
-                <tbody><tr><th scope="row">2004</th><td class="val">80,7</td></tr><tr><th scope="row">2005</th><td class="val">80,8</td></tr><tr><th scope="row">2006</th><td class="val">81,1</td></tr><tr><th scope="row">2007</th><td class="val">81,3</td></tr><tr><th scope="row">2008</th><td class="val">81,4</td></tr><tr><th scope="row">2009</th><td class="val">81,5</td></tr><tr><th scope="row">2010</th><td class="val">81,8</td></tr><tr><th scope="row">2011</th><td class="val">82,0</td></tr><tr><th scope="row">2012</th><td class="val">82,1</td></tr><tr><th scope="row">2013</th><td class="val">82,4</td></tr><tr><th scope="row">2014</th><td class="val">82,6</td></tr><tr><th scope="row">2015</th><td class="val">82,2</td></tr><tr><th scope="row">2016</th><td class="val">82,8</td></tr><tr><th scope="row">2017</th><td class="val">82,6</td></tr><tr><th scope="row">2018</th><td class="val">83,0</td></tr><tr><th scope="row">2019</th><td class="val">83,2</td></tr><tr><th scope="row">2020</th><td class="val">82,2</td></tr><tr><th scope="row">2021</th><td class="val">82,5</td></tr><tr><th scope="row">2022</th><td class="val">82,6</td></tr><tr><th scope="row">2023</th><td class="val">83,0</td></tr><tr><th scope="row">2024</th><td class="val">83,5</td></tr><tr><th scope="row">2025</th><td class="val">83,6</td></tr></tbody>
+                <tbody><tr><th scope="row">2004</th><td class="val"><data class="n n--cell" value="80.73">80,7</data></td></tr><tr><th scope="row">2005</th><td class="val"><data class="n n--cell" value="80.76">80,8</data></td></tr><tr><th scope="row">2006</th><td class="val"><data class="n n--cell" value="81.12">81,1</data></td></tr><tr><th scope="row">2007</th><td class="val"><data class="n n--cell" value="81.265">81,3</data></td></tr><tr><th scope="row">2008</th><td class="val"><data class="n n--cell" value="81.36">81,4</data></td></tr><tr><th scope="row">2009</th><td class="val"><data class="n n--cell" value="81.505">81,5</data></td></tr><tr><th scope="row">2010</th><td class="val"><data class="n n--cell" value="81.82">81,8</data></td></tr><tr><th scope="row">2011</th><td class="val"><data class="n n--cell" value="82.005">82,0</data></td></tr><tr><th scope="row">2012</th><td class="val"><data class="n n--cell" value="82.095">82,1</data></td></tr><tr><th scope="row">2013</th><td class="val"><data class="n n--cell" value="82.355">82,4</data></td></tr><tr><th scope="row">2014</th><td class="val"><data class="n n--cell" value="82.595">82,6</data></td></tr><tr><th scope="row">2015</th><td class="val"><data class="n n--cell" value="82.225">82,2</data></td></tr><tr><th scope="row">2016</th><td class="val"><data class="n n--cell" value="82.78">82,8</data></td></tr><tr><th scope="row">2017</th><td class="val"><data class="n n--cell" value="82.615">82,6</data></td></tr><tr><th scope="row">2018</th><td class="val"><data class="n n--cell" value="82.955">83,0</data></td></tr><tr><th scope="row">2019</th><td class="val"><data class="n n--cell" value="83.16">83,2</data></td></tr><tr><th scope="row">2020</th><td class="val"><data class="n n--cell" value="82.22">82,2</data></td></tr><tr><th scope="row">2021</th><td class="val"><data class="n n--cell" value="82.465">82,5</data></td></tr><tr><th scope="row">2022</th><td class="val"><data class="n n--cell" value="82.605">82,6</data></td></tr><tr><th scope="row">2023</th><td class="val"><data class="n n--cell" value="83.025">83,0</data></td></tr><tr><th scope="row">2024</th><td class="val"><data class="n n--cell" value="83.455">83,5</data></td></tr><tr><th scope="row">2025</th><td class="val"><data class="n n--cell" value="83.64">83,6</data></td></tr></tbody>
               </table>
             </div>
           </details>
@@ -1255,19 +1475,19 @@ body.has-proto { padding-bottom: 96px; }
 
           <li><a href="https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/ter-910" class="minicard">
             <span class="minicard__title">Speranza di vita alla nascita</span>
-            <span class="minicard__meta">83,6 anni, dati 2025</span>
+            <span class="minicard__meta"><data class="n n--figure" value="83.64">83,6<span class="n__u"> anni</span></data>, dati 2025</span>
             <span class="minicard__spark"><svg class="spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="spark__line" fill="none" points="4.0,31.6 9.7,32.0 15.5,26.8 21.2,26.5 27.0,23.7 32.7,22.6 38.4,21.8 44.2,20.7 49.9,18.2 55.7,16.8 61.4,16.1 67.1,14.1 72.9,12.2 78.6,15.1 84.3,10.7 90.1,12.0 95.8,9.4 101.6,7.8 107.3,15.1 113.0,13.2 118.8,12.1 124.5,8.8 130.3,5.4 136.0,4.0"/><circle class="spark__dot" cx="136.0" cy="4.0" r="2"/></svg></span>
           </a></li>
 
           <li><a href="https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita-femmine/ter-912" class="minicard">
             <span class="minicard__title">Speranza di vita alla nascita (femmine)</span>
-            <span class="minicard__meta">85,7 anni, dati 2025</span>
+            <span class="minicard__meta"><data class="n n--figure" value="85.705">85,7<span class="n__u"> anni</span></data>, dati 2025</span>
             <span class="minicard__spark"><svg class="spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="spark__line" fill="none" points="4.0,30.9 9.7,32.0 15.5,25.5 21.2,25.5 27.0,22.5 32.7,21.4 38.4,21.2 44.2,20.2 49.9,17.0 55.7,15.8 61.4,15.8 67.1,13.0 72.9,10.9 78.6,15.5 84.3,9.7 90.1,12.4 95.8,8.7 101.6,6.6 107.3,15.1 113.0,13.4 118.8,13.4 124.5,9.4 130.3,5.5 136.0,4.0"/><circle class="spark__dot" cx="136.0" cy="4.0" r="2"/></svg></span>
           </a></li>
 
           <li><a href="https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita-maschi/ter-911" class="minicard">
             <span class="minicard__title">Speranza di vita alla nascita (maschi)</span>
-            <span class="minicard__meta">81,7 anni, dati 2025</span>
+            <span class="minicard__meta"><data class="n n--figure" value="81.68">81,7<span class="n__u"> anni</span></data>, dati 2025</span>
             <span class="minicard__spark"><svg class="spark" viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="spark__line" fill="none" points="4.0,32.0 9.7,31.6 15.5,27.5 21.2,27.0 27.0,24.4 32.7,23.1 38.4,22.1 44.2,21.1 49.9,19.0 55.7,17.5 61.4,16.2 67.1,14.8 72.9,13.0 78.6,14.7 84.3,11.3 90.1,11.8 95.8,9.8 101.6,8.5 107.3,14.8 113.0,13.0 118.8,11.4 124.5,8.6 130.3,5.4 136.0,4.0"/><circle class="spark__dot" cx="136.0" cy="4.0" r="2"/></svg></span>
           </a></li>
 
@@ -1297,7 +1517,7 @@ body.has-proto { padding-bottom: 96px; }
     </div>
   </div>
 </section>
-<script type="application/json" data-explore-data>{"direction": "higher_better", "matrix": {"2004": {"abruzzo": 81.0, "basilicata": 80.4, "calabria": 80.7, "campania": 79.2, "emilia-romagna": 81.2, "friuli-venezia-giulia": 80.6, "lazio": 80.1, "liguria": 80.7, "lombardia": 80.9, "marche": 81.8, "molise": 80.4, "piemonte": 80.5, "puglia": 81.1, "sardegna": 80.7, "sicilia": 80.1, "toscana": 81.5, "trentino-alto-adige": 81.1, "umbria": 81.5, "valle-d-aosta": 79.9, "veneto": 81.2}, "2005": {"abruzzo": 81.1, "basilicata": 80.6, "calabria": 80.5, "campania": 79.1, "emilia-romagna": 81.3, "friuli-venezia-giulia": 80.7, "lazio": 80.4, "liguria": 80.7, "lombardia": 80.9, "marche": 82.1, "molise": 80.6, "piemonte": 80.6, "puglia": 81.0, "sardegna": 80.6, "sicilia": 80.0, "toscana": 81.5, "trentino-alto-adige": 81.4, "umbria": 81.1, "valle-d-aosta": 79.7, "veneto": 81.3}, "2006": {"abruzzo": 81.4, "basilicata": 80.9, "calabria": 81.0, "campania": 79.5, "emilia-romagna": 81.7, "friuli-venezia-giulia": 81.0, "lazio": 80.8, "liguria": 81.0, "lombardia": 81.3, "marche": 82.1, "molise": 80.7, "piemonte": 80.8, "puglia": 81.3, "sardegna": 81.1, "sicilia": 80.4, "toscana": 81.9, "trentino-alto-adige": 81.6, "umbria": 81.7, "valle-d-aosta": 80.5, "veneto": 81.7}, "2007": {"abruzzo": 81.4, "basilicata": 81.1, "calabria": 80.9, "campania": 79.5, "emilia-romagna": 81.8, "friuli-venezia-giulia": 81.3, "lazio": 80.9, "liguria": 81.2, "lombardia": 81.6, "marche": 82.4, "molise": 81.5, "piemonte": 81.1, "puglia": 81.2, "sardegna": 81.2, "sicilia": 80.2, "toscana": 81.9, "trentino-alto-adige": 82.0, "umbria": 81.8, "valle-d-aosta": 80.5, "veneto": 81.8}, "2008": {"abruzzo": 81.5, "basilicata": 81.6, "calabria": 81.0, "campania": 79.7, "emilia-romagna": 81.9, "friuli-venezia-giulia": 81.3, "lazio": 81.0, "liguria": 81.2, "lombardia": 81.5, "marche": 82.3, "molise": 81.1, "piemonte": 81.1, "puglia": 81.6, "sardegna": 81.3, "sicilia": 80.5, "toscana": 81.9, "trentino-alto-adige": 82.1, "umbria": 81.7, "valle-d-aosta": 81.1, "veneto": 81.8}, "2009": {"abruzzo": 81.2, "basilicata": 81.7, "calabria": 81.0, "campania": 79.9, "emilia-romagna": 82.1, "friuli-venezia-giulia": 81.5, "lazio": 81.0, "liguria": 81.2, "lombardia": 81.7, "marche": 82.5, "molise": 81.6, "piemonte": 81.3, "puglia": 81.6, "sardegna": 81.3, "sicilia": 80.5, "toscana": 82.1, "trentino-alto-adige": 82.5, "umbria": 82.2, "valle-d-aosta": 81.1, "veneto": 82.1}, "2010": {"abruzzo": 81.7, "basilicata": 81.8, "calabria": 81.6, "campania": 80.1, "emilia-romagna": 82.4, "friuli-venezia-giulia": 81.8, "lazio": 81.3, "liguria": 81.7, "lombardia": 82.0, "marche": 82.8, "molise": 81.6, "piemonte": 81.7, "puglia": 82.1, "sardegna": 81.8, "sicilia": 80.9, "toscana": 82.5, "trentino-alto-adige": 82.6, "umbria": 82.3, "valle-d-aosta": 81.3, "veneto": 82.4}, "2011": {"abruzzo": 81.9, "basilicata": 82.0, "calabria": 81.6, "campania": 80.2, "emilia-romagna": 82.6, "friuli-venezia-giulia": 82.0, "lazio": 81.5, "liguria": 81.8, "lombardia": 82.5, "marche": 82.9, "molise": 81.6, "piemonte": 81.9, "puglia": 82.1, "sardegna": 81.8, "sicilia": 80.9, "toscana": 82.7, "trentino-alto-adige": 83.1, "umbria": 82.7, "valle-d-aosta": 81.7, "veneto": 82.6}, "2012": {"abruzzo": 82.2, "basilicata": 82.1, "calabria": 81.6, "campania": 80.4, "emilia-romagna": 82.6, "friuli-venezia-giulia": 82.0, "lazio": 81.6, "liguria": 82.0, "lombardia": 82.4, "marche": 83.0, "molise": 81.9, "piemonte": 82.1, "puglia": 82.3, "sardegna": 81.9, "sicilia": 81.0, "toscana": 82.6, "trentino-alto-adige": 83.1, "umbria": 82.6, "valle-d-aosta": 81.9, "veneto": 82.6}, "2013": {"abruzzo": 82.4, "basilicata": 82.2, "calabria": 81.9, "campania": 80.6, "emilia-romagna": 83.0, "friuli-venezia-giulia": 82.2, "lazio": 82.1, "liguria": 82.1, "lombardia": 82.8, "marche": 83.2, "molise": 82.2, "piemonte": 82.2, "puglia": 82.5, "sardegna": 82.2, "sicilia": 81.4, "toscana": 83.0, "trentino-alto-adige": 83.3, "umbria": 82.8, "valle-d-aosta": 82.1, "veneto": 82.9}, "2014": {"abruzzo": 82.6, "basilicata": 82.4, "calabria": 81.9, "campania": 80.9, "emilia-romagna": 83.2, "friuli-venezia-giulia": 82.7, "lazio": 82.3, "liguria": 82.6, "lombardia": 83.2, "marche": 83.3, "molise": 82.3, "piemonte": 82.6, "puglia": 82.6, "sardegna": 82.5, "sicilia": 81.6, "toscana": 83.2, "trentino-alto-adige": 83.5, "umbria": 83.2, "valle-d-aosta": 82.1, "veneto": 83.2}, "2015": {"abruzzo": 82.3, "basilicata": 82.0, "calabria": 81.7, "campania": 80.4, "emilia-romagna": 82.9, "friuli-venezia-giulia": 82.4, "lazio": 82.0, "liguria": 82.2, "lombardia": 82.8, "marche": 83.0, "molise": 82.0, "piemonte": 82.1, "puglia": 82.3, "sardegna": 82.2, "sicilia": 81.2, "toscana": 82.8, "trentino-alto-adige": 83.4, "umbria": 82.8, "valle-d-aosta": 81.1, "veneto": 82.9}, "2016": {"abruzzo": 82.9, "basilicata": 82.6, "calabria": 82.3, "campania": 81.1, "emilia-romagna": 83.2, "friuli-venezia-giulia": 82.9, "lazio": 82.4, "liguria": 82.8, "lombardia": 83.3, "marche": 83.4, "molise": 82.7, "piemonte": 82.7, "puglia": 82.9, "sardegna": 82.6, "sicilia": 81.8, "toscana": 83.4, "trentino-alto-adige": 83.6, "umbria": 83.4, "valle-d-aosta": 82.2, "veneto": 83.4}, "2017": {"abruzzo": 82.5, "basilicata": 82.2, "calabria": 81.9, "campania": 80.9, "emilia-romagna": 83.2, "friuli-venezia-giulia": 83.0, "lazio": 82.3, "liguria": 82.6, "lombardia": 83.3, "marche": 83.2, "molise": 82.2, "piemonte": 82.5, "puglia": 82.6, "sardegna": 82.7, "sicilia": 81.4, "toscana": 83.3, "trentino-alto-adige": 83.8, "umbria": 83.3, "valle-d-aosta": 82.0, "veneto": 83.4}, "2018": {"abruzzo": 83.1, "basilicata": 82.6, "calabria": 82.5, "campania": 81.4, "emilia-romagna": 83.5, "friuli-venezia-giulia": 83.1, "lazio": 82.9, "liguria": 82.6, "lombardia": 83.4, "marche": 83.8, "molise": 82.7, "piemonte": 82.6, "puglia": 83.0, "sardegna": 83.0, "sicilia": 81.8, "toscana": 83.6, "trentino-alto-adige": 84.0, "umbria": 83.8, "valle-d-aosta": 82.1, "veneto": 83.6}, "2019": {"abruzzo": 83.3, "basilicata": 82.5, "calabria": 82.4, "campania": 81.6, "emilia-romagna": 83.6, "friuli-venezia-giulia": 83.5, "lazio": 83.2, "liguria": 83.1, "lombardia": 83.6, "marche": 84.0, "molise": 83.0, "piemonte": 82.9, "puglia": 83.2, "sardegna": 83.0, "sicilia": 82.0, "toscana": 83.6, "trentino-alto-adige": 84.2, "umbria": 84.0, "valle-d-aosta": 82.7, "veneto": 83.8}, "2020": {"abruzzo": 82.6, "basilicata": 82.2, "calabria": 82.1, "campania": 80.9, "emilia-romagna": 82.5, "friuli-venezia-giulia": 82.6, "lazio": 82.6, "liguria": 81.7, "lombardia": 81.4, "marche": 83.0, "molise": 82.2, "piemonte": 81.4, "puglia": 82.3, "sardegna": 82.3, "sicilia": 81.5, "toscana": 83.1, "trentino-alto-adige": 82.8, "umbria": 83.4, "valle-d-aosta": 80.9, "veneto": 82.9}, "2021": {"abruzzo": 82.6, "basilicata": 82.3, "calabria": 81.6, "campania": 80.7, "emilia-romagna": 83.0, "friuli-venezia-giulia": 82.3, "lazio": 82.6, "liguria": 82.7, "lombardia": 83.1, "marche": 83.1, "molise": 81.4, "piemonte": 82.5, "puglia": 82.0, "sardegna": 82.6, "sicilia": 81.2, "toscana": 83.2, "trentino-alto-adige": 83.6, "umbria": 83.2, "valle-d-aosta": 82.3, "veneto": 83.3}, "2022": {"abruzzo": 82.6, "basilicata": 82.1, "calabria": 81.7, "campania": 81.0, "emilia-romagna": 83.3, "friuli-venezia-giulia": 83.0, "lazio": 82.9, "liguria": 82.5, "lombardia": 83.2, "marche": 83.3, "molise": 81.9, "piemonte": 82.5, "puglia": 82.6, "sardegna": 82.0, "sicilia": 81.4, "toscana": 83.3, "trentino-alto-adige": 83.8, "umbria": 83.3, "valle-d-aosta": 82.3, "veneto": 83.4}, "2023": {"abruzzo": 83.0, "basilicata": 82.5, "calabria": 81.9, "campania": 81.3, "emilia-romagna": 83.6, "friuli-venezia-giulia": 83.4, "lazio": 82.9, "liguria": 83.1, "lombardia": 83.8, "marche": 83.9, "molise": 82.3, "piemonte": 83.0, "puglia": 82.8, "sardegna": 82.5, "sicilia": 81.6, "toscana": 83.8, "trentino-alto-adige": 84.4, "umbria": 83.7, "valle-d-aosta": 83.2, "veneto": 83.8}, "2024": {"abruzzo": 83.5, "basilicata": 83.2, "calabria": 82.6, "campania": 81.8, "emilia-romagna": 84.1, "friuli-venezia-giulia": 83.9, "lazio": 83.4, "liguria": 83.6, "lombardia": 84.1, "marche": 84.3, "molise": 82.5, "piemonte": 83.5, "puglia": 83.3, "sardegna": 83.0, "sicilia": 82.4, "toscana": 84.1, "trentino-alto-adige": 84.7, "umbria": 84.0, "valle-d-aosta": 82.8, "veneto": 84.3}, "2025": {"abruzzo": 83.7, "basilicata": 83.1, "calabria": 82.9, "campania": 82.1, "emilia-romagna": 84.2, "friuli-venezia-giulia": 84.1, "lazio": 83.6, "liguria": 83.7, "lombardia": 84.3, "marche": 84.4, "molise": 82.6, "piemonte": 83.6, "puglia": 83.5, "sardegna": 83.1, "sicilia": 82.6, "toscana": 84.3, "trentino-alto-adige": 84.8, "umbria": 84.1, "valle-d-aosta": 83.7, "veneto": 84.4}}, "names": {"abruzzo": "Abruzzo", "basilicata": "Basilicata", "calabria": "Calabria", "campania": "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli-Venezia Giulia", "lazio": "Lazio", "liguria": "Liguria", "lombardia": "Lombardia", "marche": "Marche", "molise": "Molise", "piemonte": "Piemonte", "puglia": "Puglia", "sardegna": "Sardegna", "sicilia": "Sicilia", "toscana": "Toscana", "trentino-alto-adige": "Trentino Alto Adige", "umbria": "Umbria", "valle-d-aosta": "Valle d\u0027Aosta", "veneto": "Veneto"}, "plural": "regioni", "profile": "/regione/", "south": ["abruzzo", "basilicata", "calabria", "campania", "molise", "puglia", "sardegna", "sicilia"], "unit": "anni", "years": [2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]}</script>
+<script type="application/json" data-explore-data>{"areas": {"abruzzo": "sud", "basilicata": "sud", "calabria": "sud", "campania": "sud", "emilia-romagna": "nord", "friuli-venezia-giulia": "nord", "lazio": "centro", "liguria": "nord", "lombardia": "nord", "marche": "centro", "molise": "sud", "piemonte": "nord", "puglia": "sud", "sardegna": "sud", "sicilia": "sud", "toscana": "centro", "trentino-alto-adige": "nord", "umbria": "centro", "valle-d-aosta": "nord", "veneto": "nord"}, "decimals": 1, "direction": "higher_better", "matrix": {"2004": {"abruzzo": 81.0, "basilicata": 80.4, "calabria": 80.7, "campania": 79.2, "emilia-romagna": 81.2, "friuli-venezia-giulia": 80.6, "lazio": 80.1, "liguria": 80.7, "lombardia": 80.9, "marche": 81.8, "molise": 80.4, "piemonte": 80.5, "puglia": 81.1, "sardegna": 80.7, "sicilia": 80.1, "toscana": 81.5, "trentino-alto-adige": 81.1, "umbria": 81.5, "valle-d-aosta": 79.9, "veneto": 81.2}, "2005": {"abruzzo": 81.1, "basilicata": 80.6, "calabria": 80.5, "campania": 79.1, "emilia-romagna": 81.3, "friuli-venezia-giulia": 80.7, "lazio": 80.4, "liguria": 80.7, "lombardia": 80.9, "marche": 82.1, "molise": 80.6, "piemonte": 80.6, "puglia": 81.0, "sardegna": 80.6, "sicilia": 80.0, "toscana": 81.5, "trentino-alto-adige": 81.4, "umbria": 81.1, "valle-d-aosta": 79.7, "veneto": 81.3}, "2006": {"abruzzo": 81.4, "basilicata": 80.9, "calabria": 81.0, "campania": 79.5, "emilia-romagna": 81.7, "friuli-venezia-giulia": 81.0, "lazio": 80.8, "liguria": 81.0, "lombardia": 81.3, "marche": 82.1, "molise": 80.7, "piemonte": 80.8, "puglia": 81.3, "sardegna": 81.1, "sicilia": 80.4, "toscana": 81.9, "trentino-alto-adige": 81.6, "umbria": 81.7, "valle-d-aosta": 80.5, "veneto": 81.7}, "2007": {"abruzzo": 81.4, "basilicata": 81.1, "calabria": 80.9, "campania": 79.5, "emilia-romagna": 81.8, "friuli-venezia-giulia": 81.3, "lazio": 80.9, "liguria": 81.2, "lombardia": 81.6, "marche": 82.4, "molise": 81.5, "piemonte": 81.1, "puglia": 81.2, "sardegna": 81.2, "sicilia": 80.2, "toscana": 81.9, "trentino-alto-adige": 82.0, "umbria": 81.8, "valle-d-aosta": 80.5, "veneto": 81.8}, "2008": {"abruzzo": 81.5, "basilicata": 81.6, "calabria": 81.0, "campania": 79.7, "emilia-romagna": 81.9, "friuli-venezia-giulia": 81.3, "lazio": 81.0, "liguria": 81.2, "lombardia": 81.5, "marche": 82.3, "molise": 81.1, "piemonte": 81.1, "puglia": 81.6, "sardegna": 81.3, "sicilia": 80.5, "toscana": 81.9, "trentino-alto-adige": 82.1, "umbria": 81.7, "valle-d-aosta": 81.1, "veneto": 81.8}, "2009": {"abruzzo": 81.2, "basilicata": 81.7, "calabria": 81.0, "campania": 79.9, "emilia-romagna": 82.1, "friuli-venezia-giulia": 81.5, "lazio": 81.0, "liguria": 81.2, "lombardia": 81.7, "marche": 82.5, "molise": 81.6, "piemonte": 81.3, "puglia": 81.6, "sardegna": 81.3, "sicilia": 80.5, "toscana": 82.1, "trentino-alto-adige": 82.5, "umbria": 82.2, "valle-d-aosta": 81.1, "veneto": 82.1}, "2010": {"abruzzo": 81.7, "basilicata": 81.8, "calabria": 81.6, "campania": 80.1, "emilia-romagna": 82.4, "friuli-venezia-giulia": 81.8, "lazio": 81.3, "liguria": 81.7, "lombardia": 82.0, "marche": 82.8, "molise": 81.6, "piemonte": 81.7, "puglia": 82.1, "sardegna": 81.8, "sicilia": 80.9, "toscana": 82.5, "trentino-alto-adige": 82.6, "umbria": 82.3, "valle-d-aosta": 81.3, "veneto": 82.4}, "2011": {"abruzzo": 81.9, "basilicata": 82.0, "calabria": 81.6, "campania": 80.2, "emilia-romagna": 82.6, "friuli-venezia-giulia": 82.0, "lazio": 81.5, "liguria": 81.8, "lombardia": 82.5, "marche": 82.9, "molise": 81.6, "piemonte": 81.9, "puglia": 82.1, "sardegna": 81.8, "sicilia": 80.9, "toscana": 82.7, "trentino-alto-adige": 83.1, "umbria": 82.7, "valle-d-aosta": 81.7, "veneto": 82.6}, "2012": {"abruzzo": 82.2, "basilicata": 82.1, "calabria": 81.6, "campania": 80.4, "emilia-romagna": 82.6, "friuli-venezia-giulia": 82.0, "lazio": 81.6, "liguria": 82.0, "lombardia": 82.4, "marche": 83.0, "molise": 81.9, "piemonte": 82.1, "puglia": 82.3, "sardegna": 81.9, "sicilia": 81.0, "toscana": 82.6, "trentino-alto-adige": 83.1, "umbria": 82.6, "valle-d-aosta": 81.9, "veneto": 82.6}, "2013": {"abruzzo": 82.4, "basilicata": 82.2, "calabria": 81.9, "campania": 80.6, "emilia-romagna": 83.0, "friuli-venezia-giulia": 82.2, "lazio": 82.1, "liguria": 82.1, "lombardia": 82.8, "marche": 83.2, "molise": 82.2, "piemonte": 82.2, "puglia": 82.5, "sardegna": 82.2, "sicilia": 81.4, "toscana": 83.0, "trentino-alto-adige": 83.3, "umbria": 82.8, "valle-d-aosta": 82.1, "veneto": 82.9}, "2014": {"abruzzo": 82.6, "basilicata": 82.4, "calabria": 81.9, "campania": 80.9, "emilia-romagna": 83.2, "friuli-venezia-giulia": 82.7, "lazio": 82.3, "liguria": 82.6, "lombardia": 83.2, "marche": 83.3, "molise": 82.3, "piemonte": 82.6, "puglia": 82.6, "sardegna": 82.5, "sicilia": 81.6, "toscana": 83.2, "trentino-alto-adige": 83.5, "umbria": 83.2, "valle-d-aosta": 82.1, "veneto": 83.2}, "2015": {"abruzzo": 82.3, "basilicata": 82.0, "calabria": 81.7, "campania": 80.4, "emilia-romagna": 82.9, "friuli-venezia-giulia": 82.4, "lazio": 82.0, "liguria": 82.2, "lombardia": 82.8, "marche": 83.0, "molise": 82.0, "piemonte": 82.1, "puglia": 82.3, "sardegna": 82.2, "sicilia": 81.2, "toscana": 82.8, "trentino-alto-adige": 83.4, "umbria": 82.8, "valle-d-aosta": 81.1, "veneto": 82.9}, "2016": {"abruzzo": 82.9, "basilicata": 82.6, "calabria": 82.3, "campania": 81.1, "emilia-romagna": 83.2, "friuli-venezia-giulia": 82.9, "lazio": 82.4, "liguria": 82.8, "lombardia": 83.3, "marche": 83.4, "molise": 82.7, "piemonte": 82.7, "puglia": 82.9, "sardegna": 82.6, "sicilia": 81.8, "toscana": 83.4, "trentino-alto-adige": 83.6, "umbria": 83.4, "valle-d-aosta": 82.2, "veneto": 83.4}, "2017": {"abruzzo": 82.5, "basilicata": 82.2, "calabria": 81.9, "campania": 80.9, "emilia-romagna": 83.2, "friuli-venezia-giulia": 83.0, "lazio": 82.3, "liguria": 82.6, "lombardia": 83.3, "marche": 83.2, "molise": 82.2, "piemonte": 82.5, "puglia": 82.6, "sardegna": 82.7, "sicilia": 81.4, "toscana": 83.3, "trentino-alto-adige": 83.8, "umbria": 83.3, "valle-d-aosta": 82.0, "veneto": 83.4}, "2018": {"abruzzo": 83.1, "basilicata": 82.6, "calabria": 82.5, "campania": 81.4, "emilia-romagna": 83.5, "friuli-venezia-giulia": 83.1, "lazio": 82.9, "liguria": 82.6, "lombardia": 83.4, "marche": 83.8, "molise": 82.7, "piemonte": 82.6, "puglia": 83.0, "sardegna": 83.0, "sicilia": 81.8, "toscana": 83.6, "trentino-alto-adige": 84.0, "umbria": 83.8, "valle-d-aosta": 82.1, "veneto": 83.6}, "2019": {"abruzzo": 83.3, "basilicata": 82.5, "calabria": 82.4, "campania": 81.6, "emilia-romagna": 83.6, "friuli-venezia-giulia": 83.5, "lazio": 83.2, "liguria": 83.1, "lombardia": 83.6, "marche": 84.0, "molise": 83.0, "piemonte": 82.9, "puglia": 83.2, "sardegna": 83.0, "sicilia": 82.0, "toscana": 83.6, "trentino-alto-adige": 84.2, "umbria": 84.0, "valle-d-aosta": 82.7, "veneto": 83.8}, "2020": {"abruzzo": 82.6, "basilicata": 82.2, "calabria": 82.1, "campania": 80.9, "emilia-romagna": 82.5, "friuli-venezia-giulia": 82.6, "lazio": 82.6, "liguria": 81.7, "lombardia": 81.4, "marche": 83.0, "molise": 82.2, "piemonte": 81.4, "puglia": 82.3, "sardegna": 82.3, "sicilia": 81.5, "toscana": 83.1, "trentino-alto-adige": 82.8, "umbria": 83.4, "valle-d-aosta": 80.9, "veneto": 82.9}, "2021": {"abruzzo": 82.6, "basilicata": 82.3, "calabria": 81.6, "campania": 80.7, "emilia-romagna": 83.0, "friuli-venezia-giulia": 82.3, "lazio": 82.6, "liguria": 82.7, "lombardia": 83.1, "marche": 83.1, "molise": 81.4, "piemonte": 82.5, "puglia": 82.0, "sardegna": 82.6, "sicilia": 81.2, "toscana": 83.2, "trentino-alto-adige": 83.6, "umbria": 83.2, "valle-d-aosta": 82.3, "veneto": 83.3}, "2022": {"abruzzo": 82.6, "basilicata": 82.1, "calabria": 81.7, "campania": 81.0, "emilia-romagna": 83.3, "friuli-venezia-giulia": 83.0, "lazio": 82.9, "liguria": 82.5, "lombardia": 83.2, "marche": 83.3, "molise": 81.9, "piemonte": 82.5, "puglia": 82.6, "sardegna": 82.0, "sicilia": 81.4, "toscana": 83.3, "trentino-alto-adige": 83.8, "umbria": 83.3, "valle-d-aosta": 82.3, "veneto": 83.4}, "2023": {"abruzzo": 83.0, "basilicata": 82.5, "calabria": 81.9, "campania": 81.3, "emilia-romagna": 83.6, "friuli-venezia-giulia": 83.4, "lazio": 82.9, "liguria": 83.1, "lombardia": 83.8, "marche": 83.9, "molise": 82.3, "piemonte": 83.0, "puglia": 82.8, "sardegna": 82.5, "sicilia": 81.6, "toscana": 83.8, "trentino-alto-adige": 84.4, "umbria": 83.7, "valle-d-aosta": 83.2, "veneto": 83.8}, "2024": {"abruzzo": 83.5, "basilicata": 83.2, "calabria": 82.6, "campania": 81.8, "emilia-romagna": 84.1, "friuli-venezia-giulia": 83.9, "lazio": 83.4, "liguria": 83.6, "lombardia": 84.1, "marche": 84.3, "molise": 82.5, "piemonte": 83.5, "puglia": 83.3, "sardegna": 83.0, "sicilia": 82.4, "toscana": 84.1, "trentino-alto-adige": 84.7, "umbria": 84.0, "valle-d-aosta": 82.8, "veneto": 84.3}, "2025": {"abruzzo": 83.7, "basilicata": 83.1, "calabria": 82.9, "campania": 82.1, "emilia-romagna": 84.2, "friuli-venezia-giulia": 84.1, "lazio": 83.6, "liguria": 83.7, "lombardia": 84.3, "marche": 84.4, "molise": 82.6, "piemonte": 83.6, "puglia": 83.5, "sardegna": 83.1, "sicilia": 82.6, "toscana": 84.3, "trentino-alto-adige": 84.8, "umbria": 84.1, "valle-d-aosta": 83.7, "veneto": 84.4}}, "names": {"abruzzo": "Abruzzo", "basilicata": "Basilicata", "calabria": "Calabria", "campania": "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli-Venezia Giulia", "lazio": "Lazio", "liguria": "Liguria", "lombardia": "Lombardia", "marche": "Marche", "molise": "Molise", "piemonte": "Piemonte", "puglia": "Puglia", "sardegna": "Sardegna", "sicilia": "Sicilia", "toscana": "Toscana", "trentino-alto-adige": "Trentino Alto Adige", "umbria": "Umbria", "valle-d-aosta": "Valle d\u0027Aosta", "veneto": "Veneto"}, "plural": "regioni", "profile": "/regione/", "south": ["abruzzo", "basilicata", "calabria", "campania", "molise", "puglia", "sardegna", "sicilia"], "unit": "anni", "years": [2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]}</script>
 
 </main>
 
@@ -1332,7 +1552,7 @@ body.has-proto { padding-bottom: 96px; }
     </div>
   </div>
 </footer>
-<div class="proto-bar" role="region" aria-label="Prototipo"><b>Divario Italia 1.0, prototipo</b><nav class="proto-bar__pages" aria-label="Pagine del prototipo"><a href="indicatore.html" data-page-link="indicatore">Scheda indicatore</a><a href="home.html" data-page-link="home">Home</a><a href="regione.html" data-page-link="regione">Regione</a><a href="provincia.html" data-page-link="provincia">Provincia</a><a href="articolo.html" data-page-link="articolo">Articolo</a><a href="classifica.html" data-page-link="classifica">Classifica</a><a href="qualita-della-vita.html" data-page-link="qualita-della-vita">Qualità della vita</a></nav><div class="proto-bar__theme" role="group" aria-label="Tema"><button type="button" data-set-theme="" aria-pressed="true">Sistema</button><button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button><button type="button" data-set-theme="dark" aria-pressed="false">Scuro</button></div></div>
+<div class="proto-bar" role="region" aria-label="Prototipo"><b>Divario Italia 1.0, prototipo</b><nav class="proto-bar__pages" aria-label="Pagine del prototipo"><a href="indicatore.html" data-page-link="indicatore">Scheda indicatore</a><a href="home.html" data-page-link="home">Home</a><a href="regione.html" data-page-link="regione">Regione</a><a href="provincia.html" data-page-link="provincia">Provincia</a><a href="articolo.html" data-page-link="articolo">Articolo</a><a href="classifica.html" data-page-link="classifica">Classifica</a><a href="qualita-della-vita.html" data-page-link="qualita-della-vita">Qualità della vita</a></nav><div class="proto-bar__theme" role="group" aria-label="Carattere"><button type="button" data-set-font="" aria-pressed="true">Sofia</button><button type="button" data-set-font="schibsted" aria-pressed="false">Schibsted</button><button type="button" data-set-font="serif" aria-pressed="false">Serif</button></div><div class="proto-bar__theme" role="group" aria-label="Tema"><button type="button" data-set-theme="" aria-pressed="true">Sistema</button><button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button><button type="button" data-set-theme="dark" aria-pressed="false">Scuro</button></div></div>
 <script>
 /* Divario Italia 1.0, prototipo: il poco JavaScript che serve.
    La pagina a riposo e' completa senza: mappa colorata, classifica, serie e
@@ -1348,10 +1568,13 @@ body.has-proto { padding-bottom: 96px; }
     if (m >= 10) return 1;
     return m < 1 ? 2 : 1;
   }
-  function fmt(v) {
+  // Come numfmt.text: meno tipografico (U+2212), non il trattino di Intl.
+  function fmt(v, d) {
     if (v === null || v === undefined || isNaN(v)) return "n.d.";
-    var d = decimals(v);
-    return new Intl.NumberFormat("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }).format(v);
+    if (d === undefined || d === null) d = decimals(v);
+    var s = new Intl.NumberFormat("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }).format(Math.abs(v));
+    var zero = Number(s.replace(/\./g, "").replace(",", ".")) === 0;
+    return (v < 0 && !zero ? "\u2212" : "") + s;
   }
   function withUnit(v, unit) {
     if (v === null || v === undefined) return "n.d.";
@@ -1377,6 +1600,20 @@ body.has-proto { padding-bottom: 96px; }
     }
   });
   setTheme(root.dataset.theme || "");
+
+  /* ---------- carattere ---------- */
+  function setFont(value) {
+    if (value) root.dataset.font = value; else delete root.dataset.font;
+    try { if (value) localStorage.setItem("proto-font", value); else localStorage.removeItem("proto-font"); } catch (e) {}
+    document.querySelectorAll("[data-set-font]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.dataset.setFont || "") === (value || "")));
+    });
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-set-font]");
+    if (b) setFont(b.dataset.setFont);
+  });
+  setFont(root.dataset.font || "");
 
   /* ---------- copia la citazione ---------- */
   document.addEventListener("click", function (ev) {
@@ -1471,12 +1708,13 @@ body.has-proto { padding-bottom: 96px; }
       list.forEach(function (r, i) {
         var crosses = lowerBetter ? r.value > avg : r.value < avg;
         if (!refDone && crosses) {
-          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val">' + fmt(avg) + "</td></tr>");
+          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
           refDone = true;
         }
-        var name = data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name);
+        var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
+        var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
         html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + (i + 1) + '</td><th scope="row">' + name +
-          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val">' + fmt(r.value) + "</td></tr>");
+          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
       });
       body.innerHTML = html.join("");
 
@@ -1511,7 +1749,7 @@ body.has-proto { padding-bottom: 96px; }
       });
       if (series) {
         series.querySelectorAll("svg").forEach(function (svg) {
-          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"]');
+          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]');
           var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
           if (src && key) {
             var pts = src.getAttribute("points").trim().split(" ");
@@ -1524,6 +1762,7 @@ body.has-proto { padding-bottom: 96px; }
           }
         });
       }
+      page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
       if (live && key) {
         var r = rows(current).filter(function (x) { return x.key === key; })[0];
         if (r) live.textContent = r.name + ": " + withUnit(r.value, data.unit) + " nel " + current + ".";
@@ -1536,6 +1775,14 @@ body.has-proto { padding-bottom: 96px; }
       highlight(select ? select.value : "");
     });
     if (select) select.addEventListener("change", function () { highlight(select.value); });
+    page.querySelectorAll(".strip").forEach(function (svg) {
+      svg.addEventListener("click", function (ev) {
+        var c = ev.target.closest(".strip__dot");
+        if (!c || !select) return;
+        select.value = select.value === c.dataset.key ? "" : c.dataset.key;
+        highlight(select.value);
+      });
+    });
     mod.addEventListener("click", function (ev) {
       var p = ev.target.closest("path[data-key]");
       if (!p || !select) return;
@@ -1543,6 +1790,11 @@ body.has-proto { padding-bottom: 96px; }
       highlight(select.value);
     });
   });
+
+  /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ---------- */
+  if (matchMedia("(max-width: 599px)").matches) {
+    document.querySelectorAll("details[data-collapse-mobile]").forEach(function (d) { d.open = false; });
+  }
 
   /* ---------- indice di pagina: la voce della sezione che si sta leggendo ---------- */
   document.querySelectorAll(".toc").forEach(function (toc) {
@@ -1557,7 +1809,13 @@ body.has-proto { padding-bottom: 96px; }
         if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
       });
       var cur = visible.length ? Math.min.apply(null, visible) : -1;
-      links.forEach(function (a, j) { if (j === cur) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+      links.forEach(function (a, j) {
+        if (j === cur) {
+          a.setAttribute("aria-current", "location");
+          var ol = a.closest("ol");
+          if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+        } else a.removeAttribute("aria-current");
+      });
     }, { rootMargin: "-20% 0px -70% 0px" });
     targets.forEach(function (t) { if (t) io.observe(t); });
   });

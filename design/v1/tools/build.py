@@ -141,6 +141,9 @@ def make_env(mode: str):
         """Nell'Artifact tutte le pagine stanno in un file: gli id si prefissano."""
         return f"{state['page']}-{ident}" if mode == "artifact" else ident
 
+    import numfmt
+
+    numfmt.register(env)
     env.globals.update(href=href, aid=aid, nav=NAV, logo_src=logo_data_uri(),
                        paths=json.loads((SRC / "partials" / "italy_paths.json").read_text()))
     return env, flask_app, state, href
@@ -198,6 +201,11 @@ def proto_bar(mode: str, current: str | None) -> str:
         '<div class="proto-bar" role="region" aria-label="Prototipo">'
         '<b>Divario Italia 1.0, prototipo</b>'
         f'<nav class="proto-bar__pages" aria-label="Pagine del prototipo">{"".join(links)}</nav>'
+        '<div class="proto-bar__theme" role="group" aria-label="Carattere">'
+        '<button type="button" data-set-font="" aria-pressed="true">Sofia</button>'
+        '<button type="button" data-set-font="schibsted" aria-pressed="false">Schibsted</button>'
+        '<button type="button" data-set-font="serif" aria-pressed="false">Serif</button>'
+        "</div>"
         '<div class="proto-bar__theme" role="group" aria-label="Tema">'
         '<button type="button" data-set-theme="" aria-pressed="true">Sistema</button>'
         '<button type="button" data-set-theme="light" aria-pressed="false">Chiaro</button>'
@@ -256,7 +264,8 @@ def build_pages(only: list[str] | None = None) -> list[Path]:
 # Prima del primo disegno: il tema scelto nel prototipo, se c'e'. Senza scelta
 # decide prefers-color-scheme, come sul sito.
 THEME_BOOT = ("try{var t=localStorage.getItem('proto-theme');if(t==='light'||t==='dark')"
-              "document.documentElement.dataset.theme=t}catch(e){}")
+              "document.documentElement.dataset.theme=t;var f=localStorage.getItem('proto-font');"
+              "if(f==='schibsted'||f==='serif')document.documentElement.dataset.font=f}catch(e){}")
 
 
 if __name__ == "__main__":

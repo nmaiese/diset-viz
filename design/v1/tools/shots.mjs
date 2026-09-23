@@ -303,6 +303,17 @@ if (mode === "prima") {
       }
     }
   } finally { cdp.close(); }
+} else if (mode === "url") {
+  // node shots.mjs url <url> <prefisso> [larghezze separate da virgola]
+  const [url, prefix, widths = "1440,375"] = process.argv.slice(3);
+  const cdp = await launch();
+  try {
+    for (const w of widths.split(",")) {
+      const viewport = { width: Number(w), height: Number(w) > 600 ? 900 : 800, deviceScaleFactor: Number(w) > 600 ? 1 : 2, mobile: Number(w) <= 600 };
+      const info = await capture(cdp, url, { viewport, theme: "light" }, `${prefix}-${w}`);
+      console.log(`${prefix} ${w}: ${info.h}px`);
+    }
+  } finally { cdp.close(); }
 } else if (mode === "check") {
   await check();
 } else {

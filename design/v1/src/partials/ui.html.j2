@@ -30,7 +30,7 @@
   {%- for t in items %}
   <div class="tile">
     <dt>{{ t.label }}</dt>
-    <dd><span class="figure-num">{{ t.num }}{% if t.unit %}<span class="u">{{ t.unit }}</span>{% endif %}</span>
+    <dd><span class="figure-num">{% if t.value is defined %}{{ t.value | num(t.unit, t.role or 'figure') }}{% else %}{{ t.num }}{% if t.unit %}<span class="u">{{ t.unit }}</span>{% endif %}{% endif %}</span>
       {%- if t.sub %}<span class="sub">{% if t.href %}<a href="{{ href(t.href) }}">{{ t.sub }}</a>{% else %}{{ t.sub }}{% endif %}</span>{% endif %}</dd>
   </div>
   {%- endfor %}
@@ -40,7 +40,7 @@
 {#- La mappa: aria-hidden, perche' la tabella accanto porta gli stessi dati e i
     link che la mappa avrebbe. Il mouse ci passa sopra, la tastiera usa la
     tabella e il campo "Trova la tua regione". -#}
-{% macro map(classes, keyname, names, values=None, selected=None, small=False) -%}
+{% macro map(classes, keyname, names, values=None, selected=None, small=False, overlay='') -%}
 <div class="map{{ ' map--small' if small }}" data-map>
   <svg viewBox="0 0 560 660" aria-hidden="true" focusable="false">
     <defs>
@@ -51,6 +51,7 @@
     {%- for key, d in paths.items() %}
     <path d="{{ d }}" data-key="{{ key }}" data-name="{{ names.get(key, key) }}"{% if values %} data-value="{{ values.get(key, '') }}"{% endif %} class="{{ classes.get(key, '') }}{{ ' is-on' if key == selected }}"{% if key not in classes %} style="fill: url(#{{ aid('nd-' ~ keyname) }})"{% endif %}/>
     {%- endfor %}
+    {{ overlay | safe }}
   </svg>
   <div class="map__tip" data-map-tip hidden></div>
 </div>
@@ -63,6 +64,12 @@
   <span class="legend__caption">{{ caption }}</span>
   <span class="legend__nd"><i></i> n.d., dato non disponibile</span>
 </div>
+{%- endmacro %}
+
+{% macro arealegend(items) -%}
+<ul class="arealegend" aria-label="Ripartizioni">
+  {%- for a in items %}<li><span class="area-dot area-dot--{{ a.area }}" aria-hidden="true"></span><b>{{ a.label }}</b>{{ a.count }}</li>{% endfor %}
+</ul>
 {%- endmacro %}
 
 {% macro ad(kind='') -%}

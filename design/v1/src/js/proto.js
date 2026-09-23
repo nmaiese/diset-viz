@@ -12,10 +12,13 @@
     if (m >= 10) return 1;
     return m < 1 ? 2 : 1;
   }
-  function fmt(v) {
+  // Come numfmt.text: meno tipografico (U+2212), non il trattino di Intl.
+  function fmt(v, d) {
     if (v === null || v === undefined || isNaN(v)) return "n.d.";
-    var d = decimals(v);
-    return new Intl.NumberFormat("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }).format(v);
+    if (d === undefined || d === null) d = decimals(v);
+    var s = new Intl.NumberFormat("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }).format(Math.abs(v));
+    var zero = Number(s.replace(/\./g, "").replace(",", ".")) === 0;
+    return (v < 0 && !zero ? "\u2212" : "") + s;
   }
   function withUnit(v, unit) {
     if (v === null || v === undefined) return "n.d.";
@@ -41,6 +44,20 @@
     }
   });
   setTheme(root.dataset.theme || "");
+
+  /* ---------- carattere ---------- */
+  function setFont(value) {
+    if (value) root.dataset.font = value; else delete root.dataset.font;
+    try { if (value) localStorage.setItem("proto-font", value); else localStorage.removeItem("proto-font"); } catch (e) {}
+    document.querySelectorAll("[data-set-font]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.dataset.setFont || "") === (value || "")));
+    });
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-set-font]");
+    if (b) setFont(b.dataset.setFont);
+  });
+  setFont(root.dataset.font || "");
 
   /* ---------- copia la citazione ---------- */
   document.addEventListener("click", function (ev) {
@@ -135,12 +152,13 @@
       list.forEach(function (r, i) {
         var crosses = lowerBetter ? r.value > avg : r.value < avg;
         if (!refDone && crosses) {
-          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val">' + fmt(avg) + "</td></tr>");
+          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
           refDone = true;
         }
-        var name = data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name);
+        var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
+        var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
         html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + (i + 1) + '</td><th scope="row">' + name +
-          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val">' + fmt(r.value) + "</td></tr>");
+          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
       });
       body.innerHTML = html.join("");
 
@@ -175,7 +193,7 @@
       });
       if (series) {
         series.querySelectorAll("svg").forEach(function (svg) {
-          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"]');
+          var src = svg.querySelector('polyline.ctx[data-key="' + key + '"], polyline.band__src[data-key="' + key + '"]');
           var hl = svg.querySelector("[data-hl]"), dot = svg.querySelector("[data-hl-dot]"), lab = svg.querySelector("[data-hl-lab]");
           if (src && key) {
             var pts = src.getAttribute("points").trim().split(" ");
@@ -188,6 +206,7 @@
           }
         });
       }
+      page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
       if (live && key) {
         var r = rows(current).filter(function (x) { return x.key === key; })[0];
         if (r) live.textContent = r.name + ": " + withUnit(r.value, data.unit) + " nel " + current + ".";
@@ -200,6 +219,14 @@
       highlight(select ? select.value : "");
     });
     if (select) select.addEventListener("change", function () { highlight(select.value); });
+    page.querySelectorAll(".strip").forEach(function (svg) {
+      svg.addEventListener("click", function (ev) {
+        var c = ev.target.closest(".strip__dot");
+        if (!c || !select) return;
+        select.value = select.value === c.dataset.key ? "" : c.dataset.key;
+        highlight(select.value);
+      });
+    });
     mod.addEventListener("click", function (ev) {
       var p = ev.target.closest("path[data-key]");
       if (!p || !select) return;
@@ -207,6 +234,11 @@
       highlight(select.value);
     });
   });
+
+  /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ---------- */
+  if (matchMedia("(max-width: 599px)").matches) {
+    document.querySelectorAll("details[data-collapse-mobile]").forEach(function (d) { d.open = false; });
+  }
 
   /* ---------- indice di pagina: la voce della sezione che si sta leggendo ---------- */
   document.querySelectorAll(".toc").forEach(function (toc) {
@@ -221,7 +253,13 @@
         if (!e.isIntersecting) visible = visible.filter(function (v) { return v !== i; });
       });
       var cur = visible.length ? Math.min.apply(null, visible) : -1;
-      links.forEach(function (a, j) { if (j === cur) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+      links.forEach(function (a, j) {
+        if (j === cur) {
+          a.setAttribute("aria-current", "location");
+          var ol = a.closest("ol");
+          if (ol && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = Math.max(0, a.offsetLeft - 16);
+        } else a.removeAttribute("aria-current");
+      });
     }, { rootMargin: "-20% 0px -70% 0px" });
     targets.forEach(function (t) { if (t) io.observe(t); });
   });
