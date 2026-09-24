@@ -71,9 +71,10 @@ def the_place(name: str, level_key: str) -> str:
 
 
 def del_(text: str) -> str:
-    """"del 3,6%" ma "dell'11,3%" e "dell'8%": l'articolo davanti a una cifra si
-    elide quando la cifra si legge con una vocale."""
-    return "dell'" if re.match(r"(8|11)|1(?![\d.])", text) else "del "
+    """"del 3,6%" ma "dell'11,3%", "dell'8%" e "dello 0,5%": l'articolo davanti a
+    una cifra lo decide `numfmt.articulated`, la stessa regola dei title. Quella
+    scritta qui vedeva "11" in testa a 116 e diceva "dell'116%"."""
+    return numfmt.articulated("di", text)
 
 
 GENERIC_UNITS = numfmt.GENERIC_UNITS

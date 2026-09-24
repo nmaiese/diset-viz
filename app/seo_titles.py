@@ -36,7 +36,10 @@ sostituisse il taglio a budget, cioe' prima della correzione raccontata in
 """
 from __future__ import annotations
 
-from app import indicator_notes
+import re
+
+from app import indicator_notes, sources
+from app.design import numfmt
 
 # Il budget SERP, lo stesso che usa il percorso derivato di `indicator_notes`.
 TITLE_MAX = indicator_notes._TITLE_MAX
@@ -72,9 +75,13 @@ def _decimals(value):
     Non e' `it_num`, che ne prende una fissa: "34.343,0 euro" in SERP e' rumore,
     e "84,8 anni" senza decimale sarebbe una cifra diversa. La regola e' la
     grandezza, perche' e' quella che decide se il decimale porta informazione.
+    Lo zero si scrive "0": "0,00" dava allo zero una precisione che non ha, e in
+    SERP si leggeva "dal 358% al 0,00%". Le due copie di questa regola,
+    `numfmt.magnitude_decimals` e `decimals` in `static/js/v1.js`, le tiene
+    allineate `tests/unit/test_decimals_parity.py`.
     """
     magnitude = abs(float(value))
-    if magnitude >= 100:
+    if magnitude == 0 or magnitude >= 100:
         return 0
     if magnitude >= 10:
         return 1
@@ -86,9 +93,12 @@ def format_number(value):
     if value is None:
         return None
     try:
-        text = f"{float(value):,.{_decimals(value)}f}"
+        number = float(value)
+        text = f"{number:,.{_decimals(number)}f}"
     except (TypeError, ValueError):
         return None
+    if text.startswith("-") and not text.strip("-0.,"):
+        text = text[1:]  # -0.0 e' zero, e lo zero non ha segno
     return text.replace(",", "\x00").replace(".", ",").replace("\x00", ".")
 
 
@@ -96,12 +106,19 @@ def _short_unit(meta):
     """L'unita' come si scrive in un titolo, o None se non si scrive.
 
     La percentuale si attacca al numero e non vale come parola a se'; le unita'
-    lunghe ("numero medio di componenti") costano piu' di quanto rendano.
+    lunghe ("per 100.000 abitanti") costano piu' di quanto rendano. La forma
+    breve la da' `numfmt.short_unit`, la stessa della pagina: cosi' "Numero
+    medio di anni" diventa "anni" anche qui. Le etichette che non sono
+    un'unita' (`numfmt.GENERIC_UNITS`) non si scrivono accanto a una cifra:
+    uscivano titoli come "da 0,35 a 0,27 indice" e "da 5,6 a 3,8 rapporto".
     """
-    unit = (meta.get("value_unit") or meta.get("unit") or "").strip()
-    if not unit or indicator_notes.is_percentage_unit(unit):
+    raw = (meta.get("value_unit") or meta.get("unit") or "").strip()
+    if not raw or indicator_notes.is_percentage_unit(raw):
         return None
-    if len(unit) > 12 or " " in unit:
+    unit = numfmt.short_unit(raw)
+    if not unit or unit == "%" or len(unit) > 12 or " " in unit:
+        return None
+    if numfmt.lower_first(unit).lower() in numfmt.GENERIC_UNITS:
         return None
     return unit
 
@@ -112,6 +129,23 @@ def _is_percentage(meta):
     )
 
 
+# Le serie i cui estremi non vanno in SERP finche' qualcuno non li ha
+# verificati alla fonte. `bes-06POL012P`, l'affollamento delle carceri per
+# provincia, ha Macerata e Savona a zero dal 2016 dopo anni sopra il 60%, e
+# Fermo al 358% nel 2024: il titolo diceva "dal 358% al 0,00%". Le serie possono
+# essere vere, la causa non e' verificata, e un titolo non e' il posto per
+# scoprirlo. La pagina resta com'e', con la sua classifica.
+UNVERIFIED_EXTREMES = frozenset({"bes-06POL012P"})
+
+
+def _code(meta):
+    """Il codice pubblico ("ter-598", "bes-06POL012P"), o None se `meta` non lo dice."""
+    family, raw_id = meta.get("family"), meta.get("raw_id")
+    if not family or raw_id in (None, ""):
+        return None
+    return sources.indicator_code(family, raw_id)
+
+
 def extremes(meta, level):
     """(territorio col valore alto, territorio col valore basso) del livello.
 
@@ -119,7 +153,13 @@ def extremes(meta, level):
     indicatore `lower_better` il migliore e' il minimo. Un titolo che dice "da X
     a Y" pero' e' un intervallo, non una classifica, quindi si ordina per
     valore, altrimenti meta' del catalogo leggerebbe al contrario.
+
+    Su `UNVERIFIED_EXTREMES` non ci sono estremi: ne' nel titolo, ne' nella
+    description, ne' in `minValue` e `maxValue` del Dataset, che leggono questa
+    stessa funzione.
     """
+    if _code(meta) in UNVERIFIED_EXTREMES:
+        return None, None
     high, low = level.get("best"), level.get("worst")
     if not high or not low:
         return None, None
@@ -134,7 +174,12 @@ def extremes(meta, level):
 
 
 def _figures(meta, level):
-    """Il pezzo ", da X a Y unita'" del titolo, e la sua variante senza unita'."""
+    """Il pezzo ", da X a Y unita'" del titolo, e la sua variante senza unita'.
+
+    Sulle percentuali la preposizione si articola con `numfmt.articulated`
+    ("dall'89,1% allo 0,22%"), e le due varianti coincidono: l'unita' e' il
+    segno di percentuale, attaccato al numero.
+    """
     high, low = extremes(meta, level)
     if high is None:
         return None, None
@@ -142,11 +187,46 @@ def _figures(meta, level):
     if top is None or bottom is None or top == bottom:
         return None, None
     if _is_percentage(meta):
-        both = f", dal {top}% al {bottom}%"
+        both = (f", {numfmt.articulated('da', top)}{top}% "
+                f"{numfmt.articulated('a', bottom)}{bottom}%")
         return both, both
     unit = _short_unit(meta)
     bare = f", da {top} a {bottom}"
     return (f"{bare} {unit}" if unit else bare), bare
+
+
+_PERCENT_RANGE = re.compile(r", (?:dal |dall'|dallo )(\S+%) (?:al |all'|allo )(\S+%)")
+
+
+def _unarticled(figures):
+    """", dall'89,1% allo 0%" -> ", da 89,1% a 0%": l'intervallo in percentuale
+    senza articolo, o None se `figures` non e' un intervallo in percentuale."""
+    match = _PERCENT_RANGE.fullmatch(figures or "")
+    return f", da {match.group(1)} a {match.group(2)}" if match else None
+
+
+def _cost(figures):
+    """Quanto conta il pezzo delle cifre quando si decide che cosa sacrificare.
+
+    Su un intervallo in percentuale conta come "dal X% al Y%", la forma di
+    prima dell'elisione: "dallo" e "allo" costano un carattere ciascuno, e un
+    articolo non deve spostare la scelta fra coda del livello, nome e cifre. Se
+    la forma articolata poi non ci sta, si scrive "da X% a Y%", che e' piu'
+    corta di tutte e due.
+    """
+    bare = _unarticled(figures)
+    return len(bare) + 2 if bare else len(figures or "")
+
+
+def _with_figures(text, figures, max_len):
+    """`text` con le cifre accanto, articolate se ci stanno e senza articolo se
+    no; None se nemmeno cosi' ci sta."""
+    if not figures:
+        return text if len(text) <= max_len else None
+    for form in (figures, _unarticled(figures)):
+        if form and len(text) + len(form) <= max_len:
+            return f"{text}{form}"
+    return None
 
 
 def _level_tail(level):
@@ -160,7 +240,7 @@ def _level_tail(level):
     return f" per {singular}" if singular else ""
 
 
-def _fit(measure, marker, room):
+def _fit(measure, marker, room, guarded=True, strict=True):
     """La misura dentro `room` caratteri, tenendo cio' che la distingue se si puo'.
 
     Due accorciatori, in quest'ordine.
@@ -182,12 +262,73 @@ def _fit(measure, marker, room):
     lamentano per regione" su tre), cioe' proprio il guasto che `_compact_title`
     esiste per evitare. Quando nemmeno la giuntura basta si torna vuoti, e chi
     chiama rinuncia alle cifre invece che al nome.
+
+    Con `guarded` tutti e due passano da `_keeps_meaning`: un accorciamento che
+    tiene una parola sola ("Impermeabilizzazione") o che butta una negazione
+    ("Ospiti anziani" da "Ospiti anziani non autosufficienti") dice un'altra
+    cosa, e vale meno del nome intero senza cifre. `strict` protegge anche
+    cifre, sigle e soglie ("PM10", "con meno di 40 anni", "di basso importo").
     """
+    def keeps(text):
+        return not guarded or _keeps_meaning(measure, text, marker, strict=strict)
+
     compact = indicator_notes._compact_title(measure, marker, room)
-    if compact and len(compact) <= room and _whole_words(compact, measure) and _head_holds(compact):
+    if (compact and len(compact) <= room and _whole_words(compact, measure)
+            and _head_holds(compact) and keeps(compact)):
         return compact
     trimmed = _shorten_at_joint(measure, room - len(marker))
-    return f"{trimmed}{marker}" if trimmed else ""
+    if trimmed and keeps(f"{trimmed}{marker}"):
+        return f"{trimmed}{marker}"
+    return ""
+
+
+# Parole che un accorciamento non puo' buttare. Le negazioni rovesciano la
+# misura: "Competenza numerica" da "Competenza numerica non adeguata" e'
+# l'opposto. Le soglie la cambiano: "Tasso di partecipazione" senza "mancata",
+# "Pensionati con reddito pensionistico" senza "di basso importo".
+_NEGATIONS = frozenset(("non", "senza"))
+_THRESHOLDS = frozenset((
+    "almeno", "mancata", "mancato", "mancate", "mancati",
+    "basso", "bassa", "bassi", "basse",
+))
+
+
+def _carries_meaning(word, strict):
+    """Una parola che il titolo non puo' perdere: sempre una negazione, e con
+    `strict` anche una cifra, una sigla o una soglia."""
+    clean = word.strip(",.:()'\"").lower()
+    if clean in _NEGATIONS:
+        return True
+    if not strict:
+        return False
+    if any(char.isdigit() for char in clean):
+        return True
+    letters = [char for char in word if char.isalpha()]
+    if len(letters) >= 2 and all(char.isupper() for char in letters):
+        return True
+    return clean in _THRESHOLDS
+
+
+def _keeps_meaning(measure, text, marker, strict=True):
+    """La misura accorciata a `text` dice ancora la stessa cosa?
+
+    La testa tiene almeno due parole, perche' una sola non dice mai di che
+    cosa si parla: `_shorten_at_joint` misura in caratteri, e
+    "Impermeabilizzazione" ne ha venti. E le parole buttate non portano una
+    negazione e, con `strict`, nemmeno una cifra, una sigla o una soglia
+    (`_carries_meaning`). Il nome intero passa sempre: non ha buttato niente.
+    """
+    kept = text[: len(text) - len(marker)] if marker and text.endswith(marker) else text
+    if kept == measure:
+        return True
+    head, _, coda = kept.partition(" (")
+    coda = coda.removesuffix(")")
+    if len(head.split()) < 2 or not measure.startswith(head):
+        return False
+    dropped = measure[len(head):].strip()
+    if coda and dropped.endswith(coda):
+        dropped = dropped[: -len(coda)]
+    return not any(_carries_meaning(word, strict) for word in dropped.split())
 
 
 def _head_holds(compact):
@@ -230,6 +371,10 @@ def _shorten_at_joint(measure, room):
             continue
         if any(word.lower().rstrip(",") in _UNRESOLVED for word in head.split()):
             continue
+        # Una giuntura dopo una congiunzione lascia la testa appesa: "Tasso di
+        # criminalita' organizzata e" da "... organizzata e di tipo mafioso".
+        if head.split()[-1].lower() in indicator_notes._TRAILING_STOP:
+            continue
         if len(head) > len(scelta):
             scelta = head
     return scelta
@@ -264,11 +409,19 @@ def answer_title(meta, level, max_len=TITLE_MAX):
     34.343 a 13.388 euro" invece di "Retribuzione media annua per provincia, da
     34.343 a 13.388". Dire "euro" accanto a una cifra in euro non aggiunge
     niente; dire "per provincia" risponde a meta' della domanda.
+
+    Dove c'e' un nome breve curato (`indicator_notes.SHORT_NAMES`) la misura e'
+    quello, senza marcatore, e non si accorcia oltre: o ci sta intero, o si
+    rinuncia al pezzo successivo.
     """
-    measure = indicator_notes._short_name_for_title(meta.get("name") or "")
+    curated = indicator_notes.short_name(_code(meta), level.get("key"))
+    if curated:
+        measure, marker = curated, ""
+    else:
+        measure = indicator_notes._short_name_for_title(meta.get("name") or "")
+        marker = indicator_notes._variant_marker(meta.get("name") or "")
     if not measure:
         return None
-    marker = indicator_notes._variant_marker(meta.get("name") or "")
     tail = _level_tail(level)
     with_unit, without_unit = _figures(meta, level)
 
@@ -277,16 +430,21 @@ def answer_title(meta, level, max_len=TITLE_MAX):
         (with_unit, ""), (without_unit, ""),
         (None, tail), (None, ""),
     )
-    for figures, tail_part in tentativi:
-        room = max_len - len(tail_part) - len(figures or "")
-        if room - len(marker) < MIN_MEASURE:
-            continue
-        text = _fit(measure, marker, room)
-        if not text:
-            continue
-        candidate = f"{text}{tail_part}{figures or ''}"
-        if len(candidate) <= max_len:
-            return candidate
+    strict = level.get("key") == "provincia"
+    for guarded in (True, False):
+        for figures, tail_part in tentativi:
+            room = max_len - len(tail_part) - _cost(figures)
+            if room - len(marker) < MIN_MEASURE:
+                continue
+            if curated:
+                text = measure if len(measure) <= room else ""
+            else:
+                text = _fit(measure, marker, room, guarded=guarded, strict=strict)
+            if not text:
+                continue
+            candidate = _with_figures(f"{text}{tail_part}", figures, max_len)
+            if candidate:
+                return candidate
     return None
 
 
@@ -296,8 +454,8 @@ def enrich(title, meta, level, max_len=TITLE_MAX):
         return title
     with_unit, without_unit = _figures(meta, level)
     for figures in (with_unit, without_unit):
-        if figures and len(title) + len(figures) <= max_len:
-            return f"{title}{figures}"
+        if figures and len(title) + _cost(figures) <= max_len:
+            return _with_figures(title, figures, max_len)
     return title
 
 
@@ -391,6 +549,22 @@ def to_place(name):
     return f"a {name}"
 
 
+def _places(extreme, level):
+    """Dove sta un estremo: "a Nuoro", "a Lecco e a Treviso", "in 16 province".
+
+    I pari merito si leggono da `level["observations"]`, i territori dell'ultimo
+    anno: `best` e `worst` ne nominano uno solo, il primo in ordine alfabetico.
+    Oltre due si conta, perche' una fila di nomi in SERP non si legge.
+    """
+    names = [row["name"] for row in level.get("observations") or ()
+             if row.get("value") is not None and row.get("value") == extreme.get("value")]
+    if extreme["name"] not in names:
+        names = [extreme["name"]]
+    if len(names) > 2:
+        return f"in {len(names)} {level.get('plural') or 'territori'}"
+    return " e ".join(_preposition(name, level) for name in names)
+
+
 def answer_description(meta, level, max_len=DESCRIPTION_MAX):
     """La descrizione derivata, per le pagine che non hanno un lead scritto.
 
@@ -401,6 +575,11 @@ def answer_description(meta, level, max_len=DESCRIPTION_MAX):
     La forma e' "Misura, anno: da X a Y." e non "Nel 2023 la misura va da...",
     per non dover indovinare l'articolo: in italiano sarebbe la/il/lo/l'/i/le a
     seconda della parola, e sbagliarlo si legge subito.
+
+    Un estremo condiviso si dice tutto: "a 0 in 16 province", non "a 0 ad
+    Aosta", che era solo la prima in ordine alfabetico delle sedici. E il
+    conteggio e' quello dei territori col dato nell'anno, "106 province con
+    dato", quando non sono tutti.
     """
     high, low = extremes(meta, level)
     if high is None:
@@ -408,7 +587,8 @@ def answer_description(meta, level, max_len=DESCRIPTION_MAX):
     top, bottom = format_number(high["value"]), format_number(low["value"])
     if top is None or bottom is None:
         return None
-    measure = (indicator_notes._short_name_for_title(meta.get("name") or "") or "").strip()
+    measure = (indicator_notes.short_name(_code(meta), level.get("key"))
+               or indicator_notes._short_name_for_title(meta.get("name") or "") or "").strip()
     if not measure:
         return None
 
@@ -422,13 +602,19 @@ def answer_description(meta, level, max_len=DESCRIPTION_MAX):
 
     year = level.get("year_max")
     opening = (f"{measure}{f', {year}' if year else ''}: "
-               f"da {value_high} {_preposition(high['name'], level)} "
-               f"a {value_low} {_preposition(low['name'], level)}.")
+               f"da {value_high} {_places(high, level)} "
+               f"a {value_low} {_places(low, level)}.")
 
     total = level.get("territory_total")
     plural = level.get("plural") or "territori"
+    observed = sum(1 for row in level.get("observations") or () if row.get("value") is not None)
     institution = (meta.get("institution") or "").strip()
-    closing = f" {total} {plural} a confronto" if total else f" Tutte le {plural} a confronto"
+    if observed and total and observed < total:
+        closing = f" {observed} {plural} con dato"
+    elif total:
+        closing = f" {total} {plural} a confronto"
+    else:
+        closing = f" Tutte le {plural} a confronto"
     closing += f", dati {institution}." if institution else "."
 
     if len(opening) + len(closing) <= max_len:
@@ -478,9 +664,11 @@ def page_title(article, meta, level, site_name=None, source_qualifier=None,
     derived = answer_title(meta, level, max_len=max_len)
     if derived:
         return derived
+    # La coda e' quella del livello anche qui: fissa su " per regione", la
+    # vista province dei NEET prendeva il `<title>` della vista regioni.
     return indicator_notes.seo_title(
         meta.get("name") or "", site_name or "", max_len=max_len,
-        source_qualifier=source_qualifier,
+        source_qualifier=source_qualifier, tail=_level_tail(level),
     )
 
 

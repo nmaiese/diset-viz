@@ -38,9 +38,15 @@ FIXED = {"score": 1, "ratio": 1, "rank": 0, "count": 0}
 
 
 def magnitude_decimals(value: float) -> int:
-    """La regola di seo_titles._decimals: la grandezza decide se il decimale conta."""
+    """La regola di seo_titles._decimals: la grandezza decide se il decimale conta.
+
+    Lo zero si scrive "0": "0,00" diceva una precisione che uno zero non ha, e
+    finiva nei title ("dal 358% al 0,00%"). La stessa regola sta in
+    `seo_titles._decimals` e in `decimals` di `static/js/v1.js`, e
+    `tests/unit/test_decimals_parity.py` controlla che le tre concordino.
+    """
     m = abs(float(value))
-    if m >= 100:
+    if m == 0 or m >= 100:
         return 0
     if m >= 10:
         return 1
@@ -48,11 +54,50 @@ def magnitude_decimals(value: float) -> int:
 
 
 def column_decimals(values) -> int:
-    """I decimali di una colonna: quelli della cifra mediana, uguali per tutte le righe."""
+    """I decimali di una colonna: quelli della cifra mediana, uguali per tutte le righe.
+
+    Una mediana a zero tiene i due decimali di prima: la regola dello zero vale
+    per la cifra da sola, e una colonna a zero decimali arrotonderebbe a "1" e
+    "0" anche le righe che zero non sono."""
     vals = sorted(abs(float(v)) for v in values if v is not None)
     if not vals:
         return 0
-    return magnitude_decimals(vals[len(vals) // 2])
+    median = vals[len(vals) // 2]
+    return magnitude_decimals(median) if median else 2
+
+
+# "dal", "dallo", "dall'" davanti a una cifra: la forma la decide come la cifra
+# si legge. "otto", "undici" e "uno" cominciano per vocale, "zero" vuole "lo".
+_ARTICULATED = {
+    "di": ("del ", "dello ", "dell'"),
+    "da": ("dal ", "dallo ", "dall'"),
+    "a": ("al ", "allo ", "all'"),
+}
+_READS_AS_ZERO = re.compile(r"0(?![\d.])")
+# 8, 80, 800, 8.000 (otto...); 11, 11,3, 11.000 (undici...); 1 e 1,x (uno).
+# Non 110-119 ("centodieci") e non 1.022 ("milleventidue").
+_READS_WITH_VOWEL = re.compile(r"8|11(?!\d)|1(?![\d.])")
+
+
+def articulated(preposition: str, figure: str) -> str:
+    """La preposizione articolata davanti a una cifra gia' scritta all'italiana:
+    `articulated("da", "89,1%")` -> "dall'", `("a", "0,22%")` -> "allo ",
+    `("di", "116%")` -> "del ".
+
+    Un posto solo, perche' erano due regole scritte a mano e sbagliavano in due
+    modi diversi: i title dicevano "dal 8" e "al 0,00%", le frasi della scheda
+    "dell'116%" (la vecchia regola vedeva "11" in testa a 116). Il negativo si
+    legge "meno" e prende la forma piena. `preposition` e' "di", "da" o "a".
+    """
+    plain, before_zero, elided = _ARTICULATED[preposition]
+    text = (figure or "").strip()
+    if text.startswith((MINUS, "−")):
+        return plain
+    if _READS_AS_ZERO.match(text):
+        return before_zero
+    if _READS_WITH_VOWEL.match(text):
+        return elided
+    return plain
 
 
 def text(value, decimals: int | None = None, sign: bool = False) -> str:

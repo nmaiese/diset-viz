@@ -1142,56 +1142,6 @@ class AppSmokeTest(unittest.TestCase):
                 seo_title(by_id["190"]["name"], "Divario Italia"),
             )
 
-    def test_authored_titles_stay_inside_the_budget_and_stay_distinct(self):
-        """La guardia che al percorso autorato mancava.
-
-        Il titolo derivato ha un test sul catalogo che gli vieta di sforare i 60
-        caratteri e di collidere con un altro; il titolo autorato non aveva
-        niente, quindi il giorno in cui un editor ne scrive uno lungo (o due che
-        aprono sulla stessa frase) due pagine indicizzabili si sarebbero prese lo
-        stesso `<title>` in silenzio. Questo controlla i titoli **resi**, cioè
-        l'autorato quando c'è e il derivato quando manca, ed è un no-op finché
-        nessun articolo ne dichiara uno.
-        """
-        from app import sources
-        from app.atlas_catalog import get_atlas_catalog
-        from app.indicator_notes import authored_seo_title, seo_title
-        from app.indicator_view import build_indicator_view
-        from app.taxonomy import DUPLICATE_BES_IDS
-        from scripts import indicator_store
-
-        entries = indicator_store.load_all()
-
-        def rendered(indicator_id, name, family, raw_id):
-            """La stessa logica di `_render_indicator`, qualificatore compreso."""
-            qualifier = (sources.family_short_label(family)
-                         if family == "bes" and raw_id in DUPLICATE_BES_IDS else None)
-            entry = entries.get(str(indicator_id)) or {}
-            authored = (entry.get("seo_title") or entry.get("h1") or "").strip()
-            if authored:
-                return authored_seo_title(authored, "Divario Italia",
-                                          source_qualifier=qualifier)
-            return seo_title(name, "Divario Italia", source_qualifier=qualifier)
-
-        # Il catalogo d'atlante, non quello territoriale: un titolo autorato su un
-        # BES, un Multiscopo, un Eurostat o un demografico non sarebbe passato di
-        # qui, e la collisione che conta è anche quella **fra famiglie** (una
-        # serie BES duplicata misura lo stesso fenomeno della gemella
-        # territoriale, ed è il caso che il qualificatore esiste per separare).
-        titles = {}
-        for item in get_atlas_catalog()["indicators"]:
-            family, raw_id = sources.split_internal_id(str(item["id"]))
-            title = rendered(item["id"], item["name"], family, raw_id)
-            self.assertLessEqual(len(title), 60, f"title too long for {item['id']}: {title}")
-            self.assertEqual(title, title.strip())
-            self.assertEqual(title.count("("), title.count(")"), title)
-            view = build_indicator_view(family, raw_id)
-            if view is not None and view["meta"]["indexable"]:
-                titles.setdefault(title, []).append(item["id"])
-        collisions = {title: ids for title, ids in titles.items() if len(ids) > 1}
-        self.assertEqual(collisions, {},
-                         f"pagine indicizzabili con lo stesso <title>: {list(collisions.items())[:5]}")
-
     def test_a_long_authored_title_keeps_what_distinguishes_it(self):
         """Due titoli lunghi che aprono sulla stessa frase non possono diventare
         lo stesso `<title>`: ciò che li distingue sta in fondo, quindi in fondo
@@ -1285,60 +1235,6 @@ class AppSmokeTest(unittest.TestCase):
             self.assertLessEqual(len(title), 60, f"{raw_id}: {title}")
         self.assertEqual(len(titles), len(set(titles.values())), titles)
 
-    def test_titles_are_unique_across_the_full_served_inventory(self):
-        # Rilievo Codex sulla #177: le due prove sopra guardano `get_catalog()`
-        # (solo territoriale) e il solo insieme di `DUPLICATE_BES_IDS` fra loro.
-        # Nessuna delle due copre l'inventario che il sito serve davvero: BES
-        # non duplicati, multiscopo, le famiglie esterne, e le pagine
-        # BES-solo-provincia che non entrano nel catalogo atlante ma restano
-        # indicizzabili (`_build_indexable_indicator_catalog`, la stessa base
-        # della sitemap). Una collisione lì non l'avrebbe vista nessun test.
-        from app import sources
-        from app.config import SITE_NAME
-        from app.indicator_notes import authored_seo_title, seo_title
-        from app.indicator_texts import build_article
-        from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
-        from app.views import _build_indexable_indicator_catalog
-
-        # Specchia la stessa logica di `views._render_indicator`: una prova che
-        # calcolasse il qualificatore in un altro modo potrebbe passare per
-        # ragioni sue, mentre la pagina vera collide ancora. Confronta sul solo
-        # codice grezzo (senza prefisso di famiglia): le pagine BES-solo-
-        # provincia arrivano da `_view_from_bes_only` con `meta["id"]` già
-        # senza il prefisso `bes:`, quindi risalire alla famiglia da
-        # `split_internal_id(meta["id"])` le farebbe passare per territoriali.
-        # I due insiemi sono codici BES per costruzione, così il confronto sul
-        # solo codice non può incrociare un id territoriale per sbaglio.
-        def qualifier_for(raw_id):
-            if raw_id in DUPLICATE_BES_IDS:
-                return sources.family_short_label("bes")
-            if raw_id in PROVINCE_ONLY_TITLE_COLLISIONS:
-                return "dati provinciali"
-            return None
-
-        titles = {}
-        for record in _build_indexable_indicator_catalog():
-            meta = record["meta"]
-            bare_id = str(meta["id"]).rsplit(":", 1)[-1]
-            qualifier = qualifier_for(bare_id)
-            # Un titolo autorato (h1/seo_title) sostituisce il derivato quando
-            # c'è: stesso ramo di `views._render_indicator`, o la prova non
-            # vedrebbe una collisione fra due titoli autorati né fra uno
-            # autorato e uno derivato. `build_article` con il livello di
-            # default: un'entry autorata solo su un livello non regionale (oggi
-            # nessuna) resterebbe fuori da questo controllo, lo stesso limite
-            # del catalogo compatto che non porta la chiave di livello.
-            article = build_article(meta["id"])
-            authored = article["seo_title"] or article["h1"]
-            if authored:
-                title = authored_seo_title(authored, SITE_NAME, source_qualifier=qualifier)
-            else:
-                title = seo_title(meta["name"], SITE_NAME, source_qualifier=qualifier)
-            self.assertLessEqual(len(title), 60, f"{meta['id']}: {title}")
-            titles.setdefault(title, []).append(meta["id"])
-        collisions = {title: ids for title, ids in titles.items() if len(ids) > 1}
-        self.assertEqual(collisions, {}, collisions)
-
     def test_public_game_and_editorial_metadata_within_budget(self):
         client = app.test_client()
         paths = (
@@ -1404,51 +1300,49 @@ class AppSmokeTest(unittest.TestCase):
 class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
     """La catena vera di `seo_titles.page_title`, su tutto il catalogo indicizzabile.
 
-    Il test che c'era sopra esercita `indicator_notes.seo_title` per conto suo,
-    che e' solo l'ultimo anello: da quando la scheda passa da `page_title`,
-    quello non prova piu' cio' che il sito serve davvero.
+    Una pagina e' una coppia (indicatore, livello), e qui si misurano le coppie
+    **vive**: ogni scheda indicizzabile col livello che il suo URL rende. Titolo,
+    descrizione e Dataset escono dalle stesse chiamate di `_render_indicator`,
+    qualificatore di fonte compreso (`views._source_qualifier`): le due prove
+    che c'erano prima guardavano `indicator_notes.seo_title` e
+    `authored_seo_title` per conto loro, cioe' una catena che la scheda non usa
+    piu', e non avrebbero visto una collisione del titolo servito.
 
-    Le due collisioni note e il perche' restano scritte qui sotto: una pagina
-    che collide non e' un dettaglio, sono due URL indicizzabili che si
-    presentano a Google con lo stesso titolo.
+    Nessuna collisione e' ammessa. Le due che stavano dichiarate qui (598 e 599,
+    910 e bes:01SAL001) sono sparite: la prima col nome breve curato
+    (`indicator_notes.SHORT_NAMES`), la seconda perche' la pagina vera passa il
+    qualificatore che la prova di prima non passava.
     """
-
-    # 598 e 599 differiscono **in mezzo** al nome ("di genere femminile" contro
-    # "in eta' giovanile") e sono `contextual`, quindi non hanno estremi da cui
-    # ricavare cifre che le distinguano. Nessun accorciatore testa-coda le
-    # salva, e allargare il vocabolario dei marcatori per due pagine tocca le
-    # altre 370. Sono dichiarate, non nascoste: la prova serve a far diventare
-    # rossa una collisione **nuova**.
-    # 910 e bes:01SAL001 sono **la stessa serie Istat pubblicata da due
-    # famiglie**: stesso nome, stessi estremi (84,8 e 82,1), stesso anno, e tutte
-    # e due nella sitemap. A tenerne distinti i titoli era solo l'etichetta
-    # dell'unita', "anni" da una parte e "Numero medio di anni" dall'altra, che
-    # `_short_unit` scarta perche' troppo lunga. Quell'unita' e' caduta da sola
-    # quando il sacrificio ha smesso di togliere la coda del livello prima
-    # dell'unita', e ha scoperto il guasto vero: qui non collidono due titoli,
-    # collidono due pagine. Si risolve nel catalogo, non in `seo_titles`.
-    COLLISIONI_NOTE = {frozenset({"598", "599"}), frozenset({"910", "bes:01SAL001"})}
 
     @classmethod
     def setUpClass(cls):
-        from app import indicator_universe, indicator_view, indicator_texts, seo_titles
+        from app import (
+            indicator_texts,
+            indicator_universe,
+            indicator_view,
+            seo_titles,
+            views,
+        )
 
         cls.titoli = {}
         cls.descrizioni = {}
+        cls.dataset = {}
         for voce in indicator_universe.indexable_catalog():
             base = voce["meta"]
             vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
             meta, level = vista["meta"], vista["levels"][0]
             articolo = indicator_texts.build_article(meta["id"], level["key"])
-            # Le due chiamate sono le stesse che fa `_render_indicator`, incluso
+            # Le chiamate sono le stesse che fa `_render_indicator`, incluso
             # il lead composto come ultima spiaggia: senza quello la descrizione
             # torna `None` sulle serie `contextual` senza pezzo, e il test
             # misurerebbe una pagina che il sito non serve.
             lead = articolo["lead"] or indicator_texts.composed_lead(meta, level)
+            qualifier = views._source_qualifier(base["family"], str(base["raw_id"]))
             cls.titoli[meta["id"]] = seo_titles.page_title(
-                articolo, meta, level, site_name="Divario Italia")
+                articolo, meta, level, site_name="Divario Italia", source_qualifier=qualifier)
             cls.descrizioni[meta["id"]] = seo_titles.page_description(
                 articolo, meta, level, composed=lead)
+            cls.dataset[meta["id"]] = views._dataset_description(lead, meta)
 
     def test_nessun_titolo_sfora_il_budget_serp(self):
         for ind, titolo in self.titoli.items():
@@ -1457,6 +1351,7 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
                 self.assertLessEqual(len(titolo), 60, f"{ind}: {titolo}")
                 self.assertGreaterEqual(len(titolo), 8, f"{ind}: {titolo}")
                 self.assertEqual(titolo, titolo.strip())
+                self.assertEqual(titolo.count("("), titolo.count(")"), f"{ind}: {titolo}")
 
     def test_nessuna_descrizione_sfora_il_budget_serp(self):
         for ind, descrizione in self.descrizioni.items():
@@ -1469,8 +1364,8 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
         per_titolo = {}
         for ind, titolo in self.titoli.items():
             per_titolo.setdefault(titolo, set()).add(ind)
-        collisioni = {frozenset(ids) for ids in per_titolo.values() if len(ids) > 1}
-        self.assertEqual(collisioni - self.COLLISIONI_NOTE, set())
+        collisioni = {titolo: ids for titolo, ids in per_titolo.items() if len(ids) > 1}
+        self.assertEqual(collisioni, {})
 
     # Le pagine d'ingresso: le schede le misura `self.titoli`, queste no, e
     # nessuno le misurava. La home stava a 73 caratteri perche' finiva con
@@ -1519,18 +1414,40 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
         self.assertGreaterEqual(con_cifra / len(self.titoli), 0.6)
 
     def test_nessun_titolo_dice_per_regione_sopra_dati_provinciali(self):
-        """`indicator_notes._TITLE_TAIL` e' fissa: la coda ora segue il livello."""
-        from app import indicator_universe, indicator_view, seo_titles
+        """`indicator_notes._TITLE_TAIL` e' fissa: la coda ora segue il livello.
 
-        for voce in indicator_universe.indexable_catalog():
-            base = voce["meta"]
-            vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
-            level = vista["levels"][0]
-            if level["key"] != "provincia":
+        Ogni pagina provinciale, anche la vista `?livello=provincia` di una
+        scheda a due livelli, e per la catena intera di `page_title`: la vista
+        province dei NEET passava dal ripiego, che aveva la coda fissa, e diceva
+        "per regione" mentre `answer_title` da solo era in regola.
+        """
+        from app import (
+            indicator_texts,
+            indicator_universe,
+            indicator_view,
+            seo_titles,
+            views,
+        )
+
+        for family, raw_id in indicator_universe.all_indicator_refs():
+            vista = indicator_view.build_indicator_view(family, raw_id)
+            if vista is None:
                 continue
-            titolo = seo_titles.answer_title(vista["meta"], level)
-            with self.subTest(indicatore=base["id"]):
-                self.assertNotIn(" per regione", titolo or "")
+            for level in vista["levels"]:
+                if level["key"] != "provincia":
+                    continue
+                articolo = indicator_texts.build_article(vista["meta"]["id"], level["key"])
+                titolo = seo_titles.page_title(
+                    articolo, vista["meta"], level, site_name="Divario Italia",
+                    source_qualifier=views._source_qualifier(family, raw_id))
+                with self.subTest(indicatore=vista["meta"]["id"]):
+                    self.assertNotIn(" per regione", titolo or "")
+                    self.assertLessEqual(len(titolo), 60, titolo)
+
+    # Le cifre come si leggono: "dal 8" e "al 0" sono italiano sbagliato, "0,00"
+    # una precisione che lo zero non ha. "dal 116%" e "dal 1.022" invece sono
+    # giusti (centosedici, milleventidue), e la regola non li deve vietare.
+    CIFRE_SBAGLIATE = re.compile(r"0,00|\b(dal|al) (0|8|11(?!\d)|1(?![\d.]))|\b(dall|all)'1(\d\d|\.\d)")
 
     def test_niente_caratteri_vietati_in_serp(self):
         """Gli assoluti di `content/STYLE.md` valgono anche sul testo in SERP."""
@@ -1539,6 +1456,54 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
                 for vietato in ("—", "–", ";", "…"):
                     with self.subTest(indicatore=ind, carattere=vietato):
                         self.assertNotIn(vietato, testo or "")
+                with self.subTest(indicatore=ind, testo=testo):
+                    self.assertIsNone(self.CIFRE_SBAGLIATE.search(testo or ""), testo)
+
+    def test_la_regola_delle_cifre_non_vieta_l_italiano_giusto(self):
+        for giusto in ("dal 116% al 3,9%", "dal 1.022 al 980", "dall'89,1% allo 0%",
+                       "dall'11,9% all'1,3%", "dallo 0,94% al -2,6%", "da 3,4 a 0"):
+            with self.subTest(testo=giusto):
+                self.assertIsNone(self.CIFRE_SBAGLIATE.search(giusto))
+        for sbagliato in ("dal 89,1%", "al 0,22%", "al 1,3%", "dal 11,9%", "da 3,4 a 0,00", "dall'116%"):
+            with self.subTest(testo=sbagliato):
+                self.assertIsNotNone(self.CIFRE_SBAGLIATE.search(sbagliato))
+
+    def test_il_dataset_non_porta_markdown(self):
+        """Il lead e' Markdown e il JSON-LD e' testo: in produzione quello di
+        `bes-04BEC002P` diceva "A [Milano](/provincia/milano) la retribuzione"."""
+        for ind, testo in self.dataset.items():
+            with self.subTest(indicatore=ind):
+                self.assertNotIn("](", testo)
+
+    def test_il_dataset_reso_non_porta_markdown(self):
+        """La stessa prova sulla pagina servita, perche' il template potrebbe
+        prendere la descrizione da un'altra parte: le due schede il cui lead ha
+        un link, lette nel JSON-LD come le legge un motore."""
+        import json
+
+        def nodi(dato):
+            if isinstance(dato, list):
+                for voce in dato:
+                    yield from nodi(voce)
+            elif isinstance(dato, dict):
+                yield dato
+                yield from nodi(dato.get("@graph", []))
+
+        client = app.test_client()
+        for path in ("/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+                     "/indicatore/tasso-di-occupazione-totale/ter-13"):
+            with self.subTest(path=path):
+                risposta = client.get(path)
+                self.assertEqual(risposta.status_code, 200, path)
+                corpo = risposta.get_data(as_text=True)
+                blocchi = re.findall(r'<script type="application/ld\+json">(.*?)</script>', corpo, re.DOTALL)
+                descrizioni = [nodo.get("description", "")
+                               for blocco in blocchi for nodo in nodi(json.loads(blocco))
+                               if nodo.get("@type") == "Dataset"]
+                self.assertTrue(descrizioni, f"{path}: nessun Dataset nel JSON-LD")
+                for descrizione in descrizioni:
+                    self.assertTrue(descrizione)
+                    self.assertNotIn("](", descrizione)
 
 
 class HardeningTest(unittest.TestCase):
