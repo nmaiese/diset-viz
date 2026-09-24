@@ -113,7 +113,7 @@ Una scala di undici ruoli, nominati per funzione:
 
 ## Componenti
 
-Venticinque, e ognuno prende il posto delle sue varianti di oggi.
+Ventotto, e ognuno prende il posto delle sue varianti di oggi.
 
 - **Testata**: salto al contenuto, simbolo e wordmark, navigazione (Territori,
   Temi, Qualita' della vita, Atlante e dati con Metodologia, Storie, Quiz),
@@ -143,6 +143,22 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
 - **Mappa coropletica**: sei gradini da poco a molto contrasto seguendo la
   grandezza, qualunque sia il verso, legenda con tutti e sei. Dato mancante
   tratteggiato, "n.d.". Selezione con contorno in inchiostro, mai in accento.
+  Regioni o province (`ui.map(..., level=)`): sulle province i confini
+  regionali si ridisegnano sopra, piu' larghi nel colore del fondo. I contorni
+  delle province li scrive `design/v1/tools/province_map.py` (Istat via
+  openpolis, CC BY 4.0, attribuzione nella riga fonte) nella stessa proiezione
+  delle regioni. Dove le mappe sono piu' d'una i tracciati stanno in uno
+  sprite (`v1_map_sprite(livello)`) e la mappa li richiama con `use=True`.
+- **Mappa per scegliere** (`ui.navmap`): non porta un dato, serve a scegliere
+  un territorio. Colori dell'interfaccia, mai della rampa: terra nel grigio
+  della superficie, confini nel colore del fondo, il territorio scelto o sotto
+  il mouse nell'accento, perche' e' un link. Ogni tracciato porta al profilo
+  senza JavaScript, fuori dall'ordine di tabulazione e nascosto ai lettori di
+  schermo: la tastiera ha il campo o l'indice accanto.
+- **Distintivo**: un quadrato di 44 pixel con un'icona, su un lavaggio
+  dell'interfaccia (ambra, verde, blu, rosso, o la superficie). Riconosce
+  un'area o un impegno a colpo d'occhio. Non e' un colore dei dati e non da'
+  un giudizio: testa e coda di una classifica le dicono le frecce.
 - **Serie storica**: altezza fissa, etichette dirette a fine linea, media
   semplice tratteggiata, tabella equivalente.
 - **Tabella dati**: `caption`, `th scope`, numeri a destra con decimali uniformi,
@@ -150,7 +166,9 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
   blocchi etichettati.
 - **Classifica a barre**: e' una tabella. Tutte le barre nel grigio di contesto,
   solo la riga scelta in accento. Per 107 province: prime 10 e ultime 10, le
-  altre nello stesso DOM dentro un `details`.
+  altre nello stesso DOM dentro un `details`. In home la classifica sta in due colonne da
+  dieci per tutti e due i livelli (regioni dalla 1ª alla 10ª e dalla 11ª alla
+  20ª, province le prime e le ultime dieci).
 - **Barra di posizione e punteggio**: un segno in linea, sempre accanto al
   numero (punteggio 0-100 con tacca a 50, traccia da 1 a N).
 - **Segno di verso e movimento**: freccia, segno e parole ("da 12ª a 8ª",
@@ -165,7 +183,10 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
 - **Scheda**: una sola card per indicatore, storia, territorio, tema. Il titolo
   e' il link, esteso a tutta la scheda. Niente ombra, niente "Apri".
 - **Controlli segmentati**: link quando cambia il documento, bottoni con
-  `aria-pressed` quando cambia uno stato. Attivo = fondo pieno.
+  `aria-pressed` quando cambia uno stato. Attivo = fondo pieno. Il selettore
+  Regioni/Province della home e' un caso di mezzo: senza JavaScript sono due
+  link a `?livello=`, con JavaScript diventano schede (tab) con i ruoli ARIA e
+  le frecce, e il pannello dell'altro livello e' gia' in pagina.
 - **Ricerca**: una per pagina, suggerimenti raggruppati per tipo.
 - **Indice di pagina**: domande brevi ("Chi e' in testa", "Com'e' cambiato"),
   sticky nel margine da 1200.
@@ -231,18 +252,33 @@ serie di un anno solo, indicatore senza verso, scheda non indicizzabile.
 
 ### Home
 
-Una sequenza di fasce che alternano fondo e superficie. Testata-risposta con
-un H1 descrittivo e la ricerca "trova il tuo territorio", sulla superficie
-insieme alle porte del sito. Poi l'indicatore in evidenza, **uno a caso a ogni
-visita** (`app/home_pick.py`): una coppia indicatore e livello dal catalogo
-indicizzabile, prima il livello e poi l'indicatore, cosi' le province escono
-una volta su due e non una su otto. Per le regioni la striscia del divario, la
-mappa che nomina i suoi estremi e la classifica dallo zero, per le province la
-striscia e le prime e le ultime dieci affiancate. `?indicatore=ter-901&livello=provincia`
-fissa la scelta, se quella coppia sta nel pool. Per questo la home non sta nella cache di pagina. Seguono le
-regioni per ripartizione e le province, la qualita' della vita (doppio podio),
-il quiz (i tre giochi e una domanda da provare), i temi, le storie, fonti
-metodo e come citare.
+Una sequenza di fasce che alternano fondo e superficie, un partial per fascia
+in `app/templates/v1/home/`. Testata-risposta con un H1 descrittivo e la
+ricerca "trova il tuo territorio", e da 960 pixel la mappa per andare a una
+regione, sulla superficie insieme alle porte del sito.
+
+Poi l'indicatore in evidenza, **uno a caso a ogni visita** (`app/home_pick.py`):
+una coppia indicatore e livello dal catalogo indicizzabile, prima il livello e
+poi l'indicatore, cosi' le province escono una volta su due e non una su otto.
+Sta in una scheda con la sua testata, e il nome dell'indicatore e' piu' piccolo
+del titolo di sezione. Regioni e province hanno la stessa forma: la striscia
+del divario su tutta la larghezza (taglio largo a `HOME_STRIP_WIDTH`), poi la
+mappa accanto alla classifica in due colonne. Se l'indicatore sta nel pool a
+tutti e due i livelli, il selettore passa dall'uno all'altro senza ricaricare.
+`?indicatore=ter-901&livello=provincia` fissa la scelta, se quella coppia sta
+nel pool. Per questo la home non sta nella cache di pagina.
+
+Seguono regioni e province (per ognuno dei due livelli la mappa per scegliere,
+un territorio a caso e l'anteprima della sua scheda, con le frasi della sua
+testata), i temi (le quattro aree col distintivo, testa e coda con le
+frecce), la qualita' della vita come porta (che cosa misura, i profili di
+priorita', il bottone verso la pagina: la classifica in home non c'e'), il
+quiz in una fascia sua (lavaggio ambra, schede con illustrazione, una domanda
+lampo), le storie (una grande accanto alla foto, tre in fila) e fonti, metodo
+e come citare. Un bottone primario per fascia.
+
+I prototipi in `design/v1/src/` non hanno ancora queste fasce: la home del
+sito e' andata avanti da sola.
 
 ### Regione
 

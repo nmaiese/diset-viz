@@ -5,14 +5,23 @@ paths:
 
 # Le rotte, e le regole che non si vedono rompendole
 
-- `/` — la home, **server-rendered** (`app/templates/v1/home.html`, con
-  `home.html` come ripiego): le porte del sito, un indicatore in evidenza
-  **diverso a ogni visita** (`app/home_pick.py`, per regione o per provincia),
-  i territori, la qualita' della vita, il quiz, i temi, le storie. Per questo
-  **non sta nella cache di pagina**: rimetterci `@cache.cached` mostrerebbe lo
-  stesso indicatore a tutti per cinque minuti. `?indicatore=<codice>&livello=`
+- `/` — la home, **server-rendered** (`app/templates/v1/home.html` con un
+  partial per fascia in `app/templates/v1/home/`, e `home.html` come ripiego):
+  la testata con la ricerca e, da 960 px, la mappa per andare a una regione;
+  le porte del sito; un indicatore in evidenza **diverso a ogni visita**
+  (`app/home_pick.py`, per regione o per provincia), con tutti e due i livelli
+  nello stesso pannello quando tutti e due stanno nel pool; regioni e province
+  con un territorio estratto a caso e l'anteprima della sua scheda; i temi; la
+  qualita' della vita come porta, senza classifica; il quiz; le storie; fonti
+  e metodo. Per questo **non sta nella cache di pagina**: rimetterci
+  `@cache.cached` mostrerebbe lo stesso indicatore e gli stessi territori a
+  tutti per cinque minuti. Le anteprime dei territori
+  (`home.territory_previews`) escono dalle stesse funzioni delle pagine
+  regione e provincia e si calcolano una volta per processo: costano circa
+  un secondo alla prima home di ogni istanza. `?indicatore=<codice>&livello=`
   fissa la scelta (e `?indicator=<id>` del selettore di prima) se quella coppia
-  sta nel pool, se no si torna al caso. Il canonico resta `/`. Non e' l'atlante.
+  sta nel pool, se no si torna al caso. Il canonico resta `/`. Non e'
+  l'atlante.
 - `/atlante` — l'atlante React/Vite (sorgente in `frontend/`, build in
   `app/static/dist/`), montato da `app/templates/app.html`. Insieme a
   `/confronto` sono le due sole pagine che caricano il bundle della SPA, e si
