@@ -182,8 +182,8 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         lettore e il crawler perderebbero la serie. La tabella-serie la porta a
         tutti, un anno per riga, e per una serie a un solo anno non compare."""
         multi = self._get("920").get_data(as_text=True)  # eta media, serie lunga
-        self.assertIn('class="trend-table"', multi)
-        rows = re.findall(r'<tr><th scope="row">(\d{4})</th><td>[^<]+</td>', multi)
+        self.assertRegex(multi, r'class="[^"]*\btrend-table\b')
+        rows = re.findall(r'<tr><th scope="row">(\d{4})</th><td[^>]*>', multi)
         self.assertGreater(len(rows), 5)
         self.assertEqual(rows, sorted(rows))  # in ordine di anno
 
@@ -276,7 +276,7 @@ class LaCodaDellaSchedaNonEUnMenu(unittest.TestCase):
         cls.html = cls.client.get(cls.URL).get_data(as_text=True)
 
     def test_c_e_una_zona_sola_con_una_intestazione_sola(self):
-        self.assertEqual(self.html.count('class="indicator-next"'), 1)
+        self.assertEqual(len(re.findall(r'class="[^"]*\bindicator-next\b', self.html)), 1)
         self.assertEqual(self.html.count('id="continua-da-qui"'), 1)
         for morto in ('class="indicator-articles"', 'class="sibling-nav"',
                       'class="dimension-nav"', 'class="indicator-related"'):
@@ -318,14 +318,11 @@ class LaCodaDellaSchedaNonEUnMenu(unittest.TestCase):
         self.assertTrue(any(v.get("source_theme") == sottotema for v in primi),
                         [v["name"] for v in primi])
 
-    def test_l_immagine_da_condividere_sta_nell_apparato(self):
-        """E' un artefatto di citazione, non una destinazione: in coda faceva
-        numero fra i blocchi di navigazione e non c'entrava con nessuno."""
-        apparato = self.html.index('class="indicator-apparatus"')
-        continua = self.html.index('class="indicator-next"')
-        cover = self.html.index('class="indicator-cover-share"')
-        self.assertLess(apparato, cover)
-        self.assertLess(cover, continua)
+    def test_l_immagine_da_condividere_non_c_e_piu(self):
+        """La 1.0 l'ha tolta: era un'anteprima della scheda disegnata come
+        un'immagine social, dentro l'apparato, e la pagina ha gia' la striscia
+        del divario e la classifica come figure vere."""
+        self.assertNotIn('class="indicator-cover-share"', self.html)
 
     def test_a_livello_provincia_i_territori_portano_alla_loro_pagina(self):
         """Le province hanno una pagina dal 22/9, e le schede continuavano a
@@ -334,7 +331,7 @@ class LaCodaDellaSchedaNonEUnMenu(unittest.TestCase):
         html = self.client.get(
             "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
         ).get_data(as_text=True)
-        self.assertIn('class="indicator-next"', html)
+        self.assertRegex(html, r'class="[^"]*\bindicator-next\b')
         link = set(re.findall(r'href="(/provincia/[^"#?]+)"', html))
         with app.app_context():
             chiavi = set(province_profile.chiavi())

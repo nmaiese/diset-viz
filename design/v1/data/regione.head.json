@@ -1,0 +1,185 @@
+{
+ "title": "Puglia: 14ª su 20 regioni, tema per tema",
+ "description": "Profilo di Puglia: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.",
+ "canonical": "https://divarioitalia.it/regione/puglia",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "Puglia",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Profilo territoriale di Puglia",
+   "description": "Punti di forza e di debolezza di Puglia sugli indicatori territoriali Istat, con confronto tra le regioni italiane.",
+   "url": "https://divarioitalia.it/regione/puglia",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Puglia",
+    "containsPlace": [
+     {
+      "@type": "Place",
+      "name": "Bari",
+      "url": "https://divarioitalia.it/provincia/bari"
+     },
+     {
+      "@type": "Place",
+      "name": "Barletta-Andria-Trani",
+      "url": "https://divarioitalia.it/provincia/barletta-andria-trani"
+     },
+     {
+      "@type": "Place",
+      "name": "Brindisi",
+      "url": "https://divarioitalia.it/provincia/brindisi"
+     },
+     {
+      "@type": "Place",
+      "name": "Foggia",
+      "url": "https://divarioitalia.it/provincia/foggia"
+     },
+     {
+      "@type": "Place",
+      "name": "Lecce",
+      "url": "https://divarioitalia.it/provincia/lecce"
+     },
+     {
+      "@type": "Place",
+      "name": "Taranto",
+      "url": "https://divarioitalia.it/provincia/taranto"
+     }
+    ]
+   },
+   "creator": {
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione"
+   },
+   "isBasedOn": {
+    "@type": "Dataset",
+    "name": "Indicatori territoriali",
+    "creator": {
+     "@type": "Organization",
+     "name": "Istat"
+    }
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "keywords": [
+    "Puglia",
+    "indicatori territoriali",
+    "divario regionale",
+    "Istat"
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Regioni",
+     "item": "https://divarioitalia.it/regioni"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Puglia",
+     "item": "https://divarioitalia.it/regione/puglia"
+    }
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "ItemList",
+   "name": "I temi di Puglia, dal migliore al peggiore",
+   "description": "Posizione di Puglia fra le 20 regioni italiane su ciascun tema, per media dei percentili orientati degli indicatori del tema.",
+   "url": "https://divarioitalia.it/regione/puglia",
+   "numberOfItems": 10,
+   "itemListOrder": "https://schema.org/ItemListOrderAscending",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Ambiente ed energia",
+     "url": "https://divarioitalia.it/tema/ambiente-ed-energia"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Mobilità e servizi territoriali",
+     "url": "https://divarioitalia.it/tema/mobilita-e-servizi-territoriali"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Salute, demografia e cura",
+     "url": "https://divarioitalia.it/tema/salute-demografia-e-cura"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "name": "Cultura, patrimonio e turismo",
+     "url": "https://divarioitalia.it/tema/cultura-patrimonio-e-turismo"
+    },
+    {
+     "@type": "ListItem",
+     "position": 5,
+     "name": "Reddito, inclusione e accessibilità",
+     "url": "https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 6,
+     "name": "Sicurezza e legalità",
+     "url": "https://divarioitalia.it/tema/sicurezza-e-legalita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 7,
+     "name": "Imprese e competitività",
+     "url": "https://divarioitalia.it/tema/imprese-e-competitivita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 8,
+     "name": "Ricerca, innovazione e digitale",
+     "url": "https://divarioitalia.it/tema/ricerca-innovazione-e-digitale"
+    },
+    {
+     "@type": "ListItem",
+     "position": 9,
+     "name": "Istruzione e formazione",
+     "url": "https://divarioitalia.it/tema/istruzione-e-formazione"
+    },
+    {
+     "@type": "ListItem",
+     "position": 10,
+     "name": "Lavoro e conciliazione",
+     "url": "https://divarioitalia.it/tema/lavoro-e-conciliazione"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 258509
+}

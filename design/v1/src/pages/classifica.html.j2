@@ -1,0 +1,218 @@
+{% extends "base.html.j2" %}
+{% import "partials/ui.html.j2" as ui %}
+{#- La classifica della qualita' della vita nella 1.0. Stesso contenuto di
+    quality_life_classifica.html, un'altra regia: la risposta, poi la striscia
+    dei punteggi con il titolo sul Mezzogiorno, poi le tessere che la striscia
+    non dice, poi la tabella con la mappa accanto, dove eccelle ogni
+    territorio, e il metodo in fondo. Regge i due livelli: le 20 regioni con la
+    mappa, le 107 province con prime e ultime 10 e le altre in un details. -#}
+{% set s = d.spec %}
+{% set trail = [
+  {"name": "Home", "path": "/"},
+  {"name": "Qualità della vita", "path": "/qualita-della-vita"},
+  {"name": d.crumb, "path": d.path},
+] %}
+{% block main %}
+{%- macro rank_table(rows, caption, ident, visible_caption=false) -%}
+<div class="tablewrap rankwrap" id="{{ aid(ident) }}" tabindex="0" role="region" aria-label="{{ caption }}">
+  <table class="table table--rank">
+    <caption{% if not visible_caption %} class="sr-only"{% endif %}>{{ caption }}</caption>
+    <thead><tr>
+      <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
+      <th scope="col">{{ s.singular | capitalize }}</th>
+      <th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio</span></th>
+      <th class="r" scope="col">Punteggio</th>
+      <th scope="col">Punto forte</th>
+      <th scope="col">Punto debole</th>
+      {%- if not d.is_default %}<th scope="col">Rispetto a {{ d.default_name }}</th>{% endif %}
+    </tr></thead>
+    <tbody>
+      {%- for row in rows %}
+      <tr data-key="{{ row.key }}">
+        <td class="rank">{{ row.rank | rank }}</td>
+        <th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ href(row.href) }}">{{ row.name }}</a>
+          {%- if row.region or row.metro %}<span class="where">
+          {%- if row.region %}{% if row.region.href %}<a href="{{ href(row.region.href) }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}{% endif %}
+          {%- if row.metro %}{{ ', città metropolitana' if row.region else 'Città metropolitana' }}{% endif %}</span>{% endif %}{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}</th>
+        <td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td>
+        <td class="val">{{ row.score | num(None, 'score') }}</td>
+        <td class="note" data-label="Punto forte">{{ row.strong or 'n.d.' }}</td>
+        <td class="note" data-label="Punto debole">{{ row.weak or 'n.d.' }}</td>
+        {%- if not d.is_default %}<td class="note" data-label="Rispetto a {{ d.default_name }}">{% if row.delta.dir %}<span class="status">{{ ui.icon(row.delta.dir) }} {{ row.delta.verb }} da {{ row.delta.before | rank }} a {{ row.delta.after | rank }}</span>{% else %}stessa posizione{% endif %}</td>{% endif %}
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro %}
+<div class="wrap">
+  {{ ui.crumbs(trail) }}
+
+  <header class="pagehead">
+    <p class="eyebrow"><a href="{{ href('/qualita-della-vita') }}">Qualità della vita</a><span class="sep" aria-hidden="true">·</span>{{ d.institutions }}<span class="sep" aria-hidden="true">·</span>{{ d.n }} {{ s.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ d.years_span }}</p>
+    <h1 class="h-title">{{ d.h1 }}</h1>
+    <p class="answer">Il punteggio più alto è {{ d.first.prep }}<a href="{{ href(d.first.href) }}">{{ d.first.name }}</a>, {{ d.first.score | num(None, 'score') }} su 100, il più basso {{ d.last.prep }}<a href="{{ href(d.last.href) }}">{{ d.last.name }}</a>, {{ d.last.score | num(None, 'score') }}: fra prima e ultima corrono {{ d.gap | num('punti', 'score') }}.
+      {%- if d.movers and d.movers.up %} Rispetto al profilo {{ d.default_name }} {{ d.movers.up.text }}{% if d.movers.down %}, e {{ d.movers.down.text }}{% endif %}.{% endif %} I dati degli indicatori vanno {{ d.years_text }}.</p>
+    <p class="meta">
+      <span>Non è la classifica del Sole 24 Ore</span>
+      <a href="#{{ aid('metodo') }}">Come si calcola</a>
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  {% if d.strip.svg %}
+  {{ ui.leadfigure('striscia', d.claim or ('Le ' ~ d.n ~ ' ' ~ s.plural ~ ' sulla scala da 0 a 100'), d.strip,
+     'Ogni punto è una ' ~ s.singular ~ ', nel colore della sua ripartizione, con il punteggio da 0 a 100 del profilo ' ~ d.profile.name ~ '. Tutti i punteggi sono nella classifica qui sotto. Fonte: ' ~ d.institutions ~ ' (' ~ d.years_span ~ '). Elaborazione Divario Italia.') }}
+  {% endif %}
+  {{ ui.tiles(d.tiles) }}
+
+  <section class="section" id="{{ aid('classifica') }}" aria-labelledby="{{ aid('h-classifica') }}">
+    <h2 id="{{ aid('h-classifica') }}">La classifica</h2>
+    <figure class="module">
+      <figcaption class="module__head">
+        {% if d.table_claim %}<h3 class="h-sub">{{ d.table_claim }}</h3>{% endif %}
+        <p class="subline">Punteggio da 0 a 100 con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso, con il punto forte e il punto debole di ognuna.</p>
+      </figcaption>
+      <div class="toolbar cl-toolbar">
+        <div class="field"><span>Livello</span>
+          <div class="seg" role="group" aria-label="Livello territoriale">
+            {%- for item in d.levels %}<a href="{{ href(item.href) }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor -%}
+          </div>
+        </div>
+        <div class="field cl-field"><span>Profilo dei pesi</span>
+          <div class="seg cl-profiles" role="group" aria-label="Profilo dei pesi">
+            {%- for item in d.profiles %}<a href="{{ href(item.href) }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.name }}</a>{% endfor -%}
+          </div>
+        </div>
+      </div>
+      <p class="cl-profile-note"><b>{{ d.profile.name }}.</b> {{ d.profile.description }}{% if d.dims_short %} {{ d.dims_short }}{% endif %} <a href="#{{ aid('metodo') }}">Come pesano le dimensioni</a></p>
+
+      <div class="cl-body">
+        <div class="cl-tables">
+          {% if d.strip.legend %}{{ ui.arealegend(d.strip.legend) }}{% endif %}
+          {% if d.rows.middle %}
+          {{ rank_table(d.rows.head, 'Le prime ' ~ d.rows.head | length ~ ' ' ~ s.plural, 'classifica-prime', true) }}
+          <details class="more">
+            <summary>{{ d.rows.middle_label }}</summary>
+            {{ rank_table(d.rows.middle, d.rows.middle_label, 'classifica-centro') }}
+          </details>
+          {{ rank_table(d.rows.tail, 'Le ultime ' ~ d.rows.tail | length ~ ' ' ~ s.plural, 'classifica-ultime', true) }}
+          {% else %}
+          {{ rank_table(d.rows.head, 'Classifica della qualità della vita per ' ~ s.singular ~ ', profilo ' ~ d.profile.name ~ ', punteggio da 0 a 100', 'classifica-dati') }}
+          {% endif %}
+        </div>
+        <div class="cl-side">
+          {% if d.map %}
+          {{ ui.map(d.map.classes, 'punteggio', d.map.names, d.map.tips, overlay=d.map.callouts) }}
+          {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto. Sei gradini uguali fra il più basso e il più alto.') }}
+          {% else %}
+          <div class="cl-find">
+            <p class="cl-find__title">Trova la tua {{ s.singular }}</p>
+            <p>Le {{ d.n }} {{ s.plural }} sono in ordine di punteggio. Per cercarne una parti dalla sua regione.</p>
+            <p><a class="linkarrow" href="{{ href(s.index) }}">Le {{ s.plural }} regione per regione</a></p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <p class="source">Fonte: {{ d.institutions }} ({{ d.years_span }}). Elaborazione Divario Italia. <a href="{{ href(d.downloads.csv) }}">Dati in CSV</a></p>
+    </figure>
+  </section>
+
+  {{ ui.ad() }}
+
+  <section class="section" id="{{ aid('dove-eccelle') }}" aria-labelledby="{{ aid('h-eccelle') }}">
+    <h2 id="{{ aid('h-eccelle') }}">Dove eccelle ogni {{ s.singular }}</h2>
+    <figure class="module">
+      <figcaption class="module__head">
+        {% if d.champions_claim %}<h3 class="h-sub">{{ d.champions_claim }}</h3>{% endif %}
+        <p class="subline">Per ognuna delle {{ d.dims_total }} dimensioni le tre {{ s.plural }} con il punteggio più alto e l'ultima. Il punteggio di una dimensione va da 0 a 100 e non cambia con il profilo.</p>
+      </figcaption>
+      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="Le prime {{ s.plural }} per dimensione">
+        <table class="table table--compact table--stack cl-cats">
+          <caption class="sr-only">Le tre {{ s.plural }} con il punteggio più alto e l'ultima, per dimensione, punteggio da 0 a 100</caption>
+          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima</th><th scope="col">Seconda</th><th scope="col">Terza</th><th scope="col">Ultima</th></tr></thead>
+          <tbody>
+            {%- for c in d.categories %}
+            <tr>
+              <th scope="row"><a href="{{ href(c.href) }}">{{ c.name }}</a></th>
+              {%- for t in c.top %}
+              <td data-label="{{ ['Prima', 'Seconda', 'Terza'][loop.index0] }}"><span class="cl-pair"><a href="{{ href(t.href) }}">{{ t.name }}</a>{{ t.score | num(None, 'score') }}</span></td>
+              {%- endfor %}
+              <td data-label="Ultima">{% if c.last %}<span class="cl-pair"><a href="{{ href(c.last.href) }}">{{ c.last.name }}</a>{{ c.last.score | num(None, 'score') }}</span>{% else %}n.d.{% endif %}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="source">Fonte: {{ d.institutions }} ({{ d.years_span }}). Elaborazione Divario Italia.</p>
+    </figure>
+  </section>
+
+  <section class="section" id="{{ aid('metodo') }}" aria-labelledby="{{ aid('h-metodo') }}">
+    <h2 id="{{ aid('h-metodo') }}">Come si calcola il punteggio</h2>
+    <div class="method">
+      <div>
+        <h3>In parole semplici</h3>
+        <p>Per ogni indicatore si guarda quanto una {{ s.singular }} si allontana dalla media delle {{ d.n }}, nel verso giusto: dove è meglio un valore alto, un valore alto alza il punteggio, dove è meglio basso lo abbassa.</p>
+        <p>Gli indicatori si raggruppano in {{ d.dims_total }} dimensioni, dal reddito alla salute alla sicurezza, e le dimensioni si combinano con i pesi del profilo scelto. Il risultato va da 0 a 100{% if d.fifty %}: 50 è la media semplice delle {{ d.n }} {{ s.plural }}, e sopra 50 una {{ s.singular }} fa meglio della media{% endif %}.</p>
+      </div>
+      <div>
+        <h3>Il calcolo</h3>
+        <dl>
+          <div><dt>Metodo</dt><dd>Per ogni indicatore uno z-score orientato, che conserva le distanze fra i territori. Poi la media per dimensione e la media pesata delle dimensioni, riportata su una scala da 0 a 100 dove 50 è la media e una deviazione standard vale {{ d.spread }} punti.</dd></div>
+          <div><dt>Pesi del profilo {{ d.profile.name }}</dt><dd>{{ d.weights }}</dd></div>
+          {% if d.dims_note %}<div><dt>Dimensioni senza dati</dt><dd>{{ d.dims_note }}</dd></div>{% endif %}
+          <div><dt>Che cosa non è</dt><dd>Una sintesi di Divario Italia, con dimensioni e versi scelti dalla redazione e rivedibili. Non è la classifica del Sole 24 Ore.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="{{ aid('fonti-dati') }}" aria-labelledby="{{ aid('h-fonti') }}">
+    <h2 id="{{ aid('h-fonti') }}">Fonti, dati e citazione</h2>
+    <dl class="specs">
+      <div><dt>Da dove vengono i dati</dt><dd><ul class="reflist">{% for b in d.breakdown %}<li>{{ b.label }}: {{ b.count | num(None, 'count') }} indicatori</li>{% endfor %}</ul></dd></div>
+      <div><dt>Anni dei dati</dt><dd>{% if d.year_counts %}{% for y in d.year_counts %}{% if loop.first %}{{ y.n | num(None, 'count') }} {{ 'indicatore ha' if y.n == 1 else 'indicatori hanno' }} il dato più recente del {{ y.year }}{% else %}, {{ y.n | num(None, 'count') }} del {{ y.year }}{% endif %}{% endfor %}.{% else %}{{ d.years_span }}{% endif %}</dd></div>
+      {% if d.coverage %}<div><dt>Copertura</dt><dd>{{ d.coverage }}</dd></div>{% endif %}
+      {% if d.unrated %}<div><dt>Non valutate</dt><dd>Mancano dati recenti per {{ d.unrated | join(', ') }}.</dd></div>{% endif %}
+      <div><dt>Metodologia</dt><dd><a href="{{ href('/metodologia#qualita-della-vita') }}">Come si calcola la qualità della vita</a> e <a href="{{ href('/metodologia#indicatori-usati') }}">quali indicatori entrano nel punteggio</a></dd></div>
+      <div><dt>Licenza</dt><dd><a href="{{ data_license_url }}">{{ data_license_label }}</a></dd></div>
+    </dl>
+    <div class="actions" id="{{ aid('scarica') }}">
+      <a class="btn btn--primary" href="{{ href(d.downloads.csv) }}">{{ ui.icon('download') }} Scarica la classifica in CSV</a>
+      <a class="btn" href="{{ href(d.downloads.json) }}">{{ ui.icon('download') }} JSON</a>
+    </div>
+    {{ ui.cite(d.citation) }}
+  </section>
+</div>
+<section class="band" aria-labelledby="{{ aid('continua-da-qui') }}">
+  <div class="wrap">
+    <h2 class="h-section" id="{{ aid('continua-da-qui') }}">Continua da qui</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>Qualità della vita</h3>
+        <ul>
+          <li><a href="{{ href('/qualita-della-vita') }}">Dove si vive meglio, regioni e province insieme</a></li>
+          <li><a href="{{ href(d.other_level_href) }}">La classifica delle {{ d.other_level.plural }}</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>I territori</h3>
+        <ul>
+          <li><a href="{{ href(d.first.href) }}">Il profilo {{ d.first.prep }}{{ d.first.name }}, in testa</a></li>
+          <li><a href="{{ href(d.last.href) }}">Il profilo {{ d.last.prep }}{{ d.last.name }}, in coda</a></li>
+          <li><a href="{{ href(s.index) }}">Tutte le {{ d.n }} {{ s.plural }}</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Gli indicatori</h3>
+        <ul>
+          <li><a href="{{ href('/temi') }}">Tutti gli indicatori per tema</a></li>
+          <li><a href="{{ href('/atlante') }}">L'atlante degli indicatori</a></li>
+          <li><a href="{{ href('/divari-regionali') }}">I divari fra Nord, Centro e Mezzogiorno</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

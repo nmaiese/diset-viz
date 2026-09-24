@@ -50,6 +50,9 @@ def disable_simple_cache():
     which is safe for testing and prevents race conditions.
     """
     os.environ.setdefault('CACHE_TYPE', 'null')
+    # Una pagina della 1.0 che cede torna al template di prima in produzione;
+    # nei test deve fallire, o il ripiego nasconde il guasto (app/design).
+    os.environ.setdefault('DIVARIO_V1_STRICT', '1')
 
 
 # Module-level setup: runs once, when this module is first imported.

@@ -1,0 +1,37 @@
+/* ==========================================================================
+   qv: l'indice della qualita' della vita. Le strisce (.lead-figure), il
+   doppio podio (.podiums + .table--rank) e "dove eccelle" (.stackwrap +
+   .table--stack) sono componenti comuni: qui resta l'impaginazione.
+   ========================================================================== */
+
+.qv-lead { max-width: var(--measure); margin-top: calc(-1 * var(--space-3)); margin-bottom: var(--space-6); }
+.qv-strip > details.more { margin-top: 0; }
+
+/* Una colonna del doppio podio: titolo con filetto, tabella, i due link. */
+.qv-podium { display: grid; gap: var(--space-3); align-content: start; min-width: 0; margin: 0; }
+.qv-podium .h-sub { padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
+.qv-podium__more { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
+
+/* I profili: una griglia di voci con filetto, niente scatole. */
+.qv-profiles { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
+@media (min-width: 600px) { .qv-profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 960px) { .qv-profiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.qv-profiles > li { display: grid; align-content: start; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
+.qv-profiles__name { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.qv-profiles__name a { text-decoration: none; }
+.qv-profiles__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.qv-profiles__desc { color: var(--text-2); }
+.qv-profiles__why { font-size: var(--fs-small); line-height: var(--lh-small); }
+.qv-profiles__links { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: var(--fs-small); line-height: var(--lh-small); }
+.qv-profiles__links a { display: inline-flex; align-items: center; min-height: var(--target, 44px); }
+
+/* Dove eccelle: nomi e punteggio nella stessa cella, il punteggio in colonna.
+   Sul telefono regione e provincia stanno affiancate. */
+.qv-pair { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.qv-pair .n { flex: none; color: var(--text-2); }
+.qv-where { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.qv-cats tbody th { font-weight: 600; }
+@container (max-width: 560px) { .table--stack.qv-cats tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.qv-method-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-6); font-size: var(--fs-ui); }
+.qv-download-note { max-width: var(--measure); color: var(--text-2); }

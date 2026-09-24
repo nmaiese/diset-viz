@@ -37,16 +37,15 @@
        seconda della URL da cui la si apre. #}
     {# I font arrivano da qui, non da fonts.googleapis.com: un foglio
        cross-origin bloccante costava tre round trip prima del primo
-       carattere, e Newsreader e' il serif dei titoli, cioe' quasi sempre
-       l'LCP. I due `preload` sono i soli file che una pagina in italiano
-       scarica sempre: latin-ext lo prende solo chi incontra un carattere
-       che lo richiede, e il monospazio non e' nel primo paint.
+       carattere. I due `preload` sono i soli file che una pagina in
+       italiano scarica sempre, il tondo del testo e lo stretto delle cifre
+       e dei titoli: latin-ext e il corsivo li prende solo chi li incontra.
    Senza `?v=`, di proposito: `fonts.css` richiama il file per percorso
    nudo, e un precarico con la marca di versione sarebbe una URL diversa,
    cioe' lo stesso font scaricato due volte. I file sono immutabili, il
    nome dice famiglia e sottoinsieme: si sostituiscono rinominandoli. #}
-    <link rel="preload" href="{{ url_for('static', filename='fonts/newsreader-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/sofia-sans-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/sofia-sans-semi-condensed-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset_url('css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">

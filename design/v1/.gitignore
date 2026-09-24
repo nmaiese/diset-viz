@@ -1,0 +1,8 @@
+# Si committano i primi schermi e le pagine intere "prima" in chiaro, che non si
+# potranno piu' rifare. Il resto si rigenera.
+screens/prima/**/*-scuro-full.jpg
+screens/dopo/**/*-full.jpg
+dist/artifact/
+dist/artifact-single/
+tools/node_modules/
+screens/artifact/

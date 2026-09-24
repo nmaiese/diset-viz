@@ -1,0 +1,53 @@
+{
+ "title": "Qualità della vita: 20 regioni e 107 province a confronto",
+ "description": "Classifica della qualità della vita nelle regioni e nelle province italiane su indicatori Istat: reddito, lavoro, salute, ambiente, istruzione e servizi.",
+ "canonical": "https://divarioitalia.it/qualita-della-vita",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "Qualità della vita nelle regioni e nelle province italiane",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "WebPage",
+   "name": "Qualità della vita nelle regioni e nelle province italiane",
+   "description": "Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori Istat selezionati.",
+   "url": "https://divarioitalia.it/qualita-della-vita",
+   "isPartOf": {
+    "@type": "WebSite",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/"
+   },
+   "creator": {
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione"
+   },
+   "isBasedOn": {
+    "@type": "Dataset",
+    "name": "BES dei Territori",
+    "creator": {
+     "@type": "Organization",
+     "name": "Istat"
+    }
+   },
+   "isAccessibleForFree": true
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Qualità della vita",
+     "item": "https://divarioitalia.it/qualita-della-vita"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 25204
+}

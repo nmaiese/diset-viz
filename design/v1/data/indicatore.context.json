@@ -1,0 +1,3957 @@
+{
+ "template": "indicator_page.html",
+ "route": "/indicatore/pil-pro-capite/ter-901",
+ "context": {
+  "meta": {
+   "id": "901",
+   "raw_id": "901",
+   "family": "territorial",
+   "family_label": "Istat, indicatori territoriali",
+   "name": "PIL pro capite",
+   "unit": "euro",
+   "value_unit": "euro",
+   "change_unit": "euro",
+   "percentage_like": false,
+   "direction": "higher_better",
+   "scoreable": true,
+   "explain": {
+    "plain": "Misura il prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025.",
+    "example": "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.",
+    "scope": "Il confronto applica la stessa definizione in tutti i territori regionali e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+    "caveat": "Il valore pro capite va letto insieme al costo della vita, alle disuguaglianze interne e alla redistribuzione, perché la media regionale nasconde differenze tra persone e tra aree.",
+    "direction": "higher_better"
+   },
+   "theme": "Reddito, inclusione e accessibilità",
+   "theme_path": "/tema/reddito-inclusione-e-accessibilita",
+   "source_theme": "Reddito e ricchezza",
+   "macro_area": "Economia e opportunità",
+   "source": "Istat",
+   "source_label": "Istat, Conti economici territoriali",
+   "source_url": "https://www.istat.it/it/archivio/conti+territoriali",
+   "source_data_url": null,
+   "source_dataflow": null,
+   "institution": "Istat",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "archive": "Prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025",
+   "quality_life_scored": true,
+   "quality_life_category_label": "Reddito, inclusione e accessibilità",
+   "indexable": true,
+   "indexable_reason": null,
+   "canonical_path": "/indicatore/pil-pro-capite/ter-901",
+   "downloads": {
+    "csv": "/download/indicator/901.csv",
+    "json": "/download/indicator/901.json"
+   },
+   "year_min": 1995,
+   "year_max": 2024,
+   "freshness_status": "recent",
+   "freshness_label": "Recente"
+  },
+  "levels": [
+   {
+    "key": "regione",
+    "label": "Regioni",
+    "singular": "regione",
+    "plural": "regioni",
+    "profile_path": "/regione/",
+    "has_map": true,
+    "explain": {
+     "plain": "Misura il prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025.",
+     "example": "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.",
+     "scope": "Il confronto applica la stessa definizione in tutti i territori regionali e per ciascun anno.",
+     "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+     "caveat": "Il valore pro capite va letto insieme al costo della vita, alle disuguaglianze interne e alla redistribuzione, perché la media regionale nasconde differenze tra persone e tra aree.",
+     "direction": "higher_better"
+    },
+    "years": [
+     1995,
+     1996,
+     1997,
+     1998,
+     1999,
+     2000,
+     2001,
+     2002,
+     2003,
+     2004,
+     2005,
+     2006,
+     2007,
+     2008,
+     2009,
+     2010,
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024
+    ],
+    "year_min": 1995,
+    "year_max": 2024,
+    "observations": [
+     {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige",
+      "value": 54636.7
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia",
+      "value": 50398.9
+     },
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta",
+      "value": 47742.8
+     },
+     {
+      "key": "emilia-romagna",
+      "name": "Emilia-Romagna",
+      "value": 44557.0
+     },
+     {
+      "key": "lazio",
+      "name": "Lazio",
+      "value": 43166.9
+     },
+     {
+      "key": "veneto",
+      "name": "Veneto",
+      "value": 41496.3
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana",
+      "value": 39262.0
+     },
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia",
+      "value": 39005.1
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria",
+      "value": 38841.8
+     },
+     {
+      "key": "piemonte",
+      "name": "Piemonte",
+      "value": 38625.5
+     },
+     {
+      "key": "marche",
+      "name": "Marche",
+      "value": 34149.1
+     },
+     {
+      "key": "umbria",
+      "name": "Umbria",
+      "value": 32466.9
+     },
+     {
+      "key": "abruzzo",
+      "name": "Abruzzo",
+      "value": 32108.7
+     },
+     {
+      "key": "basilicata",
+      "name": "Basilicata",
+      "value": 28416.3
+     },
+     {
+      "key": "sardegna",
+      "name": "Sardegna",
+      "value": 27730.8
+     },
+     {
+      "key": "molise",
+      "name": "Molise",
+      "value": 27697.8
+     },
+     {
+      "key": "campania",
+      "name": "Campania",
+      "value": 24564.2
+     },
+     {
+      "key": "puglia",
+      "name": "Puglia",
+      "value": 24327.7
+     },
+     {
+      "key": "sicilia",
+      "name": "Sicilia",
+      "value": 23308.7
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria",
+      "value": 21702.2
+     }
+    ],
+    "best": {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 54636.7
+    },
+    "worst": {
+     "key": "calabria",
+     "name": "Calabria",
+     "value": 21702.2
+    },
+    "stats": {
+     "year": 2024,
+     "year_avg": 35710.270000000004,
+     "year_count": 20,
+     "median": 36387.3,
+     "above_avg_count": 10,
+     "below_avg_count": 10,
+     "year_min": 1995,
+     "year_min_avg": 17035.245000000003,
+     "year_max": 2024,
+     "has_multi_year": true,
+     "avg_change_abs": 18675.025,
+     "avg_change_pct": 109.62580814071062,
+     "gap_abs": 32934.5,
+     "gap_ratio": 2.517565039489084,
+     "year_min_gap_abs": 16603.6,
+     "gap_trend": 16330.900000000001,
+     "highest_delta": {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige",
+      "value": null,
+      "delta": 29901.299999999996,
+      "kind": "aumento"
+     },
+     "lowest_delta": {
+      "key": "calabria",
+      "name": "Calabria",
+      "value": null,
+      "delta": 11706.7,
+      "kind": "aumento"
+     }
+    },
+    "annual_change": {
+     "year": 2024,
+     "previous_year": 2023,
+     "year_gap": 1,
+     "common_count": 20,
+     "current_count": 20,
+     "previous_count": 20,
+     "same_coverage": true,
+     "previous_avg": 34844.87,
+     "current_avg": 35710.270000000004,
+     "average_delta": 865.4000000000015,
+     "average_delta_pct": 2.4835793618974655,
+     "increase_count": 20,
+     "decrease_count": 0,
+     "stable_count": 0,
+     "largest_increases": [
+      {
+       "key": "friuli-venezia-giulia",
+       "name": "Friuli-Venezia Giulia",
+       "value": null,
+       "delta": 1275.699999999997,
+       "kind": "aumento",
+       "previous_value": 37729.4,
+       "current_value": 39005.1
+      },
+      {
+       "key": "lombardia",
+       "name": "Lombardia",
+       "value": null,
+       "delta": 1254.7000000000044,
+       "kind": "aumento",
+       "previous_value": 49144.2,
+       "current_value": 50398.9
+      },
+      {
+       "key": "piemonte",
+       "name": "Piemonte",
+       "value": null,
+       "delta": 1186.199999999997,
+       "kind": "aumento",
+       "previous_value": 37439.3,
+       "current_value": 38625.5
+      }
+     ],
+     "largest_decreases": []
+    },
+    "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+    "trend_note": "una variazione media favorevole",
+    "coverage": null,
+    "territory_total": 20,
+    "territories": [
+     {
+      "key": "abruzzo",
+      "name": "Abruzzo"
+     },
+     {
+      "key": "basilicata",
+      "name": "Basilicata"
+     },
+     {
+      "key": "calabria",
+      "name": "Calabria"
+     },
+     {
+      "key": "campania",
+      "name": "Campania"
+     },
+     {
+      "key": "emilia-romagna",
+      "name": "Emilia-Romagna"
+     },
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia"
+     },
+     {
+      "key": "lazio",
+      "name": "Lazio"
+     },
+     {
+      "key": "liguria",
+      "name": "Liguria"
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia"
+     },
+     {
+      "key": "marche",
+      "name": "Marche"
+     },
+     {
+      "key": "molise",
+      "name": "Molise"
+     },
+     {
+      "key": "piemonte",
+      "name": "Piemonte"
+     },
+     {
+      "key": "puglia",
+      "name": "Puglia"
+     },
+     {
+      "key": "sardegna",
+      "name": "Sardegna"
+     },
+     {
+      "key": "sicilia",
+      "name": "Sicilia"
+     },
+     {
+      "key": "toscana",
+      "name": "Toscana"
+     },
+     {
+      "key": "trentino-alto-adige",
+      "name": "Trentino Alto Adige"
+     },
+     {
+      "key": "umbria",
+      "name": "Umbria"
+     },
+     {
+      "key": "valle-d-aosta",
+      "name": "Valle d'Aosta"
+     },
+     {
+      "key": "veneto",
+      "name": "Veneto"
+     }
+    ],
+    "default_territory": {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 54636.7
+    },
+    "matrix": {
+     "1995": {
+      "piemonte": 18809.9,
+      "valle-d-aosta": 26599.1,
+      "lombardia": 23993.3,
+      "trentino-alto-adige": 24735.4,
+      "veneto": 19966.8,
+      "friuli-venezia-giulia": 18537.3,
+      "liguria": 17812.3,
+      "emilia-romagna": 21133.7,
+      "toscana": 18253.4,
+      "umbria": 16992.6,
+      "marche": 16294.8,
+      "lazio": 21900.4,
+      "abruzzo": 15377.5,
+      "molise": 13342.7,
+      "campania": 11409.1,
+      "puglia": 11027.9,
+      "basilicata": 11629.5,
+      "calabria": 9995.5,
+      "sicilia": 11102.5,
+      "sardegna": 11791.2
+     },
+     "1996": {
+      "piemonte": 19752.2,
+      "valle-d-aosta": 27502.4,
+      "lombardia": 25404.9,
+      "trentino-alto-adige": 26518.7,
+      "veneto": 21223.2,
+      "friuli-venezia-giulia": 19427.5,
+      "liguria": 18915.7,
+      "emilia-romagna": 22605.1,
+      "toscana": 19321.5,
+      "umbria": 17723.7,
+      "marche": 17444.0,
+      "lazio": 22939.3,
+      "abruzzo": 16347.6,
+      "molise": 14186.3,
+      "campania": 11927.0,
+      "puglia": 11699.6,
+      "basilicata": 12646.3,
+      "calabria": 10546.6,
+      "sicilia": 11720.5,
+      "sardegna": 12308.4
+     },
+     "1997": {
+      "piemonte": 20731.5,
+      "valle-d-aosta": 27552.2,
+      "lombardia": 26376.7,
+      "trentino-alto-adige": 27034.5,
+      "veneto": 22175.0,
+      "friuli-venezia-giulia": 20219.7,
+      "liguria": 19854.6,
+      "emilia-romagna": 23458.1,
+      "toscana": 20121.2,
+      "umbria": 18639.2,
+      "marche": 18123.0,
+      "lazio": 24125.9,
+      "abruzzo": 16881.9,
+      "molise": 15325.1,
+      "campania": 12657.5,
+      "puglia": 12117.0,
+      "basilicata": 13416.1,
+      "calabria": 11175.9,
+      "sicilia": 12228.7,
+      "sardegna": 13109.6
+     },
+     "1998": {
+      "piemonte": 21479.2,
+      "valle-d-aosta": 28561.8,
+      "lombardia": 27484.6,
+      "trentino-alto-adige": 28187.3,
+      "veneto": 22894.0,
+      "friuli-venezia-giulia": 20758.8,
+      "liguria": 20785.1,
+      "emilia-romagna": 24430.3,
+      "toscana": 21074.7,
+      "umbria": 19119.9,
+      "marche": 18635.9,
+      "lazio": 25410.4,
+      "abruzzo": 17274.2,
+      "molise": 15891.6,
+      "campania": 13243.0,
+      "puglia": 12748.6,
+      "basilicata": 14147.1,
+      "calabria": 11693.6,
+      "sicilia": 12686.8,
+      "sardegna": 13575.9
+     },
+     "1999": {
+      "piemonte": 22291.1,
+      "valle-d-aosta": 28725.9,
+      "lombardia": 28028.3,
+      "trentino-alto-adige": 28727.6,
+      "veneto": 23512.7,
+      "friuli-venezia-giulia": 21688.3,
+      "liguria": 21462.9,
+      "emilia-romagna": 25295.2,
+      "toscana": 21936.0,
+      "umbria": 19983.2,
+      "marche": 19505.8,
+      "lazio": 26075.6,
+      "abruzzo": 17880.1,
+      "molise": 16183.7,
+      "campania": 13688.0,
+      "puglia": 13363.7,
+      "basilicata": 15174.3,
+      "calabria": 12409.1,
+      "sicilia": 12909.7,
+      "sardegna": 14126.0
+     },
+     "2000": {
+      "piemonte": 23346.2,
+      "valle-d-aosta": 29291.9,
+      "lombardia": 29458.7,
+      "trentino-alto-adige": 30156.4,
+      "veneto": 25034.6,
+      "friuli-venezia-giulia": 23265.1,
+      "liguria": 23015.5,
+      "emilia-romagna": 27048.5,
+      "toscana": 23208.5,
+      "umbria": 21077.5,
+      "marche": 20532.8,
+      "lazio": 27408.0,
+      "abruzzo": 19057.7,
+      "molise": 16962.9,
+      "campania": 14452.9,
+      "puglia": 14118.8,
+      "basilicata": 15615.3,
+      "calabria": 12911.9,
+      "sicilia": 13659.1,
+      "sardegna": 14877.7
+     },
+     "2001": {
+      "piemonte": 24395.9,
+      "valle-d-aosta": 30831.0,
+      "lombardia": 30884.4,
+      "trentino-alto-adige": 31222.7,
+      "veneto": 25934.9,
+      "friuli-venezia-giulia": 24535.1,
+      "liguria": 24600.2,
+      "emilia-romagna": 28015.6,
+      "toscana": 24356.7,
+      "umbria": 22143.7,
+      "marche": 21728.3,
+      "lazio": 29074.6,
+      "abruzzo": 19967.7,
+      "molise": 17889.8,
+      "campania": 15312.3,
+      "puglia": 14812.0,
+      "basilicata": 16209.1,
+      "calabria": 13677.6,
+      "sicilia": 14499.3,
+      "sardegna": 15848.1
+     },
+     "2002": {
+      "piemonte": 25255.7,
+      "valle-d-aosta": 31833.1,
+      "lombardia": 32080.9,
+      "trentino-alto-adige": 31701.6,
+      "veneto": 26343.6,
+      "friuli-venezia-giulia": 25192.7,
+      "liguria": 24965.0,
+      "emilia-romagna": 28690.1,
+      "toscana": 25180.0,
+      "umbria": 22537.3,
+      "marche": 22876.0,
+      "lazio": 30592.0,
+      "abruzzo": 20365.6,
+      "molise": 18397.8,
+      "campania": 15969.8,
+      "puglia": 15155.9,
+      "basilicata": 16735.7,
+      "calabria": 14097.9,
+      "sicilia": 14984.8,
+      "sardegna": 16171.1
+     },
+     "2003": {
+      "piemonte": 25999.9,
+      "valle-d-aosta": 33848.9,
+      "lombardia": 32875.5,
+      "trentino-alto-adige": 32521.1,
+      "veneto": 27310.5,
+      "friuli-venezia-giulia": 25276.8,
+      "liguria": 25892.4,
+      "emilia-romagna": 29225.6,
+      "toscana": 25858.0,
+      "umbria": 23075.6,
+      "marche": 23214.5,
+      "lazio": 31310.3,
+      "abruzzo": 20564.3,
+      "molise": 18693.6,
+      "campania": 16272.1,
+      "puglia": 15555.7,
+      "basilicata": 16817.8,
+      "calabria": 14609.6,
+      "sicilia": 15525.4,
+      "sardegna": 16991.7
+     },
+     "2004": {
+      "piemonte": 26819.2,
+      "valle-d-aosta": 34541.4,
+      "lombardia": 33607.9,
+      "trentino-alto-adige": 33684.0,
+      "veneto": 28365.0,
+      "friuli-venezia-giulia": 26047.8,
+      "liguria": 26777.6,
+      "emilia-romagna": 30111.6,
+      "toscana": 26646.1,
+      "umbria": 23817.0,
+      "marche": 23977.7,
+      "lazio": 32958.6,
+      "abruzzo": 20541.4,
+      "molise": 19538.2,
+      "campania": 16728.5,
+      "puglia": 16077.0,
+      "basilicata": 17458.3,
+      "calabria": 15328.2,
+      "sicilia": 15988.3,
+      "sardegna": 17765.6
+     },
+     "2005": {
+      "piemonte": 27449.1,
+      "valle-d-aosta": 35211.6,
+      "lombardia": 34178.0,
+      "trentino-alto-adige": 33995.1,
+      "veneto": 28895.5,
+      "friuli-venezia-giulia": 27087.9,
+      "liguria": 27499.2,
+      "emilia-romagna": 30686.4,
+      "toscana": 27007.4,
+      "umbria": 24106.2,
+      "marche": 24528.9,
+      "lazio": 33639.9,
+      "abruzzo": 21421.9,
+      "molise": 20107.8,
+      "campania": 17132.0,
+      "puglia": 16373.8,
+      "basilicata": 17771.7,
+      "calabria": 15807.8,
+      "sicilia": 16703.5,
+      "sardegna": 18122.3
+     },
+     "2006": {
+      "piemonte": 28519.3,
+      "valle-d-aosta": 36271.3,
+      "lombardia": 35024.2,
+      "trentino-alto-adige": 35278.2,
+      "veneto": 29760.2,
+      "friuli-venezia-giulia": 28308.3,
+      "liguria": 28388.1,
+      "emilia-romagna": 32141.7,
+      "toscana": 28091.9,
+      "umbria": 25190.3,
+      "marche": 25740.2,
+      "lazio": 34537.3,
+      "abruzzo": 22325.2,
+      "molise": 21525.6,
+      "campania": 17778.2,
+      "puglia": 17088.0,
+      "basilicata": 18936.9,
+      "calabria": 16520.6,
+      "sicilia": 17364.1,
+      "sardegna": 19008.0
+     },
+     "2007": {
+      "piemonte": 29224.4,
+      "valle-d-aosta": 37001.6,
+      "lombardia": 36209.3,
+      "trentino-alto-adige": 36620.4,
+      "veneto": 30768.4,
+      "friuli-venezia-giulia": 29397.9,
+      "liguria": 29958.4,
+      "emilia-romagna": 33411.3,
+      "toscana": 29058.4,
+      "umbria": 25962.3,
+      "marche": 26657.1,
+      "lazio": 35586.0,
+      "abruzzo": 23074.9,
+      "molise": 22389.2,
+      "campania": 18358.7,
+      "puglia": 17506.9,
+      "basilicata": 19778.9,
+      "calabria": 16980.1,
+      "sicilia": 17685.2,
+      "sardegna": 19505.8
+     },
+     "2008": {
+      "piemonte": 28999.5,
+      "valle-d-aosta": 37859.9,
+      "lombardia": 37307.4,
+      "trentino-alto-adige": 37051.8,
+      "veneto": 30394.3,
+      "friuli-venezia-giulia": 28966.4,
+      "liguria": 30562.2,
+      "emilia-romagna": 33352.9,
+      "toscana": 29047.9,
+      "umbria": 25948.9,
+      "marche": 26268.9,
+      "lazio": 35234.9,
+      "abruzzo": 23452.2,
+      "molise": 21913.4,
+      "campania": 18411.5,
+      "puglia": 17257.3,
+      "basilicata": 19856.0,
+      "calabria": 17262.0,
+      "sicilia": 17835.0,
+      "sardegna": 19924.4
+     },
+     "2009": {
+      "piemonte": 26950.8,
+      "valle-d-aosta": 35694.0,
+      "lombardia": 35275.6,
+      "trentino-alto-adige": 36291.0,
+      "veneto": 29128.3,
+      "friuli-venezia-giulia": 27278.2,
+      "liguria": 29033.1,
+      "emilia-romagna": 31381.5,
+      "toscana": 28289.9,
+      "umbria": 24198.0,
+      "marche": 25300.5,
+      "lazio": 34448.5,
+      "abruzzo": 22507.9,
+      "molise": 21398.4,
+      "campania": 17884.7,
+      "puglia": 16747.2,
+      "basilicata": 18805.6,
+      "calabria": 16861.2,
+      "sicilia": 17317.6,
+      "sardegna": 19472.0
+     },
+     "2010": {
+      "piemonte": 27832.6,
+      "valle-d-aosta": 37335.2,
+      "lombardia": 36651.4,
+      "trentino-alto-adige": 37272.6,
+      "veneto": 29545.2,
+      "friuli-venezia-giulia": 28210.0,
+      "liguria": 28601.2,
+      "emilia-romagna": 31768.6,
+      "toscana": 28481.4,
+      "umbria": 24622.5,
+      "marche": 25307.7,
+      "lazio": 34600.0,
+      "abruzzo": 23129.3,
+      "molise": 21499.0,
+      "campania": 17682.6,
+      "puglia": 17085.9,
+      "basilicata": 18760.6,
+      "calabria": 16855.1,
+      "sicilia": 17289.5,
+      "sardegna": 19650.1
+     },
+     "2011": {
+      "piemonte": 28514.0,
+      "valle-d-aosta": 38039.3,
+      "lombardia": 37290.7,
+      "trentino-alto-adige": 38173.4,
+      "veneto": 30543.2,
+      "friuli-venezia-giulia": 28903.5,
+      "liguria": 29415.5,
+      "emilia-romagna": 32950.6,
+      "toscana": 29111.8,
+      "umbria": 24876.8,
+      "marche": 25702.9,
+      "lazio": 35054.9,
+      "abruzzo": 24197.8,
+      "molise": 21623.1,
+      "campania": 17735.1,
+      "puglia": 17445.7,
+      "basilicata": 19494.6,
+      "calabria": 17026.2,
+      "sicilia": 17275.0,
+      "sardegna": 19961.2
+     },
+     "2012": {
+      "piemonte": 27552.5,
+      "valle-d-aosta": 38248.0,
+      "lombardia": 36407.8,
+      "trentino-alto-adige": 38902.3,
+      "veneto": 29944.0,
+      "friuli-venezia-giulia": 28181.7,
+      "liguria": 28907.5,
+      "emilia-romagna": 32350.8,
+      "toscana": 28865.4,
+      "umbria": 24158.0,
+      "marche": 25129.7,
+      "lazio": 33801.5,
+      "abruzzo": 24093.8,
+      "molise": 20993.7,
+      "campania": 17608.5,
+      "puglia": 17527.2,
+      "basilicata": 19401.5,
+      "calabria": 16734.8,
+      "sicilia": 17210.4,
+      "sardegna": 20026.8
+     },
+     "2013": {
+      "piemonte": 27779.6,
+      "valle-d-aosta": 36633.1,
+      "lombardia": 35837.0,
+      "trentino-alto-adige": 39352.1,
+      "veneto": 29897.0,
+      "friuli-venezia-giulia": 28371.2,
+      "liguria": 28677.2,
+      "emilia-romagna": 32454.8,
+      "toscana": 28593.5,
+      "umbria": 23756.4,
+      "marche": 24754.7,
+      "lazio": 33081.3,
+      "abruzzo": 23736.0,
+      "molise": 19746.5,
+      "campania": 17335.2,
+      "puglia": 17109.5,
+      "basilicata": 19947.0,
+      "calabria": 16455.2,
+      "sicilia": 17003.0,
+      "sardegna": 19529.1
+     },
+     "2014": {
+      "piemonte": 27801.7,
+      "valle-d-aosta": 36239.0,
+      "lombardia": 36435.2,
+      "trentino-alto-adige": 39325.4,
+      "veneto": 30382.7,
+      "friuli-venezia-giulia": 28528.1,
+      "liguria": 29338.9,
+      "emilia-romagna": 33020.3,
+      "toscana": 29145.1,
+      "umbria": 23383.0,
+      "marche": 25463.0,
+      "lazio": 32959.4,
+      "abruzzo": 23760.4,
+      "molise": 19625.5,
+      "campania": 17418.8,
+      "puglia": 17302.2,
+      "basilicata": 19339.0,
+      "calabria": 16353.2,
+      "sicilia": 16689.7,
+      "sardegna": 19641.7
+     },
+     "2015": {
+      "piemonte": 28441.7,
+      "valle-d-aosta": 36465.0,
+      "lombardia": 37137.0,
+      "trentino-alto-adige": 39628.9,
+      "veneto": 31038.8,
+      "friuli-venezia-giulia": 29407.6,
+      "liguria": 29925.8,
+      "emilia-romagna": 33602.3,
+      "toscana": 29498.2,
+      "umbria": 24177.3,
+      "marche": 25648.9,
+      "lazio": 32950.9,
+      "abruzzo": 24036.8,
+      "molise": 20091.8,
+      "campania": 17842.0,
+      "puglia": 17733.6,
+      "basilicata": 20959.9,
+      "calabria": 16557.7,
+      "sicilia": 17043.6,
+      "sardegna": 20363.3
+     },
+     "2016": {
+      "piemonte": 29308.6,
+      "valle-d-aosta": 36238.2,
+      "lombardia": 38174.9,
+      "trentino-alto-adige": 40305.7,
+      "veneto": 32138.8,
+      "friuli-venezia-giulia": 29890.2,
+      "liguria": 30665.8,
+      "emilia-romagna": 34654.6,
+      "toscana": 30236.0,
+      "umbria": 24397.7,
+      "marche": 26251.5,
+      "lazio": 34291.3,
+      "abruzzo": 24248.8,
+      "molise": 20491.6,
+      "campania": 18199.6,
+      "puglia": 18144.5,
+      "basilicata": 21074.0,
+      "calabria": 16907.1,
+      "sicilia": 17242.8,
+      "sardegna": 20213.5
+     },
+     "2017": {
+      "piemonte": 30418.0,
+      "valle-d-aosta": 37725.3,
+      "lombardia": 39114.3,
+      "trentino-alto-adige": 41317.4,
+      "veneto": 33014.4,
+      "friuli-venezia-giulia": 30572.3,
+      "liguria": 31474.9,
+      "emilia-romagna": 35565.0,
+      "toscana": 30942.8,
+      "umbria": 25077.1,
+      "marche": 26930.1,
+      "lazio": 34707.7,
+      "abruzzo": 24987.3,
+      "molise": 21094.5,
+      "campania": 18620.2,
+      "puglia": 18494.6,
+      "basilicata": 21375.2,
+      "calabria": 17336.8,
+      "sicilia": 17696.0,
+      "sardegna": 20670.5
+     },
+     "2018": {
+      "piemonte": 31161.6,
+      "valle-d-aosta": 38180.5,
+      "lombardia": 40078.6,
+      "trentino-alto-adige": 42798.7,
+      "veneto": 33691.5,
+      "friuli-venezia-giulia": 31436.2,
+      "liguria": 31728.5,
+      "emilia-romagna": 36283.4,
+      "toscana": 31744.8,
+      "umbria": 25908.4,
+      "marche": 27465.9,
+      "lazio": 35215.4,
+      "abruzzo": 25163.9,
+      "molise": 21641.2,
+      "campania": 18871.5,
+      "puglia": 18920.3,
+      "basilicata": 22548.2,
+      "calabria": 17317.1,
+      "sicilia": 17837.5,
+      "sardegna": 21076.0
+     },
+     "2019": {
+      "piemonte": 31429.8,
+      "valle-d-aosta": 38688.9,
+      "lombardia": 40425.6,
+      "trentino-alto-adige": 43860.2,
+      "veneto": 34308.9,
+      "friuli-venezia-giulia": 32264.6,
+      "liguria": 32403.7,
+      "emilia-romagna": 36521.0,
+      "toscana": 33072.6,
+      "umbria": 26177.6,
+      "marche": 28072.9,
+      "lazio": 35843.3,
+      "abruzzo": 25460.6,
+      "molise": 22293.5,
+      "campania": 19353.4,
+      "puglia": 19269.7,
+      "basilicata": 22437.5,
+      "calabria": 17597.6,
+      "sicilia": 18187.7,
+      "sardegna": 21646.1
+     },
+     "2020": {
+      "piemonte": 29059.9,
+      "valle-d-aosta": 35610.6,
+      "lombardia": 37986.5,
+      "trentino-alto-adige": 40981.0,
+      "veneto": 31494.3,
+      "friuli-venezia-giulia": 30239.0,
+      "liguria": 29545.6,
+      "emilia-romagna": 34182.7,
+      "toscana": 29276.3,
+      "umbria": 24175.4,
+      "marche": 26070.2,
+      "lazio": 33246.0,
+      "abruzzo": 23728.4,
+      "molise": 20971.9,
+      "campania": 18078.6,
+      "puglia": 18217.5,
+      "basilicata": 20583.5,
+      "calabria": 16588.6,
+      "sicilia": 17214.5,
+      "sardegna": 20199.7
+     },
+     "2021": {
+      "piemonte": 32261.6,
+      "valle-d-aosta": 38666.0,
+      "lombardia": 42584.3,
+      "trentino-alto-adige": 44670.4,
+      "veneto": 34994.5,
+      "friuli-venezia-giulia": 33767.4,
+      "liguria": 32620.0,
+      "emilia-romagna": 38128.0,
+      "toscana": 32512.3,
+      "umbria": 26692.9,
+      "marche": 28959.4,
+      "lazio": 35754.7,
+      "abruzzo": 26292.5,
+      "molise": 23332.4,
+      "campania": 19908.2,
+      "puglia": 20255.1,
+      "basilicata": 23859.9,
+      "calabria": 18335.4,
+      "sicilia": 19076.2,
+      "sardegna": 22472.7
+     },
+     "2022": {
+      "piemonte": 34514.2,
+      "valle-d-aosta": 43799.0,
+      "lombardia": 45964.0,
+      "trentino-alto-adige": 49824.9,
+      "veneto": 37956.3,
+      "friuli-venezia-giulia": 35735.2,
+      "liguria": 35164.6,
+      "emilia-romagna": 40744.9,
+      "toscana": 35647.7,
+      "umbria": 28830.5,
+      "marche": 31227.4,
+      "lazio": 39786.3,
+      "abruzzo": 28600.1,
+      "molise": 25009.0,
+      "campania": 21791.1,
+      "puglia": 22069.0,
+      "basilicata": 25934.1,
+      "calabria": 19667.1,
+      "sicilia": 21229.9,
+      "sardegna": 24558.2
+     },
+     "2023": {
+      "piemonte": 37439.3,
+      "valle-d-aosta": 47123.4,
+      "lombardia": 49144.2,
+      "trentino-alto-adige": 54120.3,
+      "veneto": 40671.5,
+      "friuli-venezia-giulia": 37729.4,
+      "liguria": 38505.2,
+      "emilia-romagna": 43757.2,
+      "toscana": 38144.6,
+      "umbria": 31442.9,
+      "marche": 33331.5,
+      "lazio": 42202.6,
+      "abruzzo": 31120.4,
+      "molise": 27161.1,
+      "campania": 23725.2,
+      "puglia": 23636.3,
+      "basilicata": 27718.9,
+      "calabria": 21131.1,
+      "sicilia": 22241.2,
+      "sardegna": 26551.1
+     },
+     "2024": {
+      "piemonte": 38625.5,
+      "valle-d-aosta": 47742.8,
+      "lombardia": 50398.9,
+      "trentino-alto-adige": 54636.7,
+      "veneto": 41496.3,
+      "friuli-venezia-giulia": 39005.1,
+      "liguria": 38841.8,
+      "emilia-romagna": 44557.0,
+      "toscana": 39262.0,
+      "umbria": 32466.9,
+      "marche": 34149.1,
+      "lazio": 43166.9,
+      "abruzzo": 32108.7,
+      "molise": 27697.8,
+      "campania": 24564.2,
+      "puglia": 24327.7,
+      "basilicata": 28416.3,
+      "calabria": 21702.2,
+      "sicilia": 23308.7,
+      "sardegna": 27730.8
+     }
+    },
+    "annual_means": [
+     {
+      "year": 1995,
+      "avg": 17035.245000000003
+     },
+     {
+      "year": 1996,
+      "avg": 18008.025
+     },
+     {
+      "year": 1997,
+      "avg": 18766.170000000002
+     },
+     {
+      "year": 1998,
+      "avg": 19504.14
+     },
+     {
+      "year": 1999,
+      "avg": 20148.36
+     },
+     {
+      "year": 2000,
+      "avg": 21225.0
+     },
+     {
+      "year": 2001,
+      "avg": 22296.95
+     },
+     {
+      "year": 2002,
+      "avg": 22956.329999999998
+     },
+     {
+      "year": 2003,
+      "avg": 23571.965
+     },
+     {
+      "year": 2004,
+      "avg": 24338.97
+     },
+     {
+      "year": 2005,
+      "avg": 24886.3
+     },
+     {
+      "year": 2006,
+      "avg": 25889.879999999997
+     },
+     {
+      "year": 2007,
+      "avg": 26756.760000000002
+     },
+     {
+      "year": 2008,
+      "avg": 26845.340000000004
+     },
+     {
+      "year": 2009,
+      "avg": 25713.2
+     },
+     {
+      "year": 2010,
+      "avg": 26109.025
+     },
+     {
+      "year": 2011,
+      "avg": 26666.765000000003
+     },
+     {
+      "year": 2012,
+      "avg": 26302.295000000002
+     },
+     {
+      "year": 2013,
+      "avg": 26002.47
+     },
+     {
+      "year": 2014,
+      "avg": 26107.614999999998
+     },
+     {
+      "year": 2015,
+      "avg": 26627.555
+     },
+     {
+      "year": 2016,
+      "avg": 27153.76
+     },
+     {
+      "year": 2017,
+      "avg": 27856.72
+     },
+     {
+      "year": 2018,
+      "avg": 28453.46
+     },
+     {
+      "year": 2019,
+      "avg": 28965.76
+     },
+     {
+      "year": 2020,
+      "avg": 26872.51
+     },
+     {
+      "year": 2021,
+      "avg": 29757.195
+     },
+     {
+      "year": 2022,
+      "avg": 32402.675
+     },
+     {
+      "year": 2023,
+      "avg": 34844.87
+     },
+     {
+      "year": 2024,
+      "avg": 35710.270000000004
+     }
+    ],
+    "map_colors": {
+     "trentino-alto-adige": "var(--seq-6)",
+     "lombardia": "var(--seq-6)",
+     "valle-d-aosta": "var(--seq-5)",
+     "emilia-romagna": "var(--seq-5)",
+     "lazio": "var(--seq-4)",
+     "veneto": "var(--seq-4)",
+     "toscana": "var(--seq-4)",
+     "friuli-venezia-giulia": "var(--seq-4)",
+     "liguria": "var(--seq-4)",
+     "piemonte": "var(--seq-4)",
+     "marche": "var(--seq-3)",
+     "umbria": "var(--seq-2)",
+     "abruzzo": "var(--seq-2)",
+     "basilicata": "var(--seq-2)",
+     "sardegna": "var(--seq-2)",
+     "molise": "var(--seq-2)",
+     "campania": "var(--seq-1)",
+     "puglia": "var(--seq-1)",
+     "sicilia": "var(--seq-1)",
+     "calabria": "var(--seq-1)"
+    },
+    "cover_bars": [
+     {
+      "region": "Trentino Alto Adige",
+      "region_key": "trentino-alto-adige",
+      "value": 54636.7,
+      "width_pct": 100,
+      "is_best": true,
+      "is_worst": false
+     },
+     {
+      "region": "Lombardia",
+      "region_key": "lombardia",
+      "value": 50398.9,
+      "width_pct": 88,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Valle d'Aosta",
+      "region_key": "valle-d-aosta",
+      "value": 47742.8,
+      "width_pct": 80,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Emilia-Romagna",
+      "region_key": "emilia-romagna",
+      "value": 44557.0,
+      "width_pct": 71,
+      "is_best": false,
+      "is_worst": false
+     },
+     {
+      "region": "Calabria",
+      "region_key": "calabria",
+      "value": 21702.2,
+      "width_pct": 6,
+      "is_best": false,
+      "is_worst": true
+     }
+    ],
+    "bar_max": 54636.7,
+    "query_map": [
+     {
+      "intent": "definizione",
+      "label": "Che cosa misura PIL pro capite?",
+      "target": "sezione-definizione"
+     },
+     {
+      "intent": "dato",
+      "label": "Qual è il dato più recente, nel 2024?",
+      "target": "esplora"
+     },
+     {
+      "intent": "classifica",
+      "label": "Qual è la classifica delle regioni nel 2024?",
+      "target": "classifica-dati"
+     },
+     {
+      "intent": "confronto",
+      "label": "Che cosa è cambiato dal 2023 al 2024?",
+      "target": "sezione-dinamica"
+     },
+     {
+      "intent": "andamento",
+      "label": "Come è cambiato dal 1995 al 2024?",
+      "target": "serie-storica"
+     },
+     {
+      "intent": "metodologia",
+      "label": "Come sono calcolati confronti e medie?",
+      "target": "fonti-verifica"
+     },
+     {
+      "intent": "download",
+      "label": "Dove posso scaricare la serie?",
+      "target": "download-dati"
+     }
+    ]
+   }
+  ],
+  "level": {
+   "key": "regione",
+   "label": "Regioni",
+   "singular": "regione",
+   "plural": "regioni",
+   "profile_path": "/regione/",
+   "has_map": true,
+   "explain": {
+    "plain": "Misura il prodotto interno lordo ai prezzi di mercato per abitante, valori correnti. Conti economici territoriali, edizione dicembre 2025.",
+    "example": "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante.",
+    "scope": "Il confronto applica la stessa definizione in tutti i territori regionali e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore.",
+    "caveat": "Il valore pro capite va letto insieme al costo della vita, alle disuguaglianze interne e alla redistribuzione, perché la media regionale nasconde differenze tra persone e tra aree.",
+    "direction": "higher_better"
+   },
+   "years": [
+    1995,
+    1996,
+    1997,
+    1998,
+    1999,
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+   ],
+   "year_min": 1995,
+   "year_max": 2024,
+   "observations": [
+    {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": 54636.7
+    },
+    {
+     "key": "lombardia",
+     "name": "Lombardia",
+     "value": 50398.9
+    },
+    {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta",
+     "value": 47742.8
+    },
+    {
+     "key": "emilia-romagna",
+     "name": "Emilia-Romagna",
+     "value": 44557.0
+    },
+    {
+     "key": "lazio",
+     "name": "Lazio",
+     "value": 43166.9
+    },
+    {
+     "key": "veneto",
+     "name": "Veneto",
+     "value": 41496.3
+    },
+    {
+     "key": "toscana",
+     "name": "Toscana",
+     "value": 39262.0
+    },
+    {
+     "key": "friuli-venezia-giulia",
+     "name": "Friuli-Venezia Giulia",
+     "value": 39005.1
+    },
+    {
+     "key": "liguria",
+     "name": "Liguria",
+     "value": 38841.8
+    },
+    {
+     "key": "piemonte",
+     "name": "Piemonte",
+     "value": 38625.5
+    },
+    {
+     "key": "marche",
+     "name": "Marche",
+     "value": 34149.1
+    },
+    {
+     "key": "umbria",
+     "name": "Umbria",
+     "value": 32466.9
+    },
+    {
+     "key": "abruzzo",
+     "name": "Abruzzo",
+     "value": 32108.7
+    },
+    {
+     "key": "basilicata",
+     "name": "Basilicata",
+     "value": 28416.3
+    },
+    {
+     "key": "sardegna",
+     "name": "Sardegna",
+     "value": 27730.8
+    },
+    {
+     "key": "molise",
+     "name": "Molise",
+     "value": 27697.8
+    },
+    {
+     "key": "campania",
+     "name": "Campania",
+     "value": 24564.2
+    },
+    {
+     "key": "puglia",
+     "name": "Puglia",
+     "value": 24327.7
+    },
+    {
+     "key": "sicilia",
+     "name": "Sicilia",
+     "value": 23308.7
+    },
+    {
+     "key": "calabria",
+     "name": "Calabria",
+     "value": 21702.2
+    }
+   ],
+   "best": {
+    "key": "trentino-alto-adige",
+    "name": "Trentino Alto Adige",
+    "value": 54636.7
+   },
+   "worst": {
+    "key": "calabria",
+    "name": "Calabria",
+    "value": 21702.2
+   },
+   "stats": {
+    "year": 2024,
+    "year_avg": 35710.270000000004,
+    "year_count": 20,
+    "median": 36387.3,
+    "above_avg_count": 10,
+    "below_avg_count": 10,
+    "year_min": 1995,
+    "year_min_avg": 17035.245000000003,
+    "year_max": 2024,
+    "has_multi_year": true,
+    "avg_change_abs": 18675.025,
+    "avg_change_pct": 109.62580814071062,
+    "gap_abs": 32934.5,
+    "gap_ratio": 2.517565039489084,
+    "year_min_gap_abs": 16603.6,
+    "gap_trend": 16330.900000000001,
+    "highest_delta": {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige",
+     "value": null,
+     "delta": 29901.299999999996,
+     "kind": "aumento"
+    },
+    "lowest_delta": {
+     "key": "calabria",
+     "name": "Calabria",
+     "value": null,
+     "delta": 11706.7,
+     "kind": "aumento"
+    }
+   },
+   "annual_change": {
+    "year": 2024,
+    "previous_year": 2023,
+    "year_gap": 1,
+    "common_count": 20,
+    "current_count": 20,
+    "previous_count": 20,
+    "same_coverage": true,
+    "previous_avg": 34844.87,
+    "current_avg": 35710.270000000004,
+    "average_delta": 865.4000000000015,
+    "average_delta_pct": 2.4835793618974655,
+    "increase_count": 20,
+    "decrease_count": 0,
+    "stable_count": 0,
+    "largest_increases": [
+     {
+      "key": "friuli-venezia-giulia",
+      "name": "Friuli-Venezia Giulia",
+      "value": null,
+      "delta": 1275.699999999997,
+      "kind": "aumento",
+      "previous_value": 37729.4,
+      "current_value": 39005.1
+     },
+     {
+      "key": "lombardia",
+      "name": "Lombardia",
+      "value": null,
+      "delta": 1254.7000000000044,
+      "kind": "aumento",
+      "previous_value": 49144.2,
+      "current_value": 50398.9
+     },
+     {
+      "key": "piemonte",
+      "name": "Piemonte",
+      "value": null,
+      "delta": 1186.199999999997,
+      "kind": "aumento",
+      "previous_value": 37439.3,
+      "current_value": 38625.5
+     }
+    ],
+    "largest_decreases": []
+   },
+   "annual_note": "Per la direzione di questo indicatore, il movimento medio è favorevole.",
+   "trend_note": "una variazione media favorevole",
+   "coverage": null,
+   "territory_total": 20,
+   "territories": [
+    {
+     "key": "abruzzo",
+     "name": "Abruzzo"
+    },
+    {
+     "key": "basilicata",
+     "name": "Basilicata"
+    },
+    {
+     "key": "calabria",
+     "name": "Calabria"
+    },
+    {
+     "key": "campania",
+     "name": "Campania"
+    },
+    {
+     "key": "emilia-romagna",
+     "name": "Emilia-Romagna"
+    },
+    {
+     "key": "friuli-venezia-giulia",
+     "name": "Friuli-Venezia Giulia"
+    },
+    {
+     "key": "lazio",
+     "name": "Lazio"
+    },
+    {
+     "key": "liguria",
+     "name": "Liguria"
+    },
+    {
+     "key": "lombardia",
+     "name": "Lombardia"
+    },
+    {
+     "key": "marche",
+     "name": "Marche"
+    },
+    {
+     "key": "molise",
+     "name": "Molise"
+    },
+    {
+     "key": "piemonte",
+     "name": "Piemonte"
+    },
+    {
+     "key": "puglia",
+     "name": "Puglia"
+    },
+    {
+     "key": "sardegna",
+     "name": "Sardegna"
+    },
+    {
+     "key": "sicilia",
+     "name": "Sicilia"
+    },
+    {
+     "key": "toscana",
+     "name": "Toscana"
+    },
+    {
+     "key": "trentino-alto-adige",
+     "name": "Trentino Alto Adige"
+    },
+    {
+     "key": "umbria",
+     "name": "Umbria"
+    },
+    {
+     "key": "valle-d-aosta",
+     "name": "Valle d'Aosta"
+    },
+    {
+     "key": "veneto",
+     "name": "Veneto"
+    }
+   ],
+   "default_territory": {
+    "key": "trentino-alto-adige",
+    "name": "Trentino Alto Adige",
+    "value": 54636.7
+   },
+   "matrix": {
+    "1995": {
+     "piemonte": 18809.9,
+     "valle-d-aosta": 26599.1,
+     "lombardia": 23993.3,
+     "trentino-alto-adige": 24735.4,
+     "veneto": 19966.8,
+     "friuli-venezia-giulia": 18537.3,
+     "liguria": 17812.3,
+     "emilia-romagna": 21133.7,
+     "toscana": 18253.4,
+     "umbria": 16992.6,
+     "marche": 16294.8,
+     "lazio": 21900.4,
+     "abruzzo": 15377.5,
+     "molise": 13342.7,
+     "campania": 11409.1,
+     "puglia": 11027.9,
+     "basilicata": 11629.5,
+     "calabria": 9995.5,
+     "sicilia": 11102.5,
+     "sardegna": 11791.2
+    },
+    "1996": {
+     "piemonte": 19752.2,
+     "valle-d-aosta": 27502.4,
+     "lombardia": 25404.9,
+     "trentino-alto-adige": 26518.7,
+     "veneto": 21223.2,
+     "friuli-venezia-giulia": 19427.5,
+     "liguria": 18915.7,
+     "emilia-romagna": 22605.1,
+     "toscana": 19321.5,
+     "umbria": 17723.7,
+     "marche": 17444.0,
+     "lazio": 22939.3,
+     "abruzzo": 16347.6,
+     "molise": 14186.3,
+     "campania": 11927.0,
+     "puglia": 11699.6,
+     "basilicata": 12646.3,
+     "calabria": 10546.6,
+     "sicilia": 11720.5,
+     "sardegna": 12308.4
+    },
+    "1997": {
+     "piemonte": 20731.5,
+     "valle-d-aosta": 27552.2,
+     "lombardia": 26376.7,
+     "trentino-alto-adige": 27034.5,
+     "veneto": 22175.0,
+     "friuli-venezia-giulia": 20219.7,
+     "liguria": 19854.6,
+     "emilia-romagna": 23458.1,
+     "toscana": 20121.2,
+     "umbria": 18639.2,
+     "marche": 18123.0,
+     "lazio": 24125.9,
+     "abruzzo": 16881.9,
+     "molise": 15325.1,
+     "campania": 12657.5,
+     "puglia": 12117.0,
+     "basilicata": 13416.1,
+     "calabria": 11175.9,
+     "sicilia": 12228.7,
+     "sardegna": 13109.6
+    },
+    "1998": {
+     "piemonte": 21479.2,
+     "valle-d-aosta": 28561.8,
+     "lombardia": 27484.6,
+     "trentino-alto-adige": 28187.3,
+     "veneto": 22894.0,
+     "friuli-venezia-giulia": 20758.8,
+     "liguria": 20785.1,
+     "emilia-romagna": 24430.3,
+     "toscana": 21074.7,
+     "umbria": 19119.9,
+     "marche": 18635.9,
+     "lazio": 25410.4,
+     "abruzzo": 17274.2,
+     "molise": 15891.6,
+     "campania": 13243.0,
+     "puglia": 12748.6,
+     "basilicata": 14147.1,
+     "calabria": 11693.6,
+     "sicilia": 12686.8,
+     "sardegna": 13575.9
+    },
+    "1999": {
+     "piemonte": 22291.1,
+     "valle-d-aosta": 28725.9,
+     "lombardia": 28028.3,
+     "trentino-alto-adige": 28727.6,
+     "veneto": 23512.7,
+     "friuli-venezia-giulia": 21688.3,
+     "liguria": 21462.9,
+     "emilia-romagna": 25295.2,
+     "toscana": 21936.0,
+     "umbria": 19983.2,
+     "marche": 19505.8,
+     "lazio": 26075.6,
+     "abruzzo": 17880.1,
+     "molise": 16183.7,
+     "campania": 13688.0,
+     "puglia": 13363.7,
+     "basilicata": 15174.3,
+     "calabria": 12409.1,
+     "sicilia": 12909.7,
+     "sardegna": 14126.0
+    },
+    "2000": {
+     "piemonte": 23346.2,
+     "valle-d-aosta": 29291.9,
+     "lombardia": 29458.7,
+     "trentino-alto-adige": 30156.4,
+     "veneto": 25034.6,
+     "friuli-venezia-giulia": 23265.1,
+     "liguria": 23015.5,
+     "emilia-romagna": 27048.5,
+     "toscana": 23208.5,
+     "umbria": 21077.5,
+     "marche": 20532.8,
+     "lazio": 27408.0,
+     "abruzzo": 19057.7,
+     "molise": 16962.9,
+     "campania": 14452.9,
+     "puglia": 14118.8,
+     "basilicata": 15615.3,
+     "calabria": 12911.9,
+     "sicilia": 13659.1,
+     "sardegna": 14877.7
+    },
+    "2001": {
+     "piemonte": 24395.9,
+     "valle-d-aosta": 30831.0,
+     "lombardia": 30884.4,
+     "trentino-alto-adige": 31222.7,
+     "veneto": 25934.9,
+     "friuli-venezia-giulia": 24535.1,
+     "liguria": 24600.2,
+     "emilia-romagna": 28015.6,
+     "toscana": 24356.7,
+     "umbria": 22143.7,
+     "marche": 21728.3,
+     "lazio": 29074.6,
+     "abruzzo": 19967.7,
+     "molise": 17889.8,
+     "campania": 15312.3,
+     "puglia": 14812.0,
+     "basilicata": 16209.1,
+     "calabria": 13677.6,
+     "sicilia": 14499.3,
+     "sardegna": 15848.1
+    },
+    "2002": {
+     "piemonte": 25255.7,
+     "valle-d-aosta": 31833.1,
+     "lombardia": 32080.9,
+     "trentino-alto-adige": 31701.6,
+     "veneto": 26343.6,
+     "friuli-venezia-giulia": 25192.7,
+     "liguria": 24965.0,
+     "emilia-romagna": 28690.1,
+     "toscana": 25180.0,
+     "umbria": 22537.3,
+     "marche": 22876.0,
+     "lazio": 30592.0,
+     "abruzzo": 20365.6,
+     "molise": 18397.8,
+     "campania": 15969.8,
+     "puglia": 15155.9,
+     "basilicata": 16735.7,
+     "calabria": 14097.9,
+     "sicilia": 14984.8,
+     "sardegna": 16171.1
+    },
+    "2003": {
+     "piemonte": 25999.9,
+     "valle-d-aosta": 33848.9,
+     "lombardia": 32875.5,
+     "trentino-alto-adige": 32521.1,
+     "veneto": 27310.5,
+     "friuli-venezia-giulia": 25276.8,
+     "liguria": 25892.4,
+     "emilia-romagna": 29225.6,
+     "toscana": 25858.0,
+     "umbria": 23075.6,
+     "marche": 23214.5,
+     "lazio": 31310.3,
+     "abruzzo": 20564.3,
+     "molise": 18693.6,
+     "campania": 16272.1,
+     "puglia": 15555.7,
+     "basilicata": 16817.8,
+     "calabria": 14609.6,
+     "sicilia": 15525.4,
+     "sardegna": 16991.7
+    },
+    "2004": {
+     "piemonte": 26819.2,
+     "valle-d-aosta": 34541.4,
+     "lombardia": 33607.9,
+     "trentino-alto-adige": 33684.0,
+     "veneto": 28365.0,
+     "friuli-venezia-giulia": 26047.8,
+     "liguria": 26777.6,
+     "emilia-romagna": 30111.6,
+     "toscana": 26646.1,
+     "umbria": 23817.0,
+     "marche": 23977.7,
+     "lazio": 32958.6,
+     "abruzzo": 20541.4,
+     "molise": 19538.2,
+     "campania": 16728.5,
+     "puglia": 16077.0,
+     "basilicata": 17458.3,
+     "calabria": 15328.2,
+     "sicilia": 15988.3,
+     "sardegna": 17765.6
+    },
+    "2005": {
+     "piemonte": 27449.1,
+     "valle-d-aosta": 35211.6,
+     "lombardia": 34178.0,
+     "trentino-alto-adige": 33995.1,
+     "veneto": 28895.5,
+     "friuli-venezia-giulia": 27087.9,
+     "liguria": 27499.2,
+     "emilia-romagna": 30686.4,
+     "toscana": 27007.4,
+     "umbria": 24106.2,
+     "marche": 24528.9,
+     "lazio": 33639.9,
+     "abruzzo": 21421.9,
+     "molise": 20107.8,
+     "campania": 17132.0,
+     "puglia": 16373.8,
+     "basilicata": 17771.7,
+     "calabria": 15807.8,
+     "sicilia": 16703.5,
+     "sardegna": 18122.3
+    },
+    "2006": {
+     "piemonte": 28519.3,
+     "valle-d-aosta": 36271.3,
+     "lombardia": 35024.2,
+     "trentino-alto-adige": 35278.2,
+     "veneto": 29760.2,
+     "friuli-venezia-giulia": 28308.3,
+     "liguria": 28388.1,
+     "emilia-romagna": 32141.7,
+     "toscana": 28091.9,
+     "umbria": 25190.3,
+     "marche": 25740.2,
+     "lazio": 34537.3,
+     "abruzzo": 22325.2,
+     "molise": 21525.6,
+     "campania": 17778.2,
+     "puglia": 17088.0,
+     "basilicata": 18936.9,
+     "calabria": 16520.6,
+     "sicilia": 17364.1,
+     "sardegna": 19008.0
+    },
+    "2007": {
+     "piemonte": 29224.4,
+     "valle-d-aosta": 37001.6,
+     "lombardia": 36209.3,
+     "trentino-alto-adige": 36620.4,
+     "veneto": 30768.4,
+     "friuli-venezia-giulia": 29397.9,
+     "liguria": 29958.4,
+     "emilia-romagna": 33411.3,
+     "toscana": 29058.4,
+     "umbria": 25962.3,
+     "marche": 26657.1,
+     "lazio": 35586.0,
+     "abruzzo": 23074.9,
+     "molise": 22389.2,
+     "campania": 18358.7,
+     "puglia": 17506.9,
+     "basilicata": 19778.9,
+     "calabria": 16980.1,
+     "sicilia": 17685.2,
+     "sardegna": 19505.8
+    },
+    "2008": {
+     "piemonte": 28999.5,
+     "valle-d-aosta": 37859.9,
+     "lombardia": 37307.4,
+     "trentino-alto-adige": 37051.8,
+     "veneto": 30394.3,
+     "friuli-venezia-giulia": 28966.4,
+     "liguria": 30562.2,
+     "emilia-romagna": 33352.9,
+     "toscana": 29047.9,
+     "umbria": 25948.9,
+     "marche": 26268.9,
+     "lazio": 35234.9,
+     "abruzzo": 23452.2,
+     "molise": 21913.4,
+     "campania": 18411.5,
+     "puglia": 17257.3,
+     "basilicata": 19856.0,
+     "calabria": 17262.0,
+     "sicilia": 17835.0,
+     "sardegna": 19924.4
+    },
+    "2009": {
+     "piemonte": 26950.8,
+     "valle-d-aosta": 35694.0,
+     "lombardia": 35275.6,
+     "trentino-alto-adige": 36291.0,
+     "veneto": 29128.3,
+     "friuli-venezia-giulia": 27278.2,
+     "liguria": 29033.1,
+     "emilia-romagna": 31381.5,
+     "toscana": 28289.9,
+     "umbria": 24198.0,
+     "marche": 25300.5,
+     "lazio": 34448.5,
+     "abruzzo": 22507.9,
+     "molise": 21398.4,
+     "campania": 17884.7,
+     "puglia": 16747.2,
+     "basilicata": 18805.6,
+     "calabria": 16861.2,
+     "sicilia": 17317.6,
+     "sardegna": 19472.0
+    },
+    "2010": {
+     "piemonte": 27832.6,
+     "valle-d-aosta": 37335.2,
+     "lombardia": 36651.4,
+     "trentino-alto-adige": 37272.6,
+     "veneto": 29545.2,
+     "friuli-venezia-giulia": 28210.0,
+     "liguria": 28601.2,
+     "emilia-romagna": 31768.6,
+     "toscana": 28481.4,
+     "umbria": 24622.5,
+     "marche": 25307.7,
+     "lazio": 34600.0,
+     "abruzzo": 23129.3,
+     "molise": 21499.0,
+     "campania": 17682.6,
+     "puglia": 17085.9,
+     "basilicata": 18760.6,
+     "calabria": 16855.1,
+     "sicilia": 17289.5,
+     "sardegna": 19650.1
+    },
+    "2011": {
+     "piemonte": 28514.0,
+     "valle-d-aosta": 38039.3,
+     "lombardia": 37290.7,
+     "trentino-alto-adige": 38173.4,
+     "veneto": 30543.2,
+     "friuli-venezia-giulia": 28903.5,
+     "liguria": 29415.5,
+     "emilia-romagna": 32950.6,
+     "toscana": 29111.8,
+     "umbria": 24876.8,
+     "marche": 25702.9,
+     "lazio": 35054.9,
+     "abruzzo": 24197.8,
+     "molise": 21623.1,
+     "campania": 17735.1,
+     "puglia": 17445.7,
+     "basilicata": 19494.6,
+     "calabria": 17026.2,
+     "sicilia": 17275.0,
+     "sardegna": 19961.2
+    },
+    "2012": {
+     "piemonte": 27552.5,
+     "valle-d-aosta": 38248.0,
+     "lombardia": 36407.8,
+     "trentino-alto-adige": 38902.3,
+     "veneto": 29944.0,
+     "friuli-venezia-giulia": 28181.7,
+     "liguria": 28907.5,
+     "emilia-romagna": 32350.8,
+     "toscana": 28865.4,
+     "umbria": 24158.0,
+     "marche": 25129.7,
+     "lazio": 33801.5,
+     "abruzzo": 24093.8,
+     "molise": 20993.7,
+     "campania": 17608.5,
+     "puglia": 17527.2,
+     "basilicata": 19401.5,
+     "calabria": 16734.8,
+     "sicilia": 17210.4,
+     "sardegna": 20026.8
+    },
+    "2013": {
+     "piemonte": 27779.6,
+     "valle-d-aosta": 36633.1,
+     "lombardia": 35837.0,
+     "trentino-alto-adige": 39352.1,
+     "veneto": 29897.0,
+     "friuli-venezia-giulia": 28371.2,
+     "liguria": 28677.2,
+     "emilia-romagna": 32454.8,
+     "toscana": 28593.5,
+     "umbria": 23756.4,
+     "marche": 24754.7,
+     "lazio": 33081.3,
+     "abruzzo": 23736.0,
+     "molise": 19746.5,
+     "campania": 17335.2,
+     "puglia": 17109.5,
+     "basilicata": 19947.0,
+     "calabria": 16455.2,
+     "sicilia": 17003.0,
+     "sardegna": 19529.1
+    },
+    "2014": {
+     "piemonte": 27801.7,
+     "valle-d-aosta": 36239.0,
+     "lombardia": 36435.2,
+     "trentino-alto-adige": 39325.4,
+     "veneto": 30382.7,
+     "friuli-venezia-giulia": 28528.1,
+     "liguria": 29338.9,
+     "emilia-romagna": 33020.3,
+     "toscana": 29145.1,
+     "umbria": 23383.0,
+     "marche": 25463.0,
+     "lazio": 32959.4,
+     "abruzzo": 23760.4,
+     "molise": 19625.5,
+     "campania": 17418.8,
+     "puglia": 17302.2,
+     "basilicata": 19339.0,
+     "calabria": 16353.2,
+     "sicilia": 16689.7,
+     "sardegna": 19641.7
+    },
+    "2015": {
+     "piemonte": 28441.7,
+     "valle-d-aosta": 36465.0,
+     "lombardia": 37137.0,
+     "trentino-alto-adige": 39628.9,
+     "veneto": 31038.8,
+     "friuli-venezia-giulia": 29407.6,
+     "liguria": 29925.8,
+     "emilia-romagna": 33602.3,
+     "toscana": 29498.2,
+     "umbria": 24177.3,
+     "marche": 25648.9,
+     "lazio": 32950.9,
+     "abruzzo": 24036.8,
+     "molise": 20091.8,
+     "campania": 17842.0,
+     "puglia": 17733.6,
+     "basilicata": 20959.9,
+     "calabria": 16557.7,
+     "sicilia": 17043.6,
+     "sardegna": 20363.3
+    },
+    "2016": {
+     "piemonte": 29308.6,
+     "valle-d-aosta": 36238.2,
+     "lombardia": 38174.9,
+     "trentino-alto-adige": 40305.7,
+     "veneto": 32138.8,
+     "friuli-venezia-giulia": 29890.2,
+     "liguria": 30665.8,
+     "emilia-romagna": 34654.6,
+     "toscana": 30236.0,
+     "umbria": 24397.7,
+     "marche": 26251.5,
+     "lazio": 34291.3,
+     "abruzzo": 24248.8,
+     "molise": 20491.6,
+     "campania": 18199.6,
+     "puglia": 18144.5,
+     "basilicata": 21074.0,
+     "calabria": 16907.1,
+     "sicilia": 17242.8,
+     "sardegna": 20213.5
+    },
+    "2017": {
+     "piemonte": 30418.0,
+     "valle-d-aosta": 37725.3,
+     "lombardia": 39114.3,
+     "trentino-alto-adige": 41317.4,
+     "veneto": 33014.4,
+     "friuli-venezia-giulia": 30572.3,
+     "liguria": 31474.9,
+     "emilia-romagna": 35565.0,
+     "toscana": 30942.8,
+     "umbria": 25077.1,
+     "marche": 26930.1,
+     "lazio": 34707.7,
+     "abruzzo": 24987.3,
+     "molise": 21094.5,
+     "campania": 18620.2,
+     "puglia": 18494.6,
+     "basilicata": 21375.2,
+     "calabria": 17336.8,
+     "sicilia": 17696.0,
+     "sardegna": 20670.5
+    },
+    "2018": {
+     "piemonte": 31161.6,
+     "valle-d-aosta": 38180.5,
+     "lombardia": 40078.6,
+     "trentino-alto-adige": 42798.7,
+     "veneto": 33691.5,
+     "friuli-venezia-giulia": 31436.2,
+     "liguria": 31728.5,
+     "emilia-romagna": 36283.4,
+     "toscana": 31744.8,
+     "umbria": 25908.4,
+     "marche": 27465.9,
+     "lazio": 35215.4,
+     "abruzzo": 25163.9,
+     "molise": 21641.2,
+     "campania": 18871.5,
+     "puglia": 18920.3,
+     "basilicata": 22548.2,
+     "calabria": 17317.1,
+     "sicilia": 17837.5,
+     "sardegna": 21076.0
+    },
+    "2019": {
+     "piemonte": 31429.8,
+     "valle-d-aosta": 38688.9,
+     "lombardia": 40425.6,
+     "trentino-alto-adige": 43860.2,
+     "veneto": 34308.9,
+     "friuli-venezia-giulia": 32264.6,
+     "liguria": 32403.7,
+     "emilia-romagna": 36521.0,
+     "toscana": 33072.6,
+     "umbria": 26177.6,
+     "marche": 28072.9,
+     "lazio": 35843.3,
+     "abruzzo": 25460.6,
+     "molise": 22293.5,
+     "campania": 19353.4,
+     "puglia": 19269.7,
+     "basilicata": 22437.5,
+     "calabria": 17597.6,
+     "sicilia": 18187.7,
+     "sardegna": 21646.1
+    },
+    "2020": {
+     "piemonte": 29059.9,
+     "valle-d-aosta": 35610.6,
+     "lombardia": 37986.5,
+     "trentino-alto-adige": 40981.0,
+     "veneto": 31494.3,
+     "friuli-venezia-giulia": 30239.0,
+     "liguria": 29545.6,
+     "emilia-romagna": 34182.7,
+     "toscana": 29276.3,
+     "umbria": 24175.4,
+     "marche": 26070.2,
+     "lazio": 33246.0,
+     "abruzzo": 23728.4,
+     "molise": 20971.9,
+     "campania": 18078.6,
+     "puglia": 18217.5,
+     "basilicata": 20583.5,
+     "calabria": 16588.6,
+     "sicilia": 17214.5,
+     "sardegna": 20199.7
+    },
+    "2021": {
+     "piemonte": 32261.6,
+     "valle-d-aosta": 38666.0,
+     "lombardia": 42584.3,
+     "trentino-alto-adige": 44670.4,
+     "veneto": 34994.5,
+     "friuli-venezia-giulia": 33767.4,
+     "liguria": 32620.0,
+     "emilia-romagna": 38128.0,
+     "toscana": 32512.3,
+     "umbria": 26692.9,
+     "marche": 28959.4,
+     "lazio": 35754.7,
+     "abruzzo": 26292.5,
+     "molise": 23332.4,
+     "campania": 19908.2,
+     "puglia": 20255.1,
+     "basilicata": 23859.9,
+     "calabria": 18335.4,
+     "sicilia": 19076.2,
+     "sardegna": 22472.7
+    },
+    "2022": {
+     "piemonte": 34514.2,
+     "valle-d-aosta": 43799.0,
+     "lombardia": 45964.0,
+     "trentino-alto-adige": 49824.9,
+     "veneto": 37956.3,
+     "friuli-venezia-giulia": 35735.2,
+     "liguria": 35164.6,
+     "emilia-romagna": 40744.9,
+     "toscana": 35647.7,
+     "umbria": 28830.5,
+     "marche": 31227.4,
+     "lazio": 39786.3,
+     "abruzzo": 28600.1,
+     "molise": 25009.0,
+     "campania": 21791.1,
+     "puglia": 22069.0,
+     "basilicata": 25934.1,
+     "calabria": 19667.1,
+     "sicilia": 21229.9,
+     "sardegna": 24558.2
+    },
+    "2023": {
+     "piemonte": 37439.3,
+     "valle-d-aosta": 47123.4,
+     "lombardia": 49144.2,
+     "trentino-alto-adige": 54120.3,
+     "veneto": 40671.5,
+     "friuli-venezia-giulia": 37729.4,
+     "liguria": 38505.2,
+     "emilia-romagna": 43757.2,
+     "toscana": 38144.6,
+     "umbria": 31442.9,
+     "marche": 33331.5,
+     "lazio": 42202.6,
+     "abruzzo": 31120.4,
+     "molise": 27161.1,
+     "campania": 23725.2,
+     "puglia": 23636.3,
+     "basilicata": 27718.9,
+     "calabria": 21131.1,
+     "sicilia": 22241.2,
+     "sardegna": 26551.1
+    },
+    "2024": {
+     "piemonte": 38625.5,
+     "valle-d-aosta": 47742.8,
+     "lombardia": 50398.9,
+     "trentino-alto-adige": 54636.7,
+     "veneto": 41496.3,
+     "friuli-venezia-giulia": 39005.1,
+     "liguria": 38841.8,
+     "emilia-romagna": 44557.0,
+     "toscana": 39262.0,
+     "umbria": 32466.9,
+     "marche": 34149.1,
+     "lazio": 43166.9,
+     "abruzzo": 32108.7,
+     "molise": 27697.8,
+     "campania": 24564.2,
+     "puglia": 24327.7,
+     "basilicata": 28416.3,
+     "calabria": 21702.2,
+     "sicilia": 23308.7,
+     "sardegna": 27730.8
+    }
+   },
+   "annual_means": [
+    {
+     "year": 1995,
+     "avg": 17035.245000000003
+    },
+    {
+     "year": 1996,
+     "avg": 18008.025
+    },
+    {
+     "year": 1997,
+     "avg": 18766.170000000002
+    },
+    {
+     "year": 1998,
+     "avg": 19504.14
+    },
+    {
+     "year": 1999,
+     "avg": 20148.36
+    },
+    {
+     "year": 2000,
+     "avg": 21225.0
+    },
+    {
+     "year": 2001,
+     "avg": 22296.95
+    },
+    {
+     "year": 2002,
+     "avg": 22956.329999999998
+    },
+    {
+     "year": 2003,
+     "avg": 23571.965
+    },
+    {
+     "year": 2004,
+     "avg": 24338.97
+    },
+    {
+     "year": 2005,
+     "avg": 24886.3
+    },
+    {
+     "year": 2006,
+     "avg": 25889.879999999997
+    },
+    {
+     "year": 2007,
+     "avg": 26756.760000000002
+    },
+    {
+     "year": 2008,
+     "avg": 26845.340000000004
+    },
+    {
+     "year": 2009,
+     "avg": 25713.2
+    },
+    {
+     "year": 2010,
+     "avg": 26109.025
+    },
+    {
+     "year": 2011,
+     "avg": 26666.765000000003
+    },
+    {
+     "year": 2012,
+     "avg": 26302.295000000002
+    },
+    {
+     "year": 2013,
+     "avg": 26002.47
+    },
+    {
+     "year": 2014,
+     "avg": 26107.614999999998
+    },
+    {
+     "year": 2015,
+     "avg": 26627.555
+    },
+    {
+     "year": 2016,
+     "avg": 27153.76
+    },
+    {
+     "year": 2017,
+     "avg": 27856.72
+    },
+    {
+     "year": 2018,
+     "avg": 28453.46
+    },
+    {
+     "year": 2019,
+     "avg": 28965.76
+    },
+    {
+     "year": 2020,
+     "avg": 26872.51
+    },
+    {
+     "year": 2021,
+     "avg": 29757.195
+    },
+    {
+     "year": 2022,
+     "avg": 32402.675
+    },
+    {
+     "year": 2023,
+     "avg": 34844.87
+    },
+    {
+     "year": 2024,
+     "avg": 35710.270000000004
+    }
+   ],
+   "map_colors": {
+    "trentino-alto-adige": "var(--seq-6)",
+    "lombardia": "var(--seq-6)",
+    "valle-d-aosta": "var(--seq-5)",
+    "emilia-romagna": "var(--seq-5)",
+    "lazio": "var(--seq-4)",
+    "veneto": "var(--seq-4)",
+    "toscana": "var(--seq-4)",
+    "friuli-venezia-giulia": "var(--seq-4)",
+    "liguria": "var(--seq-4)",
+    "piemonte": "var(--seq-4)",
+    "marche": "var(--seq-3)",
+    "umbria": "var(--seq-2)",
+    "abruzzo": "var(--seq-2)",
+    "basilicata": "var(--seq-2)",
+    "sardegna": "var(--seq-2)",
+    "molise": "var(--seq-2)",
+    "campania": "var(--seq-1)",
+    "puglia": "var(--seq-1)",
+    "sicilia": "var(--seq-1)",
+    "calabria": "var(--seq-1)"
+   },
+   "cover_bars": [
+    {
+     "region": "Trentino Alto Adige",
+     "region_key": "trentino-alto-adige",
+     "value": 54636.7,
+     "width_pct": 100,
+     "is_best": true,
+     "is_worst": false
+    },
+    {
+     "region": "Lombardia",
+     "region_key": "lombardia",
+     "value": 50398.9,
+     "width_pct": 88,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Valle d'Aosta",
+     "region_key": "valle-d-aosta",
+     "value": 47742.8,
+     "width_pct": 80,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Emilia-Romagna",
+     "region_key": "emilia-romagna",
+     "value": 44557.0,
+     "width_pct": 71,
+     "is_best": false,
+     "is_worst": false
+    },
+    {
+     "region": "Calabria",
+     "region_key": "calabria",
+     "value": 21702.2,
+     "width_pct": 6,
+     "is_best": false,
+     "is_worst": true
+    }
+   ],
+   "bar_max": 54636.7,
+   "query_map": [
+    {
+     "intent": "definizione",
+     "label": "Che cosa misura PIL pro capite?",
+     "target": "sezione-definizione"
+    },
+    {
+     "intent": "dato",
+     "label": "Qual è il dato più recente, nel 2024?",
+     "target": "esplora"
+    },
+    {
+     "intent": "classifica",
+     "label": "Qual è la classifica delle regioni nel 2024?",
+     "target": "classifica-dati"
+    },
+    {
+     "intent": "confronto",
+     "label": "Che cosa è cambiato dal 2023 al 2024?",
+     "target": "sezione-dinamica"
+    },
+    {
+     "intent": "andamento",
+     "label": "Come è cambiato dal 1995 al 2024?",
+     "target": "serie-storica"
+    },
+    {
+     "intent": "metodologia",
+     "label": "Come sono calcolati confronti e medie?",
+     "target": "fonti-verifica"
+    },
+    {
+     "intent": "download",
+     "label": "Dove posso scaricare la serie?",
+     "target": "download-dati"
+    }
+   ]
+  },
+  "query_map": [
+   {
+    "intent": "definizione",
+    "label": "Che cosa misura PIL pro capite?",
+    "target": "come-leggere"
+   },
+   {
+    "intent": "dato",
+    "label": "Qual è il dato più recente, nel 2024?",
+    "target": "esplora"
+   },
+   {
+    "intent": "classifica",
+    "label": "Qual è la classifica delle regioni nel 2024?",
+    "target": "classifica-dati"
+   },
+   {
+    "intent": "andamento",
+    "label": "Come è cambiato dal 1995 al 2024?",
+    "target": "serie-storica"
+   },
+   {
+    "intent": "metodologia",
+    "label": "Come sono calcolati confronti e medie?",
+    "target": "fonti-verifica"
+   },
+   {
+    "intent": "download",
+    "label": "Dove posso scaricare la serie?",
+    "target": "download-dati"
+   }
+  ],
+  "page_h1": "PIL pro capite per regione: di che cosa è fatta la distanza fra Trentino e Calabria",
+  "related": [
+   {
+    "id": "multiscopo:MULTI_REDD_FONTE_CAPITALE",
+    "name": "Famiglie con fonte principale di reddito da capitale e altri redditi",
+    "path": "/indicatore/famiglie-con-fonte-principale-di-reddito-da-capitale-e-altri-redditi/ims-MULTI_REDD_FONTE_CAPITALE",
+    "direction": "contextual",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "%",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 2.663
+     },
+     {
+      "year": 2019,
+      "value": 2.675
+     },
+     {
+      "year": 2020,
+      "value": 2.67
+     },
+     {
+      "year": 2021,
+      "value": 2.34
+     },
+     {
+      "year": 2022,
+      "value": 2.073
+     },
+     {
+      "year": 2023,
+      "value": 2.358
+     },
+     {
+      "year": 2024,
+      "value": 2.355
+     }
+    ],
+    "latest": 2.355
+   },
+   {
+    "id": "multiscopo:MULTI_REDD_FONTE_LAVAUT",
+    "name": "Famiglie con fonte principale di reddito da lavoro autonomo",
+    "path": "/indicatore/famiglie-con-fonte-principale-di-reddito-da-lavoro-autonomo/ims-MULTI_REDD_FONTE_LAVAUT",
+    "direction": "contextual",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "%",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 12.335
+     },
+     {
+      "year": 2019,
+      "value": 12.936
+     },
+     {
+      "year": 2020,
+      "value": 12.037
+     },
+     {
+      "year": 2021,
+      "value": 11.779
+     },
+     {
+      "year": 2022,
+      "value": 12.442
+     },
+     {
+      "year": 2023,
+      "value": 12.402
+     },
+     {
+      "year": 2024,
+      "value": 12.869
+     }
+    ],
+    "latest": 12.869
+   },
+   {
+    "id": "multiscopo:MULTI_REDD_FONTE_LAVDIP",
+    "name": "Famiglie con fonte principale di reddito da lavoro dipendente",
+    "path": "/indicatore/famiglie-con-fonte-principale-di-reddito-da-lavoro-dipendente/ims-MULTI_REDD_FONTE_LAVDIP",
+    "direction": "contextual",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "%",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 45.672
+     },
+     {
+      "year": 2019,
+      "value": 45.432
+     },
+     {
+      "year": 2020,
+      "value": 43.146
+     },
+     {
+      "year": 2021,
+      "value": 43.092
+     },
+     {
+      "year": 2022,
+      "value": 44.335
+     },
+     {
+      "year": 2023,
+      "value": 44.714
+     },
+     {
+      "year": 2024,
+      "value": 43.374
+     }
+    ],
+    "latest": 43.374
+   },
+   {
+    "id": "multiscopo:MULTI_REDD_FONTE_TRASF",
+    "name": "Famiglie con fonte principale di reddito da trasferimenti pubblici",
+    "path": "/indicatore/famiglie-con-fonte-principale-di-reddito-da-trasferimenti-pubblici/ims-MULTI_REDD_FONTE_TRASF",
+    "direction": "contextual",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "%",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 39.954
+     },
+     {
+      "year": 2019,
+      "value": 39.888
+     },
+     {
+      "year": 2020,
+      "value": 42.941
+     },
+     {
+      "year": 2021,
+      "value": 42.94
+     },
+     {
+      "year": 2022,
+      "value": 41.31
+     },
+     {
+      "year": 2023,
+      "value": 40.694
+     },
+     {
+      "year": 2024,
+      "value": 41.808
+     }
+    ],
+    "latest": 41.808
+   },
+   {
+    "id": "multiscopo:MULTI_SPESA_GINI",
+    "name": "Indice di concentrazione di Gini della spesa per consumi",
+    "path": "/indicatore/indice-di-concentrazione-di-gini-della-spesa-per-consumi/ims-MULTI_SPESA_GINI",
+    "direction": "lower_better",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "indice",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 0.293
+     },
+     {
+      "year": 2019,
+      "value": 0.292
+     },
+     {
+      "year": 2020,
+      "value": 0.287
+     },
+     {
+      "year": 2021,
+      "value": 0.294
+     },
+     {
+      "year": 2022,
+      "value": 0.302
+     },
+     {
+      "year": 2023,
+      "value": 0.3
+     },
+     {
+      "year": 2024,
+      "value": 0.298
+     }
+    ],
+    "latest": 0.298
+   },
+   {
+    "id": "930",
+    "name": "Indice di Gini del reddito",
+    "path": "/indicatore/indice-di-gini-del-reddito/ter-930",
+    "direction": "lower_better",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "indice (0-1)",
+    "spark": [
+     {
+      "year": 2004,
+      "value": 0.313
+     },
+     {
+      "year": 2005,
+      "value": 0.307
+     },
+     {
+      "year": 2006,
+      "value": 0.31
+     },
+     {
+      "year": 2007,
+      "value": 0.304
+     },
+     {
+      "year": 2008,
+      "value": 0.308
+     },
+     {
+      "year": 2009,
+      "value": 0.304
+     },
+     {
+      "year": 2010,
+      "value": 0.311
+     },
+     {
+      "year": 2011,
+      "value": 0.314
+     },
+     {
+      "year": 2012,
+      "value": 0.316
+     },
+     {
+      "year": 2013,
+      "value": 0.308
+     },
+     {
+      "year": 2014,
+      "value": 0.305
+     },
+     {
+      "year": 2015,
+      "value": 0.318
+     },
+     {
+      "year": 2016,
+      "value": 0.314
+     },
+     {
+      "year": 2017,
+      "value": 0.321
+     },
+     {
+      "year": 2018,
+      "value": 0.318
+     },
+     {
+      "year": 2019,
+      "value": 0.316
+     },
+     {
+      "year": 2020,
+      "value": 0.32
+     },
+     {
+      "year": 2021,
+      "value": 0.317
+     },
+     {
+      "year": 2022,
+      "value": 0.309
+     },
+     {
+      "year": 2023,
+      "value": 0.316
+     },
+     {
+      "year": 2024,
+      "value": 0.302
+     }
+    ],
+    "latest": 0.302
+   },
+   {
+    "id": "multiscopo:MULTI_SPESA_INTERQUINTILE",
+    "name": "Rapporto interquintilico della spesa per consumi",
+    "path": "/indicatore/rapporto-interquintilico-della-spesa-per-consumi/ims-MULTI_SPESA_INTERQUINTILE",
+    "direction": "lower_better",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "rapporto",
+    "spark": [
+     {
+      "year": 2018,
+      "value": 4.445
+     },
+     {
+      "year": 2019,
+      "value": 4.373
+     },
+     {
+      "year": 2020,
+      "value": 4.254
+     },
+     {
+      "year": 2021,
+      "value": 4.359
+     },
+     {
+      "year": 2022,
+      "value": 4.531
+     },
+     {
+      "year": 2023,
+      "value": 4.494
+     },
+     {
+      "year": 2024,
+      "value": 4.472
+     }
+    ],
+    "latest": 4.472
+   },
+   {
+    "id": "905",
+    "name": "Redditi da lavoro dipendente per unità di lavoro",
+    "path": "/indicatore/redditi-da-lavoro-dipendente-per-unita-di-lavoro/ter-905",
+    "direction": "higher_better",
+    "source_theme": "Reddito e ricchezza",
+    "year_max": 2024,
+    "unit": "euro",
+    "spark": [
+     {
+      "year": 1995,
+      "value": 23818.01
+     },
+     {
+      "year": 1996,
+      "value": 25380.87
+     },
+     {
+      "year": 1998,
+      "value": 26097.79
+     },
+     {
+      "year": 1999,
+      "value": 26558.735
+     },
+     {
+      "year": 2000,
+      "value": 27078.97
+     },
+     {
+      "year": 2001,
+      "value": 27923.81
+     },
+     {
+      "year": 2003,
+      "value": 29397.8
+     },
+     {
+      "year": 2004,
+      "value": 30510.115
+     },
+     {
+      "year": 2005,
+      "value": 31303.465
+     },
+     {
+      "year": 2006,
+      "value": 32066.525
+     },
+     {
+      "year": 2008,
+      "value": 33653.165
+     },
+     {
+      "year": 2009,
+      "value": 33774.18
+     },
+     {
+      "year": 2010,
+      "value": 34427.175
+     },
+     {
+      "year": 2011,
+      "value": 34713.34
+     },
+     {
+      "year": 2013,
+      "value": 34405.86
+     },
+     {
+      "year": 2014,
+      "value": 34411.48
+     },
+     {
+      "year": 2015,
+      "value": 34808.335
+     },
+     {
+      "year": 2016,
+      "value": 34905.97
+     },
+     {
+      "year": 2018,
+      "value": 35530.775
+     },
+     {
+      "year": 2019,
+      "value": 36067.73
+     },
+     {
+      "year": 2020,
+      "value": 34552.995
+     },
+     {
+      "year": 2021,
+      "value": 36693.195
+     },
+     {
+      "year": 2023,
+      "value": 39022.24
+     },
+     {
+      "year": 2024,
+      "value": 40370.93
+     }
+    ],
+    "latest": 40370.93
+   }
+  ],
+  "related_posts": [
+   {
+    "slug": "pil-pro-capite-regioni-divario-2024",
+    "title": "PIL pro capite per regione: il divario Nord-Sud",
+    "seo_title": "PIL pro capite: due volte e mezzo tra la prima e l'ultima",
+    "description": "Nel 2024 il Trentino-Alto Adige produce 54.637 euro di PIL per abitante, la Calabria 21.702. Quasi due volte e mezzo. I dati Istat per regione.",
+    "date": "2026-06-30",
+    "date_modified": "2026-06-30",
+    "author": "Redazione Divario Italia",
+    "cover": "/static/img/blog/pil-pro-capite.svg",
+    "cover_alt": "PIL pro capite 2024 per regione: dal Trentino-Alto Adige (54.637 euro) alla Calabria (21.702). Grafico a barre.",
+    "cover_credit": null,
+    "cover_caption": "",
+    "dataset": null,
+    "social_image": "/static/img/blog/pil-pro-capite.png",
+    "social_image_size": [
+     1200,
+     630
+    ],
+    "tags": [
+     "Reddito e ricchezza",
+     "Divario Nord-Sud",
+     "Dati 2024"
+    ],
+    "indicator": "901",
+    "indicator_label": "PIL pro capite (2024)",
+    "read_time": 4,
+    "body_markdown": "Il prodotto interno lordo per abitante è il modo più diretto per misurare quanta\nricchezza un territorio produce, una volta tolta la differenza di dimensione tra\nregioni grandi e piccole. Nel 2024 in Italia questo numero cambia di quasi due\nvolte e mezzo tra la prima e l'ultima regione.\n\nIl punto di partenza sono **54.637 euro contro 21.702 euro**. Tanto separa il Trentino-Alto Adige, in testa, dalla Calabria, in coda. Un rapporto di circa 2,5 a 1.\n{: .data-callout}\n\n## In breve\n\n- Trentino-Alto Adige primo con 54.637 euro di PIL pro capite, Calabria ultima con 21.702.\n- La media semplice delle 20 regioni è circa 35.710 euro, ma poche regioni del Nord la tirano in alto.\n- Tutte e otto le regioni del Mezzogiorno stanno sotto la media delle regioni, e solo l'Abruzzo e la Basilicata superano i 28.000 euro.\n\n## Dati usati\n\n- **Fonte:** Istat, Conti economici territoriali (edizione dicembre 2025).\n- **Periodo:** 2024, ultimo anno disponibile.\n- **Territorio:** 20 regioni italiane.\n- **Unità:** euro per abitante, valori correnti.\n- **Metodo:** dato di fonte diretta. Le medie per area sono medie semplici tra regioni, non pesate per popolazione.\n- **Limite:** essendo a valori correnti, non è confrontabile nel tempo come misura di potere d'acquisto reale.\n\n## Dove si produce più valore\n\nIn cima ci sono i territori del Nord. Il Trentino-Alto Adige guida con 54.637\neuro per abitante, seguito dalla Lombardia con 50.399 e dalla Valle d'Aosta con\n47.743. In fondo si concentra il Sud: Calabria 21.702, Sicilia 23.309, Puglia\n24.328, Campania 24.564.\n\n| Regione | PIL pro capite 2024 (euro) |\n|---|---|\n| Trentino-Alto Adige | 54.637 |\n| Lombardia | 50.399 |\n| Valle d'Aosta | 47.743 |\n| Emilia-Romagna | 44.557 |\n| Lazio | 43.167 |\n| *Media 20 regioni* | *35.710* |\n| Molise | 27.698 |\n| Campania | 24.564 |\n| Puglia | 24.328 |\n| Sicilia | 23.309 |\n| Calabria | 21.702 |\n\nLa media semplice delle venti regioni è circa 35.710 euro. È un numero che dice\npoco da solo, perché un piccolo gruppo di regioni del Nord lo spinge verso l'alto\nmentre la maggioranza resta sotto.\n\nAggregando le regioni in due blocchi, la distanza diventa ancora più leggibile:\nil Centro-Nord (dodici regioni) produce in media circa 42.000 euro di PIL per\nabitante, il Mezzogiorno (otto regioni) circa 26.200. Sono medie semplici tra le\nregioni di ciascun blocco, non pesate per popolazione, ma il rapporto è netto:\n**il Centro-Nord produce in media il 60% in più per abitante**.\n\n## Una linea netta tra Nord e Sud\n\nIl dato più chiaro non è la singola regione, ma la separazione. Tutte le regioni\ndel Centro-Nord stanno sopra o vicino alla media delle regioni. Tutte le otto\ndel Mezzogiorno stanno sotto, e sei delle otto restano sotto i 28.000 euro per\nabitante: sopra quella cifra arrivano solo l'Abruzzo, con 32.109 euro, e la\nBasilicata, con 28.416. Non è una sfumatura, ed è anche il punto in cui la linea\nsi vede meno netta di quanto sembri.\n\n> Il PIL pro capite non misura quanto guadagna una famiglia, ma quanta ricchezza\n> un territorio riesce a produrre. È il primo strato del divario, quello da cui\n> partono salari, servizi e occasioni di lavoro.\n\nVale la pena ricordare cosa questo numero non dice. Il PIL per abitante conta la\nproduzione dove avviene, non dove finiscono i redditi: una regione con molte sedi\nd'impresa può segnare un valore alto anche se parte di quel valore si redistribuisce\naltrove. Per leggere quanto resta davvero alle famiglie serve affiancare il reddito\ndisponibile, un altro indicatore della stessa famiglia.\n\n## Cosa dice sul divario economico\n\nDove il PIL pro capite è alto e stabile, di solito si appoggiano salari più alti,\nservizi più solidi e un mercato del lavoro più capace di assorbire i giovani.\nDove è basso, le altre fragilità, dalla disoccupazione di lunga durata ai giovani che non\nstudiano e non lavorano, tendono a presentarsi insieme.\n\nPuoi vedere l'indicatore anno per anno e regione per regione, con mappa e classifica,\nnella [scheda dell'indicatore](/indicatore/pil-pro-capite/ter-901). Per il quadro completo della\nricchezza prodotta e redistribuita, guarda il tema [Reddito, inclusione e accessibilità](/tema/reddito-inclusione-e-accessibilita),\ne per capire dove il divario economico si traduce in fragilità giovanile leggi\nl'analisi sui [NEET per regione](/blog/neet-giovani-regioni-2024).\n\n*Dati: Istat, \"Conti economici territoriali\", edizione dicembre 2025. Valori\ncorrenti, non corretti per il diverso costo della vita tra regioni.*",
+    "body_html": "<p>Il prodotto interno lordo per abitante è il modo più diretto per misurare quanta\nricchezza un territorio produce, una volta tolta la differenza di dimensione tra\nregioni grandi e piccole. Nel 2024 in Italia questo numero cambia di quasi due\nvolte e mezzo tra la prima e l'ultima regione.</p>\n<p class=\"data-callout\">Il punto di partenza sono <strong>54.637 euro contro 21.702 euro</strong>. Tanto separa il Trentino-Alto Adige, in testa, dalla Calabria, in coda. Un rapporto di circa 2,5 a 1.</p>\n<h2 id=\"in-breve\">In breve</h2>\n<ul>\n<li>Trentino-Alto Adige primo con 54.637 euro di PIL pro capite, Calabria ultima con 21.702.</li>\n<li>La media semplice delle 20 regioni è circa 35.710 euro, ma poche regioni del Nord la tirano in alto.</li>\n<li>Tutte e otto le regioni del Mezzogiorno stanno sotto la media delle regioni, e solo l'Abruzzo e la Basilicata superano i 28.000 euro.</li>\n</ul>\n<h2 id=\"dati-usati\">Dati usati</h2>\n<ul>\n<li><strong>Fonte:</strong> Istat, Conti economici territoriali (edizione dicembre 2025).</li>\n<li><strong>Periodo:</strong> 2024, ultimo anno disponibile.</li>\n<li><strong>Territorio:</strong> 20 regioni italiane.</li>\n<li><strong>Unità:</strong> euro per abitante, valori correnti.</li>\n<li><strong>Metodo:</strong> dato di fonte diretta. Le medie per area sono medie semplici tra regioni, non pesate per popolazione.</li>\n<li><strong>Limite:</strong> essendo a valori correnti, non è confrontabile nel tempo come misura di potere d'acquisto reale.</li>\n</ul>\n<h2 id=\"dove-si-produce-piu-valore\">Dove si produce più valore</h2>\n<p>In cima ci sono i territori del Nord. Il Trentino-Alto Adige guida con 54.637\neuro per abitante, seguito dalla Lombardia con 50.399 e dalla Valle d'Aosta con\n47.743. In fondo si concentra il Sud: Calabria 21.702, Sicilia 23.309, Puglia\n24.328, Campania 24.564.</p>\n<table>\n<thead>\n<tr>\n<th>Regione</th>\n<th>PIL pro capite 2024 (euro)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Trentino-Alto Adige</td>\n<td>54.637</td>\n</tr>\n<tr>\n<td>Lombardia</td>\n<td>50.399</td>\n</tr>\n<tr>\n<td>Valle d'Aosta</td>\n<td>47.743</td>\n</tr>\n<tr>\n<td>Emilia-Romagna</td>\n<td>44.557</td>\n</tr>\n<tr>\n<td>Lazio</td>\n<td>43.167</td>\n</tr>\n<tr>\n<td><em>Media 20 regioni</em></td>\n<td><em>35.710</em></td>\n</tr>\n<tr>\n<td>Molise</td>\n<td>27.698</td>\n</tr>\n<tr>\n<td>Campania</td>\n<td>24.564</td>\n</tr>\n<tr>\n<td>Puglia</td>\n<td>24.328</td>\n</tr>\n<tr>\n<td>Sicilia</td>\n<td>23.309</td>\n</tr>\n<tr>\n<td>Calabria</td>\n<td>21.702</td>\n</tr>\n</tbody>\n</table>\n<p>La media semplice delle venti regioni è circa 35.710 euro. È un numero che dice\npoco da solo, perché un piccolo gruppo di regioni del Nord lo spinge verso l'alto\nmentre la maggioranza resta sotto.</p>\n<p>Aggregando le regioni in due blocchi, la distanza diventa ancora più leggibile:\nil Centro-Nord (dodici regioni) produce in media circa 42.000 euro di PIL per\nabitante, il Mezzogiorno (otto regioni) circa 26.200. Sono medie semplici tra le\nregioni di ciascun blocco, non pesate per popolazione, ma il rapporto è netto:\n<strong>il Centro-Nord produce in media il 60% in più per abitante</strong>.</p>\n<h2 id=\"una-linea-netta-tra-nord-e-sud\">Una linea netta tra Nord e Sud</h2>\n<p>Il dato più chiaro non è la singola regione, ma la separazione. Tutte le regioni\ndel Centro-Nord stanno sopra o vicino alla media delle regioni. Tutte le otto\ndel Mezzogiorno stanno sotto, e sei delle otto restano sotto i 28.000 euro per\nabitante: sopra quella cifra arrivano solo l'Abruzzo, con 32.109 euro, e la\nBasilicata, con 28.416. Non è una sfumatura, ed è anche il punto in cui la linea\nsi vede meno netta di quanto sembri.</p>\n<blockquote>\n<p>Il PIL pro capite non misura quanto guadagna una famiglia, ma quanta ricchezza\nun territorio riesce a produrre. È il primo strato del divario, quello da cui\npartono salari, servizi e occasioni di lavoro.</p>\n</blockquote>\n<p>Vale la pena ricordare cosa questo numero non dice. Il PIL per abitante conta la\nproduzione dove avviene, non dove finiscono i redditi: una regione con molte sedi\nd'impresa può segnare un valore alto anche se parte di quel valore si redistribuisce\naltrove. Per leggere quanto resta davvero alle famiglie serve affiancare il reddito\ndisponibile, un altro indicatore della stessa famiglia.</p>\n<h2 id=\"cosa-dice-sul-divario-economico\">Cosa dice sul divario economico</h2>\n<p>Dove il PIL pro capite è alto e stabile, di solito si appoggiano salari più alti,\nservizi più solidi e un mercato del lavoro più capace di assorbire i giovani.\nDove è basso, le altre fragilità, dalla disoccupazione di lunga durata ai giovani che non\nstudiano e non lavorano, tendono a presentarsi insieme.</p>\n<p>Puoi vedere l'indicatore anno per anno e regione per regione, con mappa e classifica,\nnella <a href=\"/indicatore/pil-pro-capite/ter-901\">scheda dell'indicatore</a>. Per il quadro completo della\nricchezza prodotta e redistribuita, guarda il tema <a href=\"/tema/reddito-inclusione-e-accessibilita\">Reddito, inclusione e accessibilità</a>,\ne per capire dove il divario economico si traduce in fragilità giovanile leggi\nl'analisi sui <a href=\"/blog/neet-giovani-regioni-2024\">NEET per regione</a>.</p>\n<p><em>Dati: Istat, \"Conti economici territoriali\", edizione dicembre 2025. Valori\ncorrenti, non corretti per il diverso costo della vita tra regioni.</em></p>",
+    "url": "https://divarioitalia.it/blog/pil-pro-capite-regioni-divario-2024"
+   }
+  ],
+  "siblings": {
+   "prev": {
+    "id": "365",
+    "name": "Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030 (totale)",
+    "path": "/indicatore/persone-in-condizioni-di-grave-deprivazione-materiale-e-sociale-europa-2030-tota/ter-365",
+    "direction": "lower_better",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2024,
+    "unit": "numero",
+    "spark": [
+     {
+      "year": 2021,
+      "value": 183167.895
+     },
+     {
+      "year": 2022,
+      "value": 152095.882
+     },
+     {
+      "year": 2023,
+      "value": 153683.111
+     },
+     {
+      "year": 2024,
+      "value": 167383.75
+     }
+    ],
+    "latest": 167383.75
+   },
+   "next": {
+    "id": "245",
+    "name": "Popolazione residente nei comuni rurali",
+    "path": "/indicatore/popolazione-residente-nei-comuni-rurali/ter-245",
+    "direction": "contextual",
+    "source_theme": "Inclusione sociale",
+    "year_max": 2013,
+    "unit": "percentuale",
+    "spark": [
+     {
+      "year": 2011,
+      "value": -0.166
+     },
+     {
+      "year": 2012,
+      "value": 0.154
+     },
+     {
+      "year": 2013,
+      "value": 0.503
+     }
+    ],
+    "latest": 0.503
+   }
+  },
+  "dimension_siblings": [],
+  "explore": {
+   "id": "901",
+   "unit": "euro",
+   "changeUnit": "euro",
+   "direction": "higher_better",
+   "higherBetter": true,
+   "scoreable": true,
+   "rampStops": [
+    "var(--seq-1)",
+    "var(--seq-2)",
+    "var(--seq-3)",
+    "var(--seq-4)",
+    "var(--seq-5)",
+    "var(--seq-6)"
+   ],
+   "defaultLevel": "regione",
+   "levels": [
+    {
+     "key": "regione",
+     "label": "Regioni",
+     "singular": "regione",
+     "plural": "regioni",
+     "profilePath": "/regione/",
+     "hasMap": true,
+     "years": [
+      1995,
+      1996,
+      1997,
+      1998,
+      1999,
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+     ],
+     "yearMin": 1995,
+     "yearMax": 2024,
+     "defaultYear": 2024,
+     "territories": [
+      {
+       "key": "abruzzo",
+       "name": "Abruzzo"
+      },
+      {
+       "key": "basilicata",
+       "name": "Basilicata"
+      },
+      {
+       "key": "calabria",
+       "name": "Calabria"
+      },
+      {
+       "key": "campania",
+       "name": "Campania"
+      },
+      {
+       "key": "emilia-romagna",
+       "name": "Emilia-Romagna"
+      },
+      {
+       "key": "friuli-venezia-giulia",
+       "name": "Friuli-Venezia Giulia"
+      },
+      {
+       "key": "lazio",
+       "name": "Lazio"
+      },
+      {
+       "key": "liguria",
+       "name": "Liguria"
+      },
+      {
+       "key": "lombardia",
+       "name": "Lombardia"
+      },
+      {
+       "key": "marche",
+       "name": "Marche"
+      },
+      {
+       "key": "molise",
+       "name": "Molise"
+      },
+      {
+       "key": "piemonte",
+       "name": "Piemonte"
+      },
+      {
+       "key": "puglia",
+       "name": "Puglia"
+      },
+      {
+       "key": "sardegna",
+       "name": "Sardegna"
+      },
+      {
+       "key": "sicilia",
+       "name": "Sicilia"
+      },
+      {
+       "key": "toscana",
+       "name": "Toscana"
+      },
+      {
+       "key": "trentino-alto-adige",
+       "name": "Trentino Alto Adige"
+      },
+      {
+       "key": "umbria",
+       "name": "Umbria"
+      },
+      {
+       "key": "valle-d-aosta",
+       "name": "Valle d'Aosta"
+      },
+      {
+       "key": "veneto",
+       "name": "Veneto"
+      }
+     ],
+     "defaultTerritory": "trentino-alto-adige",
+     "matrix": {
+      "1995": {
+       "piemonte": 18809.9,
+       "valle-d-aosta": 26599.1,
+       "lombardia": 23993.3,
+       "trentino-alto-adige": 24735.4,
+       "veneto": 19966.8,
+       "friuli-venezia-giulia": 18537.3,
+       "liguria": 17812.3,
+       "emilia-romagna": 21133.7,
+       "toscana": 18253.4,
+       "umbria": 16992.6,
+       "marche": 16294.8,
+       "lazio": 21900.4,
+       "abruzzo": 15377.5,
+       "molise": 13342.7,
+       "campania": 11409.1,
+       "puglia": 11027.9,
+       "basilicata": 11629.5,
+       "calabria": 9995.5,
+       "sicilia": 11102.5,
+       "sardegna": 11791.2
+      },
+      "1996": {
+       "piemonte": 19752.2,
+       "valle-d-aosta": 27502.4,
+       "lombardia": 25404.9,
+       "trentino-alto-adige": 26518.7,
+       "veneto": 21223.2,
+       "friuli-venezia-giulia": 19427.5,
+       "liguria": 18915.7,
+       "emilia-romagna": 22605.1,
+       "toscana": 19321.5,
+       "umbria": 17723.7,
+       "marche": 17444.0,
+       "lazio": 22939.3,
+       "abruzzo": 16347.6,
+       "molise": 14186.3,
+       "campania": 11927.0,
+       "puglia": 11699.6,
+       "basilicata": 12646.3,
+       "calabria": 10546.6,
+       "sicilia": 11720.5,
+       "sardegna": 12308.4
+      },
+      "1997": {
+       "piemonte": 20731.5,
+       "valle-d-aosta": 27552.2,
+       "lombardia": 26376.7,
+       "trentino-alto-adige": 27034.5,
+       "veneto": 22175.0,
+       "friuli-venezia-giulia": 20219.7,
+       "liguria": 19854.6,
+       "emilia-romagna": 23458.1,
+       "toscana": 20121.2,
+       "umbria": 18639.2,
+       "marche": 18123.0,
+       "lazio": 24125.9,
+       "abruzzo": 16881.9,
+       "molise": 15325.1,
+       "campania": 12657.5,
+       "puglia": 12117.0,
+       "basilicata": 13416.1,
+       "calabria": 11175.9,
+       "sicilia": 12228.7,
+       "sardegna": 13109.6
+      },
+      "1998": {
+       "piemonte": 21479.2,
+       "valle-d-aosta": 28561.8,
+       "lombardia": 27484.6,
+       "trentino-alto-adige": 28187.3,
+       "veneto": 22894.0,
+       "friuli-venezia-giulia": 20758.8,
+       "liguria": 20785.1,
+       "emilia-romagna": 24430.3,
+       "toscana": 21074.7,
+       "umbria": 19119.9,
+       "marche": 18635.9,
+       "lazio": 25410.4,
+       "abruzzo": 17274.2,
+       "molise": 15891.6,
+       "campania": 13243.0,
+       "puglia": 12748.6,
+       "basilicata": 14147.1,
+       "calabria": 11693.6,
+       "sicilia": 12686.8,
+       "sardegna": 13575.9
+      },
+      "1999": {
+       "piemonte": 22291.1,
+       "valle-d-aosta": 28725.9,
+       "lombardia": 28028.3,
+       "trentino-alto-adige": 28727.6,
+       "veneto": 23512.7,
+       "friuli-venezia-giulia": 21688.3,
+       "liguria": 21462.9,
+       "emilia-romagna": 25295.2,
+       "toscana": 21936.0,
+       "umbria": 19983.2,
+       "marche": 19505.8,
+       "lazio": 26075.6,
+       "abruzzo": 17880.1,
+       "molise": 16183.7,
+       "campania": 13688.0,
+       "puglia": 13363.7,
+       "basilicata": 15174.3,
+       "calabria": 12409.1,
+       "sicilia": 12909.7,
+       "sardegna": 14126.0
+      },
+      "2000": {
+       "piemonte": 23346.2,
+       "valle-d-aosta": 29291.9,
+       "lombardia": 29458.7,
+       "trentino-alto-adige": 30156.4,
+       "veneto": 25034.6,
+       "friuli-venezia-giulia": 23265.1,
+       "liguria": 23015.5,
+       "emilia-romagna": 27048.5,
+       "toscana": 23208.5,
+       "umbria": 21077.5,
+       "marche": 20532.8,
+       "lazio": 27408.0,
+       "abruzzo": 19057.7,
+       "molise": 16962.9,
+       "campania": 14452.9,
+       "puglia": 14118.8,
+       "basilicata": 15615.3,
+       "calabria": 12911.9,
+       "sicilia": 13659.1,
+       "sardegna": 14877.7
+      },
+      "2001": {
+       "piemonte": 24395.9,
+       "valle-d-aosta": 30831.0,
+       "lombardia": 30884.4,
+       "trentino-alto-adige": 31222.7,
+       "veneto": 25934.9,
+       "friuli-venezia-giulia": 24535.1,
+       "liguria": 24600.2,
+       "emilia-romagna": 28015.6,
+       "toscana": 24356.7,
+       "umbria": 22143.7,
+       "marche": 21728.3,
+       "lazio": 29074.6,
+       "abruzzo": 19967.7,
+       "molise": 17889.8,
+       "campania": 15312.3,
+       "puglia": 14812.0,
+       "basilicata": 16209.1,
+       "calabria": 13677.6,
+       "sicilia": 14499.3,
+       "sardegna": 15848.1
+      },
+      "2002": {
+       "piemonte": 25255.7,
+       "valle-d-aosta": 31833.1,
+       "lombardia": 32080.9,
+       "trentino-alto-adige": 31701.6,
+       "veneto": 26343.6,
+       "friuli-venezia-giulia": 25192.7,
+       "liguria": 24965.0,
+       "emilia-romagna": 28690.1,
+       "toscana": 25180.0,
+       "umbria": 22537.3,
+       "marche": 22876.0,
+       "lazio": 30592.0,
+       "abruzzo": 20365.6,
+       "molise": 18397.8,
+       "campania": 15969.8,
+       "puglia": 15155.9,
+       "basilicata": 16735.7,
+       "calabria": 14097.9,
+       "sicilia": 14984.8,
+       "sardegna": 16171.1
+      },
+      "2003": {
+       "piemonte": 25999.9,
+       "valle-d-aosta": 33848.9,
+       "lombardia": 32875.5,
+       "trentino-alto-adige": 32521.1,
+       "veneto": 27310.5,
+       "friuli-venezia-giulia": 25276.8,
+       "liguria": 25892.4,
+       "emilia-romagna": 29225.6,
+       "toscana": 25858.0,
+       "umbria": 23075.6,
+       "marche": 23214.5,
+       "lazio": 31310.3,
+       "abruzzo": 20564.3,
+       "molise": 18693.6,
+       "campania": 16272.1,
+       "puglia": 15555.7,
+       "basilicata": 16817.8,
+       "calabria": 14609.6,
+       "sicilia": 15525.4,
+       "sardegna": 16991.7
+      },
+      "2004": {
+       "piemonte": 26819.2,
+       "valle-d-aosta": 34541.4,
+       "lombardia": 33607.9,
+       "trentino-alto-adige": 33684.0,
+       "veneto": 28365.0,
+       "friuli-venezia-giulia": 26047.8,
+       "liguria": 26777.6,
+       "emilia-romagna": 30111.6,
+       "toscana": 26646.1,
+       "umbria": 23817.0,
+       "marche": 23977.7,
+       "lazio": 32958.6,
+       "abruzzo": 20541.4,
+       "molise": 19538.2,
+       "campania": 16728.5,
+       "puglia": 16077.0,
+       "basilicata": 17458.3,
+       "calabria": 15328.2,
+       "sicilia": 15988.3,
+       "sardegna": 17765.6
+      },
+      "2005": {
+       "piemonte": 27449.1,
+       "valle-d-aosta": 35211.6,
+       "lombardia": 34178.0,
+       "trentino-alto-adige": 33995.1,
+       "veneto": 28895.5,
+       "friuli-venezia-giulia": 27087.9,
+       "liguria": 27499.2,
+       "emilia-romagna": 30686.4,
+       "toscana": 27007.4,
+       "umbria": 24106.2,
+       "marche": 24528.9,
+       "lazio": 33639.9,
+       "abruzzo": 21421.9,
+       "molise": 20107.8,
+       "campania": 17132.0,
+       "puglia": 16373.8,
+       "basilicata": 17771.7,
+       "calabria": 15807.8,
+       "sicilia": 16703.5,
+       "sardegna": 18122.3
+      },
+      "2006": {
+       "piemonte": 28519.3,
+       "valle-d-aosta": 36271.3,
+       "lombardia": 35024.2,
+       "trentino-alto-adige": 35278.2,
+       "veneto": 29760.2,
+       "friuli-venezia-giulia": 28308.3,
+       "liguria": 28388.1,
+       "emilia-romagna": 32141.7,
+       "toscana": 28091.9,
+       "umbria": 25190.3,
+       "marche": 25740.2,
+       "lazio": 34537.3,
+       "abruzzo": 22325.2,
+       "molise": 21525.6,
+       "campania": 17778.2,
+       "puglia": 17088.0,
+       "basilicata": 18936.9,
+       "calabria": 16520.6,
+       "sicilia": 17364.1,
+       "sardegna": 19008.0
+      },
+      "2007": {
+       "piemonte": 29224.4,
+       "valle-d-aosta": 37001.6,
+       "lombardia": 36209.3,
+       "trentino-alto-adige": 36620.4,
+       "veneto": 30768.4,
+       "friuli-venezia-giulia": 29397.9,
+       "liguria": 29958.4,
+       "emilia-romagna": 33411.3,
+       "toscana": 29058.4,
+       "umbria": 25962.3,
+       "marche": 26657.1,
+       "lazio": 35586.0,
+       "abruzzo": 23074.9,
+       "molise": 22389.2,
+       "campania": 18358.7,
+       "puglia": 17506.9,
+       "basilicata": 19778.9,
+       "calabria": 16980.1,
+       "sicilia": 17685.2,
+       "sardegna": 19505.8
+      },
+      "2008": {
+       "piemonte": 28999.5,
+       "valle-d-aosta": 37859.9,
+       "lombardia": 37307.4,
+       "trentino-alto-adige": 37051.8,
+       "veneto": 30394.3,
+       "friuli-venezia-giulia": 28966.4,
+       "liguria": 30562.2,
+       "emilia-romagna": 33352.9,
+       "toscana": 29047.9,
+       "umbria": 25948.9,
+       "marche": 26268.9,
+       "lazio": 35234.9,
+       "abruzzo": 23452.2,
+       "molise": 21913.4,
+       "campania": 18411.5,
+       "puglia": 17257.3,
+       "basilicata": 19856.0,
+       "calabria": 17262.0,
+       "sicilia": 17835.0,
+       "sardegna": 19924.4
+      },
+      "2009": {
+       "piemonte": 26950.8,
+       "valle-d-aosta": 35694.0,
+       "lombardia": 35275.6,
+       "trentino-alto-adige": 36291.0,
+       "veneto": 29128.3,
+       "friuli-venezia-giulia": 27278.2,
+       "liguria": 29033.1,
+       "emilia-romagna": 31381.5,
+       "toscana": 28289.9,
+       "umbria": 24198.0,
+       "marche": 25300.5,
+       "lazio": 34448.5,
+       "abruzzo": 22507.9,
+       "molise": 21398.4,
+       "campania": 17884.7,
+       "puglia": 16747.2,
+       "basilicata": 18805.6,
+       "calabria": 16861.2,
+       "sicilia": 17317.6,
+       "sardegna": 19472.0
+      },
+      "2010": {
+       "piemonte": 27832.6,
+       "valle-d-aosta": 37335.2,
+       "lombardia": 36651.4,
+       "trentino-alto-adige": 37272.6,
+       "veneto": 29545.2,
+       "friuli-venezia-giulia": 28210.0,
+       "liguria": 28601.2,
+       "emilia-romagna": 31768.6,
+       "toscana": 28481.4,
+       "umbria": 24622.5,
+       "marche": 25307.7,
+       "lazio": 34600.0,
+       "abruzzo": 23129.3,
+       "molise": 21499.0,
+       "campania": 17682.6,
+       "puglia": 17085.9,
+       "basilicata": 18760.6,
+       "calabria": 16855.1,
+       "sicilia": 17289.5,
+       "sardegna": 19650.1
+      },
+      "2011": {
+       "piemonte": 28514.0,
+       "valle-d-aosta": 38039.3,
+       "lombardia": 37290.7,
+       "trentino-alto-adige": 38173.4,
+       "veneto": 30543.2,
+       "friuli-venezia-giulia": 28903.5,
+       "liguria": 29415.5,
+       "emilia-romagna": 32950.6,
+       "toscana": 29111.8,
+       "umbria": 24876.8,
+       "marche": 25702.9,
+       "lazio": 35054.9,
+       "abruzzo": 24197.8,
+       "molise": 21623.1,
+       "campania": 17735.1,
+       "puglia": 17445.7,
+       "basilicata": 19494.6,
+       "calabria": 17026.2,
+       "sicilia": 17275.0,
+       "sardegna": 19961.2
+      },
+      "2012": {
+       "piemonte": 27552.5,
+       "valle-d-aosta": 38248.0,
+       "lombardia": 36407.8,
+       "trentino-alto-adige": 38902.3,
+       "veneto": 29944.0,
+       "friuli-venezia-giulia": 28181.7,
+       "liguria": 28907.5,
+       "emilia-romagna": 32350.8,
+       "toscana": 28865.4,
+       "umbria": 24158.0,
+       "marche": 25129.7,
+       "lazio": 33801.5,
+       "abruzzo": 24093.8,
+       "molise": 20993.7,
+       "campania": 17608.5,
+       "puglia": 17527.2,
+       "basilicata": 19401.5,
+       "calabria": 16734.8,
+       "sicilia": 17210.4,
+       "sardegna": 20026.8
+      },
+      "2013": {
+       "piemonte": 27779.6,
+       "valle-d-aosta": 36633.1,
+       "lombardia": 35837.0,
+       "trentino-alto-adige": 39352.1,
+       "veneto": 29897.0,
+       "friuli-venezia-giulia": 28371.2,
+       "liguria": 28677.2,
+       "emilia-romagna": 32454.8,
+       "toscana": 28593.5,
+       "umbria": 23756.4,
+       "marche": 24754.7,
+       "lazio": 33081.3,
+       "abruzzo": 23736.0,
+       "molise": 19746.5,
+       "campania": 17335.2,
+       "puglia": 17109.5,
+       "basilicata": 19947.0,
+       "calabria": 16455.2,
+       "sicilia": 17003.0,
+       "sardegna": 19529.1
+      },
+      "2014": {
+       "piemonte": 27801.7,
+       "valle-d-aosta": 36239.0,
+       "lombardia": 36435.2,
+       "trentino-alto-adige": 39325.4,
+       "veneto": 30382.7,
+       "friuli-venezia-giulia": 28528.1,
+       "liguria": 29338.9,
+       "emilia-romagna": 33020.3,
+       "toscana": 29145.1,
+       "umbria": 23383.0,
+       "marche": 25463.0,
+       "lazio": 32959.4,
+       "abruzzo": 23760.4,
+       "molise": 19625.5,
+       "campania": 17418.8,
+       "puglia": 17302.2,
+       "basilicata": 19339.0,
+       "calabria": 16353.2,
+       "sicilia": 16689.7,
+       "sardegna": 19641.7
+      },
+      "2015": {
+       "piemonte": 28441.7,
+       "valle-d-aosta": 36465.0,
+       "lombardia": 37137.0,
+       "trentino-alto-adige": 39628.9,
+       "veneto": 31038.8,
+       "friuli-venezia-giulia": 29407.6,
+       "liguria": 29925.8,
+       "emilia-romagna": 33602.3,
+       "toscana": 29498.2,
+       "umbria": 24177.3,
+       "marche": 25648.9,
+       "lazio": 32950.9,
+       "abruzzo": 24036.8,
+       "molise": 20091.8,
+       "campania": 17842.0,
+       "puglia": 17733.6,
+       "basilicata": 20959.9,
+       "calabria": 16557.7,
+       "sicilia": 17043.6,
+       "sardegna": 20363.3
+      },
+      "2016": {
+       "piemonte": 29308.6,
+       "valle-d-aosta": 36238.2,
+       "lombardia": 38174.9,
+       "trentino-alto-adige": 40305.7,
+       "veneto": 32138.8,
+       "friuli-venezia-giulia": 29890.2,
+       "liguria": 30665.8,
+       "emilia-romagna": 34654.6,
+       "toscana": 30236.0,
+       "umbria": 24397.7,
+       "marche": 26251.5,
+       "lazio": 34291.3,
+       "abruzzo": 24248.8,
+       "molise": 20491.6,
+       "campania": 18199.6,
+       "puglia": 18144.5,
+       "basilicata": 21074.0,
+       "calabria": 16907.1,
+       "sicilia": 17242.8,
+       "sardegna": 20213.5
+      },
+      "2017": {
+       "piemonte": 30418.0,
+       "valle-d-aosta": 37725.3,
+       "lombardia": 39114.3,
+       "trentino-alto-adige": 41317.4,
+       "veneto": 33014.4,
+       "friuli-venezia-giulia": 30572.3,
+       "liguria": 31474.9,
+       "emilia-romagna": 35565.0,
+       "toscana": 30942.8,
+       "umbria": 25077.1,
+       "marche": 26930.1,
+       "lazio": 34707.7,
+       "abruzzo": 24987.3,
+       "molise": 21094.5,
+       "campania": 18620.2,
+       "puglia": 18494.6,
+       "basilicata": 21375.2,
+       "calabria": 17336.8,
+       "sicilia": 17696.0,
+       "sardegna": 20670.5
+      },
+      "2018": {
+       "piemonte": 31161.6,
+       "valle-d-aosta": 38180.5,
+       "lombardia": 40078.6,
+       "trentino-alto-adige": 42798.7,
+       "veneto": 33691.5,
+       "friuli-venezia-giulia": 31436.2,
+       "liguria": 31728.5,
+       "emilia-romagna": 36283.4,
+       "toscana": 31744.8,
+       "umbria": 25908.4,
+       "marche": 27465.9,
+       "lazio": 35215.4,
+       "abruzzo": 25163.9,
+       "molise": 21641.2,
+       "campania": 18871.5,
+       "puglia": 18920.3,
+       "basilicata": 22548.2,
+       "calabria": 17317.1,
+       "sicilia": 17837.5,
+       "sardegna": 21076.0
+      },
+      "2019": {
+       "piemonte": 31429.8,
+       "valle-d-aosta": 38688.9,
+       "lombardia": 40425.6,
+       "trentino-alto-adige": 43860.2,
+       "veneto": 34308.9,
+       "friuli-venezia-giulia": 32264.6,
+       "liguria": 32403.7,
+       "emilia-romagna": 36521.0,
+       "toscana": 33072.6,
+       "umbria": 26177.6,
+       "marche": 28072.9,
+       "lazio": 35843.3,
+       "abruzzo": 25460.6,
+       "molise": 22293.5,
+       "campania": 19353.4,
+       "puglia": 19269.7,
+       "basilicata": 22437.5,
+       "calabria": 17597.6,
+       "sicilia": 18187.7,
+       "sardegna": 21646.1
+      },
+      "2020": {
+       "piemonte": 29059.9,
+       "valle-d-aosta": 35610.6,
+       "lombardia": 37986.5,
+       "trentino-alto-adige": 40981.0,
+       "veneto": 31494.3,
+       "friuli-venezia-giulia": 30239.0,
+       "liguria": 29545.6,
+       "emilia-romagna": 34182.7,
+       "toscana": 29276.3,
+       "umbria": 24175.4,
+       "marche": 26070.2,
+       "lazio": 33246.0,
+       "abruzzo": 23728.4,
+       "molise": 20971.9,
+       "campania": 18078.6,
+       "puglia": 18217.5,
+       "basilicata": 20583.5,
+       "calabria": 16588.6,
+       "sicilia": 17214.5,
+       "sardegna": 20199.7
+      },
+      "2021": {
+       "piemonte": 32261.6,
+       "valle-d-aosta": 38666.0,
+       "lombardia": 42584.3,
+       "trentino-alto-adige": 44670.4,
+       "veneto": 34994.5,
+       "friuli-venezia-giulia": 33767.4,
+       "liguria": 32620.0,
+       "emilia-romagna": 38128.0,
+       "toscana": 32512.3,
+       "umbria": 26692.9,
+       "marche": 28959.4,
+       "lazio": 35754.7,
+       "abruzzo": 26292.5,
+       "molise": 23332.4,
+       "campania": 19908.2,
+       "puglia": 20255.1,
+       "basilicata": 23859.9,
+       "calabria": 18335.4,
+       "sicilia": 19076.2,
+       "sardegna": 22472.7
+      },
+      "2022": {
+       "piemonte": 34514.2,
+       "valle-d-aosta": 43799.0,
+       "lombardia": 45964.0,
+       "trentino-alto-adige": 49824.9,
+       "veneto": 37956.3,
+       "friuli-venezia-giulia": 35735.2,
+       "liguria": 35164.6,
+       "emilia-romagna": 40744.9,
+       "toscana": 35647.7,
+       "umbria": 28830.5,
+       "marche": 31227.4,
+       "lazio": 39786.3,
+       "abruzzo": 28600.1,
+       "molise": 25009.0,
+       "campania": 21791.1,
+       "puglia": 22069.0,
+       "basilicata": 25934.1,
+       "calabria": 19667.1,
+       "sicilia": 21229.9,
+       "sardegna": 24558.2
+      },
+      "2023": {
+       "piemonte": 37439.3,
+       "valle-d-aosta": 47123.4,
+       "lombardia": 49144.2,
+       "trentino-alto-adige": 54120.3,
+       "veneto": 40671.5,
+       "friuli-venezia-giulia": 37729.4,
+       "liguria": 38505.2,
+       "emilia-romagna": 43757.2,
+       "toscana": 38144.6,
+       "umbria": 31442.9,
+       "marche": 33331.5,
+       "lazio": 42202.6,
+       "abruzzo": 31120.4,
+       "molise": 27161.1,
+       "campania": 23725.2,
+       "puglia": 23636.3,
+       "basilicata": 27718.9,
+       "calabria": 21131.1,
+       "sicilia": 22241.2,
+       "sardegna": 26551.1
+      },
+      "2024": {
+       "piemonte": 38625.5,
+       "valle-d-aosta": 47742.8,
+       "lombardia": 50398.9,
+       "trentino-alto-adige": 54636.7,
+       "veneto": 41496.3,
+       "friuli-venezia-giulia": 39005.1,
+       "liguria": 38841.8,
+       "emilia-romagna": 44557.0,
+       "toscana": 39262.0,
+       "umbria": 32466.9,
+       "marche": 34149.1,
+       "lazio": 43166.9,
+       "abruzzo": 32108.7,
+       "molise": 27697.8,
+       "campania": 24564.2,
+       "puglia": 24327.7,
+       "basilicata": 28416.3,
+       "calabria": 21702.2,
+       "sicilia": 23308.7,
+       "sardegna": 27730.8
+      }
+     }
+    }
+   ]
+  },
+  "page_article": {
+   "lead": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane. Chi cerca questa cifra di solito vuole sapere anche la seconda cosa, cioè perché sia così lontana dalle altre. La risposta sta dentro una divisione, e i pezzi sono due: quanta parte degli abitanti lavora, e quanto vale quello che produce chi lavora.",
+   "sections": [
+    {
+     "role": "libera",
+     "anchor": "sezione-il-conto-si-divide-fra-tutti-non-fra-chi-lavora",
+     "heading": "Il conto si divide fra tutti, non fra chi lavora",
+     "body": "Il prodotto interno lordo di una regione è il valore di tutto quello che ci si produce in un anno. Per ottenere la cifra che finisce in classifica lo si divide per i residenti, tutti: i bambini, gli studenti, i pensionati, chi un lavoro lo cerca e chi ha smesso di cercarlo. Quel numero, quindi, non dice soltanto quanto vale il lavoro di chi lavora. Dice anche quanta parte degli abitanti un lavoro ce l'ha.\n\nBasta questo a distanziare i due capi della classifica. Se in due regioni ogni occupato producesse la stessa cifra, ma in una gli abitanti al lavoro fossero molti di più, le due finirebbero comunque lontane in classifica. Nel 2024 le regioni del Nord stanno in media a 44.413 euro per abitante e quelle del Mezzogiorno a 26.232, e la distanza fra le due medie vale più di quattro quinti di tutto quello che la Calabria produce in un anno per ogni suo abitante.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-quante-persone-hanno-un-lavoro",
+     "heading": "Quante persone hanno un lavoro",
+     "body": "La classifica del prodotto per abitante e quella di quante persone lavorano si somigliano molto, e ai due capi si sovrappongono. Il Trentino Alto Adige, primo qui, è primo in Italia anche per [quota di persone al lavoro fra i 20 e i 64 anni](/indicatore/tasso-di-occupazione-20-64-anni/ter-345), e la Calabria è ultima in tutte e due. Lo stesso vale per [il tasso di occupazione di tutte le età](/indicatore/tasso-di-occupazione-totale/ter-13). E non è solo la distanza fra Nord e Sud: il legame si vede anche fra regioni della stessa parte d'Italia.\n\n[Istat lo ha scritto](https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/) in un'analisi sui vent'anni di politiche di coesione nel Mezzogiorno, su un confronto diverso da questo: non le regioni italiane fra loro, ma le regioni italiane più indietro messe accanto alla media dei paesi dell'Unione europea. Lì il distacco di reddito, misurato tenendo conto dei prezzi diversi fra paesi, è spiegato interamente dal tasso di occupazione. E aggiunge subito dopo che a quel fattore se ne è aggiunto un secondo.\n\n<!-- grafico: dispersione con=ter-345 evidenzia=Lazio didascalia=\"Ogni punto e' una regione: dove lavora piu' gente, il prodotto per abitante e' piu' alto. Il Lazio e' quinto qui e dodicesimo per occupazione.\" -->\n\nUna regione però non ci sta. Il Lazio è quinto fra le regioni per prodotto per abitante e dodicesimo per quota di persone al lavoro fra i 20 e i 64 anni: sette posti di distanza.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-l-altra-meta-del-conto",
+     "heading": "L'altra metà del conto",
+     "body": "Il conto però ha due pezzi. Uno è quante persone lavorano, l'altro è quanto vale quello che produce chi lavora. [La Banca d'Italia](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2018/2018-0023/1823-eco-regioni.pdf) ha scritto nel 2018, sui dati del 2017, che il distacco di prodotto per abitante fra le regioni meridionali e il resto del Paese si divide in parti quasi uguali fra i due, e che al Sud la seconda parte, la produttività, è più bassa.\n\nIl peso di quel secondo pezzo non è sempre stato lo stesso, e a datarlo è di nuovo [Istat](https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/), sempre nel confronto con l'Europa, che lo fa cominciare con i fondi europei fra il 2014 e il 2020. Per una regione la differenza non è una sottigliezza: portare al lavoro chi oggi non lavora e far valere di più il lavoro di chi già ce l'ha sono due strade diverse, e si percorrono in modi diversi.",
+     "authored": true
+    },
+    {
+     "role": "libera",
+     "anchor": "sezione-che-cosa-e-cambiato-in-dieci-anni",
+     "heading": "Che cosa è cambiato in dieci anni",
+     "body": "Dal 2014 al 2024 la media delle regioni è salita di 9.603 euro per abitante. Sono euro correnti, cioè dentro c'è anche l'aumento dei prezzi di quei dieci anni, e quindi non è tutta ricchezza in più. Quello che i prezzi non spostano è l'ordine: dieci anni fa i due capi della classifica erano già questi, il Trentino Alto Adige davanti e la Calabria dietro.\n\nIl prodotto per abitante, comunque, non è uno stipendio e non entra in nessun portafoglio: è quello che si produce diviso per chi ci vive. La misura che si sente in casa è un'altra, e nel 2024 in Calabria più di un quarto delle famiglie dice di [arrivare a fine mese con difficoltà](/indicatore/famiglie-che-arrivano-a-fine-mese-con-difficolta/ims-MULTI_DISAGIO_DIFFICOLTA).",
+     "authored": true
+    }
+   ],
+   "come_leggere": true,
+   "h1": "PIL pro capite per regione: di che cosa è fatta la distanza fra Trentino e Calabria",
+   "seo_title": "PIL pro capite per regione",
+   "fonti": [
+    {
+     "testo": "Istat, \"La politica di coesione e il Mezzogiorno. Vent'anni di mancata convergenza\", comunicato stampa del 13 giugno 2023, anni 2000-2021. «Il divario crescente in termini di reddito (misurato in Pil pro capite in ppa) fra le regioni italiane economicamente meno avanzate e l'Ue27, è spiegato interamente dal tasso di occupazione, inferiore alla media Ue di ben 20 punti percentuali.». «Soltanto nel corso dell'ultimo ciclo di programmazione 2014-2020 è divenuta determinante anche la produttività del lavoro inferiore alla media Ue27 di 9 punti percentuali.»",
+     "url": "https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/"
+    },
+    {
+     "testo": "Banca d'Italia, \"L'economia delle regioni italiane. Dinamiche recenti e aspetti strutturali\", Economie regionali n. 23, novembre 2018",
+     "url": "https://www.bancaditalia.it/pubblicazioni/economie-regionali/2018/2018-0023/1823-eco-regioni.pdf"
+    }
+   ],
+   "vintage": 2024,
+   "authored_count": 1
+  },
+  "page_lead": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane. Chi cerca questa cifra di solito vuole sapere anche la seconda cosa, cioè perché sia così lontana dalle altre. La risposta sta dentro una divisione, e i pezzi sono due: quanta parte degli abitanti lavora, e quanto vale quello che produce chi lavora.",
+  "noindex": false,
+  "seo_title": "PIL pro capite per regione, da 54.637 a 21.702 euro",
+  "seo_description": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane.",
+  "dataset_description": "Nel 2024 in Calabria si sono prodotti 21.702 euro per ogni abitante, il valore più basso fra le regioni italiane. Chi cerca questa cifra di solito vuole sapere anche la seconda cosa, cioè perché sia così lontana dalle altre. La risposta sta dentro una divisione, e i pezzi sono due: quanta parte degli abitanti lavora, e quanto vale quello che produce chi lavora.",
+  "dataset_updated": "2026-07-17",
+  "estremi": {
+   "alto": {
+    "key": "trentino-alto-adige",
+    "name": "Trentino Alto Adige",
+    "value": 54636.7
+   },
+   "basso": {
+    "key": "calabria",
+    "name": "Calabria",
+    "value": 21702.2
+   }
+  },
+  "site_url": "https://divarioitalia.it",
+  "site_name": "Divario Italia",
+  "canonical": "https://divarioitalia.it/indicatore/pil-pro-capite/ter-901",
+  "SITE_NAME": "Divario Italia",
+  "SITE_URL": "https://divarioitalia.it",
+  "data_license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "data_license_label": "Creative Commons BY 4.0",
+  "publisher": {
+   "@type": "Organization",
+   "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+   "name": "Divario Italia",
+   "url": "https://divarioitalia.it/chi-siamo",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://divarioitalia.it/static/img/logo-mark.png"
+   },
+   "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "editorial",
+    "email": "divarioitalia@protonmail.com",
+    "url": "https://divarioitalia.it/contatti",
+    "availableLanguage": "it"
+   }
+  },
+  "publisher_jsonld": "{\"@type\": \"Organization\", \"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\", \"name\": \"Divario Italia\", \"url\": \"https://divarioitalia.it/chi-siamo\", \"logo\": {\"@type\": \"ImageObject\", \"url\": \"https://divarioitalia.it/static/img/logo-mark.png\"}, \"contactPoint\": {\"@type\": \"ContactPoint\", \"contactType\": \"editorial\", \"email\": \"divarioitalia@protonmail.com\", \"url\": \"https://divarioitalia.it/contatti\", \"availableLanguage\": \"it\"}}",
+  "organization_ref_jsonld": "{\"@id\": \"https://divarioitalia.it/chi-siamo#organizzazione\"}",
+  "corrections_url": "https://github.com/nmaiese/diset-viz/issues/new",
+  "contact_email": "divarioitalia@protonmail.com",
+  "consent_cmp_name": "Iubenda",
+  "consent_cmp_url": "https://www.iubenda.com/privacy-policy/"
+ }
+}

@@ -1,0 +1,90 @@
+{
+ "title": "Qualità province: Equilibrato | Divario Italia",
+ "description": "Classifica della qualità della vita per province: indicatori Istat su scala 0-100, profilo Equilibrato, categorie e metodo trasparenti.",
+ "canonical": "https://divarioitalia.it/qualita-della-vita/classifica/province",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "Qualità della vita: province italiane",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Classifica qualità della vita per province, profilo Equilibrato",
+   "description": "Punteggi di qualità della vita delle province italiane su indicatori Istat selezionati, normalizzati con z-score orientato e display 0-100.",
+   "url": "https://divarioitalia.it/qualita-della-vita/classifica/province",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Italia"
+   },
+   "creator": {
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione"
+   },
+   "isBasedOn": [
+    {
+     "@type": "Dataset",
+     "name": "BES dei Territori",
+     "creator": {
+      "@type": "Organization",
+      "name": "Istat"
+     }
+    }
+   ],
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "encodingFormat": "text/csv",
+     "contentUrl": "https://divarioitalia.it/download/quality-life/province"
+    },
+    {
+     "@type": "DataDownload",
+     "encodingFormat": "application/json",
+     "contentUrl": "https://divarioitalia.it/download/quality-life/province.json"
+    }
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Qualità della vita",
+     "item": "https://divarioitalia.it/qualita-della-vita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Classifica province",
+     "item": "https://divarioitalia.it/qualita-della-vita/classifica/province"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 165776
+}

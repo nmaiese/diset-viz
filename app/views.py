@@ -12,6 +12,7 @@ from app.atlas_catalog import (
     get_atlas_theme_profile,
     search_atlas_indicators,
 )
+from app import design
 from app import divari
 from app import profiles
 from app import province_profile
@@ -391,8 +392,8 @@ def home():
             f"{SITE_URL}/",
         )
     themes_preview = _home_themes_preview()
-    return render_template(
-        "home.html",
+    return design.render(
+        "home", "v1/home.html", "home.html",
         territories=territories,
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -921,8 +922,8 @@ def blog_post(slug):
             post["url"],
         )
     related = [p for p in get_posts() if p["slug"] != slug][:3]
-    return render_template(
-        "blog_post.html",
+    return design.render(
+        "articolo", "v1/articolo.html", "blog_post.html",
         post=post,
         related=related,
         site_url=SITE_URL,
@@ -1135,8 +1136,10 @@ def _render_indicator(family, raw_id):
         source_qualifier=source_qualifier,
     )
 
-    response = make_response(render_template(
-        "indicator_page.html",
+    # La pagina della 1.0, con `indicator_page.html` come ripiego se la sua
+    # regia cede (app/design/__init__.py).
+    response = make_response(design.render(
+        "indicatore", "v1/indicatore.html", "indicator_page.html",
         meta=meta,
         levels=view["levels"],
         level=level,
@@ -1198,8 +1201,8 @@ def region_page(region_key):
     # tira dentro lo strato dati, e in cima chiuderebbe un anello di import.
     from app import charts
 
-    return render_template(
-        "region_page.html",
+    return design.render(
+        "regione", "v1/regione.html", "region_page.html",
         profile=profile,
         provinces=provinces,
         portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
@@ -1289,8 +1292,8 @@ def province_page(province_key):
                 first_in_region=prime, last_in_region=ultime),
             f"{SITE_URL}/provincia/{province_key}",
         )
-    return render_template(
-        "province_page.html",
+    return design.render(
+        "provincia", "v1/provincia.html", "province_page.html",
         profile=profilo,
         sister_provinces=[
             entry for entry in province_profile.by_region().get(
@@ -1731,8 +1734,8 @@ def quality_life_index():
     preview = qb.build_bes_ranking(URL_LEVEL["regioni"], qb.DEFAULT_PROFILE)
     preview_rows = preview["ranking"][:3] if preview else []
     province_ranking = qb.build_bes_ranking(URL_LEVEL["province"], qb.DEFAULT_PROFILE)
-    return render_template(
-        "quality_life_index.html",
+    return design.render(
+        "qualita-della-vita", "v1/qualita-della-vita.html", "quality_life_index.html",
         province_preview=[
             {**row, "path": f"/provincia/{row['key']}"}
             for row in (province_ranking["ranking"][:3] if province_ranking else [])
@@ -1791,8 +1794,8 @@ def quality_life_classifica(url_level):
         chiave = profiles.region_key_for(nome)
         if chiave and profiles.region_name(chiave):
             region_paths[nome] = f"/regione/{chiave}"
-    response = make_response(render_template(
-        "quality_life_classifica.html",
+    response = make_response(design.render(
+        "classifica", "v1/classifica.html", "quality_life_classifica.html",
         data=payload,
         region_paths=region_paths,
         quality_map_data=quality_map_data,

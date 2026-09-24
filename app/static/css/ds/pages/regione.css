@@ -1,0 +1,43 @@
+/* La pagina regione: solo l'impaginazione sua. Traccia, barra attorno a 50,
+   localizzatore, classifiche e tabelle a blocchi sono in components.css.
+   Legge solo token. */
+
+/* ---------- testata con il localizzatore nel margine ---------- */
+.regione-head { display: grid; gap: 0 var(--gutter-l); align-items: start; }
+.regione-head > .locator { display: none; padding-top: var(--space-8); }
+@media (min-width: 600px) {
+  .regione-head { grid-template-columns: minmax(0, 1fr) 9rem; }
+  .regione-head > .locator { display: grid; }
+}
+@media (min-width: 960px) { .regione-head { grid-template-columns: minmax(0, 1fr) 13rem; } }
+
+/* ---------- la tabella della figura d'apertura, larga quanto il grafico ---------- */
+.regione-qdv { max-width: 920px; }
+
+/* ---------- i temi: sul telefono la traccia sotto le cifre, a tutta riga ---------- */
+@container (max-width: 560px) {
+  .regione-temi td.barcell { grid-column: 1 / -1; grid-row: 3; width: auto; }
+}
+
+/* ---------- tutti gli indicatori ---------- */
+.regione-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+.regione-filter { margin-bottom: var(--space-6); }
+.regione-filter[hidden] { display: none; }
+.regione-area + .regione-area { margin-top: var(--space-8); }
+.regione-area > summary { cursor: pointer; padding-block: var(--space-2); }
+.regione-area > summary > h3 { display: inline; }
+.regione-area__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
+/* Le righe a blocchi sono griglie: l'attributo hidden del filtro va imposto. */
+.regione-area [hidden] { display: none !important; }
+/* L'intestazione di tema dentro la tabella (tr.group) non ha ancora uno stile
+   comune fuori dalle righe a blocchi. */
+.regione-area tr.group > th {
+  padding-top: var(--space-6); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600;
+  color: var(--text-2); border-bottom-color: var(--rule-strong);
+}
+.regione-area tr.group a { color: var(--text-2); }
+.regione-area tbody tr.group:hover > * { background: transparent; }
+@container (max-width: 560px) {
+  .regione-area tr.group { padding-top: var(--space-6); padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
+  .regione-area td[colspan] { grid-column: span 2; }
+}

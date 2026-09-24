@@ -1,0 +1,89 @@
+{
+ "commit": "d4d1195ff6208eb20203c62e2911bc5800b0ddba",
+ "pages": {
+  "home": {
+   "route": "/",
+   "final_url": "/",
+   "template": "home.html",
+   "markdown": true,
+   "html_bytes": 170585
+  },
+  "indicatore": {
+   "route": "/indicatore/pil-pro-capite/ter-901",
+   "final_url": "/indicatore/pil-pro-capite/ter-901",
+   "template": "indicator_page.html",
+   "markdown": true,
+   "html_bytes": 161411
+  },
+  "indicatore-senza-prosa": {
+   "route": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+   "final_url": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+   "template": "indicator_page.html",
+   "markdown": true,
+   "html_bytes": 171792
+  },
+  "indicatore-due-livelli": {
+   "route": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+   "final_url": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+   "template": "indicator_page.html",
+   "markdown": true,
+   "html_bytes": 156637
+  },
+  "indicatore-province": {
+   "route": "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+   "final_url": "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+   "template": "indicator_page.html",
+   "markdown": true,
+   "html_bytes": 103476
+  },
+  "regione": {
+   "route": "/regione/puglia",
+   "final_url": "/regione/puglia",
+   "template": "region_page.html",
+   "markdown": true,
+   "html_bytes": 258509
+  },
+  "provincia": {
+   "route": "/provincia/lecce",
+   "final_url": "/provincia/lecce",
+   "template": "province_page.html",
+   "markdown": true,
+   "html_bytes": 96268
+  },
+  "articolo": {
+   "route": "/blog/infortuni-lavoro-province",
+   "final_url": "/blog/infortuni-lavoro-province",
+   "template": "blog_post.html",
+   "markdown": true,
+   "html_bytes": 50218
+  },
+  "articolo-giugno": {
+   "route": "/blog/italia-che-invecchia-indice-vecchiaia-2026",
+   "final_url": "/blog/italia-che-invecchia-indice-vecchiaia-2026",
+   "template": "blog_post.html",
+   "markdown": true,
+   "html_bytes": 24940
+  },
+  "classifica": {
+   "route": "/qualita-della-vita/classifica/regioni",
+   "final_url": "/qualita-della-vita/classifica/regioni",
+   "template": "quality_life_classifica.html",
+   "markdown": false,
+   "html_bytes": 144529
+  },
+  "classifica-province": {
+   "route": "/qualita-della-vita/classifica/province",
+   "final_url": "/qualita-della-vita/classifica/province",
+   "template": "quality_life_classifica.html",
+   "markdown": false,
+   "html_bytes": 165776
+  },
+  "qualita-della-vita": {
+   "route": "/qualita-della-vita",
+   "final_url": "/qualita-della-vita",
+   "template": "quality_life_index.html",
+   "markdown": false,
+   "html_bytes": 25204
+  }
+ }
+}

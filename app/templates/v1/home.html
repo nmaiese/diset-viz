@@ -1,0 +1,322 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% set active_nav = 'home' %}
+{#- La home della 1.0. Apre con che cos'e' il sito e la ricerca del proprio
+    territorio, poi un indicatore solo con la regia della scheda (la striscia
+    del divario, poi la mappa che nomina i suoi estremi accanto alla
+    classifica), poi le porte d'ingresso (territori, qualita' della vita, quiz,
+    temi, storie) e in fondo fonti e citazione. Cio' che la pagina chiede in
+    piu' ai dati lo compone app/design/pages/home.py e arriva qui come `d`.
+
+    La testa (title, description, JSON-LD) e' quella di home.html, che resta
+    come ripiego, riga per riga: il ridisegno non tocca cio' che vedono i
+    motori. "Indicatore in evidenza" e' il marcatore della home in
+    PUBLIC_DISCOVERABILITY_EXPECTATIONS: deve restare nel testo della pagina. -#}
+{% set f = d.feature %}
+{% set q = d.quality %}
+{% set t = d.quiz_try %}
+
+{# La marca resta **solo qui**: la home e' la pagina delle ricerche per nome, ed
+   e' il nodo `WebSite` da cui Google prende il nome del sito per tutte le altre.
+   `sources_label` era in fondo e cresce a ogni fonte nuova: con "Istat ed
+   Eurostat" il titolo stava a 73 caratteri, tredici oltre la finestra, e la
+   coda tagliata era proprio quella che nominava le fonti. Un conteggio al suo
+   posto e' piu' corto, non cresce, e dice quanto e' grande l'atlante. #}
+{% block title %}{{ site_name }}: {{ total_indicators }} indicatori territoriali per regione{% endblock %}
+{% block description %}{{ total_indicators }} indicatori {{ sources_label }}, {{ territories.regions }} regioni e {{ territories.provinces }} province, dal {{ year_min }} al {{ year_max }}. Mappa, profili dei territori, confronti, qualità della vita e storie dai dati.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/home.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "{{ SITE_URL }}/#site",
+      "name": "{{ site_name }}",
+      "url": "{{ SITE_URL }}/",
+      "inLanguage": "it-IT",
+      "description": {{ ("Atlante interattivo degli indicatori territoriali " ~ sources_label ~ ": " ~ total_indicators ~ " indicatori, " ~ territories.regions ~ " regioni e " ~ territories.provinces ~ " province, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
+      "publisher": { "@id": {{ publisher['@id'] | tojson }} },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ SITE_URL }}/ricerca?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {{ publisher_jsonld | safe }}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-home" data-v1="home" tabindex="-1">
+{% if f %}<script type="application/json" data-explore-data>{{ f.explore_js | tojson }}</script>{% endif %}
+<div class="wrap">
+  <header class="pagehead home-head">
+    <p class="eyebrow">L'Italia, regione per regione.</p>
+    <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
+    <p class="answer">Divario Italia pubblica {{ d.indicators | num(None, 'count') }} indicatori di {{ sources_label }} per le {{ d.regions | num(None, 'count') }} regioni e le {{ d.provinces | num(None, 'count') }} province italiane, con serie dal {{ year_min }} al {{ year_max }}. Ogni cifra porta la sua fonte e il suo anno.</p>
+    <form class="home-find" role="search" action="/ricerca" method="get" aria-labelledby="l-trova">
+      <label id="l-trova" for="trova">Trova il tuo territorio</label>
+      <div class="home-find__row">
+        <input id="trova" name="q" type="search" placeholder="Una regione, una provincia o un indicatore" autocomplete="off">
+        <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
+      </div>
+      <p>Oppure sfoglia <a href="/regioni">tutte le regioni</a> e <a href="/province">tutte le province</a>.</p>
+    </form>
+  </header>
+
+  {% if f %}
+  <section class="section home-feature" id="dato" aria-labelledby="h-dato">
+    <h2 id="h-dato">Indicatore in evidenza</h2>
+    <div class="home-wide">
+    {% if f.strip.svg %}
+    <figure class="lead-figure" aria-labelledby="dato-t">
+      <figcaption class="lead-figure__head">
+        <span class="home-feature__what">
+          <span class="eyebrow">{{ f.name }}{% if f.unit %}, in {{ f.unit }}{% endif %}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}</span>
+          <span class="lead-figure__title" id="dato-t">{{ f.lead_claim }}</span>
+        </span>
+        {{ ui.arealegend(f.strip.legend) }}
+      </figcaption>
+      <div class="chart chart--hero">{{ f.strip.svg | safe }}</div>
+      <p class="source">Ogni punto è una regione, nel colore della sua ripartizione{% if f.unit %}, valori in {{ f.unit }}{% endif %}. Fonte: {{ f.source_label }} ({{ f.year }}). Tutte le cifre sono nella classifica qui sotto.</p>
+    </figure>
+    {% endif %}
+
+    <figure class="module" data-explore>
+      <figcaption class="module__head">
+        {% if f.table_claim %}<h3 class="h-sub">{{ f.table_claim }}</h3>{% endif %}
+        <p class="subline">{{ f.name }}{% if f.unit %}, in {{ f.unit }}{% endif %}, {{ f.year }}. Le {{ f.n | num(None, 'count') }} regioni dal valore più alto al più basso{% if f.lower_better %}, che qui è il migliore{% endif %}, con la media semplice al suo posto.</p>
+      </figcaption>
+      <div class="toolbar">
+        {#- Un form GET e non dei link, come il selettore di prima: cambiare
+            indicatore funziona senza JavaScript, e la pagina non offre ai
+            motori tre copie di se stessa con `?indicator=`. -#}
+        {% if f.options | length > 1 %}
+        <div class="field home-pick"><span id="l-dato">Colora la mappa per</span>
+          <form class="seg" role="group" aria-labelledby="l-dato" method="get" action="/">
+            {%- for o in f.options %}<button type="submit" name="indicator" value="{{ o.id }}" aria-pressed="{{ 'true' if o.on else 'false' }}">{{ o.name }}</button>{% endfor -%}
+          </form>
+        </div>
+        {% endif %}
+        <label class="field" for="territorio">Trova la tua regione
+          <select id="territorio" data-territory>
+            <option value="">Nessuna in evidenza</option>
+            {% for key, name in f.names | dictsort(by='value') %}<option value="{{ key }}">{{ name }}</option>{% endfor %}
+          </select>
+        </label>
+      </div>
+
+      <div class="module__body">
+        <div class="module__map">
+          {{ ui.map(f.map_classes, 'dato', f.names, f.map_values, overlay=f.callouts, label="Mappa cliccabile delle regioni italiane per " ~ f.name ~ ", " ~ f.year) }}
+          {% if f.legend %}{{ ui.legend(f.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.') }}{% endif %}
+        </div>
+        <details class="more" data-collapse-mobile open>
+          <summary>La classifica delle {{ f.n | num(None, 'count') }} regioni</summary>
+          <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle regioni per {{ f.name }}">
+            <table class="table table--compact">
+              <caption class="sr-only">{{ f.name }} per regione nel {{ f.year }}{% if f.unit %}, in {{ f.unit }}{% endif %}</caption>
+              <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (f.short_unit or 'Valore') | capitalize }}</th></tr></thead>
+              <tbody data-rank-body>
+                {%- for row in f.rows %}
+                {%- if row.ref %}
+                <tr class="ref"><td></td><th scope="row">Media semplice delle {{ f.n | num(None, 'count') }} regioni</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', f.decimals) }}</td></tr>
+                {%- else %}
+                {%- set area = f.areas.get(row.key) %}
+                <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if area %}<span class="area-dot area-dot--{{ area }}" aria-hidden="true"></span>{% endif %}<a href="{{ '/regione/' ~ row.key }}">{{ row.name }}</a>{% if area %}<span class="sr-only">, {{ f.area_label[area] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', f.decimals) }}</td></tr>
+                {%- endif %}
+                {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+      <p class="source">Fonte: {{ f.source_label }} ({{ f.year }}). Elaborazione Divario Italia. Le barre partono da zero. <a class="linkarrow" href="{{ f.path }}">{{ f.name }}, la scheda completa</a></p>
+      <p class="sr-only" role="status" aria-live="polite" data-live></p>
+    </figure>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="section" id="territori" aria-labelledby="h-territori">
+    <h2 id="h-territori">Regioni e province</h2>
+    <p class="home-sectionlead">Il profilo di ogni regione e di ogni provincia: dove stacca, dove resta indietro, i valori veri di ogni indicatore.{% if d.areas_regions %} Le ripartizioni hanno i colori della striscia qui sopra.{% endif %}</p>
+    {% if d.areas_regions %}
+    <div class="home-regions">
+      {%- for g in d.areas_regions %}
+      <div class="{{ 'is-wide' if g.wide }}">
+        <h3><span class="area-dot area-dot--{{ g.area }}" aria-hidden="true"></span>{{ g.label }}</h3>
+        <ul>{% for r in g.regions %}<li><a href="{{ '/regione/' ~ r.key }}">{{ r.name }}</a></li>{% endfor %}</ul>
+      </div>
+      {%- endfor %}
+    </div>
+    {% endif %}
+    <p class="actions home-links">
+      {% if not d.areas_regions %}<a class="linkarrow" href="/regioni">Tutte le regioni</a>{% endif %}
+      <a class="linkarrow" href="/province">Tutte le province</a>
+      <a class="linkarrow" href="/confronto">Confronta fino a tre territori</a>
+      <a class="linkarrow" href="/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a>
+    </p>
+  </section>
+
+  {% if q %}
+  <section class="section" id="qualita" aria-labelledby="h-qualita">
+    <h2 id="h-qualita">Qualità della vita</h2>
+    <div class="home-wide">
+    <div class="home-qol__head">
+      {% if q.has_gaps and q.profile %}<p class="lede">Con il profilo {{ q.profile | lower }}, fra la prima e l'ultima regione ci sono {{ q.regions.gap | num(None, 'score') }} punti sulla scala da 0 a 100, fra la prima e l'ultima provincia {{ q.provinces.gap | num(None, 'score') }}.</p>{% endif %}
+      <p class="status">{{ ui.icon('info') }} Indice sperimentale di Divario Italia, non un dato ufficiale.{% if q.profile %} Profilo {{ q.profile | lower }}{% if q.profile_text %}: {{ q.profile_text }}{% else %}.{% endif %}{% endif %}</p>
+    </div>
+    <div class="podiums">
+      {%- for p in [q.regions, q.provinces] if p %}
+      <div class="home-podium">
+        <h3 class="h-sub">{{ p.label }}</h3>
+        <div class="tablewrap rankwrap" tabindex="0" role="region" aria-label="Qualità della vita, {{ p.label | lower }} in testa e in coda">
+          <table class="table table--rank">
+            <caption>Le prime tre e le ultime tre delle {{ p.total | num(None, 'count') }} {{ p.unit_word }}, punteggio da 0 a 100</caption>
+            <thead><tr><th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th><th scope="col">{{ p.singular }}</th><th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio, tacca a 50</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
+            <tbody>
+              {%- for r in p.top %}
+              <tr><td class="rank">{{ r.rank | rank }}</td><th class="name" scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if r.where %}<span class="where">{{ r.where }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ r.width }}%"></i></span></td><td class="val">{{ r.score | num(None, 'score') }}</td></tr>
+              {%- endfor %}
+              {%- if p.middle %}
+              <tr class="gap"><td></td><td colspan="3">Altre {{ p.middle | num(None, 'count') }} {{ p.unit_word }}, dalla {{ p.middle_from | rank }} alla {{ p.middle_to | rank }}</td></tr>
+              {%- endif %}
+              {%- for r in p.bottom %}
+              <tr><td class="rank">{{ r.rank | rank }}</td><th class="name" scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if r.where %}<span class="where">{{ r.where }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ r.width }}%"></i></span></td><td class="val">{{ r.score | num(None, 'score') }}</td></tr>
+              {%- endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p><a class="linkarrow" href="{{ p.classifica }}">{{ p.cta }}</a></p>
+      </div>
+      {%- endfor %}
+    </div>
+    {% if q.others %}
+    <p class="home-qol__more">Altre priorità, altre classifiche delle regioni: {% for o in q.others %}<a href="{{ '/qualita-della-vita/classifica/regioni?profilo=' ~ o.slug }}">{{ o.name }}</a>{{ ', ' if not loop.last else '.' }}{% endfor %}</p>
+    {% endif %}
+    <p class="home-more"><a class="linkarrow" href="/qualita-della-vita">Dove si vive meglio</a></p>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+{% if quiz_games %}
+<section class="band home-quiz" id="quiz" aria-labelledby="h-quiz">
+  <div class="wrap">
+    <h2 class="h-section" id="h-quiz">Quiz: quanto conosci l'Italia?</h2>
+    <div class="home-quiz__grid">
+      <div>
+        <p class="lede">{{ d.games_word }} giochi costruiti sugli stessi indicatori di {{ sources_label }} che trovi nell'atlante. Si gioca senza registrarsi.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="/quiz">Gioca al quiz</a>
+          <a class="linkarrow" href="/quiz/classifica">La classifica dei giocatori</a>
+        </div>
+      </div>
+      {% if t %}
+      {#- La risposta si mostra senza JavaScript: la accende il CSS della pagina
+          (`.home-try:has(input:checked)`), e la dice la parola, non un colore. -#}
+      <fieldset class="home-try">
+        <legend>
+          <span class="card__kicker">Prova una domanda di «{{ t.game.name }}»</span>
+          <span class="h-sub">{{ t.indicator }}, {{ t.year }}: quale delle due regioni ha il valore più alto?</span>
+        </legend>
+        <div class="home-try__opts">
+          {%- for o in t.options %}
+          <label><input type="radio" name="prova" value="{{ loop.index }}"{% if o.right %} data-right{% endif %}> {{ o.name }}</label>
+          {%- endfor %}
+        </div>
+        {% set answer %}{{ t.right.name }} {{ t.right.value | num(t.unit, 'figure') }}, {{ t.wrong.name }} {{ t.wrong.value | num(t.unit, 'figure') }}.{% endset %}
+        <div class="home-try__out" role="status">
+          <p class="home-try__ok"><strong>Giusto.</strong> {{ answer }}</p>
+          <p class="home-try__no"><strong>Non è così.</strong> {{ answer }}</p>
+        </div>
+        <p class="source">Fonte: {{ t.source_label }} ({{ t.year }}). <a href="{{ t.path }}">{{ t.indicator }}, la scheda</a></p>
+      </fieldset>
+      {% endif %}
+    </div>
+    <ul class="cards cards--3 home-games">
+      {%- for g in quiz_games %}
+      <li class="card">
+        <p class="card__kicker">{{ g.meta | capitalize }}</p>
+        <h3 class="card__title"><a href="{{ g.href }}">{{ g.name }}</a></h3>
+        <p class="card__text">{{ g.desc }}</p>
+      </li>
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<div class="wrap">
+  {% if d.areas %}
+  <section class="section" id="temi" aria-labelledby="h-temi">
+    <h2 id="h-temi">I temi</h2>
+    <p class="home-sectionlead">Per ogni area, la regione con la posizione media migliore e quella con la peggiore sugli indicatori che hanno un verso.</p>
+    <ul class="cards cards--4">
+      {%- for a in d.areas %}
+      <li class="card home-theme">
+        <p class="card__kicker">{{ a.count | num(None, 'count') }} indicatori, {{ a.theme_count | num(None, 'count') }} {{ 'tema' if a.theme_count == 1 else 'temi' }}</p>
+        <h3 class="card__title"><a href="{{ a.area_path }}">{{ a.area }}</a></h3>
+        <ul>{% for th in a.themes %}<li><a href="{{ th.path }}">{{ th.theme }}</a></li>{% endfor %}</ul>
+        <dl>
+          <div><dt>In testa</dt><dd>{% if a.best_key %}<a href="{{ '/regione/' ~ a.best_key }}">{{ a.best }}</a>{% else %}{{ a.best }}{% endif %}</dd></div>
+          <div><dt>In coda</dt><dd>{% if a.worst_key %}<a href="{{ '/regione/' ~ a.worst_key }}">{{ a.worst }}</a>{% else %}{{ a.worst }}{% endif %}</dd></div>
+        </dl>
+      </li>
+      {%- endfor %}
+    </ul>
+    <p class="home-more"><a class="linkarrow" href="/temi">Tutti i temi e i loro indicatori</a></p>
+  </section>
+  {% endif %}
+
+  {{ ui.ad('leader') }}
+
+  {% if d.stories %}
+  <section class="section" id="storie" aria-labelledby="h-storie">
+    <h2 id="h-storie">Le ultime storie</h2>
+    <ul class="cards home-stories">
+      {%- for s in d.stories %}
+      {%- set lead = loop.first %}
+      <li class="card{{ ' card--lead' if lead }}">
+        {% if s.cover %}
+        <figure class="home-story__fig">
+          <div class="card__media"><img src="{{ s.cover }}" alt="{{ s.cover_alt }}"{% if s.size %} width="{{ s.size[0] }}" height="{{ s.size[1] }}"{% endif %}{% if not lead %} loading="lazy"{% endif %} decoding="async"></div>
+          {% if s.credit or (lead and s.caption) %}<figcaption>{% if lead and s.caption %}{{ s.caption }} {% endif %}{% if s.credit %}Foto {% if s.credit.source_url %}<a href="{{ s.credit.source_url }}">{{ s.credit.author }}</a>{% else %}{{ s.credit.author }}{% endif %}{% if s.credit.source %}, {{ s.credit.source }}{% endif %}{% if s.credit.license %}, {% if s.credit.license_url %}<a href="{{ s.credit.license_url }}">{{ s.credit.license }}</a>{% else %}{{ s.credit.license }}{% endif %}{% endif %}{% endif %}</figcaption>{% endif %}
+        </figure>
+        {% endif %}
+        {% if s.tag %}<p class="card__kicker">{{ s.tag }}</p>{% endif %}
+        <h3 class="card__title"><a href="{{ '/blog/' ~ s.slug }}">{{ s.title }}</a></h3>
+        {% if lead and s.description %}<p class="card__text">{{ s.description }}</p>{% endif %}
+        <p class="card__meta">{% if s.date %}<time datetime="{{ s.date }}">{{ s.date_label }}</time>{% endif %}{% if s.read_time %}{% if s.date %}, {% endif %}{{ s.read_time | num(None, 'count') }} minuti di lettura{% endif %}</p>
+      </li>
+      {%- endfor %}
+    </ul>
+    <p class="home-more"><a class="linkarrow" href="/blog">Tutte le storie</a></p>
+  </section>
+  {% endif %}
+
+  {% set tr = d.trust %}
+  <section class="section" id="fonti" aria-labelledby="h-fonti">
+    <h2 id="h-fonti">Fonti, metodo e come citare</h2>
+    <dl class="specs">
+      {% if tr.Fonti %}<div><dt>Fonti</dt><dd>{{ tr.Fonti.title }}. {{ tr.Fonti.body }} <a href="{{ tr.Fonti.href }}">{{ tr.Fonti.cta }}</a></dd></div>{% endif %}
+      {% if tr.Copertura %}<div><dt>Catalogo</dt><dd>{{ tr.Copertura.body }} <a href="{{ tr.Copertura.href }}">{{ tr.Copertura.cta }}</a></dd></div>{% endif %}
+      <div><dt>Metodo</dt><dd>{% if tr.Metodo %}{{ tr.Metodo.title }}. {% endif %}Le medie sono medie semplici delle regioni: ogni territorio pesa uguale, quindi non sono dati nazionali. <a href="/metodologia">Consulta la metodologia</a></dd></div>
+      {% if tr.Correzioni %}<div><dt>Correzioni</dt><dd>{{ tr.Correzioni.body }} <a href="{{ corrections_url }}">Segnala un errore</a> o scrivi alla redazione da <a href="{{ tr.Correzioni.href }}">Chi siamo</a>.</dd></div>{% endif %}
+      <div><dt>Licenza</dt><dd>Dati pubblicati con licenza <a href="{{ data_license_url }}">{{ data_license_label }}</a>.</dd></div>
+      <div><dt>Per assistenti e motori</dt><dd>Una versione in testo semplice del sito: <a href="/llms.txt">llms.txt</a></dd></div>
+    </dl>
+    <p class="home-sectionlead home-cite">Per un dato, aggiungi la fonte primaria e l'anno che trovi nella sua scheda. Le regole per intero stanno in <a href="/chi-siamo#come-citare">Come citare</a>.</p>
+    {{ ui.cite(d.citation) }}
+  </section>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

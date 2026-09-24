@@ -1,0 +1,272 @@
+{% extends "base.html.j2" %}
+{% import "partials/ui.html.j2" as ui %}
+{#- La pagina provincia della 1.0. Stesso contenuto di province_page.html, un'altra
+    regia: la risposta con il localizzatore nel margine, poi la striscia delle
+    province con questa in evidenza, tre cifre che la striscia non dice, le
+    dimensioni attorno alla media 50, una sintesi sola dove oggi ci sono tre
+    coppie, il movimento, poi tutti i valori veri per area, le province intorno
+    e il metodo. Le cifre passano dai filtri num, rank e delta, e i valori della
+    fonte portano i decimali della fonte. Il confronto dentro la regione e'
+    sempre fra province. -#}
+{% set p = profile %}
+{% set trail = [
+  {"name": "Home", "path": "/"},
+  {"name": "Regioni", "path": "/regioni"},
+  {"name": p.region, "path": p.region_path},
+  {"name": p.name, "path": p.path},
+] if p.region_path else [
+  {"name": "Home", "path": "/"},
+  {"name": "Province", "path": "/province"},
+  {"name": p.name, "path": p.path},
+] %}
+{% block main %}
+{#- Il valore di un indicatore con la sua unita' e i decimali della fonte.
+    L'unita' troppo lunga per stare accanto alla cifra segue per intero. -#}
+{% macro value_unit(i) -%}
+{{ i.value | num(i.unit, 'figure', i.decimals) }}{% if i.unit_after %} {{ i.unit_after }}{% endif %}
+{%- endmacro %}
+{% macro facts(i) -%}
+<span class="provincia-facts"><span>{{ value_unit(i) }} nel {{ i.year }}</span><span class="sep" aria-hidden="true">·</span><span>{{ i.rank | rank(i.province_count, 'province') }}</span>{% if i.in_regione %}<span class="sep" aria-hidden="true">·</span><span>{{ i.in_regione.posizione | rank(i.in_regione.quante) }} in {{ p.region }}</span>{% endif %}</span>
+{%- endmacro %}
+{#- Una classifica per punteggio: la provincia della pagina al suo posto, la
+    barra da 0 a 100 con la tacca a 50. -#}
+{% macro rank_table(rows, caption, label, show_region=true) -%}
+<div class="rankwrap">
+  <div class="tablewrap" tabindex="0" role="region" aria-label="{{ label }}">
+    <table class="table table--rank">
+      <caption class="sr-only">{{ caption }}</caption>
+      <thead><tr><th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th><th scope="col">Provincia</th><th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio</span></th><th class="r" scope="col">Punteggio</th></tr></thead>
+      <tbody>
+        {%- for r in rows %}
+        <tr{% if r.is_me %} class="is-on"{% endif %}><td class="rank">{{ r.rank | rank }}</td><th class="name" scope="row">{% if r.is_me %}{{ r.name }}<span class="sr-only">, questa pagina</span>{% else %}<a href="{{ href(r.path) }}">{{ r.name }}</a>{% endif %}
+          {%- if show_region and r.region %}<span class="where">{{ r.region }}{{ ', città metropolitana' if r.metro_city }}</span>{% elif r.metro_city %}<span class="where">Città metropolitana</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ r.width }}%"></i></span></td><td class="val">{{ r.score | num(None, 'score') }}</td></tr>
+        {%- endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{%- endmacro %}
+{% set region_label = p.region or 'regione' %}
+<div class="wrap">
+  {{ ui.crumbs(trail) }}
+
+  <div class="provincia-top">
+    <header class="pagehead provincia-head">
+      <p class="eyebrow"><a href="{{ href('/qualita-della-vita/classifica/province') }}">Classifica delle province</a><span class="sep" aria-hidden="true">·</span>{{ d.source }}<span class="sep" aria-hidden="true">·</span>dati fino al {{ d.year_to }}</p>
+      <h1>{{ p.name }} è {{ p.rank | rank }} su {{ p.total | num(None, 'count') }} province per qualità della vita</h1>
+      <p class="answer">Con il profilo {{ d.profile_name }} ottiene {{ p.score | num(None, 'score') }} su 100, dove 50 è la media delle province.{% if d.best and d.worst %} Va meglio su {{ d.best.name | lower }} ({{ d.best.score | num(None, 'score') }}) e peggio su {{ d.worst.name | lower }} ({{ d.worst.score | num(None, 'score') }}).{% endif %}</p>
+      <p class="meta">
+        <a href="{{ corrections_url }}">Segnala un errore</a>
+        <button class="star" type="button" aria-pressed="false">{{ ui.icon('star') }} Salva</button>
+      </p>
+    </header>
+    {% if d.region_key %}
+    {% set where %}{{ 'Città metropolitana' if p.metro_city else 'Provincia' }} di {{ p.name }}, in <a href="{{ href(p.region_path) }}">{{ p.region }}</a>{% endset %}
+    {{ ui.locator(d.region_key, where) }}
+    {% elif p.metro_city %}
+    <p class="provincia-status"><span class="status">Città metropolitana</span></p>
+    {% endif %}
+  </div>
+
+  {% if d.strip.svg %}
+  {% set note %}Ogni punto è una provincia, nel colore della ripartizione della sua regione, con il punteggio da 0 a 100 del profilo {{ d.profile_name }}. Fonte: {{ d.source }}. Elaborazione Divario Italia, non è una classifica ufficiale.{% endset %}
+  <div class="provincia-lead{{ ' provincia-lead--left' if d.strip.label_left }}">{{ ui.leadfigure('divario-t', d.strip.title, d.strip, note) }}</div>
+  <details class="more provincia-strip-table">
+    <summary>Le {{ d.strip.count | num(None, 'count') }} province in tabella</summary>
+    {% set cap %}Le {{ d.strip.count | num(None, 'count') }} province per punteggio della qualità della vita, profilo {{ d.profile_name }}, dalla prima all'ultima{% endset %}
+    {{ rank_table(d.strip.rows, cap, 'Le province per punteggio') }}
+  </details>
+  {% endif %}
+
+  {{ ui.tiles(d.tiles) }}
+
+  <div class="layout">
+    <aside class="layout__aside">
+      <nav class="toc" aria-label="In questa pagina">
+        <p>In questa pagina</p>
+        <ol>
+          {% if d.dims.rows %}<li><a href="#{{ aid('dimensioni') }}">Dimensione per dimensione</a></li>{% endif %}
+          {% if d.synthesis.strong or d.synthesis.weak %}<li><a href="#{{ aid('sintesi') }}">Dove va meglio e peggio</a></li>{% endif %}
+          {% if d.moves.up or d.moves.down %}<li><a href="#{{ aid('cambiato') }}">Che cosa è cambiato</a></li>{% endif %}
+          {% if indicatori %}<li><a href="#{{ aid('indicatori') }}">Tutti gli indicatori</a></li>{% endif %}
+          {% if d.near or d.sisters %}<li><a href="#{{ aid('intorno') }}">Le province intorno</a></li>{% endif %}
+          <li><a href="#{{ aid('fonti-verifica') }}">Fonti e metodo</a></li>
+        </ol>
+      </nav>
+      <div class="aside-block">
+        <p>Fonte: {{ d.source }}. Elaborazione Divario Italia.</p>
+        <p><a class="linkarrow" href="#{{ aid('fonti-verifica') }}">Cita questa pagina</a></p>
+      </div>
+    </aside>
+
+    <div class="layout__main">
+      {% if d.dims.rows %}
+      <section class="section" id="{{ aid('dimensioni') }}" aria-labelledby="{{ aid('h-dimensioni') }}">
+        <h2 id="{{ aid('h-dimensioni') }}">Dimensione per dimensione</h2>
+        <figure class="module">
+          <figcaption class="module__head">
+            <h3 class="h-sub">{{ d.dims.claim }}</h3>
+            <p class="subline">Punteggio da 0 a 100 sul profilo {{ d.profile_name }}. Ogni barra parte dalla linea della media 50: verso destra sopra, verso sinistra sotto.</p>
+          </figcaption>
+          <div class="tablewrap" tabindex="0" role="region" aria-label="Le dimensioni in tabella">
+            <table class="table provincia-dims">
+              <caption class="sr-only">Punteggio di {{ p.name }} nelle {{ d.dims.count | num(None, 'count') }} dimensioni misurate, dal più alto al più basso</caption>
+              <thead><tr>
+                <th scope="col">Dimensione</th>
+                <th class="provincia-dims__bar" scope="col"><span class="divbar__axis" aria-hidden="true"><span>{{ 0 | num(None, 'count') }}</span><span>{{ 50 | num(None, 'count') }}</span><span>{{ 100 | num(None, 'count') }}</span></span><span class="sr-only">Barra</span></th>
+                <th class="r" scope="col">Punteggio</th>
+                <th class="r provincia-dims__diff" scope="col">Rispetto a 50</th>
+              </tr></thead>
+              <tbody>
+                {%- for row in d.dims.rows %}
+                <tr><th scope="row">{{ row.name }}</th><td class="provincia-dims__bar" aria-hidden="true"><span class="divbar"><i style="left: {{ row.left }}%; width: {{ row.width }}%"></i></span></td><td class="val">{{ row.score | num(None, 'score') }}</td><td class="val provincia-dims__diff">{% if row.diff == 0 %}alla media{% else %}{{ row.diff | delta(None, 1) }}{% endif %}</td></tr>
+                {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if d.dims.missing %}<p class="chart-note">{{ d.dims.missing_lead }} {{ d.dims.missing_text }}: {{ 'non ha' if d.dims.missing | length == 1 else 'non hanno' }} indicatori misurati per le province.</p>{% endif %}
+          <p class="source">Fonte: {{ d.source }}. Elaborazione Divario Italia, non è una classifica ufficiale.</p>
+        </figure>
+      </section>
+      {% endif %}
+
+      {% if d.synthesis.strong or d.synthesis.weak %}
+      <section class="section" id="{{ aid('sintesi') }}" aria-labelledby="{{ aid('h-sintesi') }}">
+        <h2 id="{{ aid('h-sintesi') }}">Dove stacca e dove resta indietro</h2>
+        <p class="provincia-note">Gli indicatori che pesano di più sul punteggio, in un senso e nell'altro{% if p.region %}, e quelli in cui {{ p.name }} è la prima o l'ultima fra le province {{ p.region | of_region }}. Il confronto in regione è fra province, mai con il valore regionale{% endif %}. La traccia sotto ogni indicatore va dalla prima provincia in Italia, a sinistra, all'ultima.</p>
+        <div class="podiums">
+          {% for side in [('Dove va meglio', d.synthesis.strong), ('Dove va peggio', d.synthesis.weak)] if side[1] %}
+          <div>
+            <h3 class="h-sub provincia-colhead">{{ side[0] }}</h3>
+            <ul class="provincia-list">
+              {%- for i in side[1] %}
+              <li><a href="{{ href(i.path) }}">{{ i.name }}</a>{{ facts(i) }}<span class="track" aria-hidden="true"><i style="left: {{ i.track }}%"></i></span></li>
+              {%- endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% if d.moves.up or d.moves.down %}
+      <section class="section" id="{{ aid('cambiato') }}" aria-labelledby="{{ aid('h-cambiato') }}">
+        <h2 id="{{ aid('h-cambiato') }}">Che cosa è cambiato</h2>
+        <div class="module__head provincia-movehead">
+          <h3 class="h-sub">{{ d.moves.claim }}</h3>
+          <p class="subline">La posizione fra le province nell'anno più recente di ogni indicatore, confrontata con la rilevazione precedente. Si muove la posizione, non il valore, e il numero di province con un dato può cambiare da una rilevazione all'altra.{% if d.moves.same %} Su {{ d.moves.same | num(None, 'count') }} {{ d.moves.same | it_plural('indicatore', 'indicatori') }} la posizione è rimasta ferma.{% endif %}</p>
+        </div>
+        <div class="podiums">
+          {% for side in [('up', 'Dove ha guadagnato più posizioni', d.moves.up), ('down', 'Dove ne ha perse di più', d.moves.down)] if side[2] %}
+          <div>
+            <h4 class="h-sub provincia-colhead">{{ side[1] }}</h4>
+            <ul class="moves provincia-moves">
+              {%- for i in side[2] %}
+              <li><span class="arrow">{{ ui.icon(side[0]) }}</span><span class="what"><a href="{{ href(i.path) }}">{{ i.name }}</a><span class="provincia-when">{{ i.rank | rank(i.province_count) }} nel {{ i.year }}, era {{ i.previous | rank }} {% if i.fewer_now %}quando le province con un dato erano di più{% else %}nella rilevazione precedente{% endif %}</span></span><span class="how">{{ i.movement | delta('posizione' if i.movement in (1, -1) else 'posizioni', 0) }}</span></li>
+              {%- endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    </div>
+  </div>
+
+  {{ ui.ad() }}
+
+  {% if indicatori %}
+  <section class="section" id="{{ aid('indicatori') }}" aria-labelledby="{{ aid('h-indicatori') }}">
+    <h2 id="{{ aid('h-indicatori') }}">Tutti gli indicatori misurati {{ p.name | at_place }}</h2>
+    <p class="provincia-note">{{ indicatori | length | num(None, 'count') }} indicatori, per area. Il valore è quello pubblicato dalla fonte, con i suoi decimali e l'anno più recente per {{ p.name }}, e la variazione è dal primo anno della serie. La posizione in Italia si conta fra le province che quell'anno hanno un dato, quindi il denominatore cambia da riga a riga, e la prima è la migliore secondo il verso dell'indicatore. {% if p.region %}In {{ p.region }} il confronto è con le altre province della regione, e la media è la loro, non il valore regionale.{% endif %}</p>
+    {% if d.groups | length > 1 %}
+    <nav class="provincia-jump" aria-label="Aree della tabella">
+      {%- for g in d.groups %}<a href="#{{ aid(g.anchor) }}">{{ g.name }} {{ g.rows | length | num(None, 'count') }}</a>{% endfor -%}
+    </nav>
+    {% endif %}
+    {%- for g in d.groups %}
+    <details class="provincia-group" id="{{ aid(g.anchor) }}" open data-collapse-mobile>
+      <summary>{{ ui.icon('chevron') }}<h3 class="h-sub">{{ g.name }}</h3><span class="provincia-muted">{{ g.rows | length | num(None, 'count') }} {{ g.rows | length | it_plural('indicatore', 'indicatori') }}</span></summary>
+      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="{{ g.name }}, gli indicatori in tabella">
+        <table class="table table--stack provincia-table" role="table">
+          <caption class="sr-only">{{ g.name }}: {{ g.rows | length | num(None, 'count') }} indicatori per {{ p.name }}. Valore della fonte con unità e anno, variazione dal primo anno della serie, posizione fra le province italiane{% if p.region %}, posizione fra le province {{ p.region | of_region }} e media delle altre{% endif %}.</caption>
+          <thead role="rowgroup"><tr role="row">
+            <th scope="col" role="columnheader">Indicatore</th>
+            <th class="r" scope="col" role="columnheader">Valore</th>
+            <th scope="col" role="columnheader">Unità</th>
+            <th class="r" scope="col" role="columnheader">Anno</th>
+            <th class="r" scope="col" role="columnheader">Variazione</th>
+            <th class="r" scope="col" role="columnheader">In Italia</th>
+            <th class="r" scope="col" role="columnheader">In {{ region_label }}</th>
+            <th class="r" scope="col" role="columnheader">Media delle altre</th>
+          </tr></thead>
+          <tbody role="rowgroup">
+            {%- for i in g.rows %}
+            <tr role="row">
+              <th scope="row" role="rowheader"><a href="{{ href(i.path) }}">{{ i.name }}</a></th>
+              <td role="cell" class="val" data-label="Valore">{{ i.value | num(None, 'cell', i.decimals) }}</td>
+              <td role="cell" class="provincia-unit" data-label="Unità">{{ i.unit }}</td>
+              <td role="cell" class="val" data-label="Anno">{{ i.year }}</td>
+              <td role="cell" class="val" data-label="Variazione">{% if i.variazione is not none %}<span class="provincia-muted">dal {{ i.year_from }}</span> {{ i.variazione | delta(None, i.decimals) }}{% else %}{{ none | num }}{% endif %}</td>
+              <td role="cell" class="val" data-label="In Italia">{{ i.rank | rank(i.province_count) }}</td>
+              {%- if i.in_regione %}
+              <td role="cell" class="val" data-label="In {{ region_label }}">{{ i.in_regione.posizione | rank(i.in_regione.quante) }}</td>
+              <td role="cell" class="val" data-label="Media delle altre">{{ i.in_regione.media | num(None, 'cell', i.decimals) }}</td>
+              {%- else %}
+              <td role="cell" class="val" data-label="In {{ region_label }}">{{ none | num }}</td>
+              <td role="cell" class="val" data-label="Media delle altre">{{ none | num }}</td>
+              {%- endif %}
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+    {%- endfor %}
+    <p class="source">Fonte: {{ d.source }}. Elaborazione Divario Italia.</p>
+  </section>
+  {% endif %}
+
+  {% if d.near or d.sisters %}
+  <section class="section" id="{{ aid('intorno') }}" aria-labelledby="{{ aid('h-intorno') }}">
+    <h2 id="{{ aid('h-intorno') }}">Le province intorno</h2>
+    <div class="podiums">
+      {% if d.near %}
+      <div>
+        <h3 class="h-sub provincia-colhead">Vicine in classifica</h3>
+        <p class="subline">Posizione su {{ p.total | num(None, 'count') }} province e punteggio da 0 a 100, con la tacca sulla media 50.</p>
+        {% set cap %}Le province dalla {{ d.near[0].rank | rank }} alla {{ d.near[-1].rank | rank }} su {{ p.total | num(None, 'count') }} per qualità della vita, con il punteggio{% endset %}
+        {{ rank_table(d.near, cap, 'Le province vicine in classifica') }}
+      </div>
+      {% endif %}
+      {% if d.sisters %}
+      <div>
+        <h3 class="h-sub provincia-colhead">Le province {{ p.region | of_region }}</h3>
+        <p class="subline">Stessa classifica, stesso punteggio: dove sta {{ p.name }} fra le province della sua regione.</p>
+        {% set cap %}Le {{ d.sisters | length | num(None, 'count') }} province {{ p.region | of_region }} con la posizione su {{ p.total | num(None, 'count') }} e il punteggio{% endset %}
+        {{ rank_table(d.sisters, cap, 'Le province ' ~ (p.region | of_region), false) }}
+      </div>
+      {% endif %}
+    </div>
+    <p class="provincia-more">
+      {% if p.region_path %}<a class="linkarrow" href="{{ href(p.region_path) }}">Il profilo {{ p.region | of_region }}</a>{% endif %}
+      <a class="linkarrow" href="{{ href('/qualita-della-vita/classifica/province') }}">La classifica delle province per qualità della vita</a>
+      <a class="linkarrow" href="{{ href('/province') }}">Tutte le province, regione per regione</a>
+    </p>
+  </section>
+  {% endif %}
+
+  <section class="section" id="{{ aid('fonti-verifica') }}" aria-labelledby="{{ aid('h-fonti') }}">
+    <h2 id="{{ aid('h-fonti') }}">Fonti e metodo</h2>
+    <dl class="specs">
+      <div><dt>Fonte</dt><dd>{{ d.source }}, {{ indicatori | length | num(None, 'count') }} indicatori con un dato per {{ p.name }}{% if d.year_from %}, dal {{ d.year_from }} al {{ d.year_to }}{% endif %}.{% if d.dataset %} Il dataset di origine è «{{ d.dataset }}».{% endif %}</dd></div>
+      <div><dt>Come è calcolato</dt><dd>Ogni indicatore diventa uno scarto standardizzato dalla media delle province, con il segno girato quando il valore basso è il migliore, e le distanze restano quelle vere. I punteggi si mostrano da 0 a 100, dove 50 è la media. Il profilo {{ d.profile_name }} dà lo stesso peso a ogni dimensione. Non è una classifica ufficiale. <a href="{{ href('/metodologia#qualita-della-vita') }}">Il metodo per esteso</a></dd></div>
+      {% if d.in_score %}<div><dt>Copertura</dt><dd>{% if d.covered == d.in_score %}Tutti i {{ d.in_score | num(None, 'count') }} indicatori del punteggio hanno un dato per {{ p.name }}.{% else %}{{ d.covered | num(None, 'count') }} dei {{ d.in_score | num(None, 'count') }} indicatori del punteggio hanno un dato per {{ p.name }}.{% endif %}</dd></div>{% endif %}
+      {% if indicatori %}<div><dt>I valori e le posizioni</dt><dd>I valori della tabella sono quelli pubblicati dalla fonte, senza riscalature: il punteggio da 0 a 100 delle dimensioni è un'altra cosa e serve solo a mettere in fila le province. Ogni posizione si conta fra le province che quell'anno hanno un dato per quell'indicatore, e a pari valore corrisponde pari posizione. Il confronto dentro la regione è fra province della stessa regione, mai con il valore regionale: livello provinciale e livello regionale sono due letture diverse della stessa misura.</dd></div>{% endif %}
+      <div><dt>Come nasce questa pagina</dt><dd>I dati vengono dalla fonte senza correzioni e le sintesi si ricalcolano a ogni caricamento. <a href="{{ href('/metodologia') }}">Metodologia</a></dd></div>
+      <div><dt>Licenza</dt><dd><a href="{{ data_license_url }}">{{ data_license_label }}</a></dd></div>
+    </dl>
+    {{ ui.cite(d.citation) }}
+  </section>
+</div>
+{% endblock %}

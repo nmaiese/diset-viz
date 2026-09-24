@@ -1,176 +1,239 @@
-/* DivarioItalia — Design system 2026, token layer + base.
+/* Divario Italia 1.0, direzione Cronaca: i token e la base.
  * ===========================================================================
- * Ported from the `DivarioItalia Design System` handoff bundle
- * (tokens/colors.css, typography.css, spacing.css, indicators.css,
- * elevation.css, base.css) into a single file so the browser makes one
- * request instead of walking an @import chain.
+ * I valori vengono da design/v1/tokens/tokens.json, dove si verificano
+ * (design/v1/tools/check_tokens.py: contrasti, daltonismo, ripartizioni). Qui
+ * si cambiano solo insieme a quel file.
  *
- * PERCHE' IL FILE E' DIVISO IN DUE BLOCCHI.
- * Il ponte nasce da una migrazione che adesso e' finita: `site.css` dichiarava
- * un suo `:root` con gli STESSI nomi e i valori vecchi, e `body.ds`
- * (specificita' 0,1,1) li ripuntava battendo quel `:root` (0,1,0) qualunque
- * fosse l'ordine di caricamento.
+ * TRE STRATI.
+ *   :root            i token della 1.0 (colori chiari, caratteri, scala,
+ *                    spazi, misure, movimento) e i nomi vecchi del sistema
+ *                    2026 (--n-*, --coral-*, --teal-*, --seq-*, --cat-*...),
+ *                    che restano per chi li legge ma puntano ai valori nuovi.
+ *                    Il "corallo" di quei nomi e' l'arancio bruciato della 1.0.
+ *   body.ds          i nomi che site.css, la SPA e il gioco usano nelle loro
+ *                    regole: e' il ponte con cui le pagine non ancora rifatte
+ *                    prendono carattere, colori e tono della 1.0.
+ *   [data-theme=dark] gli stessi nomi col valore scuro. Il tema lo mette
+ *                    _theme_bootstrap.html prima del primo disegno.
  *
- *   :root      i token che nessun altro foglio dichiara. Qui stanno anche il
- *              movimento e i bersagli tattili, perche' li leggono cose che
- *              non sono figlie di <body>: `::view-transition-group(root)` e'
- *              figlio della radice, e da dentro `body.ds` i suoi `var()` non
- *              risolverebbero.
- *   body.ds    i nomi che `site.css` e `frontend/src/styles.css` usano nelle
- *              loro regole. `site.css` non dichiara piu' un'identita', ma le
- *              sue componenti leggono ancora quei nomi, e il `:root` della SPA
- *              resta come ripiego per quando questo foglio non arriva.
- *
- * Quindi il blocco `body.ds` non e' un residuo: e' il modo in cui il livello
- * componenti prende i colori. Si fonde in `:root` solo il giorno che nessun
- * foglio dichiara piu' quei nomi per conto suo, e
- * `tests/unit/test_css_tokens.py` tiene il conto.
+ * Il movimento sta in :root e non in body.ds: le view transition lo leggono
+ * dalla radice del documento (tests/unit/test_css_tokens.py).
  * ========================================================================= */
 
 :root {
-  /* === PRIMITIVES ======================================================= */
+  /* === I TOKEN DELLA 1.0 ================================================ */
+  --bg: #ffffff;
+  --surface-1: #f5f6f8;
+  --surface-2: #eceef1;
+  --ink: #121519;
+  --text-2: #3e4650;
+  --muted: #5e646a;
+  --link: #a75001;
+  --accent: #a75001;
+  --accent-strong: #8b3f03;
+  --accent-wash: #fbf1e8;
+  --on-accent: #ffffff;
+  --focus: #a75001;
+  --rule: #e3e6ea;
+  --rule-strong: #c9ced4;
+  --control-border: #767b80;
+  --seq-1: #d8e8fa;
+  --seq-2: #a9cbf1;
+  --seq-3: #76a9e2;
+  --seq-4: #4383c8;
+  --seq-5: #1c5fa1;
+  --seq-6: #093e6f;
+  --seq-label-1: #121519;
+  --seq-label-2: #121519;
+  --seq-label-3: #121519;
+  --seq-label-4: #121519;
+  --seq-label-5: #ffffff;
+  --seq-label-6: #ffffff;
+  --div-neg-3: #205f9f;
+  --div-neg-2: #6396ce;
+  --div-neg-1: #aecaeb;
+  --div-mid: #eef0f2;
+  --div-pos-1: #e1c38b;
+  --div-pos-2: #b78a2c;
+  --div-pos-3: #795702;
+  --cmp: #84888c;
+  --cmp-track: #eceef1;
+  --data-focus: #a75001;
+  --data-reference: #3e4650;
+  --data-null: #eceef1;
+  --data-null-stripe: #7a8086;
+  --map-edge: #ffffff;
+  --map-outline: #c9ced4;
+  --cat-1: #2d6fbe;
+  --cat-2: #471b3a;
+  --cat-3: #63591d;
+  --cat-4: #33278d;
+  --ad-bg: #f5f6f8;
+  --area-nord: #2466c3;
+  --area-centro: #504907;
+  --area-sud: #983c75;
+  --shadow-color: #12151929;
+  --error-text: #b3261e;
+  --warning-text: #8a5a00;
+  --success-text: #1d7a3a;
+  --error-soft: #fdeceb;
+  --warning-soft: #fdf3dc;
+  --success-soft: #e8f5ec;
+  --cmp-1: #c9ced4;
+  --cmp-2: #84888c;
+  --cmp-3: #5e646a;
+  --cat-5: #5e646a;
+  --cat-6: #84888c;
 
-  /* warm neutral scale (green-cast, never pure grey) — light to dark */
-  --n-0:  #ffffff;
-  --n-25: #faf9f5;
-  --n-50: #f5f3ee;   /* paper */
-  --n-100:#efece4;
-  --n-200:#e4e0d6;
-  --n-300:#cfcabd;
-  --n-400:#a9a89d;
-  --n-500:#7f857e;
-  --n-600:#676d67;   /* AA body on paper (~5:1) */
-  --n-700:#4f5754;
-  --n-800:#2c3733;
-  --n-900:#18201e;   /* ink */
+  --font-ui: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fw-heading: 760;
+  --fw-num: 700;
+  --fs-display: clamp(36px, 26.909px + 2.4242vw, 56px);
+  --lh-display: 1.04;
+  --fw-display: 800;
+  --tr-display: -0.02em;
+  --fs-title: clamp(30px, 23.636px + 1.6970vw, 44px);
+  --lh-title: 1.1;
+  --fw-title: 700;
+  --tr-title: -0.015em;
+  --fs-section: clamp(23px, 20.727px + 0.6061vw, 28px);
+  --lh-section: 1.2;
+  --fw-section: 700;
+  --tr-section: -0.01em;
+  --fs-subsection: clamp(19px, 18.545px + 0.1212vw, 20px);
+  --lh-subsection: 1.3;
+  --fw-subsection: 700;
+  --tr-subsection: 0;
+  --fs-lede: clamp(19px, 17.636px + 0.3636vw, 22px);
+  --lh-lede: 1.45;
+  --fw-lede: 400;
+  --tr-lede: 0;
+  --fs-prose: clamp(18px, 17.545px + 0.1212vw, 19px);
+  --lh-prose: 1.6;
+  --fw-prose: 400;
+  --tr-prose: 0;
+  --fs-ui: 16px;
+  --lh-ui: 1.5;
+  --fw-ui: 400;
+  --tr-ui: 0;
+  --fs-small: 14px;
+  --lh-small: 1.43;
+  --fw-small: 400;
+  --tr-small: 0.005em;
+  --fs-label: 13px;
+  --lh-label: 1.38;
+  --fw-label: 600;
+  --tr-label: 0.01em;
+  --fs-figure: clamp(44px, 34.909px + 2.4242vw, 64px);
+  --lh-figure: 1;
+  --fw-figure: 700;
+  --tr-figure: -0.02em;
+  --fs-figure-sm: clamp(28px, 24.364px + 0.9697vw, 36px);
+  --lh-figure-sm: 1.05;
+  --fw-figure-sm: 700;
+  --tr-figure-sm: -0.015em;
+  --container: 1200px;
+  --measure: 38rem;
+  --gutter-s: 16px;
+  --gutter-l: 24px;
+  --margin-s: 16px;
+  --margin-m: 24px;
+  --margin-l: 32px;
+  --masthead-s: 56px;
+  --masthead-l: 64px;
+  --radius-control: 4px;
+  --radius-0: 0;
+  --target: 44px;
+  --motion-fast: 120ms;
+  --motion-base: 150ms;
+  --motion-ease: cubic-bezier(.2,.7,.2,1);
 
-  /* brand hues */
-  --coral-300:#f2a99d;
-  --coral-400:#ec7565;
-  --coral-500:#e24b3c;   /* brand coral */
-  --coral-600:#c23829;   /* AA small-text coral (~4.9:1 on paper) */
-  --coral-700:#a4301f;
-  --coral-wash:#f9ded9;
-  --teal-300:#7fcbba;
-  --teal-400:#33ac95;
-  --teal-500:#0f9e86;    /* brand teal */
-  --teal-600:#0b7f6b;    /* AA small-text teal */
-  --teal-700:#0c5f51;
-  --teal-wash:#e2f1ed;
+  /* === I NOMI DEL SISTEMA 2026, CON I VALORI DELLA 1.0 =================== */
+  --n-0: #ffffff;
+  --n-25: #fafbfc;
+  --n-50: #ffffff;
+  --n-100: #f5f6f8;
+  --n-200: #eceef1;
+  --n-300: #c9ced4;
+  --n-400: #9aa0a6;
+  --n-500: #767b80;
+  --n-600: #5e646a;
+  --n-700: #3e4650;
+  --n-800: #262b31;
+  --n-900: #121519;
+  --coral-300: #e9b27f;
+  --coral-400: #c9701f;
+  --coral-500: #a75001;
+  --coral-600: #a75001;
+  --coral-700: #8b3f03;
+  --coral-wash: #fbf1e8;
+  --teal-300: #a9cbf1;
+  --teal-400: #76a9e2;
+  --teal-500: #1c5fa1;
+  --teal-600: #093e6f;
+  --teal-700: #093e6f;
+  --teal-wash: #d8e8fa;
+  --red-500: #b3261e;
+  --red-600: #b3261e;
+  --red-wash: #fdeceb;
+  --amber-500: #8a5a00;
+  --amber-600: #8a5a00;
+  --amber-wash: #fdf3dc;
+  --green-500: #1d7a3a;
+  --green-600: #1d7a3a;
+  --green-wash: #e8f5ec;
+  --blue-500: #1c5fa1;
+  --blue-600: #093e6f;
+  --blue-wash: #d8e8fa;
 
-  /* interface-semantic hues (NOT brand) */
-  --red-500:#c0362b;     /* error — true red, distinct from coral */
-  --red-600:#a32a20;
-  --red-wash:#f7dcd9;
-  --amber-500:#b8791a;   /* warning */
-  --amber-600:#956010;
-  --amber-wash:#f6ecd7;
-  --green-500:#2f8f5b;   /* success */
-  --green-600:#24774a;
-  --green-wash:#e3f0e7;
-  --blue-500:#2f6fb0;    /* info */
-  --blue-600:#245a91;
-  --blue-wash:#e2ebf5;
-
-  /* === BRAND (identity chrome — carries no data meaning) ================ */
   --brand-coral: var(--coral-500);
   --brand-coral-text: var(--coral-600);
-  --brand-coral-hover: var(--coral-600);
+  --brand-coral-hover: var(--coral-700);
   --brand-coral-press: var(--coral-700);
   --brand-coral-wash: var(--coral-wash);
   --brand-teal: var(--teal-500);
   --brand-teal-text: var(--teal-600);
   --brand-teal-hover: var(--teal-600);
   --brand-teal-wash: var(--teal-wash);
-
   --accent-hover: var(--brand-coral-hover);
   --accent-press: var(--brand-coral-press);
   --accent-text: var(--brand-coral-text);
-  --on-accent: #ffffff;
 
-  /* === SURFACES / TEXT / LINES ========================================== */
-  --surface-page: var(--n-50);
-  --surface-card: var(--n-0);
-  --surface-sunk: var(--n-100);
-  --surface-inverse: var(--n-900);
-
-  --text-strong: var(--n-900);      /* ~14:1 on paper */
-  --text-body: var(--n-800);        /* ~10:1 */
-  --text-secondary: var(--n-700);   /* ~7:1 */
-  --text-muted: var(--n-600);       /* ~5:1, AA body */
-  --text-faint: var(--n-400);       /* decorative / disabled only, not text */
-  --text-on-accent: #ffffff;
-  --text-on-inverse: var(--n-50);
-  --text-link: var(--brand-coral-text);
-  --text-link-hover: var(--brand-coral-press);
-
-  --line-strong: rgba(24, 32, 30, 0.26);
-  --line-soft: rgba(24, 32, 30, 0.08);
-
-  --focus-ring: var(--brand-coral-text);
+  --surface-page: var(--bg);
+  --surface-card: var(--bg);
+  --surface-sunk: var(--surface-1);
+  --surface-inverse: var(--ink);
+  --text-strong: var(--ink);
+  --text-body: var(--ink);
+  --text-secondary: var(--text-2);
+  --text-muted: var(--muted);
+  --text-faint: var(--n-400);
+  --text-on-accent: var(--on-accent);
+  --text-on-inverse: var(--bg);
+  --text-link: var(--link);
+  --text-link-hover: var(--accent-strong);
+  --line-strong: var(--rule-strong);
+  --line-soft: var(--rule);
+  --focus-ring: var(--focus);
   --disabled-fg: var(--n-400);
-  --disabled-bg: var(--n-100);
+  --disabled-bg: var(--surface-1);
 
-  /* === INTERFACE SEMANTIC (UI feedback only) ============================ */
-  --success: var(--green-500);
-  --success-text: var(--green-600);
-  --success-soft: var(--green-wash);
-  --warning: var(--amber-500);
-  --warning-text: var(--amber-600);
-  --warning-soft: var(--amber-wash);
-  --error: var(--red-500);
-  --error-text: var(--red-600);
-  --error-soft: var(--red-wash);
   --info: var(--blue-500);
   --info-text: var(--blue-600);
   --info-soft: var(--blue-wash);
 
-  /* === DATA VISUALISATION (charts + maps only) ==========================
-   * Sequential: single-hue teal, monotonic in lightness so it also reads in
-   * greyscale and for every CVD type. Reverse the stops when the indicator is
-   * lower_is_better: colour encodes the VALUE, never a verdict. */
-  --seq-1:#e9f1ee;
-  --seq-2:#b9dcd1;
-  --seq-3:#79c0ab;
-  --seq-4:#369e85;
-  --seq-5:#0c6f5c;
-  --seq-6:#08453a;
-
-  /* Diverging: distance from a reference. Non-brand purple/orange (CVD-safe)
-   * so a divergence never reads as the teal/coral identity. */
-  --div-neg-2:#6a3d9a;
-  --div-neg-1:#b08fce;
-  --div-mid:  #efeae2;
-  --div-pos-1:#e0a860;
-  --div-pos-2:#b3690a;
-
-  /* Categorical: up to 6 series, ordered for separation + CVD safety. */
-  --cat-1:#e24b3c;
-  --cat-2:#0f9e86;
-  --cat-3:#2f6fb0;
-  --cat-4:#b8791a;
-  --cat-5:#6a3d9a;
-  --cat-6:#5a615b;
-
-  /* Neutral comparison: the "context" series behind a focus series. */
-  --cmp-1:#d3cec3;
-  --cmp-2:#a9a89d;
-  --cmp-3:#7f857e;
-
-  /* map + chart furniture */
-  --data-null: #e7e4dc;
-  --data-null-stripe: #cfcabd;
-  --map-stroke: var(--surface-card);
-  --data-focus: var(--brand-coral);
-  --data-reference: var(--n-600);
-  --map-sea: #e3e7e0;
-  --map-region-stroke: rgba(24, 32, 30, 0.30);
-  --data-highlight-halo: rgba(226, 75, 60, 0.18);
-  --chart-grid: var(--line-soft);
-  --chart-axis: var(--line-strong);
-  --chart-baseline: var(--line-strong);
+  --data-highlight-halo: var(--accent-wash);
+  --map-stroke: var(--map-edge);
+  --map-sea: var(--surface-1);
+  --map-region-stroke: var(--map-outline);
+  --chart-grid: var(--rule);
+  --chart-axis: var(--rule-strong);
+  --chart-baseline: var(--rule-strong);
   --chart-reference: var(--data-reference);
-
   --map-1: var(--seq-1);
   --map-2: var(--seq-2);
   --map-3: var(--seq-3);
@@ -178,57 +241,46 @@
   --map-5: var(--seq-5);
   --map-null: var(--data-null);
   --map-null-stripe: var(--data-null-stripe);
-  --map-selected: var(--data-focus);
-
-  /* neutral change marks — movement, not verdict (tokens/indicators.css) */
-  --delta-up: var(--n-700);
-  --delta-down: var(--n-700);
-  --delta-flat: var(--n-500);
-  --delta-good: var(--success-text);
-  --delta-bad: var(--error-text);
+  --map-selected: var(--ink);
+  --delta-up: var(--ink);
+  --delta-down: var(--ink);
+  --delta-flat: var(--muted);
+  --delta-good: var(--ink);
+  --delta-bad: var(--ink);
   --median-line: var(--data-reference);
   --highlight: var(--data-focus);
 
-  /* === TYPOGRAPHY ======================================================= */
-  --font-sans: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-
-  --text-hero: clamp(34px, 5.2vw, 60px);
-  --text-title: clamp(28px, 3.6vw, 40px);
-  --text-h2: clamp(22px, 2.6vw, 30px);
-  --text-h3: clamp(19px, 1.6vw, 22px);
+  --text-hero: var(--fs-display);
+  --text-title: var(--fs-title);
+  --text-h2: var(--fs-section);
+  --text-h3: var(--fs-subsection);
   --text-h4: 18px;
-
-  --text-prose: clamp(17px, 1.1vw, 19px);
-  --text-lead: clamp(18px, 1.4vw, 21px);
+  --text-prose: var(--fs-prose);
+  --text-lead: var(--fs-lede);
   --text-body-lg: 17px;
   --text-sm: 14px;
   --text-label: 13px;
-  --text-label-sm: 12px;
-  --text-meta: 13px;
-  --text-meta-sm: 12px;
-
+  --text-label-sm: 13px;
+  --text-meta: 14px;
+  --text-meta-sm: 13px;
   --w-regular: 400;
   --w-medium: 500;
   --w-semibold: 600;
   --w-bold: 700;
   --w-extrabold: 800;
-
   --leading-tight: 1.04;
-  --leading-snug: 1.18;
+  --leading-snug: 1.2;
   --leading-normal: 1.5;
-  --leading-body: 1.65;
-
-  --tracking-display: -0.012em;
+  --leading-body: 1.6;
+  --tracking-display: -0.015em;
   --tracking-tight: -0.02em;
   --tracking-normal: 0;
-  --tracking-label: 0.02em;
-  --tracking-eyebrow: 0.08em;
-
-  --measure-prose: 68ch;
+  --tracking-label: 0.01em;
+  --tracking-eyebrow: 0.01em;
+  --measure-prose: 38rem;
   --measure-narrow: 54ch;
   --measure-wide: 1200px;
 
-  /* === SPACING / LAYOUT ================================================= */
   --space-0: 0;
   --space-1: 4px;
   --space-2: 8px;
@@ -243,59 +295,46 @@
   --space-20: 80px;
   --space-24: 96px;
   --space-32: 128px;
-
-  --space-section: clamp(48px, 7vw, 96px);
-  --space-block: clamp(24px, 4vw, 48px);
-  --gutter: clamp(16px, 4vw, 40px);
-
-  --container-prose: 720px;
+  --space-section: clamp(48px, 7vw, 64px);
+  --space-block: clamp(16px, 4vw, 24px);
+  --gutter: clamp(16px, 3vw, 24px);
+  --container-prose: 38rem;
   --container-narrow: 960px;
   --container-wide: 1200px;
-  --container-atlas: 1440px;
-
+  --container-atlas: 1200px;
   --topbar-h: 64px;
   --topbar-h-mobile: 56px;
   --dock-h: 60px;
   --bottomnav-h: 56px;
-
-  /* radii — the brand is emphatically square */
-  --radius-0: 0px;
-  --radius-sm: 3px;
+  --radius-sm: 4px;
   --radius-md: 4px;
   --radius-pill: 999px;
-
   --logo-mark-full: 30px;
-  --logo-mark-compact: 24px;
+  --logo-mark-compact: 26px;
   --logo-mark-icon: 28px;
   --logo-mark-min: 20px;
-  --logo-gap: 9px;
+  --logo-gap: 10px;
 
-  /* === MOTION ===========================================================
-   * La scala sta qui e non in `body.ds` perche' le view transition la usano:
-   * `::view-transition-group(root)` e' figlio della radice, non di <body>, e
-   * da dentro `body.ds` i suoi `var()` non risolvono. La dissolvenza fra
-   * pagine cadeva a 0s senza che niente fallisse. */
+  /* === MOVIMENTO (in radice: lo leggono le view transition) ============== */
   --dur-instant: 80ms;
   --dur-fast: 120ms;
-  --dur: 200ms;
-  --dur-slow: 320ms;
-  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --dur: 150ms;
+  --dur-slow: 240ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  /* === ELEVATION / Z / TARGETS ========================================== */
-  --shadow-tint: 24, 32, 30;
+  /* === OMBRE, LIVELLI, BERSAGLI ========================================= */
+  --shadow-tint: 18, 21, 25;
   --elev-0: none;
-  --elev-1: 0 1px 2px rgba(var(--shadow-tint), 0.06);
-  --elev-2: 0 1px 0 rgba(var(--shadow-tint), 0.04),
-            0 10px 26px rgba(var(--shadow-tint), 0.09);
-  --elev-3: 0 12px 32px rgba(var(--shadow-tint), 0.14);
-  --elev-4: 0 24px 60px rgba(var(--shadow-tint), 0.20);
+  --elev-1: 0 1px 2px var(--shadow-color);
+  --elev-2: 0 8px 24px var(--shadow-color);
+  --elev-3: 0 12px 32px var(--shadow-color);
+  --elev-4: 0 24px 60px var(--shadow-color);
   --shadow-panel: var(--elev-2);
   --shadow-pop: var(--elev-3);
   --shadow-modal: var(--elev-4);
-  --scrim: rgba(24, 32, 30, 0.42);
-
+  --scrim: #12151966;
   --z-base: 0;
   --z-raised: 10;
   --z-sticky: 100;
@@ -304,199 +343,237 @@
   --z-scrim: 380;
   --z-modal: 400;
   --z-toast: 500;
-
   --target-min: 40px;
   --target-comfortable: 44px;
 }
 
 /* ===========================================================================
- * OPT-IN LAYER. Only the token names that also exist in the legacy site.css
- * live here, so an un-migrated page keeps its old values and a migrated one
- * (<body class="ds">) gets the new system.
+ * IL PONTE: i nomi che site.css, la SPA e il gioco leggono nelle loro regole.
  * ========================================================================= */
 body.ds {
-  --paper: var(--n-50);
-  --paper-sunk: var(--n-100);
-  --panel: var(--n-0);
+  --paper: var(--bg);
+  --paper-sunk: var(--surface-1);
+  --panel: var(--bg);
   --ink: var(--n-900);
   --ink-soft: var(--n-800);
-  --soft: var(--n-700);
+  --soft: var(--text-2);
   --muted: var(--n-600);
   --muted-faint: var(--n-400);
 
-  /* the single interactive accent. Primary actions, links, the active nav
-   * marker and selection outlines — never a data value. */
-  --accent: var(--brand-coral);
-  --accent-soft: var(--brand-coral-wash);
+  /* un accento solo: l'interazione e cio' che e' in evidenza, mai un dato */
+  --accent: var(--coral-500);
+  --accent-soft: var(--accent-wash);
   --coral: var(--coral-500);
   --coral-strong: var(--coral-600);
   --teal: var(--teal-500);
   --teal-strong: var(--teal-600);
   --teal-soft: var(--teal-wash);
-  --brand: var(--brand-coral);
-  --on-ink: var(--n-50);
+  --brand: var(--coral-500);
+  --on-ink: var(--bg);
   --ocra: var(--amber-500);
   --green: var(--green-500);
 
-  --line: rgba(24, 32, 30, 0.14);
-  --grid: rgba(24, 32, 30, 0.08);
-  --border: var(--line);
-  --border-soft: var(--line-soft);
-  --border-hairline: 1px solid var(--line);
-  --border-strong: 1px solid var(--line-strong);
+  --line: var(--rule);
+  /* La carta a righe del 2026 non c'e' piu': le regole che la disegnano
+     restano in site.css, e con la riga trasparente non disegnano niente. */
+  --grid: transparent;
+  --border: var(--rule);
+  --border-soft: var(--rule);
+  --border-hairline: 1px solid var(--rule);
+  --border-strong: 1px solid var(--rule-strong);
   --rule-accent: 3px solid var(--accent);
 
-  /* deltas historically used these; they now point at the DATA layer, not
-   * at brand coral, so a change never reads as an accent. */
-  --positive: var(--green-500);
-  --positive-ink: var(--green-600);
-  --positive-soft: var(--green-wash);
-  --negative: var(--red-500);
-  --negative-soft: var(--red-wash);
+  /* il verso di un dato si dice a parole: niente verde e rosso per meglio e peggio */
+  --positive: var(--ink);
+  --positive-ink: var(--ink);
+  --positive-soft: var(--surface-2);
+  --negative: var(--ink);
+  --negative-soft: var(--surface-2);
   --map-missing: var(--data-null);
 
-  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --font-body: var(--font-sans);
-  --font-mono: 'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
+  --font-body: var(--font-ui);
+  /* Le etichette del sistema 2026 erano in monospazio maiuscolo: nella 1.0 il
+     monospazio resta ai codici (--font-code) e le etichette sono Sofia Sans. */
+  --font-mono: var(--font-ui);
 
   --shadow: var(--elev-2);
-  --shadow-tooltip: 0 8px 20px rgba(var(--shadow-tint), 0.22);
-
-  /* Il movimento non e' piu' qui: sta in `:root`, perche' le view transition
-     lo leggono dalla radice. Vedi la sezione MOTION piu' sopra. */
+  --shadow-tooltip: 0 8px 20px var(--shadow-color);
 }
 
 /* ===========================================================================
- * DARK THEME (opt-in: <html data-theme="dark">, set by ds-chrome.js).
- * Warm near-black surfaces with a green cast; brand + data hues brightened so
- * contrast holds. Only primitives and a few role tokens flip — everything
- * built on semantic tokens follows automatically.
+ * TEMA SCURO: ogni colore ridefinito per tenere lo stesso contrasto del chiaro.
  * ========================================================================= */
 [data-theme="dark"] {
-  --n-0:  #1e2426;
-  --n-25: #1b2022;
-  --n-50: #14181a;
-  --n-100:#1b2123;
-  --n-200:#242b2d;
-  --n-300:#333b3d;
-  --n-400:#5a625f;
-  --n-500:#79817c;
-  --n-600:#98a09a;
-  --n-700:#b6bcb5;
-  --n-800:#dde2db;
-  --n-900:#eef1ec;
-
-  --coral-500:#f2604f;
-  --coral-600:#f4715f;
-  --coral-700:#d94a3a;
-  --coral-wash:rgba(242, 96, 79, 0.16);
-  --teal-500:#3bb39c;
-  --teal-600:#52c3ad;
-  --teal-700:#7fcbba;
-  --teal-wash:rgba(59, 179, 156, 0.16);
-  --red-500:#ef6a5c;   --red-600:#f4796c;   --red-wash:rgba(239, 106, 92, 0.16);
-  --amber-500:#d9a24f; --amber-600:#e4b46a; --amber-wash:rgba(217, 162, 79, 0.16);
-  --green-500:#4fb37a; --green-600:#66c48d; --green-wash:rgba(79, 179, 122, 0.16);
-  --blue-500:#5a9bd6;  --blue-600:#77aee0;  --blue-wash:rgba(90, 155, 214, 0.16);
-
-  --line-strong: rgba(238, 241, 236, 0.30);
-  --line-soft: rgba(238, 241, 236, 0.09);
-  --focus-ring: var(--coral-600);
-
-  --map-sea:#1a2123;
-  --map-region-stroke: rgba(238, 241, 236, 0.34);
-  --data-null:#2a3032;
-  --data-null-stripe:#3a4143;
-  --div-mid:#2b322f;
-
-  /* data ramps keep the hue, lift lightness for the dark surface */
-  --seq-1:#173b34; --seq-2:#1d5a4c; --seq-3:#2a8069;
-  --seq-4:#3ba98d; --seq-5:#63c7ac; --seq-6:#8ed9c4;
-
-  --shadow-tint: 0, 0, 0;
-  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --elev-2: 0 1px 0 rgba(0, 0, 0, 0.3), 0 12px 30px rgba(0, 0, 0, 0.5);
-  --elev-3: 0 14px 34px rgba(0, 0, 0, 0.55);
-  --elev-4: 0 26px 64px rgba(0, 0, 0, 0.6);
-  --scrim: rgba(0, 0, 0, 0.62);
-}
-
-[data-theme="dark"] body.ds {
-  --line: rgba(238, 241, 236, 0.16);
-  --grid: rgba(238, 241, 236, 0.09);
+  color-scheme: dark;
+  --bg: #121417;
+  --surface-1: #1a1d21;
+  --surface-2: #23272c;
+  --ink: #eceef1;
+  --text-2: #c4c9cf;
+  --muted: #9a9fa5;
+  --link: #ef852e;
+  --accent: #ef852e;
+  --accent-strong: #ffa65f;
+  --accent-wash: #2a1d12;
+  --on-accent: #121417;
+  --focus: #ef852e;
+  --rule: #2b3036;
+  --rule-strong: #3d434a;
+  --control-border: #70757a;
+  --seq-1: #1a2f46;
+  --seq-2: #274a6f;
+  --seq-3: #3b6ca1;
+  --seq-4: #5890cd;
+  --seq-5: #8ab8ec;
+  --seq-6: #c8e1fe;
+  --seq-label-1: #eceef1;
+  --seq-label-2: #eceef1;
+  --seq-label-3: #eceef1;
+  --seq-label-4: #121417;
+  --seq-label-5: #121417;
+  --seq-label-6: #121417;
+  --div-neg-3: #93c2f7;
+  --div-neg-2: #5e90c7;
+  --div-neg-1: #355578;
+  --div-mid: #252729;
+  --div-pos-1: #664e21;
+  --div-pos-2: #ad8532;
+  --div-pos-3: #deb870;
+  --cmp: #6e7378;
+  --cmp-track: #23272c;
+  --data-focus: #ef852e;
+  --data-reference: #c4c9cf;
+  --data-null: #23272c;
+  --data-null-stripe: #70767d;
+  --map-edge: #121417;
+  --map-outline: #3d434a;
+  --cat-1: #a3cffd;
+  --cat-2: #d296b2;
+  --cat-3: #d6cc8f;
+  --cat-4: #9281e1;
+  --ad-bg: #1a1d21;
+  --area-nord: #5182e5;
+  --area-centro: #a48118;
+  --area-sud: #f7b1df;
+  --shadow-color: #00000066;
+  --error-text: #ff8a80;
+  --warning-text: #e8b04b;
+  --success-text: #5fcf85;
+  --error-soft: #3b1d1c;
+  --warning-soft: #33280f;
+  --success-soft: #15301f;
+  --cmp-1: #3d434a;
+  --cmp-2: #6e7378;
+  --cmp-3: #9a9fa5;
+  --cat-5: #9a9fa5;
+  --cat-6: #6e7378;
+  --n-0: #121417;
+  --n-25: #121417;
+  --n-50: #121417;
+  --n-100: #1a1d21;
+  --n-200: #23272c;
+  --n-300: #3d434a;
+  --n-400: #5b6167;
+  --n-500: #70757a;
+  --n-600: #9a9fa5;
+  --n-700: #c4c9cf;
+  --n-800: #d6dadf;
+  --n-900: #eceef1;
+  --coral-300: #ffb67a;
+  --coral-400: #ef852e;
+  --coral-500: #ef852e;
+  --coral-600: #ef852e;
+  --coral-700: #ffa65f;
+  --coral-wash: #2a1d12;
+  --teal-300: #5890cd;
+  --teal-400: #5890cd;
+  --teal-500: #8ab8ec;
+  --teal-600: #c8e1fe;
+  --teal-700: #c8e1fe;
+  --teal-wash: #1a2f46;
+  --red-500: #ff8a80;
+  --red-600: #ff8a80;
+  --red-wash: #3b1d1c;
+  --amber-500: #e8b04b;
+  --amber-600: #e8b04b;
+  --amber-wash: #33280f;
+  --green-500: #5fcf85;
+  --green-600: #5fcf85;
+  --green-wash: #15301f;
+  --blue-500: #8ab8ec;
+  --blue-600: #c8e1fe;
+  --blue-wash: #1a2f46;
+  --scrim: #000000a0;
 }
 
 /* ===========================================================================
- * BASE — scoped to .ds so it cannot reach an un-migrated page.
+ * BASE, dentro .ds perche' non raggiunga /legacy.
  * ========================================================================= */
 html { -webkit-text-size-adjust: 100%; color-scheme: light; }
 html[data-theme="dark"] { color-scheme: dark; }
 
 body.ds {
   margin: 0;
-  background: var(--surface-page);
-  color: var(--text-body);
-  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
   font-size: 16px;
   line-height: var(--leading-normal);
-  -webkit-font-smoothing: antialiased;
+  /* La scala e' tarata su un occhio medio di 0,49. */
+  font-size-adjust: 0.49;
   text-rendering: optimizeLegibility;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums;
 }
 
 .ds *, .ds *::before, .ds *::after { box-sizing: border-box; }
 
-/* numbers everywhere line up */
-.ds .tnum, .ds .mono { font-variant-numeric: tabular-nums; }
+.ds .tnum, .ds .mono { font-variant-numeric: tabular-nums lining-nums; }
+.ds code, .ds kbd, .ds pre { font-family: var(--font-code); }
 
 .ds h1, .ds h2, .ds h3, .ds h4 {
   font-family: var(--font-display);
-  color: var(--text-strong);
-  font-weight: var(--w-medium);
+  color: var(--ink);
+  font-weight: var(--fw-heading);
   letter-spacing: var(--tracking-display);
   line-height: var(--leading-snug);
+  text-wrap: balance;
   margin: 0;
 }
 
-/* Le etichette di sezione e gli occhielli, una volta sola e qui. Un
- * `h2.section-label` perdeva contro `.ds h2` qui sopra, che e' piu' specifica,
- * e usciva in Newsreader grande invece che in mono piccolo. L'occhiello non
- * aveva stile fuori dalla home e dalle testate del blog: sulle province, su
- * /ricerca e su /divari-regionali era testo semplice. */
+/* Occhielli ed etichette di sezione: nella 1.0 non sono mai in maiuscolo
+ * spaziato ne' in monospazio, ma un'etichetta da 13 pixel in Sofia Sans. */
 .ds .section-label,
 .ds .eyebrow {
-  font-family: var(--font-mono);
-  font-size: var(--text-label-sm);
-  font-weight: var(--w-semibold);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-snug);
-  text-transform: uppercase;
-}
-.ds .section-label { color: var(--text-muted); }
-.ds .eyebrow { color: var(--accent-text); }
-
-/* Un'intestazione di riga e' il nome della riga, non l'intestazione di una
- * colonna: senza questa regola prendeva il maiuscoletto grigio di `th`. */
-.ds .data-table tbody th[scope="row"] {
-  font-family: var(--font-body);
-  font-size: inherit;
-  font-weight: var(--w-medium);
-  letter-spacing: var(--tracking-normal);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.38;
   text-transform: none;
-  color: var(--text-strong);
+}
+.ds .section-label { color: var(--muted); }
+.ds .eyebrow { color: var(--text-2); }
+
+.ds .data-table tbody th[scope="row"] {
+  font-family: var(--font-ui);
+  font-size: inherit;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
 }
 
-/* AA-safe coral link, underlined on hover. The bright brand coral is reserved
- * for fills and large text; --text-link is the deep coral that clears 4.5:1. */
-.ds a { color: var(--text-link); text-decoration: none; transition: color var(--dur) var(--ease); }
-.ds a:hover { color: var(--text-link-hover); text-decoration: underline; text-underline-offset: 3px; }
+/* Link: in inchiostro, sottolineati. L'arancio resta alla prosa, alle azioni e
+ * a cio' che e' in evidenza: su ogni elenco perdeva il suo compito. */
+.ds a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule-strong); text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: color var(--dur) var(--ease); }
+.ds a:hover { color: var(--accent-strong); text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 
 .ds img { max-width: 100%; display: block; }
+.ds ::selection { background: var(--accent-wash); color: var(--ink); }
 
-.ds ::selection { background: var(--accent-soft); color: var(--text-strong); }
-
-/* Focus is always visible and always the same shape. Never removed. */
-.ds *:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+/* Il focus e' sempre visibile e sempre della stessa forma. */
+.ds *:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 .ds button, .ds [role="button"], .ds a,
 .ds input, .ds select, .ds summary { touch-action: manipulation; }
@@ -509,10 +586,9 @@ body.ds {
   white-space: nowrap; border: 0;
 }
 
-/* the no-data hatch used on maps and empty cells */
 .ds .ds-nodata {
-  background-color: var(--map-null);
-  background-image: repeating-linear-gradient(45deg, transparent 0 5px, var(--map-null-stripe) 5px 6px);
+  background-color: var(--data-null);
+  background-image: repeating-linear-gradient(45deg, transparent 0 3px, var(--data-null-stripe) 3px 4px);
 }
 
 @media (prefers-reduced-motion: reduce) {

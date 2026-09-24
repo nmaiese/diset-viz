@@ -109,7 +109,7 @@ class DesignSystemMigration(unittest.TestCase):
         ha semplicemente spostato di file.
         """
         css = self._statico("/static/css/fonts.css").decode("utf-8")
-        for famiglia in ("Newsreader", "Public Sans", "Spline Sans Mono"):
+        for famiglia in ("Sofia Sans", "Sofia Sans Semi Condensed"):
             self.assertIn(f"font-family: '{famiglia}'", css)
 
         for path in SPA_ROUTES:
@@ -177,18 +177,23 @@ class DesignSystemMigration(unittest.TestCase):
 
     # --- la rampa dei dati -------------------------------------------------
     def test_the_indicator_map_uses_the_design_system_ramp(self):
-        """La mappa deve essere dipinta con `var(--seq-N)`, non con un colore
-        cotto: `--seq-1..6` sono ridefinite nel tema scuro, e un hex nel markup
-        lascerebbe la mappa sulla rampa chiara con il resto della pagina scuro.
+        """La mappa si dipinge per classe (`q1`..`q6`), e le classi leggono
+        `var(--seq-N)`: `--seq-1..6` sono ridefinite nel tema scuro, e un colore
+        cotto nel markup lascerebbe la mappa sulla rampa chiara con il resto
+        della pagina scuro. Prima le regole erano un `<style>` in pagina con i
+        `var()`; nella 1.0 stanno in components.css.
         """
         html = self._html(
             "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99"
         )
-        fills = re.findall(r'\.indicator-map \[data-key="[^"]+"\]\{fill:([^}]+)\}', html)
-        self.assertTrue(fills, "la mappa dell'indicatore non dipinge nessuna regione")
-        for fill in fills:
-            self.assertRegex(fill.strip(), r"^var\(--seq-[1-6]\)$",
-                             f"colore fuori dalla rampa del design system: {fill}")
+        mappa = re.search(r'<div class="map[^"]*" data-map>.*?</svg>', html, re.S)
+        self.assertIsNotNone(mappa, "la scheda non disegna la mappa")
+        classi = re.findall(r'<path d="[^"]+" data-key="[^"]+"[^>]*class="(q[1-6])', mappa.group(0))
+        self.assertGreaterEqual(len(classi), 15, "la mappa dell'indicatore non dipinge le regioni")
+        self.assertNotRegex(mappa.group(0), r'fill="#|fill:\s*#', "colore cotto nella mappa")
+        css = self._statico("/static/css/ds/components.css").decode("utf-8")
+        for passo in range(1, 7):
+            self.assertIn(f".q{passo} {{ fill: var(--seq-{passo})", css)
 
     def test_the_legacy_blue_ramp_is_gone_from_the_migrated_pages(self):
         # `#15233b` era il navy dell'identita' vecchia. Sopravvive solo nelle
@@ -281,15 +286,10 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
             self.assertEqual(voce["label"], atteso)
 
     def test_il_cassetto_del_telefono_non_perde_voci_per_strada(self):
-        """Sul telefono il cassetto e' l'unica navigazione che si vede.
-
-        `/metodologia` ci compare due volte di proposito, come nella testata:
-        "Metodologia dell'indice" accanto alle classifiche, dove serve a
-        spiegare il punteggio, e "Metodologia" fra le voci generali. Escludendo
-        dal gruppo "Altro" ogni percorso gia' citato nelle tendine, la seconda
-        spariva e la pagina si trovava solo sotto una parola che non la
-        descrive tutta.
-        """
+        """Sul telefono il cassetto e' l'unica navigazione che si vede, e ogni
+        destinazione del menu e del piede ci deve stare. Il gruppo "Altro" si
+        ricava da `nav.drawer_other()`: una voce che non sta in una tendina
+        finisce li', senza che nessuno debba ricordarsela."""
         html = self.client.get("/").get_data(as_text=True)
         cassetto = re.search(r'<div class="drawer" id="ds-drawer".*?</header>', html, re.S)
         self.assertIsNotNone(cassetto)
@@ -297,4 +297,4 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
         for percorso in nav.paths():
             with self.subTest(percorso=percorso):
                 self.assertIn(percorso, rotte, "il cassetto ha perso una voce")
-        self.assertEqual(rotte.count("/metodologia"), 2)
+        self.assertEqual(rotte.count("/metodologia"), 1)

@@ -1,0 +1,506 @@
+{
+ "title": "Lecce: 79ª su 107 province per qualità della vita",
+ "description": "Qualità della vita a Lecce: 79ª su 107 province, punteggio 40,7 su 100. Meglio su sicurezza e legalità. Dati Istat BES.",
+ "canonical": "https://divarioitalia.it/provincia/lecce",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "Lecce è 79ª su 107 province",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Qualità della vita a Lecce",
+   "description": "Lecce è 79ª su 107 province per qualità della vita, con 40,7 su 100. I valori di 67 indicatori del BES dei Territori di Istat, con anno, posizione fra le province e confronto con le province della sua regione.",
+   "url": "https://divarioitalia.it/provincia/lecce",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Lecce",
+    "containedInPlace": {
+     "@type": "Place",
+     "name": "Puglia",
+     "url": "https://divarioitalia.it/regione/puglia"
+    }
+   },
+   "temporalCoverage": "2015/2024",
+   "creator": {
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione"
+   },
+   "isBasedOn": {
+    "@type": "Dataset",
+    "name": "BES dei Territori",
+    "creator": {
+     "@type": "Organization",
+     "name": "Istat"
+    }
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "variableMeasured": [
+    {
+     "@type": "PropertyValue",
+     "name": "Punteggio qualità della vita, profilo Equilibrato",
+     "value": 40.7,
+     "minValue": 0,
+     "maxValue": 100,
+     "measurementTechnique": "Istat, BES dei Territori (Bes at local level)"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Diffusione delle aziende agrituristiche",
+     "value": 14.0,
+     "unitText": "per 100 km²"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Omicidi volontari",
+     "value": 0.3,
+     "unitText": "per 100.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Posti letto per specialità ad elevata assistenza",
+     "value": 4.0,
+     "unitText": "per 10.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Denunce di borseggio",
+     "value": 31.7,
+     "unitText": "per 100.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Partecipazione al sistema scolastico dei bambini di 4-5 anni",
+     "value": 97.4,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Partecipazione elettorale (elezioni regionali)",
+     "value": 58.1,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado)",
+     "value": 35.4,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Denunce di rapina",
+     "value": 15.6,
+     "unitText": "per 100.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mortalità per demenze e malattie del sistema nervoso (65 anni e più)",
+     "value": 30.9,
+     "unitText": "tasso standardizzato per 10.000"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Amministrazioni provinciali: capacità di riscossione",
+     "value": 88.9,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Concentrazione media annua di PM2.5",
+     "value": 14.0,
+     "unitText": "microgrammi per m³"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Energia elettrica da fonti rinnovabili",
+     "value": 49.7,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Popolazione esposta al rischio di frane",
+     "value": 0.9,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Posti-km offerti dal Tpl",
+     "value": 1239.0,
+     "unitText": "valore per abitante"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Scuole accessibili",
+     "value": 45.6,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Comuni con servizi per le famiglie interamente on line",
+     "value": 28.8,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Popolazione esposta al rischio di alluvioni",
+     "value": 3.7,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Passaggio all'università",
+     "value": 55.2,
+     "unitText": "tasso specifico per coorte"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Densità di verde storico",
+     "value": 0.8,
+     "unitText": "per 100 m²"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Altri delitti mortali denunciati",
+     "value": 2.7,
+     "unitText": "per 100.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mortalità infantile",
+     "value": 2.1,
+     "unitText": "per 1.000 nati vivi"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado)",
+     "value": 40.9,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Laureati e altri titoli terziari (25-39 anni)",
+     "value": 28.2,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Concentrazione media annua di PM10",
+     "value": 24.0,
+     "unitText": "microgrammi per m³"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Denunce di furto in abitazione",
+     "value": 240.6,
+     "unitText": "per 100.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mortalità evitabile (0-74 anni)",
+     "value": 17.7,
+     "unitText": "tasso standardizzato per 10.000"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Dispersione da rete idrica comunale",
+     "value": 43.0,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Propensione alla brevettazione",
+     "value": 38.2,
+     "unitText": "per milione di abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Comuni: capacità di riscossione",
+     "value": 75.1,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Bambini che hanno usufruito dei servizi comunali per l'infanzia",
+     "value": 15.2,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mortalità per incidenti stradali (15-34 anni)",
+     "value": 0.6,
+     "unitText": "tasso standardizzato per 10.000"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Rifiuti urbani prodotti",
+     "value": 494.0,
+     "unitText": "kg per abitante"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Emigrazione ospedaliera in altra regione",
+     "value": 9.3,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Servizio di raccolta differenziata dei rifiuti urbani",
+     "value": 70.1,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Speranza di vita alla nascita",
+     "value": 83.2,
+     "unitText": "anni (media)"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Addetti nelle imprese culturali",
+     "value": 1.1,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Tasso di infortuni mortali e inabilità permanente",
+     "value": 12.9,
+     "unitText": "per 10.000 occupati"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Medici specialisti",
+     "value": 26.6,
+     "unitText": "per 10.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Posti letto negli ospedali",
+     "value": 29.7,
+     "unitText": "per 10.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Partecipazione alla formazione continua",
+     "value": 8.5,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie",
+     "value": 0.7,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Partecipazione elettorale",
+     "value": 46.3,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Raccolta differenziata dei rifiuti urbani",
+     "value": 63.9,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Amministratori comunali donne",
+     "value": 32.8,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Tasso di occupazione giovanile (15-29 anni)",
+     "value": 30.1,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Densità e rilevanza del patrimonio museale",
+     "value": 0.28,
+     "unitText": "per 100 km²"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mortalità stradale in ambito extraurbano",
+     "value": 5.6,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Amministratori comunali con meno di 40 anni",
+     "value": 22.5,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Tasso di mancata partecipazione al lavoro giovanile (15-29 anni)",
+     "value": 36.8,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mobilità dei laureati italiani (25-39 anni)",
+     "value": -31.0,
+     "unitText": "per 1.000 laureati residenti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Organizzazioni non profit",
+     "value": 55.2,
+     "unitText": "per 10.000 abitanti"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Affollamento degli istituti di pena",
+     "value": 153.1,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Giovani che non lavorano e non studiano (NEET)",
+     "value": 20.0,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Mortalità per tumore (20-64 anni)",
+     "value": 8.4,
+     "unitText": "tasso standardizzato per 10.000"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Persone con almeno il diploma (25-64 anni)",
+     "value": 58.5,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Irregolarità del servizio elettrico",
+     "value": 3.9,
+     "unitText": "numero medio per utente"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Tasso di occupazione (20-64 anni)",
+     "value": 55.4,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Reddito medio disponibile pro capite",
+     "value": 16510.1,
+     "unitText": "euro"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Tasso di mancata partecipazione al lavoro",
+     "value": 22.0,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Copertura della rete fissa di accesso ultra veloce a internet",
+     "value": 49.9,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Disponibilità di verde urbano",
+     "value": 10.7,
+     "unitText": "m² per abitante"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Giornate retribuite nell'anno (lavoratori dipendenti)",
+     "value": 69.7,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Importo medio annuo pro-capite dei redditi pensionistici",
+     "value": 18086.9,
+     "unitText": "euro"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Retribuzione media annua dei lavoratori dipendenti",
+     "value": 15675.5,
+     "unitText": "euro"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Impermeabilizzazione del suolo da copertura artificiale",
+     "value": 14.4,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Pensionati con reddito pensionistico di basso importo",
+     "value": 13.9,
+     "unitText": "%"
+    },
+    {
+     "@type": "PropertyValue",
+     "name": "Aree protette",
+     "value": 5.3,
+     "unitText": "%"
+    }
+   ],
+   "keywords": [
+    "Lecce",
+    "qualità della vita",
+    "province italiane",
+    "Istat"
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Regioni",
+     "item": "https://divarioitalia.it/regioni"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Puglia",
+     "item": "https://divarioitalia.it/regione/puglia"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "name": "Lecce",
+     "item": "https://divarioitalia.it/provincia/lecce"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 96268
+}

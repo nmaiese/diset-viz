@@ -14,13 +14,14 @@
 
 <header class="hdr">
   <div class="hdr__bar">
-    <a class="hdr__brand" href="/" aria-label="DivarioItalia, torna alla home"{% if active_nav == 'home' %} aria-current="page"{% endif %}>
-      <img src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="30" height="30">
+    <a class="hdr__brand" href="/" aria-label="Divario Italia, torna alla home"{% if active_nav == 'home' %} aria-current="page"{% endif %}>
+      <img src="{{ url_for('static', filename='img/logo-simbolo.png') }}" alt="" width="26" height="30">
       {# `site_name` lo passano le view che rendono con blog_base, `SITE_NAME` lo
          mette il context processor su ogni render: serve il secondo perche' su
          /atlante e /confronto la view non passa il primo, e il marchio usciva
          senza nome. #}
-      <span class="brandword">{{ site_name or SITE_NAME }}</span>
+      {% set marchio = (site_name or SITE_NAME).split(' ', 1) %}
+      <span class="brandword"><b>{{ marchio[0] }}</b>{% if marchio[1] %} <span>{{ marchio[1] }}</span>{% endif %}</span>
     </a>
 
     {# Le voci vengono da `app/nav.py`, non da qui: la testata React dell'atlante
@@ -50,11 +51,17 @@
         <label class="sr-only" for="ds-search">Cerca una regione, una provincia o un indicatore</label>
         <div class="searchbox">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-          <input id="ds-search" type="search" name="q" placeholder="Cerca" autocomplete="off"
+          <input id="ds-search" type="search" name="q" placeholder="Cerca un territorio o un dato" autocomplete="off"
                  role="combobox" aria-expanded="false" aria-controls="ds-search-results" aria-autocomplete="list">
         </div>
         <div class="searchpanel" id="ds-search-results" role="listbox" aria-label="Suggerimenti di ricerca" hidden></div>
       </form>
+
+      {# Sotto i 1100 pixel la casella non entra: la lente porta alla pagina di
+         ricerca, e funziona anche senza JavaScript. #}
+      <a class="iconbtn hdr__searchlink" href="{{ url_for('ricerca') }}" aria-label="Cerca">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      </a>
 
       {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
       {# Placeholder a dimensioni fisse per il controllo login: il bundle site.js
@@ -75,14 +82,6 @@
     </div>
   </div>
 
-  <form class="msearch mobile-only" role="search" action="/ricerca" method="get">
-    <label class="sr-only" for="ds-msearch">Cerca una regione, una provincia o un indicatore</label>
-    <div class="searchbox">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <input id="ds-msearch" type="search" name="q" placeholder="Cerca una regione, una provincia o un indicatore">
-    </div>
-  </form>
-
   <div class="drawer" id="ds-drawer" hidden>
     <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu di navigazione">
       <div class="drawer__top">
@@ -97,6 +96,13 @@
           </button>
         </div>
       </div>
+      <form class="msearch mobile-only" role="search" action="/ricerca" method="get">
+        <label class="sr-only" for="ds-msearch">Cerca una regione, una provincia o un indicatore</label>
+        <div class="searchbox">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+          <input id="ds-msearch" type="search" name="q" placeholder="Regione, provincia, indicatore">
+        </div>
+      </form>
       {# Stesse voci della barra, dallo stesso elenco: il cassetto del telefono
          e' la sola navigazione che quegli utenti vedono, e quando le due liste
          erano scritte a mano perdeva pezzi per primo. Le tendine si ciclano,

@@ -1,0 +1,99 @@
+/* Home 1.0: solo l'impaginazione della home. Tutto il resto (striscia, mappa,
+   classifica, podio, schede, cifre) e' in components.css. Legge solo token. */
+
+/* "largo" = colonne 1-10 della griglia a 12: il dato e il podio non si stirano fino al margine */
+@media (min-width: 960px) { .home-wide { max-width: calc((100% + var(--gutter-l)) * 10 / 12 - var(--gutter-l)); } }
+.home-sectionlead { max-width: var(--measure); color: var(--text-2); margin: calc(-1 * var(--space-2)) 0 var(--space-6); }
+.home-more { margin-top: var(--space-6); }
+.home-cite { margin: var(--space-6) 0 0; }
+
+/* ---------- testata: il titolo sopra, la frase e la ricerca affiancate da 960 ---------- */
+@media (min-width: 960px) {
+  .home-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-16); align-items: end; padding-top: var(--space-12); }
+  .home-head > .eyebrow, .home-head > h1 { grid-column: 1 / -1; }
+  .home-head > h1 { max-width: 16em; }
+}
+.home-find { display: grid; gap: var(--space-2); min-width: 0; }
+.home-find > * { min-width: 0; }
+.home-find label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-find__row { display: flex; gap: var(--space-2); }
+.home-find input {
+  width: 0; flex: 1; min-width: 0; height: var(--space-12); padding: 0 var(--space-4); font: inherit; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
+}
+.home-find input::placeholder { color: var(--muted); }
+.home-find .btn { min-height: var(--space-12); }
+.home-find p { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* ---------- il dato in evidenza: la striscia, poi mappa e classifica ---------- */
+.home-feature .lead-figure { border-top: 0; padding-top: 0; }
+.home-feature__what { display: grid; gap: var(--space-1); }
+.home-feature .module { margin-top: var(--space-8); }
+.home-feature .more { margin-top: 0; }
+.home-pick .seg > a, .home-pick .seg > button { white-space: normal; padding-block: var(--space-2); }
+@container (max-width: 599px) {
+  .home-pick, .home-pick .seg { display: grid; width: 100%; }
+  .home-pick .seg > a, .home-pick .seg > button { border-left: 0; border-top: 1px solid var(--control-border); }
+  .home-pick .seg > :first-child { border-top: 0; }
+}
+
+/* ---------- regioni per ripartizione, nei colori della striscia ---------- */
+.home-regions { display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 960px) { .home-regions { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.home-regions .is-wide { grid-column: span 2; }
+.home-regions .is-wide ul { column-count: 2; column-gap: var(--gutter-l); }
+.home-regions h3 { font-family: var(--font-ui); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
+.home-regions ul { list-style: none; }
+.home-regions li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
+.home-regions li a, .home-links a { display: inline-flex; align-items: center; min-height: var(--target); }
+.home-regions li a { display: flex; text-decoration: none; }
+.home-regions li a:hover { text-decoration: underline; }
+
+/* ---------- qualita' della vita ---------- */
+.home-qol__head { display: grid; gap: var(--space-3); max-width: var(--measure); margin-bottom: var(--space-8); }
+.home-qol__head .lede, .home-quiz .lede { color: var(--ink); }
+.home-podium { display: grid; gap: var(--space-3); align-content: start; }
+.home-qol__more { margin-top: var(--space-8); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* ---------- quiz in evidenza, con una domanda da provare ---------- */
+.home-quiz__grid { display: grid; gap: var(--space-8) var(--space-16); align-items: start; }
+@media (min-width: 960px) { .home-quiz__grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); } }
+.home-quiz .actions { align-items: center; gap: var(--space-3) var(--space-6); }
+.home-try { margin: 0; padding: var(--space-3) 0 0; border: 0; border-top: 1px solid var(--rule); min-width: 0; }
+.home-try legend { display: grid; gap: var(--space-1); padding: 0; }
+.home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+.home-try__opts label {
+  display: flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: var(--space-2) var(--space-4);
+  background: var(--bg); font-weight: 600; border: 1px solid var(--control-border); border-radius: var(--radius-control); cursor: pointer;
+}
+.home-try__opts label:hover { border-color: var(--ink); }
+.home-try__opts label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.home-try__opts label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.home-try__opts input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+/* la risposta si vede solo dopo la scelta, senza JavaScript: la dice la parola, non un colore */
+.home-try__out p { display: none; margin-top: var(--space-4); }
+.home-try:has(input[data-right]:checked) .home-try__ok, .home-try:has(input:not([data-right]):checked) .home-try__no { display: block; }
+.home-try .source { margin-top: var(--space-4); }
+.home-games { margin-top: var(--space-12); }
+
+/* ---------- temi: schede con piu' link, senza il link esteso a tutta la scheda ---------- */
+.home-theme { position: static; }
+.home-theme .card__title a::after { content: none; }
+.home-theme ul { list-style: none; }
+.home-theme li { border-top: 1px solid var(--rule); }
+.home-theme li a { display: flex; align-items: center; min-height: var(--target); }
+.home-theme dl { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.home-theme dl div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
+.home-theme dt { font-weight: 600; }
+
+/* ---------- storie: la prima grande, le altre due accanto, foto con credito ---------- */
+@media (min-width: 600px) { .home-stories > .card--lead { grid-column: 1 / -1; } }
+@media (min-width: 960px) {
+  .home-stories { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .home-stories > .card--lead { grid-column: 1; grid-row: 1 / span 2; }
+}
+.home-story__fig { order: -1; display: grid; gap: var(--space-1); margin-bottom: var(--space-2); }
+.home-story__fig .card__media { margin-bottom: 0; }
+.home-story__fig figcaption { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
+/* i link del credito stanno sopra il link esteso del titolo */
+.home-story__fig a { position: relative; z-index: 1; color: inherit; }

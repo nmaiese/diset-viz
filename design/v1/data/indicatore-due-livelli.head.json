@@ -1,0 +1,110 @@
+{
+ "title": "Tasso di infortuni sul lavoro mortali e, da 17,8 a 8,0",
+ "description": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria.",
+ "canonical": "https://divarioitalia.it/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+ "robots": "noindex, follow",
+ "x_robots_tag": "noindex, follow",
+ "h1": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+   "description": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria. La media delle regioni è del 12,4, e la mappa non ricalca quella dell'occupazione.",
+   "url": "https://divarioitalia.it/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+   "temporalCoverage": "2018/2022",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Italia"
+   },
+   "creator": {
+    "@type": "Organization",
+    "name": "Istat, BES nazionale, aggiornamento intermedio 2026",
+    "url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "dateModified": "2026-05-25",
+   "isBasedOn": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/",
+   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
+   "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+    "unitText": "Per 10.000 occupati",
+    "minValue": 8.0,
+    "maxValue": 17.8,
+    "measurementTechnique": "Istat, BES nazionale, aggiornamento intermedio 2026",
+    "description": "Benessere equo e sostenibile, aggiornamento intermedio 2026"
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "keywords": [
+    "Lavoro e conciliazione",
+    "regioni italiane",
+    "Istat"
+   ],
+   "distribution": [
+    {
+     "@type": "DataDownload",
+     "name": "Download CSV",
+     "description": "Serie dell'indicatore in formato CSV",
+     "encodingFormat": "text/csv",
+     "contentUrl": "https://divarioitalia.it/download/indicator/bes:03LAV007.csv"
+    },
+    {
+     "@type": "DataDownload",
+     "name": "Download JSON",
+     "description": "Serie dell'indicatore in formato JSON",
+     "encodingFormat": "application/json",
+     "contentUrl": "https://divarioitalia.it/download/indicator/bes:03LAV007.json"
+    }
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Temi",
+     "item": "https://divarioitalia.it/temi"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Lavoro e conciliazione",
+     "item": "https://divarioitalia.it/tema/lavoro-e-conciliazione"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "name": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+     "item": "https://divarioitalia.it/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 156637
+}

@@ -57,7 +57,7 @@
    Due colonne perche' un elenco di cinquanta voci in colonna singola e' un
    muro, e `.indicator-list` da sola resta a una. */
 .theme-list {
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   counter-reset: none;
 }
 .theme-list li { min-width: 0; }
@@ -70,7 +70,7 @@
 .theme-next { margin-top: var(--space-10, 40px); }
 .theme-next__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: var(--space-4, 16px);
   align-items: start;
 }

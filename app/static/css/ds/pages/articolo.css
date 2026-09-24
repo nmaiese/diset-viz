@@ -1,0 +1,72 @@
+/* Articolo del blog: solo l'impaginazione di questa pagina. L'immagine
+   d'apertura (.hero-img), la figura (.figure), i grafici in due tagli (.chart),
+   le tabelle, le schede e l'indice sono in components.css. Legge solo token. */
+
+/* ---------- testata, apertura, risposta in breve ---------- */
+.art-head .h-display { max-width: 56rem; }
+.art-hero figcaption { max-width: var(--measure); }
+.art-hero__caption { color: var(--text-2); }
+.art-lead > details.more { max-width: var(--measure); margin-top: 0; }
+
+.art-brief {
+  display: grid; gap: var(--space-4); max-width: var(--measure);
+  margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--rule-strong);
+}
+.art-brief .answer strong { font-weight: 700; }
+.art-brief__title { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: var(--fw-label); color: var(--text-2); }
+.art-brief__list ul { list-style: none; display: grid; }
+.art-brief__list li {
+  position: relative; padding: var(--space-3) 0 var(--space-3) var(--space-6); border-top: 1px solid var(--rule);
+  font-family: var(--font-text); font-size: var(--fs-prose); line-height: 1.5;
+}
+.art-brief__list li:last-child { border-bottom: 1px solid var(--rule); }
+.art-brief__list li::before { content: ""; position: absolute; left: 0; top: calc(var(--space-3) + 0.6em); width: 8px; height: 8px; background: var(--ink); }
+
+/* ---------- impaginazione: sotto i 1200 l'indice e' la barra delle sezioni ---------- */
+/* La barra resta sotto la testata solo se il suo contenitore e' alto quanto
+   l'articolo: qui il margine diventa un blocco, e a restare fermo e' lui. */
+.art-layout { margin-top: var(--space-12); }
+@media (max-width: 1199px) {
+  .art-layout { display: block; }
+  .art-aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20; }
+  .art-aside + .layout__main { margin-top: var(--space-8); }
+  .art-body h2[id], .art-data { scroll-margin-top: calc(var(--masthead-l) + var(--space-16)); }
+}
+@media (min-width: 960px) and (max-width: 1199px) { .art-aside { top: var(--masthead-l); } }
+
+/* ---------- corpo: testo a misura, figure alla loro larghezza vera ---------- */
+.art-body.prose { max-width: none; }
+.art-body > * { max-width: var(--measure); }
+.art-body > .figure { max-width: 42.5rem; font-size: var(--fs-ui); line-height: var(--lh-ui); }
+.art-body .figure > * { margin: 0; }
+.art-body > .tablewrap, .art-body > .stackwrap { margin-block: var(--space-8); }
+.art-body .table thead th { white-space: normal; }
+.art-body .pull p { margin: 0; }
+
+/* ---------- il testo delle figure a 13 pixel veri, i colori per classe ---------- */
+.art-fig .fig text { font-size: 13px; stroke: none; }
+.art-fig .fig .fig__name, .art-fig .fig .fig__value, .art-fig .fig .fig__label { fill: var(--ink); }
+.art-fig .fig .fig__value, .art-fig .fig .fig__label, .art-fig .fig .fig__ref-label { font-weight: 600; }
+.art-fig .fig .fig__axis, .art-fig .fig .fig__axis-name, .art-fig .fig .fig__gap { fill: var(--muted); }
+.art-fig .fig .fig__ref--official { stroke: var(--ink); stroke-dasharray: none; }
+.art-fig .fig text.is-on, .art-fig .fig .fig__label--on { fill: var(--data-focus); font-weight: 700; }
+/* Le ripartizioni nei colori di tutto il sito, e ognuna col suo tratto: la
+   figura si legge anche senza colore. Italia e' il valore ufficiale, neutro. */
+.art-fig .fig .fig__pt { fill: var(--cmp); stroke: var(--bg); stroke-width: 1; }
+.art-fig .fig .fig__line { stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.art-fig .fig .fig__line--north { stroke: var(--area-nord); }
+.art-fig .fig .fig__line--centre { stroke: var(--area-centro); stroke-dasharray: 1 5; }
+.art-fig .fig .fig__line--south { stroke: var(--area-sud); stroke-dasharray: 7 4; }
+.art-fig .fig .fig__line--italy { stroke: var(--data-reference); stroke-width: 1.5; }
+.art-fig .fig .fig__dot--north, .art-fig .fig .fig__label--north { fill: var(--area-nord); }
+.art-fig .fig .fig__dot--centre, .art-fig .fig .fig__label--centre { fill: var(--area-centro); }
+.art-fig .fig .fig__dot--south, .art-fig .fig .fig__label--south, .art-fig .fig .fig__pt--south { fill: var(--area-sud); }
+.art-fig .fig .fig__dot--italy { fill: var(--data-reference); }
+.art-fig .fig .fig__label--italy { fill: var(--text-2); font-weight: 400; }
+.art-fig .fig .fig__pt.is-on { fill: var(--data-focus); }
+
+/* ---------- rimando alla scheda, dati e metodo, storie ---------- */
+.art-link { margin-top: var(--space-8); max-width: var(--measure); padding-bottom: var(--space-4); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.art-data .specs dd p + p { margin-top: var(--space-2); }
+.art-data .specs dd ul { list-style: none; display: grid; gap: var(--space-2); }
+.art-more { margin-top: var(--space-16); }

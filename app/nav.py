@@ -19,46 +19,47 @@ from __future__ import annotations
 
 # Le voci di primo livello, nell'ordine in cui si leggono.
 # `group` raccoglie le voci di una tendina, `path` quelle singole.
+#
+# Dalla 1.0 la testata e' ordinata per quello che si cerca, non per il tipo di
+# pagina: i territori, i temi, la qualita' della vita, l'atlante coi dati, le
+# storie, il quiz. Chi siamo, contatti e informativa sono usciti dalla testata
+# (dove li aveva portati una tendina "Progetto") e stanno nel piede, in una
+# colonna loro e nella riga legale: su ogni pagina, anche senza JavaScript.
 PRIMARY = (
     {
-        "label": "Esplora",
-        "key": "esplora",
+        "label": "Territori",
+        "key": "territori",
+        "group": (
+            {"label": "Le 20 regioni", "path": "/regioni", "active": "regioni"},
+            {"label": "Le 107 province", "path": "/province", "active": "province"},
+            {"label": "Confronta i territori", "path": "/confronto", "active": "confronto"},
+        ),
+    },
+    {"label": "Temi", "path": "/temi", "active": "temi"},
+    {
+        "label": "Qualità della vita",
+        "key": "qualita",
+        "group": (
+            {"label": "Dove si vive meglio", "path": "/qualita-della-vita",
+             "active": "qualita-della-vita"},
+            {"label": "Classifica delle regioni",
+             "path": "/qualita-della-vita/classifica/regioni", "active": "qualita-della-vita"},
+            {"label": "Classifica delle province",
+             "path": "/qualita-della-vita/classifica/province", "active": "qualita-della-vita"},
+        ),
+    },
+    {
+        "label": "Atlante e dati",
+        "key": "atlante",
         "group": (
             {"label": "Atlante", "path": "/atlante", "active": "atlas"},
-            {"label": "Regioni", "path": "/regioni", "active": "regioni"},
-            {"label": "Province", "path": "/province", "active": "province"},
-            {"label": "Temi", "path": "/temi", "active": "temi"},
-            {"label": "Confronta", "path": "/confronto", "active": "confronto"},
             {"label": "Divari regionali", "path": "/divari-regionali", "active": "divari"},
-        ),
-    },
-    {
-        "label": "Classifiche",
-        "key": "classifiche",
-        "group": (
-            {"label": "Qualità della vita, regioni",
-             "path": "/qualita-della-vita/classifica/regioni", "active": "qualita-della-vita"},
-            {"label": "Qualità della vita, province",
-             "path": "/qualita-della-vita/classifica/province", "active": "qualita-della-vita"},
-            {"label": "Metodologia dell'indice", "path": "/metodologia", "active": "metodologia"},
-        ),
-    },
-    {
-        # Chi siamo, i contatti e l'informativa stavano solo nel pie' di pagina
-        # e nel cassetto del telefono: da un monitor, dalla testata, non si
-        # raggiungevano. Sono le tre pagine che chi vuole sapere con chi ha a
-        # che fare cerca nel menu, non in fondo.
-        "label": "Progetto",
-        "key": "progetto",
-        "group": (
-            {"label": "Chi siamo", "path": "/chi-siamo", "active": "progetto"},
-            {"label": "Contatti", "path": "/contatti", "active": "progetto"},
-            {"label": "Privacy e cookie", "path": "/privacy", "active": "progetto"},
+            {"label": "Catalogo dati", "path": "/catalogo-dati", "active": "catalogo"},
+            {"label": "Metodologia", "path": "/metodologia", "active": "metodologia"},
         ),
     },
     {"label": "Storie", "path": "/blog", "active": "blog"},
     {"label": "Quiz", "path": "/quiz", "active": "gioco"},
-    {"label": "Metodologia", "path": "/metodologia", "active": "metodologia"},
 )
 
 # Il pie' di pagina, nelle sue colonne. E' l'elenco che si vede, e da qui si
@@ -66,54 +67,57 @@ PRIMARY = (
 #
 # Era scritto due volte, e questo modulo esiste per non farlo: le colonne
 # stavano a mano in `blog_base.html`, la lista piatta qui sotto, e le due
-# divergevano in silenzio. Aggiungere `/contatti` avrebbe voluto dire
-# ricordarsi di toccarle tutte e due.
+# divergevano in silenzio.
 FOOTER_GROUPS = (
     {
-        "label": "Esplora",
+        "label": "Territori",
         "items": (
-            {"label": "Atlante", "path": "/atlante"},
             {"label": "Regioni", "path": "/regioni"},
             {"label": "Province", "path": "/province"},
-            {"label": "Temi", "path": "/temi"},
             {"label": "Confronta", "path": "/confronto"},
             {"label": "Divari regionali", "path": "/divari-regionali"},
         ),
     },
     {
-        "label": "Classifiche",
+        "label": "Qualità della vita",
         "items": (
-            {"label": "Qualità della vita, regioni",
+            {"label": "Dove si vive meglio", "path": "/qualita-della-vita"},
+            {"label": "Classifica delle regioni",
              "path": "/qualita-della-vita/classifica/regioni"},
-            {"label": "Qualità della vita, province",
+            {"label": "Classifica delle province",
              "path": "/qualita-della-vita/classifica/province"},
-            {"label": "Metodologia della classifica", "path": "/metodologia"},
         ),
     },
     {
-        "label": "Contenuti",
+        "label": "Atlante e dati",
         "items": (
-            {"label": "Storie e analisi", "path": "/blog"},
-            {"label": "Quiz", "path": "/quiz"},
-            {"label": "Cerca nel sito", "path": "/ricerca"},
+            {"label": "Temi", "path": "/temi"},
+            {"label": "Atlante", "path": "/atlante"},
             {"label": "Catalogo dati", "path": "/catalogo-dati"},
+            {"label": "Metodologia e fonti", "path": "/metodologia"},
+            {"label": "Cerca nel sito", "path": "/ricerca"},
         ),
     },
     {
         "label": "Progetto",
         "items": (
+            {"label": "Storie", "path": "/blog"},
+            {"label": "Quiz", "path": "/quiz"},
             {"label": "Chi siamo", "path": "/chi-siamo"},
             {"label": "Contatti", "path": "/contatti"},
-            {"label": "Metodologia e fonti", "path": "/metodologia"},
-            {"label": "Privacy e cookie", "path": "/privacy"},
-            # Stessa pagina, punto diverso. `anchor` sta separata da `path`
-            # perche' `paths()` apre ogni percorso aspettandosi 200, e
-            # "/privacy#cookie" come percorso sarebbe una 404: l'ancora la
-            # legge il browser, non il router.
-            {"label": "Cookie policy", "path": "/privacy", "anchor": "#cookie"},
-            {"label": "Termini", "path": "/termini"},
         ),
     },
+)
+
+# La riga legale in fondo al piede. Sta fuori dalle colonne perche' si legge
+# come una riga di servizio, ma entra nell'elenco piatto come le altre voci.
+LEGAL = (
+    {"label": "Privacy e cookie", "path": "/privacy"},
+    # Stessa pagina, punto diverso. `anchor` sta separata da `path` perche'
+    # `paths()` apre ogni percorso aspettandosi 200, e "/privacy#cookie" come
+    # percorso sarebbe una 404: l'ancora la legge il browser, non il router.
+    {"label": "Cookie policy", "path": "/privacy", "anchor": "#cookie"},
+    {"label": "Termini", "path": "/termini"},
 )
 
 
@@ -129,7 +133,7 @@ def _footer_piatto():
     due destinazioni diverse per chi legge, e deduplicarle sul solo percorso
     farebbe sparire la seconda."""
     viste, uscita = set(), []
-    for gruppo in FOOTER_GROUPS:
+    for gruppo in (*FOOTER_GROUPS, {"items": LEGAL}):
         for voce in gruppo["items"]:
             chiave = (voce["path"], voce.get("anchor", ""))
             if chiave not in viste:
@@ -161,6 +165,8 @@ SPA_MASTHEAD = (
 # Dove il nome per esteso non entra in una barra. Non e' un'etichetta diversa:
 # e' la stessa voce, abbreviata dove lo spazio lo impone.
 SHORT = {
+    "/regioni": "Regioni",
+    "/confronto": "Confronta",
     "/qualita-della-vita/classifica/regioni": "Qualità della vita",
 }
 

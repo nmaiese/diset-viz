@@ -1,0 +1,200 @@
+{% extends "base.html.j2" %}
+{% import "partials/ui.html.j2" as ui %}
+{#- L'articolo del blog della 1.0. Stesso contenuto di blog_post.html, un'altra
+    regia: titolo, sommario e firma, poi l'immagine d'apertura larga quanto la
+    pagina (o, se la copertina e' un grafico, la striscia del divario degli
+    stessi dati), la risposta in breve che la redazione gia' scrive, il corpo a
+    misura di lettura con le figure comuni, il rimando alla scheda dopo la
+    prima figura, un solo blocco di dati e metodo, e le uscite. Il corpo lo
+    smonta e lo rimonta tools/pages/articolo.py. -#}
+{% set meta = post.indicator_meta or {} %}
+{% set ds = post.dataset or {} %}
+{% set trail = [{"name": "Home", "path": "/"}, {"name": "Storie", "path": "/blog"}] %}
+{% if d.theme_path %}{% set trail = trail + [{"name": d.theme, "path": d.theme_path}] %}{% endif %}
+{% set trail = trail + [{"name": post.title, "path": "/blog/" ~ post.slug}] %}
+{% set prefix = aid('') %}
+{% block main %}
+<div class="wrap art">
+  {{ ui.crumbs(trail) }}
+
+  <header class="pagehead art-head">
+    <p class="eyebrow">{% if d.theme_path %}<a href="{{ href(d.theme_path) }}">{{ d.theme }}</a><span class="sep" aria-hidden="true">·</span>{% endif %}Storia{% if d.institution %}<span class="sep" aria-hidden="true">·</span>{{ d.institution }}{% endif %}{% if d.period %}<span class="sep" aria-hidden="true">·</span>dati {{ d.period }}{% endif %}</p>
+    <h1 class="h-display">{{ post.title }}</h1>
+    <p class="lede">{{ post.description }}</p>
+    <p class="meta">
+      <span class="byline">Di <a href="{{ href('/chi-siamo') }}">{{ post.author }}</a></span>
+      <span>Pubblicato il <time datetime="{{ post.date }}">{{ d.published }}</time></span>
+      {% if d.modified %}<span>Aggiornato il <time datetime="{{ post.date_modified }}">{{ d.modified }}</time></span>{% endif %}
+      {% if post.read_time %}<span>{{ post.read_time | num(None, 'count') }} {{ 'minuto' if post.read_time == 1 else 'minuti' }} di lettura</span>{% endif %}
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  {% if d.hero %}{% set h = d.hero %}
+  <figure class="hero-img art-hero">
+    <img src="{{ href(h.src) }}" alt="{{ h.alt }}"{% if h.size %} width="{{ h.size[0] }}" height="{{ h.size[1] }}" style="aspect-ratio: {{ h.size[0] }} / {{ h.size[1] }}"{% endif %} fetchpriority="high" decoding="async">
+    {%- if h.caption or h.credit %}
+    <figcaption>{% if h.caption %}<span class="art-hero__caption">{{ h.caption }}</span> {% endif %}
+      {%- if h.credit %}{% set c = h.credit %}<span class="art-hero__credit">Foto: {{ c.author }}, {% if c.license_url %}<a href="{{ c.license_url }}" rel="license">{{ c.license }}</a>{% else %}{{ c.license }}{% endif %}{% if c.source_url %}, via <a href="{{ c.source_url }}">{{ c.source_name }}</a>{% endif %}.{% if c.changes %} {{ c.changes }}.{% endif %}</span>{% endif %}</figcaption>
+    {%- endif %}
+  </figure>
+  {% elif d.lead %}{% set l = d.lead %}
+  <div class="art-lead">
+    {{ ui.leadfigure('apertura-t', l.title, l.strip, l.note) }}
+    <details class="more">
+      <summary>Le {{ l.rows | length | num(None, 'count') }} regioni in tabella</summary>
+      <div class="tablewrap" tabindex="0" role="region" aria-label="Le regioni in tabella">
+        <table class="table table--compact">
+          <caption class="sr-only">{{ meta.name }} per regione nel {{ l.year }}{% if l.unit %}, {{ l.unit }}{% endif %}</caption>
+          <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="r" scope="col">{{ (l.unit or 'Valore') | capitalize }}</th></tr></thead>
+          <tbody>
+            {% set ref_done = namespace(v=false) %}
+            {% for row in l.rows %}
+            {% if not ref_done.v and row.value < l.avg %}{% set ref_done.v = true %}
+            <tr class="ref"><td></td><th scope="row">Media semplice delle {{ l.rows | length | num(None, 'count') }} regioni</th><td class="val">{{ l.avg | num(None, 'cell', l.decimals) }}</td></tr>
+            {% endif %}
+            <tr><td class="rank">{{ loop.index | rank }}</td><th scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}{{ row.name }}{% if row.area %}<span class="sr-only">, {{ l.area_label[row.area] }}</span>{% endif %}</th><td class="val">{{ row.value | num(None, 'cell', l.decimals) }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+  {% endif %}
+
+  {% if d.callout or d.brief_list %}
+  <section class="art-brief" aria-labelledby="{{ aid('in-breve') }}">
+    {% if d.callout %}<p class="answer">{{ d.callout | safe }}</p>{% endif %}
+    {% if d.brief_list %}
+    <h2 class="art-brief__title" id="{{ aid('in-breve') }}">{{ d.brief_title }}</h2>
+    <div class="art-brief__list">{{ d.brief_list | safe }}</div>
+    {% else %}
+    <h2 class="sr-only" id="{{ aid('in-breve') }}">In breve</h2>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <div class="layout art-layout">
+    <aside class="layout__aside art-aside" aria-label="Strumenti dell'articolo">
+      {% if d.toc %}
+      <nav class="toc" aria-label="In questo articolo">
+        <p>In questo articolo</p>
+        <ol>
+          {% for item in d.toc %}<li><a href="#{{ aid(item.id) }}">{{ item.text }}</a></li>{% endfor %}
+          <li><a href="#{{ aid('dati-metodo') }}">Dati e metodo</a></li>
+        </ol>
+      </nav>
+      {% endif %}
+      <div class="aside-block">
+        {% if d.institution %}<p>Dati: {{ d.institution }}. Elaborazione Divario Italia.</p>{% endif %}
+        {% if ds.download %}<p><a class="linkarrow" href="{{ href(ds.download) }}">Scarica i dati in CSV</a></p>{% endif %}
+        <p><a class="linkarrow" href="#{{ aid('dati-metodo') }}">Cita questo articolo</a></p>
+      </div>
+    </aside>
+
+    <div class="layout__main">
+      <div class="prose art-body">
+{{ d.body_before | replace(d.mark, prefix) | safe }}
+      </div>
+
+      {% if post.indicator_path %}
+      <div class="card art-link">
+        <p class="card__kicker">La scheda dell'indicatore</p>
+        <p class="card__title"><a href="{{ href(post.indicator_path) }}">{{ meta.name or post.indicator_label }}</a></p>
+        <p class="card__text">Mappa, classifica e serie storica{% if d.indicator_years %} {{ d.indicator_years }}{% endif %}, con la definizione della fonte e il metodo.</p>
+      </div>
+      {% endif %}
+
+      {{ ui.ad() }}
+
+      <div class="prose art-body">
+{{ d.body_after | replace(d.mark, prefix) | safe }}
+      </div>
+
+      <section class="section art-data" id="{{ aid('dati-metodo') }}" aria-labelledby="{{ aid('h-dati-metodo') }}">
+        <h2 id="{{ aid('h-dati-metodo') }}">Dati e metodo</h2>
+        <dl class="specs">
+          {% if d.used %}<div id="{{ aid('dati-usati') }}"><dt>Dati usati</dt><dd>{{ d.used | safe }}</dd></div>{% endif %}
+          {% if d.sources %}<div id="{{ aid('fonti') }}"><dt>Fonti</dt><dd>{{ d.sources | safe }}</dd></div>
+          {% elif d.data_note %}<div id="{{ aid('fonti') }}"><dt>Fonti</dt><dd>{{ d.data_note | safe }}</dd></div>{% endif %}
+          {% if ds %}
+          <div><dt>I dati di questo articolo</dt><dd><p>{{ ds.description }}</p>{% if ds.source_url %}<p><a href="{{ ds.source_url }}">Il file originale della fonte</a></p>{% endif %}</dd></div>
+          {% if ds.method %}<div><dt>Metodo</dt><dd>{{ ds.method }}</dd></div>{% endif %}
+          {% if ds.temporal %}<div><dt>Periodo</dt><dd>{{ d.period }}</dd></div>{% endif %}
+          {% if ds.spatial %}<div><dt>Territori</dt><dd>{{ ds.spatial }}</dd></div>{% endif %}
+          {% endif %}
+          {% if meta.explain %}
+          <div><dt>L'indicatore in parole semplici</dt><dd>
+            <p><strong>{{ meta.name }}.</strong> {{ meta.explain.plain }}</p>
+            {% if meta.explain.example %}<p><strong>In pratica.</strong> {{ meta.explain.example }}</p>{% endif %}
+            {% if meta.explain.reading %}<p><strong>Come si legge.</strong> {{ meta.explain.reading }}</p>{% endif %}
+            {% if meta.explain.caveat %}<p><strong>Limite.</strong> {{ meta.explain.caveat }}</p>{% endif %}
+          </dd></div>
+          {% endif %}
+          {% if d.license.url %}<div><dt>Licenza</dt><dd><a href="{{ d.license.url }}" rel="license">{{ d.license.label }}</a></dd></div>{% endif %}
+          <div><dt>Correzioni</dt><dd>Ultima verifica editoriale il <time datetime="{{ post.date_modified or post.date }}">{{ d.reviewed }}</time>. <a href="{{ corrections_url }}">Segnala un errore</a></dd></div>
+        </dl>
+        {% if ds.download %}
+        <div class="actions">
+          <a class="btn btn--primary" href="{{ href(ds.download) }}">{{ ui.icon('download') }} Scarica i dati in CSV</a>
+        </div>
+        {% endif %}
+        {{ ui.cite(d.citation) }}
+      </section>
+
+      {{ ui.ad() }}
+    </div>
+  </div>
+</div>
+
+<div class="band">
+  <section class="wrap" aria-labelledby="{{ aid('continua') }}">
+    <h2 class="h-section" id="{{ aid('continua') }}">Continua a esplorare</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>I dati</h3>
+        <ul>
+          {% if post.indicator_path %}<li><a href="{{ href(post.indicator_path) }}" class="minicard"><span class="minicard__title">{{ meta.name or post.indicator_label }}</span><span class="minicard__meta">Scheda indicatore{% if d.indicator_years %}, dati {{ d.indicator_years }}{% endif %}</span>{% if meta.spark %}<span class="minicard__spark">{{ meta.spark | sparkline }}</span>{% endif %}</a></li>{% endif %}
+          {% for item in d.named.indicatore %}<li><a href="{{ href(item.path) }}">{{ item.label }}</a></li>{% endfor %}
+          {% if d.theme_path %}<li><a href="{{ href(d.theme_path) }}">Tutti gli indicatori del tema {{ d.theme | lower }}</a></li>{% endif %}
+          <li><a href="{{ href('/atlante') }}">L'atlante di tutti gli indicatori</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Territori e confronti</h3>
+        <ul>
+          {% for item in d.named.territorio %}<li><a href="{{ href(item.path) }}">{{ item.label }}</a></li>{% endfor %}
+          <li><a href="{{ href('/divari-regionali') }}">I divari fra Nord, Centro e Mezzogiorno</a></li>
+          <li><a href="{{ href('/confronto') }}">Metti a confronto due territori</a></li>
+          <li><a href="{{ href('/regioni') }}">Tutte le regioni</a></li>
+          <li><a href="{{ href('/province') }}">Tutte le province</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Nelle Storie</h3>
+        <ul>
+          {% for item in d.named.blog %}<li><a href="{{ href(item.path) }}">{{ item.label }}</a></li>{% endfor %}
+          <li><a href="{{ href('/blog') }}">Tutte le Storie</a></li>
+          <li><a href="{{ href('/metodologia') }}">Come lavoriamo sui dati</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+  {% if d.related %}
+  <section class="wrap art-more" aria-labelledby="{{ aid('altre-storie') }}">
+    <h2 class="h-section" id="{{ aid('altre-storie') }}">Altre storie</h2>
+    <ul class="cards cards--3">
+      {% for item in d.related %}
+      <li class="card">
+        <h3 class="card__title"><a href="{{ href('/blog/' ~ item.slug) }}">{{ item.title }}</a></h3>
+        <p class="card__meta"><time datetime="{{ item.date }}">{{ item.date_label }}</time>{% if item.read_time %}, {{ item.read_time | num(None, 'count') }} {{ 'minuto' if item.read_time == 1 else 'minuti' }}{% endif %}</p>
+        <p class="card__text">{{ item.description }}</p>
+        {% if item.cover and not item.cover.endswith('.svg') %}<div class="card__media"><img src="{{ href(item.cover) }}" alt=""{% if item.size %} width="{{ item.size[0] }}" height="{{ item.size[1] }}"{% endif %} loading="lazy" decoding="async"></div>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

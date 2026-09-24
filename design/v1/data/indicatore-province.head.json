@@ -1,0 +1,93 @@
+{
+ "title": "Retribuzione media annua 2023: sale in euro, compra di meno",
+ "description": "A Milano la retribuzione media annua vale 34.343 euro nel 2023, l&#39;ultimo anno del Bes dei territori.",
+ "canonical": "https://divarioitalia.it/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "La retribuzione media annua non è uno stipendio, e compra meno di nove anni fa",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@type": "Dataset",
+   "name": "Retribuzione media annua dei lavoratori dipendenti",
+   "description": "A [Milano](/provincia/milano) la retribuzione media annua vale 34.343 euro nel 2023, l'ultimo anno del Bes dei territori. È una cifra lorda per testa, non uno stipendio, e fra il 2015 e il 2023 questo indicatore è cresciuto in euro molto meno dei prezzi.",
+   "url": "https://divarioitalia.it/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P",
+   "temporalCoverage": "2015/2023",
+   "spatialCoverage": {
+    "@type": "Place",
+    "name": "Italia"
+   },
+   "creator": {
+    "@type": "Organization",
+    "name": "Istat, benessere e qualità della vita",
+    "url": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+    "name": "Divario Italia",
+    "url": "https://divarioitalia.it/chi-siamo",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://divarioitalia.it/static/img/logo-mark.png"
+    },
+    "contactPoint": {
+     "@type": "ContactPoint",
+     "contactType": "editorial",
+     "email": "divarioitalia@protonmail.com",
+     "url": "https://divarioitalia.it/contatti",
+     "availableLanguage": "it"
+    }
+   },
+   "dateModified": "2026-05-25",
+   "isBasedOn": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/",
+   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
+   "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": "Retribuzione media annua dei lavoratori dipendenti",
+    "unitText": "euro",
+    "minValue": 13387.8,
+    "maxValue": 34343.0,
+    "measurementTechnique": "Istat, benessere e qualità della vita"
+   },
+   "isAccessibleForFree": true,
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "keywords": [
+    "Reddito, inclusione e accessibilità",
+    "regioni italiane",
+    "Istat"
+   ]
+  },
+  {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://divarioitalia.it/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Temi",
+     "item": "https://divarioitalia.it/temi"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Reddito, inclusione e accessibilità",
+     "item": "https://divarioitalia.it/tema/reddito-inclusione-e-accessibilita"
+    },
+    {
+     "@type": "ListItem",
+     "position": 4,
+     "name": "Retribuzione media annua dei lavoratori dipendenti",
+     "item": "https://divarioitalia.it/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
+    }
+   ]
+  }
+ ],
+ "html_bytes": 103476
+}

@@ -1,0 +1,49 @@
+{
+ "title": "Divario Italia: 594 indicatori territoriali per regione",
+ "description": "594 indicatori Istat ed Eurostat, 20 regioni e 107 province, dal 1981 al 2026. Mappa, profili dei territori, confronti, qualità della vita e storie dai dati.",
+ "canonical": "https://divarioitalia.it/",
+ "robots": "index, follow, max-snippet:-1, max-image-preview:large",
+ "x_robots_tag": "index, follow, max-snippet:-1, max-image-preview:large",
+ "h1": "L'Italia, regione per regione.",
+ "jsonld": [
+  {
+   "@context": "https://schema.org",
+   "@graph": [
+    {
+     "@type": "WebSite",
+     "@id": "https://divarioitalia.it/#site",
+     "name": "Divario Italia",
+     "url": "https://divarioitalia.it/",
+     "inLanguage": "it-IT",
+     "description": "Atlante interattivo degli indicatori territoriali Istat ed Eurostat: 594 indicatori, 20 regioni e 107 province, dal 1981 al 2026.",
+     "publisher": {
+      "@id": "https://divarioitalia.it/chi-siamo#organizzazione"
+     },
+     "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://divarioitalia.it/ricerca?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+     }
+    },
+    {
+     "@type": "Organization",
+     "@id": "https://divarioitalia.it/chi-siamo#organizzazione",
+     "name": "Divario Italia",
+     "url": "https://divarioitalia.it/chi-siamo",
+     "logo": {
+      "@type": "ImageObject",
+      "url": "https://divarioitalia.it/static/img/logo-mark.png"
+     },
+     "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "editorial",
+      "email": "divarioitalia@protonmail.com",
+      "url": "https://divarioitalia.it/contatti",
+      "availableLanguage": "it"
+     }
+    }
+   ]
+  }
+ ],
+ "html_bytes": 170585
+}
