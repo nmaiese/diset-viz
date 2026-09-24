@@ -14,8 +14,9 @@ Usare soltanto le interfacce pubbliche e read-only di `https://divarioitalia.it`
 3. Per un confronto nello stesso anno usare `GET /api/indicator/<id>/year/<anno>`.
 4. Citare la pagina canonica indicata nei metadati, non l'endpoint API.
 5. Per calcoli riproducibili usare `/download/indicator/<id>.csv` o `.json`. API e download servono la serie regionale.
-6. Per una provincia leggere la sua pagina, `/provincia/<key>`, anche in Markdown con `Accept: text/markdown`: porta i valori veri di tutti gli indicatori del BES dei Territori, l'anno, la posizione fra le province e il confronto con le province della stessa regione. L'elenco delle province e le chiavi stanno in `/province`.
-7. Per le classifiche della qualità della vita usare `GET /api/quality-life/<regioni|province>/rankings` (con `/<profilo>` per un altro profilo) e `GET /api/quality-life/<regioni|province>/<key>`.
+6. Per i valori di tutte le province su un indicatore aprire la sua scheda con `?livello=provincia` (per esempio `/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia`), anche in Markdown: il canonico di una scheda con tutti e due i livelli si apre sulle regioni. Le schede solo provinciali si aprono già sulle province.
+7. Per una provincia leggere la sua pagina, `/provincia/<key>`, anche in Markdown con `Accept: text/markdown`: porta i valori veri di tutti gli indicatori del BES dei Territori, l'anno, la posizione fra le province e il confronto con le province della stessa regione. L'elenco delle province e le chiavi stanno in `/province`.
+8. Per le classifiche della qualità della vita usare `GET /api/quality-life/<regioni|province>/rankings` (con `/<profilo>` per un altro profilo) e `GET /api/quality-life/<regioni|province>/<key>`.
 
 ## Regole di interpretazione
 

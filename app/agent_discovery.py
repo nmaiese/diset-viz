@@ -500,8 +500,12 @@ def _composed_indicator_section(role, meta, level):
     return ""
 
 
-def indicator_markdown(meta, level, article, site_url):
+def indicator_markdown(meta, level, article, site_url, levels=()):
     canonical = f"{site_url}{meta['canonical_path']}"
+    # Gli altri livelli della stessa scheda: l'HTML ha il selettore
+    # Regioni/Province, e senza questa riga un agente che leggeva il canonico
+    # non sapeva che esistono i valori per provincia.
+    others = [other for other in levels if other["key"] != level["key"]]
     unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
     explain = level.get("explain") or meta.get("explain") or {}
     # Il titolo autorato vale anche qui: la proiezione markdown è una
@@ -526,6 +530,8 @@ def indicator_markdown(meta, level, article, site_url):
         f"- Serie: {meta['name']}",
         f"- Tema: [{meta['theme']}]({_absolute(site_url, meta['theme_path'])})",
         f"- Livello territoriale: {level['label']}",
+        *(f"- Gli stessi dati per {other['plural']}: {canonical}?livello={other['key']}"
+          for other in others),
         f"- Unità di misura: {unit}",
         f"- Copertura: dal {level['year_min']} al {level['year_max']}",
         f"- Territori nell'ultimo anno: {len(level['observations'])}",
@@ -597,8 +603,12 @@ def indicator_markdown(meta, level, article, site_url):
         f"| Posizione | {level['singular'].capitalize()} | Valore |",
         "| ---: | --- | ---: |",
     ]
+    # Ogni riga porta al profilo del territorio, come nella tabella HTML alla
+    # stessa URL.
+    profile = level.get("profile_path")
     for position, row in enumerate(level["observations"], 1):
-        lines.append(f"| {position} | {row['name']} | {_number(row['value'])} {unit} |")
+        name = f"[{row['name']}]({site_url}{profile}{row['key']})" if profile and row.get("key") else row["name"]
+        lines.append(f"| {position} | {name} | {_number(row['value'])} {unit} |")
 
     lines += ["", "## Fonti e download", ""]
     if meta.get("source_data_url"):
@@ -668,7 +678,7 @@ def region_markdown(profile, site_url, provinces=()):
 
 
 def province_markdown(profile, neighbours, site_url, indicators=None,
-                      gains=(), losses=(), first_in_region=(), last_in_region=()):
+                      gains=(), losses=(), first_in_region=(), last_in_region=(), sisters=()):
     """La stessa pagina provincia, per chi chiede `text/markdown`.
 
     HTML e Markdown sono lo stesso documento alla stessa URL, quindi questa
@@ -798,6 +808,18 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
             lines.append(f"- {entry['rank']}ª [{entry['name']}]({_absolute(site_url, entry['path'])}), "
                          f"{it_numbers.number(entry['score'])}")
 
+    ranked = [entry for entry in sisters if entry.get("rank") is not None and entry.get("score") is not None]
+    if ranked and region and profile.get("rank") is not None:
+        from app.seo_titles import of_region
+
+        me = {"name": name, "rank": profile["rank"], "score": profile["score"], "path": None}
+        lines += ["", f"## Le province {of_region(region)}", "",
+                  f"Stessa classifica, stesso punteggio: dove sta {name} fra le province della sua regione.", ""]
+        for entry in sorted([*ranked, me], key=lambda e: (e["rank"], e["name"])):
+            label = (f"[{entry['name']}]({_absolute(site_url, entry['path'])})" if entry["path"]
+                     else f"{entry['name']} (questa pagina)")
+            lines.append(f"- {entry['rank']}ª {label}, {it_numbers.number(entry['score'])}")
+
     coverage = round((profile.get("coverage") or 0) * 100)
     lines += ["", "## Fonti e metodo", "",
               f"- Fonte: {profile['methodology'].get('source') or 'Istat, BES dei Territori'}",
@@ -805,6 +827,7 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
               f"sono standardizzati sulle {total} province e mostrati da 0 a 100, dove 50 è la media.",
               f"- Copertura: {coverage}% degli indicatori del punteggio ha un dato per {name}.",
               f"- Classifica completa: {_absolute(site_url, '/qualita-della-vita/classifica/province')}",
+              f"- Tutte le province, regione per regione: {_absolute(site_url, '/province')}",
               f"- Metodologia: {_absolute(site_url, '/metodologia#qualita-della-vita')}"]
     return "\n".join(lines)
 

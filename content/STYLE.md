@@ -214,6 +214,12 @@ essere più umano, l'errore facile è diventare più libero anche sui numeri, ed
   catalogo espone per ogni voce. Non usare `/?indicator=...` né
   `/atlante?indicator=...`: la prima forma oggi apre la home, la seconda resta
   sull'Atlante e arriva alla scheda solo via JavaScript.
+- Lega alla sua pagina i territori che il pezzo racconta, alla prima menzione
+  con un valore: una regione a `/regione/<key>`, una provincia a
+  `/provincia/<key>`, con la chiave di `/regioni` e `/province`. Non ogni nome:
+  in un elenco di dieci province si legano le tre o quattro che il pezzo segue.
+  Una città non è la sua provincia ("a Torino un bambino" resta testo). Le
+  tabelle dei valori delle figure le lega il sito da sé.
 - Prima di pubblicare, prepara una claim table anche se non entra nel testo:
   claim, fonte, periodo, territorio, unita, trasformazione e confidenza.
 - Se usi una seconda fonte di contesto, deve essere autorevole e verificata. Se

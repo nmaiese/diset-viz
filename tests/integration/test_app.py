@@ -281,12 +281,17 @@ class AppSmokeTest(unittest.TestCase):
         client = app.test_client()
         sitemap = client.get("/sitemap.xml").get_data(as_text=True)
         llms_full = client.get("/llms-full.txt").get_data(as_text=True)
-        indicator_url = re.compile(r"https://divarioitalia\.it/indicatore/[^<)\s]+")
+        # Il canonico, senza stato: `?livello=provincia` accanto a una voce e'
+        # la stessa scheda aperta sulle province, non una pagina in piu'.
+        indicator_url = re.compile(r"https://divarioitalia\.it/indicatore/[^<)\s?]+")
 
         sitemap_indicators = set(indicator_url.findall(sitemap))
         llms_indicators = set(indicator_url.findall(llms_full))
         self.assertTrue(sitemap_indicators)
         self.assertEqual(sitemap_indicators, llms_indicators)
+        views = set(re.findall(r"(https://divarioitalia\.it/indicatore/[^<)\s?]+)\?livello=provincia", llms_full))
+        self.assertTrue(views)
+        self.assertLessEqual(views, sitemap_indicators)
         self.assertEqual(len(sitemap_indicators), sitemap.count("<loc>https://divarioitalia.it/indicatore/"))
 
         for field in ("famiglia ", "fonte ", "unita ", "copertura ", "definizione: "):

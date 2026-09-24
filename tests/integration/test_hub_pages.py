@@ -989,6 +989,31 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         for percorso in ("/api/quality-life/{level}/rankings", "/api/quality-life/{level}/{key}"):
             self.assertIn(percorso, percorsi)
 
+    def test_la_scheda_in_markdown_lega_i_territori_e_dice_l_altro_livello(self):
+        """HTML e Markdown sono lo stesso documento: la tabella HTML lega ogni
+        riga al profilo, e il selettore porta alle province."""
+        base = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001"
+        regioni = self.client.get(base, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertRegex(regioni, r"\| \[[^]]+\]\(\S*/regione/[a-z-]+\) \|")
+        self.assertIn(f"{base}?livello=provincia", regioni)
+        province = self.client.get(base + "?livello=provincia", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertGreaterEqual(province.count("/provincia/"), 100)
+        self.assertIn(f"{base}?livello=regione", province)
+
+    def test_la_provincia_in_markdown_porta_le_sorelle(self):
+        markdown = self.client.get("/provincia/lecce", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn("## Le province della Puglia", markdown)
+        for sorella in ("bari", "barletta-andria-trani", "brindisi", "foggia", "taranto"):
+            self.assertIn(f"/provincia/{sorella})", markdown)
+        self.assertIn("Lecce (questa pagina)", markdown)
+        self.assertIn("/province\n", markdown + "\n")
+
+    def test_llms_full_e_lo_skill_dicono_dove_stanno_i_valori_per_provincia(self):
+        completo = self.client.get("/llms-full.txt").get_data(as_text=True)
+        self.assertIn("bes-01SAL001?livello=provincia", completo)
+        skill = self.client.get("/.well-known/agent-skills/query-divario-italia/SKILL.md").get_data(as_text=True)
+        self.assertIn("?livello=provincia", skill)
+
     def test_home_e_metodologia_in_markdown_portano_le_province(self):
         for percorso in ("/", "/metodologia"):
             with self.subTest(pagina=percorso):
