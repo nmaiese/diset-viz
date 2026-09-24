@@ -1030,12 +1030,17 @@ class LaHomePortaAlleProvince(unittest.TestCase):
         self.assertIn('href="/province"', self.html)
         self.assertRegex(self.html, r'href="/provincia/[a-z0-9-]+"')
 
-    def test_il_modulo_qualita_della_vita_ha_regioni_e_province(self):
-        """Il doppio podio della home porta a regioni e a province, e ogni
-        nome e' una pagina che risponde."""
-        link = re.findall(r'<th class="name" scope="row"><a href="(/(?:regione|provincia)/[a-z0-9-]+)"', self.html)
+    def test_regioni_e_province_hanno_anteprima_e_indice(self):
+        """La fascia dei territori porta a una regione e a una provincia (quelle
+        estratte a caso) e ai due indici, e ogni link e' una pagina che
+        risponde. Il podio della qualita' della vita, che faceva lo stesso,
+        non c'e' piu': la home non svela la classifica."""
+        blocco = self.html[self.html.index('id="territori"'):self.html.index('id="temi"')]
+        link = set(re.findall(r'<h4 class="terr__name"><a href="(/(?:regione|provincia)/[a-z0-9-]+)"', blocco))
         self.assertTrue(any(h.startswith("/regione/") for h in link), link)
         self.assertTrue(any(h.startswith("/provincia/") for h in link), link)
+        self.assertIn('href="/regioni"', blocco)
+        self.assertIn('href="/province"', blocco)
         for percorso in link:
             with self.subTest(percorso=percorso):
                 self.assertEqual(self.client.get(percorso).status_code, 200)

@@ -12,10 +12,24 @@
    altezza: col titolo steso su tutta la riga l'angolo in alto a destra restava
    vuoto. */
 @media (min-width: 960px) {
-  .home-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-16); padding-top: var(--space-12); }
+  /* Le righe della colonna sinistra restano alte quanto il loro testo: lo
+     spazio in piu' della colonna con la mappa va tutto in fondo. */
+  .home-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto auto auto 1fr; column-gap: var(--space-16); align-content: start; padding-top: var(--space-12); }
   .home-head > * { grid-column: 1; }
-  .home-head > .home-find { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+  .home-head > .home-map { grid-column: 2; grid-row: 1 / span 5; align-self: center; }
+  .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
+/* La mappa accanto alla ricerca: solo da 960. Sul fondo grigio della testata
+   la terra e' un grigio piu' scuro, i confini nel colore del fondo, e la
+   regione sotto il mouse prende l'accento (e' un link). */
+.home-map { display: none; }
+@media (min-width: 960px) {
+  .home-map { display: grid; gap: var(--space-2); justify-items: center; }
+  .home-map .navmap { width: 100%; max-width: 320px; }
+  .home-map .navmap a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
+  .home-map .navmap a:hover use { fill: var(--accent); }
+}
+.home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }
 .home-find > * { min-width: 0; }
 .home-find label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
@@ -75,81 +89,303 @@
 .doors__more a:hover { color: var(--ink); }
 .doors__more a:hover b { color: var(--accent-strong); text-decoration: underline; }
 
-/* ---------- l'indicatore in evidenza ---------- */
-.home-feature__name { display: grid; gap: var(--space-2); margin-bottom: var(--space-8); }
-.home-feature__name .h-title { max-width: 30em; }
-.home-feature__name .h-title a { color: var(--ink); text-decoration: none; }
-.home-feature__name .h-title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
-.home-feature .lead-figure { border-top: 0; padding-top: 0; }
-.home-feature .module { margin-top: var(--space-12); }
-.home-feature .more { margin-top: 0; }
-.home-feature .module .actions { margin-top: 0; }
-/* Le province: le prime e le ultime dieci affiancate, al posto della mappa. */
-@container (min-width: 720px) {
-  .module__body.module__body--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* ---------- l'indicatore in evidenza: una scheda con la sua testata ----------
+   Il titolo della fascia e' quello di sezione, come le altre. L'indicatore sta
+   in una scheda: la testata grigia porta il suo nome (piu' piccolo del titolo
+   di sezione) e il selettore dei livelli, il corpo la striscia a tutta
+   larghezza e poi la mappa accanto alla classifica. Ogni blocco ha la sua
+   etichetta, cosi' si capisce a che cosa si riferisce ogni titolo. */
+.feat { border: 1px solid var(--rule-strong); background: var(--bg); }
+.feat__head {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4) var(--space-8);
+  padding: var(--space-5); background: var(--surface-1); border-bottom: 1px solid var(--rule-strong);
 }
-.module__body--pair caption { font-weight: 600; color: var(--ink); }
+.feat__id { display: grid; gap: var(--space-2); min-width: 0; max-width: 60rem; }
+.feat__meta { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); }
+.feat__meta a { color: var(--text-2); text-decoration-color: var(--rule-strong); }
+.feat__meta a:hover { color: var(--ink); }
+.feat__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
+.feat__name { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); }
+.feat__name a { color: var(--ink); text-decoration: none; }
+.feat__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+/* Il selettore dei livelli: due schede (tab) che senza JavaScript sono link. */
+.seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control); }
+.seg__btn {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: 0 var(--space-4);
+  font-weight: 600; color: var(--text-2); text-decoration: none; border-radius: var(--radius-sm);
+}
+.seg__btn:hover { color: var(--ink); background: var(--surface-1); }
+.seg__btn.is-on { color: var(--on-ink); background: var(--ink); }
+.seg__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.seg__n { font-size: var(--fs-label); font-weight: 500; font-variant-numeric: tabular-nums; }
+.feat__level { display: grid; gap: var(--space-8); padding: var(--space-6) var(--space-5); }
+.feat__level:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.feat__level[hidden] { display: none; }
+/* `.field` e' una griglia e batterebbe il [hidden] del browser: senza
+   JavaScript il campo "Scegli" deve restare nascosto. */
+.terr__find[hidden] { display: none; }
+.feat__block { margin: 0; min-width: 0; }
+.feat__cap { display: grid; gap: var(--space-1); margin-bottom: var(--space-4); }
+.feat__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.feat__caprow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--space-2) var(--space-6); }
+.feat__claim { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; color: var(--ink); max-width: 44em; }
+/* La striscia prende tutta la scheda: il taglio largo della home e' disegnato
+   a 1320 (home.HOME_STRIP_WIDTH), non ai 1180 della scheda indicatore. */
+.home-feature .chart, .home-feature .chart:has(> .chart__xl), .home-feature .chart__xl svg { max-width: none; }
+.home-feature .chart--hero { margin-top: 0; }
+.feat__pair { display: grid; gap: var(--space-6) var(--space-12); padding-top: var(--space-8); border-top: 1px solid var(--rule); }
+.feat__pairhead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4) var(--space-8); }
+.feat__pairhead .feat__cap { margin-bottom: 0; }
+.feat__find { min-width: min(100%, 16rem); }
+.feat__map { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
+.feat__map .map { max-width: 360px; margin-inline: auto; width: 100%; }
+.feat__rank { margin: 0; min-width: 0; }
+/* Due colonne da dieci righe: la mappa e la classifica finiscono insieme. */
+.feat__cols { display: grid; gap: var(--space-4) var(--space-8); align-items: start; }
+.feat__cols caption { font-weight: 600; color: var(--ink); text-align: left; }
+@media (min-width: 720px) { .feat__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.feat__source { margin: 0; }
+.feat__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--rule); }
+.feat__end .source { flex: 1 1 24rem; }
+.feat__only { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+/* Sul telefono la scheda perde il margine interno largo e la colonna delle
+   barre: con i due livelli di cornice i nomi andavano a capo su tre righe. */
+@media (max-width: 599px) {
+  .feat__head { padding: var(--space-4); }
+  .feat__level { padding: var(--space-5) var(--space-4); gap: var(--space-6); }
+  .feat .barcell { display: none; }
+}
+@media (min-width: 960px) {
+  .feat__head { padding: var(--space-6) var(--space-10); }
+  .feat__level { padding: var(--space-8) var(--space-10); gap: var(--space-8); }
+  .feat__pair { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: start; }
+  .feat__pairhead { grid-column: 1 / -1; }
+  .feat__map .map { max-width: none; }
+  .feat__map .map svg { max-height: 390px; }
+  /* Sul computer la classifica e' sempre aperta: il sommario non serve. */
+  /* Solo se e' aperta: chiusa sotto i 600 al caricamento e poi allargata,
+     senza il sommario la classifica non si potrebbe piu' aprire. */
+  .feat__rank[open] > summary { display: none; }
+  details.more.feat__rank[open] { border-top: 0; margin-top: 0; }
+}
 
-/* ---------- regioni per ripartizione, nei colori della striscia ---------- */
-.home-regions { display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 960px) { .home-regions { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-.home-regions .is-wide { grid-column: span 2; }
-.home-regions .is-wide ul { column-count: 2; column-gap: var(--gutter-l); }
-.home-regions h3 { font-family: var(--font-ui); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
-.home-regions ul { list-style: none; }
-.home-regions li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
-.home-regions li a { display: flex; align-items: center; min-height: var(--target); text-decoration: none; }
-.home-regions li a:hover { text-decoration: underline; }
+/* ---------- regioni e province: mappa, anteprima, indice ----------
+   Due blocchi, uno per livello, affiancati da 1200. In ogni blocco la mappa
+   per scegliere e accanto la scheda del territorio scelto. */
+.terr { display: grid; gap: var(--space-10) var(--gutter-l); }
+@media (min-width: 1200px) { .terr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.terr__block { display: grid; align-content: start; gap: var(--space-5); min-width: 0; padding: var(--space-5); background: var(--bg); border-top: 3px solid var(--ink); }
+@media (min-width: 960px) { .terr__block { padding: var(--space-6) var(--space-8) var(--space-8); } }
+.terr__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-6); }
+.terr__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.terr__body { display: grid; gap: var(--space-6); align-items: start; }
+@media (min-width: 600px) { .terr__body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.terr__body .navmap { max-width: 260px; margin-inline: auto; width: 100%; }
+@media (min-width: 600px) { .terr__body .navmap { max-width: none; } }
+.terr__side { display: grid; gap: var(--space-5); align-content: start; min-width: 0; }
+.terr__find select { width: 100%; }
+.terr__card { display: grid; gap: var(--space-3); align-content: start; }
+.terr__kicker { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.terr__name { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); }
+.terr__name a { color: var(--ink); text-decoration: none; }
+.terr__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.terr__lead { color: var(--text-2); }
+.terr__facts { display: grid; margin: 0; border-top: 1px solid var(--rule); }
+.terr__facts > div { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); gap: var(--space-3); padding-block: var(--space-2); border-bottom: 1px solid var(--rule); font-size: var(--fs-small); line-height: var(--lh-small); }
+.terr__facts dt { font-weight: 600; color: var(--text-2); }
+.terr__facts dd { margin: 0; color: var(--ink); }
+.terr__note { color: var(--muted); font-variant-numeric: tabular-nums; }
+.terr__cta { margin-top: var(--space-2); }
 
-/* ---------- qualita' della vita ---------- */
-.v1-home #qualita .status { margin-bottom: var(--space-8); max-width: var(--measure); }
-.home-podium { display: grid; gap: var(--space-3); align-content: start; }
-.home-qol__more { margin-top: var(--space-8); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+/* ---------- qualita' della vita: una porta, non una classifica ----------
+   A sinistra la domanda e il bottone che porta alla pagina, a destra i
+   profili di priorita' (link alla stessa pagina col profilo) e le dimensioni. */
+.qol { display: grid; gap: var(--space-10) var(--space-16); align-items: start; }
+@media (min-width: 960px) { .qol { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); } }
+.qol__main { display: grid; gap: var(--space-5); align-content: start; }
+.qol__main .h-section { margin-bottom: 0; }
+/* La domanda sta sotto il titolo di sezione, piu' piccola: due titoli della
+   stessa taglia non si capiva quale fosse quello della fascia. */
+.qol__big { font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); max-width: 22em; }
+.qol__text { max-width: var(--measure); color: var(--text-2); font-size: var(--fs-lede); line-height: var(--lh-lede); }
+.qol__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin: var(--space-2) 0 0; }
+.btn--lg { min-height: 56px; padding-inline: var(--space-6); font-size: var(--fs-subsection); }
+.btn--lg svg { flex: none; }
+.qol__side { display: grid; gap: var(--space-4); align-content: start; }
+.qol__h { font-family: var(--font-ui); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.qol__profiles { list-style: none; display: grid; gap: var(--space-2); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .qol__profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.qol__profiles a {
+  display: grid; gap: 2px; height: 100%; padding: var(--space-3) var(--space-4); color: var(--ink); text-decoration: none;
+  background: var(--bg); border: 1px solid var(--rule-strong); border-radius: var(--radius-sm);
+}
+.qol__profiles a:hover { border-color: var(--ink); }
+.qol__profiles a:hover b { color: var(--accent-strong); text-decoration: underline; }
+.qol__profiles b { font-weight: 700; }
+.qol__profiles span { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); }
+.qol__dims { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.qol__only { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
+.qol__dims li { padding: 4px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); background: var(--bg); border-radius: var(--radius-sm); }
 
-/* ---------- quiz: i giochi, e una domanda da provare accanto ---------- */
-.home-quiz__grid { display: grid; gap: var(--space-8) var(--space-16); align-items: start; }
-@media (min-width: 960px) { .home-quiz__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
-.home-games { grid-template-columns: minmax(0, 1fr); }
+/* ---------- quiz: una fascia da gioco ----------
+   Il lavaggio ambra la stacca dalle altre, le schede dei giochi hanno
+   un'illustrazione e si cliccano per intero, la domanda lampo e' una carta
+   con due bottoni grandi. Niente colori dei dati, niente accento fuori da
+   cio' che si clicca. */
+.zone--fun { background: var(--amber-wash); }
+.home-quiz__grid { display: grid; gap: var(--space-8) var(--space-12); align-items: start; }
+@media (min-width: 1200px) { .home-quiz__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+.home-games { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 600px) { .home-games { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.home-try { margin: 0; padding: var(--space-5) var(--space-6) var(--space-6); border: 0; border-top: 3px solid var(--ink); background: var(--bg); min-width: 0; }
-.home-try legend { display: grid; gap: var(--space-1); padding: 0; float: left; width: 100%; }
+.game {
+  position: relative; display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5);
+  background: var(--bg); border-radius: var(--radius-md); box-shadow: var(--shadow-panel);
+  transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease);
+}
+.game:hover { transform: translateY(-3px); box-shadow: var(--shadow-pop); }
+@media (prefers-reduced-motion: reduce) { .game, .game:hover { transition: none; transform: none; } }
+@supports selector(:has(a)) {
+  .game:has(a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .game__title a:focus-visible { outline: none; }
+}
+.game__art { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: var(--space-2); border-radius: var(--radius-md); }
+.game__meta { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.game__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.game__title a { color: var(--ink); text-decoration: none; }
+.game__title a::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-md); }
+.game__text { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.game { grid-template-rows: auto auto auto 1fr auto; }
+.game__go { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); align-self: end; font-weight: 700; color: var(--accent-strong); }
+.game:hover .game__go { text-decoration: underline; }
+/* La domanda lampo */
+.home-try { margin: 0; min-width: 0; padding: var(--space-6); border: 2px solid var(--ink); border-radius: var(--radius-md); background: var(--bg); }
+.home-try legend { display: grid; gap: var(--space-2); padding: 0; float: left; width: 100%; }
 .home-try legend + * { clear: both; }
-.home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+.home-try__flag { display: inline-flex; align-items: center; gap: var(--space-1); justify-self: start; padding: 4px var(--space-3); font-size: var(--fs-label); font-weight: 700; color: var(--ink); background: var(--amber-wash); border-radius: var(--radius-sm); }
+.home-try__q { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-5); }
 .home-try__opts label {
-  display: flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: var(--space-2) var(--space-4);
-  background: var(--bg); font-weight: 600; border: 1px solid var(--control-border); border-radius: var(--radius-control); cursor: pointer;
+  display: flex; align-items: center; gap: var(--space-2); min-height: 56px; padding: var(--space-2) var(--space-4);
+  background: var(--bg); font-weight: 700; border: 2px solid var(--control-border); border-radius: var(--radius-md); cursor: pointer;
 }
 .home-try__opts label:hover { border-color: var(--ink); }
-.home-try__opts label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.home-try__opts label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
 .home-try__opts label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
-.home-try__opts input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
-/* la risposta si vede solo dopo la scelta, senza JavaScript: la dice la parola, non un colore */
-.home-try__out p { display: none; margin-top: var(--space-4); }
-.home-try:has(input[data-right]:checked) .home-try__ok, .home-try:has(input:not([data-right]):checked) .home-try__no { display: block; }
+.home-try__opts input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+/* la risposta si vede solo dopo la scelta, senza JavaScript: la dicono la parola e il segno */
+.home-try__out p { display: none; align-items: center; gap: var(--space-2); margin-top: var(--space-4); }
+.home-try:has(input[data-right]:checked) .home-try__ok, .home-try:has(input:not([data-right]):checked) .home-try__no { display: flex; align-items: flex-start; }
+.home-try__out svg { flex: none; }
 .home-try .source { margin-top: var(--space-4); }
 .home-try .actions { margin-top: var(--space-4); }
 
-/* ---------- temi: schede con piu' link, senza il link esteso a tutta la scheda ---------- */
-.home-theme { position: static; }
-.home-theme .card__title a::after { content: none; }
-.home-theme ul { list-style: none; }
-.home-theme li { border-top: 1px solid var(--rule); }
-.home-theme li a { display: flex; align-items: center; min-height: var(--target); }
-.home-theme dl { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.home-theme dl div { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); }
-.home-theme dt { font-weight: 600; }
+/* ---------- temi: le quattro aree col loro distintivo ----------
+   Il distintivo ha un lavaggio per area (ambra, verde, blu, rosso): colori
+   dell'interfaccia per riconoscere l'area, non colori dei dati. */
+.home-areas { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .home-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .home-areas { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.home-area { display: grid; align-content: start; gap: var(--space-3); padding-top: var(--space-4); border-top: 3px solid var(--ink); }
+.home-area__top { display: flex; align-items: center; gap: var(--space-3); }
+.badge { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); color: var(--ink); background: var(--surface-2); }
+.badge--amber { background: var(--amber-wash); color: var(--amber-600); }
+.badge--green { background: var(--green-wash); color: var(--green-600); }
+.badge--blue { background: var(--blue-wash); color: var(--ink); }
+.badge--red { background: var(--red-wash); color: var(--red-600); }
+.home-area__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.home-area__title a { color: var(--ink); text-decoration: none; }
+.home-area__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.home-area__themes { list-style: none; }
+.home-area__themes li { border-top: 1px solid var(--rule); }
+.home-area__themes a { display: flex; align-items: center; min-height: var(--target); }
+.home-area__ends { display: grid; margin: var(--space-2) 0 0; background: var(--surface-1); border-radius: var(--radius-sm); }
+.home-area__ends > div { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); padding: var(--space-2) var(--space-3); }
+.home-area__ends > div + div { border-top: 1px solid var(--rule); }
+.home-area__ends dt { display: inline-flex; align-items: center; gap: 6px; min-width: 5.5rem; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.home-area__ends dd { margin: 0; font-weight: 600; }
 
-/* ---------- storie: la prima grande, le altre due accanto, foto con credito ---------- */
-@media (min-width: 600px) { .home-stories > .card--lead { grid-column: 1 / -1; } }
-@media (min-width: 960px) {
-  .home-stories { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
-  .home-stories > .card--lead { grid-column: 1; grid-row: 1 / span 2; }
+/* ---------- storie: una grande accanto alla sua foto, tre in fila ----------
+   Tutta la scheda si clicca (il titolo si allarga), tranne i link del
+   credito della foto, che stanno sopra. Le foto hanno proporzioni diverse
+   (1200x630, 1376x768): si tagliano tutte a 16:9. */
+.story { position: relative; display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
+.story__fig { display: grid; gap: var(--space-1); min-width: 0; }
+.story__media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 16 / 9; }
+.story__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
+.story:hover .story__media img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .story__media img, .story:hover .story__media img { transition: none; transform: none; } }
+.story__credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
+.story__credit a { position: relative; z-index: 1; color: inherit; }
+.story__body { display: grid; align-content: start; gap: var(--space-2); min-width: 0; }
+.story__tag { justify-self: start; padding: 2px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); background: var(--surface-2); border-radius: var(--radius-sm); }
+.story__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.story__title a { color: var(--ink); text-decoration: none; }
+.story__title a::after { content: ""; position: absolute; inset: 0; }
+.story:hover .story__title a { text-decoration: underline; text-decoration-thickness: 2px; }
+@supports selector(:has(a)) {
+  .story:has(.story__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .story__title a:focus-visible { outline: none; }
 }
-.home-story__fig { order: -1; display: grid; gap: var(--space-1); margin-bottom: var(--space-2); }
-.home-story__fig .card__media { margin-bottom: 0; }
-.home-story__fig figcaption { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
-/* i link del credito stanno sopra il link esteso del titolo */
-.home-story__fig a { position: relative; z-index: 1; color: inherit; }
+.story__text { color: var(--text-2); }
+.story__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.story__go { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); font-weight: 700; color: var(--accent-strong); }
+.story--lead { padding-bottom: var(--space-8); margin-bottom: var(--space-8); border-bottom: 1px solid var(--rule-strong); }
+.story--lead .story__title { font-size: var(--fs-section); line-height: var(--lh-section); }
+.story--lead .story__text { font-size: var(--fs-lede); line-height: var(--lh-lede); max-width: var(--measure); }
+@media (min-width: 960px) {
+  .story--lead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-10); align-items: center; }
+}
+.stories { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
+@media (min-width: 720px) { .stories { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Sul telefono le tre in fila diventano righe con la miniatura a sinistra. */
+@media (max-width: 719px) {
+  .stories .story { grid-template-columns: 112px minmax(0, 1fr); gap: var(--space-2) var(--space-4); align-items: start; }
+  .stories .story__fig { display: contents; }
+  .stories .story__media { grid-column: 1; grid-row: 1; aspect-ratio: 1 / 1; }
+  .stories .story__body { grid-column: 2; grid-row: 1; }
+  /* Il credito resta: CC BY-SA chiede l'attribuzione anche sul telefono. */
+  .stories .story__credit { grid-column: 1 / -1; grid-row: 2; }
+  .stories .story__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
+}
 
-/* ---------- fonti ---------- */
-.home-cite { margin: var(--space-6) 0 0; }
+/* ---------- fonti, metodo e come citare ----------
+   Quattro impegni in schede bianche sul fondo della fascia, e accanto la
+   colonna di chi deve citare. */
+.trust { display: grid; gap: var(--space-8) var(--space-12); align-items: start; }
+@media (min-width: 1200px) { .trust { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+.trust__pillars { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .trust__pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pillar { display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5); background: var(--bg); border-radius: var(--radius-sm); }
+.pillar .badge { margin-bottom: var(--space-2); }
+.pillar .linkarrow { justify-self: start; margin-top: var(--space-1); }
+.pillar__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.pillar__text { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.trust__cite { display: grid; gap: var(--space-4); align-content: start; padding-top: var(--space-4); border-top: 3px solid var(--ink); }
+.trust__cite .cite { margin: 0; }
+.trust__small { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.trust__small svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+
+/* ---------- telefono: qualita' della vita e quiz piu' corti ----------
+   Sei profili con la descrizione e dodici dimensioni facevano due schermi, e
+   le tre schede dei giochi in colonna altri due: sul telefono i profili sono
+   solo nomi, le dimensioni restano alla pagina dedicata, e i giochi hanno
+   l'illustrazione accanto al testo. */
+@media (max-width: 599px) {
+  .qol__profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .qol__profiles span { display: none; }
+  .qol__dims, .qol__dims + *, .qol__side > .qol__h:nth-of-type(2) { display: none; }
+  .game { grid-template-columns: 56px minmax(0, 1fr); grid-template-rows: none; column-gap: var(--space-4); row-gap: var(--space-1); padding: var(--space-4); }
+  .game__art { grid-row: 1 / span 4; width: 56px; height: 56px; margin: 0; }
+  .game__art svg { width: 34px; height: 34px; }
+  .game > :not(.game__art) { grid-column: 2; }
+  .game__go { margin-top: 0; }
+}
+@media (max-width: 599px) {
+  /* Regioni e province: la mappa piu' piccola, sul telefono si sceglie anche dal campo. */
+  .terr__body .navmap { max-width: 200px; }
+  .terr__block { padding: var(--space-4); gap: var(--space-4); }
+  /* Fonti: il distintivo accanto al titolo, non sopra. */
+  .pillar { grid-template-columns: 44px minmax(0, 1fr); column-gap: var(--space-3); padding: var(--space-4); }
+  .pillar .badge { grid-row: 1 / span 3; margin: 0; }
+  .pillar > :not(.badge) { grid-column: 2; }
+}

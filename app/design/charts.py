@@ -175,12 +175,14 @@ def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=
 
 def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_ratio: float | None = None,
                   highlight: str | None = None, gap_label: str | None = None, avg_label: str | None = None,
-                  decimals: int | None = None) -> dict:
+                  decimals: int | None = None, xl_width: int = XL_WIDTH) -> dict:
     """La striscia del divario in due tagli, piu' la legenda delle ripartizioni presenti.
 
     `highlight` e' la chiave del territorio della pagina: il suo punto prende
     l'anello dell'accento e il suo nome. `gap_label` sostituisce "2,5 volte"
     quando il rapporto non ha senso (un punteggio da 0 a 100 si legge in punti).
+    `xl_width` e' la larghezza del taglio largo: la home stende la striscia su
+    tutto il contenitore, la scheda la tiene a XL_WIDTH accanto al testo.
     """
     rows = [row for row in rows if row.get("value") is not None]
     if len(rows) < 2:
@@ -192,7 +194,7 @@ def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_rat
         ratio = f"{n.text(gap_ratio, 1)} volte"
     else:
         ratio = f"distanza {n.text(hi - lo)}"
-    xl = _strip(rows, avg, unit, XL_WIDTH, False, ratio, highlight, avg_label, decimals)
+    xl = _strip(rows, avg, unit, xl_width, False, ratio, highlight, avg_label, decimals)
     wide = _strip(rows, avg, unit, 920, False, ratio, highlight, avg_label, decimals)
     narrow = _strip(rows, avg, unit, 360, True, ratio, highlight, avg_label, decimals)
     counts = {}
@@ -292,11 +294,46 @@ def band_series(level: dict, areas: dict) -> dict:
 
 # ---------------------------------------------------------------- richiami sulla mappa
 
+def path_rings(d: str) -> list[list[tuple[float, float]]]:
+    """Gli anelli di un tracciato, in coordinate assolute. Le regioni sono
+    scritte con `M` e `L` assoluti, le province con `m`/`l` relativi (piu'
+    leggeri): qui si leggono tutti e due."""
+    rings: list[list[tuple[float, float]]] = []
+    x = y = 0.0
+    cmd = "M"
+    tokens = re.findall(r"[MmLlZz]|-?\d*\.?\d+", d)
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok in "MmLlZz":
+            cmd = tok
+            i += 1
+            if tok in "Zz":
+                # Dopo z il punto corrente torna all'inizio del sottotracciato
+                # (specifica SVG): una m relativa che segue parte da li'.
+                cmd = "L"
+                if rings:
+                    x, y = rings[-1][0]
+            continue
+        dx, dy = float(tok), float(tokens[i + 1])
+        i += 2
+        if cmd in "Mm":
+            x, y = (x + dx, y + dy) if cmd == "m" and rings else (dx, dy)
+            rings.append([(x, y)])
+            cmd = "l" if cmd == "m" else "L"
+        elif cmd == "l":
+            x, y = x + dx, y + dy
+            rings[-1].append((x, y))
+        else:
+            x, y = dx, dy
+            rings[-1].append((x, y))
+    return rings
+
+
 def _largest_subpath_centroid(d: str) -> tuple[float, float]:
     """Il baricentro del poligono piu' grande del tracciato (formula del laccio)."""
     best = (0.0, (0.0, 0.0))
-    for sub in re.findall(r"M[^M]*", d):
-        pts = [(float(a), float(b)) for a, b in re.findall(r"(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)", sub)]
+    for pts in path_rings(d):
         if len(pts) < 3:
             continue
         area = cx = cy = 0.0
@@ -310,6 +347,10 @@ def _largest_subpath_centroid(d: str) -> tuple[float, float]:
     return best[1]
 
 
+# L'altezza di un richiamo (nome piu' valore) in unita' del viewBox.
+CALLOUT_GAP = 50
+
+
 def map_callouts(paths: dict[str, str], items: list[tuple[str, str, str]]) -> str:
     """Nome e valore di alcuni territori sulla mappa, con un filo dal baricentro.
 
@@ -319,6 +360,7 @@ def map_callouts(paths: dict[str, str], items: list[tuple[str, str, str]]) -> st
     dal baricentro all'etichetta, e il testo ha un alone del colore di fondo.
     """
     out = []
+    placed: list[tuple[bool, float]] = []
     for key, name, value in items:
         if key not in paths:
             continue
@@ -331,8 +373,17 @@ def map_callouts(paths: dict[str, str], items: list[tuple[str, str, str]]) -> st
             tx, anchor, lx = 552, "end", 552 - width
         else:
             tx, anchor, lx = 8, "start", 8 + width
-        out.append(f'<g class="callout"><line x1="{cx:.1f}" y1="{cy:.1f}" x2="{lx:.1f}" y2="{cy:.1f}"/>'
+        # Due estremi vicini sullo stesso bordo (con le province succede:
+        # Fermo e Macerata) avevano i testi uno sopra l'altro. Il secondo si
+        # sposta di un'etichetta, e il filo va in obliquo fino a lui.
+        ty = cy
+        for side, other in placed:
+            if side == east and abs(ty - other) < CALLOUT_GAP:
+                ty = other + CALLOUT_GAP if cy >= other else other - CALLOUT_GAP
+        ty = min(max(ty, 24.0), 636.0)
+        placed.append((east, ty))
+        out.append(f'<g class="callout"><line x1="{cx:.1f}" y1="{cy:.1f}" x2="{lx:.1f}" y2="{ty:.1f}"/>'
                    f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5"/>'
-                   f'<text x="{tx}" y="{cy - 4:.1f}" text-anchor="{anchor}"><tspan class="callout__nm">{escape(name)}</tspan>'
+                   f'<text x="{tx}" y="{ty - 4:.1f}" text-anchor="{anchor}"><tspan class="callout__nm">{escape(name)}</tspan>'
                    f'<tspan x="{tx}" dy="24" class="callout__v">{escape(value)}</tspan></text></g>')
     return "".join(out)

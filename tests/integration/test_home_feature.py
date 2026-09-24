@@ -10,8 +10,10 @@ fa uscire l'eccezione, e ogni coppia del pool deve:
 - rispondere 200 dal template della 1.0, col marcatore "Indicatore in evidenza";
 - mostrare l'indicatore e il livello chiesti, non un altro;
 - non lasciare in pagina un `None`, un `nan` o il segnaposto dei prototipi;
-- avere la mappa solo per le regioni, e per le province le prime e le ultime
-  dieci al suo posto.
+- avere la mappa per tutti e due i livelli, e per le province le prime e le
+  ultime dieci;
+- aprire sul livello chiesto, e disegnare l'altro (nascosto) quando
+  l'indicatore sta nel pool anche li'.
 """
 
 import random
@@ -70,12 +72,14 @@ class OgniCoppiaDelPool(unittest.TestCase):
                     guasti.append((path, FUGHE.search(testo).group(0)))
                 elif f"/{code}\"" not in html:
                     guasti.append((path, "l'indicatore in evidenza non e' quello chiesto"))
-                elif ("qui per regione." if level == "regione" else "qui per provincia.") not in testo:
+                elif not re.search(rf'<div class="feat__level" id="lv-{level}"[^>]*data-page-root(?![^>]*hidden)', html):
                     guasti.append((path, "il livello in evidenza non e' quello chiesto"))
-                elif level == "regione" and 'class="map"' not in html:
+                elif html.find(f'id="lv-{level}"') > html.find('class="feat__level"') + 40:
+                    guasti.append((path, "il livello chiesto non e' il primo pannello"))
+                elif level == "regione" and 'class="map" data-map' not in html:
                     guasti.append((path, "regioni senza mappa"))
-                elif level == "provincia" and ("module__body--pair" not in html or 'class="map"' in html):
-                    guasti.append((path, "province senza le prime e le ultime dieci"))
+                elif level == "provincia" and ('class="map map--province"' not in html or "Le prime dieci" not in html):
+                    guasti.append((path, "province senza mappa o senza le prime e le ultime dieci"))
         self.assertEqual(guasti, [], guasti[:10])
 
 
@@ -96,10 +100,12 @@ class LeFrasi(unittest.TestCase):
             for level, pairs in home_pick.pool().items():
                 for family, raw_id in pairs:
                     code = sources.indicator_code(family, raw_id)
-                    f = home.feature(home_pick.pick(code, level))
-                    for claim in (f["lead_claim"], f["table_claim"]):
-                        if claim:
-                            cls.frasi.append((code, level, claim, f))
+                    # Tutti e due i pannelli: quello estratto e l'altro livello,
+                    # che il selettore mostra senza ricaricare.
+                    for panel in home.feature(home_pick.pick(code, level))["levels"]:
+                        for claim in (panel["lead_claim"], panel["table_claim"]):
+                            if claim:
+                                cls.frasi.append((code, panel["key"], claim, panel))
 
     def test_ci_sono_frasi(self):
         self.assertGreater(len(self.frasi), 300)
@@ -151,7 +157,7 @@ class LaScelta(unittest.TestCase):
         titoli = set()
         for _ in range(12):
             html = client.get("/").get_data(as_text=True)
-            m = re.search(r'<p class="h-title"><a href="([^"]+)"', html)
+            m = re.search(r'<h3 class="feat__name" id="feat-name"><a href="([^"]+)"', html)
             self.assertIsNotNone(m)
             titoli.add(m.group(1))
         self.assertGreater(len(titoli), 1, "dodici visite, sempre lo stesso indicatore")

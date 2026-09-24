@@ -38,4 +38,4 @@
 @container (max-width: 560px) { .table--stack.cl-cats tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* La mappa porta al profilo della regione cliccata, come la mappa di prima. */
-.cl-side .map path[data-key] { cursor: pointer; }
+.cl-side .map [data-key] { cursor: pointer; }

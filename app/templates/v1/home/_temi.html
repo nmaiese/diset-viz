@@ -1,0 +1,34 @@
+{% import "v1/_ui.html" as ui %}
+{#- I temi, subito dopo i territori: le quattro aree con il loro distintivo,
+    i temi di ognuna e la regione in testa e in coda. Il segno fra testa e
+    coda lo portano le frecce, non un colore: il sistema non da' giudizi di
+    colore sui territori (--positive e --negative sono inchiostro). -#}
+{% if d.areas %}
+<section class="zone" id="temi" aria-labelledby="h-temi">
+<div class="wrap">
+  <header class="zone__head">
+    <div class="zone__title">
+      <h2 class="h-section" id="h-temi">I temi</h2>
+      <p class="zone__lead">Gli indicatori raccolti per argomento, in quattro aree. Per ogni area, la regione con la posizione media migliore e quella con la peggiore sugli indicatori che hanno un verso.</p>
+    </div>
+    <p class="zone__actions"><a class="linkarrow" href="/temi">Tutti i temi e i loro indicatori</a></p>
+  </header>
+  <ul class="home-areas">
+    {%- for a in d.areas %}
+    <li class="home-area">
+      <div class="home-area__top">
+        <span class="badge badge--{{ a.tone }}">{{ ui.icon(a.icon) }}</span>
+        <p class="card__kicker">{{ a.count | num(None, 'count') }} indicatori</p>
+      </div>
+      <h3 class="home-area__title"><a href="{{ a.area_path }}">{{ a.area }}</a></h3>
+      <ul class="home-area__themes">{% for th in a.themes %}<li><a href="{{ th.path }}">{{ th.theme }}</a></li>{% endfor %}</ul>
+      <dl class="home-area__ends">
+        <div class="is-head"><dt>{{ ui.icon('up') }} In testa</dt><dd>{% if a.best_key %}<a href="{{ '/regione/' ~ a.best_key }}">{{ a.best }}</a>{% else %}{{ a.best }}{% endif %}</dd></div>
+        <div class="is-tail"><dt>{{ ui.icon('down') }} In coda</dt><dd>{% if a.worst_key %}<a href="{{ '/regione/' ~ a.worst_key }}">{{ a.worst }}</a>{% else %}{{ a.worst }}{% endif %}</dd></div>
+      </dl>
+    </li>
+    {%- endfor %}
+  </ul>
+</div>
+</section>
+{% endif %}

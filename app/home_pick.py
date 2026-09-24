@@ -66,7 +66,8 @@ def _choice(view: dict | None, level_key: str, candidates: dict, requested: bool
     per quella chiesta con `?indicatore=`, cosi' un link non porta in home una
     scheda che il catalogo indicizzabile non ha, o un livello con poche righe.
     `other_level` e' l'altro livello dello stesso indicatore, solo se anche
-    quello sta nel pool: e' il link "Lo stesso indicatore per provincia"."""
+    quello sta nel pool, e `other` il suo livello intero: la home li disegna
+    tutti e due e passa dall'uno all'altro senza ricaricare."""
     if view is None:
         return None
     level = next((lv for lv in view["levels"] if lv["key"] == level_key), None)
@@ -75,7 +76,12 @@ def _choice(view: dict | None, level_key: str, candidates: dict, requested: bool
     if level is None or pair not in candidates.get(level_key, ()):
         return None
     other = next((key for key in LEVELS if key != level_key and pair in candidates.get(key, ())), None)
-    return {"meta": view["meta"], "level": level, "other_level": other, "requested": requested}
+    other_view = next((lv for lv in view["levels"] if lv["key"] == other), None) if other else None
+    return {"meta": view["meta"], "level": level, "other_level": other if other_view else None,
+            "other": other_view, "requested": requested,
+            # I livelli che la scheda ha davvero, anche fuori dal pool: la home
+            # non deve dire "c'e' solo per regione" se la scheda ha le province.
+            "available": [lv["key"] for lv in view["levels"]]}
 
 
 def pick(code: str | None = None, level_key: str | None = None,

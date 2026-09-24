@@ -249,11 +249,29 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 /* ---------- mappa ---------- */
 .map { position: relative; }
 .map svg { display: block; width: 100%; height: auto; max-height: 560px; }
-.map path { stroke: var(--map-edge); stroke-width: 0.9; stroke-linejoin: round; fill: var(--data-null); transition: fill var(--motion-base) var(--motion-ease); }
-.map path.is-null { fill: url(#nd-stripes); }
+.map [data-key] { stroke: var(--map-edge); stroke-width: 0.9; stroke-linejoin: round; fill: var(--data-null); transition: fill var(--motion-base) var(--motion-ease); }
+.map [data-key].is-null { fill: url(#nd-stripes); }
 .map .outline { fill: none; stroke: var(--map-outline); stroke-width: 1; pointer-events: none; }
-.map path.is-on { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
-.map path:focus { outline: none; }
+.map [data-key].is-on { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+/* Le province: filo sottile fra una e l'altra, e i confini delle regioni
+   ridisegnati sopra piu' larghi, nello stesso colore del fondo. */
+.map--province [data-key] { stroke-width: 0.5; }
+.map--province [data-key].is-on { stroke-width: 1.8; }
+.map__borders { fill: none; stroke: var(--map-edge); stroke-width: 2.2; stroke-linejoin: round; pointer-events: none; }
+/* Lo sprite dei tracciati (app/design/maps.py): in pagina, ma senza spazio. */
+.map-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* La mappa per scegliere un territorio (macro navmap): colori dell'interfaccia,
+   non dei dati. La terra nel grigio della superficie con i confini nel colore
+   del fondo, un grigio piu' deciso al passaggio, l'accento pieno su quello
+   scelto. */
+.navmap { position: relative; }
+.navmap svg { display: block; width: 100%; height: auto; }
+.navmap a use { fill: var(--surface-2); stroke: var(--bg); stroke-width: 1; stroke-linejoin: round; transition: fill var(--motion-fast) var(--motion-ease); }
+.navmap--provincia a use { stroke-width: 0.5; }
+.navmap a:hover use { fill: var(--rule-strong); }
+.navmap a.is-on use { fill: var(--accent); }
+.navmap__borders { fill: none; stroke: var(--control-border); stroke-width: 1.1; stroke-linejoin: round; pointer-events: none; }
+.map [data-key]:focus { outline: none; }
 .map a:focus-visible path { stroke: var(--focus); stroke-width: 3; }
 .q1 { fill: var(--seq-1) !important; } .q2 { fill: var(--seq-2) !important; } .q3 { fill: var(--seq-3) !important; }
 .q4 { fill: var(--seq-4) !important; } .q5 { fill: var(--seq-5) !important; } .q6 { fill: var(--seq-6) !important; }
@@ -580,6 +598,9 @@ details.more[open] > summary { color: var(--ink); }
 .band__dot { fill: var(--accent); }
 .band__hllab { font-size: 13px; font-weight: 700; fill: var(--accent); }
 
+/* I richiami stanno sopra i tracciati: senza questo il testo e il filo
+   prendevano mouse e clic, e sotto l'etichetta un territorio non si sceglieva. */
+.callout { pointer-events: none; }
 .callout line { stroke: var(--ink); stroke-width: 1; }
 .callout circle { fill: var(--ink); stroke: var(--bg); stroke-width: 1.5; }
 .callout text { font-family: var(--font-num); font-size: 21px; paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }

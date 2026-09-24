@@ -1,0 +1,58 @@
+{% import "v1/_ui.html" as ui %}
+{#- Fonti, metodo e come citare: quattro impegni con la loro icona (da dove
+    vengono i numeri, il catalogo, le medie semplici, le correzioni) e
+    accanto come si cita, con la citazione da copiare, la licenza e la
+    versione per gli assistenti. I conteggi del catalogo li portano le porte in
+    testa alla pagina, qui non si ripetono. -#}
+{% set tr = d.trust %}
+<section class="zone zone--tint" id="fonti" aria-labelledby="h-fonti">
+<div class="wrap">
+  <header class="zone__head">
+    <div class="zone__title">
+      <h2 class="h-section" id="h-fonti">Fonti, metodo e come citare</h2>
+      <p class="zone__lead">Da dove vengono i numeri, come li mettiamo in ordine e come riusarli.</p>
+    </div>
+    <p class="zone__actions"><a class="linkarrow" href="/metodologia">La metodologia</a></p>
+  </header>
+  <div class="trust">
+    <ul class="trust__pillars">
+      {% if tr.Fonti %}
+      <li class="pillar">
+        <span class="badge">{{ ui.icon('source') }}</span>
+        <h3 class="pillar__title">Fonti ufficiali</h3>
+        <p class="pillar__text">{{ tr.Fonti.title }}. {{ tr.Fonti.body }}</p>
+        <a class="linkarrow" href="{{ tr.Fonti.href }}">{{ tr.Fonti.cta }}</a>
+      </li>
+      {% endif %}
+      {% if tr.Copertura %}
+      <li class="pillar">
+        <span class="badge">{{ ui.icon('catalog') }}</span>
+        <h3 class="pillar__title">Un catalogo aggiornato</h3>
+        <p class="pillar__text">{{ tr.Copertura.body }}</p>
+        <a class="linkarrow" href="{{ tr.Copertura.href }}">{{ tr.Copertura.cta }}</a>
+      </li>
+      {% endif %}
+      <li class="pillar">
+        <span class="badge">{{ ui.icon('method') }}</span>
+        <h3 class="pillar__title">Medie semplici, dette tali</h3>
+        <p class="pillar__text">{% if tr.Metodo %}{{ tr.Metodo.title }}. {% endif %}Le medie sono medie semplici dei territori: ognuno pesa uguale, quindi non sono dati nazionali.</p>
+        <a class="linkarrow" href="/metodologia">La metodologia</a>
+      </li>
+      {% if tr.Correzioni %}
+      <li class="pillar">
+        <span class="badge">{{ ui.icon('fix') }}</span>
+        <h3 class="pillar__title">Correzioni pubbliche</h3>
+        <p class="pillar__text">{{ tr.Correzioni.body }} Scrivi alla redazione da <a href="{{ tr.Correzioni.href }}">Chi siamo</a>.</p>
+        <a class="linkarrow" href="{{ corrections_url }}">Segnala un errore</a>
+      </li>
+      {% endif %}
+    </ul>
+    <div class="trust__cite">
+      <h3 class="pillar__title">Come citare</h3>
+      <p class="pillar__text">Per un dato, aggiungi la fonte primaria e l'anno che trovi nella sua scheda. Le regole per intero stanno in <a href="/chi-siamo#come-citare">Come citare</a>.</p>
+      {{ ui.cite(d.citation) }}
+      <p class="trust__small">{{ ui.icon('license') }}<span>Dati pubblicati con licenza <a href="{{ data_license_url }}">{{ data_license_label }}</a>. Per assistenti e motori c'è una versione in testo semplice: <a href="/llms.txt">llms.txt</a>.</span></p>
+    </div>
+  </div>
+</div>
+</section>

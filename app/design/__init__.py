@@ -37,6 +37,10 @@ def register(app) -> None:
     app.jinja_env.filters["of_place"] = _of_place
     app.jinja_env.globals["column_decimals"] = numfmt.column_decimals
     app.jinja_env.globals["v1_paths"] = _paths()
+    from app.design import maps
+
+    app.jinja_env.globals["v1_province_paths"] = maps.PROVINCE_PATHS
+    app.jinja_env.globals["v1_map_sprite"] = maps.sprite
 
 
 def _of_place(name: str, level_key: str) -> str:

@@ -411,7 +411,9 @@ def home():
         year_max=summary["year_max"],
         themes_preview=themes_preview,
         quiz_games=_home_quiz_games(),
-        posts=recent_posts,
+        # Quattro per la fascia delle storie (una grande, tre in fila); il
+        # markdown per gli agenti resta sulle tre di `recent_posts`.
+        posts=get_posts()[:4],
         # 2026 design system modules
         hero_map=_home_hero_map(),
         paths=_home_paths(summary, themes_preview, territories),

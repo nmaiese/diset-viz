@@ -15,17 +15,17 @@ pagina.
 from __future__ import annotations
 
 import math
+import random
 import re
 import struct
 from functools import lru_cache
 
-from app import profiles, quality_life_bes
+from app import indicator_notes, profiles, quality_life_bes
 from app.blog import STATIC_DIR, social_image_size
 from app.data import REGION_GEO_AREA
-from app.design import charts, numfmt
+from app.design import charts, maps, numfmt
 from app.design.common import (
     LOWER_BETTER,
-    PATHS,
     count_word,
     date_it,
     legend,
@@ -163,19 +163,23 @@ def extremes_claim(low: dict, high: dict, unit: str | None, year, level_key: str
 # stanno nella scheda, a un clic.
 FULL_RANKING_MAX = 25
 RANK_EDGE = 10
+# La striscia della home prende tutta la larghezza della scheda che la
+# contiene: a 1920 pixel sono circa 1360, a 1440 circa 1300. Il taglio si
+# disegna a questa misura e scala di poco nelle due direzioni.
+HOME_STRIP_WIDTH = 1320
+LEVEL_TAB = {"regione": "Regioni", "provincia": "Province"}
 
 
-def feature(pick: dict | None) -> dict | None:
-    """L'indicatore in evidenza con la regia della scheda: la striscia del
-    divario, poi la mappa che nomina i suoi estremi accanto alla classifica
-    per le regioni, le prime e le ultime dieci per le province.
+def level_panel(meta: dict, level: dict, code: str) -> dict | None:
+    """Un livello dell'indicatore in evidenza, con la regia della scheda: la
+    striscia del divario, poi la mappa che nomina i suoi estremi accanto alla
+    classifica. Regioni e province hanno la stessa forma: per le province la
+    classifica tiene le prime e le ultime dieci, con una riga che dice quante
+    ne restano in mezzo.
 
     Legge il livello che `indicator_view` costruisce per la scheda, lo stesso
     che `test_v1_pages` passa su ogni istanza: la home non ricalcola niente,
     sceglie."""
-    if not pick:
-        return None
-    meta, level = pick["meta"], pick["level"]
     observations = [o for o in level.get("observations") or [] if o.get("value") is not None]
     year = level.get("year_max")
     if len(observations) < 2 or year is None:
@@ -197,7 +201,6 @@ def feature(pick: dict | None) -> dict | None:
         low, high = observations[0], observations[-1]
     else:
         high, low = observations[0], observations[-1]
-
     # Le frasi sul Mezzogiorno valgono su un insieme: si scrivono solo se i
     # territori che nominano ci sono tutti. Con il Molise senza dato, "tutte le
     # sette regioni del Mezzogiorno" era falsa.
@@ -218,48 +221,64 @@ def feature(pick: dict | None) -> dict | None:
         table_claim = None
 
     strip = charts.divario_strip([{**o, "area": areas.get(o["key"])} for o in observations],
-                                 mean, unit, stats.get("gap_ratio"))
-    has_map = bool(level.get("has_map"))
-    callouts = charts.map_callouts(PATHS, [(high["key"], high["name"], with_unit(high["value"], unit, decimals)),
-                                           (low["key"], low["name"], with_unit(low["value"], unit, decimals))]) if has_map else ""
-    verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
-             "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
+                                 mean, unit, stats.get("gap_ratio"), xl_width=HOME_STRIP_WIDTH)
+    shapes = maps.paths(key)
+    callouts = charts.map_callouts(shapes, [(high["key"], high["name"], with_unit(high["value"], unit, decimals)),
+                                            (low["key"], low["name"], with_unit(low["value"], unit, decimals))])
+    # Le classi della rampa: quelle della scheda per le regioni, le stesse sei
+    # a intervalli uguali calcolate qui per le province, che la scheda non
+    # disegna su una mappa.
+    colors = level.get("map_colors") or indicator_notes.ds_choropleth_colors(
+        [{"region_key": o["key"], "value": o["value"]} for o in observations])
     # Solo i territori con un dato: "Trova la tua provincia" offriva anche quelli
     # senza, e sceglierli non accendeva niente.
     names = {o["key"]: o["name"] for o in observations}
     territory_areas = {o["key"]: areas.get(o["key"]) for o in observations}
 
+    # La classifica in due colonne da dieci, per tutti e due i livelli: le
+    # regioni dalla 1a alla 10a e dalla 11a alla 20a, con la riga della media
+    # dove cade, le province le prime e le ultime dieci. In una colonna sola
+    # le venti righe facevano la fascia lunga il doppio della mappa.
     rows = ranking({**level, "observations": observations}, unit)
-    top = bottom = None
+    middle = None
     if n > FULL_RANKING_MAX:
         ranked = [r for r in rows if not r.get("ref")]
-        top, bottom = ranked[:RANK_EDGE], ranked[-RANK_EDGE:]
-        rows = []
+        middle = n - 2 * RANK_EDGE
+        columns = [{"caption": "Le prime dieci", "rows": ranked[:RANK_EDGE]},
+                   {"caption": "Le ultime dieci", "rows": ranked[-RANK_EDGE:]}]
+    else:
+        half = math.ceil(sum(1 for r in rows if not r.get("ref")) / 2)
+        seen, split = 0, len(rows)
+        for i, r in enumerate(rows):
+            if not r.get("ref"):
+                seen += 1
+                if seen == half:
+                    split = i + 1
+                    break
+        columns = [{"caption": None, "rows": rows[:split]}, {"caption": None, "rows": rows[split:]}]
+        columns = [c for c in columns if c["rows"]]
 
-    code = meta["canonical_path"].rstrip("/").rsplit("/", 1)[-1]
-    other = pick.get("other_level")
     return {
-        "name": meta["name"], "path": meta["canonical_path"], "year": year, "n": n,
-        "level": key, "plural": plural, "singular": singular, "requested": bool(pick.get("requested")),
+        "key": key, "tab": LEVEL_TAB.get(key, plural.capitalize()), "year": year, "n": n,
+        "plural": plural, "singular": singular,
+        # Senza JavaScript il selettore e' questo link: #dato riporta al pannello.
+        "href": f"/?indicatore={code}&livello={key}#dato",
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
-        "short_unit": short_unit(unit), "source_label": meta.get("source_label"),
-        "source_url": meta.get("source_url"), "theme": meta.get("theme"), "theme_path": meta.get("theme_path"),
-        "lead_claim": lead_claim, "table_claim": table_claim, "verso": verso,
+        "short_unit": short_unit(unit),
+        "lead_claim": lead_claim, "table_claim": table_claim,
         "lower_better": direction in LOWER_BETTER,
-        "rows": rows, "top": top, "bottom": bottom, "decimals": decimals,
-        "middle": n - 2 * RANK_EDGE if top else None,
+        "columns": columns, "middle": middle, "decimals": decimals,
         "areas": territory_areas, "area_label": charts.AREA_LABEL,
         "profile_path": level.get("profile_path"),
-        "strip": strip, "callouts": callouts, "has_map": has_map,
-        "map_classes": map_classes(level) if has_map else {},
+        "strip": strip, "callouts": callouts,
+        "map_classes": map_classes({"map_colors": colors}),
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in observations},
         "names": names,
-        "legend": legend(values, unit) if has_map else None,
-        # L'altro livello dello stesso indicatore, quando c'e': un link vero,
-        # che funziona senza JavaScript e non offre ai motori copie della home.
-        "other_level": {"key": other, "href": f"/?indicatore={code}&livello={other}",
-                        "label": "Lo stesso indicatore per provincia" if other == "provincia"
-                        else "Lo stesso indicatore per regione"} if other else None,
+        # Sulla mappa ci sono anche i territori senza dato: il tooltip ne dice
+        # il nome, non la chiave ("reggio-calabria n.d.").
+        "map_names": {**level_names(key), **names},
+        "legend": legend(values, unit),
+        "missing": bool(set(shapes) - set(names)),
         # Lo stesso contratto del modulo della scheda, con un anno solo: basta
         # perche' v1.js accenda "Trova la tua regione", il clic sulla mappa e
         # il punto della striscia.
@@ -272,7 +291,36 @@ def feature(pick: dict | None) -> dict | None:
     }
 
 
-# ---------------------------------------------------------------- regioni per ripartizione
+def feature(pick: dict | None) -> dict | None:
+    """L'indicatore in evidenza: cio' che vale per tutti e due i livelli (nome,
+    tema, fonte, verso) e un pannello per livello. Il primo e' quello estratto,
+    il secondo c'e' quando lo stesso indicatore sta nel pool anche all'altro
+    livello: la pagina li disegna tutti e due e il selettore passa dall'uno
+    all'altro senza ricaricare. Senza JavaScript il selettore e' un link."""
+    if not pick:
+        return None
+    meta = pick["meta"]
+    code = meta["canonical_path"].rstrip("/").rsplit("/", 1)[-1]
+    first = level_panel(meta, pick["level"], code)
+    if first is None:
+        return None
+    second = level_panel(meta, pick["other"], code) if pick.get("other") else None
+    direction = meta.get("direction")
+    verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
+             "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
+    shown = {first["key"]} | ({second["key"]} if second else set())
+    elsewhere = next((k for k in pick.get("available") or [] if k not in shown), None)
+    return {
+        "name": meta["name"], "path": meta["canonical_path"], "code": code,
+        "level": first["key"], "requested": bool(pick.get("requested")),
+        "elsewhere": {"regione": "regione", "provincia": "provincia"}.get(elsewhere),
+        "source_label": meta.get("source_label"), "source_url": meta.get("source_url"),
+        "theme": meta.get("theme"), "theme_path": meta.get("theme_path"), "verso": verso,
+        "levels": [first] + ([second] if second else []),
+    }
+
+
+# ---------------------------------------------------------------- regioni e province
 
 def region_names() -> dict[str, str]:
     """Le venti regioni col loro nome, a prescindere dall'indicatore in
@@ -281,89 +329,167 @@ def region_names() -> dict[str, str]:
     return {key: name for key in REGION_GEO_AREA if (name := profiles.region_name(key))}
 
 
-def regions_by_area(names: dict[str, str]) -> list[dict]:
-    """Le regioni nelle tre ripartizioni della striscia (Nord, Centro,
-    Mezzogiorno), nell'ordine Istat, con il loro colore."""
-    areas = charts.area_map()
-    groups = {a: [] for a in ("nord", "centro", "sud")}
+@lru_cache(maxsize=1)
+def province_names() -> dict[str, str]:
+    """Le 107 province col loro nome, dalla tabella dei codici del BES."""
+    import csv
+
+    from app import bes_data
+
+    with bes_data.PROVINCE_CODES.open(encoding="utf-8", newline="") as handle:
+        return {row["province_key"]: row["name"] for row in csv.DictReader(handle, delimiter=";")}
+
+
+def level_names(level_key: str) -> dict[str, str]:
+    return region_names() if level_key == "regione" else province_names()
+
+
+def _ordinal(rank: int, total: int | None) -> str:
+    return f"{rank}ª su {total}" if total else f"{rank}ª"
+
+
+def region_preview(key: str, profile: dict, answer: dict, quality_ranks: dict, quality_total: int | None) -> dict:
+    """L'anteprima della scheda di una regione, con le frasi della sua testata:
+    la posizione media sugli indicatori confrontabili, il tema dove va meglio e
+    quello dove va peggio, la posizione nella qualita' della vita. Le cifre
+    escono dalle stesse funzioni della pagina (`profiles.region_profile`,
+    `regione._answer`), cosi' l'anteprima non contraddice la scheda."""
+    name = profile["region"]
+    total = profile.get("region_total")
+    area = charts.area_map().get(key)
+    the_name = the_place(name, "regione")
+    verb = "sono" if name == "Marche" else "è"
+    if profile.get("avg_rank") and profile.get("comparable_count"):
+        lead = (f"In media {the_name} {verb} {profile['avg_rank']}ª su {total} regioni "
+                f"sui {profile['comparable_count']} indicatori confrontabili.")
+    else:
+        lead = f"Il profilo {of_place(name, 'regione')} su {len(profile.get('all_indicators') or [])} indicatori."
+    facts = []
+    if answer.get("strong"):
+        a = answer["strong"]
+        facts.append({"label": "Va meglio in", "text": a["theme"], "href": a["path"], "note": _ordinal(a["rank"], a["total"])})
+    if answer.get("weak"):
+        a = answer["weak"]
+        facts.append({"label": "Va peggio in", "text": a["theme"], "href": a["path"], "note": _ordinal(a["rank"], a["total"])})
+    if quality_ranks.get(key):
+        facts.append({"label": "Qualità della vita", "text": _ordinal(quality_ranks[key], quality_total),
+                      "href": None, "note": None})
+    return {"key": key, "name": name, "href": f"/regione/{key}", "area": area,
+            "kicker": charts.AREA_LABEL.get(area), "lead": lead[:1].upper() + lead[1:], "facts": facts,
+            "cta": f"Il profilo {of_place(name, 'regione')}"}
+
+
+def province_preview(key: str, profile: dict) -> dict:
+    """L'anteprima della scheda di una provincia, con le frasi della sua
+    testata: la posizione per qualita' della vita, il punteggio col profilo, la
+    dimensione dove va meglio e quella dove va peggio. Dalla stessa
+    `province_profile.profilo` della pagina."""
+    name = profile["name"]
+    the_name = the_place(name, "provincia")
+    categories = [c for c in profile.get("categories") or [] if c.get("score") is not None]
+    facts = [{"label": "Punteggio", "text": f"{numfmt.text(profile['score'], 1)} su 100",
+              "href": None, "note": f"profilo {((profile.get('profile') or {}).get('name') or '').lower()}".strip()}]
+    if categories:
+        facts.append({"label": "Va meglio su", "text": categories[0]["name"], "href": None,
+                      "note": numfmt.text(categories[0]["score"], 1)})
+    if len(categories) > 1:
+        facts.append({"label": "Va peggio su", "text": categories[-1]["name"], "href": None,
+                      "note": numfmt.text(categories[-1]["score"], 1)})
+    area = charts.area_map().get(key)
+    region = profile.get("region")
+    return {"key": key, "name": name, "href": f"/provincia/{key}", "area": area,
+            "kicker": region,
+            "lead": f"{the_name[:1].upper() + the_name[1:]} è {profile['rank']}ª su {profile['total']} province per qualità della vita.",
+            "facts": facts, "cta": f"Il profilo {of_place(name, 'provincia')}"}
+
+
+@lru_cache(maxsize=1)
+def territory_previews() -> dict[str, dict[str, dict]]:
+    """Le anteprime di tutte le regioni e le province, una volta per processo:
+    la home non sta nella cache di pagina (l'indicatore cambia a ogni visita),
+    e le venti schede regionali costano circa un secondo e mezzo a freddo. I
+    dati cambiano solo col deploy, come per i loader con `lru_cache`."""
+    from app import province_profile
+    from app.design.pages import regione
+
+    quality = regione._region_quality()
+    ranks = quality["ranks"] if quality else {}
+    regions = {}
     for key in REGION_GEO_AREA:
-        if key in names and areas.get(key) in groups:
-            groups[areas[key]].append({"key": key, "name": names[key]})
-    # Una ripartizione con piu' di quattro regioni prende due colonne, cosi' il
-    # Nord (otto regioni) non fa una colonna lunga il doppio delle altre.
-    return [{"area": a, "label": charts.AREA_LABEL[a], "regions": regions, "wide": len(regions) > 4}
-            for a, regions in groups.items() if regions]
+        profile = profiles.region_profile(key)
+        if profile:
+            regions[key] = region_preview(key, profile, regione._answer(profile), ranks, len(ranks) or None)
+    provinces = {}
+    for key in province_profile.chiavi():
+        profile = province_profile.profilo(key)
+        if profile and profile.get("rank") and profile.get("score") is not None:
+            provinces[key] = province_preview(key, profile)
+    return {"regione": regions, "provincia": provinces}
+
+
+def territories(rng: random.Random | None = None) -> list[dict]:
+    """I due blocchi della fascia Regioni e province: una mappa che si puo'
+    cliccare, un territorio scelto a caso con l'anteprima della sua scheda, e
+    tutte le altre anteprime per passare da uno all'altro senza ricaricare.
+    `rng` serve alle prove, come in `home_pick`."""
+    choice = (rng or random).choice
+    previews = territory_previews()
+    blocks = []
+    for level, title, index, word in (("regione", "Le regioni", "/regioni", "regioni"),
+                                      ("provincia", "Le province", "/province", "province")):
+        items = previews.get(level) or {}
+        if not items:
+            continue
+        selected = choice(sorted(items))
+        blocks.append({
+            "level": level, "title": title, "index": index, "count": len(items), "word": word,
+            "singular": "regione" if level == "regione" else "provincia",
+            "selected": items[selected], "names": {k: v["name"] for k, v in items.items()},
+            "previews": items,
+        })
+    return blocks
 
 
 # ---------------------------------------------------------------- qualita' della vita
 
-def live_ranking(level_key: str, profile: dict, slug: str) -> list[dict] | None:
-    """La classifica intera di un profilo, dalla stessa funzione che serve le
-    pagine delle classifiche (`quality_life_bes.build_bes_ranking`, gia' in
-    cache per processo con `cache.memoize`).
-
-    Il modulo della home porta i punteggi arrotondati all'intero: scritti col
-    ruolo "punteggio" (un decimale) direbbero 72,0 dove il dato e' 71,6. Qui ci
-    sono i valori veri, e si accettano solo se le righe coincidono con quelle
-    del modulo: se non coincidono il podio si toglie."""
-    payload = quality_life_bes.build_bes_ranking(QOL_LEVEL[level_key], slug)
-    rows = (payload or {}).get("ranking") or []
-    if len(rows) < 6:
-        return None
-    by_rank = {r["rank"]: r for r in rows}
-    for r in profile.get("top", []) + profile.get("bottom", []):
-        twin = by_rank.get(r["rank"])
-        if not twin or not r["path"].endswith("/" + twin["key"]) or abs(twin["score"] - r["score"]) > 0.5:
-            return None
-    return rows
-
-
-def podium(level: dict, level_key: str, slug: str, unit_word: str, singular: str) -> dict | None:
-    """Le prime tre e le ultime tre di un profilo, con quante ne restano in mezzo."""
-    profile = next((p for p in level.get("profiles") or [] if p["slug"] == slug), None)
-    if profile is None:
-        return None
-    precise = live_ranking(level_key, profile, slug)
-    if precise is None:
-        return None
-
-    def row(r):
-        return {"rank": r["rank"], "name": r["name"], "path": f"/{QOL_LEVEL[level_key]}/{r['key']}",
-                "score": r["score"], "where": r.get("region") or None, "width": max(0, min(100, r["score"]))}
-
-    top = [row(r) for r in precise[:3]]
-    bottom = [row(r) for r in precise[-3:]]
-    total = len(precise)
-    middle = total - len(top) - len(bottom)
-    gap = precise[0]["score"] - precise[-1]["score"]
-    if profile.get("gap") is not None and abs(gap - profile["gap"]) > 1:
-        return None
-    return {
-        "label": level["label"], "classifica": level["classifica"], "cta": level["cta"],
-        "profile": profile["name"], "total": total, "unit_word": unit_word, "singular": singular,
-        "top": top, "bottom": bottom, "gap": gap,
-        "middle": middle if middle > 0 else None,
-        "middle_from": top[-1]["rank"] + 1,
-        "middle_to": bottom[0]["rank"] - 1,
-    }
-
-
 def quality(ctx: dict) -> dict | None:
+    """La porta della qualita' della vita: quanti territori, quali dimensioni,
+    quali profili di priorita'. Niente classifica: la home non la svela, la
+    mostra la pagina dedicata. I profili portano alla classifica delle regioni
+    col profilo scelto (`?profilo=`, che la pagina indice non legge).
+
+    Le dimensioni si contano per livello: le province non hanno indicatori su
+    due di esse (imprese, benessere soggettivo), e la frase lo dice. La fonte
+    viene dalla metodologia della classifica, non dal template."""
     qol = ctx.get("qol_module")
     if not qol:
         return None
     slug = qol.get("default_slug")
     levels = qol.get("levels") or {}
-    regions = podium(levels["regioni"], "regioni", slug, "regioni", "Regione") if "regioni" in levels else None
-    provinces = podium(levels["province"], "province", slug, "province", "Provincia") if "province" in levels else None
-    if not regions and not provinces:
+    totals = {}
+    for url_level, level_key in QOL_LEVEL.items():
+        if url_level in levels:
+            rows = ((quality_life_bes.build_bes_ranking(level_key, slug) or {}).get("ranking")) or []
+            if rows:
+                totals[url_level] = len(rows)
+    if "regioni" not in totals:
         return None
-    default = next((p for p in qol.get("profiles") or [] if p["slug"] == slug), None)
-    others = [{"name": p["name"], "slug": p["slug"]} for p in qol.get("profiles") or [] if p["slug"] != slug]
-    return {"regions": regions, "provinces": provinces, "others": others,
-            "has_gaps": bool(regions and provinces),
-            "profile": default["name"] if default else None,
-            "profile_text": lower_first(default.get("description")) if default else None}
+    base = quality_life_bes.build_bes_ranking("regione", slug) or {}
+    measured = {lv: {k for k, v in quality_life_bes._indicators_by_category(lv).items() if v}
+                for lv in ("regione", "provincia")}
+    dimensions = [{"name": c["name"], "regions_only": c["slug"] not in measured["provincia"]}
+                  for c in base.get("categories") or [] if c.get("name") and c["slug"] in measured["regione"]]
+    classifica = "/qualita-della-vita/classifica/regioni"
+    profiles_list = [{"name": p["name"], "slug": p["slug"], "text": p.get("description"),
+                      "href": classifica if p["slug"] == slug else f"{classifica}?profilo={p['slug']}"}
+                     for p in qol.get("profiles") or []]
+    province_dims = sum(1 for d in dimensions if not d["regions_only"])
+    return {"regions": totals.get("regioni"), "provinces": totals.get("province"),
+            "dimensions": dimensions, "profiles": profiles_list,
+            "dims_regions": len(dimensions),
+            "dims_provinces": province_dims if totals.get("province") and province_dims < len(dimensions) else None,
+            "institutions": (base.get("methodology") or {}).get("catalog_institutions"),
+            "profile_word": count_word(len(profiles_list), feminine=False) if profiles_list else None}
 
 
 # ---------------------------------------------------------------- quiz
@@ -470,7 +596,7 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     mano in sei posti, e le province non comparivano in nessuno. Dove la cifra
     e il titolo dicono la stessa cosa ("20", "Regioni") l'unita' non si ripete."""
     counts = ctx.get("territories") or {}
-    ranked = sum(p["total"] for p in (qol["regions"], qol["provinces"]) if p) if qol else None
+    ranked = sum(n for n in (qol["regions"], qol["provinces"]) if n) if qol else None
     main = {
         "/regioni": {"num": counts.get("regions"), "unit": None, "title": "Regioni",
                      "text": "Il profilo di ogni regione: dove stacca, dove resta indietro, i valori di ogni indicatore."},
@@ -498,6 +624,24 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     }
 
 
+# I tre giochi del quiz con la loro illustrazione e il lavaggio della scheda.
+GAME_LOOK = {
+    "indovina-la-regione": {"icon": "game-map", "tone": "blue"},
+    "chi-e-maggiore": {"icon": "game-versus", "tone": "green"},
+    "ordina": {"icon": "game-sort", "tone": "red"},
+}
+
+# Le quattro aree dei temi con la loro icona e il lavaggio del distintivo. Non
+# sono colori dei dati (rampa, ripartizioni) ne' l'accento: servono solo a
+# riconoscere l'area a colpo d'occhio.
+AREA_LOOK = {
+    "Economia e opportunità": {"icon": "economy", "tone": "amber"},
+    "Persone e conoscenza": {"icon": "people", "tone": "green"},
+    "Territorio e servizi": {"icon": "territory", "tone": "blue"},
+    "Comunità e benessere": {"icon": "community", "tone": "red"},
+}
+
+
 # ---------------------------------------------------------------- tutta la pagina
 
 def derive(ctx: dict) -> dict:
@@ -506,10 +650,11 @@ def derive(ctx: dict) -> dict:
     feat = feature(ctx.get("feature_pick"))
     qol = quality(ctx)
     posts = sorted(ctx.get("posts") or [], key=lambda p: p["slug"])
-    posts = sorted(posts, key=lambda p: str(p.get("date") or ""), reverse=True)[:3]
+    posts = sorted(posts, key=lambda p: str(p.get("date") or ""), reverse=True)[:4]
     names = region_names()
     areas = [{
         **area,
+        **AREA_LOOK.get(area.get("area"), {"icon": "catalog", "tone": "neutral"}),
         "best_key": next((k for k, v in names.items() if v == area.get("best")), None),
         "worst_key": next((k for k, v in names.items() if v == area.get("worst")), None),
     } for area in ctx.get("themes_preview") or []]
@@ -520,9 +665,12 @@ def derive(ctx: dict) -> dict:
         "regions": counts.get("regions"), "provinces": counts.get("provinces"),
         "doors": doors(ctx, qol),
         "feature": feat,
-        "areas_regions": regions_by_area(names),
+        "territories": territories(ctx.get("territory_rng")),
+        "region_names": names,
         "quality": qol,
         "quiz_try": quiz_try(ctx, (feat or {}).get("path")),
+        "games": [{**g, **GAME_LOOK.get(g["href"].rsplit("/", 1)[-1], {"icon": "bolt", "tone": "amber"})}
+                  for g in ctx.get("quiz_games") or []],
         "areas": areas,
         "stories": [story(p) for p in posts],
         "citation": citation,
