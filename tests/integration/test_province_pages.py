@@ -249,6 +249,15 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
                 self.assertEqual(len(vicine), 6)
                 self.assertNotIn(chiave, [v["key"] for v in vicine])
 
+    def test_le_province_con_l_articolo_lo_portano_ovunque(self):
+        """"a Sud Sardegna", "di Verbano-Cusio-Ossola": nella description,
+        nel titolo della tabella e nella caption per chi legge con lo screen reader."""
+        for chiave, nome in (("sud-sardegna", "Sud Sardegna"), ("verbano-cusio-ossola", "Verbano-Cusio-Ossola")):
+            with self.subTest(provincia=chiave):
+                pagina = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                self.assertIn(f"Qualità della vita nel {nome}", pagina)
+                self.assertNotRegex(pagina, rf"\b(?:a|di|in|dopo) {nome}")
+
     def test_il_creatore_e_divario_italia_e_la_fonte_istat(self):
         """"creator: Istat" su un punteggio che Istat non ha mai pubblicato."""
         import json

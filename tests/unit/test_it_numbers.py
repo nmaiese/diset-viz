@@ -2,7 +2,7 @@
 import unittest
 
 from app import it_numbers
-from app.seo_titles import at_place
+from app.seo_titles import at_place, to_place
 
 
 class ItalianNumbers(unittest.TestCase):
@@ -29,6 +29,15 @@ class AtPlace(unittest.TestCase):
         self.assertEqual(at_place("Ascoli Piceno"), "ad Ascoli Piceno")
         self.assertEqual(at_place("L'Aquila"), "all'Aquila")
         self.assertEqual(at_place("La Spezia"), "alla Spezia")
+
+    def test_le_province_con_l_articolo(self):
+        """"Qualita' della vita a Sud Sardegna" stava nella description."""
+        self.assertEqual(at_place("Sud Sardegna"), "nel Sud Sardegna")
+        self.assertEqual(at_place("Verbano-Cusio-Ossola"), "nel Verbano-Cusio-Ossola")
+        # "davanti a": il complemento di termine non e' lo stato in luogo.
+        self.assertEqual(to_place("Sud Sardegna"), "al Sud Sardegna")
+        self.assertEqual(to_place("Aosta"), "ad Aosta")
+        self.assertEqual(to_place("L'Aquila"), "all'Aquila")
 
 
 if __name__ == "__main__":
