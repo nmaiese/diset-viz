@@ -63,40 +63,10 @@
 
     {% block content %}{% endblock %}
 
-    {# Il piede. Vive qui e non in un include perche' privacy.html deve poter
-       svuotare `footer_privacy_settings`, e un blocco dentro un include non e'
-       sovrascrivibile dalle pagine figlie. #}
-    <footer class="ftr">
-      <div class="ftr__inner">
-        <div class="ftr__wrap">
-          <a class="hdr__brand" href="/">
-            <img src="{{ url_for('static', filename='img/logo-simbolo.png') }}" alt="" width="23" height="26">
-            {% set marchio = (site_name or SITE_NAME).split(' ', 1) %}
-            <span class="brandword"><b>{{ marchio[0] }}</b>{% if marchio[1] %} <span>{{ marchio[1] }}</span>{% endif %}</span>
-          </a>
-          <p class="ftr__trust">{{ site_name or SITE_NAME }} rimette in ordine i dati pubblici di Istat ed Eurostat su regioni e province, senza correggerli, e ricalcola ogni sintesi dai dati. <a href="/metodologia">Come lavoriamo</a>, <a href="{{ corrections_url }}" rel="noopener">correzioni</a> e <a href="/chi-siamo#come-citare">come citarci</a>.</p>
-          {# Le colonne vengono da `app/nav.py`, come le voci della testata. #}
-          <nav class="ftr__cols" aria-label="Mappa del sito">
-            {% for colonna in nav.FOOTER_GROUPS %}
-            <div>
-              <h2>{{ colonna.label }}</h2>
-              <ul>
-                {% for voce in colonna['items'] %}<li><a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a></li>
-                {% endfor %}
-              </ul>
-            </div>
-            {% endfor %}
-          </nav>
-          <div class="ftr__legal">
-            <p>Dati di Istat ed Eurostat, con licenza <a href="{{ data_license_url }}" rel="license noopener">{{ data_license_label }}</a>.</p>
-            {% for voce in nav.LEGAL %}<a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a>
-            {% endfor %}
-            {% block footer_privacy_settings %}
-            {% include "_funding_choices_revoke.html" %}
-            {% endblock %}
-          </div>
-        </div>
-      </div>
-    </footer>
+    {# Il piede sta in `_ds_footer.html`, lo stesso che includono le due shell
+       della SPA: finche' viveva qui, l'atlante e il confronto ne avevano due
+       loro. `/privacy` toglie il bottone dei consensi con la variabile
+       `footer_consent_link`, non piu' con un blocco. #}
+    {% include "_ds_footer.html" %}
   </body>
 </html>

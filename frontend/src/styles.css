@@ -200,56 +200,21 @@ h1, h2, h3 { font-family: var(--font-display); }
 .site-auth__login:hover { border-color: var(--accent); color: var(--accent); }
 .site-auth__menu { position: relative; }
 .site-auth__btn { display: flex; align-items: center; gap: 8px; background: none; border: 0; cursor: pointer; color: var(--ink); font: 600 13px/1 var(--font-body); padding: 4px; }
-.site-auth__avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font: 700 13px/1 var(--font-display); flex: 0 0 auto; }
+.site-auth__avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font: 700 13px/1 var(--font-display); flex: 0 0 auto; }
 .site-auth__label { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .site-auth__dropdown { position: absolute; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); min-width: 160px; padding: 6px; z-index: 60; }
 .site-auth__item { display: block; width: 100%; text-align: left; box-sizing: border-box; background: none; border: 0; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--ink); font: 500 14px/1 var(--font-body); text-decoration: none; }
 .site-auth__item:hover { background: var(--accent-soft); color: var(--accent); }
 @media (max-width: 760px) { .site-auth { min-width: 44px; } .site-auth__label { display: none; } }
 
-/* Bottom tab bar: mobile-only primary nav, replaces the old hamburger menu. */
-.tabbar { display: none; }
-.tabbar__item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 9px 2px 8px;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-}
-.tabbar__item:hover { color: var(--ink); }
-.tabbar__item.is-active { color: var(--accent); border-top: 2px solid var(--accent); margin-top: -1px; }
-
-.site-footer {
-  margin-top: 64px;
-  padding: 32px clamp(16px, 4vw, 48px);
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 13.5px;
+/* La barra in basso del telefono e il piede React non ci sono piu': testata,
+   briciole e piede li rende Flask, fuori da #root, con i fogli del design
+   system. Resta la fila dei pulsanti di ritorno, che dipende dalla vista. */
+.spa-backbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
-  justify-content: space-between;
-}
-.site-footer a,
-.privacy-settings-link {
-  color: var(--accent);
-  text-decoration: none;
-}
-.site-footer a:hover,
-.privacy-settings-link:hover {
-  color: var(--ink);
-  text-decoration: underline;
-}
-.privacy-settings-link {
-  border: 0;
-  padding: 0;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
+  gap: 8px;
+  padding: 12px clamp(16px, 4vw, 48px) 0;
 }
 
 .back-link {
@@ -653,7 +618,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 .coverage__pill.is-complete { color: var(--accent); border-color: var(--accent); }
 .coverage__pill.is-partial { color: var(--ink-soft); }
-.coverage__pill.is-quality { color: var(--ink); border-color: var(--ink); background: #eef2f7; }
+.coverage__pill.is-quality { color: var(--ink); border-color: var(--ink); background: var(--surface-2); }
 
 .index-row__spark { grid-area: spark; }
 .index-row__meta { grid-area: meta; display: grid; gap: 3px; justify-items: end; text-align: right; }
@@ -673,37 +638,31 @@ h1, h2, h3 { font-family: var(--font-display); }
 .index-row:hover .spark__dot, .index-row:focus-visible .spark__dot { fill: var(--accent); }
 
 /* ---------- Breadcrumb ---------- */
-.context-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px clamp(16px, 4vw, 48px);
-  background: var(--panel);
-  border-bottom: 1px solid var(--line);
-}
-.context-bar__path { display: grid; gap: 4px; min-width: 0; }
-.context-bar__label {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-}
-.context-bar__tools { flex: 0 0 auto; }
-.context-bar .mode-switch { margin-top: 0; }
+/* Le briciole le rende Flask con `_breadcrumb.html`, sopra #root, come su ogni
+   altra pagina: la barra di contesto di React, con le sue briciole a bottoni e
+   il selettore delle modalita', e' andata con la barra del telefono. Questa
+   pagina non carica `site.css` ne' `components.css` (le regole `.spark__*` si
+   scontrerebbero), quindi il percorso si veste qui, con i token della 1.0. */
 .breadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 0;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  gap: 2px 8px;
+  margin: 0;
+  padding: 16px clamp(16px, 4vw, 48px) 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
   color: var(--muted);
 }
-.breadcrumb button { border: 0; background: transparent; color: var(--accent); padding: 0; font: inherit; }
-.breadcrumb button:hover { text-decoration: underline; }
+.breadcrumb a { color: var(--text-2); }
+.breadcrumb [aria-hidden="true"] { color: var(--rule-strong); }
+.breadcrumb__here { color: var(--muted); }
+
+/* Il contenitore statico attorno a #root e' il bersaglio di "Vai al contenuto"
+   (tabindex="-1"): riceve il fuoco dal salto, e un anello attorno a tutta la
+   pagina non dice niente a nessuno. */
+.spa-page:focus { outline: none; }
 
 /* ---------- Detail workspace ---------- */
 .workspace {
@@ -738,7 +697,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.indicator-header .tag--quality { margin-left: 6px; background: #eef2f7; color: var(--ink); }
+.indicator-header .tag--quality { margin-left: 6px; background: var(--surface-2); color: var(--ink); }
 .indicator-header h2 {
   margin: 14px 0 12px;
   font-size: 27px;
@@ -859,7 +818,7 @@ h1, h2, h3 { font-family: var(--font-display); }
    dashboard out of the viewport; width follows the aspect ratio and is centred. */
 .italy-map { display: block; margin: 0 auto; height: clamp(320px, 48vh, 500px); width: auto; max-width: 100%; }
 .italy-map path {
-  stroke: var(--map-region-stroke, rgba(21, 35, 59, 0.35));
+  stroke: var(--map-region-stroke);
   stroke-width: 1;
   transition: fill var(--dur) var(--ease-out), stroke-width 160ms ease;
   outline: none;
@@ -891,7 +850,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   text-align: left;
   padding: 7px 8px;
 }
-.ranking-row:hover, .ranking-row.is-active { background: var(--accent-soft); border-color: rgba(228, 87, 46, 0.3); }
+.ranking-row:hover, .ranking-row.is-active { background: var(--accent-soft); border-color: var(--accent); }
 /* FLIP row-reorder on year change: useFlipRows sets a transform delta then
    clears it on the next frame, letting this transition carry the move. */
 .ranking-row.is-flipping { transition: transform var(--dur-slow) var(--ease-out); will-change: transform; }
@@ -1010,29 +969,6 @@ h1, h2, h3 { font-family: var(--font-display); }
 @media (max-width: 900px) {
   .compare-layout { grid-template-columns: 1fr; }
 }
-
-/* ---------- Mode switch (per indicatore / per regione) ---------- */
-.mode-switch {
-  display: inline-flex;
-  margin-top: clamp(18px, 3vw, 28px);
-  border: 1px solid var(--line);
-  background: var(--panel);
-}
-.mode-switch__tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border: 0;
-  background: transparent;
-  color: var(--ink-soft);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  transition: background 140ms ease, color 140ms ease;
-}
-.mode-switch__tab + .mode-switch__tab { border-left: 1px solid var(--line); }
-.mode-switch__tab:hover { color: var(--ink); }
-.mode-switch__tab.is-active { background: var(--ink); color: var(--paper); }
 
 /* ---------- Stable numeric and bar primitives ---------- */
 .numeric-value {
@@ -1208,13 +1144,20 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 .region-similar__card:hover { border-color: var(--accent); color: var(--accent); }
 
-.region-cta {
+/* `.ds .region-cta` e non `.region-cta`: la regola dei link del sistema,
+   `.ds a` (0,1,1), batteva questa (0,1,0) e scriveva la scheda in inchiostro
+   su fondo inchiostro, cioe' non si leggeva. Fondo `--ink` e testo `--paper`,
+   i nomi che `body.ds` ripunta, e non `--surface-inverse`: quello il sistema
+   lo ricava da `--ink` sulla radice, dove qui vince il `:root` di ripiego di
+   questo foglio, e usciva il blu del 2026 anche nel tema scuro. */
+.ds .region-cta {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 18px 20px; background: var(--ink); color: var(--paper);
+  text-decoration: none;
 }
-.region-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-on-inverse); opacity: 0.72; }
-.region-cta strong { display: block; margin-top: 3px; font-size: 15px; }
-.region-cta:hover { background: #0f1a2d; }
+.ds .region-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: inherit; opacity: 0.72; }
+.ds .region-cta strong { display: block; margin-top: 3px; font-size: 15px; }
+.ds .region-cta:hover { background: var(--ink-soft); color: var(--paper); }
 
 /* Summary strip (top strength / weakness / mover) above the fold */
 .region-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
@@ -1312,23 +1255,6 @@ h1, h2, h3 { font-family: var(--font-display); }
   .brand-text small { display: none; }
   .masthead__links { display: none; }
   .masthead__search { display: flex; }
-  .tabbar {
-    display: flex;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 40;
-    background: var(--paper);
-    border-top: 1px solid var(--line);
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-  body { padding-bottom: 58px; }
-  .site-footer { padding-bottom: 74px; }
-  .context-bar { align-items: stretch; flex-direction: column; gap: 10px; }
-  .context-bar__tools { flex: 1 1 auto; }
-  .context-bar .mode-switch { width: 100%; }
-  .context-bar .mode-switch__tab { flex: 1; justify-content: center; padding: 10px 8px; gap: 5px; font-size: 12px; }
 
   .index-row {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -1403,11 +1329,6 @@ h1, h2, h3 { font-family: var(--font-display); }
 .indicator-header__seo { margin: 4px 0 0; font-size: 13.5px; }
 .insight__link { display: inline-block; margin-top: 8px; font-size: 12.5px; }
 
-/* Crawlable SSR footer below the React app (links to indexed hub pages). */
-.spa-seo-footer { padding: 24px 16px 40px; text-align: center; border-top: 1px solid var(--line, rgba(21,35,59,0.16)); }
-.spa-seo-footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center; font-size: 13px; }
-.spa-seo-footer a { color: var(--muted); }
-
 /* Contenuto server-renderizzato dentro #root, visibile per un istante prima
    che React monti: senza queste regole eredita solo i reset globali (link
    senza colore/sottolineatura, elenchi coi pallini di default) e appare come
@@ -1418,10 +1339,6 @@ h1, h2, h3 { font-family: var(--font-display); }
 .spa-seo-fallback > p { font-size: 16px; color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
 .spa-seo-fallback nav { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 32px; }
 .spa-seo-fallback nav a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 0; font-size: 13.5px; font-weight: 600; }
-/* La pagina corrente non e' un link: il macro `_breadcrumb.html` la rende come
-   `span`, qui come dappertutto. Senza questa riga sarebbe l'unica voce del
-   percorso senza pillola, perche' questa pagina non carica `site.css`. */
-.spa-seo-fallback nav .breadcrumb__here { padding: 7px 14px; border: 1px solid var(--line); font-size: 13.5px; font-weight: 600; color: var(--muted); }
 .spa-seo-fallback section { margin: 0 0 24px; }
 .spa-seo-fallback h2 { font-size: 18px; margin: 0 0 12px; }
 .spa-seo-fallback ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -1451,7 +1368,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 
 /* Confronti salvati (Fase 5.3). */
 .saved-cmp { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
-.saved-cmp__save { background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 8px 16px; font: 600 13.5px/1 var(--font-body); cursor: pointer; }
+.saved-cmp__save { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 999px; padding: 8px 16px; font: 600 13.5px/1 var(--font-body); cursor: pointer; }
 .saved-cmp__save:disabled { opacity: .6; cursor: default; }
 .saved-cmp__list { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .saved-cmp__label { font-size: 12.5px; color: var(--muted); }

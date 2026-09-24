@@ -24,10 +24,10 @@
       <span class="brandword"><b>{{ marchio[0] }}</b>{% if marchio[1] %} <span>{{ marchio[1] }}</span>{% endif %}</span>
     </a>
 
-    {# Le voci vengono da `app/nav.py`, non da qui: la testata React dell'atlante
-       legge lo stesso elenco da `window.__diNav`, e finche' erano due liste
-       scritte a mano divergevano. Dall'atlante non si raggiungevano
-       `/confronto` ne' `/divari-regionali`. #}
+    {# Le voci vengono da `app/nav.py`, non da qui: finche' erano scritte a mano
+       qui e nella testata React dell'atlante divergevano, e dall'atlante non si
+       raggiungevano `/confronto` ne' `/divari-regionali`. Ora la SPA non ha
+       nessuna navigazione sua: questa testata vale anche per le sue due rotte. #}
     <nav class="hdr__nav" aria-label="Navigazione principale">
       {% for voce in nav.PRIMARY %}
       {% if voce.group %}

@@ -389,10 +389,11 @@ class PathScopedViewTest(unittest.TestCase):
     def test_every_exit_from_a_path_view_is_a_real_navigation(self):
         source = (Path(app.root_path).parent / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
         self.assertIn('window.__diInitialView || null', source)
-        # Cambio di modalità e apertura di una regione: entrambi escono da
-        # /confronto navigando, invece di lasciare /confronto?view=qualcos-altro.
-        self.assertIn('window.location.assign(mode === "regioni" ? "/atlante?view=regioni" : "/atlante")', source)
+        # L'apertura di una regione esce da /confronto navigando, invece di
+        # lasciare /confronto?view=regioni. Il cambio di modalità, che faceva lo
+        # stesso, non c'è più: fra atlante e confronto si passa dalla testata.
         self.assertIn('window.location.assign(`/atlante?view=regioni&rk=${encodeURIComponent(key)}`)', source)
+        self.assertNotIn("switch_mode", source)
         # Il bundle servito contiene davvero il gancio: il template lo usa.
         bundle = Path(app.root_path) / "static" / "dist" / "assets" / "index.js"
         self.assertIn("__diInitialView", bundle.read_text(encoding="utf-8"))

@@ -1,5 +1,8 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'progetto' %}
+{# Il bottone dei consensi sta nel testo qui sotto: nel piede sarebbe il
+   secondo sulla stessa pagina. #}
+{% set footer_consent_link = false %}
 
 {% block title %}Privacy e cookie · {{ site_name }}{% endblock %}
 {% block description %}Chi tratta i dati di Divario Italia, che cosa raccoglie il sito, come funzionano gli annunci pubblicitari e i cookie, e come si nega o si revoca il consenso.{% endblock %}
@@ -51,5 +54,3 @@
   <p>Alcune pagine rimandano a siti esterni, per esempio Istat, Eurostat o archivi pubblici. Quei siti applicano le proprie informative, e questa non vale per loro.</p>
 </main>
 {% endblock %}
-
-{% block footer_privacy_settings %}{% endblock %}

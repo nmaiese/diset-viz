@@ -101,6 +101,24 @@ class FogliDiStileTest(unittest.TestCase):
         coperti = _nomi(_corpi(sistema, r"^body\.ds\s*\{")) | _nomi(_corpi(sistema, r"^:root\s*\{"))
         self.assertEqual(spa - coperti - {"--masthead-h"}, set())
 
+    def test_spa_rules_bake_no_colour(self):
+        """Nel foglio della SPA un colore sta solo nel `:root` di ripiego.
+
+        Un esadecimale o un `rgba()` in una regola non segue il tema scuro: il
+        bollino "Qualita' della vita" dell'atlante restava grigio chiaro sulla
+        pagina scura, e la scheda della regione passava a un blu scuro fisso al
+        passaggio del mouse. Anche il ripiego dentro un `var()` conta: e' un
+        colore del sistema vecchio che aspetta solo che il token manchi.
+        """
+        testo = SPA.read_text(encoding="utf-8")
+        senza_commenti = re.sub(r"/\*.*?\*/", "", testo, flags=re.DOTALL)
+        radice = re.search(r"^:root\s*\{", senza_commenti, re.MULTILINE)
+        self.assertIsNotNone(radice)
+        fine = senza_commenti.index("}", radice.end())
+        regole = senza_commenti[:radice.start()] + senza_commenti[fine + 1:]
+        cotti = re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", regole)
+        self.assertEqual(cotti, [], "colori cotti in frontend/src/styles.css fuori dal :root")
+
     def test_il_telaio_vecchio_non_ha_piu_regole(self):
         """Nessuna pagina rende piu' `.masthead`, `.mobmenu` o `.nav-underline`.
 

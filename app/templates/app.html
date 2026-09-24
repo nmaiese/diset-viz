@@ -19,11 +19,6 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script>window.__diSpaPageView = true;</script>
-    {# La navigazione arriva da `app/nav.py`, come `__diInitialView` arriva da
-       qui: la SPA continua a non conoscere nessuna rotta Flask, gliele si
-       passa. Finche' le voci erano scritte a mano in `main.jsx`, dall'atlante
-       non si raggiungevano `/confronto` ne' `/divari-regionali`. #}
-    <script>window.__diNav = {{ nav.for_spa() | tojson }};</script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}
     {# Migrato al design system 2026, con lo stesso meccanismo delle pagine
@@ -85,54 +80,46 @@
     {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
     {% set active_nav = 'atlas' %}
     {% include "_ds_header.html" %}
-    <div id="root">
-      <main class="spa-seo-fallback">
-        <h1>Atlante degli indicatori territoriali italiani</h1>
-        <p>Divario Italia raccoglie indicatori territoriali Istat per confrontare regioni, temi e serie storiche sullo sviluppo dei territori italiani.</p>
-        <nav aria-label="Percorsi principali">
-          <a href="/">Home</a>
-          <a href="/regioni">Regioni italiane a confronto</a>
-          <a href="/province">Le province, una per una</a>
-          <a href="/temi">Indicatori per tema</a>
-          <a href="/blog">Analisi data-driven</a>
-          <a href="/qualita-della-vita">Qualità della vita</a>
-          <a href="/quiz">Quanto conosci l'Italia?</a>
-          <a href="/metodologia">Metodologia e fonti</a>
-        </nav>
-        <section aria-label="Indicatori in evidenza">
-          <h2>Indicatori territoriali in evidenza</h2>
-          <ul>
-            {% for item in featured_indicators %}
-            <li>
-              <a href="{{ item.path }}">{{ item.name }}</a>
-              <span>{{ item.theme }}, ultimo anno {{ item.year }}</span>
-            </li>
-            {% endfor %}
-          </ul>
-        </section>
-        <p>Ogni pagina indicatore espone definizione, fonte, ultimo anno disponibile e copertura territoriale. Atlante, temi e qualità della vita condividono lo stesso catalogo regionale. Solo gli indicatori con direzione e copertura adeguate entrano nel punteggio.</p>
-      </main>
+    {# Testata, briciole e piede li rende Flask, come su ogni altra pagina: a
+       React resta solo cio' che sta dentro `#root`. Il bersaglio di "Vai al
+       contenuto" e' questo contenitore statico, non il `<main>` di React, che
+       esiste solo dopo il montaggio: e `<main>` in pagina ce n'e' uno alla
+       volta, il ripiego qui sotto o quello dell'applicazione che lo sostituisce. #}
+    <div id="contenuto" class="spa-page" tabindex="-1">
+      {{ breadcrumb.trail(percorso) }}
+      <div id="root">
+        <main class="spa-seo-fallback">
+          <h1>Atlante degli indicatori territoriali italiani</h1>
+          <p>Divario Italia raccoglie indicatori territoriali Istat per confrontare regioni, temi e serie storiche sullo sviluppo dei territori italiani.</p>
+          <nav aria-label="Percorsi principali">
+            <a href="/">Home</a>
+            <a href="/regioni">Regioni italiane a confronto</a>
+            <a href="/province">Le province, una per una</a>
+            <a href="/temi">Indicatori per tema</a>
+            <a href="/blog">Analisi data-driven</a>
+            <a href="/qualita-della-vita">Qualità della vita</a>
+            <a href="/quiz">Quanto conosci l'Italia?</a>
+            <a href="/metodologia">Metodologia e fonti</a>
+          </nav>
+          <section aria-label="Indicatori in evidenza">
+            <h2>Indicatori territoriali in evidenza</h2>
+            <ul>
+              {% for item in featured_indicators %}
+              <li>
+                <a href="{{ item.path }}">{{ item.name }}</a>
+                <span>{{ item.theme }}, ultimo anno {{ item.year }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+          </section>
+          <p>Ogni pagina indicatore espone definizione, fonte, ultimo anno disponibile e copertura territoriale. Atlante, temi e qualità della vita condividono lo stesso catalogo regionale. Solo gli indicatori con direzione e copertura adeguate entrano nel punteggio.</p>
+        </main>
+      </div>
     </div>
-    <footer class="spa-seo-footer">
-      <nav aria-label="Sezioni del sito">
-        <a href="/regioni">Regioni italiane a confronto</a>
-        <a href="/province">Le province, una per una</a>
-        <a href="/temi">Indicatori per tema</a>
-        <a href="/quiz">Quanto conosci l'Italia?</a>
-        <a href="/metodologia">Metodologia e fonti</a>
-        <a href="/blog">Blog</a>
-      </nav>
-      {# Le tre pagine di fiducia e il pannello dei consensi stavano solo nel
-         cassetto della testata, che si apre con JavaScript: su questa rotta,
-         senza bundle, non si raggiungevano. Questo piede sta fuori da #root,
-         quindi sopravvive al mount di React. #}
-      <nav aria-label="Il progetto">
-        <a href="/chi-siamo">Chi siamo</a>
-        <a href="/contatti">Contatti</a>
-        <a href="/privacy">Privacy e cookie</a>
-      </nav>
-      {% include "_funding_choices_revoke.html" %}
-    </footer>
+    {# Il piede della 1.0, fuori da #root: sopravvive al montaggio di React e
+       porta ogni sezione del sito, pagine di fiducia e consensi compresi, anche
+       senza JavaScript. #}
+    {% include "_ds_footer.html" %}
     <!-- Copre il contenuto SEO (sopra) finché l'app React non ha dati veri
          da mostrare, così l'utente vede un solo caricamento invece del
          cambio di forma tra pagina SEO, scheletro e contenuto reale. Vive
