@@ -166,11 +166,31 @@ def _column_decimals(rows: list[list], i: int) -> tuple[bool, int | None]:
     return numeric, max((p[1] for p in parsed if p), default=None)
 
 
+# Le colonne dei territori. Il nome diventa il link alla sua pagina quando
+# coincide esattamente con una regione o una provincia: l'articolo sulle
+# province ne nominava 123 in tabella senza un link, e "Continua a esplorare"
+# restava vuoto. Solo le tabelle, mai la prosa, dove "a Torino" e' una citta'.
+TERRITORY_COLUMNS = {"Provincia": ("provincia",), "Regione": ("regione",),
+                     "Territorio": ("regione", "provincia")}
+# Quanti territori in "Continua a esplorare": con le tabelle legate sarebbero
+# centoventi.
+TERRITORY_NAMED_MAX = 6
+
+
+def _territory_cell(name, kinds) -> str:
+    from app import territory_search
+
+    text = escape(str(name))
+    path = territory_search.path_for_name(str(name), kinds) if kinds else None
+    return f'<a href="{path}">{text}</a>' if path else text
+
+
 def _table(caption: str, head: list[str], rows: list[list], label: str, ref_rows: set[int] = frozenset(),
            visible_caption: bool = False) -> str:
     """Una tabella dati del sistema: didascalia, scope, cifre a destra con decimali
     uniformi per colonna. Da quattro colonne in su, sul telefono, blocchi etichettati."""
     columns = [_column_decimals(rows, i) for i in range(len(head))]
+    kinds = TERRITORY_COLUMNS.get(head[0]) if head else None
     stack = len(head) >= 4
     right = ' class="r"'
     th = "".join(f'<th scope="col"{right if i and columns[i][0] else ""}>{escape(h)}</th>' for i, h in enumerate(head))
@@ -183,7 +203,8 @@ def _table(caption: str, head: list[str], rows: list[list], label: str, ref_rows
             cls = ' class="val"' if numeric else ""
             cells.append(f"<td{cls}{label_attr}>{cell(c, dec) if numeric else escape(str(c))}</td>")
         tr = ' class="ref"' if n in ref_rows else ""
-        body.append(f'<tr{tr}><th scope="row">{escape(str(row[0]))}</th>{"".join(cells)}</tr>')
+        name = escape(str(row[0])) if n in ref_rows else _territory_cell(row[0], kinds)
+        body.append(f'<tr{tr}><th scope="row">{name}</th>{"".join(cells)}</tr>')
     wrap = "stackwrap tablewrap" if stack else "tablewrap"
     table_cls = "table table--compact" + (" table--stack" if stack else "")
     cap = "<caption>" if visible_caption else '<caption class="sr-only">'
@@ -824,13 +845,18 @@ def derive(ctx: dict) -> dict:
     seen = {post.get("indicator_path"), "/blog/" + post["slug"]}
     related_slugs = {"/blog/" + r["slug"] for r in ctx.get("related") or []}
     named = {"indicatore": [], "territorio": [], "blog": []}
-    for path, label in re.findall(r'<a href="(/(?:indicatore|regione|provincia|blog)/[^"#?]+)">(.*?)</a>', "".join(items), re.DOTALL):
+    # Prima i link della prosa, poi quelli delle tabelle, che legano ogni riga:
+    # i territori che il pezzo nomina contano piu' di quelli che elenca.
+    boxes = ("<figure", '<div class="tablewrap"', '<div class="stackwrap')
+    ordered = "".join(b for b in items if not b.startswith(boxes)) + "".join(b for b in items if b.startswith(boxes))
+    for path, label in re.findall(r'<a href="(/(?:indicatore|regione|provincia|blog)/[^"#?]+)">(.*?)</a>', ordered, re.DOTALL):
         if path in seen or path in related_slugs:
             continue
         seen.add(path)
         text = text_of(label)
         kind = "indicatore" if path.startswith("/indicatore/") else "blog" if path.startswith("/blog/") else "territorio"
         named[kind].append({"path": path, "label": text[:1].upper() + text[1:]})
+    named["territorio"] = named["territorio"][:TERRITORY_NAMED_MAX]
 
     related = []
     for item in ctx.get("related") or []:

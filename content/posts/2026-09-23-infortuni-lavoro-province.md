@@ -123,7 +123,7 @@ Non conta solo i morti. Conta gli infortuni che hanno ucciso qualcuno o gli hann
 
 ## Una mappa che passa per il centro Italia
 
-In cima ci sono Arezzo con 20,3, Potenza con 20,1 e Massa-Carrara con 19,8, poi Teramo, Grosseto, Perugia, Lucca, Chieti e Siena. In fondo non ci sono soltanto le grandi città. C'è quasi tutto il Nord-Ovest: Verbano-Cusio-Ossola 4,7, Novara 4,8, Mantova 5,8, Pavia 5,9, Biella 6,3, Milano 6,4, Torino 6,6.
+In cima ci sono [Arezzo](/provincia/arezzo) con 20,3, [Potenza](/provincia/potenza) con 20,1 e [Massa-Carrara](/provincia/massa-carrara) con 19,8, poi Teramo, Grosseto, Perugia, Lucca, Chieti e Siena. In fondo non ci sono soltanto le grandi città. C'è quasi tutto il Nord-Ovest: [Verbano-Cusio-Ossola](/provincia/verbano-cusio-ossola) 4,7, [Novara](/provincia/novara) 4,8, [Mantova](/provincia/mantova) 5,8, Pavia 5,9, Biella 6,3, Milano 6,4, Torino 6,6.
 
 <!-- figura: province-2022 -->
 

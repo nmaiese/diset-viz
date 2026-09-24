@@ -1128,7 +1128,7 @@ def _render_indicator(family, raw_id):
 
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
-            agent_discovery.indicator_markdown(meta, level, article, SITE_URL),
+            agent_discovery.indicator_markdown(meta, level, article, SITE_URL, levels=view["levels"]),
             f"{SITE_URL}{meta['canonical_path']}",
         )
         if noindex:
@@ -1312,22 +1312,23 @@ def province_page(province_key):
     righe = province_profile.indicatori(province_key)
     su, giu = province_profile.movimenti(righe)
     prime, ultime = province_profile.dentro_la_regione(righe)
+    sisters = [
+        entry for entry in province_profile.by_region().get(
+            profiles.region_key_for(profilo.get("region") or ""), [])
+        if entry["key"] != province_key
+    ]
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.province_markdown(
                 profilo, province_profile.vicine(province_key), SITE_URL,
                 indicators=righe, gains=su, losses=giu,
-                first_in_region=prime, last_in_region=ultime),
+                first_in_region=prime, last_in_region=ultime, sisters=sisters),
             f"{SITE_URL}/provincia/{province_key}",
         )
     return design.render(
         "provincia", "v1/provincia.html", "province_page.html",
         profile=profilo,
-        sister_provinces=[
-            entry for entry in province_profile.by_region().get(
-                profiles.region_key_for(profilo.get("region") or ""), [])
-            if entry["key"] != province_key
-        ],
+        sister_provinces=sisters,
         vicine=province_profile.vicine(province_key),
         indicatori=righe,
         # Le quattro macro-aree nell'ordine del sito, lo stesso filtro della
@@ -2681,6 +2682,10 @@ def llms_full_txt():
             f"unita {meta.get('unit') or 'n.d.'}; copertura {coverage}; "
             f"definizione: {definition}"
         )
+        # Il canonico si apre sul primo livello: i valori per provincia di una
+        # scheda a due livelli stanno a `?livello=provincia`, anche in Markdown.
+        for other in view["levels"][1:]:
+            lines.append(f"  {other['label']}: {SITE_URL}{meta['canonical_path']}?livello={other['key']}")
         if meta.get("downloads"):
             lines.append(
                 f"  Download: CSV {SITE_URL}{meta['downloads']['csv']}; "

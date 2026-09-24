@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from functools import lru_cache
 
 from app import profiles, province_profile
 
@@ -114,3 +115,28 @@ def search_territories(query, limit=10):
             found.append((-score, 0 if entry["kind"] == "provincia" else 1, position, entry))
     found.sort(key=lambda row: row[:3])
     return [row[3] for row in found[:limit]]
+
+
+def path_for_name(name, kinds=("regione", "provincia")):
+    """La pagina del territorio che si chiama esattamente `name`, o None.
+
+    Per legare un nome gia' scritto (la colonna di una tabella), non per
+    cercare: nessun alias e nessun contenimento, perche' "Italia" o "Nord"
+    non devono diventare una regione e "Milano" in una tabella di regioni non
+    deve diventare la provincia.
+    """
+    # "Valle d'Aosta/Vallée d'Aoste": il nome bilingue vale per la sua prima parte.
+    for folded in dict.fromkeys((fold(name), fold((name or "").split("/")[0]))):
+        for kind in kinds:
+            path = _paths_by_name().get(kind, {}).get(folded)
+            if path:
+                return path
+    return None
+
+
+@lru_cache(maxsize=1)
+def _paths_by_name():
+    out = {}
+    for entry in _entries():
+        out.setdefault(entry["kind"], {})[fold(entry["name"])] = entry["path"]
+    return out

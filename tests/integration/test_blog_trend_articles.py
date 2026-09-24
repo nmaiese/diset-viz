@@ -78,3 +78,37 @@ class DatasetTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TerritoriNelleTabelleTest(unittest.TestCase):
+    """L'articolo sulle province ne nominava 123 in tabella senza un link, e
+    "Continua a esplorare" restava vuoto. Le colonne dei territori legano il
+    nome alla sua pagina quando coincide esattamente, e solo allora."""
+
+    def test_la_colonna_provincia_lega_i_nomi_che_esistono(self):
+        from app.design.pages import articolo
+        with app.app_context():
+            html = articolo._table("Tasso", ["Provincia", "Tasso"],
+                                   [["Arezzo", "20,3"], ["Italia", "11,0"], ["Mantova", "5,8"]], "Valori", {1})
+        self.assertIn('<a href="/provincia/arezzo">Arezzo</a>', html)
+        self.assertIn('<a href="/provincia/mantova">Mantova</a>', html)
+        self.assertIn('<th scope="row">Italia</th>', html)
+
+    def test_una_colonna_che_non_e_di_territori_resta_testo(self):
+        from app.design.pages import articolo
+        with app.app_context():
+            html = articolo._table("Serie", ["Serie", "2018", "2022"], [["Milano", "1,0", "2,0"]], "Valori")
+            regioni = articolo._table("Tasso", ["Regione", "Tasso"], [["Milano", "1,0"], ["Valle d'Aosta/Vallée d'Aoste", "2,0"]], "Valori")
+        self.assertNotIn("href=", html)
+        self.assertNotIn('href="/provincia/milano"', regioni)
+        self.assertIn('href="/regione/valle-d-aosta"', regioni)
+
+    def test_l_articolo_sulle_province_porta_alle_province(self):
+        html = app.test_client().get("/blog/infortuni-lavoro-province").get_data(as_text=True)
+        self.assertGreater(len(set(re.findall(r'href="(/provincia/[a-z-]+)"', html))), 50)
+        corsia = html[html.index("<h3>Territori e confronti</h3>"):]
+        corsia = corsia[:corsia.index("</ul>")]
+        legati = re.findall(r'href="(/provincia/[a-z-]+)"', corsia)
+        self.assertLessEqual(len(legati), 6)
+        # Prima i territori della prosa, poi quelli delle tabelle.
+        self.assertEqual(legati[0], "/provincia/arezzo")
