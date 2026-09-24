@@ -1128,7 +1128,8 @@ def _render_indicator(family, raw_id):
 
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
-            agent_discovery.indicator_markdown(meta, level, article, SITE_URL, levels=view["levels"]),
+            agent_discovery.indicator_markdown(meta, level, article, SITE_URL, levels=view["levels"],
+                                               twin=view.get("twin")),
             f"{SITE_URL}{meta['canonical_path']}",
         )
         if noindex:
@@ -1177,6 +1178,7 @@ def _render_indicator(family, raw_id):
         related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],
         dimension_siblings=view["dimension_siblings"],
+        twin=view.get("twin"),
         explore=view["explore"],
         page_article=article,
         page_lead=lead,
@@ -1390,15 +1392,21 @@ def theme_page(theme_slug):
         t for area in atlas_themes_by_macro_area() if area["macro_area"] == profile["macro_area"]
         for t in area["themes"] if t["path"] != profile["theme_path"]
     ]
+    # Le schede del tema con i valori per provincia: le solo provinciali non
+    # stanno nel catalogo dell'atlante, e senza questo non erano in nessun tema.
+    province_indicators = indicator_view.province_indicators_by_theme().get(profile["theme_path"], [])
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.theme_markdown(profile, SITE_URL, standings=standings,
-                                           province_total=province_profile.total()),
+                                           province_total=province_profile.total(),
+                                           province_indicators=province_indicators),
             f"{SITE_URL}{profile['theme_path']}",
         )
     return render_template(
         "theme_page.html",
         profile=profile,
+        province_indicators=province_indicators,
+        province_paths={item["canonical_path"] for item in province_indicators},
         standings=standings,
         region_total=len(profiles.regions_overview()),
         province_total=province_profile.total(),

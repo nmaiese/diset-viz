@@ -29,7 +29,7 @@
         <p class="feat__meta">{% if f.theme %}{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}<span class="sep" aria-hidden="true">·</span>{% endif %}{{ f.source_label }}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}</p>
         <h3 class="feat__name" id="feat-name"><a href="{{ f.levels[0].scheda }}" data-tab-href>{{ f.name }}</a></h3>
       </div>
-      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> sono nella scheda.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
+      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> {% if f.elsewhere_twin %}hanno una scheda loro{% else %}sono nella scheda{% endif %}.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
       {% if two %}
       {#- Senza JavaScript sono due link, tutti e due nell'ordine di
           tabulazione: ruoli, aria-selected e tabindex mobile li aggiunge

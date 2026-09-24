@@ -7,7 +7,7 @@ il contesto che `_render_indicator` passa al template, e non ne cambia niente.
 
 from __future__ import annotations
 
-from app.design import charts, numfmt
+from app.design import charts, maps, numfmt
 from app.design.common import (
     MEZZOGIORNO,
     PATHS,
@@ -26,6 +26,7 @@ from app.design.common import (
     values_note,
     with_unit,
 )
+from app.indicator_notes import ds_choropleth_colors
 
 
 def derive(ctx: dict) -> dict:
@@ -81,10 +82,25 @@ def derive(ctx: dict) -> dict:
     rows = [{**o, "area": areas.get(o["key"])} for o in obs]
     series = charts.band_series(level, areas) if len(level.get("matrix") or {}) >= 2 else {"svg": "", "single_year": True}
     strip = charts.divario_strip(rows, stats.get("year_avg"), unit, stats.get("gap_ratio"))
+    # La mappa c'e' per tutti e due i livelli. `LEVELS["provincia"]["has_map"]`
+    # resta falso perche' lo leggono il template di ripiego e il vecchio
+    # esploratore, che hanno solo le regioni: qui le province hanno i loro
+    # contorni (maps.PROVINCE_PATHS) e la stessa rampa a sei gradini
+    # calcolata come in home.
+    show_map = bool(level.get("has_map")) or level["key"] == "provincia"
+    classes = map_classes(level)
+    map_names = {t["key"]: t["name"] for t in level.get("territories") or []}
+    if show_map and not level.get("has_map"):
+        from app.design.pages.home import level_names
+
+        classes = map_classes({"map_colors": ds_choropleth_colors(
+            [{"region_key": o["key"], "value": o["value"]} for o in level.get("observations") or []])})
+        map_names = {**level_names(level["key"]), **map_names}
     callouts = ""
-    if level.get("has_map") and best and worst:
-        callouts = charts.map_callouts(PATHS, [(best["key"], best["name"], with_unit(best["value"], unit)),
-                                              (worst["key"], worst["name"], with_unit(worst["value"], unit))])
+    if show_map and best and worst:
+        shapes = PATHS if level["key"] == "regione" else maps.paths(level["key"])
+        callouts = charts.map_callouts(shapes, [(best["key"], best["name"], with_unit(best["value"], unit)),
+                                                (worst["key"], worst["name"], with_unit(worst["value"], unit))])
     series_claim = None
     if stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
         r = 1 + stats["avg_change_pct"] / 100
@@ -139,6 +155,14 @@ def derive(ctx: dict) -> dict:
             facts.append({"label": "Anni della serie", "value": years_n, "unit": None, "role": "count",
                           "sub": f"dal {level['year_min']} al {level['year_max']}"})
         tiles = facts
+    # Le voci del selettore di livello: quelli della scheda e, se ne manca uno,
+    # quello della gemella. Prima le regioni, come in tutto il sito.
+    level_tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
+                   "href": f"{meta['canonical_path']}?livello={lv['key']}"} for lv in ctx.get("levels") or []]
+    twin = ctx.get("twin")
+    if twin and level_tabs:
+        level_tabs.append({"key": twin["key"], "label": twin["label"], "current": False, "href": twin["path"]})
+    level_tabs.sort(key=lambda t: 0 if t["key"] == "regione" else 1)
     citation = (f"Divario Italia, «{meta['name']}», elaborazione su dati {meta.get('source_label') or meta.get('source')} "
                 f"({year}). {ctx.get('canonical')}")
     return {
@@ -146,11 +170,12 @@ def derive(ctx: dict) -> dict:
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
         "unit": numfmt.lower_first(unit) if unit else unit, "short_unit": short_unit(unit), "tiles": tiles, "verso": verso,
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
-        "claim": claim, "map_classes": map_classes(level),
+        "claim": claim, "map_classes": classes, "show_map": show_map, "map_names": map_names,
+        "map_missing": show_map and bool(set(maps.paths(level["key"])) - {o["key"] for o in obs}),
         "legend": legend(values, unit) if values else None,
         "ranking": ranking(level, unit), "series": series, "strip": strip, "callouts": callouts,
         "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
         "decimals": numfmt.column_decimals([o["value"] for o in obs]), "series_claim": series_claim, "series_note": series_note,
-        "updated": date_it(ctx.get("dataset_updated")), "explore_js": explore_js,
+        "updated": date_it(ctx.get("dataset_updated")), "explore_js": explore_js, "level_tabs": level_tabs,
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),
     }

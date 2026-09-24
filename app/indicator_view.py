@@ -38,10 +38,17 @@ from pathlib import Path
 
 from app import profiles, seo_policy, sources
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog
-from app.bes_data import all_bes_indicators, get_bes_indicator_page, get_bes_rows, get_bes_territories
+from app.bes_data import (
+    all_bes_indicators,
+    bes_level_path,
+    get_bes_indicator_page,
+    get_bes_rows,
+    get_bes_territories,
+)
 from app.data import indicator_trend_stats, indicator_year_over_year_stats
 from app.external_data import freshness_label, freshness_status
 from app.multiscopo_data import all_multiscopo_indicators
+from app.taxonomy import PROVINCE_TWINS, REGIONAL_TWINS
 from app.indicator_notes import (
     annual_change_framing,
     change_unit_label,
@@ -138,7 +145,40 @@ def _assemble(meta, levels):
         "siblings": siblings,
         "dimension_siblings": _dimension_siblings(meta["family"], meta["id"]),
         "explore": _explore_payload(meta, levels),
+        "twin": twin_level(meta, levels),
     }
+
+
+def twin_level(meta, levels):
+    """Il livello che manca a questa scheda, quando sta in una scheda gemella.
+
+    La speranza di vita regionale (ter-910) e quella con le province
+    (bes-01SAL001) sono la stessa misura in due pagine (`taxonomy.PROVINCE_TWINS`).
+    Una scheda che ha solo le regioni porta alla gemella aperta sulle province,
+    una che ha solo le province alla sua regionale. None se la scheda ha gia'
+    tutti e due i livelli o non ha una gemella.
+    """
+    keys = {level["key"] for level in levels}
+    if keys == {"regione"}:
+        code, level_key = PROVINCE_TWINS.get(sources.indicator_code(meta["family"], meta["raw_id"])), "provincia"
+    elif keys == {"provincia"}:
+        code, level_key = REGIONAL_TWINS.get(sources.indicator_code(meta["family"], meta["raw_id"])), "regione"
+    else:
+        return None
+    parsed = sources.parse_indicator_code(code) if code else None
+    if parsed is None:
+        return None
+    family, raw_id = parsed
+    if family == "bes":
+        path = bes_level_path(raw_id, level_key)
+    else:
+        item = next((i for i in get_atlas_catalog()["indicators"]
+                     if str(i["id"]) == sources.internal_id(family, raw_id)), None)
+        if item is None:
+            return None
+        path = item["path"]
+    conf = LEVELS[level_key]
+    return {"key": level_key, "label": conf["label"], "plural": conf["plural"], "path": path, "code": code}
 
 
 def _build_meta(family, raw_id, source_meta):
@@ -633,6 +673,42 @@ def _theme_siblings(theme):
         ),
         key=lambda item: item["name"].lower(),
     )
+
+
+@functools.lru_cache(maxsize=1)
+def province_indicators_by_theme():
+    """`{theme_path: [scheda]}`: le schede indicizzabili con i valori per
+    provincia, tema per tema.
+
+    Le pagine tema leggono il catalogo dell'atlante, che e' regionale: le 25
+    schede solo provinciali non comparivano in nessuna, mentre la loro briciola
+    rimandava proprio li'. Il tema e' quello della scheda (`meta.theme_path`,
+    lo stesso della briciola), e il link apre la scheda sulle province.
+    Mezzo secondo a freddo, una volta per processo, come `_theme_siblings`.
+    """
+    by_theme = defaultdict(list)
+    for item in all_bes_indicators():
+        if "provincia" not in item["levels"]:
+            continue
+        view = build_indicator_view("bes", item["id"])
+        if view is None or not view["meta"]["indexable"]:
+            continue
+        level = next((lv for lv in view["levels"] if lv["key"] == "provincia"), None)
+        if level is None:
+            continue
+        meta = view["meta"]
+        only_province = view["default_level"] == "provincia"
+        by_theme[meta["theme_path"]].append({
+            "name": meta["name"],
+            "canonical_path": meta["canonical_path"],
+            "path": meta["canonical_path"] if only_province else f"{meta['canonical_path']}?livello=provincia",
+            "year_min": level["year_min"],
+            "year_max": level["year_max"],
+            "count": len(level["observations"]),
+            "only_province": only_province,
+            "plain": (level.get("explain") or meta.get("explain") or {}).get("plain"),
+        })
+    return {theme: sorted(items, key=lambda i: i["name"].lower()) for theme, items in by_theme.items()}
 
 
 INDICATOR_FAMILIES_PATH = Path(__file__).resolve().parent.parent / "config" / "indicator_families.csv"
