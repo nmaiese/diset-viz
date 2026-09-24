@@ -322,6 +322,43 @@ class LeUnitaPercentuali(unittest.TestCase):
         self.assertRegex(html, r'class="n n--delta"[^>]*>[+-]\d+,\d+<span class="n__u">\u2009punti percentuali</span>')
         self.assertIn("\u00a0punti percentuali", html_lib.unescape(html))
 
+    def test_il_titolo_di_com_e_cambiato_parla_in_punti(self):
+        # Il titolo della serie diceva "la media semplice e' scesa dell'8,2%"
+        # mentre la prosa della stessa scheda diceva "1,48 punti percentuali in
+        # meno": una variazione relativa accanto a un livello in "%". Su ter-61
+        # la misura stessa e' in punti, su ter-264 e' una quota.
+        for path in ("/indicatore/x/ter-61", "/indicatore/aree-terrestri-protette/ter-264"):
+            with self.subTest(path=path):
+                html = self._page(path)
+                claim = re.search(r'<h3 class="h-sub">(Dal \d{4} al \d{4} la media semplice [^<]*)</h3>', html)
+                self.assertIsNotNone(claim, "manca il titolo della serie")
+                mean = html_lib.unescape(claim.group(1)).split(", e la distanza")[0]
+                self.assertNotIn("%", mean)
+                self.assertNotRegex(mean, r"raddoppiat|triplicat")
+                self.assertRegex(mean, r"(?:cresciuta|scesa) di \d+,\d+\u00a0punti percentuali$")
+
+    def test_la_riga_della_regione_dice_punti_per_la_differenza_fra_tassi(self):
+        # Le righe della pagina regione scrivevano "27,9%" per la differenza fra
+        # due tassi: `regione._unit` faceva "%" di ogni percentuale.
+        html = self._page("/regione/puglia")
+        rows = [row for row in re.findall(r"<tr\b.*?</tr>", html, re.DOTALL)
+                if re.search(r'href="[^"]*/ter-(?:57|61)"', row)]
+        self.assertTrue(rows, "nessuna riga di ter-57 o ter-61 su /regione/puglia")
+        for row in rows:
+            self.assertNotIn("n__u--pct", row)
+            self.assertIn("punti percentuali<", row)
+
+    def test_la_card_dell_articolo_dice_punti_per_la_differenza_fra_tassi(self):
+        # La card della scheda dentro l'articolo leggeva l'unita' della fonte,
+        # "percentuale": oggi sarebbe "16,3%", una quota che non e'.
+        post = next(p for p in get_posts() if str(p.get("indicator")) in {"57", "61"} and not p.get("draft"))
+        html = self._page(f"/blog/{post['slug']}")
+        cards = re.findall(r'<a href="[^"]*/ter-(?:57|61)" class="minicard">.*?</a>', html, re.DOTALL)
+        self.assertTrue(cards, "nessuna card della scheda nell'articolo")
+        for card in cards:
+            self.assertIn("\u2009punti percentuali</span>", card)
+            self.assertNotIn("%", card)
+
 
 class IlRipiegoTiene(unittest.TestCase):
     """Se la regia della 1.0 cede, la pagina si serve col template di prima.
