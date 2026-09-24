@@ -28,6 +28,7 @@ saltando, non fanno fallire niente e si vedono solo aprendo il sito.
 """
 import re
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 
 from app import app, nav
@@ -53,11 +54,54 @@ JINJA_PAGES = ("/", "/blog", "/regioni", "/temi", "/metodologia",
 # testata, briciole e piede sono gli stessi template di ogni altra pagina.
 MIGRATED = JINJA_PAGES + SPA_ROUTES
 
-RADICE = Path(__file__).resolve().parents[2]
-BUNDLE_JS = RADICE / "app" / "static" / "dist" / "assets" / "index.js"
-BUNDLE_CSS = RADICE / "app" / "static" / "dist" / "assets" / "index.css"
-SPA_SOURCE = RADICE / "frontend" / "src" / "main.jsx"
-SPA_STYLES = RADICE / "frontend" / "src" / "styles.css"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+BUNDLE_JS = REPO_ROOT / "app" / "static" / "dist" / "assets" / "index.js"
+BUNDLE_CSS = REPO_ROOT / "app" / "static" / "dist" / "assets" / "index.css"
+SPA_SOURCE = REPO_ROOT / "frontend" / "src" / "main.jsx"
+SPA_STYLES = REPO_ROOT / "frontend" / "src" / "styles.css"
+
+VOID_ELEMENTS = frozenset({"area", "base", "br", "col", "embed", "hr", "img", "input",
+                           "link", "meta", "source", "track", "wbr"})
+
+
+class _AncestorProbe(HTMLParser):
+    """Per ogni elemento con un `id`, e per il primo `<footer>`, gli `id` degli
+    elementi che lo contengono.
+
+    L'ordine nel sorgente non basta a dire dove sta un elemento: un piede
+    incluso per sbaglio dentro `#root` viene comunque dopo `id="root"`, e React
+    lo cancella al montaggio. Una chiusura mancante chiude anche cio' che le sta
+    dentro, come fa il browser, quindi un annidamento sbagliato si vede come un
+    antenato in piu' e la prova va in rosso, non in verde.
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []
+        self.ancestors = {}
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        keys = ["#" + attributes["id"]] if attributes.get("id") else []
+        if tag == "footer":
+            keys.append("footer")
+        for key in keys:
+            self.ancestors.setdefault(key, [ident for _, ident in self.stack if ident])
+        if tag not in VOID_ELEMENTS:
+            self.stack.append((tag, attributes.get("id")))
+
+    def handle_endtag(self, tag):
+        for depth in range(len(self.stack) - 1, -1, -1):
+            if self.stack[depth][0] == tag:
+                del self.stack[depth:]
+                return
+
+
+def ancestor_ids(html):
+    probe = _AncestorProbe()
+    probe.feed(html)
+    probe.close()
+    return probe.ancestors
 
 
 class DesignSystemMigration(unittest.TestCase):
@@ -314,44 +358,58 @@ class TheSpaShellsWearTheSiteChrome(unittest.TestCase):
 
     def test_the_bundle_draws_no_navigation_of_its_own(self):
         bundle = BUNDLE_JS.read_text(encoding="utf-8") + BUNDLE_CSS.read_text(encoding="utf-8")
-        for resto in self.GONE_FROM_BUNDLE:
-            with self.subTest(resto=resto):
-                self.assertNotIn(resto, bundle, "il bundle servito ha ancora un pezzo del menu vecchio")
-        sorgente = SPA_SOURCE.read_text(encoding="utf-8")
-        for resto in ("NAV_RIPIEGO", "readNav", "navPath", "function SiteFooter",
-                      "function ContextBar", "function ModeSwitch", 'className="tabbar"'):
-            with self.subTest(resto=resto):
-                self.assertNotIn(resto, sorgente)
+        for leftover in self.GONE_FROM_BUNDLE:
+            with self.subTest(leftover=leftover):
+                self.assertNotIn(leftover, bundle, "il bundle servito ha ancora un pezzo del menu vecchio")
+        source = SPA_SOURCE.read_text(encoding="utf-8")
+        for leftover in ("NAV_RIPIEGO", "readNav", "navPath", "function SiteFooter",
+                         "function ContextBar", "function ModeSwitch", 'className="tabbar"'):
+            with self.subTest(leftover=leftover):
+                self.assertNotIn(leftover, source)
 
     def test_one_footer_the_same_as_every_other_page(self):
         """Il piede delle shell e' lo stesso markup di una pagina qualunque:
         cosi' ogni sezione del sito, `/province` compresa, si raggiunge anche
         senza JavaScript, e non puo' tornare un secondo elenco scritto a mano."""
-        riferimento = self._footer(self._html("/metodologia"))
-        self.assertEqual(len(riferimento), 1)
+        reference = self._footer(self._html("/metodologia"))
+        self.assertEqual(len(reference), 1)
         for path in SPA_ROUTES:
             with self.subTest(path=path):
                 html = self._html(path)
                 self.assertEqual(html.count("<footer"), 1, "un piede solo")
-                self.assertEqual(self._footer(html), riferimento)
+                self.assertEqual(self._footer(html), reference)
                 self.assertLess(html.index('id="root"'), html.index('<footer class="ftr">'),
-                                "il piede sta fuori da #root, dopo l'applicazione")
-                piede = self._footer(html)[0]
-                for percorso in nav.paths():
-                    self.assertIn(f'href="{percorso}"', piede)
+                                "il piede viene dopo l'applicazione")
+                ancestors = ancestor_ids(html)
+                self.assertIn("footer", ancestors)
+                self.assertNotIn("root", ancestors["footer"],
+                                 "il piede sta dentro #root: React lo cancella al montaggio")
+                footer = self._footer(html)[0]
+                for href in nav.paths():
+                    self.assertIn(f'href="{href}"', footer)
 
     def test_the_skip_link_lands_on_a_static_wrapper(self):
         """Il bersaglio non puo' essere il `<main>` di React, che esiste solo
-        dopo il montaggio, e due `<main>` annidati non sono ammessi."""
+        dopo il montaggio, e due `<main>` annidati non sono ammessi. Deve
+        contenere `#root`, e dopo il salto l'anello del fuoco si vede come su
+        ogni pagina 1.0: una regola che lo toglie a `.spa-page` batte
+        `.ds *:focus-visible`, perche' il foglio della SPA si carica dopo."""
         for path in SPA_ROUTES:
             with self.subTest(path=path):
                 html = self._html(path)
                 self.assertEqual(html.count("<main"), 1, "un <main> solo nell'HTML del server")
-                bersaglio = re.search(r'<(\w+)[^>]*\bid="contenuto"[^>]*>', html)
-                self.assertIsNotNone(bersaglio)
-                self.assertNotEqual(bersaglio.group(1), "main")
-                self.assertIn('tabindex="-1"', bersaglio.group(0))
-                self.assertLess(html.index('id="contenuto"'), html.index('id="root"'))
+                target = re.search(r'<(\w+)[^>]*\bid="contenuto"[^>]*>', html)
+                self.assertIsNotNone(target)
+                self.assertNotEqual(target.group(1), "main")
+                self.assertIn('tabindex="-1"', target.group(0))
+                ancestors = ancestor_ids(html)
+                self.assertIn("#root", ancestors)
+                self.assertIn("contenuto", ancestors["#root"], "#contenuto deve contenere #root")
+        for stylesheet in (SPA_STYLES, BUNDLE_CSS):
+            with self.subTest(stylesheet=stylesheet.name):
+                rules = re.sub(r"\s+", "", stylesheet.read_text(encoding="utf-8"))
+                self.assertIsNone(re.search(r"\.spa-page:focus\{[^}]*outline:(none|0)", rules),
+                                  "il salto al contenuto deve mostrare l'anello del fuoco")
 
     def test_the_breadcrumb_is_rendered_by_flask_above_the_app(self):
         for path in SPA_ROUTES:
@@ -364,16 +422,16 @@ class TheSpaShellsWearTheSiteChrome(unittest.TestCase):
     def test_the_region_call_to_action_beats_the_link_rule(self):
         """`.ds a` (0,1,1) batteva `.region-cta` (0,1,0): la scheda era scritta
         in inchiostro su fondo inchiostro. La regola vince solo sotto `.ds`."""
-        fogli = SPA_STYLES.read_text(encoding="utf-8")
-        self.assertIsNone(re.search(r"^\.region-cta\b", fogli, re.MULTILINE),
+        stylesheet = SPA_STYLES.read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"^\.region-cta\b", stylesheet, re.MULTILINE),
                           "`.region-cta` senza `.ds` perde contro `.ds a`")
-        self.assertIn(".ds .region-cta {", fogli)
+        self.assertIn(".ds .region-cta {", stylesheet)
         self.assertIn(".ds .region-cta", BUNDLE_CSS.read_text(encoding="utf-8"))
 
     def test_the_favourites_toggle_waits_for_a_signed_in_reader(self):
         """"Solo preferiti" compariva a chiunque appena l'accesso era configurato
         sul sito, e all'anonimo dava una lista vuota."""
-        sorgente = SPA_SOURCE.read_text(encoding="utf-8")
-        self.assertNotIn("showFav={isAuthConfigured()}", sorgente)
-        self.assertIn("showFav={signedIn}", sorgente)
-        self.assertIn('const favOnly = favParam === "1" && signedIn;', sorgente)
+        source = SPA_SOURCE.read_text(encoding="utf-8")
+        self.assertNotIn("showFav={isAuthConfigured()}", source)
+        self.assertIn("showFav={signedIn}", source)
+        self.assertIn('const favOnly = favParam === "1" && signedIn;', source)

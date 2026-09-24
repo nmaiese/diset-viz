@@ -659,11 +659,6 @@ h1, h2, h3 { font-family: var(--font-display); }
 .breadcrumb [aria-hidden="true"] { color: var(--rule-strong); }
 .breadcrumb__here { color: var(--muted); }
 
-/* Il contenitore statico attorno a #root e' il bersaglio di "Vai al contenuto"
-   (tabindex="-1"): riceve il fuoco dal salto, e un anello attorno a tutta la
-   pagina non dice niente a nessuno. */
-.spa-page:focus { outline: none; }
-
 /* ---------- Detail workspace ---------- */
 .workspace {
   display: grid;

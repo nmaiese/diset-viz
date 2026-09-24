@@ -110,14 +110,14 @@ class FogliDiStileTest(unittest.TestCase):
         passaggio del mouse. Anche il ripiego dentro un `var()` conta: e' un
         colore del sistema vecchio che aspetta solo che il token manchi.
         """
-        testo = SPA.read_text(encoding="utf-8")
-        senza_commenti = re.sub(r"/\*.*?\*/", "", testo, flags=re.DOTALL)
-        radice = re.search(r"^:root\s*\{", senza_commenti, re.MULTILINE)
-        self.assertIsNotNone(radice)
-        fine = senza_commenti.index("}", radice.end())
-        regole = senza_commenti[:radice.start()] + senza_commenti[fine + 1:]
-        cotti = re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", regole)
-        self.assertEqual(cotti, [], "colori cotti in frontend/src/styles.css fuori dal :root")
+        text = SPA.read_text(encoding="utf-8")
+        without_comments = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
+        root_match = re.search(r"^:root\s*\{", without_comments, re.MULTILINE)
+        self.assertIsNotNone(root_match)
+        end = without_comments.index("}", root_match.end())
+        rules = without_comments[:root_match.start()] + without_comments[end + 1:]
+        baked = re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", rules)
+        self.assertEqual(baked, [], "colori cotti in frontend/src/styles.css fuori dal :root")
 
     def test_il_telaio_vecchio_non_ha_piu_regole(self):
         """Nessuna pagina rende piu' `.masthead`, `.mobmenu` o `.nav-underline`.
