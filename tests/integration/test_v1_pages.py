@@ -23,12 +23,15 @@ l'eccezione invece del ripiego, quindi un guasto qui ha il suo traceback.
 import html as html_lib
 import json
 import re
+import statistics
 import unittest
 from pathlib import Path
 
-from app import app, profiles, province_profile, sources
+from app import app, indicator_view, profiles, province_profile, sources
+from app.atlas_catalog import get_atlas_indicator
 from app.blog import get_posts
 from app.data import REGION_GEO_AREA
+from app.design import charts
 from app.design.common import PLACEHOLDER
 from app.quality_life_config import QUALITY_LIFE_PROFILES
 from tests.support import family_and_raw
@@ -72,6 +75,28 @@ def spark_faults(page):
         if "<data " not in cell:
             faults.append("sparkline senza una cifra in testo accanto")
     return found, faults
+
+
+def regional_iqr(indicator_id, year):
+    """Lo scarto interquartile delle regioni in un anno, con i quartili per
+    interpolazione lineare. Si ricalcola qui con `statistics`, non con
+    `charts.spark_floor`: la prova deve accorgersene anche quando e' quella
+    funzione a cedere."""
+    values = [row["value"] for row in get_atlas_indicator(indicator_id)["series"]
+              if row["year"] == year and row["value"] is not None]
+    q1, _, q3 = statistics.quantiles(values, n=4, method="inclusive")
+    return q3 - q1
+
+
+def last_year(points):
+    """L'anno dell'ultimo punto con un valore: quello che la card scrive."""
+    return max(p["year"] for p in points if p.get("value") is not None)
+
+
+def minicard(page, path):
+    """La minicard che porta a `path`, dall'apertura dell'`<a>` alla chiusura."""
+    start = page.index(f'<a href="{path}" class="minicard">')
+    return page[start:page.index("</a>", start)]
 
 
 def visible_text(page):
@@ -170,6 +195,69 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         self.assertEqual(guasti, [], guasti[:10])
 
 
+class LaSparklineHaIlPavimentoEDiceDiCheMediaE(unittest.TestCase):
+    """Accanto alla sparkline la cifra dice di che media e', e la sparkline
+    arriva in pagina col suo pavimento.
+
+    `spark_faults` guarda la forma di ogni sparkline, non il pavimento ne' la
+    frase: con il pavimento a None, o con la frase sparita, restava tutto
+    verde. Qui il disegno atteso si ricalcola da capo, dalla serie e dallo
+    scarto interquartile delle regioni nell'anno dell'ultimo punto, e deve
+    stare nella minicard. Il pavimento non cambia il disegno quando la serie
+    si muove piu' di lui: almeno una delle sparkline guardate deve essere di
+    quelle che cambia, altrimenti la prova non distingue niente."""
+
+    SCHEDA = "/indicatore/pil-pro-capite/ter-901"
+    FRASE = "media semplice delle regioni con il dato"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+
+    def _prova(self, html, indicator_id, path, points):
+        """La minicard che porta a `path` disegna `points` col pavimento e
+        scrive la frase; True se qui il pavimento cambia il disegno."""
+        anno = last_year(points)
+        disegno = charts.spark(points, "s", regional_iqr(indicator_id, anno))
+        cella = minicard(html, path)
+        self.assertIn(disegno, cella)
+        self.assertIn(f"nel {anno}, {self.FRASE}", cella)
+        return disegno != charts.spark(points, "s", None)
+
+    def test_le_correlate_della_scheda(self):
+        vista = indicator_view.build_indicator_view("territorial", "901")
+        # Il view model non porta il pavimento: lo calcola la rotta per le
+        # sole correlate che la pagina mostra. Nel view model lo pagava anche
+        # la passata dei 634 di `indicator_universe`, che le correlate non le
+        # legge.
+        self.assertFalse([v["id"] for v in vista["related"] if "spark_floor" in v])
+        html = self.client.get(self.SCHEDA).get_data(as_text=True)
+        carte = vista["related"][:indicator_view.RELATED_SHOWN]
+        self.assertEqual(len(carte), indicator_view.RELATED_SHOWN)
+        sensibili = 0
+        for carta in carte:
+            with self.subTest(carta=carta["id"]):
+                sensibili += self._prova(html, carta["id"], carta["path"], carta["spark"])
+        self.assertGreater(sensibili, 0, "nessuna correlata dove il pavimento cambia il disegno")
+
+    def test_la_scheda_negli_articoli(self):
+        viste = sensibili = 0
+        for post in get_posts():
+            payload = get_atlas_indicator(post["indicator"]) if post.get("indicator") else None
+            if payload is None:
+                continue
+            meta = payload["metadata"]
+            punti = [p for p in meta.get("spark") or [] if p.get("value") is not None]
+            if len(punti) < 2:
+                continue
+            html = self.client.get(f"/blog/{post['slug']}").get_data(as_text=True)
+            with self.subTest(articolo=post["slug"]):
+                sensibili += self._prova(html, post["indicator"], meta["path"], punti)
+            viste += 1
+        self.assertGreater(viste, 0, "nessun articolo con la scheda dell'indicatore")
+        self.assertGreater(sensibili, 0, "nessun articolo dove il pavimento cambia il disegno")
+
+
 class IlRipiegoTiene(unittest.TestCase):
     """Se la regia della 1.0 cede, la pagina si serve col template di prima.
 
@@ -211,6 +299,12 @@ class IlRipiegoTiene(unittest.TestCase):
                             # Il filtro `sparkline` e' un involucro di
                             # `charts.spark`: il ripiego lo usa ancora.
                             self.assertIn('class="related-card__spark"><svg class="spark spark--m"', html)
+                            # E col pavimento, nella taglia m.
+                            for carta in indicator_view.build_indicator_view(
+                                    "territorial", "901")["related"][:indicator_view.RELATED_SHOWN]:
+                                anno = last_year(carta["spark"])
+                                self.assertIn(charts.spark(carta["spark"], "m",
+                                                           regional_iqr(carta["id"], anno)), html)
         finally:
             app.logger.setLevel(livello)
             cache.clear()

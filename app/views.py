@@ -1151,7 +1151,9 @@ def _render_indicator(family, raw_id):
         level=level,
         query_map=query_map,
         page_h1=page_h1,
-        related=view["related"],
+        # Le sole correlate che i template disegnano, col pavimento della
+        # sparkline calcolato qui e non nel view model (`related_cards`).
+        related=indicator_view.related_cards(view["related"]),
         related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],
         dimension_siblings=view["dimension_siblings"],

@@ -486,7 +486,7 @@
         <p class="section-label">Nello stesso tema</p>
         {% if related %}
         <ul class="indicator-related__grid indicator-next__related">
-          {% for item in related[:3] %}
+          {% for item in related %}
           {% if item.direction == 'higher_better' %}{% set dcls = 'up' %}{% set dlabel = 'meglio se alto' %}
           {% elif item.direction in ('lower_better', 'higher_worse') %}{% set dcls = 'down' %}{% set dlabel = 'meglio se basso' %}
           {% else %}{% set dcls = 'flat' %}{% set dlabel = 'senza direzione' %}{% endif %}

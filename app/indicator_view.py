@@ -93,6 +93,10 @@ LEVELS = {
 }
 
 RELATED_LIMIT = 8
+# Le correlate che la scheda disegna davvero, nella corsia "Continua da qui"
+# (`v1/indicatore.html`) e nel ripiego (`indicator_page.html`). I template non
+# tagliano da se': ricevono gia' le sole `RELATED_SHOWN` da `related_cards`.
+RELATED_SHOWN = 3
 
 
 def build_indicator_view(family, raw_id):
@@ -622,7 +626,20 @@ def _theme_neighbours(meta):
             item["name"].lower(),
         ),
     )[:RELATED_LIMIT]
-    return [_with_spark_floor(item) for item in related], {"prev": prev_item, "next": next_item}
+    return related, {"prev": prev_item, "next": next_item}
+
+
+def related_cards(related):
+    """Le correlate che la scheda mostra, ciascuna con il pavimento della sua
+    sparkline.
+
+    Si chiama al render, dalla rotta della scheda, e non dentro
+    `build_indicator_view`: il view model lo costruisce anche la passata dei
+    634 di `indicator_universe.projection()`, che le correlate non le legge, e
+    con il pavimento li' ne calcolava otto per scheda a vuoto, alla prima
+    richiesta della home. Qui se ne calcolano solo le `RELATED_SHOWN` che i
+    template disegnano."""
+    return [_with_spark_floor(item) for item in related[:RELATED_SHOWN]]
 
 
 def _with_spark_floor(item):
@@ -630,9 +647,9 @@ def _with_spark_floor(item):
 
     Il pavimento e' lo scarto interquartile delle regioni nell'anno dell'ultimo
     punto (`charts.spark_floor`): una media che si muove poco rispetto alla
-    distanza fra le regioni si disegna quasi piatta. Si calcola solo per le
-    correlate, non per tutto il tema, e su una copia: `item` viene dalla cache
-    di `_theme_siblings`, condivisa fra le richieste."""
+    distanza fra le regioni si disegna quasi piatta. Lo chiede solo
+    `related_cards`, e su una copia: `item` viene dalla cache di
+    `_theme_siblings`, condivisa fra le richieste."""
     floor = None
     if item.get("latest_year") is not None:
         data = get_atlas_indicator_year(item["id"], item["latest_year"])
