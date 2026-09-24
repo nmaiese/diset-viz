@@ -999,7 +999,11 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         self.assertIn(f"{base}?livello=provincia", regioni)
         province = self.client.get(base + "?livello=provincia", headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertGreaterEqual(province.count("/provincia/"), 100)
-        self.assertIn(f"{base}?livello=regione", province)
+        # Le regioni stanno sul canonico nudo: `?livello=regione` era una
+        # seconda URL della stessa pagina.
+        self.assertIn(f"- Gli stessi dati per regioni: https://divarioitalia.it{base}\n", province)
+        self.assertNotIn("livello=regione", province)
+        self.assertIn("# Speranza di vita alla nascita nelle province italiane", province)
 
     def test_la_provincia_in_markdown_porta_le_sorelle(self):
         markdown = self.client.get("/provincia/lecce", headers={"Accept": "text/markdown"}).get_data(as_text=True)

@@ -40,11 +40,19 @@ def derive(ctx: dict) -> dict:
     best, worst = level.get("best"), level.get("worst")
     year = level.get("year_max")
 
+    def said(extreme):
+        """La frase-risposta nomina gia' questo estremo? Anche quando e' un pari
+        merito: "(Lecco e Treviso)" nomina Lecco, "(16 province)" le sedici
+        insieme, e una tessera "In coda: Agrigento" direbbe una delle sedici."""
+        tied = [o for o in level.get("observations") or [] if o.get("value") == extreme["value"]]
+        return (any(o["name"] in lede for o in tied or [extreme])
+                or (len(tied) > 2 and f"({len(tied)} {plural})" in lede))
+
     tiles = []
-    if best and best["name"] not in lede:
+    if best and not said(best):
         tiles.append({"label": f"In testa nel {year}", "value": best["value"], "unit": unit, "role": "figure",
                       "sub": best["name"], "href": (level.get("profile_path") or "") + best["key"] if level.get("profile_path") else None})
-    if worst and worst["name"] not in lede:
+    if worst and not said(worst):
         tiles.append({"label": f"In coda nel {year}", "value": worst["value"], "unit": unit, "role": "figure",
                       "sub": worst["name"], "href": (level.get("profile_path") or "") + worst["key"] if level.get("profile_path") else None})
     if stats.get("year_avg") is not None:
@@ -156,9 +164,15 @@ def derive(ctx: dict) -> dict:
                           "sub": f"dal {level['year_min']} al {level['year_max']}"})
         tiles = facts
     # Le voci del selettore di livello: quelli della scheda e, se ne manca uno,
-    # quello della gemella. Prima le regioni, come in tutto il sito.
+    # quello della gemella. Prima le regioni, come in tutto il sito. Il primo
+    # livello porta al canonico nudo, che e' quello che la base rende:
+    # `?livello=regione` era una seconda URL `noindex` della stessa pagina, e
+    # ci portavano le linguette di cento schede. La voce corrente il template
+    # non la rende come link.
+    levels = ctx.get("levels") or []
     level_tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
-                   "href": f"{meta['canonical_path']}?livello={lv['key']}"} for lv in ctx.get("levels") or []]
+                   "href": meta["canonical_path"] if index == 0 else f"{meta['canonical_path']}?livello={lv['key']}"}
+                  for index, lv in enumerate(levels)]
     twin = ctx.get("twin")
     if twin and level_tabs:
         level_tabs.append({"key": twin["key"], "label": twin["label"], "current": False, "href": twin["path"]})

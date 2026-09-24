@@ -500,7 +500,10 @@ def _composed_indicator_section(role, meta, level):
     return ""
 
 
-def indicator_markdown(meta, level, article, site_url, levels=(), twin=None):
+def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, heading=None):
+    """La scheda in Markdown. `heading` e' l'H1 della pagina HTML
+    (`views._page_h1`), che sulle province dice il livello: stesso URL, stesso
+    titolo."""
     canonical = f"{site_url}{meta['canonical_path']}"
     # Gli altri livelli della stessa scheda: l'HTML ha il selettore
     # Regioni/Province, e senza questa riga un agente che leggeva il canonico
@@ -513,7 +516,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None):
     # dare all'agente il nome amministrativo mentre il lettore HTML legge il
     # titolo in lingua comune vuol dire due pagine diverse allo stesso URL.
     lines = [
-        f"# {article.get('h1') or meta['name']}",
+        f"# {heading or article.get('h1') or meta['name']}",
         "",
         article.get("lead") or explain.get("plain") or meta["name"],
         "",
@@ -530,7 +533,10 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None):
         f"- Serie: {meta['name']}",
         f"- Tema: [{meta['theme']}]({_absolute(site_url, meta['theme_path'])})",
         f"- Livello territoriale: {level['label']}",
-        *(f"- Gli stessi dati per {other['plural']}: {canonical}?livello={other['key']}"
+        # Il primo livello e' quello che il canonico gia' rende: `?livello=regione`
+        # sarebbe una seconda URL della stessa pagina.
+        *(f"- Gli stessi dati per {other['plural']}: {canonical}"
+          f"{'' if other['key'] == levels[0]['key'] else '?livello=' + other['key']}"
           for other in others),
         *([f"- La stessa misura per {twin['plural']}, in un'altra scheda: {site_url}{twin['path']}"]
           if twin else []),

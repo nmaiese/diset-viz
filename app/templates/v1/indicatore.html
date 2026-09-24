@@ -15,12 +15,9 @@
     i motori. -#}
 {% set year = level.year_max %}
 {% set n = level.observations | length %}
-{% set percorso = [
-  {"name": "Home", "path": "/"},
-  {"name": "Temi", "path": "/temi"},
-  {"name": meta.theme, "path": meta.theme_path},
-  {"name": meta.name, "path": canonical | replace(site_url, "")},
-] %}
+{#- `percorso`, il nome e l'area del Dataset e la definizione in piano li
+    compone la view (`views._indicator_trail` e le sue vicine), per questo
+    template e per il ripiego: la testa non puo' dire due cose diverse. -#}
 
 {% block title %}{{ seo_title }}{% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
@@ -39,7 +36,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  "name": {{ meta.name | tojson }},
+  "name": {{ dataset_name | tojson }},
   "description": {{ dataset_description | tojson }},
   "url": {{ canonical | tojson }},
   "temporalCoverage": "{{ level.year_min }}/{{ level.year_max }}",
@@ -70,7 +67,7 @@
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
-  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},
+  "keywords": [{{ meta.theme | tojson }}, {{ dataset_area | tojson }}, {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},
   "distribution": [
     { "@type": "DataDownload", "name": "Download CSV", "description": "Serie dell'indicatore in formato CSV", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },
     { "@type": "DataDownload", "name": "Download JSON", "description": "Serie dell'indicatore in formato JSON", "encodingFormat": "application/json", "contentUrl": "{{ site_url }}{{ meta.downloads.json }}" }
@@ -176,7 +173,7 @@
             {% if d.level_tabs | length > 1 %}
             <div class="field"><span>Livello</span>
               <div class="seg" role="group" aria-label="Livello territoriale">
-                {% for item in d.level_tabs %}<a href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
+                {% for item in d.level_tabs %}{% if item.current %}<span aria-current="page">{{ item.label }}</span>{% else %}<a href="{{ item.href }}">{{ item.label }}</a>{% endif %}{% endfor %}
               </div>
             </div>
             {% endif %}
@@ -267,8 +264,9 @@
             <h3>In parole semplici</h3>
             {#- La definizione in piano solo dove non la da' gia' qualcun altro: il
                 lead composto la contiene, e una sezione "definizione" dell'articolo
-                la direbbe due volte (vedi `come_leggere` in _indicator_article.html). -#}
-            {% if explain.plain and page_article.lead is not none and page_article.come_leggere %}<p>{{ explain.plain }}</p>{% endif %}
+                la direbbe due volte (`views._show_plain_definition`). La
+                frase-risposta delle province non la contiene. -#}
+            {% if show_plain_definition %}<p>{{ explain.plain }}</p>{% endif %}
             {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
             {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
             {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
@@ -352,8 +350,9 @@
         <h3>Lo stesso dato, altre viste</h3>
         <ul>
           {% for item in dimension_siblings %}<li><a href="{{ item.path }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>{% endfor %}
-          {% for other in levels if other.key != level.key %}<li><a href="{{ meta.canonical_path ~ '?livello=' ~ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>{% endfor %}
-          {% if twin %}<li><a href="{{ twin.path }}">La stessa misura per {{ twin.plural }}</a></li>{% endif %}
+          {#- Gli altri livelli e la gemella, con un'ancora che dice di che cosa
+              (`views._other_views`). -#}
+          {% for item in other_views %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
           {#- Confronto e atlante sono solo regionali: sulle province portavano
               a una pagina senza province. L'atlante non apre una scheda (la
               scheda e' questa pagina) e alcune serie BES regionali non sono

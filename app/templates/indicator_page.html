@@ -1,12 +1,7 @@
 {% extends "blog_base.html" %}
 {% import "_indicator_article.html" as article %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [
-  {"name": "Home", "path": "/"},
-  {"name": "Temi", "path": "/temi"},
-  {"name": meta.theme, "path": meta.theme_path},
-  {"name": meta.name, "path": canonical | replace(site_url, "")},
-] %}
+{# `percorso` lo compone la view (`views._indicator_trail`), lo stesso della 1.0. #}
 {# Migrata al design system 2026: font, token e chrome nuovi. Il grosso
    della pagina si ridipinge da se', perche' le regole di site.css che la
    riguardano sono scritte sui nomi dei token (--ink, --paper, --accent...)
@@ -40,7 +35,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  "name": {{ meta.name | tojson }},
+  "name": {{ dataset_name | tojson }},
   "description": {{ dataset_description | tojson }},
   "url": {{ canonical | tojson }},
   "temporalCoverage": "{{ level.year_min }}/{{ level.year_max }}",
@@ -71,7 +66,7 @@
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
-  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},
+  "keywords": [{{ meta.theme | tojson }}, {{ dataset_area | tojson }}, {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},
   "distribution": [
     { "@type": "DataDownload", "name": "Download CSV", "description": "Serie dell'indicatore in formato CSV", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },
     { "@type": "DataDownload", "name": "Download JSON", "description": "Serie dell'indicatore in formato JSON", "encodingFormat": "application/json", "contentUrl": "{{ site_url }}{{ meta.downloads.json }}" }
@@ -139,10 +134,17 @@
       {# Server-rendered links first, so the other level is reachable without JS;
          the script upgrades them to an in-place switch. #}
       <div class="level-switch" data-explore="levels" role="group" aria-label="Livello territoriale">
+        {# La voce del livello su cui si e' non e' un link, e il primo livello
+           porta al canonico nudo: `?livello=regione` era una seconda URL della
+           stessa pagina. #}
         {% for item in levels %}
-        <a class="level-switch__option{{ ' is-active' if item.key == level.key }}"
-           href="{{ meta.canonical_path }}?livello={{ item.key }}"
-           data-level="{{ item.key }}"{% if item.key == level.key %} aria-current="true"{% endif %}>{{ item.label }}</a>
+        {% if item.key == level.key %}
+        <span class="level-switch__option is-active" data-level="{{ item.key }}" aria-current="true">{{ item.label }}</span>
+        {% else %}
+        <a class="level-switch__option"
+           href="{{ meta.canonical_path }}{% if not loop.first %}?livello={{ item.key }}{% endif %}"
+           data-level="{{ item.key }}">{{ item.label }}</a>
+        {% endif %}
         {% endfor %}
       </div>
       {% endif %}
@@ -337,7 +339,7 @@
      `page_article.come_leggere` è vero quando la definizione non è fra gli H2
      dell'articolo: la definizione in piano si mostra solo quando non la sta già
      dando qualcun altro. #}
-  {{ article.come_leggere(meta, level, page_article.lead is not none and page_article.come_leggere) }}
+  {{ article.come_leggere(meta, level, show_plain_definition) }}
 
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
   <section class="indicator-apparatus" id="fonti-verifica">
@@ -517,8 +519,8 @@
           {% for item in dimension_siblings %}
           <li><a href="{{ item.path }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>
           {% endfor %}
-          {% for other in levels if other.key != level.key %}
-          <li><a href="?livello={{ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>
+          {% for item in other_views %}
+          <li><a href="{{ item.path }}">{{ item.label }}</a></li>
           {% endfor %}
           <li><a href="/confronto">Mettere questo indicatore a confronto fra territori</a></li>
           <li><a href="{{ atlas_theme_url(meta.theme) }}">Gli indicatori del tema nell'atlante</a></li>
