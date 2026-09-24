@@ -112,10 +112,17 @@ def derive(ctx: dict) -> dict:
         # loro nella stessa frase, e su una differenza fra tassi (ter-61) una
         # cifra diversa da quella della prosa. Per la stessa ragione niente
         # "raddoppiata": e' una misura relativa.
-        if round(abs(change_abs), numfmt.magnitude_decimals(change_abs)) == 0:
+        # Su un livello minuscolo lo spostamento arrotondato fa zero anche
+        # quando la media si e' mossa: ter-163 va da 0,0107 a 0,0095, l'11,6% in
+        # meno, e "rimasta la stessa" smentiva la prosa ("una variazione media
+        # sfavorevole"). Si aggiungono decimali finche' la cifra non e' zero.
+        decimals = numfmt.magnitude_decimals(change_abs)
+        while change_abs and round(abs(change_abs), decimals) == 0 and decimals < 4:
+            decimals += 1
+        if round(abs(change_abs), decimals) == 0:
             what = "rimasta la stessa"
         else:
-            what = f"{'cresciuta' if change_abs > 0 else 'scesa'} di {with_unit(abs(change_abs), change_unit)}"
+            what = f"{'cresciuta' if change_abs > 0 else 'scesa'} di {with_unit(abs(change_abs), change_unit, decimals)}"
     elif stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
         r = 1 + stats["avg_change_pct"] / 100
         if r >= 3:

@@ -326,8 +326,10 @@ class LeUnitaPercentuali(unittest.TestCase):
         # Il titolo della serie diceva "la media semplice e' scesa dell'8,2%"
         # mentre la prosa della stessa scheda diceva "1,48 punti percentuali in
         # meno": una variazione relativa accanto a un livello in "%". Su ter-61
-        # la misura stessa e' in punti, su ter-264 e' una quota.
-        for path in ("/indicatore/x/ter-61", "/indicatore/aree-terrestri-protette/ter-264"):
+        # la misura stessa e' in punti, su ter-264 e' una quota. Su ter-163 il
+        # livello e' intorno a 0,01 e lo spostamento arrotondato a due decimali
+        # fa zero, ma la media e' scesa dell'11,6%: non e' "rimasta la stessa".
+        for path in ("/indicatore/x/ter-61", "/indicatore/aree-terrestri-protette/ter-264", "/indicatore/x/ter-163"):
             with self.subTest(path=path):
                 html = self._page(path)
                 claim = re.search(r'<h3 class="h-sub">(Dal \d{4} al \d{4} la media semplice [^<]*)</h3>', html)
