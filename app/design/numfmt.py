@@ -32,6 +32,8 @@ from html import escape
 
 from markupsafe import Markup
 
+from app.indicator_notes import is_percentage_unit
+
 MINUS = "-"
 THIN = " "  # spazio fine fra la cifra e l'unita'
 FIXED = {"score": 1, "ratio": 1, "rank": 0, "count": 0}
@@ -150,6 +152,21 @@ GENERIC_UNITS = {"numero", "numero medio", "valore medio", "indice", "indice (0-
 # "centomila anziani" e' un tasso, ogni centomila anziani: scritto accanto a una
 # cifra senza "ogni", "228 centomila anziani" si legge come ventidue milioni.
 RATE_BASE = re.compile(r"(cento|mille|diecimila|centomila|un milione di) ")
+# La differenza fra due percentuali. Contiene "percentual", quindi per
+# `is_percentage_unit` e' una percentuale: va riconosciuta prima, perche'
+# accanto a una variazione si scrive per intero, "+0,89 punti percentuali",
+# mai "+0,89%".
+POINTS = "punti percentuali"
+_POINTS = re.compile(r"(?i)\bpunti percentual")
+
+
+def is_percent(unit: str | None) -> bool:
+    """Se accanto alla cifra si scrive "%": ogni unita' percentuale della
+    fonte ("%", "% del PIL", "percentuale", "Valori percentuali"), non i punti
+    percentuali e non i tassi su base cento ("per centomila abitanti"), che
+    distingue `indicator_notes.is_percentage_unit`."""
+    raw = (unit or "").strip()
+    return bool(raw) and not _POINTS.search(raw) and is_percentage_unit(raw)
 
 
 def phrase_unit(unit: str | None) -> str | None:
@@ -158,7 +175,17 @@ def phrase_unit(unit: str | None) -> str | None:
     e' un'unita': la cifra resta nuda, e l'unita' la dice la riga sotto il titolo
     o l'intestazione della colonna. La usano `num` (tessere, celle, frasi dei
     template), `common.with_unit` e `common.signed` (frasi composte in Python) e
-    il JavaScript delle mappe, cosi' la stessa cifra si scrive uguale ovunque."""
+    il JavaScript delle mappe, cosi' la stessa cifra si scrive uguale ovunque.
+
+    Ogni unita' percentuale diventa "%", attaccato alla cifra: la fonte scrive
+    "percentuale" o "Valori percentuali", e le pagine dicevano "79,9 valori
+    percentuali". I punti percentuali restano per intero: sono l'unita' delle
+    variazioni di una percentuale (`indicator_notes.change_unit_label`) e del
+    valore della differenza fra due tassi."""
+    if _POINTS.search(unit or ""):
+        return POINTS
+    if is_percent(unit):
+        return "%"
     u = short_unit(unit)
     if not u or u == "%":
         return u

@@ -12,6 +12,8 @@ Qui ogni istanza deve:
 - non mostrare mai il segnaposto dei prototipi, ne' un `None` o un `nan`
   finiti nel testo;
 - avere un solo `<h1>`;
+- scrivere ogni percentuale accanto alla cifra come "%", mai "percentuale" o
+  "valori percentuali", anche nel JSON che legge il JavaScript delle mappe;
 - disegnare ogni sparkline (`svg.spark`) nascosta agli screen reader, senza
   stirarla, e con la sua cifra scritta in testo nella stessa cella (un
   `<data>` di `numfmt`, non solo un anno).
@@ -47,6 +49,13 @@ SENZA_ARTICOLO = re.compile(
 
 
 SPARK = re.compile(r'<svg\b[^>]*\bclass="spark\b[^"]*"[^>]*>.*?</svg>', re.DOTALL)
+# Una percentuale accanto alla cifra si scrive "%" (`numfmt.phrase_unit`): nel
+# `<data>` di numfmt e nell'unita' che il JavaScript delle mappe legge dal JSON.
+# Le card correlate dicevano "79,9 valori percentuali" e "60,3 percentuale".
+PERCENT_IN_WORDS = re.compile(
+    r'class="n__u">[\s\u2009\u00a0]*(?:valori percentuali|percentuale)\b'
+    r'|"unit": "(?:[Vv]alori percentuali|percentuale)"')
+EXPLORE = re.compile(r'<script type="application/json" data-explore-data>(.*?)</script>', re.DOTALL)
 # La cella di una sparkline: il contenitore piu' vicino fra questi, aperto
 # prima del disegno e chiuso dopo. Oggi e' la minicard (`<a class="minicard">`),
 # domani una cella di tabella.
@@ -131,6 +140,8 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
                 guasti.append((percorso, "h1 non unico"))
             elif SENZA_ARTICOLO.search(html_lib.unescape(html)):
                 guasti.append((percorso, SENZA_ARTICOLO.search(html_lib.unescape(html)).group(0)))
+            elif PERCENT_IN_WORDS.search(html):
+                guasti.append((percorso, PERCENT_IN_WORDS.search(html).group(0)))
             else:
                 found, faults = spark_faults(html)
                 self.sparks_seen += found
@@ -256,6 +267,60 @@ class LaSparklineHaIlPavimentoEDiceDiCheMediaE(unittest.TestCase):
             seen += 1
         self.assertGreater(seen, 0, "nessun articolo con la scheda dell'indicatore")
         self.assertGreater(sensitive, 0, "nessun articolo dove il pavimento cambia il disegno")
+
+
+class LeUnitaPercentuali(unittest.TestCase):
+    """Le due vie di un'unita' percentuale: il valore in "%", la variazione e
+    la differenza fra due tassi in punti percentuali.
+
+    `PERCENT_IN_WORDS` in `_guasti` guarda che "percentuale" non esca piu'
+    accanto a una cifra, ma non si accorgerebbe dell'errore opposto: con
+    "punti percentuali" trattato come una percentuale qualunque (contiene
+    "percentual"), le variazioni e la differenza fra due tassi uscirebbero in
+    "%" senza che niente diventi rosso. Qui si guardano le due schede che le
+    portano tutte e due."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+
+    def _page(self, path):
+        response = self.client.get(path, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        return response.get_data(as_text=True)
+
+    def test_la_differenza_fra_due_tassi_resta_in_punti(self):
+        # "Differenza tra tasso di attivita' maschile e femminile": per la fonte
+        # e' in "percentuale", ma il valore e' una distanza in punti.
+        html = self._page("/indicatore/x/ter-61")
+        explore = json.loads(EXPLORE.search(html).group(1))
+        self.assertEqual(explore["unit"], "punti percentuali")
+        # La scheda fino alle correlate: tessere, mappa, richiami, classifica,
+        # serie. Le correlate sono altri indicatori, e i tassi li' sono in "%".
+        own = html[:html.index('class="lanes"')]
+        self.assertNotIn("n__u--pct", own)
+        self.assertNotRegex(own, r'data-value="[^"]*%"')
+        self.assertIn('<span class="n__u">\u2009punti percentuali</span>', own)
+        self.assertRegex(own, r'data-value="\d+,\d\spunti percentuali"')
+        # La card correlata della sua gemella, "Differenza tra tasso di
+        # occupazione", dice lo stesso: prima scriveva "16,3 percentuale".
+        twin = next(item for item in indicator_view.build_indicator_view("territorial", "61")["related"]
+                    if str(item["id"]) == "57")
+        card = minicard(html, twin["path"])
+        self.assertIn("\u2009punti percentuali</span>", card)
+        self.assertNotIn("%", card)
+
+    def test_il_valore_in_segno_e_la_variazione_in_punti(self):
+        html = self._page("/indicatore/aree-terrestri-protette/ter-264")
+        explore = json.loads(EXPLORE.search(html).group(1))
+        self.assertEqual(explore["unit"], "%")
+        # Le card correlate: "55,9%", non "55,9 percentuale".
+        cards = re.findall(r'class="minicard">.*?</a>', html, re.DOTALL)
+        self.assertTrue(cards)
+        self.assertTrue(any('<span class="n__u n__u--pct">%</span>' in c for c in cards), cards)
+        # La variazione dall'anno prima e la serie parlano in punti percentuali.
+        self.assertRegex(html, r'class="n n--delta"[^>]*>[+-]\d+,\d+<span class="n__u">\u2009punti percentuali</span>')
+        self.assertIn("\u00a0punti percentuali", html_lib.unescape(html))
 
 
 class IlRipiegoTiene(unittest.TestCase):

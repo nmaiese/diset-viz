@@ -144,8 +144,13 @@ class LeFrasi(unittest.TestCase):
         self.assertEqual(rotte, [], rotte[:5])
 
     def test_nessuna_etichetta_generica_come_unita(self):
+        """Ne' un'etichetta che non e' un'unita', ne' una percentuale scritta per
+        esteso ("79,9 valori percentuali"): accanto alla cifra va "%". Lo spazio
+        fra cifra e unita' e' insecabile (`common.with_unit`), e `\\s` lo
+        prende: con lo spazio semplice la prova non vedeva nessuna frase."""
         rotte = [(c, t) for c, _, t, _ in self.frasi
-                 if re.search(r"\d (numero|valore medio|Valore medio|indice|rapporto|classi|centomila)\b", t)]
+                 if re.search(r"\d\s(numero|valore medio|Valore medio|indice|rapporto|classi|centomila"
+                              r"|percentuale|[Vv]alori percentuali)\b", t)]
         self.assertEqual(rotte, [], rotte[:5])
 
     def test_il_mezzogiorno_nominato_c_e_tutto(self):

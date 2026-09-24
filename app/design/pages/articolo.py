@@ -44,6 +44,7 @@ from app import sources
 from app.blog import STATIC_DIR
 from app.design import charts, numfmt
 from app.design.common import count_word, date_it
+from app.indicator_notes import figure_unit
 
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 NUMBER = r"-?\d[\d.]*(?:,\d+)?"
@@ -813,7 +814,7 @@ def indicator_card(post: dict) -> dict | None:
     last = spark[-1]
     data = get_atlas_indicator_year(str(post["indicator"]), last["year"])
     floor = charts.spark_floor([row["value"] for row in data["values"]]) if data else None
-    return {"value": last["value"], "year": last["year"], "unit": meta.get("unit"),
+    return {"value": last["value"], "year": last["year"], "unit": figure_unit(meta.get("name"), meta.get("unit")),
             "spark": spark, "floor": floor}
 
 
