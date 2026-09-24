@@ -207,55 +207,55 @@ class LaSparklineHaIlPavimentoEDiceDiCheMediaE(unittest.TestCase):
     si muove piu' di lui: almeno una delle sparkline guardate deve essere di
     quelle che cambia, altrimenti la prova non distingue niente."""
 
-    SCHEDA = "/indicatore/pil-pro-capite/ter-901"
-    FRASE = "media semplice delle regioni con il dato"
+    PAGE = "/indicatore/pil-pro-capite/ter-901"
+    PHRASE = "media semplice delle regioni con il dato"
 
     @classmethod
     def setUpClass(cls):
         cls.client = app.test_client()
 
-    def _prova(self, html, indicator_id, path, points):
+    def _check_card(self, html, indicator_id, path, points):
         """La minicard che porta a `path` disegna `points` col pavimento e
         scrive la frase; True se qui il pavimento cambia il disegno."""
-        anno = last_year(points)
-        disegno = charts.spark(points, "s", regional_iqr(indicator_id, anno))
-        cella = minicard(html, path)
-        self.assertIn(disegno, cella)
-        self.assertIn(f"nel {anno}, {self.FRASE}", cella)
-        return disegno != charts.spark(points, "s", None)
+        year = last_year(points)
+        drawing = charts.spark(points, "s", regional_iqr(indicator_id, year))
+        cell = minicard(html, path)
+        self.assertIn(drawing, cell)
+        self.assertIn(f"nel {year}, {self.PHRASE}", cell)
+        return drawing != charts.spark(points, "s", None)
 
     def test_le_correlate_della_scheda(self):
-        vista = indicator_view.build_indicator_view("territorial", "901")
+        view = indicator_view.build_indicator_view("territorial", "901")
         # Il view model non porta il pavimento: lo calcola la rotta per le
         # sole correlate che la pagina mostra. Nel view model lo pagava anche
         # la passata dei 634 di `indicator_universe`, che le correlate non le
         # legge.
-        self.assertFalse([v["id"] for v in vista["related"] if "spark_floor" in v])
-        html = self.client.get(self.SCHEDA).get_data(as_text=True)
-        carte = vista["related"][:indicator_view.RELATED_SHOWN]
-        self.assertEqual(len(carte), indicator_view.RELATED_SHOWN)
-        sensibili = 0
-        for carta in carte:
-            with self.subTest(carta=carta["id"]):
-                sensibili += self._prova(html, carta["id"], carta["path"], carta["spark"])
-        self.assertGreater(sensibili, 0, "nessuna correlata dove il pavimento cambia il disegno")
+        self.assertFalse([v["id"] for v in view["related"] if "spark_floor" in v])
+        html = self.client.get(self.PAGE).get_data(as_text=True)
+        cards = view["related"][:indicator_view.RELATED_SHOWN]
+        self.assertEqual(len(cards), indicator_view.RELATED_SHOWN)
+        sensitive = 0
+        for card in cards:
+            with self.subTest(card=card["id"]):
+                sensitive += self._check_card(html, card["id"], card["path"], card["spark"])
+        self.assertGreater(sensitive, 0, "nessuna correlata dove il pavimento cambia il disegno")
 
     def test_la_scheda_negli_articoli(self):
-        viste = sensibili = 0
+        seen = sensitive = 0
         for post in get_posts():
             payload = get_atlas_indicator(post["indicator"]) if post.get("indicator") else None
             if payload is None:
                 continue
             meta = payload["metadata"]
-            punti = [p for p in meta.get("spark") or [] if p.get("value") is not None]
-            if len(punti) < 2:
+            points = [p for p in meta.get("spark") or [] if p.get("value") is not None]
+            if len(points) < 2:
                 continue
             html = self.client.get(f"/blog/{post['slug']}").get_data(as_text=True)
-            with self.subTest(articolo=post["slug"]):
-                sensibili += self._prova(html, post["indicator"], meta["path"], punti)
-            viste += 1
-        self.assertGreater(viste, 0, "nessun articolo con la scheda dell'indicatore")
-        self.assertGreater(sensibili, 0, "nessun articolo dove il pavimento cambia il disegno")
+            with self.subTest(post=post["slug"]):
+                sensitive += self._check_card(html, post["indicator"], meta["path"], points)
+            seen += 1
+        self.assertGreater(seen, 0, "nessun articolo con la scheda dell'indicatore")
+        self.assertGreater(sensitive, 0, "nessun articolo dove il pavimento cambia il disegno")
 
 
 class IlRipiegoTiene(unittest.TestCase):
@@ -300,11 +300,11 @@ class IlRipiegoTiene(unittest.TestCase):
                             # `charts.spark`: il ripiego lo usa ancora.
                             self.assertIn('class="related-card__spark"><svg class="spark spark--m"', html)
                             # E col pavimento, nella taglia m.
-                            for carta in indicator_view.build_indicator_view(
+                            for card in indicator_view.build_indicator_view(
                                     "territorial", "901")["related"][:indicator_view.RELATED_SHOWN]:
-                                anno = last_year(carta["spark"])
-                                self.assertIn(charts.spark(carta["spark"], "m",
-                                                           regional_iqr(carta["id"], anno)), html)
+                                year = last_year(card["spark"])
+                                self.assertIn(charts.spark(card["spark"], "m",
+                                                           regional_iqr(card["id"], year)), html)
         finally:
             app.logger.setLevel(livello)
             cache.clear()
