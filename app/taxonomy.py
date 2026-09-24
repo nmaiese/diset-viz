@@ -247,13 +247,16 @@ DUPLICATE_BES_IDS = {
 
 # BES ids che esistono **solo** a livello provincia (assenti dal manifest
 # regione) ma il cui nome coincide con quello di un gemello regionale, BES o
-# territoriale. `app.indicator_notes.seo_title` appende una coda " per
+# territoriale. `app.indicator_notes.seo_title` appendeva una coda " per
 # regione" fissa a ogni titolo indipendentemente dal livello: senza un
-# qualificatore i due titoli collassano sullo stesso <title>, esattamente il
+# qualificatore i due titoli collassavano sullo stesso <title>, esattamente il
 # rilievo di Codex sulla #177 su `DUPLICATE_BES_IDS`, qui sulla dimensione
-# livello invece che fonte. Il fix corretto è rendere `_TITLE_TAIL`
-# consapevole del livello per ogni indicatore; nel frattempo questo insieme
-# riusa lo stesso meccanismo di `source_qualifier` già in `views._render_indicator`.
+# livello invece che fonte. Oggi `seo_titles.page_title` passa al titolo
+# derivato e al ripiego la coda del livello (`seo_titles._level_tail`), e la
+# coda fissa resta solo come default di `seo_title`. Questo insieme riusa il
+# meccanismo di `source_qualifier` (`views._source_qualifier`) e vale ancora
+# per i titoli scritti, che la coda del livello non la portano: toglierlo e'
+# un passo a se', dopo aver verificato che quei titoli non collidano.
 PROVINCE_ONLY_TITLE_COLLISIONS = {
     "06POL012P",  # Affollamento degli istituti di pena -> gemello regionale 06POL012
     "07SIC001P",  # Omicidi volontari -> gemello regionale 07SIC001

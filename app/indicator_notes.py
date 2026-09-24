@@ -538,6 +538,52 @@ def _short_name_for_title(name):
     return re.sub(r"\s+", " ", n).strip()
 
 
+# Il nome breve curato, per (codice pubblico, livello): prende il posto del nome
+# amministrativo nel `<title>` derivato e nella description, e non si accorcia
+# oltre. Ogni riga ripara un difetto visto in produzione, e si rivede contro
+# definizione e unita' del manifest: un nome breve non toglie mai una negazione
+# ("non adeguata") ne' un denominatore.
+#
+# - ter-598 e ter-599 uscivano tutte e due "Incidenza di dipendenti (culturali
+#   e creativi) per regione": due pagine indicizzabili, un titolo. Cio' che le
+#   distingue ("di genere femminile", "in eta' giovanile") sta in mezzo al nome.
+# - Le competenze non adeguate perdevano "non adeguata" e dicevano l'opposto
+#   della misura: "Competenza numerica (classe III secondaria)".
+# - L'affollamento delle carceri e' la parola delle query, e l'accorciatore
+#   buttava "di pena": "Affollamento degli istituti".
+#
+# Tre righe riparano un accorciamento che cambiava la misura, venuto fuori
+# quando il titolo ha cominciato a scrivere lo zero come "0" e l'unita' accanto
+# alle cifre, e a scartare gli accorciamenti che buttano una negazione.
+# - ter-84 usciva "Rifiuti urbani smaltiti per regione, da 317 a 0
+#   chilogrammi": senza "in discarica per abitante", e con l'unita' accanto, si
+#   leggeva come un totale regionale.
+# - bes-01SAL008 usciva "Speranza di vita senza limitazioni, da 12,2 a 8,8
+#   anni": senza "a 65 anni" sembrava una speranza di vita di dodici anni.
+# - ter-255 usciva "Superficie boscata e non boscata percorsa": la guardia sulle
+#   negazioni scartava "Superficie boscata (percorsa dal fuoco)", che a sua
+#   volta restringeva la misura al solo bosco. "Forestale" e' la parola della
+#   definizione, e tiene "dal fuoco".
+SHORT_NAMES = {
+    ("ter-598", "regione"): "Donne fra i dipendenti delle imprese culturali",
+    ("ter-599", "regione"): "Giovani fra i dipendenti delle imprese culturali",
+    ("bes-SDG-310", "regione"): "Competenza numerica non adeguata",
+    ("bes-SDG-311", "regione"): "Competenza alfabetica non adeguata",
+    ("bes-02IST010P", "provincia"): "Competenza numerica non adeguata",
+    ("bes-02IST011P", "provincia"): "Competenza alfabetica non adeguata",
+    ("bes-06POL012", "regione"): "Affollamento delle carceri",
+    ("bes-06POL012P", "provincia"): "Affollamento delle carceri",
+    ("ter-84", "regione"): "Rifiuti urbani in discarica per abitante",
+    ("bes-01SAL008", "regione"): "Speranza di vita a 65 anni senza limitazioni",
+    ("ter-255", "regione"): "Superficie forestale percorsa dal fuoco",
+}
+
+
+def short_name(code, level_key):
+    """Il nome breve curato di (codice, livello), o None se non c'e'."""
+    return SHORT_NAMES.get((code, level_key))
+
+
 def _compact_title(core, marker, max_len):
     combined = f"{core}{marker}"
     if len(combined) <= max_len:
@@ -562,6 +608,20 @@ def _compact_title(core, marker, max_len):
     return f"{head}{separator}{tail})"
 
 
+def strip_markdown(markdown):
+    """Il testo di un attacco senza Markdown: `[Milano](/provincia/milano)`
+    diventa "Milano", enfasi e codice perdono i segni.
+
+    Serve a tutto cio' che esce dalla pagina come testo semplice, la meta
+    description e la `description` del Dataset: in produzione il JSON-LD di
+    `bes-04BEC002P` diceva "A [Milano](/provincia/milano) la retribuzione...".
+    """
+    text = (markdown or "").strip()
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)  # [label](url) -> label
+    text = re.sub(r"[*_`]", "", text)                       # stray markdown emphasis
+    return " ".join(text.split())
+
+
 def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
     """Turn an analyst-note lead (the visible page opener, with real regional
     numbers) into a SERP meta description, trimmed to budget on a word boundary.
@@ -570,12 +630,9 @@ def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
     figures that lift click-through, and it is the same text already visible on
     the page (so structured/visible content stay consistent). Markdown links are
     flattened to their label and any residual markup is dropped."""
-    text = (attacco or "").strip()
+    text = strip_markdown(attacco)
     if not text:
         return ""
-    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)  # [label](url) -> label
-    text = re.sub(r"[*_`]", "", text)                       # stray markdown emphasis
-    text = " ".join(text.split())
     if len(text) <= max_len:
         return text
     # Keep whole sentences that fit; fall back to a clean word-boundary cut.
@@ -590,17 +647,23 @@ def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
     return kept or _truncate_words(text, max_len, add_period=True)
 
 
-def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_qualifier=None):
+def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_qualifier=None,
+              tail=_TITLE_TAIL):
     """Compact SERP title: shortened name + variant marker + 'per regioné.
 
     `source_qualifier`, when given, disambiguates a name that another
     indicator also carries (see `app.taxonomy.DUPLICATE_BES_IDS`), so the two
-    pages do not compete on an identical SERP title."""
+    pages do not compete on an identical SERP title.
+
+    `tail` e' la coda del livello: `seo_titles.page_title` passa quella del
+    livello che la pagina rende. Fissa su " per regione", la vista province dei
+    NEET usciva "Giovani che non lavorano e non studiano (NEET) per regione",
+    lo stesso `<title>` della vista regioni sopra dati provinciali."""
     marker = _variant_marker(name, extra=source_qualifier)
     core = _short_name_for_title(name) or (name or "").strip()
     core = core.rstrip(" ,.;:-(")  # a trailing comma/colon must not sit before the tail
     suffix = f" · {site_name}"
-    with_tail = f"{core}{marker}{_TITLE_TAIL}"
+    with_tail = f"{core}{marker}{tail}"
     # Short names: keep the "per regione" intent cue, add the brand if it still fits.
     if len(with_tail) + len(suffix) <= max_len:
         return with_tail + suffix

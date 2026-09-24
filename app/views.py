@@ -1136,22 +1136,7 @@ def _render_indicator(family, raw_id):
             response.headers["X-Robots-Tag"] = "noindex, follow"
         return response
 
-    # A handful of BES ids are exact duplicates of an existing territorial
-    # series (DUPLICATE_BES_IDS docstring): hidden from browsing, but the page
-    # itself stays reachable and indexable, so its <title> must not collide
-    # with its territorial twin's. Stays within the normal 60-char budget like
-    # every other title, same as the crawler flags on any other page.
-    if family == "bes" and raw_id in DUPLICATE_BES_IDS:
-        source_qualifier = sources.family_short_label(family)
-    # A handful of BES ids exist only at province level but share a name with a
-    # regional twin (PROVINCE_ONLY_TITLE_COLLISIONS docstring): the same
-    # collision as above, on the level dimension instead of the source, because
-    # the title tail below is fixed to "per regione" regardless of the page's
-    # actual level.
-    elif family == "bes" and raw_id in PROVINCE_ONLY_TITLE_COLLISIONS:
-        source_qualifier = "dati provinciali"
-    else:
-        source_qualifier = None
+    source_qualifier = _source_qualifier(family, raw_id)
 
     # Titolo H1 e SERP. L'H1 resta quello autorato o il nome amministrativo; il
     # `<title>` passa da `seo_titles.page_title`, che prova nell'ordine il
@@ -1202,15 +1187,39 @@ def _render_indicator(family, raw_id):
     return response
 
 
+def _source_qualifier(family, raw_id):
+    """Il qualificatore che `seo_titles.page_title` mette accanto a un titolo
+    scritto, o None. Una funzione e non un ramo dentro la view perche' la prova
+    di unicita' dei `<title>` deve costruirli come la pagina, non a modo suo.
+
+    A handful of BES ids are exact duplicates of an existing territorial
+    series (DUPLICATE_BES_IDS docstring): hidden from browsing, but the page
+    itself stays reachable and indexable, so its <title> must not collide
+    with its territorial twin's. A handful of BES ids exist only at province
+    level but share a name with a regional twin
+    (PROVINCE_ONLY_TITLE_COLLISIONS docstring): the same collision on the
+    level dimension instead of the source.
+    """
+    if family == "bes" and raw_id in DUPLICATE_BES_IDS:
+        return sources.family_short_label(family)
+    if family == "bes" and raw_id in PROVINCE_ONLY_TITLE_COLLISIONS:
+        return "dati provinciali"
+    return None
+
+
 def _dataset_description(lead, meta):
     """Dataset JSON-LD description, kept in step with the visible page.
 
     It used to concatenate two procedural sentences that appeared nowhere on the
     page. Now it is the lead the reader actually sees, with the plain definition
     as the fallback for indicators that have no written lead yet.
+
+    Il lead e' Markdown, e il JSON-LD e' testo: `[Milano](/provincia/milano)`
+    ci arrivava cosi' com'era (bes-04BEC002P, in produzione). Il link resta
+    nella pagina, qui resta il nome.
     """
     plain = (meta["explain"].get("plain") or "").strip()
-    return lead or plain or meta["name"]
+    return indicator_notes.strip_markdown(lead) or plain or meta["name"]
 
 
 @app.route("/regione/<region_key>")

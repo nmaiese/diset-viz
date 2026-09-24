@@ -10,6 +10,7 @@ guasto trovato scrivendo il modulo.
 import unittest
 
 from app import seo_titles
+from app.design import common, numfmt
 
 
 def meta(name="PIL pro capite", unit="euro", institution="Istat", **extra):
@@ -21,15 +22,23 @@ def meta(name="PIL pro capite", unit="euro", institution="Istat", **extra):
 
 def level(best=("Trentino Alto Adige", 54636.7), worst=("Calabria", 21702.2),
           key="regione", singular="regione", plural="regioni",
-          year_max=2024, territory_total=20):
+          year_max=2024, territory_total=20, observations=None):
     def terr(pair):
         if pair is None:
             return None
         nome, valore = pair
         return {"key": nome.lower().replace(" ", "-"), "name": nome, "value": valore}
-    return {"best": terr(best), "worst": terr(worst), "key": key,
+    base = {"best": terr(best), "worst": terr(worst), "key": key,
             "singular": singular, "plural": plural, "year_max": year_max,
             "territory_total": territory_total}
+    if observations is not None:
+        base["observations"] = [terr(pair) for pair in observations]
+    return base
+
+
+def provincia(best, worst, **extra):
+    return level(best=best, worst=worst, key="provincia", singular="provincia",
+                 plural="province", territory_total=107, **extra)
 
 
 class NumeriTest(unittest.TestCase):
@@ -49,6 +58,240 @@ class NumeriTest(unittest.TestCase):
     def test_un_valore_che_non_e_un_numero_non_esplode(self):
         self.assertIsNone(seo_titles.format_number(None))
         self.assertIsNone(seo_titles.format_number("n.d."))
+
+    def test_lo_zero_si_scrive_zero(self):
+        """"0,00" dava allo zero una precisione che non ha: in SERP si leggeva
+        "dal 358% al 0,00%" e "da 3,4 a 0,00"."""
+        self.assertEqual(seo_titles.format_number(0), "0")
+        self.assertEqual(seo_titles.format_number(0.0), "0")
+        self.assertEqual(seo_titles.format_number(-0.0), "0")
+        self.assertEqual(seo_titles.format_number(0.10), "0,10")
+
+
+# cifra -> (da, a, di): la preposizione la decide come la cifra si legge.
+ELISIONI = {
+    "89,1": ("dall'", "all'", "dell'"),     # ottantanove
+    "8.000": ("dall'", "all'", "dell'"),    # ottomila
+    "8": ("dall'", "all'", "dell'"),
+    "1,1": ("dall'", "all'", "dell'"),      # uno virgola uno
+    "1": ("dall'", "all'", "dell'"),
+    "11": ("dall'", "all'", "dell'"),       # undici
+    "11,3": ("dall'", "all'", "dell'"),
+    "11.000": ("dall'", "all'", "dell'"),   # undicimila
+    "116": ("dal ", "al ", "del "),         # centosedici, non "dell'116"
+    "110": ("dal ", "al ", "del "),
+    "1.022": ("dal ", "al ", "del "),       # milleventidue
+    "18": ("dal ", "al ", "del "),
+    "0,10": ("dallo ", "allo ", "dello "),  # zero
+    "0": ("dallo ", "allo ", "dello "),
+    "-64,7": ("dal ", "al ", "del "),       # meno
+    "3,6": ("dal ", "al ", "del "),
+}
+
+
+class ElisioneTest(unittest.TestCase):
+    """`numfmt.articulated`: la preposizione la decide come la cifra si legge."""
+
+    def test_ogni_forma(self):
+        for cifra, (da, a, di) in ELISIONI.items():
+            with self.subTest(cifra=cifra):
+                self.assertEqual(numfmt.articulated("da", cifra), da)
+                self.assertEqual(numfmt.articulated("a", cifra), a)
+                self.assertEqual(numfmt.articulated("di", cifra), di)
+                self.assertEqual(numfmt.articulated("di", f"{cifra}%"), di)
+
+    def test_le_frasi_della_scheda_usano_la_stessa_regola(self):
+        """`common.del_` aveva la sua: vedeva "11" in testa a 116."""
+        self.assertEqual(common.del_("116%"), "del ")
+        self.assertEqual(common.del_("11,3%"), "dell'")
+        self.assertEqual(common.del_("0,5%"), "dello ")
+
+    def test_il_titolo_articola_l_intervallo(self):
+        casi = {
+            (89.1, 36.7): ", dall'89,1% al 36,7%",
+            (116.0, 3.9): ", dal 116% al 3,9%",
+            (0.94, -2.6): ", dallo 0,94% al -2,6%",
+            (18.5, 0.22): ", dal 18,5% allo 0,22%",
+            (82.0, 0.0): ", dall'82,0% allo 0%",
+            (11.9, 1.3): ", dall'11,9% all'1,3%",
+        }
+        for (alto, basso), atteso in casi.items():
+            with self.subTest(atteso=atteso):
+                lv = level(best=("A", alto), worst=("B", basso))
+                self.assertEqual(seo_titles._figures(meta(unit="%"), lv)[0], atteso)
+
+    def test_se_l_articolo_sfora_si_scrive_senza_e_la_coda_resta(self):
+        """"dallo" e "allo" costano due caratteri: un titolo che stava nei 60
+        con "dal" non deve perdere la coda del livello per colpa loro."""
+        lv = level(best=("A", 0.79), worst=("B", 0.01))
+        titolo = seo_titles.answer_title(meta(name="Superficie boscata percorsa", unit="%"), lv)
+        self.assertEqual(titolo, "Superficie boscata percorsa per regione, da 0,79% a 0,01%")
+
+    def test_l_articolo_non_sposta_la_scelta_dei_sacrifici(self):
+        """Un nome che senza coda ci stava con "dal" non guadagna la coda con la
+        forma senza articolo: l'ordine dei sacrifici resta quello di prima."""
+        # 32 caratteri: con la coda ci starebbe "da 82,0% a 0%", non "dal 82,0% al 0%".
+        nome = "Quota di rifiuti urbani smaltiti"
+        lv = level(best=("A", 82.0), worst=("B", 0.0))
+        titolo = seo_titles.answer_title(meta(name=nome, unit="%"), lv)
+        self.assertEqual(titolo, "Quota di rifiuti urbani smaltiti, dall'82,0% allo 0%")
+
+
+class UnitaTest(unittest.TestCase):
+    def test_l_unita_breve_viene_da_numfmt(self):
+        """"Numero medio di anni" era troppo lunga per il titolo, e la cifra
+        restava senza unita'. `numfmt.short_unit` la riduce ad "anni"."""
+        lv = level(best=("Trentino Alto Adige", 84.8), worst=("Campania", 82.1))
+        titolo = seo_titles.answer_title(meta(name="Speranza di vita", unit="Numero medio di anni"), lv)
+        self.assertEqual(titolo, "Speranza di vita per regione, da 84,8 a 82,1 anni")
+
+    def test_un_etichetta_che_non_e_un_unita_non_si_scrive(self):
+        """"da 0,35 a 0,27 indice" e "da 5,6 a 3,8 rapporto" erano in produzione."""
+        lv = level(best=("A", 0.35), worst=("B", 0.27))
+        titolo = seo_titles.answer_title(meta(name="Indice di Gini", unit="indice"), lv)
+        self.assertEqual(titolo, "Indice di Gini per regione, da 0,35 a 0,27")
+
+
+class GuardiaTest(unittest.TestCase):
+    """`_keeps_meaning`: un accorciamento che dice un'altra cosa vale meno del
+    nome intero senza cifre."""
+
+    def test_mai_una_parola_sola(self):
+        nome = "Impermeabilizzazione del suolo da copertura artificiale"
+        titolo = seo_titles.answer_title(meta(name=nome, unit="%"),
+                                         provincia(("Napoli", 40.8), ("Aosta", 2.2)))
+        self.assertFalse(titolo.startswith("Impermeabilizzazione per"), titolo)
+        self.assertTrue(titolo.startswith("Impermeabilizzazione del suolo"), titolo)
+
+    def test_una_negazione_non_si_butta(self):
+        nome = ("Ospiti anziani non autosufficienti dei presidi residenziali "
+                "socio-assistenziali e socio-sanitari per centomila anziani")
+        titolo = seo_titles.answer_title(meta(name=nome, unit="centomila anziani"),
+                                         level(best=None, worst=None))
+        self.assertIn("non autosufficienti", titolo)
+
+    def test_sulle_province_non_si_buttano_cifre_sigle_e_soglie(self):
+        casi = {
+            "Concentrazione media annua di PM10": "PM10",
+            "Amministratori comunali con meno di 40 anni": "40",
+            "Pensionati con reddito pensionistico di basso importo": "basso",
+        }
+        for nome, parola in casi.items():
+            with self.subTest(nome=nome):
+                titolo = seo_titles.answer_title(meta(name=nome, unit="%"),
+                                                 provincia(("A", 38.3), ("B", 16.2)))
+                self.assertIn(parola, titolo)
+
+    def test_una_giuntura_non_lascia_la_testa_appesa(self):
+        """"Tasso di criminalita' organizzata e per regione": il taglio cadeva
+        davanti a "di" e lasciava la congiunzione in fondo."""
+        nome = "Tasso di criminalità organizzata e di tipo mafioso"
+        titolo = seo_titles.answer_title(meta(name=nome, unit="per 100.000 abitanti"),
+                                         level(best=("A", 2.7), worst=("B", 0.0)))
+        self.assertNotIn(" e per ", titolo)
+        self.assertNotIn(" e,", titolo)
+
+    def test_se_nessun_accorciamento_regge_resta_quello_di_prima(self):
+        """La guardia sceglie fra gli accorciamenti, non li vieta tutti: senza
+        alternative la pagina tiene il titolo di prima invece di cadere sul
+        ripiego, che taglierebbe allo stesso modo e senza cifre."""
+        nome = ("Incidenza della popolazione residente in comuni senza offerta "
+                "di spettacolo, intrattenimento e sport")
+        titolo = seo_titles.answer_title(meta(name=nome, unit="%"),
+                                         level(best=("A", 11.2), worst=("B", 0.03)))
+        self.assertIsNotNone(titolo)
+        self.assertIn("11,2%", titolo)
+
+
+class NomeBreveTest(unittest.TestCase):
+    def test_due_pagine_che_collidevano_si_distinguono(self):
+        a = seo_titles.answer_title(
+            meta(name="Incidenza di dipendenti di genere femminile delle imprese nei settori culturali e creativi",
+                 unit="%", family="territorial", raw_id="598"),
+            level(best=None, worst=None))
+        b = seo_titles.answer_title(
+            meta(name="Incidenza di dipendenti in età giovanile delle imprese nei settori culturali e creativi",
+                 unit="%", family="territorial", raw_id="599"),
+            level(best=None, worst=None))
+        self.assertEqual(a, "Donne fra i dipendenti delle imprese culturali per regione")
+        self.assertEqual(b, "Giovani fra i dipendenti delle imprese culturali per regione")
+
+    def test_la_negazione_resta_e_le_cifre_entrano(self):
+        nome = "Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado)"
+        titolo = seo_titles.answer_title(
+            meta(name=nome, unit="%", family="bes", raw_id="SDG-310"),
+            level(best=("Calabria", 62.0), worst=("Trento", 33.6)))
+        self.assertEqual(titolo, "Competenza numerica non adeguata, dal 62,0% al 33,6%")
+
+    def test_il_nome_breve_vale_per_il_suo_livello(self):
+        """La chiave e' (codice, livello): la stessa scheda su un altro livello
+        non lo prende."""
+        titolo = seo_titles.answer_title(
+            meta(name="Affollamento degli istituti di pena", unit="%", family="bes", raw_id="06POL012"),
+            provincia(None, None))
+        self.assertNotIn("carceri", titolo)
+
+    def test_l_unita_non_cambia_la_misura_accorciata(self):
+        """ter-84 usciva "Rifiuti urbani smaltiti per regione, da 317 a 0
+        chilogrammi", un totale regionale, e bes-01SAL008 "Speranza di vita
+        senza limitazioni, da 12,2 a 8,8 anni", una vita di dodici anni: lo
+        zero scritto "0" aveva fatto spazio all'unita', e l'accorciatore aveva
+        buttato il denominatore e l'eta'."""
+        rifiuti = seo_titles.answer_title(
+            meta(name="Rifiuti urbani smaltiti in discarica per abitante", unit="chilogrammi",
+                 family="territorial", raw_id="84"),
+            level(best=("Molise", 317.0), worst=("Campania", 0.0)))
+        self.assertEqual(rifiuti, "Rifiuti urbani in discarica per abitante, da 317 a 0")
+        self.assertNotIn("chilogrammi", rifiuti)
+        speranza = seo_titles.answer_title(
+            meta(name="Speranza di vita senza limitazioni nelle attività a 65 anni",
+                 unit="Numero medio di anni", family="bes", raw_id="01SAL008"),
+            level(best=("Veneto", 12.2), worst=("Calabria", 8.8)))
+        self.assertEqual(speranza, "Speranza di vita a 65 anni senza limitazioni, da 12,2 a 8,8")
+
+    def test_la_misura_non_si_restringe(self):
+        """ter-255 misura il bosco e il resto della superficie forestale: la
+        guardia sulle negazioni scartava "Superficie boscata (percorsa dal
+        fuoco)", che del resto diceva solo il bosco, e restava "Superficie
+        boscata e non boscata percorsa", senza il fuoco."""
+        titolo = seo_titles.answer_title(
+            meta(name="Superficie boscata e non boscata percorsa dal fuoco", unit="%",
+                 family="territorial", raw_id="255"),
+            level(best=("Calabria", 2.4), worst=("Valle d'Aosta", 0.02)))
+        self.assertEqual(titolo, "Superficie forestale percorsa dal fuoco, dal 2,4% allo 0,02%")
+
+
+class EstremiNonVerificatiTest(unittest.TestCase):
+    """bes-06POL012P: zeri dal 2016 e 358% a Fermo, causa non verificata."""
+
+    def setUp(self):
+        self.meta = meta(name="Affollamento degli istituti di pena", unit="%",
+                         family="bes", raw_id="06POL012P")
+        self.lv = provincia(("Fermo", 358.1), ("Macerata", 0.0))
+
+    def test_niente_estremi(self):
+        self.assertEqual(seo_titles.extremes(self.meta, self.lv), (None, None))
+
+    def test_il_titolo_non_porta_cifre_e_dice_carceri(self):
+        titolo = seo_titles.page_title({}, self.meta, self.lv, site_name="Divario Italia")
+        self.assertEqual(titolo, "Affollamento delle carceri per provincia")
+
+    def test_la_descrizione_non_porta_cifre(self):
+        self.assertIsNone(seo_titles.answer_description(self.meta, self.lv))
+        composto = "Rapporta il numero di persone detenute ai posti regolamentari."
+        self.assertEqual(seo_titles.page_description({}, self.meta, self.lv, composed=composto),
+                         composto)
+
+
+class RipiegoTest(unittest.TestCase):
+    def test_la_coda_del_ripiego_segue_il_livello(self):
+        """La vista province dei NEET usciva "... (NEET) per regione": il
+        derivato non ci stava, e il ripiego aveva la coda fissa."""
+        titolo = seo_titles.page_title(
+            {}, meta(name="Giovani che non lavorano e non studiano (NEET)", unit="%"),
+            provincia(("Taranto", 34.6), ("Padova", 6.1)), site_name="Divario Italia")
+        self.assertEqual(titolo, "Giovani che non lavorano e non studiano (NEET) per provincia")
+        self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
 
 
 class EstremiTest(unittest.TestCase):
@@ -249,6 +492,28 @@ class DescrizioneTest(unittest.TestCase):
                  "ricerca e sviluppo sul prodotto interno lordo regionale")
         d = seo_titles.page_description({}, meta(name=lungo), level())
         self.assertLessEqual(len(d), seo_titles.DESCRIPTION_MAX)
+
+    def test_un_estremo_condiviso_si_dice_tutto(self):
+        """"a 0,00 ad Aosta" era la prima in ordine alfabetico di sedici
+        province a zero."""
+        zeri = [(nome, 0.0) for nome in ("Aosta", "Belluno", "Rovigo")]
+        lv = provincia(("Nuoro", 3.4), ("Aosta", 0.0), observations=[("Nuoro", 3.4), ("Lecce", 1.2), *zeri])
+        d = seo_titles.answer_description(meta(name="Omicidi volontari", unit="per 100.000 abitanti"), lv)
+        self.assertIn("da 3,4 a Nuoro a 0 in 3 province.", d)
+
+    def test_due_a_pari_merito_si_nominano(self):
+        lv = provincia(("Lecco", 84.9), ("Napoli", 81.4),
+                       observations=[("Lecco", 84.9), ("Treviso", 84.9), ("Napoli", 81.4)])
+        d = seo_titles.answer_description(meta(name="Speranza di vita", unit="anni"), lv)
+        self.assertIn("a Lecco e a Treviso", d)
+
+    def test_il_conteggio_e_quello_dei_territori_col_dato(self):
+        """"107 province a confronto" su una serie che ne ha 106 nell'anno."""
+        osservate = [(f"P{i}", float(i)) for i in range(1, 107)]
+        lv = provincia(("P106", 106.0), ("P1", 1.0), observations=osservate)
+        d = seo_titles.answer_description(meta(unit="euro"), lv)
+        self.assertIn("106 province con dato", d)
+        self.assertNotIn("107", d)
 
     def test_senza_cifre_si_ripiega_sul_lead_composto(self):
         composto = "Una frase generata dal sito."

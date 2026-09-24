@@ -7,9 +7,13 @@
 (function () {
   "use strict";
 
-  /* ---------- numeri all'italiana, stessa regola di seo_titles._decimals ---------- */
+  /* ---------- numeri all'italiana, stessa regola di seo_titles._decimals ----------
+     Lo zero si scrive "0". tests/unit/test_decimals_parity.py legge il corpo di
+     questa funzione e lo confronta con le due copie Python: una riga di forma
+     diversa fa fallire la prova, apposta. */
   function decimals(v) {
     var m = Math.abs(v);
+    if (m === 0) return 0;
     if (m >= 100) return 0;
     if (m >= 10) return 1;
     return m < 1 ? 2 : 1;
