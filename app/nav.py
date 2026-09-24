@@ -32,7 +32,7 @@ PRIMARY = (
         "group": (
             {"label": "Le 20 regioni", "path": "/regioni", "active": "regioni"},
             {"label": "Le 107 province", "path": "/province", "active": "province"},
-            {"label": "Confronta i territori", "path": "/confronto", "active": "confronto"},
+            {"label": "Confronta le regioni", "path": "/confronto", "active": "confronto"},
         ),
     },
     {"label": "Temi", "path": "/temi", "active": "temi"},

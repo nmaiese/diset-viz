@@ -20,6 +20,9 @@ from app import profiles, province_profile
 # la chiave della pagina, il valore le forme alternative gia' normalizzate.
 ALIASES = {
     "bolzano": ("bozen", "bolzano bozen", "alto adige", "sudtirol", "suedtirol"),
+    # Come Bolzano per "alto adige": chi scrive "trentino" cerca quasi sempre
+    # la provincia di Trento, e la regione esce subito dopo.
+    "trento": ("trentino",),
     "reggio-emilia": ("reggio nell emilia",),
     "reggio-calabria": ("reggio di calabria",),
     "forli-cesena": ("forli", "cesena"),
@@ -27,6 +30,9 @@ ALIASES = {
     "massa-carrara": ("massa carrara",),
     "barletta-andria-trani": ("bat", "barletta", "andria", "trani"),
     "monza-e-della-brianza": ("monza", "brianza", "monza brianza"),
+    # I capoluoghi che non stanno nel nome della provincia.
+    "verbano-cusio-ossola": ("verbania",),
+    "sud-sardegna": ("carbonia", "iglesias", "sanluri", "carbonia iglesias", "medio campidano"),
     "trentino-alto-adige": ("trentino", "alto adige"),
     "friuli-venezia-giulia": ("friuli", "venezia giulia"),
     "valle-d-aosta": ("val d aosta", "vallee d aoste"),

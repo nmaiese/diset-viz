@@ -343,8 +343,15 @@
         <ul>
           {% for item in dimension_siblings %}<li><a href="{{ item.path }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>{% endfor %}
           {% for other in levels if other.key != level.key %}<li><a href="{{ meta.canonical_path ~ '?livello=' ~ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>{% endfor %}
-          <li><a href="/confronto">Metti a confronto le {{ level.plural }}</a></li>
+          {#- Confronto e atlante sono solo regionali: sulle province portavano
+              a una pagina senza province. -#}
+          {% if level.key == 'regione' %}
+          <li><a href="/confronto">Metti a confronto le regioni</a></li>
           <li><a href="/atlante">Apri l'indicatore nell'atlante</a></li>
+          {% else %}
+          <li><a href="/province">Il profilo di ogni provincia</a></li>
+          <li><a href="/qualita-della-vita/classifica/province">Le province per qualità della vita</a></li>
+          {% endif %}
         </ul>
       </div>
       <div class="lane">

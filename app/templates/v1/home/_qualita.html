@@ -26,6 +26,9 @@
         {%- endfor %}
       </ul>
       {% endif %}
+      {% if q.rankings | length > 1 %}
+      <p class="qol__levels">{% for r in q.rankings %}<a class="linkarrow" href="{{ r.href }}">La classifica delle {{ r.n | num(None, 'count') }} {{ r.plural }}</a>{% endfor %}</p>
+      {% endif %}
       {% if q.dimensions %}
       <h3 class="qol__h">Le dimensioni</h3>
       <ul class="qol__dims">{% for dim in q.dimensions %}<li>{{ dim.name }}{% if dim.regions_only and q.dims_provinces %} <span class="qol__only">(solo regioni)</span>{% endif %}</li>{% endfor %}</ul>
