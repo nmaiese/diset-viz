@@ -487,17 +487,22 @@ details.more[open] > summary { color: var(--ink); }
 
 /* la sparkline in una cella di tabella (regione e provincia, la stessa):
    il disegno prima, cosi' le linee stanno in colonna da una riga all'altra,
-   e accanto la cifra in testo, su una riga sola. Sotto i 900 pixel di
-   tabella il testo puo' andare sotto il disegno, tutto intero: a 768 una
-   cella larga 230 pixel schiacciava i nomi degli indicatori a 90 pixel.
-   Sopra no, perche' nelle tabelle coi nomi lunghi la cella andava a capo
-   anche a 1440 pur avendo spazio. Sulle tabelle a blocchi la cella prende
-   tutta la riga, nel blocco @container di `.table--stack`. */
+   e accanto la cifra in testo. Il disegno resta a 88 pixel: la regola
+   generale `svg { max-width: 100% }` lo schiaccerebbe appena la tabella
+   stringe la colonna.
+   Sotto i 1100 pixel di tabella la cella va a capo quando serve, il testo
+   sotto il disegno e "dal 2018" sopra la cifra, e la colonna scende a 112
+   pixel. Su una riga sola ne vuole circa 250: misurate le 107 province e
+   le 20 regioni a passi di 10 pixel, la tabella piu' esigente (Bolzano)
+   scorreva di lato fino a 1036 pixel di contenitore, da qui la soglia.
+   Sopra resta su una riga, perche' con l'a capo sempre attivo le tabelle
+   coi nomi lunghi la mandavano sotto anche a 1440. Sulle tabelle a blocchi
+   la cella prende tutta la riga. */
 .trend { display: inline-flex; align-items: center; gap: var(--space-1) var(--space-3); vertical-align: middle; }
-.trend .spark { flex: none; }
+.trend .spark { flex: none; max-width: none; }
 .trend__txt { white-space: nowrap; }
-.trend__from { font-size: var(--fs-small); color: var(--muted); }
-@container (max-width: 900px) { .trend { flex-wrap: wrap; } }
+.trend__from { font-size: var(--fs-small); color: var(--muted); white-space: nowrap; }
+@container (max-width: 1100px) { .trend { flex-wrap: wrap; } .trend__txt { white-space: normal; } }
 
 .cards { display: grid; gap: var(--space-8) var(--gutter-l); list-style: none; }
 @media (min-width: 600px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -660,6 +665,29 @@ details.more[open] > summary { color: var(--ink); }
 /* tabella che sotto i 560 pixel del suo contenitore diventa blocchi etichettati */
 .stackwrap { container-type: inline-size; }
 @container (max-width: 560px) {
+  .table--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .table--stack, .table--stack tbody, .table--stack tr, .table--stack th, .table--stack td { display: block; }
+  .table--stack tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2) var(--space-4); padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .table--stack tr > * { padding: 0 !important; border: 0 !important; text-align: left !important; white-space: normal; }
+  .table--stack tbody th[scope="row"] { grid-column: 1 / -1; }
+  .table--stack td[data-label]::before { content: attr(data-label); display: block; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); }
+  .table--stack tr.group, .table--stack tr.group > * { display: block; grid-column: 1 / -1; }
+  /* dentro una tabella a blocchi la barra resta, a tutta riga */
+  .table--stack .barcell { width: auto; grid-column: 1 / -1; }
+  /* e anche la cella con la sparkline */
+  .table--stack .trendcell { grid-column: 1 / -1; }
+}
+
+/* le tabelle larghe, "Tutti gli indicatori" di regione e provincia (sette e
+   otto colonne), diventano blocchi gia' sotto i 720 pixel, come la
+   classifica: fra 560 e 720 non ci stavano, e la regione con la colonna
+   Andamento scorreva di lato. Il corpo e' quello del blocco qui sopra, riga
+   per riga, perche' la soglia di un contenitore non si passa per variabile:
+   test_css_tokens controlla che i due restino uguali. Le regole di pagina
+   che valgono solo a blocchi, in regione.css e provincia.css, interrogano
+   questo stesso contenitore. */
+.stackwrap--wide { container-name: stackwide; }
+@container stackwide (max-width: 719px) {
   .table--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .table--stack, .table--stack tbody, .table--stack tr, .table--stack th, .table--stack td { display: block; }
   .table--stack tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2) var(--space-4); padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }

@@ -245,7 +245,7 @@
     {%- for g in d.groups %}
     <details class="provincia-group" id="{{ g.anchor }}" open data-collapse-mobile>
       <summary>{{ ui.icon('chevron') }}<h3 class="h-sub">{{ g.name }}</h3><span class="provincia-muted">{{ g.rows | length | num(None, 'count') }} {{ g.rows | length | it_plural('indicatore', 'indicatori') }}</span></summary>
-      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="{{ g.name }}, gli indicatori in tabella">
+      <div class="tablewrap stackwrap stackwrap--wide" tabindex="0" role="region" aria-label="{{ g.name }}, gli indicatori in tabella">
         <table class="table table--stack provincia-table" role="table">
           <caption class="sr-only">{{ g.name }}: {{ g.rows | length | num(None, 'count') }} indicatori per {{ p.name }}. Valore della fonte con unità e anno, variazione dal primo anno della serie con la linea della provincia anno per anno, posizione fra le province italiane{% if p.region %}, posizione fra le province {{ p.region | of_region }} e media delle altre{% endif %}.</caption>
           <thead role="rowgroup"><tr role="row">
