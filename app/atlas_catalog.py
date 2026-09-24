@@ -9,6 +9,7 @@ families can coexist without collisions or accidental double counting.
 from collections import Counter, defaultdict
 from functools import lru_cache
 import unicodedata
+from urllib.parse import urlencode
 
 from app.cache_util import synchronized_cache
 from app import sources
@@ -262,12 +263,17 @@ def catalog_summary():
 
     `total` is the catalog you can browse. How many of those enter the score is
     a different number, owned by the scoring engine (`quality_life_bes`), and the
-    copy has to keep the two distinct."""
+    copy has to keep the two distinct.
+
+    `complete` e' quante di quelle serie l'atlante mostra all'apertura: senza
+    `partial=1` la SPA tiene solo le complete, e una porta che dice "594" e apre
+    una lista di 447 promette una cosa e ne mostra un'altra."""
     catalog = get_atlas_catalog()
     indicators = catalog["indicators"]
     families = catalog["source_families"]
     return {
         "total": len(indicators),
+        "complete": sum(1 for item in indicators if item["complete"]),
         "year_min": min(item["year_min"] for item in indicators),
         "year_max": max(item["year_max"] for item in indicators),
         "families": families,
@@ -484,6 +490,21 @@ def get_atlas_indicator_year(indicator_id, year):
     ]
     values.sort(key=lambda row: row["value"], reverse=True)
     return {"metadata": payload["metadata"], "year": year, "values": values}
+
+
+def atlas_theme_url(theme):
+    """L'atlante aperto sugli indicatori di un tema, parziali comprese.
+
+    Il filtro della SPA confronta il **nome** del tema (`item.theme` del
+    catalogo), non lo slug. `partial=1` perche' la pagina tema conta tutte le
+    serie del catalogo (`indicator_count`) e l'atlante, senza, mostra solo le
+    complete: sulla mobilita' i "58 indicatori" della pagina tema aprirebbero
+    una lista di 25. Senza tema resta l'atlante intero, che e' comunque una
+    destinazione vera.
+    """
+    if not theme:
+        return "/atlante"
+    return f"/atlante?{urlencode({'theme': theme, 'partial': '1'})}"
 
 
 def get_atlas_theme_profile(theme_slug):

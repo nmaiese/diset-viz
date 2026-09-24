@@ -228,7 +228,7 @@
           <li><a href="/province">Il profilo di ognuna delle {{ province_total }} province</a></li>
           <li><a href="/confronto">Mettere due o tre territori sullo stesso piano</a></li>
           <li><a href="/divari-regionali">Quanto pesa davvero il divario Nord-Sud</a></li>
-          <li><a href="/atlante">L'atlante, con mappa e serie storica</a></li>
+          <li><a href="{{ atlas_theme_url(p.theme) }}">Gli stessi {{ p.indicator_count }} indicatori nell'atlante, da filtrare per fonte e anni</a></li>
         </ul>
       </div>
     </div>
@@ -236,7 +236,7 @@
 
   <aside class="indicator-cta">
     <p>{{ p.indicator_count }} indicatori su {{ p.theme | lower }}, con fonte, serie storica e download aperti.</p>
-    <a class="btn btn--primary" href="/atlante">Aprili nell'atlante</a>
+    <a class="btn btn--primary" href="{{ atlas_theme_url(p.theme) }}">Aprili nell'atlante</a>
   </aside>
 </article>
 {% endblock %}

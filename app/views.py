@@ -4,6 +4,7 @@ from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts, posts_f
 from app.data import get_catalog
 from app.atlas_catalog import (
     all_atlas_themes_index,
+    atlas_theme_url,
     atlas_themes_by_macro_area,
     catalog_summary,
     get_atlas_catalog,
@@ -188,6 +189,11 @@ def _inject_license():
         # il posto giusto e' questo processore, non ogni singola `render_template`.
         "nav": nav,
     }
+
+
+# L'atlante aperto su un tema: la pagina tema, la scheda e il suo ripiego
+# leggono la stessa regola invece di comporsi l'indirizzo ognuno a mano.
+app.add_template_global(atlas_theme_url)
 
 
 def _client_ip():
@@ -406,6 +412,7 @@ def home():
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/",
         total_indicators=total_indicators,
+        complete_indicators=summary["complete"],
         sources_label=summary["institutions_label"],
         year_min=summary["year_min"],
         year_max=summary["year_max"],

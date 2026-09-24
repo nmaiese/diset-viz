@@ -623,6 +623,23 @@ MAIN_DOORS = ("/regioni", "/province", "/temi", "/qualita-della-vita")
 MORE_DOORS = ("/atlante", "/confronto", "/divari-regionali", "/blog", "/quiz", "/catalogo-dati")
 
 
+def _atlas_door_text(ctx: dict) -> str:
+    """La porta dell'atlante dice le due cifre che l'atlante mostra.
+
+    All'apertura, senza `partial=1` e con fonte e area su "tutte", la SPA
+    elenca solo le serie complete e lo scrive ("solo dati completi (447)").
+    Una porta che diceva "594 indicatori" apriva una lista di 447: il totale
+    da solo e' la promessa sbagliata, quindi senza il conto delle complete la
+    porta resta senza cifre."""
+    total, complete = ctx.get("total_indicators"), ctx.get("complete_indicators")
+    tail = "da filtrare per tema, fonte e anni"
+    if not total or complete is None:
+        return f"Tutti gli indicatori, {tail}"
+    if complete >= total:
+        return f"{numfmt.text(total, 0)} indicatori, tutti con i dati completi, {tail}"
+    return f"{numfmt.text(total, 0)} indicatori, {numfmt.text(complete, 0)} con i dati completi, {tail}"
+
+
 def doors(ctx: dict, qol: dict | None = None) -> dict:
     """Le porte d'ingresso, con le cifre calcolate: "20 regioni" era scritto a
     mano in sei posti, e le province non comparivano in nessuno. Dove la cifra
@@ -639,9 +656,12 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
         "/qualita-della-vita": {"num": ranked or None, "unit": "territori in classifica", "title": "Qualità della vita",
                                 "text": "Dove si vive meglio: la classifica delle regioni e quella delle province, con il profilo di priorità che scegli tu."},
     }
+    # La mappa dell'atlante si colora con uno di sei indicatori, e solo
+    # all'ultimo anno: "sulla mappa, anno per anno" prometteva quello che la
+    # pagina non fa. Quello che fa davvero e' l'elenco, con i filtri per tema,
+    # fonte e anni.
     more = {
-        "/atlante": {"title": "L'atlante", "text": f"{numfmt.text(ctx.get('total_indicators'), 0)} indicatori sulla mappa, anno per anno"
-                     if ctx.get("total_indicators") else "Tutti gli indicatori sulla mappa, anno per anno"},
+        "/atlante": {"title": "L'atlante", "text": _atlas_door_text(ctx)},
         "/confronto": {"title": "Confronta le regioni", "text": "Due o tre regioni fianco a fianco su un indicatore"},
         "/divari-regionali": {"title": "Divari regionali", "text": "Nord, Centro e Mezzogiorno messi a confronto"},
         "/blog": {"title": "Storie", "text": f"{ctx['post_total']} articoli costruiti sui dati" if ctx.get("post_total")
