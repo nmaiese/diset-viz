@@ -31,7 +31,12 @@ paths:
   A React restano la barra del telefono e il pulsante di ritorno. Una testata
   disegnata dentro la SPA sono due identita' sullo stesso dominio, ed e' gia'
   successo.
-- `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema.
+- `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema. La
+  pagina tema legge il catalogo dell'atlante, che e' regionale, e in fondo ha
+  la sezione "Per provincia" con le schede del tema che hanno i valori delle
+  province, aperte sulle province (`indicator_view.province_indicators_by_theme`,
+  col tema della scheda, lo stesso della sua briciola): senza, le 25 schede
+  solo provinciali non stavano in nessun tema.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
 - `/provincia/<key>` — il profilo di una delle 107 province misurate dal BES:
   posizione, punteggio, le dodici dimensioni, **i valori veri di tutti i 67
@@ -44,6 +49,9 @@ paths:
   anni. Il confronto dentro la regione e' sempre fra province, mai con il
   valore regionale. Il profilo lo monta `app/province_profile.py`, che non calcola niente
   di nuovo: mette in forma il payload di `quality_life_bes.build_bes_territory`.
+  I link alle schede escono da `bes_data.bes_level_path(id, "provincia")`: una
+  scheda a due livelli si apre sulle regioni, e da una provincia il lettore
+  deve atterrare su `?livello=provincia`, dove c'e' la sua provincia.
 - `/province` — l'indice geografico delle province, regione per regione, dal
   23 settembre 2026. Prima l'indice era la classifica: la classifica risponde a
   "chi e' prima", l'indice a "dov'e' la mia provincia". La briciola di una
@@ -82,7 +90,9 @@ paths:
   Mai una cifra hardcoded in quel template. Riusa la mappa della homepage via
   `_map_panel.html` (`_map_hero` in `app/views.py`); le medie delle partizioni
   sono medie semplici dei valori regionali, limite che la pagina dichiara.
-- `/confronto` — la casa canonica del confronto: pagina server-rendered che
+- `/confronto` — **solo regionale**: la voce del menu dice "Confronta le
+  regioni", e le schede al livello provinciale non lo propongono. La casa
+  canonica del confronto: pagina server-rendered che
   monta la vista compare della SPA con `window.__diInitialView`. Lo stato SPA
   `/atlante?view=confronto` funziona ancora ma niente ci punta: uno strumento,
   una URL pubblica. Una vista path-scoped si aggiunge impostando quel flag nel

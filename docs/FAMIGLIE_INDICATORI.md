@@ -16,6 +16,12 @@ territoriale diverso (regione, provincia). Oggi ognuno è una pagina e un
 articolo separati, scritti uno alla volta, senza che la pipeline sappia che
 sono la stessa cosa.
 
+Il livello territoriale ha oggi un solo collegamento, scritto a mano:
+`taxonomy.PROVINCE_TWINS` elenca le schede regionali che hanno una gemella con
+le province (per esempio ter-910 e bes-01SAL001), e la scheda porta dall'una
+all'altra dal selettore di livello. Non e' una famiglia: le due pagine restano
+due, ognuna col suo canonico.
+
 ## Tre situazioni diverse, verificate sul codice
 
 (Erano due fino al 4 settembre sera; il 4 settembre notte l'audit delle

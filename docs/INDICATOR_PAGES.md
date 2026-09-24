@@ -20,6 +20,20 @@ due, con due modelli dati diversi, e le pagine sono andate alla deriva.
    dell'indicatore, come nasce il testo, come citare, immagine da condividere,
    indicatori correlati, percorso.
 
+**Le province.** Il cruscotto ha la mappa per tutti e due i livelli. Quella
+delle province la compone `app/design/pages/indicatore.py`, con i contorni di
+`design.maps` e la stessa rampa a sei gradini della home, mentre
+`LEVELS["provincia"]["has_map"]` resta falso perché lo leggono il template di
+ripiego e il vecchio esploratore, che hanno solo le regioni. Quando il livello
+che manca a una scheda sta in un'altra pagina (la speranza di vita regionale,
+ter-910, e quella con le province, bes-01SAL001), il view model porta `twin`
+(`indicator_view.twin_level`, dalle coppie di `taxonomy.PROVINCE_TWINS`): il
+selettore Regioni/Province ha la voce della gemella come le altre, la corsia
+"Lo stesso dato, altre viste" dice "La stessa misura per province", e il
+Markdown lo scrive. Chi linka una scheda da un contesto provinciale usa
+`bes_data.bes_level_path(id, "provincia")`, che aggiunge `?livello=provincia`
+solo alle schede a due livelli.
+
 Fra l'articolo e l'apparato sta il blocco **«Come leggere il dato»**
 (`id="come-leggere"`), reso **sempre** e sempre dopo la narrazione.
 

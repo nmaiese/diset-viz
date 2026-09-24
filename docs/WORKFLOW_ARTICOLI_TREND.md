@@ -326,6 +326,12 @@ interno che non risponde 200, una fonte citata nel testo che non risponde o
 che manca dalla sezione "## Fonti", una figura senza file. Gli avvisi (un
 piccolo numero che non e' nel dossier, piu' di mille parole) si leggono.
 
+La guardia non controlla i territori. I tre o quattro che il pezzo racconta si
+legano alla loro pagina alla prima menzione con un valore (`/regione/<key>`,
+`/provincia/<key>`, regola in `content/STYLE.md`). Le tabelle dei valori delle
+figure le lega il sito da se'. Il pezzo sugli infortuni per provincia era
+uscito con 123 province nominate e nessun link.
+
 Poi la suite: `bin/py -m unittest discover -s tests -v`. I test
 `tests/integration/test_blog_trend_articles.py` controllano credito foto,
 figure e `Dataset` su tutti i pezzi.

@@ -140,6 +140,8 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
 - **Modulo dato**: una `<figure>` con titolo-affermazione, sottotitolo (misura,
   unita', anno), barra strumenti (livello come link reali, anno, trova il tuo
   territorio), mappa e classifica affiancate da 720px di modulo, riga fonte.
+  Il livello che manca a una scheda, quando sta in una scheda gemella, e' una
+  voce del selettore come le altre e porta all'altra pagina.
 - **Mappa coropletica**: sei gradini da poco a molto contrasto seguendo la
   grandezza, qualunque sia il verso, legenda con tutti e sei. Dato mancante
   tratteggiato, "n.d.". Selezione con contorno in inchiostro, mai in accento.
@@ -149,6 +151,9 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   openpolis, CC BY 4.0, attribuzione nella riga fonte) nella stessa proiezione
   delle regioni. Dove le mappe sono piu' d'una i tracciati stanno in uno
   sprite (`v1_map_sprite(livello)`) e la mappa li richiama con `use=True`.
+  La scheda la disegna per tutti e due i livelli, e al cambio d'anno un
+  territorio senza dato prende il tratteggio (le province con un dato cambiano
+  da un anno all'altro).
 - **Mappa per scegliere** (`ui.navmap`): non porta un dato, serve a scegliere
   un territorio. Colori dell'interfaccia, mai della rampa: terra nel grigio
   della superficie, confini nel colore del fondo, il territorio scelto o sotto
@@ -247,7 +252,7 @@ di una pagina.
 10. Continua da qui, pieno.
 
 Stati da reggere: scheda senza prosa (251 su 634), due livelli regione e
-provincia, solo provinciale senza mappa (107 righe), territorio scelto (noindex),
+provincia, solo provinciale (mappa delle province, 107 righe), territorio scelto (noindex),
 serie di un anno solo, indicatore senza verso, scheda non indicizzabile.
 
 ### Home
