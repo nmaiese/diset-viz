@@ -241,7 +241,7 @@ def feature(pick: dict | None) -> dict | None:
     return {
         "name": meta["name"], "path": meta["canonical_path"], "year": year, "n": n,
         "level": key, "plural": plural, "singular": singular, "requested": bool(pick.get("requested")),
-        "unit_note": unit_note(unit), "values_note": values_note(unit),
+        "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
         "short_unit": short_unit(unit), "source_label": meta.get("source_label"),
         "source_url": meta.get("source_url"), "theme": meta.get("theme"), "theme_path": meta.get("theme_path"),
         "lead_claim": lead_claim, "table_claim": table_claim, "verso": verso,
@@ -265,7 +265,7 @@ def feature(pick: dict | None) -> dict | None:
         # il punto della striscia.
         "explore_js": {
             "years": [year], "matrix": {str(year): {o["key"]: o["value"] for o in observations}},
-            "names": names, "unit": short_unit(unit), "direction": direction,
+            "names": names, "unit": numfmt.phrase_unit(unit), "direction": direction,
             "plural": plural, "profile": level.get("profile_path"), "south": [],
             "decimals": decimals, "areas": territory_areas,
         },

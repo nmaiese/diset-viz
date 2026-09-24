@@ -99,6 +99,38 @@ def short_unit(unit: str | None) -> str | None:
     return None
 
 
+# Etichette della fonte che dicono che cosa si conta ma non sono un'unita' da
+# scrivere accanto a una cifra: "29,0 numero", "7,0 Valore medio", "0,61 classi".
+GENERIC_UNITS = {"numero", "numero medio", "valore medio", "indice", "indice (0-1)", "rapporto", "classi"}
+# "centomila anziani" e' un tasso, ogni centomila anziani: scritto accanto a una
+# cifra senza "ogni", "228 centomila anziani" si legge come ventidue milioni.
+RATE_BASE = re.compile(r"(cento|mille|diecimila|centomila|un milione di) ")
+
+
+def phrase_unit(unit: str | None) -> str | None:
+    """L'unita' come si scrive dopo una cifra: "euro", "%", "per mille
+    abitanti", "ogni centomila anziani". None quando l'etichetta della fonte non
+    e' un'unita': la cifra resta nuda, e l'unita' la dice la riga sotto il titolo
+    o l'intestazione della colonna. La usano `num` (tessere, celle, frasi dei
+    template), `common.with_unit` e `common.signed` (frasi composte in Python) e
+    il JavaScript delle mappe, cosi' la stessa cifra si scrive uguale ovunque."""
+    u = short_unit(unit)
+    if not u or u == "%":
+        return u
+    u = lower_first(u)
+    if u in GENERIC_UNITS:
+        return None
+    m = re.match(r"(?:numero medio|numero|valori) (per .+)$", u)
+    if m:
+        return m.group(1)
+    m = re.match(r"numero di (.+)$", u)
+    if m:
+        return m.group(1)
+    if RATE_BASE.match(u):
+        return "ogni " + u
+    return u
+
+
 def num(value, unit: str | None = None, role: str = "figure", decimals: int | None = None) -> Markup:
     """Una cifra con la sua unita', come elemento `<data>`."""
     if value is None or (isinstance(value, float) and math.isnan(value)):
@@ -107,7 +139,7 @@ def num(value, unit: str | None = None, role: str = "figure", decimals: int | No
     shown = text(value, d, sign=(role == "delta"))
     if role == "delta" and shown in ("0", "0,0", "0,00"):
         return Markup('<data class="n n--delta" value="0">invariato</data>')
-    u = short_unit(unit)
+    u = phrase_unit(unit)
     unit_html = ""
     if u == "%":
         unit_html = '<span class="n__u n__u--pct">%</span>'
