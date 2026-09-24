@@ -263,12 +263,17 @@ def catalog_summary():
 
     `total` is the catalog you can browse. How many of those enter the score is
     a different number, owned by the scoring engine (`quality_life_bes`), and the
-    copy has to keep the two distinct."""
+    copy has to keep the two distinct.
+
+    `complete` e' quante di quelle serie l'atlante mostra all'apertura: senza
+    `partial=1` la SPA tiene solo le complete, e una porta che dice "594" e apre
+    una lista di 447 promette una cosa e ne mostra un'altra."""
     catalog = get_atlas_catalog()
     indicators = catalog["indicators"]
     families = catalog["source_families"]
     return {
         "total": len(indicators),
+        "complete": sum(1 for item in indicators if item["complete"]),
         "year_min": min(item["year_min"] for item in indicators),
         "year_max": max(item["year_max"] for item in indicators),
         "families": families,

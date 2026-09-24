@@ -412,6 +412,7 @@ def home():
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/",
         total_indicators=total_indicators,
+        complete_indicators=summary["complete"],
         sources_label=summary["institutions_label"],
         year_min=summary["year_min"],
         year_max=summary["year_max"],

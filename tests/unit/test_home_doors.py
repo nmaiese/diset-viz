@@ -42,6 +42,19 @@ class LePorte(unittest.TestCase):
                            {"regions": 20, "provinces": 107})
         self.assertEqual([d["num"] for d in piene["main"]], [20, 107, 12, 127])
 
+    def test_la_porta_dell_atlante_dice_quante_ne_mostra(self):
+        """L'atlante all'apertura mostra solo le serie complete: la porta dice
+        il totale insieme alle complete, e il totale da solo non lo dice mai."""
+        def atlas_text(ctx):
+            return next(d["text"] for d in home.doors(ctx)["more"] if d["path"] == "/atlante")
+
+        text = atlas_text({"total_indicators": 1594, "complete_indicators": 1447})
+        self.assertIn("1.594 indicatori", text)
+        self.assertIn("1.447 con i dati completi", text)
+        self.assertNotIn("1.594", atlas_text({"total_indicators": 1594}))
+        self.assertIn("tutti con i dati completi",
+                      atlas_text({"total_indicators": 594, "complete_indicators": 594}))
+
 
 if __name__ == "__main__":
     unittest.main()
