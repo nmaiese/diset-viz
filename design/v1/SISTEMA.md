@@ -43,10 +43,13 @@ Upshot per il testo che accompagna il dato.
 
 ## Griglia
 
-- **Un contenitore solo** da 1200px, condiviso da testata, briciole, contenuto
-  e piede: il simbolo, la prima voce delle briciole, l'H1 e il bordo sinistro di
-  mappe e tabelle stanno sulla stessa verticale. Margine di pagina 16px sotto i
-  600, 24 fino a 959, 32 da 960.
+- **Un contenitore solo** da 1440px, condiviso da testata, briciole, contenuto
+  e piede, e anche da `.wrap` delle pagine ancora su `site.css`: il simbolo, la
+  prima voce delle briciole, l'H1 e il bordo sinistro di mappe e tabelle stanno
+  sulla stessa verticale. Margine di pagina 16px sotto i 600, 24 fino a 959, 32
+  da 960. Era da 1200: a 1920 pixel lasciava 360 pixel vuoti per lato e metteva
+  tutto in una colonna stretta al centro. La misura del testo non cambia,
+  crescono mappe, tabelle, griglie e grafici.
 - **Colonne**: 4 sotto i 600, 8 fino a 959, 12 da 960, gutter 16 e poi 24.
 - **Tre larghezze nominate**, che partono sempre dalla prima colonna:
   - **testo**: colonne 1-7 con tetto di 38rem, circa 65-70 caratteri. Prosa,
@@ -54,12 +57,23 @@ Upshot per il testo che accompagna il dato.
   - **largo**: colonne 1-10. Modulo dato, tessere, figure larghe, serie.
   - **pieno**: colonne 1-12. Tabelle lunghe, griglie di schede, podi.
 - **Margine**: da 1200px le colonne 9-12 accanto al testo ospitano l'indice di
-  pagina sticky, la riga fonte e le azioni Cita e Scarica. Sotto, rientrano nel
-  flusso.
+  pagina sticky, la riga fonte e le azioni Cita e Scarica. Nella scheda
+  indicatore il margine accanto alla testata porta le tessere, una sotto
+  l'altra. Sotto i 1200, tutto rientra nel flusso.
 - **Breakpoint** 600, 960, 1200. Dentro i componenti si usano container query
   sulla larghezza del componente, non altri breakpoint di pagina.
 - **Spazi** a passo 4, usati su nove valori: 4, 8, 12, 16, 24, 32, 48, 64, 96.
-  Fra sezioni 64 (48 su telefono) con un filetto, fra blocchi 24 (16).
+  Fra sezioni 64 (48 su telefono) sotto la testata di sezione, fra blocchi 24
+  (16).
+- **La testata di sezione** e' un filetto d'inchiostro da 3px con l'H2 sotto,
+  a 34px da 1200. Col filetto chiaro da 1px e l'H2 poco piu' grande dei titoli
+  dei grafici, a schermo largo le sezioni si confondevano una con l'altra.
+- **La fascia** (`.zone`) e' una sezione a tutta larghezza col suo contenitore
+  dentro. Le pagine che sono un indice di sezioni, la home per prima, alternano
+  le fasce fra il fondo e la superficie (`.zone--tint`), cosi' ogni sezione ha
+  un inizio e una fine visibili da lontano. La testata della fascia tiene a
+  sinistra il titolo con la sua frase e a destra il link alla sezione intera,
+  sotto lo stesso filetto.
 - **Testata** alta 64px (56 su telefono), sticky solo la barra.
 
 ## Tipografia
@@ -70,7 +84,7 @@ Una scala di undici ruoli, nominati per funzione:
 | --- | --- | --- | --- |
 | display | 56/58 | 36/40 | H1 della home e degli articoli |
 | titolo | 44/48 | 30/34 | H1 di schede, territori, classifiche |
-| sezione | 28/32 | 23/28 | H2, sempre sotto un filetto |
+| sezione | 28/32, 34/39 da 1200 | 23/28 | H2, sempre sotto il filetto d'inchiostro |
 | sottosezione | 20/26 | 19/24 | H3, titolo-affermazione dei grafici |
 | lede | 22/32 | 19/28 | frase-risposta, sommario |
 | prosa | 19/30 | 18/28 | articolo della scheda, blog, metodologia |
@@ -115,7 +129,14 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
 - **Frase-risposta**: una o due frasi con estremi, territori linkati, anno e
   unita'. E' il frammento che una persona o un assistente cita senza scorrere.
 - **Tessere numero**: 3-4 cifre di contesto che la frase non dice, in un `<dl>`,
-  separate da filetti verticali, senza scatola.
+  separate da filetti verticali, senza scatola. Nel margine della scheda, da
+  1200, una sotto l'altra con filetti orizzontali.
+- **Porte del sito**: in home, sotto la testata, le quattro destinazioni
+  grandi (regioni, province, temi, qualita' della vita) con la cifra che le
+  misura, calcolata e mai scritta a mano, poi le altre in fila (atlante,
+  confronto, divari regionali, storie, quiz, catalogo). I percorsi sono quelli
+  di `app/nav.py`: ogni porta e' una voce del menu e ogni tendina ha una porta.
+  Il titolo e' il link, esteso a tutta la scheda.
 - **Modulo dato**: una `<figure>` con titolo-affermazione, sottotitolo (misura,
   unita', anno), barra strumenti (livello come link reali, anno, trova il tuo
   territorio), mappa e classifica affiancate da 720px di modulo, riga fonte.
@@ -171,7 +192,10 @@ Venticinque, e ognuno prende il posto delle sue varianti di oggi.
   del pezzo piu' grande della regione.
 - Ogni grafico esce in due tagli, largo e stretto, perche' il testo resti a
   12-13 pixel veri anche sul telefono, e ha accanto una tabella con gli stessi
-  dati. Si disegna lato server in `tools/charts.py`, i colori stanno nel CSS.
+  dati. La striscia e la serie a fascia ne hanno un terzo da 1180 pixel, che
+  prende il posto del largo da 1100 pixel di grafico: col contenitore a 1440 il
+  taglio da 920 lasciava vuoto un terzo della riga. Si disegna lato server in
+  `tools/charts.py` (nel sito `app/design/charts.py`), i colori stanno nel CSS.
 
 ### Dove stanno oggi
 
@@ -192,6 +216,7 @@ di una pagina.
 2. Testata-risposta, larghezza testo.
 3. La risposta in cifre: tessere senza ripetere la lede (in testa o media
    semplice, rapporto fra prima e ultima, variazione, copertura), verso a parole.
+   Da 1200 nel margine accanto alla testata.
 4. Indice di pagina nel margine.
 5. Confronta i territori: modulo dato, largo.
 6. Com'e' cambiato: serie storica con tabella, largo.
@@ -206,10 +231,18 @@ serie di un anno solo, indicatore senza verso, scheda non indicizzabile.
 
 ### Home
 
-Testata-risposta con un H1 descrittivo e la ricerca "trova il tuo territorio",
-il dato in evidenza (frase calcolata, mappa, classifica dallo zero), regioni per
-ripartizione e province, qualita' della vita (doppio podio), il quiz (modulo con
-i tre giochi), i temi, le storie, fonti metodo e come citare.
+Una sequenza di fasce che alternano fondo e superficie. Testata-risposta con
+un H1 descrittivo e la ricerca "trova il tuo territorio", sulla superficie
+insieme alle porte del sito. Poi l'indicatore in evidenza, **uno a caso a ogni
+visita** (`app/home_pick.py`): una coppia indicatore e livello dal catalogo
+indicizzabile, prima il livello e poi l'indicatore, cosi' le province escono
+una volta su due e non una su otto. Per le regioni la striscia del divario, la
+mappa che nomina i suoi estremi e la classifica dallo zero, per le province la
+striscia e le prime e le ultime dieci affiancate. `?indicatore=ter-901&livello=provincia`
+fissa la scelta, se quella coppia sta nel pool. Per questo la home non sta nella cache di pagina. Seguono le
+regioni per ripartizione e le province, la qualita' della vita (doppio podio),
+il quiz (i tre giochi e una domanda da provare), i temi, le storie, fonti
+metodo e come citare.
 
 ### Regione
 

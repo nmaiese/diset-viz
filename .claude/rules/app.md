@@ -5,10 +5,14 @@ paths:
 
 # Le rotte, e le regole che non si vedono rompendole
 
-- `/` — la home, **server-rendered** (`app/templates/home.html`): la mappa viva,
-  i quattro percorsi d'ingresso, una storia dai dati, il confronto, i temi, la
-  qualita' della vita, le analisi, i quiz. Non e' l'atlante, e non lo e' piu'
-  da quando la home e' stata rifatta sul design system 2026.
+- `/` — la home, **server-rendered** (`app/templates/v1/home.html`, con
+  `home.html` come ripiego): le porte del sito, un indicatore in evidenza
+  **diverso a ogni visita** (`app/home_pick.py`, per regione o per provincia),
+  i territori, la qualita' della vita, il quiz, i temi, le storie. Per questo
+  **non sta nella cache di pagina**: rimetterci `@cache.cached` mostrerebbe lo
+  stesso indicatore a tutti per cinque minuti. `?indicatore=<codice>&livello=`
+  fissa la scelta (e `?indicator=<id>` del selettore di prima) se quella coppia
+  sta nel pool, se no si torna al caso. Il canonico resta `/`. Non e' l'atlante.
 - `/atlante` — l'atlante React/Vite (sorgente in `frontend/`, build in
   `app/static/dist/`), montato da `app/templates/app.html`. Insieme a
   `/confronto` sono le due sole pagine che caricano il bundle della SPA, e si

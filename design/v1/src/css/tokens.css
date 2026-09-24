@@ -23,6 +23,10 @@
   --lh-section: 1.2;
   --fw-section: 700;
   --tr-section: -0.01em;
+  --fs-section-l: 34px;
+  --lh-section-l: 1.15;
+  --fw-section-l: 700;
+  --tr-section-l: -0.01em;
   --fs-subsection: clamp(19px, 18.545px + 0.1212vw, 20px);
   --lh-subsection: 1.3;
   --fw-subsection: 700;
@@ -64,7 +68,7 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-24: 96px;
-  --container: 1200px;
+  --container: 1440px;
   --measure: 38rem;
   --gutter-s: 16px;
   --gutter-l: 24px;
