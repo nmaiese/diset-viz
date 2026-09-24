@@ -605,10 +605,19 @@ SHORT_NAMES = {
     ("bes-04BEC009P", "provincia"): "Nuove sofferenze bancarie delle famiglie",  # tasso di ingresso; %
     ("bes-06POL002P", "provincia"): "Amministratrici comunali",               # amministratori comunali donne; %
     ("bes-06POL003P", "provincia"): "Amministratori under 40",                # con meno di 40 anni; %
+    # "Province" e "Comuni" con la maiuscola: sono gli enti, e accanto alla coda
+    # " per provincia" non si confondono col territorio. L'accorciatore buttava
+    # "di riscossione" e usciva "Amministrazioni provinciali: capacita'".
+    ("bes-06POL007P", "provincia"): "Riscossione delle Province",             # amministrazioni provinciali, capacita' di riscossione; %
+    ("bes-06POL009P", "provincia"): "Riscossione dei Comuni",                 # comuni, capacita' di riscossione; %
     ("bes-07SIC007P", "provincia"): "Altri delitti mortali",                  # denunciati; per 100.000 abitanti
     ("bes-07SIC008P", "provincia"): "Mortalità stradale extraurbana",         # in ambito extraurbano; %
     ("bes-09PAE008", "provincia"): "Densità di agriturismi",                  # diffusione; per 100 km²
     ("bes-10AMB001P", "provincia"): "Concentrazione media di PM10",           # annua; microgrammi per m³
+    # Senza il nome breve l'accorciatore toglieva il rischio ("di frane", "di
+    # alluvioni") e le due schede avevano quasi lo stesso titolo.
+    ("bes-10AMB011", "provincia"): "Popolazione a rischio frane",             # esposta al rischio di frane; %
+    ("bes-10AMB012", "provincia"): "Popolazione a rischio alluvioni",         # esposta al rischio di alluvioni; %
     ("bes-10AMB016", "provincia"): "Elettricità da rinnovabili",              # energia elettrica da fonti rinnovabili; %
     ("bes-10AMB017", "provincia"): "Raccolta differenziata",                  # dei rifiuti urbani; %
     ("bes-10AMB018P", "provincia"): "Suolo impermeabilizzato",                # da copertura artificiale; %

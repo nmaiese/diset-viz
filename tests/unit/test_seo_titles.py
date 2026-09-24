@@ -260,6 +260,32 @@ class NomeBreveTest(unittest.TestCase):
             level(best=("Calabria", 2.4), worst=("Valle d'Aosta", 0.02)))
         self.assertEqual(titolo, "Superficie forestale percorsa dal fuoco, dal 2,4% allo 0,02%")
 
+    def test_sulle_province_il_nome_breve_tiene_cio_che_distingue_la_misura(self):
+        """Con la coda " per provincia" che non cade, l'accorciatore buttava
+        la parte che distingue: frane e alluvioni uscivano tutte e due
+        "Popolazione esposta al rischio per provincia", e 06POL007P
+        "Amministrazioni provinciali: capacita' per provincia"."""
+        casi = {
+            ("10AMB011", "Popolazione esposta al rischio di frane"):
+                "Popolazione a rischio frane per provincia, dal 15,5% allo 0%",
+            ("10AMB012", "Popolazione esposta al rischio di alluvioni"):
+                "Popolazione a rischio alluvioni per provincia, da 100% a 0%",
+            ("06POL007P", "Amministrazioni provinciali: capacità di riscossione"):
+                "Riscossione delle Province per provincia, dal 96,4% al 44,1%",
+            ("06POL009P", "Comuni: capacità di riscossione"):
+                "Riscossione dei Comuni per provincia, dall'87,1% al 45,1%",
+        }
+        estremi = {"10AMB011": (15.5, 0.0), "10AMB012": (100.0, 0.0),
+                   "06POL007P": (96.4, 44.1), "06POL009P": (87.1, 45.1)}
+        for (codice, nome), atteso in casi.items():
+            with self.subTest(codice=codice):
+                alto, basso = estremi[codice]
+                titolo = seo_titles.answer_title(
+                    meta(name=nome, unit="%", family="bes", raw_id=codice),
+                    provincia(("A", alto), ("B", basso)))
+                self.assertEqual(titolo, atteso)
+                self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
+
 
 class EstremiNonVerificatiTest(unittest.TestCase):
     """bes-06POL012P: zeri dal 2016 e 358% a Fermo, causa non verificata."""
@@ -604,6 +630,24 @@ class RispostaProvincialeTest(unittest.TestCase):
         self.assertIn("da 84,9 per 100.000 abitanti (Lecco e Treviso)", d)
         self.assertNotIn("separano", d)
         self.assertTrue(d.endswith("5 province con dato, dati Istat."), d)
+
+    def test_un_tasso_standardizzato_porta_il_suo_denominatore(self):
+        """Sulle serie di mortalita' la frase usciva "da 1,9 (Vercelli)": una
+        cifra nuda che si legge come un totale. `phrase_unit` resta com'e',
+        perche' scrive anche tessere, celle e mappe delle altre pagine: il
+        denominatore lo aggiunge solo la frase delle province."""
+        for unita, atteso in (("Tassi standardizzati per 10.000 residenti", "per 10.000 residenti"),
+                              ("tasso standardizzato per 10.000", "per 10.000")):
+            with self.subTest(unita=unita):
+                self.assertIsNone(numfmt.phrase_unit(unita))
+                d = seo_titles.province_answer(meta(name="Mortalità evitabile (0-74 anni)", unit=unita), self.lv)
+                self.assertIn(f"da 84,9 {atteso} (Lecco e Treviso) a 81,4 (Napoli).", d)
+                self.assertNotIn("separano", d)
+
+    def test_un_tasso_senza_denominatore_resta_nudo(self):
+        d = seo_titles.province_answer(meta(name="Passaggio all'università", unit="tasso specifico per coorte"),
+                                       self.lv)
+        self.assertIn("da 84,9 (Lecco e Treviso)", d)
 
     def test_la_regione_prende_la_sua_preposizione(self):
         self.lv["region_of"] = {key: "Marche" for key in self.lv["region_of"]}

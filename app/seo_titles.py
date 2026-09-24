@@ -680,6 +680,26 @@ def _coverage_closing(meta, level):
     return closing + (f", dati {institution}." if institution else ".")
 
 
+# Un tasso col suo denominatore: "Tassi standardizzati per 10.000 residenti",
+# "tasso standardizzato per 10.000". Il denominatore comincia con una cifra,
+# cosi' "Tasso specifico per coorte" non ne ha uno.
+_RATE_DENOMINATOR = re.compile(r"(?i)^tass[oi]\b.*?\s(per\s+\d[\d.]*(?:\s+\S.*)?)$")
+
+
+def _rate_unit(raw):
+    """Il denominatore di un tasso ("per 10.000 residenti"), o None.
+
+    `numfmt.phrase_unit` rinuncia alle etichette lunghe, e sulle serie di
+    mortalita' la frase-risposta usciva con la cifra nuda ("da 1,9 (Vercelli)"),
+    che si legge come un totale. Qui si tiene solo la coda "per N ...": il resto
+    ("standardizzati") lo dice la pagina. Resta locale alla frase delle
+    province, perche' `phrase_unit` scrive anche tessere, celle e mappe di
+    tutte le altre pagine.
+    """
+    match = _RATE_DENOMINATOR.match((raw or "").strip())
+    return match.group(1) if match else None
+
+
 def province_answer(meta, level, link_prefix=None, max_len=DESCRIPTION_MAX):
     """La frase-risposta di una pagina provinciale senza pezzo, o None.
 
@@ -704,7 +724,10 @@ def province_answer(meta, level, link_prefix=None, max_len=DESCRIPTION_MAX):
     - l'unita' accanto al primo estremo e' quella delle frasi (`phrase_unit`),
       che porta anche il denominatore ("3,4 per 100.000 abitanti", "46,0 per
       100 km²"): il nome breve non lo dice, e senza l'unita' la cifra si
-      leggerebbe come un totale. Se non sta nel budget, la cifra resta nuda.
+      leggerebbe come un totale. Dove `phrase_unit` non scrive niente perche'
+      l'etichetta e' lunga ("Tassi standardizzati per 10.000 residenti"), il
+      denominatore lo estrae `_rate_unit`. Se non sta nel budget, la cifra
+      resta nuda.
 
     Gli estremi sono quelli di `extremes`, gli stessi del titolo: sulle serie
     `contextual` e su `UNVERIFIED_EXTREMES` non ce ne sono, e la frase non c'e'.
@@ -730,7 +753,8 @@ def province_answer(meta, level, link_prefix=None, max_len=DESCRIPTION_MAX):
     rows = [row for row in level.get("observations") or () if row.get("value") is not None]
     plural = level.get("plural") or "territori"
     percent = _is_percentage(meta)
-    unit = None if percent else numfmt.phrase_unit(meta.get("value_unit") or meta.get("unit"))
+    raw_unit = meta.get("value_unit") or meta.get("unit")
+    unit = None if percent else (numfmt.phrase_unit(raw_unit) or _rate_unit(raw_unit))
     year = level.get("year_max")
 
     def show(row, linked, text=None):
