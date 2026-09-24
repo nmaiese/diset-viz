@@ -249,7 +249,9 @@
       <div class="lane">
         <h3>I dati</h3>
         <ul>
-          {% if post.indicator_path %}<li><a href="{{ post.indicator_path }}" class="minicard"><span class="minicard__title">{{ meta.name or post.indicator_label }}</span><span class="minicard__meta">Scheda indicatore{% if d.indicator_years %}, dati {{ d.indicator_years }}{% endif %}</span>{% if meta.spark %}<span class="minicard__spark">{{ meta.spark | sparkline }}</span>{% endif %}</a></li>{% endif %}
+          {% set card = d.indicator_card %}
+          {% set spark_svg = card.spark | sparkline("s", card.floor) if card else "" %}
+          {% if post.indicator_path %}<li><a href="{{ post.indicator_path }}" class="minicard"><span class="minicard__title">{{ meta.name or post.indicator_label }}</span><span class="minicard__meta">{% if card %}{{ card.value | num(card.unit) }} nel {{ card.year }}, media semplice delle regioni con il dato{% else %}Scheda indicatore{% if d.indicator_years %}, dati {{ d.indicator_years }}{% endif %}{% endif %}</span>{% if spark_svg %}<span class="minicard__spark">{{ spark_svg }}</span>{% endif %}</a></li>{% endif %}
           {% for item in d.named.indicatore %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
           {% if d.theme_path %}<li><a href="{{ d.theme_path }}">Tutti gli indicatori del tema {{ d.theme | lower }}</a></li>{% endif %}
           <li><a href="/atlante">L'atlante di tutti gli indicatori</a></li>

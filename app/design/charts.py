@@ -1,6 +1,6 @@
 """I grafici della 1.0, disegnati lato server in SVG.
 
-Tre disegni che tornano in piu' pagine:
+Quattro disegni che tornano in piu' pagine:
 
 - la striscia del divario: ogni territorio e' un punto sulla stessa scala, nel
   colore della sua ripartizione (Nord, Centro, Mezzogiorno), con i due estremi
@@ -12,9 +12,12 @@ Tre disegni che tornano in piu' pagine:
 - i richiami sulla mappa: nome e valore dei due estremi, con un filo che parte
   dal baricentro del pezzo piu' grande della regione (non dal rettangolo che la
   contiene, che per la Campania o la Liguria cade in mare).
+- la sparkline: una serie in una linea e un punto, con l'asse per anno, in due
+  taglie fisse accanto a una cifra scritta in testo.
 
-Ogni disegno esce in tre tagli, molto largo, largo e stretto, cosi' il testo
-resta a 12-13 pixel veri dallo schermo grande al telefono. I colori stanno nel CSS, per classe: niente
+I primi tre escono in tre tagli, molto largo, largo e stretto, cosi' il testo
+resta a 12-13 pixel veri dallo schermo grande al telefono. La sparkline no: non
+ha testo, e la sua misura e' quella dei pixel. I colori stanno nel CSS, per classe: niente
 esadecimali qui. Accanto a ogni grafico la pagina tiene una tabella con gli
 stessi dati.
 """
@@ -290,6 +293,94 @@ def band_series(level: dict, areas: dict) -> dict:
     narrow, _ = _band(level, areas, 360, 280, 112, True)
     return {"svg": f'<div class="chart__xl">{xl}</div><div class="chart__l">{wide}</div><div class="chart__s">{narrow}</div>',
             "single_year": False, "first": years[0], "last": years[-1]}
+
+
+# ---------------------------------------------------------------- sparkline
+
+# Le due taglie, in pixel veri: il viewBox e' la misura in cui la curva si
+# disegna, e nessun CSS la stira. Prima il filtro disegnava in 140x36 e il CSS
+# lo schiacciava in 88x28 con `preserveAspectRatio="none"`: il tratto e il
+# punto finale uscivano ovali e la pendenza non era quella dei dati.
+SPARK_SIZES = {"s": (88, 28), "m": (120, 32)}
+# Il margine tiene dentro la tela il punto finale (raggio 2,5) e il tratto.
+SPARK_PAD = 3.0
+SPARK_DOT_R = 2.5
+
+
+def spark_floor(values) -> float | None:
+    """Il pavimento della sparkline: lo scarto interquartile dei valori dei
+    territori nell'ultimo anno, con i quartili per interpolazione lineare.
+
+    La regola sta qui, in un posto solo, e chi disegna una sparkline le passa
+    i valori, non un numero calcolato altrove. None sotto i due valori, e zero
+    quando i territori del quartile centrale sono pari: in tutti e due i casi
+    la sparkline si disegna senza pavimento."""
+    vals = sorted(float(v) for v in values if v is not None)
+    if len(vals) < 2:
+        return None
+
+    def quartile(p):
+        k = (len(vals) - 1) * p
+        f = int(k)
+        c = min(f + 1, len(vals) - 1)
+        return vals[f] + (vals[c] - vals[f]) * (k - f)
+
+    return quartile(0.75) - quartile(0.25)
+
+
+def spark(points, size: str = "s", floor: float | None = None) -> str:
+    """La sparkline: una serie `{year, value}` in una linea e un punto finale.
+
+    - L'asse x e' per anno, non per posizione. Le indagini periodiche saltano
+      degli anni ("Aree terrestri protette" passa dal 2003 al 2010): la linea
+      unisce i due punti e il salto si vede come un tratto lungo, invece di
+      valere quanto un anno solo.
+    - `floor` e' il pavimento della scala verticale, nell'unita' della serie.
+      Quando la serie si muove meno del pavimento la scala si allarga al
+      pavimento attorno al centro, e la linea resta quasi piatta: chi chiama
+      passa lo scarto interquartile dei territori nell'ultimo anno, cosi' una
+      variazione piccola rispetto alla distanza fra i territori non si disegna
+      come una salita. Senza pavimento la serie riempie l'altezza.
+    - Sotto i due punti non c'e' niente da disegnare, ed esce una stringa vuota.
+    - Colori solo per classe (`.spark__line`, `.spark__dot`), niente
+      esadecimali. `aria-hidden` sempre: le cifre stanno in testo accanto.
+    """
+    if size not in SPARK_SIZES:
+        size = "s"
+    width, height = SPARK_SIZES[size]
+    pts = sorted(
+        (int(p["year"]), float(p["value"]))
+        for p in (points or [])
+        if p.get("value") is not None and p.get("year") is not None
+    )
+    if len(pts) < 2:
+        return ""
+    y0, y1 = pts[0][0], pts[-1][0]
+    vals = [v for _, v in pts]
+    lo, hi = min(vals), max(vals)
+    if floor and hi - lo < floor:
+        mid = (lo + hi) / 2
+        lo, hi = mid - floor / 2, mid + floor / 2
+    inner_w, inner_h = width - 2 * SPARK_PAD, height - 2 * SPARK_PAD
+
+    def x(yr):
+        return SPARK_PAD + (yr - y0) / ((y1 - y0) or 1) * inner_w
+
+    def y(v):
+        # Una serie piatta e senza pavimento si disegna a meta' altezza.
+        if hi == lo:
+            return height / 2
+        return SPARK_PAD + (hi - v) / (hi - lo) * inner_h
+
+    coords = [(x(yr), y(v)) for yr, v in pts]
+    line = " ".join(f"{cx:.1f},{cy:.1f}" for cx, cy in coords)
+    lx, ly = coords[-1]
+    return (f'<svg class="spark spark--{size}" '
+            f'viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+            f'aria-hidden="true" focusable="false">'
+            f'<polyline class="spark__line" points="{line}"/>'
+            f'<circle class="spark__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="{SPARK_DOT_R}"/>'
+            f'</svg>')
 
 
 # ---------------------------------------------------------------- richiami sulla mappa

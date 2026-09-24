@@ -472,10 +472,18 @@ details.more[open] > summary { color: var(--ink); }
 .minicard { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1) var(--space-4); align-items: end; }
 .minicard__title { font-weight: 600; line-height: 1.3; }
 .minicard__meta { grid-column: 1; font-size: var(--fs-small); color: var(--muted); }
-.minicard__spark { grid-column: 2; grid-row: 1 / span 2; width: 88px; }
-.minicard__spark svg { width: 88px; height: 28px; display: block; }
-.spark__line { fill: none; stroke: var(--cmp); stroke-width: 1.5; }
-.spark__dot { fill: var(--ink); }
+.minicard__spark { grid-column: 2; grid-row: 1 / span 2; }
+
+/* ---------- sparkline ----------
+   Una sola definizione, per il disegno di `charts.spark`: il viewBox e' la
+   misura in pixel (88x28 la taglia s, 120x32 la m) e qui non si stira. Linea e
+   punto sono la serie, un dato: nel grigio del confronto, mai nell'arancio
+   dell'interazione, neanche al passaggio del mouse, e mai nell'inchiostro. */
+.spark { display: block; overflow: visible; }
+.spark--s { width: 88px; height: 28px; }
+.spark--m { width: 120px; height: 32px; }
+.spark__line { fill: none; stroke: var(--cmp); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.spark__dot { fill: var(--cmp); }
 
 .cards { display: grid; gap: var(--space-8) var(--gutter-l); list-style: none; }
 @media (min-width: 600px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

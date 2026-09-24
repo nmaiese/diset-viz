@@ -318,43 +318,20 @@ def figures(html, indicator_id, level_key):
 
 
 @app.template_filter("sparkline")
-def sparkline(series, width=140, height=36):
-    """Inline SVG sparkline for a {year, value} series, server-side.
+def sparkline(series, size="s", floor=None):
+    """La sparkline di una serie `{year, value}`, disegnata lato server.
 
-    The React atlas has its own <Sparkline> component, but the indicator page is
-    server-rendered Jinja: this emits the same shape (a polyline plus a dot on
-    the last point, styled by .spark in site.css) without a second bundle. The
-    viewBox is fixed and CSS sizes it; a flat series draws a centred line.
+    E' un involucro di `app.design.charts.spark`, cosi' le pagine della 1.0 e
+    i template di ripiego (`indicator_page.html`) disegnano la stessa curva:
+    asse per anno, viewBox uguale ai pixel, pavimento sulla scala verticale.
+    `{{ item.spark | sparkline("s", item.spark_floor) }}`. Sotto i due punti
+    esce una stringa vuota.
     """
     from markupsafe import Markup
-    points = [p for p in (series or []) if p.get("value") is not None]
-    if len(points) < 2:
-        return Markup("")
-    values = [p["value"] for p in points]
-    lo, hi = min(values), max(values)
-    span = (hi - lo) or 1.0
-    # Inset on every side so the 2px stroke and the end dot never cross the box
-    # (the card container also clips with overflow:hidden as a safety net).
-    m = 4.0
-    inner_w = width - 2 * m
-    inner_h = height - 2 * m
-    n = len(points)
-    coords = [
-        (
-            m + (i / (n - 1)) * inner_w,
-            m + inner_h * (1 - (0.5 if hi == lo else (p["value"] - lo) / span)),
-        )
-        for i, p in enumerate(points)
-    ]
-    poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in coords)
-    lx, ly = coords[-1]
-    return Markup(
-        f'<svg class="spark" viewBox="0 0 {width} {height}" preserveAspectRatio="none" '
-        f'aria-hidden="true" focusable="false">'
-        f'<polyline class="spark__line" fill="none" points="{poly}"/>'
-        f'<circle class="spark__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="2"/>'
-        f'</svg>'
-    )
+
+    from app.design import charts as design_charts
+
+    return Markup(design_charts.spark(series, size, floor))
 
 
 def get_all_data():
@@ -1166,7 +1143,9 @@ def _render_indicator(family, raw_id):
         level=level,
         query_map=query_map,
         page_h1=page_h1,
-        related=view["related"],
+        # Le sole correlate che i template disegnano, col pavimento della
+        # sparkline calcolato qui e non nel view model (`related_cards`).
+        related=indicator_view.related_cards(view["related"]),
         related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],
         dimension_siblings=view["dimension_siblings"],
@@ -2881,14 +2860,18 @@ def _area_anchor(macro_area):
 
 def _themes_index_areas():
     """Full '/temì page: every macro-area with its themes, and for each theme
-    the indicator count, a preview of its indicators, an illustrative
-    average-trend sparkline and the region in front / trailing (per-theme
-    standings), matching the design's themes index."""
+    the indicator count, a preview of its indicators and the region in front /
+    trailing (per-theme standings).
+
+    La scheda di un tema non ha piu' la sparkline "Andamento medio": era un
+    composito illustrativo che normalizzava ogni serie, la allineava alle altre
+    per posizione e non per anno, e le tagliava tutte alla piu' corta. Una
+    curva che nessuna fonte ha misurato, disegnata come un dato."""
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
     # Card details from the unified atlas catalog (numeric + BES + Multiscopo),
     # the same source as the macro-area counts, so themes made only of BES/
-    # Multiscopo indicators (e.g. Benessere soggettivo) get names and sparkline.
+    # Multiscopo indicators (e.g. Benessere soggettivo) get their names.
     by_theme = {}
     for item in get_atlas_catalog()["indicators"]:
         by_theme.setdefault(item["theme"], []).append(item)
@@ -2908,7 +2891,6 @@ def _themes_index_areas():
                 "indicator_count": theme["indicator_count"],
                 "indicators": names[:5],
                 "extra_count": max(0, len(names) - 5),
-                "spark_points": _theme_spark_points(items),
                 "lead": lead,
                 "lag": lag,
             })
@@ -2920,33 +2902,6 @@ def _themes_index_areas():
             "themes": themes,
         })
     return areas
-
-
-def _theme_spark_points(items):
-    """SVG polyline for a theme's illustrative average trend: each indicator's
-    national-average series normalised to 0..1 (inverted so up = improving),
-    averaged across indicators by point index. Illustrative composite, not an
-    official series."""
-    series = []
-    for item in items:
-        values = [p["value"] for p in (item.get("spark") or []) if p.get("value") is not None]
-        if len(values) < 2:
-            continue
-        lo, hi = min(values), max(values)
-        span = (hi - lo) or 1.0
-        invert = (item.get("explain") or {}).get("direction") in ("lower_better", "higher_worse")
-        normalised = [(v - lo) / span for v in values]
-        if invert:
-            normalised = [1.0 - n for n in normalised]
-        series.append(normalised)
-    if not series:
-        return ""
-    length = min(len(s) for s in series)
-    averaged = [
-        {"year": index, "value": sum(s[index] for s in series) / len(series)}
-        for index in range(length)
-    ]
-    return indicator_notes.sparkline_points(averaged, width=160, height=42)
 
 
 def _home_compare_preview():

@@ -794,6 +794,29 @@ def lead_strip(post: dict, items: list[str], year: int | None) -> dict | None:
     }
 
 
+def indicator_card(post: dict) -> dict | None:
+    """La scheda dell'indicatore nella corsia "I dati": l'ultima media e la sua
+    sparkline col pavimento.
+
+    La serie e' quella del catalogo (`meta.spark`), la media semplice delle
+    regioni che hanno il dato anno per anno: la card lo dice in chiaro, perche'
+    in un anno possono mancare delle regioni. Il pavimento e' lo scarto
+    interquartile delle regioni nell'anno dell'ultimo punto, letto con
+    `get_atlas_indicator_year`, che serve ogni famiglia (non solo le serie
+    Istat territoriali). None quando la scheda non ha una serie."""
+    meta = post.get("indicator_meta") or {}
+    spark = [p for p in meta.get("spark") or [] if p.get("value") is not None]
+    if not post.get("indicator") or not spark:
+        return None
+    from app.atlas_catalog import get_atlas_indicator_year
+
+    last = spark[-1]
+    data = get_atlas_indicator_year(str(post["indicator"]), last["year"])
+    floor = charts.spark_floor([row["value"] for row in data["values"]]) if data else None
+    return {"value": last["value"], "year": last["year"], "unit": meta.get("unit"),
+            "spark": spark, "floor": floor}
+
+
 # ---------------------------------------------------------------- pagina
 
 def derive(ctx: dict) -> dict:
@@ -893,6 +916,7 @@ def derive(ctx: dict) -> dict:
         "institution": institution,
         "theme_path": f"/tema/{meta['theme_slug']}" if meta.get("theme_slug") else None,
         "theme": meta.get("theme"),
+        "indicator_card": indicator_card(post),
         "indicator_years": (f"dal {meta['year_min']} al {meta['year_max']}"
                             if meta.get("year_min") and meta.get("year_max") and meta["year_min"] != meta["year_max"]
                             else f"nel {meta['year_max']}" if meta.get("year_max") else None),

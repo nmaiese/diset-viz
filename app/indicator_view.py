@@ -37,7 +37,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from app import profiles, seo_policy, sources
-from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog
+from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog, get_atlas_indicator_year
 from app.bes_data import (
     all_bes_indicators,
     bes_level_path,
@@ -46,6 +46,7 @@ from app.bes_data import (
     get_bes_territories,
 )
 from app.data import indicator_trend_stats, indicator_year_over_year_stats
+from app.design.charts import spark_floor
 from app.external_data import freshness_label, freshness_status
 from app.multiscopo_data import all_multiscopo_indicators
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_TWINS
@@ -92,6 +93,10 @@ LEVELS = {
 }
 
 RELATED_LIMIT = 8
+# Le correlate che la scheda disegna davvero, nella corsia "Continua da qui"
+# (`v1/indicatore.html`) e nel ripiego (`indicator_page.html`). I template non
+# tagliano da se': ricevono gia' le sole `RELATED_SHOWN` da `related_cards`.
+RELATED_SHOWN = 3
 
 
 def build_indicator_view(family, raw_id):
@@ -624,6 +629,35 @@ def _theme_neighbours(meta):
     return related, {"prev": prev_item, "next": next_item}
 
 
+def related_cards(related):
+    """Le correlate che la scheda mostra, ciascuna con il pavimento della sua
+    sparkline.
+
+    Si chiama al render, dalla rotta della scheda, e non dentro
+    `build_indicator_view`: il view model lo costruisce anche la passata dei
+    634 di `indicator_universe.projection()`, che le correlate non le legge, e
+    con il pavimento li' ne calcolava otto per scheda a vuoto, alla prima
+    richiesta della home. Qui se ne calcolano solo le `RELATED_SHOWN` che i
+    template disegnano."""
+    return [_with_spark_floor(item) for item in related[:RELATED_SHOWN]]
+
+
+def _with_spark_floor(item):
+    """La scheda correlata con il pavimento della sua sparkline.
+
+    Il pavimento e' lo scarto interquartile delle regioni nell'anno dell'ultimo
+    punto (`charts.spark_floor`): una media che si muove poco rispetto alla
+    distanza fra le regioni si disegna quasi piatta. Lo chiede solo
+    `related_cards`, e su una copia: `item` viene dalla cache di
+    `_theme_siblings`, condivisa fra le richieste."""
+    floor = None
+    if item.get("latest_year") is not None:
+        data = get_atlas_indicator_year(item["id"], item["latest_year"])
+        if data:
+            floor = spark_floor([row["value"] for row in data["values"]])
+    return dict(item, spark_floor=floor)
+
+
 # Parole che compaiono ovunque e non dicono niente sulla vicinanza fra due
 # indicatori: tenerle farebbe somigliare "Tasso di occupazione" a "Tasso di
 # omicidi" piu' di quanto somigli a "Occupati non regolari".
@@ -661,12 +695,17 @@ def _theme_siblings(theme):
                 "source_theme": item.get("source_theme"),
                 "year_max": item["year_max"],
                 "unit": item.get("unit"),
-                # La sparkline delle card usa la stessa serie (media nazionale
-                # ridotta a 24 punti) già calcolata nel catalogo; `latest` è
-                # l'ultimo punto, l'ordine di grandezza che accompagna la curva.
+                # La sparkline delle card usa la serie gia' calcolata nel
+                # catalogo: la media semplice delle regioni che hanno il dato,
+                # anno per anno (non un gruppo fisso), ridotta a 24 punti.
+                # `latest` e `latest_year` sono l'ultimo punto, la cifra che la
+                # card scrive in testo accanto alla curva. L'anno e' quello del
+                # punto, non `year_max`: un ultimo anno senza valori non ha media.
                 "spark": item.get("spark") or [],
                 "latest": (item["spark"][-1]["value"]
                            if item.get("spark") else None),
+                "latest_year": (item["spark"][-1]["year"]
+                                if item.get("spark") else None),
             }
             for item in get_atlas_catalog()["indicators"]
             if item["theme"] == theme
