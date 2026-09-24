@@ -77,8 +77,11 @@ class FogliDiStileTest(unittest.TestCase):
                 self.assertIn(token, radice)
 
     def test_chi_usa_quei_token_li_trova(self):
-        """Il foglio che anima la view transition e quello che la dichiara."""
-        site = SITE.read_text(encoding="utf-8")
+        """Il foglio che anima la view transition e quello che la dichiara.
+
+        La regola sta in `chrome.css`, che caricano tutte le pagine: in
+        `site.css` non la vedevano ne' le shell della SPA ne' le pagine 1.0."""
+        site = CHROME.read_text(encoding="utf-8")
         self.assertIn("::view-transition-group(root)", site)
         sistema = SISTEMA.read_text(encoding="utf-8")
         radice = _nomi(_corpi(sistema, r"^:root\s*\{"))

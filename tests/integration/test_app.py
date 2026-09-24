@@ -2056,7 +2056,7 @@ class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
             with self.subTest(path=path):
                 html = self.client.get(path).get_data(as_text=True)
                 self.assertEqual(html.count('<header class="hdr">'), 1, path)
-                self.assertIn('class="brandword">Divario Italia<', html, path)
+                self.assertIn('class="brandword"><b>Divario</b> <span>Italia</span><', html, path)
 
     def test_la_spa_non_disegna_piu_la_sua(self):
         sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")

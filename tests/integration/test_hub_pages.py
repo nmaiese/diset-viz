@@ -264,12 +264,13 @@ class SearchPageTest(unittest.TestCase):
     def test_site_search_entry_points_lead_to_the_page(self):
         client = app.test_client()
         home = client.get("/").data.decode("utf-8")
-        # Il campo di ricerca dell'header, quello della barra mobile e la
-        # SearchAction dello schema puntano tutti alla stessa pagina. Sul
-        # chrome 2026 i primi due sono form GET veri, quindi la ricerca
-        # funziona anche senza JavaScript.
+        # Il campo di ricerca dell'header, quello del cassetto del telefono, la
+        # lente e la SearchAction dello schema puntano tutti alla stessa
+        # pagina. I due campi sono form GET veri e la lente un link, quindi la
+        # ricerca funziona anche senza JavaScript.
         self.assertIn('class="hdr__search desktop-only" role="search" action="/ricerca"', home)
         self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', home)
+        self.assertIn('class="iconbtn hdr__searchlink" href="/ricerca"', home)
         self.assertIn("/ricerca?q={search_term_string}", home)
 
         # E ogni altra pagina ha lo stesso punto di arrivo, perche' ormai
@@ -939,8 +940,8 @@ class ItaliaRegioneProvincia(unittest.TestCase):
 
     def test_l_indice_e_nel_menu_nella_sitemap_e_in_markdown(self):
         from app import nav
-        esplora = next(voce for voce in nav.PRIMARY if voce.get("key") == "esplora")
-        self.assertIn("/province", [voce["path"] for voce in esplora["group"]])
+        territori = next(voce for voce in nav.PRIMARY if voce.get("key") == "territori")
+        self.assertIn("/province", [voce["path"] for voce in territori["group"]])
         self.assertIn("/province<", self.client.get("/sitemap.xml").get_data(as_text=True))
         markdown = self.client.get("/province", headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertIn(f"# Le {len(self.chiavi)} province italiane", markdown)

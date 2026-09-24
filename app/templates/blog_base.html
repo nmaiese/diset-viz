@@ -27,29 +27,27 @@
     {% endblock %}
     <meta name="twitter:card" content="summary_large_image">
     {% include "_third_party_head.html" %}
-    {# Design system 2026, per tutte le pagine. La migrazione era opt-in per
-       pagina (`ds_page`) finche' i due sistemi convivevano: ora che non ne
-       resta nessuna sul chrome vecchio, il ramo e' sparito e non c'e' piu' una
-       pagina che possa dimenticarsi di dichiararlo.
+    {# Il sistema della 1.0, per tutte le pagine. L'ordine conta:
+       `ds/system.css` porta i token, poi il CSS delle componenti, poi
+       `ds/chrome.css` la testata e il piede condivisi.
 
-       L'ordine conta: `ds/system.css` porta i token, `site.css` le componenti
-       delle pagine (scritte sui nomi di quei token), `ds/chrome.css` l'header
-       e il footer condivisi. #}
+       Il CSS delle componenti e' un blocco: le pagine rifatte sulla 1.0 lo
+       sostituiscono con `ds/components.css` e il loro foglio di pagina, le
+       altre tengono `site.css`, che legge gli stessi nomi di token. #}
     {# I font arrivano da qui, non da fonts.googleapis.com: un foglio
        cross-origin bloccante costava tre round trip prima del primo
-       carattere, e Newsreader e' il serif dei titoli, cioe' quasi sempre
-       l'LCP. I due `preload` sono i soli file che una pagina in italiano
-       scarica sempre: latin-ext lo prende solo chi incontra un carattere
-       che lo richiede, e il monospazio non e' nel primo paint.
-   Senza `?v=`, di proposito: `fonts.css` richiama il file per percorso
-   nudo, e un precarico con la marca di versione sarebbe una URL diversa,
-   cioe' lo stesso font scaricato due volte. I file sono immutabili, il
-   nome dice famiglia e sottoinsieme: si sostituiscono rinominandoli. #}
-    <link rel="preload" href="{{ url_for('static', filename='fonts/newsreader-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+       carattere. I due `preload` sono i soli file che una pagina in italiano
+       scarica sempre, il tondo del testo e lo stretto delle cifre e dei
+       titoli: latin-ext e il corsivo li prende solo chi li incontra.
+       Senza `?v=`, di proposito: `fonts.css` richiama il file per percorso
+       nudo, e un precarico con la marca di versione sarebbe una URL diversa,
+       cioe' lo stesso font scaricato due volte. I file sono immutabili, il
+       nome dice famiglia e sottoinsieme: si sostituiscono rinominandoli. #}
+    <link rel="preload" href="{{ url_for('static', filename='fonts/sofia-sans-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/sofia-sans-semi-condensed-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset_url('css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
-    <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
+    {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/site.css') }}">{% endblock %}
     <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">
     <script src="{{ url_for('static', filename='js/ds-chrome.js') }}" defer></script>
     {% include "_theme_bootstrap.html" %}
@@ -65,37 +63,39 @@
 
     {% block content %}{% endblock %}
 
-    {# Footer del design system 2026. Vive qui e non in un include perche
-       privacy.html deve poter svuotare `footer_privacy_settings`, e un blocco
-       dentro un include non e sovrascrivibile dalle pagine figlie. #}
+    {# Il piede. Vive qui e non in un include perche' privacy.html deve poter
+       svuotare `footer_privacy_settings`, e un blocco dentro un include non e'
+       sovrascrivibile dalle pagine figlie. #}
     <footer class="ftr">
-      <div class="ftr__grid">
-        {# Le colonne vengono da `app/nav.py`, come le voci della testata. Erano
-           scritte a mano qui e in fila li', e le due liste divergevano senza
-           che niente fallisse. #}
-        {% for colonna in nav.FOOTER_GROUPS %}
-        <div>
-          <h4>{{ colonna.label }}</h4>
-          {% for voce in colonna['items'] %}<a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a>
-          {% endfor %}
-        </div>
-        {% endfor %}
-        <div class="ftr__close">
+      <div class="ftr__inner">
+        <div class="ftr__wrap">
           <a class="hdr__brand" href="/">
             <img src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="26" height="26">
-            <span class="brandword">{{ site_name }}</span>
+            {% set marchio = (site_name or SITE_NAME).split(' ', 1) %}
+            <span class="brandword"><b>{{ marchio[0] }}</b>{% if marchio[1] %} <span>{{ marchio[1] }}</span>{% endif %}</span>
           </a>
-          <p class="ftr__tag">L'Italia, regione per regione. Nei dati.</p>
+          <p class="ftr__trust">{{ site_name or SITE_NAME }} rimette in ordine i dati pubblici di Istat ed Eurostat su regioni e province, senza correggerli, e ricalcola ogni sintesi dai dati. <a href="/metodologia">Come lavoriamo</a>, <a href="/contatti">come segnalare un errore</a> e <a href="/chi-siamo#come-citare">come citarci</a>.</p>
+          {# Le colonne vengono da `app/nav.py`, come le voci della testata. #}
+          <nav class="ftr__cols" aria-label="Mappa del sito">
+            {% for colonna in nav.FOOTER_GROUPS %}
+            <div>
+              <h2>{{ colonna.label }}</h2>
+              <ul>
+                {% for voce in colonna['items'] %}<li><a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </nav>
+          <div class="ftr__legal">
+            <p>Dati di Istat ed Eurostat, con la licenza delle istituzioni che li pubblicano.</p>
+            {% for voce in nav.LEGAL %}<a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a>
+            {% endfor %}
+            {% block footer_privacy_settings %}
+            {% include "_funding_choices_revoke.html" %}
+            {% endblock %}
+          </div>
         </div>
-      </div>
-      <div class="ftr__legal">
-        <p>Dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noopener noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo.</p>
-        {# Il blocco e definito qui e richiamato con self.* nel ramo legacy, cosi
-           privacy.html continua a poterlo svuotare e il markup viene reso una
-           volta sola qualunque sia il chrome attivo. #}
-        {% block footer_privacy_settings %}
-        {% include "_funding_choices_revoke.html" %}
-        {% endblock %}
       </div>
     </footer>
   </body>

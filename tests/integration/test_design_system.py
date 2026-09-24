@@ -109,7 +109,7 @@ class DesignSystemMigration(unittest.TestCase):
         ha semplicemente spostato di file.
         """
         css = self._statico("/static/css/fonts.css").decode("utf-8")
-        for famiglia in ("Newsreader", "Public Sans", "Spline Sans Mono"):
+        for famiglia in ("Sofia Sans", "Sofia Sans Semi Condensed"):
             self.assertIn(f"font-family: '{famiglia}'", css)
 
         for path in SPA_ROUTES:
@@ -281,15 +281,10 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
             self.assertEqual(voce["label"], atteso)
 
     def test_il_cassetto_del_telefono_non_perde_voci_per_strada(self):
-        """Sul telefono il cassetto e' l'unica navigazione che si vede.
-
-        `/metodologia` ci compare due volte di proposito, come nella testata:
-        "Metodologia dell'indice" accanto alle classifiche, dove serve a
-        spiegare il punteggio, e "Metodologia" fra le voci generali. Escludendo
-        dal gruppo "Altro" ogni percorso gia' citato nelle tendine, la seconda
-        spariva e la pagina si trovava solo sotto una parola che non la
-        descrive tutta.
-        """
+        """Sul telefono il cassetto e' l'unica navigazione che si vede, e ogni
+        destinazione del menu e del piede ci deve stare. Il gruppo "Altro" si
+        ricava da `nav.drawer_other()`: una voce che non sta in una tendina
+        finisce li', senza che nessuno debba ricordarsela."""
         html = self.client.get("/").get_data(as_text=True)
         cassetto = re.search(r'<div class="drawer" id="ds-drawer".*?</header>', html, re.S)
         self.assertIsNotNone(cassetto)
@@ -297,4 +292,4 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
         for percorso in nav.paths():
             with self.subTest(percorso=percorso):
                 self.assertIn(percorso, rotte, "il cassetto ha perso una voce")
-        self.assertEqual(rotte.count("/metodologia"), 2)
+        self.assertEqual(rotte.count("/metodologia"), 1)
