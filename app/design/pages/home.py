@@ -309,11 +309,23 @@ def feature(pick: dict | None) -> dict | None:
     verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
              "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
     shown = {first["key"]} | ({second["key"]} if second else set())
-    elsewhere = next((k for k in pick.get("available") or [] if k not in shown), None)
+    available = pick.get("available") or [first["key"]]
+    elsewhere = next((k for k in available if k not in shown), None)
+
+    # La scheda si apre sul suo primo livello: per l'altro serve `?livello=`,
+    # o il pannello delle province mandava alla classifica delle regioni.
+    def scheda(key):
+        path = meta["canonical_path"]
+        return path if key == available[0] else f"{path}?livello={key}"
+
+    for panel in (first, second):
+        if panel:
+            panel["scheda"] = scheda(panel["key"])
     return {
         "name": meta["name"], "path": meta["canonical_path"], "code": code,
         "level": first["key"], "requested": bool(pick.get("requested")),
         "elsewhere": {"regione": "regione", "provincia": "provincia"}.get(elsewhere),
+        "elsewhere_href": scheda(elsewhere) if elsewhere else None,
         "source_label": meta.get("source_label"), "source_url": meta.get("source_url"),
         "theme": meta.get("theme"), "theme_path": meta.get("theme_path"), "verso": verso,
         "levels": [first] + ([second] if second else []),
@@ -396,9 +408,14 @@ def province_preview(key: str, profile: dict) -> dict:
         facts.append({"label": "Va peggio su", "text": categories[-1]["name"], "href": None,
                       "note": numfmt.text(categories[-1]["score"], 1)})
     area = charts.area_map().get(key)
-    region = profile.get("region")
+    # La regione e' un link, come sulla pagina: l'anteprima della provincia
+    # porta anche un piano piu' su. Sopra il nome la ripartizione, come per
+    # le regioni.
+    if profile.get("region"):
+        facts.insert(0, {"label": "Regione", "text": profile["region"], "href": profile.get("region_path"),
+                         "note": None})
     return {"key": key, "name": name, "href": f"/provincia/{key}", "area": area,
-            "kicker": region,
+            "kicker": charts.AREA_LABEL.get(area),
             "lead": f"{the_name[:1].upper() + the_name[1:]} è {profile['rank']}ª su {profile['total']} province per qualità della vita.",
             "facts": facts, "cta": f"Il profilo {of_place(name, 'provincia')}"}
 
@@ -456,7 +473,8 @@ def quality(ctx: dict) -> dict | None:
     """La porta della qualita' della vita: quanti territori, quali dimensioni,
     quali profili di priorita'. Niente classifica: la home non la svela, la
     mostra la pagina dedicata. I profili portano alla classifica delle regioni
-    col profilo scelto (`?profilo=`, che la pagina indice non legge).
+    col profilo scelto (`?profilo=`, che la pagina indice non legge), e accanto
+    ci sono le due classifiche, regioni e province.
 
     Le dimensioni si contano per livello: le province non hanno indicatori su
     due di esse (imprese, benessere soggettivo), e la frase lo dice. La fonte
@@ -484,8 +502,13 @@ def quality(ctx: dict) -> dict | None:
                       "href": classifica if p["slug"] == slug else f"{classifica}?profilo={p['slug']}"}
                      for p in qol.get("profiles") or []]
     province_dims = sum(1 for d in dimensions if not d["regions_only"])
+    # I profili portano alle regioni: le due classifiche, una per livello,
+    # stanno accanto, cosi' chi cerca la sua provincia non passa dalle regioni.
+    rankings = [{"href": f"/qualita-della-vita/classifica/{url_level}", "n": totals[url_level],
+                 "plural": url_level}
+                for url_level in QOL_LEVEL if url_level in totals]
     return {"regions": totals.get("regioni"), "provinces": totals.get("province"),
-            "dimensions": dimensions, "profiles": profiles_list,
+            "dimensions": dimensions, "profiles": profiles_list, "rankings": rankings,
             "dims_regions": len(dimensions),
             "dims_provinces": province_dims if totals.get("province") and province_dims < len(dimensions) else None,
             "institutions": (base.get("methodology") or {}).get("catalog_institutions"),
@@ -610,7 +633,7 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     more = {
         "/atlante": {"title": "L'atlante", "text": f"{numfmt.text(ctx.get('total_indicators'), 0)} indicatori sulla mappa, anno per anno"
                      if ctx.get("total_indicators") else "Tutti gli indicatori sulla mappa, anno per anno"},
-        "/confronto": {"title": "Confronta i territori", "text": "Due o tre regioni fianco a fianco su un indicatore"},
+        "/confronto": {"title": "Confronta le regioni", "text": "Due o tre regioni fianco a fianco su un indicatore"},
         "/divari-regionali": {"title": "Divari regionali", "text": "Nord, Centro e Mezzogiorno messi a confronto"},
         "/blog": {"title": "Storie", "text": f"{ctx['post_total']} articoli costruiti sui dati" if ctx.get("post_total")
                   else "Gli articoli costruiti sui dati"},

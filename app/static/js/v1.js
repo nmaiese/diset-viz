@@ -273,6 +273,7 @@
   document.querySelectorAll("[data-tabs]").forEach(function (list) {
     var tabs = Array.prototype.slice.call(list.querySelectorAll("[data-tab]"));
     if (tabs.length < 2) return;
+    var scope = list.closest("article, section") || document;
     // I ruoli li mette il JavaScript: senza, restano due link tabulabili.
     list.setAttribute("role", "tablist");
     tabs.forEach(function (t) {
@@ -291,6 +292,11 @@
         var panel = document.getElementById(t.dataset.tab);
         if (panel) panel.hidden = !on;
       });
+      // Il titolo sopra le schede porta alla scheda sul livello mostrato.
+      var shown = document.getElementById(tab.dataset.tab);
+      if (shown && shown.dataset.href) {
+        scope.querySelectorAll("[data-tab-href]").forEach(function (a) { a.setAttribute("href", shown.dataset.href); });
+      }
       if (focus) tab.focus();
     }
     show(tabs.filter(function (t) { return t.classList.contains("is-on"); })[0] || tabs[0], false);

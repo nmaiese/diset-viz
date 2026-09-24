@@ -70,7 +70,7 @@ class OgniCoppiaDelPool(unittest.TestCase):
                     guasti.append((path, "segnaposto in pagina"))
                 elif FUGHE.search(testo):
                     guasti.append((path, FUGHE.search(testo).group(0)))
-                elif f"/{code}\"" not in html:
+                elif f"/{code}\"" not in html and f"/{code}?livello=" not in html:
                     guasti.append((path, "l'indicatore in evidenza non e' quello chiesto"))
                 elif not re.search(rf'<div class="feat__level" id="lv-{level}"[^>]*data-page-root(?![^>]*hidden)', html):
                     guasti.append((path, "il livello in evidenza non e' quello chiesto"))
@@ -81,6 +81,31 @@ class OgniCoppiaDelPool(unittest.TestCase):
                 elif level == "provincia" and ('class="map map--province"' not in html or "Le prime dieci" not in html):
                     guasti.append((path, "province senza mappa o senza le prime e le ultime dieci"))
         self.assertEqual(guasti, [], guasti[:10])
+
+
+class LaSchedaSulSuoLivello(unittest.TestCase):
+    """Ogni pannello porta alla scheda aperta sul suo livello. La scheda di un
+    indicatore con tutti e due i livelli si apre sulle regioni, e il pannello
+    delle province mandava li': chi cercava la sua provincia non la trovava."""
+
+    def test_ogni_pannello_del_pool(self):
+        from app.design.pages import home
+        with app.app_context():
+            for level, pairs in home_pick.pool().items():
+                for family, raw_id in pairs:
+                    code = sources.indicator_code(family, raw_id)
+                    scelta = home_pick.pick(code, level)
+                    primo = scelta["available"][0]
+                    for panel in home.feature(scelta)["levels"]:
+                        with self.subTest(indicatore=code, livello=panel["key"]):
+                            base = scelta["meta"]["canonical_path"]
+                            atteso = base if panel["key"] == primo else f"{base}?livello={panel['key']}"
+                            self.assertEqual(panel["scheda"], atteso)
+
+    def test_titolo_e_bottone_del_pannello_province(self):
+        html = app.test_client().get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
+        self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001\?livello=provincia"')
+        self.assertIn("/bes-01SAL001?livello=provincia\">Tutta la scheda", html)
 
 
 class LeFrasi(unittest.TestCase):

@@ -27,9 +27,9 @@
     <header class="feat__head">
       <div class="feat__id">
         <p class="feat__meta">{% if f.theme %}{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}<span class="sep" aria-hidden="true">·</span>{% endif %}{{ f.source_label }}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}</p>
-        <h3 class="feat__name" id="feat-name"><a href="{{ f.path }}">{{ f.name }}</a></h3>
+        <h3 class="feat__name" id="feat-name"><a href="{{ f.levels[0].scheda }}" data-tab-href>{{ f.name }}</a></h3>
       </div>
-      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: per {{ f.elsewhere }} c'è la scheda.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
+      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> sono nella scheda.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
       {% if two %}
       {#- Senza JavaScript sono due link, tutti e due nell'ordine di
           tabulazione: ruoli, aria-selected e tabindex mobile li aggiunge
@@ -43,7 +43,7 @@
     </header>
 
     {% for lv in f.levels %}
-    <div class="feat__level" id="lv-{{ lv.key }}" data-page-root{% if not loop.first %} hidden{% endif %}>
+    <div class="feat__level" id="lv-{{ lv.key }}" data-page-root data-href="{{ lv.scheda }}"{% if not loop.first %} hidden{% endif %}>
       <script type="application/json" data-explore-data>{{ lv.explore_js | tojson }}</script>
       {% if lv.strip.svg %}
       <figure class="feat__block" aria-labelledby="dato-t-{{ lv.key }}">
@@ -113,7 +113,7 @@
       </div>
       <div class="feat__end">
         <p class="source feat__source">Fonte: {% if f.source_url %}<a href="{{ f.source_url }}">{{ f.source_label }}</a>{% else %}{{ f.source_label }}{% endif %} ({{ lv.year }}). Elaborazione Divario Italia. Le barre partono da zero.{% if lv.key == 'provincia' %} Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.{% endif %}</p>
-        <a class="btn btn--primary" href="{{ f.path }}">Tutta la scheda dell'indicatore</a>
+        <a class="btn btn--primary" href="{{ lv.scheda }}">Tutta la scheda dell'indicatore</a>
       </div>
     </div>
     {% endfor %}

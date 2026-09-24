@@ -193,6 +193,31 @@ def bes_path(indicator_id):
         raise LookupError(f"indicatore BES {indicator_id!r} assente da all_bes_indicators") from None
 
 
+def bes_level_path(indicator_id, level):
+    """Il link a una scheda BES aperta sul livello di chi la cerca.
+
+    Una scheda con tutti e due i livelli si apre sulle regioni, e chi ci
+    arrivava da una pagina provincia trovava la classifica delle venti regioni
+    senza la sua provincia dentro: 34 link su 67 a Lecce. Da un contesto
+    provinciale il link porta quindi a `?livello=provincia`, che e' uno stato
+    della stessa pagina (`noindex, follow`, canonico sulla base), non una
+    seconda URL. Una scheda solo provinciale si apre gia' li', e resta il suo
+    canonico.
+    """
+    path = bes_path(indicator_id)
+    raw_id = str(indicator_id).removeprefix(sources.SOURCES["bes"]["internal_prefix"])
+    levels = _bes_levels().get(raw_id, ())
+    if level != "regione" and level in levels and "regione" in levels:
+        return f"{path}?livello={level}"
+    return path
+
+
+@synchronized_cache(maxsize=1)
+def _bes_levels():
+    """`{id: livelli}` di tutte le schede BES, come `_bes_paths`."""
+    return {item["id"]: frozenset(item["levels"]) for item in all_bes_indicators()}
+
+
 @synchronized_cache(maxsize=1)
 def _bes_paths():
     """`{id: path}` di tutte le schede BES, costruito una volta per processo.

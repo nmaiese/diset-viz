@@ -23,6 +23,10 @@ ESEMPI = {
     "Puglia": "/regione/puglia",
     "emilia romagna": "/regione/emilia-romagna",
     "città metropolitana di Milano": "/provincia/milano",
+    # I capoluoghi che non stanno nel nome, e il nome d'uso di Trento.
+    "Verbania": "/provincia/verbano-cusio-ossola",
+    "Carbonia": "/provincia/sud-sardegna",
+    "trentino": "/provincia/trento",
 }
 
 

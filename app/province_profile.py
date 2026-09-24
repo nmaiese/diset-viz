@@ -41,6 +41,13 @@ LIVELLO = "provincia"
 QUANTI_INDICATORI = 5
 
 
+def _province_view_path(voce):
+    try:
+        return bes_data.bes_level_path(voce["id"], "provincia")
+    except LookupError:
+        return voce["path"]
+
+
 def _indicatori(voci):
     return [
         {
@@ -49,9 +56,9 @@ def _indicatori(voci):
             "theme": voce.get("theme"),
             "score": voce.get("score"),
             "year_max": voce.get("year_max"),
-            # Gia' `bes_path` dell'id: lo calcola `quality_life_bes` una volta
-            # per indicatore, dentro la matrice memoizzata.
-            "path": voce["path"],
+            # Il canonico lo calcola `quality_life_bes` (`bes_path`), qui lo si
+            # apre sulle province come le altre righe della pagina.
+            "path": _province_view_path(voce),
         }
         for voce in (voci or [])[:QUANTI_INDICATORI]
     ]
@@ -370,7 +377,9 @@ def indicatori(chiave):
             # dominio BES ne dava undici, che si sovrapponevano quasi voce per
             # voce al filtro Tema e alzavano la barra dei filtri a 564 px.
             "macro_area": _macro_area(info.get("category")),
-            "path": bes_data.bes_path(id_indicatore),
+            # Aperta sulle province: da qui il lettore cerca la sua, e il
+            # canonico di una scheda a due livelli mostra le regioni.
+            "path": bes_data.bes_level_path(id_indicatore, "provincia"),
             "unit": info.get("unit") or "",
             "direction": info.get("direction"),
             "value": valore,
