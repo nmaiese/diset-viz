@@ -137,7 +137,6 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .zone__title { display: grid; gap: var(--space-2); }
 .zone__lead { max-width: var(--measure); color: var(--text-2); }
 .zone__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); }
-.zone__actions .btn { min-height: 40px; }
 
 /* ---------- indice di pagina ---------- */
 .toc { font-size: var(--fs-small); line-height: var(--lh-small); }
