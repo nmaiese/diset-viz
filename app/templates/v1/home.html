@@ -68,7 +68,10 @@
   <header class="pagehead home-head">
     <p class="eyebrow">L'Italia, regione per regione.</p>
     <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
-    <p class="answer">Divario Italia pubblica {{ d.indicators | num(None, 'count') }} indicatori di {{ sources_label }} per le {{ d.regions | num(None, 'count') }} regioni e le {{ d.provinces | num(None, 'count') }} province italiane, con serie dal {{ year_min }} al {{ year_max }}. Ogni cifra porta la sua fonte e il suo anno.</p>
+    {#- I conteggi (indicatori, regioni, province) li portano le porte qui sotto:
+        ripetuti anche nella frase, la stessa cifra compariva due volte nella
+        stessa fascia (SISTEMA.md, "Una cifra una volta"). -#}
+    <p class="answer">Divario Italia mette in un posto solo gli indicatori di {{ sources_label }} sulle regioni e sulle province italiane, con serie dal {{ year_min }} al {{ year_max }}. Ogni cifra porta la sua fonte e il suo anno.</p>
     <form class="home-find" role="search" action="/ricerca" method="get" aria-labelledby="l-trova">
       <label id="l-trova" for="trova">Trova il tuo territorio</label>
       <div class="home-find__row">
@@ -106,7 +109,7 @@
   <header class="zone__head">
     <div class="zone__title">
       <h2 class="h-section" id="h-dato">Indicatore in evidenza</h2>
-      <p class="zone__lead">Uno a caso fra le schede di Divario Italia, qui {{ 'per regione' if f.level == 'regione' else 'per provincia' }}. A ogni visita la home lo estrae di nuovo.</p>
+      <p class="zone__lead">{% if f.requested %}L'indicatore che hai scelto, qui {{ 'per regione' if f.level == 'regione' else 'per provincia' }}. Per uno a caso fra le schede di Divario Italia, usa il bottone qui accanto.{% else %}Uno a caso fra le schede di Divario Italia, qui {{ 'per regione' if f.level == 'regione' else 'per provincia' }}. A ogni visita la home lo estrae di nuovo.{% endif %}</p>
     </div>
     <p class="zone__actions">
       <a class="btn" href="/">{{ ui.icon('shuffle') }} Un altro indicatore</a>
@@ -126,14 +129,14 @@
       {{ ui.arealegend(f.strip.legend) }}
     </figcaption>
     <div class="chart chart--hero">{{ f.strip.svg | safe }}</div>
-    <p class="source">Ogni punto è una {{ f.singular }}, nel colore della sua ripartizione{% if f.unit %}, valori in {{ f.unit }}{% endif %}. Fonte: {{ f.source_label }} ({{ f.year }}).{% if f.rows %} Tutte le cifre sono nella classifica qui sotto.{% endif %}</p>
+    <p class="source">Ogni punto è una {{ f.singular }}, nel colore della sua ripartizione{% if f.values_note %}, {{ f.values_note }}{% endif %}. Fonte: {{ f.source_label }} ({{ f.year }}).{% if f.rows %} Tutte le cifre sono nella classifica qui sotto.{% endif %}</p>
   </figure>
   {% endif %}
 
   <figure class="module" data-explore>
     <figcaption class="module__head">
       {% if f.table_claim %}<h3 class="h-sub">{{ f.table_claim }}</h3>{% endif %}
-      <p class="subline">{{ f.name }}{% if f.unit %}, {{ '' if f.unit.startswith('per ') else 'in ' }}{{ f.unit }}{% endif %}, {{ f.year }}. {% if f.top %}Le prime e le ultime dieci delle {{ f.n | num(None, 'count') }} {{ f.plural }}{% else %}Le {{ f.n | num(None, 'count') }} {{ f.plural }}{% endif %} {% if f.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
+      <p class="subline">{{ f.name }}{% if f.unit_note %}, {{ f.unit_note }}{% endif %}, {{ f.year }}. {% if f.top %}Le prime e le ultime dieci delle {{ f.n | num(None, 'count') }} {{ f.plural }}{% else %}Le {{ f.n | num(None, 'count') }} {{ f.plural }}{% endif %} {% if f.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
     </figcaption>
     <div class="toolbar">
       <label class="field" for="territorio">Trova la tua {{ f.singular }}
@@ -179,7 +182,7 @@
         <summary>La classifica delle {{ f.n | num(None, 'count') }} {{ f.plural }}</summary>
         <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle {{ f.plural }} per {{ f.name }}">
           <table class="table table--compact">
-            <caption class="sr-only">{{ f.name }} per {{ f.singular }} nel {{ f.year }}{% if f.unit %}, in {{ f.unit }}{% endif %}</caption>
+            <caption class="sr-only">{{ f.name }} per {{ f.singular }} nel {{ f.year }}{% if f.unit_note %}, {{ f.unit_note }}{% endif %}</caption>
             {{ head }}
             <tbody data-rank-body>
               {%- for row in f.rows %}

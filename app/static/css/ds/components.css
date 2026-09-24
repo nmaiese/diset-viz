@@ -331,6 +331,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
   .scheda-head > .tiles > .tile { padding: var(--space-4) 0; border-left: 0; }
   .scheda-head > .tiles > .tile + .tile { border-top: 1px solid var(--rule); }
 }
+/* Sotto i 1200 le tessere vengono subito prima della striscia, che apre col suo
+   filetto: senza aria l'ultima riga delle tessere ci poggiava sopra. */
+@media (max-width: 1199px) { .scheda-head > .tiles { padding-bottom: var(--space-6); } }
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart .grid line { stroke: var(--rule); stroke-width: 1; }
 .chart .axis text, .chart .lab { font-family: var(--font-sans); font-size: 13px; fill: var(--muted); font-variant-numeric: tabular-nums; }

@@ -79,6 +79,61 @@ class OgniCoppiaDelPool(unittest.TestCase):
         self.assertEqual(guasti, [], guasti[:10])
 
 
+class LeFrasi(unittest.TestCase):
+    """I titoli dei grafici della fascia, su ogni coppia del pool.
+
+    Con il PIL fisso i titoli erano quattro e si potevano leggere a mano. Con
+    l'estrazione a caso sono centinaia, e la revisione ne ha trovati di
+    sgrammaticati ("una regioni del Mezzogiorno"), di falsi ("tutte le sette
+    regioni del Mezzogiorno" col Molise senza dato, "228 centomila anziani"
+    per un tasso) e di troppo lunghi."""
+
+    @classmethod
+    def setUpClass(cls):
+        from app.design.pages import home
+        cls.frasi = []
+        with app.app_context():
+            for level, pairs in home_pick.pool().items():
+                for family, raw_id in pairs:
+                    code = sources.indicator_code(family, raw_id)
+                    f = home.feature(home_pick.pick(code, level))
+                    for claim in (f["lead_claim"], f["table_claim"]):
+                        if claim:
+                            cls.frasi.append((code, level, claim, f))
+
+    def test_ci_sono_frasi(self):
+        self.assertGreater(len(self.frasi), 300)
+
+    def test_nessun_titolo_oltre_i_novanta_caratteri(self):
+        lunghi = [(c, l, len(t)) for c, l, t, _ in self.frasi if len(t) > 90]
+        self.assertEqual(lunghi, [], lunghi[:5])
+
+    def test_accordo_col_singolare(self):
+        rotte = [(c, t) for c, _, t, _ in self.frasi if re.search(r"\buna (regioni|province)\b", t)]
+        self.assertEqual(rotte, [], rotte[:5])
+
+    def test_nessuna_etichetta_generica_come_unita(self):
+        rotte = [(c, t) for c, _, t, _ in self.frasi
+                 if re.search(r"\d (numero|valore medio|Valore medio|indice|rapporto|classi|centomila)\b", t)]
+        self.assertEqual(rotte, [], rotte[:5])
+
+    def test_il_mezzogiorno_nominato_c_e_tutto(self):
+        """Una frase che conta il Mezzogiorno ("le otto regioni", "su 38") lo
+        conta intero: con un territorio senza dato la frase non si scrive."""
+        from app.design import charts
+        from app.design.pages.home import expected_areas
+        areas = charts.area_map()
+        rotte = []
+        for code, level, claim, f in self.frasi:
+            if "Mezzogiorno" not in claim:
+                continue
+            attesi = expected_areas(level)["sud"]
+            presenti = {k for k in f["names"] if areas.get(k) == "sud"}
+            if attesi - presenti:
+                rotte.append((code, level, claim))
+        self.assertEqual(rotte, [], rotte[:5])
+
+
 class LaScelta(unittest.TestCase):
     def test_prima_il_livello_poi_l_indicatore(self):
         """Le coppie regionali sono molte piu' di quelle provinciali: pescando

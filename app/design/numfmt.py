@@ -70,6 +70,15 @@ def text(value, decimals: int | None = None, sign: bool = False) -> str:
     return body
 
 
+def lower_first(text: str) -> str:
+    """"Per 1.000 abitanti" -> "per 1.000 abitanti", ma "GWh" e "KTep" restano
+    come sono: una sigla con la maiuscola non si abbassa, "gWh" e' un'altra
+    unita'."""
+    if len(text) > 1 and text[1].isupper():
+        return text
+    return text[:1].lower() + text[1:]
+
+
 def short_unit(unit: str | None) -> str | None:
     """L'unita' come si scrive accanto a una cifra ("anni", "per 10.000 occupati")."""
     unit = (unit or "").strip()
@@ -80,7 +89,7 @@ def short_unit(unit: str | None) -> str | None:
     m = re.match(r"(?i)numero medio di (.+)", unit)
     if m:
         return m.group(1)
-    lowered = unit[:1].lower() + unit[1:]
+    lowered = lower_first(unit)
     if lowered.startswith("per "):
         return lowered
     if len(unit) <= 14:

@@ -43,10 +43,16 @@ def short_unit(unit: str | None) -> str | None:
     return numfmt.short_unit(unit)
 
 
+# Le province che vogliono l'articolo: "del Verbano-Cusio-Ossola", "del Sud Sardegna".
+PROVINCE_OF = {"Verbano-Cusio-Ossola": "del Verbano-Cusio-Ossola", "Sud Sardegna": "del Sud Sardegna"}
+
+
 def of_place(name: str, level_key: str) -> str:
     """"della Basilicata", "del Piemonte" per le regioni, "di Milano" per le province."""
     if level_key == "regione":
         return of_region(name)
+    if name in PROVINCE_OF:
+        return PROVINCE_OF[name]
     if name.startswith("L'"):
         return f"dell'{name[2:]}"
     if name.startswith("La "):
@@ -69,10 +75,72 @@ def del_(text: str) -> str:
     return "dell'" if re.match(r"(8|11)|1(?![\d.])", text) else "del "
 
 
-def with_unit(value, unit: str | None) -> str:
-    """`54.637 euro`, `78,8%`: l'unita' corta accanto alla cifra, spazio insecabile."""
-    text = num(value)
+# Etichette della fonte che dicono che cosa si conta ma non sono un'unita' da
+# scrivere accanto a una cifra: "29,0 numero", "7,0 Valore medio", "0,61 classi".
+GENERIC_UNITS = {"numero", "numero medio", "valore medio", "indice", "indice (0-1)", "rapporto", "classi"}
+# "centomila anziani" e' un tasso, ogni centomila anziani: scritto accanto a una
+# cifra senza "ogni", "228 centomila anziani" si legge come ventidue milioni.
+RATE_BASE = re.compile(r"(cento|mille|diecimila|centomila|un milione di) ")
+
+
+def phrase_unit(unit: str | None) -> str | None:
+    """L'unita' come si scrive dopo una cifra dentro una frase: "euro", "%",
+    "per mille abitanti", "ogni centomila anziani". None quando l'etichetta
+    della fonte non e' un'unita': la cifra resta nuda, e l'unita' la dice la
+    riga sotto il titolo."""
     u = short_unit(unit)
+    if not u or u == "%":
+        return u
+    u = numfmt.lower_first(u)
+    if u in GENERIC_UNITS:
+        return None
+    m = re.match(r"(?:numero medio|numero|valori) (per .+)$", u)
+    if m:
+        return m.group(1)
+    m = re.match(r"numero di (.+)$", u)
+    if m:
+        return m.group(1)
+    if RATE_BASE.match(u):
+        return "ogni " + u
+    return u
+
+
+def unit_note(unit: str | None) -> str | None:
+    """L'unita' come complemento dopo il nome della misura: "in euro", "in %",
+    "per mille abitanti", "ogni cento abitanti", "valori per abitante". None
+    quando l'etichetta non e' un'unita'. Prima si scriveva "in" davanti a
+    tutto, e usciva "valori in per mille abitanti"."""
+    raw = (unit or "").strip()
+    if not raw:
+        return None
+    if raw.startswith("%"):
+        return "in %"
+    u = numfmt.lower_first(raw)
+    short = short_unit(raw)
+    if (short and numfmt.lower_first(short) in GENERIC_UNITS) or u.startswith("numero puro"):
+        return None
+    if u.startswith(("per ", "ogni ", "valori ")):
+        return u
+    if RATE_BASE.match(u):
+        return "ogni " + u
+    return "in " + u
+
+
+def values_note(unit: str | None) -> str | None:
+    """"valori in euro", "valori per mille abitanti": la nota sotto la striscia."""
+    note = unit_note(unit)
+    if note is None:
+        return None
+    return note if note.startswith("valori ") else f"valori {note}"
+
+
+def with_unit(value, unit: str | None, decimals: int | None = None) -> str:
+    """`54.637 euro`, `78,8%`: l'unita' accanto alla cifra, spazio insecabile.
+    L'unita' e' quella che si scrive dentro una frase (`phrase_unit`), e manca
+    quando l'etichetta della fonte non e' un'unita'. `decimals` quando la cifra
+    deve coincidere con quella di una colonna (numfmt.column_decimals)."""
+    text = num(value) if decimals is None or value is None else numfmt.text(value, decimals)
+    u = phrase_unit(unit)
     if u == "%":
         return f"{text}%"
     return f"{text} {u}" if u else text

@@ -176,6 +176,7 @@
       if (live && key) {
         var r = rows(current).filter(function (x) { return x.key === key; })[0];
         if (r) live.textContent = r.name + ": " + withUnit(r.value, data.unit) + " nel " + current + ".";
+        else live.textContent = (data.names[key] || key) + ": dato non disponibile nel " + current + ".";
       }
     }
 

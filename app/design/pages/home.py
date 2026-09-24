@@ -34,6 +34,8 @@ from app.design.common import (
     ranking,
     short_unit,
     the_place,
+    unit_note,
+    values_note,
     with_unit,
 )
 
@@ -72,13 +74,26 @@ def join_names(names: list[str]) -> str:
 
 # ---------------------------------------------------------------- l'indicatore in evidenza
 
+# I titoli dei grafici stanno in circa 90 caratteri (SISTEMA.md, "Regole di
+# contenuto"). Una frase piu' lunga si ripiega su una piu' corta.
+CLAIM_MAX = 90
+
+
+def expected_areas(level_key: str) -> dict[str, set[str]]:
+    """{nord|centro|sud: chiavi} di tutti i territori del livello, anche quelli
+    che l'indicatore non misura: le frasi su un insieme si scrivono solo se
+    l'insieme c'e' tutto."""
+    areas = charts.area_map()
+    regions = set(REGION_GEO_AREA)
+    keys = regions if level_key == "regione" else set(areas) - regions
+    return {a: {k for k in keys if areas.get(k) == a} for a in ("nord", "centro", "sud")}
+
+
 def split_claim(observations: list[dict], year, areas: dict, singular: str) -> str | None:
     """Il Mezzogiorno tutto da una parte del Centro-Nord, se lo e': nella
-    striscia si vede come due gruppi di colore che non si toccano. Se un
-    territorio non ha ripartizione la frase non si scrive: "nessuna regione del
+    striscia si vede come due gruppi di colore che non si toccano. Il chiamante
+    la chiede solo quando ci sono tutti i territori: "nessuna regione del
     Mezzogiorno" su un insieme che ne ignora una puo' essere falsa."""
-    if any(areas.get(o["key"]) is None for o in observations):
-        return None
     south = [o["value"] for o in observations if areas.get(o["key"]) == "sud"]
     north = [o["value"] for o in observations if areas.get(o["key"]) in ("nord", "centro")]
     if not south or not north:
@@ -91,10 +106,13 @@ def split_claim(observations: list[dict], year, areas: dict, singular: str) -> s
 
 
 def average_claim(observations: list[dict], mean: float | None, year, areas: dict,
-                  level_key: str, plural: str) -> str | None:
+                  level_key: str, plural: str, all_present: bool) -> str | None:
     """Chi sta sotto la media semplice, a partire dal Mezzogiorno: si legge nella
-    classifica, dove la riga della media divide i territori."""
-    if mean is None or any(areas.get(o["key"]) is None for o in observations):
+    classifica, dove la riga della media divide i territori. Il chiamante la
+    chiede solo quando il Mezzogiorno c'e' tutto, e le frasi che dicono chi
+    altro sta sotto ("tutte e sole", "piu' le Marche") solo se c'e' tutto
+    l'insieme (`all_present`)."""
+    if mean is None:
         return None
     south = [o for o in observations if areas.get(o["key"]) == "sud"]
     if not south:
@@ -104,26 +122,40 @@ def average_claim(observations: list[dict], mean: float | None, year, areas: dic
     others = [o for o in below if areas.get(o["key"]) != "sud"]
     words = count_word(len(south))
     if len(south_below) == len(south):
-        if not others:
+        if all_present and not others:
             return f"Nel {year} sotto la media semplice stanno tutte e sole le {words} {plural} del Mezzogiorno"
-        if len(others) <= 3:
+        if all_present and len(others) <= 3:
             names = join_names([the_place(o["name"], level_key) for o in others])
             # L'anno sta nella riga sotto il titolo: qui resta fuori, per stare nei 90 caratteri.
-            return f"Sotto la media semplice stanno le {words} {plural} del Mezzogiorno, più {names}"
+            claim = f"Sotto la media semplice stanno le {words} {plural} del Mezzogiorno, più {names}"
+            if len(claim) <= CLAIM_MAX:
+                return claim
         return f"Nel {year} tutte le {words} {plural} del Mezzogiorno stanno sotto la media semplice"
     if all(o["value"] > mean for o in south):
         return f"Nel {year} tutte le {words} {plural} del Mezzogiorno stanno sopra la media semplice"
+    if len(south_below) == 1:
+        one = the_place(south_below[0]["name"], level_key)
+        return f"Nel {year} nel Mezzogiorno solo {one} sta sotto la media semplice"
     # "Nel 2023 31 province" mette due cifre una accanto all'altra: il verbo va prima.
     return (f"Nel {year} stanno sotto la media semplice {count_word(len(south_below))} "
             f"{plural} del Mezzogiorno su {words}")
 
 
-def extremes_claim(high: dict, low: dict, unit: str | None, year, level_key: str) -> str:
-    if level_key == "regione":
-        return (f"Nel {year} si va da {with_unit(low['value'], unit)} {in_region(low['name'])} "
-                f"a {with_unit(high['value'], unit)} {in_region(high['name'])}")
-    return (f"Nel {year} si va da {with_unit(low['value'], unit)} {of_place(low['name'], level_key)} "
-            f"a {with_unit(high['value'], unit)} {of_place(high['name'], level_key)}")
+def extremes_claim(low: dict, high: dict, unit: str | None, year, level_key: str,
+                   decimals: int | None = None) -> str | None:
+    """"Nel 2024 si va da 21.702 euro in Calabria a 54.637 euro in Trentino Alto
+    Adige". Le cifre con i decimali della colonna, come in tabella. Se con
+    l'unita' non sta nei 90 caratteri si prova senza (la dice la riga sotto),
+    e se non sta nemmeno cosi' non si scrive."""
+    def place(o):
+        return in_region(o["name"]) if level_key == "regione" else of_place(o["name"], level_key)
+
+    for u in (unit, None):
+        claim = (f"Nel {year} si va da {with_unit(low['value'], u, decimals)} {place(low)} "
+                 f"a {with_unit(high['value'], u, decimals)} {place(high)}")
+        if len(claim) <= CLAIM_MAX:
+            return claim
+    return None
 
 
 # Oltre questa soglia la classifica della home si ferma alle prime e alle
@@ -155,30 +187,46 @@ def feature(pick: dict | None) -> dict | None:
     areas = charts.area_map()
     n = len(observations)
 
+    direction = meta.get("direction")
+    values = [o["value"] for o in observations]
+    decimals = numfmt.column_decimals(values)
+    # Gli estremi sono le due righe in cima e in fondo alla classifica, che e'
+    # ordinata per verso: a parita' di valore titolo, mappa e tabella nominano
+    # lo stesso territorio.
+    if direction in LOWER_BETTER:
+        low, high = observations[0], observations[-1]
+    else:
+        high, low = observations[0], observations[-1]
+
+    # Le frasi sul Mezzogiorno valgono su un insieme: si scrivono solo se i
+    # territori che nominano ci sono tutti. Con il Molise senza dato, "tutte le
+    # sette regioni del Mezzogiorno" era falsa.
+    present = {o["key"] for o in observations}
+    expected = expected_areas(key)
+    south_present = bool(expected["sud"]) and expected["sud"] <= present
+    all_present = south_present and all(keys <= present for keys in expected.values())
     by_value = sorted(observations, key=lambda o: o["value"], reverse=True)
-    high, low = by_value[0], by_value[-1]
 
     # Due titoli, uno per grafico, mai la stessa frase: la striscia dice come
     # stanno le ripartizioni, la classifica chi sta sotto la media.
-    split = split_claim(by_value, year, areas, singular)
-    avg_claim = average_claim(by_value, mean, year, areas, key, plural)
-    lead_claim = split or avg_claim or extremes_claim(high, low, unit, year, key)
-    table_claim = avg_claim if split else extremes_claim(high, low, unit, year, key)
+    split = split_claim(by_value, year, areas, singular) if all_present else None
+    avg_claim = average_claim(by_value, mean, year, areas, key, plural, all_present) if south_present else None
+    extremes = extremes_claim(low, high, unit, year, key, decimals)
+    lead_claim = split or avg_claim or extremes or f"Il divario nel {year}: le {n} {plural} sulla stessa scala"
+    table_claim = avg_claim if split else extremes
     if table_claim == lead_claim:
         table_claim = None
 
     strip = charts.divario_strip([{**o, "area": areas.get(o["key"])} for o in observations],
                                  mean, unit, stats.get("gap_ratio"))
     has_map = bool(level.get("has_map"))
-    callouts = charts.map_callouts(PATHS, [(high["key"], high["name"], with_unit(high["value"], unit)),
-                                           (low["key"], low["name"], with_unit(low["value"], unit))]) if has_map else ""
-    direction = meta.get("direction")
+    callouts = charts.map_callouts(PATHS, [(high["key"], high["name"], with_unit(high["value"], unit, decimals)),
+                                           (low["key"], low["name"], with_unit(low["value"], unit, decimals))]) if has_map else ""
     verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
              "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
-    names = {t["key"]: t["name"] for t in level.get("territories") or []}
-    names.update({o["key"]: o["name"] for o in observations})
-    values = [o["value"] for o in observations]
-    decimals = numfmt.column_decimals(values)
+    # Solo i territori con un dato: "Trova la tua provincia" offriva anche quelli
+    # senza, e sceglierli non accendeva niente.
+    names = {o["key"]: o["name"] for o in observations}
     territory_areas = {o["key"]: areas.get(o["key"]) for o in observations}
 
     rows = ranking({**level, "observations": observations}, unit)
@@ -189,12 +237,12 @@ def feature(pick: dict | None) -> dict | None:
         rows = []
 
     code = meta["canonical_path"].rstrip("/").rsplit("/", 1)[-1]
-    other = next((lv for lv in pick.get("levels") or [] if lv != key), None)
-    unit_text = (unit[:1].lower() + unit[1:]) if unit else None
+    other = pick.get("other_level")
     return {
         "name": meta["name"], "path": meta["canonical_path"], "year": year, "n": n,
-        "level": key, "plural": plural, "singular": singular,
-        "unit": unit_text, "short_unit": short_unit(unit), "source_label": meta.get("source_label"),
+        "level": key, "plural": plural, "singular": singular, "requested": bool(pick.get("requested")),
+        "unit_note": unit_note(unit), "values_note": values_note(unit),
+        "short_unit": short_unit(unit), "source_label": meta.get("source_label"),
         "source_url": meta.get("source_url"), "theme": meta.get("theme"), "theme_path": meta.get("theme_path"),
         "lead_claim": lead_claim, "table_claim": table_claim, "verso": verso,
         "lower_better": direction in LOWER_BETTER,
@@ -442,7 +490,7 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
                   else "Gli articoli costruiti sui dati"},
         "/quiz": {"title": "Quiz", "text": f"{count_word(len(ctx.get('quiz_games') or []), feminine=False).capitalize()} giochi sugli stessi indicatori"
                   if ctx.get("quiz_games") else "Giochi sugli stessi indicatori"},
-        "/catalogo-dati": {"title": "Catalogo dati", "text": "L'elenco di ogni scheda, con la sua fonte"},
+        "/catalogo-dati": {"title": "Catalogo dati", "text": "Le schede principali in un elenco, con la loro fonte"},
     }
     return {
         "main": [{"path": path, **main[path]} for path in MAIN_DOORS],

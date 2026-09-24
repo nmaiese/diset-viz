@@ -355,7 +355,9 @@ class MapAccessibilityTest(unittest.TestCase):
         indicator_html = client.get(profiles.indicator_path(sample["id"], sample["name"])).data.decode("utf-8")
         self.assertIn(f'aria-label="Mappa cliccabile delle regioni italiane per {sample["name"]}"', indicator_html)
 
-        for path in ("/", "/divari-regionali"):
+        # La home cambia indicatore a ogni visita, e solo quello regionale ha
+        # la mappa: la si chiede fissando l'indicatore.
+        for path in ("/?indicatore=ter-901", "/divari-regionali"):
             html = client.get(path).data.decode("utf-8")
             label = re.search(r'aria-label="(Mappa cliccabile delle regioni italiane[^"]*)"', html)
             self.assertIsNotNone(label, path)

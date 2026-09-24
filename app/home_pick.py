@@ -61,35 +61,43 @@ def _requested(code: str | None) -> tuple[str, str] | None:
     return parsed
 
 
-def _choice(view: dict | None, level_key: str | None) -> dict | None:
-    if view is None or not view.get("levels"):
+def _choice(view: dict | None, level_key: str, candidates: dict, requested: bool = False) -> dict | None:
+    """La scelta, se la coppia (indicatore, livello) sta nel pool: vale anche
+    per quella chiesta con `?indicatore=`, cosi' un link non porta in home una
+    scheda che il catalogo indicizzabile non ha, o un livello con poche righe.
+    `other_level` e' l'altro livello dello stesso indicatore, solo se anche
+    quello sta nel pool: e' il link "Lo stesso indicatore per provincia"."""
+    if view is None:
         return None
-    level = next((lv for lv in view["levels"] if lv["key"] == level_key), view["levels"][0])
-    if level["key"] not in LEVELS or len(level.get("observations") or []) < 2:
+    level = next((lv for lv in view["levels"] if lv["key"] == level_key), None)
+    code = view["meta"]["canonical_path"].rstrip("/").rsplit("/", 1)[-1]
+    pair = sources.parse_indicator_code(code)
+    if level is None or pair not in candidates.get(level_key, ()):
         return None
-    return {
-        "meta": view["meta"],
-        "level": level,
-        "levels": [lv["key"] for lv in view["levels"] if lv["key"] in LEVELS],
-    }
+    other = next((key for key in LEVELS if key != level_key and pair in candidates.get(key, ())), None)
+    return {"meta": view["meta"], "level": level, "other_level": other, "requested": requested}
 
 
 def pick(code: str | None = None, level_key: str | None = None,
          rng: random.Random | None = None) -> dict | None:
-    """L'indicatore in evidenza: `meta`, il `level` intero della scheda e i
-    livelli che l'indicatore ha. Quello chiesto se esiste, se no uno a caso.
-    `rng` serve alle prove, che vogliono estrazioni ripetibili."""
+    """L'indicatore in evidenza: `meta`, il `level` intero della scheda, l'altro
+    livello se c'e' e se la scelta viene dall'URL. Quello chiesto se sta nel
+    pool, se no uno a caso. `rng` serve alle prove, che vogliono estrazioni
+    ripetibili."""
     choice = rng.choice if rng is not None else random.choice
+    candidates = {key: set(pairs) for key, pairs in pool().items()}
     requested = _requested(code)
     if requested is not None:
-        chosen = _choice(indicator_view.build_indicator_view(*requested), level_key)
-        if chosen is not None:
-            return chosen
+        view = indicator_view.build_indicator_view(*requested)
+        keys = [level_key] if level_key in LEVELS else list(LEVELS)
+        for key in keys:
+            chosen = _choice(view, key, candidates, requested=True)
+            if chosen is not None:
+                return chosen
 
-    candidates = pool()
     levels = [key for key in LEVELS if candidates[key]]
     if not levels:
         return None
     key = level_key if level_key in levels else choice(levels)
-    family, raw_id = choice(candidates[key])
-    return _choice(indicator_view.build_indicator_view(family, raw_id), key)
+    family, raw_id = choice(sorted(candidates[key]))
+    return _choice(indicator_view.build_indicator_view(family, raw_id), key, candidates)
