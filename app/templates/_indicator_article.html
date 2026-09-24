@@ -12,8 +12,12 @@
 
 {# "54,87 %" reads wrong in Italian and "%" is glued to the number everywhere
    else on the page, so the unit is joined for percentages and spaced otherwise. #}
+{#- L'unita' passa da `phrase_unit`, come nelle altre frasi della scheda:
+    "4,53 Numero puro - rapporto tra redditi" e "228 centomila anziani" non
+    sono unita' da scrivere accanto a una cifra. -#}
 {% macro value(number, unit) -%}
-{{ number | it_num(2) }}{% if unit == '%' %}%{% elif unit %} {{ unit }}{% endif %}
+{%- set u = unit | phrase_unit -%}
+{{ number | it_num(2) }}{% if u == '%' %}%{% elif u %} {{ u }}{% endif %}
 {%- endmacro %}
 
 {% macro territory(level, item) -%}
@@ -140,15 +144,15 @@
      "da ... a ..." turns a short sentence into a mouthful.
    - a percentage-like indicator states its change in points. A relative "9,8%"
      next to a "54,87%" level puts two unrelated percentages in one sentence. #}
-<p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media {{ level.singular == 'regione' and 'regionale' or 'provinciale' }} è passata da {{ stats.year_min_avg | it_num(2) }} a {{ value(stats.year_avg, meta.value_unit) }}{% if meta.percentage_like %}, {{ (stats.avg_change_abs | abs) | it_num(2) }} {{ meta.change_unit }} in {{ 'più' if stats.avg_change_abs > 0 else 'meno' }}{% elif stats.avg_change_pct is not none %}, {{ (stats.avg_change_pct | abs) | it_num(1) }}% in {{ 'più' if stats.avg_change_pct > 0 else 'meno' }}{% endif %}{% if level.trend_note %}, {{ level.trend_note }}{% endif %}.</p>
+<p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media {{ level.singular == 'regione' and 'regionale' or 'provinciale' }} è passata da {{ stats.year_min_avg | it_num(2) }} a {{ value(stats.year_avg, meta.value_unit) }}{% if meta.percentage_like %}, {{ (stats.avg_change_abs | abs) | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }} in {{ 'più' if stats.avg_change_abs > 0 else 'meno' }}{% elif stats.avg_change_pct is not none %}, {{ (stats.avg_change_pct | abs) | it_num(1) }}% in {{ 'più' if stats.avg_change_pct > 0 else 'meno' }}{% endif %}{% if level.trend_note %}, {{ level.trend_note }}{% endif %}.</p>
 {% endif %}
 {% if stats.highest_delta and stats.lowest_delta %}
 <p>Sull'intero periodo
-  {%- if stats.highest_delta.kind == 'aumento' %} l'aumento maggiore è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit }}
-  {%- elif stats.highest_delta.kind == 'calo' %} il calo più contenuto è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit }}
+  {%- if stats.highest_delta.kind == 'aumento' %} l'aumento maggiore è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
+  {%- elif stats.highest_delta.kind == 'calo' %} il calo più contenuto è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
   {%- else %} {{ territory(level, stats.highest_delta) }} resta sostanzialmente stabile{% endif %},
-  {%- if stats.lowest_delta.kind == 'calo' %} mentre il calo maggiore è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit }}
-  {%- elif stats.lowest_delta.kind == 'aumento' %} mentre l'aumento più contenuto è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit }}
+  {%- if stats.lowest_delta.kind == 'calo' %} mentre il calo maggiore è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
+  {%- elif stats.lowest_delta.kind == 'aumento' %} mentre l'aumento più contenuto è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
   {%- else %} mentre {{ territory(level, stats.lowest_delta) }} resta sostanzialmente stabile{% endif %}.
   {#- No "it depends on the direction" caveat here. On a directional indicator the
       direction is known and the sentence is simply false; on a contextual one the
@@ -160,8 +164,8 @@
 {% if stats.gap_trend is not none and stats.year_min_gap_abs %}
 {% set estremi %}{% if level.best and level.worst %}la distanza fra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }}{% else %}la distanza fra il valore più alto e il più basso{% endif %}{% endset %}
 <p>{% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Dal {{ stats.year_min }} {{ estremi }} è rimasta sostanzialmente la stessa, quindi le distanze di partenza non si sono ricomposte.
-  {%- elif stats.gap_trend > 0 %}Dal {{ stats.year_min }} {{ estremi }} si è allargata di {{ stats.gap_trend | it_num(2) }} {{ meta.change_unit }}, quindi i territori non si stanno avvicinando.
-  {%- else %}Dal {{ stats.year_min }} {{ estremi }} si è ristretta di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.change_unit }}, quindi le distanze si sono in parte ricomposte.{% endif %}</p>
+  {%- elif stats.gap_trend > 0 %}Dal {{ stats.year_min }} {{ estremi }} si è allargata di {{ stats.gap_trend | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}, quindi i territori non si stanno avvicinando.
+  {%- else %}Dal {{ stats.year_min }} {{ estremi }} si è ristretta di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}, quindi le distanze si sono in parte ricomposte.{% endif %}</p>
 {% endif %}
 {% if annual %}
 {# "Il confronto usa le N regioni presenti in entrambi gli anni" e la nota

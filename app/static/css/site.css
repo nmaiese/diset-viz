@@ -1166,7 +1166,10 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 /* Ricerca interna (/ricerca): una lista di risultati, niente card. La pagina e'
    noindex per scelta, quindi tutto il peso sta sulla leggibilita', non sul
    markup ricco. */
-.search-page { padding: clamp(24px, 5vw, 44px) 0 56px; max-width: 860px; }
+/* Allineata al contenitore come la testata: con max-width sul contenitore la
+   pagina stava centrata, 290 pixel dentro il marchio a 1920. */
+.search-page { padding: clamp(24px, 5vw, 44px) 0 56px; }
+.search-page > * { max-width: 860px; }
 .search-page h1 { font-size: clamp(26px, 4vw, 36px); margin: 0 0 18px; }
 .search-page__form { display: flex; gap: 10px; align-items: stretch; margin: 0 0 14px; }
 .search-page__form .search-box { flex: 1; min-width: 0; }

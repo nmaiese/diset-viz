@@ -123,7 +123,7 @@ def derive(ctx: dict) -> dict:
         "years": [int(y) for y in sorted(level.get("matrix") or {}, key=int)],
         "matrix": level.get("matrix") or {},
         "names": {t["key"]: t["name"] for t in level.get("territories") or []},
-        "unit": short_unit(unit), "direction": direction, "plural": plural,
+        "unit": numfmt.phrase_unit(unit), "direction": direction, "plural": plural,
         "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
         "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
     }
@@ -145,7 +145,7 @@ def derive(ctx: dict) -> dict:
         "fmt": num, "fmt_unit": with_unit, "date_it": date_it, "citation": citation,
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
         "unit": numfmt.lower_first(unit) if unit else unit, "short_unit": short_unit(unit), "tiles": tiles, "verso": verso,
-        "unit_note": unit_note(unit), "values_note": values_note(unit),
+        "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
         "claim": claim, "map_classes": map_classes(level),
         "legend": legend(values, unit) if values else None,
         "ranking": ranking(level, unit), "series": series, "strip": strip, "callouts": callouts,
