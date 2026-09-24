@@ -19,16 +19,17 @@ Non e' un problema di lunghezza. Su sessanta titoli campionati la media e' 54
 caratteri e 54 stanno dentro la finestra: lo spazio c'e' gia', manca il motivo
 per cliccare. Quindi il titolo derivato porta **l'intervallo**, che e' la
 risposta alla domanda che la gente fa davvero ("pil pro capite regioni
-italiane", "pil pro capite calabria"). Copre il 61% delle pagine
-indicizzabili, 228 su 372, misurato sulla catena vera di `page_title` e non su
-questa funzione da sola. Gli estremi esistono su 273 (73%): le 99 che non li
-hanno sono quasi tutte `contextual`, dove il catalogo non espone un massimo e
-un minimo perche' su quelle serie un estremo non vuol dire niente, e quella
-guardia non si aggira dal titolo. Le altre 45 li hanno e li perdono al budget,
-perche' il nome e' troppo lungo per stare accanto all'intervallo: li' si
-rinuncia alle cifre invece che al nome, ed e' lo scambio giusto. Una forma
-compatta ("9,4-0,4%") ne recupererebbe quattro, che non valgono un secondo
-formato di numero in SERP.
+italiane", "pil pro capite calabria"). Copre il 64% delle pagine
+indicizzabili, 237 su 372, misurato sulla catena vera di `page_title` e non su
+questa funzione da sola (24 settembre 2026, dati di quel giorno). Gli estremi
+esistono su 281 (76%). Delle 91 che non li hanno, 90 sono `contextual`, dove il
+catalogo non espone un massimo e un minimo perche' su quelle serie un estremo
+non vuol dire niente, e quella guardia non si aggira dal titolo. L'ultima e'
+`bes-06POL012P`, fuori apposta (`UNVERIFIED_EXTREMES`). Le altre 44 li hanno e
+li perdono al budget, perche' il nome e' troppo lungo per stare accanto
+all'intervallo: li' si rinuncia alle cifre invece che al nome, ed e' lo scambio
+giusto. Una forma compatta ("9,4-0,4%") ne recuperava quattro al conto di
+prima, che non valgono un secondo formato di numero in SERP.
 
 Il 70% che stava scritto qui era il conto fatto prima che `_shorten_at_joint`
 sostituisse il taglio a budget, cioe' prima della correzione raccontata in
@@ -232,9 +233,12 @@ def _with_figures(text, figures, max_len):
 def _level_tail(level):
     """" per regione" o " per provincia", dal livello che la pagina rende.
 
-    `indicator_notes._TITLE_TAIL` e' fissa su " per regione" e viene appesa
-    anche sopra dati provinciali: e' il motivo per cui esiste
-    `taxonomy.PROVINCE_ONLY_TITLE_COLLISIONS`, che rattoppa il sintomo.
+    La usano il titolo derivato e il ripiego: `page_title` la passa a
+    `indicator_notes.seo_title`, che da solo appenderebbe `_TITLE_TAIL`, fissa
+    su " per regione", anche sopra dati provinciali. Quella coda fissa e' il
+    motivo per cui e' nato `taxonomy.PROVINCE_ONLY_TITLE_COLLISIONS`: prima di
+    toglierlo va visto se serve ancora ai titoli scritti, che la coda del
+    livello non la portano.
     """
     singular = (level.get("singular") or "").strip()
     return f" per {singular}" if singular else ""
@@ -321,13 +325,13 @@ def _keeps_meaning(measure, text, marker, strict=True):
     kept = text[: len(text) - len(marker)] if marker and text.endswith(marker) else text
     if kept == measure:
         return True
-    head, _, coda = kept.partition(" (")
-    coda = coda.removesuffix(")")
+    head, _, paren = kept.partition(" (")
+    paren = paren.removesuffix(")")
     if len(head.split()) < 2 or not measure.startswith(head):
         return False
     dropped = measure[len(head):].strip()
-    if coda and dropped.endswith(coda):
-        dropped = dropped[: -len(coda)]
+    if paren and dropped.endswith(paren):
+        dropped = dropped[: -len(paren)]
     return not any(_carries_meaning(word, strict) for word in dropped.split())
 
 

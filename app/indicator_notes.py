@@ -551,6 +551,19 @@ def _short_name_for_title(name):
 #   della misura: "Competenza numerica (classe III secondaria)".
 # - L'affollamento delle carceri e' la parola delle query, e l'accorciatore
 #   buttava "di pena": "Affollamento degli istituti".
+#
+# Tre righe riparano un accorciamento che cambiava la misura, venuto fuori
+# quando il titolo ha cominciato a scrivere lo zero come "0" e l'unita' accanto
+# alle cifre, e a scartare gli accorciamenti che buttano una negazione.
+# - ter-84 usciva "Rifiuti urbani smaltiti per regione, da 317 a 0
+#   chilogrammi": senza "in discarica per abitante", e con l'unita' accanto, si
+#   leggeva come un totale regionale.
+# - bes-01SAL008 usciva "Speranza di vita senza limitazioni, da 12,2 a 8,8
+#   anni": senza "a 65 anni" sembrava una speranza di vita di dodici anni.
+# - ter-255 usciva "Superficie boscata e non boscata percorsa": la guardia sulle
+#   negazioni scartava "Superficie boscata (percorsa dal fuoco)", che a sua
+#   volta restringeva la misura al solo bosco. "Forestale" e' la parola della
+#   definizione, e tiene "dal fuoco".
 SHORT_NAMES = {
     ("ter-598", "regione"): "Donne fra i dipendenti delle imprese culturali",
     ("ter-599", "regione"): "Giovani fra i dipendenti delle imprese culturali",
@@ -560,6 +573,9 @@ SHORT_NAMES = {
     ("bes-02IST011P", "provincia"): "Competenza alfabetica non adeguata",
     ("bes-06POL012", "regione"): "Affollamento delle carceri",
     ("bes-06POL012P", "provincia"): "Affollamento delle carceri",
+    ("ter-84", "regione"): "Rifiuti urbani in discarica per abitante",
+    ("bes-01SAL008", "regione"): "Speranza di vita a 65 anni senza limitazioni",
+    ("ter-255", "regione"): "Superficie forestale percorsa dal fuoco",
 }
 
 

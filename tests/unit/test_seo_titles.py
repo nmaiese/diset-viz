@@ -231,6 +231,35 @@ class NomeBreveTest(unittest.TestCase):
             provincia(None, None))
         self.assertNotIn("carceri", titolo)
 
+    def test_l_unita_non_cambia_la_misura_accorciata(self):
+        """ter-84 usciva "Rifiuti urbani smaltiti per regione, da 317 a 0
+        chilogrammi", un totale regionale, e bes-01SAL008 "Speranza di vita
+        senza limitazioni, da 12,2 a 8,8 anni", una vita di dodici anni: lo
+        zero scritto "0" aveva fatto spazio all'unita', e l'accorciatore aveva
+        buttato il denominatore e l'eta'."""
+        rifiuti = seo_titles.answer_title(
+            meta(name="Rifiuti urbani smaltiti in discarica per abitante", unit="chilogrammi",
+                 family="territorial", raw_id="84"),
+            level(best=("Molise", 317.0), worst=("Campania", 0.0)))
+        self.assertEqual(rifiuti, "Rifiuti urbani in discarica per abitante, da 317 a 0")
+        self.assertNotIn("chilogrammi", rifiuti)
+        speranza = seo_titles.answer_title(
+            meta(name="Speranza di vita senza limitazioni nelle attività a 65 anni",
+                 unit="Numero medio di anni", family="bes", raw_id="01SAL008"),
+            level(best=("Veneto", 12.2), worst=("Calabria", 8.8)))
+        self.assertEqual(speranza, "Speranza di vita a 65 anni senza limitazioni, da 12,2 a 8,8")
+
+    def test_la_misura_non_si_restringe(self):
+        """ter-255 misura il bosco e il resto della superficie forestale: la
+        guardia sulle negazioni scartava "Superficie boscata (percorsa dal
+        fuoco)", che del resto diceva solo il bosco, e restava "Superficie
+        boscata e non boscata percorsa", senza il fuoco."""
+        titolo = seo_titles.answer_title(
+            meta(name="Superficie boscata e non boscata percorsa dal fuoco", unit="%",
+                 family="territorial", raw_id="255"),
+            level(best=("Calabria", 2.4), worst=("Valle d'Aosta", 0.02)))
+        self.assertEqual(titolo, "Superficie forestale percorsa dal fuoco, dal 2,4% allo 0,02%")
+
 
 class EstremiNonVerificatiTest(unittest.TestCase):
     """bes-06POL012P: zeri dal 2016 e 358% a Fermo, causa non verificata."""
