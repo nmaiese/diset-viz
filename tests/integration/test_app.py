@@ -2016,9 +2016,10 @@ class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
     tendine Esplora e Classifiche, ricerca in testata, interruttore tondo);
     `/atlante` e `/confronto` montavano una testata React con marchio corallo e
     sottotitolo, otto voci piatte, nessuna ricerca e un interruttore quadrato.
-    Le voci venivano gia' dalla stessa lista (`window.__diNav`), il disegno no.
-    Adesso la testata e' una, la rende Flask, e React tiene solo cio' che la
-    testata non puo' sapere: la barra del telefono e il pulsante di ritorno.
+    Le voci venivano gia' dalla stessa lista, il disegno no. Adesso la testata
+    e' una, la rende Flask, e React tiene solo cio' che la testata non puo'
+    sapere: il pulsante di ritorno. La barra in basso del telefono, che ne era
+    rimasta, se n'e' andata con le sue etichette vecchie.
     """
 
     PAGINE = ("/", "/atlante", "/confronto", "/temi", "/regioni", "/province",

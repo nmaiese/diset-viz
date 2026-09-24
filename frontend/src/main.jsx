@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import { getAccessToken, getUser, isAuthConfigured } from "./shared/supabase.js";
@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   ArrowDownRight,
   ArrowLeft,
-  ArrowLeftRight,
   ArrowUpRight,
   BarChart3,
   Check,
@@ -276,23 +275,15 @@ function App() {
     withViewTransition(apply);
   };
 
-  // Switch between reading modes ("per indicatore" / "per regione" / "confronta").
-  const goToMode = (mode) => {
-    trackEvent("switch_mode", { mode });
-    // Su una pagina che possiede la sua vista (/confronto) cambiare modalità è
-    // una navigazione vera: altrimenti resteremmo su /confronto con ?view=atlas,
-    // cioè una URL che dice il contrario di quello che mostra.
-    if (INITIAL_VIEW) {
-      if (mode === INITIAL_VIEW) {
-        window.scrollTo({ top: 0, behavior: "auto" });
-        return;
-      }
-      window.location.assign(mode === "regioni" ? "/atlante?view=regioni" : "/atlante");
-      return;
-    }
+  // Il selettore delle modalità ("Per indicatore", "Per regione", "Confronta") e
+  // la barra del telefono non ci sono più: fra atlante, regioni e confronto si
+  // passa dalla testata e dalle briciole, che rende Flask. Restano il passaggio
+  // dalla mappa alla regione, qui sotto, e il ritorno all'elenco: la vista
+  // regione è uno stato di /atlante, basta togliere vista e regione dall'URL.
+  const backToAtlas = () => {
     withViewTransition(() => {
-      setFromParam(null);
-      setView(mode === "regioni" ? "regioni" : mode === "confronto" ? "confronto" : "atlas");
+      setRegionKey(null);
+      setView(null);
       window.scrollTo({ top: 0, behavior: "auto" });
     });
   };
@@ -301,8 +292,7 @@ function App() {
   // regions, or the indicator dashboard) without a full page reload.
   const openRegion = (key) => {
     trackEvent("open_region", { region_key: key });
-    // Stessa regola di goToMode: da una pagina che possiede la sua vista si esce
-    // navigando. Senza questa riga, aprire una regione dal confronto lascerebbe
+    // Da una pagina che possiede la sua vista si esce navigando. Senza questa riga, aprire una regione dal confronto lascerebbe
     // /confronto?view=regioni, una URL che mostra tutt'altro da quello che dice.
     if (INITIAL_VIEW) {
       window.location.assign(`/atlante?view=regioni&rk=${encodeURIComponent(key)}`);
@@ -335,9 +325,7 @@ function App() {
   if (error) {
     return (
       <main className="app-shell">
-        <SiteHeader />
         <ErrorState message={error} />
-        <SiteFooter />
       </main>
     );
   }
@@ -345,9 +333,7 @@ function App() {
   if (!catalog || !mapData) {
     return (
       <main className="app-shell">
-        <SiteHeader />
         <AtlasViewSkeleton />
-        <SiteFooter />
       </main>
     );
   }
@@ -361,7 +347,7 @@ function App() {
         profile={regionProfile}
         onSelectRegion={selectRegion}
         onClearRegion={() => setRegionKey(null)}
-        onMode={goToMode}
+        onBack={backToAtlas}
         onOpenIndicator={(item) =>
           openIndicator(item, { type: "regione", key: regionKey, name: regionProfile?.region })
         }
@@ -374,7 +360,6 @@ function App() {
       <CompareView
         catalog={catalog}
         mapData={mapData}
-        onMode={goToMode}
         onOpenRegion={openRegion}
       />
     );
@@ -385,9 +370,7 @@ function App() {
     // page. Show the skeleton meanwhile so there is no flash of a second dashboard.
     return (
       <main className="app-shell">
-        <SiteHeader />
         <AtlasViewSkeleton />
-        <SiteFooter />
       </main>
     );
   }
@@ -436,188 +419,26 @@ function App() {
       favParam={favParam}
       setFavParam={setFavParam}
       onOpen={openIndicator}
-      onMode={goToMode}
     />
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Shared chrome                                                       */
+/* Back bar                                                            */
 /* ------------------------------------------------------------------ */
 
-// Le voci arrivano dal server via `window.__diNav`, lo stesso meccanismo di
-// `__diInitialView`: la SPA continua a non conoscere nessuna rotta Flask, e
-// `app/nav.py` resta l'unico posto dove si aggiunge o si rinomina una sezione.
-// Il ripiego copre il caso in cui il bundle giri senza il suo guscio (uno
-// smoke test, una pagina vecchia in cache): meglio una barra ridotta che una
-// testata senza navigazione.
-const NAV_RIPIEGO = {
-  masthead: [
-    { label: "Atlante", path: "/atlante", key: "atlas" },
-    { label: "Regioni", path: "/regioni", key: "regioni" },
-    { label: "Temi", path: "/temi", key: "temi" },
-  ],
-  footer: [],
-};
-
-function readNav() {
-  const dato = typeof window !== "undefined" ? window.__diNav : null;
-  if (!dato || !Array.isArray(dato.masthead) || !dato.masthead.length) return NAV_RIPIEGO;
-  return dato;
-}
-
-// La barra del telefono tiene le sue icone e le sue etichette brevissime, che in
-// `nav.py` non avrebbero senso, ma NON le sue destinazioni: mandava a
-// `/qualita-della-vita` mentre la testata mandava alla classifica, cioe' due
-// pagine diverse per la stessa voce a seconda del dispositivo.
-function navPath(key, ripiego) {
-  const voce = readNav().masthead.find((v) => v.key === key);
-  return (voce && voce.path) || ripiego;
-}
-
-function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
-  // La testata non si disegna piu' qui: la rende Flask con `_ds_header.html`,
-  // lo stesso file di ogni altra pagina, sopra `#root`. Prima queste due rotte
-  // avevano una testata loro, con marchio, navigazione, ricerca e interruttore
-  // del tema disegnati in modo diverso dal resto del sito: due identita' sullo
-  // stesso dominio, e CLAUDE.md ne ammette una sola.
-  //
-  // Quel che resta a React e' cio' che la testata SSR non puo' sapere: la
-  // barra del telefono, che evidenzia la vista aperta dentro la SPA, e il
-  // pulsante di ritorno, che dipende da dove si e' entrati.
-  //
-  // `onNavAtlas` e `onNavRegioni` restano nella firma perche' la barra del
-  // telefono li usa ancora per cambiare vista senza ricaricare. Dalla testata
-  // quei due link ora ricaricano la pagina, ed e' corretto: `/atlante` e
-  // `/regioni` sono due pagine vere, non due stati.
-  const handleLocalNav = (event, handler) => {
-    if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
-      event.preventDefault();
-      handler();
-    }
-  };
-
-  return (
-    <>
-      {children ? <div className="spa-backbar">{children}</div> : null}
-
-      <nav className="tabbar" aria-label="Navigazione principale">
-        <a
-          href={navPath("atlas", "/atlante")}
-          className={activeNav === "atlas" ? "tabbar__item is-active" : "tabbar__item"}
-          onClick={(event) => handleLocalNav(event, onNavAtlas)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"></path></svg>
-          <span>Atlante</span>
-        </a>
-        <a
-          href={navPath("regioni", "/regioni")}
-          className={activeNav === "regioni" ? "tabbar__item is-active" : "tabbar__item"}
-          onClick={(event) => handleLocalNav(event, onNavRegioni)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
-          <span>Regioni</span>
-        </a>
-        <a href={navPath("qualita-della-vita", "/qualita-della-vita")} className="tabbar__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-          <span>Qualità</span>
-        </a>
-        <a href={navPath("gioco", "/quiz")} className="tabbar__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"></rect><circle cx="8" cy="8" r="1"></circle><circle cx="16" cy="8" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>
-          <span>Gioco</span>
-        </a>
-        <a href={navPath("blog", "/blog")} className="tabbar__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
-          <span>Blog</span>
-        </a>
-      </nav>
-    </>
-  );
-}
-
-function SiteFooter() {
-  const hasConsentPreferences = typeof window !== "undefined" && typeof window.diOpenConsentPreferences === "function";
-
-  return (
-    <footer className="site-footer">
-      <span>
-        Divario Italia · dati{" "}
-        <a
-          href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Istat
-        </a>
-        , indicatori territoriali per le politiche di sviluppo
-      </span>
-      <span>
-        {readNav().footer.map((item, indice) => (
-          <Fragment key={item.path}>
-            {indice > 0 && " · "}
-            <a href={item.path}>{item.label}</a>
-          </Fragment>
-        ))}
-      </span>
-      {hasConsentPreferences && (
-        <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>
-          Gestisci preferenze cookie
-        </button>
-      )}
-    </footer>
-  );
-}
-
-// Top-level reading mode: browse indicators, or look up how a region is doing.
-function ModeSwitch({ active, onMode }) {
-  const modes = [
-    { id: "atlas", label: "Per indicatore", icon: BarChart3 },
-    { id: "regioni", label: "Per regione", icon: MapPinned },
-    { id: "confronto", label: "Confronta", icon: ArrowLeftRight },
-  ];
-  return (
-    <div className="mode-switch" role="tablist" aria-label="Modalità di lettura">
-      {modes.map((mode) => {
-        const Icon = mode.icon;
-        const isActive = active === mode.id;
-        return (
-          <button
-            key={mode.id}
-            type="button"
-            role="tab"
-            aria-selected={isActive}
-            className={isActive ? "mode-switch__tab is-active" : "mode-switch__tab"}
-            onClick={() => !isActive && onMode(mode.id)}
-          >
-            <Icon size={16} /> {mode.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function ContextBar({ label, crumbs, children }) {
-  return (
-    <section className="context-bar" aria-label="Contesto">
-      <div className="context-bar__path">
-        <span className="context-bar__label">{label}</span>
-        <nav className="breadcrumb" aria-label="Percorso">
-          {crumbs.map((crumb, index) => (
-            <React.Fragment key={`${crumb.label}-${index}`}>
-              {index > 0 && <span>/</span>}
-              {crumb.onClick ? (
-                <button type="button" onClick={crumb.onClick}>{crumb.label}</button>
-              ) : (
-                <span>{crumb.label}</span>
-              )}
-            </React.Fragment>
-          ))}
-        </nav>
-      </div>
-      {children && <div className="context-bar__tools">{children}</div>}
-    </section>
-  );
+// Testata, briciole e piede non si disegnano qui: li rende Flask con
+// `_ds_header.html`, `_breadcrumb.html` e `_ds_footer.html`, gli stessi file di
+// ogni altra pagina, fuori da `#root`. Qui c'erano una barra fissa in basso per
+// il telefono, con etichette sue ("Gioco", "Blog") che il menu non usava piu',
+// un piede con la stessa lista in fila, e un selettore delle modalita' con le
+// sue briciole: tre navigazioni in piu' sulla stessa pagina, e la SPA che per
+// disegnarle doveva farsi passare le rotte del server.
+//
+// Resta a React solo cio' che la pagina server non puo' sapere: il pulsante di
+// ritorno, che dipende da dove si e' entrati.
+function BackBar({ children }) {
+  return <div className="spa-backbar">{children}</div>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -781,11 +602,17 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
 function AtlasView({
   catalog, mapData, onOpenRegion, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
   macroArea, setMacroArea, sourceFamily, setSourceFamily, yearFrom, yearTo, setYearRange,
-  favParam, setFavParam, onOpen, onMode,
+  favParam, setFavParam, onOpen,
 }) {
   // Preferiti dell'utente (Set di id), null finché non caricati / se anonimo.
   const [favorites, setFavorites] = useState(null);
-  const favOnly = favParam === "1";
+  // "Solo preferiti" ha senso solo con un account: all'anonimo il filtro dava
+  // una lista vuota, e il bottone compariva appena l'accesso era configurato sul
+  // sito, cioè a tutti. Il filtro segue il bottone: un `?fav=1` condiviso, aperto
+  // senza accesso, mostra l'elenco intero invece di un elenco vuoto senza un
+  // comando per tornare indietro.
+  const [signedIn, setSignedIn] = useState(false);
+  const favOnly = favParam === "1" && signedIn;
   const [fullMin, fullMax] = useMemo(() => {
     const mins = catalog.indicators.map((i) => i.year_min);
     const maxs = catalog.indicators.map((i) => i.year_max);
@@ -809,6 +636,7 @@ function AtlasView({
         if (active) setFavorites(new Set());
         return;
       }
+      setSignedIn(true);
       fetch("/api/favorites", { headers: { Authorization: `Bearer ${token}` } })
         .then((r) => (r.ok ? r.json() : { favorites: [] }))
         .then((d) => active && setFavorites(new Set(d.favorites || [])))
@@ -858,17 +686,7 @@ function AtlasView({
 
   return (
     <main className="app-shell">
-      <SiteHeader
-        activeNav="atlas"
-        onNavAtlas={() => onMode("atlas")}
-        onNavRegioni={() => onMode("regioni")}
-      />
-
       <div className="scene-enter">
-        <ContextBar label="Atlante" crumbs={[{ label: "Atlante" }]}>
-          <ModeSwitch active="atlas" onMode={onMode} />
-        </ContextBar>
-
         <HomeMapHero catalog={catalog} mapData={mapData} onOpenRegion={onOpenRegion} />
 
         <MacroSpine
@@ -906,13 +724,12 @@ function AtlasView({
               setYearRange={setYearRange}
               favOnly={favOnly}
               setFavOnly={(on) => setFavParam(on ? "1" : null)}
-              showFav={isAuthConfigured()}
+              showFav={signedIn}
             />
             <IndicatorIndex items={filtered} onOpen={onOpen} />
           </div>
         </section>
       </div>
-      <SiteFooter />
     </main>
   );
 }
@@ -1166,7 +983,7 @@ function CoverageBadge({ item }) {
 /* ------------------------------------------------------------------ */
 
 function RegionView({
-  mapData, overview, regionKey, profile, onSelectRegion, onClearRegion, onMode, onOpenIndicator,
+  mapData, overview, regionKey, profile, onSelectRegion, onClearRegion, onBack, onOpenIndicator,
 }) {
   const entries = useMemo(() => (overview ? Object.values(overview) : []), [overview]);
   const values = useMemo(
@@ -1191,29 +1008,23 @@ function RegionView({
 
   return (
     <main className="app-shell">
-      <SiteHeader
-        activeNav="regioni"
-        onNavAtlas={() => onMode("atlas")}
-        onNavRegioni={selectRandomRegion}
-      >
+      {/* Il ritorno all'elenco stava nelle briciole di React ("Atlante / Per
+          regione") e nel selettore delle modalità, andati via con la barra:
+          la vista regione è uno stato di /atlante, e l'URL non tiene la
+          cronologia (replaceState), quindi senza questo bottone si tornava
+          all'elenco solo dal menu della testata. */}
+      <BackBar>
+        <button className="back-link" type="button" onClick={onBack}>
+          <ArrowLeft size={16} /> Tutti gli indicatori
+        </button>
         {selectedName && (
           <button className="back-link" type="button" onClick={selectRandomRegion}>
             <MapPinned size={16} /> Regione casuale
           </button>
         )}
-      </SiteHeader>
+      </BackBar>
 
       <div className="scene-enter">
-        <ContextBar
-          label="Per regione"
-          crumbs={[
-            { label: "Atlante", onClick: () => onMode("atlas") },
-            { label: "Per regione" },
-            ...(selectedName ? [{ label: selectedName }] : []),
-          ]}
-        >
-          <ModeSwitch active="regioni" onMode={onMode} />
-        </ContextBar>
 
         <section className="atlas-hero atlas-hero--compact atlas-hero--region">
           <p className="eyebrow">Istat · 20 regioni · profili territoriali</p>
@@ -1277,7 +1088,6 @@ function RegionView({
           </div>
         </section>
       </div>
-      <SiteFooter />
     </main>
   );
 }
@@ -1725,7 +1535,7 @@ function SavedComparisons({ config, onLoad }) {
   );
 }
 
-function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
+function CompareView({ catalog, mapData, onOpenRegion }) {
   const [indId, setIndId] = useState(catalog.featured_indicator_id);
   const [indicator, setIndicator] = useState(null);
   const [regionNames, setRegionNames] = useState([]);
@@ -1790,13 +1600,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
 
   return (
     <main className="app-shell">
-      <SiteHeader activeNav="atlas" onNavAtlas={() => onMode("atlas")} onNavRegioni={() => onMode("regioni")} />
-
       <div className="scene-enter">
-        <ContextBar label="Confronta" crumbs={[{ label: "Confronta" }]}>
-          <ModeSwitch active="confronto" onMode={onMode} />
-        </ContextBar>
-
         <section className="atlas-hero atlas-hero--compact">
           <p className="eyebrow">Confronto regioni</p>
           <h1>Metti due o tre regioni a confronto.</h1>
@@ -1910,7 +1714,6 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
           </div>
         )}
       </div>
-      <SiteFooter />
     </main>
   );
 }
@@ -1931,8 +1734,6 @@ function DetailView({
   setSelectedRegion,
   onSelectIndicator,
   onOpenRegion,
-  onNavRegioni,
-  onNavAtlas,
   onBack,
   backContext,
   activeTab,
@@ -1968,37 +1769,16 @@ function DetailView({
 
   return (
     <main className="app-shell">
-      <SiteHeader
-        activeNav={fromRegion ? "regioni" : "atlas"}
-        onNavAtlas={onNavAtlas}
-        onNavRegioni={onNavRegioni}
-      >
+      <BackBar>
         <button className="back-link" type="button" onClick={onBack}>
           <ArrowLeft size={16} /> {fromRegion ? fromRegion.name : "Atlante"}
         </button>
-      </SiteHeader>
+      </BackBar>
 
       {!indicatorMeta ? (
         <DetailViewSkeleton />
       ) : (
         <div key={selectedId} className="scene-enter">
-          <ContextBar
-            label="Scheda indicatore"
-            crumbs={
-              fromRegion
-                ? [
-                    { label: "Regioni", onClick: onBack },
-                    { label: fromRegion.name, onClick: onBack },
-                    { label: indicatorMeta.name },
-                  ]
-                : [
-                    { label: "Atlante", onClick: onBack },
-                    { label: indicatorMeta.theme },
-                    { label: indicatorMeta.name },
-                  ]
-            }
-          />
-
           <section className="workspace" id="dashboard">
             <aside className="indicator-panel">
               <IndicatorHeader metadata={indicatorMeta} regionCount={yearValues.length} />
@@ -2073,7 +1853,6 @@ function DetailView({
           </section>
         </div>
       )}
-      <SiteFooter />
     </main>
   );
 }
@@ -2496,8 +2275,12 @@ function Sparkline({ data, width = 150, height = 40 }) {
   const y = d3.scaleLinear().domain(d3.extent(points, (row) => row.value)).range([height - pad, pad]);
   const line = d3.line().x((row) => x(row.year)).y((row) => y(row.value)).curve(d3.curveMonotoneX);
   const last = points[points.length - 1];
+  // Decorativa, e detta cosi' agli screen reader: prima si annunciava come
+  // "Andamento medio nazionale", che e' falso due volte. La linea e' la media
+  // semplice delle regioni con il dato, non un valore nazionale, e cio' che dice
+  // sta gia' in testo accanto (variazione, anni, copertura).
   return (
-    <svg className="spark" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Andamento medio nazionale" preserveAspectRatio="none">
+    <svg className="spark" viewBox={`0 0 ${width} ${height}`} aria-hidden="true" focusable="false" preserveAspectRatio="none">
       <path className="spark__line" d={line(points)} />
       <circle className="spark__dot" cx={x(last.year)} cy={y(last.value)} r={2.6} />
     </svg>
@@ -2519,11 +2302,6 @@ function LoadingState() {
 function AtlasViewSkeleton() {
   return (
     <>
-      <section className="context-bar" aria-label="Contesto" aria-hidden="true">
-        <div className="context-bar__path">
-          <span className="skel-bar" style={{ height: 14, width: 120 }} />
-        </div>
-      </section>
       <section className="atlas-hero" aria-hidden="true">
         <div className="skel-bars" style={{ marginTop: 0 }}>
           <span style={{ height: 14, width: "35%" }} />
@@ -2547,19 +2325,14 @@ function AtlasViewSkeleton() {
   );
 }
 
-// Riproduce context-bar + workspace (pannello indicatore + mappa/classifica/
-// serie storica) al posto del generico LoadingState: DetailView collassa a
+// Riproduce il workspace (pannello indicatore + mappa/classifica/serie
+// storica) al posto del generico LoadingState: DetailView collassa a
 // quel blocco non solo al primo mount ma ad ogni cambio indicatore
 // (Precedente/Successivo, selezione da classifica), quindi il salto di
 // layout altrimenti si ripete durante la navigazione normale.
 function DetailViewSkeleton() {
   return (
     <>
-      <section className="context-bar" aria-label="Contesto" aria-hidden="true">
-        <div className="context-bar__path">
-          <span className="skel-bar" style={{ height: 14, width: 220 }} />
-        </div>
-      </section>
       <section className="workspace" aria-hidden="true">
         <aside className="indicator-panel">
           <div className="skel-bars" style={{ marginTop: 0 }}>

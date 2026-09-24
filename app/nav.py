@@ -7,13 +7,13 @@ raggiungevano `/confronto` ne' `/divari-regionali`, la qualita' della vita
 portava all'indice invece che alla classifica, e le stesse sezioni si
 chiamavano "Quiz Italia" e "Blog" da una parte, "Quiz" e "Storie" dall'altra.
 
-La SPA continua a non conoscere nessuna rotta Flask: le voci le arrivano da
-`window.__diNav`, lo stesso meccanismo con cui `.claude/rules/frontend.md`
-consente gia' di passarle `__diInitialView`. Qui si decide, li' si disegna.
+Adesso la SPA non disegna piu' nessuna navigazione. Testata, briciole e piede
+di `/atlante` e `/confronto` li rende Flask, con gli stessi template di ogni
+altra pagina: la barra in basso del telefono e il piede React, che leggevano
+queste voci da `window.__diNav`, sono andati con le loro etichette vecchie.
 
 `active` e' la chiave che una pagina dichiara con `active_nav` per marcare la
-voce corrente, e serve solo alla testata Flask: nella SPA la voce attiva la sa
-il bundle.
+voce corrente nella testata.
 """
 from __future__ import annotations
 
@@ -63,7 +63,7 @@ PRIMARY = (
 )
 
 # Il pie' di pagina, nelle sue colonne. E' l'elenco che si vede, e da qui si
-# ricava anche quello piatto che leggono il cassetto e la SPA.
+# ricava anche quello piatto che legge il cassetto del telefono.
 #
 # Era scritto due volte, e questo modulo esiste per non farlo: le colonne
 # stavano a mano in `blog_base.html`, la lista piatta qui sotto, e le due
@@ -124,10 +124,10 @@ LEGAL = (
 def _footer_piatto():
     """Le stesse voci in fila, una sola volta per destinazione.
 
-    La barra della SPA e il cassetto del telefono mostrano una riga, non
-    quattro colonne: `/metodologia` sta in due colonne con due nomi diversi e
-    in una riga sola diventerebbe una ripetizione. Vince il primo nome, che e'
-    quello che la colonna piu' a sinistra ha gia' dato.
+    Il cassetto del telefono mostra una riga, non quattro colonne:
+    `/metodologia` sta in due colonne con due nomi diversi e in una riga sola
+    diventerebbe una ripetizione. Vince il primo nome, che e' quello che la
+    colonna piu' a sinistra ha gia' dato.
 
     La chiave e' percorso **piu' ancora**: "/privacy" e "/privacy#cookie" sono
     due destinazioni diverse per chi legge, e deduplicarle sul solo percorso
@@ -143,32 +143,6 @@ def _footer_piatto():
 
 
 FOOTER = _footer_piatto()
-
-
-# La barra compatta della testata React non puo' portare le undici voci della
-# navigazione Flask, che li' vivono in due tendine. Qui si dichiara **quali**
-# destinazioni porta, non le sue etichette: quelle restano quelle di sopra, e
-# una prova verifica che ogni percorso di questa lista esista davvero in
-# `PRIMARY`. Cosi' le due superfici mostrano quantita' diverse dello stesso
-# vocabolario, invece di essere due elenchi che divergono.
-SPA_MASTHEAD = (
-    "/atlante",
-    "/regioni",
-    "/temi",
-    "/confronto",
-    "/divari-regionali",
-    "/qualita-della-vita/classifica/regioni",
-    "/quiz",
-    "/blog",
-)
-
-# Dove il nome per esteso non entra in una barra. Non e' un'etichetta diversa:
-# e' la stessa voce, abbreviata dove lo spazio lo impone.
-SHORT = {
-    "/regioni": "Regioni",
-    "/confronto": "Confronta",
-    "/qualita-della-vita/classifica/regioni": "Qualità della vita",
-}
 
 
 def drawer_other():
@@ -238,25 +212,3 @@ def paths():
             viste.add(voce["path"])
             uscita.append(voce["path"])
     return uscita
-
-
-def for_spa():
-    """La forma che il bundle legge da `window.__diNav`.
-
-    Solo etichette, percorsi e la chiave `key` con cui la SPA riconosce le due
-    voci che gestisce internamente (atlante e regioni) senza ricaricare la
-    pagina. La chiave `active` della testata Flask non serve: nella SPA la voce
-    corrente la sa il bundle."""
-    per_percorso = {v["path"]: v for v in flat()}
-    return {
-        "masthead": [
-            {"label": SHORT.get(percorso) or per_percorso[percorso]["label"],
-             "path": percorso,
-             "key": per_percorso[percorso].get("active", "")}
-            for percorso in SPA_MASTHEAD if percorso in per_percorso
-        ],
-        # Il percorso che la SPA usa come href porta l'ancora, quando c'e':
-        # li' e' un indirizzo, non una rotta da risolvere.
-        "footer": [{"label": v["label"], "path": v["path"] + v.get("anchor", "")}
-                   for v in FOOTER],
-    }

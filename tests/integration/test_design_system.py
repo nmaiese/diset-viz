@@ -19,13 +19,16 @@ saltando, non fanno fallire niente e si vedono solo aprendo il sito.
    segue il tema scuro: lascia la mappa sulla scala chiara mentre il resto
    della pagina e' scuro, e nessuna pagina risulta rotta.
 
-Le shell della SPA restano fuori dai controlli sul markup del chrome: hanno un
-masthead React proprio, che porta la navigazione dentro l'applicazione senza
-ricaricare. Con le altre pagine devono condividere il design system, non l'HTML.
+4. **Le shell della SPA hanno il chrome di tutte le altre.** Testata, briciole
+   e piede li rende Flask anche su `/atlante` e `/confronto`, fuori da `#root`.
+   La barra in basso del telefono, il piede React e la barra di contesto con il
+   selettore delle modalita' erano tre navigazioni in piu', con etichette che il
+   menu non usava piu', e per disegnarle la SPA si faceva passare le rotte in
+   `window.__diNav`. Se tornano non fallisce niente: si vedono solo sul telefono.
 """
-import json
 import re
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 
 from app import app, nav
@@ -47,11 +50,58 @@ JINJA_PAGES = ("/", "/blog", "/regioni", "/temi", "/metodologia",
                "/blog/divario-turistico-nord-sud-2024",
                "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99")
 
-# Tutte. Le shell della SPA hanno un chrome proprio (il masthead React, che
-# porta la navigazione dentro l'applicazione senza ricaricare), quindi non
-# hanno l'header di Jinja: quello che devono avere in comune con le altre e' il
-# design system, non il markup.
+# Tutte, shell della SPA comprese: dentro `#root` hanno la loro applicazione, ma
+# testata, briciole e piede sono gli stessi template di ogni altra pagina.
 MIGRATED = JINJA_PAGES + SPA_ROUTES
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+BUNDLE_JS = REPO_ROOT / "app" / "static" / "dist" / "assets" / "index.js"
+BUNDLE_CSS = REPO_ROOT / "app" / "static" / "dist" / "assets" / "index.css"
+SPA_SOURCE = REPO_ROOT / "frontend" / "src" / "main.jsx"
+SPA_STYLES = REPO_ROOT / "frontend" / "src" / "styles.css"
+
+VOID_ELEMENTS = frozenset({"area", "base", "br", "col", "embed", "hr", "img", "input",
+                           "link", "meta", "source", "track", "wbr"})
+
+
+class _AncestorProbe(HTMLParser):
+    """Per ogni elemento con un `id`, e per il primo `<footer>`, gli `id` degli
+    elementi che lo contengono.
+
+    L'ordine nel sorgente non basta a dire dove sta un elemento: un piede
+    incluso per sbaglio dentro `#root` viene comunque dopo `id="root"`, e React
+    lo cancella al montaggio. Una chiusura mancante chiude anche cio' che le sta
+    dentro, come fa il browser, quindi un annidamento sbagliato si vede come un
+    antenato in piu' e la prova va in rosso, non in verde.
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []
+        self.ancestors = {}
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        keys = ["#" + attributes["id"]] if attributes.get("id") else []
+        if tag == "footer":
+            keys.append("footer")
+        for key in keys:
+            self.ancestors.setdefault(key, [ident for _, ident in self.stack if ident])
+        if tag not in VOID_ELEMENTS:
+            self.stack.append((tag, attributes.get("id")))
+
+    def handle_endtag(self, tag):
+        for depth in range(len(self.stack) - 1, -1, -1):
+            if self.stack[depth][0] == tag:
+                del self.stack[depth:]
+                return
+
+
+def ancestor_ids(html):
+    probe = _AncestorProbe()
+    probe.feed(html)
+    probe.close()
+    return probe.ancestors
 
 
 class DesignSystemMigration(unittest.TestCase):
@@ -168,8 +218,9 @@ class DesignSystemMigration(unittest.TestCase):
     def test_every_page_offers_the_skip_link_target(self):
         # Lo skiplink del chrome punta a #contenuto su OGNI pagina: se una non
         # ha il bersaglio, "Vai al contenuto" non va da nessuna parte, ed e' un
-        # guasto che si vede solo con la tastiera.
-        for path in JINJA_PAGES:
+        # guasto che si vede solo con la tastiera. Sulle due shell della SPA il
+        # bersaglio mancava: il link c'era, l'id no.
+        for path in MIGRATED:
             with self.subTest(path=path):
                 html = self._html(path)
                 self.assertIn('href="#contenuto"', html)
@@ -217,9 +268,9 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
     da una parte, "Quiz" e "Storie" dall'altra. Nessuna di queste cose fa
     fallire niente: si vedono solo aprendo le due testate una accanto all'altra.
 
-    Adesso `app/nav.py` decide e le due superfici disegnano. La SPA continua a
-    non conoscere nessuna rotta Flask: le riceve da `window.__diNav`, lo stesso
-    meccanismo di `__diInitialView`.
+    Adesso `app/nav.py` decide e disegna solo Flask: la SPA non ha piu' nessuna
+    navigazione sua, e nemmeno riceve le voci. Testata, briciole e piede di
+    `/atlante` e `/confronto` sono gli stessi template di ogni altra pagina.
     """
 
     def setUp(self):
@@ -242,48 +293,14 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
     def test_il_bundle_non_manda_da_nessuna_parte_che_il_menu_non_conosca(self):
         """La barra del telefono mandava a `/qualita-della-vita`, la testata
         alla classifica: due pagine diverse per la stessa voce a seconda del
-        dispositivo. Le icone restano in JSX, che e' giusto; le destinazioni no.
-
-        Il controllo e' su dove il bundle manda, non sulle stringhe che contiene:
-        vietare le stringhe direbbe rosso anche sul ripiego, che serve e sta li'
-        apposta."""
-        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        dispositivo. La barra non c'e' piu', ma un link scritto nel bundle deve
+        restare una rotta che il menu conosce."""
+        sorgente = SPA_SOURCE.read_text(encoding="utf-8")
         noti = set(nav.paths()) | {"/"}
         for rotta in sorted(set(re.findall(r'href="(/[^"{]*)"', sorgente))):
             with self.subTest(rotta=rotta):
                 self.assertIn(rotta, noti,
                               "main.jsx manda a una rotta che app/nav.py non dichiara")
-
-    def test_il_ripiego_del_bundle_non_inventa_rotte(self):
-        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
-        ripiego = re.search(r"const NAV_RIPIEGO = \{(.*?)\n\};", sorgente, re.S)
-        self.assertIsNotNone(ripiego)
-        for rotta in re.findall(r'path: "([^"]+)"', ripiego.group(1)):
-            with self.subTest(rotta=rotta):
-                self.assertIn(rotta, nav.paths())
-
-    def test_le_shell_passano_la_navigazione_al_bundle(self):
-        atteso = nav.for_spa()
-        for path in SPA_ROUTES:
-            with self.subTest(path=path):
-                risposta = self.client.get(path)
-                self.assertEqual(risposta.status_code, 200, path)
-                html = risposta.get_data(as_text=True)
-                trovato = re.search(r"window\.__diNav = (.*?);\s*(?:</script>|\n)", html, re.S)
-                self.assertIsNotNone(trovato, f"{path}: nessun __diNav")
-                self.assertEqual(json.loads(trovato.group(1)), atteso)
-
-    def test_la_barra_compatta_usa_le_etichette_dell_elenco_lungo(self):
-        """`SPA_MASTHEAD` dichiara quali destinazioni entrano nella barra, non
-        come si chiamano: un'etichetta nuova li' sarebbe un secondo elenco."""
-        per_percorso = {v["path"]: v for v in nav.flat()}
-        for percorso in nav.SPA_MASTHEAD:
-            with self.subTest(percorso=percorso):
-                self.assertIn(percorso, per_percorso,
-                              "la barra promette una destinazione che il menu non ha")
-        for voce in nav.for_spa()["masthead"]:
-            atteso = nav.SHORT.get(voce["path"]) or per_percorso[voce["path"]]["label"]
-            self.assertEqual(voce["label"], atteso)
 
     def test_il_cassetto_del_telefono_non_perde_voci_per_strada(self):
         """Sul telefono il cassetto e' l'unica navigazione che si vede, e ogni
@@ -298,3 +315,123 @@ class LaNavigazioneEUnaSola(unittest.TestCase):
             with self.subTest(percorso=percorso):
                 self.assertIn(percorso, rotte, "il cassetto ha perso una voce")
         self.assertEqual(rotte.count("/metodologia"), 1)
+
+
+class TheSpaShellsWearTheSiteChrome(unittest.TestCase):
+    """`/atlante` e `/confronto` con la testata, le briciole e il piede del sito.
+
+    Sul telefono l'atlante aveva una barra fissa in basso con cinque voci sue
+    ("Atlante, Regioni, Qualita', Gioco, Blog", a 9,5 pixel) mentre il menu
+    diceva "Storie" e "Quiz", e in fondo due piedi: uno React con la lista in
+    fila e uno server con una manciata di link. La vista regione aveva una
+    scheda scritta in inchiostro su fondo inchiostro, e "Vai al contenuto" non
+    portava da nessuna parte. Nessuna di queste cose fa fallire una pagina.
+    """
+
+    # I resti di quello che la SPA disegnava per conto suo. Si cercano nel
+    # bundle servito, non solo nel sorgente: se `dist/` resta indietro, la
+    # produzione serve la barra anche con il sorgente pulito.
+    GONE_FROM_BUNDLE = ("tabbar", "__diNav", "mode-switch", "context-bar",
+                        "site-footer", "spa-seo-footer", "Andamento medio nazionale",
+                        "switch_mode")
+
+    def setUp(self):
+        self.client = app.test_client()
+        cache.clear()
+
+    def _html(self, path):
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200, path)
+        return response.get_data(as_text=True)
+
+    @staticmethod
+    def _footer(html):
+        found = re.findall(r'<footer class="ftr">.*?</footer>', html, re.DOTALL)
+        return [re.sub(r">\s+<", "><", re.sub(r"\s+", " ", f)).strip() for f in found]
+
+    def test_the_shells_no_longer_hand_the_menu_to_the_bundle(self):
+        for path in SPA_ROUTES:
+            with self.subTest(path=path):
+                self.assertNotIn("__diNav", self._html(path))
+        self.assertFalse(hasattr(nav, "for_spa"))
+        self.assertFalse(hasattr(nav, "SPA_MASTHEAD"))
+
+    def test_the_bundle_draws_no_navigation_of_its_own(self):
+        bundle = BUNDLE_JS.read_text(encoding="utf-8") + BUNDLE_CSS.read_text(encoding="utf-8")
+        for leftover in self.GONE_FROM_BUNDLE:
+            with self.subTest(leftover=leftover):
+                self.assertNotIn(leftover, bundle, "il bundle servito ha ancora un pezzo del menu vecchio")
+        source = SPA_SOURCE.read_text(encoding="utf-8")
+        for leftover in ("NAV_RIPIEGO", "readNav", "navPath", "function SiteFooter",
+                         "function ContextBar", "function ModeSwitch", 'className="tabbar"'):
+            with self.subTest(leftover=leftover):
+                self.assertNotIn(leftover, source)
+
+    def test_one_footer_the_same_as_every_other_page(self):
+        """Il piede delle shell e' lo stesso markup di una pagina qualunque:
+        cosi' ogni sezione del sito, `/province` compresa, si raggiunge anche
+        senza JavaScript, e non puo' tornare un secondo elenco scritto a mano."""
+        reference = self._footer(self._html("/metodologia"))
+        self.assertEqual(len(reference), 1)
+        for path in SPA_ROUTES:
+            with self.subTest(path=path):
+                html = self._html(path)
+                self.assertEqual(html.count("<footer"), 1, "un piede solo")
+                self.assertEqual(self._footer(html), reference)
+                self.assertLess(html.index('id="root"'), html.index('<footer class="ftr">'),
+                                "il piede viene dopo l'applicazione")
+                ancestors = ancestor_ids(html)
+                self.assertIn("footer", ancestors)
+                self.assertNotIn("root", ancestors["footer"],
+                                 "il piede sta dentro #root: React lo cancella al montaggio")
+                footer = self._footer(html)[0]
+                for href in nav.paths():
+                    self.assertIn(f'href="{href}"', footer)
+
+    def test_the_skip_link_lands_on_a_static_wrapper(self):
+        """Il bersaglio non puo' essere il `<main>` di React, che esiste solo
+        dopo il montaggio, e due `<main>` annidati non sono ammessi. Deve
+        contenere `#root`, e dopo il salto l'anello del fuoco si vede come su
+        ogni pagina 1.0: una regola che lo toglie a `.spa-page` batte
+        `.ds *:focus-visible`, perche' il foglio della SPA si carica dopo."""
+        for path in SPA_ROUTES:
+            with self.subTest(path=path):
+                html = self._html(path)
+                self.assertEqual(html.count("<main"), 1, "un <main> solo nell'HTML del server")
+                target = re.search(r'<(\w+)[^>]*\bid="contenuto"[^>]*>', html)
+                self.assertIsNotNone(target)
+                self.assertNotEqual(target.group(1), "main")
+                self.assertIn('tabindex="-1"', target.group(0))
+                ancestors = ancestor_ids(html)
+                self.assertIn("#root", ancestors)
+                self.assertIn("contenuto", ancestors["#root"], "#contenuto deve contenere #root")
+        for stylesheet in (SPA_STYLES, BUNDLE_CSS):
+            with self.subTest(stylesheet=stylesheet.name):
+                rules = re.sub(r"\s+", "", stylesheet.read_text(encoding="utf-8"))
+                self.assertIsNone(re.search(r"\.spa-page:focus\{[^}]*outline:(none|0)", rules),
+                                  "il salto al contenuto deve mostrare l'anello del fuoco")
+
+    def test_the_breadcrumb_is_rendered_by_flask_above_the_app(self):
+        for path in SPA_ROUTES:
+            with self.subTest(path=path):
+                html = self._html(path)
+                self.assertEqual(html.count('aria-label="Percorso"'), 1, "un percorso solo")
+                self.assertLess(html.index('aria-label="Percorso"'), html.index('id="root"'))
+                self.assertIn('<nav class="breadcrumb" aria-label="Percorso"><a href="/">Home</a>', html)
+
+    def test_the_region_call_to_action_beats_the_link_rule(self):
+        """`.ds a` (0,1,1) batteva `.region-cta` (0,1,0): la scheda era scritta
+        in inchiostro su fondo inchiostro. La regola vince solo sotto `.ds`."""
+        stylesheet = SPA_STYLES.read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"^\.region-cta\b", stylesheet, re.MULTILINE),
+                          "`.region-cta` senza `.ds` perde contro `.ds a`")
+        self.assertIn(".ds .region-cta {", stylesheet)
+        self.assertIn(".ds .region-cta", BUNDLE_CSS.read_text(encoding="utf-8"))
+
+    def test_the_favourites_toggle_waits_for_a_signed_in_reader(self):
+        """"Solo preferiti" compariva a chiunque appena l'accesso era configurato
+        sul sito, e all'anonimo dava una lista vuota."""
+        source = SPA_SOURCE.read_text(encoding="utf-8")
+        self.assertNotIn("showFav={isAuthConfigured()}", source)
+        self.assertIn("showFav={signedIn}", source)
+        self.assertIn('const favOnly = favParam === "1" && signedIn;', source)
