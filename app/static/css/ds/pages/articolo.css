@@ -4,6 +4,9 @@
 
 /* ---------- testata, apertura, risposta in breve ---------- */
 .art-head .h-display { max-width: 56rem; }
+/* La copertina resta a 1200 pixel anche col contenitore a 1440: piu' larga
+   diventava piu' alta, e a 1920 per 1080 usciva dalla piega. */
+.art-hero { max-width: 75rem; }
 .art-hero figcaption { max-width: var(--measure); }
 .art-hero__caption { color: var(--text-2); }
 .art-lead > details.more { max-width: var(--measure); margin-top: 0; }

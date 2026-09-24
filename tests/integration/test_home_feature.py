@@ -34,6 +34,21 @@ class OgniCoppiaDelPool(unittest.TestCase):
         self.assertGreater(len(self.pool["regione"]), 100)
         self.assertGreater(len(self.pool["provincia"]), 20)
 
+    def test_ogni_territorio_ha_la_sua_ripartizione(self):
+        """Le frasi della home sul Mezzogiorno ("nessuna regione del
+        Mezzogiorno arriva...") valgono sull'insieme: se un territorio non ha
+        ripartizione la frase si toglie. Qui si controlla che oggi non succeda,
+        cosi' la guardia resta una guardia e non una frase che sparisce."""
+        from app.design import charts
+        with app.app_context():
+            areas = charts.area_map()
+            fuori = set()
+            for level, pairs in self.pool.items():
+                for family, raw_id in pairs:
+                    scelta = home_pick.pick(sources.indicator_code(family, raw_id), level)
+                    fuori |= {o["key"] for o in scelta["level"]["observations"] if areas.get(o["key"]) is None}
+        self.assertEqual(fuori, set())
+
     def test_ogni_coppia_rende_la_home_della_v1(self):
         guasti = []
         for level, pairs in self.pool.items():
@@ -55,7 +70,7 @@ class OgniCoppiaDelPool(unittest.TestCase):
                     guasti.append((path, FUGHE.search(testo).group(0)))
                 elif f"/{code}\"" not in html:
                     guasti.append((path, "l'indicatore in evidenza non e' quello chiesto"))
-                elif ("per regione." if level == "regione" else "per provincia.") not in testo:
+                elif ("qui per regione." if level == "regione" else "qui per provincia.") not in testo:
                     guasti.append((path, "il livello in evidenza non e' quello chiesto"))
                 elif level == "regione" and 'class="map"' not in html:
                     guasti.append((path, "regioni senza mappa"))

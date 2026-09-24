@@ -114,7 +114,7 @@
     <p class="meta">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
     {% endif %}
   </header>
-  {{ ui.tiles(d.tiles) }}
+  {% if d.tiles %}{{ ui.tiles(d.tiles) }}{% endif %}
   </div>
 
   {% if d.strip.svg %}

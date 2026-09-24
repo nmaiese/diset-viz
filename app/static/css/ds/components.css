@@ -323,7 +323,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
    accanto alla frase-risposta, una sotto l'altra divise da filetti
    orizzontali. Sotto i 1200 restano la fila che segue la testata. */
 @media (min-width: 1200px) {
-  .scheda-head { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; column-gap: var(--space-16); align-items: start; }
+  .scheda-head:has(> .tiles) { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; column-gap: var(--space-16); align-items: start; }
   .scheda-head > .tiles {
     grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: var(--space-6);
     padding-top: 0; border-top: 3px solid var(--ink);

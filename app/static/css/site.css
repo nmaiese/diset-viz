@@ -994,7 +994,13 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .home-theme-card__go { margin-top: auto; font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); }
 
 /* ---------- Pagina "I temi" (themes_index.html) — allineata al design ---------- */
+/* Dentro il contenitore comune, come la testata: la pagina partiva dal bordo
+   sinistro della finestra, e a 1920 pixel ogni area teneva tre schede in
+   un'ottantina di centimetri lasciando vuoto il resto. I rientri propri delle
+   fasce si tolgono, il contenitore ha i suoi margini. */
 .themes-index { display: block; }
+.themes-index.wrap :is(.themes-hero, .facts, .theme-search, .card-empty, .theme-group) { padding-inline: 0; }
+.themes-index.wrap .explore-band { margin-inline: 0; }
 .themes-hero { padding: clamp(24px, 4vw, 44px) clamp(16px, 4vw, 48px) clamp(16px, 2vw, 24px); background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 28px, var(--paper); border-bottom: 1px solid var(--line); }
 .themes-hero .eyebrow { margin: 0; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
 .themes-hero h1 { margin: 12px 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(32px, 4.4vw, 58px); line-height: 0.98; letter-spacing: -0.015em; }
@@ -1015,7 +1021,9 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 
 .card-empty { margin: 0; padding: 4px clamp(16px, 4vw, 48px) 24px; color: var(--muted); font-size: 14px; }
 
-.theme-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+/* auto-fit e non auto-fill: con tre temi per area le colonne vuote si chiudono
+   e le tre schede prendono la riga intera. */
+.theme-index-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px; }
 .theme-index-card { display: grid; gap: 4px; align-content: start; padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); color: var(--ink); transition: border-color 140ms ease, transform 140ms ease; }
 .theme-index-card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
 .theme-index-card strong { font-family: var(--font-display); font-size: 16px; line-height: 1.2; }

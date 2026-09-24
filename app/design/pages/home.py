@@ -74,7 +74,11 @@ def join_names(names: list[str]) -> str:
 
 def split_claim(observations: list[dict], year, areas: dict, singular: str) -> str | None:
     """Il Mezzogiorno tutto da una parte del Centro-Nord, se lo e': nella
-    striscia si vede come due gruppi di colore che non si toccano."""
+    striscia si vede come due gruppi di colore che non si toccano. Se un
+    territorio non ha ripartizione la frase non si scrive: "nessuna regione del
+    Mezzogiorno" su un insieme che ne ignora una puo' essere falsa."""
+    if any(areas.get(o["key"]) is None for o in observations):
+        return None
     south = [o["value"] for o in observations if areas.get(o["key"]) == "sud"]
     north = [o["value"] for o in observations if areas.get(o["key"]) in ("nord", "centro")]
     if not south or not north:
@@ -90,7 +94,7 @@ def average_claim(observations: list[dict], mean: float | None, year, areas: dic
                   level_key: str, plural: str) -> str | None:
     """Chi sta sotto la media semplice, a partire dal Mezzogiorno: si legge nella
     classifica, dove la riga della media divide i territori."""
-    if mean is None:
+    if mean is None or any(areas.get(o["key"]) is None for o in observations):
         return None
     south = [o for o in observations if areas.get(o["key"]) == "sud"]
     if not south:
@@ -432,13 +436,13 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     more = {
         "/atlante": {"title": "L'atlante", "text": f"{numfmt.text(ctx.get('total_indicators'), 0)} indicatori sulla mappa, anno per anno"
                      if ctx.get("total_indicators") else "Tutti gli indicatori sulla mappa, anno per anno"},
-        "/confronto": {"title": "Confronta i territori", "text": "Fino a tre regioni o province fianco a fianco"},
+        "/confronto": {"title": "Confronta i territori", "text": "Due o tre regioni fianco a fianco su un indicatore"},
         "/divari-regionali": {"title": "Divari regionali", "text": "Nord, Centro e Mezzogiorno messi a confronto"},
         "/blog": {"title": "Storie", "text": f"{ctx['post_total']} articoli costruiti sui dati" if ctx.get("post_total")
                   else "Gli articoli costruiti sui dati"},
         "/quiz": {"title": "Quiz", "text": f"{count_word(len(ctx.get('quiz_games') or []), feminine=False).capitalize()} giochi sugli stessi indicatori"
                   if ctx.get("quiz_games") else "Giochi sugli stessi indicatori"},
-        "/catalogo-dati": {"title": "Catalogo dati", "text": "Ogni scheda con la sua fonte e i suoi anni"},
+        "/catalogo-dati": {"title": "Catalogo dati", "text": "L'elenco di ogni scheda, con la sua fonte"},
     }
     return {
         "main": [{"path": path, **main[path]} for path in MAIN_DOORS],
