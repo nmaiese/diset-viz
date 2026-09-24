@@ -165,47 +165,51 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
 
 /* --- account ------------------------------------------------------------ */
 /* Il posto e' riservato (larghezza e altezza fisse): site.js lo riempie dopo,
-   e la testata non deve saltare. Discreto: una parola, non un bottone. */
-.site-auth {
+   e la testata non deve saltare. Discreto: una parola, non un bottone.
+   Sotto `.sitechrome` di proposito: il bundle della SPA porta le sue regole
+   `.site-auth` (una pillola larga 92 pixel) e si carica dopo questo foglio, e a
+   parita' di peso vinceva lui. Sulle shell dell'atlante e del confronto la
+   testata sforava di sei pixel a 360. */
+.sitechrome .site-auth {
   min-width: 64px; height: 40px;
   display: flex; align-items: center; justify-content: flex-end; flex: 0 0 auto;
 }
-.site-auth__login {
+.sitechrome .site-auth__login {
   font: 500 var(--fs-ui)/1 var(--font-ui);
   color: var(--text-2); background: none; border: 0;
   padding: var(--space-2); cursor: pointer;
   text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 0.18em;
 }
-.site-auth__login:hover { color: var(--ink); text-decoration-color: currentColor; }
-.site-auth__menu { position: relative; }
-.site-auth__btn {
+.sitechrome .site-auth__login:hover { color: var(--ink); text-decoration-color: currentColor; }
+.sitechrome .site-auth__menu { position: relative; }
+.sitechrome .site-auth__btn {
   display: flex; align-items: center; gap: var(--space-2);
   background: none; border: 0; cursor: pointer;
   color: var(--ink); font: 500 var(--fs-small)/1 var(--font-ui); padding: 4px;
 }
-.site-auth__avatar {
+.sitechrome .site-auth__avatar {
   width: 30px; height: 30px; border-radius: var(--radius-control);
   background: var(--ink); color: var(--bg);
   display: flex; align-items: center; justify-content: center;
   font: 700 13px/1 var(--font-ui); flex: 0 0 auto;
 }
-.site-auth__label { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.site-auth__dropdown {
+.sitechrome .site-auth__label { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sitechrome .site-auth__dropdown {
   position: absolute; right: 0; top: calc(100% + 6px);
   background: var(--bg); border: 1px solid var(--rule-strong);
   box-shadow: var(--shadow-pop);
   min-width: 180px; padding: var(--space-2) 0; z-index: var(--z-dropdown);
 }
-.site-auth__item {
+.sitechrome .site-auth__item {
   display: block; width: 100%; text-align: left; box-sizing: border-box;
   background: none; border: 0; padding: var(--space-2) var(--space-4);
   cursor: pointer; color: var(--ink); font: 400 var(--fs-ui)/1.3 var(--font-ui);
   text-decoration: none;
 }
-.site-auth__item:hover { background: var(--surface-1); color: var(--ink); }
+.sitechrome .site-auth__item:hover { background: var(--surface-1); color: var(--ink); }
 @media (max-width: 959px) {
-  .site-auth { min-width: 44px; }
-  .site-auth__label { display: none; }
+  .sitechrome .site-auth { min-width: 44px; }
+  .sitechrome .site-auth__label { display: none; }
 }
 
 /* La stella dei preferiti accanto al titolo di un indicatore. */
