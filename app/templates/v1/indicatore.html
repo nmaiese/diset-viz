@@ -332,10 +332,15 @@
         <h3>Nello stesso tema</h3>
         <ul>
           {% for item in related[:3] %}
+          {#- La serie e' quella del catalogo: la media semplice delle regioni
+              che hanno il dato, anno per anno. La card lo dice, perche' in un
+              anno possono mancare delle regioni e la cifra non e' quella di
+              "Com'e' cambiato" della scheda. -#}
+          {% set spark_svg = item.spark | sparkline("s", item.spark_floor) %}
           <li><a href="{{ item.path }}" class="minicard">
             <span class="minicard__title">{{ item.name }}</span>
-            <span class="minicard__meta">{% if item.latest is not none %}{{ item.latest | num(item.unit) }}, {% endif %}dati {{ item.year_max }}</span>
-            <span class="minicard__spark">{{ item.spark | sparkline }}</span>
+            <span class="minicard__meta">{% if item.latest is not none %}{{ item.latest | num(item.unit) }} nel {{ item.latest_year }}, media semplice delle regioni con il dato{% else %}Dati fino al {{ item.year_max }}{% endif %}</span>
+            {% if spark_svg %}<span class="minicard__spark">{{ spark_svg }}</span>{% endif %}
           </a></li>
           {% endfor %}
           {% if siblings.prev %}<li><a href="{{ siblings.prev.path }}">Precedente: {{ siblings.prev.name }}</a></li>{% endif %}

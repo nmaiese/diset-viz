@@ -493,7 +493,7 @@
           <li class="related-card related-card--{{ dcls }}">
             <a class="related-card__link" href="{{ item.path }}">
               <span class="related-card__name">{{ item.name }}</span>
-              <span class="related-card__spark">{{ item.spark | sparkline }}</span>
+              <span class="related-card__spark">{{ item.spark | sparkline("m", item.spark_floor) }}</span>
               <span class="related-card__foot">
                 {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}</b>{% endif %}
                 <small class="related-card__year">dati {{ item.year_max }}</small>

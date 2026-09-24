@@ -11,7 +11,10 @@ Qui ogni istanza deve:
   ripiego che `app/design` usa in produzione quando la regia nuova cede;
 - non mostrare mai il segnaposto dei prototipi, ne' un `None` o un `nan`
   finiti nel testo;
-- avere un solo `<h1>`.
+- avere un solo `<h1>`;
+- disegnare ogni sparkline (`svg.spark`) nascosta agli screen reader, senza
+  stirarla, e con la sua cifra scritta in testo nella stessa cella (un
+  `<data>` di `numfmt`, non solo un anno).
 
 La modalita' stretta (`DIVARIO_V1_STRICT`, da tests/conftest.py) fa uscire
 l'eccezione invece del ripiego, quindi un guasto qui ha il suo traceback.
@@ -40,6 +43,37 @@ SENZA_ARTICOLO = re.compile(
     % "|".join(sorted({k.split("-")[0].capitalize() for k in REGION_GEO_AREA})))
 
 
+SPARK = re.compile(r'<svg\b[^>]*\bclass="spark\b[^"]*"[^>]*>.*?</svg>', re.DOTALL)
+# La cella di una sparkline: il contenitore piu' vicino fra questi, aperto
+# prima del disegno e chiuso dopo. Oggi e' la minicard (`<a class="minicard">`),
+# domani una cella di tabella.
+CELLA = re.compile(r"<(a|td|th|li)\b[^>]*>")
+
+
+def spark_faults(page):
+    """Quante sparkline ha la pagina, e che cosa non va in ciascuna."""
+    faults = []
+    found = 0
+    for match in SPARK.finditer(page):
+        found += 1
+        svg = match.group(0)
+        if 'aria-hidden="true"' not in svg:
+            faults.append("sparkline senza aria-hidden")
+        if "preserveAspectRatio" in svg or re.search(r"#[0-9a-fA-F]{3,8}\b", svg):
+            faults.append("sparkline stirata o con un colore cotto")
+        before = page[max(0, match.start() - 3000):match.start()]
+        opened = list(CELLA.finditer(before))
+        if not opened:
+            faults.append("sparkline fuori da una cella")
+            continue
+        tag = opened[-1].group(1)
+        close = page.find(f"</{tag}>", match.end())
+        cell = before[opened[-1].start():] + page[match.end():close]
+        if "<data " not in cell:
+            faults.append("sparkline senza una cifra in testo accanto")
+    return found, faults
+
+
 def visible_text(page):
     page = re.sub(r"<(script|style)\b.*?</\1>", " ", page, flags=re.DOTALL)
     page = re.sub(r"<[^>]+>", " ", page)
@@ -53,6 +87,9 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
 
     def _guasti(self, pagina, percorsi):
         guasti = []
+        # Le sparkline viste in questo giro: una prova che ne controlla zero
+        # non controlla niente.
+        self.sparks_seen = 0
         for percorso in percorsi:
             risposta = self.client.get(percorso, follow_redirects=True)
             html = risposta.get_data(as_text=True)
@@ -69,6 +106,11 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
                 guasti.append((percorso, "h1 non unico"))
             elif SENZA_ARTICOLO.search(html_lib.unescape(html)):
                 guasti.append((percorso, SENZA_ARTICOLO.search(html_lib.unescape(html)).group(0)))
+            else:
+                found, faults = spark_faults(html)
+                self.sparks_seen += found
+                if faults:
+                    guasti.append((percorso, faults[0]))
         return guasti
 
     def test_ogni_scheda_indicatore(self):
@@ -79,6 +121,7 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         self.assertEqual(len(percorsi), 634)
         guasti = self._guasti("indicatore", percorsi)
         self.assertEqual(guasti, [], guasti[:10])
+        self.assertGreater(self.sparks_seen, 0, "nessuna sparkline nelle schede: la prova non guarda niente")
 
     def test_ogni_scheda_al_livello_provinciale(self):
         percorsi = []
@@ -115,6 +158,7 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         self.assertTrue(post)
         guasti = self._guasti("articolo", [f"/blog/{p['slug']}" for p in post])
         self.assertEqual(guasti, [], guasti[:10])
+        self.assertGreater(self.sparks_seen, 0, "nessuna sparkline negli articoli: la prova non guarda niente")
 
     def test_la_qualita_della_vita_con_ogni_profilo(self):
         self.assertEqual(self._guasti("qualita-della-vita", ["/qualita-della-vita"]), [])
@@ -163,6 +207,10 @@ class IlRipiegoTiene(unittest.TestCase):
                         self.assertNotIn('data-v1="', html)
                         self.assertIn('<header class="hdr">', html)
                         self.assertIn("css/site.css", html)
+                        if percorso.startswith("/indicatore/"):
+                            # Il filtro `sparkline` e' un involucro di
+                            # `charts.spark`: il ripiego lo usa ancora.
+                            self.assertIn('class="related-card__spark"><svg class="spark spark--m"', html)
         finally:
             app.logger.setLevel(livello)
             cache.clear()

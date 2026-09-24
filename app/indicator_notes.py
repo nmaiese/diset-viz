@@ -1427,27 +1427,6 @@ def cover_bars(values, best, worst, scoreable, limit=4):
     return bars
 
 
-def sparkline_points(spark, width=320, height=64, pad=4):
-    """SVG <polyline> "x,y x,y ..." string for the indicator page's inline trend
-    chart, from the national-average series in get_indicator()'s metadata.spark."""
-    values = [point["value"] for point in spark if point.get("value") is not None]
-    if len(values) < 2:
-        return ""
-    lo, hi = min(values), max(values)
-    span = (hi - lo) or 1.0
-    count = len(spark)
-    step = (width - 2 * pad) / (count - 1) if count > 1 else 0
-    coords = []
-    for index, point in enumerate(spark):
-        value = point.get("value")
-        if value is None:
-            continue
-        x = pad + index * step
-        y = pad + (height - 2 * pad) * (1 - (value - lo) / span)
-        coords.append(f"{x:.1f},{y:.1f}")
-    return " ".join(coords)
-
-
 def _clean(value):
     return " ".join((value or "").split())
 

@@ -1033,10 +1033,6 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .theme-index-card__inds li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 5px; height: 5px; background: var(--accent); }
 .theme-index-card__inds li.theme-index-card__more { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
 .theme-index-card__inds li.theme-index-card__more::before { background: none; border: 1px solid var(--line); }
-.theme-index-card__spark-wrap { display: grid; gap: 4px; margin-top: 10px; }
-.theme-index-card__sparklabel { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
-.theme-index-card__spark { display: block; width: 100%; height: 36px; }
-.theme-index-card__spark polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .theme-index-card__standing { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--grid); font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); }
 .theme-index-card__standing span { display: flex; align-items: center; gap: 6px; }
 .dot { width: 6px; height: 6px; border-radius: 999px; flex: 0 0 auto; display: inline-block; }
@@ -1294,8 +1290,7 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   font-family: var(--font-display); font-size: 15px; line-height: 1.3; min-height: 2.6em;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.related-card__spark { display: block; overflow: hidden; }
-.related-card__spark .spark { width: 100%; height: 36px; display: block; }
+.related-card__spark { display: block; }
 .related-card__foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .related-card__value { font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--ink); }
 .related-card__year { font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
@@ -1304,13 +1299,16 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px;
 }
 
-/* Sparkline SVG server-side: un solo accento, come l'identita' del sito. */
-/* La serie di una sparkline e' un dato, non l'accento dell'interfaccia. Erano
-   `var(--accent)`, e nella corsia "Nello stesso tema" si vedevano tre curve
-   coralli che rubavano l'occhio ai link veri. Il design system ha un livello
-   apposta per la serie di contesto, e il corallo resta dove si clicca. */
-.spark__line { stroke: var(--cmp-2); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
-.spark__dot { fill: var(--cmp-2); }
+/* La sparkline dei template di ripiego (indicator_page.html), gli stessi valori
+   di components.css, che le pagine della 1.0 caricano al posto di questo file.
+   Il disegno e' `charts.spark`, in pixel veri: qui non si stira. La serie e' un
+   dato, non l'accento dell'interfaccia: erano `var(--accent)`, e nella corsia
+   "Nello stesso tema" tre curve arancio rubavano l'occhio ai link veri. */
+.spark { display: block; overflow: visible; }
+.spark--s { width: 88px; height: 28px; }
+.spark--m { width: 120px; height: 32px; }
+.spark__line { fill: none; stroke: var(--cmp); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.spark__dot { fill: var(--cmp); }
 
 /* La dispersione dentro l'articolo (app/charts.py): due indicatori, una regione
    per punto. Non ripete i colori della mappa e della serie storica, che stanno
