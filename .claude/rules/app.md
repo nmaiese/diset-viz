@@ -28,7 +28,12 @@ paths:
   migrano sempre insieme. **La testata non e' loro**: la rende Flask con
   `_ds_header.html` sopra `#root`, come su ogni altra pagina, e il body porta
   `class="ds sitechrome"` perche' `chrome.css` e' scoped sotto quella classe.
-  A React restano la barra del telefono e il pulsante di ritorno. Una testata
+  Anche briciole (`_breadcrumb.html`) e piede (`_ds_footer.html`, lo stesso di
+  ogni pagina) li rende Flask, fuori da `#root`, e il bersaglio di "Vai al
+  contenuto" e' il `div#contenuto` attorno a briciole e `#root`. A React resta
+  solo il pulsante di ritorno: la barra del telefono, la barra di contesto e il
+  selettore "Per indicatore, Per regione, Confronta" se ne sono andati il 24
+  settembre 2026, con `window.__diNav`. Una testata
   disegnata dentro la SPA sono due identita' sullo stesso dominio, ed e' gia'
   successo.
 - `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema. La

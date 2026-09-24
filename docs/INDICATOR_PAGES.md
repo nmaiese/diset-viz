@@ -542,6 +542,19 @@ Ogni pagina indicizzabile deve avere:
 - canonical autoreferenziale
 - `Dataset` JSON-LD la cui `description` è il lead che il lettore vede davvero
 - `BreadcrumbList` JSON-LD
+
+Il titolo lo compone `seo_titles.page_title`, con la formula "{nome} per
+{livello}, {da A a B}{unita'}" e la coda del livello anche nel ripiego
+(`indicator_notes.seo_title(..., tail=)`). Quando il nome non ci sta,
+l'accorciatore taglia a una giuntura, ma tiene almeno due parole, non butta
+una negazione e, sulle province, nemmeno cifre, sigle e soglie. Dove nessun
+taglio regge, il nome breve e' scritto a mano in `indicator_notes.SHORT_NAMES`,
+una riga per (codice, livello) riletta contro la definizione del manifest.
+`seo_titles.UNVERIFIED_EXTREMES` elenca le schede i cui estremi non vanno in
+titolo, description e Dataset finche' non sono verificati (bes-06POL012P: gli
+zeri di Macerata e Savona sono carceri chiuse nel 2016). La description nomina
+i pari merito ("in 16 province") e conta i territori col dato, e il Dataset
+non porta Markdown.
 - link alla metodologia e al contesto tematico
 
 Niente `FAQPage`: la FAQ generata rileggeva massimo, minimo e media, cioè quello

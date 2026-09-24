@@ -216,6 +216,13 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   tempo.
 - **La mappa nomina i suoi estremi** con un richiamo che parte dal baricentro
   del pezzo piu' grande della regione.
+- **La sparkline** (`charts.spark`, filtro `sparkline` nei template): una serie
+  per anno, mai per posizione, in due taglie a pixel veri (s 88x28, m 120x32),
+  linea e punto finale in `--cmp`, mai l'accento e mai la rampa. La scala
+  verticale ha un pavimento, lo scarto interquartile dei territori, perche' una
+  media che si muove poco non sembri una salita. E' `aria-hidden`: accanto c'e'
+  sempre la cifra in testo, con l'anno e di che media e' ("media semplice delle
+  regioni con il dato"). Sotto i due punti non si disegna.
 - Ogni grafico esce in due tagli, largo e stretto, perche' il testo resti a
   12-13 pixel veri anche sul telefono, e ha accanto una tabella con gli stessi
   dati. La striscia e la serie a fascia ne hanno un terzo da 1180 pixel, che
@@ -321,7 +328,11 @@ stessi pezzi con il doppio podio regioni e province.
 - **Numeri** in formato italiano, spazio insecabile fra cifra e unita', unita'
   su ogni cifra isolata e nell'intestazione di colonna.
 - **Decimali** da una funzione sola (`seo_titles.format_number`): euro sopra
-  1.000 interi, percentuali e indici con un decimale.
+  1.000 interi, percentuali e indici con un decimale, lo zero scritto "0". Le
+  due copie (`numfmt.magnitude_decimals` e `decimals` di `v1.js`) le tiene
+  allineate `tests/unit/test_decimals_parity.py`. La preposizione davanti a una
+  cifra ("dall'89,1%", "allo 0,2%", "dal 116%") la sceglie
+  `numfmt.articulated`, e nessun altro.
 - **Date** "17 luglio 2026" in `<time datetime>`. L'anno del dato resta distinto
   dalla data di aggiornamento.
 - **Una cifra una volta**: frase-risposta, tessere e titoli dei grafici non si

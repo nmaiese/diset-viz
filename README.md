@@ -10,7 +10,7 @@ data-driven blog and quality-of-life rankings for regions and provinces.
 ## Features
 
 - **Atlas explorer**: a federated index of 393 territorial indicators and 145
-  national BES regional indicators, with national-trend sparklines, coverage
+  national BES regional indicators, with sparklines of the simple mean of the regions with data, coverage
   badges, source/theme filters, search, sort and a "complete data only" filter
   (on by default).
 - **Indicator detail**: choropleth map, regional ranking and historical series,

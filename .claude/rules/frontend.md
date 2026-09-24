@@ -55,4 +55,11 @@ Due errori che non fanno fallire niente:
 
 La SPA non conosce le rotte Flask: una vista path-scoped si monta con
 `window.__diInitialView` dal template, mai insegnando gli URL del server a
-`frontend/src/main.jsx`.
+`frontend/src/main.jsx`. E' l'unica cosa che la pagina le passa: la
+navigazione (`window.__diNav`) non le arriva piu', testata, briciole e piede
+(`_ds_footer.html`) li rende Flask fuori da `#root`.
+
+Nel CSS della SPA si usano solo i nomi che `body.ds` ripunta (`--ink`,
+`--paper`, `--muted` e simili). Un token ricavato sulla radice della 1.0
+(`--surface-inverse`, `--text-*`) nella SPA non esiste o vale il ripiego, e il
+colore esce sbagliato senza che niente fallisca.
