@@ -9,6 +9,7 @@ families can coexist without collisions or accidental double counting.
 from collections import Counter, defaultdict
 from functools import lru_cache
 import unicodedata
+from urllib.parse import urlencode
 
 from app.cache_util import synchronized_cache
 from app import sources
@@ -484,6 +485,21 @@ def get_atlas_indicator_year(indicator_id, year):
     ]
     values.sort(key=lambda row: row["value"], reverse=True)
     return {"metadata": payload["metadata"], "year": year, "values": values}
+
+
+def atlas_theme_url(theme):
+    """L'atlante aperto sugli indicatori di un tema, parziali comprese.
+
+    Il filtro della SPA confronta il **nome** del tema (`item.theme` del
+    catalogo), non lo slug. `partial=1` perche' la pagina tema conta tutte le
+    serie del catalogo (`indicator_count`) e l'atlante, senza, mostra solo le
+    complete: sulla mobilita' i "58 indicatori" della pagina tema aprirebbero
+    una lista di 25. Senza tema resta l'atlante intero, che e' comunque una
+    destinazione vera.
+    """
+    if not theme:
+        return "/atlante"
+    return f"/atlante?{urlencode({'theme': theme, 'partial': '1'})}"
 
 
 def get_atlas_theme_profile(theme_slug):

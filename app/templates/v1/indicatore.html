@@ -350,10 +350,13 @@
           {% for other in levels if other.key != level.key %}<li><a href="{{ meta.canonical_path ~ '?livello=' ~ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>{% endfor %}
           {% if twin %}<li><a href="{{ twin.path }}">La stessa misura per {{ twin.plural }}</a></li>{% endif %}
           {#- Confronto e atlante sono solo regionali: sulle province portavano
-              a una pagina senza province. -#}
+              a una pagina senza province. L'atlante non apre una scheda (la
+              scheda e' questa pagina) e alcune serie BES regionali non sono
+              nel suo catalogo: "Apri l'indicatore" prometteva quello che non
+              fa. Si apre sul tema, con tutte le serie che il catalogo ha. -#}
           {% if level.key == 'regione' %}
           <li><a href="/confronto">Metti a confronto le regioni</a></li>
-          <li><a href="/atlante">Apri l'indicatore nell'atlante</a></li>
+          <li><a href="{{ atlas_theme_url(meta.theme) }}">Gli indicatori del tema nell'atlante</a></li>
           {% else %}
           <li><a href="/province">Il profilo di ogni provincia</a></li>
           <li><a href="/qualita-della-vita/classifica/province">Le province per qualità della vita</a></li>

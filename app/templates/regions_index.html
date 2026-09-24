@@ -50,7 +50,11 @@
   {{ breadcrumb.trail(percorso) }}
   <h1>Le regioni a confronto</h1>
   <p class="page-lead">Venti regioni, venti profili territoriali. Per ognuna trovi i temi in cui emerge o fatica, dove ha recuperato o perso terreno nell'ultimo anno e le regioni dal profilo più simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
-  <p class="page-note"><a href="/atlante?view=regioni">Apri l'atlante interattivo per regione →</a> · <a href="/province">Tutte le {{ province_total }} province, regione per regione →</a></p>
+  {#- Qui c'era "Apri l'atlante interattivo per regione", verso
+      `/atlante?view=regioni`: una vista della SPA che ripete le pagine
+      `/regione/<key>` a cui questa pagina porta gia', con la mappa e con
+      l'elenco. -#}
+  <p class="page-note"><a href="/province">Tutte le {{ province_total }} province, regione per regione →</a></p>
 
   <div class="regions-layout">
     <div class="regions-map-wrap">

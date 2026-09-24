@@ -1081,3 +1081,85 @@ class LaHomePortaAlleProvince(unittest.TestCase):
         from app import province_profile
         totale = province_profile.total()
         self.assertIn(f'<data class="n n--count" value="{totale}">{totale}</data> province', self.html)
+
+
+class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
+    """Ogni rimando all'atlante porta dove dice.
+
+    La pagina tema diceva "58 indicatori" e "Aprili nell'atlante", e l'atlante
+    si apriva senza filtro, sulle serie complete di tutti i temi. La scheda
+    diceva "Apri l'indicatore nell'atlante", che non apre nessuna scheda. La
+    porta della home prometteva la mappa "anno per anno", che l'atlante non ha.
+    `/regioni` portava a `?view=regioni`, che ripete le pagine regione.
+
+    Il conto rifa' il filtro di `AtlasView` (`frontend/src/main.jsx`): il nome
+    del tema confrontato con `item.theme` del catalogo, e senza `partial=1`
+    solo le serie complete.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+
+    @staticmethod
+    def _rimandi(html):
+        """I link all'atlante nel corpo della pagina, fuori da testata e piede."""
+        corpo = re.search(r"<(article|main)\b.*?</\1>", html, re.DOTALL).group(0)
+        return [unescape(h) for h in re.findall(r'href="(/atlante[^"]*)"', corpo)]
+
+    @staticmethod
+    def _cosa_mostra_l_atlante(link):
+        from urllib.parse import parse_qs, urlsplit
+
+        from app.atlas_catalog import get_atlas_catalog
+
+        query = parse_qs(urlsplit(link).query)
+        tema = query["theme"][0]
+        parziali = query.get("partial") == ["1"]
+        return [i for i in get_atlas_catalog()["indicators"]
+                if i["theme"] == tema and (parziali or i["complete"])]
+
+    def test_la_pagina_tema_apre_l_atlante_sui_suoi_indicatori(self):
+        from app import atlas_catalog
+
+        for voce in atlas_catalog.all_atlas_themes_index():
+            html = self.client.get(voce["path"]).get_data(as_text=True)
+            dichiarati = int(re.search(r"<small>Indicatori</small><strong>(\d+)</strong>", html).group(1))
+            rimandi = self._rimandi(html)
+            with self.subTest(tema=voce["theme"]):
+                self.assertEqual(len(rimandi), 2, rimandi)
+                for link in rimandi:
+                    self.assertEqual(len(self._cosa_mostra_l_atlante(link)), dichiarati, link)
+
+    def test_la_scheda_apre_l_atlante_sul_suo_tema(self):
+        """Anche le serie regionali fuori dal catalogo dell'atlante (qui la
+        speranza di vita, BES) hanno un tema che l'atlante conosce."""
+        for percorso in ("/indicatore/tasso-di-turisticita/ter-105",
+                         "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001"):
+            html = self.client.get(percorso, follow_redirects=True).get_data(as_text=True)
+            rimandi = self._rimandi(html)
+            with self.subTest(scheda=percorso):
+                self.assertNotIn("Apri l'indicatore nell'atlante", visible_text(html))
+                self.assertEqual(len(rimandi), 1, rimandi)
+                self.assertTrue(self._cosa_mostra_l_atlante(rimandi[0]), rimandi[0])
+
+    def test_la_scheda_provinciale_non_porta_all_atlante(self):
+        """L'atlante e' regionale: dalle province portava a una pagina senza province."""
+        html = self.client.get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia",
+                               follow_redirects=True).get_data(as_text=True)
+        self.assertEqual(self._rimandi(html), [])
+
+    def test_l_indice_delle_regioni_non_porta_alla_vista_regione_della_spa(self):
+        html = self.client.get("/regioni").get_data(as_text=True)
+        self.assertNotIn("view=regioni", html)
+
+    def test_la_home_non_promette_la_mappa_anno_per_anno(self):
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertNotIn("anno per anno", visible_text(html))
+        for fascia in ("quiz", "storie"):
+            if f'id="{fascia}"' not in html:
+                continue
+            with self.subTest(fascia=fascia):
+                testa = re.search(rf'id="{fascia}".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
+                self.assertIn('<a href="/atlante">atlante</a>', testa)

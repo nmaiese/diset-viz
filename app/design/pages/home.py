@@ -639,9 +639,13 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
         "/qualita-della-vita": {"num": ranked or None, "unit": "territori in classifica", "title": "Qualità della vita",
                                 "text": "Dove si vive meglio: la classifica delle regioni e quella delle province, con il profilo di priorità che scegli tu."},
     }
+    # La mappa dell'atlante si colora con uno di sei indicatori, e solo
+    # all'ultimo anno: "sulla mappa, anno per anno" prometteva quello che la
+    # pagina non fa. Quello che fa davvero e' l'elenco, con i filtri per tema,
+    # fonte e anni.
     more = {
-        "/atlante": {"title": "L'atlante", "text": f"{numfmt.text(ctx.get('total_indicators'), 0)} indicatori sulla mappa, anno per anno"
-                     if ctx.get("total_indicators") else "Tutti gli indicatori sulla mappa, anno per anno"},
+        "/atlante": {"title": "L'atlante", "text": f"{numfmt.text(ctx.get('total_indicators'), 0)} indicatori, da filtrare per tema, fonte e anni"
+                     if ctx.get("total_indicators") else "Tutti gli indicatori, da filtrare per tema, fonte e anni"},
         "/confronto": {"title": "Confronta le regioni", "text": "Due o tre regioni fianco a fianco su un indicatore"},
         "/divari-regionali": {"title": "Divari regionali", "text": "Nord, Centro e Mezzogiorno messi a confronto"},
         "/blog": {"title": "Storie", "text": f"{ctx['post_total']} articoli costruiti sui dati" if ctx.get("post_total")

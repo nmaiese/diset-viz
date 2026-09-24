@@ -521,7 +521,7 @@
           <li><a href="?livello={{ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>
           {% endfor %}
           <li><a href="/confronto">Mettere questo indicatore a confronto fra territori</a></li>
-          <li><a href="/atlante">Aprirlo nell'atlante, con mappa e serie storica</a></li>
+          <li><a href="{{ atlas_theme_url(meta.theme) }}">Gli indicatori del tema nell'atlante</a></li>
         </ul>
       </div>
 
