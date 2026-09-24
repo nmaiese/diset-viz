@@ -47,15 +47,19 @@ class AppSmokeTest(unittest.TestCase):
         self.assertNotIn(b'<header class="masthead">', home.data)
         self.assertIn(b'class="hdr__bar"', home.data)
         # Ogni modulo si disegna su dati veri, non su segnaposto e lato server:
-        # la mappa colora venti regioni per classe della rampa, la striscia del
-        # divario ha i suoi punti, temi e podio della qualita' della vita hanno
-        # righe reali. Senza JavaScript la pagina resta leggibile.
-        self.assertEqual(len(re.findall(
-            rb'data-key="[a-z-]+" data-name="[^"]*" data-value="[^"]*" class="q[1-6]', home.data)), 20)
+        # la striscia del divario ha i suoi punti, la classifica le sue righe,
+        # temi e podio della qualita' della vita hanno righe reali. Senza
+        # JavaScript la pagina resta leggibile.
         self.assertIn(b'class="strip__dot', home.data)
         self.assertIn(b"data-rank-body", home.data)
         self.assertIn(b'class="card home-theme"', home.data)
         self.assertIn(b'class="home-podium"', home.data)
+        # L'indicatore in evidenza cambia a ogni visita, e solo quello regionale
+        # ha la mappa: la si chiede fissando l'indicatore. Venti regioni colorate
+        # per classe della rampa.
+        regionale = client.get("/?indicatore=ter-901")
+        self.assertEqual(len(re.findall(
+            rb'data-key="[a-z-]+" data-name="[^"]*" data-value="[^"]*" class="q[1-6]', regionale.data)), 20)
 
         atlante = client.get("/atlante")
         self.assertEqual(atlante.status_code, 200)
@@ -1531,26 +1535,26 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
 
 
 class HardeningTest(unittest.TestCase):
-    def test_home_is_actually_cached(self):
-        """Con i decorator nell'ordine corretto, il corpo della view / non viene
-        ricomputato a ogni richiesta."""
+    def test_home_is_not_cached(self):
+        """La home si rende a ogni richiesta: l'indicatore in evidenza cambia a
+        ogni visita (`app/home_pick.py`), e una pagina tenuta cinque minuti per
+        worker mostrerebbe lo stesso a tutti. Fino al 24 settembre 2026 questa
+        prova diceva il contrario, quando la home era uguale per tutti e la
+        cache era cio' che la teneva leggera: oggi la leggerezza la danno i
+        loader in cache per processo, e a caldo la home si rende in decine di
+        millisecondi."""
         from unittest import mock
         from app import cache
 
         cache.clear()
         try:
-            # La home rende da `app.design` (la 1.0), non piu' da views.
             with mock.patch("app.design.render_template", return_value="OK") as rt:
                 client = app.test_client()
                 client.get("/")
                 client.get("/")
                 client.get("/")
-                self.assertEqual(rt.call_count, 1)
+                self.assertEqual(rt.call_count, 3)
         finally:
-            # La prova funziona proprio perche' la home resta in cache, quindi
-            # esce di qui lasciandoci dentro "OK" al posto della pagina. Finche'
-            # nessuno guardava il corpo di `/` non se ne accorgeva nessuno: la
-            # prima prova che lo guarda riceve due caratteri e nessun `<title>`.
             cache.clear()
 
     def test_events_rate_limited(self):

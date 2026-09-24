@@ -152,7 +152,8 @@
 
     function highlight(key) {
       mod.querySelectorAll("path[data-key]").forEach(function (p) { p.classList.toggle("is-on", p.dataset.key === key); });
-      body.querySelectorAll("tr[data-key]").forEach(function (tr) {
+      // Piu' di un corpo quando la home affianca le prime e le ultime dieci province.
+      mod.querySelectorAll("[data-rank-body] tr[data-key]").forEach(function (tr) {
         var on = tr.dataset.key === key;
         tr.classList.toggle("is-on", on);
         if (on) tr.setAttribute("aria-current", "true"); else tr.removeAttribute("aria-current");

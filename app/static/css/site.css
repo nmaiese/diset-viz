@@ -33,12 +33,14 @@ a:hover { text-decoration: underline; }
 img { max-width: 100%; display: block; }
 h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-height: 1.1; }
 
-.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+/* Lo stesso contenitore della testata e delle pagine della 1.0 (`--container`
+   di ds/system.css), con gli stessi margini: a 1180 pixel fissi, con la
+   testata a 1440, il bordo sinistro del contenuto stava 130 pixel dentro
+   quello del marchio. `.wrap-wide` resta un nome, e oggi e' lo stesso. */
+.wrap, .wrap-wide { width: min(var(--container), 100% - 2 * var(--margin-s)); margin-inline: auto; }
+@media (min-width: 600px) { .wrap, .wrap-wide { width: min(var(--container), 100% - 2 * var(--margin-m)); } }
+@media (min-width: 960px) { .wrap, .wrap-wide { width: min(var(--container), 100% - 2 * var(--margin-l)); } }
 .prose-wrap { width: min(760px, 100% - 32px); margin-inline: auto; }
-/* Wider desktop wrap for the region / indicator / theme / quality-ranking /
-   quiz-hub pages: their content is dense enough to use multi-column layouts
-   at 1440px, unlike the narrower prose-driven pages that keep .wrap. */
-.wrap-wide { width: min(1360px, 100% - 32px); margin-inline: auto; }
 
 .panel-card { border: 1px solid var(--line); background: var(--panel); padding: 16px 18px; }
 

@@ -88,6 +88,11 @@
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
 
+  {#- Da 1200 pixel le tessere stanno nel margine accanto alla testata, dove
+      prima restava un rettangolo vuoto largo quanto un terzo della pagina:
+      le cifre che la frase non dice si leggono insieme alla frase. Sotto,
+      tornano in fila dopo la testata. -#}
+  <div class="scheda-head">
   <header class="pagehead">
     <p class="eyebrow"><a href="{{ meta.theme_path }}">{{ meta.theme }}</a><span class="sep" aria-hidden="true">·</span>{{ meta.source_label }}<span class="sep" aria-hidden="true">·</span>{{ n }} {{ level.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ year }}</p>
     <h1 class="h-title">{{ page_h1 }}</h1>
@@ -109,6 +114,8 @@
     <p class="meta">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
     {% endif %}
   </header>
+  {{ ui.tiles(d.tiles) }}
+  </div>
 
   {% if d.strip.svg %}
   <figure class="lead-figure" aria-labelledby="divario-t">
@@ -120,7 +127,6 @@
     <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.unit %}, valori in {{ d.unit }}{% endif %}. Tutte le cifre sono nella classifica qui sotto.</p>
   </figure>
   {% endif %}
-  {{ ui.tiles(d.tiles) }}
 
   <div class="layout">
     <aside class="layout__aside">

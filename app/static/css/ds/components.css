@@ -96,17 +96,48 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 
 /* `.come-leggere` e' una sezione come le altre: porta il suo nome perche' le prove
    sulla ripetizione delle schede la cercano per classe (scripts/duplicazione.py). */
+/* Le sezioni. A 1920 pixel un filetto chiaro da 1px e un H2 poco piu' grande
+   dei titoli dei grafici non bastavano a dire dove finiva una sezione e
+   cominciava l'altra: la testata di sezione porta ora un filetto d'inchiostro
+   di 3px e piu' aria sopra, e il titolo cresce sugli schermi larghi. Resta un
+   filetto e non una scatola (SISTEMA.md, "Regia"). */
 .section, .come-leggere { padding-top: var(--space-12); }
 .section + .section, .section + .come-leggere, .come-leggere + .section { margin-top: var(--space-4); }
+@media (min-width: 960px) {
+  .section, .come-leggere { padding-top: var(--space-16); }
+  .section + .section, .section + .come-leggere, .come-leggere + .section { margin-top: var(--space-8); }
+}
 .section > h2, .come-leggere > h2, .h-section {
   font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
-  padding-top: var(--space-3); border-top: 1px solid var(--rule-strong);
+  padding-top: var(--space-4); border-top: 3px solid var(--ink);
   margin-bottom: var(--space-6);
+}
+@media (min-width: 1200px) {
+  .section > h2, .come-leggere > h2, .h-section { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); }
 }
 .h-sub { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); }
 .subline { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-top: var(--space-1); }
 .band { margin-top: var(--space-16); padding-block: var(--space-12); background: var(--surface-1); }
 .band .section:first-child { padding-top: 0; }
+
+/* La fascia: una sezione a tutta larghezza, col suo contenitore dentro. Le
+   pagine che sono un indice di sezioni (la home) le alternano fra il fondo e
+   la superficie, cosi' ogni sezione ha un inizio e una fine visibili anche
+   da lontano. La testata della fascia tiene a sinistra il titolo con la sua
+   frase e a destra il link alla sezione intera, sotto lo stesso filetto. */
+.zone { padding-block: var(--space-12); }
+@media (min-width: 960px) { .zone { padding-block: var(--space-16) var(--space-20); } }
+.zone--tint { background: var(--surface-1); }
+.zone__head {
+  display: grid; gap: var(--space-3) var(--space-8); margin-bottom: var(--space-8);
+  padding-top: var(--space-4); border-top: 3px solid var(--ink);
+}
+@media (min-width: 960px) { .zone__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
+.zone__head .h-section { border-top: 0; padding-top: 0; margin-bottom: 0; }
+.zone__title { display: grid; gap: var(--space-2); }
+.zone__lead { max-width: var(--measure); color: var(--text-2); }
+.zone__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); }
+.zone__actions .btn { min-height: 40px; }
 
 /* ---------- indice di pagina ---------- */
 .toc { font-size: var(--fs-small); line-height: var(--lh-small); }
@@ -287,6 +318,19 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .chart__s { display: none; }
 @container (max-width: 560px) { .chart__l { display: none; } .chart__s { display: block; } }
 .tiles + .layout { margin-top: var(--space-8); }
+
+/* La testata della scheda: da 1200 pixel le tessere passano nel margine
+   accanto alla frase-risposta, una sotto l'altra divise da filetti
+   orizzontali. Sotto i 1200 restano la fila che segue la testata. */
+@media (min-width: 1200px) {
+  .scheda-head { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; column-gap: var(--space-16); align-items: start; }
+  .scheda-head > .tiles {
+    grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: var(--space-6);
+    padding-top: 0; border-top: 3px solid var(--ink);
+  }
+  .scheda-head > .tiles > .tile { padding: var(--space-4) 0; border-left: 0; }
+  .scheda-head > .tiles > .tile + .tile { border-top: 1px solid var(--rule); }
+}
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart .grid line { stroke: var(--rule); stroke-width: 1; }
 .chart .axis text, .chart .lab { font-family: var(--font-sans); font-size: 13px; fill: var(--muted); font-variant-numeric: tabular-nums; }
@@ -387,6 +431,13 @@ details.more[open] > summary { color: var(--ink); }
 .linkarrow { font-weight: 600; text-decoration: none; }
 .linkarrow::after { content: " \2192"; }
 .linkarrow:hover { text-decoration: underline; }
+/* `.ds a` di system.css (0,1,1) batteva `.btn` e `.linkarrow` (0,1,0): i bottoni
+   fatti con un link uscivano sottolineati, e il primario col testo in
+   inchiostro sull'arancio. */
+.ds a.btn, .ds a.btn:hover { color: var(--ink); text-decoration: none; }
+.ds a.btn--primary, .ds a.btn--primary:hover { color: var(--on-accent); }
+.ds a.linkarrow { text-decoration: none; }
+.ds a.linkarrow:hover { text-decoration: underline; }
 
 /* ---------- continua da qui e schede ---------- */
 .lanes { display: grid; gap: var(--space-8); }
@@ -494,6 +545,12 @@ details.more[open] > summary { color: var(--ink); }
    alcuni caratteri (Schibsted) le tabellari spaziano troppo. */
 .chart svg text { font-family: var(--font-num); font-variant-numeric: lining-nums proportional-nums; }
 .chart__l svg { max-width: 920px; }
+/* Il taglio molto largo (charts.XL_WIDTH) prende il posto del largo da 1100
+   pixel di grafico, e il grafico che lo porta puo' allargarsi fin li'. */
+.chart:has(> .chart__xl) { max-width: 1180px; }
+.chart__xl { display: none; }
+.chart__xl svg { max-width: 1180px; }
+@container (min-width: 1100px) { .chart__l { display: none; } .chart__xl { display: block; } }
 .chart--hero { margin-top: var(--space-2); }
 
 .strip__axis { stroke: var(--rule-strong); stroke-width: 1; }

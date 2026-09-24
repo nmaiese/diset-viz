@@ -1,10 +1,10 @@
 """La home della 1.0: le frasi e le cifre che il template chiede in piu' al contesto.
 
-La home di prima mostrava il PIL pro capite tre volte (mappa, storia in
-evidenza, confronto). Qui compare una volta sola, nell'indicatore in evidenza,
-con la regia della scheda: prima la striscia del divario, poi la mappa che
-nomina i suoi estremi accanto alla classifica. Le cifre vengono tutte da
-`hero_map`, la media semplice da `series_module`.
+L'indicatore in evidenza cambia a ogni visita (`app/home_pick.py` lo pesca dal
+catalogo indicizzabile, per regione o per provincia) e ha la regia della
+scheda: prima la striscia del divario, poi la mappa che nomina i suoi estremi
+accanto alla classifica. Le cifre vengono tutte dal livello che
+`indicator_view` costruisce per la scheda, niente si ricalcola qui.
 
 Qui non si formatta: il template scrive le cifre con i filtri `num`, `rank` e
 `delta` di numfmt, e le poche frasi composte in Python passano da
@@ -19,18 +19,18 @@ import re
 import struct
 from functools import lru_cache
 
-from app import quality_life_bes
+from app import profiles, quality_life_bes
 from app.blog import STATIC_DIR, social_image_size
 from app.data import REGION_GEO_AREA
 from app.design import charts, numfmt
 from app.design.common import (
     LOWER_BETTER,
-    MEZZOGIORNO,
     PATHS,
     count_word,
     date_it,
     legend,
     map_classes,
+    of_place,
     ranking,
     short_unit,
     the_place,
@@ -72,136 +72,162 @@ def join_names(names: list[str]) -> str:
 
 # ---------------------------------------------------------------- l'indicatore in evidenza
 
-def split_claim(observations: list[dict], year) -> str | None:
+def split_claim(observations: list[dict], year, areas: dict, singular: str) -> str | None:
     """Il Mezzogiorno tutto da una parte del Centro-Nord, se lo e': nella
     striscia si vede come due gruppi di colore che non si toccano."""
-    south = [o["value"] for o in observations if o["key"] in MEZZOGIORNO]
-    north = [o["value"] for o in observations if o["key"] not in MEZZOGIORNO]
+    south = [o["value"] for o in observations if areas.get(o["key"]) == "sud"]
+    north = [o["value"] for o in observations if areas.get(o["key"]) in ("nord", "centro")]
     if not south or not north:
         return None
     if max(south) < min(north):
-        return f"Nel {year} nessuna regione del Mezzogiorno arriva al valore più basso del Centro-Nord"
+        return f"Nel {year} nessuna {singular} del Mezzogiorno arriva al valore più basso del Centro-Nord"
     if min(south) > max(north):
-        return f"Nel {year} nessuna regione del Mezzogiorno scende al valore più alto del Centro-Nord"
+        return f"Nel {year} nessuna {singular} del Mezzogiorno scende al valore più alto del Centro-Nord"
     return None
 
 
-def average_claim(observations: list[dict], mean: float | None, year) -> str | None:
+def average_claim(observations: list[dict], mean: float | None, year, areas: dict,
+                  level_key: str, plural: str) -> str | None:
     """Chi sta sotto la media semplice, a partire dal Mezzogiorno: si legge nella
-    classifica, dove la riga della media divide le regioni."""
+    classifica, dove la riga della media divide i territori."""
     if mean is None:
         return None
-    south = [o for o in observations if o["key"] in MEZZOGIORNO]
+    south = [o for o in observations if areas.get(o["key"]) == "sud"]
     if not south:
         return None
     below = [o for o in observations if o["value"] < mean]
-    south_below = [o for o in below if o["key"] in MEZZOGIORNO]
-    others = [o for o in below if o["key"] not in MEZZOGIORNO]
+    south_below = [o for o in below if areas.get(o["key"]) == "sud"]
+    others = [o for o in below if areas.get(o["key"]) != "sud"]
     words = count_word(len(south))
     if len(south_below) == len(south):
         if not others:
-            return f"Nel {year} sotto la media semplice stanno tutte e sole le {words} regioni del Mezzogiorno"
+            return f"Nel {year} sotto la media semplice stanno tutte e sole le {words} {plural} del Mezzogiorno"
         if len(others) <= 3:
-            names = join_names([the_place(o["name"], "regione") for o in others])
+            names = join_names([the_place(o["name"], level_key) for o in others])
             # L'anno sta nella riga sotto il titolo: qui resta fuori, per stare nei 90 caratteri.
-            return f"Sotto la media semplice stanno le {words} regioni del Mezzogiorno, più {names}"
-        return f"Nel {year} tutte le {words} regioni del Mezzogiorno stanno sotto la media semplice"
-    if not south_below:
-        return f"Nel {year} tutte le {words} regioni del Mezzogiorno stanno sopra la media semplice"
-    return (f"Nel {year} {count_word(len(south_below))} regioni del Mezzogiorno su {words} "
-            f"stanno sotto la media semplice")
+            return f"Sotto la media semplice stanno le {words} {plural} del Mezzogiorno, più {names}"
+        return f"Nel {year} tutte le {words} {plural} del Mezzogiorno stanno sotto la media semplice"
+    if all(o["value"] > mean for o in south):
+        return f"Nel {year} tutte le {words} {plural} del Mezzogiorno stanno sopra la media semplice"
+    # "Nel 2023 31 province" mette due cifre una accanto all'altra: il verbo va prima.
+    return (f"Nel {year} stanno sotto la media semplice {count_word(len(south_below))} "
+            f"{plural} del Mezzogiorno su {words}")
 
 
-def extremes_claim(high: dict, low: dict, unit: str | None, year) -> str:
-    return (f"Nel {year} si va da {with_unit(low['value'], unit)} {in_region(low['name'])} "
-            f"a {with_unit(high['value'], unit)} {in_region(high['name'])}")
+def extremes_claim(high: dict, low: dict, unit: str | None, year, level_key: str) -> str:
+    if level_key == "regione":
+        return (f"Nel {year} si va da {with_unit(low['value'], unit)} {in_region(low['name'])} "
+                f"a {with_unit(high['value'], unit)} {in_region(high['name'])}")
+    return (f"Nel {year} si va da {with_unit(low['value'], unit)} {of_place(low['name'], level_key)} "
+            f"a {with_unit(high['value'], unit)} {of_place(high['name'], level_key)}")
 
 
-def simple_mean(hero: dict, series: dict, computed: float | None) -> float | None:
-    """La media semplice che l'app calcola per la serie del confronto, se e'
-    lo stesso indicatore e il suo ultimo anno e' l'anno della mappa. Deve
-    coincidere con la media delle cifre della mappa (che arrivano arrotondate
-    al centesimo): se non coincide, vale quella della mappa, perche' e' la
-    media delle cifre che la pagina mostra."""
-    reference = series.get("reference") or {}
-    years = series.get("years") or []
-    values = reference.get("series") or []
-    if (computed is None or not years or not values or years[-1] != hero.get("year")
-            or series.get("indicator_path") != hero.get("indicator_path") or values[-1] is None):
-        return computed
-    mean = values[-1]
-    return mean if abs(mean - computed) <= max(0.01, abs(computed) * 1e-4) else computed
+# Oltre questa soglia la classifica della home si ferma alle prime e alle
+# ultime dieci (SISTEMA.md, "Classifica a barre"): le 107 province intere
+# stanno nella scheda, a un clic.
+FULL_RANKING_MAX = 25
+RANK_EDGE = 10
 
 
-def feature(ctx: dict) -> dict | None:
-    """L'indicatore in evidenza: striscia del divario, mappa con i due estremi, classifica."""
-    hero = ctx["hero_map"]
-    unit = hero.get("unit")
-    year = hero.get("year")
-    plural = "regioni"
-    areas = charts.area_map()
+def feature(pick: dict | None) -> dict | None:
+    """L'indicatore in evidenza con la regia della scheda: la striscia del
+    divario, poi la mappa che nomina i suoi estremi accanto alla classifica
+    per le regioni, le prime e le ultime dieci per le province.
 
-    observations = []
-    for key, row in (hero.get("readout") or {}).items():
-        value = parse_it(row.get("value"))
-        if value is not None:
-            observations.append({"key": key, "name": row["name"], "value": value})
+    Legge il livello che `indicator_view` costruisce per la scheda, lo stesso
+    che `test_v1_pages` passa su ogni istanza: la home non ricalcola niente,
+    sceglie."""
+    if not pick:
+        return None
+    meta, level = pick["meta"], pick["level"]
+    observations = [o for o in level.get("observations") or [] if o.get("value") is not None]
+    year = level.get("year_max")
     if len(observations) < 2 or year is None:
         return None
-    observations.sort(key=lambda o: o["value"], reverse=True)
+    key, plural, singular = level["key"], level["plural"], level["singular"]
+    unit = meta.get("value_unit") or meta.get("unit")
+    stats = level.get("stats") or {}
+    mean = stats.get("year_avg")
+    areas = charts.area_map()
     n = len(observations)
-    values = [o["value"] for o in observations]
-    mean = simple_mean(hero, ctx.get("series_module") or {}, sum(values) / n)
 
-    level = {"observations": observations, "stats": {"year_avg": mean}, "plural": plural}
-    rows = ranking(level, unit)
-    high, low = observations[0], observations[-1]
-    ratio = high["value"] / low["value"] if low["value"] > 0 else None
+    by_value = sorted(observations, key=lambda o: o["value"], reverse=True)
+    high, low = by_value[0], by_value[-1]
 
     # Due titoli, uno per grafico, mai la stessa frase: la striscia dice come
     # stanno le ripartizioni, la classifica chi sta sotto la media.
-    split = split_claim(observations, year)
-    avg_claim = average_claim(observations, mean, year)
-    lead_claim = split or avg_claim or extremes_claim(high, low, unit, year)
-    table_claim = avg_claim if split else extremes_claim(high, low, unit, year)
+    split = split_claim(by_value, year, areas, singular)
+    avg_claim = average_claim(by_value, mean, year, areas, key, plural)
+    lead_claim = split or avg_claim or extremes_claim(high, low, unit, year, key)
+    table_claim = avg_claim if split else extremes_claim(high, low, unit, year, key)
     if table_claim == lead_claim:
         table_claim = None
 
-    strip = charts.divario_strip([{**o, "area": areas.get(o["key"])} for o in observations], mean, unit, ratio)
+    strip = charts.divario_strip([{**o, "area": areas.get(o["key"])} for o in observations],
+                                 mean, unit, stats.get("gap_ratio"))
+    has_map = bool(level.get("has_map"))
     callouts = charts.map_callouts(PATHS, [(high["key"], high["name"], with_unit(high["value"], unit)),
-                                           (low["key"], low["name"], with_unit(low["value"], unit))])
-    direction = hero.get("direction")
+                                           (low["key"], low["name"], with_unit(low["value"], unit))]) if has_map else ""
+    direction = meta.get("direction")
     verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
              "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
-    names = {o["key"]: o["name"] for o in observations}
+    names = {t["key"]: t["name"] for t in level.get("territories") or []}
+    names.update({o["key"]: o["name"] for o in observations})
+    values = [o["value"] for o in observations]
     decimals = numfmt.column_decimals(values)
-    region_areas = {o["key"]: areas.get(o["key"]) for o in observations}
-    options = hero.get("options") or []
+    territory_areas = {o["key"]: areas.get(o["key"]) for o in observations}
+
+    rows = ranking({**level, "observations": observations}, unit)
+    top = bottom = None
+    if n > FULL_RANKING_MAX:
+        ranked = [r for r in rows if not r.get("ref")]
+        top, bottom = ranked[:RANK_EDGE], ranked[-RANK_EDGE:]
+        rows = []
+
+    code = meta["canonical_path"].rstrip("/").rsplit("/", 1)[-1]
+    other = next((lv for lv in pick.get("levels") or [] if lv != key), None)
+    unit_text = (unit[:1].lower() + unit[1:]) if unit else None
     return {
-        "name": hero["indicator_name"], "path": hero["indicator_path"], "year": year, "n": n,
-        "unit": unit, "short_unit": short_unit(unit), "source_label": hero.get("source_label"),
+        "name": meta["name"], "path": meta["canonical_path"], "year": year, "n": n,
+        "level": key, "plural": plural, "singular": singular,
+        "unit": unit_text, "short_unit": short_unit(unit), "source_label": meta.get("source_label"),
+        "source_url": meta.get("source_url"), "theme": meta.get("theme"), "theme_path": meta.get("theme_path"),
         "lead_claim": lead_claim, "table_claim": table_claim, "verso": verso,
         "lower_better": direction in LOWER_BETTER,
-        "options": [{"id": o["id"], "name": o["name"], "on": o["id"] == hero.get("selected_id")} for o in options],
-        "rows": rows, "decimals": decimals, "areas": region_areas, "area_label": charts.AREA_LABEL,
-        "strip": strip, "callouts": callouts,
-        "map_classes": map_classes({"map_colors": hero.get("colors") or {}}),
+        "rows": rows, "top": top, "bottom": bottom, "decimals": decimals,
+        "middle": n - 2 * RANK_EDGE if top else None,
+        "areas": territory_areas, "area_label": charts.AREA_LABEL,
+        "profile_path": level.get("profile_path"),
+        "strip": strip, "callouts": callouts, "has_map": has_map,
+        "map_classes": map_classes(level) if has_map else {},
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in observations},
         "names": names,
-        "legend": legend(values, unit),
+        "legend": legend(values, unit) if has_map else None,
+        # L'altro livello dello stesso indicatore, quando c'e': un link vero,
+        # che funziona senza JavaScript e non offre ai motori copie della home.
+        "other_level": {"key": other, "href": f"/?indicatore={code}&livello={other}",
+                        "label": "Lo stesso indicatore per provincia" if other == "provincia"
+                        else "Lo stesso indicatore per regione"} if other else None,
         # Lo stesso contratto del modulo della scheda, con un anno solo: basta
         # perche' v1.js accenda "Trova la tua regione", il clic sulla mappa e
         # il punto della striscia.
         "explore_js": {
             "years": [year], "matrix": {str(year): {o["key"]: o["value"] for o in observations}},
             "names": names, "unit": short_unit(unit), "direction": direction,
-            "plural": plural, "profile": "/regione/", "south": sorted(MEZZOGIORNO),
-            "decimals": decimals, "areas": region_areas,
+            "plural": plural, "profile": level.get("profile_path"), "south": [],
+            "decimals": decimals, "areas": territory_areas,
         },
     }
 
 
 # ---------------------------------------------------------------- regioni per ripartizione
+
+def region_names() -> dict[str, str]:
+    """Le venti regioni col loro nome, a prescindere dall'indicatore in
+    evidenza: quando esce una serie provinciale le sezioni che parlano di
+    regioni non devono restare vuote."""
+    return {key: name for key in REGION_GEO_AREA if (name := profiles.region_name(key))}
+
 
 def regions_by_area(names: dict[str, str]) -> list[dict]:
     """Le regioni nelle tre ripartizioni della striscia (Nord, Centro,
@@ -290,12 +316,12 @@ def quality(ctx: dict) -> dict | None:
 
 # ---------------------------------------------------------------- quiz
 
-def quiz_try(ctx: dict) -> dict | None:
+def quiz_try(ctx: dict, feature_path: str | None = None) -> dict | None:
     """Una domanda di "Chi è maggiore?" fatta con una lettura in evidenza del
-    contesto: due regioni, un indicatore, quale ha il valore piu' alto."""
+    contesto: due regioni, un indicatore, quale ha il valore piu' alto. Mai
+    sull'indicatore che la pagina ha appena mostrato."""
     game = next((g for g in ctx.get("quiz_games") or [] if g["href"].endswith("chi-e-maggiore")), None)
-    card = next((c for c in ctx.get("insight_cards") or []
-                 if c.get("path") != (ctx.get("hero_map") or {}).get("indicator_path")), None)
+    card = next((c for c in ctx.get("insight_cards") or [] if c.get("path") != feature_path), None)
     if not game or not card:
         return None
     a = {"name": card["lead_region"], "value": parse_it(card.get("lead_value"))}
@@ -376,15 +402,60 @@ def story(p: dict) -> dict:
     }
 
 
+# ---------------------------------------------------------------- le porte del sito
+
+# Le destinazioni che la home mette in evidenza subito sotto la testata: le
+# quattro grandi, con la cifra che le misura, e le altre in fila. I percorsi
+# sono quelli di `app/nav.py`, e `tests/unit/test_home_doors.py` controlla che
+# ognuno ci sia: una porta che porta a una pagina tolta dal menu e' una porta
+# rotta che nessuna prova vedrebbe.
+MAIN_DOORS = ("/regioni", "/province", "/temi", "/qualita-della-vita")
+MORE_DOORS = ("/atlante", "/confronto", "/divari-regionali", "/blog", "/quiz", "/catalogo-dati")
+
+
+def doors(ctx: dict, qol: dict | None = None) -> dict:
+    """Le porte d'ingresso, con le cifre calcolate: "20 regioni" era scritto a
+    mano in sei posti, e le province non comparivano in nessuno. Dove la cifra
+    e il titolo dicono la stessa cosa ("20", "Regioni") l'unita' non si ripete."""
+    counts = ctx.get("territories") or {}
+    ranked = sum(p["total"] for p in (qol["regions"], qol["provinces"]) if p) if qol else None
+    main = {
+        "/regioni": {"num": counts.get("regions"), "unit": None, "title": "Regioni",
+                     "text": "Il profilo di ogni regione: dove stacca, dove resta indietro, i valori di ogni indicatore."},
+        "/province": {"num": counts.get("provinces"), "unit": None, "title": "Province",
+                      "text": "Posizione, dimensioni del benessere e tutti gli indicatori di ogni provincia."},
+        "/temi": {"num": ctx.get("theme_total"), "unit": None, "title": "Temi",
+                  "text": "Gli indicatori raccolti per argomento, con la mappa e chi sta in testa su ognuno."},
+        "/qualita-della-vita": {"num": ranked or None, "unit": "territori in classifica", "title": "Qualità della vita",
+                                "text": "Dove si vive meglio: la classifica delle regioni e quella delle province, con il profilo di priorità che scegli tu."},
+    }
+    more = {
+        "/atlante": {"title": "L'atlante", "text": f"{numfmt.text(ctx.get('total_indicators'), 0)} indicatori sulla mappa, anno per anno"
+                     if ctx.get("total_indicators") else "Tutti gli indicatori sulla mappa, anno per anno"},
+        "/confronto": {"title": "Confronta i territori", "text": "Fino a tre regioni o province fianco a fianco"},
+        "/divari-regionali": {"title": "Divari regionali", "text": "Nord, Centro e Mezzogiorno messi a confronto"},
+        "/blog": {"title": "Storie", "text": f"{ctx['post_total']} articoli costruiti sui dati" if ctx.get("post_total")
+                  else "Gli articoli costruiti sui dati"},
+        "/quiz": {"title": "Quiz", "text": f"{count_word(len(ctx.get('quiz_games') or []), feminine=False).capitalize()} giochi sugli stessi indicatori"
+                  if ctx.get("quiz_games") else "Giochi sugli stessi indicatori"},
+        "/catalogo-dati": {"title": "Catalogo dati", "text": "Ogni scheda con la sua fonte e i suoi anni"},
+    }
+    return {
+        "main": [{"path": path, **main[path]} for path in MAIN_DOORS],
+        "more": [{"path": path, **more[path]} for path in MORE_DOORS],
+    }
+
+
 # ---------------------------------------------------------------- tutta la pagina
 
 def derive(ctx: dict) -> dict:
     """Tutto cio' che il template della home chiede in piu' rispetto al contesto."""
     counts = ctx.get("territories") or {}
-    feat = feature(ctx) if ctx.get("hero_map") else None
+    feat = feature(ctx.get("feature_pick"))
+    qol = quality(ctx)
     posts = sorted(ctx.get("posts") or [], key=lambda p: p["slug"])
     posts = sorted(posts, key=lambda p: str(p.get("date") or ""), reverse=True)[:3]
-    names = (feat or {}).get("names", {})
+    names = region_names()
     areas = [{
         **area,
         "best_key": next((k for k, v in names.items() if v == area.get("best")), None),
@@ -395,10 +466,11 @@ def derive(ctx: dict) -> dict:
     return {
         "indicators": ctx.get("total_indicators"),
         "regions": counts.get("regions"), "provinces": counts.get("provinces"),
+        "doors": doors(ctx, qol),
         "feature": feat,
-        "areas_regions": regions_by_area(feat["names"]) if feat else [],
-        "quality": quality(ctx),
-        "quiz_try": quiz_try(ctx),
+        "areas_regions": regions_by_area(names),
+        "quality": qol,
+        "quiz_try": quiz_try(ctx, (feat or {}).get("path")),
         "areas": areas,
         "stories": [story(p) for p in posts],
         "citation": citation,

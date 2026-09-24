@@ -102,6 +102,10 @@
   --tr-title: -0.015em;
   --fs-section: clamp(23px, 20.727px + 0.6061vw, 28px);
   --lh-section: 1.2;
+  /* Il titolo di sezione sugli schermi larghi, da 1200 pixel: a 28 si
+     confondeva coi titoli-affermazione dei grafici da 20. */
+  --fs-section-l: 34px;
+  --lh-section-l: 1.15;
   --fw-section: 700;
   --tr-section: -0.01em;
   --fs-subsection: clamp(19px, 18.545px + 0.1212vw, 20px);
@@ -136,7 +140,7 @@
   --lh-figure-sm: 1.05;
   --fw-figure-sm: 700;
   --tr-figure-sm: -0.015em;
-  --container: 1200px;
+  --container: 1440px;
   --measure: 38rem;
   --gutter-s: 16px;
   --gutter-l: 24px;
@@ -279,7 +283,7 @@
   --tracking-eyebrow: 0.01em;
   --measure-prose: 38rem;
   --measure-narrow: 54ch;
-  --measure-wide: 1200px;
+  --measure-wide: var(--container);
 
   --space-0: 0;
   --space-1: 4px;
@@ -300,8 +304,8 @@
   --gutter: clamp(16px, 3vw, 24px);
   --container-prose: 38rem;
   --container-narrow: 960px;
-  --container-wide: 1200px;
-  --container-atlas: 1200px;
+  --container-wide: var(--container);
+  --container-atlas: var(--container);
   --topbar-h: 64px;
   --topbar-h-mobile: 56px;
   --dock-h: 60px;
