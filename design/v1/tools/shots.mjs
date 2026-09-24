@@ -3,6 +3,8 @@
 //   node design/v1/tools/shots.mjs prima   la produzione, prima del ridisegno
 //   node design/v1/tools/shots.mjs dopo    i prototipi in dist/pagine
 //   node design/v1/tools/shots.mjs check   scorrimento orizzontale e tastiera sui prototipi
+//   node design/v1/tools/shots.mjs tastiera <base> <percorsi,separati,da,virgola>
+//        salto al contenuto e focus visibile a 1440, cassetto a 375 (entra, resta, Escape)
 //   node design/v1/tools/shots.mjs giro <base> <cartella> <percorsi,separati,da,virgola>
 //        il sito servito (locale o produzione): piega e pagina intera a 1440 e 375
 //        nel tema di THEME (chiaro se manca), scorrimento orizzontale a 320, 360 e
@@ -369,6 +371,64 @@ async function giro(base, outDir, paths) {
   if (problems) process.exitCode = 1;
 }
 
+
+// Tastiera sul sito servito: a 1440 la prima fermata e' il salto al contenuto e
+// ogni fermata ha un focus visibile; a 375 il cassetto si apre dal bottone, il
+// focus ci entra e ci resta (Tab e Shift+Tab), Escape lo chiude.
+async function tastiera(base, paths) {
+  const cdp = await launch();
+  let problems = 0;
+  const tab = async (s, shift) => {
+    const mods = shift ? 8 : 0;
+    await s("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: mods });
+    await s("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: mods });
+    await sleep(40);
+  };
+  try {
+    for (const path of paths) {
+      const url = base + path;
+      {
+        const { s, sessionId, targetId } = await openPage(cdp, { viewport: VIEWPORTS[1440], theme: "light", blocked: BLOCKED });
+        await go(cdp, s, sessionId, url);
+        const stops = [];
+        for (let i = 0; i < 30; i++) { await tab(s); const f = await evaluate(s, FOCUS); if (f) stops.push(f); }
+        const first = stops[0];
+        if (!first || !/contenuto/i.test(first.text + first.cls)) { problems++; console.log(`TASTIERA ${path}: la prima fermata non e' il salto al contenuto`, first); }
+        const hidden = stops.filter((f) => !f.visible);
+        if (hidden.length) { problems++; console.log(`TASTIERA ${path}: focus non visibile su`, hidden.slice(0, 4)); }
+        await cdp.send("Target.closeTarget", { targetId });
+      }
+      {
+        const { s, sessionId, targetId } = await openPage(cdp, { viewport: { width: 375, height: 740, deviceScaleFactor: 1, mobile: true }, theme: "light", blocked: BLOCKED });
+        await go(cdp, s, sessionId, url);
+        await sleep(300);
+        const opened = await evaluate(s, `(() => { const b = document.querySelector('[data-ds-drawer-open]'); if (!b || getComputedStyle(b).display === 'none') return 'bottone assente'; b.focus(); b.click(); const d = document.getElementById('ds-drawer'); return d && !d.hidden ? 'aperto' : 'chiuso'; })()`);
+        if (opened !== "aperto") { problems++; console.log(`CASSETTO ${path}: ${opened}`); }
+        else {
+          await sleep(200);
+          const inside = [];
+          for (let i = 0; i < 40; i++) { await tab(s, i % 7 === 6); inside.push(await evaluate(s, `(() => { const a = document.activeElement; return { dentro: !!a.closest('#ds-drawer'), visibile: (() => { const c = getComputedStyle(a); return c.outlineStyle !== 'none' || (a.closest('.searchbox') && a.closest('.searchbox').matches(':focus-within')); })(), cosa: a.tagName + ' ' + (a.textContent || a.placeholder || '').trim().slice(0, 20), fv: a.matches(':focus-visible'), f: a.matches(':focus'), hf: document.hasFocus(), ol: getComputedStyle(a).outline, href: a.getAttribute('href') }; })()`)); }
+          const fuori = inside.filter((f) => !f.dentro);
+          if (fuori.length) { problems++; console.log(`CASSETTO ${path}: il focus esce`, fuori.slice(0, 3)); }
+          // Un campione preso mentre il documento non ha il focus (hasFocus falso)
+          // non dice niente sull'anello: in quell'istante nessuna regola :focus vale.
+          const invisibili = inside.filter((f) => f.dentro && f.hf && !f.visibile);
+          if (invisibili.length) { problems++; console.log(`CASSETTO ${path}: focus non visibile`, invisibili.slice(0, 3)); }
+          await s("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+          await s("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+          await sleep(150);
+          const after = await evaluate(s, `({ chiuso: document.getElementById('ds-drawer').hidden, focus: document.activeElement.matches('[data-ds-drawer-open]') })`);
+          if (!after.chiuso || !after.focus) { problems++; console.log(`CASSETTO ${path}: Escape`, after); }
+        }
+        await cdp.send("Target.closeTarget", { targetId });
+      }
+      console.log(`tastiera ${path}: fatto`);
+    }
+  } finally { cdp.close(); }
+  console.log(problems ? `${problems} problemi` : "nessun problema");
+  if (problems) process.exitCode = 1;
+}
+
 const mode = process.argv[2];
 if (mode === "prima") {
   const day = process.argv[3] || new Date().toISOString().slice(0, 10);
@@ -432,6 +492,9 @@ if (mode === "prima") {
   } finally { cdp.close(); }
 } else if (mode === "check") {
   await check();
+} else if (mode === "tastiera") {
+  const [base, paths] = process.argv.slice(3);
+  await tastiera(base.replace(/\/$/, ""), paths.split(","));
 } else if (mode === "giro") {
   const [base, outDir, paths] = process.argv.slice(3);
   await giro(base.replace(/\/$/, ""), resolve(outDir), paths.split(","));

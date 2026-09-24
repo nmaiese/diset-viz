@@ -117,5 +117,47 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         self.assertEqual(guasti, [], guasti[:10])
 
 
+class IlRipiegoTiene(unittest.TestCase):
+    """Se la regia della 1.0 cede, la pagina si serve col template di prima.
+
+    E' la rete sotto le pagine che portano quasi tutti i clic, e nessun'altra
+    prova la attraversa: la modalita' stretta dei test fa uscire l'eccezione
+    prima. Qui la si toglie, si fa cedere `derive`, e ogni rotta deve
+    rispondere 200 dal template di prima, sotto la testata e il piede nuovi."""
+
+    ROTTE = ("/", "/indicatore/pil-pro-capite/ter-901", "/regione/puglia", "/provincia/lecce",
+             "/blog/infortuni-lavoro-province", "/qualita-della-vita",
+             "/qualita-della-vita/classifica/regioni", "/qualita-della-vita/classifica/province")
+
+    def test_ogni_pagina_regge_senza_la_sua_regia(self):
+        import logging
+        import os
+        from unittest import mock
+
+        from app import cache
+
+        def cede(*_args, **_kwargs):
+            raise RuntimeError("la regia della 1.0 cede")
+
+        client = app.test_client()
+        livello = app.logger.level
+        app.logger.setLevel(logging.CRITICAL)
+        cache.clear()
+        try:
+            with mock.patch.dict(os.environ, {"DIVARIO_V1_STRICT": ""}), \
+                    mock.patch("app.design.derive", side_effect=cede):
+                for percorso in self.ROTTE:
+                    with self.subTest(percorso=percorso):
+                        risposta = client.get(percorso)
+                        html = risposta.get_data(as_text=True)
+                        self.assertEqual(risposta.status_code, 200)
+                        self.assertNotIn('data-v1="', html)
+                        self.assertIn('<header class="hdr">', html)
+                        self.assertIn("css/site.css", html)
+        finally:
+            app.logger.setLevel(livello)
+            cache.clear()
+
+
 if __name__ == "__main__":
     unittest.main()
