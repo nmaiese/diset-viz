@@ -1,9 +1,11 @@
 # design/
 
 Qui sta il progetto della **versione 1.0** del sito: il sistema di pagina e i
-prototipi statici delle pagine chiave, costruiti con dati veri. **Non e'
-l'identita' in vigore.** Quella resta `app/static/css/ds/system.css`, e il sito
-la legge da li' finche' una PR di migrazione non porta i nuovi token in `app/`.
+prototipi statici delle pagine chiave, costruiti con dati veri. La 1.0 e' in
+produzione, ma **il sito non legge niente da qui**: i token stanno in
+`app/static/css/ds/system.css`, i componenti in `css/ds/components.css`, le
+pagine in `app/templates/v1/` e cio' che chiedono ai dati in `app/design/`. Un
+prototipo che cambia qui arriva al sito solo con una PR che lo porta in `app/`.
 
 La cartella non finisce nell'immagine di Cloud Run (il `Dockerfile` copia solo
 `frontend/`, `app/`, `content/`, `scripts/`, `packs/`, `data/` e `run.py`) e
@@ -36,7 +38,14 @@ bin/py design/v1/tools/check_pages.py    # punteggiatura, numeri, colori, strutt
 node design/v1/tools/shots.mjs prima     # screenshot della produzione
 node design/v1/tools/shots.mjs dopo      # screenshot dei prototipi
 node design/v1/tools/shots.mjs check     # scorrimento orizzontale e tastiera
+node design/v1/tools/shots.mjs giro <base> <cartella> /,/temi        # il sito servito: pieghe, sforamenti, errori, richieste fallite
+node design/v1/tools/shots.mjs tastiera <base> /,/regione/puglia     # il sito servito: salto al contenuto, focus, cassetto
 ```
+
+`giro` e `tastiera` lavorano su un sito servito, locale o produzione. In locale
+gunicorn va lanciato con i thread (`--worker-class gthread --threads 8`, come
+nel Dockerfile): con un solo worker sincrono una connessione aperta da Chrome
+senza richiesta lo tiene fermo fino al timeout.
 
 Chrome headless non disegna dentro la sandbox di Claude Code: `shots.mjs` va
 lanciato fuori sandbox, o a mano.

@@ -9,14 +9,17 @@ paths:
 (`design/v1/SISTEMA.md`), i token della direzione "Cronaca"
 (`design/v1/tokens/tokens.json`) e i prototipi statici con dati veri.
 
-- **Non e' l'identita' in vigore.** Il sito legge i colori, i font e le ombre da
-  `app/static/css/ds/system.css`, e cosi' resta finche' una PR di migrazione non
-  porta i token in `app/`. Copiare un valore da qui a `app/` fuori da quella PR
-  e' lo stesso errore della vecchia cartella `design-system/`, che per mesi ha
-  descritto un'identita' morta agli agenti che la trovavano.
+- **E' il cantiere, il sito e' in `app/`.** La 1.0 e' in produzione: i token
+  stanno in `app/static/css/ds/system.css`, i componenti in
+  `app/static/css/ds/components.css`, le macro in `app/templates/v1/_ui.html`,
+  le pagine in `app/templates/v1/` e cio' che chiedono ai dati in `app/design/`.
+  Un prototipo che cambia qui non cambia il sito: si porta in `app/` con una
+  PR, e i due vanno tenuti allineati a mano. Il codice di `app/` non legge
+  niente da `design/`, che non entra nell'immagine di Cloud Run
+  (`tests/unit/test_design_runtime.py`).
 - Un colore si cambia in `tokens.json` e si rigenera `tokens.css` con
-  `tools/tokens.py`. Il CSS dei componenti legge solo token: niente esadecimali,
-  niente `rgba()`.
+  `tools/tokens.py`, poi si riporta in `app/static/css/ds/system.css`. Il CSS
+  dei componenti legge solo token: niente esadecimali, niente `rgba()`.
 - Nessuna cifra dei prototipi si scrive a mano: arriva dal contesto catturato
   (`tools/extract.py`) o da una funzione dell'app (`tools/derive.py`). Quella che
   non si puo' calcolare resta un segnaposto visibile.

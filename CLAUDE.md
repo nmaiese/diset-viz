@@ -46,7 +46,7 @@ direttamente su `master`.
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
-| **la versione 1.0**: griglia, tipografia, componenti, pagine, direzione "Cronaca", prototipi | [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md), [`design/README.md`](design/README.md) |
+| **la versione 1.0**: griglia, tipografia, componenti, pagine, direzione "Cronaca", prototipi, e le pagine del sito che ne escono (`app/design/`, `app/templates/v1/`) | [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md), [`design/README.md`](design/README.md) |
 | deploy su Cloud Run | [`DEPLOY.md`](DEPLOY.md) |
 
 ## Che cos'è
@@ -148,26 +148,33 @@ macro-area, senza che niente fallisca.
 
 - Non rompere `/legacy` né lo schema dati (`tests/integration/test_app.py` guarda entrambi).
 - Tenere intatta la SEO tecnica (la lista è in `.claude/rules/app.md`).
-- **Identità visiva: un sistema solo, ovunque.** Il design system 2026 (carta
-  calda `#f5f3ee`, inchiostro `#18201e`, accento corallo `#e24b3c`, verde-acqua
-  `#0f9e86`, rampa dati sequenziale teal, angoli squadrati, font Newsreader /
-  Public Sans / Spline Sans Mono) è l'identità di tutto il sito, e i suoi token
-  stanno in `app/static/css/ds/system.css`: è l'unico posto dove si cambia un
-  colore, un font o un'ombra. La migrazione è finita, l'identità navy/Archivo
-  non c'è più, e `/legacy` è l'unica pagina rimasta sul suo stile, di proposito.
-  `site.css` sopravvive come **livello componenti**: veste le pagine e non
-  dichiara più un'identità, perché le sue regole leggono gli stessi nomi di
-  token (`--ink`, `--paper`, `--accent`, `--font-display`) che `system.css`
-  definisce. Quel ponte di nomi è come è stata fatta la migrazione, ed è ancora
-  come le componenti prendono i colori.
+- **Identità visiva: un sistema solo, ovunque.** La 1.0, direzione "Cronaca"
+  (pagina bianca, inchiostro `#121519`, un solo accento arancio bruciato
+  `#a75001` per cio' che si clicca, rampa dati sequenziale blu, angoli quasi
+  squadrati, Sofia Sans per il testo e Sofia Sans Semi Condensed per titoli e
+  cifre, servite da noi), e' l'identita' di tutto il sito. I token stanno in
+  `app/static/css/ds/system.css`, l'unico posto dove si cambia un colore, un
+  font o un'ombra; nascono da `design/v1/tokens/tokens.json`, dove si verificano
+  contrasti e daltonismo. `/legacy` e' l'unica pagina rimasta sul suo stile, di
+  proposito.
+  Le sette pagine chiave (scheda indicatore, home, regione, provincia, articolo,
+  indice e classifica della qualita' della vita) escono da `app/templates/v1/`
+  con `css/ds/components.css` e il CSS della pagina, e cio' che chiedono ai dati
+  lo compone `app/design/` (`numfmt` per come si scrive una cifra, `charts` per
+  i grafici, un modulo per pagina). Le altre pagine restano su `site.css`, che
+  e' un **livello componenti** e legge gli stessi nomi di token
+  (`--ink`, `--paper`, `--accent`, `--font-display`) che `system.css` ripunta
+  sui valori della 1.0. `design.render` serve il template di prima se la regia
+  nuova cede, e lo scrive nel log ("pagina 1.0 ... ripiego"): un ripiego e' un
+  200, quindi in produzione si controlla `data-v1="<pagina>"`, non lo stato.
   Due regole che si rompono in silenzio. **Mai cuocere un colore** (un esadecimale
-  o un `rgba()`) dentro una regola: `--seq-*` e i neutri vengono ridefiniti sotto
+  o un `rgba()`) dentro una regola: i neutri e `--seq-*` vengono ridefiniti sotto
   `<html data-theme="dark">`, quindi un colore cotto tiene quell'elemento sulla
-  palette chiara mentre la pagina va scura, ed è esattamente così che la testata
-  dell'atlante era rimasta bianca. E **marca, interfaccia e dati restano
-  separati**: il corallo è l'accento dell'interazione, quindi una fila di venti
-  barre di classifica è `--cmp-*` e solo quella in evidenza è corallo; un colore
-  dei dati non porta mai un giudizio, e la rampa della mappa va sempre da chiaro
-  a intenso seguendo la grandezza, qualunque sia il verso dell'indicatore.
+  palette chiara mentre la pagina va scura. E **marca, interfaccia e dati restano
+  separati**: l'arancio e' l'accento dell'interazione e di cio' che e' in
+  evidenza, mai un colore dei dati; i punti dei grafici hanno il colore della
+  ripartizione (Nord, Centro, Mezzogiorno), un colore dei dati non porta mai un
+  giudizio, e la rampa della mappa va sempre da chiaro a intenso seguendo la
+  grandezza, qualunque sia il verso dell'indicatore.
 - Non committare segreti (`.gitignore` esclude già `client_secret_*.json`).
 - Messaggi di commit: nessun trailer `Co-Authored-By`.
