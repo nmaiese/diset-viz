@@ -13,8 +13,8 @@ Tre disegni che tornano in piu' pagine:
   dal baricentro del pezzo piu' grande della regione (non dal rettangolo che la
   contiene, che per la Campania o la Liguria cade in mare).
 
-Ogni disegno esce in due tagli, largo e stretto, cosi' il testo resta a 12-13
-pixel veri anche sul telefono. I colori stanno nel CSS, per classe: niente
+Ogni disegno esce in tre tagli, molto largo, largo e stretto, cosi' il testo
+resta a 12-13 pixel veri dallo schermo grande al telefono. I colori stanno nel CSS, per classe: niente
 esadecimali qui. Accanto a ogni grafico la pagina tiene una tabella con gli
 stessi dati.
 """
@@ -29,6 +29,11 @@ from html import escape
 from app.design import numfmt as n
 
 AREA_OF_REGION_AREA = {"Nord": "nord", "Centro": "centro", "Sud": "sud", "Isole": "sud"}
+
+# Il terzo taglio, per gli schermi larghi: col contenitore a 1440 pixel il
+# taglio da 920 lasciava vuoto un terzo della riga. Il CSS lo mostra da 1100
+# pixel di grafico in su, cosi' il testo non scende mai sotto i 12 pixel veri.
+XL_WIDTH = 1180
 AREA_LABEL = {"nord": "Nord", "centro": "Centro", "sud": "Mezzogiorno"}
 
 
@@ -187,13 +192,15 @@ def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_rat
         ratio = f"{n.text(gap_ratio, 1)} volte"
     else:
         ratio = f"distanza {n.text(hi - lo)}"
+    xl = _strip(rows, avg, unit, XL_WIDTH, False, ratio, highlight, avg_label, decimals)
     wide = _strip(rows, avg, unit, 920, False, ratio, highlight, avg_label, decimals)
     narrow = _strip(rows, avg, unit, 360, True, ratio, highlight, avg_label, decimals)
     counts = {}
     for row in rows:
         counts[row.get("area")] = counts.get(row.get("area"), 0) + 1
     legend = [{"area": a, "label": AREA_LABEL[a], "count": counts[a]} for a in ("nord", "centro", "sud") if a in counts]
-    return {"svg": f'<div class="chart__l">{wide}</div><div class="chart__s">{narrow}</div>', "legend": legend}
+    return {"svg": f'<div class="chart__xl">{xl}</div><div class="chart__l">{wide}</div><div class="chart__s">{narrow}</div>',
+            "legend": legend}
 
 
 # ---------------------------------------------------------------- serie a fascia
@@ -276,9 +283,10 @@ def band_series(level: dict, areas: dict) -> dict:
     matrix = level.get("matrix") or {}
     if len(matrix) < 2:
         return {"svg": "", "single_year": True}
+    xl, _ = _band(level, areas, XL_WIDTH, 380, 220, False)
     wide, years = _band(level, areas, 920, 340, 200, False)
     narrow, _ = _band(level, areas, 360, 280, 112, True)
-    return {"svg": f'<div class="chart__l">{wide}</div><div class="chart__s">{narrow}</div>',
+    return {"svg": f'<div class="chart__xl">{xl}</div><div class="chart__l">{wide}</div><div class="chart__s">{narrow}</div>',
             "single_year": False, "first": years[0], "last": years[-1]}
 
 

@@ -25,6 +25,7 @@ from app import it_numbers
 from app import indicator_texts
 from app import indicator_universe
 from app import indicator_view
+from app import home_pick
 from app import editorial_state
 from app import quality_life_bes as qb
 from app.quality_life_config import QUALITY_LIFE_PROFILES
@@ -372,8 +373,11 @@ def data():
     return response
 
 
+# La home non si mette in cache: l'indicatore in evidenza cambia a ogni visita
+# (`app/home_pick.py`), e una pagina tenuta cinque minuti per worker mostrerebbe
+# lo stesso a tutti. Il resto della pagina legge loader gia' in cache per
+# processo, e a caldo si rende in poche decine di millisecondi.
 @app.route("/")
-@cache.cached(timeout=300, query_string=True, unless=agent_discovery.prefers_markdown)
 def home():
     # The federated catalog, not the territorial family alone: the themes below
     # already aggregate every source, so counting one family here made the same
@@ -394,6 +398,9 @@ def home():
     themes_preview = _home_themes_preview()
     return design.render(
         "home", "v1/home.html", "home.html",
+        feature_pick=_home_feature_pick(),
+        theme_total=sum(len(group["themes"]) for group in atlas_themes_by_macro_area()),
+        post_total=len(get_posts()),
         territories=territories,
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -414,6 +421,25 @@ def home():
         qol_module=_home_qol_module(),
         trust_cards=_home_trust_cards(summary, territories),
     )
+
+
+def _home_feature_pick():
+    """L'indicatore in evidenza della home (`app/home_pick.py`).
+
+    La scelta si fa qui, fuori dal `try` di `design.render`: se un indicatore
+    del catalogo si rompesse, la home andrebbe in 500 una volta su N invece di
+    perdere solo la sua fascia. Come per la regia della 1.0, in produzione
+    l'errore finisce nel log e la fascia si toglie, nei test esce."""
+    try:
+        return home_pick.pick(
+            request.args.get("indicatore") or request.args.get("indicator"),
+            request.args.get("livello"),
+        )
+    except Exception:
+        if os.environ.get("DIVARIO_V1_STRICT"):
+            raise
+        app.logger.exception("home: indicatore in evidenza non disponibile")
+        return None
 
 
 @app.route("/atlante")
