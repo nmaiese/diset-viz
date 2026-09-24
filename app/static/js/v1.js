@@ -52,7 +52,7 @@
   document.querySelectorAll("[data-map]").forEach(function (box) {
     var tip = box.querySelector("[data-map-tip]");
     box.addEventListener("mousemove", function (ev) {
-      var p = ev.target.closest("path[data-key]");
+      var p = ev.target.closest(".map [data-key]");
       if (!p) { tip.hidden = true; return; }
       var r = box.getBoundingClientRect();
       tip.innerHTML = "";
@@ -102,7 +102,7 @@
       var byKey = {};
       list.forEach(function (r) { byKey[r.key] = r; });
 
-      mod.querySelectorAll("path[data-key]").forEach(function (p) {
+      mod.querySelectorAll(".map [data-key]").forEach(function (p) {
         var r = byKey[p.dataset.key];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6");
         if (r) {
@@ -151,7 +151,7 @@
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
     function highlight(key) {
-      mod.querySelectorAll("path[data-key]").forEach(function (p) { p.classList.toggle("is-on", p.dataset.key === key); });
+      mod.querySelectorAll(".map [data-key]").forEach(function (p) { p.classList.toggle("is-on", p.dataset.key === key); });
       // Piu' di un corpo quando la home affianca le prime e le ultime dieci province.
       mod.querySelectorAll("[data-rank-body] tr[data-key]").forEach(function (tr) {
         var on = tr.dataset.key === key;
@@ -186,6 +186,8 @@
       highlight(select ? select.value : "");
     });
     if (select) select.addEventListener("change", function () { highlight(select.value); });
+    // Il campo ripristinato dal browser dopo un Indietro riaccende la sua evidenza.
+    if (select && select.value) highlight(select.value);
     page.querySelectorAll(".strip").forEach(function (svg) {
       svg.addEventListener("click", function (ev) {
         var c = ev.target.closest(".strip__dot");
@@ -195,10 +197,116 @@
       });
     });
     mod.addEventListener("click", function (ev) {
-      var p = ev.target.closest("path[data-key]");
+      var p = ev.target.closest(".map [data-key]");
       if (!p || !select) return;
+      // Un territorio senza dato non ha una voce nel campo: sceglierlo lo svuotava.
+      if (!data.names[p.dataset.key]) return;
       select.value = select.value === p.dataset.key ? "" : p.dataset.key;
       highlight(select.value);
+    });
+  });
+
+  /* ---------- mappe per scegliere un territorio: il nome al passaggio del mouse ---------- */
+  document.querySelectorAll("[data-navmap]").forEach(function (box) {
+    var tip = box.querySelector("[data-navmap-tip]");
+    if (!tip) return;
+    box.addEventListener("mousemove", function (ev) {
+      var a = ev.target.closest("a[data-key]");
+      if (!a) { tip.hidden = true; return; }
+      var r = box.getBoundingClientRect();
+      tip.textContent = a.dataset.name;
+      tip.hidden = false;
+      var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
+      if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
+      tip.style.left = x + "px";
+      tip.style.top = y + "px";
+    });
+    box.addEventListener("mouseleave", function () { tip.hidden = true; });
+  });
+
+  /* ---------- regioni e province della home: l'anteprima del territorio scelto ----------
+     Le anteprime arrivano tutte nel JSON del blocco, gia' scritte dal server.
+     Qui si ricompone la stessa scheda di home/_territori.html, e il clic sulla
+     mappa sceglie invece di aprire: il profilo si apre dal bottone. */
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  document.querySelectorAll("[data-picker]").forEach(function (box) {
+    var dataEl = box.querySelector("[data-picker-data]");
+    var card = box.querySelector("[data-picker-card]");
+    if (!dataEl || !card) return;
+    var data = JSON.parse(dataEl.textContent);
+    var select = box.querySelector("[data-picker-select]");
+    var field = box.querySelector("[data-picker-field]");
+    if (field) field.hidden = false;
+    function render(key) {
+      var p = data[key];
+      if (!p) return;
+      var facts = (p.facts || []).map(function (x) {
+        var text = x.href ? '<a href="' + esc(x.href) + '">' + esc(x.text) + "</a>" : esc(x.text);
+        return "<div><dt>" + esc(x.label) + "</dt><dd>" + text + (x.note ? ' <span class="terr__note">' + esc(x.note) + "</span>" : "") + "</dd></div>";
+      }).join("");
+      card.innerHTML =
+        '<p class="terr__kicker">' + (p.area ? '<span class="area-dot area-dot--' + esc(p.area) + '" aria-hidden="true"></span>' : "") + esc(p.kicker) + "</p>" +
+        '<h4 class="terr__name"><a href="' + esc(p.href) + '">' + esc(p.name) + "</a></h4>" +
+        '<p class="terr__lead">' + esc(p.lead) + "</p>" +
+        (facts ? '<dl class="terr__facts">' + facts + "</dl>" : "") +
+        '<p class="terr__cta"><a class="btn btn--primary" href="' + esc(p.href) + '">' + esc(p.cta) + "</a></p>";
+      box.querySelectorAll("[data-navmap] a[data-key]").forEach(function (a) { a.classList.toggle("is-on", a.dataset.key === key); });
+      if (select && select.value !== key) select.value = key;
+    }
+    // Dopo un Indietro il browser rimette nel campo la scelta di prima, mentre
+    // il server ha estratto un altro territorio: vince il campo.
+    var shown = box.querySelector("[data-navmap] a.is-on[data-key]");
+    if (select && data[select.value] && (!shown || shown.dataset.key !== select.value)) render(select.value);
+    box.addEventListener("click", function (ev) {
+      var a = ev.target.closest("[data-navmap] a[data-key]");
+      if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+      ev.preventDefault();
+      render(a.dataset.key);
+    });
+    if (select) select.addEventListener("change", function () { render(select.value); });
+  });
+
+  /* ---------- schede (tab): regioni e province dell'indicatore in evidenza ----------
+     Senza JavaScript ogni scheda e' un link alla pagina con quel livello; qui
+     il clic mostra il pannello gia' in pagina, e le frecce passano da una
+     scheda all'altra come chiede il pattern ARIA dei tab. */
+  document.querySelectorAll("[data-tabs]").forEach(function (list) {
+    var tabs = Array.prototype.slice.call(list.querySelectorAll("[data-tab]"));
+    if (tabs.length < 2) return;
+    // I ruoli li mette il JavaScript: senza, restano due link tabulabili.
+    list.setAttribute("role", "tablist");
+    tabs.forEach(function (t) {
+      var panel = document.getElementById(t.dataset.tab);
+      t.setAttribute("role", "tab");
+      t.setAttribute("aria-controls", t.dataset.tab);
+      t.removeAttribute("aria-current");
+      if (panel) { panel.setAttribute("role", "tabpanel"); panel.setAttribute("aria-labelledby", t.id); panel.tabIndex = 0; }
+    });
+    function show(tab, focus) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.classList.toggle("is-on", on);
+        t.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(t.dataset.tab);
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) tab.focus();
+    }
+    show(tabs.filter(function (t) { return t.classList.contains("is-on"); })[0] || tabs[0], false);
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function (ev) {
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+        ev.preventDefault();
+        show(t, false);
+      });
+      t.addEventListener("keydown", function (ev) {
+        var step = ev.key === "ArrowRight" ? 1 : ev.key === "ArrowLeft" ? -1 : 0;
+        if (ev.key === " ") { ev.preventDefault(); show(t, false); return; }
+        if (!step) return;
+        ev.preventDefault();
+        show(tabs[(i + step + tabs.length) % tabs.length], true);
+      });
     });
   });
 

@@ -1,0 +1,55 @@
+{% import "v1/_ui.html" as ui %}
+{#- Il quiz: e' un gioco, quindi ha una fascia sua (lavaggio ambra), le
+    schede dei giochi con un'illustrazione e il loro bottone, e una domanda
+    lampo da provare subito. La risposta si mostra senza JavaScript: la accende
+    il CSS (`.home-try:has(input:checked)`), e la dicono la parola e il segno,
+    non un colore. -#}
+{% set t = d.quiz_try %}
+{% if d.games %}
+<section class="zone zone--fun home-quiz" id="quiz" aria-labelledby="h-quiz">
+<div class="wrap">
+  <header class="zone__head">
+    <div class="zone__title">
+      <h2 class="h-section" id="h-quiz">Quiz: quanto conosci l'Italia?</h2>
+      <p class="zone__lead">{{ d.games_word }} giochi costruiti sugli stessi indicatori di {{ sources_label }} che trovi nell'atlante. Si gioca senza registrarsi.</p>
+    </div>
+    <p class="zone__actions"><a class="linkarrow" href="/quiz/classifica">La classifica dei giocatori</a></p>
+  </header>
+  <div class="home-quiz__grid">
+    <ul class="home-games">
+      {%- for g in d.games %}
+      <li class="game">
+        <span class="game__art badge--{{ g.tone }}">{{ ui.icon(g.icon) }}</span>
+        <p class="game__meta">{{ g.meta | capitalize }}</p>
+        <h3 class="game__title"><a href="{{ g.href }}">{{ g.name }}</a></h3>
+        <p class="game__text">{{ g.desc }}</p>
+        <p class="game__go" aria-hidden="true">Gioca {{ ui.icon('arrow') }}</p>
+      </li>
+      {%- endfor %}
+    </ul>
+    {% if t %}
+    <fieldset class="home-try">
+      <legend>
+        <span class="home-try__flag">{{ ui.icon('bolt') }} Domanda lampo, da «{{ t.game.name }}»</span>
+        <span class="home-try__q">{{ t.indicator }}, {{ t.year }}: quale delle due regioni ha il valore più alto?</span>
+      </legend>
+      <div class="home-try__opts">
+        {%- for o in t.options %}
+        <label><input type="radio" name="prova" value="{{ loop.index }}"{% if o.right %} data-right{% endif %}> {{ o.name }}</label>
+        {%- endfor %}
+      </div>
+      {% set answer %}{{ t.right.name }} {{ t.right.value | num(t.unit, 'figure') }}, {{ t.wrong.name }} {{ t.wrong.value | num(t.unit, 'figure') }}.{% endset %}
+      <div class="home-try__out" role="status">
+        <p class="home-try__ok">{{ ui.mark(true) }}<span><strong>Giusto.</strong> {{ answer }}</span></p>
+        <p class="home-try__no">{{ ui.mark(false) }}<span><strong>Non è così.</strong> {{ answer }}</span></p>
+      </div>
+      <p class="source">Fonte: {{ t.source_label }} ({{ t.year }}). <a href="{{ t.path }}">{{ t.indicator }}, la scheda</a></p>
+      <p class="actions"><a class="btn btn--primary" href="/quiz">Gioca al quiz</a></p>
+    </fieldset>
+    {% else %}
+    <p class="actions"><a class="btn btn--primary btn--lg" href="/quiz">Gioca al quiz</a></p>
+    {% endif %}
+  </div>
+</div>
+</section>
+{% endif %}

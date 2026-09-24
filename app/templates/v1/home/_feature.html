@@ -1,0 +1,124 @@
+{% import "v1/_ui.html" as ui %}
+{#- L'indicatore in evidenza. La fascia ha il titolo di sezione come le altre,
+    e l'indicatore sta dentro una scheda con la sua testata: il nome
+    dell'indicatore e' un titolo della scheda, piu' piccolo di quello della
+    sezione, cosi' i due non si confondono.
+
+    Un pannello per livello, con la stessa forma: la striscia del divario a
+    tutta larghezza, poi la mappa accanto alla classifica. Quando l'indicatore
+    ha anche l'altro livello il selettore Regioni/Province passa dall'uno
+    all'altro senza ricaricare. Senza JavaScript il selettore e' un link a
+    `?indicatore=&livello=`, e il pannello nascosto resta nascosto. -#}
+{% set f = d.feature %}
+{% if f %}
+{% set two = f.levels | length > 1 %}
+<section class="zone home-feature" id="dato" aria-labelledby="h-dato">
+<div class="wrap">
+  <header class="zone__head">
+    <div class="zone__title">
+      <h2 class="h-section" id="h-dato">Indicatore in evidenza</h2>
+      {%- set where = 'per regione e per provincia' if two else ('per regione' if f.level == 'regione' else 'per provincia') %}
+      <p class="zone__lead">{% if f.requested %}L'indicatore che hai scelto, qui {{ where }}. Per uno a caso fra le schede di Divario Italia c'è «Un altro indicatore».{% else %}Uno a caso fra le schede di Divario Italia, qui {{ where }}. A ogni visita la home lo estrae di nuovo.{% endif %}</p>
+    </div>
+    <p class="zone__actions"><a class="btn" href="/">{{ ui.icon('shuffle') }} Un altro indicatore</a></p>
+  </header>
+
+  <article class="feat" aria-labelledby="feat-name">
+    <header class="feat__head">
+      <div class="feat__id">
+        <p class="feat__meta">{% if f.theme %}{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}<span class="sep" aria-hidden="true">·</span>{% endif %}{{ f.source_label }}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}</p>
+        <h3 class="feat__name" id="feat-name"><a href="{{ f.path }}">{{ f.name }}</a></h3>
+      </div>
+      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: per {{ f.elsewhere }} c'è la scheda.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
+      {% if two %}
+      {#- Senza JavaScript sono due link, tutti e due nell'ordine di
+          tabulazione: ruoli, aria-selected e tabindex mobile li aggiunge
+          v1.js quando aggancia le frecce. -#}
+      <div class="seg" aria-label="Livello dei territori" data-tabs>
+        {%- for lv in f.levels %}
+        <a class="seg__btn{{ ' is-on' if loop.first }}" id="tab-{{ lv.key }}" href="{{ lv.href }}" data-tab="lv-{{ lv.key }}"{% if loop.first %} aria-current="true"{% endif %}>{{ lv.tab }} <span class="seg__n">{{ lv.n | num(None, 'count') }}</span></a>
+        {%- endfor %}
+      </div>
+      {% endif %}
+    </header>
+
+    {% for lv in f.levels %}
+    <div class="feat__level" id="lv-{{ lv.key }}" data-page-root{% if not loop.first %} hidden{% endif %}>
+      <script type="application/json" data-explore-data>{{ lv.explore_js | tojson }}</script>
+      {% if lv.strip.svg %}
+      <figure class="feat__block" aria-labelledby="dato-t-{{ lv.key }}">
+        <figcaption class="feat__cap">
+          <p class="feat__kicker">Il divario fra le {{ lv.n | num(None, 'count') }} {{ lv.plural }}, {{ lv.year }}</p>
+          <div class="feat__caprow">
+            <span class="feat__claim" id="dato-t-{{ lv.key }}">{{ lv.lead_claim }}</span>
+            {{ ui.arealegend(lv.strip.legend) }}
+          </div>
+        </figcaption>
+        <div class="chart chart--hero">{{ lv.strip.svg | safe }}</div>
+        <p class="source">Ogni punto è una {{ lv.singular }}, nel colore della sua ripartizione{% if lv.values_note %}, {{ lv.values_note }}{% endif %}. Quello che scegli si accende anche sulla mappa{% if lv.middle %}, e in classifica se è fra le prime o le ultime dieci{% else %} e in classifica{% endif %}.</p>
+      </figure>
+      {% endif %}
+
+      {% macro rankrow(row) -%}
+      {%- set area = lv.areas.get(row.key) -%}
+      <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if area %}<span class="area-dot area-dot--{{ area }}" aria-hidden="true"></span>{% endif %}{% if lv.profile_path %}<a href="{{ lv.profile_path ~ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if area %}<span class="sr-only">, {{ lv.area_label[area] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', lv.decimals) }}</td></tr>
+      {%- endmacro %}
+
+      <div class="feat__pair" data-explore>
+        <div class="feat__pairhead">
+          <div class="feat__cap">
+            <p class="feat__kicker">Sulla mappa e in classifica</p>
+            {% if lv.table_claim %}<span class="feat__claim">{{ lv.table_claim }}</span>{% endif %}
+            <p class="subline">{{ f.name }}{% if lv.unit_note %}, {{ lv.unit_note }}{% endif %}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %} {% if lv.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.{% if lv.middle %} Le altre {{ lv.middle | num(None, 'count') }} sono nella scheda.{% endif %}</p>
+          </div>
+          <label class="field feat__find" for="territorio-{{ lv.key }}">Trova la tua {{ lv.singular }}
+            <select id="territorio-{{ lv.key }}" data-territory>
+              <option value="">Nessuna in evidenza</option>
+              {% for key, name in lv.names | dictsort(by='value') %}<option value="{{ key }}">{{ name }}</option>{% endfor %}
+            </select>
+          </label>
+        </div>
+
+        <div class="feat__map">
+          {{ ui.map(lv.map_classes, 'dato-' ~ lv.key, lv.map_names, lv.map_values, overlay=lv.callouts, label="Mappa cliccabile delle " ~ lv.plural ~ " italiane per " ~ f.name ~ ", " ~ lv.year, level=lv.key, use=True) }}
+          {% if lv.legend %}{{ ui.legend(lv.legend, 'Più intenso, valore più alto. Sei gradini uguali fra minimo e massimo.', lv.missing) }}{% endif %}
+        </div>
+
+        {#- Sul telefono la classifica si chiude (v1.js, data-collapse-mobile):
+            venti righe sotto la mappa facevano la fascia lunga tre schermi. -#}
+        <details class="more feat__rank" data-collapse-mobile open>
+          <summary>{% if lv.middle %}Le prime e le ultime dieci {{ lv.plural }}{% else %}La classifica delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %}</summary>
+          {% set head %}<thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ lv.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (lv.short_unit or 'Valore') | capitalize }}</th></tr></thead>{% endset %}
+          <div class="feat__cols">
+            {%- for col in lv.columns %}
+            <div class="tablewrap" tabindex="0" role="region" aria-label="{{ col.caption or 'Classifica' }}, {{ lv.plural }} per {{ f.name }}{% if not col.caption %}, parte {{ loop.index }} di {{ loop.length }}{% endif %}">
+              <table class="table table--compact">
+                {% if col.caption %}<caption>{{ col.caption }}</caption>{% else %}<caption class="sr-only">{{ f.name }} per {{ lv.singular }} nel {{ lv.year }}, parte {{ loop.index }} di {{ loop.length }}</caption>{% endif %}
+                {{ head }}
+                <tbody data-rank-body>
+                  {%- for row in col.rows %}
+                  {%- if row.ref %}
+                  <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', lv.decimals) }}</td></tr>
+                  {%- else %}
+                  {{ rankrow(row) }}
+                  {%- endif %}
+                  {%- endfor %}
+                </tbody>
+              </table>
+            </div>
+            {%- endfor %}
+          </div>
+        </details>
+        <p class="sr-only" role="status" aria-live="polite" data-live></p>
+      </div>
+      <div class="feat__end">
+        <p class="source feat__source">Fonte: {% if f.source_url %}<a href="{{ f.source_url }}">{{ f.source_label }}</a>{% else %}{{ f.source_label }}{% endif %} ({{ lv.year }}). Elaborazione Divario Italia. Le barre partono da zero.{% if lv.key == 'provincia' %} Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.{% endif %}</p>
+        <a class="btn btn--primary" href="{{ f.path }}">Tutta la scheda dell'indicatore</a>
+      </div>
+    </div>
+    {% endfor %}
+
+  </article>
+</div>
+</section>
+{% endif %}

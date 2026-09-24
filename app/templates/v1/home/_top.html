@@ -1,0 +1,50 @@
+{% import "v1/_ui.html" as ui %}
+<div class="zone home-top">
+<div class="wrap">
+  <header class="pagehead home-head">
+    <p class="eyebrow">L'Italia, regione per regione.</p>
+    <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
+    {#- I conteggi (indicatori, regioni, province) li portano le porte qui sotto:
+        ripetuti anche nella frase, la stessa cifra compariva due volte nella
+        stessa fascia (SISTEMA.md, "Una cifra una volta"). -#}
+    <p class="answer">Divario Italia mette in un posto solo gli indicatori di {{ sources_label }} sulle regioni e sulle province italiane, con serie dal {{ year_min }} al {{ year_max }}. Ogni cifra porta la sua fonte e il suo anno.</p>
+    <form class="home-find" role="search" action="/ricerca" method="get" aria-labelledby="l-trova">
+      <label id="l-trova" for="trova">Trova il tuo territorio</label>
+      <div class="home-find__row">
+        <input id="trova" name="q" type="search" placeholder="Una regione, una provincia o un indicatore" autocomplete="off">
+        <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
+      </div>
+    </form>
+    {#- Da 960 pixel, accanto al titolo e alla ricerca, la mappa per andare
+        dritti a una regione: il clic apre il suo profilo. Sul telefono non
+        c'e', la ricerca e le porte bastano. La tastiera ha il campo di
+        ricerca e la porta "Regioni". -#}
+    {% if d.region_names %}
+    <div class="home-map">
+      {{ ui.navmap('regione', d.region_names, None, '/regione/') }}
+      <p class="home-map__hint">Oppure scegli una regione sulla mappa.</p>
+    </div>
+    {% endif %}
+  </header>
+
+  {#- Le porte del sito: le quattro grandi con la cifra che le misura, le altre
+      in fila. Ogni scheda e' un link intero, senza ombra e senza "Apri". -#}
+  <nav class="doors" aria-labelledby="h-porte">
+    <h2 class="sr-only" id="h-porte">Le sezioni del sito</h2>
+    <ul class="doors__main">
+      {%- for door in d.doors.main %}
+      <li class="door">
+        {% if door.num %}<p class="door__num"><span class="figure-num">{{ door.num | num(None, 'count') }}</span>{% if door.unit %} <span class="door__unit">{{ door.unit }}</span>{% endif %}</p>{% endif %}
+        <h3 class="door__title"><a href="{{ door.path }}">{{ door.title }}<span aria-hidden="true"> &rarr;</span></a></h3>
+        <p class="door__text">{{ door.text }}</p>
+      </li>
+      {%- endfor %}
+    </ul>
+    <ul class="doors__more">
+      {%- for door in d.doors.more %}
+      <li><a href="{{ door.path }}"><b>{{ door.title }}</b><span>{{ door.text }}</span></a></li>
+      {%- endfor %}
+    </ul>
+  </nav>
+</div>
+</div>

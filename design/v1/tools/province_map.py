@@ -26,6 +26,7 @@ import math
 import re
 import unicodedata
 import urllib.request
+from itertools import pairwise
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -164,7 +165,7 @@ def ring_path(ring: list[tuple[float, float]]) -> str | None:
         return join([f"{dx / 10:g}", f"{dy / 10:g}"])
 
     (x0, y0), steps = points[0], []
-    for (ax, ay), (bx, by) in zip(points, points[1:]):
+    for (ax, ay), (bx, by) in pairwise(points):
         steps.append(pair(bx - ax, by - ay))
     return f"M{pair(x0, y0)}l" + join(steps) + "z"
 

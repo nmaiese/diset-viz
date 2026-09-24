@@ -288,7 +288,7 @@
     sulla mappa della 1.0. La tastiera ha i link della tabella accanto. -#}
 <script>
 document.addEventListener("click", function (ev) {
-  var path = ev.target.closest && ev.target.closest(".cl-side [data-map] path[data-key]");
+  var path = ev.target.closest && ev.target.closest(".cl-side [data-map] [data-key]");
   if (path) window.location.href = "/regione/" + encodeURIComponent(path.getAttribute("data-key"));
 });
 </script>

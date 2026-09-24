@@ -1,0 +1,49 @@
+{% import "v1/_ui.html" as ui %}
+{#- Regioni e province: per ognuno dei due livelli una mappa da cliccare, un
+    territorio scelto a caso con l'anteprima della sua scheda, e il link a
+    tutto l'indice. Le anteprime di tutti i territori arrivano in un JSON, e il
+    clic sulla mappa (o il campo "Scegli", per la tastiera) cambia quella
+    mostrata senza ricaricare. Senza JavaScript la mappa porta alla scheda e
+    il campo resta nascosto. Le frasi e le cifre sono quelle della testata di
+    ogni scheda (home.region_preview, home.province_preview). -#}
+{% macro preview(s) -%}
+<p class="terr__kicker">{% if s.area %}<span class="area-dot area-dot--{{ s.area }}" aria-hidden="true"></span>{% endif %}{{ s.kicker or '' }}</p>
+<h4 class="terr__name"><a href="{{ s.href }}">{{ s.name }}</a></h4>
+<p class="terr__lead">{{ s.lead }}</p>
+{% if s.facts %}<dl class="terr__facts">{% for x in s.facts %}<div><dt>{{ x.label }}</dt><dd>{% if x.href %}<a href="{{ x.href }}">{{ x.text }}</a>{% else %}{{ x.text }}{% endif %}{% if x.note %} <span class="terr__note">{{ x.note }}</span>{% endif %}</dd></div>{% endfor %}</dl>{% endif %}
+<p class="terr__cta"><a class="btn btn--primary" href="{{ s.href }}">{{ s.cta }}</a></p>
+{%- endmacro %}
+{% if d.territories %}
+<section class="zone zone--tint" id="territori" aria-labelledby="h-territori">
+<div class="wrap">
+  <header class="zone__head">
+    <div class="zone__title">
+      <h2 class="h-section" id="h-territori">Regioni e province</h2>
+      <p class="zone__lead">Il profilo di ogni regione e di ogni provincia: dove stacca, dove resta indietro, i valori veri di ogni indicatore. Qui sotto ne esce uno a caso: sulla mappa si sceglie un altro.</p>
+    </div>
+  </header>
+  <div class="terr">
+    {%- for b in d.territories %}
+    {% set s = b.selected %}
+    <article class="terr__block" aria-labelledby="h-terr-{{ b.level }}" data-picker>
+      <script type="application/json" data-picker-data>{{ b.previews | tojson }}</script>
+      <header class="terr__head">
+        <h3 class="terr__title" id="h-terr-{{ b.level }}">{{ b.title }}</h3>
+        <a class="linkarrow" href="{{ b.index }}">Scopri tutte le {{ b.count | num(None, 'count') }} {{ b.word }}</a>
+      </header>
+      <div class="terr__body">
+        {{ ui.navmap(b.level, b.names, s.key, '/' ~ b.singular ~ '/') }}
+        <div class="terr__side">
+          <label class="field terr__find" for="terr-{{ b.level }}" data-picker-field hidden>Scegli una {{ b.singular }}
+            <select id="terr-{{ b.level }}" data-picker-select>{% for key, name in b.names | dictsort(by='value') %}<option value="{{ key }}"{% if key == s.key %} selected{% endif %}>{{ name }}</option>{% endfor %}</select>
+          </label>
+          <div class="terr__card" aria-live="polite" data-picker-card>{{ preview(s) }}</div>
+        </div>
+      </div>
+      {% if b.level == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
+    </article>
+    {%- endfor %}
+  </div>
+</div>
+</section>
+{% endif %}

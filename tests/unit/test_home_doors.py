@@ -39,7 +39,7 @@ class LePorte(unittest.TestCase):
         vuote = home.doors({})
         self.assertTrue(all(d["num"] is None for d in vuote["main"]))
         piene = home.doors({"territories": {"regions": 20, "provinces": 107}, "theme_total": 12},
-                           {"regions": {"total": 20}, "provinces": {"total": 107}})
+                           {"regions": 20, "provinces": 107})
         self.assertEqual([d["num"] for d in piene["main"]], [20, 107, 12, 127])
 
 

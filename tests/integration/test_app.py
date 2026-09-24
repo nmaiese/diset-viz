@@ -48,15 +48,17 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b'class="hdr__bar"', home.data)
         # Ogni modulo si disegna su dati veri, non su segnaposto e lato server:
         # la striscia del divario ha i suoi punti, la classifica le sue righe,
-        # temi e podio della qualita' della vita hanno righe reali. Senza
-        # JavaScript la pagina resta leggibile.
+        # i temi le loro aree, i territori un'anteprima vera. Senza JavaScript
+        # la pagina resta leggibile. La qualita' della vita e' una porta verso
+        # la sua pagina, non una classifica.
         self.assertIn(b'class="strip__dot', home.data)
         self.assertIn(b"data-rank-body", home.data)
-        self.assertIn(b'class="card home-theme"', home.data)
-        self.assertIn(b'class="home-podium"', home.data)
-        # L'indicatore in evidenza cambia a ogni visita, e solo quello regionale
-        # ha la mappa: la si chiede fissando l'indicatore. Venti regioni colorate
-        # per classe della rampa.
+        self.assertIn(b'class="home-area"', home.data)
+        self.assertIn(b'class="terr__card"', home.data)
+        self.assertIn(b'href="/qualita-della-vita"', home.data)
+        self.assertNotIn(b'class="home-podium"', home.data)
+        # L'indicatore in evidenza cambia a ogni visita: la mappa si controlla
+        # fissandolo. Venti regioni colorate per classe della rampa.
         regionale = client.get("/?indicatore=ter-901")
         self.assertEqual(len(re.findall(
             rb'data-key="[a-z-]+" data-name="[^"]*" data-value="[^"]*" class="q[1-6]', regionale.data)), 20)

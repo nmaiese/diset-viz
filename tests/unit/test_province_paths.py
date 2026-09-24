@@ -24,5 +24,18 @@ class IContorniDelleProvince(unittest.TestCase):
                 self.assertGreaterEqual(len(re.findall(r"-?\d+(?:\.\d+)?", d)), 6)
 
 
+class IlParserDeiTracciati(unittest.TestCase):
+    def test_legge_assoluti_e_relativi_e_torna_all_inizio_dopo_z(self):
+        """Le regioni sono scritte con M/L assoluti, le province con m/l
+        relativi. Dopo z il punto corrente torna all'inizio del sottotracciato:
+        una m relativa che segue parte da li', non dall'ultimo vertice."""
+        from app.design import charts
+
+        self.assertEqual(charts.path_rings("M1,2L3,4L5,6Z"), [[(1.0, 2.0), (3.0, 4.0), (5.0, 6.0)]])
+        rings = charts.path_rings("M0 0l10 0 0 10zm5 5l1 0 0 1z")
+        self.assertEqual(rings[0], [(0.0, 0.0), (10.0, 0.0), (10.0, 10.0)])
+        self.assertEqual(rings[1][0], (5.0, 5.0))
+
+
 if __name__ == "__main__":
     unittest.main()

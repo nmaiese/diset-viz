@@ -1,0 +1,60 @@
+{% import "v1/_ui.html" as ui %}
+{#- Le ultime storie: la piu' recente grande, con la foto accanto al testo,
+    le altre tre in fila sotto, con le foto tagliate alla stessa proporzione.
+    Ogni foto porta autore e licenza, con i loro link (CC BY-SA li chiede). -#}
+{% macro credit(s) -%}
+{%- if s.credit %}<p class="story__credit">Foto {% if s.credit.source_url %}<a href="{{ s.credit.source_url }}">{{ s.credit.author }}</a>{% else %}{{ s.credit.author }}{% endif %}{% if s.credit.source %}, {{ s.credit.source }}{% endif %}{% if s.credit.license %}, {% if s.credit.license_url %}<a href="{{ s.credit.license_url }}">{{ s.credit.license }}</a>{% else %}{{ s.credit.license }}{% endif %}{% endif %}</p>{% endif -%}
+{%- endmacro %}
+{% macro meta(s) -%}
+<p class="story__meta">{% if s.date %}<time datetime="{{ s.date }}">{{ s.date_label }}</time>{% endif %}{% if s.read_time %}{% if s.date %}, {% endif %}{{ s.read_time | num(None, 'count') }} minuti di lettura{% endif %}</p>
+{%- endmacro %}
+{% if d.stories %}
+{% set lead = d.stories[0] %}
+<section class="zone" id="storie" aria-labelledby="h-storie">
+<div class="wrap">
+  <header class="zone__head">
+    <div class="zone__title">
+      <h2 class="h-section" id="h-storie">Le ultime storie</h2>
+      <p class="zone__lead">Articoli costruiti sui dati dell'atlante: ogni cifra ha la sua fonte e il suo anno.</p>
+    </div>
+    <p class="zone__actions"><a class="linkarrow" href="/blog">Tutte le storie</a></p>
+  </header>
+
+  <article class="story story--lead">
+    {% if lead.cover %}
+    <div class="story__fig">
+      <div class="story__media"><img src="{{ lead.cover }}" alt="{{ lead.cover_alt }}"{% if lead.size %} width="{{ lead.size[0] }}" height="{{ lead.size[1] }}"{% endif %} loading="lazy" decoding="async"></div>
+      {{ credit(lead) }}
+    </div>
+    {% endif %}
+    <div class="story__body">
+      {% if lead.tag %}<p class="story__tag">{{ lead.tag }}</p>{% endif %}
+      <h3 class="story__title"><a href="{{ '/blog/' ~ lead.slug }}">{{ lead.title }}</a></h3>
+      {% if lead.description %}<p class="story__text">{{ lead.description }}</p>{% endif %}
+      {{ meta(lead) }}
+      <p class="story__go" aria-hidden="true">Leggi la storia {{ ui.icon('arrow') }}</p>
+    </div>
+  </article>
+
+  {% if d.stories | length > 1 %}
+  <ul class="stories">
+    {%- for s in d.stories[1:] %}
+    <li class="story">
+      {% if s.cover %}
+      <div class="story__fig">
+        <div class="story__media"><img src="{{ s.cover }}" alt="{{ s.cover_alt }}"{% if s.size %} width="{{ s.size[0] }}" height="{{ s.size[1] }}"{% endif %} loading="lazy" decoding="async"></div>
+        {{ credit(s) }}
+      </div>
+      {% endif %}
+      <div class="story__body">
+        {% if s.tag %}<p class="story__tag">{{ s.tag }}</p>{% endif %}
+        <h3 class="story__title"><a href="{{ '/blog/' ~ s.slug }}">{{ s.title }}</a></h3>
+        {{ meta(s) }}
+      </div>
+    </li>
+    {%- endfor %}
+  </ul>
+  {% endif %}
+</div>
+</section>
+{% endif %}
