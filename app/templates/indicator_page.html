@@ -535,10 +535,10 @@
              non ci ha mai portato. `profile_path` e' il prefisso della pagina
              del territorio, per regioni e province. #}
           {% if level.profile_path and level.best %}
-          <li><a href="{{ level.profile_path }}{{ level.best.key }}">Il profilo di {{ level.best.name }}, in testa</a></li>
+          <li><a href="{{ level.profile_path }}{{ level.best.key }}">Il profilo {{ level.best.name | of_place(level.key) }}, in testa</a></li>
           {% endif %}
           {% if level.profile_path and level.worst %}
-          <li><a href="{{ level.profile_path }}{{ level.worst.key }}">Il profilo di {{ level.worst.name }}, in coda</a></li>
+          <li><a href="{{ level.profile_path }}{{ level.worst.key }}">Il profilo {{ level.worst.name | of_place(level.key) }}, in coda</a></li>
           {% endif %}
           {% if related_posts %}<li><a href="/blog">Tutte le analisi del blog</a></li>{% endif %}
         </ul>

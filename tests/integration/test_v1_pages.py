@@ -25,12 +25,19 @@ from pathlib import Path
 
 from app import app, profiles, province_profile, sources
 from app.blog import get_posts
+from app.data import REGION_GEO_AREA
 from app.design.common import PLACEHOLDER
 from app.quality_life_config import QUALITY_LIFE_PROFILES
 from tests.support import family_and_raw
 
 GOLDEN = Path(__file__).resolve().parent.parent / "fixtures" / "indicator_stats_golden.json"
 FUGHE = re.compile(r"\bNone\b|\bnan\b|\bundefined\b")
+# "Il profilo di Calabria", "Profilo di Puglia", "a Sud Sardegna": le regioni e
+# le due province che non sono una citta' prendono l'articolo. Si guarda tutto
+# l'HTML, perche' la description e le caption non sono testo visibile.
+SENZA_ARTICOLO = re.compile(
+    r"[Pp]rofilo di (?:%s)\b|\b(?:a|di|in|dopo) (?:Sud Sardegna|Verbano-Cusio-Ossola)\b"
+    % "|".join(sorted({k.split("-")[0].capitalize() for k in REGION_GEO_AREA})))
 
 
 def visible_text(page):
@@ -60,6 +67,8 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
                 guasti.append((percorso, FUGHE.search(testo).group(0)))
             elif len(re.findall(r"<h1\b", html)) != 1:
                 guasti.append((percorso, "h1 non unico"))
+            elif SENZA_ARTICOLO.search(html_lib.unescape(html)):
+                guasti.append((percorso, SENZA_ARTICOLO.search(html_lib.unescape(html)).group(0)))
         return guasti
 
     def test_ogni_scheda_indicatore(self):

@@ -34,8 +34,16 @@ def register(app) -> None:
     app.jinja_env.filters["delta"] = numfmt.delta
     app.jinja_env.filters["numtext"] = numfmt.text
     app.jinja_env.filters["phrase_unit"] = numfmt.phrase_unit
+    app.jinja_env.filters["of_place"] = _of_place
     app.jinja_env.globals["column_decimals"] = numfmt.column_decimals
     app.jinja_env.globals["v1_paths"] = _paths()
+
+
+def _of_place(name: str, level_key: str) -> str:
+    """`{{ name | of_place(level.key) }}`: "della Calabria", "di Treviso", "del Sud Sardegna"."""
+    from app.design.common import of_place
+
+    return of_place(name, level_key)
 
 
 def _paths() -> dict:

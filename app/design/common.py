@@ -23,7 +23,7 @@ from pathlib import Path
 
 from app.data import REGION_GEO_AREA
 from app.design import numfmt
-from app.seo_titles import format_number, of_region
+from app.seo_titles import ARTICLED_PROVINCES, format_number, of_region
 
 PLACEHOLDER = "[dato da calcolare]"
 # I contorni delle regioni, quantizzati per la mappa della 1.0 (viewBox 560x660).
@@ -44,7 +44,7 @@ def short_unit(unit: str | None) -> str | None:
 
 
 # Le province che vogliono l'articolo: "del Verbano-Cusio-Ossola", "del Sud Sardegna".
-PROVINCE_OF = {"Verbano-Cusio-Ossola": "del Verbano-Cusio-Ossola", "Sud Sardegna": "del Sud Sardegna"}
+PROVINCE_OF = {name: f"del {name}" for name in ARTICLED_PROVINCES}
 
 
 def of_place(name: str, level_key: str) -> str:

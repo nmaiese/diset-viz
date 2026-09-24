@@ -168,7 +168,7 @@
           </figcaption>
           <div class="tablewrap" tabindex="0" role="region" aria-label="Le dimensioni in tabella">
             <table class="table provincia-dims">
-              <caption class="sr-only">Punteggio di {{ p.name }} nelle {{ d.dims.count | num(None, 'count') }} dimensioni misurate, dal più alto al più basso</caption>
+              <caption class="sr-only">Punteggio {{ d.of_name }} nelle {{ d.dims.count | num(None, 'count') }} dimensioni misurate, dal più alto al più basso</caption>
               <thead><tr>
                 <th scope="col">Dimensione</th>
                 <th class="provincia-dims__bar" scope="col"><span class="divbar__axis" aria-hidden="true"><span>{{ 0 | num(None, 'count') }}</span><span>{{ 50 | num(None, 'count') }}</span><span>{{ 100 | num(None, 'count') }}</span></span><span class="sr-only">Barra</span></th>

@@ -359,13 +359,29 @@ def of_region(name):
     return f"della {name}"
 
 
+# Le province che non sono una citta' e prendono l'articolo: "il Sud Sardegna",
+# "nel Verbano-Cusio-Ossola". Tutte e due maschili.
+ARTICLED_PROVINCES = frozenset({"Sud Sardegna", "Verbano-Cusio-Ossola"})
+
+
 def at_place(name):
-    """"a Milano", "ad Aosta", "all'Aquila", "alla Spezia".
+    """"a Milano", "ad Aosta", "all'Aquila", "alla Spezia", "nel Sud Sardegna".
 
     La preposizione davanti al nome di una citta' o di una provincia. Scritta a
     mano nei template dava "a Aosta" e "a L'Aquila" su sei pagine.
     """
     name = (name or "").strip()
+    if name in ARTICLED_PROVINCES:
+        return f"nel {name}"
+    return to_place(name)
+
+
+def to_place(name):
+    """"a Milano", "all'Aquila", "al Sud Sardegna": il complemento di termine
+    ("davanti a"), che per le province con l'articolo non e' lo stato in luogo."""
+    name = (name or "").strip()
+    if name in ARTICLED_PROVINCES:
+        return f"al {name}"
     if name.startswith("L'"):
         return f"all'{name[2:]}"
     if name.startswith("La "):

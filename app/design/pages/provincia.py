@@ -21,8 +21,8 @@ from __future__ import annotations
 from app import quality_life_bes as qb
 from app import sources
 from app.design import charts, numfmt
-from app.design.common import count_word, of_place, ordinal
-from app.seo_titles import at_place, of_region
+from app.design.common import count_word, of_place, ordinal, the_place
+from app.seo_titles import at_place, of_region, to_place
 from app.taxonomy import CANONICAL_CATEGORIES, slugify_taxonomy
 
 LEVEL = "provincia"
@@ -278,9 +278,9 @@ def _tiles(ctx: dict, rows: list[dict], sisters: list[dict], covered: int | None
         after = sisters[place] if place < len(sisters) else None
         tile = {"label": f"Fra le province {of_region(profile['region'])}", "num": numfmt.rank(place, len(sisters))}
         if before:
-            tile["sub"], tile["href"] = f"dopo {before['name']}", before["path"]
+            tile["sub"], tile["href"] = f"dopo {the_place(before['name'], LEVEL)}", before["path"]
         elif after:
-            tile["sub"], tile["href"] = f"davanti {at_place(after['name'])}", after["path"]
+            tile["sub"], tile["href"] = f"davanti {to_place(after['name'])}", after["path"]
         tiles.append(tile)
     compared = [r for r in rows if r.get("in_regione")]
     if compared and profile.get("region"):
