@@ -150,7 +150,7 @@
         </div>
         {% if ind.plain %}<p class="ind-card__plain">{{ ind.plain }}</p>{% endif %}
         <div class="ind-card__foot">
-          <span class="ind-card__coverage">{{ ind.region_count }} regioni{% if ind.complete %} · completa{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</span>
+          <span class="ind-card__coverage">{{ ind.region_count }} regioni{% if ind.path in province_paths %} · anche per provincia{% endif %}{% if ind.complete %} · completa{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</span>
           <span class="ind-card__go">Apri la scheda →</span>
         </div>
       </a>
@@ -173,7 +173,27 @@
       <li>
         <a href="{{ ind.path }}">
           <strong>{{ ind.name }}</strong>
-          <small>{{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.quality_life_scored %} · qualità della vita{% endif %}</small>
+          <small>{{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.path in province_paths %} · anche per provincia{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</small>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  {% endif %}
+
+  {% if province_indicators %}
+  {#- Le schede del tema con i valori per provincia, aperte sulle province. Le
+      solo provinciali non stanno nell'elenco qui sopra, che e' il catalogo
+      dell'atlante, e senza questo blocco non erano in nessun tema. -#}
+  <section class="theme-all" id="province">
+    <h2>Per provincia</h2>
+    <p class="page-intro">{{ province_indicators | length }} {{ 'scheda di questo tema ha' if province_indicators | length == 1 else 'schede di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
+    <ol class="indicator-list theme-list">
+      {% for ind in province_indicators %}
+      <li>
+        <a href="{{ ind.path }}">
+          <strong>{{ ind.name }}</strong>
+          <small>{{ ind.year_min }}{% if ind.year_max != ind.year_min %}-{{ ind.year_max }}{% endif %} · {{ ind.count }} province{% if ind.only_province %} · solo per provincia{% endif %}</small>
         </a>
       </li>
       {% endfor %}

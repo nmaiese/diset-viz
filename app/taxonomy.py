@@ -261,6 +261,37 @@ PROVINCE_ONLY_TITLE_COLLISIONS = {
     "10AMB018P",  # Impermeabilizzazione del suolo da copertura artificiale -> gemello regionale 10AMB018
     "10AMB024P",  # Rifiuti urbani prodotti -> gemello regionale 10AMB024
 }
+# La stessa misura in due schede: una con le regioni, quella che atlante, temi e
+# ricerca mostrano, e una con le province. Dalla regionale non si arrivava mai
+# alla provinciale: chi leggeva la speranza di vita (ter-910) non sapeva che
+# bes-01SAL001 ha le 107 province. Coppie verificate una per una su nome,
+# definizione e unita', e sui valori regionali dove le due schede li hanno
+# nello stesso anno (910 e 01SAL001 coincidono, 345 e 03LAV001-N22 differiscono
+# di arrotondamento). Le fonti possono essere due uscite diverse dell'Istat:
+# per questo la pagina dice "la stessa misura", non "gli stessi dati".
+#
+# Codice della scheda regionale -> codice della scheda con le province. Quando
+# due regionali portano alla stessa provinciale, la prima e' quella a cui la
+# provinciale rimanda (la BES, indicizzabile, prima della territoriale).
+PROVINCE_TWINS = {
+    "ter-910": "bes-01SAL001",         # Speranza di vita alla nascita
+    "ter-345": "bes-03LAV001-N22",     # Tasso di occupazione (20-64 anni)
+    "ter-407": "bes-03LAV003P-N22",    # Tasso di occupazione giovanile (15-29 anni)
+    "bes-SDG-310": "bes-02IST010P",    # Competenza numerica non adeguata (III media)
+    "ter-618": "bes-02IST010P",
+    "bes-SDG-311": "bes-02IST011P",    # Competenza alfabetica non adeguata (III media)
+    "ter-617": "bes-02IST011P",
+    "bes-06POL012": "bes-06POL012P",   # Affollamento degli istituti di pena
+    "bes-07SIC001": "bes-07SIC001P",   # Omicidi volontari
+    "ter-592": "bes-10AMB008",         # Disponibilita' di verde urbano
+    "ter-52": "bes-10AMB017",          # Raccolta differenziata dei rifiuti urbani
+    "bes-10AMB018": "bes-10AMB018P",   # Impermeabilizzazione del suolo
+    "bes-10AMB024": "bes-10AMB024P",   # Rifiuti urbani prodotti
+    "ter-590": "bes-12SER025",         # Emigrazione ospedaliera in altra regione
+}
+# All'indietro: la scheda con le province -> la prima regionale che la nomina.
+REGIONAL_TWINS = {provincial: regional for regional, provincial in reversed(PROVINCE_TWINS.items())}
+
 CATEGORY_NAME_TO_SLUG = {
     category["name"]: slug for slug, category in CANONICAL_CATEGORIES.items()
 }

@@ -500,7 +500,7 @@ def _composed_indicator_section(role, meta, level):
     return ""
 
 
-def indicator_markdown(meta, level, article, site_url, levels=()):
+def indicator_markdown(meta, level, article, site_url, levels=(), twin=None):
     canonical = f"{site_url}{meta['canonical_path']}"
     # Gli altri livelli della stessa scheda: l'HTML ha il selettore
     # Regioni/Province, e senza questa riga un agente che leggeva il canonico
@@ -532,6 +532,8 @@ def indicator_markdown(meta, level, article, site_url, levels=()):
         f"- Livello territoriale: {level['label']}",
         *(f"- Gli stessi dati per {other['plural']}: {canonical}?livello={other['key']}"
           for other in others),
+        *([f"- La stessa misura per {twin['plural']}, in un'altra scheda: {site_url}{twin['path']}"]
+          if twin else []),
         f"- Unità di misura: {unit}",
         f"- Copertura: dal {level['year_min']} al {level['year_max']}",
         f"- Territori nell'ultimo anno: {len(level['observations'])}",
@@ -855,7 +857,7 @@ def provinces_index_markdown(regions, total, site_url):
     return "\n".join(lines)
 
 
-def theme_markdown(profile, site_url, standings=None, province_total=None):
+def theme_markdown(profile, site_url, standings=None, province_total=None, province_indicators=()):
     lines = [
         f"# {profile['theme']}",
         "",
@@ -896,6 +898,15 @@ def theme_markdown(profile, site_url, standings=None, province_total=None):
             f"- [{item['name']}]({_absolute(site_url, item['path'])}), "
             f"dal {item['year_min']} al {item['year_max']}. {_clean(item.get('plain'))}"
         )
+    if province_indicators:
+        lines += ["", "## Per provincia", "",
+                  "Le schede del tema con i valori delle province, aperte sulle province.", ""]
+        for item in province_indicators:
+            only = ", solo per provincia" if item["only_province"] else ""
+            years = (f"nel {item['year_max']}" if item["year_min"] == item["year_max"]
+                     else f"dal {item['year_min']} al {item['year_max']}")
+            lines.append(f"- [{item['name']}]({_absolute(site_url, item['path'])}), "
+                         f"{years}, {item['count']} province{only}.")
     if province_total:
         lines += ["", "## Gli altri modi di guardare", "",
                   f"- [Il profilo di ognuna delle regioni]({site_url}/regioni)",

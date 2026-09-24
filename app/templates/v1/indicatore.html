@@ -169,10 +169,14 @@
             <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} {% if meta.direction in ('lower_better', 'higher_worse') %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
           </figcaption>
           <div class="toolbar">
-            {% if levels | length > 1 %}
+            {#- Il livello che manca a questa scheda, quando sta in una gemella
+                (`twin`), e' una voce del selettore come le altre: porta
+                all'altra pagina, e il lettore passa dalle regioni alle province
+                senza sapere che sono due schede. -#}
+            {% if d.level_tabs | length > 1 %}
             <div class="field"><span>Livello</span>
               <div class="seg" role="group" aria-label="Livello territoriale">
-                {% for item in levels %}<a href="{{ meta.canonical_path ~ '?livello=' ~ item.key }}"{% if item.key == level.key %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
+                {% for item in d.level_tabs %}<a href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
               </div>
             </div>
             {% endif %}
@@ -192,10 +196,11 @@
           </div>
 
           <div class="module__body">
-            {% if level.has_map %}
+            {% if d.show_map %}
             <div class="module__map">
-              {{ ui.map(d.map_classes, 'esplora', d.explore_js.names, d.map_values, overlay=d.callouts, label='Mappa cliccabile delle regioni italiane per ' ~ meta.name) }}
-              {{ ui.legend(d.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.') }}
+              {{ ui.map(d.map_classes, 'esplora', d.map_names, d.map_values, overlay=d.callouts, label='Mappa cliccabile delle ' ~ level.plural ~ ' italiane per ' ~ meta.name, level=level.key) }}
+              {{ ui.legend(d.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.', level.key == 'regione' or d.map_missing) }}
+              {% if level.key == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
             </div>
             {% endif %}
             <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle {{ level.plural }}">
@@ -343,6 +348,7 @@
         <ul>
           {% for item in dimension_siblings %}<li><a href="{{ item.path }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>{% endfor %}
           {% for other in levels if other.key != level.key %}<li><a href="{{ meta.canonical_path ~ '?livello=' ~ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>{% endfor %}
+          {% if twin %}<li><a href="{{ twin.path }}">La stessa misura per {{ twin.plural }}</a></li>{% endif %}
           {#- Confronto e atlante sono solo regionali: sulle province portavano
               a una pagina senza province. -#}
           {% if level.key == 'regione' %}

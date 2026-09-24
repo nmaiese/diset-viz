@@ -321,11 +321,20 @@ def feature(pick: dict | None) -> dict | None:
     for panel in (first, second):
         if panel:
             panel["scheda"] = scheda(panel["key"])
+    elsewhere_href, elsewhere_twin = (scheda(elsewhere) if elsewhere else None), False
+    # L'altro livello puo' stare in una scheda gemella (la speranza di vita
+    # regionale e quella con le province): la frase porta li'.
+    if not elsewhere and not second:
+        from app.indicator_view import twin_level
+
+        twin = twin_level(meta, [{"key": key} for key in available])
+        if twin:
+            elsewhere, elsewhere_href, elsewhere_twin = twin["key"], twin["path"], True
     return {
         "name": meta["name"], "path": meta["canonical_path"], "code": code,
         "level": first["key"], "requested": bool(pick.get("requested")),
         "elsewhere": {"regione": "regione", "provincia": "provincia"}.get(elsewhere),
-        "elsewhere_href": scheda(elsewhere) if elsewhere else None,
+        "elsewhere_href": elsewhere_href, "elsewhere_twin": elsewhere_twin,
         "source_label": meta.get("source_label"), "source_url": meta.get("source_url"),
         "theme": meta.get("theme"), "theme_path": meta.get("theme_path"), "verso": verso,
         "levels": [first] + ([second] if second else []),

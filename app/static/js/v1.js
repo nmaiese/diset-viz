@@ -102,6 +102,10 @@
       var byKey = {};
       list.forEach(function (r) { byKey[r.key] = r; });
 
+      // Un territorio senza dato nell'anno scelto prende il tratteggio del
+      // n.d., lo stesso pattern che il server mette sull'ultimo anno: le
+      // province con un dato cambiano da un anno all'altro (95 o 106 su 107).
+      var nd = mod.querySelector(".map pattern[id]");
       mod.querySelectorAll(".map [data-key]").forEach(function (p) {
         var r = byKey[p.dataset.key];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6");
@@ -110,6 +114,7 @@
           p.style.fill = "";
           p.dataset.value = withUnit(r.value, data.unit);
         } else {
+          p.style.fill = nd ? "url(#" + nd.id + ")" : "";
           p.dataset.value = "n.d.";
         }
       });
