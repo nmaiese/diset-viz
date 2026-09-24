@@ -262,6 +262,16 @@ def _number(value, decimals=2):
     return it_numbers.number(value, decimals)
 
 
+def _with_unit(text, unit):
+    """La cifra con la sua unita', come sulla pagina HTML alla stessa URL: il
+    "%" attaccato ("17,4%", "0,5% del PIL"), le altre unita' dopo uno spazio.
+    Il gemello scriveva "17,4 %" dove la pagina scrive "17,4%"."""
+    unit = (unit or "").strip()
+    if not unit:
+        return text
+    return f"{text}{unit}" if unit.startswith("%") else f"{text} {unit}"
+
+
 def _clean(value):
     return " ".join(str(value or "").split())
 
@@ -475,7 +485,7 @@ def _composed_indicator_section(role, meta, level):
             paragraphs.append(
                 f"Dal {stats['year_min']} al {stats['year_max']} la media semplice dei valori "
                 f"{level_adjective} è passata da {_number(stats['year_min_avg'])} a "
-                f"{_number(stats['year_avg'])} {unit}."
+                f"{_with_unit(_number(stats['year_avg']), unit)}."
             )
         annual = level.get("annual_change")
         if annual:
@@ -574,7 +584,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None):
             "",
             f"Dal {change['previous_year']} al {change['year']} la media semplice dei "
             f"{change['common_count']} territori presenti in entrambi gli anni è cambiata di "
-            f"{sign}{_number(change['average_delta'])} {meta.get('change_unit') or unit}.",
+            f"{sign}{_with_unit(_number(change['average_delta']), meta.get('change_unit') or unit)}.",
         ]
         if level.get("annual_note"):
             lines.append(level["annual_note"])
@@ -610,7 +620,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None):
     profile = level.get("profile_path")
     for position, row in enumerate(level["observations"], 1):
         name = f"[{row['name']}]({site_url}{profile}{row['key']})" if profile and row.get("key") else row["name"]
-        lines.append(f"| {position} | {name} | {_number(row['value'])} {unit} |")
+        lines.append(f"| {position} | {name} | {_with_unit(_number(row['value']), unit)} |")
 
     lines += ["", "## Fonti e download", ""]
     if meta.get("source_data_url"):
@@ -753,8 +763,7 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
         for row in indicators:
             decimals = row.get("decimals", 1)
             value = it_numbers.number(row["value"], decimals)
-            unit = f" {row['unit']}" if row.get("unit") else ""
-            value_cell = f"{value}{unit}, {row['year']}"
+            value_cell = f"{_with_unit(value, row.get('unit'))}, {row['year']}"
             if row.get("variazione") is not None:
                 value_cell += f", dal {row['year_from']} {it_numbers.change(row['variazione'], decimals)}"
             rank_cell = f"{row['rank']} su {row['province_count']}"
@@ -770,9 +779,8 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
     def _value_list(title, rows):
         lines.extend(["", f"## {title}", ""])
         for row in rows:
-            unit = f" {row['unit']}" if row.get("unit") else ""
-            lines.append(f"- [{row['name']}]({_absolute(site_url, row['path'])}), "
-                         f"{it_numbers.number(row['value'], row.get('decimals', 1))}{unit}, {row['year']}")
+            figure = _with_unit(it_numbers.number(row['value'], row.get('decimals', 1)), row.get("unit"))
+            lines.append(f"- [{row['name']}]({_absolute(site_url, row['path'])}), {figure}, {row['year']}")
 
     if first_in_region or last_in_region:
         if first_in_region:

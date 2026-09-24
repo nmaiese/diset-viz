@@ -102,7 +102,28 @@ def derive(ctx: dict) -> dict:
         callouts = charts.map_callouts(shapes, [(best["key"], best["name"], with_unit(best["value"], unit)),
                                                 (worst["key"], worst["name"], with_unit(worst["value"], unit))])
     series_claim = None
-    if stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
+    what = None
+    change_abs = stats.get("avg_change_abs")
+    if stats.get("has_multi_year") and meta.get("percentage_like") and change_abs is not None:
+        # Una percentuale cambia in punti, come nella prosa della stessa scheda
+        # ("1,48 punti percentuali in meno") e come la distanza fra prima e
+        # ultima qui sotto. La variazione relativa diceva "scesa dell'8,2%"
+        # accanto a un livello in "%": due percentuali che non c'entrano fra
+        # loro nella stessa frase, e su una differenza fra tassi (ter-61) una
+        # cifra diversa da quella della prosa. Per la stessa ragione niente
+        # "raddoppiata": e' una misura relativa.
+        # Su un livello minuscolo lo spostamento arrotondato fa zero anche
+        # quando la media si e' mossa: ter-163 va da 0,0107 a 0,0095, l'11,6% in
+        # meno, e "rimasta la stessa" smentiva la prosa ("una variazione media
+        # sfavorevole"). Si aggiungono decimali finche' la cifra non e' zero.
+        decimals = numfmt.magnitude_decimals(change_abs)
+        while change_abs and round(abs(change_abs), decimals) == 0 and decimals < 4:
+            decimals += 1
+        if round(abs(change_abs), decimals) == 0:
+            what = "rimasta la stessa"
+        else:
+            what = f"{'cresciuta' if change_abs > 0 else 'scesa'} di {with_unit(abs(change_abs), change_unit, decimals)}"
+    elif stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
         r = 1 + stats["avg_change_pct"] / 100
         if r >= 3:
             what = "più che triplicata"
@@ -114,6 +135,7 @@ def derive(ctx: dict) -> dict:
         else:
             pct = num(abs(stats["avg_change_pct"])) + "%"
             what = f"scesa {del_(pct)}{pct}"
+    if what:
         gap = stats.get("gap_trend")
         gap_text = ""
         if gap is not None and stats.get("year_min_gap_abs"):
