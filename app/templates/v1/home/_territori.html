@@ -11,7 +11,7 @@
 <h4 class="terr__name"><a href="{{ s.href }}">{{ s.name }}</a></h4>
 <p class="terr__lead">{{ s.lead }}</p>
 {% if s.facts %}<dl class="terr__facts">{% for x in s.facts %}<div><dt>{{ x.label }}</dt><dd>{% if x.href %}<a href="{{ x.href }}">{{ x.text }}</a>{% else %}{{ x.text }}{% endif %}{% if x.note %} <span class="terr__note">{{ x.note }}</span>{% endif %}</dd></div>{% endfor %}</dl>{% endif %}
-<p class="terr__cta"><a class="btn btn--primary" href="{{ s.href }}">{{ s.cta }}</a></p>
+<p class="terr__cta"><a class="btn" href="{{ s.href }}">{{ s.cta }}</a></p>
 {%- endmacro %}
 {% if d.territories %}
 <section class="zone zone--tint" id="territori" aria-labelledby="h-territori">

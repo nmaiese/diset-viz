@@ -249,7 +249,7 @@
         '<h4 class="terr__name"><a href="' + esc(p.href) + '">' + esc(p.name) + "</a></h4>" +
         '<p class="terr__lead">' + esc(p.lead) + "</p>" +
         (facts ? '<dl class="terr__facts">' + facts + "</dl>" : "") +
-        '<p class="terr__cta"><a class="btn btn--primary" href="' + esc(p.href) + '">' + esc(p.cta) + "</a></p>";
+        '<p class="terr__cta"><a class="btn" href="' + esc(p.href) + '">' + esc(p.cta) + "</a></p>";
       box.querySelectorAll("[data-navmap] a[data-key]").forEach(function (a) { a.classList.toggle("is-on", a.dataset.key === key); });
       if (select && select.value !== key) select.value = key;
     }

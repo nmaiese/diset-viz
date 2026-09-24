@@ -225,7 +225,7 @@
 .qol__profiles span { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); }
 .qol__dims { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .qol__only { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
-.qol__dims li { padding: 4px var(--space-3); font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); background: var(--bg); border-radius: var(--radius-pill); }
+.qol__dims li { padding: 4px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); background: var(--bg); border-radius: var(--radius-sm); }
 
 /* ---------- quiz: una fascia da gioco ----------
    Il lavaggio ambra la stacca dalle altre, le schede dei giochi hanno
@@ -261,7 +261,7 @@
 .home-try { margin: 0; min-width: 0; padding: var(--space-6); border: 2px solid var(--ink); border-radius: var(--radius-md); background: var(--bg); }
 .home-try legend { display: grid; gap: var(--space-2); padding: 0; float: left; width: 100%; }
 .home-try legend + * { clear: both; }
-.home-try__flag { display: inline-flex; align-items: center; gap: var(--space-1); justify-self: start; padding: 4px var(--space-3); font-size: var(--fs-label); font-weight: 700; color: var(--ink); background: var(--amber-wash); border-radius: var(--radius-pill); }
+.home-try__flag { display: inline-flex; align-items: center; gap: var(--space-1); justify-self: start; padding: 4px var(--space-3); font-size: var(--fs-label); font-weight: 700; color: var(--ink); background: var(--amber-wash); border-radius: var(--radius-sm); }
 .home-try__q { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
 .home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-5); }
 .home-try__opts label {
