@@ -30,6 +30,7 @@ from app import bes_data, profiles
 from app import quality_life_bes as qb
 from app.cache import cache
 from app.cache_util import synchronized_cache
+from app.design.charts import spark_floor
 from app.external_data import freshness_label, freshness_status
 from app.taxonomy import CANONICAL_CATEGORIES
 
@@ -369,6 +370,16 @@ def indicatori(chiave):
         if len(anni) > 1:
             variazione = round(valore - per_anno[anni[0]]["valori"][chiave], 2)
 
+        # La sparkline della riga e' la serie di questa provincia, anno per
+        # anno, mai una media: sulla pagina di un territorio la linea dice
+        # come si e' mosso lui. Il pavimento e' lo scarto interquartile delle
+        # province con un dato nell'ultimo anno della riga, la stessa regola
+        # delle minicard (`charts.spark_floor`): una provincia che si muove
+        # poco rispetto alla distanza fra le province si disegna quasi piatta,
+        # invece di riempire l'altezza come se fosse salita di molto. Tutto
+        # sta gia' in `_serie()`: qui non si legge niente di nuovo.
+        spark = [{"year": year, "value": per_anno[year]["valori"][chiave]} for year in anni]
+
         righe.append({
             "id": id_indicatore,
             "name": info["name"],
@@ -392,6 +403,8 @@ def indicatori(chiave):
             "province_count": len(dati["valori"]),
             "movement": movimento,
             "variazione": variazione,
+            "spark": spark,
+            "spark_floor": spark_floor(dati["valori"].values()) if len(spark) > 1 else None,
             "in_regione": in_regione,
         })
 

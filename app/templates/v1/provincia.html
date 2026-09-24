@@ -236,7 +236,7 @@
   {% if indicatori %}
   <section class="section" id="indicatori" aria-labelledby="h-indicatori">
     <h2 id="h-indicatori">Tutti gli indicatori misurati {{ p.name | at_place }}</h2>
-    <p class="provincia-note">{{ indicatori | length | num(None, 'count') }} indicatori, per area. Il valore è quello pubblicato dalla fonte, con i suoi decimali e l'anno più recente per {{ p.name }}, e la variazione è dal primo anno della serie. La posizione in Italia si conta fra le province che quell'anno hanno un dato, quindi il denominatore cambia da riga a riga, e la prima è la migliore secondo il verso dell'indicatore. {% if p.region %}In {{ p.region }} il confronto è con le altre province della regione, e la media è la loro, non il valore regionale.{% endif %}</p>
+    <p class="provincia-note">{{ indicatori | length | num(None, 'count') }} indicatori, per area. Il valore è quello pubblicato dalla fonte, con i suoi decimali e l'anno più recente per {{ p.name }}, e la variazione è dal primo anno della serie. La linea accanto è la serie della provincia anno per anno, e resta quasi piatta quando la provincia si è mossa poco rispetto alla distanza fra le province. La posizione in Italia si conta fra le province che quell'anno hanno un dato, quindi il denominatore cambia da riga a riga, e la prima è la migliore secondo il verso dell'indicatore. {% if p.region %}In {{ p.region }} il confronto è con le altre province della regione, e la media è la loro, non il valore regionale.{% endif %}</p>
     {% if d.groups | length > 1 %}
     <nav class="provincia-jump" aria-label="Aree della tabella">
       {%- for g in d.groups %}<a href="#{{ g.anchor }}">{{ g.name }} {{ g.rows | length | num(None, 'count') }}</a>{% endfor -%}
@@ -247,13 +247,13 @@
       <summary>{{ ui.icon('chevron') }}<h3 class="h-sub">{{ g.name }}</h3><span class="provincia-muted">{{ g.rows | length | num(None, 'count') }} {{ g.rows | length | it_plural('indicatore', 'indicatori') }}</span></summary>
       <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="{{ g.name }}, gli indicatori in tabella">
         <table class="table table--stack provincia-table" role="table">
-          <caption class="sr-only">{{ g.name }}: {{ g.rows | length | num(None, 'count') }} indicatori per {{ p.name }}. Valore della fonte con unità e anno, variazione dal primo anno della serie, posizione fra le province italiane{% if p.region %}, posizione fra le province {{ p.region | of_region }} e media delle altre{% endif %}.</caption>
+          <caption class="sr-only">{{ g.name }}: {{ g.rows | length | num(None, 'count') }} indicatori per {{ p.name }}. Valore della fonte con unità e anno, variazione dal primo anno della serie con la linea della provincia anno per anno, posizione fra le province italiane{% if p.region %}, posizione fra le province {{ p.region | of_region }} e media delle altre{% endif %}.</caption>
           <thead role="rowgroup"><tr role="row">
             <th scope="col" role="columnheader">Indicatore</th>
             <th class="r" scope="col" role="columnheader">Valore</th>
             <th scope="col" role="columnheader">Unità</th>
             <th class="r" scope="col" role="columnheader">Anno</th>
-            <th class="r" scope="col" role="columnheader">Variazione</th>
+            <th scope="col" role="columnheader">Variazione</th>
             <th class="r" scope="col" role="columnheader">In Italia</th>
             <th class="r" scope="col" role="columnheader">In {{ region_label }}</th>
             <th class="r" scope="col" role="columnheader">Media delle altre</th>
@@ -265,7 +265,7 @@
               <td role="cell" class="val" data-label="Valore">{{ i.value | num(None, 'cell', i.decimals) }}</td>
               <td role="cell" class="provincia-unit" data-label="Unità">{{ i.unit }}</td>
               <td role="cell" class="val" data-label="Anno">{{ i.year }}</td>
-              <td role="cell" class="val" data-label="Variazione">{% if i.variazione is not none %}<span class="provincia-muted">dal {{ i.year_from }}</span> {{ i.variazione | delta(None, i.decimals) }}{% else %}{{ none | num }}{% endif %}</td>
+              <td role="cell" class="trendcell" data-label="Variazione">{% if i.variazione is not none %}<span class="trend">{{ i.spark | sparkline("s", i.spark_floor) }}<span class="trend__txt"><span class="trend__from">dal {{ i.year_from }}</span> {{ i.variazione | delta(None, i.decimals) }}</span></span>{% else %}{{ none | num }}{% endif %}</td>
               <td role="cell" class="val" data-label="In Italia">{{ i.rank | rank(i.province_count) }}</td>
               {%- if i.in_regione %}
               <td role="cell" class="val" data-label="In {{ region_label }}">{{ i.in_regione.posizione | rank(i.in_regione.quante) }}</td>

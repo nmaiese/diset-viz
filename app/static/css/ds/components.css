@@ -485,6 +485,20 @@ details.more[open] > summary { color: var(--ink); }
 .spark__line { fill: none; stroke: var(--cmp); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
 .spark__dot { fill: var(--cmp); }
 
+/* la sparkline in una cella di tabella (regione e provincia, la stessa):
+   il disegno prima, cosi' le linee stanno in colonna da una riga all'altra,
+   e accanto la cifra in testo, su una riga sola. Sotto i 900 pixel di
+   tabella il testo puo' andare sotto il disegno, tutto intero: a 768 una
+   cella larga 230 pixel schiacciava i nomi degli indicatori a 90 pixel.
+   Sopra no, perche' nelle tabelle coi nomi lunghi la cella andava a capo
+   anche a 1440 pur avendo spazio. Sulle tabelle a blocchi la cella prende
+   tutta la riga, nel blocco @container di `.table--stack`. */
+.trend { display: inline-flex; align-items: center; gap: var(--space-1) var(--space-3); vertical-align: middle; }
+.trend .spark { flex: none; }
+.trend__txt { white-space: nowrap; }
+.trend__from { font-size: var(--fs-small); color: var(--muted); }
+@container (max-width: 900px) { .trend { flex-wrap: wrap; } }
+
 .cards { display: grid; gap: var(--space-8) var(--gutter-l); list-style: none; }
 @media (min-width: 600px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 960px) { .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .cards--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -655,6 +669,8 @@ details.more[open] > summary { color: var(--ink); }
   .table--stack tr.group, .table--stack tr.group > * { display: block; grid-column: 1 / -1; }
   /* dentro una tabella a blocchi la barra resta, a tutta riga */
   .table--stack .barcell { width: auto; grid-column: 1 / -1; }
+  /* e anche la cella con la sparkline */
+  .table--stack .trendcell { grid-column: 1 / -1; }
 }
 
 .table--stack tr.group > * { padding-top: var(--space-6); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); border-bottom: 1px solid var(--rule-strong); }
