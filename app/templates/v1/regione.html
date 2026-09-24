@@ -1,0 +1,500 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- La pagina regione della 1.0. Stesso contenuto di region_page.html (che
+    resta come ripiego, vedi app/design/__init__.py), un'altra regia: la
+    risposta e il localizzatore in testa, poi la qualita' della vita delle
+    venti regioni come striscia con questa in evidenza, le tessere con cio' che
+    il grafico non dice, poi i temi, gli indicatori che la distinguono con i
+    valori veri, il movimento, le province, la tabella completa, le regioni
+    simili e le fonti in fondo. Cio' che la pagina chiede in piu' ai dati lo
+    compone app/design/pages/regione.py e arriva qui come `d`.
+    Nessun colore dice forte o debole: lo dicono le parole e le posizioni. I
+    colori dei punti sono le ripartizioni, come in ogni grafico del sito.
+
+    La testa (title, description, JSON-LD) e' quella di region_page.html, riga
+    per riga: il ridisegno non tocca cio' che vedono i motori. -#}
+{% set active_nav = 'regioni' %}
+{% set p = profile %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Regioni", "path": "/regioni"},
+  {"name": p.region, "path": "/regione/" ~ p.region_key},
+] %}
+
+{# Il titolo porta la posizione media, che e' il numero che la pagina mostra
+   gia' in cima ("Media 13ª su 20") e la cosa che chi cerca "molise regioni
+   classifica" vuole sapere. Senza posizione media si ripiega sul conteggio
+   degli indicatori, che c'e' sempre. #}
+{% block title %}{% if p.avg_rank %}{{ p.region }}: {{ p.avg_rank }}ª su {{ p.region_total }} regioni, tema per tema{% else %}{{ p.region }}: il profilo su {{ p.all_indicators | length }} indicatori{% endif %}{% endblock %}
+{% block description %}Profilo di {{ p.region }}: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/regione.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": {{ ('Profilo territoriale di ' ~ p.region) | tojson }},
+  "description": {{ ('Punti di forza e di debolezza di ' ~ p.region ~ ' sugli indicatori territoriali Istat, con confronto tra le regioni italiane.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }}{% if provinces %}, "containsPlace": [{% for pr in provinces %}{ "@type": "Place", "name": {{ pr.name | tojson }}, "url": {{ (site_url ~ pr.path) | tojson }} }{{ "," if not loop.last }}{% endfor %}]{% endif %} },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "creator": { "@type": "Organization", "name": "Istat" } },
+  "publisher": {{ publisher_jsonld | safe }},
+  "isAccessibleForFree": true,
+  "license": {{ data_license_url | tojson }},
+  "keywords": [{{ p.region | tojson }}, "indicatori territoriali", "divario regionale", "Istat"]
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{# `ItemList` solo adesso che la tabella "Tutti i temi" porta il rango: prima
+   sarebbe stato un elenco di nomi senza ordine dichiarato, cioe' dati
+   strutturati che promettono piu' di quanto la pagina mostri, che e' la
+   condizione posta da `.claude/rules/app.md`. Entrano i soli temi classificati:
+   un tema sotto i tre indicatori direzionali non ha un rango, e in una lista
+   ordinata sarebbe una posizione inventata. #}
+{% set temi_con_rango = p.theme_table | selectattr('rank') | list %}
+{% if temi_con_rango %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ ('I temi di ' ~ p.region ~ ', dal migliore al peggiore') | tojson }},
+  "description": {{ ('Posizione di ' ~ p.region ~ ' fra le ' ~ p.region_total ~ ' regioni italiane su ciascun tema, per media dei percentili orientati degli indicatori del tema.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "numberOfItems": {{ temi_con_rango | length }},
+  "itemListOrder": "https://schema.org/ItemListOrderAscending",
+  "itemListElement": [
+    {% for t in temi_con_rango %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ t.theme | tojson }},
+      "url": {{ (site_url ~ t.theme_path) | tojson }}
+    }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% set a = d.answer %}
+{% set q = d.quality %}
+{#- " Istat" dopo "indicatori", o niente se il profilo non dice le fonti. -#}
+{% set inst = (' ' ~ d.institution) if d.institution else '' %}
+{#- `page-region` e' il segno che l'audit della reperibilita' pubblica cerca
+    (PUBLIC_DISCOVERABILITY_EXPECTATIONS in app/views.py). -#}
+<main id="contenuto" class="v1 v1-regione page-region" data-v1="regione" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <div class="regione-head">
+    <header class="pagehead">
+      <p class="eyebrow"><a href="/regioni">Regioni</a>{% if d.geo %}<span class="sep" aria-hidden="true">·</span>{{ d.geo }}{% endif %}<span class="sep" aria-hidden="true">·</span>{{ d.indicator_count | num(None, 'count') }} indicatori{{ inst }}{% if d.year_min %}<span class="sep" aria-hidden="true">·</span>dati {% if d.year_min != d.year_max %}dal {{ d.year_min }} al {{ d.year_max }}{% else %}{{ d.year_max }}{% endif %}{% endif %}</p>
+      {#- L'H1 porta la posizione media sugli indicatori, lo stesso numero del
+          `<title>`: e' la decisione presa sui prototipi. La posizione media e'
+          la media arrotondata delle posizioni sugli indicatori completi su
+          tutte le regioni: non e' una classifica, e piu' regioni possono avere
+          lo stesso numero, per questo l'H1 la dice "in media". La posizione
+          nella qualita' della vita, che e' una classifica vera, sta nella
+          figura d'apertura e non nel titolo. -#}
+      {% if d.avg_rank and d.comparable %}
+      <h1 class="h-title">In media {{ d.the_name }} {{ d.verb.is }} {{ d.avg_rank | rank }} su {{ d.total | num(None, 'count') }} regioni sui {{ d.comparable | num(None, 'count') }} indicatori{{ inst }} confrontabili</h1>
+      {% else %}
+      <h1 class="h-title">Il profilo {{ d.of_name }} su {{ d.indicator_count | num(None, 'count') }} indicatori{{ inst }}</h1>
+      {% endif %}
+      {% if a.strong or d.best_pick %}
+      <p class="answer">
+        {%- if a.strong -%}
+          {%- if a.netto -%}{{ d.verb.goes | capitalize }} meglio in <a href="{{ a.strong.path }}">{{ a.strong.theme }}</a>, {{ a.strong.rank | rank(a.strong.total) }}
+          {%- else -%}Nessun tema {{ d.verb.obj }} porta nettamente sopra la metà classifica: {{ d.verb.goes }} meglio in <a href="{{ a.strong.path }}">{{ a.strong.theme }}</a>, {{ a.strong.rank | rank(a.strong.total) }}
+          {%- endif -%}
+          {%- if a.weak %}, e peggio in <a href="{{ a.weak.path }}">{{ a.weak.theme }}</a>, {{ a.weak.rank | rank(a.weak.total) }}{% endif %}.
+        {%- endif %}
+        {%- if d.best_pick %}{{ ' ' if a.strong }}Il {{ d.verb.poss }} piazzamento migliore è {{ d.best_pick.rank | rank(d.best_pick.count, 'regioni') }} per <a href="{{ d.best_pick.path }}">{{ d.best_pick.name_lc }}</a>, {{ d.best_pick.value | num(d.best_pick.unit) }} nel {{ d.best_pick.year }}.{% endif -%}
+      </p>
+      {% endif %}
+      <p class="meta">
+        {% if d.institution %}<span>Fonte: <a href="#fonti">{{ d.institution }}, {{ d.sources | length | num(None, 'count') }} {{ d.sources | length | it_plural('banca dati', 'banche dati') }}</a>. Elaborazione Divario Italia</span>{% endif %}
+        <a href="{{ corrections_url }}">Segnala un errore</a>
+      </p>
+    </header>
+
+    {{ ui.locator(d.key, p.region ~ (', ' ~ d.area_in if d.area_in else '')) }}
+  </div>
+
+  {#- La figura d'apertura: la qualita' della vita delle regioni sulla stessa
+      scala, con questa in evidenza. Estremi, media e distanza stanno nel
+      grafico, le cifre di ogni regione nella tabella sotto. -#}
+  {% if q and q.strip.svg %}
+  {% set lead_note -%}
+    Ogni punto è una regione, nel colore della sua ripartizione. Punteggio{% if q.scale %} da {{ q.scale.min | num(None, 'count') }} a {{ q.scale.max | num(None, 'count') }}{% endif %}{% if q.profile %} del profilo {{ q.profile }}{% endif %}{% if q.dimensions %} su {{ q.dimensions | num(None, 'count') }} dimensioni{% endif %}: la media semplice delle regioni è {{ q.mean | num(None, 'score') }}.{% if q.source %} Fonte: {{ q.source }}.{% endif %} Elaborazione Divario Italia. <a href="{{ q.path }}">Come si calcola</a>
+  {%- endset %}
+  {{ ui.leadfigure('qdv-t', q.claim, q.strip, lead_note) }}
+  <details class="more regione-qdv">
+    <summary>Le {{ q.total | num(None, 'count') }} regioni in tabella</summary>
+    <div class="rankwrap">
+      <table class="table table--rank">
+        <caption>Qualità della vita delle {{ q.total | num(None, 'count') }} regioni{% if q.profile %}, profilo {{ q.profile }}{% endif %}, dalla prima all'ultima. La barra parte dalla media semplice delle regioni{% if q.scale %}, {{ q.scale.mid | num(None, 'count') }} sulla scala da {{ q.scale.min | num(None, 'count') }} a {{ q.scale.max | num(None, 'count') }}{% endif %}.</caption>
+        <thead>
+          <tr>
+            <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
+            <th class="name" scope="col">Regione</th>
+            <th class="rankcell-bar" scope="col"><span class="sr-only">Distanza dalla media</span>{% if q.scale %}<span class="divbar__axis" aria-hidden="true"><span>{{ q.scale.min | num(None, 'count') }}</span><span>{{ q.scale.mid | num(None, 'count') }}</span><span>{{ q.scale.max | num(None, 'count') }}</span></span>{% endif %}</th>
+            <th class="val" scope="col">Punteggio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in q.rows %}
+          <tr{% if r.on %} class="is-on"{% endif %}>
+            <td class="rank">{{ r.rank | rank }}</td>
+            <th class="name" scope="row">{% if r.area %}<span class="area-dot area-dot--{{ r.area }}" aria-hidden="true"></span>{% endif %}{% if r.on %}{{ r.name }}{% else %}<a href="{{ '/regione/' ~ r.key }}">{{ r.name }}</a>{% endif %}{% if r.area_label %}<span class="sr-only">, {{ r.area_label }}</span>{% endif %}</th>
+            <td class="rankcell-bar" aria-hidden="true">{% if r.bar %}<span class="divbar"><i style="left: {{ r.bar.left }}%; width: {{ r.bar.width }}%"></i></span>{% endif %}</td>
+            <td class="val">{{ r.score | num(None, 'score') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+  {% endif %}
+
+  {#- Le tessere dicono cio' che la frase e il grafico non dicono: i primi e
+      gli ultimi cinque posti, il movimento, le province. Una cifra una volta. -#}
+  {% set tiles = [] %}
+  {% if d.top5 is not none %}
+    {% set _ = tiles.append({"label": "Fra le prime cinque regioni", "value": d.top5, "unit": "indicatori", "role": "count", "sub": "fra quelli confrontabili, con i dati di tutte le regioni"}) %}
+  {% endif %}
+  {% if d.bottom5 is not none %}
+    {% set sub -%}{{ d.bottom5_share | num('%') }} di quelli confrontabili{%- endset %}
+    {% set _ = tiles.append({"label": "Fra le ultime cinque regioni", "value": d.bottom5, "unit": "indicatori", "role": "count", "sub": sub}) %}
+  {% endif %}
+  {% if d.moved_up + d.moved_down + d.moved_same %}
+    {% set sub -%}peggiorate in {{ d.moved_down | num(None, 'count') }}, invariate in {{ d.moved_same | num(None, 'count') }}, rispetto all'anno di confronto{%- endset %}
+    {% set _ = tiles.append({"label": "Posizioni migliorate", "value": d.moved_up, "unit": "indicatori", "role": "count", "sub": sub}) %}
+  {% endif %}
+  {% if d.provinces %}
+    {% set first = d.provinces[0] %}
+    {#- Con una provincia sola (la Valle d'Aosta) "la prima" non dice niente. -#}
+    {% set sub -%}{% if d.provinces | length > 1 %}la prima per qualità della vita è {% endif %}<a href="{{ first.path }}">{{ first.name }}</a>{% if first.rank and d.province_total %}, {{ first.rank | rank(d.province_total) }} in Italia{% if d.provinces | length == 1 %} per qualità della vita{% endif %}{% endif %}{%- endset %}
+    {% set _ = tiles.append({"label": "Provincia" if d.provinces | length == 1 else "Province", "value": d.provinces | length, "unit": None, "role": "count", "sub": sub}) %}
+  {% endif %}
+  {{ ui.tiles(tiles) }}
+
+  <div class="layout">
+    <aside class="layout__aside">
+      <nav class="toc" aria-label="In questa pagina">
+        <p>In questa pagina</p>
+        <ol>
+          <li><a href="#temi">In quali temi va meglio</a></li>
+          {% if d.excels or d.lags %}<li><a href="#stacca">Dove stacca</a></li>{% endif %}
+          {% if d.gains or d.losses %}<li><a href="#cambiato">Che cosa è cambiato</a></li>{% endif %}
+          {% if d.provinces %}<li><a href="#province">{{ 'La provincia' if d.provinces | length == 1 else 'Le province' }}</a></li>{% endif %}
+          <li><a href="#indicatori">Tutti gli indicatori</a></li>
+          {% if d.similar %}<li><a href="#simili">Le regioni simili</a></li>{% endif %}
+          <li><a href="#fonti">Fonti e citazione</a></li>
+        </ol>
+      </nav>
+      <div class="aside-block">
+        {% if d.sources %}<p>Fonte: {% for s in d.sources %}{% if s.url %}<a href="{{ s.url }}">{{ s.label }}</a>{% else %}{{ s.label }}{% endif %}{{ ', ' if not loop.last }}{% endfor %}. Elaborazione Divario Italia.</p>{% endif %}
+        <p><a class="linkarrow" href="#fonti">Cita questa pagina</a></p>
+      </div>
+    </aside>
+
+    <div class="layout__main">
+      <section class="section" id="temi" aria-labelledby="h-temi">
+        <h2 id="h-temi">I temi, dal migliore al peggiore</h2>
+        <div class="tablewrap stackwrap regione-temi" tabindex="0" role="region" aria-label="I temi {{ d.of_name }}">
+          <table class="table table--stack" role="table">
+            <caption>I {{ d.count_word(d.themes | length, False) }} temi {{ d.of_name }} ordinati per percentile medio: dove sta in media la regione negli indicatori del tema, da zero se fosse ultima in tutti a cento se fosse prima in tutti. La posizione confronta lo stesso valore con quello delle altre regioni, per questo non segue sempre l'ordine.</caption>
+            <thead role="rowgroup">
+              <tr role="row">
+                <th scope="col" role="columnheader">Tema</th>
+                <th class="r" scope="col" role="columnheader">Posizione</th>
+                <th class="barcell" scope="col" role="columnheader"><span class="sr-only">Traccia della posizione</span><span class="track__scale" aria-hidden="true"><span>{{ 1 | rank }}</span><span>{{ d.total | rank }}</span></span></th>
+                <th class="r" scope="col" role="columnheader">Percentile medio</th>
+                <th class="r" scope="col" role="columnheader">Indicatori</th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              {% for t in d.themes %}
+              <tr role="row">
+                <th scope="row" role="rowheader"><a href="{{ t.path }}">{{ t.theme }}</a></th>
+                {% if t.rank %}
+                <td class="val" data-label="Posizione" role="cell">{{ t.rank | rank(t.total) }}</td>
+                <td class="barcell" aria-hidden="true" role="cell"><span class="track"><i style="left: {{ t.track }}%"></i></span></td>
+                {% else %}
+                <td class="val" data-label="Posizione" role="cell"><span class="status">Non in classifica, meno di {{ d.min_theme | num(None, 'count') }} indicatori con un verso</span></td>
+                <td class="barcell" aria-hidden="true" role="cell"></td>
+                {% endif %}
+                <td class="val" data-label="Percentile medio" role="cell">{{ t.percentile | num(None, 'score') }}</td>
+                <td class="val" data-label="Indicatori" role="cell">{{ t.count | num(None, 'count') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {% if d.excels or d.lags %}
+      <section class="section" id="stacca" aria-labelledby="h-stacca">
+        <h2 id="h-stacca">Dove stacca e dove resta indietro</h2>
+        <div class="podiums">
+          {% for block in [
+            {"items": d.excels, "title": "Più avanti delle altre regioni", "id": "h-avanti", "note": "Gli indicatori in cui " ~ d.the_name ~ " " ~ d.verb.is ~ " più in alto in classifica, tenuto conto del verso di ognuno."},
+            {"items": d.lags, "title": "Più indietro delle altre regioni", "id": "h-indietro", "note": "Gli indicatori in cui " ~ d.the_name ~ " " ~ d.verb.is ~ " più in basso in classifica, tenuto conto del verso di ognuno."},
+          ] if block["items"] %}
+          <div>
+            <h3 class="h-sub" id="{{ block.id }}">{{ block.title }}</h3>
+            <p class="subline">{{ block.note }}</p>
+            <div class="rankwrap">
+              <table class="table table--rank">
+                <caption class="sr-only">{{ block.title }}: posizione fra le regioni, indicatore e ultimo valore {{ d.of_name }}</caption>
+                <thead>
+                  <tr>
+                    <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
+                    <th class="name" scope="col">Indicatore</th>
+                    <th class="rankcell-bar" scope="col"><span class="sr-only">Traccia della posizione</span><span class="track__scale" aria-hidden="true"><span>{{ 1 | rank }}</span><span>{{ d.total | rank }}</span></span></th>
+                    <th class="val" scope="col">Valore</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in block["items"] %}
+                  <tr>
+                    <td class="rank">{{ r.rank | rank }}</td>
+                    <th class="name" scope="row"><a href="{{ r.path }}">{{ r.name }}</a><span class="where">Nel {{ r.year }}{% if r.partial %}, su {{ r.count | num(None, 'count') }} regioni{% endif %}{% if r.unit_apart %}, in {{ r.unit_apart }}{% endif %}, {{ r.verso }}. {{ r.theme }}</span></th>
+                    <td class="rankcell-bar" aria-hidden="true">{% if r.track is not none %}<span class="track"><i style="left: {{ r.track }}%"></i></span>{% endif %}</td>
+                    <td class="val">{{ r.value | num(None if r.unit_apart else r.unit, 'cell') }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% if d.gains or d.losses %}
+      <section class="section" id="cambiato" aria-labelledby="h-cambiato">
+        <h2 id="h-cambiato">Che cosa è cambiato</h2>
+        <div class="podiums">
+          {% for block in [
+            {"items": d.gains, "title": "Dove sale di più", "icon": "up", "word": "Sale"},
+            {"items": d.losses, "title": "Dove scende di più", "icon": "down", "word": "Scende"},
+          ] if block["items"] %}
+          <div>
+            <h3 class="h-sub">{{ block.title }}</h3>
+            <ul class="moves">
+              {% for r in block["items"] %}
+              <li>
+                <span class="arrow">{{ ui.icon(block.icon) }}<span class="sr-only">{{ block.word }}</span></span>
+                <div class="what"><a href="{{ r.path }}">{{ r.name }}</a>{% if r.before %}<p class="subline">Dal {{ r.before.year }} al {{ r.year }}</p>{% endif %}</div>
+                <span class="how">{% if r.before %}da {% if r.partial %}{{ r.before.rank | rank(r.before.total) }}{% else %}{{ r.before.rank | rank }}{% endif %} a {% endif %}{{ r.rank | rank(r.count) }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="chart-note">Il confronto è fra l'ultimo anno di ogni indicatore e l'anno precedente più recente con i dati di tutte le {{ d.total | num(None, 'count') }} regioni, e vale solo per gli indicatori con un verso. Tutti i movimenti sono nella tabella degli indicatori.</p>
+      </section>
+      {% endif %}
+
+      {% if d.provinces %}
+      <section class="section" id="province" aria-labelledby="h-province">
+        <h2 id="h-province">{{ 'La provincia' if d.provinces | length == 1 else 'Le province' }} {{ d.of_name }}</h2>
+        <div class="rankwrap">
+          <table class="table table--rank">
+            <caption>{% if d.provinces | length == 1 %}La provincia{% else %}Le {{ d.count_word(d.provinces | length) }} province{% endif %} {{ d.of_name }} per qualità della vita{% if d.province_profile %}, profilo {{ d.province_profile }}{% endif %}{% if d.province_total %}, con la posizione fra le {{ d.province_total | num(None, 'count') }} province italiane{% endif %}{% if d.province_scale %}. La barra parte dalla media delle province, {{ d.province_scale.mid | num(None, 'count') }} sulla scala da {{ d.province_scale.min | num(None, 'count') }} a {{ d.province_scale.max | num(None, 'count') }}{% endif %}.</caption>
+            <thead>
+              <tr>
+                <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione in Italia</span></th>
+                <th class="name" scope="col">Provincia</th>
+                <th class="rankcell-bar" scope="col"><span class="sr-only">Distanza dalla media</span>{% if d.province_scale %}<span class="divbar__axis" aria-hidden="true"><span>{{ d.province_scale.min | num(None, 'count') }}</span><span>{{ d.province_scale.mid | num(None, 'count') }}</span><span>{{ d.province_scale.max | num(None, 'count') }}</span></span>{% endif %}</th>
+                <th class="val" scope="col">Punteggio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pr in d.provinces %}
+              <tr>
+                <td class="rank">{{ pr.rank | rank }}</td>
+                <th class="name" scope="row"><a href="{{ pr.path }}">{{ pr.name }}</a>{% if pr.metro_city %}<span class="where">Città metropolitana</span>{% endif %}</th>
+                <td class="rankcell-bar" aria-hidden="true">{% if pr.bar %}<span class="divbar"><i style="left: {{ pr.bar.left }}%; width: {{ pr.bar.width }}%"></i></span>{% endif %}</td>
+                <td class="val">{{ pr.score | num(None, 'score') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="actions"><a class="linkarrow" href="/qualita-della-vita/classifica/province">La classifica di tutte le province</a></p>
+      </section>
+      {% endif %}
+    </div>
+  </div>
+
+  {{ ui.ad() }}
+
+  <section class="section" id="indicatori" aria-labelledby="h-indicatori" data-rf>
+    <h2 id="h-indicatori">Tutti gli indicatori {{ d.of_name }}</h2>
+    <p class="regione-intro">I {{ d.indicator_count | num(None, 'count') }} indicatori con l'ultimo valore {{ d.of_name }}, l'anno, la posizione fra le regioni e quella nell'anno di confronto.{% if d.contextual_count %} {{ d.contextual_count | num(None, 'count') }} descrivono il territorio senza un verso e non si classificano.{% endif %}</p>
+    <div class="toolbar regione-filter" data-rf-controls hidden>
+      <div class="field"><span id="rf-area-label">Area</span>
+        <div class="seg" role="group" aria-labelledby="rf-area-label">
+          <button type="button" aria-pressed="true" data-rf-area-btn="">Tutte</button>
+          {% for area in d.areas %}<button type="button" aria-pressed="false" data-rf-area-btn="{{ area.slug }}">{{ area.name }}</button>{% endfor %}
+        </div>
+      </div>
+      <label class="field" for="rf-q">Cerca un indicatore
+        <input id="rf-q" type="search" autocomplete="off" data-rf-q>
+      </label>
+      <p class="subline" role="status" aria-live="polite" data-rf-live>{{ d.indicator_count | num(None, 'count') }} indicatori</p>
+    </div>
+
+    {#- Ogni macro-area in un details: aperto su schermo grande, chiuso dal
+        JavaScript sul telefono, sempre nel DOM per chi cerca e per i motori. -#}
+    {% for area in d.areas %}
+    <details class="regione-area" data-rf-area="{{ area.slug }}" data-collapse-mobile open>
+      <summary><h3 class="h-sub" id="{{ 'h-area-' ~ area.slug }}">{{ area.name }} <span class="regione-area__n">{{ area.count | num(None, 'count') }} {{ area.count | it_plural('indicatore', 'indicatori') }}</span></h3></summary>
+      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-labelledby="{{ 'h-area-' ~ area.slug }}">
+        <table class="table table--compact table--stack" role="table">
+          <caption class="sr-only">{{ area.name }}: gli indicatori {{ d.of_name }} per tema, con valore, unità, anno e posizione fra le regioni</caption>
+          <thead role="rowgroup">
+            <tr role="row">
+              <th scope="col" role="columnheader">Indicatore</th>
+              <th class="r" scope="col" role="columnheader">Valore</th>
+              <th scope="col" role="columnheader">Unità</th>
+              <th class="r" scope="col" role="columnheader">Anno</th>
+              <th class="r" scope="col" role="columnheader">Posizione</th>
+              <th class="r" scope="col" role="columnheader">Nell'anno di confronto</th>
+            </tr>
+          </thead>
+          {% for g in area.groups %}
+          <tbody role="rowgroup">
+            <tr class="group" role="row"><th scope="rowgroup" colspan="6" role="rowheader">{% if g.path %}<a href="{{ g.path }}">{{ g.theme }}</a>{% else %}{{ g.theme }}{% endif %}</th></tr>
+            {% for r in g.rows %}
+            <tr data-rf-row data-name="{{ r.name | lower }}" role="row">
+              <th scope="row" role="rowheader"><a href="{{ r.path }}">{{ r.name }}</a></th>
+              <td class="val" data-label="Valore" role="cell">{{ r.value | num(None, 'cell') }}</td>
+              <td data-label="Unità" role="cell">{{ r.unit }}</td>
+              <td class="val" data-label="Anno" role="cell">{{ r.year }}</td>
+              {% if r.rank %}
+              <td class="val" data-label="Posizione" role="cell">{{ r.rank | rank(r.count) }}</td>
+              <td class="val" data-label="Nell'anno di confronto" role="cell">{% if r.before %}{% if r.before.same and not r.partial %}stessa nel {{ r.before.year }}{% else %}{{ r.before.rank | rank(r.before.total) }} nel {{ r.before.year }}{% endif %}{% else %}<span class="n n--nd">n.d.</span>{% endif %}</td>
+              {% else %}
+              <td class="val" colspan="2" data-label="Posizione" role="cell"><span class="status">Senza verso, non si classifica</span></td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+          {% endfor %}
+        </table>
+      </div>
+    </details>
+    {% endfor %}
+  </section>
+
+  {% if d.similar %}
+  <section class="section" id="simili" aria-labelledby="h-simili">
+    <h2 id="h-simili">Le regioni con un profilo simile</h2>
+    <p class="regione-intro">Le {{ d.count_word(d.similar | length) }} regioni con i piazzamenti più vicini a quelli {{ d.of_name }}, indicatore per indicatore, fra gli indicatori con i dati di tutte le regioni.</p>
+    <ul class="cards cards--4">
+      {% for s in d.similar %}
+      <li class="card">
+        {% if s.geo %}<p class="card__kicker">{% if s.area %}<span class="area-dot area-dot--{{ s.area }}" aria-hidden="true"></span>{% endif %}{{ s.geo }}</p>{% endif %}
+        <h3 class="card__title"><a href="{{ s.path }}">{{ s.name }}</a></h3>
+        {% if s.q_rank %}<p class="card__meta">Qualità della vita, {{ s.q_rank | rank(s.q_total) }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="actions"><a class="linkarrow" href="/confronto">Metti a confronto le regioni</a></p>
+  </section>
+  {% endif %}
+
+  <section class="section" id="fonti" aria-labelledby="h-fonti">
+    <h2 id="h-fonti">Fonti, metodo e citazione</h2>
+    <div class="method">
+      <div>
+        <h3>In parole semplici</h3>
+        <p>Ogni indicatore mette le {{ d.total | num(None, 'count') }} regioni in fila, dalla migliore alla peggiore secondo il suo verso: su alcuni è meglio un valore alto, su altri uno basso. La pagina dice dove {{ d.verb.stays }} {{ d.the_name }} in ciascuna di queste file.</p>
+        <p>La posizione media è la media di quei piazzamenti. Non è una classifica: più regioni possono avere la stessa, e uno scarto piccolo non vuol dire molto.</p>
+        <p>Le posizioni descrivono, non spiegano: non dimostrano rapporti di causa.</p>
+      </div>
+      <div>
+        <h3>Come è calcolato</h3>
+        <dl>
+          {% if d.avg_rank %}<div><dt>Posizione media</dt><dd>Media arrotondata delle posizioni sui {{ d.comparable | num(None, 'count') }} indicatori con un verso e con i dati di tutte le {{ d.total | num(None, 'count') }} regioni.</dd></div>{% endif %}
+          <div><dt>Temi</dt><dd>Un tema si classifica se ha almeno {{ d.min_theme | num(None, 'count') }} indicatori con un verso. Il percentile medio è la media dei piazzamenti della regione in quegli indicatori, la posizione lo confronta con le altre regioni.</dd></div>
+          <div><dt>Movimento</dt><dd>Posizioni guadagnate o perse fra l'ultimo anno di ogni indicatore e l'anno precedente più recente con tutte le regioni.</dd></div>
+          <div><dt>Regioni simili</dt><dd>Le più vicine nei piazzamenti, indicatore per indicatore.</dd></div>
+          {% if q %}<div><dt>Qualità della vita</dt><dd>Un punteggio a parte{% if q.dimensions %}, su {{ q.dimensions | num(None, 'count') }} dimensioni{% endif %}{% if q.profile %} con il profilo {{ q.profile }}{% endif %}. <a href="{{ "/qualita-della-vita" }}">Come funziona la qualità della vita</a></dd></div>{% endif %}
+        </dl>
+      </div>
+    </div>
+    <dl class="specs">
+      {% if d.sources %}<div><dt>Fonti</dt><dd><ul class="reflist">{% for s in d.sources %}<li>{% if s.url %}<a href="{{ s.url }}">{{ s.label }}</a>{% else %}{{ s.label }}{% endif %}<small>{{ s.count | num(None, 'count') }} {{ s.count | it_plural('indicatore', 'indicatori') }}</small></li>{% endfor %}</ul></dd></div>{% endif %}
+      <div><dt>Anni dei dati</dt><dd>L'ultimo anno di ogni indicatore{% if d.year_min and d.year_min != d.year_max %}, dal {{ d.year_min }} al {{ d.year_max }}{% endif %}</dd></div>
+      <div><dt>Indicatori</dt><dd>{{ d.indicator_count | num(None, 'count') }} nella tabella, di cui {{ d.scored | num(None, 'count') }} con un verso e {{ d.comparable | num(None, 'count') }} con i dati di tutte le regioni</dd></div>
+      <div><dt>Come nasce questa pagina</dt><dd>I dati vengono dalla fonte senza correzioni e le sintesi si ricalcolano a ogni caricamento. <a href="/metodologia">Metodologia</a></dd></div>
+      <div><dt>Licenza</dt><dd><a href="{{ data_license_url }}">{{ data_license_label }}</a></dd></div>
+    </dl>
+    <div class="actions">
+      <a class="btn btn--primary" href="{{ '/api/region/' ~ d.key }}">{{ ui.icon('download') }} Scarica il profilo in JSON</a>
+    </div>
+    {{ ui.cite(d.citation) }}
+  </section>
+</div>
+</main>
+<script>
+(function () {
+  /* Il filtro della tabella: senza JavaScript restano visibili tutte le righe
+     e i controlli restano nascosti. Tutto e' cercato dentro la sezione. Sul
+     telefono le macro-aree partono chiuse (v1.js): una ricerca o un'area
+     scelta aprono quelle che hanno righe da mostrare. */
+  var root = document.getElementById("indicatori");
+  if (!root) return;
+  var box = root.querySelector("[data-rf-controls]");
+  var live = root.querySelector("[data-rf-live]");
+  var input = root.querySelector("[data-rf-q]");
+  var buttons = Array.prototype.slice.call(root.querySelectorAll("[data-rf-area-btn]"));
+  var groups = Array.prototype.slice.call(root.querySelectorAll("[data-rf-area]"));
+  var area = "", query = "";
+  box.hidden = false;
+  function apply() {
+    var shown = 0;
+    groups.forEach(function (g) {
+      var inArea = !area || g.getAttribute("data-rf-area") === area;
+      var count = 0;
+      g.querySelectorAll("tbody").forEach(function (tb) {
+        var n = 0;
+        tb.querySelectorAll("[data-rf-row]").forEach(function (tr) {
+          var ok = inArea && (!query || tr.getAttribute("data-name").indexOf(query) >= 0);
+          tr.hidden = !ok;
+          if (ok) n += 1;
+        });
+        tb.hidden = n === 0;
+        count += n;
+      });
+      g.hidden = count === 0;
+      if (count > 0 && (area || query)) g.open = true;
+      shown += count;
+    });
+    live.textContent = shown === 0 ? "Nessun indicatore trovato" : shown + (shown === 1 ? " indicatore" : " indicatori");
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      area = b.getAttribute("data-rf-area-btn");
+      buttons.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      apply();
+    });
+  });
+  input.addEventListener("input", function () { query = input.value.trim().toLowerCase(); apply(); });
+})();
+</script>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

@@ -1,0 +1,48 @@
+/* Pagina provincia della 1.0: solo l'impaginazione propria. Striscia,
+   localizzatore, tessere, barra attorno a 50, traccia, classifiche e tabella a
+   blocchi sono componenti comuni. Legge solo token. */
+
+/* testata: l'H1 resta senza classe, il localizzatore sta nel margine da 1200 */
+.provincia-head > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.provincia-top { display: grid; }
+.provincia-top .locator { grid-template-columns: 4.5rem minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-bottom: var(--space-8); }
+@media (min-width: 1200px) {
+  .provincia-top { grid-template-columns: minmax(0, 1fr) 13rem; column-gap: var(--space-16); align-items: start; }
+  .provincia-top .locator { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
+}
+/* il nome della provincia sotto la media va a sinistra, lontano dalla linea della media */
+.provincia-lead--left .strip__name--on { text-anchor: end; }
+.provincia-strip-link { margin-top: var(--space-3); }
+
+.provincia-note { max-width: var(--measure); color: var(--text-2); margin-bottom: var(--space-6); }
+.provincia-muted { font-size: var(--fs-small); color: var(--muted); }
+.provincia-colhead { padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
+.provincia-colhead + .subline { margin: var(--space-2) 0 var(--space-3); }
+.provincia-movehead { margin-bottom: var(--space-6); }
+.provincia-more { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-6); }
+
+/* dimensioni: la colonna della barra, e lo scarto che sul telefono lascia il posto */
+.provincia-dims .provincia-dims__bar { width: 44%; }
+@container (max-width: 520px) { .provincia-dims__diff { display: none; } }
+
+/* sintesi: nome, cifre, traccia della posizione in Italia */
+.provincia-list { list-style: none; }
+.provincia-list li { display: grid; gap: var(--space-1); padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+.provincia-list a { font-weight: 600; }
+.provincia-list .track { max-width: 20rem; margin-top: var(--space-1); }
+.provincia-facts { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.provincia-facts .sep { color: var(--rule-strong); padding-inline: 6px; }
+.provincia-when { display: block; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); margin-top: 2px; }
+.provincia-moves .arrow svg { display: block; margin-top: 4px; }
+
+/* tutti gli indicatori: salti alle aree, un details per area */
+.provincia-jump { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-bottom: var(--space-4); font-weight: 600; }
+.provincia-jump .n { font-weight: 400; color: var(--muted); margin-left: 4px; }
+.provincia-group { margin-top: var(--space-6); }
+.provincia-group > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); padding-block: var(--space-3); border-bottom: 1px solid var(--rule-strong); cursor: pointer; }
+.provincia-group > summary::-webkit-details-marker { display: none; }
+.provincia-group > summary > svg { align-self: center; transform: rotate(-90deg); transition: transform var(--motion-base) var(--motion-ease); }
+.provincia-group[open] > summary > svg { transform: none; }
+.provincia-table tbody th[scope="row"] { min-width: 12rem; }
+.provincia-table .provincia-unit { font-size: var(--fs-small); color: var(--text-2); }
+@container (max-width: 560px) { .provincia-table tbody th[scope="row"] { min-width: 0; } }

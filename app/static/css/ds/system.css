@@ -374,7 +374,9 @@ body.ds {
   --green: var(--green-500);
 
   --line: var(--rule);
-  --grid: var(--rule);
+  /* La carta a righe del 2026 non c'e' piu': le regole che la disegnano
+     restano in site.css, e con la riga trasparente non disegnano niente. */
+  --grid: transparent;
   --border: var(--rule);
   --border-soft: var(--rule);
   --border-hairline: 1px solid var(--rule);

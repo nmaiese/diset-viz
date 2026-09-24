@@ -1,0 +1,244 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- L'indice della qualita' della vita della 1.0.
+
+    Stesso contenuto di quality_life_index.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la risposta su dove si vive
+    meglio, poi le due strisce dei punteggi, regioni e province, ognuna con la
+    sua tabella, le tessere che le strisce non dicono, il doppio podio con i
+    link ai profili, i profili dei pesi con chi guadagna di piu', dove eccelle
+    ogni territorio, il metodo in breve e i dati da scaricare. Cio' che la
+    pagina chiede in piu' ai dati lo compone
+    app/design/pages/qualita_della_vita.py e arriva qui come `d`.
+
+    La testa (title, description, JSON-LD, briciole) e' quella di
+    quality_life_index.html, riga per riga. L'H1 resta un `<h1>` nudo: il
+    testo e la forma sono asseriti da test_hub_pages.py, e il corpo del titolo
+    lo da' il foglio della pagina. -#}
+{% set active_nav = 'qualita-della-vita' %}
+{% set r = d.regions %}
+{% set pv = d.provinces %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Qualità della vita", "path": "/qualita-della-vita"}] %}
+
+{% block title %}Qualità della vita: {{ region_total }} regioni e {{ province_total }} province a confronto{% endblock %}
+{% block description %}Classifica della qualità della vita nelle regioni e nelle province italiane su indicatori Istat: reddito, lavoro, salute, ambiente, istruzione e servizi.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/qualita-della-vita.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Qualità della vita nelle regioni e nelle province italiane",
+  "description": {{ 'Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori Istat selezionati.' | tojson }},
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } },
+  "isAccessibleForFree": true
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+{%- macro rank_rows(rows) -%}
+{%- for row in rows %}
+      <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ row.href }}">{{ row.name }}</a>{% if row.region %}<span class="where">{% if row.region.href %}<a href="{{ row.region.href }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}</span>{% endif %}{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.score | num(None, 'score') }}</td></tr>
+{%- endfor %}
+{%- endmacro %}
+{%- macro rank_table(b, caption, head, tail=None, labelledby=None) -%}
+<div class="tablewrap rankwrap" tabindex="0" role="region" {% if labelledby %}aria-labelledby="{{ labelledby }}"{% else %}aria-label="{{ caption }}"{% endif %}>
+  <table class="table table--rank">
+    <caption class="sr-only">{{ caption }}</caption>
+    <thead><tr>
+      <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
+      <th scope="col">{{ b.spec.singular | capitalize }}</th>
+      <th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio</span></th>
+      <th class="r" scope="col">Punteggio</th>
+    </tr></thead>
+    <tbody>
+      {{- rank_rows(head) }}
+      {%- if tail is not none %}
+      {%- if b.gap_label %}
+      <tr class="gap"><td colspan="4">{{ b.gap_label }}</td></tr>
+      {%- endif %}
+      {{- rank_rows(tail) }}
+      {%- endif %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro %}
+<main id="contenuto" class="v1 v1-qualita-della-vita" data-v1="qualita-della-vita" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">{{ d.institutions }}{% if d.counts %}<span class="sep" aria-hidden="true">·</span>{{ d.counts }}{% endif %}{% if d.years_span %}<span class="sep" aria-hidden="true">·</span>dati {{ d.years_span }}{% endif %}</p>
+    <h1>Qualità della vita nelle regioni e nelle province italiane</h1>
+    {% if r or pv %}
+    <p class="answer">{% if r %}Fra le regioni il punteggio più alto è {{ r.first.prep }}<a href="{{ r.first.href }}">{{ r.first.name }}</a>, {{ r.first.score | num(None, 'score') }} su 100, e il più basso {{ r.last.prep }}<a href="{{ r.last.href }}">{{ r.last.name }}</a>, {{ r.last.score | num(None, 'score') }}.{% endif %}{% if r and pv %} {% endif %}{% if pv %}Fra le province il più alto è {{ pv.first.prep }}<a href="{{ pv.first.href }}">{{ pv.first.name }}</a>, {{ pv.first.score | num(None, 'score') }}{% if not r %} su 100{% endif %}, e il più basso {{ pv.last.prep }}<a href="{{ pv.last.href }}">{{ pv.last.name }}</a>, {{ pv.last.score | num(None, 'score') }}.{% endif %}</p>
+    {% endif %}
+    <p class="meta">
+      <span>Profilo {{ d.default_name }}, lo stesso peso a ogni dimensione</span>
+      <span>Non è la classifica del Sole 24 Ore</span>
+      <a href="#metodo">Come si calcola</a>
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  {% for b in d.levels if b.strip.svg %}
+  <div class="qv-strip">
+    {{ ui.leadfigure('striscia-' ~ b.spec.url, b.strip_claim or ('Le ' ~ b.n ~ ' ' ~ b.spec.plural ~ ' sulla scala da 0 a 100'), b.strip,
+       'Ogni punto è una ' ~ b.spec.singular ~ ', nel colore della sua ripartizione, con il punteggio da 0 a 100 del profilo ' ~ d.default_name ~ '. Regioni e province hanno scale separate. Fonte: ' ~ b.source_ref ~ '. Elaborazione Divario Italia.') }}
+    <details class="more">
+      <summary>I punteggi delle {{ b.n }} {{ b.spec.plural }} in tabella</summary>
+      {{ rank_table(b, 'Punteggio della qualità della vita per ' ~ b.spec.singular ~ ', profilo ' ~ d.default_name ~ ', da 0 a 100', b.rows) }}
+    </details>
+  </div>
+  {% endfor %}
+
+  {% if d.tiles %}{{ ui.tiles(d.tiles) }}{% endif %}
+
+  {% if d.levels %}
+  <section class="section" id="podio" aria-labelledby="h-podio">
+    <h2 id="h-podio">Chi è in testa e chi in coda</h2>
+    <p class="subline qv-lead">Punteggio da 0 a 100 con il profilo {{ d.default_name }}.{% if d.fifty %} La tacca segna 50, la media semplice dei territori dello stesso livello.{% endif %} Ogni nome porta al profilo del territorio.</p>
+    <div class="podiums">
+      {% for b in d.levels %}
+      <figure class="qv-podium">
+        <figcaption><h3 class="h-sub" id="podio-{{ b.spec.url }}">Le {{ b.n }} {{ b.spec.plural }}</h3></figcaption>
+        {{ rank_table(b, 'Le prime ' ~ b.top | length ~ ' e le ultime ' ~ b.bottom | length ~ ' delle ' ~ b.n ~ ' ' ~ b.spec.plural ~ ', punteggio da 0 a 100', b.top, b.bottom, 'podio-' ~ b.spec.url) }}
+        <p class="qv-podium__more"><a class="linkarrow" href="{{ b.href }}">La classifica completa delle {{ b.spec.plural }}</a>
+          {%- if b.level == 'provincia' %} <a class="linkarrow" href="{{ b.spec.index }}">Trova la tua provincia</a>{% endif %}</p>
+      </figure>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% if not pv %}
+  {#- Il link all'indice delle province e' un contratto (test_hub_pages.py):
+      resta anche se la classifica provinciale manca. -#}
+  <p class="qv-download-note"><a class="linkarrow" href="/province">Trova la tua provincia</a></p>
+  {% endif %}
+
+  {{ ui.ad() }}
+
+  <section class="section" id="profili" aria-labelledby="h-profili">
+    <h2 id="h-profili">Cambia le priorità</h2>
+    <p class="subline qv-lead">Ogni profilo pesa le dimensioni in modo diverso, e la classifica cambia. Accanto a ognuno, chi guadagna più posizioni rispetto a {{ d.default_name }}.</p>
+    <ul class="qv-profiles">
+      {% for item in d.profiles %}
+      <li>
+        <h3 class="qv-profiles__name"><a href="{{ item.regions }}">{{ item.name }}</a></h3>
+        {% if item.description %}<p class="qv-profiles__desc">{{ item.description }}</p>{% endif %}
+        {% if item.motive %}<p class="qv-profiles__why">{{ item.motive }}</p>{% elif item.default %}<p class="qv-profiles__why">È il profilo del podio qui sopra.</p>{% endif %}
+        <p class="qv-profiles__links"><a href="{{ item.regions }}">Le regioni con questo profilo</a> <a href="{{ item.provinces }}">Le province</a></p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {% if d.champions %}
+  <section class="section" id="dove-eccelle" aria-labelledby="h-eccelle">
+    <h2 id="h-eccelle">Dove eccelle ogni territorio</h2>
+    <figure class="module">
+      <figcaption class="module__head">
+        {% if r and r.claim %}<h3 class="h-sub">{{ r.claim }}</h3>{% endif %}
+        <p class="subline">Per ognuna delle {{ d.champions | length }} dimensioni, la prima regione e la prima provincia. Il punteggio di una dimensione va da 0 a 100 e non cambia con il profilo.{% if pv and pv.missing %} Per le province mancano i dati su {{ pv.missing | join(' e su ') }}.{% endif %}</p>
+      </figcaption>
+      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="La prima regione e la prima provincia per dimensione">
+        <table class="table table--compact table--stack qv-cats">
+          <caption class="sr-only">La prima regione e la prima provincia in ogni dimensione della qualità della vita, punteggio da 0 a 100</caption>
+          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima regione</th><th scope="col">Prima provincia</th></tr></thead>
+          <tbody>
+            {%- for c in d.champions %}
+            <tr>
+              <th scope="row">{% if c.href %}<a href="{{ c.href }}">{{ c.name }}</a>{% else %}{{ c.name }}{% endif %}</th>
+              {%- for group, label in [(c.regions, 'Prima regione'), (c.provinces, 'Prima provincia')] %}
+              <td data-label="{{ label }}">{% if group %}<span class="qv-pair"><span>{% for t in group %}<a href="{{ t.href }}">{{ t.name }}</a>{% if t.where %} <span class="qv-where">{{ t.where }}</span>{% endif %}{% if not loop.last %} e {% endif %}{% endfor %}{% if group | length > 1 %}<span class="qv-where">a pari merito</span>{% endif %}</span>{{ group[0].score | num(None, 'score') }}</span>{% else %}<span class="status">Nessun dato provinciale</span>{% endif %}</td>
+              {%- endfor %}
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="source">Fonte: {{ d.source_ref }}. Elaborazione Divario Italia.</p>
+    </figure>
+  </section>
+  {% endif %}
+
+  <section class="section" id="metodo" aria-labelledby="h-metodo">
+    <h2 id="h-metodo">Come si calcola, in breve</h2>
+    <div class="method">
+      <div>
+        <h3>In parole semplici</h3>
+        <p>Per ogni indicatore si guarda quanto un territorio si allontana dalla media dei territori dello stesso livello, nel verso giusto: dove è meglio un valore alto, un valore alto alza il punteggio, dove è meglio basso lo abbassa.</p>
+        <p>Gli indicatori si raggruppano in dimensioni, dal reddito alla salute alla sicurezza, e le dimensioni si combinano con i pesi del profilo. Il risultato va da 0 a 100{% if d.fifty %}, e 50 è la media{% endif %}. Regioni e province hanno classifiche separate, ognuna con i suoi indicatori.</p>
+      </div>
+      <div>
+        <h3>Il calcolo</h3>
+        <dl>
+          <div><dt>Metodo</dt><dd>Per ogni indicatore uno z-score orientato, che conserva le distanze fra i territori, riportato su una scala da 0 a 100 dove una deviazione standard vale {{ d.spread }} punti.</dd></div>
+          {% for b in d.levels if b.breakdown %}
+          <div><dt>Le fonti per le {{ b.spec.plural }}, su {{ b.dims }} dimensioni</dt><dd><ul class="reflist">{% for s in b.breakdown %}<li>{{ s.label }}: {{ s.count | num(None, 'count') }} indicatori</li>{% endfor %}</ul></dd></div>
+          {% endfor %}
+          <div><dt>Che cosa non è</dt><dd>Una sintesi di Divario Italia, con dimensioni e versi scelti dalla redazione e rivedibili. Non è la classifica del Sole 24 Ore.</dd></div>
+        </dl>
+        <p class="qv-method-links"><a class="linkarrow" href="/metodologia#qualita-della-vita">Il metodo per intero</a> <a class="linkarrow" href="/metodologia#indicatori-usati">Quali indicatori entrano nel punteggio</a></p>
+      </div>
+    </div>
+  </section>
+
+  {% if d.downloads %}
+  <section class="section" id="scarica" aria-labelledby="h-scarica">
+    <h2 id="h-scarica">Scarica i dati</h2>
+    <p class="qv-download-note">{{ 'Le due classifiche' if d.downloads | length > 1 else 'La classifica' }} con il profilo {{ d.default_name }}: in CSV la posizione e il punteggio di ogni territorio, in JSON anche il punteggio di ogni dimensione. Licenza <a href="{{ data_license_url }}">{{ data_license_label }}</a>.</p>
+    <div class="actions">
+      {% if d.downloads.regione %}
+      <a class="btn btn--primary" href="{{ d.downloads.regione.csv }}">{{ ui.icon('download') }} Le regioni in CSV</a>
+      <a class="btn" href="{{ d.downloads.regione.json }}">{{ ui.icon('download') }} Le regioni in JSON</a>
+      {% endif %}
+      {% if d.downloads.provincia %}
+      <a class="btn{{ ' btn--primary' if not d.downloads.regione }}" href="{{ d.downloads.provincia.csv }}">{{ ui.icon('download') }} Le province in CSV</a>
+      <a class="btn" href="{{ d.downloads.provincia.json }}">{{ ui.icon('download') }} Le province in JSON</a>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<section class="band" aria-labelledby="continua-da-qui">
+  <div class="wrap">
+    <h2 class="h-section" id="continua-da-qui">Continua da qui</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>I territori</h3>
+        <ul>
+          <li><a href="/regioni">I profili delle {% if r %}{{ r.n }} {% endif %}regioni</a></li>
+          <li><a href="/confronto">Metti a confronto due territori</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Gli indicatori</h3>
+        <ul>
+          <li><a href="/temi">Tutti gli indicatori per tema</a></li>
+          <li><a href="/atlante">L'atlante degli indicatori</a></li>
+          <li><a href="/catalogo-dati">Il catalogo dei dati</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Da leggere</h3>
+        <ul>
+          <li><a href="/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a></li>
+          <li><a href="/blog">Le storie di Divario Italia</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

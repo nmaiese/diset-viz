@@ -177,18 +177,23 @@ class DesignSystemMigration(unittest.TestCase):
 
     # --- la rampa dei dati -------------------------------------------------
     def test_the_indicator_map_uses_the_design_system_ramp(self):
-        """La mappa deve essere dipinta con `var(--seq-N)`, non con un colore
-        cotto: `--seq-1..6` sono ridefinite nel tema scuro, e un hex nel markup
-        lascerebbe la mappa sulla rampa chiara con il resto della pagina scuro.
+        """La mappa si dipinge per classe (`q1`..`q6`), e le classi leggono
+        `var(--seq-N)`: `--seq-1..6` sono ridefinite nel tema scuro, e un colore
+        cotto nel markup lascerebbe la mappa sulla rampa chiara con il resto
+        della pagina scuro. Prima le regole erano un `<style>` in pagina con i
+        `var()`; nella 1.0 stanno in components.css.
         """
         html = self._html(
             "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99"
         )
-        fills = re.findall(r'\.indicator-map \[data-key="[^"]+"\]\{fill:([^}]+)\}', html)
-        self.assertTrue(fills, "la mappa dell'indicatore non dipinge nessuna regione")
-        for fill in fills:
-            self.assertRegex(fill.strip(), r"^var\(--seq-[1-6]\)$",
-                             f"colore fuori dalla rampa del design system: {fill}")
+        mappa = re.search(r'<div class="map[^"]*" data-map>.*?</svg>', html, re.S)
+        self.assertIsNotNone(mappa, "la scheda non disegna la mappa")
+        classi = re.findall(r'<path d="[^"]+" data-key="[^"]+"[^>]*class="(q[1-6])', mappa.group(0))
+        self.assertGreaterEqual(len(classi), 15, "la mappa dell'indicatore non dipinge le regioni")
+        self.assertNotRegex(mappa.group(0), r'fill="#|fill:\s*#', "colore cotto nella mappa")
+        css = self._statico("/static/css/ds/components.css").decode("utf-8")
+        for passo in range(1, 7):
+            self.assertIn(f".q{passo} {{ fill: var(--seq-{passo})", css)
 
     def test_the_legacy_blue_ramp_is_gone_from_the_migrated_pages(self):
         # `#15233b` era il navy dell'identita' vecchia. Sopravvive solo nelle

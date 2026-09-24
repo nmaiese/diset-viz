@@ -22,7 +22,13 @@ from app import app, bes_data, it_numbers, province_profile
 
 
 def _visibile(html):
-    corpo = re.search(r'<main class="wrap[ "].*</main>', html, re.DOTALL)
+    """Il testo visibile del corpo della pagina.
+
+    Cercava `<main class="wrap ...">`, la classe di impaginazione della
+    pagina di prima: la 1.0 apre `<main id="contenuto" class="v1 ...">` e
+    mette `wrap` su un `div` dentro. Il contratto e' il corpo, non la classe
+    che lo impagina, quindi basta `<main>` con qualunque attributo."""
+    corpo = re.search(r"<main\b[^>]*>.*</main>", html, re.DOTALL)
     assert corpo, "la pagina non ha il corpo atteso"
     testo = re.sub(r"<(script|style)\b.*?</\1>", "", corpo.group(0), flags=re.DOTALL)
     testo = re.sub(r"<[^>]+>", " ", testo)

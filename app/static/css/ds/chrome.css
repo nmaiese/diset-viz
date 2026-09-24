@@ -58,7 +58,7 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
   color: var(--ink); text-decoration: none; margin-right: var(--space-2);
 }
 .sitechrome .hdr__brand:hover { color: var(--ink); text-decoration: none; }
-.sitechrome .hdr__brand img { display: block; width: 30px; height: 30px; object-fit: contain; }
+.sitechrome .hdr__brand img { display: block; width: auto; height: 30px; }
 /* Il marchio: "Divario" pieno, "Italia" tondo, sempre in inchiostro. */
 .sitechrome .brandword {
   font-family: var(--font-ui); font-size: 21px; line-height: 1;
@@ -115,6 +115,9 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
 }
 .sitechrome .iconbtn:hover { background: var(--surface-1); color: var(--ink); }
 .sitechrome .iconbtn svg { width: 20px; height: 20px; }
+/* `hidden` su un <svg> non basta: il foglio del browser lo spegne solo sugli
+   elementi HTML, e l'interruttore mostrava luna e sole insieme. */
+.sitechrome .iconbtn svg[hidden] { display: none; }
 
 /* --- ricerca ------------------------------------------------------------ */
 .sitechrome .hdr__search { position: relative; }
@@ -251,7 +254,7 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
 }
 .sitechrome .ftr__wrap { width: min(100% - 2 * var(--margin-s), var(--container)); margin-inline: auto; }
 .sitechrome .ftr .hdr__brand { margin-bottom: var(--space-6); }
-.sitechrome .ftr .hdr__brand img { width: 26px; height: 26px; }
+.sitechrome .ftr .hdr__brand img { height: 26px; }
 .sitechrome .ftr__trust {
   max-width: 46rem; margin: 0;
   font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink);

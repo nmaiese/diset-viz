@@ -317,15 +317,17 @@ class ProvinceViewTest(unittest.TestCase):
             self.assertEqual(meta_content(html, "robots"), "noindex, follow", base)
             self.assertIn(f'rel="canonical" href="https://divarioitalia.it{base}"', html)
 
-            # I dati provinciali ci sono, e sono piu delle venti regioni.
-            province_rows = html.count('class="ranking-row"')
-            region_rows = regional.data.decode("utf-8").count('class="ranking-row"')
+            # I dati provinciali ci sono, e sono piu delle venti regioni: una riga
+            # della classifica per territorio, server-rendered.
+            province_rows = len(re.findall(r'<tr data-key="', html))
+            region_rows = len(re.findall(r'<tr data-key="', regional.data.decode("utf-8")))
             self.assertEqual(region_rows, 20, base)
             self.assertGreater(province_rows, 90, base)
 
             # Il selettore del territorio in evidenza è un select: su mobile è il
             # menu a tendina con cui si sceglie una provincia.
-            self.assertIn('aria-label="Provincia in evidenza"', html)
+            self.assertIn("Trova la tua provincia", html)
+            self.assertIn("data-territory", html)
             self.assertIn('href="' + base + '?livello=provincia"', regional.data.decode("utf-8"))
 
     def test_provincial_level_has_no_map_by_design(self):
@@ -1027,23 +1029,23 @@ class LaHomePortaAlleProvince(unittest.TestCase):
         self.assertRegex(self.html, r'href="/provincia/[a-z0-9-]+"')
 
     def test_il_modulo_qualita_della_vita_ha_regioni_e_province(self):
-        import html as html_lib
-        import json
-        dati = json.loads(html_lib.unescape(re.search(r"data-profiles='(.*?)'>", self.html, re.DOTALL).group(1)))
-        self.assertEqual(set(dati["levels"]), {"regioni", "province"})
-        for livello, prefisso in (("regioni", "/regione/"), ("province", "/provincia/")):
-            for profilo in dati["levels"][livello]["profiles"]:
-                for riga in profilo["top"] + profilo["bottom"]:
-                    self.assertTrue(riga["path"].startswith(prefisso), riga)
-                    self.assertEqual(self.client.get(riga["path"]).status_code, 200, riga["path"])
+        """Il doppio podio della home porta a regioni e a province, e ogni
+        nome e' una pagina che risponde."""
+        link = re.findall(r'<th class="name" scope="row"><a href="(/(?:regione|provincia)/[a-z0-9-]+)"', self.html)
+        self.assertTrue(any(h.startswith("/regione/") for h in link), link)
+        self.assertTrue(any(h.startswith("/provincia/") for h in link), link)
+        for percorso in link:
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
 
     def test_i_conteggi_dei_territori_non_sono_scritti_a_mano(self):
         from pathlib import Path
-        for nome in ("home.html", "region_page.html"):
+        for nome in ("home.html", "region_page.html", "v1/home.html", "v1/regione.html"):
             testo = (Path(app.root_path) / "templates" / nome).read_text(encoding="utf-8")
             testo = re.sub(r"\{#.*?#\}", "", testo, flags=re.DOTALL)
             with self.subTest(template=nome):
                 self.assertNotRegex(testo, r"\b(?:20|venti) regioni\b")
                 self.assertNotRegex(testo, r"<strong>20</strong>")
         from app import province_profile
-        self.assertIn(f"<strong>{province_profile.total()}</strong> province", self.html)
+        totale = province_profile.total()
+        self.assertIn(f'<data class="n n--count" value="{totale}">{totale}</data> province', self.html)

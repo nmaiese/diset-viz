@@ -36,29 +36,26 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.iubenda.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://tpc.googlesyndication.com", csp)
-        # Homepage sul design system 2026: opt-in dei token e del chrome nuovi.
+        # La home della 1.0: token, testata condivisa e il CSS della sua pagina.
         self.assertIn(b'<body class="ds sitechrome">', home.data)
         self.assertIn(b"css/ds/system.css", home.data)
-        self.assertIn(b"css/ds/home.css", home.data)
+        self.assertIn(b"css/ds/pages/home.css", home.data)
+        self.assertIn(b'data-v1="home"', home.data)
         self.assertIn("L'Italia, regione per regione.".encode("utf-8"), home.data)
         self.assertIn(b"/atlante", home.data)
-        self.assertIn(b'<main class="home" id="contenuto">', home.data)
         # Il masthead legacy non deve sopravvivere accanto a quello nuovo.
         self.assertNotIn(b'<header class="masthead">', home.data)
         self.assertIn(b'class="hdr__bar"', home.data)
-        # Ogni modulo si disegna su dati veri, non su segnaposto: la mappa hero
-        # colora venti regioni, temi e confronto hanno righe reali.
-        self.assertIn(b"data-ds-heromap", home.data)
-        self.assertEqual(home.data.count(b".rmap-region[data-key="), 20)
-        self.assertIn("Ogni tema è una lente sull'Italia".encode("utf-8"), home.data)
-        self.assertIn(b'class="topcard"', home.data)
-        self.assertIn(b"data-ds-compare", home.data)
-        self.assertIn(b'class="cmprow cmprow--anim"', home.data)
-        self.assertIn(b"data-ds-qol", home.data)
-        # Grafico di confronto e barre della storia sono già disegnati lato
-        # server: senza JavaScript la pagina resta leggibile.
-        self.assertIn(b'class="cmp-line"', home.data)
-        self.assertIn(b'class="minibar__fill"', home.data)
+        # Ogni modulo si disegna su dati veri, non su segnaposto e lato server:
+        # la mappa colora venti regioni per classe della rampa, la striscia del
+        # divario ha i suoi punti, temi e podio della qualita' della vita hanno
+        # righe reali. Senza JavaScript la pagina resta leggibile.
+        self.assertEqual(len(re.findall(
+            rb'data-key="[a-z-]+" data-name="[^"]*" data-value="[^"]*" class="q[1-6]', home.data)), 20)
+        self.assertIn(b'class="strip__dot', home.data)
+        self.assertIn(b"data-rank-body", home.data)
+        self.assertIn(b'class="card home-theme"', home.data)
+        self.assertIn(b'class="home-podium"', home.data)
 
         atlante = client.get("/atlante")
         self.assertEqual(atlante.status_code, 200)
@@ -1542,7 +1539,8 @@ class HardeningTest(unittest.TestCase):
 
         cache.clear()
         try:
-            with mock.patch("app.views.render_template", return_value="OK") as rt:
+            # La home rende da `app.design` (la 1.0), non piu' da views.
+            with mock.patch("app.design.render_template", return_value="OK") as rt:
                 client = app.test_client()
                 client.get("/")
                 client.get("/")
@@ -1881,9 +1879,13 @@ class NessunaAnteprimaSocialeEUnSvg(unittest.TestCase):
 
     def test_la_copertina_in_pagina_resta_il_vettoriale(self):
         """Il PNG serve al social, non allo schermo: in pagina l'SVG e' piu'
-        nitido e pesa meno."""
+        nitido e pesa meno. Dalla 1.0 un post con copertina SVG apre sulla
+        striscia del divario disegnata dai dati, e la copertina compare solo
+        dove la striscia non si puo' disegnare: in nessuno dei due casi lo
+        schermo riceve il PNG."""
         html = self.client.get("/blog/pil-pro-capite-regioni-divario-2024").get_data(as_text=True)
-        self.assertIn('src="/static/img/blog/pil-pro-capite.svg"', html)
+        self.assertNotIn('src="/static/img/blog/pil-pro-capite.png"', html)
+        self.assertTrue('src="/static/img/blog/pil-pro-capite.svg"' in html or 'class="lead-figure"' in html)
 
     def test_ogni_svg_di_copertina_ha_il_suo_png(self):
         """Se manca, `blog.social_image` ripiega sulla figura del sito e il post

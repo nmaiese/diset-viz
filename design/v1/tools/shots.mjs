@@ -3,6 +3,11 @@
 //   node design/v1/tools/shots.mjs prima   la produzione, prima del ridisegno
 //   node design/v1/tools/shots.mjs dopo    i prototipi in dist/pagine
 //   node design/v1/tools/shots.mjs check   scorrimento orizzontale e tastiera sui prototipi
+//   node design/v1/tools/shots.mjs giro <base> <cartella> <percorsi,separati,da,virgola>
+//        il sito servito (locale o produzione): piega e pagina intera a 1440 e 375
+//        nel tema di THEME (chiaro se manca), scorrimento orizzontale a 320, 360 e
+//        375 in chiaro e in scuro, errori di console, eccezioni, richieste fallite
+//        e risposte >= 400 (un font che manca, una regola CSP che blocca)
 //
 // Zero dipendenze: Node 24 ha WebSocket e fetch globali. Un Chrome alla volta,
 // pagine in sequenza, per non stressare una macchina da 8 GB.
@@ -104,7 +109,9 @@ async function launch() {
     // Chrome puo' scrivere nel profilo ancora per un attimo dopo il kill.
     try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch {}
   };
-  return { send, waitFor, close };
+  const listen = (fn) => listeners.push(fn);
+  const unlisten = (fn) => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
+  return { send, waitFor, close, listen, unlisten };
 }
 
 async function openPage(cdp, { viewport, theme, blocked, initScript }) {
@@ -274,6 +281,94 @@ async function check() {
   console.log("nessun problema");
 }
 
+
+// Il giro sul sito servito. Le terze parti restano bloccate solo se BLOCK=1:
+// contro la produzione servono a vedere che la CSP non rompe niente.
+// Una navigazione che non lascia promesse rifiutate a mezz'aria: un server a
+// freddo puo' metterci piu' dell'attesa, e il giro deve passare alla pagina dopo.
+async function go(cdp, s, sessionId, url) {
+  const loaded = cdp.waitFor("Page.loadEventFired", sessionId, 120000);
+  loaded.catch(() => {});
+  await s("Page.navigate", { url });
+  await loaded;
+}
+
+async function giro(base, outDir, paths) {
+  mkdirSync(outDir, { recursive: true });
+  const cdp = await launch();
+  const report = [];
+  const theme = process.env.THEME === "dark" ? "dark" : "light";
+  const blocked = process.env.BLOCK ? BLOCKED : undefined;
+  let problems = 0;
+  try {
+    for (const path of paths) {
+      const url = base + path;
+      const slug = path.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "-").replace(/-+$/, "") || "home";
+      const entry = { path, errors: [], failed: [], overflow: [] };
+      try {
+      // Errori e richieste fallite, a 1440.
+      {
+        const { s, sessionId, targetId } = await openPage(cdp, { viewport: VIEWPORTS[1440], theme, blocked });
+        await s("Log.enable");
+        const onMsg = (msg) => {
+          if (msg.sessionId !== sessionId) return;
+          if (msg.method === "Runtime.exceptionThrown") entry.errors.push("eccezione: " + (msg.params.exceptionDetails.exception?.description || msg.params.exceptionDetails.text).slice(0, 200));
+          if (msg.method === "Runtime.consoleAPICalled" && msg.params.type === "error") entry.errors.push("console: " + msg.params.args.map((a) => a.value || a.description || "").join(" ").slice(0, 200));
+          if (msg.method === "Log.entryAdded" && msg.params.entry.level === "error") entry.errors.push("log: " + (msg.params.entry.text + " " + (msg.params.entry.url || "")).slice(0, 240));
+          if (msg.method === "Network.loadingFailed" && !msg.params.canceled && msg.params.blockedReason !== "inspector") entry.failed.push(`${msg.params.errorText} ${msg.params.blockedReason || ""}`.trim());
+          if (msg.method === "Network.responseReceived" && msg.params.response.status >= 400) entry.failed.push(`${msg.params.response.status} ${msg.params.response.url}`.slice(0, 200));
+        };
+        cdp.listen(onMsg);
+        await go(cdp, s, sessionId, url);
+        const info = await evaluate(s, SETTLE);
+        entry.h1440 = info.h;
+        const fold = await s("Page.captureScreenshot", { format: "webp", quality: 80 });
+        writeFileSync(join(outDir, `${slug}-1440-fold.webp`), Buffer.from(fold.data, "base64"));
+        if (process.env.FULL) {
+          const full = await s("Page.captureScreenshot", { format: "jpeg", quality: 70, captureBeyondViewport: true,
+            clip: { x: 0, y: 0, width: 1440, height: Math.min(info.h, 16000), scale: 1 } });
+          writeFileSync(join(outDir, `${slug}-1440-full.jpg`), Buffer.from(full.data, "base64"));
+        }
+        cdp.unlisten(onMsg);
+        await cdp.send("Target.closeTarget", { targetId });
+      }
+      // Telefono: piega a 375 nel tema scelto.
+      {
+        const { s, sessionId, targetId } = await openPage(cdp, { viewport: VIEWPORTS[375], theme, blocked });
+        await go(cdp, s, sessionId, url);
+        const info = await evaluate(s, SETTLE);
+        entry.h375 = info.h;
+        const fold = await s("Page.captureScreenshot", { format: "webp", quality: 80 });
+        writeFileSync(join(outDir, `${slug}-375-fold.webp`), Buffer.from(fold.data, "base64"));
+        await cdp.send("Target.closeTarget", { targetId });
+      }
+      // Scorrimento orizzontale a 320, 360, 375, chiaro e scuro.
+      for (const width of [320, 360, 375]) {
+        for (const t of ["light", "dark"]) {
+          const { s, sessionId, targetId } = await openPage(cdp, { viewport: { width, height: 740, deviceScaleFactor: 1, mobile: true }, theme: t, blocked });
+          await go(cdp, s, sessionId, url);
+          await evaluate(s, "document.fonts.ready.then(() => new Promise(r => setTimeout(r, 150)))");
+          const o = await evaluate(s, OVERFLOW);
+          if (o.SW > o.W) entry.overflow.push({ width, theme: t, sw: o.SW, bad: o.bad });
+          await cdp.send("Target.closeTarget", { targetId });
+        }
+      }
+      } catch (err) {
+        entry.errors.push("giro: " + err.message);
+      }
+      const bad = entry.errors.length + entry.failed.length + entry.overflow.length;
+      problems += bad;
+      console.log(`${path}: ${entry.h1440}px a 1440, ${entry.h375}px a 375` + (bad ? `  PROBLEMI ${JSON.stringify({ errors: entry.errors, failed: entry.failed, overflow: entry.overflow })}` : ""));
+      report.push(entry);
+    }
+  } finally {
+    cdp.close();
+  }
+  writeFileSync(join(outDir, "giro.json"), JSON.stringify(report, null, 2) + "\n");
+  console.log(problems ? `${problems} problemi` : "nessun problema");
+  if (problems) process.exitCode = 1;
+}
+
 const mode = process.argv[2];
 if (mode === "prima") {
   const day = process.argv[3] || new Date().toISOString().slice(0, 10);
@@ -337,6 +432,9 @@ if (mode === "prima") {
   } finally { cdp.close(); }
 } else if (mode === "check") {
   await check();
+} else if (mode === "giro") {
+  const [base, outDir, paths] = process.argv.slice(3);
+  await giro(base.replace(/\/$/, ""), resolve(outDir), paths.split(","));
 } else {
   console.error("uso: node design/v1/tools/shots.mjs prima|dopo|check");
   process.exit(2);

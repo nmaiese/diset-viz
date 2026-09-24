@@ -45,6 +45,12 @@ def asset_url(filename):
 
 app.jinja_env.globals["asset_url"] = asset_url
 
+# I filtri delle cifre della 1.0 (`num`, `rank`, `delta`): una regola sola per
+# come si scrive un numero, in `app/design/numfmt.py`.
+from app import design as _design  # noqa: E402
+
+_design.register(app)
+
 
 # /robots.txt resta leggibile senza password anche sullo stage. Non e' una
 # concessione: e' il documento che dice ai crawler di non entrare, e vale solo

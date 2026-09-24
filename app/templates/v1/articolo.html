@@ -1,0 +1,297 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- L'articolo del blog della 1.0. Stesso contenuto di blog_post.html (che resta
+    come ripiego, vedi app/design/__init__.py), un'altra regia: titolo,
+    sommario e firma, poi l'immagine d'apertura larga quanto la pagina (o, se
+    la copertina e' un grafico, la striscia del divario degli stessi dati), la
+    risposta in breve che la redazione gia' scrive, il corpo a misura di
+    lettura con le figure comuni, il rimando alla scheda dopo la prima figura,
+    un solo blocco di dati e metodo, e le uscite. Il corpo lo smonta e lo
+    rimonta app/design/pages/articolo.py, e arriva qui come `d`.
+
+    La testa (title, description, og, JSON-LD) e' quella di blog_post.html,
+    riga per riga: il ridisegno non tocca cio' che vedono i motori. Le
+    briciole a schermo sono la stessa lista del BreadcrumbList. -#}
+{% set active_nav = 'blog' %}
+{% set cover_abs = (site_url ~ post.cover) if post.cover else '' %}
+{% set html_title = post.seo_title or post.title %}
+{# `post.social_image` e' la copertina in un formato che un social disegna e che
+   lo schema `Article` accetta: un SVG lo scartano tutti e due, e in `image`
+   Google vuole un raster. `cover_abs` resta l'SVG, che e' cio' che va in
+   pagina. Il ripiego lo sceglie `blog.social_image`, non questo template. #}
+{% set og_image_abs = site_url ~ post.social_image %}
+{% set meta = post.indicator_meta or {} %}
+{% set ds = post.dataset or {} %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Blog", "path": "/blog"},
+  {"name": post.title, "path": "/blog/" ~ post.slug},
+] %}
+
+{# La marca non va nel `<title>` del post, per la stessa ragione per cui non va
+   in quello della scheda: diciassette caratteri di un nome che nessuno cerca,
+   in posizione 4-10, tolti al motivo per cliccare. Google il nome del sito lo
+   sintetizza dal nodo `WebSite` della home. Cosi' `seo_title` ha tutti i 60
+   caratteri, e non i 43 che gli restavano. Il budget lo tiene una prova, non un
+   taglio automatico: un titolo troncato a macchina e' peggio di uno corto. #}
+{% block title %}{{ html_title }}{% endblock %}
+{% block description %}{{ post.description }}{% endblock %}
+
+{% block og %}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ post.title }}">
+<meta property="og:description" content="{{ post.description }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:image" content="{{ og_image_abs }}">
+{%- if post.social_image_size %}
+<meta property="og:image:width" content="{{ post.social_image_size[0] }}">
+<meta property="og:image:height" content="{{ post.social_image_size[1] }}">
+{%- endif %}
+<meta property="og:image:alt" content="{{ post.cover_alt }}">
+<meta property="article:published_time" content="{{ post.date.isoformat() }}">
+{% for tag in post.tags %}<meta property="article:tag" content="{{ tag }}">{% endfor %}
+{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/articolo.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "description": {{ post.description | tojson }},
+  "image": [{{ og_image_abs | tojson }}],
+  "datePublished": "{{ post.date.isoformat() }}",
+  "dateModified": "{{ post.date_modified.isoformat() }}",
+  "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
+  "publisher": {{ publisher_jsonld | safe }},
+  "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
+  {% if post.indicator_meta %}"about": {
+    "@type": "Thing",
+    "name": {{ post.indicator_meta.name | tojson }},
+    "description": {{ post.indicator_meta.explain.plain | tojson }},
+    "url": {{ (site_url ~ post.indicator_path) | tojson }}
+  },{% endif %}
+  "isAccessibleForFree": true
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% if post.dataset %}{% set ds = post.dataset %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": {{ ds.name | tojson }},
+  "description": {{ ds.description | tojson }},
+  "url": {{ ds.url | tojson }},
+  "license": {{ ds.license | tojson }},
+  "isAccessibleForFree": true,
+  "creator": { "@type": "Organization", "name": {{ ds.creator | tojson }} },
+  "publisher": {{ publisher_jsonld | safe }},
+  {% if ds.method %}"measurementTechnique": {{ ds.method | tojson }},{% endif %}
+  {% if ds.temporal %}"temporalCoverage": {{ ds.temporal | tojson }},{% endif %}
+  "spatialCoverage": { "@type": "Place", "name": {{ ds.spatial | tojson }} },
+  {% if ds.source_url %}"isBasedOn": {{ ds.source_url | tojson }},{% endif %}
+  {% if ds.download_abs %}"distribution": [{
+    "@type": "DataDownload",
+    "encodingFormat": "text/csv",
+    "contentUrl": {{ ds.download_abs | tojson }}
+  }],{% endif %}
+  "subjectOf": { "@type": "Article", "@id": {{ canonical | tojson }} }
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-articolo" data-v1="articolo" tabindex="-1">
+<div class="wrap art">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead art-head">
+    <p class="eyebrow">{% if d.theme_path %}<a href="{{ d.theme_path }}">{{ d.theme }}</a><span class="sep" aria-hidden="true">·</span>{% endif %}Storia{% if d.institution %}<span class="sep" aria-hidden="true">·</span>{{ d.institution }}{% endif %}{% if d.period %}<span class="sep" aria-hidden="true">·</span>dati {{ d.period }}{% endif %}</p>
+    <h1 class="h-display">{{ post.title }}</h1>
+    <p class="lede">{{ post.description }}</p>
+    <p class="meta">
+      <span class="byline">Di <a href="/chi-siamo">{{ post.author }}</a></span>
+      <span>Pubblicato il <time datetime="{{ post.date }}">{{ d.published }}</time></span>
+      {% if d.modified %}<span>Aggiornato il <time datetime="{{ post.date_modified }}">{{ d.modified }}</time></span>{% endif %}
+      {% if post.read_time %}<span>{{ post.read_time | num(None, 'count') }} {{ 'minuto' if post.read_time == 1 else 'minuti' }} di lettura</span>{% endif %}
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  {% if d.hero %}{% set h = d.hero %}
+  <figure class="hero-img art-hero">
+    <img src="{{ h.src }}" alt="{{ h.alt }}"{% if h.size %} width="{{ h.size[0] }}" height="{{ h.size[1] }}" style="aspect-ratio: {{ h.size[0] }} / {{ h.size[1] }}"{% endif %} fetchpriority="high" decoding="async">
+    {#- Una foto con licenza porta la sua attribuzione: autore, licenza,
+        originale. E' la condizione della licenza, non una cortesia. -#}
+    {%- if h.caption or h.credit %}
+    <figcaption>{% if h.caption %}<span class="art-hero__caption">{{ h.caption }}</span> {% endif %}
+      {%- if h.credit %}{% set c = h.credit %}<span class="art-hero__credit">Foto: {{ c.author }}, {% if c.license_url %}<a href="{{ c.license_url }}" rel="license">{{ c.license }}</a>{% else %}{{ c.license }}{% endif %}{% if c.source_url %}, via <a href="{{ c.source_url }}">{{ c.source_name }}</a>{% endif %}.{% if c.changes %} {{ c.changes }}.{% endif %}</span>{% endif %}</figcaption>
+    {%- endif %}
+  </figure>
+  {% elif d.lead %}{% set l = d.lead %}
+  <div class="art-lead">
+    {{ ui.leadfigure('apertura-t', l.title, l.strip, l.note) }}
+    <details class="more">
+      <summary>Le {{ l.rows | length | num(None, 'count') }} regioni in tabella</summary>
+      <div class="tablewrap" tabindex="0" role="region" aria-label="Le regioni in tabella">
+        <table class="table table--compact">
+          <caption class="sr-only">{{ meta.name }} per regione nel {{ l.year }}{% if l.unit %}, {{ l.unit }}{% endif %}</caption>
+          <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="r" scope="col">{{ (l.unit or 'Valore') | capitalize }}</th></tr></thead>
+          <tbody>
+            {% set ref_done = namespace(v=false) %}
+            {% for row in l.rows %}
+            {% if not ref_done.v and row.value < l.avg %}{% set ref_done.v = true %}
+            <tr class="ref"><td></td><th scope="row">Media semplice delle {{ l.rows | length | num(None, 'count') }} regioni</th><td class="val">{{ l.avg | num(None, 'cell', l.decimals) }}</td></tr>
+            {% endif %}
+            <tr><td class="rank">{{ loop.index | rank }}</td><th scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}{{ row.name }}{% if row.area %}<span class="sr-only">, {{ l.area_label[row.area] }}</span>{% endif %}</th><td class="val">{{ row.value | num(None, 'cell', l.decimals) }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+  {% endif %}
+
+  {% if d.callout or d.brief_list %}
+  <section class="art-brief" aria-labelledby="in-breve">
+    {% if d.callout %}<p class="answer">{{ d.callout | safe }}</p>{% endif %}
+    {% if d.brief_list %}
+    <h2 class="art-brief__title" id="in-breve">{{ d.brief_title }}</h2>
+    <div class="art-brief__list">{{ d.brief_list | safe }}</div>
+    {% else %}
+    <h2 class="sr-only" id="in-breve">In breve</h2>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <div class="layout art-layout">
+    <aside class="layout__aside art-aside" aria-label="Strumenti dell'articolo">
+      {% if d.toc %}
+      <nav class="toc" aria-label="In questo articolo">
+        <p>In questo articolo</p>
+        <ol>
+          {% for item in d.toc %}<li><a href="#{{ item.id }}">{{ item.text }}</a></li>{% endfor %}
+          <li><a href="#dati-metodo">Dati e metodo</a></li>
+        </ol>
+      </nav>
+      {% endif %}
+      <div class="aside-block">
+        {% if d.institution %}<p>Dati: {{ d.institution }}. Elaborazione Divario Italia.</p>{% endif %}
+        {% if ds.download %}<p><a class="linkarrow" href="{{ ds.download }}">Scarica i dati in CSV</a></p>{% endif %}
+        <p><a class="linkarrow" href="#dati-metodo">Cita questo articolo</a></p>
+      </div>
+    </aside>
+
+    <div class="layout__main">
+      <div class="prose art-body">
+{{ d.body_before | safe }}
+      </div>
+
+      {% if post.indicator_path %}
+      <div class="card art-link">
+        <p class="card__kicker">La scheda dell'indicatore</p>
+        <p class="card__title"><a href="{{ post.indicator_path }}">{{ meta.name or post.indicator_label }}</a></p>
+        <p class="card__text">Mappa, classifica e serie storica{% if d.indicator_years %} {{ d.indicator_years }}{% endif %}, con la definizione della fonte e il metodo.</p>
+      </div>
+      {% endif %}
+
+      {{ ui.ad() }}
+
+      <div class="prose art-body">
+{{ d.body_after | safe }}
+      </div>
+
+      <section class="section art-data" id="dati-metodo" aria-labelledby="h-dati-metodo">
+        <h2 id="h-dati-metodo">Dati e metodo</h2>
+        <dl class="specs">
+          {% if d.used %}<div id="dati-usati"><dt>Dati usati</dt><dd>{{ d.used | safe }}</dd></div>{% endif %}
+          {% if d.sources %}<div id="fonti"><dt>Fonti</dt><dd>{{ d.sources | safe }}</dd></div>
+          {% elif d.data_note %}<div id="fonti"><dt>Fonti</dt><dd>{{ d.data_note | safe }}</dd></div>{% endif %}
+          {% if ds %}
+          <div><dt>I dati di questo articolo</dt><dd><p>{{ ds.description }}</p>{% if ds.source_url %}<p><a href="{{ ds.source_url }}">Il file originale della fonte</a></p>{% endif %}</dd></div>
+          {% if ds.method %}<div><dt>Metodo</dt><dd>{{ ds.method }}</dd></div>{% endif %}
+          {% if ds.temporal %}<div><dt>Periodo</dt><dd>{{ d.period }}</dd></div>{% endif %}
+          {% if ds.spatial %}<div><dt>Territori</dt><dd>{{ ds.spatial }}</dd></div>{% endif %}
+          {% endif %}
+          {% if meta.explain %}
+          <div><dt>L'indicatore in parole semplici</dt><dd>
+            <p><strong>{{ meta.name }}.</strong> {{ meta.explain.plain }}</p>
+            {% if meta.explain.example %}<p><strong>In pratica.</strong> {{ meta.explain.example }}</p>{% endif %}
+            {% if meta.explain.reading %}<p><strong>Come si legge.</strong> {{ meta.explain.reading }}</p>{% endif %}
+            {% if meta.explain.caveat %}<p><strong>Limite.</strong> {{ meta.explain.caveat }}</p>{% endif %}
+          </dd></div>
+          {% endif %}
+          {% if d.license.url %}<div><dt>Licenza</dt><dd><a href="{{ d.license.url }}" rel="license">{{ d.license.label }}</a></dd></div>{% endif %}
+          <div><dt>Correzioni</dt><dd>Ultima verifica editoriale il <time datetime="{{ post.date_modified or post.date }}">{{ d.reviewed }}</time>. <a href="{{ corrections_url }}">Segnala un errore</a></dd></div>
+        </dl>
+        {% if ds.download %}
+        <div class="actions">
+          <a class="btn btn--primary" href="{{ ds.download }}">{{ ui.icon('download') }} Scarica i dati in CSV</a>
+        </div>
+        {% endif %}
+        {{ ui.cite(d.citation) }}
+      </section>
+
+      {{ ui.ad() }}
+    </div>
+  </div>
+</div>
+
+<div class="band">
+  <section class="wrap" aria-labelledby="continua">
+    <h2 class="h-section" id="continua">Continua a esplorare</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>I dati</h3>
+        <ul>
+          {% if post.indicator_path %}<li><a href="{{ post.indicator_path }}" class="minicard"><span class="minicard__title">{{ meta.name or post.indicator_label }}</span><span class="minicard__meta">Scheda indicatore{% if d.indicator_years %}, dati {{ d.indicator_years }}{% endif %}</span>{% if meta.spark %}<span class="minicard__spark">{{ meta.spark | sparkline }}</span>{% endif %}</a></li>{% endif %}
+          {% for item in d.named.indicatore %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
+          {% if d.theme_path %}<li><a href="{{ d.theme_path }}">Tutti gli indicatori del tema {{ d.theme | lower }}</a></li>{% endif %}
+          <li><a href="/atlante">L'atlante di tutti gli indicatori</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Territori e confronti</h3>
+        <ul>
+          {% for item in d.named.territorio %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
+          <li><a href="/divari-regionali">I divari fra Nord, Centro e Mezzogiorno</a></li>
+          <li><a href="/confronto">Metti a confronto due territori</a></li>
+          <li><a href="/regioni">Tutte le regioni</a></li>
+          <li><a href="/province">Tutte le province</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Nelle Storie</h3>
+        <ul>
+          {% for item in d.named.blog %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
+          <li><a href="/blog">Tutte le Storie</a></li>
+          <li><a href="/metodologia">Come lavoriamo sui dati</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+  {% if d.related %}
+  <section class="wrap art-more" aria-labelledby="altre-storie">
+    <h2 class="h-section" id="altre-storie">Altre storie</h2>
+    <ul class="cards cards--3">
+      {% for item in d.related %}
+      <li class="card">
+        <h3 class="card__title"><a href="{{ '/blog/' ~ item.slug }}">{{ item.title }}</a></h3>
+        <p class="card__meta"><time datetime="{{ item.date }}">{{ item.date_label }}</time>{% if item.read_time %}, {{ item.read_time | num(None, 'count') }} {{ 'minuto' if item.read_time == 1 else 'minuti' }}{% endif %}</p>
+        <p class="card__text">{{ item.description }}</p>
+        {% if item.cover and not item.cover.endswith('.svg') %}<div class="card__media"><img src="{{ item.cover }}" alt=""{% if item.size %} width="{{ item.size[0] }}" height="{{ item.size[1] }}"{% endif %} loading="lazy" decoding="async"></div>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

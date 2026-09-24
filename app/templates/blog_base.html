@@ -70,11 +70,11 @@
       <div class="ftr__inner">
         <div class="ftr__wrap">
           <a class="hdr__brand" href="/">
-            <img src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="26" height="26">
+            <img src="{{ url_for('static', filename='img/logo-simbolo.png') }}" alt="" width="23" height="26">
             {% set marchio = (site_name or SITE_NAME).split(' ', 1) %}
             <span class="brandword"><b>{{ marchio[0] }}</b>{% if marchio[1] %} <span>{{ marchio[1] }}</span>{% endif %}</span>
           </a>
-          <p class="ftr__trust">{{ site_name or SITE_NAME }} rimette in ordine i dati pubblici di Istat ed Eurostat su regioni e province, senza correggerli, e ricalcola ogni sintesi dai dati. <a href="/metodologia">Come lavoriamo</a>, <a href="/contatti">come segnalare un errore</a> e <a href="/chi-siamo#come-citare">come citarci</a>.</p>
+          <p class="ftr__trust">{{ site_name or SITE_NAME }} rimette in ordine i dati pubblici di Istat ed Eurostat su regioni e province, senza correggerli, e ricalcola ogni sintesi dai dati. <a href="/metodologia">Come lavoriamo</a>, <a href="{{ corrections_url }}" rel="noopener">correzioni</a> e <a href="/chi-siamo#come-citare">come citarci</a>.</p>
           {# Le colonne vengono da `app/nav.py`, come le voci della testata. #}
           <nav class="ftr__cols" aria-label="Mappa del sito">
             {% for colonna in nav.FOOTER_GROUPS %}
@@ -88,7 +88,7 @@
             {% endfor %}
           </nav>
           <div class="ftr__legal">
-            <p>Dati di Istat ed Eurostat, con la licenza delle istituzioni che li pubblicano.</p>
+            <p>Dati di Istat ed Eurostat, con licenza <a href="{{ data_license_url }}" rel="license noopener">{{ data_license_label }}</a>.</p>
             {% for voce in nav.LEGAL %}<a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a>
             {% endfor %}
             {% block footer_privacy_settings %}
