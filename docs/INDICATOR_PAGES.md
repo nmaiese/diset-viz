@@ -381,37 +381,22 @@ Il dossier (cifre, angoli, contesto) lo costruisce `motore/dossier.py` di quel
 repo e lo scrive qui in `data/lab/dossier/`. Chi scrive un articolo non lancia
 niente a mano da questo repo:
 
-Il pacchetto è per livello, in ogni sua parte: cifre, stato dell'articolo e
-`vintage` richiesto. Chiudendo, stampa il valore che il campo `level` deve avere.
-Prima ignorava il livello nel blocco finale, quindi su `--level provincia`
-dichiarava scritte le sezioni dell'articolo *regionale* davanti a una pagina
-vuota.
-
-Il pacchetto stampa la graduatoria completa con la variazione di ogni territorio dal
-primo anno, dove la distribuzione si spezza davvero, chi si è mosso in
-controtendenza e che cosa la pagina dice già da sola. Esiste per una ragione
-precisa: scrivendo contro due o tre cifre pescate dall'API si finisce per
-riscrivere la stessa fetta che il cruscotto stampa già, ed è da lì che nasce la
-prosa banale.
-
-L'ultimo blocco, `INDICATORI CORRELATI`, è quello che permette a un articolo di
-uscire dalla propria serie. Prende tutto il tema, non gli otto vicini in ordine
-alfabetico che la pagina mostra in tabella, calcola la correlazione di rango sui
-valori regionali e li divide in tre: chi disegna la stessa mappa, chi la mappa
-opposta, chi una mappa che non c'entra. Il terzo gruppo è quasi sempre il più
-interessante da scrivere, e sopra `rho` 0,95 il brief avverte che con ogni
-probabilità è lo stesso fenomeno misurato due volte. Per ciascun correlato dà il
-percorso canonico da linkare e la posizione, su quella scala, delle due regioni
-agli estremi di questa.
+Che cosa contiene il brief, sezione per sezione, lo possiede `REDAZIONE.md` §3
+del repo della redazione, e il codice che lo scrive e' `motore/brief.py` di
+quel repo: qui non si ripete, perche' la descrizione che stava qui (un blocco
+`INDICATORI CORRELATI` con `rho`, un pacchetto che stampava il valore di
+`level`) era rimasta a una versione che non esiste piu'.
 
 Le regole editoriali complete stanno in `content/STYLE.md`. Le classi di
 errore che solo una lettura trova non le trova uno strumento: le trova chi
-rilegge. Quello che ferma un pezzo sono le sei guardie di `motore verifica`
-nel repo della redazione: una cifra fuori dal dossier, un link interno
-inesistente, una fonte che non risponde, un link a una fonte nella prosa che
-non sta anche nell'elenco, un'affermazione su un insieme che la classifica
-smentisce ("nessuna regione supera X"), e la media semplice delle regioni
-chiamata media nazionale. Non c'è una rubrica a punti. Le fonti secondarie
+rilegge. Quello che ferma un pezzo sono le quattro guardie di `motore verifica`
+nel repo della redazione, piu' i controlli di struttura (lead, sezioni, ruoli,
+fonti con testo e url, marcatori di figura): una cifra fuori dal dossier, un
+link interno inesistente, una fonte che non risponde, un link a una fonte nella
+prosa che non sta anche nell'elenco. Un'affermazione su un insieme che la
+classifica smentisce ("nessuna regione supera X") e la media semplice delle
+regioni chiamata media nazionale **non** le ferma nessuna guardia: le trova
+chi rilegge. Non c'è una rubrica a punti. Le fonti secondarie
 ammesse stanno in [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme a
 quello che resta da guardare a mano: un aggregato nazionale ponderato non è la
 nostra media semplice delle venti regioni, e le due si possono ancora

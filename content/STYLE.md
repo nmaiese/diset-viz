@@ -248,9 +248,9 @@ python3 scripts/prose_lint.py --show <id>   # solo pagine indicatore
 
 Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida che
 una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
-pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge, e le
-tre cose che fermano un pezzo sono le guardie di `motore verifica` nel repo
-della redazione. Per template, frontend e SVG testuali controlla
+pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge, e quello
+che ferma un pezzo sono le quattro guardie di `motore verifica` nel repo
+della redazione, piu' i suoi controlli di struttura. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I

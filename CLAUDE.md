@@ -130,12 +130,13 @@ Una voce sola per blog e pagine indicatore, posseduta da `content/STYLE.md`.
 Gli assoluti: niente em-dash `—`, niente en-dash `–`, niente `;`, niente `…`;
 solo numeri veri e verificati, mai una fonte inventata; link canonici agli
 indicatori (`/indicatore/<slug>/ter-105`, mai `/?indicator=`). Le guardie che
-fermano un pezzo sono le sei di `motore verifica` nel repo della redazione: una
-cifra che non sta nel dossier, un link interno che non esiste, una fonte che non
-risponde, un link a una fonte nella prosa che non sta anche nell'elenco,
-un'affermazione su un insieme che la classifica smentisce ("nessuna regione
-supera X"), e la media semplice delle regioni chiamata media nazionale. Non c'è
-una rubrica a punti e non c'è un lint della prosa.
+fermano un pezzo sono le quattro di `motore verifica` nel repo della redazione,
+piu' i controlli di struttura: una cifra che non sta nel dossier, un link interno
+che non esiste, una fonte che non risponde, un link a una fonte nella prosa che
+non sta anche nell'elenco. Un'affermazione su un insieme che la classifica
+smentisce ("nessuna regione supera X") e la media semplice delle regioni chiamata
+media nazionale non le ferma nessuna guardia: le trova chi rilegge. Non c'è una
+rubrica a punti e non c'è un lint della prosa.
 
 ## Dati, leggi [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md)
 

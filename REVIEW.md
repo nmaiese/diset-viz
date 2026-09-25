@@ -27,12 +27,14 @@ codice il primo solo se toccano `content/`.
 
 ## Passaggio 2 — Regole editoriali (blocca sui pavimenti)
 
-- `content/STYLE.md`, e le sei guardie di `motore verifica`: una cifra che non
-  sta nel dossier, un link interno che non esiste, una fonte che non risponde,
-  un link a una fonte nella prosa che non sta anche nell'elenco,
-  un'affermazione su un insieme che la classifica smentisce, la media semplice
-  delle regioni chiamata media nazionale. Sono `alta` e fermano il pezzo prima
-  della review. Non c'è una rubrica a punti.
+- `content/STYLE.md`, e le quattro guardie di `motore verifica`: una cifra che
+  non sta nel dossier, un link interno che non esiste, una fonte che non
+  risponde, un link a una fonte nella prosa che non sta anche nell'elenco. Sono
+  `alta` e fermano il pezzo prima della review. Due smentite ricalcolabili non
+  le controlla nessuna guardia, e quindi le guarda la review, sempre `alta`:
+  un'affermazione su un insieme che la classifica smentisce ("nessuna regione
+  supera X") e la media semplice delle regioni chiamata media nazionale. Non
+  c'è una rubrica a punti.
 - **Il filo.** Il corpo della PR porta la scaletta: che cosa doveva portare
   ogni sezione, e che cosa ha mosso il `redattore`. Leggila prima del pezzo e
   poi guarda se il pezzo lo fa. Due righe `porta` che dicono la stessa cosa
