@@ -103,14 +103,23 @@ def _quota(corpora):
     }
 
 
-def misura(limite=None):
+def misura(limite=None, base_only=False):
+    """Le due quote sulle pagine di livello indicizzabili.
+
+    Una voce per pagina (`indicator_universe.level_pages`): le `/province`
+    delle schede a due livelli sono URL a se', e si misurano come le altre.
+    `base_only` tiene le sole basi delle schede, il perimetro su cui sono
+    tarati i tetti della prova (`tests/integration/test_duplicazione_schede.py`).
+    """
     from app import app, indicator_universe
 
     client = app.test_client()
     racconti, con_metodo = [], []
     letti = 0
-    for vista in indicator_universe.indexable_catalog():
-        percorso = vista["meta"]["canonical_path"]
+    for vista in indicator_universe.level_pages():
+        if base_only and not vista["base"]:
+            continue
+        percorso = vista["path"]
         risposta = client.get(percorso, follow_redirects=True)
         if risposta.status_code != 200:
             continue

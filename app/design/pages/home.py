@@ -20,7 +20,7 @@ import re
 import struct
 from functools import lru_cache
 
-from app import indicator_notes, profiles, quality_life_bes
+from app import indicator_notes, profiles, quality_life_bes, sources
 from app.blog import STATIC_DIR, social_image_size
 from app.data import REGION_GEO_AREA
 from app.design import charts, maps, numfmt
@@ -326,11 +326,11 @@ def feature(pick: dict | None) -> dict | None:
     available = pick.get("available") or [first["key"]]
     elsewhere = next((k for k in available if k not in shown), None)
 
-    # La scheda si apre sul suo primo livello: per l'altro serve `?livello=`,
-    # o il pannello delle province mandava alla classifica delle regioni.
+    # La scheda si apre sul suo primo livello: l'altro ha il suo URL, la
+    # `/province` (`sources.level_path`), o il pannello delle province
+    # mandava alla classifica delle regioni.
     def scheda(key):
-        path = meta["canonical_path"]
-        return path if key == available[0] else f"{path}?livello={key}"
+        return sources.level_path(meta["canonical_path"], key, available[0])
 
     for panel in (first, second):
         if panel:

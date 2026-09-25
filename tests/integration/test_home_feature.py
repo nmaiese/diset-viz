@@ -70,7 +70,7 @@ class OgniCoppiaDelPool(unittest.TestCase):
                     guasti.append((path, "segnaposto in pagina"))
                 elif FUGHE.search(testo):
                     guasti.append((path, FUGHE.search(testo).group(0)))
-                elif f"/{code}\"" not in html and f"/{code}?livello=" not in html:
+                elif f"/{code}\"" not in html and f"/{code}/province\"" not in html:
                     guasti.append((path, "l'indicatore in evidenza non e' quello chiesto"))
                 elif not re.search(rf'<div class="feat__level" id="lv-{level}"[^>]*data-page-root(?![^>]*hidden)', html):
                     guasti.append((path, "il livello in evidenza non e' quello chiesto"))
@@ -122,13 +122,13 @@ class LaSchedaSulSuoLivello(unittest.TestCase):
                     for panel in home.feature(scelta)["levels"]:
                         with self.subTest(indicatore=code, livello=panel["key"]):
                             base = scelta["meta"]["canonical_path"]
-                            atteso = base if panel["key"] == primo else f"{base}?livello={panel['key']}"
+                            atteso = base if panel["key"] == primo else f"{base}/province"
                             self.assertEqual(panel["scheda"], atteso)
 
     def test_titolo_e_bottone_del_pannello_province(self):
         html = app.test_client().get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
-        self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001\?livello=provincia"')
-        self.assertIn("/bes-01SAL001?livello=provincia\">Tutta la scheda", html)
+        self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001/province"')
+        self.assertIn("/bes-01SAL001/province\">Tutta la scheda", html)
 
 
 class LeFrasi(unittest.TestCase):

@@ -295,7 +295,7 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
 
     Prose is written against one territorial level and cites that level's
     figures. The 31 BES articles that exist for two-level indicators were all
-    written against the regions, so on ``?livello=provincia`` they would name
+    written against the regions, so on the provincial view (``/province``) they would name
     Umbria and Piemonte under a cockpit of provinces. An entry therefore
     declares the level it describes and is used only there; every other level
     falls back to the composed skeleton, which reads the level it is given.

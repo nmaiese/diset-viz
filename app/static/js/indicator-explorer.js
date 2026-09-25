@@ -489,7 +489,9 @@
   }
 
   function sync() {
-    var qs = "?anno=" + currentYear() + "&livello=" + encodeURIComponent(state.levelKey) +
+    // Il livello sta nel path (la `/province` di una scheda a due livelli), non
+    // nella query: un `?livello=` farebbe un 301 al primo caricamento.
+    var qs = "?anno=" + currentYear() +
       "&regione=" + encodeURIComponent(state.territoryKey || "");
     try { history.replaceState(null, "", basePath + qs); } catch (err) { /* ignore */ }
     render();
@@ -512,7 +514,7 @@
   // updated only what this script owns, the controls, the KPIs, the ranking and
   // the trend, while the facts strip, the four-section article, the sources and
   // the citation kept the level the server had rendered: a provincial cockpit
-  // under regional prose. Starting from ?livello=provincia there is no map in
+  // under regional prose. Starting from the provincial view there is no map in
   // the DOM either, so switching back could not have restored it. A full
   // navigation costs one server render and every block agrees.
   if (rankingEl) {
@@ -549,8 +551,9 @@
   }
 
   // ---- Boot ---------------------------------------------------------------
-  var startLevel = params.get("livello");
-  if (!levelsByKey[startLevel]) startLevel = data.defaultLevel || data.levels[0].key;
+  // Il livello reso dal server, dal payload: l'URL lo dice gia' col suo path.
+  var startLevel = data.defaultLevel;
+  if (!levelsByKey[startLevel]) startLevel = data.levels[0].key;
   state.territoryKey = params.get("regione") || null;
   applyLevel(startLevel);
 

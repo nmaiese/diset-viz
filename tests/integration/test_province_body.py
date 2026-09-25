@@ -1,6 +1,6 @@
 """Il corpo della scheda sulle province, per chi cerca la sua.
 
-Sulla vista provinciale (le 34 `?livello=provincia` e le 33 schede solo
+Sulla vista provinciale (le 34 `/province` e le 33 schede solo
 provinciali) la scheda ha tre cose che la vista regionale non ha:
 - "Dentro le regioni": in ogni regione la provincia piu' alta, la piu' bassa
   e la distanza fra le due, con un titolo-affermazione che dice la stessa
@@ -25,7 +25,7 @@ import unittest
 from app import app, bes_data, province_profile
 from app.seo_titles import from_place, to_place
 
-SCHEDA = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia"
+SCHEDA = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province"
 WITHIN = re.compile(r'<figure class="module within" id="dentro-le-regioni">(.*?)</figure>', re.DOTALL)
 ROW = re.compile(r"<tr><th scope=\"row\"><a href=\"(/regione/[^\"]+)\">([^<]+)</a></th>(.*?)</tr>", re.DOTALL)
 RANK_ROW = re.compile(r'<tr data-key="([^"]+)" id="p-([^"]+)"><td class="rank">.*?<data value="(\d+)">')

@@ -28,7 +28,9 @@ PAGINE_PER_TIPO = (
     "/qualita-della-vita/classifica/regioni",
     # Una scheda con due livelli, nelle sue due viste, e una solo provinciale.
     "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
-    "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia",
+    "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province",
+    # Una vista provinciale fuori dall'indice: i suoi link valgono lo stesso.
+    "/indicatore/posti-km-offerti-dal-tpl/bes-12SER008/province",
     "/indicatore/medici-specialisti/bes-12SER002P",
     "/temi",
     "/tema/lavoro-e-conciliazione",

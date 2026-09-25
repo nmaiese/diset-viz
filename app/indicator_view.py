@@ -37,6 +37,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from app import profiles, seo_policy, sources
+from app.cache_util import synchronized_cache
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog, get_atlas_indicator_year
 from app.bes_data import (
     all_bes_indicators,
@@ -135,8 +136,14 @@ def _assemble(meta, levels):
     levels = [level for level in levels if level is not None and level["observations"]]
     if not levels:
         return None
+    base_key = levels[0]["key"]
     for level in levels:
         level["explain"] = _explain_for_level(meta, level["key"], len(levels))
+        # Ogni livello e' una pagina: la base e' il canonico della scheda, le
+        # province di una scheda a due livelli la sua `/province`. Canonical,
+        # `Content-Location` e robots si leggono da qui, mai da `meta`.
+        level["canonical_path"] = sources.level_path(meta["canonical_path"], level["key"], base_key)
+        level["indexable"] = level_indexable(meta, level["key"], base_key)
     meta["year_min"] = min(level["year_min"] for level in levels)
     meta["year_max"] = max(level["year_max"] for level in levels)
     meta["freshness_status"] = freshness_status(meta["year_max"])
@@ -306,6 +313,42 @@ def indexability(family, raw_id, source_meta):
             or (source_meta.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
         return False, "copertura"
     return False, "vecchia"
+
+
+@synchronized_cache(maxsize=1)
+def _bes_level_indexability():
+    """`{(raw_id, livello): indicizzabile}` come lo dice `all_bes_indicators`."""
+    return {(item["id"], key): bool(info.get("indexable"))
+            for item in all_bes_indicators() for key, info in item["levels"].items()}
+
+
+def level_passes_rule(meta, level_key, base_key):
+    """La vista di un livello passa la regola dell'indice, interruttore a parte?
+
+    La base della scheda (il suo primo livello) segue la scheda, come sempre:
+    `meta["indexable"]`. L'altro livello, cioe' la `/province` di una scheda
+    BES a due livelli, passa se il suo livello provinciale passa la regola di
+    `bes_data.all_bes_indicators` (la stessa clausola che decide
+    l'indicizzabilita' della scheda, applicata al solo livello). E' cio' che
+    decide la navigazione (temi, ricerca): l'interruttore toglie l'indice, non
+    i link.
+    """
+    if level_key == base_key:
+        return bool(meta["indexable"])
+    if meta.get("family") != "bes":
+        return False
+    return _bes_level_indexability().get((meta["raw_id"], level_key), False)
+
+
+def level_indexable(meta, level_key, base_key):
+    """La vista di un livello va nell'indice e nella sitemap?
+
+    Se passa la regola (`level_passes_rule`) e, per la `/province`, se
+    l'interruttore `seo_policy.LEVEL_PAGES_INDEXABLE` e' acceso.
+    """
+    if level_key != base_key and not seo_policy.LEVEL_PAGES_INDEXABLE:
+        return False
+    return level_passes_rule(meta, level_key, base_key)
 
 
 def _is_indexable(family, raw_id, source_meta):
@@ -756,17 +799,21 @@ def province_indicators_by_theme():
         if "provincia" not in item["levels"]:
             continue
         view = build_indicator_view("bes", item["id"])
-        if view is None or not view["meta"]["indexable"]:
+        if view is None:
             continue
         level = next((lv for lv in view["levels"] if lv["key"] == "provincia"), None)
-        if level is None:
+        # Si filtra sul livello, non sulla scheda: una scheda indicizzabile per
+        # le sue regioni puo' avere la `/province` fuori dall'indice. La regola,
+        # non l'interruttore: `seo_policy.LEVEL_PAGES_INDEXABLE` spento toglie
+        # le `/province` dall'indice, non dai temi.
+        if level is None or not level_passes_rule(view["meta"], "provincia", view["default_level"]):
             continue
         meta = view["meta"]
         only_province = view["default_level"] == "provincia"
         by_theme[meta["theme_path"]].append({
             "name": meta["name"],
             "canonical_path": meta["canonical_path"],
-            "path": meta["canonical_path"] if only_province else f"{meta['canonical_path']}?livello=provincia",
+            "path": level["canonical_path"],
             "year_min": level["year_min"],
             "year_max": level["year_max"],
             "count": len(level["observations"]),
