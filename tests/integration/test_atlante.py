@@ -291,6 +291,10 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
             "/atlante?view=detail": featured["path"],
             f"/atlante?indicator={two_level['id']}&livello=provincia": bes_level_path(two_level["id"], "provincia"),
             "/atlante?indicator=non-esiste": "/atlante",
+            # un BES che l'atlante non elenca ha comunque la sua scheda
+            "/atlante?indicator=bes:01SAL001": bes_level_path("bes:01SAL001", "regione"),
+            "/atlante?indicator=bes:01SAL001&livello=provincia": bes_level_path("bes:01SAL001", "provincia"),
+            "/atlante?indicator=bes:ZZZ999": "/atlante",
             "/atlante?view=regioni&rk=lombardia": "/regione/lombardia",
             "/atlante?view=regioni&rk=atlantide": "/regioni",
             "/atlante?view=regioni": "/regioni",

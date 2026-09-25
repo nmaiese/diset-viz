@@ -549,11 +549,29 @@ def _atlante_redirect(args):
         wanted = str(args.get("indicator") or catalog["featured_indicator_id"])
         item = next((i for i in catalog["indicators"] if str(i["id"]) == wanted), None)
         if item is None:
-            return "/atlante"
+            return _bes_fuori_atlante(wanted, args.get("livello")) or "/atlante"
         if args.get("livello") == "provincia" and item["catalog_family"] == "bes":
             return bes_data.bes_level_path(item["id"], "provincia")
         return item["path"]
     return None
+
+
+def _bes_fuori_atlante(wanted, livello):
+    """La scheda di un BES che l'atlante non elenca, o None.
+
+    L'atlante non ha le schede solo provinciali, e dal 24/9 nemmeno
+    bes-01SAL001, la cui vista regionale ha il canonical su ter-910: un link
+    vecchio `?indicator=bes:01SAL001` finiva sull'atlante nudo invece che sulla
+    scheda, che esiste. Le porta `bes_level_path`, sulle province se il link le
+    chiedeva.
+    """
+    family, _raw = sources.split_internal_id(wanted)
+    if family != "bes":
+        return None
+    try:
+        return bes_data.bes_level_path(wanted, "provincia" if livello == "provincia" else "regione")
+    except LookupError:
+        return None
 
 
 def _render_atlante(level, map_indicator):
