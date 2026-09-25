@@ -120,3 +120,8 @@ def cache_clear():
     tocca queste, che non sono memoize."""
     projection.cache_clear()
     indexable_catalog.cache_clear()
+    # Le righe dell'atlante nascono dalla proiezione: vanno via con lei.
+    # L'import sta qui perche' la pagina importa questo modulo.
+    from app.design.pages import atlante
+
+    atlante.rows.cache_clear()

@@ -66,6 +66,23 @@ class LAtlanteNellaV1(unittest.TestCase):
                 self.assertEqual(href, expected[row_id])
                 self.assertEqual(href, canonical[row_id])
 
+    def test_il_json_ld_dichiara_solo_cio_che_la_pagina_mostra(self):
+        """Ogni voce della lista e' una riga in pagina, e una scheda indicizzabile."""
+        import json
+
+        documents = [json.loads(block) for block in re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', self.html, re.DOTALL)]
+        self.assertIn("BreadcrumbList", [d.get("@type") for d in documents])
+        page = next(d for d in documents if d.get("@type") == "CollectionPage")
+        hrefs = {re.search(r'<a href="([^"]+)"', body).group(1) for _, body in ROW.findall(self.html)}
+        indexable = {r["meta"]["canonical_path"] for r in indicator_universe.projection() if r["meta"]["indexable"]}
+        items = page["mainEntity"]["itemListElement"]
+        self.assertTrue(items)
+        for item in items:
+            path = item["url"].removeprefix(config.SITE_URL)
+            self.assertIn(path, hrefs)
+            self.assertIn(path, indexable)
+
     def test_nessuna_riga_senza_tema_e_senza_area(self):
         """Il guasto silenzioso di CLAUDE.md: un tema non mappato perde le sue
         righe senza che niente fallisca."""

@@ -265,9 +265,10 @@ def catalog_summary():
     a different number, owned by the scoring engine (`quality_life_bes`), and the
     copy has to keep the two distinct.
 
-    `complete` e' quante di quelle serie l'atlante mostra all'apertura: senza
-    `partial=1` la SPA tiene solo le complete, e una porta che dice "594" e apre
-    una lista di 447 promette una cosa e ne mostra un'altra."""
+    `complete` e' quante di quelle serie hanno il dato di tutte le regioni
+    nell'ultimo anno e quasi tutti gli anni. L'atlante le mostra tutte
+    all'apertura, le parziali con la loro etichetta, e `complete=1` tiene solo
+    le complete."""
     catalog = get_atlas_catalog()
     indicators = catalog["indicators"]
     families = catalog["source_families"]
@@ -495,12 +496,12 @@ def get_atlas_indicator_year(indicator_id, year):
 def atlas_theme_url(theme):
     """L'atlante aperto sugli indicatori di un tema, parziali comprese.
 
-    Il filtro della SPA confronta il **nome** del tema (`item.theme` del
-    catalogo), non lo slug. `partial=1` perche' la pagina tema conta tutte le
-    serie del catalogo (`indicator_count`) e l'atlante, senza, mostra solo le
-    complete: sulla mobilita' i "58 indicatori" della pagina tema aprirebbero
-    una lista di 25. Senza tema resta l'atlante intero, che e' comunque una
-    destinazione vera.
+    Il filtro dell'atlante (`atlante.js`, come la SPA prima) confronta il
+    **nome** del tema (`item.theme` del catalogo), non lo slug. `partial=1`
+    viene dalla SPA, che senza mostrava solo le complete (sulla mobilita' 25
+    dei 58 indicatori della pagina tema): l'atlante della 1.0 le mostra gia'
+    tutte e lo accetta senza che cambi niente. Senza tema resta l'atlante
+    intero, che e' comunque una destinazione vera.
     """
     if not theme:
         return "/atlante"
