@@ -31,13 +31,45 @@ sono la stessa frase (`seo_titles.province_answer`): gli estremi coi
 territori fra parentesi, e la distanza piu' ampia dentro una regione
 (`in_region`, `from_place` per le preposizioni). Dataset e briciola sono per
 livello, e sulla vista province di una scheda a due livelli la briciola finisce
-in "Province". Nelle linguette la voce corrente non e' un link, il primo
-livello porta al canonico nudo (nessuna pagina linka `?livello=regione`), e i
-link verso l'altro livello o la gemella dicono di che cosa parlano ("Speranza
-di vita nelle 107 province").
+in "Province". Nelle linguette la voce corrente non e' un link, e ogni altra
+voce porta all'URL del suo livello (`lv["preferred_path"]`): la base per le
+regioni, la `/province` per le province, mai un `?livello=`. I link verso
+l'altro livello o la gemella dicono di che cosa parlano ("Speranza di vita
+nelle 107 province").
+
+**La vista provinciale e' una pagina a se'** (dal 25 settembre 2026):
+`/indicatore/<slug>/<codice>/province`, per ognuna delle 34 schede a due
+livelli, con canonical su se stessa, `Content-Location`, robots e dataset
+presi dal livello (`level["canonical_path"]`). Ogni altro indirizzo, `?livello=`
+compreso, fa un 301 in un salto solo li', tenendo `anno` e `regione`; una
+scheda senza province risponde 404 sulla `/province`. Le schede solo
+provinciali restano sul loro URL base.
+
+- **La regola 17/17.** Una `/province` e' indicizzabile quando il suo livello
+  provinciale passa la regola di `bes_data.all_bes_indicators` (copertura
+  almeno 0,8 e anno almeno 2023, `indicator_view.level_passes_rule`): 17
+  `index`, 17 `noindex, follow`. La prova sta in `tests/integration/`, e un
+  numero che cambia va capito, non ritoccato.
+- **L'interruttore** `seo_policy.LEVEL_PAGES_INDEXABLE`: spento, tutte le
+  `/province` diventano `noindex, follow` ed escono dalla sitemap, mentre link
+  e 301 restano. E' il modo di tornare indietro se Google le fonde con la base.
+  Le `/province` si somigliano fra loro al 62%: si guarda Search Console prima
+  di decidere.
+- **Chi le elenca** legge `indicator_universe.level_pages()`, una voce per
+  pagina di livello indicizzabile (la base di ogni scheda e le sue `/province`
+  che passano): sitemap, llms-full, `/catalogo-dati` e
+  `scripts/duplicazione.py`. `level_pages(listed=True)` tiene anche quelle che
+  l'interruttore spento toglie dall'indice, e la usa la ricerca: l'interruttore
+  toglie l'indice, non i link. `indexable_catalog()` resta una voce per
+  scheda.
+- **La somiglianza** delle `/province` si misura a parte:
+  `bin/py scripts/duplicazione.py --solo province` (e `--solo basi` per le
+  sole basi). I tetti stanno in `tests/integration/test_duplicazione_schede.py`,
+  66% per il racconto e 75% con il metodo, su tutte le `/province`
+  indicizzabili.
 
 **Il corpo della vista provinciale** e' fatto per chi cerca la sua provincia.
-Vale per le viste `?livello=provincia` delle schede a due livelli e per le
+Vale per le `/province` delle schede a due livelli e per le
 schede solo provinciali, e le compone `app/design/pages/indicatore.py`.
 
 - **"Dentro le regioni"**, dopo la mappa e la classifica: un titolo che afferma
@@ -72,8 +104,18 @@ ter-910, e quella con le province, bes-01SAL001), il view model porta `twin`
 selettore Regioni/Province ha la voce della gemella come le altre, la corsia
 "Lo stesso dato, altre viste" dice "La stessa misura per province", e il
 Markdown lo scrive. Chi linka una scheda da un contesto provinciale usa
-`bes_data.bes_level_path(id, "provincia")`, che aggiunge `?livello=provincia`
-solo alle schede a due livelli.
+`bes_data.bes_level_path(id, "provincia")`, che restituisce la `/province`
+delle schede a due livelli (`sources.level_path`) e il canonico delle schede
+solo provinciali.
+
+**La coppia ter-910 e bes-01SAL001** e' un caso a se'. La vista regionale di
+bes-01SAL001 e' identica a ter-910 in ogni cella, quindi ha il **canonical su
+ter-910** (`indicator_view.canonical_elsewhere`, da
+`taxonomy.REGIONAL_CANONICALS`) **senza noindex**: resta raggiungibile, ma
+sitemap, llms-full e `/catalogo-dati` non la elencano e al suo posto elencano
+la sua `/province`, e le linguette Regioni delle due schede portano a ter-910.
+Il path di arrivo si prende dal catalogo, mai ricostruito: se ter-910 sparisce,
+la pagina torna canonica di se stessa invece di puntare a un 404.
 
 Fra l'articolo e l'apparato sta il blocco **«Come leggere il dato»**
 (`id="come-leggere"`), reso **sempre** e sempre dopo la narrazione.
@@ -605,9 +647,10 @@ non porta Markdown.
 Niente `FAQPage`: la FAQ generata rileggeva massimo, minimo e media, cioè quello
 che il cruscotto mostra già, ed è stata rimossa insieme al suo schema.
 
-Gli stati di esplorazione (`?anno=`, `?regione=`, `?livello=`) sono stati della
-stessa pagina, mai documenti nuovi: restano `noindex` e il canonical punta
-all'URL base. L'elenco sta in `app/seo_policy.py:EXPLORE_PARAMS`, e va tenuto
+Gli stati di esplorazione (`?anno=`, `?regione=`) sono stati della stessa
+pagina, mai documenti nuovi: restano `noindex` e il canonical punta all'URL del
+livello. `?livello=` sta ancora nell'elenco ma non rende piu' una pagina: fa un
+301 alla `/province` o alla base. L'elenco sta in `app/seo_policy.py:EXPLORE_PARAMS`, e va tenuto
 aggiornato quando se ne aggiunge uno.
 
 Non aggiungere paragrafi di riempimento. Le varianti quasi duplicate, incomplete

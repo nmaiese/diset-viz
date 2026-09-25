@@ -22,26 +22,63 @@ paths:
   fissa la scelta (e `?indicator=<id>` del selettore di prima) se quella coppia
   sta nel pool, se no si torna al caso. Il canonico resta `/`. Non e'
   l'atlante.
-- `/atlante` — l'atlante React/Vite (sorgente in `frontend/`, build in
-  `app/static/dist/`), montato da `app/templates/app.html`. Insieme a
-  `/confronto` sono le due sole pagine che caricano il bundle della SPA, e si
-  migrano sempre insieme. **La testata non e' loro**: la rende Flask con
-  `_ds_header.html` sopra `#root`, come su ogni altra pagina, e il body porta
-  `class="ds sitechrome"` perche' `chrome.css` e' scoped sotto quella classe.
-  Anche briciole (`_breadcrumb.html`) e piede (`_ds_footer.html`, lo stesso di
-  ogni pagina) li rende Flask, fuori da `#root`, e il bersaglio di "Vai al
-  contenuto" e' il `div#contenuto` attorno a briciole e `#root`. A React resta
-  solo il pulsante di ritorno: la barra del telefono, la barra di contesto e il
-  selettore "Per indicatore, Per regione, Confronta" se ne sono andati il 24
-  settembre 2026, con `window.__diNav`. Una testata
-  disegnata dentro la SPA sono due identita' sullo stesso dominio, ed e' gia'
-  successo.
+- `/atlante` — dal 25 settembre 2026 una **pagina della 1.0 resa dal server**
+  (`design.render("atlante", "v1/atlante.html", "app.html")`, composta da
+  `app/design/pages/atlante.py`), non piu' la SPA. In alto "Sulla mappa", il
+  modulo dato della scheda (`indicatore.explore_module`, la macro `ui.explore`)
+  su un indicatore fisso, `atlante.MAP_INDICATOR` (ter-105, fisso e non estratto
+  perche' la pagina sta in cache). Sotto "Tutti gli indicatori": una tabella
+  per tema con **tutte le 594 serie** del catalogo regionale all'apertura, link
+  canonico alla scheda, sparkline della media semplice sul pannello fisso
+  (`indicator_view.fixed_panel`), variazione in chiaro, etichetta di stato
+  sulle parziali. Filtri, ricerca e ordine li fa l'isola `static/js/atlante.js`
+  sui `data-*` delle righe, con i parametri di prima (`theme`, `area`,
+  `source`, `yfrom`, `yto`, `q`, `sort`, `fav`, `partial`) piu' `complete`.
+  Le regole che non si vedono:
+  - **i 301 stanno fuori dalla cache**, nella view: `?indicator=<id>` e
+    `?view=detail` alla scheda (alla `/province` quando il link chiede le
+    province), `?view=regioni&rk=<key>` a `/regione/<key>`, `?view=regioni` a
+    `/regioni`, `?view=confronto` a `/confronto`, `?view=atlas&indicator=` a
+    `?mappa=`. Con la chiave del solo percorso `/atlante` serviva la risposta
+    data a `/atlante?indicator=910`. Il ramo Markdown resta primo;
+  - **la cache e' per (livello, indicatore)** (`_atlante_page`, `cache.memoize`)
+    e **solo sulla mappa di partenza**. `?mappa=<codice>`, il bottone "Sulla
+    mappa" di una riga, e' l'unico parametro che il server legge: si risolve
+    contro il catalogo (`atlante.map_choice`, un valore che non regge fa 301 a
+    `/atlante`) e quelle pagine non vanno in cache, perche' 594 varianti da
+    600 KB riempirebbero la SimpleCache di tutto il sito;
+  - le righe si compongono una volta per processo (`atlante.rows`,
+    `synchronized_cache`) dalla proiezione: **circa 3 s alla prima richiesta
+    di ogni istanza**, e `indicator_universe.cache_clear()` le svuota;
+  - la pagina pesa sotto 90 KB compressi (c'e' una prova);
+  - il ripiego e' `app.html`, la SPA di prima: un ripiego e' un 200, quindi in
+    produzione si controlla `data-v1="atlante"`;
+  - la page view porta `page_type: "atlas"` (`PAGE_TYPE` nel template), non
+    `server`, e l'isola emette gli stessi eventi GTM della SPA
+    (`docs/tracking_spec.md`). Il token dei preferiti lo prende da
+    `window.diAuth.token()` (`frontend/src/site/auth.js`).
+- `/confronto` e' l'**unica** rotta della SPA (`SPA_ROUTES = ("/confronto",)`):
+  sola pagina che carica il bundle, con `confronto.html`. `app.html` resta
+  come ripiego dell'atlante e deve continuare a compilare fino a quando il
+  confronto non passa alla 1.0. **La testata non e' della SPA**: la rende Flask
+  con `_ds_header.html` sopra `#root`, come su ogni altra pagina, e il body
+  porta `class="ds sitechrome"` perche' `chrome.css` e' scoped sotto quella
+  classe. Anche briciole (`_breadcrumb.html`) e piede (`_ds_footer.html`, lo
+  stesso di ogni pagina) li rende Flask, fuori da `#root`, e il bersaglio di
+  "Vai al contenuto" e' il `div#contenuto` attorno a briciole e `#root`. A
+  React resta solo il pulsante di ritorno: la barra del telefono, la barra di
+  contesto e il selettore "Per indicatore, Per regione, Confronta" se ne sono
+  andati il 24 settembre 2026, con `window.__diNav`. Una testata disegnata
+  dentro la SPA sono due identita' sullo stesso dominio, ed e' gia' successo.
 - `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema. La
   pagina tema legge il catalogo dell'atlante, che e' regionale, e in fondo ha
   la sezione "Per provincia" con le schede del tema che hanno i valori delle
   province, aperte sulle province (`indicator_view.province_indicators_by_theme`,
   col tema della scheda, lo stesso della sua briciola): senza, le schede
-  solo provinciali non stavano in nessun tema.
+  solo provinciali non stavano in nessun tema. Quella sezione **filtra sul
+  livello, non sulla scheda**: una scheda indicizzabile per le sue regioni puo'
+  avere la `/province` fuori dall'indice, e si guarda la regola del livello
+  (`level_passes_rule`), non l'interruttore `seo_policy.LEVEL_PAGES_INDEXABLE`.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
   La tabella "Tutti gli indicatori" ha la colonna Andamento, la serie della
   regione da `_region_series()`: una voce per processo (`synchronized_cache`,
@@ -60,9 +97,9 @@ paths:
   di nuovo: mette in forma il payload di `quality_life_bes.build_bes_territory`.
   I link alle schede escono da `bes_data.bes_level_path(id, "provincia")`: una
   scheda a due livelli si apre sulle regioni, e da una provincia il lettore
-  deve atterrare su `?livello=provincia`, dove c'e' la sua provincia, e
-  direttamente sulla sua riga: il link finisce in `#p-<key>`, l'`id` della
-  riga nella classifica della scheda.
+  deve atterrare sulla vista provinciale, `.../<codice>/province`, dove c'e'
+  la sua provincia, e direttamente sulla sua riga: il link finisce in
+  `.../province#p-<key>`, l'`id` della riga nella classifica della scheda.
 - `/province` — l'indice geografico delle province, regione per regione, dal
   23 settembre 2026. Prima l'indice era la classifica: la classifica risponde a
   "chi e' prima", l'indice a "dov'e' la mia provincia". La briciola di una
@@ -91,7 +128,18 @@ paths:
   (`ter`, `bes`, `ims`, `eur`, `dem`). Keyword-first per la SEO: lo slug umano
   guida, il codice risolve. Il codice è l'ultimo segmento e porta l'id, quindi
   la pagina sopravvive a un cambio di nome; uno slug sbagliato fa 301 verso il
-  canonico, le URL legacy fanno 301 qui. **Un template per tutte le famiglie**
+  canonico, le URL legacy fanno 301 qui. **La vista provinciale di una scheda a
+  due livelli e' una pagina a se'**, `/indicatore/<slug>/<codice>/province`
+  (dal 25 settembre 2026): li' il codice e' il penultimo segmento, e il terzo
+  accetta solo `province`, altrimenti 404. Ogni altro indirizzo (slug
+  sbagliato, codice prima dello slug, `/indicatore/<codice>/province`,
+  `?livello=`) fa **un 301 in un salto solo** all'URL del livello, tenendo
+  `anno` e `regione`. Una scheda senza livello provinciale risponde 404 sulla
+  `/province` (ter-910, per esempio). Canonical, robots e sitemap delle
+  `/province` stanno in `docs/INDICATOR_PAGES.md`. **Le regioni di
+  bes-01SAL001** (speranza di vita BES) hanno il canonical su ter-910, la
+  stessa serie, **senza noindex**: stanno fuori da sitemap, llms-full e
+  `/catalogo-dati`, dove le sostituisce la loro `/province`. **Un template per tutte le famiglie**
   (`app/templates/indicator_page.html`) su un view model
   (`app/indicator_view.py`): leggere `docs/INDICATOR_PAGES.md` prima di toccare
   l'uno o l'altro.
@@ -103,11 +151,11 @@ paths:
   sono medie semplici dei valori regionali, limite che la pagina dichiara.
 - `/confronto` — **solo regionale**: la voce del menu dice "Confronta le
   regioni", e le schede al livello provinciale non lo propongono. La casa
-  canonica del confronto: pagina server-rendered che
-  monta la vista compare della SPA con `window.__diInitialView`. Lo stato SPA
-  `/atlante?view=confronto` funziona ancora ma niente ci punta: uno strumento,
-  una URL pubblica. Una vista path-scoped si aggiunge impostando quel flag nel
-  template, mai insegnando a `frontend/src/main.jsx` le rotte Flask.
+  canonica del confronto: pagina server-rendered che monta la vista compare
+  della SPA con `window.__diInitialView`. `/atlante?view=confronto` e' un 301
+  qui: uno strumento, una URL pubblica. Una vista path-scoped si aggiunge
+  impostando quel flag nel template, mai insegnando a `frontend/src/main.jsx`
+  le rotte Flask.
 - `/ricerca?q=` — ricerca interna, server-rendered, **`noindex, follow` di
   proposito** (uno spazio `?q=` illimitato sarebbe pagine sottili duplicate).
   L'header sta nella view perché `add_security_headers` timbra `index, follow`

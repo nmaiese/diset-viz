@@ -102,7 +102,9 @@ Una scala di undici ruoli, nominati per funzione:
   colonna), punteggio (un decimale), rapporto (un decimale), variazione (sempre
   col segno, "invariato" sullo zero), posizione ("14ª su 20"), conteggio
   (intero). Il segno negativo e' il meno tipografico. Ogni cifra e' un `<data
-  value>` col valore per le macchine. L'unita' segue piu' piccola e in
+  value>` col valore per le macchine. L'eccezione e' la cella Andamento
+  dell'atlante: tre cifre per riga su 594 righe, e i `<data>` pesavano troppo
+  sul tetto di 90 KB compressi, quindi li' la variazione e' testo. L'unita' segue piu' piccola e in
   `--text-2`, la percentuale resta attaccata. I template non formattano mai: usano
   i filtri `num`, `rank`, `delta`.
 - Fuori dalle colonne le cifre sono proporzionali (in una tessera le tabellari
@@ -200,7 +202,9 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   `aria-pressed` quando cambia uno stato. Attivo = fondo pieno. Il selettore
   Regioni/Province della home e' un caso di mezzo: senza JavaScript sono due
   link a `?livello=`, con JavaScript diventano schede (tab) con i ruoli ARIA e
-  le frecce, e il pannello dell'altro livello e' gia' in pagina.
+  le frecce, e il pannello dell'altro livello e' gia' in pagina. Le linguette
+  Regioni/Province della scheda invece cambiano documento: ognuna linka l'URL
+  del suo livello, la base o la `/province`, mai un `?livello=`.
 - **Ricerca**: una per pagina, suggerimenti raggruppati per tipo.
 - **Indice di pagina**: domande brevi ("Chi e' in testa", "Com'e' cambiato"),
   sticky nel margine da 1200.
@@ -303,6 +307,20 @@ e come citare. Un bottone primario per fascia.
 
 I prototipi in `design/v1/src/` non hanno ancora queste fasce: la home del
 sito e' andata avanti da sola.
+
+### Atlante
+
+`/atlante`, dal 25 settembre 2026 resa dal server (`app/design/pages/atlante.py`,
+`v1/atlante.html`, `css/ds/pages/atlante.css`). Briciole, testata-risposta con
+cifre calcolate, "Sulla mappa" con il modulo dato della scheda su un indicatore
+fisso, poi "Tutti gli indicatori": una `.table` per tema con tutte le serie,
+link alla scheda, sparkline `m` della media semplice sul pannello fisso,
+variazione in chiaro con i due anni, ultimo anno e regioni, "Serie parziale"
+come etichetta di stato e "Copertura variabile" al posto della linea quando il
+pannello non regge. Il bottone "Sulla mappa" di una riga e' un GET
+(`form`, `?mappa=`). Filtri, ricerca e ordine sono un'isola
+(`static/js/atlante.js`) sui `data-*` delle righe: senza JavaScript l'elenco
+c'e' tutto. I gruppi portano `content-visibility: auto`.
 
 ### Regione
 

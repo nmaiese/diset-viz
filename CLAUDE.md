@@ -51,14 +51,16 @@ direttamente su `master`.
 
 ## Che cos'è
 
-**Divario Italia** (divarioitalia.it) è un atlante Flask + React degli
-indicatori territoriali Istat, più un blog server-rendered per la SEO e una
-sezione qualità della vita per regioni e province. A `/` c'è la **home
-server-rendered**, non l'atlante: l'atlante sta a `/atlante` (sorgente in
-`frontend/`, build in `app/static/dist/`) e condivide il bundle solo con
-`/confronto`. Ogni indicatore di ogni famiglia a
-`/indicatore/<slug>/<acronimo>-<id>`, servito da **un template su un view
-model**; i temi a `/temi` e `/tema/<slug>`; le regioni a `/regioni` e
+**Divario Italia** (divarioitalia.it) è un atlante Flask degli indicatori
+territoriali Istat, più un blog server-rendered per la SEO e una sezione
+qualità della vita per regioni e province. A `/` c'è la **home
+server-rendered**, non l'atlante: l'atlante sta a `/atlante`, anche lui una
+pagina della 1.0 resa dal server. React (sorgente in `frontend/`, build in
+`app/static/dist/`) serve ormai solo `/confronto`, più il ripiego
+dell'atlante. Ogni indicatore di ogni famiglia a
+`/indicatore/<slug>/<acronimo>-<id>`, e la vista provinciale di una scheda a
+due livelli a `/indicatore/<slug>/<acronimo>-<id>/province`, servite da **un
+template su un view model**; i temi a `/temi` e `/tema/<slug>`; le regioni a `/regioni` e
 `/regione/<key>`; le 107 province a `/provincia/<key>`; il blog a `/blog`, col suo
 feed a `/blog/feed.xml`; l'hub editoriale a `/divari-regionali`;
 la ricerca a `/ricerca`; la dashboard D3 originale a `/legacy` (non va rotta);

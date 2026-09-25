@@ -48,17 +48,36 @@ indicatori mal orientati o macro-aree incomplete.
   ultimo anno almeno 2023 e copertura almeno 80%.
 - Il **catalogo pubblico federato** (`app/atlas_catalog.py:get_atlas_catalog`)
   presenta insieme il catalogo territoriale, gli indicatori BES regionali e
-  quelli Multiscopo, tranne i BES in `app/taxonomy.py:DUPLICATE_BES_IDS`. Gli id
-  BES hanno namespace `bes:*`, quelli Multiscopo `multiscopo:*`. L'adattatore
-  alimenta le stesse mappe, classifiche e serie storiche della SPA, ma non
-  modifica il CSV legacy e non modifica i profili regionali descrittivi
-  calcolati da `app/profiles.py`. Quando aggiungi un indicatore BES, controlla
-  se esiste già una serie territoriale con lo stesso nome e con gli stessi
-  valori (stesso fenomeno Istat ingerito due volte): se sì, aggiungi il suo id
-  BES a `DUPLICATE_BES_IDS` così non compare due volte nel catalogo/ricerca/quiz.
-  `app/quiz.py` legge la stessa lista. Il motore di
-  punteggio (`app/quality_life_selection.py`) ha una deduplica separata, che
-  preferisce BES: non toccarla.
+  quelli Multiscopo, tranne le serie che `taxonomy.hidden_from_browsing`
+  nasconde (sotto). Gli id BES hanno namespace `bes:*`, quelli Multiscopo
+  `multiscopo:*`. L'adattatore alimenta le stesse mappe, classifiche e serie
+  storiche dell'atlante, ma non modifica il CSV legacy e non modifica i profili
+  regionali descrittivi calcolati da `app/profiles.py`. Il motore di punteggio
+  (`app/quality_life_selection.py`) ha una deduplica separata, che preferisce
+  BES: non toccarla.
+- **Le serie col nome di un'altra.** Quando aggiungi un indicatore BES che ha
+  esattamente il nome di una serie territoriale, **confronta le cifre cella per
+  cella (regione e anno), non il nome**: fino al 25 settembre 2026 10AMB008,
+  12SER006 e 12SER025 stavano fra i doppioni "con gli stessi valori", e
+  10AMB008 e 12SER025 differivano dalla territoriale in ogni cella, 12SER006
+  fino a 3,5 punti. La
+  coppia va in `taxonomy.TERRITORIAL_NAME_TWINS` (il qualificatore di famiglia
+  nel title, `views._source_qualifier`), poi in uno di questi insiemi:
+  - `DUPLICATE_BES_IDS`: la BES e' la stessa serie della territoriale (cifre
+    uguali, o uguali all'arrotondamento della fonte) e la navigazione (atlante,
+    temi, ricerca, quiz) mostra la territoriale. Oggi 01SAL001 e 10AMB007;
+  - `SUPERSEDED_TERRITORIAL_IDS`: il verso opposto, la stessa serie ma si
+    mostra la BES perche' e' quella indicizzabile. Oggi ter-617 e ter-618,
+    uguali a SDG-311 e SDG-310;
+  - `SAME_NAME_BES_IDS`: cifre diverse, quindi due schede a se', tutte e due
+    visibili e nell'indice, con l'H1 della BES qualificato dalla famiglia.
+    Oggi 10AMB008, 12SER006, 12SER025;
+  - `REGIONAL_CANONICALS`: la vista regionale di una scheda che porta il
+    canonical su un'altra, solo dove le cifre coincidono in ogni cella. Oggi
+    bes-01SAL001 verso ter-910, senza noindex e fuori dalla sitemap.
+
+  Nascondere e' un dedup della navigazione, non dei dati: la pagina resta
+  raggiungibile col suo robots, e `app/quiz.py` legge la stessa regola.
 - La **selezione qualità della vita** (`app/quality_life_selection.py`) opera
   sul catalogo federato. Include BES regionali almeno al 2025 e indicatori
   territoriali core almeno al 2023, tutti con direzione revisionata e copertura

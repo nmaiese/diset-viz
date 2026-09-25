@@ -32,15 +32,20 @@ Le pagine della 1.0 caricano `css/ds/components.css` e il CSS della loro pagina
 `blog_base.html`. `chrome.css` (testata, piede, transizioni fra pagine,
 account) lo caricano tutte, shell della SPA comprese.
 
-L'atlante e il confronto (`app/templates/app.html`, `app/templates/confronto.html`)
-caricano quel foglio e mettono `class="ds"` sul body: da li' `body.ds`
+Il confronto (`app/templates/confronto.html`) e il ripiego dell'atlante
+(`app/templates/app.html`) caricano quel foglio e mettono `class="ds"` sul body: da li' `body.ds`
 (specificita' 0,1,1) ripunta i token che `frontend/src/styles.css` dichiara nel
 suo `:root` (0,1,0). **Quindi i colori scritti in quel `:root` non sono quelli
 che si vedono**: sono il ripiego per quando il foglio del design system non c'e'.
 
-Le due shell si migrano e si toccano **insieme**: sono la stessa applicazione
-React, e se una resta indietro la stessa vista si vede in due palette a seconda
-della URL.
+Dal 25 settembre 2026 `/atlante` e' una pagina della 1.0 resa dal server
+(`app/design/pages/atlante.py`, `v1/atlante.html`, l'isola
+`app/static/js/atlante.js`), e l'unica rotta della SPA e' `/confronto`
+(`SPA_ROUTES`). `app.html` serve ancora l'atlante React quando la pagina nuova
+cede: la regola "le due shell si migrano e si toccano **insieme**" vale ormai
+per tenere compilabile quel ripiego accanto a `confronto.html`, fino a quando
+il confronto non passa alla 1.0 e il bundle se ne va. Il resto della SPA non
+si ritocca.
 
 Due errori che non fanno fallire niente:
 

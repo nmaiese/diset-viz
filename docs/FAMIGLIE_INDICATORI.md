@@ -20,7 +20,10 @@ Il livello territoriale ha oggi un solo collegamento, scritto a mano:
 `taxonomy.PROVINCE_TWINS` elenca le schede regionali che hanno una gemella con
 le province (per esempio ter-910 e bes-01SAL001), e la scheda porta dall'una
 all'altra dal selettore di livello. Non e' una famiglia: le due pagine restano
-due, ognuna col suo canonico.
+due. Nel caso di ter-910 e bes-01SAL001, identiche sulle regioni in ogni
+cella, dal 25 settembre 2026 la vista regionale della BES porta il canonical
+su ter-910 (`taxonomy.REGIONAL_CANONICALS`), mentre la sua `/province` resta
+una pagina a se' col suo canonico (`docs/INDICATOR_PAGES.md`).
 
 ## Tre situazioni diverse, verificate sul codice
 

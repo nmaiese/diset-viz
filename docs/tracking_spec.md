@@ -171,7 +171,20 @@ google.com, pub-6806451730012282, DIRECT, f08c47fec0942fa0
 ## Eventi dataLayer
 
 Gli eventi SPA sono emessi da `frontend/src/main.jsx`. Le pagine server-rendered
-emettono `page_view` da `app/templates/_third_party_head.html`. La homepage SPA
+emettono `page_view` da `app/templates/_third_party_head.html`.
+
+Dal 25 settembre 2026 l'atlante (`/atlante`) e' una pagina server-rendered: la
+sua `page_view` parte dal server con `page_type: "atlas"` (il template dichiara
+`PAGE_TYPE`, che `_third_party_head.html` legge al posto di `server`), cosi' la
+serie in GA4 non cambia tipo. Gli eventi del catalogo li emette l'isola
+`app/static/js/atlante.js` con gli stessi nomi e parametri della SPA
+(`filter_macro_area`, `filter_theme`, `filter_data_source`,
+`filter_year_range`, `sort_indicators`, `toggle_partial_data`,
+`select_indicator`). Il filtro nuovo e' "solo le serie complete" (`?complete=1`):
+all'apertura l'atlante mostra tutte le serie, e `toggle_partial_data` porta
+`enabled: true` quando le parziali sono visibili, cioe' col filtro spento.
+Fino a quando il confronto resta in React le copie del tracciamento sono due,
+con gli stessi nomi. La homepage SPA
 esclude la pageview server con `TRACK_SERVER_PAGE_VIEW=false`, quindi al primo
 accesso resta una sola pageview, quella emessa da React.
 

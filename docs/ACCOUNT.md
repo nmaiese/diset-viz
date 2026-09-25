@@ -75,9 +75,16 @@ Migrazioni Alembic `migrations/versions/0003..0006`, modelli in `app/models.py`:
 - **`frontend/src/site/auth.js`** — entry vanilla nel masthead di **ogni pagina
   SSR** (`blog_base.html`): controllo login/account, stella preferiti sulle pagine
   indicatore, pagina `/account`. Ottimizzato: niente supabase-js per gli anonimi.
-- **`frontend/src/shared/AuthControl.jsx`** — controllo login React per l'atlante.
-- **Atlante** (`main.jsx`): filtro "Solo preferiti" (`?fav=1`), confronti salvati
-  in `CompareView`.
+  Espone `window.diAuth.token()` alle pagine che non montano React: una
+  promessa col token, o `null` senza una sessione salvata (e in quel caso la
+  libreria di accesso non si carica). L'evento `di:auth` avvisa chi e' arrivato
+  prima dello script.
+- **`frontend/src/shared/AuthControl.jsx`** — controllo login React del
+  confronto (e del ripiego dell'atlante).
+- **Atlante** (`app/static/js/atlante.js`, dal 25 settembre 2026 fuori da
+  React): il filtro "Solo preferiti" (`?fav=1`) compare solo dopo l'accesso e
+  legge `/api/favorites` col token di `window.diAuth.token()`.
+- **Confronto** (`main.jsx`): confronti salvati in `CompareView`.
 - **Giochi** (`game/`): toast traguardi (`notifyAchievements`), scelta salva a 3
   opzioni, vetrina traguardi nell'hub, merge al login.
 
