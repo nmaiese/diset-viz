@@ -1,6 +1,6 @@
 /* Divario Italia 1.0: la testata e il piede, uguali su ogni pagina.
  *
- * Scoped sotto .sitechrome (su <body> insieme a .ds): le shell della SPA lo
+ * Scoped sotto .sitechrome (su <body> insieme a .ds): le pagine della 1.0 lo
  * caricano senza site.css, e qui dentro stanno anche le poche regole di
  * contorno che servono a tutte (transizioni fra pagine, account, stella dei
  * preferiti). Legge solo i token di system.css: niente colori cotti.
@@ -166,10 +166,10 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
 /* --- account ------------------------------------------------------------ */
 /* Il posto e' riservato (larghezza e altezza fisse): site.js lo riempie dopo,
    e la testata non deve saltare. Discreto: una parola, non un bottone.
-   Sotto `.sitechrome` di proposito: il bundle della SPA porta le sue regole
-   `.site-auth` (una pillola larga 92 pixel) e si carica dopo questo foglio, e a
-   parita' di peso vinceva lui. Sulle shell dell'atlante e del confronto la
-   testata sforava di sei pixel a 360. */
+   Sotto `.sitechrome` di proposito: il bundle React dell'atlante portava le
+   sue regole `.site-auth` (una pillola larga 92 pixel) e si caricava dopo
+   questo foglio, e a parita' di peso vinceva lui: la testata sforava di sei
+   pixel a 360. Il gioco ha ancora un bundle suo. */
 .sitechrome .site-auth {
   min-width: 64px; height: 40px;
   display: flex; align-items: center; justify-content: flex-end; flex: 0 0 auto;

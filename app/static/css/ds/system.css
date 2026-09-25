@@ -10,7 +10,7 @@
  *                    2026 (--n-*, --coral-*, --teal-*, --seq-*, --cat-*...),
  *                    che restano per chi li legge ma puntano ai valori nuovi.
  *                    Il "corallo" di quei nomi e' l'arancio bruciato della 1.0.
- *   body.ds          i nomi che site.css, la SPA e il gioco usano nelle loro
+ *   body.ds          i nomi che site.css e il gioco usano nelle loro
  *                    regole: e' il ponte con cui le pagine non ancora rifatte
  *                    prendono carattere, colori e tono della 1.0.
  *   [data-theme=dark] gli stessi nomi col valore scuro. Il tema lo mette
@@ -352,7 +352,7 @@
 }
 
 /* ===========================================================================
- * IL PONTE: i nomi che site.css, la SPA e il gioco leggono nelle loro regole.
+ * IL PONTE: i nomi che site.css e il gioco leggono nelle loro regole.
  * ========================================================================= */
 body.ds {
   --paper: var(--bg);

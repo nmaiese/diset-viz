@@ -1,0 +1,136 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- Il confronto della 1.0: un indicatore, fino a tre regioni. Cio' che la
+    pagina chiede ai dati lo compone app/design/pages/confronto.py e arriva
+    qui come `d`. Non c'e' un ripiego: se la regia cede la view risponde 500.
+
+    Senza JavaScript la pagina e' un confronto intero: il `form` GET sceglie
+    indicatore, regioni e anno, e la risposta e' una pagina nuova con i numeri
+    di quello stato. Con il JavaScript l'isola js/confronto.js tiene lo stesso
+    form, legge /api/indicator/<id> e ridisegna risposta, mappa, tabella e
+    serie senza ricaricare, e scrive lo stato nell'URL con gli stessi nomi.
+    Tutto cio' che l'isola riscrive porta un `data-cmp-*`. -#}
+{% set active_nav = 'confronto' %}
+{#- La SPA mandava la page view con page_type "atlas" anche da qui
+    (`currentPageType` del bundle di prima): lo si tiene, cosi' la serie in GA4 non
+    cambia tipo. -#}
+{% set PAGE_TYPE = 'atlas' %}
+{% set ind = d.indicator %}
+
+{% block title %}Confronta le regioni italiane{% endblock %}
+{% block description %}Scegli un indicatore e fino a tre regioni: valore, posizione in classifica e serie storica a confronto con la media semplice delle regioni.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/confronto.css') }}">{% endblock %}
+
+{% block head_extra %}
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-confronto" data-v1="confronto" data-page-root tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">Confronto fra {{ d.plural }}<span class="sep" aria-hidden="true">·</span><span data-cmp-theme>{{ ind.theme }}</span></p>
+    <h1 class="h-title">Confronta le regioni italiane</h1>
+    <div class="answer"><p data-cmp-answer>{{ d.answer or ind.name }}</p></div>
+  </header>
+
+  <form class="toolbar confronto-form" id="cmp-form" action="/confronto" method="get" aria-label="Scegli che cosa confrontare" data-cmp-form data-level="{{ d.level }}">
+    {#- Il livello: oggi solo le regioni. Il selettore delle province (PR12)
+        prende il posto di questo campo, e il server e l'isola leggono gia'
+        `livello`. -#}
+    <input type="hidden" name="livello" value="{{ d.level }}" data-cmp-level>
+    <label class="field confronto-form__ind" for="cmp-indicator">Indicatore
+      <select id="cmp-indicator" name="indicator" data-cmp-indicator>
+        {%- for g in d.options %}<optgroup label="{{ g.label }}">{% for o in g.entries %}<option value="{{ o.id }}"{% if o.u %} data-u="{{ o.u }}"{% endif %}{% if o.id == ind.id %} selected{% endif %}>{{ o.name }}</option>{% endfor %}</optgroup>{% endfor -%}
+      </select>
+    </label>
+    {% for i in range(d.max) %}
+    {% set s = d.selected[i] if i < d.selected | length else None %}
+    <label class="field" for="cmp-region-{{ i + 1 }}"><span><span class="swatch s{{ i + 1 }}" aria-hidden="true"></span>{{ ['Prima', 'Seconda', 'Terza'][i] }} regione</span>
+      <select id="cmp-region-{{ i + 1 }}" name="region" data-cmp-region>
+        {% if i > 0 %}<option value="">Nessuna</option>{% endif %}
+        {%- for t in d.territories %}<option value="{{ t.key }}"{% if s and s.key == t.key %} selected{% endif %}>{{ t.name }}</option>{% endfor -%}
+      </select>
+    </label>
+    {% endfor %}
+    <label class="field" for="cmp-year">Anno
+      <select id="cmp-year" name="year" data-cmp-year>
+        {%- for y in d.years %}<option{% if y == d.year %} selected{% endif %}>{{ y }}</option>{% endfor -%}
+      </select>
+    </label>
+    <button class="btn btn--primary" type="submit" data-cmp-submit>Confronta</button>
+  </form>
+
+  <section class="section" id="valori" aria-labelledby="h-valori">
+    <h2 id="h-valori">I valori nel <span data-cmp-year-label>{{ d.year }}</span></h2>
+    <div class="confronto-grid">
+      <div class="confronto-grid__map" data-cmp-map>
+        {{ ui.map(d.map_classes, 'confronto', d.map_names, d.map_values, label='Mappa delle regioni italiane per ' ~ ind.name ~ ', ' ~ d.year ~ ', con le regioni a confronto in evidenza') }}
+        {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le regioni a confronto.', nd_hidden=not d.legend_nd) }}{% endif %}
+      </div>
+      <div class="tablewrap">
+        <table class="table confronto-table">
+          <caption><span data-cmp-name>{{ ind.name }}</span>, <span data-cmp-year-label>{{ d.year }}</span></caption>
+          <thead><tr><th scope="col">Regione</th><th class="r" scope="col">Valore</th><th class="r" scope="col">Posizione</th></tr></thead>
+          <tbody data-cmp-rows>
+            {%- for s in d.selected %}
+            <tr><th scope="row"><span class="swatch {{ s.cls }}" aria-hidden="true"></span><a href="/regione/{{ s.key }}">{{ s.name }}</a></th><td class="val">{{ s.value | num(ind.unit_label, 'cell', d.decimals) }}</td><td class="val">{{ s.rank | rank(d.total) }}</td></tr>
+            {%- endfor %}
+            <tr class="ref"><th scope="row">Media semplice delle {{ d.avg_n }} {{ d.plural }}</th><td class="val">{{ d.avg | num(ind.unit_label, 'cell', d.decimals) }}</td><td></td></tr>
+          </tbody>
+        </table>
+        <p class="source" data-cmp-rankrule>La posizione è fra le {{ d.total }} {{ d.plural }} con il dato nel {{ d.year }}, {% if d.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="serie" aria-labelledby="h-serie">
+    <h2 id="h-serie">Com'è cambiato</h2>
+    <ul class="confronto-key" data-cmp-key>
+      {%- for s in d.selected %}<li><span class="swatch {{ s.cls }}" aria-hidden="true"></span>{{ s.name }}</li>{% endfor %}
+      <li><span class="swatch swatch--avg" aria-hidden="true"></span>Media semplice delle {{ d.plural }}</li>
+    </ul>
+    <div class="chart" data-cmp-chart>{{ d.chart | safe }}</div>
+    <p class="source" data-cmp-chartnote>{% if d.chart %}La media semplice si disegna negli anni in cui almeno {{ d.need }} {{ d.plural }} hanno il dato. La linea tratteggiata verticale segna l'anno della tabella.{% else %}Un anno solo: la serie non si disegna.{% endif %}</p>
+    <details class="more">
+      <summary>La serie in tabella</summary>
+      <div class="tablewrap">
+        <table class="table table--compact">
+          <caption class="sr-only"><span data-cmp-name>{{ ind.name }}</span>, anno per anno</caption>
+          <thead data-cmp-series-head><tr><th scope="col">Anno</th>{% for s in d.selected %}<th class="r" scope="col">{{ s.name }}</th>{% endfor %}<th class="r" scope="col">Media semplice</th></tr></thead>
+          <tbody data-cmp-series-rows>
+            {%- for r in d.series_rows %}
+            <tr><th scope="row">{{ r.year }}</th>{% for v in r.cells %}<td class="val">{{ v | num(ind.unit_label, 'cell', d.series_decimals) }}</td>{% endfor %}<td class="val">{{ r.avg | num(ind.unit_label, 'cell', d.series_decimals) }}</td></tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <p class="source confronto-source">Fonte: <a href="{{ ind.source_url }}" data-cmp-source>{{ ind.source_label }}</a>. Elaborazione Divario Italia. <a href="{{ ind.path }}" data-cmp-scheda>La scheda dell'indicatore</a> ha la definizione, tutte le {{ d.plural }} e i dati da scaricare.</p>
+
+  <section class="section confronto-saved" id="salvati" aria-labelledby="h-salvati" data-cmp-saved hidden>
+    <h2 id="h-salvati">I tuoi confronti</h2>
+    <form class="toolbar" data-cmp-save>
+      <label class="field" for="cmp-title">Nome del confronto
+        <input id="cmp-title" type="text" maxlength="120" autocomplete="off" data-cmp-title>
+      </label>
+      <button class="btn" type="submit">Salva questo confronto</button>
+    </form>
+    <ul class="confronto-saved__list" data-cmp-list></ul>
+    <p class="sr-only" role="status" aria-live="polite" data-cmp-saved-status></p>
+  </section>
+
+  <p class="confronto-more">Per una regione sola c'è <a href="/regioni">il suo profilo</a>, per tutte le serie <a href="/atlante">l'atlante</a>, per le differenze fra Nord, Centro e Mezzogiorno <a href="/divari-regionali">i divari regionali</a>.</p>
+  <p class="sr-only" role="status" aria-live="polite" data-cmp-live></p>
+  <script type="application/json" data-cmp-data>{{ d.js | tojson }}</script>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+<script src="{{ asset_url('js/confronto.js') }}" defer></script>
+{% endblock %}

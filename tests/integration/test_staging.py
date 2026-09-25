@@ -51,9 +51,9 @@ class StagingModeTest(unittest.TestCase):
 
     def test_pages_carry_the_staging_meta_and_banner(self):
         config.STAGING = True
-        # Le tre famiglie di shell: chrome nuovo, chrome legacy, e le due che
-        # montano la SPA. /confronto e' qui perche' la fascia le mancava: e'
-        # una shell a se', e una shell nuova non eredita niente.
+        # Le famiglie di pagina, e le due che montavano la SPA. /confronto e'
+        # qui perche' la fascia le mancava quando era una shell a se': dal 25
+        # settembre 2026 e' una pagina della 1.0, e la prova resta.
         for path in ("/", "/blog", "/atlante", "/confronto"):
             with self.subTest(path=path):
                 html = self.client.get(path).get_data(as_text=True)

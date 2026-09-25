@@ -11,10 +11,9 @@
    home alla pagina corrente inclusa: l'ultima voce non e' un link a schermo e
    porta `item` nel JSON-LD, come vuole lo schema. #}
 
-{# Anche le due shell della SPA (`/atlante`, `/confronto`) lo rendono cosi',
-   sopra `#root`: non caricano `site.css`, e `.breadcrumb` la vestono le regole
-   di `frontend/src/styles.css`. Prima il confronto lo scriveva dentro il
-   ripiego senza classe e senza barre, e React ne disegnava un altro suo. #}
+{# Le pagine della 1.0 hanno la loro forma a schermo, `ui.crumbs` di
+   `v1/_ui.html`, e da qui prendono solo il JSON-LD. Quando `/atlante` e
+   `/confronto` erano la SPA, React ne disegnava un altro suo. #}
 {# Lo spazio dopo la barra e' un'espressione, `{{ " " }}`, ed e' voluto:
    scritto come testo se lo mangia il `{%- endif %}` della riga successiva, e in
    pagina si legge `Home /Temi`. Con un solo separatore non si nota, con quattro

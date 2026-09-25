@@ -296,6 +296,116 @@ def band_series(level: dict, areas: dict) -> dict:
             "single_year": False, "first": years[0], "last": years[-1]}
 
 
+# ---------------------------------------------------------------- serie a confronto
+
+# I due tagli della serie del confronto: (classe, larghezza, altezza, margine
+# destro per le etichette, stretto). `compareChart` di static/js/confronto.js
+# ridisegna la stessa serie con gli stessi numeri quando il lettore cambia
+# indicatore, regioni o anno: se cambiano qui, cambiano anche li'.
+COMPARE_CUTS = (("chart__l", 920, 320, 200, False), ("chart__s", 360, 260, 112, True))
+
+
+def _compare_marks(years: list[int], short: bool) -> list[int]:
+    """Gli anni scritti sull'asse, con la regola di `_band`: un passo di 1, 2,
+    5 o 10 anni secondo la durata, e sempre l'ultimo anno."""
+    span = years[-1] - years[0]
+    step = (10 if short else 5) if span > 12 else (2 if span > 6 else 1)
+    marks = [yr for yr in years if (yr - years[0]) % step == 0]
+    if years[-1] not in marks:
+        if marks and years[-1] - marks[-1] < step / 2:
+            marks[-1] = years[-1]
+        else:
+            marks.append(years[-1])
+    return marks
+
+
+def _compare_tick(v: float, ticks: list[float]) -> str:
+    """L'etichetta di una tacca della serie del confronto. Come `_tick`, ma un
+    passo non intero (2,5) tiene i suoi decimali: con zero decimali la tacca
+    2,5 si leggeva "3". `tick` di confronto.js e' la stessa regola."""
+    step = abs(ticks[1] - ticks[0]) if len(ticks) > 1 else 1
+    if step >= 1 and float(step).is_integer():
+        return n.text(v, 0)
+    d = 1 if step >= 1 else min(2, max(1, -math.floor(math.log10(step))))
+    if step < 1 and not float(round(step * 10 ** d, 6)).is_integer():
+        d += 1
+    return n.text(v, d)
+
+
+def _compare(years, lines, avg, year, width, height, right, short):
+    vals = [v for line in lines for _, v in line["points"] if v is not None] + [v for _, v in avg if v is not None]
+    ticks = _nice(min(vals), max(vals), 4)
+    left = 46 if short else 60
+    top, bottom = 16, 30
+    pw, ph = width - left - right, height - top - bottom
+
+    def x(yr):
+        return left + (yr - years[0]) / ((years[-1] - years[0]) or 1) * pw
+
+    def y(v):
+        return top + (1 - (v - ticks[0]) / ((ticks[-1] - ticks[0]) or 1)) * ph
+
+    def path(points):
+        # Un anno senza il dato spezza la linea: unire i due lati direbbe un
+        # valore che la fonte non ha.
+        out, pen = [], "M"
+        for yr, v in points:
+            if v is None:
+                pen = "M"
+                continue
+            out.append(f"{pen}{x(yr):.1f} {y(v):.1f}")
+            pen = "L"
+        return "".join(out)
+
+    parts = [f'<svg viewBox="0 0 {width} {height}" aria-hidden="true" focusable="false" class="cmpchart">']
+    for t in ticks:
+        parts.append(f'<line class="band__grid" x1="{left}" x2="{left + pw}" y1="{y(t):.1f}" y2="{y(t):.1f}"/>')
+        parts.append(f'<text class="band__tick" x="{left - 8}" y="{y(t) + 4:.1f}" text-anchor="end">{escape(_compare_tick(t, ticks))}</text>')
+    for yr in _compare_marks(years, short):
+        anchor = "start" if yr == years[0] else ("end" if yr == years[-1] else "middle")
+        parts.append(f'<text class="band__tick" x="{x(yr):.1f}" y="{height - 8}" text-anchor="{anchor}">{yr}</text>')
+    parts.append(f'<line class="cmpchart__yr" x1="{x(year):.1f}" x2="{x(year):.1f}" y1="{top}" y2="{top + ph}"/>')
+    labels = []
+    if any(v is not None for _, v in avg):
+        parts.append(f'<path class="band__avg" d="{path(avg)}"/>')
+        last = [(yr, v) for yr, v in avg if v is not None][-1]
+        labels.append((y(last[1]), ("Media " if short else "Media semplice ") + n.text(last[1]), "band__lab band__lab--avg"))
+    for line in lines:
+        parts.append(f'<path class="cmpchart__line {line["cls"]}" d="{path(line["points"])}"/>')
+        known = [(yr, v) for yr, v in line["points"] if v is not None]
+        at = dict(known).get(year)
+        if at is not None:
+            parts.append(f'<circle class="cmpchart__dot {line["cls"]}" cx="{x(year):.1f}" cy="{y(at):.1f}" r="4.5"/>')
+        if known:
+            name = short_name(line["name"], 13) if short else line["name"]
+            labels.append((y(known[-1][1]), f"{name} {n.text(known[-1][1])}", f"band__lab {line['cls']}"))
+    labels.sort()
+    placed = []
+    for ly, label, cls in labels:
+        if placed and ly - placed[-1] < 16:
+            ly = placed[-1] + 16
+        placed.append(ly)
+        parts.append(f'<text class="{cls}" x="{left + pw + 8}" y="{ly + 4:.1f}">{escape(label)}</text>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def compare_series(years: list[int], lines: list[dict], avg: list[tuple], year: int) -> str:
+    """La serie del confronto: una linea per territorio scelto, nel colore
+    della sua serie (classi `s1`..`s3`, che il CSS legge da `--cat-*`), la
+    media semplice tratteggiata, il segno dell'anno della tabella e i punti
+    delle regioni in quell'anno, le etichette a fine linea.
+
+    `lines` e' una lista di `{"name", "cls", "points": [(anno, valore o None)]}`
+    sugli stessi `years`, `avg` una lista `(anno, media o None)`. Esce in due
+    tagli, largo e stretto, dentro un `.chart`: lo stesso markup che
+    l'isola ridisegna."""
+    if len(years) < 2 or not any(v is not None for line in lines for _, v in line["points"]):
+        return ""
+    return "".join(f'<div class="{cls}">{_compare(years, lines, avg, year, w, h, r, short)}</div>'
+                   for cls, w, h, r, short in COMPARE_CUTS)
+
+
 # ---------------------------------------------------------------- sparkline
 
 # Le due taglie, in pixel veri: il viewBox e' la misura in cui la curva si

@@ -63,9 +63,8 @@
 
     {% block content %}{% endblock %}
 
-    {# Il piede sta in `_ds_footer.html`, lo stesso che includono le due shell
-       della SPA: finche' viveva qui, l'atlante e il confronto ne avevano due
-       loro. `/privacy` toglie il bottone dei consensi con la variabile
+    {# Il piede sta in `_ds_footer.html`: finche' viveva qui, le due shell
+       della SPA di prima (l'atlante e il confronto) ne avevano due loro. `/privacy` toglie il bottone dei consensi con la variabile
        `footer_consent_link`, non piu' con un blocco. #}
     {% include "_ds_footer.html" %}
   </body>
