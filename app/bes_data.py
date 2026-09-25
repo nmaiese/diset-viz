@@ -30,10 +30,14 @@ LEVELS = {
     "regione": {
         "dataset": "Assoluti_BES_Regione.csv",
         "manifest": "bes_regione_manifest.csv",
+        # La colonna del manifest che conta i territori con un dato nell'ultimo
+        # anno: `coverage_latest` e' questa su tutti i territori del livello.
+        "latest_count": "n_region_latest",
     },
     "provincia": {
         "dataset": "Assoluti_Provincia.csv",
         "manifest": "province_manifest.csv",
+        "latest_count": "n_province_latest",
     },
 }
 PROVINCE_CODES = DATA_DIR / "province_codes.csv"
@@ -58,6 +62,11 @@ MIN_PUBLIC_COVERAGE = 0.8
 # (`seo_titles.UNVERIFIED_EXTREMES`). Due prove in
 # `tests/unit/test_bes_not_measured.py` tengono l'insieme onesto: ogni cella
 # e' uno zero nel CSV, e ogni zero di 06POL012P e' qui.
+#
+# Il manifest le conta ancora, perche' lo scrive `build_province_dataset.py`
+# dal CSV grezzo: `get_bes_manifest` toglie dalla copertura dell'ultimo anno
+# quelle che cadono in `year_max`, cosi' la scheda dice "105 province su 107"
+# come ogni altra serie parziale, e non una copertura piena sopra 105 righe.
 NOT_MEASURED = frozenset(
     ("06POL012P", territory, year)
     for territory in ("Macerata", "Savona")
@@ -114,10 +123,32 @@ def _name_to_key(level):
     return {info["name"]: key for key, info in get_bes_territories(level).items()}
 
 
+def _measured_coverage_latest(row, latest_count):
+    """`coverage_latest` del manifest senza le celle di `NOT_MEASURED` di
+    `year_max`.
+
+    Il manifest divide i territori con un dato nell'ultimo anno per quelli del
+    livello. Togliendo le celle non misurate dal numeratore la copertura resta
+    su quel denominatore: 1,0 su 107 province meno due celle fa 105 su 107,
+    0,9813, come la scriverebbe il build se le due celle non ci fossero.
+    """
+    coverage = float(row.get("coverage_latest", 0) or 0)
+    year_max = int(row["year_max"])
+    dropped = sum(
+        1 for (indicator_id, _, year) in NOT_MEASURED
+        if indicator_id == row["id"] and year == year_max
+    )
+    counted = int(row.get(latest_count) or 0)
+    if not dropped or not counted:
+        return coverage
+    return round(coverage * (counted - dropped) / counted, 4)
+
+
 @cache.memoize(timeout=3600)
 def get_bes_manifest(level):
     """id -> {name, domain_name, category, direction, year_max, unit, coverage_latest}."""
     _, manifest_path = _paths(level)
+    latest_count = LEVELS[level]["latest_count"]
     manifest = {}
     with manifest_path.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=";"):
@@ -137,7 +168,7 @@ def get_bes_manifest(level):
                 "unit": display_unit(row["unit"]),
                 "year_min": int(row["year_min"]),
                 "year_max": int(row["year_max"]),
-                "coverage_latest": float(row.get("coverage_latest", 0) or 0),
+                "coverage_latest": _measured_coverage_latest(row, latest_count),
             }
             item["explain"] = build_bes_indicator_explain(
                 item,

@@ -81,6 +81,39 @@ class LaSchedaProvinciale(unittest.TestCase):
     def test_il_minimo_non_e_piu_zero(self):
         self.assertGreater(min(o["value"] for o in self.level["observations"]), 0)
 
+    def test_la_copertura_e_parziale_in_pagina_e_in_markdown(self):
+        """Il manifest diceva copertura 1,0 anche con due province n.d.
+        nell'ultimo anno, e la frase sulla copertura parziale spariva dalla
+        pagina e dal Markdown per gli agenti. N e M vengono dal livello."""
+        count = len(self.level["observations"])
+        total = self.level["territory_total"]
+        self.assertLess(count, total)
+        self.assertLess(self.level["coverage"], 1)
+        markdown = self.client.get(PROVINCIAL, headers={"Accept": "text/markdown"})
+        self.assertTrue(markdown.content_type.startswith("text/markdown"))
+        sentence = f"copertura è parziale, {count} province su {total}"
+        self.assertIn(sentence, self.html)
+        self.assertIn(sentence, markdown.get_data(as_text=True))
+
+
+class OgniSchedaProvinciale(unittest.TestCase):
+    """La copertura di un livello provinciale BES e' quella delle province che
+    la scheda mostra, non un numero del manifest che le contraddice."""
+
+    def test_la_copertura_coincide_con_le_province_in_pagina(self):
+        checked = 0
+        for indicator_id in sorted(bes_data.get_bes_manifest("provincia")):
+            view = build_indicator_view("bes", indicator_id)
+            self.assertIsNotNone(view, indicator_id)
+            for level in view["levels"]:
+                if level["key"] != "provincia":
+                    continue
+                checked += 1
+                with self.subTest(indicatore=indicator_id):
+                    shown = len(level["observations"]) / level["territory_total"]
+                    self.assertAlmostEqual(level["coverage"], shown, places=3)
+        self.assertEqual(checked, len(bes_data.get_bes_manifest("provincia")))
+
 
 class IlTitoloEDescrizione(unittest.TestCase):
     """Fermo al 358% non e' verificato: il titolo resta senza cifre anche
@@ -141,15 +174,36 @@ class LaPaginaProvincia(unittest.TestCase):
                 self.assertIn('data-label="Anno">2015</td>', row)
                 self.assertNotRegex(row, r'value="0(\.0)?"')
 
+    def _around_links(self, key):
+        """Il testo attorno a ogni link alla scheda, senza tag: dal link al
+        primo `</li>` o `</tr>`, cioe' il fatto o la riga che lo porta."""
+        html = self.pages[key]
+        pieces = []
+        for match in re.finditer(r'<a href="' + re.escape(PROVINCIAL) + '">', html):
+            ends = [end for end in (html.find("</li>", match.end()), html.find("</tr>", match.end()))
+                    if end != -1]
+            fragment = html[match.start():min(ends)]
+            pieces.append(" ".join(re.sub(r"<[^>]+>", " ", fragment).split()))
+        return pieces
+
     def test_non_e_prima_su_107_nel_2024(self):
         """Prima del cambio l'affollamento era il primo dei punti di forza di
-        Macerata: "0,0% nel 2024, 1a su 107 province"."""
+        Macerata: "0,0% nel 2024, 1a su 107 province". Si guarda ogni punto
+        della pagina che porta alla scheda, la riga e i fatti."""
         for key in NOT_MEASURED_KEYS:
             with self.subTest(provincia=key):
-                facts = re.findall(r'<li><a href="' + re.escape(PROVINCIAL) + r'">.*?</li>',
-                                   self.pages[key], re.DOTALL)
-                for fact in facts:
-                    self.assertNotIn("nel 2024", fact)
+                pieces = self._around_links(key)
+                self.assertTrue(pieces, f"{key}: nessun link alla scheda")
+                for text in pieces:
+                    self.assertNotIn("su 107", text)
+                    self.assertNotIn("nel 2024", text)
+
+    def test_savona_ha_il_fatto_col_suo_anno(self):
+        """Savona resta fra i punti di forza col suo 2015: la prova sopra ha
+        qualcosa da guardare anche fuori dalla riga, e la cifra porta l'anno."""
+        facts = [text for text in self._around_links("savona") if "nel 2015" in text]
+        self.assertTrue(facts)
+        self.assertIn("63,3", facts[0])
 
 
 class UnVersoSolo(unittest.TestCase):

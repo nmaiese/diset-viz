@@ -60,6 +60,25 @@ class NotMeasuredTest(unittest.TestCase):
         self.assertNotIn(("Savona", 2024), values)
         self.assertEqual(values[("Fermo", 2024)], 358.1)
 
+    def test_la_copertura_del_manifest_non_le_conta(self):
+        """Il manifest lo scrive il build dal CSV grezzo, e conta anche le
+        celle n.d. dell'ultimo anno: con 1,0 la scheda taceva la frase sulla
+        copertura parziale sopra una classifica di due province in meno. La
+        copertura che arriva ai lettori e' quella delle righe che il loader
+        porta davvero, sullo stesso denominatore."""
+        info = bes_data.get_bes_manifest("provincia")[OVERCROWDING]
+        total = len(bes_data.get_bes_territories("provincia"))
+        measured = {
+            row["territory_key"] for row in self.rows
+            if row["id"] == OVERCROWDING and row["year"] == info["year_max"]
+            and row["value"] is not None and row["territory_key"]
+        }
+        dropped = {cell for cell in bes_data.NOT_MEASURED
+                   if cell[0] == OVERCROWDING and cell[2] == info["year_max"]}
+        self.assertTrue(dropped)
+        self.assertLess(info["coverage_latest"], 1)
+        self.assertAlmostEqual(info["coverage_latest"], len(measured) / total, places=4)
+
     def test_nessuno_zero_di_affollamento_arriva_ai_lettori(self):
         self.assertFalse([row for row in self.rows
                           if row["id"] == OVERCROWDING and row["value"] == 0])
