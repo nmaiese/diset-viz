@@ -83,6 +83,29 @@ class OgniCoppiaDelPool(unittest.TestCase):
         self.assertEqual(guasti, [], guasti[:10])
 
 
+class PanelLinkComesFromTheCaller(unittest.TestCase):
+    """`home.level_panel` non scrive l'indirizzo della home: lo riceve, cosi'
+    lo puo' usare un'altra pagina. Il link del selettore della home resta
+    quello di prima, `/?indicatore=<codice>&livello=<livello>#dato`."""
+
+    def test_another_page_gets_its_own_link(self):
+        from app.design.pages import home
+        with app.app_context():
+            scelta = home_pick.pick("bes-01SAL001", "provincia")
+            panel = home.level_panel(scelta["meta"], scelta["level"], "/atlante?indicatore=bes-01SAL001#mappa")
+            self.assertEqual(panel["href"], "/atlante?indicatore=bes-01SAL001&livello=provincia#mappa")
+            levels = home.feature(scelta)["levels"]
+        self.assertEqual(len(levels), 2)
+        for panel in levels:
+            self.assertEqual(panel["href"], f"/?indicatore=bes-01SAL001&livello={panel['key']}#dato")
+
+    def test_the_level_goes_before_the_anchor(self):
+        from app.design.pages.home import level_href
+        self.assertEqual(level_href("/atlante", "regione"), "/atlante?livello=regione")
+        self.assertEqual(level_href("/atlante#mappa", "regione"), "/atlante?livello=regione#mappa")
+        self.assertEqual(level_href("/?indicatore=ter-901", "regione"), "/?indicatore=ter-901&livello=regione")
+
+
 class LaSchedaSulSuoLivello(unittest.TestCase):
     """Ogni pannello porta alla scheda aperta sul suo livello. La scheda di un
     indicatore con tutti e due i livelli si apre sulle regioni, e il pannello

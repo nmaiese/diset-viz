@@ -123,6 +123,89 @@
 </ul>
 {%- endmacro %}
 
+{#- Il modulo dato: un indicatore su un livello, con la mappa accanto alla
+    classifica, l'anno e il territorio da scegliere. Nato nella scheda
+    indicatore, e' un componente perche' lo usano anche altre pagine.
+
+    `m` e' un dizionario solo, composto in Python (per la scheda da
+    `app/design/pages/indicatore.py`, chiave `module`): la macro non legge
+    nient'altro, e il JSON che v1.js legge viaggia dentro il modulo.
+
+    `root` fa del modulo il suo `data-page-root`, cioe' il confine entro cui
+    v1.js cerca cio' che il modulo accende: basta a una pagina che lo mostra
+    da solo, o a un frammento che arriva dopo il caricamento e si aggancia con
+    `DiV1.init(modulo)`. La scheda lo chiama con `root=False` e mette il
+    confine sul suo `<main>`, perche' la scelta di un territorio accende anche
+    la striscia del divario in testa e la serie di "Com'e' cambiato", che
+    stanno fuori dal modulo. Gli id (`anno`, `territorio`, `classifica-dati`)
+    sono quelli della scheda: un modulo per pagina.
+
+    Il JSON sta in fondo alla figura: una `figcaption` deve essere il primo o
+    l'ultimo figlio. -#}
+{% macro explore(m, root=True) -%}
+<figure class="module" data-explore{% if root %} data-page-root{% endif %}>
+  <figcaption class="module__head">
+    {% if m.claim %}<h3 class="h-sub" data-claim>{{ m.claim }}</h3>{% endif %}
+    <p class="subline">{{ m.name }}{% if m.unit_note %}, {{ m.unit_note }}{% endif %}, <span data-year-label>{{ m.year }}</span>. Le {{ m.n }} {{ m.plural }} {% if m.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
+  </figcaption>
+  <div class="toolbar">
+    {#- Il livello che manca a questa scheda, quando sta in una gemella
+        (`twin`), e' una voce del selettore come le altre: porta
+        all'altra pagina, e il lettore passa dalle regioni alle province
+        senza sapere che sono due schede. -#}
+    {% if m.level_tabs | length > 1 %}
+    <div class="field"><span>Livello</span>
+      <div class="seg" role="group" aria-label="Livello territoriale">
+        {% for item in m.level_tabs %}{% if item.current %}<span aria-current="page">{{ item.label }}</span>{% else %}<a href="{{ item.href }}">{{ item.label }}</a>{% endif %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if m.years | length > 1 %}
+    <label class="field field--year" for="anno">Anno <output data-year-out>{{ m.year }}</output>
+      <span class="year"><span>{{ m.year_min }}</span>
+        <input id="anno" type="range" min="0" max="{{ m.years | length - 1 }}" step="1" value="{{ m.years | length - 1 }}" aria-valuetext="{{ m.year }}" data-year>
+      <span>{{ m.year }}</span></span>
+    </label>
+    {% endif %}
+    <label class="field" for="territorio">Trova la tua {{ m.singular }}
+      <select id="territorio" data-territory>
+        <option value="">Nessuna in evidenza</option>
+        {% for t in m.territories | sort(attribute='name') %}<option value="{{ t.key }}">{{ t.name }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="module__body">
+    {% if m.show_map %}
+    <div class="module__map">
+      {{ map(m.map_classes, 'esplora', m.map_names, m.map_values, overlay=m.callouts, label='Mappa cliccabile delle ' ~ m.plural ~ ' italiane per ' ~ m.name, level=m.level) }}
+      {{ legend(m.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.', m.legend_nd) }}
+      {% if m.level == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
+    </div>
+    {% endif %}
+    <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle {{ m.plural }}">
+      {% if m.area_legend %}{{ arealegend(m.area_legend) }}{% endif %}
+      <table class="table">
+        <caption class="sr-only">{{ m.name }}, le {{ m.n }} {{ m.plural }} nel <span data-year-label>{{ m.year }}</span>{% if m.unit_note %}, {{ m.unit_note }}{% endif %}</caption>
+        <thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ m.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (m.short_unit or 'Valore') | capitalize }}</th></tr></thead>
+        <tbody data-rank-body>
+          {% for row in m.ranking %}
+          {% if row.ref %}
+          <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', m.decimals) }}</td></tr>
+          {% else %}
+          <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if m.areas.get(row.key) %}<span class="area-dot area-dot--{{ m.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if m.profile_path %}<a href="{{ m.profile_path ~ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if m.areas.get(row.key) %}<span class="sr-only">, {{ m.area_label[m.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', m.decimals) }}</td></tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="source">Fonte: <a href="{{ m.source_url }}">{{ m.source_label }}</a> ({{ m.year }}). Elaborazione Divario Italia.{% if m.csv %} <a href="{{ m.csv }}">Dati in CSV</a>{% endif %}</p>
+  <p class="sr-only" role="status" aria-live="polite" data-live></p>
+  <script type="application/json" data-explore-data>{{ m.js | tojson }}</script>
+</figure>
+{%- endmacro %}
+
 {#- Lo spazio pubblicitario. I posti sono disegnati (SISTEMA.md: al massimo due
     per pagina, mai dentro la testata, le tessere, il modulo dato o le
     tabelle), ma finche' non ci sono unita' AdSense vere per quei posti la

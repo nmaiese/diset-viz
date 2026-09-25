@@ -201,17 +201,36 @@ def derive(ctx: dict) -> dict:
     level_tabs.sort(key=lambda t: 0 if t["key"] == "regione" else 1)
     citation = (f"Divario Italia, «{meta['name']}», elaborazione su dati {meta.get('source_label') or meta.get('source')} "
                 f"({year}). {ctx.get('canonical')}")
+    map_missing = show_map and bool(set(maps.paths(level["key"])) - {o["key"] for o in obs})
+    downloads = meta.get("downloads") or {}
+    # Il modulo dato ("Chi e' in testa"): tutto cio' che la macro `ui.explore`
+    # legge, in un dizionario solo. Qui si mette insieme, non si ricalcola:
+    # ogni cifra e' quella che la scheda mostrava prima che il modulo fosse
+    # un componente.
+    module = {
+        "name": meta["name"], "level": level["key"], "year": year, "year_min": level.get("year_min"),
+        "years": level.get("years") or [], "n": n, "plural": plural, "singular": level["singular"],
+        "lower_better": direction in ("lower_better", "higher_worse"),
+        "claim": claim, "unit_note": unit_note(unit, meta["name"]), "short_unit": short_unit(unit),
+        "level_tabs": level_tabs, "territories": level.get("territories") or [],
+        "show_map": show_map, "map_classes": classes, "map_names": map_names,
+        "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
+        "callouts": callouts, "legend": legend(values, unit) if values else None,
+        "legend_nd": level["key"] == "regione" or map_missing,
+        "area_legend": strip.get("legend"), "ranking": ranking(level, unit),
+        "decimals": numfmt.column_decimals([o["value"] for o in obs]),
+        "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
+        "profile_path": level.get("profile_path"),
+        "source_url": meta.get("source_url"), "source_label": meta.get("source_label"),
+        "csv": downloads.get("csv") if level["key"] == "regione" else None,
+        "js": explore_js,
+    }
     return {
         "fmt": num, "fmt_unit": with_unit, "date_it": date_it, "citation": citation,
-        "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
-        "unit": numfmt.lower_first(unit) if unit else unit, "short_unit": short_unit(unit), "tiles": tiles, "verso": verso,
+        "unit": numfmt.lower_first(unit) if unit else unit, "tiles": tiles, "verso": verso,
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
-        "claim": claim, "map_classes": classes, "show_map": show_map, "map_names": map_names,
-        "map_missing": show_map and bool(set(maps.paths(level["key"])) - {o["key"] for o in obs}),
-        "legend": legend(values, unit) if values else None,
-        "ranking": ranking(level, unit), "series": series, "strip": strip, "callouts": callouts,
-        "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
-        "decimals": numfmt.column_decimals([o["value"] for o in obs]), "series_claim": series_claim, "series_note": series_note,
-        "updated": date_it(ctx.get("dataset_updated")), "explore_js": explore_js, "level_tabs": level_tabs,
+        "series": series, "strip": strip, "module": module,
+        "series_claim": series_claim, "series_note": series_note,
+        "updated": date_it(ctx.get("dataset_updated")),
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),
     }

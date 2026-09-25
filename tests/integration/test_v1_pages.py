@@ -687,5 +687,62 @@ class IlRipiegoTiene(unittest.TestCase):
             cache.clear()
 
 
+class ExploreModuleIsAComponent(unittest.TestCase):
+    """Il modulo dato della scheda ("Chi e' in testa") e' la macro
+    `ui.explore` su `d.module`, e un'altra pagina la puo' usare da sola.
+
+    Sulla scheda il confine di v1.js (`data-page-root`) e' il `<main>`: il
+    territorio scelto accende anche la striscia in testa e la serie di "Com'e'
+    cambiato", che stanno fuori dal modulo, e un confine sul modulo le
+    staccherebbe senza che niente nell'HTML se ne accorga. Da solo il modulo
+    e' il suo confine, con il JSON dentro: un frammento arrivato dopo si
+    aggancia con `DiV1.init(modulo)`."""
+
+    PATHS = ("/indicatore/pil-pro-capite/ter-901", "/indicatore/x/bes-01SAL001?livello=provincia")
+
+    def _page(self, path):
+        """L'HTML della scheda e il `d.module` con cui e' stata resa."""
+        from flask import template_rendered
+
+        seen = []
+
+        def record(sender, template, context, **extra):
+            if template.name == "v1/indicatore.html":
+                seen.append(context["d"]["module"])
+
+        with template_rendered.connected_to(record, app):
+            response = app.test_client().get(path, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(seen), 1)
+        return response.get_data(as_text=True), seen[0]
+
+    @staticmethod
+    def _macro(module, root):
+        from flask import render_template_string
+
+        with app.test_request_context():
+            return render_template_string('{% import "v1/_ui.html" as ui %}{{ ui.explore(m, root=root) }}',
+                                          m=module, root=root)
+
+    def test_the_page_renders_the_macro_under_its_own_root(self):
+        for path in self.PATHS:
+            with self.subTest(path=path):
+                html, module = self._page(path)
+                inside = self._macro(module, False)
+                self.assertTrue(inside.startswith('<figure class="module" data-explore>'), inside[:80])
+                self.assertIn(inside, html)
+                self.assertRegex(html, r'<main\b[^>]*\bdata-v1="indicatore"[^>]*\bdata-page-root[\s>]')
+                # Un JSON solo, quello del modulo, e in fondo alla figura.
+                self.assertEqual(len(EXPLORE.findall(html)), 1)
+                self.assertTrue(inside.rstrip().endswith("</script>\n</figure>"), inside[-80:])
+                self.assertEqual(json.loads(EXPLORE.search(inside).group(1)), json.loads(json.dumps(module["js"])))
+
+    def test_alone_the_module_is_its_own_root(self):
+        _, module = self._page(self.PATHS[0])
+        alone = self._macro(module, True)
+        self.assertTrue(alone.startswith('<figure class="module" data-explore data-page-root>'), alone[:80])
+        self.assertEqual(alone.replace(" data-page-root", "", 1), self._macro(module, False))
+
+
 if __name__ == "__main__":
     unittest.main()

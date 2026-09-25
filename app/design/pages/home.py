@@ -170,7 +170,7 @@ HOME_STRIP_WIDTH = 1320
 LEVEL_TAB = {"regione": "Regioni", "provincia": "Province"}
 
 
-def level_panel(meta: dict, level: dict, code: str) -> dict | None:
+def level_panel(meta: dict, level: dict, base: str) -> dict | None:
     """Un livello dell'indicatore in evidenza, con la regia della scheda: la
     striscia del divario, poi la mappa che nomina i suoi estremi accanto alla
     classifica. Regioni e province hanno la stessa forma: per le province la
@@ -179,7 +179,12 @@ def level_panel(meta: dict, level: dict, code: str) -> dict | None:
 
     Legge il livello che `indicator_view` costruisce per la scheda, lo stesso
     che `test_v1_pages` passa su ogni istanza: la home non ricalcola niente,
-    sceglie."""
+    sceglie.
+
+    `base` e' l'indirizzo della pagina che ospita il pannello, con
+    l'indicatore gia' scelto e l'ancora a cui tornare (la home passa
+    `/?indicatore=<codice>#dato`): il pannello ci aggiunge solo il suo
+    livello, cosi' lo puo' usare anche una pagina che non e' la home."""
     observations = [o for o in level.get("observations") or [] if o.get("value") is not None]
     year = level.get("year_max")
     if len(observations) < 2 or year is None:
@@ -261,8 +266,9 @@ def level_panel(meta: dict, level: dict, code: str) -> dict | None:
     return {
         "key": key, "tab": LEVEL_TAB.get(key, plural.capitalize()), "year": year, "n": n,
         "plural": plural, "singular": singular,
-        # Senza JavaScript il selettore e' questo link: #dato riporta al pannello.
-        "href": f"/?indicatore={code}&livello={key}#dato",
+        # Senza JavaScript il selettore e' questo link: l'ancora di `base`
+        # riporta al pannello.
+        "href": level_href(base, key),
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
         "short_unit": short_unit(unit),
         "lead_claim": lead_claim, "table_claim": table_claim,
@@ -291,6 +297,13 @@ def level_panel(meta: dict, level: dict, code: str) -> dict | None:
     }
 
 
+def level_href(base: str, key: str) -> str:
+    """`base` con `livello=<key>` nella query, prima dell'ancora."""
+    address, _, anchor = base.partition("#")
+    joined = f"{address}{'&' if '?' in address else '?'}livello={key}"
+    return f"{joined}#{anchor}" if anchor else joined
+
+
 def feature(pick: dict | None) -> dict | None:
     """L'indicatore in evidenza: cio' che vale per tutti e due i livelli (nome,
     tema, fonte, verso) e un pannello per livello. Il primo e' quello estratto,
@@ -301,10 +314,11 @@ def feature(pick: dict | None) -> dict | None:
         return None
     meta = pick["meta"]
     code = meta["canonical_path"].rstrip("/").rsplit("/", 1)[-1]
-    first = level_panel(meta, pick["level"], code)
+    base = f"/?indicatore={code}#dato"
+    first = level_panel(meta, pick["level"], base)
     if first is None:
         return None
-    second = level_panel(meta, pick["other"], code) if pick.get("other") else None
+    second = level_panel(meta, pick["other"], base) if pick.get("other") else None
     direction = meta.get("direction")
     verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
              "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")

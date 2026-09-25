@@ -3,9 +3,16 @@
    tabelle vengono dal server. Qui c'e' solo l'interazione: il valore sulla
    mappa, l'anno e il territorio del modulo dato, la citazione da copiare,
    l'indice di pagina. Il tema lo tiene ds-chrome.js, come su ogni pagina.
-   Nato coi prototipi (design/v1/src/js/proto.js). */
+   Nato coi prototipi (design/v1/src/js/proto.js).
+
+   Gli agganci li fa DiV1.init(root): al caricamento su tutto il documento, e
+   di nuovo su un pezzo di pagina arrivato dopo (un modulo dato che cambia
+   indicatore senza ricaricare). Ogni elemento si aggancia una volta sola, per
+   quante volte init lo incontri: un doppio aggancio non si vede finche' due
+   clic sulla mappa non si annullano a vicenda. */
 (function () {
   "use strict";
+  if (window.DiV1) return;
 
   /* ---------- numeri all'italiana, stessa regola di seo_titles._decimals ----------
      Lo zero si scrive "0", e sotto un centesimo i decimali arrivano alla prima
@@ -34,6 +41,24 @@
     return unit ? fmt(v) + " " + unit : fmt(v);
   }
 
+  /* ---------- una volta sola per elemento ----------
+     Il segno sta in una WeakMap, non in un attributo: un elemento clonato si
+     porta dietro gli attributi ma non gli ascoltatori, e un segno nel DOM lo
+     farebbe credere gia' agganciato. */
+  var bound = new WeakMap();
+  function each(root, selector, fn) {
+    var found = Array.prototype.slice.call(root.querySelectorAll(selector));
+    // querySelectorAll non guarda root: un modulo passato da solo e' anche il suo root.
+    if (root.matches && root.matches(selector)) found.unshift(root);
+    found.forEach(function (el) {
+      var seen = bound.get(el);
+      if (!seen) { seen = {}; bound.set(el, seen); }
+      if (seen[selector]) return;
+      seen[selector] = true;
+      fn(el);
+    });
+  }
+
   /* ---------- copia la citazione ---------- */
   document.addEventListener("click", function (ev) {
     var b = ev.target.closest("[data-copy]");
@@ -55,7 +80,7 @@
   });
 
   /* ---------- mappa: il valore al passaggio del mouse ---------- */
-  document.querySelectorAll("[data-map]").forEach(function (box) {
+  function initMap(box) {
     var tip = box.querySelector("[data-map-tip]");
     box.addEventListener("mousemove", function (ev) {
       var p = ev.target.closest(".map [data-key]");
@@ -74,12 +99,18 @@
       tip.style.top = y + "px";
     });
     box.addEventListener("mouseleave", function () { tip.hidden = true; });
-  });
+  }
 
-  /* ---------- il modulo dato della scheda ---------- */
-  document.querySelectorAll("[data-explore]").forEach(function (mod) {
+  /* ---------- il modulo dato della scheda ----------
+     Il confine e' il `data-page-root` piu' vicino (il modulo stesso, quando
+     sta da solo), se no il documento: dentro stanno la striscia e la serie
+     che il territorio scelto accende. Il JSON sta nel modulo (ui.explore) o,
+     in home, accanto nel pannello. */
+  // Il modulo agganciato per ultimo in ogni confine, per la striscia che sta fuori.
+  var liveExplore = new WeakMap();
+  function initExplore(mod) {
     var page = mod.closest("[data-page-root]") || document;
-    var dataEl = page.querySelector("[data-explore-data]");
+    var dataEl = mod.querySelector("[data-explore-data]") || page.querySelector("[data-explore-data]");
     if (!dataEl) return;
     var data = JSON.parse(dataEl.textContent);
     var slider = mod.querySelector("[data-year]");
@@ -199,12 +230,18 @@
     if (select) select.addEventListener("change", function () { highlight(select.value); });
     // Il campo ripristinato dal browser dopo un Indietro riaccende la sua evidenza.
     if (select && select.value) highlight(select.value);
-    page.querySelectorAll(".strip").forEach(function (svg) {
+    // La striscia sta fuori dal modulo, nel confine: un modulo sostituito sul
+    // posto la ritrova gia' agganciata. Il suo clic si aggancia una volta sola
+    // e parla col modulo agganciato per ultimo, non con quello che l'ha vista
+    // per primo e che forse non e' piu' nella pagina.
+    liveExplore.set(page, { select: select, highlight: highlight });
+    each(page, ".strip", function (svg) {
       svg.addEventListener("click", function (ev) {
         var c = ev.target.closest(".strip__dot");
-        if (!c || !select) return;
-        select.value = select.value === c.dataset.key ? "" : c.dataset.key;
-        highlight(select.value);
+        var cur = liveExplore.get(page);
+        if (!c || !cur || !cur.select) return;
+        cur.select.value = cur.select.value === c.dataset.key ? "" : c.dataset.key;
+        cur.highlight(cur.select.value);
       });
     });
     mod.addEventListener("click", function (ev) {
@@ -215,10 +252,10 @@
       select.value = select.value === p.dataset.key ? "" : p.dataset.key;
       highlight(select.value);
     });
-  });
+  }
 
   /* ---------- mappe per scegliere un territorio: il nome al passaggio del mouse ---------- */
-  document.querySelectorAll("[data-navmap]").forEach(function (box) {
+  function initNavmap(box) {
     var tip = box.querySelector("[data-navmap-tip]");
     if (!tip) return;
     box.addEventListener("mousemove", function (ev) {
@@ -233,14 +270,14 @@
       tip.style.top = y + "px";
     });
     box.addEventListener("mouseleave", function () { tip.hidden = true; });
-  });
+  }
 
   /* ---------- regioni e province della home: l'anteprima del territorio scelto ----------
      Le anteprime arrivano tutte nel JSON del blocco, gia' scritte dal server.
      Qui si ricompone la stessa scheda di home/_territori.html, e il clic sulla
      mappa sceglie invece di aprire: il profilo si apre dal bottone. */
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  document.querySelectorAll("[data-picker]").forEach(function (box) {
+  function initPicker(box) {
     var dataEl = box.querySelector("[data-picker-data]");
     var card = box.querySelector("[data-picker-card]");
     if (!dataEl || !card) return;
@@ -275,13 +312,13 @@
       render(a.dataset.key);
     });
     if (select) select.addEventListener("change", function () { render(select.value); });
-  });
+  }
 
   /* ---------- schede (tab): regioni e province dell'indicatore in evidenza ----------
      Senza JavaScript ogni scheda e' un link alla pagina con quel livello; qui
      il clic mostra il pannello gia' in pagina, e le frecce passano da una
      scheda all'altra come chiede il pattern ARIA dei tab. */
-  document.querySelectorAll("[data-tabs]").forEach(function (list) {
+  function initTabs(list) {
     var tabs = Array.prototype.slice.call(list.querySelectorAll("[data-tab]"));
     if (tabs.length < 2) return;
     var scope = list.closest("article, section") || document;
@@ -325,15 +362,17 @@
         show(tabs[(i + step + tabs.length) % tabs.length], true);
       });
     });
-  });
+  }
 
-  /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ---------- */
-  if (matchMedia("(max-width: 599px)").matches) {
-    document.querySelectorAll("details[data-collapse-mobile]").forEach(function (d) { d.open = false; });
+  /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ----------
+     Solo al primo aggancio: un secondo init non richiude cio' che il lettore
+     ha aperto. */
+  function initCollapse(d) {
+    if (matchMedia("(max-width: 599px)").matches) d.open = false;
   }
 
   /* ---------- indice di pagina: la voce della sezione che si sta leggendo ---------- */
-  document.querySelectorAll(".toc").forEach(function (toc) {
+  function initToc(toc) {
     var links = Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']"));
     var targets = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
     var ticking = false;
@@ -353,5 +392,20 @@
     }
     addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     update();
-  });
+  }
+
+  /* ---------- gli agganci, nell'ordine di sempre ---------- */
+  function init(root) {
+    root = root || document;
+    each(root, "[data-map]", initMap);
+    each(root, "[data-explore]", initExplore);
+    each(root, "[data-navmap]", initNavmap);
+    each(root, "[data-picker]", initPicker);
+    each(root, "[data-tabs]", initTabs);
+    each(root, "details[data-collapse-mobile]", initCollapse);
+    each(root, ".toc", initToc);
+  }
+
+  window.DiV1 = { init: init };
+  init(document);
 })();
