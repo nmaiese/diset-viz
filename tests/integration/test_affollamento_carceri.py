@@ -49,10 +49,12 @@ class LaSchedaProvinciale(unittest.TestCase):
     def test_nessuno_zero_per_loro_in_pagina(self):
         """Ne' nella striscia del divario, ne' nella classifica, ne' sulla
         mappa: prima c'erano come "Macerata 0" e "0%", in testa."""
-        self.assertIn('<tr data-key="arezzo">', self.html)
+        # La riga porta anche l'id dell'ancora (`id="p-<key>"`): si cerca
+        # l'apertura del tag, non il tag intero.
+        self.assertRegex(self.html, r'<tr data-key="arezzo"[ >]')
         for key, name in zip(NOT_MEASURED_KEYS, ("Macerata", "Savona")):
             with self.subTest(provincia=name):
-                self.assertNotIn(f'<tr data-key="{key}">', self.html)
+                self.assertNotRegex(self.html, rf'<tr data-key="{key}"[ >]')
                 self.assertNotIn(f'data-key="{key}" cx=', self.html)
                 self.assertNotIn(f"<title>{name} 0</title>", self.html)
                 self.assertNotIn(f'<tspan class="callout__nm">{name}</tspan>', self.html)

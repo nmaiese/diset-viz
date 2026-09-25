@@ -823,37 +823,60 @@ def province_answer(meta, level, link_prefix=None, max_len=DESCRIPTION_MAX):
     return None
 
 
+def region_gaps(level, rows):
+    """Per ogni regione con il dato di almeno due province: la distanza fra la
+    provincia piu' alta e la piu' bassa, dalla piu' ampia.
+
+    Una lista di `(distanza, regione, piu' alta, piu' bassa, province)`. La
+    distanza e' arrotondata ai decimali della colonna dei valori
+    (`numfmt.column_decimals`), quelli con cui la tabella di "Dentro le
+    regioni" la scrive: senza, 84,7 meno 83,1 faceva 1,6000000000000085 e
+    84,5 meno 82,9 faceva 1,5999999999999943, e due distanze che la tabella
+    scrive uguali finivano in un ordine che non era quello per nome, o una
+    regione sola si prendeva "la piu' ampia". A pari distanza l'ordine e' per
+    nome della regione, e dentro la regione un estremo a pari merito per nome
+    della provincia, cosi' niente cambia da un avvio all'altro.
+
+    La usano la frase-risposta (`_widest_within_region`) e "Dentro le regioni"
+    della scheda (`design.pages.indicatore.within_regions`): una sola, perche'
+    il titolo del blocco deve nominare la stessa regione della frase.
+    """
+    region_of = level.get("region_of") or {}
+    observed = [row for row in rows if row.get("value") is not None]
+    decimals = numfmt.column_decimals([row["value"] for row in observed])
+    by_region = {}
+    for row in observed:
+        region = region_of.get(row.get("key"))
+        if region:
+            by_region.setdefault(region, []).append(row)
+    gaps = []
+    for region, members in by_region.items():
+        if len(members) < 2:
+            continue
+        upper = min(members, key=lambda row: (-row["value"], row["name"]))
+        lower = min(members, key=lambda row: (row["value"], row["name"]))
+        gaps.append((round(upper["value"] - lower["value"], decimals), region, upper, lower, members))
+    gaps.sort(key=lambda item: (-item[0], item[1]))
+    return gaps
+
+
 def _widest_within_region(meta, level, rows, percent):
     """(distanza scritta, regione, provincia piu' alta, piu' bassa) della
     regione dove le sue province si allontanano di piu', o None.
 
     Solo con un'unita' che si scrive dopo una cifra sola ("anni", "euro") o
     con le percentuali, in punti: "2,1 per 100.000 abitanti separano" non si
-    legge. A parita' di distanza vince la regione prima in ordine alfabetico,
-    cosi' la frase non cambia da un avvio all'altro.
+    legge. A parita' di distanza, come la tabella la scrive, vince la regione
+    prima in ordine alfabetico (`region_gaps`): la frase dice il vero anche
+    allora ("Nel Lazio 0,50 punti separano..."), ma non che sia la sola.
     """
     unit = "punti" if percent else _short_unit(meta)
-    region_of = level.get("region_of") or {}
-    if not unit or not region_of:
+    if not unit or not level.get("region_of"):
         return None
-    by_region = {}
-    for row in rows:
-        region = region_of.get(row.get("key"))
-        if region:
-            by_region.setdefault(region, []).append(row)
-    best = None
-    for region in sorted(by_region):
-        members = by_region[region]
-        if len(members) < 2:
-            continue
-        upper = min(members, key=lambda row: (-row["value"], row["name"]))
-        lower = min(members, key=lambda row: (row["value"], row["name"]))
-        gap = upper["value"] - lower["value"]
-        if gap > 0 and (best is None or gap > best[0]):
-            best = (gap, region, upper, lower)
-    if best is None:
+    gaps = region_gaps(level, rows)
+    if not gaps or gaps[0][0] <= 0:
         return None
-    gap, region, upper, lower = best
+    gap, region, upper, lower, _ = gaps[0]
     text = format_number(gap)
     if text is None or text == "0":
         return None

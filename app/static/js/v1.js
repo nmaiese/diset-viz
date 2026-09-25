@@ -108,6 +108,37 @@
      in home, accanto nel pannello. */
   // Il modulo agganciato per ultimo in ogni confine, per la striscia che sta fuori.
   var liveExplore = new WeakMap();
+  // Il modulo di ogni classifica, per l'ancora #p-<key> che arriva dopo (hashchange).
+  var exploreOf = new WeakMap();
+
+  // "Dall'11ª alla 97ª", come classifica.from_to: l'articolo si elide davanti
+  // a ottava, undicesima, ottantesima e simili.
+  function fromTo(first, last) {
+    function art(prep, n) {
+      var vowel = n === 8 || n === 11 || (n >= 80 && n <= 89) || (n >= 800 && n <= 899);
+      return prep + (vowel ? "ll'" : "lla ") + n + "ª";
+    }
+    var text = art("da", first) + " " + art("a", last);
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  // L'ancora di una riga della classifica (#p-<key>, da /provincia/<key>)
+  // diventa la scelta del modulo: con il JavaScript la riga si accende come
+  // una scelta, insieme alla mappa, alla striscia e alla serie, e resta
+  // accesa quando il cambio d'anno ridisegna le righe. Un ascoltatore solo,
+  // sul documento.
+  function hashId() {
+    try { return decodeURIComponent(location.hash.slice(1)); } catch (e) { return ""; }
+  }
+  function followHash() {
+    var id = hashId();
+    var row = id && document.getElementById(id);
+    var mod = row && row.closest("[data-explore]");
+    var ctl = mod && exploreOf.get(mod);
+    if (ctl && row.dataset.key) ctl.choose(row.dataset.key);
+  }
+  addEventListener("hashchange", followHash);
+
   function initExplore(mod) {
     var page = mod.closest("[data-page-root]") || document;
     var dataEl = mod.querySelector("[data-explore-data]") || page.querySelector("[data-explore-data]");
@@ -116,16 +147,31 @@
     var slider = mod.querySelector("[data-year]");
     var select = mod.querySelector("[data-territory]");
     var body = mod.querySelector("[data-rank-body]");
+    // La classifica piegata (province): tre corpi, prime, di mezzo e ultime.
+    var parts = {
+      head: mod.querySelector('[data-rank-part="head"]'),
+      middle: mod.querySelector('[data-rank-part="middle"]'),
+      tail: mod.querySelector('[data-rank-part="tail"]')
+    };
     var claim = mod.querySelector("[data-claim]");
     var live = mod.querySelector("[data-live]");
+    // "Vai alla riga nella classifica", accanto al campo (solo le province).
+    var jump = mod.querySelector("[data-rank-goto]");
     var series = page.querySelector("[data-series]");
     var lowerBetter = data.direction === "lower_better" || data.direction === "higher_worse";
     var current = data.years[data.years.length - 1];
 
+    // A pari valore l'ordine e' per nome, come sul server (indicator_view
+    // _build_level): il confronto semplice, non localeCompare, perche' Python
+    // confronta le stringhe per codice. Senza, un pari merito cambiava
+    // posizione fra la pagina servita e lo stesso anno ridisegnato.
     function rows(year) {
       var m = data.matrix[String(year)] || {};
       var list = Object.keys(m).filter(function (k) { return m[k] !== null; }).map(function (k) { return { key: k, name: data.names[k] || k, value: m[k] }; });
-      list.sort(function (a, b) { return lowerBetter ? a.value - b.value : b.value - a.value; });
+      list.sort(function (a, b) {
+        var d = lowerBetter ? a.value - b.value : b.value - a.value;
+        return d || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
       return list;
     }
 
@@ -159,19 +205,43 @@
       mod.querySelectorAll("[data-legend]").forEach(function (el) { el.textContent = fmt(lg[el.dataset.legend]); });
 
       var sel = select ? select.value : "";
-      var html = [], refDone = false;
+      // Piegata come sul server (indicatore.fold): le prime e le ultime
+      // `edge` righe in vista, le altre nel details, se le righe dell'anno
+      // sono piu' di `over`. La riga della media va nel pezzo della riga che
+      // la segue. Si riscrivono solo i corpi: il details resta aperto o chiuso.
+      var folded = !!(data.fold && parts.head && parts.middle && parts.tail && list.length > data.fold.over);
+      var edge = folded ? data.fold.edge : 0;
+      var html = { head: [], middle: [], tail: [] }, refDone = false;
       list.forEach(function (r, i) {
+        var part = !folded || i < edge ? "head" : i >= list.length - edge ? "tail" : "middle";
         var crosses = lowerBetter ? r.value > avg : r.value < avg;
         if (!refDone && crosses) {
-          html.push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
+          html[part].push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
           refDone = true;
         }
         var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
         var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
-        html.push('<tr data-key="' + r.key + '"' + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
+        var id = data.row_id ? ' id="' + data.row_id + r.key + '"' : "";
+        html[part].push('<tr data-key="' + r.key + '"' + id + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
           '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
       });
-      body.innerHTML = html.join("");
+      if (parts.head && parts.middle && parts.tail) {
+        parts.head.innerHTML = html.head.join("");
+        parts.middle.innerHTML = html.middle.join("");
+        parts.tail.innerHTML = html.tail.join("");
+        // Un anno con meno righe della soglia non si piega: tutte in cima.
+        var more = mod.querySelector("[data-rank-more]"), tail = mod.querySelector("[data-rank-tail]");
+        if (more) more.hidden = !folded;
+        if (tail) tail.hidden = !folded;
+        var cap = mod.querySelector("[data-rank-caption]");
+        if (cap) cap.textContent = folded ? "Le prime " + edge + " " + data.plural : "Le " + list.length + " " + data.plural;
+        if (folded) {
+          var label = fromTo(edge + 1, list.length - edge) + ": le altre " + (list.length - 2 * edge) + " " + data.plural;
+          mod.querySelectorAll("[data-rank-summary]").forEach(function (el) { el.textContent = label; });
+        }
+      } else {
+        body.innerHTML = html.head.join("");
+      }
 
       if (claim && data.south && data.south.length) {
         var south = list.filter(function (r) { return data.south.indexOf(r.key) >= 0; });
@@ -191,6 +261,13 @@
 
     function profileHref(key) { return data.profile + key; }
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+    // La riga della classifica di un territorio, o null se nell'anno non c'e'.
+    function rowOf(key) {
+      var row = null;
+      if (key) mod.querySelectorAll("[data-rank-body] tr[data-key]").forEach(function (tr) { if (tr.dataset.key === key) row = tr; });
+      return row;
+    }
 
     function highlight(key) {
       mod.querySelectorAll(".map [data-key]").forEach(function (p) { p.classList.toggle("is-on", p.dataset.key === key); });
@@ -215,11 +292,58 @@
         }
       });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
+      // "Pavia: 82,6 anni nel 2024, 86ª su 107 province dal valore più alto":
+      // la posizione col suo denominatore (chi ha il dato quell'anno) e il
+      // criterio, lo stesso ordine della classifica.
       if (live && key) {
-        var r = rows(current).filter(function (x) { return x.key === key; })[0];
-        if (r) live.textContent = r.name + ": " + withUnit(r.value, data.unit) + " nel " + current + ".";
-        else live.textContent = (data.names[key] || key) + ": dato non disponibile nel " + current + ".";
+        var list = rows(current), at = -1;
+        list.forEach(function (x, i) { if (x.key === key) at = i; });
+        if (at >= 0) {
+          live.textContent = list[at].name + ": " + withUnit(list[at].value, data.unit) + " nel " + current + ", " + (at + 1) + "ª su " + list.length + " " + data.plural +
+            (lowerBetter ? " dal valore più basso." : " dal valore più alto.");
+        } else live.textContent = (data.names[key] || key) + ": dato non disponibile nel " + current + ".";
       }
+      // Il link alla riga c'e' solo se la riga c'e': un anno senza il dato
+      // della provincia scelta lo nasconde, il cambio d'anno lo rivaluta.
+      if (jump) {
+        var goRow = rowOf(key);
+        jump.hidden = !(goRow && goRow.id);
+        if (goRow && goRow.id) jump.setAttribute("href", "#" + goRow.id);
+      }
+    }
+
+    // La linea sotto cui una riga si vede davvero: lo scroll-padding della
+    // pagina (la testata) piu' lo scroll-margin della riga (sotto i 1200 la
+    // barra delle sezioni, components.css). E' dove il browser porta
+    // un'ancora: una riga sopra quella linea sta sotto una barra.
+    function landing(row) {
+      var pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      return pad + (parseFloat(getComputedStyle(row).scrollMarginTop) || 0);
+    }
+
+    // La riga di un territorio a vista: il details che la tiene si apre, e
+    // la pagina scorre solo se la riga non si vede gia' (dopo un'ancora il
+    // browser di solito l'ha gia' portata li'). Un pixel di tolleranza: il
+    // browser la lascia sulla linea, e senza la riga appena arrivata
+    // sembrerebbe coperta e la pagina scorrerebbe una seconda volta.
+    function reveal(key) {
+      var row = rowOf(key);
+      if (!row) return;
+      var more = row.closest("details");
+      if (more && !more.open) more.open = true;
+      var box = row.getBoundingClientRect();
+      if (box.top >= landing(row) - 1 && box.bottom <= innerHeight) return;
+      var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      row.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
+    }
+
+    // Scegliere un territorio dall'ancora della riga (#p-<key>): all'arrivo,
+    // da un hashchange o dal link accanto al campo. Il campo sceglie da se'.
+    function choose(key) {
+      if (!select || !data.names[key]) return;
+      select.value = key;
+      highlight(key);
+      reveal(key);
     }
 
     if (slider) slider.addEventListener("input", function () {
@@ -227,9 +351,33 @@
       paint(current);
       highlight(select ? select.value : "");
     });
+    // Il campo accende e basta, come la mappa e la striscia: con le frecce
+    // (Chrome su Windows e Linux) ogni tasto e' un change, e far scorrere la
+    // pagina a ogni tasto portava il campo fuori dalla vista. Alla riga porta
+    // il link accanto al campo (#p-<key>), che passa da followHash e reveal.
     if (select) select.addEventListener("change", function () { highlight(select.value); });
+    // Prima che il browser segua il link apre il details che tiene la riga:
+    // alla stessa ancora di prima (#p-pavia due volte) non arriva nessun
+    // hashchange, e il browser scorre solo verso una riga che si vede.
+    if (jump) jump.addEventListener("click", function () {
+      var row = rowOf(select ? select.value : "");
+      var more = row && row.closest("details");
+      if (more && !more.open) more.open = true;
+    });
+    // Con il JavaScript l'ancora della riga diventa una scelta (followHash),
+    // e `:target` non accende piu' la riga da solo: una seconda riga accesa
+    // accanto alla scelta sarebbe un'altra scelta.
+    mod.classList.add("has-js");
+    exploreOf.set(mod, { choose: choose });
     // Il campo ripristinato dal browser dopo un Indietro riaccende la sua evidenza.
     if (select && select.value) highlight(select.value);
+    // Arrivati da /provincia/<key> con #p-<key>: la riga diventa la scelta, e
+    // se il browser non ha aperto il details da se' lo apre reveal.
+    var target = hashId();
+    if (data.row_id && target.indexOf(data.row_id) === 0) {
+      var targetRow = document.getElementById(target);
+      if (targetRow && mod.contains(targetRow)) choose(targetRow.dataset.key);
+    }
     // La striscia sta fuori dal modulo, nel confine: un modulo sostituito sul
     // posto la ritrova gia' agganciata. Il suo clic si aggancia una volta sola
     // e parla col modulo agganciato per ultimo, non con quello che l'ha vista

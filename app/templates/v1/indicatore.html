@@ -165,6 +165,36 @@
         <div class="indicator-cockpit">
         {{ ui.explore(d.module, root=False) }}
         </div>
+        {#- "Dentro le regioni", solo sulle province: la provincia piu' alta e
+            la piu' bassa di ogni regione e la distanza fra le due, cio' che la
+            vista regionale non puo' dire. L'anno e' quello della testata,
+            scritto: il cursore del modulo qui sopra non lo cambia. -#}
+        {% if d.within %}{% set w = d.within %}
+        <figure class="module within" id="dentro-le-regioni">
+          <figcaption class="module__head">
+            {% if w.claim %}<h3 class="h-sub">{{ w.claim }}</h3>{% endif %}
+            <p class="subline">{{ w.subline }}</p>
+          </figcaption>
+          <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="Dentro le regioni: la provincia più alta e la più bassa">
+            <table class="table table--stack within__table">
+              <caption class="sr-only">{{ meta.name }} nel {{ w.year }}: in ogni regione la provincia con il valore più alto, quella con il più basso e la distanza fra le due</caption>
+              <thead><tr><th scope="col">Regione</th><th scope="col">Più alta</th><th scope="col">Più bassa</th><th class="r" scope="col">Distanza</th></tr></thead>
+              <tbody>
+                {%- for r in w.rows %}
+                <tr><th scope="row"><a href="{{ r.href }}">{{ r.region }}</a></th>
+                  {%- for label, end in [('Più alta', r.high), ('Più bassa', r.low)] %}
+                  {#- A pari merito un nome per riga: "Mantova e Monza e della
+                      Brianza" su una riga sola non si legge. -#}
+                  <td data-label="{{ label }}">{% if loop.index == 2 and r.high.value == r.low.value %}stesso valore{% else %}<span class="within__pair"><span>{% if end.places %}{% for p in end.places %}<span class="within__place">{% if p.href %}<a href="{{ p.href }}">{{ p.name }}</a>{% else %}{{ p.name }}{% endif %}{% if not loop.last %}<span class="sr-only">, </span>{% endif %}</span>{% endfor %}{% else %}{{ end.count }} {{ level.plural }}{% endif %}</span>{{ end.value | num(None, 'cell', w.decimals) }}</span>{% endif %}</td>
+                  {%- endfor %}
+                  <td class="val" data-label="Distanza">{{ r.gap | num(None, 'cell', w.decimals) }}</td></tr>
+                {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p class="source">Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a> ({{ w.year }}). Elaborazione Divario Italia.</p>
+        </figure>
+        {% endif %}
       </section>
 
       {% if not d.series.single_year %}

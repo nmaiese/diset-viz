@@ -153,13 +153,14 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
     def test_ogni_indicatore_porta_al_suo_indicatore(self):
         """Il link parte dal canonico della scheda, non da un path ricostruito:
         lo slug dal nome provinciale portava tre schede su un 301. Che il link
-        risponda lo controlla `test_link_interni`."""
+        risponda, e che la sua ancora `#p-lecce` trovi la riga, lo controlla
+        `test_link_interni`."""
         html = self.client.get("/provincia/lecce").get_data(as_text=True)
         with app.app_context():
             voci = province_profile.indicatori("lecce")
             for voce in voci:
                 with self.subTest(indicatore=voce["id"]):
-                    self.assertEqual(voce["path"].split("?")[0], bes_data.bes_path(voce["id"]))
+                    self.assertEqual(voce["path"].split("#")[0].split("?")[0], bes_data.bes_path(voce["id"]))
                     self.assertIn(f'href="{voce["path"]}"', html)
 
     def test_ogni_indicatore_si_apre_sulle_province(self):
@@ -173,7 +174,7 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
                 with self.subTest(indicatore=voce["id"]):
                     vista = indicator_view.build_indicator_view("bes", voce["id"].removeprefix("bes:"))
                     sulle_regioni = vista["default_level"] == "regione"
-                    self.assertEqual(voce["path"].endswith("?livello=provincia"), sulle_regioni)
+                    self.assertEqual(voce["path"].split("#")[0].endswith("?livello=provincia"), sulle_regioni)
 
     def test_due_province_non_sono_la_stessa_pagina(self):
         """Prima della tabella dei valori due province condividevano il 62% del
