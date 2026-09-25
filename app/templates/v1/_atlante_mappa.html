@@ -1,0 +1,6 @@
+{#- Il modulo "Sulla mappa" dell'atlante, da solo: lo include
+    v1/atlante.html e lo rende /api/atlante/modulo, che atlante.js mette al
+    posto di quello in pagina. Un template solo, cosi' il modulo che cambia
+    senza ricarica e' lo stesso della pagina. `m` e' `atlante.map_payload`. -#}
+{% import "v1/_ui.html" as ui %}
+{{ ui.explore(m.module) }}

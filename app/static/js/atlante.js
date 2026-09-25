@@ -14,7 +14,10 @@
 
    "Solo preferiti" compare solo a chi ha fatto l'accesso: il token lo da'
    window.diAuth (frontend/src/site/auth.js), che senza una sessione salvata
-   risponde null senza caricare la libreria di accesso. */
+   risponde null senza caricare la libreria di accesso.
+
+   Il bottone "Sulla mappa" di una riga cambia il modulo dato senza ricaricare
+   la pagina, con /api/atlante/modulo, e ricarica solo se l'API non risponde. */
 (function () {
   "use strict";
   var root = document.getElementById("indicatori");
@@ -178,15 +181,54 @@
 
   /* ---------- i controlli ---------- */
   form.addEventListener("submit", function (ev) { ev.preventDefault(); });
-  // "Sulla mappa" di una riga: la pagina si ricarica con `mappa` e con i
-  // filtri gia' scelti, che il modulo da solo perderebbe.
+  // "Sulla mappa" di una riga: il modulo arriva da /api/atlante/modulo e
+  // prende il posto di quello in pagina, senza ricaricare. L'URL porta
+  // `mappa` e i filtri gia' scelti, cosi' un link condiviso o un ricarica
+  // riaprono la stessa vista. Se l'API non risponde, la pagina si ricarica
+  // con `mappa`, come faceva il form da solo.
   var mapForm = document.getElementById("atl-map");
+  var mapSection = document.getElementById("mappa");
+  var loading = null;
+  function reloadWith(url) { location.assign(url.pathname + url.search + "#mappa"); }
+  function swapModule(code, url) {
+    var level = mapForm.querySelector('input[name="livello"]');
+    var api = "/api/atlante/modulo?indicatore=" + encodeURIComponent(code) +
+      (level ? "&livello=" + encodeURIComponent(level.value) : "");
+    if (loading) loading.abort();
+    var ctrl = loading = new AbortController();
+    mapSection.setAttribute("aria-busy", "true");
+    fetch(api, { credentials: "omit", signal: ctrl.signal })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) {
+        var box = document.createElement("div");
+        box.innerHTML = d.html;
+        var fresh = box.querySelector("[data-explore]");
+        var old = mapSection.querySelector("[data-explore]");
+        if (!fresh || !old) throw new Error("modulo");
+        old.parentNode.replaceChild(fresh, old);
+        window.DiV1.init(fresh);
+        var href = mapSection.querySelector("[data-atlas-map-href]");
+        if (href) href.setAttribute("href", d.href);
+        history.replaceState(history.state, "", url.pathname + url.search + "#mappa");
+        mapSection.removeAttribute("aria-busy");
+        loading = null;
+        mapSection.scrollIntoView({ block: "start" });
+        var head = fresh.querySelector("[data-claim]") || fresh;
+        head.setAttribute("tabindex", "-1");
+        head.focus({ preventScroll: true });
+      })
+      .catch(function (e) {
+        if (e && e.name === "AbortError") return;
+        reloadWith(url);
+      });
+  }
   if (mapForm) mapForm.addEventListener("submit", function (ev) {
     if (!ev.submitter || !ev.submitter.value) return;
     ev.preventDefault();
     var url = new URL(location.href);
     url.searchParams.set("mappa", ev.submitter.value);
-    location.assign(url.pathname + url.search + "#mappa");
+    if (!mapSection || !window.fetch || !window.AbortController || !window.DiV1) return reloadWith(url);
+    swapModule(ev.submitter.value, url);
   });
   areaButtons.forEach(function (b) {
     b.addEventListener("click", function () {

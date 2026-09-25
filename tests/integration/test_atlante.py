@@ -10,7 +10,10 @@ Sorveglia cio' che, rompendosi, non fa fallire niente:
 - la sparkline si disegna su un gruppo di regioni diverso da quello che la
   riga dichiara;
 - le province (`?livello=provincia`) perdono righe, un'area o il link alla
-  loro pagina, o finiscono nella cache o nell'indice al posto delle regioni.
+  loro pagina, o finiscono nella cache o nell'indice al posto delle regioni;
+- il modulo che `/api/atlante/modulo` manda ad `atlante.js` smette di essere
+  quello della pagina, o una coppia (indicatore, livello) dell'elenco non ha
+  il suo.
 
 Nessun numero del catalogo e' scritto qui: le righe si contano contro
 `get_atlas_catalog()` e `bes_data.all_bes_indicators()`, che cambiano quando
@@ -669,3 +672,61 @@ class IlPannelloFissoDelleProvince(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class IlModuloSenzaRicarica(unittest.TestCase):
+    """`/api/atlante/modulo`: il modulo "Sulla mappa" per un altro indicatore,
+    che `atlante.js` mette al posto di quello in pagina. Le coppie si contano
+    dalle righe di ogni livello, mai scritte qui."""
+
+    def setUp(self):
+        self.client = app.test_client()
+        cache.clear()
+
+    def tearDown(self):
+        cache.clear()
+
+    def _codes(self, level):
+        return [row["code"] for area in atlas_page.rows(level)["areas"]
+                for group in area["groups"] for row in group["rows"] if row["n"]]
+
+    def _query(self, code, level):
+        return f"/api/atlante/modulo?indicatore={code}" + ("&livello=provincia" if level == "provincia" else "")
+
+    def test_ogni_coppia_dell_elenco_ha_il_suo_modulo(self):
+        for level in ("regione", "provincia"):
+            codes = self._codes(level)
+            self.assertTrue(codes, level)
+            for code in codes:
+                with self.subTest(level=level, code=code):
+                    response = self.client.get(self._query(code, level))
+                    self.assertEqual(response.status_code, 200)
+                    data = response.get_json()
+                    self.assertEqual(data["code"], code)
+                    self.assertIn("data-explore", data["html"])
+                    self.assertIn("data-explore-data", data["html"])
+                    family, raw_id = sources.parse_indicator_code(code)
+                    level_view = atlas_page.map_view((family, raw_id), level)["level"]
+                    self.assertEqual(data["href"], level_view["preferred_path"])
+
+    def test_e_lo_stesso_modulo_della_pagina(self):
+        code = self._codes("regione")[len(self._codes("regione")) // 2]
+        page = self.client.get(f"/atlante?mappa={code}").get_data(as_text=True)
+        module = self.client.get(self._query(code, "regione")).get_json()["html"].strip()
+        self.assertIn(module, page)
+
+    def test_noindex_e_404(self):
+        ok = self.client.get(self._query(self._codes("regione")[0], "regione"))
+        self.assertEqual(ok.status_code, 200)
+        self.assertIn("noindex", ok.headers["X-Robots-Tag"])
+        for path in ("/api/atlante/modulo", "/api/atlante/modulo?indicatore=non-esiste",
+                     "/api/atlante/modulo?indicatore=ter-999999999",
+                     f"/api/atlante/modulo?indicatore={self._codes('regione')[0]}&livello=comune"):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 404)
+                self.assertIn("noindex", response.headers["X-Robots-Tag"])
+
+    def test_non_sta_nell_openapi(self):
+        spec = self.client.get("/openapi.json").get_json()
+        self.assertFalse([p for p in spec["paths"] if p.startswith("/api/atlante")])

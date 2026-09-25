@@ -556,6 +556,33 @@ def _atlante_redirect(args):
     return None
 
 
+@app.route("/api/atlante/modulo")
+@cache.cached(timeout=300, query_string=True)
+def atlante_modulo():
+    """Il modulo "Sulla mappa" dell'atlante per un altro indicatore, senza
+    ricaricare la pagina: `?indicatore=<codice>&livello=<regione|provincia>`.
+
+    Lo chiede `atlante.js` al posto del GET del form di `/atlante`, che resta
+    il ripiego. Il codice si risolve contro le righe del livello
+    (`atlante.map_choice`), come `?mappa=`: un codice che non e' una riga con
+    il dato dei territori, o un livello che non esiste, e' un 404. Sta sotto
+    `/api/`, quindi `noindex` dall'header comune, e fuori dall'OpenAPI, che
+    dichiara solo i dati. In cache per 300 s con la query string."""
+    level = request.args.get("livello") or "regione"
+    if level not in atlas_page.MAP_INDICATORS:
+        abort(404)
+    indicator = atlas_page.map_choice(request.args.get("indicatore"), level)
+    if indicator is None:
+        abort(404)
+    shown = atlas_page.map_payload(indicator, level)
+    return jsonify({
+        "code": shown["code"],
+        "name": shown["meta"]["name"],
+        "href": shown["href"],
+        "html": render_template("v1/_atlante_mappa.html", m=shown),
+    })
+
+
 def _bes_fuori_atlante(wanted, livello):
     """La scheda di un BES che l'atlante non elenca, o None.
 

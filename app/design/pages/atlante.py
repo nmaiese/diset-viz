@@ -304,12 +304,21 @@ def level_tabs(level_key: str) -> list[dict]:
             for key, path in LEVEL_PATHS.items()]
 
 
+def map_payload(indicator: tuple[str, str], level_key: str) -> dict:
+    """Il modulo "Sulla mappa" per un indicatore e un livello: lo usano la
+    pagina (`derive`) e `/api/atlante/modulo`, che lo cambia senza ricaricare
+    la pagina. Una funzione sola, cosi' il modulo che arriva dall'API e' lo
+    stesso che la pagina rende."""
+    shown = map_view(indicator, level_key)
+    meta, level = shown["meta"], shown["level"]
+    return {"meta": meta, "level": level, "module": explore_module(meta, level, claim=ranking_claim(level)),
+            "href": level["preferred_path"], "code": sources.indicator_code(meta["family"], meta["raw_id"])}
+
+
 def derive(ctx: dict) -> dict:
     level_key = ctx.get("level") or "regione"
     data = rows(level_key)
-    shown = map_view(tuple(ctx.get("map_indicator") or MAP_INDICATORS[level_key]), level_key)
-    meta, level = shown["meta"], shown["level"]
-    module = explore_module(meta, level, claim=ranking_claim(level))
+    shown = map_payload(tuple(ctx.get("map_indicator") or MAP_INDICATORS[level_key]), level_key)
     year_min, year_max = data["years"]
     # Le istituzioni del livello, non del catalogo: le province sono solo BES.
     institutions = (catalog_summary()["institutions_label"] if level_key == "regione"
@@ -325,6 +334,5 @@ def derive(ctx: dict) -> dict:
         "years": list(range(year_min, year_max + 1)), "sorts": SORTS,
         "panel_total": indicator_view.PANEL_TOTALS[level_key],
         "panel_need": indicator_view.panel_need(level_key),
-        "map": {"meta": meta, "level": level, "module": module, "href": level["preferred_path"],
-                "code": sources.indicator_code(meta["family"], meta["raw_id"])},
+        "map": shown,
     }
