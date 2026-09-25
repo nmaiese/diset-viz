@@ -61,7 +61,6 @@ ORGANIZATION = {
         "@type": "ImageObject",
         "url": f"{SITE_URL}/static/img/logo-mark.png",
     },
-    "founder": EDITOR,
     "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "editorial",

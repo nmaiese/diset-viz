@@ -102,8 +102,7 @@ class LaSchedaDiceComeENata(unittest.TestCase):
     def test_una_scheda_con_prosa_dice_che_una_persona_la_approva(self):
         pagina = self._pagina("ter-176")
         self.assertIn("Come nasce questa scheda", pagina)
-        from app import publisher
-        self.assertIn(f"lo approva {publisher.EDITOR_NAME}", pagina)
+        self.assertIn("lo approva una persona", pagina)
 
     def test_una_scheda_composta_dal_codice_non_si_dichiara_generata(self):
         """Le sezioni composte sono template deterministici sui dati della
