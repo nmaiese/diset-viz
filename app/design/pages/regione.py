@@ -31,7 +31,7 @@ from functools import lru_cache
 from app import quality_life_bes as qb
 from app.data import REGION_GEO_AREA
 from app.design import charts, common, numfmt
-from app.indicator_notes import is_percentage_unit
+from app.indicator_notes import figure_unit
 from app.profiles import MIN_THEME_INDICATORS
 from app.seo_titles import of_region
 from app.taxonomy import CATEGORY_NAME_TO_SLUG, MACRO_AREAS
@@ -68,11 +68,12 @@ def _divbar(score, scale: dict | None) -> dict | None:
             "width": round(abs(score - scale["mid"]) / span * 100, 1)}
 
 
-def _unit(unit: str | None) -> str:
-    """L'unita' come va accanto alla cifra: la percentuale diventa %, il resto
-    resta com'e' nella fonte. `numfmt.short_unit` non riconosce "percentuale"."""
-    unit = (unit or "").strip()
-    return "%" if unit and is_percentage_unit(unit) else unit
+def _unit(name: str | None, unit: str | None) -> str:
+    """L'unita' accanto alla cifra e nella colonna "Unita'": la percentuale
+    diventa "%", la differenza fra due tassi "punti percentuali"
+    (`indicator_notes.figure_unit`, la stessa regola delle card correlate), il
+    resto resta com'e' nella fonte."""
+    return figure_unit(name, (unit or "").strip())
 
 
 def _article(name: str, prep: str = "") -> str:
@@ -241,7 +242,7 @@ def _indicator_row(ind: dict, region_total: int | None) -> dict:
         # regioni (`_core_stats`): il suo denominatore e' il totale, anche
         # quando l'ultimo anno ne copre meno.
         before = {"rank": rank + movement, "total": region_total, "year": ind["year_from"], "same": movement == 0}
-    unit = _unit(ind.get("unit"))
+    unit = _unit(ind.get("name"), ind.get("unit"))
     return {
         "id": ind.get("id"), "name": ind.get("name"), "path": ind.get("path"), "theme": ind.get("theme"),
         "value": ind.get("value"), "unit": unit,

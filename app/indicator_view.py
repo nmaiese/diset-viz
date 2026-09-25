@@ -54,6 +54,7 @@ from app.indicator_notes import (
     annual_change_framing,
     change_unit_label,
     cover_bars,
+    figure_unit,
     is_percentage_unit,
     ds_choropleth_colors,
     DS_SEQ_RAMP,
@@ -717,7 +718,9 @@ def _theme_siblings(theme):
                 "direction": (item.get("explain") or {}).get("direction"),
                 "source_theme": item.get("source_theme"),
                 "year_max": item["year_max"],
-                "unit": item.get("unit"),
+                # L'unita' della cifra della card: una percentuale si scrive
+                # "%", la differenza fra due tassi in punti percentuali.
+                "unit": figure_unit(item["name"], item.get("unit")),
                 # La sparkline delle card usa la serie gia' calcolata nel
                 # catalogo: la media semplice delle regioni che hanno il dato,
                 # anno per anno (non un gruppo fisso), ridotta a 24 punti.

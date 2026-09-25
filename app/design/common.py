@@ -88,11 +88,13 @@ def unit_note(unit: str | None, name: str | None = None) -> str | None:
     quando l'etichetta non e' un'unita', o quando il nome dell'indicatore la
     dice gia' ("Ospiti ... per centomila anziani, ogni centomila anziani").
     Prima si scriveva "in" davanti a tutto, e usciva "valori in per mille
-    abitanti"."""
+    abitanti". Una percentuale e' "in %" comunque la scriva la fonte
+    ("percentuale", "Valori percentuali"), come la cifra accanto
+    (`numfmt.phrase_unit`)."""
     raw = (unit or "").strip()
     if not raw:
         return None
-    if raw.startswith("%"):
+    if numfmt.is_percent(raw):
         return "in %"
     u = numfmt.lower_first(raw)
     if name and u.lower() in name.lower():

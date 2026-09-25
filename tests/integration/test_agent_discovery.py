@@ -132,6 +132,15 @@ class AgentDiscoveryTest(unittest.TestCase):
         self.assertIn("## Come è cambiato nel tempo", text)
         self.assertIn("la media semplice dei valori regionali è passata", text)
 
+    def test_markdown_twins_attach_percent_like_the_page(self):
+        # La pagina scrive "17,4%", il gemello scriveva "17,4 %": nella media,
+        # nella tabella dei territori, nelle righe della provincia.
+        for path in ("/indicatore/aree-terrestri-protette/ter-264", "/provincia/milano"):
+            with self.subTest(path=path):
+                text = self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+                self.assertRegex(text, r"\d%")
+                self.assertNotRegex(text, r"\d[   ]%")
+
     def test_indicator_markdown_uses_the_selected_levels_explanation(self):
         path = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia"
         response = self.client.get(path, headers={"Accept": "text/markdown"})

@@ -1289,6 +1289,22 @@ def change_unit_label(name, unit):
     return value_unit_label(name, unit)
 
 
+def figure_unit(name, unit):
+    """L'unita' di una cifra per chi ha solo il nome e l'unita' della fonte
+    (le card correlate, la scheda dentro un articolo, le righe della regione).
+
+    Una percentuale passa da `value_unit_label`, che conosce la differenza fra
+    due tassi: "Differenza tra tasso di occupazione maschile e femminile" per la
+    fonte e' in "percentuale", ma il valore e' una distanza in punti, e "16,3%"
+    la farebbe leggere come una quota. Le altre unita' restano come le scrive la
+    fonte, e la forma accanto alla cifra la sceglie `numfmt.phrase_unit`, come
+    per i punti percentuali gia' scritti.
+    """
+    if not is_percentage_unit(unit) or "punti percentual" in (unit or "").lower():
+        return unit
+    return value_unit_label(name, unit)
+
+
 def annual_change_framing(name, direction, delta):
     """Interpret a mean movement without adding causal claims."""
     if delta is None:
