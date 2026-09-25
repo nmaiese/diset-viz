@@ -214,23 +214,6 @@ def get_bes_rows(level):
     return rows
 
 
-@synchronized_cache(maxsize=None)
-def source_decimals(level):
-    """`{id: n}`: quanti decimali la fonte scrive per ogni indicatore.
-
-    Si contano sul CSV, non si scelgono: con un decimale fisso 0,02 diventava
-    "0,0" e 1.022 metri quadri "1.022,0". Il massimo sulla serie, perche' la
-    fonte scrive 81 dove intende 81,0.
-    """
-    dataset, _ = _paths(level)
-    decimals = {}
-    with dataset.open(encoding="utf-8", newline="") as handle:
-        for row in csv.DictReader(handle, delimiter=";"):
-            _, _, fraction = row["Dato"].partition(",")
-            decimals[row["idIndicatore"]] = max(decimals.get(row["idIndicatore"], 0), len(fraction))
-    return decimals
-
-
 def bes_indicator_path(indicator_id, name):
     return sources.indicator_url("bes", indicator_id, slugify(name))
 

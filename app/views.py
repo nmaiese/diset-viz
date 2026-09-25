@@ -14,6 +14,7 @@ from app.atlas_catalog import (
     search_atlas_indicators,
 )
 from app import design
+from app.design import numfmt
 from app import divari
 from app import profiles
 from app import province_profile
@@ -1558,7 +1559,8 @@ def _theme_description(profile, standings):
         coda = (f" Le {len(standings['rows'])} regioni ordinate su "
                 f"{standings['indicator_count']} indicatori, con mappa e classifica.")
     else:
-        testo = f"{tema}: {profile['indicator_count']} indicatori Istat per le regioni italiane."
+        testo = (f"{tema}: {profile['indicator_count']} indicatori {profile['institutions_label']} "
+                 "per le regioni italiane.")
         coda = " Ogni serie con fonte, classifica e andamento negli anni."
     return testo + coda if len(testo) + len(coda) <= 155 else testo
 
@@ -1675,20 +1677,50 @@ def provinces_index_redirect():
 
 @app.route("/temi")
 def themes_index():
+    """L'indice dei temi, con i conteggi dello stesso catalogo che li divide.
+
+    Il totale veniva da `get_catalog()`, la sola famiglia territoriale: il title
+    diceva "393 indicatori" sopra quattro aree che ne sommavano 594, e l'atlante
+    a un clic ne elencava 594. Adesso totale, anni e istituzioni vengono da
+    `catalog_summary()`, cioe' dal catalogo dell'atlante che conta anche le aree
+    e i temi. Quel catalogo e' regionale: le schede con i valori delle province
+    stanno nella sezione "Per provincia" di ogni tema, e si contano da li'.
+    """
     areas = _themes_index_areas()
-    indicators = get_catalog()["indicators"]
-    total = len(indicators)
+    summary = catalog_summary()
+    province = [item for items in indicator_view.province_indicators_by_theme().values()
+                for item in items]
     return render_template(
         "themes_index.html",
         areas=areas,
-        total=total,
+        total=summary["total"],
+        institutions=summary["institutions_label"],
         theme_total=sum(area["theme_count"] for area in areas),
-        year_min=min(item["year_min"] for item in indicators),
-        year_max=max(item["year_max"] for item in indicators),
+        year_min=summary["year_min"],
+        year_max=summary["year_max"],
+        province_count=len(province),
+        province_only=sum(1 for item in province if item["only_province"]),
+        seo_description=_themes_index_description(summary),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/temi",
     )
+
+
+def _themes_index_description(summary):
+    """La descrizione SERP di `/temi`, dentro i 155 caratteri.
+
+    Le istituzioni vengono dal catalogo ("Istat ed Eurostat"), e il nome di
+    un'istituzione nuova allunga la frase: la coda dei temi si accorcia prima
+    di sforare, invece di farsi tagliare dal motore a meta' parola.
+    """
+    testa = (f"Esplora {summary['total']} indicatori per regione di "
+             f"{summary['institutions_label']}, per macro-area e tema")
+    for coda in (": lavoro, istruzione, ambiente, salute, trasporti e qualità della vita.",
+                 ": lavoro, istruzione, ambiente e salute.", "."):
+        if len(testa) + len(coda) <= 155:
+            return testa + coda
+    return testa + "."
 
 
 # User-facing URL level (plural) -> engine level (singular).
@@ -2704,8 +2736,11 @@ def _llms_indicator_full_block(indicator_id):
         f"Copertura: {meta['year_min']}-{meta['year_max']}, {len(meta['regions'])} regioni."
     )
     lines += ["", f"Classifica {year} (posizione. regione: valore):"]
+    # Le cifre come nella tabella della scheda, che l'intestazione del file
+    # promette uguali: i decimali della colonna, non due fissi ("50.398,90").
+    decimals = numfmt.column_decimals([row["value"] for row in values])
     for position, row in enumerate(values, 1):
-        lines.append(f"{position}. {row['region']}: {it_num(row['value'], 2)} {unit}".rstrip())
+        lines.append(f"{position}. {row['region']}: {numfmt.text(row['value'], decimals)} {unit}".rstrip())
     lines.append("")
     return "\n".join(lines)
 

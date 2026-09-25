@@ -32,7 +32,7 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": {{ (p.theme ~ ', gli indicatori regionali') | tojson }},
-  "description": {{ ('Indicatori Istat del tema ' ~ p.theme ~ ' per le regioni italiane.') | tojson }},
+  "description": {{ ('Indicatori ' ~ p.institutions_label ~ ' del tema ' ~ p.theme ~ ' per le regioni italiane.') | tojson }},
   "url": {{ canonical | tojson }}
 }
 </script>

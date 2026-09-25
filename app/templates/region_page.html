@@ -292,7 +292,7 @@
                 data-rank="{{ i.rank if i.rank is not none else '' }}">
               <td><a href="{{ i.path }}">{{ i.name }}</a></td>
               <td class="explorer-theme">{{ i.theme }}</td>
-              <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status | freshness_label | lower }}</small></td>
+              <td class="num">{{ i.value | numtext }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status | freshness_label | lower }}</small></td>
               <td class="num">
                 {% if i.rank is not none %}<strong>{{ i.rank }}</strong><small>/{{ i.region_count }}</small>
                 {% else %}<span class="page-note">n.v.</span>{% endif %}

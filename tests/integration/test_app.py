@@ -1446,8 +1446,10 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
 
     # Le cifre come si leggono: "dal 8" e "al 0" sono italiano sbagliato, "0,00"
     # una precisione che lo zero non ha. "dal 116%" e "dal 1.022" invece sono
-    # giusti (centosedici, milleventidue), e la regola non li deve vietare.
-    CIFRE_SBAGLIATE = re.compile(r"0,00|\b(dal|al) (0|8|11(?!\d)|1(?![\d.]))|\b(dall|all)'1(\d\d|\.\d)")
+    # giusti (centosedici, milleventidue), e la regola non li deve vietare, e
+    # nemmeno "0,004", la cifra sotto un centesimo scritta fino alla prima
+    # cifra significativa.
+    CIFRE_SBAGLIATE = re.compile(r"0,00(?!\d)|\b(dal|al) (0|8|11(?!\d)|1(?![\d.]))|\b(dall|all)'1(\d\d|\.\d)")
 
     def test_niente_caratteri_vietati_in_serp(self):
         """Gli assoluti di `content/STYLE.md` valgono anche sul testo in SERP."""
@@ -1461,7 +1463,7 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
 
     def test_la_regola_delle_cifre_non_vieta_l_italiano_giusto(self):
         for giusto in ("dal 116% al 3,9%", "dal 1.022 al 980", "dall'89,1% allo 0%",
-                       "dall'11,9% all'1,3%", "dallo 0,94% al -2,6%", "da 3,4 a 0"):
+                       "dall'11,9% all'1,3%", "dallo 0,94% al -2,6%", "da 3,4 a 0", "dallo 0,004%"):
             with self.subTest(testo=giusto):
                 self.assertIsNone(self.CIFRE_SBAGLIATE.search(giusto))
         for sbagliato in ("dal 89,1%", "al 0,22%", "al 1,3%", "dal 11,9%", "da 3,4 a 0,00", "dall'116%"):
