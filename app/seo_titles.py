@@ -132,10 +132,13 @@ def _is_percentage(meta):
 
 # Le serie i cui estremi non vanno in SERP finche' qualcuno non li ha
 # verificati alla fonte. `bes-06POL012P`, l'affollamento delle carceri per
-# provincia, ha Macerata e Savona a zero dal 2016 dopo anni sopra il 60%, e
-# Fermo al 358% nel 2024: il titolo diceva "dal 358% al 0,00%". Le serie possono
-# essere vere, la causa non e' verificata, e un titolo non e' il posto per
-# scoprirlo. La pagina resta com'e', con la sua classifica.
+# provincia, diceva "dal 358% al 0,00%". Gli zeri di Macerata e Savona dal 2016
+# non erano una misura e oggi sono n.d. (`bes_data.NOT_MEASURED`), quindi il
+# minimo e' un valore vero. Resta Fermo, al 358% nel 2024 dal 116% dell'anno
+# prima: puo' essere vero, la causa non e' verificata, e un titolo non e' il
+# posto per scoprirlo. Finche' Fermo non e' verificato fuori restano tutti e
+# due gli estremi, perche' un intervallo con un capo solo non e' un
+# intervallo. La pagina resta com'e', con la sua classifica.
 UNVERIFIED_EXTREMES = frozenset({"bes-06POL012P"})
 
 

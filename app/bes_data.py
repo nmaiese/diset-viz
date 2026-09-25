@@ -30,14 +30,48 @@ LEVELS = {
     "regione": {
         "dataset": "Assoluti_BES_Regione.csv",
         "manifest": "bes_regione_manifest.csv",
+        # La colonna del manifest che conta i territori con un dato nell'ultimo
+        # anno: `coverage_latest` e' questa su tutti i territori del livello.
+        "latest_count": "n_region_latest",
     },
     "provincia": {
         "dataset": "Assoluti_Provincia.csv",
         "manifest": "province_manifest.csv",
+        "latest_count": "n_province_latest",
     },
 }
 PROVINCE_CODES = DATA_DIR / "province_codes.csv"
 MIN_PUBLIC_COVERAGE = 0.8
+
+# Le celle che la fonte scrive ma che non sono una misura, come
+# (indicatore, territorio come nel CSV, anno). `get_bes_rows` le toglie, e da
+# li' ogni lettore (scheda, mappa, classifica, pagina provincia, sparkline,
+# qualita' della vita, API, llms) le vede mancanti come un dato che Istat non
+# ha pubblicato: n.d., mai 0.
+#
+# L'affollamento degli istituti di pena (06POL012P) e' detenuti su posti
+# regolamentari per cento. Macerata e Savona valgono 126,8 e 63,3 nel 2015,
+# poi 0 dal 2016 al 2024. Uno zero qui non e' un carcere vuoto ma una
+# provincia senza posti regolamentari da contare: non c'e' un affollamento da
+# misurare. Letto come valore, lo zero metteva le due province in testa alla
+# classifica, sulla mappa e nella qualita' della vita.
+#
+# Non ogni zero e' un n.d.: gli zeri degli omicidi volontari (07SIC001P) sono
+# province senza omicidi, e restano. E il 358,1 di Fermo nel 2024 non sta qui:
+# e' un valore non verificato, non l'assenza di una misura
+# (`seo_titles.UNVERIFIED_EXTREMES`). Due prove in
+# `tests/unit/test_bes_not_measured.py` tengono l'insieme onesto: ogni cella
+# e' uno zero nel CSV, e ogni zero di 06POL012P e' qui.
+#
+# Il manifest le conta ancora, perche' lo scrive `build_province_dataset.py`
+# dal CSV grezzo: `get_bes_manifest` toglie dalla copertura dell'ultimo anno
+# quelle che cadono in `year_max`, cosi' la scheda dice "105 province su 107"
+# come ogni altra serie parziale, e non una copertura piena sopra 105 righe.
+NOT_MEASURED = frozenset(
+    ("06POL012P", territory, year)
+    for territory in ("Macerata", "Savona")
+    for year in range(2016, 2025)
+)
 BES_SOURCE_URLS = {
     "regione": (
         "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/"
@@ -89,10 +123,32 @@ def _name_to_key(level):
     return {info["name"]: key for key, info in get_bes_territories(level).items()}
 
 
+def _measured_coverage_latest(row, latest_count):
+    """`coverage_latest` del manifest senza le celle di `NOT_MEASURED` di
+    `year_max`.
+
+    Il manifest divide i territori con un dato nell'ultimo anno per quelli del
+    livello. Togliendo le celle non misurate dal numeratore la copertura resta
+    su quel denominatore: 1,0 su 107 province meno due celle fa 105 su 107,
+    0,9813, come la scriverebbe il build se le due celle non ci fossero.
+    """
+    coverage = float(row.get("coverage_latest", 0) or 0)
+    year_max = int(row["year_max"])
+    dropped = sum(
+        1 for (indicator_id, _, year) in NOT_MEASURED
+        if indicator_id == row["id"] and year == year_max
+    )
+    counted = int(row.get(latest_count) or 0)
+    if not dropped or not counted:
+        return coverage
+    return round(coverage * (counted - dropped) / counted, 4)
+
+
 @cache.memoize(timeout=3600)
 def get_bes_manifest(level):
     """id -> {name, domain_name, category, direction, year_max, unit, coverage_latest}."""
     _, manifest_path = _paths(level)
+    latest_count = LEVELS[level]["latest_count"]
     manifest = {}
     with manifest_path.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=";"):
@@ -112,7 +168,7 @@ def get_bes_manifest(level):
                 "unit": display_unit(row["unit"]),
                 "year_min": int(row["year_min"]),
                 "year_max": int(row["year_max"]),
-                "coverage_latest": float(row.get("coverage_latest", 0) or 0),
+                "coverage_latest": _measured_coverage_latest(row, latest_count),
             }
             item["explain"] = build_bes_indicator_explain(
                 item,
@@ -131,13 +187,18 @@ def get_bes_rows(level):
     ogni lettura anche in-process (~14MB misurati). Il lock serializza il parsing
     del CSV da 9MB fra i thread a freddo, così non si moltiplica il picco di RAM.
     I chiamanti solo iterano e leggono le righe, non le mutano, quindi la lista
-    condivisa è sicura."""
+    condivisa è sicura.
+
+    Le celle di `NOT_MEASURED` non entrano: una riga assente e' il modo in cui
+    ogni lettore sa gia' dire n.d."""
     dataset, _ = _paths(level)
     name_to_key = _name_to_key(level)
     rows = []
     with dataset.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=";"):
             territory = row["Territorio"]
+            if (row["idIndicatore"], territory, int(row["Anno"])) in NOT_MEASURED:
+                continue
             rows.append({
                 "id": row["idIndicatore"],
                 "territory": territory,
