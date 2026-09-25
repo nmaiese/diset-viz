@@ -85,7 +85,7 @@ def indexable_catalog():
     resta **dentro il sottoinsieme indicizzabile**: allargando la passata a tutti
     e 634 sarebbe stato naturale deduplicare prima di filtrare, e un non
     indicizzabile che occupa il path avrebbe buttato fuori dalla sitemap il suo
-    gemello indicizzabile. Oggi non ci sono collisioni, ma `DUPLICATE_BES_IDS` e
+    gemello indicizzabile. Oggi non ci sono collisioni, ma `TERRITORIAL_NAME_TWINS` e
     `PROVINCE_ONLY_TITLE_COLLISIONS` esistono perche' sono reali.
     """
     catalog = []
@@ -110,7 +110,9 @@ def level_pages(listed=False):
     `seo_policy.LEVEL_PAGES_INDEXABLE`). La leggono sitemap, llms-full e
     `scripts/duplicazione.py`: le viste provinciali sono URL a se', e cio' che
     le elenca o le misura le deve vedere. `indexable_catalog()` resta una voce
-    per scheda, con la sua forma.
+    per scheda, con la sua forma. Manca la base che ha il canonical su un'altra
+    scheda (`indicator_view.canonical_elsewhere`, la vista regionale di
+    bes-01SAL001): indicizzabile, ma elencata dalla sua canonica.
 
     Ogni voce: `meta` e `levels` della scheda (come in `indexable_catalog`),
     `level` (il riassunto del livello), `path` (il canonico del livello) e
@@ -137,6 +139,11 @@ def _rule_level_pages():
         base_key = levels[0]["key"]
         for level in levels:
             if not indicator_view.level_passes_rule(meta, level["key"], base_key):
+                continue
+            # Una vista col canonical su un'altra scheda (bes-01SAL001 regionale,
+            # verso ter-910) resta indicizzabile, cioe' senza `noindex`, ma la
+            # sitemap e llms-full elencano solo la scheda canonica.
+            if indicator_view.canonical_elsewhere(meta, level["key"]):
                 continue
             pages.append({
                 "meta": meta,

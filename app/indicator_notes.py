@@ -495,7 +495,7 @@ def _variant_marker(name, extra=None):
     """Keep a compact parenthetical so sibling indicator titles stay unique.
 
     `extra`, when given (e.g. a source qualifier for a BES id that duplicates a
-    territorial series, see `DUPLICATE_BES_IDS`), is folded into the same
+    territorial series, see `TERRITORIAL_NAME_TWINS`), is folded into the same
     parenthetical instead of stacking a second one.
     """
     def _wrap(parts):
@@ -627,6 +627,13 @@ SHORT_NAMES = {
     ("bes-12SER020", "provincia"): "Rete fissa ultraveloce",                  # copertura della rete di accesso; %
     ("bes-12SER024", "provincia"): "Servizio di raccolta differenziata",      # dei rifiuti urbani; %
     ("bes-12SER025", "provincia"): "Ricoveri fuori regione",                  # emigrazione ospedaliera; %
+    # Le BES col nome esatto di una territoriale e cifre diverse
+    # (`taxonomy.SAME_NAME_BES_IDS`): senza il nome breve il `<title>` era
+    # quello della territoriale, cambiato solo nelle cifre (o nemmeno in
+    # quelle, per 12SER006 contro ter-6). L'H1 dice la famiglia, qui il nome.
+    ("bes-10AMB008", "regione"): "Verde urbano per abitante",                 # disponibilita'; m² per abitante (ter-592)
+    ("bes-12SER006", "regione"): "Irregolarità del servizio idrico",          # nella distribuzione dell'acqua; % (ter-6)
+    ("bes-12SER025", "regione"): "Ricoveri fuori regione",                    # emigrazione ospedaliera; % (ter-590)
 }
 
 
@@ -703,7 +710,7 @@ def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_quali
     """Compact SERP title: shortened name + variant marker + 'per regioné.
 
     `source_qualifier`, when given, disambiguates a name that another
-    indicator also carries (see `app.taxonomy.DUPLICATE_BES_IDS`), so the two
+    indicator also carries (see `app.taxonomy.TERRITORIAL_NAME_TWINS`), so the two
     pages do not compete on an identical SERP title.
 
     `tail` e' la coda del livello: `seo_titles.page_title` passa quella del

@@ -1197,9 +1197,9 @@ class AppSmokeTest(unittest.TestCase):
             self.assertLessEqual(len(title), 60, title)
 
     def test_seo_title_source_qualifier_disambiguates_duplicate_bes(self):
-        # A BES id in taxonomy.DUPLICATE_BES_IDS is hidden from browsing but its
-        # page stays indexable, so it must not share a <title> with the
-        # territorial series it duplicates.
+        # A BES id in taxonomy.TERRITORIAL_NAME_TWINS carries the exact name of
+        # a territorial series, and both pages stay reachable, so a written
+        # title must not collapse onto the territorial one.
         from app.indicator_notes import seo_title
         from app import sources
 
@@ -1213,21 +1213,21 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(qualifier.split()[0], qualified)  # institution context survives truncation
 
     def test_all_duplicate_bes_titles_are_unique_and_within_budget(self):
-        # Every id in taxonomy.DUPLICATE_BES_IDS gets a qualified title (see
-        # views._render_indicator). None may exceed the 60-char budget, and two
+        # Every id in taxonomy.TERRITORIAL_NAME_TWINS gets a qualified title (see
+        # views._source_qualifier). None may exceed the 60-char budget, and two
         # ids sharing a truncated core (e.g. "Competenza numerica"/"alfabetica")
         # must not collapse onto the same qualified title either.
         from app.bes_data import get_bes_rows
         from app.indicator_notes import seo_title
-        from app.taxonomy import DUPLICATE_BES_IDS
+        from app.taxonomy import TERRITORIAL_NAME_TWINS
         from app import sources
 
         qualifier = sources.family_short_label("bes")
         names = {}
         for row in get_bes_rows("regione"):
-            if row["id"] in DUPLICATE_BES_IDS and row["id"] not in names:
+            if row["id"] in TERRITORIAL_NAME_TWINS and row["id"] not in names:
                 names[row["id"]] = row["name"]
-        self.assertEqual(set(names), DUPLICATE_BES_IDS)
+        self.assertEqual(set(names), set(TERRITORIAL_NAME_TWINS))
 
         titles = {
             raw_id: seo_title(name, "Divario Italia", source_qualifier=qualifier)

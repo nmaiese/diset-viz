@@ -141,7 +141,7 @@
         <span class="level-switch__option is-active" data-level="{{ item.key }}" aria-current="true">{{ item.label }}</span>
         {% else %}
         <a class="level-switch__option"
-           href="{{ item.canonical_path }}"
+           href="{{ item.preferred_path }}"
            data-level="{{ item.key }}">{{ item.label }}</a>
         {% endif %}
         {% endfor %}

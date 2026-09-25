@@ -337,12 +337,14 @@ def derive(ctx: dict) -> dict:
         tiles = facts
     # Le voci del selettore di livello: quelli della scheda e, se ne manca uno,
     # quello della gemella. Prima le regioni, come in tutto il sito. Ogni voce
-    # porta all'URL del suo livello (`level["canonical_path"]`): la base per il
-    # primo, la `/province` per le province di una scheda a due livelli. La voce
-    # corrente il template non la rende come link.
+    # porta all'URL del suo livello (`level["preferred_path"]`): la base per il
+    # primo, la `/province` per le province di una scheda a due livelli, e
+    # ter-910 per le regioni di bes-01SAL001, che hanno li' il canonical
+    # (`indicator_view.canonical_elsewhere`). La voce corrente il template non
+    # la rende come link.
     levels = ctx.get("levels") or []
     level_tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
-                   "href": lv["canonical_path"]}
+                   "href": lv["preferred_path"]}
                   for lv in levels]
     twin = ctx.get("twin")
     if twin and level_tabs:

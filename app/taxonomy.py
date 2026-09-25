@@ -226,24 +226,91 @@ SOURCE_INDICATOR_CATEGORY_OVERRIDES = {
     "11RIC004P": "cultura_patrimonio_turismo",   # imprese culturali
 }
 
-# National BES regional indicators that are exact duplicates of an existing
-# territorial-backbone series: identical name and identical values in every
-# region and year (verified against the CSVs, not just the label). Excluded
-# from general browsing (atlas catalog, search, theme pages, quiz pool) so the
-# same measure does not appear twice; the territorial id is kept as canonical
-# there. The BES id stays fully reachable on its own page and keeps being used
-# by the quality-of-life score, which prefers the BES release for exact-name
-# duplicates (see quality_life_selection.regional_quality_life_selection) -
-# this is a browsing-only dedup, not a data change.
-DUPLICATE_BES_IDS = {
-    "01SAL001",  # Speranza di vita alla nascita -> territoriale 910
-    "10AMB007",  # Coste marine balneabili -> territoriale 539
-    "10AMB008",  # Disponibilità di verde urbano -> territoriale 592
-    "12SER006",  # Irregolarità nella distribuzione dell'acqua -> territoriale 6
-    "12SER025",  # Emigrazione ospedaliera in altra regione -> territoriale 590
-    "SDG-310",   # Competenza numerica non adeguata (III media) -> territoriale 618
-    "SDG-311",   # Competenza alfabetica non adeguata (III media) -> territoriale 617
+# Le serie BES regionali che hanno esattamente il nome di una serie
+# territoriale -> quella territoriale. Il nome uguale non vuol dire la stessa
+# serie: le cifre si sono confrontate cella per cella (regione e anno), e cio'
+# che se ne fa sta nei tre insiemi qui sotto. Qui serve a `views._source_qualifier`,
+# che mette la famiglia accanto al titolo scritto della BES perche' le due
+# pagine non abbiano lo stesso `<title>`.
+TERRITORIAL_NAME_TWINS = {
+    "01SAL001": "910",   # Speranza di vita alla nascita: 440 celle su 440 uguali
+    "10AMB007": "539",   # Coste marine balneabili: 105 celle, al massimo 0,14 di arrotondamento
+    "10AMB008": "592",   # Disponibilita' di verde urbano: 200 celle su 200 diverse, fino a 304 m²
+    "12SER006": "6",     # Irregolarita' nella distribuzione dell'acqua: fino a 3,5 punti
+    "12SER025": "590",   # Emigrazione ospedaliera: arrotondamento, ma la BES arriva al 2024 e la territoriale al 2023
+    "SDG-310": "618",    # Competenza numerica non adeguata: 133 celle su 133 uguali
+    "SDG-311": "617",    # Competenza alfabetica non adeguata: 133 celle su 133 uguali
 }
+
+# Le BES che sono la stessa serie della loro territoriale (le stesse cifre, o
+# le stesse all'arrotondamento della fonte) e che la navigazione non mostra:
+# atlante, temi, ricerca e quiz tengono la territoriale, cosi' la stessa misura
+# non compare due volte. La pagina della BES resta raggiungibile, e il punteggio
+# della qualita' della vita continua a usarla (preferisce l'uscita BES fra due
+# serie col nome uguale, `quality_life_selection.regional_quality_life_selection`):
+# e' un dedup della navigazione, non dei dati.
+#
+# Non basta il nome. 10AMB008 e' un'altra misura di ter-592 e 12SER006 si
+# stacca da ter-6 fino a 3,5 punti: stavano qui come doppioni "con gli stessi
+# valori", e la lista nascondeva due serie che nessun'altra scheda mostrava.
+# Sono in `SAME_NAME_BES_IDS`.
+DUPLICATE_BES_IDS = {
+    "01SAL001",  # -> ter-910, identica. La vista regionale ha il canonical su ter-910 (`REGIONAL_CANONICALS`)
+    "10AMB007",  # -> ter-539, uguale all'arrotondamento. Tutte e due ferme al 2019 e fuori dall'indice
+}
+
+# Il verso opposto: la stessa serie, ma e' la BES la pagina da mostrare, perche'
+# e' piu' fresca (12SER025 al 2024, ter-590 al 2023) o perche' e' quella
+# indicizzabile (bes-SDG-310 e bes-SDG-311, mentre ter-618 e ter-617 sono
+# `noindex`). La navigazione mostrava la territoriale e nascondeva la BES,
+# cioe' la versione vecchia o quella fuori dall'indice. Le territoriali restano
+# raggiungibili e col loro robots: nessun canonical, perche' 590 e 12SER025 non
+# hanno le stesse cifre (piano SEO, 3.7.3).
+SUPERSEDED_TERRITORIAL_IDS = {
+    "590",  # -> bes-12SER025
+    "617",  # -> bes-SDG-311
+    "618",  # -> bes-SDG-310
+}
+
+# Le BES col nome di una territoriale e cifre diverse: due schede a se',
+# tutte e due nella navigazione (o, per 12SER025, tutte e due nell'indice).
+# Col nome uguale avevano anche lo stesso H1: `views._page_h1` mette accanto al
+# nome della BES la sua famiglia (`sources.family_short_label`), sulla sola
+# vista regionale e solo quando l'H1 non e' scritto. Gli H1 delle territoriali
+# non cambiano.
+SAME_NAME_BES_IDS = {
+    "10AMB008",  # -> ter-592
+    "12SER006",  # -> ter-6
+    "12SER025",  # -> ter-590
+}
+
+# La vista regionale di una scheda il cui canonical sta su un'altra scheda:
+# codice -> codice. Solo dove le cifre coincidono in ogni cella: bes-01SAL001 e
+# ter-910 sono uguali in 440 celle su 440, e ter-910 e' quella che si cerca e
+# ha il pezzo. La vista regionale della BES resta raggiungibile e **non**
+# prende `noindex`: esce dalla sitemap, porta il canonical verso ter-910, e
+# ogni link al livello regionale della scheda (la linguetta "Regioni" della
+# `/province`, la briciola, "lo stesso dato, altre viste") porta a ter-910.
+# Canonical piu' noindex darebbe a Google due segnali contrari, e il noindex non
+# si usa per scegliere fra doppioni (piano SEO, 3.7.2). La `/province` resta una
+# pagina a se', col suo canonical e nell'indice. Prima la politica era
+# l'opposta: la BES indicizzabile per conto suo, col titolo qualificato.
+# `indicator_view.canonical_elsewhere` lo legge, e il test di integrazione che
+# confronta le celle diventa rosso se un'uscita futura separa le due serie.
+REGIONAL_CANONICALS = {
+    "bes-01SAL001": "ter-910",
+}
+
+
+def hidden_from_browsing(family, raw_id):
+    """La serie sta fuori da atlante, temi, ricerca e quiz perche' la stessa
+    misura la mostra un'altra scheda? La sua pagina resta."""
+    raw_id = str(raw_id)
+    if family == "bes":
+        return raw_id in DUPLICATE_BES_IDS
+    if family == "territorial":
+        return raw_id in SUPERSEDED_TERRITORIAL_IDS
+    return False
 
 # BES ids che esistono **solo** a livello provincia (assenti dal manifest
 # regione) ma il cui nome coincide con quello di un gemello regionale, BES o

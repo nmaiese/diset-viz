@@ -518,8 +518,9 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
     """La scheda in Markdown. `heading` e' l'H1 della pagina HTML
     (`views._page_h1`), che sulle province dice il livello: stesso URL, stesso
     titolo. L'URL canonica e' quella del livello: la `/province` di una scheda
-    a due livelli e' una pagina a se'."""
-    canonical = f"{site_url}{level.get('canonical_path') or meta['canonical_path']}"
+    a due livelli e' una pagina a se'. Dove il canonical sta su un'altra scheda
+    (le regioni di bes-01SAL001, verso ter-910) e' quella, come nell'HTML."""
+    canonical = f"{site_url}{level.get('preferred_path') or level.get('canonical_path') or meta['canonical_path']}"
     # Gli altri livelli della stessa scheda: l'HTML ha il selettore
     # Regioni/Province, e senza questa riga un agente che leggeva il canonico
     # non sapeva che esistono i valori per provincia.
@@ -550,7 +551,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         f"- Livello territoriale: {level['label']}",
         # Ogni livello ha il suo URL: la base per il primo, la `/province` per
         # le province di una scheda a due livelli (`sources.level_path`).
-        *(f"- Gli stessi dati per {other['plural']}: {site_url}{other['canonical_path']}"
+        *(f"- Gli stessi dati per {other['plural']}: {site_url}{other.get('preferred_path') or other['canonical_path']}"
           for other in others),
         *([f"- La stessa misura per {twin['plural']}, in un'altra scheda: {site_url}{twin['path']}"]
           if twin else []),

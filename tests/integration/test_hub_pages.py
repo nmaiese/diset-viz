@@ -1121,9 +1121,11 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         self.assertIn(f"{base}/province", regioni)
         province = self.client.get(base + "/province", headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertGreaterEqual(province.count("/provincia/"), 100)
-        # Ogni livello sta sul suo URL: le regioni sul canonico nudo, le
+        # Ogni livello sta sul suo URL: le regioni sul loro canonical, che per
+        # questa scheda e' ter-910 (`taxonomy.REGIONAL_CANONICALS`), le
         # province sulla `/province`, mai su un `?livello=`.
-        self.assertIn(f"- Gli stessi dati per regioni: https://divarioitalia.it{base}\n", province)
+        self.assertIn("- Gli stessi dati per regioni: "
+                      "https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/ter-910\n", province)
         self.assertNotIn("livello=", province)
         self.assertIn("# Speranza di vita alla nascita nelle province italiane", province)
 
