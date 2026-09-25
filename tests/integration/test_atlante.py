@@ -280,7 +280,7 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
         one = catalog["indicators"][len(catalog["indicators"]) // 2]
         one_code = sources.indicator_code(*sources.split_internal_id(one["id"]))
         two_level = next(i for i in catalog["indicators"]
-                         if i["catalog_family"] == "bes" and "?livello=" in bes_level_path(i["id"], "provincia"))
+                         if i["catalog_family"] == "bes" and bes_level_path(i["id"], "provincia") != i["path"])
         cases = {
             f"/atlante?indicator={one['id']}": one["path"],
             f"/atlante?view=detail&indicator={one['id']}": one["path"],
