@@ -64,13 +64,21 @@ def derive(page: str, ctx: dict) -> dict:
     return module.derive(ctx)
 
 
-def render(page: str, template: str, fallback: str, **ctx) -> str:
-    """Il template della 1.0 con `d`, oppure quello di prima se qualcosa cede."""
+def render(page: str, template: str, fallback: str | None, **ctx) -> str:
+    """Il template della 1.0 con `d`, oppure quello di prima se qualcosa cede.
+
+    `fallback=None` e' la pagina che un template di prima non ce l'ha: l'atlante
+    e il confronto, che prima erano la SPA. Li' l'errore finisce nel log e poi
+    risale, e la risposta e' un 500: un ripiego senza dati sarebbe un 200 che
+    dice che la pagina c'e' mentre e' rotta."""
     try:
         d = derive(page, ctx)
         return render_template(template, d=d, v1_page=page, **ctx)
     except Exception:
         if os.environ.get("DIVARIO_V1_STRICT"):
+            raise
+        if fallback is None:
+            current_app.logger.exception("pagina 1.0 %s: nessun ripiego, 500", page)
             raise
         current_app.logger.exception("pagina 1.0 %s: ripiego sul template %s", page, fallback)
         return render_template(fallback, **ctx)

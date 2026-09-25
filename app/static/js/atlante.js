@@ -87,7 +87,7 @@
     history.replaceState(history.state, "", url.pathname + url.search + url.hash);
   }
 
-  /* ---------- eventi, come trackEvent di main.jsx ---------- */
+  /* ---------- eventi, come trackEvent della SPA di prima ---------- */
   function track(name, extra) {
     var params = {
       page_type: "atlas",

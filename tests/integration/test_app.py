@@ -911,14 +911,15 @@ class AppSmokeTest(unittest.TestCase):
             self.assertIn("gtag('set', 'ads_data_redaction', true)", html)
             self.assertIn("GTM-PZ45BG7D", html)
             self.assertIn("googletagmanager.com/ns.html?id=GTM-PZ45BG7D", html)
-            # /atlante e' resa dal server: il page_view lo manda il frammento
-            # server, una volta, con il tipo di pagina di prima ("atlas").
-            # /confronto monta ancora la SPA, che manda il suo page_view una
-            # volta montata: li' il frammento server resta spento
-            # (TRACK_SERVER_PAGE_VIEW = false in confronto.html) per non contarlo due volte.
+            # /atlante e /confronto sono rese dal server: il page_view lo manda
+            # il frammento server, una volta, con il tipo di pagina della SPA
+            # di prima ("atlas"). Finche' /confronto montava la SPA il
+            # frammento li' restava spento, e il page_view lo mandava React.
             self.assertEqual(html.count("event: 'page_view'"), 1)
             self.assertIn('page_type: "atlas"', html)
-            self.assertNotIn("event: 'page_view'", client.get("/confronto").get_data(as_text=True))
+            confronto = client.get("/confronto").get_data(as_text=True)
+            self.assertEqual(confronto.count("event: 'page_view'"), 1)
+            self.assertIn('page_type: "atlas"', confronto)
             self.assertNotIn("googletagmanager.com/gtag/js", html)
             self.assertNotIn("diSendGoogleEvent", html)
             self.assertNotIn("googlefc.controlledMessagingFunction", html)
@@ -2016,13 +2017,18 @@ class IlTemaSegueIlSistemaFinoAllaPrimaScelta(unittest.TestCase):
         preferenza di sistema in una scelta esplicita e teneva il sito chiaro
         per sempre.
 
-        Esisteva perche' `ds-chrome.js` aggancia i bottoni una volta sola e la
-        testata React montava dopo. Da quando la testata la rende Flask anche
-        su quelle due rotte, il bottone c'e' gia' nell'HTML iniziale e quella
-        ragione non c'e' piu'."""
-        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
-        self.assertNotIn("divario-theme", sorgente)
-        self.assertNotIn("localStorage.setItem(THEME_KEY", sorgente)
+        Il bundle dell'atlante se n'e' andato il 25 settembre 2026. La prova
+        adesso guarda ogni script che resta, il gioco e le isole: il tema lo
+        tiene solo `ds-chrome.js`."""
+        radice = Path(__file__).resolve().parents[2]
+        script = [p for p in (radice / "frontend" / "src").rglob("*") if p.suffix in (".js", ".jsx")]
+        script += [p for p in (radice / "app" / "static" / "js").glob("*.js") if p.name != "ds-chrome.js"]
+        self.assertTrue(script)
+        for percorso in script:
+            with self.subTest(script=percorso.name):
+                sorgente = percorso.read_text(encoding="utf-8", errors="ignore")
+                self.assertNotIn("divario-theme", sorgente)
+                self.assertNotIn("localStorage.setItem(THEME_KEY", sorgente)
 
 class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
     """Due testate sullo stesso dominio erano due identita'.
@@ -2053,8 +2059,14 @@ class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
                 self.assertIn('class="brandword"><b>Divario</b> <span>Italia</span><', html, path)
 
     def test_la_spa_non_disegna_piu_la_sua(self):
-        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
-        self.assertNotIn('className="masthead"', sorgente)
+        """La testata React stava in `frontend/src/main.jsx`, che se n'e' andato
+        con il bundle dell'atlante: nessun sorgente React che resta ne disegna
+        una."""
+        radice = Path(__file__).resolve().parents[2] / "frontend" / "src"
+        self.assertFalse((radice / "main.jsx").exists())
+        for percorso in radice.rglob("*.jsx"):
+            with self.subTest(sorgente=percorso.name):
+                self.assertNotIn('className="masthead"', percorso.read_text(encoding="utf-8"))
 
     def test_le_due_rotte_spa_vestono_il_chrome_condiviso(self):
         """`chrome.css` e' scoped sotto `.sitechrome`: senza quella classe sul
