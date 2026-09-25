@@ -168,10 +168,12 @@ class LaPaginaProvincia(unittest.TestCase):
         return row.group(0)
 
     def test_la_riga_dice_il_2015_non_uno_zero_del_2024(self):
-        for key, value in (("macerata", "126,8"), ("savona", "63,3")):
+        # Il valore macchina, non la cifra scritta: quella segue i decimali
+        # della grandezza (126,8 si scrive "127"), e non e' questa la prova.
+        for key, value in (("macerata", "126.8"), ("savona", "63.3")):
             with self.subTest(provincia=key):
                 row = self._row(key)
-                self.assertIn(f">{value}</data>", row)
+                self.assertIn(f'value="{value}"', row)
                 self.assertIn('data-label="Anno">2015</td>', row)
                 self.assertNotRegex(row, r'value="0(\.0)?"')
 
