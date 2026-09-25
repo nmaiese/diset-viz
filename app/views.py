@@ -703,21 +703,33 @@ def divari_regionali():
 def confronto():
     """Il confronto della 1.0, reso dal server (`app/design/pages/confronto.py`).
 
-    Lo stato sta nell'URL (`indicator`, `region` fino a tre volte, `year`)
-    e si normalizza qui
-    (`confronto.resolve_state`): un valore che non regge vale quello di
-    partenza, e un link vecchio apre sempre un confronto. Il canonical resta
-    `/confronto` per ogni stato, e la pagina resta indicizzabile come prima.
+    Lo stato sta nell'URL (`indicator`, `region` fino a tre volte, `year`,
+    `livello`, e sulle province `provincia` fino a tre volte) e si normalizza
+    qui (`confronto.resolve_state`): un valore che non regge vale quello di
+    partenza del livello, e un link vecchio apre sempre un confronto. Il
+    canonical resta `/confronto` per ogni stato.
 
-    In cache c'e' solo la pagina nuda, per stato: gli altri confronti si
+    **Il robots lo decide solo il livello**, come sull'atlante: le regioni
+    restano indicizzabili, `?livello=provincia` e' `noindex, follow` con
+    canonical `/confronto`, header qui e meta nel template. Il confronto fra
+    province non e' un documento a se': e' lo strumento, sulle serie che hanno
+    gia' la loro `/province` indicizzabile, e mille terne di province per
+    diciassette serie sarebbero pagine sottili con lo stesso canonical.
+
+    In cache c'e' solo la pagina nuda di ogni livello: gli altri confronti si
     rendono ogni volta, perche' sono migliaia (indicatori per terne di
-    regioni per anni) e il payload dell'indicatore e' gia' in cache per
+    territori per anni) e il payload dell'indicatore e' gia' in cache per
     processo. Senza ripiego: se la regia cede, 500 (vedi `_render_atlante`)."""
     state = compare_page.resolve_state(request.args)
     key = (state["level"], state["indicator"], state["regions"], state["year"])
     if compare_page.is_default(state):
-        return _confronto_page(*key)
-    return _render_confronto(*key)
+        body = _confronto_page(*key)
+    else:
+        body = _render_confronto(*key)
+    response = make_response(body)
+    if state["level"] == "provincia":
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 
 def _render_confronto(level, indicator, regions, year):
@@ -1018,6 +1030,20 @@ PIPELINE_AZIONI = ("ping", "run", "agente", "consuntivo")
 
 @app.route("/api/indicator/<indicator_id>")
 def indicator(indicator_id):
+    """Metadati e serie di un indicatore. Senza `livello` (o con
+    `livello=regione`) la serie regionale, come sempre. Con
+    `livello=provincia` la serie provinciale della scheda
+    (`indicator_universe.province_payload`), nella stessa forma: la legge il
+    confronto fra province. Un livello che non esiste, o che l'indicatore non
+    ha, e' un 404."""
+    level = request.args.get("livello") or "regione"
+    if level == "provincia":
+        payload = indicator_universe.province_payload(indicator_id)
+        if payload is None:
+            abort(404)
+        return jsonify(payload)
+    if level != "regione":
+        abort(404)
     payload = get_atlas_indicator(indicator_id)
     if payload is None:
         abort(404)

@@ -327,8 +327,10 @@
           {#- Gli altri livelli e la gemella, con un'ancora che dice di che cosa
               (`views._other_views`). -#}
           {% for item in other_views %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
-          {#- Confronto e atlante sono solo regionali: sulle province portavano
-              a una pagina senza province. L'atlante non apre una scheda (la
+          {#- Il confronto ha i due livelli: dalle regioni il confronto di
+              sempre, dalle province quello fra province di questo indicatore,
+              solo se il confronto lo offre (la sua `/province` passa la
+              regola, `d.compare_path`). L'atlante non apre una scheda (la
               scheda e' questa pagina) e alcune serie BES regionali non sono
               nel suo catalogo: "Apri l'indicatore" prometteva quello che non
               fa. Si apre sul tema, con tutte le serie che il catalogo ha. -#}
@@ -336,6 +338,7 @@
           <li><a href="/confronto">Metti a confronto le regioni</a></li>
           <li><a href="{{ atlas_theme_url(meta.theme) }}">Gli indicatori del tema nell'atlante</a></li>
           {% else %}
+          {% if d.compare_path %}<li><a href="{{ d.compare_path }}">Metti a confronto le province</a></li>{% endif %}
           <li><a href="/province">Il profilo di ogni provincia</a></li>
           <li><a href="/qualita-della-vita/classifica/province">Le province per qualità della vita</a></li>
           {% endif %}

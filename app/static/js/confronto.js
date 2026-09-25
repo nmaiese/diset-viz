@@ -1,4 +1,4 @@
-/* Il confronto della 1.0: cambiare indicatore, regioni e anno senza ricaricare.
+/* Il confronto della 1.0: cambiare indicatore, territori e anno senza ricaricare.
 
    La pagina arriva completa dal server (app/design/pages/confronto.py): il
    form GET e' il modo di cambiare confronto senza JavaScript. Qui il form
@@ -8,6 +8,13 @@
    nell'URL con replaceState e con i nomi del server (indicator, region fino a
    tre volte, year, livello), cosi' un link condiviso riapre la stessa vista.
    Se l'API non risponde si manda il form, come senza JavaScript.
+
+   Lo stesso per le province (`cfg.level` "provincia"): i territori stanno in
+   `provincia` fino a tre volte (`cfg.param`), i dati in
+   /api/indicator/<id>?livello=provincia, nella stessa forma, e il selettore
+   delle province e' diviso per regione (`cfg.groups`). Il livello si cambia
+   con i link del selettore in testa, che ricaricano: qui si riscrive solo il
+   loro indirizzo quando cambia l'indicatore (`switchHref`).
 
    Le cifre si scrivono con la regola di numfmt (decimali della grandezza,
    decimali di colonna sulla mediana), e la serie ha gli stessi due tagli e
@@ -20,8 +27,10 @@
 
    Gli eventi hanno i nomi del resto del sito (docs/tracking_spec.md): la page
    view la manda il server con page_type "atlas", come la SPA di prima;
-   select_indicator, change_region e change_year quando cambia il confronto,
-   open_region quando si apre il profilo di una regione dalla tabella. */
+   compare_select_indicator (non select_indicator, che e' la conversione
+   dell'atlante), change_region e change_year quando cambia il confronto, con
+   il livello in `level`, open_region quando si apre il profilo di una regione
+   dalla tabella, open_province quello di una provincia. */
 (function () {
   "use strict";
   var root = document.querySelector('[data-v1="confronto"]');
@@ -38,6 +47,10 @@
   var live = $("[data-cmp-live]");
   var THIN = " ";
   var DEFAULT_REGIONS = ["lombardia", "lazio", "campania"];
+  var DEFAULT_PROVINCES = ["milano", "roma", "napoli"];
+  var DEFAULTS = { regione: DEFAULT_REGIONS, provincia: DEFAULT_PROVINCES };
+  // I nomi dei territori nell'URL per livello, come `LEVELS` di confronto.py.
+  var PARAMS = { regione: "region", provincia: "provincia" };
 
   var state = { level: cfg.level, indicator: cfg.indicator, regions: cfg.regions.slice(), year: cfg.year };
   var models = {};   // id -> promessa del modello
@@ -105,8 +118,9 @@
     };
   }
   function load(id) {
+    var url = "/api/indicator/" + encodeURIComponent(id) + (cfg.level === "regione" ? "" : "?livello=" + cfg.level);
     if (!models[id]) {
-      models[id] = fetch("/api/indicator/" + encodeURIComponent(id), { credentials: "omit" })
+      models[id] = fetch(url, { credentials: "omit" })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(build);
       models[id].catch(function () { delete models[id]; });
@@ -128,7 +142,7 @@
     });
     regions = regions.slice(0, cfg.max);
     if (!regions.length) {
-      regions = DEFAULT_REGIONS.filter(function (k) { return m.names[k]; });
+      regions = DEFAULTS[state.level].filter(function (k) { return m.names[k]; });
       if (!regions.length) regions = Object.keys(m.names).sort().slice(0, cfg.max);
     }
     var year = Number(wanted.year);
@@ -142,19 +156,20 @@
   }
   function writeUrl() {
     var url = new URL(location.href);
-    ["indicator", "indicatore", "region", "regione", "year", "anno", "livello", "view"].forEach(function (k) { url.searchParams.delete(k); });
+    ["indicator", "indicatore", "region", "regione", "provincia", "year", "anno", "livello", "view"].forEach(function (k) { url.searchParams.delete(k); });
     if (!isDefault(state)) {
       url.searchParams.set("indicator", state.indicator);
-      state.regions.forEach(function (k) { url.searchParams.append("region", k); });
+      state.regions.forEach(function (k) { url.searchParams.append(cfg.param, k); });
       if (state.year !== model.years[model.years.length - 1]) url.searchParams.set("year", String(state.year));
-      if (state.level !== "regione") url.searchParams.set("livello", state.level);
     }
+    // La pagina nuda delle province e' `?livello=provincia`, non `/confronto`.
+    if (state.level !== "regione") url.searchParams.set("livello", state.level);
     history.replaceState(history.state, "", url.pathname + url.search + url.hash);
   }
 
   /* ---------- eventi, come trackEvent di prima ---------- */
   function track(name, extra) {
-    var params = { page_type: "atlas", page_path: location.pathname + location.search, page_title: document.title };
+    var params = { page_type: "atlas", page_path: location.pathname + location.search, page_title: document.title, level: state.level };
     for (var k in extra) params[k] = extra[k];
     window.dataLayer = window.dataLayer || [];
     var push = { event: name };
@@ -170,9 +185,12 @@
 
   /* ---------- la serie, come charts.compare_series ---------- */
   var CUTS = [["chart__l", 920, 320, 200, false], ["chart__s", 360, 260, 112, true]];
-  // Le regioni di charts.SHORT_NAMES: le province qui non arrivano.
+  // charts.SHORT_NAMES, regioni e province (una prova le confronta).
   var SHORT = { "Trentino Alto Adige": "Trentino A.A.", "Trentino-Alto Adige": "Trentino A.A.",
     "Friuli-Venezia Giulia": "Friuli V.G.", "Friuli Venezia Giulia": "Friuli V.G.",
+    "Monza e della Brianza": "Monza Brianza", "Reggio Calabria": "Reggio Cal.",
+    "Reggio nell'Emilia": "Reggio Emilia", "Barletta-Andria-Trani": "Barletta A.T.",
+    "Verbano-Cusio-Ossola": "Verbano C.O.", "Pesaro e Urbino": "Pesaro Urbino",
     "Valle d'Aosta": "Valle d'Aosta", "Emilia-Romagna": "Emilia-Romagna" };
   function shortName(name, limit) {
     if (name.length <= limit) return name;
@@ -301,12 +319,32 @@
 
   /* ---------- il disegno ---------- */
   function setText(sel, text) { all(sel).forEach(function (el) { el.textContent = text; }); }
-  function options(select, items, chosen, empty) {
+  function optionHtml(items, chosen) {
+    return items.map(function (it) {
+      return '<option value="' + esc(it[0]) + '"' + (String(it[0]) === String(chosen) ? " selected" : "") + ">" + esc(it[1]) + "</option>";
+    }).join("");
+  }
+  // `groups`, se c'e': [[etichetta, [chiavi]]], le province per regione.
+  function options(select, items, chosen, empty, groups) {
     var html = empty ? '<option value="">' + esc(empty) + "</option>" : "";
-    items.forEach(function (it) {
-      html += '<option value="' + esc(it[0]) + '"' + (String(it[0]) === String(chosen) ? " selected" : "") + ">" + esc(it[1]) + "</option>";
-    });
+    if (groups) {
+      var byKey = {};
+      items.forEach(function (it) { byKey[it[0]] = it; });
+      groups.forEach(function (g) {
+        var inside = g[1].filter(function (k) { return byKey[k]; }).map(function (k) { return byKey[k]; });
+        if (inside.length) html += '<optgroup label="' + esc(g[0]) + '">' + optionHtml(inside, chosen) + "</optgroup>";
+      });
+    } else {
+      html += optionHtml(items, chosen);
+    }
     select.innerHTML = html;
+  }
+  // Il link del selettore del livello, come `switch_href` di confronto.py.
+  function switchHref(level) {
+    var other = cfg["switch"][level];
+    var path = level === "regione" ? "/confronto" : "/confronto?livello=" + level;
+    if (!other || other.shared.indexOf(state.indicator) < 0 || state.indicator === other["default"]) return path;
+    return "/confronto?indicator=" + state.indicator + (level === "regione" ? "" : "&livello=" + level);
   }
 
   function render() {
@@ -334,7 +372,7 @@
 
     // tabella
     var rows = sel.map(function (s) {
-      return '<tr><th scope="row"><span class="swatch ' + s.cls + '" aria-hidden="true"></span><a href="/regione/' + esc(s.key) + '">' +
+      return '<tr><th scope="row"><span class="swatch ' + s.cls + '" aria-hidden="true"></span><a href="' + esc(cfg.profile + s.key) + '">' +
         esc(s.name) + '</a></th><td class="val">' + numHtml(s.value, unit, d) + '</td><td class="val">' + rankHtml(s.value === null ? 0 : s.rank, keys.length) + "</td></tr>";
     });
     rows.push('<tr class="ref"><th scope="row">Media semplice delle ' + avgN + " " + cfg.plural + '</th><td class="val">' + numHtml(avgNow, unit, d) + "</td><td></td></tr>");
@@ -362,9 +400,11 @@
       });
       var lg = { min: lo, mid: lo + (hi - lo) / 2, max: hi };
       all("[data-legend]", box).forEach(function (el) { el.textContent = fmt(lg[el.getAttribute("data-legend")]); });
-      all(".legend__nd", box).forEach(function (el) { el.hidden = keys.length >= Object.keys(m.names).length; });
+      // Come `legend_nd` della pagina: si contano i contorni, non i territori della serie.
+      var shapes = all(".map [data-key]", box).length;
+      all(".legend__nd", box).forEach(function (el) { el.hidden = keys.length >= shapes; });
       var svg = box.querySelector(".map svg");
-      if (svg) svg.setAttribute("aria-label", "Mappa delle regioni italiane per " + meta.name + ", " + year + ", con le regioni a confronto in evidenza");
+      if (svg) svg.setAttribute("aria-label", "Mappa delle " + cfg.plural + " italiane per " + meta.name + ", " + year + ", con le " + cfg.plural + " a confronto in evidenza");
     }
 
     // la serie
@@ -408,7 +448,11 @@
     options(yearSel, m.years.slice().reverse().map(function (y) { return [y, y]; }), year);
     var territories = Object.keys(m.names).map(function (k) { return [k, m.names[k]]; })
       .sort(function (a, b) { return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0; });
-    regionSels.forEach(function (s, i) { options(s, territories, state.regions[i] || "", i > 0 ? "Nessuna" : null); });
+    regionSels.forEach(function (s, i) { options(s, territories, state.regions[i] || "", i > 0 ? "Nessuna" : null, cfg.groups); });
+    all("[data-cmp-switch]").forEach(function (a) {
+      var level = a.getAttribute("data-cmp-switch");
+      if (level !== state.level) a.setAttribute("href", switchHref(level));
+    });
 
     live.textContent = $("[data-cmp-answer]").textContent;
   }
@@ -487,8 +531,11 @@
     });
   });
   root.addEventListener("click", function (ev) {
-    var a = ev.target.closest("[data-cmp-rows] a[href^='/regione/']");
-    if (a) track("open_region", { region_key: a.getAttribute("href").slice("/regione/".length) });
+    var a = ev.target.closest("[data-cmp-rows] a[href^='" + cfg.profile + "']");
+    if (!a) return;
+    var key = a.getAttribute("href").slice(cfg.profile.length);
+    if (state.level === "provincia") track("open_province", { province_key: key });
+    else track("open_region", { region_key: key });
   });
 
   /* ---------- i confronti salvati, solo dopo l'accesso ---------- */
@@ -547,7 +594,18 @@
     if (load) {
       var it = items.filter(function (x) { return String(x.id) === load.getAttribute("data-cmp-load"); })[0];
       var c = (it && it.config) || {};
-      // L'anno torna all'ultimo (docs/ACCOUNT.md): si ricaricano indicatore e regioni.
+      // Un confronto salvato sull'altro livello si apre su quella pagina: i
+      // suoi territori e i suoi indicatori sono quelli dell'altro livello.
+      var level = c.level || "regione";
+      if (level !== state.level && PARAMS[level]) {
+        var q = new URLSearchParams();
+        if (c.indId) q.set("indicator", String(c.indId));
+        (c.regions || c.regionNames || []).forEach(function (k) { q.append(PARAMS[level], k); });
+        if (level !== "regione") q.set("livello", level);
+        location.assign("/confronto?" + q.toString());
+        return;
+      }
+      // L'anno torna all'ultimo (docs/ACCOUNT.md): si ricaricano indicatore e territori.
       apply({ indicator: String(c.indId || state.indicator), regions: c.regions || c.regionNames || [], year: null }, function () {
         status.textContent = "Confronto caricato";
         $("[data-cmp-answer]").scrollIntoView({ block: "center" });

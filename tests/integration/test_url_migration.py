@@ -119,7 +119,9 @@ class LaVistaProvincialeHaIlSuoUrl(unittest.TestCase):
         self.assertEqual(risposta.status_code, 200)
         html = risposta.get_data(as_text=True)
         self.assertIn(f'<link rel="canonical" href="https://divarioitalia.it{self.PROVINCE}">', html)
-        self.assertNotIn("livello=", html)
+        # Il link al confronto fra province porta il livello del confronto,
+        # non quello della scheda: si toglie prima di guardare.
+        self.assertNotIn("livello=", re.sub(r'href="/confronto\?[^"]*"', "", html))
         markdown = self.client.get(self.PROVINCE, headers={"Accept": "text/markdown"})
         self.assertEqual(markdown.headers["Content-Location"], f"https://divarioitalia.it{self.PROVINCE}")
 

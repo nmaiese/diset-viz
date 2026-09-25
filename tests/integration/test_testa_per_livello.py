@@ -181,6 +181,9 @@ class LaTestaSegueIlLivello(unittest.TestCase):
             with self.subTest(pagina=path):
                 page = self.client.get(path).get_data(as_text=True)
                 self.assertIn('data-v1="indicatore"', page)
+                # Il confronto fra province non e' un livello della scheda: e'
+                # un'altra pagina, e il suo livello sta nella sua query.
+                page = re.sub(r'href="/confronto\?[^"]*"', "", page)
                 self.assertNotIn("livello=", page)
                 self.assertNotIn("livello=",
                                  self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True))

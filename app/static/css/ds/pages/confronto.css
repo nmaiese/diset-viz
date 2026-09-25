@@ -5,6 +5,9 @@
    classe (`s1`..`s3`): il colore identifica una regione, non la giudica, e
    non e' mai l'accento, che resta a cio' che si clicca. */
 
+/* Il selettore Regioni/Province in testa, come quello dell'atlante. */
+.confronto-level { margin-top: var(--space-4); width: fit-content; max-width: 100%; }
+
 .confronto-form { margin-bottom: var(--space-4); gap: var(--space-4) var(--space-6); }
 .confronto-form__ind { flex: 1 1 100%; }
 .confronto-form__ind select { width: 100%; }
