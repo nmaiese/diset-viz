@@ -1,0 +1,61 @@
+/* L'atlante della 1.0: solo l'impaginazione sua. Modulo dato, tabella a
+   blocchi, sparkline, etichetta di stato e campi della barra sono componenti
+   comuni (components.css). Legge solo token. */
+
+.v1-atlante .pagehead .meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
+.atlante-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+
+/* ---------- la barra dei filtri ---------- */
+.atlante-filter { margin-bottom: var(--space-8); gap: var(--space-4) var(--space-6); }
+.atlante-filter[hidden] { display: none; }
+.atlante-filter .field select { min-width: 10rem; }
+.atlante-filter__q { flex: 1 1 18rem; }
+.atlante-filter__q input[type="search"] { width: 100%; }
+.atlante-filter .check {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px;
+  font-size: var(--fs-ui); color: var(--ink); cursor: pointer;
+}
+.atlante-filter .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+.atlante-filter .check[hidden] { display: none; }
+.atlante-filter__count { flex-basis: 100%; margin: 0; }
+
+/* ---------- le aree e i temi ---------- */
+.atlante-area + .atlante-area { margin-top: var(--space-12); }
+.atlante-area__title {
+  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--text-2);
+  padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
+}
+/* Seicento righe con una sparkline ciascuna: il browser salta layout e
+   disegno dei temi fuori dallo schermo finche' non ci si arriva. */
+.atlante-group { content-visibility: auto; contain-intrinsic-size: auto 900px; margin-top: var(--space-8); }
+.atlante-group > h4 { margin-bottom: var(--space-3); }
+.atlante-group > h4 a { color: var(--ink); }
+.atlante-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
+/* Le righe a blocchi sono griglie: l'attributo hidden del filtro va imposto. */
+.v1-atlante [data-area][hidden], .v1-atlante .atlante-group[hidden], .atlante-table tr[hidden] { display: none !important; }
+.atlante-empty[hidden] { display: none; }
+.atlante-empty { padding-block: var(--space-8); color: var(--text-2); }
+
+/* ---------- le righe ---------- */
+.atlante-table { table-layout: auto; }
+.atlante-table th[scope="row"] { width: 42%; }
+.atlante-table th[scope="row"] .status { margin-left: var(--space-2); }
+.atlante-table .val small { display: block; font-size: var(--fs-small); color: var(--muted); }
+/* "Sulla mappa": un'azione, quindi l'accento, scritta come un link sotto il nome. */
+.atlante-table [form="atl-map"] {
+  display: block; margin-top: var(--space-1); padding: 0; border: 0; background: none;
+  font: inherit; font-size: var(--fs-small); font-weight: 400; color: var(--accent);
+  text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer;
+}
+.atlante-table [form="atl-map"]:hover { color: var(--accent-strong); }
+.atlante-table .trend__from { white-space: normal; }
+.atlante-table .trend__txt { display: grid; }
+/* a blocchi: il nome a tutta riga, l'andamento sotto, l'ultimo anno accanto */
+@container (max-width: 560px) {
+  .atlante-table th[scope="row"] { width: auto; }
+  .atlante-table tbody tr { grid-template-columns: minmax(0, 1fr) auto; }
+  .atlante-table .trendcell { grid-column: 1; }
+  .atlante-table .val { grid-column: 2; }
+  .atlante-table .val small { display: inline; }
+}

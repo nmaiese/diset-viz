@@ -129,10 +129,12 @@ def with_unit(value, unit: str | None, decimals: int | None = None) -> str:
     return f"{text} {u}" if u else text
 
 
-def signed(value, unit: str | None) -> str:
+def signed(value, unit: str | None, decimals: int | None = None) -> str:
+    """`+54,3 punti percentuali`: la cifra col segno e l'unita' della frase.
+    `decimals` quando deve coincidere con cifre scritte accanto."""
     if value is None:
         return PLACEHOLDER
-    text = numfmt.text(value, sign=True)
+    text = numfmt.text(value, decimals, sign=True)
     u = phrase_unit(unit)
     if u == "%":
         return text + "%"

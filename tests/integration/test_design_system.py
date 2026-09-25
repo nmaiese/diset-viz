@@ -37,16 +37,18 @@ from app.cache import cache
 TEMPLATES = Path(app.root_path) / "templates"
 
 
-# Le shell che montano il bundle dell'atlante. Se se ne aggiunge una terza va
-# aggiunta qui, ed e' il punto: la lista e' il contratto.
-SPA_ROUTES = ("/atlante", "/confronto")
+# Le rotte servite dal bundle React. Se se ne aggiunge una va aggiunta qui, ed
+# e' il punto: la lista e' il contratto. `/atlante` ne e' uscita con la pagina
+# della 1.0 resa dal server (`v1/atlante.html`): `app.html` resta come suo
+# ripiego, e per questo monta ancora il bundle.
+SPA_ROUTES = ("/confronto",)
 
 # Un campione di ogni famiglia di pagina servita da Jinja, cioe' quelle che
 # condividono `_ds_header.html`.
 JINJA_PAGES = ("/", "/blog", "/regioni", "/temi", "/metodologia",
                "/qualita-della-vita", "/quiz", "/ricerca?q=lavoro",
                "/divari-regionali", "/chi-siamo", "/privacy", "/catalogo-dati",
-               "/regione/lombardia", "/province", "/provincia/lecce",
+               "/regione/lombardia", "/province", "/provincia/lecce", "/atlante",
                "/blog/divario-turistico-nord-sud-2024",
                "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99")
 

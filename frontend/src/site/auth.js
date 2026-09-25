@@ -120,6 +120,14 @@ async function render() {
   }
 }
 
+// Il token per le pagine che non montano React, come l'atlante della 1.0
+// (app/static/js/atlante.js): null senza una sessione salvata, e in quel caso
+// la libreria di accesso non si carica. `di:auth` avvisa chi e' arrivato prima.
+window.diAuth = {
+  token: () => (isAuthConfigured() && hasStoredSession() ? getAccessToken() : Promise.resolve(null)),
+};
+document.dispatchEvent(new Event("di:auth"));
+
 if (root && isAuthConfigured()) {
   if (hasStoredSession() || isOAuthReturn()) {
     // Sessione da risolvere, o ritorno dal login da consumare: carica supabase,

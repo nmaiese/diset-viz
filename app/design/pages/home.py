@@ -644,11 +644,11 @@ MORE_DOORS = ("/atlante", "/confronto", "/divari-regionali", "/blog", "/quiz", "
 def _atlas_door_text(ctx: dict) -> str:
     """La porta dell'atlante dice le due cifre che l'atlante mostra.
 
-    All'apertura, senza `partial=1` e con fonte e area su "tutte", la SPA
-    elenca solo le serie complete e lo scrive ("solo dati completi (447)").
-    Una porta che diceva "594 indicatori" apriva una lista di 447: il totale
-    da solo e' la promessa sbagliata, quindi senza il conto delle complete la
-    porta resta senza cifre."""
+    L'atlante elenca tutte le serie, le parziali con la loro etichetta, e in
+    testa dice quante sono complete: la porta dice le stesse due cifre. Quando
+    la SPA apriva sulle sole complete, una porta che diceva "594 indicatori"
+    apriva una lista di 447: senza il conto delle complete la porta resta
+    senza cifre."""
     total, complete = ctx.get("total_indicators"), ctx.get("complete_indicators")
     tail = "da filtrare per tema, fonte e anni"
     if not total or complete is None:

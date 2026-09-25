@@ -28,6 +28,7 @@ import math
 import re
 from functools import lru_cache
 from html import escape
+from itertools import pairwise
 
 from app.design import numfmt as n
 
@@ -328,7 +329,7 @@ def spark_floor(values) -> float | None:
     return quartile(0.75) - quartile(0.25)
 
 
-def spark(points, size: str = "s", floor: float | None = None) -> str:
+def spark(points, size: str = "s", floor: float | None = None, compact: bool = False) -> str:
     """La sparkline: una serie `{year, value}` in una linea e un punto finale.
 
     - L'asse x e' per anno, non per posizione. Le indagini periodiche saltano
@@ -344,6 +345,10 @@ def spark(points, size: str = "s", floor: float | None = None) -> str:
     - Sotto i due punti non c'e' niente da disegnare, ed esce una stringa vuota.
     - Colori solo per classe (`.spark__line`, `.spark__dot`), niente
       esadecimali. `aria-hidden` sempre: le cifre stanno in testo accanto.
+    - `compact` scrive la stessa linea con le coordinate al pixel intero e in
+      passi relativi (`M3 20l16 2 17-6`): e' per le pagine che ne mettono
+      centinaia, come l'atlante con le sue 594 righe, dove la forma lunga
+      pesava da sola 32 KB compressi. Il disegno e' lo stesso, al mezzo pixel.
     """
     if size not in SPARK_SIZES:
         size = "s"
@@ -373,6 +378,16 @@ def spark(points, size: str = "s", floor: float | None = None) -> str:
         return SPARK_PAD + (hi - v) / (hi - lo) * inner_h
 
     coords = [(x(yr), y(v)) for yr, v in pts]
+    if compact:
+        whole = [(round(cx), round(cy)) for cx, cy in coords]
+        steps = " ".join(f"{bx - ax} {by - ay}" for (ax, ay), (bx, by) in pairwise(whole)).replace(" -", "-")
+        lx, ly = whole[-1]
+        return (f'<svg class="spark spark--{size}" '
+                f'viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+                f'aria-hidden="true" focusable="false">'
+                f'<path class="spark__line" d="M{whole[0][0]} {whole[0][1]}l{steps}"/>'
+                f'<circle class="spark__dot" cx="{lx}" cy="{ly}" r="{SPARK_DOT_R}"/>'
+                f"</svg>")
     line = " ".join(f"{cx:.1f},{cy:.1f}" for cx, cy in coords)
     lx, ly = coords[-1]
     return (f'<svg class="spark spark--{size}" '

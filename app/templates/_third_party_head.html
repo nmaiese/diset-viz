@@ -72,7 +72,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     page_location: window.location.href,
     page_path: window.location.pathname + window.location.search,
     page_title: document.title,
-    page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'
+    {#- Una pagina che era della SPA tiene il suo tipo (`PAGE_TYPE`, l'atlante
+        dice "atlas"): i rapporti GA4 non devono vederla cambiare tipo solo
+        perche' ora la rende il server. -#}
+    page_type: {% if PAGE_TYPE is defined %}{{ PAGE_TYPE | tojson }}{% else %}window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'{% endif %}
   });
 </script>
 {% endif %}
