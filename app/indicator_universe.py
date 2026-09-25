@@ -20,6 +20,7 @@ risultato.
 """
 
 from app import external_atlas, indicator_view, multiscopo_data, sources
+from app.atlas_catalog import _downsample
 from app.bes_data import all_bes_indicators
 from app.cache_util import synchronized_cache
 from app.data import get_catalog
@@ -69,11 +70,23 @@ def projection():
             "levels": [
                 {"key": level["key"], "label": level["label"],
                  "year_min": level["year_min"], "year_max": level["year_max"],
-                 "territory_count": len(level["observations"])}
+                 "territory_count": len(level["observations"]),
+                 "panel": _compact_panel(level)}
                 for level in view["levels"]
             ],
         })
     return records
+
+
+def _compact_panel(level):
+    """La serie della sparkline sul pannello fisso (`indicator_view.fixed_panel`),
+    al massimo 24 punti: e' la sola parte della serie che la proiezione tiene,
+    e la leggono l'atlante e chi disegnera' la fascia in home. None quando il
+    pannello non arriva a tre anni."""
+    panel = indicator_view.fixed_panel(level)
+    if panel is None:
+        return None
+    return {**panel, "points": _downsample(panel["points"], indicator_view.PANEL_MAX_POINTS)}
 
 
 @synchronized_cache(maxsize=1)

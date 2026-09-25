@@ -33,6 +33,7 @@ Two consequences worth knowing:
 import re
 import csv
 import functools
+import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -45,8 +46,9 @@ from app.bes_data import (
     get_bes_rows,
     get_bes_territories,
 )
-from app.data import indicator_trend_stats, indicator_year_over_year_stats
+from app.data import REGION_ORDER, indicator_trend_stats, indicator_year_over_year_stats
 from app.design.charts import spark_floor
+from app.design.maps import PROVINCE_PATHS
 from app.external_data import freshness_label, freshness_status
 from app.multiscopo_data import all_multiscopo_indicators
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_TWINS
@@ -453,6 +455,68 @@ def _annual_means(matrix):
         if values:
             out.append({"year": int(year_str), "avg": sum(values) / len(values)})
     return out
+
+
+# Il pannello fisso delle sparkline: su quanti territori si conta la soglia,
+# in assoluto e non sul totale della singola serie (20 regioni, 107 province),
+# la quota che un anno deve avere per entrare e gli anni che servono per
+# disegnare una linea.
+PANEL_TOTALS = {"regione": len(REGION_ORDER), "provincia": len(PROVINCE_PATHS)}
+PANEL_SHARE = 0.8
+PANEL_MIN_YEARS = 3
+# La sparkline piu' lunga ha 24 punti: oltre, si tengono punti a passo regolare,
+# primo e ultimo compresi (`atlas_catalog._downsample`, la stessa del catalogo).
+PANEL_MAX_POINTS = 24
+
+
+def panel_need(level_key):
+    """Quanti territori deve avere un anno per entrare nel pannello: 16 regioni
+    su 20, 86 province su 107."""
+    return math.ceil(PANEL_SHARE * PANEL_TOTALS[level_key])
+
+
+def fixed_panel(level):
+    """La serie della sparkline di un livello, sul pannello fisso, o None.
+
+    Si prendono gli anni in cui almeno l'80% dei territori del livello ha il
+    dato (16 regioni su 20, 86 province su 107), si tengono i territori
+    presenti in tutti quegli anni, e la linea e' la media semplice di quel
+    gruppo fisso, anno per anno. Cosi' la linea non sale o scende perche' in un
+    anno manca una regione: la media della scheda (`_annual_means`) cambia
+    gruppo da un anno all'altro, questa no. Servono almeno tre anni.
+
+    Quando il gruppo e' intero e nessun anno e' scartato, la serie e'
+    `annual_means` della scheda, cifra per cifra. Quando il gruppo e' piu'
+    piccolo, `members` lo dice e chi disegna la riga lo scrive ("media di 16
+    regioni presenti in tutti gli anni"): la cifra non e' quella di "Com'e'
+    cambiato" della scheda. Un anno scartato e un anno che manca nella fonte si
+    trattano allo stesso modo: la linea unisce i due anni accanto.
+
+    `floor` e' il pavimento della scala verticale, lo scarto interquartile dei
+    territori nell'ultimo anno (`charts.spark_floor`).
+    """
+    total = PANEL_TOTALS.get(level["key"])
+    matrix = level.get("matrix") or {}
+    if not total or not matrix:
+        return None
+    need = panel_need(level["key"])
+    present = {year: {key for key, value in row.items() if isinstance(value, (int, float))}
+               for year, row in matrix.items()}
+    years = sorted((year for year, keys in present.items() if len(keys) >= need), key=int)
+    if len(years) < PANEL_MIN_YEARS:
+        return None
+    members = set.intersection(*(present[year] for year in years))
+    if not members:
+        return None
+    points = [{"year": int(year), "value": sum(matrix[year][key] for key in members) / len(members)}
+              for year in years]
+    return {
+        "points": points,
+        "members": len(members),
+        "total": total,
+        "dropped": sum(1 for keys in present.values() if keys) - len(years),
+        "floor": spark_floor(o["value"] for o in level.get("observations") or []),
+    }
 
 
 def _build_level(key, series, meta, territory_total, coverage):
