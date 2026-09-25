@@ -2,8 +2,8 @@
 
 Da lanciare dopo un deploy che cambia pagine indicizzabili:
 
-    bin/py scripts/indexnow.py                 # tutta la sitemap
-    bin/py scripts/indexnow.py /regione/lazio  # solo questi percorsi
+    bin/py -m scripts.indexnow                 # tutta la sitemap
+    bin/py -m scripts.indexnow /regione/lazio  # solo questi percorsi
 
 Legge la sitemap dal sito vero, non dal codice locale: notifica cio' che e'
 online, non cio' che lo sara'.
@@ -17,11 +17,14 @@ from app.config import SITE_URL
 from app.views import INDEXNOW_KEY
 
 ENDPOINT = "https://api.indexnow.org/indexnow"
+# Cloudflare davanti al sito, e l'API, rispondono 403 allo user-agent di urllib.
+HEADERS = {"User-Agent": "divarioitalia-indexnow/1.0 (+https://divarioitalia.it/contatti)"}
 LOTTO = 10000
 
 
 def _sitemap():
-    with urllib.request.urlopen(f"{SITE_URL}/sitemap.xml", timeout=60) as r:
+    req = urllib.request.Request(f"{SITE_URL}/sitemap.xml", headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=60) as r:
         return re.findall(r"<loc>([^<]+)</loc>", r.read().decode("utf-8"))
 
 
@@ -33,7 +36,7 @@ def main(argv):
                  "keyLocation": f"{SITE_URL}/{INDEXNOW_KEY}.txt",
                  "urlList": urls[i:i + LOTTO]}
         req = urllib.request.Request(ENDPOINT, json.dumps(corpo).encode(),
-                                     {"Content-Type": "application/json; charset=utf-8"})
+                                     {**HEADERS, "Content-Type": "application/json; charset=utf-8"})
         with urllib.request.urlopen(req, timeout=60) as r:
             print(f"{len(corpo['urlList'])} URL, HTTP {r.status}")
     return 0
