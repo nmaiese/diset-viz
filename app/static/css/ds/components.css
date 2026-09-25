@@ -319,11 +319,27 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .table tr.is-on > * { background: var(--surface-2); }
 .table tr.is-on > :first-child { box-shadow: inset 3px 0 0 var(--accent); padding-left: var(--space-3); }
 .table tr.is-on .bar i { background: var(--data-focus); }
+/* La riga a cui porta /provincia/<key> (#p-<key>) si accende come la riga
+   scelta anche senza JavaScript. Con il JavaScript l'ancora diventa la scelta
+   del modulo (is-on, v1.js), e :target non accende una seconda riga accanto. */
+[data-explore]:not(.has-js) .table tr:target > * { background: var(--surface-2); }
+[data-explore]:not(.has-js) .table tr:target > :first-child { box-shadow: inset 3px 0 0 var(--accent); padding-left: var(--space-3); }
+[data-explore]:not(.has-js) .table tr:target .bar i { background: var(--data-focus); }
 .table tr.ref > * { border-bottom: 1px solid var(--ink); color: var(--text-2); font-size: var(--fs-small); padding-block: 6px; }
 .table tr.ref .val { font-weight: 400; }
 .table tr.ref .bar { background: transparent; height: 1px; }
 .table tbody tr:hover > * { background: var(--surface-1); }
 .table tbody tr.is-on:hover > * { background: var(--surface-2); }
+[data-explore]:not(.has-js) .table tbody tr:target:hover > * { background: var(--surface-2); }
+/* La classifica piegata delle province: prime dieci, le altre nel details,
+   ultime dieci. Tre tabelle una sotto l'altra. */
+.tablewrap--fold { display: grid; gap: var(--space-4); }
+.tablewrap--fold > details.more { margin-top: 0; }
+/* Le tre tabelle con le stesse colonne: la larghezza non dipende dal nome piu'
+   lungo o dalla posizione a tre cifre di ciascuna. */
+.tablewrap--fold .table { table-layout: fixed; }
+.tablewrap--fold .table .rank { width: 3.25rem; }
+.tablewrap--fold .table .val, .tablewrap--fold .table thead .r { width: 5.5rem; }
 .rank-more summary { cursor: pointer; padding-block: var(--space-3); color: var(--link); font-weight: 600; }
 @container (max-width: 520px) { .barcell { display: none; } }
 
@@ -366,6 +382,12 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .chart .hl-lab { fill: var(--data-focus); font-weight: 700; font-size: 13px; font-family: var(--font-sans); }
 .chart-note { font-size: var(--fs-ui); color: var(--ink); max-width: var(--measure); margin-top: var(--space-4); }
 details.more { margin-top: var(--space-4); border-top: 1px solid var(--rule); }
+/* "Dentro le regioni" della scheda sulle province: dopo il modulo dato, nella
+   stessa sezione. Nelle celle il nome a sinistra e la cifra a destra, cosi' le
+   cifre stanno in colonna anche quando la tabella diventa blocchi. */
+.within { margin-top: var(--space-12); }
+.within__pair { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.within__pair > :last-child { white-space: nowrap; }
 details.more > summary { cursor: pointer; padding-block: var(--space-3); font-weight: 600; color: var(--link); list-style-position: inside; }
 details.more[open] > summary { color: var(--ink); }
 
@@ -702,6 +724,12 @@ details.more[open] > summary { color: var(--ink); }
   .table--stack .barcell { width: auto; grid-column: 1 / -1; }
   /* e anche la cella con la sparkline */
   .table--stack .trendcell { grid-column: 1 / -1; }
+}
+
+/* "Dentro le regioni" a blocchi: la distanza e' una cifra corta, e i nomi delle
+   province (Barletta-Andria-Trani, Forli'-Cesena e Rimini) prendono lo spazio. */
+@container (max-width: 560px) {
+  .within__table tbody tr { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
 }
 
 .table--stack tr.group > * { padding-top: var(--space-6); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); border-bottom: 1px solid var(--rule-strong); }

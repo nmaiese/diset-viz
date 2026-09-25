@@ -380,6 +380,16 @@ def indicatori(chiave):
         # sta gia' in `_serie()`: qui non si legge niente di nuovo.
         spark = [{"year": year, "value": per_anno[year]["valori"][chiave]} for year in anni]
 
+        # Aperta sulle province: da qui il lettore cerca la sua, e il canonico
+        # di una scheda a due livelli mostra le regioni. E aperta sulla sua
+        # riga (`#p-<chiave>`, che `:target` accende anche senza JavaScript),
+        # ma solo se la provincia ha il dato dell'ultimo anno della serie:
+        # la classifica della scheda e' quella, e un'ancora senza riga non
+        # porta da nessuna parte.
+        path = bes_data.bes_level_path(id_indicatore, "provincia")
+        if ultimo == max(per_anno):
+            path += f"#p-{chiave}"
+
         righe.append({
             "id": id_indicatore,
             "name": info["name"],
@@ -388,9 +398,7 @@ def indicatori(chiave):
             # dominio BES ne dava undici, che si sovrapponevano quasi voce per
             # voce al filtro Tema e alzavano la barra dei filtri a 564 px.
             "macro_area": _macro_area(info.get("category")),
-            # Aperta sulle province: da qui il lettore cerca la sua, e il
-            # canonico di una scheda a due livelli mostra le regioni.
-            "path": bes_data.bes_level_path(id_indicatore, "provincia"),
+            "path": path,
             "unit": info.get("unit") or "",
             "direction": info.get("direction"),
             "value": valore,

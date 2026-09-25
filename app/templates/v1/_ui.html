@@ -123,6 +123,22 @@
 </ul>
 {%- endmacro %}
 
+{#- Un corpo della classifica del modulo dato. Con `m.row_id` (le province)
+    ogni riga ha l'id `p-<key>`: `/provincia/<key>` ci porta, e `:target` la
+    accende anche senza JavaScript. `part` dice a v1.js quale pezzo della
+    classifica piegata e' questo corpo. -#}
+{% macro rank_body(m, rows, part=None) -%}
+<tbody data-rank-body{% if part %} data-rank-part="{{ part }}"{% endif %}>
+          {% for row in rows %}
+          {% if row.ref %}
+          <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', m.decimals) }}</td></tr>
+          {% else %}
+          <tr data-key="{{ row.key }}"{% if m.row_id %} id="{{ m.row_id ~ row.key }}"{% endif %}><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if m.areas.get(row.key) %}<span class="area-dot area-dot--{{ m.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if m.profile_path %}<a href="{{ m.profile_path ~ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if m.areas.get(row.key) %}<span class="sr-only">, {{ m.area_label[m.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', m.decimals) }}</td></tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+{%- endmacro %}
+
 {#- Il modulo dato: un indicatore su un livello, con la mappa accanto alla
     classifica, l'anno e il territorio da scegliere. Nato nella scheda
     indicatore, e' un componente perche' lo usano anche altre pagine.
@@ -183,21 +199,40 @@
       {% if m.level == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
     </div>
     {% endif %}
-    <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle {{ m.plural }}">
+    <div class="tablewrap{% if m.fold %} tablewrap--fold{% endif %}" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle {{ m.plural }}">
       {% if m.area_legend %}{{ arealegend(m.area_legend) }}{% endif %}
+      {% set rank_head %}<thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ m.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (m.short_unit or 'Valore') | capitalize }}</th></tr></thead>{% endset %}
+      {% if m.fold %}
+      {#- Le prime e le ultime dieci in vista, le altre nello stesso documento
+          dentro un `details` (SISTEMA.md, "Classifica a barre"): tre tabelle,
+          perche' un `details` non sta dentro una tabella. Al cambio d'anno
+          v1.js riscrive solo i tre corpi (`data-rank-part`), e il `details`
+          resta com'era, aperto o chiuso. -#}
+      <table class="table">
+        <caption data-rank-caption>{{ m.fold.head_caption }}</caption>
+        {{ rank_head }}
+        {{ rank_body(m, m.fold.head, 'head') }}
+      </table>
+      <details class="more" data-rank-more>
+        <summary data-rank-summary>{{ m.fold.label }}</summary>
+        <table class="table">
+          <caption class="sr-only" data-rank-summary>{{ m.fold.label }}</caption>
+          {{ rank_head }}
+          {{ rank_body(m, m.fold.middle, 'middle') }}
+        </table>
+      </details>
+      <table class="table" data-rank-tail>
+        <caption>{{ m.fold.tail_caption }}</caption>
+        {{ rank_head }}
+        {{ rank_body(m, m.fold.tail, 'tail') }}
+      </table>
+      {% else %}
       <table class="table">
         <caption class="sr-only">{{ m.name }}, le {{ m.n }} {{ m.plural }} nel <span data-year-label>{{ m.year }}</span>{% if m.unit_note %}, {{ m.unit_note }}{% endif %}</caption>
-        <thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ m.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (m.short_unit or 'Valore') | capitalize }}</th></tr></thead>
-        <tbody data-rank-body>
-          {% for row in m.ranking %}
-          {% if row.ref %}
-          <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', m.decimals) }}</td></tr>
-          {% else %}
-          <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if m.areas.get(row.key) %}<span class="area-dot area-dot--{{ m.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if m.profile_path %}<a href="{{ m.profile_path ~ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if m.areas.get(row.key) %}<span class="sr-only">, {{ m.area_label[m.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', m.decimals) }}</td></tr>
-          {% endif %}
-          {% endfor %}
-        </tbody>
+        {{ rank_head }}
+        {{ rank_body(m, m.ranking) }}
       </table>
+      {% endif %}
     </div>
   </div>
   <p class="source">Fonte: <a href="{{ m.source_url }}">{{ m.source_label }}</a> ({{ m.year }}). Elaborazione Divario Italia.{% if m.csv %} <a href="{{ m.csv }}">Dati in CSV</a>{% endif %}</p>

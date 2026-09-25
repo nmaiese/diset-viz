@@ -1,8 +1,10 @@
 """La scheda indicatore della 1.0: cio' che il template chiede in piu' ai dati.
 
 Tessere, titolo-affermazione della classifica, la striscia del divario, la
-serie a fascia, i richiami sulla mappa e i dati del modulo interattivo. Prende
-il contesto che `_render_indicator` passa al template, e non ne cambia niente.
+serie a fascia, i richiami sulla mappa e i dati del modulo interattivo. Sulle
+province anche la classifica piegata (prime e ultime dieci, le altre in un
+`details`) e "Dentro le regioni". Prende il contesto che `_render_indicator`
+passa al template, e non ne cambia niente.
 """
 
 from __future__ import annotations
@@ -26,7 +28,137 @@ from app.design.common import (
     values_note,
     with_unit,
 )
+from app.design.pages.classifica import EDGE, SPLIT_OVER, from_to
 from app.indicator_notes import ds_choropleth_colors
+from app.profiles import region_key_for
+from app.seo_titles import (
+    UNVERIFIED_EXTREMES,
+    _code,
+    _is_percentage,
+    _widest_within_region,
+    from_place,
+    in_region,
+    to_place,
+)
+
+# L'id di una riga della classifica provinciale: `/provincia/<key>` porta a
+# `...#p-<key>`, e la riga si accende con `:target` anche senza JavaScript.
+ROW_ID = {"provincia": "p-"}
+VERSO_WORDS = {"higher_better": "Qui un valore più alto è migliore.",
+               "lower_better": "Qui un valore più basso è migliore.",
+               "higher_worse": "Qui un valore più basso è migliore."}
+
+
+def fold(rows: list[dict], plural: str) -> dict | None:
+    """La classifica lunga piegata come quella della qualita' della vita
+    (`classifica.split`, stesse soglie): le prime e le ultime EDGE righe in
+    vista, le altre nello stesso documento dentro un `details` (SISTEMA.md).
+
+    La riga della media semplice va nel pezzo della riga che la segue, dove la
+    classifica la incrocia: la stessa regola che v1.js usa quando ridisegna le
+    righe al cambio d'anno. None quando le righe sono SPLIT_OVER o meno."""
+    n = sum(1 for row in rows if not row.get("ref"))
+    if n <= SPLIT_OVER:
+        return None
+    parts = {"head": [], "middle": [], "tail": []}
+    seen = 0
+    for row in rows:
+        part = "head" if seen < EDGE else "tail" if seen >= n - EDGE else "middle"
+        parts[part].append(row)
+        if not row.get("ref"):
+            seen += 1
+    return {**parts,
+            "head_caption": f"Le prime {EDGE} {plural}",
+            "tail_caption": f"Le ultime {EDGE} {plural}",
+            "label": f"{from_to(EDGE + 1, n - EDGE)}: le altre {n - 2 * EDGE} {plural}"}
+
+
+def _ends(members: list[dict], pick: dict, profile_path: str | None) -> dict:
+    """Un estremo di una regione: il valore e chi lo tiene. Un pari merito si
+    dice tutto, come nella frase-risposta: due nomi, o "5 province"."""
+    tied = sorted((o for o in members if o["value"] == pick["value"]), key=lambda o: o["name"])
+    places = [{"name": o["name"], "href": (profile_path + o["key"]) if profile_path else None} for o in tied]
+    return {"value": pick["value"], "places": places if len(tied) <= 2 else None, "count": len(tied)}
+
+
+def within_regions(meta: dict, level: dict, unit: str | None) -> dict | None:
+    """"Dentro le regioni": per ogni regione con il dato di almeno due province,
+    la provincia piu' alta, la piu' bassa e la distanza fra le due. E' cio' che
+    la vista regionale non puo' dire.
+
+    Le scelte sono quelle di `seo_titles._widest_within_region`, che scrive la
+    stessa distanza nella frase-risposta: estremi a pari merito per nome,
+    regioni a pari distanza per nome. Il titolo-affermazione prende la cifra e
+    l'unita' da li', cosi' la testata e il blocco non dicono due cose. Dove
+    quella funzione non scrive la cifra (un tasso su una base lunga) il titolo
+    nomina solo la regione e le due province, e la cifra resta nella tabella.
+    Le celle hanno i decimali della colonna dei valori, cosi' la distanza e' la
+    differenza che si legge accanto: sopra i cento il titolo la arrotonda come
+    ogni cifra del sito (443 punti, 449,6 meno 6,5 in tabella).
+
+    Su `UNVERIFIED_EXTREMES` niente titolo: la frase-risposta e il title non
+    dicono gli estremi finche' non sono verificati, e un titolo qui li
+    direbbe. La tabella resta, come la classifica.
+    """
+    region_of = level.get("region_of") or {}
+    if level["key"] != "provincia" or not region_of:
+        return None
+    observed = [o for o in level.get("observations") or [] if o.get("value") is not None]
+    by_region: dict[str, list[dict]] = {}
+    for o in observed:
+        region = region_of.get(o["key"])
+        if region:
+            by_region.setdefault(region, []).append(o)
+    profile_path = level.get("profile_path")
+    rows = []
+    for region, members in by_region.items():
+        if len(members) < 2:
+            continue
+        upper = min(members, key=lambda o: (-o["value"], o["name"]))
+        lower = min(members, key=lambda o: (o["value"], o["name"]))
+        rows.append({"region": region, "href": "/regione/" + region_key_for(region),
+                     "upper": upper, "lower": lower, "gap": upper["value"] - lower["value"],
+                     "high": _ends(members, upper, profile_path), "low": _ends(members, lower, profile_path)})
+    if not rows:
+        return None
+    rows.sort(key=lambda r: (-r["gap"], r["region"]))
+
+    def pair(upper, lower):
+        # "da Monza e della Brianza a Sondrio": con "fra ... e ..." la "e" dentro
+        # il nome della provincia si leggeva come quella fra le due.
+        return f"{from_place(upper['name'])} {to_place(lower['name'])}"
+
+    def side(end, place):
+        """"da Foggia", "a Bari e Brindisi": un estremo a pari merito si dice
+        tutto, come nella cella sotto."""
+        names = [p["name"] for p in end["places"]]
+        return place(names[0]) + "".join(f" e {name}" for name in names[1:])
+
+    claim = None
+    if _code(meta) not in UNVERIFIED_EXTREMES:
+        widest = _widest_within_region(meta, level, observed, _is_percentage(meta))
+        first = rows[0]
+        if widest:
+            # La stessa frase della frase-risposta, anche nei nomi.
+            text, region, upper, lower = widest
+            claim = f"La distanza più ampia è {in_region(region)}, {text} {pair(upper, lower)}"
+        elif first["gap"] > 0:
+            # Senza la cifra della frase-risposta il titolo non deve accordarsi
+            # con lei, e dice gli estremi come la tabella: a pari merito tutti e
+            # due i nomi, e oltre due solo la regione ("3 province" nella cella).
+            claim = f"La distanza più ampia è {in_region(first['region'])}"
+            if first["high"]["places"] and first["low"]["places"]:
+                claim += f", {side(first['high'], from_place)} {side(first['low'], to_place)}"
+    percent = numfmt.is_percent(unit)
+    note = unit_note(unit, meta["name"])
+    return {
+        "claim": claim, "rows": rows, "year": level.get("year_max"),
+        "decimals": numfmt.column_decimals([o["value"] for o in observed]),
+        "subline": (f"{meta['name']}{', ' + note if note else ''}, {level.get('year_max')}. "
+                    "Per ogni regione con il dato di almeno due province, la provincia con il valore più alto, "
+                    f"quella con il più basso e la distanza fra le due{', in punti percentuali' if percent else ''}."
+                    + (f" {VERSO_WORDS[meta.get('direction')]}" if meta.get("direction") in VERSO_WORDS else "")),
+    }
 
 
 def derive(ctx: dict) -> dict:
@@ -173,6 +305,13 @@ def derive(ctx: dict) -> dict:
         "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
         "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
     }
+    rank_rows = ranking(level, unit)
+    folded = fold(rank_rows, plural) if level["key"] in ROW_ID else None
+    if level["key"] in ROW_ID:
+        # v1.js ridisegna le righe al cambio d'anno: con l'id, e piegate con
+        # le stesse soglie quando il server le ha piegate.
+        explore_js["row_id"] = ROW_ID[level["key"]]
+        explore_js["fold"] = {"edge": EDGE, "over": SPLIT_OVER} if folded else None
     # Con la striscia del divario gli estremi, la media e la distanza stanno nel
     # grafico: le tessere dicono solo cio' che il grafico non dice.
     if strip.get("svg"):
@@ -217,7 +356,8 @@ def derive(ctx: dict) -> dict:
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
         "callouts": callouts, "legend": legend(values, unit) if values else None,
         "legend_nd": level["key"] == "regione" or map_missing,
-        "area_legend": strip.get("legend"), "ranking": ranking(level, unit),
+        "area_legend": strip.get("legend"), "ranking": rank_rows, "fold": folded,
+        "row_id": ROW_ID.get(level["key"]),
         "decimals": numfmt.column_decimals([o["value"] for o in obs]),
         "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
         "profile_path": level.get("profile_path"),
@@ -229,7 +369,7 @@ def derive(ctx: dict) -> dict:
         "fmt": num, "fmt_unit": with_unit, "date_it": date_it, "citation": citation,
         "unit": numfmt.lower_first(unit) if unit else unit, "tiles": tiles, "verso": verso,
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
-        "series": series, "strip": strip, "module": module,
+        "series": series, "strip": strip, "module": module, "within": within_regions(meta, level, unit),
         "series_claim": series_claim, "series_note": series_note,
         "updated": date_it(ctx.get("dataset_updated")),
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),
