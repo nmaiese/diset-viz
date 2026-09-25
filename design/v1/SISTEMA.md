@@ -362,6 +362,14 @@ frase, mappa, tabelle e serie senza ricaricare: rispecchia `compare_series` e
 `COMPARE_CUTS` (una prova confronta i tagli), cosi' la pagina servita e quella
 ridisegnata dicono la stessa cosa.
 
+Le province (`?livello=provincia`) hanno la stessa pagina con gli stessi
+componenti: il selettore `.seg` Regioni/Province in testa, come l'atlante, il
+selettore delle province raggruppato per regione (`optgroup`), la mappa
+provinciale della 1.0 (`ui.map` con `level='provincia'`) con le province del
+confronto contornate, la riga di riferimento sulla media semplice delle
+province. Solo le schede con la `/province` che passa la regola, e dalla
+`/province` di quelle schede il link "Metti a confronto le province".
+
 ### Regione
 
 Testata-risposta con il localizzatore nel margine, numeri chiave, i temi dal

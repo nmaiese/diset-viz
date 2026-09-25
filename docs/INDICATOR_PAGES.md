@@ -62,6 +62,13 @@ provinciali restano sul loro URL base.
   l'interruttore spento toglie dall'indice, e la usa la ricerca: l'interruttore
   toglie l'indice, non i link. `indexable_catalog()` resta una voce per
   scheda.
+- **Il confronto fra province** offre le stesse schede, quelle con la
+  `/province` in `level_pages(listed=True)`, e la `/province` di ognuna
+  propone "Metti a confronto le province" (`confronto.compare_path`, nella
+  corsia "Lo stesso dato, altre viste"), verso
+  `/confronto?indicator=<id>&livello=provincia`. E' l'unico `livello=` che una
+  `/province` puo' contenere, e le guardie tolgono solo quell'href prima di
+  cercarlo.
 - **La somiglianza** delle `/province` si misura a parte:
   `bin/py scripts/duplicazione.py --solo province` (e `--solo basi` per le
   sole basi). I tetti stanno in `tests/integration/test_duplicazione_schede.py`,

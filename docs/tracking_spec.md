@@ -193,7 +193,11 @@ quando era la SPA. L'isola `app/static/js/confronto.js` emette
 `compare_select_indicator` quando cambia l'indicatore, `change_region` quando
 cambiano le regioni (dai campi o con un clic sulla mappa), `change_year` quando
 cambia l'anno, `open_region` quando si apre il profilo di una regione dalla
-tabella. **Non emette `select_indicator`**: quello resta la conversione
+tabella. Al livello provinciale (`?livello=provincia`) gli stessi eventi
+valgono per le province, `region` porta le chiavi delle province scelte, e il
+profilo di una provincia aperto dalla tabella e' `open_province` con
+`province_key`. Ogni evento del confronto porta `level` (`regione` o
+`provincia`). **Non emette `select_indicator`**: quello resta la conversione
 "apertura di un indicatore dall'atlante", e il selettore del confronto la
 gonfierebbe a ogni cambio.
 
@@ -209,6 +213,7 @@ gonfierebbe a ogni cambio.
 | `change_region` | cambio regione nella scheda indicatore, o delle regioni del confronto | esplorazione territoriale |
 | `compare_select_indicator` | cambio indicatore nel confronto | interesse indicatore, fuori dalla conversione |
 | `open_region` | apertura del profilo di una regione dalla tabella del confronto | navigazione |
+| `open_province` | apertura del profilo di una provincia dalla tabella del confronto fra province | navigazione |
 | `select_sibling_indicator` | click su indicatore correlato | navigazione tematica |
 | `change_visualization` | cambio vista tra mappa, classifica e serie | uso visualizzazioni |
 | `filter_theme` | filtro tema nel catalogo | segmentazione |
@@ -230,8 +235,10 @@ Parametri applicativi:
 | `indicator_name` | nome indicatore |
 | `indicator_theme` | tema indicatore |
 | `year` | anno selezionato |
-| `region` | regione selezionata (nel confronto le chiavi delle regioni scelte, separate da virgola) |
+| `region` | regione selezionata (nel confronto le chiavi dei territori scelti, separate da virgola: regioni o province secondo `level`) |
 | `region_key` | chiave della regione aperta, su `open_region` |
+| `province_key` | chiave della provincia aperta, su `open_province` |
+| `level` | livello del confronto, `regione` o `provincia`, sugli eventi del confronto |
 | `view_type` | vista selezionata |
 | `theme` | tema selezionato nel catalogo |
 | `sort` | ordinamento catalogo |
