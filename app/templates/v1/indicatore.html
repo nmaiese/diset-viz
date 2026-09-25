@@ -79,9 +79,11 @@
 
 {% block content %}
 {#- `page-indicator` e' il segno che l'audit della reperibilita' pubblica cerca
-    (PUBLIC_DISCOVERABILITY_EXPECTATIONS in app/views.py). -#}
-<main id="contenuto" class="v1 v1-indicatore page-indicator" data-v1="indicatore" tabindex="-1">
-<script type="application/json" data-explore-data>{{ d.explore_js | tojson }}</script>
+    (PUBLIC_DISCOVERABILITY_EXPECTATIONS in app/views.py). `data-page-root`
+    sta qui e non sul modulo dato (`ui.explore(..., root=False)`): il
+    territorio scelto nel modulo si accende anche sulla striscia in testa e
+    sulla serie di "Com'e' cambiato", che stanno fuori dal modulo. -#}
+<main id="contenuto" class="v1 v1-indicatore page-indicator" data-v1="indicatore" tabindex="-1" data-page-root>
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
 
@@ -158,68 +160,10 @@
       <section class="section" id="esplora" aria-labelledby="h-esplora">
         <h2 id="h-esplora">Chi è in testa</h2>
         {#- `indicator-cockpit`: il posto dove vivono le cifre della scheda, e il
-            nome con cui le prove lo cercano da prima della 1.0. -#}
+            nome con cui le prove lo cercano da prima della 1.0. Il modulo
+            dato e' il componente di `v1/_ui.html`, composto in `d.module`. -#}
         <div class="indicator-cockpit">
-        <figure class="module" data-explore>
-          <figcaption class="module__head">
-            {% if d.claim %}<h3 class="h-sub" data-claim>{{ d.claim }}</h3>{% endif %}
-            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, <span data-year-label>{{ year }}</span>. Le {{ n }} {{ level.plural }} {% if meta.direction in ('lower_better', 'higher_worse') %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
-          </figcaption>
-          <div class="toolbar">
-            {#- Il livello che manca a questa scheda, quando sta in una gemella
-                (`twin`), e' una voce del selettore come le altre: porta
-                all'altra pagina, e il lettore passa dalle regioni alle province
-                senza sapere che sono due schede. -#}
-            {% if d.level_tabs | length > 1 %}
-            <div class="field"><span>Livello</span>
-              <div class="seg" role="group" aria-label="Livello territoriale">
-                {% for item in d.level_tabs %}{% if item.current %}<span aria-current="page">{{ item.label }}</span>{% else %}<a href="{{ item.href }}">{{ item.label }}</a>{% endif %}{% endfor %}
-              </div>
-            </div>
-            {% endif %}
-            {% if level.years | length > 1 %}
-            <label class="field field--year" for="anno">Anno <output data-year-out>{{ year }}</output>
-              <span class="year"><span>{{ level.year_min }}</span>
-                <input id="anno" type="range" min="0" max="{{ level.years | length - 1 }}" step="1" value="{{ level.years | length - 1 }}" aria-valuetext="{{ year }}" data-year>
-              <span>{{ year }}</span></span>
-            </label>
-            {% endif %}
-            <label class="field" for="territorio">Trova la tua {{ level.singular }}
-              <select id="territorio" data-territory>
-                <option value="">Nessuna in evidenza</option>
-                {% for t in level.territories | sort(attribute='name') %}<option value="{{ t.key }}">{{ t.name }}</option>{% endfor %}
-              </select>
-            </label>
-          </div>
-
-          <div class="module__body">
-            {% if d.show_map %}
-            <div class="module__map">
-              {{ ui.map(d.map_classes, 'esplora', d.map_names, d.map_values, overlay=d.callouts, label='Mappa cliccabile delle ' ~ level.plural ~ ' italiane per ' ~ meta.name, level=level.key) }}
-              {{ ui.legend(d.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.', level.key == 'regione' or d.map_missing) }}
-              {% if level.key == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
-            </div>
-            {% endif %}
-            <div class="tablewrap" id="classifica-dati" tabindex="0" role="region" aria-label="Classifica delle {{ level.plural }}">
-              {% if d.strip.legend %}{{ ui.arealegend(d.strip.legend) }}{% endif %}
-              <table class="table">
-                <caption class="sr-only">{{ meta.name }}, le {{ n }} {{ level.plural }} nel <span data-year-label>{{ year }}</span>{% if d.unit_note %}, {{ d.unit_note }}{% endif %}</caption>
-                <thead><tr><th class="rank" scope="col">#</th><th scope="col">{{ level.singular | capitalize }}</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (d.short_unit or 'Valore') | capitalize }}</th></tr></thead>
-                <tbody data-rank-body>
-                  {% for row in d.ranking %}
-                  {% if row.ref %}
-                  <tr class="ref"><td></td><th scope="row">{{ row.label }}</th><td class="barcell" aria-hidden="true"></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
-                  {% else %}
-                  <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th scope="row">{% if d.areas.get(row.key) %}<span class="area-dot area-dot--{{ d.areas[row.key] }}" aria-hidden="true"></span>{% endif %}{% if level.profile_path %}<a href="{{ level.profile_path ~ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if d.areas.get(row.key) %}<span class="sr-only">, {{ d.area_label[d.areas[row.key]] }}</span>{% endif %}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.value | num(None, 'cell', d.decimals) }}</td></tr>
-                  {% endif %}
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <p class="source">Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a> ({{ year }}). Elaborazione Divario Italia.{% if meta.downloads and level.key == 'regione' %} <a href="{{ meta.downloads.csv }}">Dati in CSV</a>{% endif %}</p>
-          <p class="sr-only" role="status" aria-live="polite" data-live></p>
-        </figure>
+        {{ ui.explore(d.module, root=False) }}
         </div>
       </section>
 
