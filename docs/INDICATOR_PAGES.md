@@ -36,6 +36,31 @@ livello porta al canonico nudo (nessuna pagina linka `?livello=regione`), e i
 link verso l'altro livello o la gemella dicono di che cosa parlano ("Speranza
 di vita nelle 107 province").
 
+**Il corpo della vista provinciale** e' fatto per chi cerca la sua provincia.
+Vale per le viste `?livello=provincia` delle schede a due livelli e per le
+schede solo provinciali, e le compone `app/design/pages/indicatore.py`.
+
+- **"Dentro le regioni"**, dopo la mappa e la classifica: un titolo che afferma
+  ("La distanza piu' ampia e' in Sicilia, 41,3 punti da Trapani a Palermo") e
+  una riga per ogni regione con piu' di una provincia (la piu' alta, la piu'
+  bassa, la distanza), coi link a `/regione/<key>` e `/provincia/<key>`. Il
+  verso si dice a parole. Titolo, frase-risposta e blocco leggono la distanza
+  da una funzione sola, `seo_titles.region_gaps`, che arrotonda ai decimali
+  della colonna e a pari distanza ordina per nome. Con una parita' in testa il
+  titolo nomina tutte le regioni pari.
+- **Ogni riga della classifica** ha `id="p-<key>"`, e `:target` la evidenzia
+  anche senza JavaScript (`scroll-margin-top` la tiene fuori dalla barra delle
+  sezioni). `/provincia/<key>` linka la scheda direttamente su quella riga.
+- **"Trova la tua provincia"** accende la riga e scrive in una live region
+  "Pavia: 82,6 anni, 86ª su 107"; accanto, il link "Vai alla riga nella
+  classifica" la porta a vista (le frecce sul campo non fanno scorrere la
+  pagina).
+- **La classifica a 107** mostra le prime 10 e le ultime 10, le altre nello
+  stesso DOM dentro un `details`. Il cambio d'anno ridisegna le righe senza
+  perdere id, `details` e riga accesa.
+
+Le prove stanno in `tests/integration/test_province_body.py`.
+
 **Le province.** Il cruscotto ha la mappa per tutti e due i livelli. Quella
 delle province la compone `app/design/pages/indicatore.py`, con i contorni di
 `design.maps` e la stessa rampa a sei gradini della home, mentre

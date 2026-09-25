@@ -60,7 +60,9 @@ paths:
   di nuovo: mette in forma il payload di `quality_life_bes.build_bes_territory`.
   I link alle schede escono da `bes_data.bes_level_path(id, "provincia")`: una
   scheda a due livelli si apre sulle regioni, e da una provincia il lettore
-  deve atterrare su `?livello=provincia`, dove c'e' la sua provincia.
+  deve atterrare su `?livello=provincia`, dove c'e' la sua provincia, e
+  direttamente sulla sua riga: il link finisce in `#p-<key>`, l'`id` della
+  riga nella classifica della scheda.
 - `/province` — l'indice geografico delle province, regione per regione, dal
   23 settembre 2026. Prima l'indice era la classifica: la classifica risponde a
   "chi e' prima", l'indice a "dov'e' la mia provincia". La briciola di una

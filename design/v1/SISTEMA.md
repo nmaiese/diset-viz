@@ -142,6 +142,15 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   territorio), mappa e classifica affiancate da 720px di modulo, riga fonte.
   Il livello che manca a una scheda, quando sta in una scheda gemella, e' una
   voce del selettore come le altre e porta all'altra pagina.
+  E' un componente: `ui.explore(m, root=...)` in `v1/_ui.html`, che legge un
+  solo dizionario, `d.module`, composto da `derive` della pagina con le cifre
+  che gia' calcola. Il suo JSON (`data-explore-data`) sta in fondo al modulo.
+  Il JavaScript e' `DiV1.init(root)` di `static/js/v1.js`: il caricamento la
+  chiama sul documento, e si richiama su un pezzo di pagina nuovo senza
+  agganci doppi (il segno sta in una WeakMap). Il confine entro cui il modulo
+  cerca i suoi pezzi e' il `data-page-root` piu' vicino. Sulla scheda sta sul
+  `<main>`, perche' la striscia in testa e la serie di "Com'e' cambiato" sono
+  fuori dal modulo. Da solo (`root=True`) il modulo e' il confine di se stesso.
 - **Mappa coropletica**: sei gradini da poco a molto contrasto seguendo la
   grandezza, qualunque sia il verso, legenda con tutti e sei. Dato mancante
   tratteggiato, "n.d.". Selezione con contorno in inchiostro, mai in accento.
