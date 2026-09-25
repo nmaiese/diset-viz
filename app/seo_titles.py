@@ -448,8 +448,9 @@ def answer_title(meta, level, max_len=TITLE_MAX):
     niente; dire "per provincia" risponde a meta' della domanda.
 
     Dove c'e' un nome breve curato (`indicator_notes.SHORT_NAMES`) la misura e'
-    quello, senza marcatore, e non si accorcia oltre: o ci sta intero, o si
-    rinuncia al pezzo successivo.
+    quello, senza marcatore (salvo la famiglia delle BES omonime, vedi
+    `_same_name_qualifier` qui sotto), e non si accorcia oltre: o ci sta
+    intero, o si rinuncia al pezzo successivo.
 
     Sulle pagine provinciali l'ordine e' un altro, e lo scrive `_province_title`.
 
