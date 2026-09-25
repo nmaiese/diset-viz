@@ -703,8 +703,8 @@ def divari_regionali():
 def confronto():
     """Il confronto della 1.0, reso dal server (`app/design/pages/confronto.py`).
 
-    Lo stato sta nell'URL con i parametri della SPA di prima (`indicator`,
-    `region` fino a tre volte, `year`) e si normalizza qui
+    Lo stato sta nell'URL (`indicator`, `region` fino a tre volte, `year`)
+    e si normalizza qui
     (`confronto.resolve_state`): un valore che non regge vale quello di
     partenza, e un link vecchio apre sempre un confronto. Il canonical resta
     `/confronto` per ogni stato, e la pagina resta indicizzabile come prima.

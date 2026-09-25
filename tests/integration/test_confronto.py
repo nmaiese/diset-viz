@@ -343,3 +343,49 @@ class SenzaRipiego(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LaMappaDiceIlNonDisponibile(unittest.TestCase):
+    """Il n.d. si vede anche quando cambia per mano dell'isola, e una regione a
+    confronto senza il dato resta tratteggiata."""
+
+    def setUp(self):
+        self.client = app.test_client()
+        cache.clear()
+
+    def test_la_voce_n_d_c_e_sempre(self):
+        html = self.client.get("/confronto").get_data(as_text=True)
+        self.assertIn('class="legend__nd"', html)
+
+    def test_regione_a_confronto_senza_dato_e_tratteggiata(self):
+        # Il primo indicatore del catalogo con una regione offerta dal
+        # selettore ma senza il dato dell'ultimo anno: si cerca, non si scrive.
+        for item in get_atlas_catalog()["indicators"]:
+            payload = get_atlas_indicator(str(item["id"]))
+            year = payload["metadata"]["year_max"]
+            have = {row["region_key"] for row in payload["series"]
+                    if row["year"] == year and row["value"] is not None}
+            missing = {row["region_key"] for row in payload["series"]} - have
+            if not missing or len(have) < 16:
+                continue
+            offered = self.client.get(f"/confronto?indicator={item['id']}&year={year}").get_data(as_text=True)
+            key = next((k for k in sorted(missing) if f'<option value="{k}"' in offered), None)
+            if key:
+                break
+        else:
+            self.skipTest("nessuna regione offerta senza il dato dell'ultimo anno")
+        html = self.client.get(f"/confronto?indicator={item['id']}&year={year}&region={key}").get_data(as_text=True)
+        path = re.search(rf'data-key="{key}"[^>]*', html).group(0)
+        self.assertIn("is-on", path)
+        self.assertIn("fill: url(#nd-confronto)", path)
+
+
+class LIsolaNonGonfiaLeConversioni(unittest.TestCase):
+    def test_niente_select_indicator_e_niente_lookbehind(self):
+        js = ISLAND.read_text(encoding="utf-8")
+        # `select_indicator` e' la conversione GA4 dell'atlante (docs/tracking_spec.md).
+        self.assertNotIn('track("select_indicator"', js)
+        self.assertIn('track("compare_select_indicator"', js)
+        # un lookbehind e' un errore di sintassi su Safari prima della 16.4
+        self.assertNotIn("(?<=", js)
+        self.assertNotIn("(?<!", js)

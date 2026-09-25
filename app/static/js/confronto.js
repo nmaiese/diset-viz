@@ -178,7 +178,10 @@
     if (name.length <= limit) return name;
     if (SHORT[name]) return SHORT[name];
     var out = "";
-    var words = name.split(/(?<=[ -])/);
+    // Le parole tengono il loro separatore. Niente lookbehind: su Safari prima
+    // della 16.4 e' un errore di sintassi e l'isola intera non partirebbe.
+    var parts = name.split(/([ -])/), words = [];
+    for (var j = 0; j < parts.length; j += 2) words.push(parts[j] + (parts[j + 1] || ""));
     for (var i = 0; i < words.length; i++) {
       if ((out + words[i]).length > limit) break;
       out += words[i];
@@ -346,7 +349,7 @@
       var nd = box.querySelector(".map pattern[id]");
       all(".map [data-key]", box).forEach(function (p) {
         var k = p.getAttribute("data-key"), v = now[k];
-        p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6", "is-on");
+        p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6", "is-on", "is-nd");
         if (v !== undefined) {
           p.classList.add("q" + Math.min(6, Math.floor((v - lo) / span * 6) + 1));
           p.style.fill = "";
@@ -412,7 +415,9 @@
 
   /* ---------- i cambi ---------- */
   function submitForm() { form.submit(); }
-  function apply(wanted, done) {
+  // `failed`, se c'e', prende il posto del ripiego sul form: un confronto
+  // salvato con un indicatore che non esiste piu' lo dice, non ricarica.
+  function apply(wanted, done, failed) {
     var mine = ++seq;
     root.setAttribute("aria-busy", "true");
     load(wanted.indicator).then(function (m) {
@@ -426,7 +431,7 @@
     }).catch(function () {
       if (mine !== seq) return;
       root.removeAttribute("aria-busy");
-      submitForm();
+      if (failed) failed(); else submitForm();
     });
   }
   function fromFields() {
@@ -443,9 +448,12 @@
     var wanted = fromFields();
     wanted.year = null;
     apply(wanted, function () {
-      track("select_indicator", {
+      // Non `select_indicator`: quello e' la conversione GA4 "apertura di un
+      // indicatore dall'atlante" (docs/tracking_spec.md), e il selettore del
+      // confronto la gonfierebbe a ogni cambio.
+      track("compare_select_indicator", {
         indicator_id: state.indicator, indicator_name: model.meta.name,
-        indicator_theme: model.meta.theme, from: "confronto"
+        indicator_theme: model.meta.theme
       });
     });
   });
@@ -524,8 +532,9 @@
       var title = titleIn.value.trim() || defaultTitle();
       authed("/api/comparisons", { method: "POST", body: JSON.stringify({ title: title, config: config }) })
         .then(function (r) {
-          status.textContent = r && r.ok ? "Confronto salvato" : "Il confronto non si è salvato";
-          titleIn.value = "";
+          var ok = r && r.ok;
+          status.textContent = ok ? "Confronto salvato" : "Il confronto non si è salvato";
+          if (ok) titleIn.value = "";
           return reloadSaved();
         }).catch(function () { status.textContent = "Il confronto non si è salvato"; });
     };
@@ -542,6 +551,8 @@
       apply({ indicator: String(c.indId || state.indicator), regions: c.regions || c.regionNames || [], year: null }, function () {
         status.textContent = "Confronto caricato";
         $("[data-cmp-answer]").scrollIntoView({ block: "center" });
+      }, function () {
+        status.textContent = "Questo confronto non si apre: il suo indicatore non c'è più";
       });
     } else if (del) {
       authed("/api/comparisons/" + encodeURIComponent(del.getAttribute("data-cmp-del")), { method: "DELETE" })

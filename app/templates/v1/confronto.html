@@ -70,7 +70,7 @@
     <div class="confronto-grid">
       <div class="confronto-grid__map" data-cmp-map>
         {{ ui.map(d.map_classes, 'confronto', d.map_names, d.map_values, label='Mappa delle regioni italiane per ' ~ ind.name ~ ', ' ~ d.year ~ ', con le regioni a confronto in evidenza') }}
-        {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le regioni a confronto.', d.legend_nd) }}{% endif %}
+        {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le regioni a confronto.', nd_hidden=not d.legend_nd) }}{% endif %}
       </div>
       <div class="tablewrap">
         <table class="table confronto-table">

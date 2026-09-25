@@ -9,10 +9,11 @@ come riferimento. Con il JavaScript l'isola `static/js/confronto.js` cambia
 indicatore, regioni e anno senza ricaricare, leggendo `/api/indicator/<id>`,
 e salva i confronti sull'account.
 
-**Lo stato vive nell'URL**, con i nomi dei parametri della SPA: `indicator`
-(l'id del catalogo, `105` o `bes:10AMB014`, oppure il codice della scheda,
-`ter-105`), `region` ripetuto fino a tre volte (la chiave, `lombardia`, o il
-nome, `Lombardia`, come lo scriveva la SPA), `year` (anche `anno`). Un valore
+**Lo stato vive nell'URL**: `indicator` (l'id del catalogo, `105` o
+`bes:10AMB014`, come nei link `?indicator=` della SPA, oppure il codice della
+scheda, `ter-105`), `region` ripetuto fino a tre volte (la chiave,
+`lombardia`, o il nome, `Lombardia`), `year` (anche `anno`). Il confronto
+della SPA non teneva regioni e anno nell'URL: quei parametri nascono qui. Un valore
 che non regge si lascia cadere e vale il valore di partenza: un link vecchio
 apre sempre un confronto. `livello` c'e' gia' ma conosce solo `regione`
 (`LEVELS`): le province arrivano con il loro selettore, e un livello
@@ -218,8 +219,10 @@ def derive(ctx: dict) -> dict:
     for key, value in now.items():
         step = min(6, int((value - lo) / span * 6) + 1)
         classes[key] = f"q{step}" + (" is-on" if key in state["regions"] else "")
+    # Una regione a confronto senza il dato dell'anno resta contornata e
+    # tratteggiata: `is-nd` dice alla mappa di darle il motivo del n.d.
     for key in state["regions"]:
-        classes.setdefault(key, "is-on")
+        classes.setdefault(key, "is-on is-nd")
 
     answer = answer_text(meta["name"], year, [(s["name"], s["value"]) for s in selected],
                          avg_now, avg_n, level["plural"], unit, decimals)

@@ -75,7 +75,7 @@
       </pattern>
     </defs>
     {%- for key, d in shapes.items() %}
-    {%- set attrs %} data-key="{{ key }}" data-name="{{ names.get(key, key) }}"{% if values %} data-value="{{ values.get(key, '') }}"{% endif %} class="{{ classes.get(key, '') }}{{ ' is-on' if key == selected }}"{% if key not in classes %} style="fill: url(#{{ 'nd-' ~ keyname }})"{% endif %}{% endset %}
+    {%- set attrs %} data-key="{{ key }}" data-name="{{ names.get(key, key) }}"{% if values %} data-value="{{ values.get(key, '') }}"{% endif %} class="{{ classes.get(key, '') }}{{ ' is-on' if key == selected }}"{% if key not in classes or 'is-nd' in classes[key].split() %} style="fill: url(#{{ 'nd-' ~ keyname }})"{% endif %}{% endset %}
     {% if use %}<use href="#{{ prefix ~ key }}"{{ attrs }}/>{% else %}<path d="{{ d }}"{{ attrs }}/>{% endif %}
     {%- endfor %}
     {%- if level != 'regione' %}
@@ -108,12 +108,14 @@
 
 {#- `nd=False` quando la mappa ha il dato di ogni territorio: la voce "n.d."
     spiegava un tratteggio che non c'era. -#}
-{% macro legend(lg, caption, nd=True) -%}
+{#- `nd_hidden`: la voce n.d. c'e' ma nascosta, per chi la riaccende da JS
+    quando cambia l'anno o l'indicatore (il confronto). -#}
+{% macro legend(lg, caption, nd=True, nd_hidden=False) -%}
 <div class="legend" aria-hidden="true">
   <div class="legend__ramp">{% for i in range(1, 7) %}<i class="q{{ i }}" style="background: var(--seq-{{ i }})"></i>{% endfor %}</div>
   <div class="legend__scale"><span data-legend="min">{{ lg.min }}</span><span data-legend="mid">{{ lg.mid }}</span><span data-legend="max">{{ lg.max }}</span></div>
   <span class="legend__caption">{{ caption }}</span>
-  {% if nd %}<span class="legend__nd"><i></i> n.d., dato non disponibile</span>{% endif %}
+  {% if nd %}<span class="legend__nd"{% if nd_hidden %} hidden{% endif %}><i></i> n.d., dato non disponibile</span>{% endif %}
 </div>
 {%- endmacro %}
 
