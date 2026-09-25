@@ -167,8 +167,8 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
             if family != "bes":
                 continue
             base = self.client.get(sources.indicator_url(family, raw_id, "x"), follow_redirects=True)
-            if "?livello=provincia" in base.get_data(as_text=True):
-                percorsi.append(sources.indicator_url(family, raw_id, "x") + "?livello=provincia")
+            if f"bes-{raw_id}/province\"" in base.get_data(as_text=True):
+                percorsi.append(sources.indicator_url(family, raw_id, "x") + "/province")
         self.assertTrue(percorsi, "nessuna scheda ha il livello provinciale: la prova non guarda niente")
         guasti = self._guasti("indicatore", percorsi)
         self.assertEqual(guasti, [], guasti[:10])
@@ -702,7 +702,7 @@ class ExploreModuleIsAComponent(unittest.TestCase):
     e' il suo confine, con il JSON dentro: un frammento arrivato dopo si
     aggancia con `DiV1.init(modulo)`."""
 
-    PATHS = ("/indicatore/pil-pro-capite/ter-901", "/indicatore/x/bes-01SAL001?livello=provincia")
+    PATHS = ("/indicatore/pil-pro-capite/ter-901", "/indicatore/x/bes-01SAL001/province")
 
     def _page(self, path):
         """L'HTML della scheda e il `d.module` con cui e' stata resa."""

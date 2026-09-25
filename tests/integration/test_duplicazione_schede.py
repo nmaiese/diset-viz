@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from app import app  # noqa: E402
 from app import indicator_universe  # noqa: E402
+from app import seo_policy
 from scripts import duplicazione  # noqa: E402
 
 
@@ -47,6 +48,13 @@ METODO = (
 CAMPIONE = 60
 TETTO_RACCONTO = 25.0
 TETTO_CON_METODO = 35.0
+
+# Le `/province` indicizzabili, misurate solo fra loro: il 25/9/2026 erano 17,
+# con il 62,4% del racconto e il 70,8% col metodo dentro sequenze condivise.
+# Tetti stretti apposta: sono le pagine che il piano teme come doorway, e una
+# frase fatta in piu' su tutte deve fare rosso prima di arrivare nell'indice.
+TETTO_PROVINCE_RACCONTO = 66.0
+TETTO_PROVINCE_CON_METODO = 75.0
 
 
 def _blocco(html, espressione):
@@ -88,7 +96,11 @@ class IlMetodoNonTornaNelRacconto(unittest.TestCase):
 
 class LaQuotaRipetutaNonRisale(unittest.TestCase):
     def test_sul_campione_resta_sotto_il_tetto(self):
-        esito = duplicazione.misura(limite=CAMPIONE)
+        # Le sole basi delle schede, il perimetro su cui i tetti sono stati
+        # tarati: le `/province` indicizzabili hanno la loro prova qui sotto,
+        # perche' fra loro si somigliano molto di piu' e nella media delle
+        # basi sparirebbero.
+        esito = duplicazione.misura(limite=CAMPIONE, scope="basi")
         self.assertGreaterEqual(esito["pagine"], CAMPIONE // 2)
         racconto = esito["racconto"]["quota"]
         intero = esito["con_metodo"]["quota"]
@@ -96,6 +108,21 @@ class LaQuotaRipetutaNonRisale(unittest.TestCase):
                         f"il racconto è tornato ripetitivo: {racconto}%")
         self.assertLess(intero, TETTO_CON_METODO,
                         f"scheda e metodo insieme sono tornati ripetitivi: {intero}%")
+
+    @unittest.skipUnless(seo_policy.LEVEL_PAGES_INDEXABLE,
+                         "con l'interruttore spento le `/province` sono noindex")
+    def test_le_province_restano_sotto_il_loro_tetto(self):
+        """Tutte le `/province` indicizzabili, non un campione: sono poche, e
+        una regressione su una sola si vede solo se ci sono tutte."""
+        esito = duplicazione.misura(scope="province")
+        self.assertGreaterEqual(esito["pagine"], 10,
+                                "troppo poche `/province` per dire qualcosa")
+        racconto = esito["racconto"]["quota"]
+        intero = esito["con_metodo"]["quota"]
+        self.assertLess(racconto, TETTO_PROVINCE_RACCONTO,
+                        f"le `/province` ripetono il racconto: {racconto}%")
+        self.assertLess(intero, TETTO_PROVINCE_CON_METODO,
+                        f"le `/province` ripetono scheda e metodo: {intero}%")
 
 
 if __name__ == "__main__":

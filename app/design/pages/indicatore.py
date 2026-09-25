@@ -336,15 +336,14 @@ def derive(ctx: dict) -> dict:
                           "sub": f"dal {level['year_min']} al {level['year_max']}"})
         tiles = facts
     # Le voci del selettore di livello: quelli della scheda e, se ne manca uno,
-    # quello della gemella. Prima le regioni, come in tutto il sito. Il primo
-    # livello porta al canonico nudo, che e' quello che la base rende:
-    # `?livello=regione` era una seconda URL `noindex` della stessa pagina, e
-    # ci portavano le linguette di cento schede. La voce corrente il template
-    # non la rende come link.
+    # quello della gemella. Prima le regioni, come in tutto il sito. Ogni voce
+    # porta all'URL del suo livello (`level["canonical_path"]`): la base per il
+    # primo, la `/province` per le province di una scheda a due livelli. La voce
+    # corrente il template non la rende come link.
     levels = ctx.get("levels") or []
     level_tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
-                   "href": meta["canonical_path"] if index == 0 else f"{meta['canonical_path']}?livello={lv['key']}"}
-                  for index, lv in enumerate(levels)]
+                   "href": lv["canonical_path"]}
+                  for lv in levels]
     twin = ctx.get("twin")
     if twin and level_tabs:
         level_tabs.append({"key": twin["key"], "label": twin["label"], "current": False, "href": twin["path"]})

@@ -103,14 +103,33 @@ def _quota(corpora):
     }
 
 
-def misura(limite=None):
+SCOPES = ("basi", "province")
+
+
+def misura(limite=None, scope=None):
+    """Le due quote sulle pagine di livello indicizzabili.
+
+    Una voce per pagina (`indicator_universe.level_pages`): le `/province`
+    delle schede a due livelli sono URL a se', e si misurano come le altre.
+    `scope` restringe il perimetro: "basi" tiene le sole basi delle schede,
+    "province" le sole `/province`. Sono due perimetri con due tetti diversi
+    nella prova (`tests/integration/test_duplicazione_schede.py`): le
+    `/province` si somigliano fra loro molto piu' delle basi, e misurate
+    insieme alle basi sparirebbero nella media.
+    """
+    if scope not in (None, *SCOPES):
+        raise ValueError(f"perimetro sconosciuto: {scope!r}")
     from app import app, indicator_universe
 
     client = app.test_client()
     racconti, con_metodo = [], []
     letti = 0
-    for vista in indicator_universe.indexable_catalog():
-        percorso = vista["meta"]["canonical_path"]
+    for vista in indicator_universe.level_pages():
+        if scope == "basi" and not vista["base"]:
+            continue
+        if scope == "province" and vista["base"]:
+            continue
+        percorso = vista["path"]
         risposta = client.get(percorso, follow_redirects=True)
         if risposta.status_code != 200:
             continue
@@ -136,9 +155,11 @@ def main(argv=None):
                         help="le N sequenze presenti sul maggior numero di pagine")
     parser.add_argument("--limite", type=int, default=0,
                         help="quante pagine leggere, per una prova veloce")
+    parser.add_argument("--solo", choices=SCOPES,
+                        help="solo le basi delle schede o solo le `/province`")
     args = parser.parse_args(argv)
 
-    esito = misura(limite=args.limite or None)
+    esito = misura(limite=args.limite or None, scope=args.solo)
     print(f"pagine lette              {esito['pagine']}")
     for etichetta, chiave in (("racconto", "racconto"), ("racconto e metodo", "con_metodo")):
         blocco = esito[chiave]

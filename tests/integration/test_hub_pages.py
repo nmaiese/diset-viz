@@ -308,14 +308,19 @@ class ProvinceViewTest(unittest.TestCase):
         for view in views:
             base = view["meta"]["canonical_path"]
             regional = client.get(base)
-            provincial = client.get(f"{base}?livello=provincia")
+            provincial = client.get(f"{base}/province")
             self.assertEqual(provincial.status_code, 200, base)
 
             html = provincial.data.decode("utf-8")
-            # Stato di esplorazione: noindex, follow, e canonica sulla vista base.
-            self.assertEqual(provincial.headers["X-Robots-Tag"], "noindex, follow", base)
-            self.assertEqual(meta_content(html, "robots"), "noindex, follow", base)
-            self.assertIn(f'rel="canonical" href="https://divarioitalia.it{base}"', html)
+            # Una pagina a se': canonica su se' stessa, e fuori dall'indice
+            # solo se il suo livello non passa la regola.
+            level = next(lv for lv in view["levels"] if lv["key"] == "provincia")
+            if not level["indexable"]:
+                self.assertEqual(provincial.headers["X-Robots-Tag"], "noindex, follow", base)
+                self.assertEqual(meta_content(html, "robots"), "noindex, follow", base)
+            else:
+                self.assertTrue(provincial.headers["X-Robots-Tag"].startswith("index, follow"), base)
+            self.assertIn(f'rel="canonical" href="https://divarioitalia.it{base}/province"', html)
 
             # I dati provinciali ci sono, e sono piu delle venti regioni: una riga
             # della classifica per territorio, server-rendered.
@@ -328,7 +333,7 @@ class ProvinceViewTest(unittest.TestCase):
             # menu a tendina con cui si sceglie una provincia.
             self.assertIn("Trova la tua provincia", html)
             self.assertIn("data-territory", html)
-            self.assertIn('href="' + base + '?livello=provincia"', regional.data.decode("utf-8"))
+            self.assertIn('href="' + base + '/province"', regional.data.decode("utf-8"))
 
     def test_provincial_level_has_no_map_by_design(self):
         from app import indicator_view
@@ -1113,13 +1118,13 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         base = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001"
         regioni = self.client.get(base, headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertRegex(regioni, r"\| \[[^]]+\]\(\S*/regione/[a-z-]+\) \|")
-        self.assertIn(f"{base}?livello=provincia", regioni)
-        province = self.client.get(base + "?livello=provincia", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn(f"{base}/province", regioni)
+        province = self.client.get(base + "/province", headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertGreaterEqual(province.count("/provincia/"), 100)
-        # Le regioni stanno sul canonico nudo: `?livello=regione` era una
-        # seconda URL della stessa pagina.
+        # Ogni livello sta sul suo URL: le regioni sul canonico nudo, le
+        # province sulla `/province`, mai su un `?livello=`.
         self.assertIn(f"- Gli stessi dati per regioni: https://divarioitalia.it{base}\n", province)
-        self.assertNotIn("livello=regione", province)
+        self.assertNotIn("livello=", province)
         self.assertIn("# Speranza di vita alla nascita nelle province italiane", province)
 
     def test_la_provincia_in_markdown_porta_le_sorelle(self):
@@ -1132,9 +1137,9 @@ class LeProvincePerLeMacchine(unittest.TestCase):
 
     def test_llms_full_e_lo_skill_dicono_dove_stanno_i_valori_per_provincia(self):
         completo = self.client.get("/llms-full.txt").get_data(as_text=True)
-        self.assertIn("bes-01SAL001?livello=provincia", completo)
+        self.assertIn("bes-01SAL001/province", completo)
         skill = self.client.get("/.well-known/agent-skills/query-divario-italia/SKILL.md").get_data(as_text=True)
-        self.assertIn("?livello=provincia", skill)
+        self.assertIn("bes-01SAL001/province", skill)
 
     def test_home_e_metodologia_in_markdown_portano_le_province(self):
         for percorso in ("/", "/metodologia"):
@@ -1306,7 +1311,7 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
 
     def test_la_scheda_provinciale_non_porta_all_atlante(self):
         """L'atlante e' regionale: dalle province portava a una pagina senza province."""
-        html = self.client.get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia",
+        html = self.client.get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province",
                                follow_redirects=True).get_data(as_text=True)
         self.assertEqual(self._rimandi(html), [])
 

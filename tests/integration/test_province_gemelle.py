@@ -31,7 +31,7 @@ class LeGemelle(unittest.TestCase):
                     self.assertEqual([lv["key"] for lv in regionale["levels"]], ["regione"])
                     self.assertIn("provincia", [lv["key"] for lv in provinciale["levels"]])
                     self.assertEqual(regionale["twin"]["code"], provincial)
-                    self.assertTrue(regionale["twin"]["path"].split("?")[0].endswith("/" + provincial))
+                    self.assertTrue(regionale["twin"]["path"].removesuffix("/province").endswith("/" + provincial))
                     # Il tema puo' differire (ter-590 sta in Salute, bes-12SER025
                     # in Mobilita' e servizi): lo decidono due tassonomie delle
                     # fonti, non la coppia. Il nome invece e' lo stesso.
@@ -52,13 +52,13 @@ class LeGemelle(unittest.TestCase):
         html = self.client.get("/indicatore/speranza-di-vita-alla-nascita/ter-910").get_data(as_text=True)
         seg = re.search(r'<div class="seg" role="group" aria-label="Livello territoriale">(.*?)</div>', html, re.S)
         self.assertIsNotNone(seg)
-        self.assertIn('href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia">Province</a>',
+        self.assertIn('href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province">Province</a>',
                       seg.group(1))
         # La voce su cui si e' non e' un link.
         self.assertIn('<span aria-current="page">Regioni</span>', seg.group(1))
         # Il link alla gemella dice di che cosa parla, col numero dal dato:
         # "La stessa misura per province" era la stessa ancora su ogni gemella.
-        self.assertIn('href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia">'
+        self.assertIn('href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province">'
                       "Speranza di vita nelle 107 province</a>", html)
         self.assertNotIn(">La stessa misura per province</a>", html)
         html = self.client.get("/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012P").get_data(as_text=True)
@@ -73,7 +73,7 @@ class LeGemelle(unittest.TestCase):
         markdown = self.client.get("/indicatore/speranza-di-vita-alla-nascita/ter-910",
                                    headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertIn("- La stessa misura per province, in un'altra scheda: ", markdown)
-        self.assertIn("/bes-01SAL001?livello=provincia", markdown)
+        self.assertIn("/bes-01SAL001/province", markdown)
 
 
 class LeSchedeProvincialiNeiTemi(unittest.TestCase):
@@ -85,7 +85,10 @@ class LeSchedeProvincialiNeiTemi(unittest.TestCase):
                 if "provincia" not in item["levels"]:
                     continue
                 vista = indicator_view.build_indicator_view("bes", item["id"])
-                if not vista["meta"]["indexable"]:
+                livello = next(lv for lv in vista["levels"] if lv["key"] == "provincia")
+                # Il filtro e' sul livello: una scheda indicizzabile per le sue
+                # regioni puo' avere la `/province` fuori dalla regola.
+                if not indicator_view.level_passes_rule(vista["meta"], "provincia", vista["default_level"]):
                     continue
                 tema = vista["meta"]["theme_path"]
                 if tema not in pagine:
@@ -93,7 +96,7 @@ class LeSchedeProvincialiNeiTemi(unittest.TestCase):
                 html = pagine[tema]
                 with self.subTest(scheda=item["id"], tema=tema):
                     sezione = html[html.index('id="province"'):]
-                    self.assertIn(f'href="{vista["meta"]["canonical_path"]}', sezione)
+                    self.assertIn(f'href="{livello["canonical_path"]}"', sezione)
 
     def test_il_markdown_del_tema_porta_le_province(self):
         markdown = app.test_client().get("/tema/istituzioni-e-partecipazione",
@@ -106,7 +109,7 @@ class LaMappaDelleProvince(unittest.TestCase):
     def test_la_scheda_sulle_province_ha_la_mappa(self):
         client = app.test_client()
         for path in ("/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012P",
-                     "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia"):
+                     "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province"):
             with self.subTest(pagina=path):
                 html = client.get(path).get_data(as_text=True)
                 self.assertIn('data-v1="indicatore"', html)

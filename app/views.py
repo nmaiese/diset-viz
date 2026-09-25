@@ -54,7 +54,7 @@ from flask.json import jsonify
 import csv, datetime, email.utils, hmac, io, json, os, re, time, unicodedata
 import threading
 from functools import lru_cache
-from urllib.parse import quote_plus
+from urllib.parse import parse_qsl, quote_plus, urlencode
 
 from app import config
 
@@ -150,6 +150,10 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         # porta il numero, che segue il dato.
         {"path": "/province", "content_type": "text/html", "marker": "province italiane, regione per regione</h1>", "kind": "html", "markdown_marker": "province italiane, regione per regione"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
+        # La vista provinciale di una scheda a due livelli, una pagina a se'
+        # dal 25/9/2026: indicizzata finche' `seo_policy.LEVEL_PAGES_INDEXABLE`
+        # e' acceso. Spegnendolo, questa voce va spostata su `x_robots`.
+        {"path": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province", "content_type": "text/html", "marker": "<link rel=\"canonical\" href=\"https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province\">", "kind": "html", "markdown_marker": "URL canonica: https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
         {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
     ),
@@ -634,9 +638,14 @@ def _search_indicators(query, theme=None, limit=50):
         return results
     folded = _search_fold(query)
     seen = {item["path"] for item in results}
-    for record in _indexable_indicator_catalog():
-        meta = record["meta"]
-        if meta["canonical_path"] in seen or meta.get("raw_id") in DUPLICATE_BES_IDS:
+    # Una voce per pagina di livello indicizzabile, cosi' la `/province` di una
+    # scheda a due livelli si trova anche quando la base e' gia' fra i
+    # risultati dell'atlante. Di un doppione (`DUPLICATE_BES_IDS`) si toglie
+    # solo la vista regionale, che ha una gemella nell'atlante: la sua
+    # `/province` non ce l'ha.
+    for page in indicator_universe.level_pages(listed=True):
+        meta = page["meta"]
+        if page["path"] in seen or (page["base"] and meta.get("raw_id") in DUPLICATE_BES_IDS):
             continue
         if theme and meta.get("theme") != theme:
             continue
@@ -646,14 +655,14 @@ def _search_indicators(query, theme=None, limit=50):
             continue
         results.append({
             "id": meta["id"],
-            "name": meta["name"],
-            "path": meta["canonical_path"],
+            "name": meta["name"] if page["base"] else f"{meta['name']} nelle {page['level']['label'].lower()}",
+            "path": page["path"],
             "theme": meta.get("theme") or "",
             "catalog_family_label": meta.get("family_label") or "",
             "explain": explain,
-            "year_max": meta.get("year_max"),
+            "year_max": meta.get("year_max") if page["base"] else page["level"]["year_max"],
         })
-        seen.add(meta["canonical_path"])
+        seen.add(page["path"])
         if len(results) >= limit:
             break
     return results
@@ -1014,14 +1023,34 @@ def methodology():
     )
 
 
+# `province` -> `provincia`: il terzo segmento di una scheda accetta questi e
+# nient'altro.
+_LEVEL_BY_SEGMENT = {segment: key for key, segment in sources.LEVEL_SEGMENTS.items()}
+
+
 @app.route("/indicatore/<first>")
 @app.route("/indicatore/<first>/<second>")
-def indicator_page(first, second=None):
+@app.route("/indicatore/<first>/<second>/<third>")
+def indicator_page(first, second=None, third=None):
     """Unified, keyword-first indicator page: /indicatore/<slug>/<acr>-<id>.
 
     The resolving code (ter/bes/ims/eur + id) is the LAST segment; the slug leads
     for SEO. Dispatch by family and 301 any legacy or non-canonical URL to the
-    canonical form."""
+    canonical form.
+
+    La vista provinciale di una scheda a due livelli e' una pagina a se',
+    `/indicatore/<slug>/<codice>/province`: il codice e' allora il penultimo
+    segmento, e il terzo accetta solo `province`. Anche `/indicatore/<codice>/province`
+    arriva li', con un 301 al canonico (`_render_indicator`)."""
+    if third is not None:
+        if third not in _LEVEL_BY_SEGMENT:
+            abort(404)
+        parsed = sources.parse_indicator_code(second) or sources.parse_indicator_code(first)
+        if parsed is None:
+            abort(404)
+        return _render_indicator(*parsed, path_level=_LEVEL_BY_SEGMENT[third])
+    if second in _LEVEL_BY_SEGMENT and sources.parse_indicator_code(first) is not None:
+        return _render_indicator(*sources.parse_indicator_code(first), path_level=_LEVEL_BY_SEGMENT[second])
     # New canonical: code is the last segment. Also tolerate the transitional
     # code-first order (/indicatore/<code>/<slug>) so nothing 404s mid-rollout.
     parsed = sources.parse_indicator_code(second if second is not None else first)
@@ -1066,32 +1095,59 @@ def _query_map_for_article(query_map, article):
     return out
 
 
-def _render_indicator(family, raw_id):
+def _without_level_param(path):
+    """`path` con la query della richiesta, meno `livello`.
+
+    Il 301 di un canonico tiene lo stato di esplorazione (`anno`, `regione`),
+    o un link condiviso con uno slug sbagliato perderebbe l'anno e la regione
+    a cui puntava. `livello` invece e' diventato il path: lasciarlo farebbe un
+    secondo salto."""
+    query = [(key, value) for key, value in parse_qsl(request.query_string.decode("utf-8"), keep_blank_values=True)
+             if key != "livello"]
+    return f"{path}?{urlencode(query)}" if query else path
+
+
+def _requested_level(view, path_level):
+    """Il livello che la richiesta chiede, o None se non c'e' (404).
+
+    Da `/province` le province: su una scheda solo provinciale sono la base,
+    e il 301 porta li'; una scheda che le province non le ha risponde 404,
+    come chiede Google per un filtro senza risultati (anche ter-910, la cui
+    gemella provinciale sta in un'altra scheda). Da `?livello=` il livello
+    nominato se la scheda ce l'ha, se no la base: in tutti e due i casi un 301
+    all'URL del livello. Senza niente, la base.
+    """
+    by_key = {level["key"]: level for level in view["levels"]}
+    if path_level is not None:
+        return by_key.get(path_level)
+    if "livello" in request.args:
+        return by_key.get(request.args.get("livello")) or view["levels"][0]
+    return view["levels"][0]
+
+
+def _render_indicator(family, raw_id, path_level=None):
     """The one indicator page, for every source family.
 
     Everything numeric comes from app/indicator_view.py, everything editorial
     from app/indicator_texts.py. This function only resolves the URL, picks the
     territorial level to render, and decides what search engines see.
+
+    Ogni livello e' una pagina col suo URL (`level["canonical_path"]`): la base
+    della scheda, e la `/province` di una scheda a due livelli. Canonical,
+    `Content-Location` e robots si prendono dal livello. Ogni altro indirizzo
+    (slug sbagliato, codice prima dello slug, `?livello=`) fa un 301 in un
+    salto solo all'URL del livello, tenendo `anno` e `regione`.
     """
     view = indicator_view.build_indicator_view(family, raw_id)
     if view is None:
         abort(404)
 
     meta = view["meta"]
-    if request.path != meta["canonical_path"]:
-        # Keep the query string across the canonicalization hop, otherwise a
-        # shared link with a decorative slug silently drops the exploration
-        # state it was pointing at (?livello=provincia lands on the regions).
-        target = meta["canonical_path"]
-        if request.query_string:
-            target = f"{target}?{request.query_string.decode('utf-8')}"
-        return redirect(target, code=301)
-
-    # ?livello= picks which territorial level is server-rendered, so a reader
-    # without JavaScript can still reach the provincial view. It is an
-    # exploration state of the same page, never a second indexable URL.
-    requested = request.args.get("livello")
-    level = next((item for item in view["levels"] if item["key"] == requested), view["levels"][0])
+    level = _requested_level(view, path_level)
+    if level is None:
+        abort(404)
+    if request.path != level["canonical_path"] or "livello" in request.args:
+        return redirect(_without_level_param(level["canonical_path"]), code=301)
 
     article = indicator_texts.build_article(meta["id"], level["key"])
     # Le domande-navigazione puntano ad anchor dell'articolo, che con le sezioni
@@ -1109,14 +1165,14 @@ def _render_indicator(family, raw_id):
     seo_description = seo_titles.page_description(article, meta, level, composed=lead)
 
     explore_state = seo_policy.has_explore_params(request.args)
-    noindex = (not meta["indexable"]) or explore_state
+    noindex = (not level["indexable"]) or explore_state
     page_h1 = _page_h1(article, meta, level)
 
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
             agent_discovery.indicator_markdown(meta, level, article, SITE_URL, levels=view["levels"],
                                                twin=view.get("twin"), heading=page_h1),
-            f"{SITE_URL}{meta['canonical_path']}",
+            f"{SITE_URL}{level['canonical_path']}",
         )
         if noindex:
             response.headers["X-Robots-Tag"] = "noindex, follow"
@@ -1152,7 +1208,9 @@ def _render_indicator(family, raw_id):
         siblings=view["siblings"],
         dimension_siblings=view["dimension_siblings"],
         twin=view.get("twin"),
-        explore=view["explore"],
+        # Il livello reso e' quello da cui il cockpit parte: sta nel payload,
+        # e lo script non lo legge piu' dalla query.
+        explore={**view["explore"], "defaultLevel": level["key"]},
         page_article=article,
         page_lead=lead,
         # I due template leggono le stesse cose della testa da qui, cosi' la
@@ -1175,7 +1233,7 @@ def _render_indicator(family, raw_id):
         estremi=dict(zip(("alto", "basso"), seo_titles.extremes(meta, level))),
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}{meta['canonical_path']}",
+        canonical=f"{SITE_URL}{level['canonical_path']}",
     ))
     if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
@@ -1204,16 +1262,6 @@ def _page_h1(article, meta, level):
     return meta["name"]
 
 
-def _level_path(meta, levels, key):
-    """Il link a un livello della scheda: il canonico nudo per il primo, che e'
-    quello che la base rende, e `?livello=` per l'altro. `?livello=regione`
-    era una seconda URL, `noindex`, della stessa pagina che il canonico gia'
-    serve: nessun link ci deve portare."""
-    if levels and key == levels[0]["key"]:
-        return meta["canonical_path"]
-    return f"{meta['canonical_path']}?livello={key}"
-
-
 def _indicator_trail(meta, level, levels):
     """La briciola della scheda, la stessa per gli occhi e per `BreadcrumbList`.
 
@@ -1229,21 +1277,21 @@ def _indicator_trail(meta, level, levels):
         {"name": meta["name"], "path": meta["canonical_path"]},
     ]
     if len(levels) > 1 and level["key"] != levels[0]["key"]:
-        trail.append({"name": level["label"], "path": _level_path(meta, levels, level["key"])})
+        trail.append({"name": level["label"], "path": level["canonical_path"]})
     return trail
 
 
 def _other_views(meta, level, levels, twin):
     """"Lo stesso dato, altre viste": gli altri livelli della scheda e la gemella.
 
-    Ogni link porta a un canonico o a `?livello=provincia`, mai a
-    `?livello=regione`, e dice di che cosa parla ("Speranza di vita nelle 107
+    Ogni link porta all'URL di un livello (la base o la sua `/province`), mai
+    a un `?livello=`, e dice di che cosa parla ("Speranza di vita nelle 107
     province"): "Gli stessi dati per province" e "La stessa misura per
     province" erano la stessa ancora su cento schede.
     """
     code = sources.indicator_code(meta["family"], meta["raw_id"])
     views = [
-        {"path": _level_path(meta, levels, other["key"]),
+        {"path": other["canonical_path"],
          "label": indicator_view.level_anchor(code, other["key"], meta["name"],
                                               len(other["observations"]), other["plural"])}
         for other in levels if other["key"] != level["key"]
@@ -2533,12 +2581,15 @@ def sitemap():
         pages.append({"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"})
     for theme in all_atlas_themes_index():
         pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
-    for view in _indexable_indicator_catalog():
-        meta = view["meta"]
+    # Una voce per pagina di livello indicizzabile: la base di ogni scheda e la
+    # `/province` delle schede a due livelli il cui livello provinciale passa la
+    # regola (`indicator_universe.level_pages`). Con l'interruttore
+    # `seo_policy.LEVEL_PAGES_INDEXABLE` spento le `/province` escono da qui.
+    for page in indicator_universe.level_pages():
         # No synthetic lastmod from year_max: an indexable page is not "modified"
         # on 31 December of its last data year. Only posts carry a real date.
         pages.append({
-            "loc": f"{SITE_URL}{meta['canonical_path']}",
+            "loc": f"{SITE_URL}{page['path']}",
             "priority": "0.6",
         })
     xml = render_template("sitemap.xml", pages=pages)
@@ -2799,6 +2850,10 @@ def llms_full_txt():
 
     lines.append("## Catalogo completo degli indicatori indicizzabili")
     lines.append("")
+    level_views = {}
+    for page in indicator_universe.level_pages():
+        if not page["base"]:
+            level_views.setdefault(page["meta"]["canonical_path"], []).append(page)
     for view in _indexable_indicator_catalog():
         meta = view["meta"]
         plain = " ".join(((meta.get("explain") or {}).get("plain") or "").split())
@@ -2820,9 +2875,11 @@ def llms_full_txt():
             f"definizione: {definition}"
         )
         # Il canonico si apre sul primo livello: i valori per provincia di una
-        # scheda a due livelli stanno a `?livello=provincia`, anche in Markdown.
-        for other in view["levels"][1:]:
-            lines.append(f"  {other['label']}: {SITE_URL}{meta['canonical_path']}?livello={other['key']}")
+        # scheda a due livelli stanno nella sua `/province`.
+        # Solo le viste che la sitemap elenca (`level_pages`), cosi' i due
+        # indici dicono le stesse pagine.
+        for page in level_views.get(meta["canonical_path"], ()):
+            lines.append(f"  {page['level']['label']}: {SITE_URL}{page['path']}")
         if meta.get("downloads"):
             lines.append(
                 f"  Download: CSV {SITE_URL}{meta['downloads']['csv']}; "

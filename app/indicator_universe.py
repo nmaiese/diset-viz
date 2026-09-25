@@ -19,7 +19,7 @@ vista pesante si butta appena preso il riassunto. Chi legge non deve mutare il
 risultato.
 """
 
-from app import external_atlas, indicator_view, multiscopo_data, sources
+from app import external_atlas, indicator_view, multiscopo_data, seo_policy, sources
 from app.bes_data import all_bes_indicators
 from app.cache_util import synchronized_cache
 from app.data import get_catalog
@@ -101,9 +101,57 @@ def indexable_catalog():
     return sorted(catalog, key=lambda record: record["meta"]["canonical_path"])
 
 
+def level_pages(listed=False):
+    """Una voce per ogni pagina di livello indicizzabile, in ordine di path.
+
+    Una scheda indicizzabile e' una pagina per la sua base, e una seconda per
+    la sua `/province` quando ha tutti e due i livelli e il livello provinciale
+    passa la regola (`indicator_view.level_passes_rule`, e l'interruttore
+    `seo_policy.LEVEL_PAGES_INDEXABLE`). La leggono sitemap, llms-full e
+    `scripts/duplicazione.py`: le viste provinciali sono URL a se', e cio' che
+    le elenca o le misura le deve vedere. `indexable_catalog()` resta una voce
+    per scheda, con la sua forma.
+
+    Ogni voce: `meta` e `levels` della scheda (come in `indexable_catalog`),
+    `level` (il riassunto del livello), `path` (il canonico del livello) e
+    `base` (vero sulla pagina base della scheda).
+
+    Con `listed=True` ci sono anche le `/province` che la regola ammette ma
+    l'interruttore `seo_policy.LEVEL_PAGES_INDEXABLE` spento tiene fuori
+    dall'indice: la ricerca le deve trovare lo stesso, perche' l'interruttore
+    toglie l'indice e non i link. Senza, le sole indicizzabili. L'interruttore
+    si legge a ogni chiamata, quindi spegnerlo non chiede di svuotare cache.
+    """
+    pages = _rule_level_pages()
+    if listed or seo_policy.LEVEL_PAGES_INDEXABLE:
+        return pages
+    return [page for page in pages if page["base"]]
+
+
+@synchronized_cache(maxsize=1)
+def _rule_level_pages():
+    """Le pagine di livello che passano la regola (`level_passes_rule`)."""
+    pages = []
+    for record in indexable_catalog():
+        meta, levels = record["meta"], record["levels"]
+        base_key = levels[0]["key"]
+        for level in levels:
+            if not indicator_view.level_passes_rule(meta, level["key"], base_key):
+                continue
+            pages.append({
+                "meta": meta,
+                "levels": levels,
+                "level": level,
+                "path": sources.level_path(meta["canonical_path"], level["key"], base_key),
+                "base": level["key"] == base_key,
+            })
+    return sorted(pages, key=lambda page: page["path"])
+
+
 def cache_clear():
     """Svuota la passata e la sua proiezione: serve ai test, che altrimenti
     leggono il catalogo del test precedente. `cache.clear()` di Flask-Caching non
     tocca queste, che non sono memoize."""
     projection.cache_clear()
     indexable_catalog.cache_clear()
+    _rule_level_pages.cache_clear()

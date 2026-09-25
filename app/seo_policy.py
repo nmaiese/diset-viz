@@ -9,15 +9,27 @@ REQUIRED_REGION_COUNT = 20
 
 # Exploration query parameters that put an indicator or region page into an
 # in-page state (a chosen year, a focused region, a territorial level). They
-# never create a new document: the canonical stays the base URL and the variant
-# is kept out of the index and the sitemap. Keeping the list here makes it the
+# never create a new document: the canonical stays the URL of the page (for an
+# indicator, the URL of the level it renders, `level["canonical_path"]`) and the
+# variant is kept out of the index and the sitemap. Keeping the list here makes it the
 # single source of truth shared by the views and any future sitemap check.
 #
-# `livello` switches an indicator page between regions and provinces. It is
-# server-rendered so the provincial view works without JavaScript, which is
-# exactly why it has to be listed here: without it, ?livello=provincia would be
-# a second indexable URL showing the same indicator.
+# `livello` switched an indicator page between regions and provinces. Oggi la
+# vista provinciale di una scheda a due livelli ha il suo URL,
+# `/indicatore/<slug>/<codice>/province`, e ogni `?livello=` risponde con un 301
+# in un salto solo (alla `/province` o alla base, tenendo `anno` e `regione`).
+# Resta qui lo stesso: dopo i 301 non rende piu' una pagina, e se il ripiego
+# dovesse tornare a renderla deve restare fuori dall'indice.
 EXPLORE_PARAMS = ("anno", "regione", "livello")
+
+# L'interruttore delle viste di livello. A True la `/province` di una scheda a
+# due livelli e' indicizzabile, e sta nella sitemap, quando il suo livello
+# provinciale passa la regola di `bes_data.all_bes_indicators` (copertura almeno
+# 0,8 e anno almeno 2023): 17 su 34. A False tutte le `/province` diventano
+# `noindex, follow` ed escono dalla sitemap, mentre link e 301 restano: e' il
+# modo di tornare indietro se Google le fonde con la base, senza togliere URL.
+# Non tocca la base delle schede ne' le schede solo provinciali.
+LEVEL_PAGES_INDEXABLE = True
 
 
 def has_explore_params(args):

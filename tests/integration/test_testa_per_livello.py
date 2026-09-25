@@ -7,7 +7,7 @@ della pagina che il canonico gia' serve) e i link fra i livelli dicevano
 "Province" e "La stessa misura per province" su cento schede. Qui si guarda la
 catena vera: `views._page_h1`, `seo_titles.page_title`, i template resi.
 
-Nessun URL cambia: le viste province restano `?livello=provincia`, noindex.
+Le viste province delle schede a due livelli stanno a `<canonico>/province`.
 """
 import json
 import logging
@@ -69,7 +69,7 @@ def _pages():
 
 def _path(view, level):
     path = view["meta"]["canonical_path"]
-    return path if level["key"] == view["levels"][0]["key"] else f"{path}?livello={level['key']}"
+    return path if level["key"] == view["levels"][0]["key"] else f"{path}/province"
 
 
 def _jsonld(page, kind):
@@ -178,7 +178,7 @@ class LaTestaSegueIlLivello(unittest.TestCase):
                     self.assertNotIn(forbidden, description)
         self.assertGreater(checked, 40)
 
-    def test_nessuna_pagina_porta_a_livello_regione(self):
+    def test_nessuna_pagina_porta_a_un_livello_in_query(self):
         paths = set()
         for code, view, level, _ in self.pages:
             if len(view["levels"]) > 1 or level["key"] == "provincia" or code in PROVINCE_TWINS:
@@ -188,12 +188,12 @@ class LaTestaSegueIlLivello(unittest.TestCase):
             with self.subTest(pagina=path):
                 page = self.client.get(path).get_data(as_text=True)
                 self.assertIn('data-v1="indicatore"', page)
-                self.assertNotIn("livello=regione", page)
-                self.assertNotIn("livello=regione",
+                self.assertNotIn("livello=", page)
+                self.assertNotIn("livello=",
                                  self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True))
 
     def test_la_linguetta_corrente_non_e_un_link(self):
-        page = self.client.get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia")
+        page = self.client.get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province")
         seg = re.search(r'<div class="seg" role="group" aria-label="Livello territoriale">(.*?)</div>',
                         page.get_data(as_text=True), re.DOTALL).group(1)
         self.assertIn('<span aria-current="page">Province</span>', seg)
@@ -207,7 +207,7 @@ class LaVistaProvinciale(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         client = app.test_client()
-        cls.province = client.get(cls.BASE + "?livello=provincia").get_data(as_text=True)
+        cls.province = client.get(cls.BASE + "/province").get_data(as_text=True)
         cls.regioni = client.get(cls.BASE).get_data(as_text=True)
 
     def test_il_dataset_dice_il_livello(self):
@@ -243,7 +243,7 @@ class LaVistaProvinciale(unittest.TestCase):
 
     def test_i_link_fra_i_livelli_dicono_di_che_cosa(self):
         self.assertIn(f'<a href="{self.BASE}">Speranza di vita alla nascita nelle 20 regioni</a>', self.province)
-        self.assertIn(f'<a href="{self.BASE}?livello=provincia">Speranza di vita nelle 107 province</a>',
+        self.assertIn(f'<a href="{self.BASE}/province">Speranza di vita nelle 107 province</a>',
                       self.regioni)
         self.assertNotIn("Gli stessi dati per", self.province + self.regioni)
 
@@ -254,7 +254,7 @@ class IlRipiegoHaLaStessaTesta(unittest.TestCase):
 
     PATHS = (
         "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
-        "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia",
+        "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province",
         "/indicatore/raccolta-differenziata-dei-rifiuti-urbani/bes-10AMB017",
         "/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012P",
         "/indicatore/speranza-di-vita-alla-nascita/ter-910",
