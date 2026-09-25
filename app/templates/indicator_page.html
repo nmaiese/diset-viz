@@ -134,15 +134,14 @@
       {# Server-rendered links first, so the other level is reachable without JS;
          the script upgrades them to an in-place switch. #}
       <div class="level-switch" data-explore="levels" role="group" aria-label="Livello territoriale">
-        {# La voce del livello su cui si e' non e' un link, e il primo livello
-           porta al canonico nudo: `?livello=regione` era una seconda URL della
-           stessa pagina. #}
+        {# La voce del livello su cui si e' non e' un link, e ogni altra porta
+           all'URL del suo livello: la base, o la `/province`. #}
         {% for item in levels %}
         {% if item.key == level.key %}
         <span class="level-switch__option is-active" data-level="{{ item.key }}" aria-current="true">{{ item.label }}</span>
         {% else %}
         <a class="level-switch__option"
-           href="{{ meta.canonical_path }}{% if not loop.first %}?livello={{ item.key }}{% endif %}"
+           href="{{ item.preferred_path }}"
            data-level="{{ item.key }}">{{ item.label }}</a>
         {% endif %}
         {% endfor %}

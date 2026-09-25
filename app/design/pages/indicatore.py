@@ -195,13 +195,14 @@ def ranking_claim(level: dict) -> str | None:
 def level_tabs(meta: dict, level: dict, levels: list[dict], twin: dict | None) -> list[dict]:
     """Le voci del selettore di livello della scheda: i suoi livelli e, se ne
     manca uno, quello della gemella. Prima le regioni, come in tutto il sito.
-    Il primo livello porta al canonico nudo, che e' quello che la base rende:
-    `?livello=regione` era una seconda URL `noindex` della stessa pagina, e ci
-    portavano le linguette di cento schede. La voce corrente il template non
-    la rende come link."""
+    Ogni voce porta all'URL del suo livello (`level["preferred_path"]`): la
+    base per il primo, la `/province` per le province di una scheda a due
+    livelli, e ter-910 per le regioni di bes-01SAL001, che hanno li' il
+    canonical (`indicator_view.canonical_elsewhere`). La voce corrente il
+    template non la rende come link."""
     tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
-             "href": meta["canonical_path"] if index == 0 else f"{meta['canonical_path']}?livello={lv['key']}"}
-            for index, lv in enumerate(levels)]
+             "href": lv["preferred_path"]}
+            for lv in levels]
     if twin and tabs:
         tabs.append({"key": twin["key"], "label": twin["label"], "current": False, "href": twin["path"]})
     tabs.sort(key=lambda t: 0 if t["key"] == "regione" else 1)

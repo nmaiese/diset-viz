@@ -283,17 +283,19 @@ class AppSmokeTest(unittest.TestCase):
         client = app.test_client()
         sitemap = client.get("/sitemap.xml").get_data(as_text=True)
         llms_full = client.get("/llms-full.txt").get_data(as_text=True)
-        # Il canonico, senza stato: `?livello=provincia` accanto a una voce e'
-        # la stessa scheda aperta sulle province, non una pagina in piu'.
+        # Ogni pagina di livello, senza stato: la `/province` di una scheda a
+        # due livelli e' una pagina in piu', e sta nei due indici solo se e'
+        # indicizzabile (`indicator_universe.level_pages`).
         indicator_url = re.compile(r"https://divarioitalia\.it/indicatore/[^<)\s?]+")
 
         sitemap_indicators = set(indicator_url.findall(sitemap))
         llms_indicators = set(indicator_url.findall(llms_full))
         self.assertTrue(sitemap_indicators)
         self.assertEqual(sitemap_indicators, llms_indicators)
-        views = set(re.findall(r"(https://divarioitalia\.it/indicatore/[^<)\s?]+)\?livello=provincia", llms_full))
-        self.assertTrue(views)
+        views = {url for url in llms_indicators if url.endswith("/province")}
+        self.assertEqual(len(views), 17)
         self.assertLessEqual(views, sitemap_indicators)
+        self.assertNotIn("?livello=", llms_full)
         self.assertEqual(len(sitemap_indicators), sitemap.count("<loc>https://divarioitalia.it/indicatore/"))
 
         for field in ("famiglia ", "fonte ", "unita ", "copertura ", "definizione: "):
@@ -1201,9 +1203,9 @@ class AppSmokeTest(unittest.TestCase):
             self.assertLessEqual(len(title), 60, title)
 
     def test_seo_title_source_qualifier_disambiguates_duplicate_bes(self):
-        # A BES id in taxonomy.DUPLICATE_BES_IDS is hidden from browsing but its
-        # page stays indexable, so it must not share a <title> with the
-        # territorial series it duplicates.
+        # A BES id in taxonomy.TERRITORIAL_NAME_TWINS carries the exact name of
+        # a territorial series, and both pages stay reachable, so a written
+        # title must not collapse onto the territorial one.
         from app.indicator_notes import seo_title
         from app import sources
 
@@ -1217,21 +1219,21 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(qualifier.split()[0], qualified)  # institution context survives truncation
 
     def test_all_duplicate_bes_titles_are_unique_and_within_budget(self):
-        # Every id in taxonomy.DUPLICATE_BES_IDS gets a qualified title (see
-        # views._render_indicator). None may exceed the 60-char budget, and two
+        # Every id in taxonomy.TERRITORIAL_NAME_TWINS gets a qualified title (see
+        # views._source_qualifier). None may exceed the 60-char budget, and two
         # ids sharing a truncated core (e.g. "Competenza numerica"/"alfabetica")
         # must not collapse onto the same qualified title either.
         from app.bes_data import get_bes_rows
         from app.indicator_notes import seo_title
-        from app.taxonomy import DUPLICATE_BES_IDS
+        from app.taxonomy import TERRITORIAL_NAME_TWINS
         from app import sources
 
         qualifier = sources.family_short_label("bes")
         names = {}
         for row in get_bes_rows("regione"):
-            if row["id"] in DUPLICATE_BES_IDS and row["id"] not in names:
+            if row["id"] in TERRITORIAL_NAME_TWINS and row["id"] not in names:
                 names[row["id"]] = row["name"]
-        self.assertEqual(set(names), DUPLICATE_BES_IDS)
+        self.assertEqual(set(names), set(TERRITORIAL_NAME_TWINS))
 
         titles = {
             raw_id: seo_title(name, "Divario Italia", source_qualifier=qualifier)
@@ -1307,7 +1309,8 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
     """La catena vera di `seo_titles.page_title`, su tutto il catalogo indicizzabile.
 
     Una pagina e' una coppia (indicatore, livello), e qui si misurano le coppie
-    **vive**: ogni scheda indicizzabile col livello che il suo URL rende. Titolo,
+    **vive**: ogni pagina di livello indicizzabile (`indicator_universe.level_pages`),
+    cioe' la base di ogni scheda e le `/province` indicizzabili. Titolo,
     descrizione e Dataset escono dalle stesse chiamate di `_render_indicator`,
     qualificatore di fonte compreso (`views._source_qualifier`): le due prove
     che c'erano prima guardavano `indicator_notes.seo_title` e
@@ -1333,10 +1336,14 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
         cls.titoli = {}
         cls.descrizioni = {}
         cls.dataset = {}
-        for voce in indicator_universe.indexable_catalog():
+        for voce in indicator_universe.level_pages():
             base = voce["meta"]
             vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
-            meta, level = vista["meta"], vista["levels"][0]
+            meta = vista["meta"]
+            level = next(lv for lv in vista["levels"] if lv["key"] == voce["level"]["key"])
+            # La chiave e' il path: la base e la `/province` di una scheda
+            # sono due pagine, con lo stesso id.
+            chiave = voce["path"]
             articolo = indicator_texts.build_article(meta["id"], level["key"])
             # Le chiamate sono le stesse che fa `_render_indicator`, incluso
             # il lead composto come ultima spiaggia: senza quello la descrizione
@@ -1344,11 +1351,11 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
             # misurerebbe una pagina che il sito non serve.
             lead = articolo["lead"] or indicator_texts.composed_lead(meta, level)
             qualifier = views._source_qualifier(base["family"], str(base["raw_id"]))
-            cls.titoli[meta["id"]] = seo_titles.page_title(
+            cls.titoli[chiave] = seo_titles.page_title(
                 articolo, meta, level, site_name="Divario Italia", source_qualifier=qualifier)
-            cls.descrizioni[meta["id"]] = seo_titles.page_description(
+            cls.descrizioni[chiave] = seo_titles.page_description(
                 articolo, meta, level, composed=lead)
-            cls.dataset[meta["id"]] = views._dataset_description(lead, meta)
+            cls.dataset[chiave] = views._dataset_description(lead, meta)
 
     def test_nessun_titolo_sfora_il_budget_serp(self):
         for ind, titolo in self.titoli.items():
@@ -1422,7 +1429,7 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
     def test_nessun_titolo_dice_per_regione_sopra_dati_provinciali(self):
         """`indicator_notes._TITLE_TAIL` e' fissa: la coda ora segue il livello.
 
-        Ogni pagina provinciale, anche la vista `?livello=provincia` di una
+        Ogni pagina provinciale, anche la vista `/province` di una
         scheda a due livelli, e per la catena intera di `page_title`: la vista
         province dei NEET passava dal ripiego, che aveva la coda fissa, e diceva
         "per regione" mentre `answer_title` da solo era in regola.

@@ -249,9 +249,35 @@ def indicator_url(family, raw_id, slug_tail=""):
         /indicatore/<slug>/<acronym>-<raw_id>
 
     With no slug we fall back to the code alone; the page then 301s to the
-    canonical slug-first form."""
+    canonical slug-first form.
+
+    Il codice e' l'ultimo segmento, oppure il penultimo davanti a `/province`:
+    la vista provinciale di una scheda a due livelli sta a
+    `/indicatore/<slug>/<codice>/province` (`level_path`)."""
     code = indicator_code(family, raw_id)
     return f"{INDICATOR_ROOT}/{slug_tail}/{code}" if slug_tail else f"{INDICATOR_ROOT}/{code}"
+
+
+# Il segmento che segue il codice sulla vista di un livello che non e' la base
+# della scheda. Solo le province: il terzo segmento dell'URL accetta questo e
+# nient'altro (`views.indicator_page`).
+LEVEL_SEGMENTS = {"provincia": "province"}
+
+
+def level_path(canonical_path, level_key, base_level_key):
+    """Il path di un livello della scheda, dal canonico della scheda.
+
+    Il livello su cui la scheda si apre (`base_level_key`, il primo dei suoi
+    livelli) e' il canonico stesso. L'altro, cioe' le province di una scheda che
+    ha anche le regioni, e' `<canonico>/province`, una pagina a se' col suo
+    canonical e il suo robots. Non si ricalcola lo slug: il canonico arriva gia'
+    fatto dal catalogo della famiglia, che lo tronca o no a modo suo
+    (`indicator_view._build_meta`), e ricostruirlo qui sposterebbe la vista su un
+    URL che fa un 301.
+    """
+    if level_key == base_level_key or level_key not in LEVEL_SEGMENTS:
+        return canonical_path
+    return f"{canonical_path}/{LEVEL_SEGMENTS[level_key]}"
 
 
 def parse_indicator_code(code):

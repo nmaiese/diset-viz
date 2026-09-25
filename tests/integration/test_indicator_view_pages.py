@@ -240,18 +240,37 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 ))
         self.assertEqual(wrong, [], f"sitemap and pages disagree: {wrong[:10]}")
 
-    def test_the_provincial_level_renders_and_stays_out_of_the_index(self):
+    def test_the_provincial_view_is_its_own_page_indexed_by_the_level_rule(self):
+        """La `/province` di ogni scheda a due livelli: 200, canonical su se'
+        stessa, e `index` solo se il suo livello provinciale passa la regola
+        (copertura almeno 0,8 e anno almeno 2023). Sono 17 e 17: se il conto
+        cambia e' cambiato il dato, e il numero va riletto, non allargato."""
+        from app import indicator_universe
+
         two_level = [
             indicator_id for indicator_id, entry in self.golden.items()
             if len(entry["levels"]) > 1
         ]
-        self.assertGreater(len(two_level), 20)
+        self.assertEqual(len(two_level), 34)
+        indexed, not_indexed = set(), set()
         for indicator_id in two_level:
+            family, raw_id = family_and_raw(indicator_id)
+            view = build_indicator_view(family, raw_id)
+            path = view["meta"]["canonical_path"] + "/province"
             with self.subTest(indicator=indicator_id):
-                response = self._get(indicator_id, "?livello=provincia")
+                response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
-                # A level is a state of the same page, never a second document.
-                self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
+                html = response.get_data(as_text=True)
+                self.assertIn(f'<link rel="canonical" href="https://divarioitalia.it{path}">', html)
+                robots = response.headers.get("X-Robots-Tag") or ""
+                if robots == "noindex, follow":
+                    not_indexed.add(path)
+                else:
+                    self.assertTrue(robots.startswith("index, follow"), robots)
+                    indexed.add(path)
+        self.assertEqual((len(indexed), len(not_indexed)), (17, 17))
+        listed = {page["path"] for page in indicator_universe.level_pages() if not page["base"]}
+        self.assertEqual(indexed, listed)
 
 
 if __name__ == "__main__":

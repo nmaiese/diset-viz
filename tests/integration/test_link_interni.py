@@ -11,9 +11,10 @@ tipo: e' dove un costruttore di link rifatto a mano si vede per primo.
 """
 import unittest
 
-from app import app, bes_data, indicator_view, province_profile
+from app import app, bes_data, indicator_view, province_profile, sources
 from app.agent_discovery import markdown_available
 from app.cache import cache
+from app.taxonomy import REGIONAL_CANONICALS
 from scripts.audit_link_interni import LinkChecker, extract_links
 
 PAGINE_PER_TIPO = (
@@ -28,7 +29,9 @@ PAGINE_PER_TIPO = (
     "/qualita-della-vita/classifica/regioni",
     # Una scheda con due livelli, nelle sue due viste, e una solo provinciale.
     "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
-    "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia",
+    "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province",
+    # Una vista provinciale fuori dall'indice: i suoi link valgono lo stesso.
+    "/indicatore/posti-km-offerti-dal-tpl/bes-12SER008/province",
     "/indicatore/medici-specialisti/bes-12SER002P",
     "/temi",
     "/tema/lavoro-e-conciliazione",
@@ -98,6 +101,36 @@ class OgniLinkInternoRisponde(unittest.TestCase):
                  '{"url": "/pagina-che-non-esiste",}</script>')
         with self.assertRaisesRegex(ValueError, "JSON-LD non valido"):
             extract_links(rotto, "text/html")
+
+
+class NessunLinkAUnaVistaColCanonicalAltrove(unittest.TestCase):
+    """Le regioni di bes-01SAL001 hanno il canonical su ter-910
+    (`taxonomy.REGIONAL_CANONICALS`): la pagina risponde 200, quindi la prova
+    qui sopra non vedrebbe un link che ci porta, ma un link interno a una
+    pagina non canonica contraddice il suo canonical."""
+
+    def test_nessuna_pagina_linka_la_base_della_bes(self):
+        client = app.test_client()
+        with app.app_context():
+            vietati = set()
+            for code in REGIONAL_CANONICALS:
+                family, raw_id = sources.parse_indicator_code(code)
+                vietati.add(indicator_view.build_indicator_view(family, raw_id)["meta"]["canonical_path"])
+        pagine = PAGINE_PER_TIPO + (
+            "/indicatore/speranza-di-vita-alla-nascita/ter-910",
+            "/tema/salute-demografia-e-cura",
+            "/ricerca?q=speranza+di+vita",
+            "/provincia/lecco",
+        )
+        for percorso in pagine:
+            forme = (False, True) if markdown_available(percorso.split("?")[0]) else (False,)
+            for markdown in forme:
+                with self.subTest(pagina=percorso, markdown=markdown):
+                    risposta = client.get(percorso, headers={"Accept": "text/markdown"} if markdown else {})
+                    self.assertEqual(risposta.status_code, 200)
+                    link = {link.split("#")[0].split("?")[0]
+                            for link in extract_links(risposta.get_data(as_text=True), risposta.content_type)}
+                    self.assertEqual(link & vietati, set())
 
 
 class IlLinkAUnaSchedaBesENeHaUnoSolo(unittest.TestCase):

@@ -70,7 +70,7 @@ class OgniCoppiaDelPool(unittest.TestCase):
                     guasti.append((path, "segnaposto in pagina"))
                 elif FUGHE.search(testo):
                     guasti.append((path, FUGHE.search(testo).group(0)))
-                elif f"/{code}\"" not in html and f"/{code}?livello=" not in html:
+                elif f"/{code}\"" not in html and f"/{code}/province\"" not in html:
                     guasti.append((path, "l'indicatore in evidenza non e' quello chiesto"))
                 elif not re.search(rf'<div class="feat__level" id="lv-{level}"[^>]*data-page-root(?![^>]*hidden)', html):
                     guasti.append((path, "il livello in evidenza non e' quello chiesto"))
@@ -89,15 +89,17 @@ class PanelLinkComesFromTheCaller(unittest.TestCase):
     quello di prima, `/?indicatore=<codice>&livello=<livello>#dato`."""
 
     def test_another_page_gets_its_own_link(self):
+        # Una scheda con tutti e due i livelli nel pool. Non bes-01SAL001, le
+        # cui regioni hanno il canonical su ter-910 e la home non le pesca.
         from app.design.pages import home
         with app.app_context():
-            scelta = home_pick.pick("bes-01SAL001", "provincia")
-            panel = home.level_panel(scelta["meta"], scelta["level"], "/atlante?indicatore=bes-01SAL001#mappa")
-            self.assertEqual(panel["href"], "/atlante?indicatore=bes-01SAL001&livello=provincia#mappa")
+            scelta = home_pick.pick("bes-12SER020", "provincia")
+            panel = home.level_panel(scelta["meta"], scelta["level"], "/atlante?indicatore=bes-12SER020#mappa")
+            self.assertEqual(panel["href"], "/atlante?indicatore=bes-12SER020&livello=provincia#mappa")
             levels = home.feature(scelta)["levels"]
         self.assertEqual(len(levels), 2)
         for panel in levels:
-            self.assertEqual(panel["href"], f"/?indicatore=bes-01SAL001&livello={panel['key']}#dato")
+            self.assertEqual(panel["href"], f"/?indicatore=bes-12SER020&livello={panel['key']}#dato")
 
     def test_the_level_goes_before_the_anchor(self):
         from app.design.pages.home import level_href
@@ -122,13 +124,13 @@ class LaSchedaSulSuoLivello(unittest.TestCase):
                     for panel in home.feature(scelta)["levels"]:
                         with self.subTest(indicatore=code, livello=panel["key"]):
                             base = scelta["meta"]["canonical_path"]
-                            atteso = base if panel["key"] == primo else f"{base}?livello={panel['key']}"
+                            atteso = base if panel["key"] == primo else f"{base}/province"
                             self.assertEqual(panel["scheda"], atteso)
 
     def test_titolo_e_bottone_del_pannello_province(self):
         html = app.test_client().get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
-        self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001\?livello=provincia"')
-        self.assertIn("/bes-01SAL001?livello=provincia\">Tutta la scheda", html)
+        self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001/province"')
+        self.assertIn("/bes-01SAL001/province\">Tutta la scheda", html)
 
 
 class LeFrasi(unittest.TestCase):

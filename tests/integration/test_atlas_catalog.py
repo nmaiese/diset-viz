@@ -11,7 +11,14 @@ from app.bes_data import get_bes_manifest
 from app.data import get_catalog
 from app.multiscopo_data import get_multiscopo_manifest
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES
-from app.taxonomy import CANONICAL_CATEGORIES, DUPLICATE_BES_IDS, MACRO_AREA_ORDER
+from app.taxonomy import (
+    CANONICAL_CATEGORIES,
+    DUPLICATE_BES_IDS,
+    MACRO_AREA_ORDER,
+    SAME_NAME_BES_IDS,
+    SUPERSEDED_TERRITORIAL_IDS,
+    TERRITORIAL_NAME_TWINS,
+)
 
 
 class CatalogSummaryTest(unittest.TestCase):
@@ -71,12 +78,13 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         legacy = get_catalog()
         federated = get_atlas_catalog()
         bes_count = len(get_bes_manifest("regione")) - len(DUPLICATE_BES_IDS)
+        territorial_count = len(legacy["indicators"]) - len(SUPERSEDED_TERRITORIAL_IDS)
         multiscopo_count = len(get_multiscopo_manifest())
         eurostat_count = len(all_external_indicators())
 
         self.assertEqual(
             len(federated["indicators"]),
-            len(legacy["indicators"]) + bes_count + multiscopo_count + eurostat_count,
+            territorial_count + bes_count + multiscopo_count + eurostat_count,
         )
         self.assertFalse(any(str(item["id"]).startswith(BES_ID_PREFIX) for item in legacy["indicators"]))
         self.assertEqual(
@@ -84,7 +92,7 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
             len(federated["indicators"]),
         )
         families = {item["id"]: item["indicator_count"] for item in federated["source_families"]}
-        self.assertEqual(families["territorial"], len(legacy["indicators"]))
+        self.assertEqual(families["territorial"], territorial_count)
         self.assertEqual(families["bes"], bes_count)
         self.assertEqual(families["multiscopo"], multiscopo_count)
         self.assertTrue(any(item["complete"] for item in federated["indicators"] if item["catalog_family"] == "bes"))
@@ -102,13 +110,22 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         self.assertTrue(all(item["quality_life_category_label"] for item in scored))
 
     def test_exact_duplicate_bes_indicators_are_excluded_from_general_browsing(self):
-        """These BES ids are the same Istat series (identical name and values) as an
-        existing territorial indicator. They must not show up twice in the general
-        catalog, so only the territorial id is kept for browsing/search/quiz."""
+        """La stessa serie in due schede si mostra una volta sola: la
+        territoriale per le BES di `DUPLICATE_BES_IDS`, la BES
+        indicizzabile per le territoriali di `SUPERSEDED_TERRITORIAL_IDS`. Le
+        BES col nome di una territoriale e cifre diverse (`SAME_NAME_BES_IDS`,
+        fra cui 12SER025 e ter-590) sono schede a se', e ci sono tutte e due."""
         federated = get_atlas_catalog()
         federated_ids = {str(item["id"]) for item in federated["indicators"]}
         for raw_id in DUPLICATE_BES_IDS:
             self.assertNotIn(f"{BES_ID_PREFIX}{raw_id}", federated_ids)
+            self.assertIn(TERRITORIAL_NAME_TWINS[raw_id], federated_ids)
+        for raw_id in SUPERSEDED_TERRITORIAL_IDS:
+            self.assertNotIn(raw_id, federated_ids)
+        superseding = {bes for bes, ter in TERRITORIAL_NAME_TWINS.items() if ter in SUPERSEDED_TERRITORIAL_IDS}
+        self.assertEqual(superseding, {"SDG-310", "SDG-311"})
+        for raw_id in superseding | SAME_NAME_BES_IDS:
+            self.assertIn(f"{BES_ID_PREFIX}{raw_id}", federated_ids)
 
         from collections import Counter
 
@@ -116,14 +133,17 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         duplicate_names = {
             "speranza di vita alla nascita",
             "coste marine balneabili",
-            "disponibilità di verde urbano",
-            "emigrazione ospedaliera in altra regione",
-            "irregolarità nella distribuzione dell'acqua",
             "competenza alfabetica non adeguata (studenti classi iii scuola secondaria primo grado)",
             "competenza numerica non adeguata (studenti classi iii scuola secondaria primo grado)",
         }
         for name in duplicate_names:
             self.assertEqual(name_counts[name], 1, f"{name!r} still appears more than once in the atlas catalog")
+        # Due serie diverse col nome uguale: due voci, una per famiglia.
+        for name in ("disponibilità di verde urbano", "irregolarità nella distribuzione dell'acqua",
+                     "emigrazione ospedaliera in altra regione"):
+            families = sorted(item["catalog_family"] for item in federated["indicators"]
+                              if item["name"].strip().lower() == name)
+            self.assertEqual(families, ["bes", "territorial"], name)
 
     def test_theme_pages_use_the_same_federated_catalog(self):
         client = app.test_client()

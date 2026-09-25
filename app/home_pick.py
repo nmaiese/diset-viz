@@ -35,6 +35,11 @@ MIN_TERRITORIES = {"regione": 15, "provincia": 60}
 def pool() -> dict[str, list[tuple[str, str]]]:
     """{livello: [(famiglia, raw_id), ...]} dal catalogo indicizzabile.
 
+    Un livello col canonical su un'altra scheda (le regioni di bes-01SAL001,
+    che sono ter-910 cella per cella, `indicator_view.canonical_elsewhere`)
+    non entra: la home lo disegnerebbe e linkerebbe una pagina che i motori
+    non devono indicizzare, mentre ter-910 ha il suo posto nel pool.
+
     Non si mette in cache: il catalogo lo e' gia' (`synchronized_cache`, per la
     vita del processo), e questo e' un giro di qualche centinaio di record."""
     out: dict[str, list[tuple[str, str]]] = {key: [] for key in LEVELS}
@@ -45,8 +50,11 @@ def pool() -> dict[str, list[tuple[str, str]]]:
             continue
         for level in record["levels"]:
             key = level["key"]
-            if key in out and (level.get("territory_count") or 0) >= MIN_TERRITORIES[key]:
-                out[key].append(parsed)
+            if key not in out or (level.get("territory_count") or 0) < MIN_TERRITORIES[key]:
+                continue
+            if indicator_view.canonical_elsewhere(record["meta"], key):
+                continue
+            out[key].append(parsed)
     return out
 
 

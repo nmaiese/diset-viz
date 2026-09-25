@@ -243,16 +243,18 @@ def bes_level_path(indicator_id, level):
     Una scheda con tutti e due i livelli si apre sulle regioni, e chi ci
     arrivava da una pagina provincia trovava la classifica delle venti regioni
     senza la sua provincia dentro: 34 link su 67 a Lecce. Da un contesto
-    provinciale il link porta quindi a `?livello=provincia`, che e' uno stato
-    della stessa pagina (`noindex, follow`, canonico sulla base), non una
-    seconda URL. Una scheda solo provinciale si apre gia' li', e resta il suo
-    canonico.
+    provinciale il link porta quindi alla vista provinciale, che e' una pagina
+    a se': `<canonico>/province` (`sources.level_path`), col suo canonical e il
+    suo robots (`index` se il livello provinciale passa la regola di
+    `all_bes_indicators`, altrimenti `noindex, follow`). Prima era
+    `?livello=provincia`, che oggi fa un 301 li'. Una scheda solo provinciale
+    si apre gia' sulle province, e resta il suo canonico.
     """
     path = bes_path(indicator_id)
     raw_id = str(indicator_id).removeprefix(sources.SOURCES["bes"]["internal_prefix"])
     levels = _bes_levels().get(raw_id, ())
     if level != "regione" and level in levels and "regione" in levels:
-        return f"{path}?livello={level}"
+        return sources.level_path(path, level, "regione")
     return path
 
 
@@ -289,12 +291,20 @@ def all_bes_indicators():
             for level, manifest in (("regione", regioni), ("provincia", province))
             if indicator_id in manifest
         }
+        # La regola vale livello per livello, e ogni livello ne porta il suo
+        # esito (`levels[lv]["indexable"]`): la vista provinciale di una scheda
+        # a due livelli e' una pagina a se' (`/province`), indicizzabile solo se
+        # il suo livello passa. La scheda e' indicizzabile se ne passa uno.
+        # Copie, non i dict del manifest, che stanno in cache e si condividono.
+        levels = {
+            level: {**level_info, "indexable": (
+                level_info["coverage_latest"] >= MIN_PUBLIC_COVERAGE
+                and level_info["year_max"] >= 2023
+            )}
+            for level, level_info in levels.items()
+        }
         info = levels.get("regione") or levels["provincia"]
-        indexable = any(
-            level_info["coverage_latest"] >= MIN_PUBLIC_COVERAGE
-            and level_info["year_max"] >= 2023
-            for level_info in levels.values()
-        )
+        indexable = any(level_info["indexable"] for level_info in levels.values())
         # Il motivo si calcola qui, accanto alla clausola, o si perde: chi legge
         # solo il booleano puo' dire "famiglia" e basta, che non distingue una
         # serie ferma al 2019 da una che copre mezza Italia. Le due cose si

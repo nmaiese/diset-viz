@@ -120,10 +120,17 @@ class AgentDiscoveryTest(unittest.TestCase):
             self.assertIn(marker, text)
 
         explored = self.client.get(
-            path + "?livello=regione", headers={"Accept": "text/markdown"}
+            path + "?anno=2020", headers={"Accept": "text/markdown"}
         )
         self.assertEqual(explored.headers["X-Robots-Tag"], "noindex, follow")
         self.assertEqual(explored.headers["Content-Location"], "https://divarioitalia.it" + path)
+        # `?livello=` non rende piu' una pagina: un 301 al livello, in Markdown
+        # come in HTML.
+        levelled = self.client.get(
+            path + "?livello=regione", headers={"Accept": "text/markdown"}
+        )
+        self.assertEqual(levelled.status_code, 301)
+        self.assertEqual(levelled.headers["Location"], path)
 
     def test_indicator_markdown_composes_missing_article_sections(self):
         path = "/indicatore/aree-terrestri-protette/ter-264"
@@ -142,7 +149,7 @@ class AgentDiscoveryTest(unittest.TestCase):
                 self.assertNotRegex(text, r"\d[   ]%")
 
     def test_indicator_markdown_uses_the_selected_levels_explanation(self):
-        path = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia"
+        path = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province"
         response = self.client.get(path, headers={"Accept": "text/markdown"})
         text = response.get_data(as_text=True)
 

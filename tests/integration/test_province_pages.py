@@ -160,7 +160,7 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
             voci = province_profile.indicatori("lecce")
             for voce in voci:
                 with self.subTest(indicatore=voce["id"]):
-                    self.assertEqual(voce["path"].split("#")[0].split("?")[0], bes_data.bes_path(voce["id"]))
+                    self.assertEqual(voce["path"].split("#")[0].removesuffix("/province"), bes_data.bes_path(voce["id"]))
                     self.assertIn(f'href="{voce["path"]}"', html)
 
     def test_ogni_indicatore_si_apre_sulle_province(self):
@@ -174,7 +174,7 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
                 with self.subTest(indicatore=voce["id"]):
                     vista = indicator_view.build_indicator_view("bes", voce["id"].removeprefix("bes:"))
                     sulle_regioni = vista["default_level"] == "regione"
-                    self.assertEqual(voce["path"].split("#")[0].endswith("?livello=provincia"), sulle_regioni)
+                    self.assertEqual(voce["path"].split("#")[0].endswith("/province"), sulle_regioni)
 
     def test_due_province_non_sono_la_stessa_pagina(self):
         """Prima della tabella dei valori due province condividevano il 62% del
