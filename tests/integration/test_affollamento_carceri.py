@@ -1,13 +1,14 @@
-"""L'affollamento delle carceri: gli zeri che non erano una misura, e un verso solo.
+"""L'affollamento delle carceri: gli zeri che non erano una misura.
 
 Macerata e Savona valevano 0 dal 2016 al 2024 e stavano in testa alla
 classifica, prime sulla mappa e "prime su 107" nella loro pagina provincia. Uno
 zero di affollamento non e' un carcere vuoto: la provincia non ha posti
 regolamentari da contare. Da `bes_data.NOT_MEASURED` ogni lettore le vede n.d.
 
-E la stessa misura si leggeva in due modi: `contextual` sulle regioni
-(06POL012), `lower_better` sulle province (06POL012P). La polarita' BES e'
-negativa, e adesso le due schede dicono "Meglio se basso" tutte e due.
+Il verso della regionale (06POL012, `contextual`, contro `lower_better` della
+provinciale) resta com'e' finche' la redazione non riscrive la prosa di
+`content/indicators/bes__06POL012.md`: quella prosa legge la classifica dal
+valore piu' alto, e col verso nuovo quattro sue frasi direbbero il falso.
 """
 import json
 import re
@@ -204,19 +205,6 @@ class LaPaginaProvincia(unittest.TestCase):
         facts = [text for text in self._around_links("savona") if "nel 2015" in text]
         self.assertTrue(facts)
         self.assertIn("63,3", facts[0])
-
-
-class UnVersoSolo(unittest.TestCase):
-    def test_le_due_schede_hanno_lo_stesso_verso(self):
-        regional = build_indicator_view("bes", "06POL012")["meta"]["direction"]
-        provincial = build_indicator_view("bes", "06POL012P")["meta"]["direction"]
-        self.assertEqual(regional, provincial)
-        self.assertEqual(regional, "lower_better")
-
-    def test_la_regionale_dice_meglio_se_basso(self):
-        html = app.test_client().get(REGIONAL).get_data(as_text=True)
-        self.assertIn("Meglio se basso", html)
-        self.assertNotIn("Senza un verso", html)
 
 
 if __name__ == "__main__":

@@ -68,13 +68,6 @@ CURATED_DIRECTION_BES_NATIONAL = {
     "06POL005": "higher_better",
     "06POL007": "higher_better",
     "06POL011": "lower_better",
-    # Affollamento degli istituti di pena: la polarita' BES Istat e' negativa,
-    # piu' detenuti per posto regolamentare e' peggio. Era "contextual" perche'
-    # `CURATED_DIRECTION_BES` lo fissa solo come 06POL012P, l'id provinciale, e
-    # la regionale e la provinciale si leggevano in due modi. Decisione del
-    # 25/9/2026, la stessa che toglie gli zeri di Macerata e Savona
-    # (`app/bes_data.NOT_MEASURED`).
-    "06POL012": "lower_better",
     "07SIC002": "lower_better",
     "07SIC003": "lower_better",
     "07SIC004": "lower_better",

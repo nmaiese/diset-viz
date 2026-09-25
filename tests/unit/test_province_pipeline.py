@@ -317,9 +317,10 @@ class ProposeDirectionTest(unittest.TestCase):
         non se ne accorgeva. Qui si confrontano le coppie di
         `taxonomy.PROVINCE_TWINS` fra due schede BES.
 
-        Tre coppie hanno ancora due versi e aspettano una decisione: restano
-        elencate, e la prova si rompe quando una si allinea, cosi' l'elenco
-        non invecchia."""
+        Quattro coppie hanno ancora due versi: restano elencate, e la prova si
+        rompe quando una si allinea, cosi' l'elenco non invecchia. 06POL012
+        aspetta la prosa riscritta della redazione (`bes__06POL012.md` legge la
+        classifica dal valore piu' alto), le altre tre una decisione."""
         import csv
         from pathlib import Path
 
@@ -329,7 +330,7 @@ class ProposeDirectionTest(unittest.TestCase):
             with (data_dir / name).open(encoding="utf-8", newline="") as handle:
                 return {r["id"]: r["proposed_direction"] for r in csv.DictReader(handle, delimiter=";")}
         by_id = {**directions("bes_regione_manifest.csv"), **directions("province_manifest.csv")}
-        pending = {"07SIC001", "10AMB018", "10AMB024"}
+        pending = {"06POL012", "07SIC001", "10AMB018", "10AMB024"}
         pairs = [(r.removeprefix("bes-"), p.removeprefix("bes-"))
                  for r, p in PROVINCE_TWINS.items()
                  if r.startswith("bes-") and p.startswith("bes-")]
@@ -342,8 +343,8 @@ class ProposeDirectionTest(unittest.TestCase):
                     self.assertEqual(by_id[regional], by_id[provincial])
 
     def test_il_manifest_regionale_e_quello_che_la_pipeline_riscriverebbe(self):
-        """I versi del manifest regionale si allineano a mano (D1, e il 25/9
-        l'affollamento delle carceri), e `update_bes_regions.py` li riscrive
+        """I versi del manifest regionale si allineano a mano (D1), e
+        `update_bes_regions.py` li riscrive
         da `bes_national_sources.direction_for`. Se i due divergono, la
         prossima rigenerazione rimette il verso di prima senza dirlo."""
         import csv
