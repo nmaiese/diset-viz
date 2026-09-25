@@ -1,0 +1,112 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- L'atlante della 1.0, livello regione. In testa la risposta con le cifre
+    del catalogo, poi "Sulla mappa" (il modulo dato della scheda, la macro
+    `ui.explore`, su un indicatore fisso), poi "Tutti gli indicatori": una
+    tabella per tema, una riga per ogni serie del catalogo, con il link alla
+    scheda, la sparkline della media semplice e la variazione in chiaro.
+    Cio' che la pagina chiede ai dati lo compone app/design/pages/atlante.py
+    e arriva qui come `d`. `app.html`, la SPA, resta il ripiego.
+
+    Filtri, ricerca e ordine li fa js/atlante.js sulle righe gia' in pagina:
+    senza JavaScript si vedono tutte, e i controlli restano nascosti. -#}
+{% set active_nav = 'atlas' %}
+{% set PAGE_TYPE = 'atlas' %}
+{% set m = d.map %}
+
+{% block title %}Atlante degli indicatori territoriali: {{ d.total }} serie regionali, tema per tema{% endblock %}
+{% block description %}Le {{ d.total }} serie regionali di Divario Italia in un elenco solo, tema per tema, con l'andamento della media semplice delle regioni dal {{ d.year_min }} al {{ d.year_max }} e una mappa da esplorare.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/atlante.css') }}">{% endblock %}
+
+{% block head_extra %}
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{#- La lista dichiara gli indicatori in evidenza, come l'atlante di prima:
+    stanno tutti fra le righe in pagina. Le 340 e piu' schede indicizzabili
+    dell'elenco pesavano 8,6 KB compressi, e la pagina ne ha 90 in tutto. -#}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":"Atlante degli indicatori territoriali","url":{{ canonical | tojson }},"inLanguage":"it-IT","isPartOf":{"@id":{{ (site_url ~ '/#site') | tojson }}},"mainEntity":{"@type":"ItemList","itemListElement":[{% for item in featured_indicators %}{"@type":"ListItem","position":{{ loop.index }},"name":{{ item.name | tojson }},"url":{{ (site_url ~ item.path) | tojson }}}{{ "," if not loop.last }}{% endfor %}]}}
+</script>
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-atlante" data-v1="atlante" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">{{ d.institutions }}<span class="sep" aria-hidden="true">·</span>dal {{ d.year_min }} al {{ d.year_max }}</p>
+    <h1 class="h-title">Atlante degli indicatori territoriali italiani</h1>
+    <div class="answer"><p>{{ d.total | num(None, 'count') }} serie regionali in un elenco solo, tema per tema, ognuna con la sua scheda. {{ d.complete | num(None, 'count') }} hanno il dato di tutte le regioni nell'ultimo anno e quasi tutti gli anni, le altre {{ d.partial | num(None, 'count') }} sono segnate come serie parziali.</p></div>
+    <p class="meta"><a href="#mappa">Sulla mappa</a><a href="#indicatori">Tutti gli indicatori</a><a href="/metodologia">Metodologia e fonti</a></p>
+  </header>
+
+  <section class="section" id="mappa" aria-labelledby="h-mappa">
+    <h2 id="h-mappa">Sulla mappa</h2>
+    <p class="atlante-intro">Un indicatore sulle regioni, con la mappa accanto alla classifica: scegli l'anno e trova la tua regione. <a href="{{ m.meta.canonical_path }}">La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
+    {{ ui.explore(m.module) }}
+  </section>
+
+  <section class="section" id="indicatori" aria-labelledby="h-indicatori">
+    <h2 id="h-indicatori">Tutti gli indicatori</h2>
+    <p class="atlante-intro">La linea è la media semplice delle regioni, anno per anno, sugli anni in cui almeno {{ d.panel_need }} regioni su {{ d.panel_total }} hanno il dato e sulle regioni presenti in tutti quegli anni. Resta quasi piatta quando la media si è mossa poco rispetto alla distanza fra le regioni. {{ d.with_spark | num(None, 'count') }} serie hanno la linea, {{ d.without_spark | num(None, 'count') }} hanno una copertura che cambia troppo da un anno all'altro per disegnarla.</p>
+
+    <form class="toolbar atlante-filter" id="filtri" data-atlas-controls hidden role="search" aria-label="Filtra gli indicatori">
+      <label class="field atlante-filter__q" for="atl-q">Cerca un indicatore
+        <input id="atl-q" type="search" name="q" autocomplete="off" placeholder="turismo, occupazione, rifiuti">
+      </label>
+      <div class="field"><span id="atl-area-label">Area</span>
+        <div class="seg" role="group" aria-labelledby="atl-area-label">
+          <button type="button" aria-pressed="true" data-atlas-area="">Tutte</button>
+          {% for area in d.areas %}<button type="button" aria-pressed="false" data-atlas-area="{{ area.name }}">{{ area.name }}</button>{% endfor %}
+        </div>
+      </div>
+      <label class="field" for="atl-theme">Tema
+        <select id="atl-theme" name="theme"><option value="">Tutti</option>{% for area in d.areas %}{% for g in area.groups %}<option value="{{ g.name }}" data-area="{{ area.name }}">{{ g.name }}</option>{% endfor %}{% endfor %}</select>
+      </label>
+      <label class="field" for="atl-source">Fonte
+        <select id="atl-source" name="source"><option value="">Tutte</option>{% for s in d.sources %}<option value="{{ s.id }}">{{ s.label }}</option>{% endfor %}</select>
+      </label>
+      <label class="field" for="atl-yfrom">Dal
+        <select id="atl-yfrom" name="yfrom"><option value="">Da sempre</option>{% for y in d.years %}<option>{{ y }}</option>{% endfor %}</select>
+      </label>
+      <label class="field" for="atl-yto">Al
+        <select id="atl-yto" name="yto"><option value="">A oggi</option>{% for y in d.years %}<option>{{ y }}</option>{% endfor %}</select>
+      </label>
+      <label class="field" for="atl-sort">Ordina
+        <select id="atl-sort" name="sort">{% for key, label in d.sorts %}<option value="{{ key }}">{{ label }}</option>{% endfor %}</select>
+      </label>
+      <label class="check" for="atl-complete"><input id="atl-complete" type="checkbox" name="complete" value="1"> Solo serie complete</label>
+      <label class="check" for="atl-fav" data-atlas-fav hidden><input id="atl-fav" type="checkbox" name="fav" value="1"> Solo preferiti</label>
+      <p class="subline atlante-filter__count" role="status" aria-live="polite" data-atlas-live>{{ d.total | num(None, 'count') }} indicatori</p>
+    </form>
+
+    {% for area in d.areas %}
+    <div class="atlante-area" data-area="{{ area.name }}">
+      <h3 class="atlante-area__title" id="{{ 'a-' ~ area.slug }}">{{ area.name }}</h3>
+      {% for g in area.groups %}
+      <section class="atlante-group" data-theme="{{ g.name }}" aria-labelledby="{{ 't-' ~ g.slug }}">
+        <h4 class="h-sub" id="{{ 't-' ~ g.slug }}"><a href="{{ g.path }}">{{ g.name }}</a> <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4>
+        <div class="tablewrap stackwrap">
+          <table class="table table--compact table--stack atlante-table">
+            <caption class="sr-only">{{ g.name }}: le serie regionali, con l'andamento della media semplice e l'ultimo anno</caption>
+            <thead><tr><th scope="col">Indicatore</th><th scope="col">Andamento</th><th class="r" scope="col">Ultimo anno</th></tr></thead>
+            <tbody>
+            {%- for r in g.rows %}
+            <tr data-id="{{ r.id }}" data-s="{{ r.family }}" data-y0="{{ r.y0 }}" data-y1="{{ r.y1 }}" data-c="{{ r.completeness }}"{% if not r.complete %} data-p{% endif %}{% if r.search %} data-q="{{ r.search }}"{% endif %}><th scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if not r.complete %} <span class="status">Serie parziale</span>{% endif %}</th><td class="trendcell" data-label="Andamento">{% if r.spark %}<span class="trend">{{ r.spark | safe }}<span class="trend__txt">{{ r.change.head }} <span class="trend__from">{{ r.change.tail }}</span></span></span>{% else %}<span class="status">Copertura variabile</span>{% endif %}</td><td class="val" data-label="Ultimo anno">{{ r.y1 }}{% if r.n %} <small>{{ r.n }} regioni</small>{% endif %}</td></tr>
+            {%- endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    <p class="atlante-empty" data-atlas-empty hidden>Nessun indicatore con questi filtri. <a href="/atlante">Tutti gli indicatori</a></p>
+  </section>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+<script src="{{ asset_url('js/atlante.js') }}" defer></script>
+{% endblock %}

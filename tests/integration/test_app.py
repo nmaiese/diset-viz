@@ -63,11 +63,13 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(len(re.findall(
             rb'data-key="[a-z-]+" data-name="[^"]*" data-value="[^"]*" class="q[1-6]', regionale.data)), 20)
 
+        # L'atlante e' la pagina della 1.0 resa dal server, non piu' la SPA:
+        # le sue prove stanno in tests/integration/test_atlante.py.
         atlante = client.get("/atlante")
         self.assertEqual(atlante.status_code, 200)
-        self.assertIn(b'id="root"', atlante.data)
+        self.assertIn(b'data-v1="atlante"', atlante.data)
+        self.assertNotIn(b'id="root"', atlante.data)
         self.assertIn(b"/metodologia", atlante.data)
-        self.assertIn(b"Indicatori territoriali in evidenza", atlante.data)
 
         legacy = client.get("/legacy")
         self.assertEqual(legacy.status_code, 200)
@@ -907,10 +909,14 @@ class AppSmokeTest(unittest.TestCase):
             self.assertIn("gtag('set', 'ads_data_redaction', true)", html)
             self.assertIn("GTM-PZ45BG7D", html)
             self.assertIn("googletagmanager.com/ns.html?id=GTM-PZ45BG7D", html)
-            # /atlante still mounts the React SPA, which fires its own page_view
-            # once mounted, so the server-rendered page_view push stays off there
-            # (TRACK_SERVER_PAGE_VIEW = false in app.html) to avoid double-counting.
-            self.assertNotIn("event: 'page_view'", html)
+            # /atlante e' resa dal server: il page_view lo manda il frammento
+            # server, una volta, con il tipo di pagina di prima ("atlas").
+            # /confronto monta ancora la SPA, che manda il suo page_view una
+            # volta montata: li' il frammento server resta spento
+            # (TRACK_SERVER_PAGE_VIEW = false in confronto.html) per non contarlo due volte.
+            self.assertEqual(html.count("event: 'page_view'"), 1)
+            self.assertIn('page_type: "atlas"', html)
+            self.assertNotIn("event: 'page_view'", client.get("/confronto").get_data(as_text=True))
             self.assertNotIn("googletagmanager.com/gtag/js", html)
             self.assertNotIn("diSendGoogleEvent", html)
             self.assertNotIn("googlefc.controlledMessagingFunction", html)
