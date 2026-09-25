@@ -8,7 +8,7 @@ solo per provincia, che pure hanno una pagina indicizzabile.
 import unittest
 
 from app import app, indicator_universe, province_profile
-from app.taxonomy import DUPLICATE_BES_IDS
+from app.taxonomy import hidden_from_browsing
 
 ESEMPI = {
     "Lecce": "/provincia/lecce",
@@ -60,7 +60,8 @@ class LaRicercaTrovaITerritori(unittest.TestCase):
             catalogo = indicator_universe.indexable_catalog()
         for record in catalogo:
             meta = record["meta"]
-            if meta.get("raw_id") in DUPLICATE_BES_IDS:
+            # La stessa serie la ricerca la da' con un'altra scheda.
+            if hidden_from_browsing(meta.get("family"), meta.get("raw_id")):
                 continue
             with self.subTest(indicatore=meta["id"]):
                 dati = self.client.get("/api/search", query_string={"q": meta["name"]}).get_json()

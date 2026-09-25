@@ -193,13 +193,22 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
     def _locs(self):
         return self.LOC.findall(self.client.get("/sitemap.xml").get_data(as_text=True))
 
+    def _bases_elsewhere(self):
+        """Le basi col canonical su un'altra scheda (le regioni di
+        bes-01SAL001, verso ter-910), che la sitemap non elenca mai."""
+        from app import indicator_view
+
+        return [record for record in self.universe.indexable_catalog()
+                if indicator_view.canonical_elsewhere(record["meta"], record["levels"][0]["key"])]
+
     def test_diciassette_province_e_nessuna_query(self):
         locs = self._locs()
         province = [loc for loc in locs if loc.endswith("/province") and "/indicatore/" in loc]
         self.assertEqual(len(province), 17)
         self.assertFalse([loc for loc in locs if "/indicatore/" in loc and "?" in loc])
         schede = [loc for loc in locs if "/indicatore/" in loc]
-        self.assertEqual(len(schede), len(self.universe.indexable_catalog()) + 17)
+        self.assertEqual(len(self._bases_elsewhere()), 1)
+        self.assertEqual(len(schede), len(self.universe.indexable_catalog()) - 1 + 17)
         self.assertEqual(len(schede), len(set(schede)))
 
     def test_l_interruttore_spento(self):
@@ -211,8 +220,10 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
         with mock.patch.object(seo_policy, "LEVEL_PAGES_INDEXABLE", False):
             locs = self._locs()
             self.assertEqual([loc for loc in locs if "/indicatore/" in loc and loc.endswith("/province")], [])
+            elsewhere = self._bases_elsewhere()
+            self.assertEqual(len(elsewhere), 1)
             self.assertEqual(len([loc for loc in locs if "/indicatore/" in loc]),
-                             len(self.universe.indexable_catalog()))
+                             len(self.universe.indexable_catalog()) - len(elsewhere))
             risposta = self.client.get(base + "/province")
             self.assertEqual(risposta.status_code, 200)
             self.assertEqual(risposta.headers.get("X-Robots-Tag"), "noindex, follow")

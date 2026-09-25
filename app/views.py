@@ -31,6 +31,7 @@ from app import home_pick
 from app import editorial_state
 from app import quality_life_bes as qb
 from app.quality_life_config import QUALITY_LIFE_PROFILES
+from app.quality_life_selection import regional_quality_life_selection
 from app import bes_data
 from app import multiscopo_data
 from app import external_atlas
@@ -46,7 +47,13 @@ from app import publisher
 from app import agent_discovery
 from app import nav
 from app import taxonomy
-from app.taxonomy import DUPLICATE_BES_IDS, MACRO_AREA_ORDER, PROVINCE_ONLY_TITLE_COLLISIONS
+from app.taxonomy import (
+    MACRO_AREA_ORDER,
+    PROVINCE_ONLY_TITLE_COLLISIONS,
+    SAME_NAME_BES_IDS,
+    TERRITORIAL_NAME_TWINS,
+    hidden_from_browsing,
+)
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -468,17 +475,19 @@ def data_catalog():
     validi fuori dal catalogo pubblico e dal suo grafo `DataCatalog.dataset`.
     """
     datasets = []
-    for record in _indexable_indicator_catalog():
-        meta = record["meta"]
+    # Le voci di llms-full: la base di bes-01SAL001, col canonical su ter-910,
+    # lascia il posto alla sua `/province` (`_listed_indicator_entries`).
+    for entry in _listed_indicator_entries():
+        meta = entry["meta"]
         datasets.append({
-            "name": meta["name"],
-            "url": f"{SITE_URL}{meta['canonical_path']}",
-            "path": meta["canonical_path"],
+            "name": entry["name"],
+            "url": f"{SITE_URL}{entry['path']}",
+            "path": entry["path"],
             "source": meta.get("source_label") or meta.get("family_label") or "",
             # Il titolo diceva "N indicatori scaricabili" contando anche i 26
             # BES solo provinciali, che il download non ce l'hanno: si conta
-            # da `meta.downloads`, non si presume.
-            "downloadable": bool(meta.get("downloads")),
+            # dai download della voce, non si presume.
+            "downloadable": bool(entry["downloads"]),
         })
     description = (
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
@@ -640,12 +649,14 @@ def _search_indicators(query, theme=None, limit=50):
     seen = {item["path"] for item in results}
     # Una voce per pagina di livello indicizzabile, cosi' la `/province` di una
     # scheda a due livelli si trova anche quando la base e' gia' fra i
-    # risultati dell'atlante. Di un doppione (`DUPLICATE_BES_IDS`) si toglie
-    # solo la vista regionale, che ha una gemella nell'atlante: la sua
-    # `/province` non ce l'ha.
+    # risultati dell'atlante. Di una serie che la navigazione mostra in
+    # un'altra scheda (`taxonomy.hidden_from_browsing`: le BES doppioni e le
+    # territoriali superate da una BES) si toglie solo la vista regionale: la
+    # `/province` di bes-01SAL001 una gemella non ce l'ha. La base di
+    # bes-01SAL001 `level_pages` non la da' comunque, col canonical su ter-910.
     for page in indicator_universe.level_pages(listed=True):
         meta = page["meta"]
-        if page["path"] in seen or (page["base"] and meta.get("raw_id") in DUPLICATE_BES_IDS):
+        if page["path"] in seen or (page["base"] and hidden_from_browsing(meta.get("family"), meta.get("raw_id"))):
             continue
         if theme and meta.get("theme") != theme:
             continue
@@ -1016,11 +1027,35 @@ def methodology():
         unmeasured_provinces=province_profile.unmeasured_provinces(),
         categories=qb.get_quality_life_categories(),
         profiles=qb.get_quality_life_profiles(),
-        quality_life_indicators=[
-            item for item in get_atlas_catalog()["indicators"]
-            if item["quality_life_scored"]
-        ],
+        quality_life_indicators=_quality_life_indicators(),
     )
+
+
+def _quality_life_indicators():
+    """Le serie del punteggio regionale per la metodologia, con la loro scheda.
+
+    Dal catalogo dell'atlante, piu' quelle che la navigazione mostra in
+    un'altra scheda (`taxonomy.hidden_from_browsing`): bes-01SAL001 sta
+    nel punteggio, e una lista che le salta dice che il
+    punteggio usa meno serie di quelle che usa. Il link segue il canonical
+    (bes-01SAL001 porta a ter-910, che ha le stesse cifre).
+    """
+    catalog = get_atlas_catalog()["indicators"]
+    items = [item for item in catalog if item["quality_life_scored"]]
+    listed = {str(item["id"]) for item in catalog}
+    for indicator_id in sorted(regional_quality_life_selection()):
+        if indicator_id in listed:
+            continue
+        family, raw_id = sources.split_internal_id(indicator_id)
+        if not hidden_from_browsing(family, raw_id):
+            continue
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        path = indicator_view.canonical_elsewhere({"family": family, "raw_id": raw_id}, "regione")
+        items.append({**meta, "path": path or meta["path"]})
+    return items
 
 
 # `province` -> `provincia`: il terzo segmento di una scheda accetta questi e
@@ -1233,7 +1268,12 @@ def _render_indicator(family, raw_id, path_level=None):
         estremi=dict(zip(("alto", "basso"), seo_titles.extremes(meta, level))),
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}{level['canonical_path']}",
+        # Il canonical del livello: il suo URL, o la scheda che lo porta
+        # (`indicator_view.canonical_elsewhere`, le regioni di bes-01SAL001
+        # verso ter-910). Non cambia il robots: la pagina resta senza
+        # `noindex`, perche' canonical e `noindex` insieme sono due segnali
+        # contrari (piano SEO, 3.7.2).
+        canonical=f"{SITE_URL}{level['preferred_path']}",
     ))
     if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
@@ -1259,6 +1299,11 @@ def _page_h1(article, meta, level):
         return article["h1"]
     if level["key"] == "provincia":
         return f"{meta['name']} nelle {level['plural']} italiane"
+    if meta.get("family") == "bes" and meta.get("raw_id") in SAME_NAME_BES_IDS:
+        # Il nome di una serie territoriale con cifre diverse
+        # (`taxonomy.SAME_NAME_BES_IDS`): due schede, e l'H1 dice di quale
+        # famiglia e' questa. L'H1 della territoriale resta il nome.
+        return f"{meta['name']} ({sources.family_short_label('bes')})"
     return meta["name"]
 
 
@@ -1266,18 +1311,19 @@ def _indicator_trail(meta, level, levels):
     """La briciola della scheda, la stessa per gli occhi e per `BreadcrumbList`.
 
     Sulla vista province di una scheda a due livelli finisce in "Province":
-    la misura porta alla vista regioni, che e' la base, e la pagina e' la
-    sua vista sulle province. Una scheda con un livello solo finisce sulla
+    la misura porta alla vista regioni, che e' la base (o la scheda che ne ha
+    il canonical: ter-910 per bes-01SAL001), e la pagina e' la sua vista
+    sulle province. Una scheda con un livello solo finisce sulla
     misura, che e' la pagina.
     """
     trail = [
         {"name": "Home", "path": "/"},
         {"name": "Temi", "path": "/temi"},
         {"name": meta["theme"], "path": meta["theme_path"]},
-        {"name": meta["name"], "path": meta["canonical_path"]},
+        {"name": meta["name"], "path": levels[0]["preferred_path"]},
     ]
     if len(levels) > 1 and level["key"] != levels[0]["key"]:
-        trail.append({"name": level["label"], "path": level["canonical_path"]})
+        trail.append({"name": level["label"], "path": level["preferred_path"]})
     return trail
 
 
@@ -1291,7 +1337,7 @@ def _other_views(meta, level, levels, twin):
     """
     code = sources.indicator_code(meta["family"], meta["raw_id"])
     views = [
-        {"path": other["canonical_path"],
+        {"path": other["preferred_path"],
          "label": indicator_view.level_anchor(code, other["key"], meta["name"],
                                               len(other["observations"]), other["plural"])}
         for other in levels if other["key"] != level["key"]
@@ -1326,15 +1372,15 @@ def _source_qualifier(family, raw_id):
     scritto, o None. Una funzione e non un ramo dentro la view perche' la prova
     di unicita' dei `<title>` deve costruirli come la pagina, non a modo suo.
 
-    A handful of BES ids are exact duplicates of an existing territorial
-    series (DUPLICATE_BES_IDS docstring): hidden from browsing, but the page
-    itself stays reachable and indexable, so its <title> must not collide
-    with its territorial twin's. A handful of BES ids exist only at province
+    Alcune serie BES hanno esattamente il nome di una territoriale
+    (`TERRITORIAL_NAME_TWINS`): le stesse cifre o no, sono due pagine
+    raggiungibili, e un titolo scritto uguale al nome farebbe collidere i due
+    `<title>`. A handful of BES ids exist only at province
     level but share a name with a regional twin
     (PROVINCE_ONLY_TITLE_COLLISIONS docstring): the same collision on the
     level dimension instead of the source.
     """
-    if family == "bes" and raw_id in DUPLICATE_BES_IDS:
+    if family == "bes" and raw_id in TERRITORIAL_NAME_TWINS:
         return sources.family_short_label(family)
     if family == "bes" and raw_id in PROVINCE_ONLY_TITLE_COLLISIONS:
         return "dati provinciali"
@@ -2537,6 +2583,44 @@ def _indexable_indicator_catalog():
     return indicator_universe.indexable_catalog()
 
 
+def _listed_indicator_entries():
+    """Una voce per scheda indicizzabile, come la elencano llms-full e il
+    catalogo dati: `meta`, `name`, `path`, `levels` e `sub_views` (le sue
+    `/province` nella sitemap).
+
+    Dove la base ha il canonical su un'altra scheda (bes-01SAL001 verso
+    ter-910, `indicator_view.canonical_elsewhere`), la voce e' la sua
+    `/province`, se c'e', e altrimenti la scheda non ha voce: la base la elenca
+    la sua canonica, come nella sitemap (`indicator_universe.level_pages`).
+
+    `downloads` sta sulla voce e non si legge da `meta`: il CSV e il JSON della
+    scheda hanno solo le regioni, e la voce che e' la `/province` non li porta.
+    `meta` e' quello della scheda, in cache, e non si tocca.
+    """
+    level_views = {}
+    listed_bases = set()
+    for page in indicator_universe.level_pages():
+        if page["base"]:
+            listed_bases.add(page["path"])
+        else:
+            level_views.setdefault(page["meta"]["canonical_path"], []).append(page)
+    entries = []
+    for view in _indexable_indicator_catalog():
+        meta = view["meta"]
+        sub_views = level_views.get(meta["canonical_path"], [])
+        entry = {"meta": meta, "name": meta["name"], "path": meta["canonical_path"],
+                 "levels": view["levels"], "sub_views": sub_views,
+                 "downloads": meta.get("downloads")}
+        if meta["canonical_path"] not in listed_bases:
+            if not sub_views:
+                continue
+            page = sub_views[0]
+            entry.update(name=f"{meta['name']} nelle {page['level']['label'].lower()}",
+                         path=page["path"], levels=[page["level"]], sub_views=[], downloads=None)
+        entries.append(entry)
+    return entries
+
+
 # Il nome vecchio, per i test che lo importano da qui: la funzione si e' spostata,
 # la domanda che risponde no.
 _build_indexable_indicator_catalog = _indexable_indicator_catalog
@@ -2850,18 +2934,17 @@ def llms_full_txt():
 
     lines.append("## Catalogo completo degli indicatori indicizzabili")
     lines.append("")
-    level_views = {}
-    for page in indicator_universe.level_pages():
-        if not page["base"]:
-            level_views.setdefault(page["meta"]["canonical_path"], []).append(page)
-    for view in _indexable_indicator_catalog():
-        meta = view["meta"]
+    # Una riga per scheda, e la base col canonical altrove (bes-01SAL001) lascia
+    # il posto alla sua `/province` (`_listed_indicator_entries`).
+    for entry in _listed_indicator_entries():
+        meta, name, path = entry["meta"], entry["name"], entry["path"]
+        levels, sub_views = entry["levels"], entry["sub_views"]
         plain = " ".join(((meta.get("explain") or {}).get("plain") or "").split())
         definition = plain or "Definizione sintetica non disponibile."
         coverage = ", ".join(
             f"{level['label'].lower()} {level['year_min']}-{level['year_max']} "
             f"({level['territory_count']} territori nell'ultimo anno)"
-            for level in view["levels"]
+            for level in levels
         )
         source_label = meta["source_label"]
         source = (
@@ -2869,7 +2952,7 @@ def llms_full_txt():
             if meta.get("source_url") else source_label
         )
         lines.append(
-            f"- [{meta['name']}]({SITE_URL}{meta['canonical_path']}): "
+            f"- [{name}]({SITE_URL}{path}): "
             f"famiglia {meta['family_label']}; fonte {source}; "
             f"unita {meta.get('unit') or 'n.d.'}; copertura {coverage}; "
             f"definizione: {definition}"
@@ -2878,12 +2961,13 @@ def llms_full_txt():
         # scheda a due livelli stanno nella sua `/province`.
         # Solo le viste che la sitemap elenca (`level_pages`), cosi' i due
         # indici dicono le stesse pagine.
-        for page in level_views.get(meta["canonical_path"], ()):
+        for page in sub_views:
             lines.append(f"  {page['level']['label']}: {SITE_URL}{page['path']}")
-        if meta.get("downloads"):
+        downloads = entry["downloads"]
+        if downloads:
             lines.append(
-                f"  Download: CSV {SITE_URL}{meta['downloads']['csv']}; "
-                f"JSON {SITE_URL}{meta['downloads']['json']}."
+                f"  Download: CSV {SITE_URL}{downloads['csv']}; "
+                f"JSON {SITE_URL}{downloads['json']}."
             )
     lines.append("")
     return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")

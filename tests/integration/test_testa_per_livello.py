@@ -31,17 +31,6 @@ from app.indicator_notes import strip_markdown
 from app.indicator_universe import all_indicator_refs
 from app.taxonomy import PROVINCE_TWINS
 
-# Le due coppie regionali che la decisione 2 del piano SEO lascia aperte:
-# ter-592 e bes-10AMB008 sono due misure diverse col nome uguale (unita'
-# diverse, 200 celle su 200 diverse), ter-590 e bes-12SER025 la stessa misura
-# in due uscite. Hanno lo stesso H1 perche' hanno lo stesso nome, e si
-# risolvono con `DUPLICATE_BES_IDS`, non con l'H1. L'elenco si svuota con la
-# PR di quella decisione.
-H1_EXCEPTIONS = (
-    frozenset({("ter-592", "regione"), ("bes-10AMB008", "regione")}),
-    frozenset({("ter-590", "regione"), ("bes-12SER025", "regione")}),
-)
-
 
 def _pages():
     """(codice, vista, livello, indicizzabile) per ogni livello di ogni scheda.
@@ -121,13 +110,17 @@ class LaTestaSegueIlLivello(unittest.TestCase):
                 self.assertNotEqual(self.h1[(regional, "regione")], self.h1[(provincial, "provincia")])
 
     def test_nessun_h1_ripetuto_fra_le_pagine_indicizzabili(self):
+        """Senza eccezioni. Le due coppie che la decisione 2 del piano SEO
+        lasciava aperte (ter-592 e bes-10AMB008, ter-590 e bes-12SER025)
+        avevano lo stesso H1 perche' hanno lo stesso nome: ora l'H1 della BES
+        dice la famiglia (`taxonomy.SAME_NAME_BES_IDS`)."""
         per_h1 = {}
         for code, _, level, indexable in self.pages:
             if indexable:
                 per_h1.setdefault(self.h1[(code, level["key"])], set()).add((code, level["key"]))
         self.assertGreater(len(per_h1), 350)
-        collisions = [frozenset(who) for who in per_h1.values() if len(who) > 1]
-        self.assertEqual(sorted(map(sorted, collisions)), sorted(map(sorted, H1_EXCEPTIONS)))
+        collisions = [sorted(who) for who in per_h1.values() if len(who) > 1]
+        self.assertEqual(collisions, [])
 
     def test_l_h1_composto_non_entra_nell_articolo(self):
         """`page_title` usa `article["h1"]` come `<title>` se ci sta intero:
@@ -197,12 +190,17 @@ class LaTestaSegueIlLivello(unittest.TestCase):
         seg = re.search(r'<div class="seg" role="group" aria-label="Livello territoriale">(.*?)</div>',
                         page.get_data(as_text=True), re.DOTALL).group(1)
         self.assertIn('<span aria-current="page">Province</span>', seg)
-        self.assertIn('<a href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001">Regioni</a>', seg)
+        # Le regioni di bes-01SAL001 hanno il canonical su ter-910, e la
+        # linguetta porta li' (`taxonomy.REGIONAL_CANONICALS`).
+        self.assertIn('<a href="/indicatore/speranza-di-vita-alla-nascita/ter-910">Regioni</a>', seg)
         self.assertNotIn("aria-current", re.sub(r"<span aria-current[^>]*>[^<]*</span>", "", seg))
 
 
 class LaVistaProvinciale(unittest.TestCase):
     BASE = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001"
+    # Dove portano i link alle regioni della scheda: il canonical della sua
+    # vista regionale (`taxonomy.REGIONAL_CANONICALS`).
+    REGIONI = "/indicatore/speranza-di-vita-alla-nascita/ter-910"
 
     @classmethod
     def setUpClass(cls):
@@ -228,7 +226,7 @@ class LaVistaProvinciale(unittest.TestCase):
         listed = [item["name"] for item in _jsonld(self.province, "BreadcrumbList")["itemListElement"]]
         self.assertEqual(visible, listed)
         self.assertEqual(visible[-2:], ["Speranza di vita alla nascita", "Province"])
-        self.assertIn(f'<a href="{self.BASE}">Speranza di vita alla nascita</a>', crumbs)
+        self.assertIn(f'<a href="{self.REGIONI}">Speranza di vita alla nascita</a>', crumbs)
         regioni = [item["name"] for item in _jsonld(self.regioni, "BreadcrumbList")["itemListElement"]]
         self.assertEqual(regioni[-1], "Speranza di vita alla nascita")
 
@@ -242,7 +240,8 @@ class LaVistaProvinciale(unittest.TestCase):
         self.assertIn("Esprime in anni la speranza di vita alla nascita", body)
 
     def test_i_link_fra_i_livelli_dicono_di_che_cosa(self):
-        self.assertIn(f'<a href="{self.BASE}">Speranza di vita alla nascita nelle 20 regioni</a>', self.province)
+        self.assertIn(f'<a href="{self.REGIONI}">Speranza di vita alla nascita nelle 20 regioni</a>', self.province)
+        self.assertNotIn(f'href="{self.BASE}"', self.province)
         self.assertIn(f'<a href="{self.BASE}/province">Speranza di vita nelle 107 province</a>',
                       self.regioni)
         self.assertNotIn("Gli stessi dati per", self.province + self.regioni)

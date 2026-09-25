@@ -32,7 +32,7 @@ from app.multiscopo_data import (
     multiscopo_indicator_path,
 )
 from app.external_atlas import all_external_indicators, get_external_atlas_indicator, has_external_data
-from app.taxonomy import DUPLICATE_BES_IDS, category_metadata
+from app.taxonomy import category_metadata, hidden_from_browsing
 from app import profiles, sources
 
 COMPARE_CHOICES = ("region_a", "region_b", "timeout")
@@ -184,7 +184,7 @@ def _bes_quiz_indicators():
     pool = []
     manifest = get_bes_manifest("regione")
     for raw_id, info in manifest.items():
-        if raw_id in DUPLICATE_BES_IDS:
+        if hidden_from_browsing("bes", raw_id):
             continue
         if info["year_max"] < _BES_MIN_YEAR or info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
             continue
@@ -284,6 +284,12 @@ def _quiz_indicators():
     pool = []
     for item in get_catalog()["indicators"]:
         if not profiles.is_core(item) or profiles.is_gender_variant(item):
+            continue
+        # Una territoriale con le stesse cifre di una BES indicizzabile
+        # (`taxonomy.SUPERSEDED_TERRITORIAL_IDS`: ter-617 e ter-618) resta fuori,
+        # come dall'atlante. Oggi e' una guardia: le due non passano gia'
+        # `is_core`, e le loro BES (SDG-311 e SDG-310) stanno nel pool BES.
+        if hidden_from_browsing("territorial", item["id"]):
             continue
         year = item["year_max"]
         payload = get_indicator_year(item["id"], year)

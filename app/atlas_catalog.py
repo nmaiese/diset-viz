@@ -29,11 +29,11 @@ from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 from app.quality_life_selection import regional_quality_life_selection
 from app.taxonomy import (
     CANONICAL_CATEGORIES,
-    DUPLICATE_BES_IDS,
     MACRO_AREA_ORDER,
     canonical_category_slug,
     category_metadata,
     category_path,
+    hidden_from_browsing,
 )
 
 
@@ -295,7 +295,14 @@ def _canonicalize_item(item):
 
 @synchronized_cache(maxsize=1)
 def get_atlas_catalog():
-    """Merge legacy territorial metadata and BES metadata for atlas browsing."""
+    """Merge legacy territorial metadata and BES metadata for atlas browsing.
+
+    Una serie che la navigazione mostra in un'altra scheda
+    (`taxonomy.hidden_from_browsing`: le BES doppioni e le territoriali superate
+    da una BES piu' fresca o indicizzabile) resta fuori prima dei conteggi, cosi'
+    temi, macro-aree, famiglie e ricerca dicono lo stesso numero che mostrano.
+    La sua pagina resta, e `get_atlas_indicator` la risolve lo stesso.
+    """
     legacy = get_catalog()
     score_selection = regional_quality_life_selection()
     legacy_indicators = [
@@ -308,6 +315,7 @@ def get_atlas_catalog():
             "quality_life_category": score_selection.get(item["id"]),
         })
         for item in legacy["indicators"]
+        if not hidden_from_browsing("territorial", item["id"])
     ]
     bes_indicators = [
         {
@@ -316,7 +324,7 @@ def get_atlas_catalog():
             "quality_life_category": score_selection.get(_bes_public_id(raw_id)),
         }
         for raw_id in get_bes_manifest("regione")
-        if raw_id not in DUPLICATE_BES_IDS
+        if not hidden_from_browsing("bes", raw_id)
     ]
     multiscopo_indicators = [
         {

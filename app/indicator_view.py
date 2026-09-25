@@ -50,7 +50,7 @@ from app.data import indicator_trend_stats, indicator_year_over_year_stats
 from app.design.charts import spark_floor
 from app.external_data import freshness_label, freshness_status
 from app.multiscopo_data import all_multiscopo_indicators
-from app.taxonomy import PROVINCE_TWINS, REGIONAL_TWINS
+from app.taxonomy import PROVINCE_TWINS, REGIONAL_CANONICALS, REGIONAL_TWINS
 from app.indicator_notes import (
     annual_change_framing,
     change_unit_label,
@@ -144,6 +144,11 @@ def _assemble(meta, levels):
         # `Content-Location` e robots si leggono da qui, mai da `meta`.
         level["canonical_path"] = sources.level_path(meta["canonical_path"], level["key"], base_key)
         level["indexable"] = level_indexable(meta, level["key"], base_key)
+        # Il path che portano il `<link rel="canonical">` e ogni link a questo
+        # livello: il suo URL, tranne la vista regionale che ha il canonical su
+        # un'altra scheda (`canonical_elsewhere`). `canonical_path` resta l'URL
+        # della pagina, quello che il 301 e `Content-Location` guardano.
+        level["preferred_path"] = canonical_elsewhere(meta, level["key"]) or level["canonical_path"]
     meta["year_min"] = min(level["year_min"] for level in levels)
     meta["year_max"] = max(level["year_max"] for level in levels)
     meta["freshness_status"] = freshness_status(meta["year_max"])
@@ -161,6 +166,28 @@ def _assemble(meta, levels):
         "explore": _explore_payload(meta, levels),
         "twin": twin_level(meta, levels),
     }
+
+
+def canonical_elsewhere(meta, level_key):
+    """Il path della scheda che porta il canonical di questo livello, o None.
+
+    Solo la vista regionale di bes-01SAL001, identica a ter-910 in ogni cella
+    (`taxonomy.REGIONAL_CANONICALS`): la pagina resta raggiungibile e senza
+    `noindex`, ma il canonical e i link al livello regionale vanno a ter-910, e
+    la sitemap non la elenca. Il path si prende dal catalogo dell'atlante come
+    per la gemella (`twin_level`), mai ricostruito: se la scheda di arrivo non
+    c'e' piu', None, e la pagina torna canonica di se stessa invece di puntare
+    a un 404.
+    """
+    if level_key != "regione":
+        return None
+    target = REGIONAL_CANONICALS.get(sources.indicator_code(meta["family"], meta["raw_id"]))
+    parsed = sources.parse_indicator_code(target) if target else None
+    if parsed is None:
+        return None
+    internal = sources.internal_id(*parsed)
+    item = next((i for i in get_atlas_catalog()["indicators"] if str(i["id"]) == internal), None)
+    return item["path"] if item else None
 
 
 def twin_level(meta, levels):
