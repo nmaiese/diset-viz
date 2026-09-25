@@ -632,7 +632,10 @@ SHORT_NAMES = {
     # quello della territoriale, cambiato solo nelle cifre (o nemmeno in
     # quelle, per 12SER006 contro ter-6). L'H1 dice la famiglia, qui il nome.
     ("bes-10AMB008", "regione"): "Verde urbano pro capite",                   # disponibilita'; m² per abitante (ter-592). Non "per abitante": col " per regione" della coda faceva due "per"
-    ("bes-12SER006", "regione"): "Irregolarità del servizio idrico",          # nella distribuzione dell'acqua; % (ter-6)
+    # Il titolo derivato ci mette accanto la famiglia, trentatre caratteri
+    # (`seo_titles._same_name_qualifier`): il nome deve starci in ventisette.
+    # "Irregolarità del servizio idrico" ne ha trentadue.
+    ("bes-12SER006", "regione"): "Servizio idrico irregolare",                # irregolarita' nella distribuzione dell'acqua; % (ter-6)
     ("bes-12SER025", "regione"): "Ricoveri fuori regione",                    # emigrazione ospedaliera; % (ter-590)
 }
 
