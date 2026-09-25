@@ -375,7 +375,7 @@
       return '<tr><th scope="row"><span class="swatch ' + s.cls + '" aria-hidden="true"></span><a href="' + esc(cfg.profile + s.key) + '">' +
         esc(s.name) + '</a></th><td class="val">' + numHtml(s.value, unit, d) + '</td><td class="val">' + rankHtml(s.value === null ? 0 : s.rank, keys.length) + "</td></tr>";
     });
-    rows.push('<tr class="ref"><th scope="row">Media semplice delle ' + avgN + " " + cfg.plural + '</th><td class="val">' + numHtml(avgNow, unit, d) + "</td><td></td></tr>");
+    rows.push('<tr class="ref"><th scope="row">Media semplice delle ' + avgN + " " + esc(cfg.plural) + '</th><td class="val">' + numHtml(avgNow, unit, d) + "</td><td></td></tr>");
     $("[data-cmp-rows]").innerHTML = rows.join("");
     $("[data-cmp-rankrule]").textContent = "La posizione è fra le " + keys.length + " " + cfg.plural + " con il dato nel " + year + ", " +
       (m.lowerBetter ? "dal valore più basso, che qui è il migliore, al più alto." : "dal valore più alto al più basso.");
@@ -422,7 +422,7 @@
       : "Un anno solo: la serie non si disegna.";
     $("[data-cmp-key]").innerHTML = sel.map(function (s) {
       return '<li><span class="swatch ' + s.cls + '" aria-hidden="true"></span>' + esc(s.name) + "</li>";
-    }).join("") + '<li><span class="swatch swatch--avg" aria-hidden="true"></span>Media semplice delle ' + cfg.plural + "</li>";
+    }).join("") + '<li><span class="swatch swatch--avg" aria-hidden="true"></span>Media semplice delle ' + esc(cfg.plural) + "</li>";
     var cells = [];
     m.years.forEach(function (yr) { sel.forEach(function (s) { var v = m.matrix[yr][s.key]; if (v !== undefined) cells.push(v); }); });
     var sd = columnDecimals(cells);
@@ -464,6 +464,12 @@
   function apply(wanted, done, failed) {
     var mine = ++seq;
     root.setAttribute("aria-busy", "true");
+    var offered = indSel.querySelector('option[value="' + String(wanted.indicator).replace(/["\\]/g, "") + '"]');
+    if (!offered) {
+      root.removeAttribute("aria-busy");
+      if (failed) failed(); else submitForm();
+      return;
+    }
     load(wanted.indicator).then(function (m) {
       if (mine !== seq) return;
       model = m;
@@ -516,6 +522,9 @@
     var p = ev.target.closest(".map [data-key]");
     if (!p) return;
     var k = p.getAttribute("data-key");
+    // Un territorio senza nome nel payload (n.d. in tutta la serie) non entra:
+    // prenderebbe il posto dell'ultimo e poi sparirebbe in silenzio.
+    if (!model || !model.names[k]) return;
     var regions = state.regions.slice();
     var at = regions.indexOf(k);
     if (at >= 0) {

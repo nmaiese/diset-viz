@@ -170,6 +170,7 @@ def _rule_level_pages():
 
 @synchronized_cache(maxsize=1)
 def _records_by_id():
+    """Le voci della proiezione per id, una volta per processo."""
     return {str(record["meta"]["id"]): record for record in projection()}
 
 
@@ -204,7 +205,9 @@ def province_payload(indicator_id):
             "path": sources.level_path(meta["canonical_path"], "provincia", keys[0]),
             "source": meta.get("source"), "source_label": meta.get("source_label"),
             "source_url": meta.get("source_url"),
-            "explain": {**(meta.get("explain") or {}), "direction": meta.get("direction")},
+            # Solo il verso: `scope` e `caveat` della scheda parlano delle
+            # regioni, e sul livello provinciale direbbero il falso.
+            "explain": {"direction": meta.get("direction")},
             "year_min": level["year_min"], "year_max": level["year_max"],
             "catalog_family": record["family"],
         },

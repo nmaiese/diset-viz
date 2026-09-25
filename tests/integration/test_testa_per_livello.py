@@ -32,6 +32,20 @@ from app.indicator_universe import all_indicator_refs
 from app.taxonomy import PROVINCE_TWINS
 
 
+def _without_own_compare_link(page, meta):
+    """La pagina senza il suo link "Metti a confronto le province": solo
+    l'href esatto che `confronto.compare_path` da' per questa scheda, e al
+    massimo una volta. Ogni altro `/confronto?` con un livello resta, e la
+    guardia lo trova (un indicatore fuori regola, `livello=regione`)."""
+    from app.design.pages import confronto
+    own = confronto.compare_path(meta, "provincia")
+    if not own:
+        return page
+    href = 'href="' + own.replace("&", "&amp;") + '"'
+    assert page.count(href) <= 1, f"{href} compare {page.count(href)} volte"
+    return page.replace(href, "")
+
+
 def _pages():
     """(codice, vista, livello, indicizzabile) per ogni livello di ogni scheda.
 
@@ -172,18 +186,19 @@ class LaTestaSegueIlLivello(unittest.TestCase):
         self.assertGreater(checked, 40)
 
     def test_nessuna_pagina_porta_a_un_livello_in_query(self):
-        paths = set()
+        paths = {}
         for code, view, level, _ in self.pages:
             if len(view["levels"]) > 1 or level["key"] == "provincia" or code in PROVINCE_TWINS:
-                paths.add(_path(view, level))
+                paths[_path(view, level)] = view["meta"]
         self.assertGreater(len(paths), 100)
         for path in sorted(paths):
             with self.subTest(pagina=path):
                 page = self.client.get(path).get_data(as_text=True)
                 self.assertIn('data-v1="indicatore"', page)
                 # Il confronto fra province non e' un livello della scheda: e'
-                # un'altra pagina, e il suo livello sta nella sua query.
-                page = re.sub(r'href="/confronto\?[^"]*"', "", page)
+                # un'altra pagina, e il suo livello sta nella sua query. Si
+                # toglie solo il link giusto di questa scheda.
+                page = _without_own_compare_link(page, paths[path])
                 self.assertNotIn("livello=", page)
                 self.assertNotIn("livello=",
                                  self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True))

@@ -88,6 +88,7 @@ def province_pages() -> list[dict]:
 
 
 def province_ids() -> set[str]:
+    """Gli id degli indicatori che il confronto offre sulle province."""
     return {str(page["meta"]["id"]) for page in province_pages()}
 
 
