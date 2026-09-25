@@ -1,11 +1,14 @@
 {% extends "blog_base.html" %}
 {% import "v1/_ui.html" as ui %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{#- L'atlante della 1.0, livello regione. In testa la risposta con le cifre
-    del catalogo, poi "Sulla mappa" (il modulo dato della scheda, la macro
-    `ui.explore`, su un indicatore fisso), poi "Tutti gli indicatori": una
-    tabella per tema, una riga per ogni serie del catalogo, con il link alla
-    scheda, la sparkline della media semplice e la variazione in chiaro.
+{#- L'atlante della 1.0, sulle regioni (`/atlante`) o sulle province
+    (`/atlante?livello=provincia`, `d.level`). In testa la risposta con le
+    cifre del livello e il selettore Regioni/Province, l'unico controllo del
+    livello. Poi "Sulla mappa" (il modulo dato della scheda, la macro
+    `ui.explore`, su un indicatore fisso per livello), poi "Tutti gli
+    indicatori": una tabella per tema, con il link alla scheda, la sparkline
+    della media semplice e la variazione in chiaro. Una riga regionale che ha
+    anche le province porta alla loro pagina ("anche per provincia").
     Cio' che la pagina chiede ai dati lo compone app/design/pages/atlante.py
     e arriva qui come `d`. `app.html`, la SPA, resta il ripiego.
 
@@ -16,20 +19,29 @@
 {% set active_nav = 'atlas' %}
 {% set PAGE_TYPE = 'atlas' %}
 {% set m = d.map %}
+{% set prov = d.level == 'provincia' %}
+{% set adj = 'provinciali' if prov else 'regionali' %}
 
-{% block title %}Atlante degli indicatori territoriali: {{ d.total }} serie regionali, tema per tema{% endblock %}
-{% block description %}Le {{ d.total }} serie regionali di Divario Italia in un elenco solo, tema per tema, con l'andamento della media semplice delle regioni dal {{ d.year_min }} al {{ d.year_max }} e una mappa da esplorare.{% endblock %}
+{% block title %}Atlante degli indicatori territoriali: {{ d.total }} serie {{ adj }}, tema per tema{% endblock %}
+{% block description %}Le {{ d.total }} serie {{ adj }} di Divario Italia in un elenco solo, tema per tema, con l'andamento della media semplice delle {{ d.plural }} dal {{ d.year_min }} al {{ d.year_max }} e una mappa da esplorare.{% endblock %}
+{#- Le province non sono un documento a se': il canonical resta /atlante e la
+    pagina esce dall'indice. L'header lo mette la view. -#}
+{% block robots_meta %}{% if prov %}<meta name="robots" content="noindex, follow">{% else %}{{ super() }}{% endif %}{% endblock %}
 
 {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/atlante.css') }}">{% endblock %}
 
 {% block head_extra %}
 {{ breadcrumb.jsonld(percorso, site_url) }}
-{#- La lista dichiara gli indicatori in evidenza, come l'atlante di prima:
+{#- La lista la dichiara solo la pagina canonica, le regioni: quella delle
+    province ha il canonical su /atlante e non e' nell'indice.
+    La lista dichiara gli indicatori in evidenza, come l'atlante di prima:
     stanno tutti fra le righe in pagina. Le 340 e piu' schede indicizzabili
     dell'elenco pesavano 8,6 KB compressi, e la pagina ne ha 90 in tutto. -#}
+{% if not prov %}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"CollectionPage","name":"Atlante degli indicatori territoriali","url":{{ canonical | tojson }},"inLanguage":"it-IT","isPartOf":{"@id":{{ (site_url ~ '/#site') | tojson }}},"mainEntity":{"@type":"ItemList","itemListElement":[{% for item in featured_indicators %}{"@type":"ListItem","position":{{ loop.index }},"name":{{ item.name | tojson }},"url":{{ (site_url ~ item.path) | tojson }}}{{ "," if not loop.last }}{% endfor %}]}}
 </script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -40,22 +52,23 @@
   <header class="pagehead">
     <p class="eyebrow">{{ d.institutions }}<span class="sep" aria-hidden="true">·</span>dal {{ d.year_min }} al {{ d.year_max }}</p>
     <h1 class="h-title">Atlante degli indicatori territoriali italiani</h1>
-    <div class="answer"><p>{{ d.total | num(None, 'count') }} serie regionali in un elenco solo, tema per tema, ognuna con la sua scheda. {{ d.complete | num(None, 'count') }} hanno il dato di tutte le regioni nell'ultimo anno e quasi tutti gli anni, le altre {{ d.partial | num(None, 'count') }} sono segnate come serie parziali.</p></div>
+    <div class="answer"><p>{{ d.total | num(None, 'count') }} serie {{ adj }} in un elenco solo, tema per tema, ognuna con la sua scheda. {{ d.complete | num(None, 'count') }} hanno il dato di tutte le {{ d.panel_total }} {{ d.plural }} nell'ultimo anno{% if not prov %} e quasi tutti gli anni{% endif %}, le altre {{ d.partial | num(None, 'count') }} sono segnate come serie parziali.</p></div>
+    <nav class="seg atlante-level" aria-label="Livello dei territori">{% for t in d.tabs %}<a href="{{ t.href }}"{% if t.current %} aria-current="page"{% endif %}>{{ t.label }} <span class="atlante-level__n">{{ t.n }}</span></a>{% endfor %}</nav>
     <p class="meta"><a href="#mappa">Sulla mappa</a><a href="#indicatori">Tutti gli indicatori</a><a href="/metodologia">Metodologia e fonti</a></p>
   </header>
 
   <section class="section" id="mappa" aria-labelledby="h-mappa">
     <h2 id="h-mappa">Sulla mappa</h2>
-    <p class="atlante-intro">Un indicatore sulle regioni, con la mappa accanto alla classifica: scegli l'anno e trova la tua regione. <a href="{{ m.meta.canonical_path }}">La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
+    <p class="atlante-intro">Un indicatore sulle {{ d.plural }}, con la mappa accanto alla classifica: scegli l'anno e trova la tua {{ 'provincia' if prov else 'regione' }}. <a href="{{ m.href }}">La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
     {{ ui.explore(m.module) }}
     {#- Il modulo dei bottoni "Sulla mappa" delle righe: GET su /atlante, con
         il solo codice dell'indicatore. atlante.js ci aggiunge i filtri. -#}
-    <form id="atl-map" action="/atlante#mappa" hidden></form>
+    <form id="atl-map" action="/atlante#mappa" hidden>{% if prov %}<input type="hidden" name="livello" value="provincia">{% endif %}</form>
   </section>
 
   <section class="section" id="indicatori" aria-labelledby="h-indicatori">
     <h2 id="h-indicatori">Tutti gli indicatori</h2>
-    <p class="atlante-intro">La linea è la media semplice delle regioni, anno per anno, sugli anni in cui almeno {{ d.panel_need }} regioni su {{ d.panel_total }} hanno il dato e sulle regioni presenti in tutti quegli anni. Resta quasi piatta quando la media si è mossa poco rispetto alla distanza fra le regioni. {{ d.with_spark | num(None, 'count') }} serie hanno la linea, {{ d.without_spark | num(None, 'count') }} hanno una copertura che cambia troppo da un anno all'altro per disegnarla.</p>
+    <p class="atlante-intro">La linea è la media semplice delle {{ d.plural }}, anno per anno, sugli anni in cui almeno {{ d.panel_need }} {{ d.plural }} su {{ d.panel_total }} hanno il dato e sulle {{ d.plural }} presenti in tutti quegli anni. Resta quasi piatta quando la media si è mossa poco rispetto alla distanza fra le {{ d.plural }}. {{ d.with_spark | num(None, 'count') }} serie hanno la linea, {{ d.without_spark | num(None, 'count') }} hanno una copertura che cambia troppo da un anno all'altro per disegnarla.</p>
 
     <form class="toolbar atlante-filter" id="filtri" data-atlas-controls hidden role="search" aria-label="Filtra gli indicatori">
       <label class="field atlante-filter__q" for="atl-q">Cerca un indicatore
@@ -95,11 +108,11 @@
         <h4 class="h-sub" id="{{ 't-' ~ g.slug }}"><a href="{{ g.path }}">{{ g.name }}</a> <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4>
         <div class="tablewrap stackwrap">
           <table class="table table--compact table--stack atlante-table">
-            <caption class="sr-only">{{ g.name }}: le serie regionali, con l'andamento della media semplice e l'ultimo anno</caption>
+            <caption class="sr-only">{{ g.name }}: le serie {{ adj }}, con l'andamento della media semplice e l'ultimo anno</caption>
             <thead><tr><th scope="col">Indicatore</th><th scope="col">Andamento</th><th class="r" scope="col">Ultimo anno</th></tr></thead>
             <tbody>
             {%- for r in g.rows %}
-            <tr data-id="{{ r.id }}" data-s="{{ r.family }}" data-y0="{{ r.y0 }}" data-y1="{{ r.y1 }}" data-c="{{ r.completeness }}"{% if not r.complete %} data-p{% endif %}{% if r.search %} data-q="{{ r.search }}"{% endif %}><th scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if not r.complete %} <span class="status">Serie parziale</span>{% endif %}{% if r.n %}<button form="atl-map" name="mappa" value="{{ r.code }}">Sulla mappa</button>{% endif %}</th><td class="trendcell" data-label="Andamento">{% if r.spark %}<span class="trend">{{ r.spark | safe }}<span class="trend__txt">{{ r.change.head }} <span class="trend__from">{{ r.change.tail }}</span></span></span>{% else %}<span class="status">Copertura variabile</span>{% endif %}</td><td class="val" data-label="Ultimo anno">{{ r.y1 }}{% if r.n %} <small>{{ r.n }} regioni</small>{% endif %}</td></tr>
+            <tr data-id="{{ r.id }}" data-s="{{ r.family }}" data-y0="{{ r.y0 }}" data-y1="{{ r.y1 }}" data-c="{{ r.completeness }}"{% if not r.complete %} data-p{% endif %}{% if r.search %} data-q="{{ r.search }}"{% endif %}><th scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if not r.complete %} <span class="status">Serie parziale</span>{% endif %}{% if r.n %}<button form="atl-map" name="mappa" value="{{ r.code }}">Sulla mappa</button>{% endif %}</th><td class="trendcell" data-label="Andamento">{% if r.spark %}<span class="trend">{{ r.spark | safe }}<span class="trend__txt">{{ r.change.head }} <span class="trend__from">{{ r.change.tail }}</span></span></span>{% else %}<span class="status">Copertura variabile</span>{% endif %}</td><td class="val" data-label="Ultimo anno">{{ r.y1 }}{% if r.n %} <small>{{ r.n }} {{ d.plural }}</small>{% endif %}{% if r.also %} <small><a href="{{ r.also }}">anche per provincia</a></small>{% endif %}</td></tr>
             {%- endfor %}
             </tbody>
           </table>
@@ -108,7 +121,7 @@
       {% endfor %}
     </div>
     {% endfor %}
-    <p class="atlante-empty" data-atlas-empty hidden>Nessun indicatore con questi filtri. <a href="/atlante">Tutti gli indicatori</a></p>
+    <p class="atlante-empty" data-atlas-empty hidden>Nessun indicatore con questi filtri. <a href="{{ d.path }}">Tutti gli indicatori</a></p>
   </section>
 </div>
 </main>

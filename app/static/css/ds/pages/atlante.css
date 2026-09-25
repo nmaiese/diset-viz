@@ -4,6 +4,9 @@
 
 .v1-atlante .pagehead .meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
 .atlante-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+/* Il selettore Regioni/Province: due link, l'unico controllo del livello. */
+.atlante-level { margin-top: var(--space-4); }
+.atlante-level__n { margin-left: var(--space-1); font-size: var(--fs-small); font-variant-numeric: tabular-nums; }
 
 /* ---------- la barra dei filtri ---------- */
 .atlante-filter { margin-bottom: var(--space-8); gap: var(--space-4) var(--space-6); }
@@ -58,4 +61,6 @@
   .atlante-table .trendcell { grid-column: 1; }
   .atlante-table .val { grid-column: 2; }
   .atlante-table .val small { display: inline; }
+  /* "anche per provincia" va a capo, non si legge come "20 regioni anche" */
+  .atlante-table .val small + small { display: block; }
 }
