@@ -137,23 +137,25 @@ class LeRegioniDellaSperanzaDiVitaHannoIlCanonicalSuTer910(unittest.TestCase):
 
 
 class NessunaTestaRipetutaFraLePagineDellIndice(unittest.TestCase):
-    """Le pagine che sitemap e llms-full elencano (`level_pages`) hanno ciascuna
-    il suo `<title>` e il suo H1, senza eccezioni: costruiti come la pagina,
-    con `seo_titles.page_title` e `views._page_h1`."""
+    """Le pagine che sitemap e llms-full elencano (`level_pages`), piu' le basi
+    col canonical altrove (`REGIONAL_CANONICALS`), che non hanno `noindex`,
+    hanno ciascuna il suo `<title>` e il suo H1, senza eccezioni: costruiti
+    come la pagina, con `seo_titles.page_title` e `views._page_h1`."""
 
     def test_title_e_h1_unici(self):
         with app.app_context():
+            pages = [(page["meta"]["family"], page["meta"]["raw_id"], page["level"]["key"], page["path"])
+                     for page in indicator_universe.level_pages()]
+            pages += [(*sources.parse_indicator_code(code), "regione", code) for code in REGIONAL_CANONICALS]
             titles, h1s = {}, {}
-            for page in indicator_universe.level_pages():
-                meta = page["meta"]
-                family, raw_id = meta["family"], meta["raw_id"]
+            for family, raw_id, level_key, path in pages:
                 view = indicator_view.build_indicator_view(family, raw_id)
-                level = next(lv for lv in view["levels"] if lv["key"] == page["level"]["key"])
+                level = next(lv for lv in view["levels"] if lv["key"] == level_key)
                 article = indicator_texts.build_article(view["meta"]["id"], level["key"])
                 title = seo_titles.page_title(article, view["meta"], level, site_name="Divario Italia",
                                               source_qualifier=views._source_qualifier(family, raw_id))
-                titles.setdefault(title, []).append(page["path"])
-                h1s.setdefault(views._page_h1(article, view["meta"], level), []).append(page["path"])
+                titles.setdefault(title, []).append(path)
+                h1s.setdefault(views._page_h1(article, view["meta"], level), []).append(path)
         self.assertGreater(len(titles), 350)
         self.assertEqual({t: p for t, p in titles.items() if len(p) > 1}, {})
         self.assertEqual({h: p for h, p in h1s.items() if len(p) > 1}, {})
