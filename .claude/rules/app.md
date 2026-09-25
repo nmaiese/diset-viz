@@ -64,8 +64,18 @@ paths:
     server legge sono due: `livello` e `?mappa=<codice>`, il bottone "Sulla
     mappa" di una riga, che si risolve contro le righe del livello
     (`atlante.map_choice(code, level)`, un valore che non regge fa 301
-    all'atlante di quel livello) e quelle pagine non vanno in cache, perche' 594 varianti da
+    all'atlante di quel livello) e quelle pagine non vanno in cache, perche' seicento varianti da
     600 KB riempirebbero la SimpleCache di tutto il sito;
+  - **il bottone "Sulla mappa" non ricarica la pagina** (dal 25 settembre
+    2026): `atlante.js` chiede il modulo a
+    `/api/atlante/modulo?indicatore=<codice>&livello=<regione|provincia>` e lo
+    sostituisce con `DiV1.init`, e l'URL prende `?mappa=` tenendo i filtri. Il
+    GET del form con `?mappa=` resta il ripiego, senza JavaScript o se l'API
+    non risponde. Il modulo lo compone solo `atlante.map_payload` e lo rende
+    solo `v1/_atlante_mappa.html`, per la pagina e per l'API: una prova li
+    confronta. L'endpoint risolve il codice con `map_choice` (404 su codice o
+    livello sbagliato), sta sotto `/api/` con `noindex`, fuori dall'OpenAPI,
+    in cache 300 s con la query string;
   - le righe si compongono una volta per processo (`atlante.rows`,
     `synchronized_cache`) dalla proiezione: **circa 3 s alla prima richiesta
     di ogni istanza**, e `indicator_universe.cache_clear()` le svuota;

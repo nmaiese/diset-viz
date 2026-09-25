@@ -328,8 +328,10 @@ fisso, poi "Tutti gli indicatori": una `.table` per tema con tutte le serie,
 link alla scheda, sparkline `m` della media semplice sul pannello fisso,
 variazione in chiaro con i due anni, ultimo anno e regioni, "Serie parziale"
 come etichetta di stato e "Copertura variabile" al posto della linea quando il
-pannello non regge. Il bottone "Sulla mappa" di una riga e' un GET
-(`form`, `?mappa=`). Filtri, ricerca e ordine sono un'isola
+pannello non regge. Il bottone "Sulla mappa" di una riga cambia il
+modulo senza ricaricare (`/api/atlante/modulo`, lo stesso template
+`v1/_atlante_mappa.html` della pagina), e il GET del `form` con `?mappa=` resta
+il ripiego. Filtri, ricerca e ordine sono un'isola
 (`static/js/atlante.js`) sui `data-*` delle righe: senza JavaScript l'elenco
 c'e' tutto. I gruppi portano `content-visibility: auto`. Le province
 (`?livello=provincia`) hanno la stessa pagina: il selettore `.seg`
