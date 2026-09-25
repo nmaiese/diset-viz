@@ -284,7 +284,7 @@ def _absolute(site_url, path):
     return path if str(path).startswith(("http://", "https://")) else f"{site_url}{path}"
 
 
-def home_markdown(summary, featured, posts, site_url, territories=None):
+def home_markdown(summary, featured, posts, site_url, territories=None, atlas_band=None):
     lines = [
         "# Divario Italia",
         "",
@@ -313,10 +313,32 @@ def home_markdown(summary, featured, posts, site_url, territories=None):
             f"- [{item['name']}]({_absolute(site_url, item['path'])}): "
             f"{_clean(item.get('summary'))} Ultimo anno {item['year']}."
         )
+    lines += _atlas_band_markdown(atlas_band, site_url)
     lines += ["", "## Analisi recenti", ""]
     for post in posts:
         lines.append(f"- [{post['title']}]({post['url']}): {_clean(post['description'])}")
     return "\n".join(lines)
+
+
+def _atlas_band_markdown(band, site_url):
+    """La fascia "Gli indicatori, tema per tema" della home, con le stesse
+    cifre (`home.atlas_band`): quante righe ha ogni area nell'atlante e
+    l'indicatore cambiato di piu', con la variazione scritta come nella riga.
+    Senza fascia, niente sezione."""
+    if not band:
+        return []
+    lines = ["", "## Gli indicatori, tema per tema", "",
+             f"[Esplora i {band['total']} indicatori nell'atlante]({_absolute(site_url, band['href'])})."]
+    for level in band["levels"]:
+        lines += ["", f"### {level['tab']}", ""]
+        for area in level["areas"]:
+            line = f"- [{area['area']}, {area['count']} indicatori]({_absolute(site_url, area['href'])})"
+            mover = area.get("mover")
+            if mover:
+                line += (f". Cambiato di più: [{mover['name']}]({_absolute(site_url, mover['path'])}), "
+                         f"{mover['change']['head']} {mover['change']['tail']}.")
+            lines.append(line)
+    return lines
 
 
 def atlas_markdown(featured, site_url):

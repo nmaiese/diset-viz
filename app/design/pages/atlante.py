@@ -94,7 +94,7 @@ def _change(meta: dict, panel: dict, plural: str) -> dict:
             f"dal {first['year']} al {last['year']}")
     if panel["members"] < panel["total"]:
         tail += f", media di {panel['members']} {plural} presenti in tutti gli anni"
-    return {"head": head, "tail": tail}
+    return {"head": head, "tail": tail, "delta": delta}
 
 
 def _trend(meta: dict, level: dict, plural: str) -> tuple[str, dict | None]:
