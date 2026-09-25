@@ -260,6 +260,32 @@ class NomeBreveTest(unittest.TestCase):
             level(best=("Calabria", 2.4), worst=("Valle d'Aosta", 0.02)))
         self.assertEqual(titolo, "Superficie forestale percorsa dal fuoco, dal 2,4% allo 0,02%")
 
+    def test_sulle_province_il_nome_breve_tiene_cio_che_distingue_la_misura(self):
+        """Con la coda " per provincia" che non cade, l'accorciatore buttava
+        la parte che distingue: frane e alluvioni uscivano tutte e due
+        "Popolazione esposta al rischio per provincia", e 06POL007P
+        "Amministrazioni provinciali: capacita' per provincia"."""
+        casi = {
+            ("10AMB011", "Popolazione esposta al rischio di frane"):
+                "Popolazione a rischio frane per provincia, dal 15,5% allo 0%",
+            ("10AMB012", "Popolazione esposta al rischio di alluvioni"):
+                "Popolazione a rischio alluvioni per provincia, da 100% a 0%",
+            ("06POL007P", "Amministrazioni provinciali: capacità di riscossione"):
+                "Riscossione delle Province per provincia, dal 96,4% al 44,1%",
+            ("06POL009P", "Comuni: capacità di riscossione"):
+                "Riscossione dei Comuni per provincia, dall'87,1% al 45,1%",
+        }
+        estremi = {"10AMB011": (15.5, 0.0), "10AMB012": (100.0, 0.0),
+                   "06POL007P": (96.4, 44.1), "06POL009P": (87.1, 45.1)}
+        for (codice, nome), atteso in casi.items():
+            with self.subTest(codice=codice):
+                alto, basso = estremi[codice]
+                titolo = seo_titles.answer_title(
+                    meta(name=nome, unit="%", family="bes", raw_id=codice),
+                    provincia(("A", alto), ("B", basso)))
+                self.assertEqual(titolo, atteso)
+                self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
+
 
 class EstremiNonVerificatiTest(unittest.TestCase):
     """bes-06POL012P: zeri dal 2016 e 358% a Fermo, causa non verificata."""
@@ -479,7 +505,8 @@ class DescrizioneTest(unittest.TestCase):
         self.assertIn("in Calabria", seo_titles.page_description({}, meta(), level()))
         prov = level(best=("Milano", 34343.0), worst=("Vibo Valentia", 13387.8),
                      key="provincia", singular="provincia", plural="province")
-        self.assertIn("a Milano", seo_titles.page_description({}, meta(), prov))
+        # Sulle province i territori stanno fra parentesi (`province_answer`).
+        self.assertIn("(Milano)", seo_titles.page_description({}, meta(), prov))
 
     def test_gli_acronimi_restano_maiuscoli(self):
         """Minuscolare la prima lettera per attaccarla a un articolo produceva
@@ -499,13 +526,13 @@ class DescrizioneTest(unittest.TestCase):
         zeri = [(nome, 0.0) for nome in ("Aosta", "Belluno", "Rovigo")]
         lv = provincia(("Nuoro", 3.4), ("Aosta", 0.0), observations=[("Nuoro", 3.4), ("Lecce", 1.2), *zeri])
         d = seo_titles.answer_description(meta(name="Omicidi volontari", unit="per 100.000 abitanti"), lv)
-        self.assertIn("da 3,4 a Nuoro a 0 in 3 province.", d)
+        self.assertIn("da 3,4 per 100.000 abitanti (Nuoro) a 0 (3 province).", d)
 
     def test_due_a_pari_merito_si_nominano(self):
         lv = provincia(("Lecco", 84.9), ("Napoli", 81.4),
                        observations=[("Lecco", 84.9), ("Treviso", 84.9), ("Napoli", 81.4)])
         d = seo_titles.answer_description(meta(name="Speranza di vita", unit="anni"), lv)
-        self.assertIn("a Lecco e a Treviso", d)
+        self.assertIn("(Lecco e Treviso)", d)
 
     def test_il_conteggio_e_quello_dei_territori_col_dato(self):
         """"107 province a confronto" su una serie che ne ha 106 nell'anno."""
@@ -520,6 +547,143 @@ class DescrizioneTest(unittest.TestCase):
         d = seo_titles.page_description({}, meta(), level(best=None, worst=None),
                                         composed=composto)
         self.assertIn("generata dal sito", d)
+
+
+class TitoloProvincialeTest(unittest.TestCase):
+    """Sulle province " per provincia" non cade mai (`_province_title`)."""
+
+    def test_la_coda_resta_e_cadono_le_cifre(self):
+        """Il tasso di occupazione 20-64 per provincia usciva senza "per
+        provincia": il livello era la prima cosa sacrificata alle cifre."""
+        titolo = seo_titles.answer_title(meta(name="Tasso di occupazione (20-64 anni)", unit="%"),
+                                         provincia(("Bolzano", 79.9), ("Taranto", 44.2)))
+        self.assertEqual(titolo, "Tasso di occupazione (20-64 anni) per provincia, dati 2024")
+
+    def test_prima_cade_l_unita_poi_il_nome(self):
+        titolo = seo_titles.answer_title(
+            meta(name="Speranza di vita alla nascita", unit="Numero medio di anni"),
+            provincia(("Lecco", 84.9), ("Napoli", 81.4)))
+        self.assertEqual(titolo, "Speranza di vita alla nascita per provincia, da 84,9 a 81,4")
+
+    def test_il_nome_breve_curato_prende_il_posto_del_nome(self):
+        titolo = seo_titles.answer_title(
+            meta(name="Speranza di vita alla nascita", unit="Numero medio di anni",
+                 family="bes", raw_id="01SAL001"),
+            provincia(("Lecco", 84.9), ("Napoli", 81.4)))
+        self.assertEqual(titolo, "Speranza di vita per provincia, da 84,9 a 81,4 anni")
+
+    def test_senza_estremi_niente_anno(self):
+        """L'anno prende il posto delle cifre che non ci stanno, non delle cifre
+        che non ci sono: una serie `contextual` resta col nome e il livello."""
+        titolo = seo_titles.answer_title(meta(name="Tasso di occupazione (20-64 anni)", unit="%"),
+                                         provincia(None, None))
+        self.assertEqual(titolo, "Tasso di occupazione (20-64 anni) per provincia")
+
+    def test_le_regioni_non_cambiano(self):
+        """Sulle regioni l'ordine resta quello di prima: la coda cade prima
+        delle cifre."""
+        titolo = seo_titles.answer_title(meta(name="Tasso di occupazione (20-64 anni)", unit="%"),
+                                         level(best=("Bolzano", 79.9), worst=("Taranto", 44.2)))
+        self.assertEqual(titolo, "Tasso di occupazione (20-64 anni), dal 79,9% al 44,2%")
+
+
+class PreposizioneRegioneTest(unittest.TestCase):
+    def test_in_nel_nelle(self):
+        casi = {"Puglia": "in Puglia", "Lazio": "nel Lazio", "Molise": "nel Molise",
+                "Marche": "nelle Marche", "Piemonte": "in Piemonte",
+                "Trentino Alto Adige": "in Trentino Alto Adige",
+                "Friuli-Venezia Giulia": "in Friuli-Venezia Giulia", "Umbria": "in Umbria"}
+        for regione, atteso in casi.items():
+            with self.subTest(regione=regione):
+                self.assertEqual(seo_titles.in_region(regione), atteso)
+
+
+class RispostaProvincialeTest(unittest.TestCase):
+    """`province_answer`: la description e la frase-risposta delle province."""
+
+    def setUp(self):
+        osservate = [("Lecco", 84.9), ("Treviso", 84.9), ("Pavia", 82.6), ("Napoli", 81.4), ("Caserta", 81.9)]
+        self.lv = provincia(("Lecco", 84.9), ("Napoli", 81.4), observations=osservate, year_max=2024)
+        self.lv["region_of"] = {"lecco": "Lombardia", "pavia": "Lombardia", "treviso": "Veneto",
+                                "napoli": "Campania", "caserta": "Campania"}
+        self.meta = meta(name="Speranza di vita alla nascita", unit="Numero medio di anni",
+                         family="bes", raw_id="01SAL001")
+
+    def test_la_forma(self):
+        self.assertEqual(
+            seo_titles.province_answer(self.meta, self.lv),
+            "Speranza di vita per provincia, 2024: da 84,9 anni (Lecco e Treviso) a 81,4 (Napoli). "
+            "In Lombardia 2,3 anni separano Lecco da Pavia.")
+
+    def test_i_territori_linkati_dicono_la_stessa_frase(self):
+        from app.indicator_notes import strip_markdown
+
+        linkata = seo_titles.province_answer(self.meta, self.lv, link_prefix="/provincia/")
+        self.assertIn("([Lecco](/provincia/lecco) e [Treviso](/provincia/treviso))", linkata)
+        self.assertIn("separano [Lecco](/provincia/lecco) da [Pavia](/provincia/pavia).", linkata)
+        self.assertEqual(strip_markdown(linkata), seo_titles.province_answer(self.meta, self.lv))
+
+    def test_senza_un_unita_breve_niente_distanza(self):
+        """"2,1 per 100.000 abitanti separano" non si legge: si dice il
+        conteggio. L'unita' lunga resta accanto al primo estremo."""
+        d = seo_titles.province_answer(meta(name="Omicidi volontari", unit="per 100.000 abitanti"), self.lv)
+        self.assertIn("da 84,9 per 100.000 abitanti (Lecco e Treviso)", d)
+        self.assertNotIn("separano", d)
+        self.assertTrue(d.endswith("5 province con dato, dati Istat."), d)
+
+    def test_un_tasso_standardizzato_porta_il_suo_denominatore(self):
+        """Sulle serie di mortalita' la frase usciva "da 1,9 (Vercelli)": una
+        cifra nuda che si legge come un totale. `phrase_unit` resta com'e',
+        perche' scrive anche tessere, celle e mappe delle altre pagine: il
+        denominatore lo aggiunge solo la frase delle province."""
+        for unita, atteso in (("Tassi standardizzati per 10.000 residenti", "per 10.000 residenti"),
+                              ("tasso standardizzato per 10.000", "per 10.000")):
+            with self.subTest(unita=unita):
+                self.assertIsNone(numfmt.phrase_unit(unita))
+                d = seo_titles.province_answer(meta(name="Mortalità evitabile (0-74 anni)", unit=unita), self.lv)
+                self.assertIn(f"da 84,9 {atteso} (Lecco e Treviso) a 81,4 (Napoli).", d)
+                self.assertNotIn("separano", d)
+
+    def test_un_tasso_senza_denominatore_resta_nudo(self):
+        d = seo_titles.province_answer(meta(name="Passaggio all'università", unit="tasso specifico per coorte"),
+                                       self.lv)
+        self.assertIn("da 84,9 (Lecco e Treviso)", d)
+
+    def test_la_regione_prende_la_sua_preposizione(self):
+        self.lv["region_of"] = {key: "Marche" for key in self.lv["region_of"]}
+        d = seo_titles.province_answer(meta(name="Tasso", unit="%"), self.lv)
+        self.assertIn(" Nelle Marche 3,5 punti separano Lecco da Napoli.", d)
+
+    def test_solo_sulle_province(self):
+        self.assertIsNone(seo_titles.province_answer(self.meta, level()))
+
+    def test_la_provincia_prende_la_sua_preposizione(self):
+        """"separano Cagliari da Sud Sardegna" era in pagina: le province con
+        l'articolo lo vogliono anche qui, e il link non se lo prende."""
+        from app.indicator_notes import strip_markdown
+
+        casi = {
+            ("Cagliari", "Sud Sardegna"): "separano Cagliari dal Sud Sardegna.",
+            ("Sud Sardegna", "Cagliari"): "separano il Sud Sardegna da Cagliari.",
+            ("Teramo", "L'Aquila"): "separano Teramo dall'Aquila.",
+            ("Genova", "La Spezia"): "separano Genova dalla Spezia.",
+            ("Novara", "Verbano-Cusio-Ossola"): "separano Novara dal Verbano-Cusio-Ossola.",
+        }
+        for (alta, bassa), atteso in casi.items():
+            with self.subTest(coppia=(alta, bassa)):
+                lv = provincia((alta, 60.0), (bassa, 40.0), observations=[(alta, 60.0), (bassa, 40.0)])
+                lv["region_of"] = {alta.lower().replace(" ", "-"): "Regione",
+                                   bassa.lower().replace(" ", "-"): "Regione"}
+                d = seo_titles.province_answer(meta(name="Tasso", unit="%"), lv)
+                self.assertTrue(d.endswith(atteso), d)
+                linkata = seo_titles.province_answer(meta(name="Tasso", unit="%"), lv, link_prefix="/provincia/")
+                self.assertEqual(strip_markdown(linkata), d)
+
+    def test_da_con_l_articolo(self):
+        for nome, atteso in {"Milano": "da Milano", "L'Aquila": "dall'Aquila", "La Spezia": "dalla Spezia",
+                             "Sud Sardegna": "dal Sud Sardegna", "Aosta": "da Aosta"}.items():
+            with self.subTest(nome=nome):
+                self.assertEqual(seo_titles.from_place(nome), atteso)
 
 
 class CaratteriVietatiTest(unittest.TestCase):

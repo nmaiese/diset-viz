@@ -35,7 +35,7 @@ resolve by reading it.
 import functools
 from collections import Counter
 
-from app import sources
+from app import seo_titles, sources
 from packs import context
 from scripts import indicator_store
 
@@ -400,7 +400,20 @@ def composed_lead(meta, level):
     as a stat dump repeated twice. It is also the SERP description and the
     Dataset JSON-LD description, so it has to stand alone and be unique per
     indicator: the plain definition supplies both.
+
+    Sulle province e' un'altra cosa: la frase-risposta di
+    `seo_titles.province_answer`, con gli estremi, i territori linkati, l'anno
+    e la distanza dentro una regione (design/v1/SISTEMA.md, "Frase-risposta").
+    La vista regionale ha la sua tessera per ogni cifra, e la definizione in
+    apertura; quella provinciale deve dire subito che cosa cambia fra 107
+    province, che e' cio' che la distingue dalla regionale. La stessa frase,
+    senza link, e' la description. Dove gli estremi non ci sono (`contextual`,
+    `UNVERIFIED_EXTREMES`) resta la definizione.
     """
+    if level.get("key") == "provincia":
+        answer = seo_titles.province_answer(meta, level, link_prefix=level.get("profile_path"))
+        if answer:
+            return answer
     plain = (meta.get("explain") or {}).get("plain") or ""
     count = len(level["observations"])
     noun = level["singular"] if count == 1 else level["plural"]
@@ -410,8 +423,12 @@ def composed_lead(meta, level):
         if level["year_min"] != level["year_max"]
         else f"nel {level['year_max']}"
     )
-    views = "con mappa, classifica e serie storica" if level["has_map"] else "con classifica e serie storica"
+    # La scheda della 1.0 disegna la mappa anche delle province
+    # (`design/pages/indicatore.py`), mentre `has_map` resta falso sul livello
+    # perche' lo leggono il ripiego e il vecchio esploratore, che non l'hanno.
+    has_map = level["has_map"] or level.get("key") == "provincia"
+    views = "con mappa, classifica e serie storica" if has_map else "con classifica e serie storica"
     if level["year_min"] == level["year_max"]:
-        views = "con mappa e classifica" if level["has_map"] else "con la classifica completa"
+        views = "con mappa e classifica" if has_map else "con la classifica completa"
     second = f"Dati {institution} per {count} {noun}, {span}, {views}."
     return f"{plain} {second}".strip() if plain else second

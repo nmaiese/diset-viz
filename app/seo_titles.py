@@ -417,6 +417,8 @@ def answer_title(meta, level, max_len=TITLE_MAX):
     Dove c'e' un nome breve curato (`indicator_notes.SHORT_NAMES`) la misura e'
     quello, senza marcatore, e non si accorcia oltre: o ci sta intero, o si
     rinuncia al pezzo successivo.
+
+    Sulle pagine provinciali l'ordine e' un altro, e lo scrive `_province_title`.
     """
     curated = indicator_notes.short_name(_code(meta), level.get("key"))
     if curated:
@@ -426,6 +428,8 @@ def answer_title(meta, level, max_len=TITLE_MAX):
         marker = indicator_notes._variant_marker(meta.get("name") or "")
     if not measure:
         return None
+    if level.get("key") == "provincia":
+        return _province_title(meta, level, measure, marker, bool(curated), max_len)
     tail = _level_tail(level)
     with_unit, without_unit = _figures(meta, level)
 
@@ -434,7 +438,6 @@ def answer_title(meta, level, max_len=TITLE_MAX):
         (with_unit, ""), (without_unit, ""),
         (None, tail), (None, ""),
     )
-    strict = level.get("key") == "provincia"
     for guarded in (True, False):
         for figures, tail_part in tentativi:
             room = max_len - len(tail_part) - _cost(figures)
@@ -443,12 +446,69 @@ def answer_title(meta, level, max_len=TITLE_MAX):
             if curated:
                 text = measure if len(measure) <= room else ""
             else:
-                text = _fit(measure, marker, room, guarded=guarded, strict=strict)
+                text = _fit(measure, marker, room, guarded=guarded, strict=False)
             if not text:
                 continue
             candidate = _with_figures(f"{text}{tail_part}", figures, max_len)
             if candidate:
                 return candidate
+    return None
+
+
+def _province_title(meta, level, measure, marker, curated, max_len):
+    """Il titolo derivato di una pagina provinciale: " per provincia" non cade mai.
+
+    Sulle regioni la coda del livello e' la prima cosa che si sacrifica, e va
+    bene: "per regione" e' il livello che chi cerca si aspetta. Sulle province
+    no. Delle 43 pagine provinciali con il livello indicizzabile 24 uscivano
+    senza "per provincia" (24 settembre 2026), e in SERP non si capiva che la
+    pagina ha le 107 province, cioe' l'unica cosa che la distingue dalla scheda
+    regionale. Con questa regola sono 42 su 43: l'ultima ha un titolo scritto.
+
+    Quindi la coda resta, e se il titolo sfora si rinuncia nell'ordine a:
+
+    1. l'unita';
+    2. il nome intero, per il nome breve curato (`indicator_notes.SHORT_NAMES`),
+       che se c'e' prende il suo posto da subito e non si accorcia oltre;
+    3. un accorciamento con guardia (`_fit` con `strict`): almeno due parole, e
+       niente cifre, sigle, negazioni o soglie buttate;
+    4. le cifre, che diventano ", dati {anno}";
+    5. l'anno.
+
+    L'anno sostituisce le cifre solo dove le cifre c'erano e non ci stavano:
+    una serie senza estremi (`contextual`, `UNVERIFIED_EXTREMES`) resta col nome
+    e il livello, come prima.
+    """
+    tail = _level_tail(level)
+    with_unit, without_unit = _figures(meta, level)
+    figures = [option for option in dict.fromkeys((with_unit, without_unit)) if option]
+    year = level.get("year_max")
+    dated = f", dati {year}" if figures and year else None
+    whole = f"{measure}{marker}"
+
+    def shortened(option):
+        room = max_len - len(tail) - _cost(option)
+        if room - len(marker) < MIN_MEASURE:
+            return ""
+        return _fit(measure, marker, room, guarded=True, strict=True)
+
+    # 1 e 2: il nome (o il nome breve) con le cifre, prima con l'unita' e poi
+    # senza. 3: accorciato, sempre con le cifre. 4 e 5: l'anno, poi niente.
+    attempts = [(whole, option) for option in figures]
+    if not curated:
+        attempts += [(shortened, option) for option in figures]
+    for option in ((dated, None) if dated else (None,)):
+        attempts.append((whole, option))
+        if not curated:
+            attempts.append((shortened, option))
+
+    for name, option in attempts:
+        text = name(option) if callable(name) else name
+        if not text:
+            continue
+        candidate = _with_figures(f"{text}{tail}", option, max_len)
+        if candidate:
+            return candidate
     return None
 
 
@@ -521,6 +581,20 @@ def of_region(name):
     return f"della {name}"
 
 
+# Le regioni che nello stato in luogo prendono l'articolo: "nel Lazio", "nelle
+# Marche". Tutte le altre vogliono "in" nudo, anche i maschili ("in Piemonte",
+# "in Veneto", "in Trentino Alto Adige"), dove l'articolo suona di burocrazia.
+_ARTICLED_IN = {"Lazio": "nel", "Molise": "nel", "Marche": "nelle"}
+
+
+def in_region(name):
+    """"in Puglia", "nel Lazio", "nelle Marche": lo stato in luogo davanti a
+    una regione, accanto a `of_region`. Minuscolo: chi apre una frase con
+    questa preposizione alza lui la prima lettera."""
+    name = (name or "").strip()
+    return f"{_ARTICLED_IN.get(name, 'in')} {name}"
+
+
 # Le province che non sono una citta' e prendono l'articolo: "il Sud Sardegna",
 # "nel Verbano-Cusio-Ossola". Tutte e due maschili.
 ARTICLED_PROVINCES = frozenset({"Sud Sardegna", "Verbano-Cusio-Ossola"})
@@ -536,6 +610,27 @@ def at_place(name):
     if name in ARTICLED_PROVINCES:
         return f"nel {name}"
     return to_place(name)
+
+
+def _from_parts(name):
+    """("da ", "Milano"), ("dall'", "Aquila"), ("dalla ", "Spezia"), ("dal ",
+    "Sud Sardegna"): la preposizione e il resto del nome, separati perche' chi
+    scrive un link ci mette dentro solo il nome."""
+    name = (name or "").strip()
+    if name in ARTICLED_PROVINCES:
+        return "dal ", name
+    if name.startswith("L'"):
+        return "dall'", name[2:]
+    if name.startswith("La "):
+        return "dalla ", name[3:]
+    return "da ", name
+
+
+def from_place(name):
+    """"da Milano", "dall'Aquila", "dalla Spezia", "dal Sud Sardegna": il
+    complemento di separazione ("separano Lecco da Pavia"). Scritto a mano
+    usciva "da Sud Sardegna", come prima "a Aosta" e "a L'Aquila"."""
+    return "".join(_from_parts(name))
 
 
 def to_place(name):
@@ -569,6 +664,193 @@ def _places(extreme, level):
     return " e ".join(_preposition(name, level) for name in names)
 
 
+def _coverage_closing(meta, level):
+    """" 107 province a confronto, dati Istat." o " 106 province con dato, dati
+    Istat.": quanti territori hanno il dato nell'anno, e di chi e' il dato."""
+    total = level.get("territory_total")
+    plural = level.get("plural") or "territori"
+    observed = sum(1 for row in level.get("observations") or () if row.get("value") is not None)
+    institution = (meta.get("institution") or "").strip()
+    if observed and total and observed < total:
+        closing = f" {observed} {plural} con dato"
+    elif total:
+        closing = f" {total} {plural} a confronto"
+    else:
+        closing = f" Tutte le {plural} a confronto"
+    return closing + (f", dati {institution}." if institution else ".")
+
+
+# Un tasso col suo denominatore: "Tassi standardizzati per 10.000 residenti",
+# "tasso standardizzato per 10.000". Il denominatore comincia con una cifra,
+# cosi' "Tasso specifico per coorte" non ne ha uno.
+_RATE_DENOMINATOR = re.compile(r"(?i)^tass[oi]\b.*?\s(per\s+\d[\d.]*(?:\s+\S.*)?)$")
+
+
+def _rate_unit(raw):
+    """Il denominatore di un tasso ("per 10.000 residenti"), o None.
+
+    `numfmt.phrase_unit` rinuncia alle etichette lunghe, e sulle serie di
+    mortalita' la frase-risposta usciva con la cifra nuda ("da 1,9 (Vercelli)"),
+    che si legge come un totale. Qui si tiene solo la coda "per N ...": il resto
+    ("standardizzati") lo dice la pagina. Resta locale alla frase delle
+    province, perche' `phrase_unit` scrive anche tessere, celle e mappe di
+    tutte le altre pagine.
+    """
+    match = _RATE_DENOMINATOR.match((raw or "").strip())
+    return match.group(1) if match else None
+
+
+def province_answer(meta, level, link_prefix=None, max_len=DESCRIPTION_MAX):
+    """La frase-risposta di una pagina provinciale senza pezzo, o None.
+
+    "Speranza di vita per provincia, 2024: da 84,9 anni (Lecco e Treviso) a
+    81,4 (Napoli). In Lombardia 2,3 anni separano Lecco da Pavia."
+
+    E' la description e, con i territori linkati (`link_prefix`, il prefisso dei
+    profili, "/provincia/"), la frase che apre la pagina: le due dicono la
+    stessa cosa, e la `description` del Dataset e' la seconda senza Markdown.
+
+    Tre scelte, tutte contro difetti che si leggevano:
+
+    - i territori stanno fra parentesi. Con la preposizione ("da 84,9 anni a
+      Lecco e a Treviso a 81,4 a Napoli") la frase era una catena di "a" in cui
+      non si capiva quale "a" fosse una cifra e quale un luogo;
+    - la seconda frase e' la distanza piu' ampia dentro una stessa regione, che
+      e' cio' che la vista regionale non puo' dire. Solo dove la misura ha
+      un'unita' che regge "2,3 anni separano" o e' una percentuale ("punti"),
+      e solo se sta nel budget. Altrimenti si dice quante province hanno il
+      dato. "da" e non "e" fra i due nomi: "separano Fermo e Pesaro e Urbino"
+      non si legge;
+    - l'unita' accanto al primo estremo e' quella delle frasi (`phrase_unit`),
+      che porta anche il denominatore ("3,4 per 100.000 abitanti", "46,0 per
+      100 km²"): il nome breve non lo dice, e senza l'unita' la cifra si
+      leggerebbe come un totale. Dove `phrase_unit` non scrive niente perche'
+      l'etichetta e' lunga ("Tassi standardizzati per 10.000 residenti"), il
+      denominatore lo estrae `_rate_unit`. Se non sta nel budget, la cifra
+      resta nuda.
+
+    Gli estremi sono quelli di `extremes`, gli stessi del titolo: sulle serie
+    `contextual` e su `UNVERIFIED_EXTREMES` non ce ne sono, e la frase non c'e'.
+    La regione di ogni provincia la mette il modello della scheda in
+    `level["region_of"]`; senza, la seconda frase dice il conteggio.
+    """
+    if level.get("key") != "provincia":
+        return None
+    high, low = extremes(meta, level)
+    if high is None:
+        return None
+    top, bottom = format_number(high["value"]), format_number(low["value"])
+    if top is None or bottom is None or top == bottom:
+        return None
+    # Il nome breve curato, o il nome col suo marcatore: "(25-39 anni)" e'
+    # parte della misura, e la description regionale lo perde.
+    name = meta.get("name") or ""
+    measure = (indicator_notes.short_name(_code(meta), "provincia")
+               or (indicator_notes._short_name_for_title(name) + indicator_notes._variant_marker(name))).strip()
+    if not measure:
+        return None
+
+    rows = [row for row in level.get("observations") or () if row.get("value") is not None]
+    plural = level.get("plural") or "territori"
+    percent = _is_percentage(meta)
+    raw_unit = meta.get("value_unit") or meta.get("unit")
+    unit = None if percent else (numfmt.phrase_unit(raw_unit) or _rate_unit(raw_unit))
+    year = level.get("year_max")
+
+    def show(row, linked, text=None):
+        text = text or row["name"]
+        if linked and link_prefix and row.get("key"):
+            return f"[{text}]({link_prefix}{row['key']})"
+        return text
+
+    def subject(row, linked):
+        """"il Sud Sardegna" come soggetto, l'articolo fuori dal link."""
+        article = "il " if row["name"] in ARTICLED_PROVINCES else ""
+        return article + show(row, linked)
+
+    def separated(row, linked):
+        """"da Pavia", "dall'Aquila", "dal Sud Sardegna": la preposizione
+        fuori dal link, cosi' il testo senza Markdown e' la stessa frase."""
+        preposition, rest = _from_parts(row["name"])
+        return preposition + show(row, linked, rest)
+
+    def where(extreme, linked):
+        tied = [row for row in rows if row["value"] == extreme["value"]]
+        if not any(row["name"] == extreme["name"] for row in tied):
+            tied = [extreme]
+        if len(tied) > 2:
+            return f"({len(tied)} {plural})"
+        return "(" + " e ".join(show(row, linked) for row in tied) + ")"
+
+    def opening(linked, with_unit):
+        first = f"{top}%" if percent else (f"{top} {unit}" if with_unit and unit else top)
+        second = f"{bottom}%" if percent else bottom
+        return (f"{measure}{_level_tail(level)}{f', {year}' if year else ''}: "
+                f"da {first} {where(high, linked)} a {second} {where(low, linked)}.")
+
+    within = _widest_within_region(meta, level, rows, percent)
+
+    def inside(linked):
+        if not within:
+            return ""
+        gap, region, upper, lower = within
+        where_region = in_region(region)
+        return (f" {where_region[:1].upper()}{where_region[1:]} {gap} separano "
+                f"{subject(upper, linked)} {separated(lower, linked)}.")
+
+    closing = _coverage_closing(meta, level)
+    linked = bool(link_prefix)
+    # Le scelte si fanno sul testo semplice, che e' quello che conta nel budget:
+    # i link del Markdown non si leggono in SERP.
+    for with_unit in (True, False):
+        plain = opening(False, with_unit)
+        if len(plain) > max_len:
+            continue
+        if within and len(plain) + len(inside(False)) <= max_len:
+            return opening(linked, with_unit) + inside(linked)
+        if len(plain) + len(closing) <= max_len:
+            return opening(linked, with_unit) + closing
+        return opening(linked, with_unit)
+    return None
+
+
+def _widest_within_region(meta, level, rows, percent):
+    """(distanza scritta, regione, provincia piu' alta, piu' bassa) della
+    regione dove le sue province si allontanano di piu', o None.
+
+    Solo con un'unita' che si scrive dopo una cifra sola ("anni", "euro") o
+    con le percentuali, in punti: "2,1 per 100.000 abitanti separano" non si
+    legge. A parita' di distanza vince la regione prima in ordine alfabetico,
+    cosi' la frase non cambia da un avvio all'altro.
+    """
+    unit = "punti" if percent else _short_unit(meta)
+    region_of = level.get("region_of") or {}
+    if not unit or not region_of:
+        return None
+    by_region = {}
+    for row in rows:
+        region = region_of.get(row.get("key"))
+        if region:
+            by_region.setdefault(region, []).append(row)
+    best = None
+    for region in sorted(by_region):
+        members = by_region[region]
+        if len(members) < 2:
+            continue
+        upper = min(members, key=lambda row: (-row["value"], row["name"]))
+        lower = min(members, key=lambda row: (row["value"], row["name"]))
+        gap = upper["value"] - lower["value"]
+        if gap > 0 and (best is None or gap > best[0]):
+            best = (gap, region, upper, lower)
+    if best is None:
+        return None
+    gap, region, upper, lower = best
+    text = format_number(gap)
+    if text is None or text == "0":
+        return None
+    return f"{text} {unit}", region, upper, lower
+
+
 def answer_description(meta, level, max_len=DESCRIPTION_MAX):
     """La descrizione derivata, per le pagine che non hanno un lead scritto.
 
@@ -584,7 +866,13 @@ def answer_description(meta, level, max_len=DESCRIPTION_MAX):
     Aosta", che era solo la prima in ordine alfabetico delle sedici. E il
     conteggio e' quello dei territori col dato nell'anno, "106 province con
     dato", quando non sono tutti.
+
+    Sulle province la forma e' quella di `province_answer`.
     """
+    if level.get("key") == "provincia":
+        answer = province_answer(meta, level, max_len=max_len)
+        if answer:
+            return answer
     high, low = extremes(meta, level)
     if high is None:
         return None
@@ -609,18 +897,7 @@ def answer_description(meta, level, max_len=DESCRIPTION_MAX):
                f"da {value_high} {_places(high, level)} "
                f"a {value_low} {_places(low, level)}.")
 
-    total = level.get("territory_total")
-    plural = level.get("plural") or "territori"
-    observed = sum(1 for row in level.get("observations") or () if row.get("value") is not None)
-    institution = (meta.get("institution") or "").strip()
-    if observed and total and observed < total:
-        closing = f" {observed} {plural} con dato"
-    elif total:
-        closing = f" {total} {plural} a confronto"
-    else:
-        closing = f" Tutte le {plural} a confronto"
-    closing += f", dati {institution}." if institution else "."
-
+    closing = _coverage_closing(meta, level)
     if len(opening) + len(closing) <= max_len:
         return opening + closing
     if len(opening) <= max_len:

@@ -54,11 +54,20 @@ class LeGemelle(unittest.TestCase):
         self.assertIsNotNone(seg)
         self.assertIn('href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia">Province</a>',
                       seg.group(1))
-        self.assertIn(">La stessa misura per province</a>", html)
+        # La voce su cui si e' non e' un link.
+        self.assertIn('<span aria-current="page">Regioni</span>', seg.group(1))
+        # Il link alla gemella dice di che cosa parla, col numero dal dato:
+        # "La stessa misura per province" era la stessa ancora su ogni gemella.
+        self.assertIn('href="/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia">'
+                      "Speranza di vita nelle 107 province</a>", html)
+        self.assertNotIn(">La stessa misura per province</a>", html)
         html = self.client.get("/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012P").get_data(as_text=True)
         seg = re.search(r'<div class="seg" role="group" aria-label="Livello territoriale">(.*?)</div>', html, re.S)
         self.assertIn('href="/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012">Regioni</a>', seg.group(1))
+        self.assertIn('<span aria-current="page">Province</span>', seg.group(1))
         self.assertLess(seg.group(1).index("Regioni"), seg.group(1).index("Province"))
+        self.assertIn('href="/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012">'
+                      "Affollamento delle carceri nelle 20 regioni</a>", html)
 
     def test_il_markdown_dice_la_gemella(self):
         markdown = self.client.get("/indicatore/speranza-di-vita-alla-nascita/ter-910",

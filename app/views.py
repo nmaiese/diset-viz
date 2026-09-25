@@ -1109,11 +1109,12 @@ def _render_indicator(family, raw_id):
 
     explore_state = seo_policy.has_explore_params(request.args)
     noindex = (not meta["indexable"]) or explore_state
+    page_h1 = _page_h1(article, meta, level)
 
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
             agent_discovery.indicator_markdown(meta, level, article, SITE_URL, levels=view["levels"],
-                                               twin=view.get("twin")),
+                                               twin=view.get("twin"), heading=page_h1),
             f"{SITE_URL}{meta['canonical_path']}",
         )
         if noindex:
@@ -1122,13 +1123,13 @@ def _render_indicator(family, raw_id):
 
     source_qualifier = _source_qualifier(family, raw_id)
 
-    # Titolo H1 e SERP. L'H1 resta quello autorato o il nome amministrativo; il
-    # `<title>` passa da `seo_titles.page_title`, che prova nell'ordine il
-    # `seo_title` scritto, l'`h1` se ci sta intero, e il titolo-risposta con
-    # l'intervallo dentro. Il perché sta nel docstring di quel modulo: la CTR
-    # è 3,14% su posizioni che ne varrebbero il 4,6%, e il titolo che dice solo
-    # il nome della serie non dà un motivo per cliccare.
-    page_h1 = article["h1"] or meta["name"]
+    # Titolo SERP. Il `<title>` passa da `seo_titles.page_title`, che prova
+    # nell'ordine il `seo_title` scritto, l'`h1` scritto se ci sta intero, e il
+    # titolo-risposta con l'intervallo dentro. Il perché sta nel docstring di
+    # quel modulo: la CTR è 3,14% su posizioni che ne varrebbero il 4,6%, e il
+    # titolo che dice solo il nome della serie non dà un motivo per cliccare.
+    # L'H1 composto (`_page_h1`) non entra qui: `page_title` legge solo
+    # `article["h1"]`, cioè quello scritto.
     seo_title_value = seo_titles.page_title(
         article, meta, level, site_name=SITE_NAME,
         source_qualifier=source_qualifier,
@@ -1153,9 +1154,16 @@ def _render_indicator(family, raw_id):
         explore=view["explore"],
         page_article=article,
         page_lead=lead,
+        # I due template leggono le stesse cose della testa da qui, cosi' la
+        # 1.0 e il ripiego non possono dire due briciole o due Dataset diversi.
+        percorso=_indicator_trail(meta, level, view["levels"]),
+        other_views=_other_views(meta, level, view["levels"], view.get("twin")),
+        show_plain_definition=_show_plain_definition(article, meta, level, lead),
         noindex=noindex,
         seo_title=seo_title_value,
         seo_description=seo_description,
+        dataset_name=_dataset_name(meta, level),
+        dataset_area=f"{level['plural']} italiane",
         dataset_description=_dataset_description(lead, meta),
         dataset_updated=publisher.dataset_updated(meta["family"]),
         # Gli stessi estremi che `seo_titles` mette nel titolo, cosi' il
@@ -1171,6 +1179,97 @@ def _render_indicator(family, raw_id):
     if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
+
+
+def _page_h1(article, meta, level):
+    """L'H1 della scheda: quello scritto, o il nome, o il nome col livello.
+
+    Sulle province, senza un H1 scritto, "{nome} nelle province italiane". La
+    vista province di una scheda a due livelli aveva lo stesso H1 della vista
+    regioni, e le schede solo provinciali lo stesso della loro gemella
+    regionale ("Omicidi volontari" due volte): due pagine con lo stesso titolo
+    di pagina e un contenuto diverso. Niente numero: l'occhiello dice gia'
+    "107 province", e il numero cambierebbe con la copertura. La forma risponde
+    a chi cerca "province italiane". Sulle regioni non cambia niente.
+
+    Si compone qui e **mai** dentro `article["h1"]`: `seo_titles.page_title`
+    usa `article["h1"]` come `<title>` quando ci sta intero, e l'H1 composto
+    prenderebbe il posto del titolo con le cifre.
+    """
+    if article.get("h1"):
+        return article["h1"]
+    if level["key"] == "provincia":
+        return f"{meta['name']} nelle {level['plural']} italiane"
+    return meta["name"]
+
+
+def _level_path(meta, levels, key):
+    """Il link a un livello della scheda: il canonico nudo per il primo, che e'
+    quello che la base rende, e `?livello=` per l'altro. `?livello=regione`
+    era una seconda URL, `noindex`, della stessa pagina che il canonico gia'
+    serve: nessun link ci deve portare."""
+    if levels and key == levels[0]["key"]:
+        return meta["canonical_path"]
+    return f"{meta['canonical_path']}?livello={key}"
+
+
+def _indicator_trail(meta, level, levels):
+    """La briciola della scheda, la stessa per gli occhi e per `BreadcrumbList`.
+
+    Sulla vista province di una scheda a due livelli finisce in "Province":
+    la misura porta alla vista regioni, che e' la base, e la pagina e' la
+    sua vista sulle province. Una scheda con un livello solo finisce sulla
+    misura, che e' la pagina.
+    """
+    trail = [
+        {"name": "Home", "path": "/"},
+        {"name": "Temi", "path": "/temi"},
+        {"name": meta["theme"], "path": meta["theme_path"]},
+        {"name": meta["name"], "path": meta["canonical_path"]},
+    ]
+    if len(levels) > 1 and level["key"] != levels[0]["key"]:
+        trail.append({"name": level["label"], "path": _level_path(meta, levels, level["key"])})
+    return trail
+
+
+def _other_views(meta, level, levels, twin):
+    """"Lo stesso dato, altre viste": gli altri livelli della scheda e la gemella.
+
+    Ogni link porta a un canonico o a `?livello=provincia`, mai a
+    `?livello=regione`, e dice di che cosa parla ("Speranza di vita nelle 107
+    province"): "Gli stessi dati per province" e "La stessa misura per
+    province" erano la stessa ancora su cento schede.
+    """
+    code = sources.indicator_code(meta["family"], meta["raw_id"])
+    views = [
+        {"path": _level_path(meta, levels, other["key"]),
+         "label": indicator_view.level_anchor(code, other["key"], meta["name"],
+                                              len(other["observations"]), other["plural"])}
+        for other in levels if other["key"] != level["key"]
+    ]
+    if twin:
+        views.append({"path": twin["path"], "label": twin["anchor"]})
+    return views
+
+
+def _show_plain_definition(article, meta, level, lead):
+    """La definizione in piano va in "Come leggere il dato"?
+
+    Si', a meno che la pagina non la dica gia' altrove: nel lead composto, che
+    la contiene, o in una sezione "definizione" dell'articolo (`come_leggere`
+    falso). Prima la condizione era "il lead e' scritto", e la frase-risposta
+    delle province, che non e' scritta e la definizione non la contiene, la
+    faceva sparire dalla pagina quando l'articolo non aveva quella sezione.
+    """
+    plain = ((level.get("explain") or meta.get("explain") or {}).get("plain") or "").strip()
+    return bool(plain) and article["come_leggere"] and plain not in (lead or "")
+
+
+def _dataset_name(meta, level):
+    """Il `name` del Dataset: sulle province dice che la serie e' quella."""
+    if level["key"] == "provincia":
+        return f"{meta['name']} per {level['singular']}"
+    return meta["name"]
 
 
 def _source_qualifier(family, raw_id):

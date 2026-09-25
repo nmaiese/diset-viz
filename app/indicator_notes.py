@@ -576,6 +576,57 @@ SHORT_NAMES = {
     ("ter-84", "regione"): "Rifiuti urbani in discarica per abitante",
     ("bes-01SAL008", "regione"): "Speranza di vita a 65 anni senza limitazioni",
     ("ter-255", "regione"): "Superficie forestale percorsa dal fuoco",
+    # "Persone con almeno (25-64 anni)": l'accorciatore teneva la testa fino a
+    # "almeno" e buttava "il diploma". "Diplomati" comprende chi ha un titolo
+    # superiore, come la misura, che conta chi ha almeno il diploma.
+    ("bes-02IST002-N22", "regione"): "Diplomati (25-64 anni)",
+    # Le pagine provinciali, dove " per provincia" non cade mai
+    # (`seo_titles._province_title`): senza un nome breve la coda si mangiava
+    # le cifre. Una riga per scheda, ciascuna rivista contro nome e unita' del
+    # manifest (`province_manifest.csv`, qui accanto in commento): il nome
+    # breve tiene la popolazione (l'eta', "delle famiglie"), la soglia
+    # ("basse", "under 40", "mancata") e, dove la misura e' un rapporto, lo
+    # dice ("Densita'", "pro capite", "Mortalita'").
+    ("bes-01SAL001", "provincia"): "Speranza di vita",                        # alla nascita; anni
+    ("bes-01SAL005", "provincia"): "Mortalità stradale 15-34 anni",           # tassi per 10.000 residenti
+    ("bes-02IST001", "provincia"): "Bambini di 4-5 anni a scuola",            # partecipazione al sistema scolastico; %
+    ("bes-02IST002-N22", "provincia"): "Diplomati (25-64 anni)",              # almeno il diploma; %
+    ("bes-02IST003P-N22", "provincia"): "Laureati (25-39 anni)",              # e altri titoli terziari; %
+    ("bes-02IST006-N22", "provincia"): "Giovani NEET",                        # la sigla porta le due negazioni; %
+    ("bes-02IST007-N22", "provincia"): "Formazione continua",                 # partecipazione; %
+    ("bes-03LAV001-N22", "provincia"): "Occupazione 20-64 anni",              # tasso, come ter-345; %
+    ("bes-03LAV002-N22", "provincia"): "Mancata partecipazione al lavoro",    # tasso; %
+    ("bes-03LAV003P-N22", "provincia"): "Occupazione 15-29 anni",             # tasso giovanile; %
+    ("bes-03LAV004P", "provincia"): "Giornate retribuite dei dipendenti",     # nell'anno; %
+    ("bes-03LAV006P-N22", "provincia"): "Mancata partecipazione al lavoro (15-29 anni)",  # tasso giovanile; %
+    ("bes-04BEC001P", "provincia"): "Reddito pro capite",                     # medio disponibile; euro
+    ("bes-04BEC005P", "provincia"): "Reddito medio da pensione",              # importo annuo pro capite; euro
+    ("bes-04BEC006P", "provincia"): "Pensionati con pensioni basse",          # reddito pensionistico di basso importo; %
+    ("bes-04BEC009P", "provincia"): "Nuove sofferenze bancarie delle famiglie",  # tasso di ingresso; %
+    ("bes-06POL002P", "provincia"): "Amministratrici comunali",               # amministratori comunali donne; %
+    ("bes-06POL003P", "provincia"): "Amministratori under 40",                # con meno di 40 anni; %
+    # "Province" e "Comuni" con la maiuscola: sono gli enti, e accanto alla coda
+    # " per provincia" non si confondono col territorio. L'accorciatore buttava
+    # "di riscossione" e usciva "Amministrazioni provinciali: capacita'".
+    ("bes-06POL007P", "provincia"): "Riscossione delle Province",             # amministrazioni provinciali, capacita' di riscossione; %
+    ("bes-06POL009P", "provincia"): "Riscossione dei Comuni",                 # comuni, capacita' di riscossione; %
+    ("bes-07SIC007P", "provincia"): "Altri delitti mortali",                  # denunciati; per 100.000 abitanti
+    ("bes-07SIC008P", "provincia"): "Mortalità stradale extraurbana",         # in ambito extraurbano; %
+    ("bes-09PAE008", "provincia"): "Densità di agriturismi",                  # diffusione; per 100 km²
+    ("bes-10AMB001P", "provincia"): "Concentrazione media di PM10",           # annua; microgrammi per m³
+    # Senza il nome breve l'accorciatore toglieva il rischio ("di frane", "di
+    # alluvioni") e le due schede avevano quasi lo stesso titolo.
+    ("bes-10AMB011", "provincia"): "Popolazione a rischio frane",             # esposta al rischio di frane; %
+    ("bes-10AMB012", "provincia"): "Popolazione a rischio alluvioni",         # esposta al rischio di alluvioni; %
+    ("bes-10AMB016", "provincia"): "Elettricità da rinnovabili",              # energia elettrica da fonti rinnovabili; %
+    ("bes-10AMB017", "provincia"): "Raccolta differenziata",                  # dei rifiuti urbani; %
+    ("bes-10AMB018P", "provincia"): "Suolo impermeabilizzato",                # da copertura artificiale; %
+    ("bes-10AMB024P", "provincia"): "Rifiuti urbani pro capite",              # prodotti; kg per abitante
+    ("bes-12SER002", "provincia"): "Bambini nei servizi comunali per l'infanzia",  # che ne hanno usufruito; %
+    ("bes-12SER007", "provincia"): "Interruzioni di corrente",                # irregolarita' del servizio elettrico; numero medio per utente
+    ("bes-12SER020", "provincia"): "Rete fissa ultraveloce",                  # copertura della rete di accesso; %
+    ("bes-12SER024", "provincia"): "Servizio di raccolta differenziata",      # dei rifiuti urbani; %
+    ("bes-12SER025", "provincia"): "Ricoveri fuori regione",                  # emigrazione ospedaliera; %
 }
 
 

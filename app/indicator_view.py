@@ -57,6 +57,7 @@ from app.indicator_notes import (
     is_percentage_unit,
     ds_choropleth_colors,
     DS_SEQ_RAMP,
+    short_name,
     trend_framing,
     value_unit_label,
 )
@@ -176,14 +177,32 @@ def twin_level(meta, levels):
     family, raw_id = parsed
     if family == "bes":
         path = bes_level_path(raw_id, level_key)
+        page = get_bes_indicator_page(raw_id)
+        payload = next((lv for lv in (page or {}).get("level_payloads") or () if lv["level"] == level_key), {})
+        name, count = (page or {}).get("name"), payload.get("count_latest")
     else:
         item = next((i for i in get_atlas_catalog()["indicators"]
                      if str(i["id"]) == sources.internal_id(family, raw_id)), None)
         if item is None:
             return None
-        path = item["path"]
+        path, name, count = item["path"], item.get("name"), item.get("region_count")
     conf = LEVELS[level_key]
-    return {"key": level_key, "label": conf["label"], "plural": conf["plural"], "path": path, "code": code}
+    return {"key": level_key, "label": conf["label"], "plural": conf["plural"], "path": path, "code": code,
+            "anchor": level_anchor(code, level_key, name, count, conf["plural"])}
+
+
+def level_anchor(code, level_key, name, count, plural):
+    """Il testo di un link a un livello: "Speranza di vita nelle 107 province".
+
+    Prima i link dicevano "Province" e "La stessa misura per province": a chi
+    legge e a un motore non dicevano di che cosa, e cento schede portavano la
+    stessa ancora. Il nome e' quello breve curato del livello
+    (`indicator_notes.SHORT_NAMES`), se c'e', e il numero e' quello dei
+    territori col dato nell'ultimo anno, dal dato e mai scritto a mano.
+    """
+    measure = short_name(code, level_key) or (name or "").strip()
+    where = f"nelle {count} {plural}" if count else f"nelle {plural} italiane"
+    return f"{measure} {where}" if measure else where.capitalize()
 
 
 def _build_meta(family, raw_id, source_meta):
@@ -367,9 +386,13 @@ def _provincial_level(raw_id, meta):
     rows = _bes_series_by_indicator("provincia").get(raw_id)
     if not rows:
         return None
-    return _build_level(
-        "provincia", rows, meta, territory_total=len(get_bes_territories("provincia")), coverage=None
-    )
+    territories = get_bes_territories("provincia")
+    level = _build_level("provincia", rows, meta, territory_total=len(territories), coverage=None)
+    if level is not None:
+        # La regione di ogni provincia: la frase-risposta dice dove le province
+        # di una stessa regione si allontanano di piu' (`seo_titles.province_answer`).
+        level["region_of"] = {key: info.get("region") for key, info in territories.items()}
+    return level
 
 
 # The exact phrases app/indicator_notes.py emits for the territorial level, and
