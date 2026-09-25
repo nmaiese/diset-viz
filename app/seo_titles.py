@@ -39,7 +39,7 @@ from __future__ import annotations
 
 import re
 
-from app import indicator_notes, sources
+from app import indicator_notes, it_numbers, sources
 from app.design import numfmt
 
 # Il budget SERP, lo stesso che usa il percorso derivato di `indicator_notes`.
@@ -77,16 +77,20 @@ def _decimals(value):
     e "84,8 anni" senza decimale sarebbe una cifra diversa. La regola e' la
     grandezza, perche' e' quella che decide se il decimale porta informazione.
     Lo zero si scrive "0": "0,00" dava allo zero una precisione che non ha, e in
-    SERP si leggeva "dal 358% al 0,00%". Le due copie di questa regola,
+    SERP si leggeva "dal 358% al 0,00%". Sotto un centesimo i decimali
+    crescono fino alla prima cifra significativa, perche' una cifra che zero
+    non e' non si scriva zero. Le due copie di questa regola,
     `numfmt.magnitude_decimals` e `decimals` in `static/js/v1.js`, le tiene
     allineate `tests/unit/test_decimals_parity.py`.
     """
     magnitude = abs(float(value))
     if magnitude == 0 or magnitude >= 100:
         return 0
-    if magnitude >= 10:
+    if magnitude >= 1:
         return 1
-    return 2 if magnitude < 1 else 1
+    if magnitude >= 0.01:
+        return 2
+    return 3 if magnitude >= 0.001 else 4
 
 
 def format_number(value):
@@ -95,12 +99,14 @@ def format_number(value):
         return None
     try:
         number = float(value)
-        text = f"{number:,.{_decimals(number)}f}"
     except (TypeError, ValueError):
         return None
+    # Arrotonda `it_numbers.number`, mezzo per eccesso come la pagina e come
+    # v1.js: il title non scrive "26.348" dove la pagina scrive "26.349".
+    text = it_numbers.number(number, _decimals(number))
     if text.startswith("-") and not text.strip("-0.,"):
         text = text[1:]  # -0.0 e' zero, e lo zero non ha segno
-    return text.replace(",", "\x00").replace(".", ",").replace("\x00", ".")
+    return text
 
 
 def _short_unit(meta):
@@ -132,10 +138,13 @@ def _is_percentage(meta):
 
 # Le serie i cui estremi non vanno in SERP finche' qualcuno non li ha
 # verificati alla fonte. `bes-06POL012P`, l'affollamento delle carceri per
-# provincia, ha Macerata e Savona a zero dal 2016 dopo anni sopra il 60%, e
-# Fermo al 358% nel 2024: il titolo diceva "dal 358% al 0,00%". Le serie possono
-# essere vere, la causa non e' verificata, e un titolo non e' il posto per
-# scoprirlo. La pagina resta com'e', con la sua classifica.
+# provincia, diceva "dal 358% al 0,00%". Gli zeri di Macerata e Savona dal 2016
+# non erano una misura e oggi sono n.d. (`bes_data.NOT_MEASURED`), quindi il
+# minimo e' un valore vero. Resta Fermo, al 358% nel 2024 dal 116% dell'anno
+# prima: puo' essere vero, la causa non e' verificata, e un titolo non e' il
+# posto per scoprirlo. Finche' Fermo non e' verificato fuori restano tutti e
+# due gli estremi, perche' un intervallo con un capo solo non e' un
+# intervallo. La pagina resta com'e', con la sua classifica.
 UNVERIFIED_EXTREMES = frozenset({"bes-06POL012P"})
 
 

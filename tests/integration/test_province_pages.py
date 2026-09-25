@@ -19,6 +19,7 @@ import re
 import unittest
 
 from app import app, bes_data, it_numbers, province_profile
+from app.design import numfmt
 
 
 def _visibile(html):
@@ -121,16 +122,33 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
     def test_il_valore_e_l_unita_arrivano_in_pagina(self):
         html = self.client.get("/provincia/lecce").get_data(as_text=True)
         testo = _visibile(html)
-        formatta = app.jinja_env.filters["it_num"]
+        # La cifra come la scrive la pagina: `numfmt`, coi decimali della sua
+        # grandezza, non piu' quelli della fonte (la scheda scriveva "34.885"
+        # e la provincia "34.885,3").
+        formatta = numfmt.text
         voci = province_profile.indicatori("lecce")
         self.assertGreater(len(voci), 50)
         for voce in voci[:12]:
             with self.subTest(indicatore=voce["name"]):
                 self.assertIn(voce["name"], testo)
-                self.assertIn(formatta(voce["value"], voce["decimals"]), testo)
+                self.assertIn(formatta(voce["value"]), testo)
         unita = {v["unit"] for v in voci if v["unit"]}
         for misura in list(unita)[:5]:
             self.assertIn(misura, testo)
+
+    def test_nessuna_cifra_piccola_si_scrive_zero(self):
+        """Con i decimali della grandezza una cifra sotto l'uno ne prende due:
+        0,004 si scriverebbe "0,00" e una variazione di 0,003 "invariato",
+        due cose false. Sulle 107 province oggi non succede (con i decimali
+        della fonte non succedeva per costruzione), e questa prova lo tiene."""
+        a_zero = []
+        for chiave in province_profile.chiavi():
+            for voce in province_profile.indicatori(chiave):
+                if voce["value"] and not re.search(r"[1-9]", numfmt.text(voce["value"])):
+                    a_zero.append((chiave, voce["id"], voce["value"]))
+                if voce["variazione"] and numfmt.change_text(voce["variazione"]) == numfmt.UNCHANGED:
+                    a_zero.append((chiave, voce["id"], voce["variazione"]))
+        self.assertEqual(a_zero, [])
 
     def test_ogni_indicatore_porta_al_suo_indicatore(self):
         """Il link parte dal canonico della scheda, non da un path ricostruito:
@@ -194,12 +212,15 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
         self.assertIn("Città metropolitana", testo)
 
         voci = province_profile.indicatori("napoli")
-        formatta = app.jinja_env.filters["it_num"]
+        # La cifra come la scrive la pagina: `numfmt`, coi decimali della sua
+        # grandezza, non piu' quelli della fonte (la scheda scriveva "34.885"
+        # e la provincia "34.885,3").
+        formatta = numfmt.text
         con_media = [v for v in voci if v["in_regione"]]
         self.assertTrue(con_media, "nessun confronto dentro la regione da rendere")
         for voce in con_media[:5]:
             with self.subTest(indicatore=voce["name"]):
-                self.assertIn(formatta(voce["in_regione"]["media"], voce["decimals"]), testo)
+                self.assertIn(formatta(voce["in_regione"]["media"]), testo)
 
         con_variazione = [v for v in voci if v["variazione"] is not None]
         self.assertTrue(con_variazione, "nessuna variazione da rendere")
@@ -221,14 +242,14 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
                 self.assertIn(punteggio, markdown)
                 self.assertIn(f"{profilo['rank']}ª su {profilo['total']}", markdown)
             for voce in province_profile.indicatori(chiave):
-                valore = it_numbers.number(voce["value"], voce["decimals"])
+                valore = numfmt.text(voce["value"])
                 with self.subTest(provincia=chiave, indicatore=voce["id"]):
                     self.assertIn(voce["name"], markdown)
                     self.assertIn(voce["theme"], markdown)
                     self.assertIn(valore, html)
                     self.assertIn(valore, markdown)
                     if voce["variazione"] is not None:
-                        variazione = it_numbers.change(voce["variazione"], voce["decimals"])
+                        variazione = numfmt.change_text(voce["variazione"])
                         self.assertIn(f"dal {voce['year_from']} {variazione}", html)
                         self.assertIn(f"dal {voce['year_from']} {variazione}", markdown)
 

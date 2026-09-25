@@ -523,6 +523,7 @@ def get_atlas_theme_profile(theme_slug):
             "region_count": item["region_count"],
             "complete": item["complete"],
             "plain": (item.get("explain") or {}).get("plain"),
+            "catalog_family": item["catalog_family"],
             "catalog_family_label": item["catalog_family_label"],
             "quality_life_scored": item["quality_life_scored"],
             "quality_life_category_label": item["quality_life_category_label"],
@@ -543,6 +544,10 @@ def get_atlas_theme_profile(theme_slug):
         "indicator_count": len(indicators),
         "complete_count": sum(item["complete"] for item in indicators),
         "quality_life_count": sum(item["quality_life_scored"] for item in indicators),
+        # Chi pubblica le serie del tema, dalle famiglie che il tema elenca: il
+        # JSON-LD diceva "Indicatori Istat" anche sul tema con due serie Eurostat.
+        "institutions_label": sources.institutions_label(
+            [item["catalog_family"] for item in indicators]),
         "indicators": indicators,
     }
 

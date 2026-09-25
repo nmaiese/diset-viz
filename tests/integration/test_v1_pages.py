@@ -32,7 +32,7 @@ from pathlib import Path
 from app import app, bes_data, indicator_view, profiles, province_profile, sources
 from app.atlas_catalog import get_atlas_indicator
 from app.blog import get_posts
-from app.data import REGION_GEO_AREA, get_rows
+from app.data import REGION_GEO_AREA, REGION_ORDER, get_rows
 from app.design import charts
 from app.design.common import PLACEHOLDER
 from app.quality_life_config import QUALITY_LIFE_PROFILES
@@ -496,6 +496,120 @@ class RegionSeriesCacheDoesNotGrowWithPages(unittest.TestCase):
         self.assertEqual(info.hits, len(keys) - 1)
 
 
+class LaCifraDelTerritorioELaStessaDellaScheda(unittest.TestCase):
+    """Una regola dei decimali sola, `numfmt.magnitude_decimals`, anche sulle
+    pagine territorio.
+
+    La pagina provincia scriveva i valori coi decimali della fonte: il reddito
+    di Milano usciva "34.885,3" e la retribuzione "26.348,5", mentre la scheda
+    dell'indicatore, a un clic, scriveva "34.885". Qui ogni cifra della
+    pagina territorio (valore, variazione, media delle altre, "dal ... era")
+    deve avere i decimali della sua grandezza, e per tre indicatori a testa
+    (euro, percentuale, cifra sotto l'uno) la cifra deve essere quella che la
+    scheda scrive nella sua tabella e sulla sua mappa.
+
+    La tabella della scheda prende i decimali dalla mediana della colonna
+    (`numfmt.column_decimals`): li' dove la grandezza di una riga sta dall'altra
+    parte di 1 o di 100 rispetto alla mediana, la tabella della scheda e la
+    pagina territorio scrivono la stessa cifra in due modi (Milano, 136 e
+    "136,0" sulla brevettazione). I tre indicatori qui non sono di quelli: la
+    prova e' che la regola sia la stessa, non che la colonna non esista.
+
+    Gli euro sopra cento si scrivono interi, quelli sotto cento tengono un
+    decimale come ogni cifra di quella grandezza ("-50,8 euro", "42,2 euro
+    costanti"): e' la regola, non un'eccezione."""
+
+    DATA = re.compile(r'<data class="n n--(figure|cell|delta)" value="([^"]+)">([^<]*)'
+                      r'(?:<span class="n__u[^"]*">([^<]*)</span>)?</data>')
+    # (pagina, chiave del territorio), (euro, percentuale, cifra sotto l'uno)
+    CASI = (
+        (("/provincia/milano", "milano"), ("bes-04BEC001P", "bes-10AMB018P", "bes-04BEC009P")),
+        (("/regione/lombardia", "lombardia"), ("ter-902", "ter-643", "ter-242")),
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+        cls.pages = {path: cls.client.get(path).get_data(as_text=True) for (path, _), _codes in cls.CASI}
+
+    def test_ogni_cifra_ha_i_decimali_della_sua_grandezza(self):
+        from app.design import numfmt
+
+        for path, page in self.pages.items():
+            # Le differenze delle dimensioni dalla media 50 sono punteggi, con
+            # un decimale fisso: non sono cifre della fonte.
+            page = re.sub(r'<td class="val provincia-dims__diff">.*?</td>', "", page, flags=re.DOTALL)
+            found = self.DATA.findall(page)
+            self.assertGreater(len(found), 100, path)
+            for role, value, text, unit in found:
+                if text == numfmt.UNCHANGED or (role == "delta" and "posizion" in unit):
+                    continue
+                shown = len(text.split(",", 1)[1]) if "," in text else 0
+                with self.subTest(pagina=path, valore=value, scritto=text):
+                    self.assertEqual(shown, numfmt.magnitude_decimals(float(value)))
+
+    def test_gli_euro_sopra_cento_sono_interi(self):
+        """Le celle della tabella non portano l'unita' dentro il `<data>`: una
+        prova che la cercasse li' non vedrebbe nessun euro. L'unita' viene dai
+        dati della pagina, e la cifra dal `value` del `<data>`."""
+        for (path, key), _codes in self.CASI:
+            rows = (province_profile.indicatori(key) if path.startswith("/provincia/")
+                    else profiles.region_profile(key)["all_indicators"])
+            in_euro = {f"{float(r['value']):.6g}" for r in rows
+                       if r.get("value") is not None and abs(r["value"]) >= 100
+                       and re.search(r"(?i)\beuro\b", r.get("unit") or "")}
+            self.assertTrue(in_euro, path)
+            seen = 0
+            for _role, value, text, _unit in self.DATA.findall(self.pages[path]):
+                if value in in_euro:
+                    seen += 1
+                    with self.subTest(pagina=path, valore=value, scritto=text):
+                        self.assertNotIn(",", text)
+            self.assertGreaterEqual(seen, len(in_euro), path)
+
+    def test_nessuna_regione_scrive_zero_una_cifra_che_zero_non_e(self):
+        """La stessa prova delle province (`test_province_pages`), sulle venti
+        regioni e su ogni cifra resa: valore, "dal ... era", riquadri. La pesca
+        in Lombardia vale 0,0045% e la pagina scriveva "0,00"."""
+        a_zero = []
+        for region in REGION_ORDER:
+            key = profiles.region_key_for(region)
+            page = self.client.get(f"/regione/{key}").get_data(as_text=True)
+            for value, text in re.findall(r'<data class="n n--[a-z]+" value="([^"]+)">([^<]*)', page):
+                if float(value) != 0 and not re.search(r"[1-9]", text):
+                    a_zero.append((key, value, text))
+        self.assertEqual(a_zero, [])
+
+    def test_tre_indicatori_scritti_come_sulla_scheda(self):
+        for (path, key), codes in self.CASI:
+            page = self.pages[path]
+            for code in codes:
+                href = re.search(rf'<th scope="row" role="rowheader"><a href="([^"]*/{code}(?:\?[^"]*)?)">', page)
+                self.assertIsNotNone(href, (path, code))
+                href = html_lib.unescape(href.group(1))
+                cell = re.search(r'data-label="Valore"[^>]*><data class="n n--cell" value="[^"]+">([^<]*)</data>',
+                                 table_row(page, href)).group(1)
+                scheda = self.client.get(href, follow_redirects=True).get_data(as_text=True)
+                in_table = re.search(rf'<tr data-key="{key}">.*?<td class="val"><data class="n n--cell" '
+                                     r'value="[^"]+">([^<]*)</data>', scheda).group(1)
+                on_map = html_lib.unescape(re.search(
+                    rf'data-key="{key}" data-name="[^"]*" data-value="([^"]*)"', scheda).group(1))
+                # Il gemello Markdown della scheda: la stessa riga, la stessa
+                # cifra. Scriveva due decimali fissi, "34.885,30 euro".
+                markdown = self.client.get(href, follow_redirects=True,
+                                           headers={"Accept": "text/markdown"}).get_data(as_text=True)
+                in_markdown = re.search(rf"\| \d+ \| \[[^\]]+\]\([^)]*/{key}\) \| ([^|]+?) \|", markdown)
+                with self.subTest(pagina=path, indicatore=code):
+                    self.assertEqual(cell, in_table)
+                    self.assertEqual(re.match(r"-?[\d.,]*\d", on_map).group(0), cell)
+                    self.assertIsNotNone(in_markdown, (href, key))
+                    self.assertEqual(re.match(r"-?[\d.,]*\d", in_markdown.group(1)).group(0), cell)
+            euro = re.search(r'data-label="Valore"[^>]*><data class="n n--cell" value="[^"]+">([^<]*)',
+                             table_row(page, html_lib.unescape(re.search(
+                                 rf'<a href="([^"]*/{codes[0]}[^"]*)">', page).group(1)))).group(1)
+            self.assertNotIn(",", euro, f"{path}: una cifra in euro con i decimali")
+
+
 class IlRipiegoTiene(unittest.TestCase):
     """Se la regia della 1.0 cede, la pagina si serve col template di prima.
 
@@ -504,7 +618,8 @@ class IlRipiegoTiene(unittest.TestCase):
     prima. Qui la si toglie, si fa cedere `derive`, e ogni rotta deve
     rispondere 200 dal template di prima, sotto la testata e il piede nuovi."""
 
-    ROTTE = ("/", "/indicatore/pil-pro-capite/ter-901", "/regione/puglia", "/provincia/lecce",
+    ROTTE = ("/", "/indicatore/pil-pro-capite/ter-901", "/regione/puglia", "/regione/lombardia",
+             "/provincia/lecce",
              "/blog/infortuni-lavoro-province", "/qualita-della-vita",
              "/qualita-della-vita/classifica/regioni", "/qualita-della-vita/classifica/province")
 
@@ -533,6 +648,30 @@ class IlRipiegoTiene(unittest.TestCase):
                         self.assertNotIn('data-v1="', html)
                         self.assertIn('<header class="hdr">', html)
                         self.assertIn("css/site.css", html)
+                        if percorso.startswith("/regione/"):
+                            # Anche il ripiego della regione: scriveva il
+                            # valore con `it_num`, un decimale fisso, e la
+                            # Lombardia aveva "28.154,3 euro" e "0,0".
+                            from app.design import numfmt
+
+                            with app.app_context():
+                                voci = profiles.region_profile(percorso.rsplit("/", 1)[1])["all_indicators"]
+                            self.assertGreater(len(voci), 100)
+                            for voce in voci:
+                                self.assertIn(f'<td class="num">{numfmt.text(voce["value"])} <small>', html)
+                        if percorso.startswith("/provincia/"):
+                            # Il ripiego scrive le cifre con la regola della
+                            # pagina: con i decimali della riga, tolti, avrebbe
+                            # stampato il valore col punto decimale di Python.
+                            from app.design import numfmt
+
+                            with app.app_context():
+                                voci = province_profile.indicatori(percorso.rsplit("/", 1)[1])
+                            for voce in voci[:12]:
+                                self.assertIn(f'<td class="num">{numfmt.text(voce["value"])} <small>', html)
+                                if voce["variazione"] is not None:
+                                    self.assertIn(f"dal {voce['year_from']} {numfmt.change_text(voce['variazione'])}"
+                                                  "</small>", html)
                         if percorso.startswith("/indicatore/"):
                             # Il filtro `sparkline` e' un involucro di
                             # `charts.spark`: il ripiego lo usa ancora.

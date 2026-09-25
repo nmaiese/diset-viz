@@ -15,15 +15,17 @@
   if (window.DiV1) return;
 
   /* ---------- numeri all'italiana, stessa regola di seo_titles._decimals ----------
-     Lo zero si scrive "0". tests/unit/test_decimals_parity.py legge il corpo di
+     Lo zero si scrive "0", e sotto un centesimo i decimali arrivano alla prima
+     cifra significativa. tests/unit/test_decimals_parity.py legge il corpo di
      questa funzione e lo confronta con le due copie Python: una riga di forma
      diversa fa fallire la prova, apposta. */
   function decimals(v) {
     var m = Math.abs(v);
     if (m === 0) return 0;
     if (m >= 100) return 0;
-    if (m >= 10) return 1;
-    return m < 1 ? 2 : 1;
+    if (m >= 1) return 1;
+    if (m >= 0.01) return 2;
+    return m >= 0.001 ? 3 : 4;
   }
   // Come numfmt.text: il trattino davanti ai negativi, lo zero arrotondato senza segno.
   function fmt(v, d) {

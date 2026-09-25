@@ -4,7 +4,7 @@
 {% set active_nav = 'temi' %}
 
 {% block title %}I {{ theme_total }} temi dell'atlante, {{ total }} indicatori per regione{% endblock %}
-{% block description %}Esplora {{ total }} indicatori Istat per macro-area e tema: lavoro, istruzione, ambiente, salute, trasporti, qualità della vita e divari regionali.{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -12,7 +12,7 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "I temi degli indicatori territoriali",
-  "description": {{ ('Indicatori Istat delle regioni italiane raggruppati per macro-area e tema.') | tojson }},
+  "description": {{ ('Indicatori di ' ~ institutions ~ ' per le regioni italiane, raggruppati per macro-area e tema.') | tojson }},
   "url": {{ canonical | tojson }}
 }
 </script>
@@ -47,13 +47,16 @@
   <section class="themes-hero">
     <p class="eyebrow">Temi</p>
     <h1>I temi</h1>
-    <p class="region-hero__sum">{{ total }} indicatori del catalogo unico Istat per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.</p>
+    {#- Il totale e' quello del catalogo dell'atlante, che e' regionale: i
+        valori delle province non ci stanno, e le schede che li hanno le conta
+        la sezione "Per provincia" dei temi (`indicator_view.province_indicators_by_theme`). #}
+    <p class="region-hero__sum">{{ total }} indicatori per regione, di {{ institutions }}, per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.{% if province_count %} Nella sezione Per provincia dei temi ci {{ 'è' if province_count == 1 else 'sono' }} anche {{ 'la' if province_count == 1 else 'le' }} {{ province_count }} {{ province_count | it_plural('scheda', 'schede') }} con i valori delle province{% if province_only %}, {{ province_only }} solo per provincia{% endif %}.{% endif %}</p>
   </section>
 
   <div class="facts">
     <div class="fact"><small>Aree</small><strong>{{ areas | length }}</strong></div>
     <div class="fact"><small>Temi</small><strong>{{ theme_total }}</strong></div>
-    <div class="fact"><small>Indicatori</small><strong>{{ total }}</strong></div>
+    <div class="fact"><small>Indicatori per regione</small><strong>{{ total }}</strong></div>
     <div class="fact"><small>Copertura</small><strong>{{ year_min }}<span class="fact__range">-{{ year_max }}</span></strong></div>
   </div>
 

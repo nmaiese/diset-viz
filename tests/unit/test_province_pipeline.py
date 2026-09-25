@@ -310,6 +310,56 @@ class ProposeDirectionTest(unittest.TestCase):
             with self.subTest(indicatore=indicatore):
                 self.assertEqual(provincia[indicatore], regione[indicatore])
 
+    def test_le_schede_gemelle_hanno_lo_stesso_verso(self):
+        """La prova qui sopra confronta lo stesso id, e l'affollamento delle
+        carceri ne ha due: 06POL012 sulle regioni, `contextual`, e 06POL012P
+        sulle province, `lower_better`. Stessa misura, due letture, e la prova
+        non se ne accorgeva. Qui si confrontano le coppie di
+        `taxonomy.PROVINCE_TWINS` fra due schede BES.
+
+        Quattro coppie hanno ancora due versi: restano elencate, e la prova si
+        rompe quando una si allinea, cosi' l'elenco non invecchia. 06POL012
+        aspetta la prosa riscritta della redazione (`bes__06POL012.md` legge la
+        classifica dal valore piu' alto), le altre tre una decisione."""
+        import csv
+        from pathlib import Path
+
+        from app.taxonomy import PROVINCE_TWINS
+        data_dir = Path(__file__).resolve().parents[2] / "app" / "static" / "data"
+        def directions(name):
+            with (data_dir / name).open(encoding="utf-8", newline="") as handle:
+                return {r["id"]: r["proposed_direction"] for r in csv.DictReader(handle, delimiter=";")}
+        by_id = {**directions("bes_regione_manifest.csv"), **directions("province_manifest.csv")}
+        pending = {"06POL012", "07SIC001", "10AMB018", "10AMB024"}
+        pairs = [(r.removeprefix("bes-"), p.removeprefix("bes-"))
+                 for r, p in PROVINCE_TWINS.items()
+                 if r.startswith("bes-") and p.startswith("bes-")]
+        self.assertIn(("06POL012", "06POL012P"), pairs)
+        for regional, provincial in pairs:
+            with self.subTest(regionale=regional, provinciale=provincial):
+                if regional in pending:
+                    self.assertNotEqual(by_id[regional], by_id[provincial])
+                else:
+                    self.assertEqual(by_id[regional], by_id[provincial])
+
+    def test_il_manifest_regionale_e_quello_che_la_pipeline_riscriverebbe(self):
+        """I versi del manifest regionale si allineano a mano (D1), e
+        `update_bes_regions.py` li riscrive
+        da `bes_national_sources.direction_for`. Se i due divergono, la
+        prossima rigenerazione rimette il verso di prima senza dirlo."""
+        import csv
+        from pathlib import Path
+
+        from scripts import bes_national_sources
+        manifest = Path(__file__).resolve().parents[2] / "app" / "static" / "data" / "bes_regione_manifest.csv"
+        with manifest.open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle, delimiter=";"))
+        self.assertTrue(rows)
+        for row in rows:
+            with self.subTest(indicatore=row["id"]):
+                self.assertEqual(bes_national_sources.direction_for(row["id"], row["name"]),
+                                 row["proposed_direction"])
+
     def test_discover_provinces_usa_la_stessa_definizione(self):
         from scripts import discover_provinces
         self.assertIs(discover_provinces.NUTS3_PATTERN, province_sources.NUTS3_PATTERN)

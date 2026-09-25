@@ -165,11 +165,11 @@
             data-rank="{{ i.rank if i.rank is not none else '' }}">
           <td><a href="{{ i.path }}">{{ i.name }}</a></td>
           <td class="explorer-theme">{{ i.theme }}</td>
-          <td class="num">{{ i.value | it_num(i.decimals) }} <small>{{ i.unit }} · {{ i.year }}</small>
-            {% if i.variazione is not none %}<small>dal {{ i.year_from }} {{ i.variazione | it_change(i.decimals) }}</small>{% endif %}</td>
+          <td class="num">{{ i.value | numtext }} <small>{{ i.unit }} · {{ i.year }}</small>
+            {% if i.variazione is not none %}<small>dal {{ i.year_from }} {{ i.variazione | numchange }}</small>{% endif %}</td>
           <td class="num">
             <strong>{{ i.rank }}</strong><small>/{{ i.province_count }}</small>
-            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}, media delle altre {{ i.in_regione.quante - 1 }}: {{ i.in_regione.media | it_num(i.decimals) }}</small>{% endif %}
+            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}, media delle altre {{ i.in_regione.quante - 1 }}: {{ i.in_regione.media | numtext }}</small>{% endif %}
           </td>
           <td class="num">
             {% if i.movement %}<span class="movement-tag {{ 'is-up' if i.movement > 0 else 'is-down' }}">{{ '+' if i.movement > 0 else '' }}{{ i.movement }}</span>
@@ -197,7 +197,7 @@
       {% if prime_in_regione %}
       <ul class="theme-chips">
         {% for i in prime_in_regione %}
-        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num(i.decimals) }} {{ i.unit }}, {{ i.year }}</small></li>
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | numtext }} {{ i.unit }}, {{ i.year }}</small></li>
         {% endfor %}
       </ul>
       {% else %}
@@ -209,7 +209,7 @@
       {% if ultime_in_regione %}
       <ul class="theme-chips">
         {% for i in ultime_in_regione %}
-        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num(i.decimals) }} {{ i.unit }}, {{ i.year }}</small></li>
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | numtext }} {{ i.unit }}, {{ i.year }}</small></li>
         {% endfor %}
       </ul>
       {% else %}

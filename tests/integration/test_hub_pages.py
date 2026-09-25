@@ -569,6 +569,123 @@ class LaPaginaTemaRisponde(unittest.TestCase):
             self.assertNotIn(vietato, testo, f"tipografia vietata: {vietato!r}")
 
 
+def _section(html, opening):
+    """Il pezzo di pagina da `opening` al primo `</section>` che segue."""
+    start = html.find(opening)
+    return "" if start < 0 else html[start:html.index("</section>", start)]
+
+
+class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
+    """`/temi` diceva "393 indicatori" nel title, nella description e nel testo,
+    e sotto quattro aree che ne sommavano 594: il totale veniva dalla sola
+    famiglia territoriale, le aree dal catalogo dell'atlante, che a un clic ne
+    elencava 594. Qui ogni numero che una pagina dei temi dichiara si confronta
+    con quello che la pagina elenca, e con il catalogo dell'API.
+
+    Le aree non si danno per buone: un indicatore con un tema che la tassonomia
+    non conosce resta nel catalogo e cade da ogni area senza che niente
+    fallisca, e allora titolo e somma delle aree devono divergere qui."""
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+        cls.html = cls.client.get("/temi").get_data(as_text=True)
+        cls.catalog = cls.client.get("/api/catalog").get_json()
+
+    def test_titolo_testo_aree_e_catalogo_dicono_lo_stesso_numero(self):
+        titolo = unescape(re.search(r"<title>(.*?)</title>", self.html, re.DOTALL).group(1)).strip()
+        nel_titolo = int(re.search(r"(\d+) indicatori per regione", titolo).group(1))
+        aree = [int(n) for n in re.findall(r'theme-group__count">(\d+) indicator', self.html)]
+        self.assertEqual(len(aree), len(self.catalog["macro_areas"]))
+        self.assertEqual(nel_titolo, sum(aree))
+        self.assertEqual(nel_titolo, len(self.catalog["indicators"]))
+        testo = visible_text(self.html)
+        self.assertIn(f"{nel_titolo} indicatori per regione", testo)
+        self.assertIn(f"<small>Indicatori per regione</small><strong>{nel_titolo}</strong>", self.html)
+        descrizione = meta_content(self.html, "description")
+        self.assertIn(f"{nel_titolo} indicatori per regione", descrizione)
+        self.assertLessEqual(len(titolo), 60, titolo)
+        self.assertLessEqual(len(descrizione), 155, descrizione)
+        self.assertGreaterEqual(len(descrizione), 80, descrizione)
+
+    def test_ogni_area_e_la_somma_dei_suoi_temi(self):
+        for blocco in re.findall(r'<section class="theme-group".*?</section>', self.html, re.DOTALL):
+            area = int(re.search(r'theme-group__count">(\d+) indicator', blocco).group(1))
+            temi = [int(n) for n in re.findall(r"<small>(\d+) indicator[ei]</small>", blocco)]
+            with self.subTest(area=re.search(r"<h2>(.*?)</h2>", blocco).group(1)):
+                self.assertTrue(temi)
+                self.assertEqual(area, sum(temi))
+
+    def test_le_istituzioni_sono_quelle_del_catalogo(self):
+        """Il catalogo ha anche Eurostat: "catalogo unico Istat" non era vero."""
+        from app.atlas_catalog import catalog_summary
+
+        istituzioni = catalog_summary()["institutions_label"]
+        self.assertIn(f"di {istituzioni}", visible_text(self.html))
+        self.assertIn(istituzioni, meta_content(self.html, "description"))
+        self.assertNotIn("catalogo unico Istat", self.html)
+
+    def test_ogni_tema_dichiara_quello_che_elenca(self):
+        """Il numero del title, della scheda in `/temi`, dei dati disponibili,
+        del link all'atlante e del gemello Markdown e' quello delle serie che la
+        pagina elenca, e la sezione "Per provincia" elenca le schede che dice.
+        La somma delle sezioni per provincia e' quella che `/temi` dichiara.
+        Il JSON-LD dice chi pubblica le serie del tema: "Indicatori Istat" stava
+        anche sul tema con due serie Eurostat."""
+        from app import atlas_catalog, sources
+
+        famiglie = {}
+        for item in atlas_catalog.get_atlas_catalog()["indicators"]:
+            famiglie.setdefault(item["theme"], set()).add(item["catalog_family"])
+        self.assertIn("eurostat", famiglie["Ricerca, innovazione e digitale"])
+        sulle_card = {t_path: int(n) for t_path, n in re.findall(
+            r'<a class="theme-index-card" href="([^"]+)".*?<small>(\d+) indicator', self.html, re.DOTALL)}
+        per_provincia = solo_provincia = 0
+        for voce in atlas_catalog.all_atlas_themes_index():
+            html = self.client.get(voce["path"]).get_data(as_text=True)
+            markdown = self.client.get(voce["path"], headers={"Accept": "text/markdown"}).get_data(as_text=True)
+            elencati = (_section(html, '<section class="theme-featured">').count('<a class="ind-card"')
+                        + _section(html, '<section class="theme-all" id="tutti">').count("<li>"))
+            provinciali = _section(html, '<section class="theme-all" id="province">').count("<li>")
+            per_provincia += provinciali
+            solo_provincia += _section(html, '<section class="theme-all" id="province">').count(
+                "solo per provincia")
+            titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.DOTALL).group(1))
+            collezione = next(nodo for nodo in (json.loads(blocco) for blocco in re.findall(
+                r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL))
+                if nodo.get("@type") == "CollectionPage")
+            with self.subTest(tema=voce["theme"]):
+                istituzioni = sources.institutions_label(famiglie[voce["theme"]])
+                self.assertTrue(collezione["description"].startswith(f"Indicatori {istituzioni} del tema "),
+                                collezione["description"])
+                descrizione = meta_content(html, "description")
+                if "in testa" not in descrizione:
+                    # I temi senza classifica dicono le istituzioni anche in SERP.
+                    self.assertIn(f"indicatori {istituzioni} per le regioni italiane", descrizione)
+                self.assertEqual(elencati, voce["indicator_count"])
+                self.assertEqual(sulle_card[voce["path"]], elencati)
+                self.assertIn(f"<small>Indicatori</small><strong>{elencati}</strong>", html)
+                self.assertIn(f"Gli stessi {elencati} indicatori nell'atlante", html)
+                self.assertIn(f"<p>{elencati} indicatori su ", html)
+                dichiarato = re.search(r": (\d+) indicatori", titolo)
+                if dichiarato:
+                    self.assertEqual(int(dichiarato.group(1)), elencati)
+                self.assertIn(f"Indicatori per regione: {elencati}\n", markdown)
+                sezione = markdown.split("## Indicatori del tema", 1)[1].split("\n## ", 1)[0]
+                self.assertEqual(sezione.count("\n- ["), elencati)
+                if provinciali:
+                    self.assertIn(f"Schede per provincia: {provinciali}\n", markdown)
+                    self.assertIn(f"{provinciali} schede di questo tema" if provinciali > 1
+                                  else "1 scheda di questo tema", html)
+                else:
+                    self.assertNotIn("Schede per provincia", markdown)
+        testo = visible_text(self.html)
+        self.assertGreater(per_provincia, 0)
+        self.assertIn(f"le {per_provincia} schede con i valori delle province, {solo_provincia} solo per provincia",
+                      " ".join(testo.split()))
+
+
 class LaClassificaQualitaDellaVitaPortaDaQualcheParte(unittest.TestCase):
     """Venti regioni e 103 province erano testo nudo.
 

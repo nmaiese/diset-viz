@@ -222,7 +222,10 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   verticale ha un pavimento, lo scarto interquartile dei territori, perche' una
   media che si muove poco non sembri una salita. E' `aria-hidden`: accanto c'e'
   sempre la cifra in testo, con l'anno e di che media e' ("media semplice delle
-  regioni con il dato"). Sotto i due punti non si disegna.
+  regioni con il dato"). Sotto i due punti non si disegna. Nelle tabelle delle
+  pagine regione e provincia la sparkline e' quella del territorio, mai una
+  media, nella cella `.trend` con "dal 2018 era 64,1": a capo sotto i 1100 px,
+  a tutta riga quando la tabella si impila (`.stackwrap--wide`, sotto i 720).
 - Ogni grafico esce in due tagli, largo e stretto, perche' il testo resti a
   12-13 pixel veri anche sul telefono, e ha accanto una tabella con gli stessi
   dati. La striscia e la serie a fascia ne hanno un terzo da 1180 pixel, che
@@ -325,6 +328,11 @@ stessi pezzi con il doppio podio regioni e province.
 
 ## Regole di contenuto
 
+- **Percentuali**: ogni forma percentuale della fonte ("valori percentuali",
+  "percentuale") si scrive "%" (`numfmt.phrase_unit`, e `indicator_notes.
+  figure_unit` per chi ha solo nome e unita' della fonte). Variazioni e
+  differenze fra tassi restano "punti percentuali", per intero, anche nel
+  titolo di "Com'e' cambiato".
 - **Numeri** in formato italiano, spazio insecabile fra cifra e unita', unita'
   su ogni cifra isolata e nell'intestazione di colonna.
 - **Decimali** da una funzione sola (`seo_titles.format_number`): euro sopra

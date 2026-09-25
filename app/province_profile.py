@@ -322,7 +322,6 @@ def indicatori(chiave):
     lo stesso motivo per cui questo modulo non riusa `region_profile`.
     """
     manifesto = bes_data.get_bes_manifest(LIVELLO)
-    decimals = bes_data.source_decimals(LIVELLO)
     serie = _serie()
     regione_di = _regione_di()
     mia_regione = regione_di.get(chiave) or ""
@@ -406,7 +405,6 @@ def indicatori(chiave):
             "year_from": anni[0],
             "freshness_status": freshness_status(ultimo),
             "freshness_label": freshness_label(freshness_status(ultimo)),
-            "decimals": decimals.get(id_indicatore, 1),
             "rank": posizione,
             "province_count": len(dati["valori"]),
             "movement": movimento,

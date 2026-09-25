@@ -14400,22 +14400,22 @@
   "levels": {
    "provincia": {
     "annual": {
-     "average_delta": 7.442991,
-     "common_count": 107,
-     "current_avg": 126.608411,
+     "average_delta": 7.584762,
+     "common_count": 105,
+     "current_avg": 129.02,
      "decrease_count": 35,
      "increase_count": 69,
-     "previous_avg": 119.165421,
+     "previous_avg": 121.435238,
      "previous_year": 2023,
-     "stable_count": 3,
+     "stable_count": 1,
      "year": 2024
     },
-    "count": 107,
-    "coverage": 1.0,
-    "first": "Macerata",
+    "count": 105,
+    "coverage": 0.9813,
+    "first": "Arezzo",
     "last": "Fermo",
-    "mean": 126.608411,
-    "median": 125.1,
+    "mean": 129.02,
+    "median": 125.3,
     "year_max": 2024
    }
   }

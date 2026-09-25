@@ -745,7 +745,7 @@ def province_indicators_by_theme():
     """`{theme_path: [scheda]}`: le schede indicizzabili con i valori per
     provincia, tema per tema.
 
-    Le pagine tema leggono il catalogo dell'atlante, che e' regionale: le 25
+    Le pagine tema leggono il catalogo dell'atlante, che e' regionale: le
     schede solo provinciali non comparivano in nessuna, mentre la loro briciola
     rimandava proprio li'. Il tema e' quello della scheda (`meta.theme_path`,
     lo stesso della briciola), e il link apre la scheda sulle province.

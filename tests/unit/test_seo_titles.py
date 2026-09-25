@@ -298,6 +298,16 @@ class EstremiNonVerificatiTest(unittest.TestCase):
     def test_niente_estremi(self):
         self.assertEqual(seo_titles.extremes(self.meta, self.lv), (None, None))
 
+    def test_niente_estremi_anche_col_minimo_vero(self):
+        """Gli zeri di Macerata e Savona oggi sono n.d. (`bes_data.NOT_MEASURED`)
+        e il minimo e' Arezzo, un valore vero. Fermo resta non verificato, e
+        un intervallo con un capo solo non va in SERP."""
+        lv = provincia(("Fermo", 358.1), ("Arezzo", 35.2))
+        self.assertEqual(seo_titles.extremes(self.meta, lv), (None, None))
+        self.assertEqual(seo_titles.page_title({}, self.meta, lv, site_name="Divario Italia"),
+                         "Affollamento delle carceri per provincia")
+        self.assertIsNone(seo_titles.answer_description(self.meta, lv))
+
     def test_il_titolo_non_porta_cifre_e_dice_carceri(self):
         titolo = seo_titles.page_title({}, self.meta, self.lv, site_name="Divario Italia")
         self.assertEqual(titolo, "Affollamento delle carceri per provincia")
