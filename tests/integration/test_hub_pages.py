@@ -50,21 +50,26 @@ class ConfrontoPageTest(unittest.TestCase):
         self.assertTrue(description)
         self.assertLessEqual(len(description), 155)
 
-        # Il bundle monta la vista confronto perché il template lo dichiara: la
-        # SPA non conosce le rotte Flask.
-        self.assertIn('window.__diInitialView = "confronto"', html)
-        self.assertIn('id="root"', html)
+        # Dal 25 settembre 2026 e' una pagina della 1.0 resa dal server, non
+        # la vista confronto della SPA montata da un flag del template.
+        self.assertIn('data-v1="confronto"', html)
+        self.assertNotIn("__diInitialView", html)
+        self.assertNotIn('id="root"', html)
 
     def test_confronto_works_without_javascript(self):
         client = app.test_client()
         html = client.get("/confronto").data.decode("utf-8")
 
-        # Il fallback server-rendered porta un confronto vero, non una pagina vuota:
+        # La pagina servita e' il confronto vero, non un ripiego sotto la SPA:
         # tre regioni con valore, unita e posizione in classifica.
-        self.assertIn("spa-seo-fallback", html)
-        self.assertRegex(html, r"\d+ª su \d+")
-        links = sorted(set(re.findall(r'href="(/indicatore/[^"]+)"', html)))
-        self.assertGreaterEqual(len(links), 3)
+        self.assertNotIn("spa-seo-fallback", html)
+        self.assertRegex(html, r'<data value="\d+">\d+</data><span class="n__o">ª</span><span class="n__u">\u2009su \d+')
+        # Prima il ripiego metteva tre indicatori in fila con tre link alle
+        # schede. Il confronto della 1.0 e' un indicatore alla volta: la sua
+        # scheda, e il profilo delle tre regioni.
+        links = sorted(set(re.findall(r'href="(/indicatore/[^"]+|/regione/[^"]+)"', html)))
+        self.assertEqual(len([p for p in links if p.startswith("/indicatore/")]), 1, links)
+        self.assertGreaterEqual(len([p for p in links if p.startswith("/regione/")]), 3, links)
         for path in links:
             self.assertEqual(client.get(path).status_code, 200, path)
 
@@ -374,34 +379,36 @@ class MapAccessibilityTest(unittest.TestCase):
         self.assertIn("aria-label=\"Mappa cliccabile delle regioni italiane per punteggio", qol)
         self.assertTrue(bes_data.all_bes_indicators())
 
-    def test_react_map_takes_a_label_and_keeps_the_legend_hidden(self):
-        source = (Path(app.root_path).parent / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
-        # Il contenitore accetta un'etichetta e ha ancora role="img": le path
-        # sotto restano presentazionali, quindi l'etichetta è l'unica voce.
-        self.assertIn('aria-label={label || "Mappa delle regioni italiane"}', source)
-        self.assertIn('role="img"', source)
-        # Ogni chiamata passa un'etichetta che nomina il dato.
-        call_labels = re.findall(r"label=\{?[`\"]([^`\"]*)", source)
-        self.assertGreaterEqual(len([lab for lab in call_labels if "Mappa cliccabile" in lab]), 4)
-        # La legenda resta fuori dalla lettura assistita per scelta: gli stessi
-        # valori stanno nella classifica accanto.
-        self.assertIn('className="map-legend" aria-hidden="true"', source)
+    def test_the_compare_map_takes_a_label_and_keeps_the_legend_hidden(self):
+        """La mappa React del confronto e dell'atlante se n'e' andata con il
+        bundle: la mappa del confronto e' la macro `ui.map` della 1.0, con
+        un'etichetta che nomina il dato e l'anno e la legenda fuori dalla
+        lettura assistita, perche' gli stessi valori stanno nella tabella."""
+        html = app.test_client().get("/confronto").data.decode("utf-8")
+        label = re.search(r'<svg viewBox="0 0 560 660" role="img" aria-label="([^"]+)"', html)
+        self.assertIsNotNone(label)
+        self.assertRegex(unescape(label.group(1)), r"^Mappa delle regioni italiane per .+, \d{4}, con le regioni a confronto in evidenza$")
+        self.assertIn('<div class="legend" aria-hidden="true">', html)
 
 
 class PathScopedViewTest(unittest.TestCase):
-    """Una vista che possiede una URL non può essere lasciata via ?view=."""
+    """Una vista che possiede una URL non può essere lasciata via ?view=.
 
-    def test_every_exit_from_a_path_view_is_a_real_navigation(self):
-        source = (Path(app.root_path).parent / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
-        self.assertIn('window.__diInitialView || null', source)
-        # L'apertura di una regione esce da /confronto navigando, invece di
-        # lasciare /confronto?view=regioni. Il cambio di modalità, che faceva lo
-        # stesso, non c'è più: fra atlante e confronto si passa dalla testata.
-        self.assertIn('window.location.assign(`/atlante?view=regioni&rk=${encodeURIComponent(key)}`)', source)
-        self.assertNotIn("switch_mode", source)
-        # Il bundle servito contiene davvero il gancio: il template lo usa.
-        bundle = Path(app.root_path) / "static" / "dist" / "assets" / "index.js"
-        self.assertIn("__diInitialView", bundle.read_text(encoding="utf-8"))
+    Quando il confronto era la SPA, aprire una regione da /confronto lasciava
+    /confronto?view=regioni, una URL che mostrava tutt'altro. Adesso le regioni
+    del confronto sono link veri al loro profilo, senza passare dallo stato
+    della SPA di prima e dal suo 301."""
+
+    def test_every_exit_from_the_compare_page_is_a_real_navigation(self):
+        html = app.test_client().get("/confronto").data.decode("utf-8")
+        self.assertNotIn("view=regioni", html)
+        rows = re.search(r"<tbody data-cmp-rows>(.*?)</tbody>", html, re.S).group(1)
+        regions = re.findall(r'href="(/regione/[^"]+)"', rows)
+        self.assertEqual(len(regions), 3, regions)
+        for path in regions:
+            self.assertEqual(app.test_client().get(path).status_code, 200, path)
+        island = (Path(app.root_path) / "static" / "js" / "confronto.js").read_text(encoding="utf-8")
+        self.assertNotIn("view=regioni", island)
 
 
 class SitemapTest(unittest.TestCase):
@@ -1221,7 +1228,7 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
     porta della home prometteva la mappa "anno per anno", che l'atlante non ha.
     `/regioni` portava a `?view=regioni`, che ripete le pagine regione.
 
-    Il conto rifa' il filtro di `AtlasView` (`frontend/src/main.jsx`): il nome
+    Il conto rifa' il filtro di `AtlasView` della SPA di prima: il nome
     del tema confrontato con `item.theme` del catalogo, e senza `partial=1`
     solo le serie complete.
     """

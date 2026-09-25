@@ -3,7 +3,8 @@
 Sorveglia cio' che, rompendosi, non fa fallire niente:
 - l'elenco perde righe (un tema senza area, un filtro lasciato acceso) e la
   pagina resta un 200;
-- la pagina esce dal ripiego della SPA (`app.html`), che e' anche lui un 200;
+- la pagina non esce dal template della 1.0 (dal 25 settembre 2026 non c'e'
+  piu' un ripiego: se la regia cede, 500);
 - un rimando della SPA di prima finisce nella cache e `/atlante` serve la
   risposta data a `/atlante?indicator=910`;
 - la pagina ingrassa con seicento righe e nessuno se ne accorge;
@@ -57,7 +58,7 @@ class LAtlanteNellaV1(unittest.TestCase):
 
     def test_e_la_pagina_della_1_0_con_un_solo_h1(self):
         self.assertEqual(self.status, 200)
-        self.assertIn('data-v1="atlante"', self.html, "e' uscito il ripiego della SPA")
+        self.assertIn('data-v1="atlante"', self.html, "non e' la pagina della 1.0")
         self.assertEqual(len(re.findall(r"<h1\b", self.html)), 1)
         self.assertIn("Atlante degli indicatori territoriali italiani", self.html)
         self.assertNotIn("dist/assets/index.js", self.html, "l'atlante non monta piu' il bundle React")
@@ -302,7 +303,7 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
             "/atlante?view=regioni&rk=atlantide": "/regioni",
             "/atlante?view=regioni": "/regioni",
             "/atlante?view=confronto": "/confronto",
-            # la vista decide prima dell'indicatore, come in activeView di main.jsx
+            # la vista decide prima dell'indicatore, come in activeView della SPA di prima
             "/atlante?view=confronto&indicator=105": "/confronto",
             "/atlante?view=regioni&rk=lombardia&indicator=105": "/regione/lombardia",
             f"/atlante?view=atlas&indicator={one['id']}": f"/atlante?mappa={one_code}#mappa",
@@ -379,7 +380,7 @@ class LeProvinceNellAtlante(unittest.TestCase):
 
     def test_e_la_pagina_della_1_0_sulle_province(self):
         self.assertEqual(self.status, 200)
-        self.assertIn('data-v1="atlante"', self.html, "e' uscito il ripiego della SPA")
+        self.assertIn('data-v1="atlante"', self.html, "non e' la pagina della 1.0")
         self.assertEqual(len(re.findall(r"<h1\b", self.html)), 1)
         self.assertIn("serie provinciali", self.html)
 

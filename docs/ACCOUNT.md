@@ -75,16 +75,21 @@ Migrazioni Alembic `migrations/versions/0003..0006`, modelli in `app/models.py`:
 - **`frontend/src/site/auth.js`** — entry vanilla nel masthead di **ogni pagina
   SSR** (`blog_base.html`): controllo login/account, stella preferiti sulle pagine
   indicatore, pagina `/account`. Ottimizzato: niente supabase-js per gli anonimi.
-  Espone `window.diAuth.token()` alle pagine che non montano React: una
+  Espone `window.diAuth.token()` alle isole delle pagine server (atlante,
+  confronto): una
   promessa col token, o `null` senza una sessione salvata (e in quel caso la
   libreria di accesso non si carica). L'evento `di:auth` avvisa chi e' arrivato
   prima dello script.
-- **`frontend/src/shared/AuthControl.jsx`** — controllo login React del
-  confronto (e del ripiego dell'atlante).
 - **Atlante** (`app/static/js/atlante.js`, dal 25 settembre 2026 fuori da
   React): il filtro "Solo preferiti" (`?fav=1`) compare solo dopo l'accesso e
   legge `/api/favorites` col token di `window.diAuth.token()`.
-- **Confronto** (`main.jsx`): confronti salvati in `CompareView`.
+- **Confronto** (`app/static/js/confronto.js`, dal 25 settembre 2026 fuori da
+  React): la sezione "I tuoi confronti" compare solo dopo l'accesso e parla con
+  `/api/comparisons` col token di `window.diAuth.token()`. Salva
+  `{indId, regionNames, regions, year, level}`: `indId` e `regionNames` sono i
+  nomi che scriveva la SPA, `regions` porta le chiavi, cosi' anche i confronti
+  salvati prima si ricaricano. Un confronto si ricarica con indicatore e
+  regioni, e l'anno torna all'ultimo dell'indicatore.
 - **Giochi** (`game/`): toast traguardi (`notifyAchievements`), scelta salva a 3
   opzioni, vetrina traguardi nell'hub, merge al login.
 
@@ -94,9 +99,9 @@ fidato.
 
 ## Cache dei bundle (una trappola)
 
-Gli entry (`index.js`, `game.js`, `site.js`) hanno **nome fisso** ma importano
-chunk con **hash** che cambiano a ogni build. Con la cache del browser, un entry
-vecchio importa chunk spariti e la SPA resta bianca (fallback SEO). Il fix è
+Gli entry (`game.js`, `site.js`) hanno **nome fisso** ma importano chunk con
+**hash** che cambiano a ogni build. Con la cache del browser, un entry vecchio
+importa chunk spariti e il gioco o il controllo di accesso non partono. Il fix è
 `asset_url()` (`app/__init__.py`): un `?v=<hash-contenuto>` sugli entry, URL
 unico per rilascio. Usalo (non `url_for('static')` diretto) per ogni asset a nome
 fisso che cambia.

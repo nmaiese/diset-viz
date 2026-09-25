@@ -40,7 +40,7 @@ paths:
   la proiezione la scalda gia' `home_pick`. Il gemello Markdown ha la stessa
   sezione.
 - `/atlante` — dal 25 settembre 2026 una **pagina della 1.0 resa dal server**
-  (`design.render("atlante", "v1/atlante.html", "app.html")`, composta da
+  (`design.render("atlante", "v1/atlante.html", None)`, composta da
   `app/design/pages/atlante.py`), non piu' la SPA. In alto "Sulla mappa", il
   modulo dato della scheda (`indicatore.explore_module`, la macro `ui.explore`)
   su un indicatore fisso, `atlante.MAP_INDICATOR` (ter-105, fisso e non estratto
@@ -96,25 +96,15 @@ paths:
     `?livello=provincia` e' `noindex, follow` con canonical `/atlante`, header
     e meta insieme, fuori dalla sitemap. `?anno=`, `?regione=` e un livello
     sconosciuto restano la pagina delle regioni, indicizzabile;
-  - il ripiego e' `app.html`, la SPA di prima: un ripiego e' un 200, quindi in
-    produzione si controlla `data-v1="atlante"`;
+  - **non c'e' un ripiego**: se la regia cede, `design.render` scrive l'errore
+    nel log ("pagina 1.0 atlante: nessun ripiego, 500") e la risposta e' un
+    500. Il ripiego era `app.html`, la SPA, che se n'e' andata il 25 settembre
+    2026: una pagina senza le righe sarebbe un 200 che dice che l'atlante c'e'
+    mentre e' rotto.
   - la page view porta `page_type: "atlas"` (`PAGE_TYPE` nel template), non
-    `server`, e l'isola emette gli stessi eventi GTM della SPA
+    `server`, e l'isola emette gli stessi eventi GTM che emetteva la SPA
     (`docs/tracking_spec.md`). Il token dei preferiti lo prende da
     `window.diAuth.token()` (`frontend/src/site/auth.js`).
-- `/confronto` e' l'**unica** rotta della SPA (`SPA_ROUTES = ("/confronto",)`):
-  sola pagina che carica il bundle, con `confronto.html`. `app.html` resta
-  come ripiego dell'atlante e deve continuare a compilare fino a quando il
-  confronto non passa alla 1.0. **La testata non e' della SPA**: la rende Flask
-  con `_ds_header.html` sopra `#root`, come su ogni altra pagina, e il body
-  porta `class="ds sitechrome"` perche' `chrome.css` e' scoped sotto quella
-  classe. Anche briciole (`_breadcrumb.html`) e piede (`_ds_footer.html`, lo
-  stesso di ogni pagina) li rende Flask, fuori da `#root`, e il bersaglio di
-  "Vai al contenuto" e' il `div#contenuto` attorno a briciole e `#root`. A
-  React resta solo il pulsante di ritorno: la barra del telefono, la barra di
-  contesto e il selettore "Per indicatore, Per regione, Confronta" se ne sono
-  andati il 24 settembre 2026, con `window.__diNav`. Una testata disegnata
-  dentro la SPA sono due identita' sullo stesso dominio, ed e' gia' successo.
 - `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema. La
   pagina tema legge il catalogo dell'atlante, che e' regionale, e in fondo ha
   la sezione "Per provincia" con le schede del tema che hanno i valori delle
@@ -194,13 +184,44 @@ paths:
   Mai una cifra hardcoded in quel template. Riusa la mappa della homepage via
   `_map_panel.html` (`_map_hero` in `app/views.py`); le medie delle partizioni
   sono medie semplici dei valori regionali, limite che la pagina dichiara.
-- `/confronto` — **solo regionale**: la voce del menu dice "Confronta le
-  regioni", e le schede al livello provinciale non lo propongono. La casa
-  canonica del confronto: pagina server-rendered che monta la vista compare
-  della SPA con `window.__diInitialView`. `/atlante?view=confronto` e' un 301
-  qui: uno strumento, una URL pubblica. Una vista path-scoped si aggiunge
-  impostando quel flag nel template, mai insegnando a `frontend/src/main.jsx`
-  le rotte Flask.
+- `/confronto`: dal 25 settembre 2026 una **pagina della 1.0 resa dal
+  server** (`design.render("confronto", "v1/confronto.html", None)`, composta
+  da `app/design/pages/confronto.py`), non piu' la SPA. Un indicatore, fino a
+  tre regioni: la frase in testa, un `form` GET che senza JavaScript e' il modo
+  di cambiare confronto, la mappa dell'anno con le regioni scelte contornate,
+  la tabella con valore, posizione e la media semplice delle regioni, la serie
+  nel tempo. L'isola `static/js/confronto.js` tiene lo stesso form, legge
+  `/api/indicator/<id>` e ridisegna senza ricaricare. Le regole che non si
+  vedono:
+  - **lo stato sta nell'URL** e lo normalizza `confronto.resolve_state`:
+    `indicator` (l'id del catalogo, `105` o `bes:10AMB014`, oppure il codice,
+    `ter-105`), `region` ripetuto fino a tre volte (la chiave o il nome),
+    `year`, con gli alias `indicatore`, `regione` e `anno`. Un valore che non
+    regge cade e vale quello di partenza (l'indicatore in evidenza del
+    catalogo, Lombardia, Lazio e Campania, l'ultimo anno): un link vecchio
+    apre sempre un confronto. L'isola riscrive l'URL con gli stessi nomi.
+  - `livello` e' gia' letto da server, form e isola, ma `LEVELS` conosce solo
+    `regione`: un livello sconosciuto vale le regioni. **Solo regionale**: la
+    voce del menu dice "Confronta le regioni", e le schede al livello
+    provinciale non lo propongono.
+  - il canonical e' `/confronto` per ogni stato, e la pagina resta
+    indicizzabile. `/atlante?view=confronto` e' un 301 qui: uno strumento, una
+    URL pubblica.
+  - **in cache c'e' solo la pagina nuda** (`_confronto_page`, `cache.memoize`):
+    gli altri stati si rendono ogni volta, perche' sono migliaia e il payload
+    dell'indicatore e' gia' in cache per processo.
+  - **non c'e' un ripiego**: se la regia cede, la risposta e' un 500 loggato,
+    come l'atlante. Una prova lo guarda.
+  - la pagina nuda pesa sotto 45 KiB compressi (c'e' una prova).
+  - i confronti salvati compaiono solo dopo l'accesso: l'isola prende il token
+    da `window.diAuth.token()` (`frontend/src/site/auth.js`) e parla con
+    `/api/comparisons` (`docs/ACCOUNT.md`).
+  - la page view porta `page_type: "atlas"` (`PAGE_TYPE` nel template), come
+    quando il confronto era la SPA, e l'isola emette `compare_select_indicator`,
+    non `select_indicator`, che e' la conversione dell'atlante
+    (`docs/tracking_spec.md`).
+  - testata, briciole e piede li rende Flask da `blog_base.html`, come su ogni
+    pagina: non c'e' piu' una testata dentro una SPA.
 - `/ricerca?q=` — ricerca interna, server-rendered, **`noindex, follow` di
   proposito** (uno spazio `?q=` illimitato sarebbe pagine sottili duplicate).
   L'header sta nella view perché `add_security_headers` timbra `index, follow`

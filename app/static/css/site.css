@@ -45,8 +45,8 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .panel-card { border: 1px solid var(--line); background: var(--panel); padding: 16px 18px; }
 
 /* Le transizioni fra pagine, il controllo dell'account e la stella dei
-   preferiti stanno in `ds/chrome.css`: servono anche alle pagine della 1.0 e
-   alle shell della SPA, che questo foglio non lo caricano. */
+   preferiti stanno in `ds/chrome.css`: servono anche alle pagine della 1.0,
+   che questo foglio non lo caricano. */
 
 /* Mobile navigation: a hamburger in the masthead opens a full-page menu.
    Both are mobile-only (shown in the <=760px block); the site footer carries

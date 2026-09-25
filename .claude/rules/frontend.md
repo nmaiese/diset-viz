@@ -6,6 +6,15 @@ paths:
 
 # Frontend
 
+`frontend/` non e' piu' una SPA. La build di Vite ha due entry
+(`frontend/vite.config.js`): `game`, il quiz in React (`src/game/`, servito
+dalle pagine `game*.html` sotto `/quiz`), e `site`, il controllo di accesso
+della testata in JavaScript senza framework (`src/site/auth.js`, caricato da
+`blog_base.html` su ogni pagina, che espone `window.diAuth`). React resta solo
+per il gioco. L'atlante e il confronto React se ne sono andati il 25 settembre
+2026: sono pagine della 1.0 rese dal server, con le loro isole in
+`app/static/js/` (`atlante.js`, `confronto.js`), che non passano da Vite.
+
 Dopo ogni modifica a `frontend/src/*`, **ricompila prima di provare l'app
 servita**:
 
@@ -30,22 +39,7 @@ il "corallo" di quei nomi e' l'arancio bruciato.
 Le pagine della 1.0 caricano `css/ds/components.css` e il CSS della loro pagina
 (`css/ds/pages/`) al posto di `site.css`, attraverso il blocco `page_css` di
 `blog_base.html`. `chrome.css` (testata, piede, transizioni fra pagine,
-account) lo caricano tutte, shell della SPA comprese.
-
-Il confronto (`app/templates/confronto.html`) e il ripiego dell'atlante
-(`app/templates/app.html`) caricano quel foglio e mettono `class="ds"` sul body: da li' `body.ds`
-(specificita' 0,1,1) ripunta i token che `frontend/src/styles.css` dichiara nel
-suo `:root` (0,1,0). **Quindi i colori scritti in quel `:root` non sono quelli
-che si vedono**: sono il ripiego per quando il foglio del design system non c'e'.
-
-Dal 25 settembre 2026 `/atlante` e' una pagina della 1.0 resa dal server
-(`app/design/pages/atlante.py`, `v1/atlante.html`, l'isola
-`app/static/js/atlante.js`), e l'unica rotta della SPA e' `/confronto`
-(`SPA_ROUTES`). `app.html` serve ancora l'atlante React quando la pagina nuova
-cede: la regola "le due shell si migrano e si toccano **insieme**" vale ormai
-per tenere compilabile quel ripiego accanto a `confronto.html`, fino a quando
-il confronto non passa alla 1.0 e il bundle se ne va. Il resto della SPA non
-si ritocca.
+account) lo caricano tutte, le pagine del gioco comprese.
 
 Due errori che non fanno fallire niente:
 
@@ -57,14 +51,3 @@ Due errori che non fanno fallire niente:
   arancio lo svalutano dove serve: la serie di contesto e' `--cmp-*`, l'accento
   resta all'elemento in evidenza. E una serie non si dipinge col colore del
   testo.
-
-La SPA non conosce le rotte Flask: una vista path-scoped si monta con
-`window.__diInitialView` dal template, mai insegnando gli URL del server a
-`frontend/src/main.jsx`. E' l'unica cosa che la pagina le passa: la
-navigazione (`window.__diNav`) non le arriva piu', testata, briciole e piede
-(`_ds_footer.html`) li rende Flask fuori da `#root`.
-
-Nel CSS della SPA si usano solo i nomi che `body.ds` ripunta (`--ink`,
-`--paper`, `--muted` e simili). Un token ricavato sulla radice della 1.0
-(`--surface-inverse`, `--text-*`) nella SPA non esiste o vale il ripiego, e il
-colore esce sbagliato senza che niente fallisca.

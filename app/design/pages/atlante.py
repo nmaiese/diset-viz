@@ -60,7 +60,7 @@ MAP_INDICATORS = {"regione": MAP_INDICATOR, "provincia": MAP_INDICATOR_PROVINCE}
 # qui, e nessun altro controllo cambia livello.
 LEVEL_PATHS = {"regione": "/atlante", "provincia": "/atlante?livello=provincia"}
 
-# Gli ordini dell'elenco, gli stessi della SPA (`SORTS` in main.jsx).
+# Gli ordini dell'elenco, gli stessi dell'atlante React di prima.
 SORTS = (("complete", "Completezza"), ("recent", "Più recente"), ("az", "A-Z"), ("theme", "Tema"))
 
 

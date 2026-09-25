@@ -81,7 +81,7 @@ Tag principali:
 | `iubenda Privacy Controls and Cookie Solution` | template Iubenda | `Consent Initialization - All Pages` | da collegare manualmente a Iubenda |
 | `Consent update - Google ads from Iubenda TCF` | Custom HTML | `Consent Initialization - All Pages` | stesso schema di Vecchio Conio, concede consenso ads solo se Iubenda/TCF lo permette |
 | `Google Tag` | Google tag | `Initialization - All Pages` | usa `G-THTPZZ02QH`, con `send_page_view=false` |
-| `GA4 event - page_view` | GA4 event | `CE - page_view` | pageview unica da `dataLayer`, SPA e pagine server |
+| `GA4 event - page_view` | GA4 event | `CE - page_view` | pageview unica da `dataLayer`, emessa dalle pagine server |
 | `GA4 event - select_indicator` | GA4 event | `CE - select_indicator` | apertura indicatore |
 | `GA4 event - back_to_atlas` | GA4 event | `CE - back_to_atlas` | ritorno all'atlante |
 | `GA4 event - change_year` | GA4 event | `CE - change_year` | cambio anno |
@@ -170,8 +170,11 @@ google.com, pub-6806451730012282, DIRECT, f08c47fec0942fa0
 
 ## Eventi dataLayer
 
-Gli eventi SPA sono emessi da `frontend/src/main.jsx`. Le pagine server-rendered
-emettono `page_view` da `app/templates/_third_party_head.html`.
+Tutte le pagine sono server-rendered ed emettono `page_view` da
+`app/templates/_third_party_head.html`, una per pagina. La SPA React, che
+emetteva gli eventi dell'atlante e del confronto, se n'e' andata il 25
+settembre 2026: gli eventi dell'interazione li emettono le isole delle due
+pagine, con i nomi di prima, salvo `compare_select_indicator` del confronto.
 
 Dal 25 settembre 2026 l'atlante (`/atlante`) e' una pagina server-rendered: la
 sua `page_view` parte dal server con `page_type: "atlas"` (il template dichiara
@@ -183,18 +186,29 @@ serie in GA4 non cambia tipo. Gli eventi del catalogo li emette l'isola
 `select_indicator`). Il filtro nuovo e' "solo le serie complete" (`?complete=1`):
 all'apertura l'atlante mostra tutte le serie, e `toggle_partial_data` porta
 `enabled: true` quando le parziali sono visibili, cioe' col filtro spento.
-Fino a quando il confronto resta in React le copie del tracciamento sono due,
-con gli stessi nomi. La homepage SPA
-esclude la pageview server con `TRACK_SERVER_PAGE_VIEW=false`, quindi al primo
-accesso resta una sola pageview, quella emessa da React.
+
+Il confronto (`/confronto`) e' anche lui una pagina server-rendered dal 25
+settembre 2026, e anche la sua `page_view` porta `page_type: "atlas"`, come
+quando era la SPA. L'isola `app/static/js/confronto.js` emette
+`compare_select_indicator` quando cambia l'indicatore, `change_region` quando
+cambiano le regioni (dai campi o con un clic sulla mappa), `change_year` quando
+cambia l'anno, `open_region` quando si apre il profilo di una regione dalla
+tabella. **Non emette `select_indicator`**: quello resta la conversione
+"apertura di un indicatore dall'atlante", e il selettore del confronto la
+gonfierebbe a ogni cambio.
+
+`TRACK_SERVER_PAGE_VIEW=false` in un template spegne la pageview del server
+(`_third_party_head.html`): oggi nessun template lo imposta.
 
 | Evento | Quando parte | Uso |
 |---|---|---|
-| `page_view` | apertura SPA, cambio vista SPA, apertura pagine server | navigazione |
+| `page_view` | apertura di ogni pagina, dal server | navigazione |
 | `select_indicator` | apertura di un indicatore dall'atlante | interesse indicatore |
 | `back_to_atlas` | ritorno dalla scheda all'atlante | navigazione |
-| `change_year` | cambio anno nella scheda indicatore | esplorazione temporale |
-| `change_region` | cambio regione nella scheda indicatore | esplorazione territoriale |
+| `change_year` | cambio anno nella scheda indicatore o nel confronto | esplorazione temporale |
+| `change_region` | cambio regione nella scheda indicatore, o delle regioni del confronto | esplorazione territoriale |
+| `compare_select_indicator` | cambio indicatore nel confronto | interesse indicatore, fuori dalla conversione |
+| `open_region` | apertura del profilo di una regione dalla tabella del confronto | navigazione |
 | `select_sibling_indicator` | click su indicatore correlato | navigazione tematica |
 | `change_visualization` | cambio vista tra mappa, classifica e serie | uso visualizzazioni |
 | `filter_theme` | filtro tema nel catalogo | segmentazione |
@@ -216,7 +230,8 @@ Parametri applicativi:
 | `indicator_name` | nome indicatore |
 | `indicator_theme` | tema indicatore |
 | `year` | anno selezionato |
-| `region` | regione selezionata |
+| `region` | regione selezionata (nel confronto le chiavi delle regioni scelte, separate da virgola) |
+| `region_key` | chiave della regione aperta, su `open_region` |
 | `view_type` | vista selezionata |
 | `theme` | tema selezionato nel catalogo |
 | `sort` | ordinamento catalogo |
@@ -276,7 +291,7 @@ Configurazione richiesta:
 - usa il Google Tag con `G-THTPZZ02QH`
 - imposta `send_page_view=false` sul Google Tag
 - mantieni Enhanced Measurement attivo per scroll, outbound click, site search, video, download e form
-- mantieni disattivato `pageChangesEnabled`, perché questa SPA aggiorna l'URL anche per filtri, anno e regione
+- mantieni disattivato `pageChangesEnabled`, perché le isole dell'atlante e del confronto aggiornano l'URL (`replaceState`) anche per filtri, indicatore, anno e regione
 - mantieni create le custom dimension evento per ogni parametro utile all'analisi
 - marca come key event solo eventi che rappresentano un obiettivo reale, non `page_view`
 - non salvare dati personali o testo libero non controllato
@@ -338,4 +353,4 @@ Verifica live eseguita con Chrome headless e API Google:
 - il JavaScript GTM contiene `send_page_view=false` sul Google Tag
 - il JavaScript GTM non contiene piu `iubenda_gtm_consent_event` come trigger del Google Tag
 - la stream GA4 mantiene Enhanced Measurement attivo ma con `pageChangesEnabled` disattivato
-- il codice applicativo emette una sola `page_view` manuale per SPA o pagina server-rendered
+- il codice applicativo emette una sola `page_view` manuale per pagina server-rendered

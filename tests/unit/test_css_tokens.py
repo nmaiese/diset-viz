@@ -11,9 +11,10 @@ ognuna e' del tipo che non si vede in una PR e non rompe nessun test:
 2. un token di movimento dichiarato solo dentro `body.ds`. Uno pseudo-elemento
    di view transition e' figlio della radice, non di `<body>`, quindi da li'
    quei `var()` non risolvono e la dissolvenza fra pagine cade a `0s`.
-3. il `:root` di ripiego della SPA che smette di essere ripiego. Vale finche'
-   il design system ripunta ogni nome che dichiara: il giorno che ne aggiunge
-   uno che il design system non conosce, quel valore vecchio arriva a schermo.
+3. un colore cotto nel foglio di una pagina della 1.0. Fino al 25 settembre
+   2026 la prova guardava il `:root` di ripiego della SPA
+   (`frontend/src/styles.css`), che se n'e' andato con il bundle dell'atlante:
+   adesso guarda i fogli di pagina, dove stanno l'atlante e il confronto.
 """
 import re
 import unittest
@@ -21,7 +22,7 @@ from pathlib import Path
 
 RADICE = Path(__file__).resolve().parents[2]
 SITE = RADICE / "app" / "static" / "css" / "site.css"
-SPA = RADICE / "frontend" / "src" / "styles.css"
+PAGINE = RADICE / "app" / "static" / "css" / "ds" / "pages"
 GIOCO = RADICE / "frontend" / "src" / "game" / "game.css"
 SISTEMA = RADICE / "app" / "static" / "css" / "ds" / "system.css"
 CHROME = RADICE / "app" / "static" / "css" / "ds" / "chrome.css"
@@ -29,7 +30,7 @@ COMPONENTS = RADICE / "app" / "static" / "css" / "ds" / "components.css"
 REGION_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "regione.css"
 PROVINCE_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "provincia.css"
 
-FOGLI = (SITE, SPA, GIOCO, SISTEMA, CHROME)
+FOGLI = (SITE, GIOCO, SISTEMA, CHROME, COMPONENTS, *sorted(PAGINE.glob("*.css")))
 
 # I token che le view transition leggono dalla radice del documento.
 MOVIMENTO_IN_RADICE = ("--dur", "--ease-out")
@@ -93,41 +94,27 @@ class FogliDiStileTest(unittest.TestCase):
         self.assertTrue(usati, "la regola non usa nessun token: il test non guarda piu' niente")
         self.assertEqual(usati - radice, set())
 
-    def test_il_ripiego_della_spa_resta_un_ripiego(self):
-        """Ogni nome del `:root` della SPA deve essere ripuntato dal sistema.
-
-        `--masthead-h` e' l'eccezione dichiarata: e' un'altezza, non un colore,
-        e vale lo stesso valore da entrambe le parti.
-        """
-        spa = _nomi(_corpi(SPA.read_text(encoding="utf-8"), r"^:root\s*\{"))
-        sistema = SISTEMA.read_text(encoding="utf-8")
-        coperti = _nomi(_corpi(sistema, r"^body\.ds\s*\{")) | _nomi(_corpi(sistema, r"^:root\s*\{"))
-        self.assertEqual(spa - coperti - {"--masthead-h"}, set())
-
-    def test_spa_rules_bake_no_colour(self):
-        """Nel foglio della SPA un colore sta solo nel `:root` di ripiego.
+    def test_i_fogli_di_pagina_non_cuociono_colori(self):
+        """Nei fogli delle pagine della 1.0 un colore sta solo nei token.
 
         Un esadecimale o un `rgba()` in una regola non segue il tema scuro: il
-        bollino "Qualita' della vita" dell'atlante restava grigio chiaro sulla
-        pagina scura, e la scheda della regione passava a un blu scuro fisso al
-        passaggio del mouse. Anche il ripiego dentro un `var()` conta: e' un
-        colore del sistema vecchio che aspetta solo che il token manchi.
+        bollino "Qualita' della vita" dell'atlante React restava grigio chiaro
+        sulla pagina scura. Quel foglio non c'e' piu', e la stessa regola vale
+        per i fogli che hanno preso il suo posto: le tre serie del confronto
+        leggono `--cat-*`, mai un colore scritto.
         """
-        text = SPA.read_text(encoding="utf-8")
-        without_comments = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
-        root_match = re.search(r"^:root\s*\{", without_comments, re.MULTILINE)
-        self.assertIsNotNone(root_match)
-        end = without_comments.index("}", root_match.end())
-        rules = without_comments[:root_match.start()] + without_comments[end + 1:]
-        baked = re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", rules)
-        self.assertEqual(baked, [], "colori cotti in frontend/src/styles.css fuori dal :root")
+        fogli = sorted(PAGINE.glob("*.css"))
+        self.assertIn("confronto.css", [f.name for f in fogli])
+        for foglio in fogli:
+            with self.subTest(foglio=foglio.name):
+                testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
+                self.assertEqual(re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", testo), [])
 
     def test_il_telaio_vecchio_non_ha_piu_regole(self):
         """Nessuna pagina rende piu' `.masthead`, `.mobmenu` o `.nav-underline`.
 
-        Le shell della SPA non caricano nemmeno `site.css`, quindi quelle regole
-        stavano li' senza raggiungere un solo elemento. La SPA tiene le sue in
-        `frontend/src/styles.css`, che e' un altro foglio e un altro bundle.
+        Le pagine della 1.0 non caricano nemmeno `site.css`, quindi quelle
+        regole stavano li' senza raggiungere un solo elemento.
         """
         site = SITE.read_text(encoding="utf-8")
         for morto in (".masthead", ".mobmenu", ".nav-underline", ".brand-mark"):

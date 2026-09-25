@@ -35,9 +35,9 @@ def _asset_hash(rel):
 
 def asset_url(filename):
     """`url_for('static')` più un `?v=<hash>` sul contenuto. Gli entry bundle
-    (index.js, game.js, site.js) hanno nome fisso ma i chunk che importano hanno
+    (game.js, site.js) hanno nome fisso ma i chunk che importano hanno
     hash che cambiano: senza cache-busting, un browser con l'entry vecchio in
-    cache importa chunk spariti e la SPA resta bianca dopo un deploy. Il query
+    cache importa chunk spariti e il gioco resta bianco dopo un deploy. Il query
     param rende l'URL unico per rilascio."""
     ver = _asset_hash(filename)
     return url_for("static", filename=filename, v=ver) if ver else url_for("static", filename=filename)

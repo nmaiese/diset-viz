@@ -339,6 +339,29 @@ Regioni/Province in testa, la mappa delle province con i confini regionali,
 le stesse righe e le stesse tabelle, e sulle righe regionali con una vista
 provinciale il link "anche per provincia".
 
+### Confronto
+
+`/confronto`, dal 25 settembre 2026 resa dal server
+(`app/design/pages/confronto.py`, `v1/confronto.html`,
+`css/ds/pages/confronto.css`). Un indicatore, fino a tre regioni. Briciole,
+testata-risposta con la frase dei valori contro la media semplice delle
+regioni, poi un `form` GET (indicatore per tema, tre regioni, anno) che senza
+JavaScript e' il modo di cambiare confronto. "I valori" mette accanto la mappa
+dell'anno, con le regioni del confronto contornate (`is-on`), e una `.table`
+con valore e posizione per ogni regione scelta e una riga di riferimento
+(`.ref`) per la media semplice. "Com'e' cambiato" e' la serie delle regioni
+scelte con la media semplice tratteggiata e il segno dell'anno della tabella,
+in due tagli, largo e stretto (`charts.compare_series`, tagli in
+`charts.COMPARE_CUTS`), con la tabella della serie sotto. Il colore di una
+regione e' la sua classe `s1`..`s3` sui token categoriali `--cat-1..3`: la
+identifica, non la giudica, e non e' mai l'accento. Una regione scelta senza
+il dato dell'anno resta contornata e prende il tratteggio del n.d. (`is-nd`),
+e la voce n.d. della legenda c'e' sempre, nascosta (`nd_hidden`) quando
+nell'anno ogni regione ha il dato. L'isola `static/js/confronto.js` ridisegna
+frase, mappa, tabelle e serie senza ricaricare: rispecchia `compare_series` e
+`COMPARE_CUTS` (una prova confronta i tagli), cosi' la pagina servita e quella
+ridisegnata dicono la stessa cosa.
+
 ### Regione
 
 Testata-risposta con il localizzatore nel margine, numeri chiave, i temi dal

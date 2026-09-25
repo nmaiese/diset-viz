@@ -16,6 +16,7 @@ from app.atlas_catalog import (
 from app import design
 from app.design import numfmt
 from app.design.pages import atlante as atlas_page
+from app.design.pages import confronto as compare_page
 from app import divari
 from app import profiles
 from app import province_profile
@@ -79,18 +80,6 @@ _HOME_MAP_INDICATORS = _HOME_FEATURED_INDICATORS
 # higher_better/lower_better direction, so "guida"/"resta indietro" framing is
 # supported by the data instead of asserted for a contextual indicator.
 _HOME_STORY_INDICATORS = ("901", "408", "910", "102")
-
-# "Confronta" preview: a North / Centre / South contrast on three scoreable
-# indicators (PIL pro capite, NEET, speranza di vita), so bars and ranking are
-# something the data supports rather than a placeholder.
-_HOME_COMPARE_INDICATORS = ("901", "408", "910")
-_HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
-# Palette categorica (--cat-1..3), come la serie storica piu' sotto. Prima erano
-# --ink, --accent e --positive-ink: il colore del testo, la marca e un giudizio.
-# Il primo pesa una regione piu' delle altre, il secondo svaluta l'accento
-# dov'e' l'interazione vera, il terzo dice che la Campania sta "bene". Un colore
-# qui identifica un territorio, non lo giudica.
-_HOME_COMPARE_COLORS = ("var(--cat-1)", "var(--cat-2)", "var(--cat-3)")
 
 # --- Homepage 2026 design system ------------------------------------------
 # The indicator whose regional time series drives the homepage comparison
@@ -533,7 +522,7 @@ def _atlante_redirect(args):
       Un id che il catalogo non ha torna all'atlante nudo.
     """
     view = args.get("view")
-    # L'ordine della SPA (activeView di main.jsx): la vista decide prima
+    # L'ordine della SPA di prima (activeView): la vista decide prima
     # dell'indicatore, e `?view=confronto&indicator=105` era il confronto.
     if view == "confronto":
         return "/confronto"
@@ -605,10 +594,15 @@ def _bes_fuori_atlante(wanted, livello):
 
 
 def _render_atlante(level, map_indicator):
-    """La pagina per (livello, indicatore della mappa). Il ripiego e' la SPA
-    di prima (`app.html`), che legge `featured_indicators` e `percorso`."""
+    """La pagina per (livello, indicatore della mappa).
+
+    Senza ripiego: se la regia cede la risposta e' un 500, non un 200. Il
+    ripiego era la SPA di prima (`app.html`), che se n'e' andata con il
+    bundle React, e una pagina minima senza le righe dell'atlante direbbe che
+    l'atlante c'e' mentre e' rotto: il 500 lo vedono il monitoraggio e i
+    motori, che tornano a leggere dopo, e l'errore resta nel log."""
     return design.render(
-        "atlante", "v1/atlante.html", "app.html",
+        "atlante", "v1/atlante.html", None,
         level=level, map_indicator=map_indicator,
         featured_indicators=_home_featured_indicator_links(),
         percorso=[{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}],
@@ -709,20 +703,39 @@ def divari_regionali():
 
 
 @app.route("/confronto")
-@cache.cached(timeout=300)
 def confronto():
-    """La casa canonica del comparatore.
+    """Il confronto della 1.0, reso dal server (`app/design/pages/confronto.py`).
 
-    Il confronto tra regioni era solo uno stato della SPA (/atlante?view=confronto):
-    funzionava, ma non aveva una URL da condividere né un titolo suo. Qui la
-    pagina è server-rendered, quindi chi arriva senza JavaScript legge un
-    confronto vero con numeri reali, e il bundle monta sopra la vista giusta.
-    """
-    return render_template(
-        "confronto.html",
-        compare_preview=_home_compare_preview(),
-        featured_indicators=_home_featured_indicator_links(),
+    Lo stato sta nell'URL (`indicator`, `region` fino a tre volte, `year`)
+    e si normalizza qui
+    (`confronto.resolve_state`): un valore che non regge vale quello di
+    partenza, e un link vecchio apre sempre un confronto. Il canonical resta
+    `/confronto` per ogni stato, e la pagina resta indicizzabile come prima.
+
+    In cache c'e' solo la pagina nuda, per stato: gli altri confronti si
+    rendono ogni volta, perche' sono migliaia (indicatori per terne di
+    regioni per anni) e il payload dell'indicatore e' gia' in cache per
+    processo. Senza ripiego: se la regia cede, 500 (vedi `_render_atlante`)."""
+    state = compare_page.resolve_state(request.args)
+    key = (state["level"], state["indicator"], state["regions"], state["year"])
+    if compare_page.is_default(state):
+        return _confronto_page(*key)
+    return _render_confronto(*key)
+
+
+def _render_confronto(level, indicator, regions, year):
+    return design.render(
+        "confronto", "v1/confronto.html", None,
+        state={"level": level, "indicator": indicator, "regions": tuple(regions), "year": year},
+        percorso=[{"name": "Home", "path": "/"}, {"name": "Confronta", "path": "/confronto"}],
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/confronto",
     )
+
+
+# In cache solo il confronto di partenza.
+_confronto_page = cache.memoize(timeout=300)(_render_confronto)
 
 
 @app.route("/legacy")
@@ -3354,62 +3367,6 @@ def _themes_index_areas():
             "themes": themes,
         })
     return areas
-
-
-def _home_compare_preview():
-    """'Confronta' preview: three real regions across three scoreable indicators,
-    with a bar filled by oriented position (best = full) and the real ranking."""
-    rows = []
-    for indicator_id in _HOME_COMPARE_INDICATORS:
-        payload = get_atlas_indicator(indicator_id)
-        if payload is None:
-            continue
-        meta = payload["metadata"]
-        year = meta["year_max"]
-        values = get_atlas_indicator_year(indicator_id, year)["values"]
-        direction = (meta.get("explain") or {}).get("direction")
-        invert = direction in ("lower_better", "higher_worse")
-        ranked = list(reversed(values)) if invert else values
-        rank_by_key = {row["region_key"]: pos for pos, row in enumerate(ranked, 1)}
-        value_by_key = {row["region_key"]: row["value"] for row in values}
-        vals = [row["value"] for row in values]
-        low, high = min(vals), max(vals)
-        span = (high - low) or 1
-        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
-        entries = []
-        for key, color in zip(_HOME_COMPARE_REGIONS, _HOME_COMPARE_COLORS):
-            if key not in value_by_key:
-                continue
-            fraction = (value_by_key[key] - low) / span
-            if invert:
-                fraction = 1 - fraction
-            entries.append({
-                "name": profiles.region_name(key),
-                "value": it_num(value_by_key[key], 2),
-                "unit": unit,
-                "rank": rank_by_key[key],
-                "total": len(ranked),
-                "pct": max(6, round(fraction * 100)),
-                "color": color,
-            })
-        if entries:
-            rows.append({
-                "theme": meta["theme"],
-                "name": meta["name"],
-                # /confronto rende lo stesso confronto senza JavaScript, e là
-                # ogni riga deve poter aprire la scheda dell'indicatore: il
-                # percorso canonico viene dal catalogo, non ricostruito a mano.
-                "path": meta["path"],
-                "year": year,
-                "entries": entries,
-            })
-    if not rows:
-        return None
-    legend = [
-        {"name": profiles.region_name(key), "color": color}
-        for key, color in zip(_HOME_COMPARE_REGIONS, _HOME_COMPARE_COLORS)
-    ]
-    return {"legend": legend, "rows": rows}
 
 
 def _home_quiz_games():
