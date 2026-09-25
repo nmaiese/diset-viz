@@ -172,6 +172,125 @@ def within_regions(meta: dict, level: dict, unit: str | None) -> dict | None:
     }
 
 
+def ranking_claim(level: dict) -> str | None:
+    """Il titolo-affermazione della classifica: un fatto verificato sul
+    Mezzogiorno, o quante stanno sopra e quante sotto la media semplice."""
+    stats = level.get("stats") or {}
+    year, plural = level.get("year_max"), level["plural"]
+    claim = None
+    if level["key"] == "regione" and stats.get("year_avg") is not None:
+        south = [o for o in level["observations"] if o["key"] in MEZZOGIORNO]
+        below = [o for o in south if o["value"] < stats["year_avg"]]
+        if south and len(below) == len(south):
+            claim = f"Nel {year} tutte le {count_word(len(south))} regioni del Mezzogiorno stanno sotto la media semplice"
+        elif south and not below:
+            claim = f"Nel {year} tutte le {count_word(len(south))} regioni del Mezzogiorno stanno sopra la media semplice"
+        elif south:
+            claim = f"Nel {year} {count_word(len(below))} regioni del Mezzogiorno su {count_word(len(south))} stanno sotto la media semplice"
+    if claim is None and stats.get("above_avg_count") is not None:
+        claim = f"Nel {year} {stats['above_avg_count']} {plural} stanno sopra la media semplice e {stats['below_avg_count']} sotto"
+    return claim
+
+
+def level_tabs(meta: dict, level: dict, levels: list[dict], twin: dict | None) -> list[dict]:
+    """Le voci del selettore di livello della scheda: i suoi livelli e, se ne
+    manca uno, quello della gemella. Prima le regioni, come in tutto il sito.
+    Il primo livello porta al canonico nudo, che e' quello che la base rende:
+    `?livello=regione` era una seconda URL `noindex` della stessa pagina, e ci
+    portavano le linguette di cento schede. La voce corrente il template non
+    la rende come link."""
+    tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
+             "href": meta["canonical_path"] if index == 0 else f"{meta['canonical_path']}?livello={lv['key']}"}
+            for index, lv in enumerate(levels)]
+    if twin and tabs:
+        tabs.append({"key": twin["key"], "label": twin["label"], "current": False, "href": twin["path"]})
+    tabs.sort(key=lambda t: 0 if t["key"] == "regione" else 1)
+    return tabs
+
+
+def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
+                   claim: str | None = None, strip: dict | None = None) -> dict:
+    """Il modulo dato ("Chi e' in testa"): tutto cio' che la macro `ui.explore`
+    legge, in un dizionario solo, per un indicatore su un livello.
+
+    Lo compongono la scheda e l'atlante, dallo stesso livello che
+    `indicator_view` costruisce. Qui si mette insieme, non si ricalcola: ogni
+    cifra e' quella che la scheda mostrava prima che il modulo fosse un
+    componente. `tabs` sono le voci del selettore di livello (la scheda passa
+    le sue, `level_tabs`), `claim` il titolo sopra la classifica
+    (`ranking_claim` se manca), `strip` la striscia del divario quando chi
+    chiama l'ha gia' disegnata: del modulo fa parte solo la sua legenda delle
+    ripartizioni."""
+    stats = level.get("stats") or {}
+    unit = meta.get("value_unit") or meta.get("unit")
+    direction = meta.get("direction")
+    plural, year = level["plural"], level.get("year_max")
+    obs = level.get("observations") or []
+    best, worst = level.get("best"), level.get("worst")
+    areas = charts.area_map()
+    if claim is None:
+        claim = ranking_claim(level)
+    if strip is None:
+        rows = [{**o, "area": areas.get(o["key"])} for o in obs]
+        strip = charts.divario_strip(rows, stats.get("year_avg"), unit, stats.get("gap_ratio"))
+    # La mappa c'e' per tutti e due i livelli. `LEVELS["provincia"]["has_map"]`
+    # resta falso perche' lo leggono il template di ripiego e il vecchio
+    # esploratore, che hanno solo le regioni: qui le province hanno i loro
+    # contorni (maps.PROVINCE_PATHS) e la stessa rampa a sei gradini
+    # calcolata come in home.
+    show_map = bool(level.get("has_map")) or level["key"] == "provincia"
+    classes = map_classes(level)
+    map_names = {t["key"]: t["name"] for t in level.get("territories") or []}
+    if show_map and not level.get("has_map"):
+        from app.design.pages.home import level_names
+
+        classes = map_classes({"map_colors": ds_choropleth_colors(
+            [{"region_key": o["key"], "value": o["value"]} for o in level.get("observations") or []])})
+        map_names = {**level_names(level["key"]), **map_names}
+    callouts = ""
+    if show_map and best and worst:
+        shapes = PATHS if level["key"] == "regione" else maps.paths(level["key"])
+        callouts = charts.map_callouts(shapes, [(best["key"], best["name"], with_unit(best["value"], unit)),
+                                                (worst["key"], worst["name"], with_unit(worst["value"], unit))])
+    values = [o["value"] for o in level.get("observations") or [] if o.get("value") is not None]
+    explore_js = {
+        "years": [int(y) for y in sorted(level.get("matrix") or {}, key=int)],
+        "matrix": level.get("matrix") or {},
+        "names": {t["key"]: t["name"] for t in level.get("territories") or []},
+        "unit": numfmt.phrase_unit(unit), "direction": direction, "plural": plural,
+        "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
+        "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
+    }
+    rank_rows = ranking(level, unit)
+    folded = fold(rank_rows, plural) if level["key"] in ROW_ID else None
+    if level["key"] in ROW_ID:
+        # v1.js ridisegna le righe al cambio d'anno: con l'id, e piegate con
+        # le stesse soglie quando il server le ha piegate.
+        explore_js["row_id"] = ROW_ID[level["key"]]
+        explore_js["fold"] = {"edge": EDGE, "over": SPLIT_OVER} if folded else None
+    map_missing = show_map and bool(set(maps.paths(level["key"])) - {o["key"] for o in obs})
+    downloads = meta.get("downloads") or {}
+    return {
+        "name": meta["name"], "level": level["key"], "year": year, "year_min": level.get("year_min"),
+        "years": level.get("years") or [], "n": len(obs), "plural": plural, "singular": level["singular"],
+        "lower_better": direction in ("lower_better", "higher_worse"),
+        "claim": claim, "unit_note": unit_note(unit, meta["name"]), "short_unit": short_unit(unit),
+        "level_tabs": tabs or [], "territories": level.get("territories") or [],
+        "show_map": show_map, "map_classes": classes, "map_names": map_names,
+        "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
+        "callouts": callouts, "legend": legend(values, unit) if values else None,
+        "legend_nd": level["key"] == "regione" or map_missing,
+        "area_legend": strip.get("legend"), "ranking": rank_rows, "fold": folded,
+        "row_id": ROW_ID.get(level["key"]),
+        "decimals": numfmt.column_decimals([o["value"] for o in obs]),
+        "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
+        "profile_path": level.get("profile_path"),
+        "source_url": meta.get("source_url"), "source_label": meta.get("source_label"),
+        "csv": downloads.get("csv") if level["key"] == "regione" else None,
+        "js": explore_js,
+    }
+
+
 def derive(ctx: dict) -> dict:
     meta, level = ctx["meta"], ctx["level"]
     stats = level.get("stats") or {}
@@ -214,44 +333,13 @@ def derive(ctx: dict) -> dict:
     direction = meta.get("direction")
     verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso", "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
 
-    # Il titolo-affermazione della classifica: un fatto verificato sul Mezzogiorno.
-    claim = None
-    if level["key"] == "regione" and stats.get("year_avg") is not None:
-        south = [o for o in level["observations"] if o["key"] in MEZZOGIORNO]
-        below = [o for o in south if o["value"] < stats["year_avg"]]
-        if south and len(below) == len(south):
-            claim = f"Nel {year} tutte le {count_word(len(south))} regioni del Mezzogiorno stanno sotto la media semplice"
-        elif south and not below:
-            claim = f"Nel {year} tutte le {count_word(len(south))} regioni del Mezzogiorno stanno sopra la media semplice"
-        elif south:
-            claim = f"Nel {year} {count_word(len(below))} regioni del Mezzogiorno su {count_word(len(south))} stanno sotto la media semplice"
-    if claim is None and stats.get("above_avg_count") is not None:
-        claim = f"Nel {year} {stats['above_avg_count']} {plural} stanno sopra la media semplice e {stats['below_avg_count']} sotto"
+    claim = ranking_claim(level)
 
     areas = charts.area_map()
     obs = level.get("observations") or []
     rows = [{**o, "area": areas.get(o["key"])} for o in obs]
     series = charts.band_series(level, areas) if len(level.get("matrix") or {}) >= 2 else {"svg": "", "single_year": True}
     strip = charts.divario_strip(rows, stats.get("year_avg"), unit, stats.get("gap_ratio"))
-    # La mappa c'e' per tutti e due i livelli. `LEVELS["provincia"]["has_map"]`
-    # resta falso perche' lo leggono il template di ripiego e il vecchio
-    # esploratore, che hanno solo le regioni: qui le province hanno i loro
-    # contorni (maps.PROVINCE_PATHS) e la stessa rampa a sei gradini
-    # calcolata come in home.
-    show_map = bool(level.get("has_map")) or level["key"] == "provincia"
-    classes = map_classes(level)
-    map_names = {t["key"]: t["name"] for t in level.get("territories") or []}
-    if show_map and not level.get("has_map"):
-        from app.design.pages.home import level_names
-
-        classes = map_classes({"map_colors": ds_choropleth_colors(
-            [{"region_key": o["key"], "value": o["value"]} for o in level.get("observations") or []])})
-        map_names = {**level_names(level["key"]), **map_names}
-    callouts = ""
-    if show_map and best and worst:
-        shapes = PATHS if level["key"] == "regione" else maps.paths(level["key"])
-        callouts = charts.map_callouts(shapes, [(best["key"], best["name"], with_unit(best["value"], unit)),
-                                                (worst["key"], worst["name"], with_unit(worst["value"], unit))])
     series_claim = None
     what = None
     change_abs = stats.get("avg_change_abs")
@@ -307,22 +395,6 @@ def derive(ctx: dict) -> dict:
         series_note = (f"Su tutto il periodo la variazione va da {signed(ld['delta'], change_unit)} {of_place(ld['name'], lk)} "
                        f"a {signed(hd['delta'], change_unit)} {of_place(hd['name'], lk)}.")
 
-    values = [o["value"] for o in level.get("observations") or [] if o.get("value") is not None]
-    explore_js = {
-        "years": [int(y) for y in sorted(level.get("matrix") or {}, key=int)],
-        "matrix": level.get("matrix") or {},
-        "names": {t["key"]: t["name"] for t in level.get("territories") or []},
-        "unit": numfmt.phrase_unit(unit), "direction": direction, "plural": plural,
-        "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
-        "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
-    }
-    rank_rows = ranking(level, unit)
-    folded = fold(rank_rows, plural) if level["key"] in ROW_ID else None
-    if level["key"] in ROW_ID:
-        # v1.js ridisegna le righe al cambio d'anno: con l'id, e piegate con
-        # le stesse soglie quando il server le ha piegate.
-        explore_js["row_id"] = ROW_ID[level["key"]]
-        explore_js["fold"] = {"edge": EDGE, "over": SPLIT_OVER} if folded else None
     # Con la striscia del divario gli estremi, la media e la distanza stanno nel
     # grafico: le tessere dicono solo cio' che il grafico non dice.
     if strip.get("svg"):
@@ -335,47 +407,10 @@ def derive(ctx: dict) -> dict:
             facts.append({"label": "Anni della serie", "value": years_n, "unit": None, "role": "count",
                           "sub": f"dal {level['year_min']} al {level['year_max']}"})
         tiles = facts
-    # Le voci del selettore di livello: quelli della scheda e, se ne manca uno,
-    # quello della gemella. Prima le regioni, come in tutto il sito. Il primo
-    # livello porta al canonico nudo, che e' quello che la base rende:
-    # `?livello=regione` era una seconda URL `noindex` della stessa pagina, e
-    # ci portavano le linguette di cento schede. La voce corrente il template
-    # non la rende come link.
-    levels = ctx.get("levels") or []
-    level_tabs = [{"key": lv["key"], "label": lv["label"], "current": lv["key"] == level["key"],
-                   "href": meta["canonical_path"] if index == 0 else f"{meta['canonical_path']}?livello={lv['key']}"}
-                  for index, lv in enumerate(levels)]
-    twin = ctx.get("twin")
-    if twin and level_tabs:
-        level_tabs.append({"key": twin["key"], "label": twin["label"], "current": False, "href": twin["path"]})
-    level_tabs.sort(key=lambda t: 0 if t["key"] == "regione" else 1)
     citation = (f"Divario Italia, «{meta['name']}», elaborazione su dati {meta.get('source_label') or meta.get('source')} "
                 f"({year}). {ctx.get('canonical')}")
-    map_missing = show_map and bool(set(maps.paths(level["key"])) - {o["key"] for o in obs})
-    downloads = meta.get("downloads") or {}
-    # Il modulo dato ("Chi e' in testa"): tutto cio' che la macro `ui.explore`
-    # legge, in un dizionario solo. Qui si mette insieme, non si ricalcola:
-    # ogni cifra e' quella che la scheda mostrava prima che il modulo fosse
-    # un componente.
-    module = {
-        "name": meta["name"], "level": level["key"], "year": year, "year_min": level.get("year_min"),
-        "years": level.get("years") or [], "n": n, "plural": plural, "singular": level["singular"],
-        "lower_better": direction in ("lower_better", "higher_worse"),
-        "claim": claim, "unit_note": unit_note(unit, meta["name"]), "short_unit": short_unit(unit),
-        "level_tabs": level_tabs, "territories": level.get("territories") or [],
-        "show_map": show_map, "map_classes": classes, "map_names": map_names,
-        "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
-        "callouts": callouts, "legend": legend(values, unit) if values else None,
-        "legend_nd": level["key"] == "regione" or map_missing,
-        "area_legend": strip.get("legend"), "ranking": rank_rows, "fold": folded,
-        "row_id": ROW_ID.get(level["key"]),
-        "decimals": numfmt.column_decimals([o["value"] for o in obs]),
-        "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
-        "profile_path": level.get("profile_path"),
-        "source_url": meta.get("source_url"), "source_label": meta.get("source_label"),
-        "csv": downloads.get("csv") if level["key"] == "regione" else None,
-        "js": explore_js,
-    }
+    module = explore_module(meta, level, claim=claim, strip=strip,
+                            tabs=level_tabs(meta, level, ctx.get("levels") or [], ctx.get("twin")))
     return {
         "fmt": num, "fmt_unit": with_unit, "date_it": date_it, "citation": citation,
         "unit": numfmt.lower_first(unit) if unit else unit, "tiles": tiles, "verso": verso,
