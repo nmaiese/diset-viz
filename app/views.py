@@ -486,8 +486,8 @@ def data_catalog():
             "source": meta.get("source_label") or meta.get("family_label") or "",
             # Il titolo diceva "N indicatori scaricabili" contando anche i 26
             # BES solo provinciali, che il download non ce l'hanno: si conta
-            # da `meta.downloads`, non si presume.
-            "downloadable": bool(meta.get("downloads")),
+            # dai download della voce, non si presume.
+            "downloadable": bool(entry["downloads"]),
         })
     description = (
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
@@ -1035,8 +1035,8 @@ def _quality_life_indicators():
     """Le serie del punteggio regionale per la metodologia, con la loro scheda.
 
     Dal catalogo dell'atlante, piu' quelle che la navigazione mostra in
-    un'altra scheda (`taxonomy.hidden_from_browsing`): ter-590 e
-    bes-01SAL001 stanno nel punteggio, e una lista che le salta dice che il
+    un'altra scheda (`taxonomy.hidden_from_browsing`): bes-01SAL001 sta
+    nel punteggio, e una lista che le salta dice che il
     punteggio usa meno serie di quelle che usa. Il link segue il canonical
     (bes-01SAL001 porta a ter-910, che ha le stesse cifre).
     """
@@ -2592,6 +2592,10 @@ def _listed_indicator_entries():
     ter-910, `indicator_view.canonical_elsewhere`), la voce e' la sua
     `/province`, se c'e', e altrimenti la scheda non ha voce: la base la elenca
     la sua canonica, come nella sitemap (`indicator_universe.level_pages`).
+
+    `downloads` sta sulla voce e non si legge da `meta`: il CSV e il JSON della
+    scheda hanno solo le regioni, e la voce che e' la `/province` non li porta.
+    `meta` e' quello della scheda, in cache, e non si tocca.
     """
     level_views = {}
     listed_bases = set()
@@ -2605,13 +2609,14 @@ def _listed_indicator_entries():
         meta = view["meta"]
         sub_views = level_views.get(meta["canonical_path"], [])
         entry = {"meta": meta, "name": meta["name"], "path": meta["canonical_path"],
-                 "levels": view["levels"], "sub_views": sub_views}
+                 "levels": view["levels"], "sub_views": sub_views,
+                 "downloads": meta.get("downloads")}
         if meta["canonical_path"] not in listed_bases:
             if not sub_views:
                 continue
             page = sub_views[0]
             entry.update(name=f"{meta['name']} nelle {page['level']['label'].lower()}",
-                         path=page["path"], levels=[page["level"]], sub_views=[])
+                         path=page["path"], levels=[page["level"]], sub_views=[], downloads=None)
         entries.append(entry)
     return entries
 
@@ -2958,10 +2963,11 @@ def llms_full_txt():
         # indici dicono le stesse pagine.
         for page in sub_views:
             lines.append(f"  {page['level']['label']}: {SITE_URL}{page['path']}")
-        if meta.get("downloads"):
+        downloads = entry["downloads"]
+        if downloads:
             lines.append(
-                f"  Download: CSV {SITE_URL}{meta['downloads']['csv']}; "
-                f"JSON {SITE_URL}{meta['downloads']['json']}."
+                f"  Download: CSV {SITE_URL}{downloads['csv']}; "
+                f"JSON {SITE_URL}{downloads['json']}."
             )
     lines.append("")
     return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")

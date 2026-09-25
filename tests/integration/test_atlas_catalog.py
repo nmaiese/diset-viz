@@ -111,10 +111,10 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
 
     def test_exact_duplicate_bes_indicators_are_excluded_from_general_browsing(self):
         """La stessa serie in due schede si mostra una volta sola: la
-        territoriale per le BES di `DUPLICATE_BES_IDS`, la BES (piu' fresca o
-        indicizzabile) per le territoriali di `SUPERSEDED_TERRITORIAL_IDS`. Le
-        BES col nome di una territoriale e cifre diverse (`SAME_NAME_BES_IDS`)
-        sono schede a se', e ci sono tutte e due."""
+        territoriale per le BES di `DUPLICATE_BES_IDS`, la BES
+        indicizzabile per le territoriali di `SUPERSEDED_TERRITORIAL_IDS`. Le
+        BES col nome di una territoriale e cifre diverse (`SAME_NAME_BES_IDS`,
+        fra cui 12SER025 e ter-590) sono schede a se', e ci sono tutte e due."""
         federated = get_atlas_catalog()
         federated_ids = {str(item["id"]) for item in federated["indicators"]}
         for raw_id in DUPLICATE_BES_IDS:
@@ -123,7 +123,7 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         for raw_id in SUPERSEDED_TERRITORIAL_IDS:
             self.assertNotIn(raw_id, federated_ids)
         superseding = {bes for bes, ter in TERRITORIAL_NAME_TWINS.items() if ter in SUPERSEDED_TERRITORIAL_IDS}
-        self.assertEqual(superseding, {"12SER025", "SDG-310", "SDG-311"})
+        self.assertEqual(superseding, {"SDG-310", "SDG-311"})
         for raw_id in superseding | SAME_NAME_BES_IDS:
             self.assertIn(f"{BES_ID_PREFIX}{raw_id}", federated_ids)
 
@@ -133,14 +133,14 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         duplicate_names = {
             "speranza di vita alla nascita",
             "coste marine balneabili",
-            "emigrazione ospedaliera in altra regione",
             "competenza alfabetica non adeguata (studenti classi iii scuola secondaria primo grado)",
             "competenza numerica non adeguata (studenti classi iii scuola secondaria primo grado)",
         }
         for name in duplicate_names:
             self.assertEqual(name_counts[name], 1, f"{name!r} still appears more than once in the atlas catalog")
         # Due serie diverse col nome uguale: due voci, una per famiglia.
-        for name in ("disponibilità di verde urbano", "irregolarità nella distribuzione dell'acqua"):
+        for name in ("disponibilità di verde urbano", "irregolarità nella distribuzione dell'acqua",
+                     "emigrazione ospedaliera in altra regione"):
             families = sorted(item["catalog_family"] for item in federated["indicators"]
                               if item["name"].strip().lower() == name)
             self.assertEqual(families, ["bes", "territorial"], name)

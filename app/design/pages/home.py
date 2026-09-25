@@ -328,19 +328,23 @@ def feature(pick: dict | None) -> dict | None:
 
     # La scheda si apre sul suo primo livello: l'altro ha il suo URL, la
     # `/province` (`sources.level_path`), o il pannello delle province
-    # mandava alla classifica delle regioni.
+    # mandava alla classifica delle regioni. Un livello col canonical su
+    # un'altra scheda (le regioni di bes-01SAL001, `canonical_elsewhere`)
+    # porta a quella, non alla base che i motori non indicizzano.
+    from app.indicator_view import canonical_elsewhere, twin_level
+
     def scheda(key):
-        return sources.level_path(meta["canonical_path"], key, available[0])
+        return (canonical_elsewhere(meta, key)
+                or sources.level_path(meta["canonical_path"], key, available[0]))
 
     for panel in (first, second):
         if panel:
             panel["scheda"] = scheda(panel["key"])
-    elsewhere_href, elsewhere_twin = (scheda(elsewhere) if elsewhere else None), False
+    elsewhere_href = scheda(elsewhere) if elsewhere else None
+    elsewhere_twin = bool(elsewhere and canonical_elsewhere(meta, elsewhere))
     # L'altro livello puo' stare in una scheda gemella (la speranza di vita
     # regionale e quella con le province): la frase porta li'.
     if not elsewhere and not second:
-        from app.indicator_view import twin_level
-
         twin = twin_level(meta, [{"key": key} for key in available])
         if twin:
             elsewhere, elsewhere_href, elsewhere_twin = twin["key"], twin["path"], True

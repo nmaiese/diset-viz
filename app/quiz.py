@@ -285,8 +285,10 @@ def _quiz_indicators():
     for item in get_catalog()["indicators"]:
         if not profiles.is_core(item) or profiles.is_gender_variant(item):
             continue
-        # Una territoriale superata da una BES (`taxonomy.SUPERSEDED_TERRITORIAL_IDS`)
-        # resta fuori: il quiz prende la BES, e la stessa misura non entra due volte.
+        # Una territoriale con le stesse cifre di una BES indicizzabile
+        # (`taxonomy.SUPERSEDED_TERRITORIAL_IDS`: ter-617 e ter-618) resta fuori,
+        # come dall'atlante. Oggi e' una guardia: le due non passano gia'
+        # `is_core`, e le loro BES (SDG-311 e SDG-310) stanno nel pool BES.
         if hidden_from_browsing("territorial", item["id"]):
             continue
         year = item["year_max"]

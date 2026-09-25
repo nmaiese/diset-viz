@@ -4,9 +4,9 @@
    ter-910, fuori dalla sitemap, ma senza `noindex` (canonical e `noindex`
    insieme sono due segnali contrari). La `/province` resta una pagina a se'.
 2. `DUPLICATE_BES_IDS` diceva "identical values" di serie che non lo sono:
-   10AMB008 e 12SER006 sono schede a se', con un H1 che le distingue, e per
-   12SER025 e le due SDG la navigazione mostra la BES, piu' fresca o
-   indicizzabile, al posto della territoriale.
+   10AMB008, 12SER006 e 12SER025 sono schede a se', con un H1 che le
+   distingue, e per le due SDG la navigazione mostra la BES, indicizzabile e
+   con le stesse cifre, al posto della territoriale `noindex`.
 """
 import re
 import unittest
@@ -114,6 +114,24 @@ class LeRegioniDellaSperanzaDiVitaHannoIlCanonicalSuTer910(unittest.TestCase):
         self.assertNotIn(f"({SITE_URL}{BASE})", corpus)
         self.assertNotIn(f"{SITE_URL}{BASE}\n", corpus)
 
+    def test_la_voce_della_province_non_porta_i_download_delle_regioni(self):
+        """Il CSV e il JSON di bes-01SAL001 hanno solo le regioni: la voce che
+        e' la `/province`, in llms-full e nel catalogo dati, non li offre. La
+        scheda regionale li tiene."""
+        corpus = self.client.get("/llms-full.txt").get_data(as_text=True)
+        self.assertNotIn("bes:01SAL001.csv", corpus)
+        self.assertNotIn("bes:01SAL001.json", corpus)
+        with app.test_request_context():
+            entry = next(e for e in views._listed_indicator_entries() if e["path"] == PROVINCE)
+            ter = next(e for e in views._listed_indicator_entries() if e["path"] == TER_910)
+        self.assertIsNone(entry["downloads"])
+        self.assertTrue(entry["meta"]["downloads"])  # la meta della scheda non si tocca
+        self.assertTrue(ter["downloads"])
+        for accept in ({}, {"Accept": "text/markdown"}):
+            with self.subTest(accept=accept):
+                page = self.client.get("/catalogo-dati", headers=accept).get_data(as_text=True)
+                self.assertNotIn("bes:01SAL001.csv", page)
+
     def test_il_catalogo_dati_elenca_la_province_e_non_la_base(self):
         for accept in ({}, {"Accept": "text/markdown"}):
             with self.subTest(accept=accept):
@@ -218,14 +236,45 @@ class LeListeDeiDoppioniDiconoIlVero(unittest.TestCase):
                 self.assertNotEqual(head_bes["description"], head_ter["description"])
                 for forbidden in ("—", "–", ";", "…"):
                     self.assertNotIn(forbidden, head_bes["title"])
+                # Il nome breve "Verde urbano per abitante" piu' la coda del
+                # livello dava "per abitante per regione".
+                self.assertLessEqual(len(re.findall(r"\bper\b", head_bes["title"])), 1, head_bes["title"])
+
+
+class LaHomeNonLinkaLaBase(unittest.TestCase):
+    """La home pesca dal catalogo indicizzabile: le regioni di bes-01SAL001,
+    col canonical su ter-910, non le pesca, e dalle sue province il link alle
+    regioni va a ter-910, non alla base."""
+
+    def test_il_pool_regionale_non_ha_la_base(self):
+        from app import home_pick
+
+        with app.app_context():
+            pool = home_pick.pool()
+        self.assertNotIn(("bes", "01SAL001"), pool["regione"])
+        self.assertIn(("bes", "01SAL001"), pool["provincia"])
+        self.assertIn(("territorial", "910"), pool["regione"])
+
+    def test_la_home_chiesta_sulla_speranza_di_vita_bes(self):
+        """Chiesta sulle regioni, la home ne pesca un'altra: nessun caso porta
+        alla base."""
+        for query, drawn in (({"indicatore": "bes-01SAL001"}, True),
+                             ({"indicatore": "bes-01SAL001", "livello": "provincia"}, True),
+                             ({"indicatore": "bes-01SAL001", "livello": "regione"}, False)):
+            with self.subTest(query=query):
+                page = app.test_client().get("/", query_string=query).get_data(as_text=True)
+                self.assertIsNone(re.search(re.escape(BASE) + r"(?!/province)", page))
+                if drawn:
+                    self.assertIn(PROVINCE, page)
+                    self.assertIn(f'href="{TER_910}"', page)
 
 
 class LaNavigazioneMostraLaSchedaGiusta(unittest.TestCase):
     """Atlante, temi e ricerca leggono lo stesso catalogo: una serie che non c'e'
     in uno non c'e' negli altri, e ogni conteggio e' quello che si vede."""
 
-    SHOWN = frozenset({"bes:10AMB008", "bes:12SER006", "bes:12SER025", "bes:SDG-310", "bes:SDG-311", "592", "6", "910"})
-    HIDDEN = frozenset({"590", "617", "618", "bes:01SAL001", "bes:10AMB007"})
+    SHOWN = frozenset({"bes:10AMB008", "bes:12SER006", "bes:12SER025", "bes:SDG-310", "bes:SDG-311", "590", "592", "6", "910"})
+    HIDDEN = frozenset({"617", "618", "bes:01SAL001", "bes:10AMB007"})
 
     @classmethod
     def setUpClass(cls):
@@ -285,8 +334,9 @@ class LaNavigazioneMostraLaSchedaGiusta(unittest.TestCase):
         self.assertIn(PROVINCE, [result["path"] for result in found["results"]])
 
     def test_la_metodologia_elenca_ogni_serie_del_punteggio(self):
-        """ter-590 e bes-01SAL001 stanno nel punteggio anche se la navigazione
-        mostra un'altra scheda: la lista della metodologia non le perde."""
+        """bes-01SAL001 sta nel punteggio anche se la navigazione mostra
+        ter-910: la lista della metodologia non la perde, e la porta a ter-910.
+        ter-590 e' nel punteggio e nell'atlante, con la sua scheda."""
         with app.test_request_context():
             items = views._quality_life_indicators()
         paths = {item["path"] for item in items}
@@ -294,14 +344,55 @@ class LaNavigazioneMostraLaSchedaGiusta(unittest.TestCase):
         self.assertIn(TER_910, paths)
         self.assertNotIn(BASE, paths)
 
-    def test_la_sitemap_non_toglie_le_territoriali_superate(self):
-        """Nascondere dalla navigazione non e' togliere dall'indice: ter-590
-        resta indicizzabile, senza canonical verso una pagina con altre cifre."""
+    def test_nel_punteggio_dice_le_schede_che_il_tema_elenca(self):
+        """"Nel punteggio" di un tema conta le schede del tema che il punteggio
+        usa, e ogni serie del punteggio ha la sua scheda in un tema, salvo le
+        regioni di bes-01SAL001, che sono ter-910 cella per cella. Quando
+        ter-590 stava fuori dall'atlante, il tema della salute contava una serie
+        del punteggio in meno di quelle che il punteggio usa."""
+        from app.quality_life_selection import regional_quality_life_selection
+
+        listed = set(self.by_id)
+        with app.app_context():
+            selection = regional_quality_life_selection()
+        self.assertEqual(set(selection) - listed, {"bes:01SAL001"})
+        for theme in self.catalog["themes"]:
+            slug = theme["path"].rstrip("/").rsplit("/", 1)[-1]
+            with self.subTest(tema=theme["name"]), app.app_context():
+                profile = get_atlas_theme_profile(slug)
+                ids = {str(item["id"]) for item in profile["indicators"]}
+                scored = ids & set(selection)
+                self.assertEqual(profile["quality_life_count"], len(scored))
+                self.assertEqual(profile["quality_life_count"],
+                                 sum(item["quality_life_scored"] for item in profile["indicators"]))
+                page = self.client.get(theme["path"]).get_data(as_text=True)
+                shown = re.search(r"<small>Nel punteggio</small><strong>(\d+)</strong>", page)
+                self.assertIsNotNone(shown)
+                self.assertEqual(int(shown.group(1)), len(scored))
+
+    def test_ter_590_sta_nel_quiz(self):
+        """Il quiz la prendeva su master e la riprende: bes-12SER025, con altre
+        cifre, non ci entra perche' si ferma al 2024."""
+        from app import quiz
+
+        with app.app_context():
+            territorial = {str(item["id"]) for item in quiz._quiz_indicators()}
+            bes = {str(item["id"]) for item in quiz._bes_quiz_indicators()}
+        self.assertIn("590", territorial)
+        self.assertEqual(territorial & SUPERSEDED_TERRITORIAL_IDS, set())
+        self.assertLessEqual({"bes:SDG-310", "bes:SDG-311"}, bes)
+
+    def test_ter_590_resta_canonica_di_se_stessa(self):
+        """ter-590 e bes-12SER025 hanno cifre diverse: tutte e due nell'indice,
+        nessun canonical dall'una all'altra."""
         with app.app_context():
             paths = {page["path"] for page in indicator_universe.level_pages()}
-        self.assertIn("/indicatore/emigrazione-ospedaliera-in-altra-regione/ter-590", paths)
-        head = _head(self.client.get("/indicatore/emigrazione-ospedaliera-in-altra-regione/ter-590"))
-        self.assertEqual(head["canonical"], f"{SITE_URL}/indicatore/emigrazione-ospedaliera-in-altra-regione/ter-590")
+        for path in ("/indicatore/emigrazione-ospedaliera-in-altra-regione/ter-590",
+                     "/indicatore/emigrazione-ospedaliera-in-altra-regione/bes-12SER025"):
+            with self.subTest(path=path):
+                self.assertIn(path, paths)
+                head = _head(self.client.get(path))
+                self.assertEqual(head["canonical"], f"{SITE_URL}{path}")
 
 
 if __name__ == "__main__":

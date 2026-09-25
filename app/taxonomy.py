@@ -237,7 +237,7 @@ TERRITORIAL_NAME_TWINS = {
     "10AMB007": "539",   # Coste marine balneabili: 105 celle, al massimo 0,14 di arrotondamento
     "10AMB008": "592",   # Disponibilita' di verde urbano: 200 celle su 200 diverse, fino a 304 m²
     "12SER006": "6",     # Irregolarita' nella distribuzione dell'acqua: fino a 3,5 punti
-    "12SER025": "590",   # Emigrazione ospedaliera: arrotondamento, ma la BES arriva al 2024 e la territoriale al 2023
+    "12SER025": "590",   # Emigrazione ospedaliera: 400 celle su 400 diverse, fino a 0,12 punti
     "SDG-310": "618",    # Competenza numerica non adeguata: 133 celle su 133 uguali
     "SDG-311": "617",    # Competenza alfabetica non adeguata: 133 celle su 133 uguali
 }
@@ -259,21 +259,22 @@ DUPLICATE_BES_IDS = {
     "10AMB007",  # -> ter-539, uguale all'arrotondamento. Tutte e due ferme al 2019 e fuori dall'indice
 }
 
-# Il verso opposto: la stessa serie, ma e' la BES la pagina da mostrare, perche'
-# e' piu' fresca (12SER025 al 2024, ter-590 al 2023) o perche' e' quella
-# indicizzabile (bes-SDG-310 e bes-SDG-311, mentre ter-618 e ter-617 sono
-# `noindex`). La navigazione mostrava la territoriale e nascondeva la BES,
-# cioe' la versione vecchia o quella fuori dall'indice. Le territoriali restano
-# raggiungibili e col loro robots: nessun canonical, perche' 590 e 12SER025 non
-# hanno le stesse cifre (piano SEO, 3.7.3).
+# Il verso opposto: la stessa serie, ma e' la BES la pagina da mostrare,
+# perche' e' quella indicizzabile (bes-SDG-310 e bes-SDG-311, mentre ter-618 e
+# ter-617 sono `noindex`), con le stesse cifre in 133 celle su 133. La
+# navigazione mostrava la territoriale e nascondeva la BES, cioe' la versione
+# fuori dall'indice. Le territoriali restano raggiungibili e col loro robots.
+#
+# Non ci sta ter-590: bes-12SER025 ha il suo stesso nome ma cifre diverse in
+# 400 celle su 400, e nasconderla toglieva dal tema, dal quiz, dai divari e
+# dalle pagine regione una serie che il punteggio usa.
 SUPERSEDED_TERRITORIAL_IDS = {
-    "590",  # -> bes-12SER025
     "617",  # -> bes-SDG-311
     "618",  # -> bes-SDG-310
 }
 
 # Le BES col nome di una territoriale e cifre diverse: due schede a se',
-# tutte e due nella navigazione (o, per 12SER025, tutte e due nell'indice).
+# tutte e due nella navigazione e nell'indice.
 # Col nome uguale avevano anche lo stesso H1: `views._page_h1` mette accanto al
 # nome della BES la sua famiglia (`sources.family_short_label`), sulla sola
 # vista regionale e solo quando l'H1 non e' scritto. Gli H1 delle territoriali

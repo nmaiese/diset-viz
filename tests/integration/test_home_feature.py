@@ -89,15 +89,17 @@ class PanelLinkComesFromTheCaller(unittest.TestCase):
     quello di prima, `/?indicatore=<codice>&livello=<livello>#dato`."""
 
     def test_another_page_gets_its_own_link(self):
+        # Una scheda con tutti e due i livelli nel pool. Non bes-01SAL001, le
+        # cui regioni hanno il canonical su ter-910 e la home non le pesca.
         from app.design.pages import home
         with app.app_context():
-            scelta = home_pick.pick("bes-01SAL001", "provincia")
-            panel = home.level_panel(scelta["meta"], scelta["level"], "/atlante?indicatore=bes-01SAL001#mappa")
-            self.assertEqual(panel["href"], "/atlante?indicatore=bes-01SAL001&livello=provincia#mappa")
+            scelta = home_pick.pick("bes-12SER020", "provincia")
+            panel = home.level_panel(scelta["meta"], scelta["level"], "/atlante?indicatore=bes-12SER020#mappa")
+            self.assertEqual(panel["href"], "/atlante?indicatore=bes-12SER020&livello=provincia#mappa")
             levels = home.feature(scelta)["levels"]
         self.assertEqual(len(levels), 2)
         for panel in levels:
-            self.assertEqual(panel["href"], f"/?indicatore=bes-01SAL001&livello={panel['key']}#dato")
+            self.assertEqual(panel["href"], f"/?indicatore=bes-12SER020&livello={panel['key']}#dato")
 
     def test_the_level_goes_before_the_anchor(self):
         from app.design.pages.home import level_href
