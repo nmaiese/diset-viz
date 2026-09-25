@@ -584,13 +584,17 @@ class LaCifraDelTerritorioELaStessaDellaScheda(unittest.TestCase):
         for (path, key), codes in self.CASI:
             page = self.pages[path]
             for code in codes:
-                href = re.search(rf'<th scope="row" role="rowheader"><a href="([^"]*/{code}(?:\?[^"]*)?)">', page)
+                # Il link della riga porta alla riga della provincia sulla
+                # scheda (`#p-<key>`): la riga si cerca col link intero, la
+                # scheda si chiede senza l'ancora.
+                href = re.search(rf'<th scope="row" role="rowheader"><a href="([^"]*/{code}(?:\?[^"#]*)?(?:#[^"]*)?)">', page)
                 self.assertIsNotNone(href, (path, code))
                 href = html_lib.unescape(href.group(1))
                 cell = re.search(r'data-label="Valore"[^>]*><data class="n n--cell" value="[^"]+">([^<]*)</data>',
                                  table_row(page, href)).group(1)
+                href = href.split("#")[0]
                 scheda = self.client.get(href, follow_redirects=True).get_data(as_text=True)
-                in_table = re.search(rf'<tr data-key="{key}">.*?<td class="val"><data class="n n--cell" '
+                in_table = re.search(rf'<tr data-key="{key}"[^>]*>.*?<td class="val"><data class="n n--cell" '
                                      r'value="[^"]+">([^<]*)</data>', scheda).group(1)
                 on_map = html_lib.unescape(re.search(
                     rf'data-key="{key}" data-name="[^"]*" data-value="([^"]*)"', scheda).group(1))
