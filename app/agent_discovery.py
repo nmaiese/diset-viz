@@ -163,9 +163,15 @@ def openapi_document(site_url):
             "/api/indicator/{indicator_id}": {
                 "get": {
                     "summary": "Restituisce metadati e serie completa di un indicatore",
-                    "description": "La serie servita e' quella regionale. I valori provinciali stanno nelle pagine /provincia/<key>, anche in Markdown.",
+                    "description": "Senza livello la serie servita e' quella regionale. Con livello=provincia e' quella provinciale di un indicatore BES, nella stessa forma. I profili delle province stanno nelle pagine /provincia/<key>, anche in Markdown.",
                     "operationId": "getIndicator",
-                    "parameters": [indicator_parameter],
+                    "parameters": [indicator_parameter, {
+                        "name": "livello",
+                        "in": "query",
+                        "required": False,
+                        "description": "Livello della serie: regione (predefinito) o provincia. Un indicatore senza quel livello risponde 404.",
+                        "schema": {"type": "string", "enum": ["regione", "provincia"], "default": "regione"},
+                    }],
                     "responses": json_responses,
                 }
             },

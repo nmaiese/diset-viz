@@ -1,7 +1,8 @@
 {% extends "blog_base.html" %}
 {% import "v1/_ui.html" as ui %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{#- Il confronto della 1.0: un indicatore, fino a tre regioni. Cio' che la
+{#- Il confronto della 1.0: un indicatore, fino a tre regioni o tre province
+    (`d.level`, il selettore Regioni/Province in testa). Cio' che la
     pagina chiede ai dati lo compone app/design/pages/confronto.py e arriva
     qui come `d`. Non c'e' un ripiego: se la regia cede la view risponde 500.
 
@@ -17,9 +18,15 @@
     cambia tipo. -#}
 {% set PAGE_TYPE = 'atlas' %}
 {% set ind = d.indicator %}
+{#- Le province non sono un documento a se': canonical `/confronto` come ogni
+    stato, e `noindex, follow` nel meta e nell'header (la view), come
+    `/atlante?livello=provincia`. -#}
+{% set prov = d.level == 'provincia' %}
 
-{% block title %}Confronta le regioni italiane{% endblock %}
-{% block description %}Scegli un indicatore e fino a tre regioni: valore, posizione in classifica e serie storica a confronto con la media semplice delle regioni.{% endblock %}
+{% block title %}Confronta le {{ d.plural }} italiane{% endblock %}
+{% block description %}Scegli un indicatore e fino a tre {{ d.plural }}: valore, posizione in classifica e serie storica a confronto con la media semplice delle {{ d.plural }}.{% endblock %}
+
+{% block robots_meta %}{% if prov %}<meta name="robots" content="noindex, follow">{% else %}{{ super() }}{% endif %}{% endblock %}
 
 {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/confronto.css') }}">{% endblock %}
 
@@ -34,14 +41,16 @@
 
   <header class="pagehead">
     <p class="eyebrow">Confronto fra {{ d.plural }}<span class="sep" aria-hidden="true">·</span><span data-cmp-theme>{{ ind.theme }}</span></p>
-    <h1 class="h-title">Confronta le regioni italiane</h1>
+    <h1 class="h-title">Confronta le {{ d.plural }} italiane</h1>
     <div class="answer"><p data-cmp-answer>{{ d.answer or ind.name }}</p></div>
+    {#- Il livello: un link per livello, come l'atlante. Tiene l'indicatore se
+        l'altro livello lo offre (`confronto.switch_href`, e `switchHref`
+        nell'isola, che riscrive l'indirizzo quando cambia l'indicatore). -#}
+    <nav class="seg confronto-level" aria-label="Livello dei territori">{% for t in d.tabs %}<a href="{{ t.href }}" data-cmp-switch="{{ t.key }}"{% if t.current %} aria-current="page"{% endif %}>{{ t.label }}</a>{% endfor %}</nav>
   </header>
 
   <form class="toolbar confronto-form" id="cmp-form" action="/confronto" method="get" aria-label="Scegli che cosa confrontare" data-cmp-form data-level="{{ d.level }}">
-    {#- Il livello: oggi solo le regioni. Il selettore delle province (PR12)
-        prende il posto di questo campo, e il server e l'isola leggono gia'
-        `livello`. -#}
+    {#- Il livello lo cambia il selettore in testa: qui viaggia con il form. -#}
     <input type="hidden" name="livello" value="{{ d.level }}" data-cmp-level>
     <label class="field confronto-form__ind" for="cmp-indicator">Indicatore
       <select id="cmp-indicator" name="indicator" data-cmp-indicator>
@@ -50,10 +59,11 @@
     </label>
     {% for i in range(d.max) %}
     {% set s = d.selected[i] if i < d.selected | length else None %}
-    <label class="field" for="cmp-region-{{ i + 1 }}"><span><span class="swatch s{{ i + 1 }}" aria-hidden="true"></span>{{ ['Prima', 'Seconda', 'Terza'][i] }} regione</span>
-      <select id="cmp-region-{{ i + 1 }}" name="region" data-cmp-region>
+    <label class="field" for="cmp-region-{{ i + 1 }}"><span><span class="swatch s{{ i + 1 }}" aria-hidden="true"></span>{{ d.ordinals[i] }} {{ d.singular }}</span>
+      <select id="cmp-region-{{ i + 1 }}" name="{{ d.param }}" data-cmp-region>
         {% if i > 0 %}<option value="">Nessuna</option>{% endif %}
-        {%- for t in d.territories %}<option value="{{ t.key }}"{% if s and s.key == t.key %} selected{% endif %}>{{ t.name }}</option>{% endfor -%}
+        {%- if d.groups %}{% for g in d.groups %}<optgroup label="{{ g.label }}">{% for t in g.entries %}<option value="{{ t.key }}"{% if s and s.key == t.key %} selected{% endif %}>{{ t.name }}</option>{% endfor %}</optgroup>{% endfor %}
+        {%- else %}{% for t in d.territories %}<option value="{{ t.key }}"{% if s and s.key == t.key %} selected{% endif %}>{{ t.name }}</option>{% endfor %}{% endif -%}
       </select>
     </label>
     {% endfor %}
@@ -69,16 +79,16 @@
     <h2 id="h-valori">I valori nel <span data-cmp-year-label>{{ d.year }}</span></h2>
     <div class="confronto-grid">
       <div class="confronto-grid__map" data-cmp-map>
-        {{ ui.map(d.map_classes, 'confronto', d.map_names, d.map_values, label='Mappa delle regioni italiane per ' ~ ind.name ~ ', ' ~ d.year ~ ', con le regioni a confronto in evidenza') }}
-        {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le regioni a confronto.', nd_hidden=not d.legend_nd) }}{% endif %}
+        {{ ui.map(d.map_classes, 'confronto', d.map_names, d.map_values, label='Mappa delle ' ~ d.plural ~ ' italiane per ' ~ ind.name ~ ', ' ~ d.year ~ ', con le ' ~ d.plural ~ ' a confronto in evidenza', level=d.level) }}
+        {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le ' ~ d.plural ~ ' a confronto.', nd_hidden=not d.legend_nd) }}{% endif %}
       </div>
       <div class="tablewrap">
         <table class="table confronto-table">
           <caption><span data-cmp-name>{{ ind.name }}</span>, <span data-cmp-year-label>{{ d.year }}</span></caption>
-          <thead><tr><th scope="col">Regione</th><th class="r" scope="col">Valore</th><th class="r" scope="col">Posizione</th></tr></thead>
+          <thead><tr><th scope="col">{{ d.singular | capitalize }}</th><th class="r" scope="col">Valore</th><th class="r" scope="col">Posizione</th></tr></thead>
           <tbody data-cmp-rows>
             {%- for s in d.selected %}
-            <tr><th scope="row"><span class="swatch {{ s.cls }}" aria-hidden="true"></span><a href="/regione/{{ s.key }}">{{ s.name }}</a></th><td class="val">{{ s.value | num(ind.unit_label, 'cell', d.decimals) }}</td><td class="val">{{ s.rank | rank(d.total) }}</td></tr>
+            <tr><th scope="row"><span class="swatch {{ s.cls }}" aria-hidden="true"></span><a href="{{ d.profile ~ s.key }}">{{ s.name }}</a></th><td class="val">{{ s.value | num(ind.unit_label, 'cell', d.decimals) }}</td><td class="val">{{ s.rank | rank(d.total) }}</td></tr>
             {%- endfor %}
             <tr class="ref"><th scope="row">Media semplice delle {{ d.avg_n }} {{ d.plural }}</th><td class="val">{{ d.avg | num(ind.unit_label, 'cell', d.decimals) }}</td><td></td></tr>
           </tbody>
@@ -126,7 +136,11 @@
     <p class="sr-only" role="status" aria-live="polite" data-cmp-saved-status></p>
   </section>
 
+  {% if prov %}
+  <p class="confronto-more">Per una provincia sola c'è <a href="/province">il suo profilo</a>, per tutte le serie sulle province <a href="/atlante?livello=provincia">l'atlante</a>, per le province in fila <a href="/qualita-della-vita/classifica/province">la classifica della qualità della vita</a>.</p>
+  {% else %}
   <p class="confronto-more">Per una regione sola c'è <a href="/regioni">il suo profilo</a>, per tutte le serie <a href="/atlante">l'atlante</a>, per le differenze fra Nord, Centro e Mezzogiorno <a href="/divari-regionali">i divari regionali</a>.</p>
+  {% endif %}
   <p class="sr-only" role="status" aria-live="polite" data-cmp-live></p>
   <script type="application/json" data-cmp-data>{{ d.js | tojson }}</script>
 </div>

@@ -168,6 +168,53 @@ def _rule_level_pages():
     return sorted(pages, key=lambda page: page["path"])
 
 
+@synchronized_cache(maxsize=1)
+def _records_by_id():
+    """Le voci della proiezione per id, una volta per processo."""
+    return {str(record["meta"]["id"]): record for record in projection()}
+
+
+def province_payload(indicator_id):
+    """Un indicatore sulle province nella forma di `/api/indicator/<id>`, o
+    None se non ha il livello provinciale.
+
+    E' cio' che `/api/indicator/<id>?livello=provincia` restituisce e da cui
+    il confronto fra province compone la pagina: la serie e' quella della
+    `/province` della scheda (`indicator_view.provincial_series`), i metadati
+    sono quelli della scheda, con `path` sull'URL del livello (la `/province`
+    di una scheda a due livelli, il canonico di una solo provinciale). Le
+    righe hanno i nomi del payload regionale (`region`, `region_key`), cosi'
+    chi legge l'uno legge l'altro.
+    """
+    record = _records_by_id().get(str(indicator_id))
+    if record is None:
+        return None
+    keys = [level["key"] for level in record["levels"]]
+    if "provincia" not in keys or record["family"] != "bes":
+        return None
+    rows = indicator_view.provincial_series(record["raw_id"])
+    if not rows:
+        return None
+    meta = record["meta"]
+    level = next(level for level in record["levels"] if level["key"] == "provincia")
+    series = sorted(rows, key=lambda row: (row["year"], row["region"]))
+    return {
+        "metadata": {
+            "id": str(meta["id"]), "raw_id": meta["raw_id"], "level": "provincia",
+            "name": meta["name"], "theme": meta.get("theme"), "unit": meta.get("unit"),
+            "path": sources.level_path(meta["canonical_path"], "provincia", keys[0]),
+            "source": meta.get("source"), "source_label": meta.get("source_label"),
+            "source_url": meta.get("source_url"),
+            # Solo il verso: `scope` e `caveat` della scheda parlano delle
+            # regioni, e sul livello provinciale direbbero il falso.
+            "explain": {"direction": meta.get("direction")},
+            "year_min": level["year_min"], "year_max": level["year_max"],
+            "catalog_family": record["family"],
+        },
+        "series": [dict(row) for row in series],
+    }
+
+
 def cache_clear():
     """Svuota la passata e la sua proiezione: serve ai test, che altrimenti
     leggono il catalogo del test precedente. `cache.clear()` di Flask-Caching non
@@ -175,6 +222,7 @@ def cache_clear():
     projection.cache_clear()
     indexable_catalog.cache_clear()
     _rule_level_pages.cache_clear()
+    _records_by_id.cache_clear()
     # Le righe dell'atlante nascono dalla proiezione: vanno via con lei.
     # L'import sta qui perche' la pagina importa questo modulo.
     from app.design.pages import atlante

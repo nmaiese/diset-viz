@@ -412,7 +412,16 @@ def derive(ctx: dict) -> dict:
                 f"({year}). {ctx.get('canonical')}")
     module = explore_module(meta, level, claim=claim, strip=strip,
                             tabs=level_tabs(meta, level, ctx.get("levels") or [], ctx.get("twin")))
+    # Il confronto fra province, dalla `/province` di una scheda che il
+    # confronto offre (la regola dell'indice, `confronto.province_ids`): lo
+    # stesso ingresso che la vista regionale ha verso `/confronto`.
+    compare = None
+    if level["key"] == "provincia":
+        from app.design.pages import confronto
+
+        compare = confronto.compare_path(meta, "provincia")
     return {
+        "compare_path": compare,
         "fmt": num, "fmt_unit": with_unit, "date_it": date_it, "citation": citation,
         "unit": numfmt.lower_first(unit) if unit else unit, "tiles": tiles, "verso": verso,
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),

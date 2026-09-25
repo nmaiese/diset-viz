@@ -454,6 +454,14 @@ def _bes_series_by_indicator(level):
     return by_indicator
 
 
+def provincial_series(raw_id):
+    """Le righe provinciali di un BES, le stesse da cui la scheda compone la
+    sua `/province`, o una lista vuota. I campi hanno i nomi del payload
+    regionale (`region`, `region_key`): chi le legge, come il confronto, non
+    distingue i due livelli. Chi le riceve non le deve mutare."""
+    return _bes_series_by_indicator("provincia").get(str(raw_id)) or []
+
+
 def _provincial_level(raw_id, meta):
     """The BES provincial series, which lives outside the atlas layer."""
     rows = _bes_series_by_indicator("provincia").get(raw_id)
