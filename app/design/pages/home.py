@@ -578,6 +578,7 @@ def atlas_band() -> dict:
         "total": levels[0]["n"], "href": atlante.LEVEL_PATHS["regione"], "levels": levels,
         "need": {key: indicator_view.panel_need(key) for key in atlante.LEVEL_PATHS},
         "panel_total": dict(indicator_view.PANEL_TOTALS),
+        "min_years": indicator_view.PANEL_MIN_YEARS,
     }
 
 
@@ -831,8 +832,8 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
     need, total = band["need"], band["panel_total"]
     rule = ("Per ogni area, l'indicatore la cui media semplice è cambiata di più fra il primo e l'ultimo anno, "
             "in rapporto allo scarto interquartile fra i territori nell'ultimo anno, a pari merito in ordine "
-            "alfabetico. Solo schede indicizzabili, con almeno tre anni in cui almeno "
-            f"{need['regione']} regioni su {total['regione']} ({need['provincia']} province su "
+            f"alfabetico. Solo schede indicizzabili, con almeno {count_word(band['min_years'], feminine=False)} "
+            f"anni in cui almeno {need['regione']} regioni su {total['regione']} ({need['provincia']} province su "
             f"{total['provincia']}) hanno il dato, e con la media dei territori presenti in tutti quegli anni.")
     return {"total": band["total"], "href": band["href"], "rule": rule, "levels": levels}
 
@@ -853,7 +854,7 @@ def derive(ctx: dict) -> dict:
         "best_key": next((k for k, v in names.items() if v == area.get("best")), None),
         "worst_key": next((k for k, v in names.items() if v == area.get("worst")), None),
     } for area in ctx.get("themes_preview") or []]
-    citation =(f"Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati "
+    citation = (f"Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati "
                 f"{ctx.get('sources_label')}. {ctx.get('canonical')}")
     return {
         "indicators": ctx.get("total_indicators"),

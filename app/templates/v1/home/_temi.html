@@ -15,6 +15,7 @@
 {% set t = d.temi %}
 {% if t %}
 {% set two = t.levels | length > 1 %}
+{# Il bottone primario porta sempre all'atlante delle regioni, col loro totale, anche col pannello Province aperto: le province si raggiungono dal selettore e dai conteggi d'area. #}
 <section class="zone" id="temi" aria-labelledby="h-temi">
 <div class="wrap">
   <header class="zone__head">
