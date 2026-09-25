@@ -26,10 +26,13 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from collections import defaultdict
 from functools import lru_cache
 
+from app import profiles
 from app import quality_life_bes as qb
-from app.data import REGION_GEO_AREA
+from app.cache_util import synchronized_cache
+from app.data import REGION_GEO_AREA, get_rows
 from app.design import charts, common, numfmt
 from app.indicator_notes import figure_unit
 from app.profiles import MIN_THEME_INDICATORS
@@ -231,6 +234,62 @@ def _quality(key: str, name: str) -> dict | None:
     }
 
 
+# ---------------------------------------------------------------- andamento
+
+@synchronized_cache(maxsize=1)
+def _region_series() -> dict[str, dict]:
+    """Le serie di tutte le regioni per gli indicatori della tabella, una volta per processo.
+
+    `{id: {"floor": pavimento, "points": {chiave di regione: (anni, valori)}}}`,
+    sugli stessi indicatori di `profiles._core_stats`, cioe' le righe di
+    "Tutti gli indicatori". Una voce sola per tutte e venti le pagine: la
+    passata sulle centomila righe del dataset si fa alla prima regione, e le
+    altre leggono. `synchronized_cache` e non `lru_cache`: con piu' thread due
+    miss in parallelo rifarebbero la passata insieme, ed e' il picco di
+    memoria che ha gia' fatto cadere il worker (`app/cache_util.py`).
+
+    La serie e' quella della regione, mai una media: sulla pagina di un
+    territorio la linea dice come si e' mosso lui. Si ferma all'anno della
+    colonna Valore, cosi' il punto finale e' la cifra scritta accanto. Due
+    tuple parallele per regione, anni e valori, e non un dizionario o una
+    coppia per punto: sono cinquantamila punti, e cosi' la voce pesa circa un
+    megabyte invece di tre. I dizionari che `charts.spark` legge si fanno solo
+    per le righe della pagina.
+
+    Il pavimento vale anche qui, con la regola delle minicard: lo scarto
+    interquartile delle regioni nell'ultimo anno (`charts.spark_floor`). Una
+    regione che si muove poco rispetto alla distanza fra le regioni si
+    disegna quasi piatta, invece di riempire l'altezza come se fosse salita di
+    molto. Senza, ogni linea della tabella sembrerebbe una grande variazione.
+    """
+    stats = profiles._core_stats()
+    values: dict[str, dict[str, dict[int, float]]] = {ind_id: defaultdict(dict) for ind_id in stats}
+    for row in get_rows():
+        by_region = values.get(row["id"])
+        if by_region is None or row["value"] is None or row["year"] > stats[row["id"]]["year"]:
+            continue
+        by_region[row["region_key"]][row["year"]] = row["value"]
+    return {
+        ind_id: {
+            "floor": charts.spark_floor(stats[ind_id]["values"].values()),
+            "points": {key: (tuple(sorted(years)), tuple(years[y] for y in sorted(years)))
+                       for key, years in by_region.items()},
+        }
+        for ind_id, by_region in values.items()
+    }
+
+
+def _with_trend(row: dict, key: str, series: dict[str, dict]) -> dict:
+    """La riga della tabella con la serie della regione `key`, per la sparkline
+    e per "dal 2004 era 45,1". `series` e' `_region_series()`, letta una volta
+    per pagina e non una per riga. Una copia: la riga non viene dalla cache, ma
+    la serie si'."""
+    entry = series.get(row["id"])
+    years, values = entry["points"].get(key, ((), ())) if entry else ((), ())
+    return {**row, "spark": [{"year": year, "value": value} for year, value in zip(years, values)],
+            "spark_floor": entry["floor"] if entry else None}
+
+
 # ---------------------------------------------------------------- profilo
 
 def _indicator_row(ind: dict, region_total: int | None) -> dict:
@@ -282,12 +341,14 @@ def _answer(profile: dict) -> dict:
     return out
 
 
-def _areas(indicators: list[dict], theme_paths: dict[str, str], total: int | None) -> list[dict]:
+def _areas(indicators: list[dict], theme_paths: dict[str, str], total: int | None, key: str) -> list[dict]:
     """Tutti gli indicatori per macro-area, e dentro per tema nell'ordine della
-    tassonomia. Dentro il tema, dalla posizione migliore alla peggiore."""
+    tassonomia. Dentro il tema, dalla posizione migliore alla peggiore. Ogni
+    riga porta la serie della regione `key` per la colonna Andamento."""
     order = _theme_order()
     rows_ok = [i for i in indicators if i.get("name") and i.get("path")]
     known = set(MACRO_AREAS)
+    series = _region_series()
     names = list(MACRO_AREAS) + sorted({i.get("macro_area") or "Altro" for i in rows_ok} - known)
     areas = []
     for area in names:
@@ -299,7 +360,7 @@ def _areas(indicators: list[dict], theme_paths: dict[str, str], total: int | Non
             items = sorted((i for i in rows if (i.get("theme") or "") == theme),
                            key=lambda i: (i.get("rank") is None, i.get("rank") or 0, i["name"]))
             groups.append({"theme": theme or "Altri indicatori", "path": theme_paths.get(theme),
-                           "rows": [_indicator_row(i, total) for i in items]})
+                           "rows": [_with_trend(_indicator_row(i, total), key, series) for i in items]})
         plain = unicodedata.normalize("NFKD", area.lower()).encode("ascii", "ignore").decode()
         areas.append({"name": area, "slug": re.sub(r"[^a-z]+", "-", plain).strip("-"),
                       "count": len(rows), "groups": groups})
@@ -365,7 +426,7 @@ def derive(ctx: dict) -> dict:
                  for pr in sorted(ctx.get("provinces") or [], key=lambda r: (r.get("rank") is None, r.get("rank") or 0))]
 
     theme_paths = {t["theme"]: t.get("theme_path") for t in p.get("theme_table") or []}
-    areas = _areas(indicators, theme_paths, total)
+    areas = _areas(indicators, theme_paths, total, key)
 
     area_of = charts.area_map()
     similar = []

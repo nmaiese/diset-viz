@@ -342,7 +342,7 @@
 
   <section class="section" id="indicatori" aria-labelledby="h-indicatori" data-rf>
     <h2 id="h-indicatori">Tutti gli indicatori {{ d.of_name }}</h2>
-    <p class="regione-intro">I {{ d.indicator_count | num(None, 'count') }} indicatori con l'ultimo valore {{ d.of_name }}, l'anno, la posizione fra le regioni e quella nell'anno di confronto.{% if d.contextual_count %} {{ d.contextual_count | num(None, 'count') }} descrivono il territorio senza un verso e non si classificano.{% endif %}</p>
+    <p class="regione-intro">I {{ d.indicator_count | num(None, 'count') }} indicatori con l'ultimo valore {{ d.of_name }}, l'anno, l'andamento dal primo anno della serie, la posizione fra le regioni e quella nell'anno di confronto. La linea è la serie della regione anno per anno, e resta quasi piatta quando la regione si è mossa poco rispetto alla distanza fra le regioni.{% if d.contextual_count %} {{ d.contextual_count | num(None, 'count') }} descrivono il territorio senza un verso e non si classificano.{% endif %}</p>
     <div class="toolbar regione-filter" data-rf-controls hidden>
       <div class="field"><span id="rf-area-label">Area</span>
         <div class="seg" role="group" aria-labelledby="rf-area-label">
@@ -361,28 +361,30 @@
     {% for area in d.areas %}
     <details class="regione-area" data-rf-area="{{ area.slug }}" data-collapse-mobile open>
       <summary><h3 class="h-sub" id="{{ 'h-area-' ~ area.slug }}">{{ area.name }} <span class="regione-area__n">{{ area.count | num(None, 'count') }} {{ area.count | it_plural('indicatore', 'indicatori') }}</span></h3></summary>
-      <div class="tablewrap stackwrap" tabindex="0" role="region" aria-labelledby="{{ 'h-area-' ~ area.slug }}">
+      <div class="tablewrap stackwrap stackwrap--wide" tabindex="0" role="region" aria-labelledby="{{ 'h-area-' ~ area.slug }}">
         <table class="table table--compact table--stack" role="table">
-          <caption class="sr-only">{{ area.name }}: gli indicatori {{ d.of_name }} per tema, con valore, unità, anno e posizione fra le regioni</caption>
+          <caption class="sr-only">{{ area.name }}: gli indicatori {{ d.of_name }} per tema, con valore, unità, anno, andamento dal primo anno della serie e posizione fra le regioni</caption>
           <thead role="rowgroup">
             <tr role="row">
               <th scope="col" role="columnheader">Indicatore</th>
               <th class="r" scope="col" role="columnheader">Valore</th>
               <th scope="col" role="columnheader">Unità</th>
               <th class="r" scope="col" role="columnheader">Anno</th>
+              <th scope="col" role="columnheader">Andamento</th>
               <th class="r" scope="col" role="columnheader">Posizione</th>
               <th class="r" scope="col" role="columnheader">Nell'anno di confronto</th>
             </tr>
           </thead>
           {% for g in area.groups %}
           <tbody role="rowgroup">
-            <tr class="group" role="row"><th scope="rowgroup" colspan="6" role="rowheader">{% if g.path %}<a href="{{ g.path }}">{{ g.theme }}</a>{% else %}{{ g.theme }}{% endif %}</th></tr>
+            <tr class="group" role="row"><th scope="rowgroup" colspan="7" role="rowheader">{% if g.path %}<a href="{{ g.path }}">{{ g.theme }}</a>{% else %}{{ g.theme }}{% endif %}</th></tr>
             {% for r in g.rows %}
             <tr data-rf-row data-name="{{ r.name | lower }}" role="row">
               <th scope="row" role="rowheader"><a href="{{ r.path }}">{{ r.name }}</a></th>
               <td class="val" data-label="Valore" role="cell">{{ r.value | num(None, 'cell') }}</td>
               <td data-label="Unità" role="cell">{{ r.unit }}</td>
               <td class="val" data-label="Anno" role="cell">{{ r.year }}</td>
+              <td class="trendcell" data-label="Andamento" role="cell">{% if r.spark | length > 1 %}<span class="trend">{{ r.spark | sparkline("s", r.spark_floor) }}<span class="trend__txt"><span class="trend__from">dal {{ r.spark[0].year }} era</span> {{ r.spark[0].value | num(None, 'cell') }}</span></span>{% else %}{{ none | num }}{% endif %}</td>
               {% if r.rank %}
               <td class="val" data-label="Posizione" role="cell">{{ r.rank | rank(r.count) }}</td>
               <td class="val" data-label="Nell'anno di confronto" role="cell">{% if r.before %}{% if r.before.same and not r.partial %}stessa nel {{ r.before.year }}{% else %}{{ r.before.rank | rank(r.before.total) }} nel {{ r.before.year }}{% endif %}{% else %}<span class="n n--nd">n.d.</span>{% endif %}</td>

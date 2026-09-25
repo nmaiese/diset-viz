@@ -45,4 +45,4 @@
 .provincia-group[open] > summary > svg { transform: none; }
 .provincia-table tbody th[scope="row"] { min-width: 12rem; }
 .provincia-table .provincia-unit { font-size: var(--fs-small); color: var(--text-2); }
-@container (max-width: 560px) { .provincia-table tbody th[scope="row"] { min-width: 0; } }
+@container stackwide (max-width: 719px) { .provincia-table tbody th[scope="row"] { min-width: 0; } }

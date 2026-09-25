@@ -37,7 +37,8 @@
 }
 .regione-area tr.group a { color: var(--text-2); }
 .regione-area tbody tr.group:hover > * { background: transparent; }
-@container (max-width: 560px) {
+/* a blocchi dalla stessa soglia della tabella (`.stackwrap--wide`, 720 pixel) */
+@container stackwide (max-width: 719px) {
   .regione-area tr.group { padding-top: var(--space-6); padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
   .regione-area td[colspan] { grid-column: span 2; }
 }

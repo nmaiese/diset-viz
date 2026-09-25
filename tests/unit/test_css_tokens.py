@@ -25,6 +25,9 @@ SPA = RADICE / "frontend" / "src" / "styles.css"
 GIOCO = RADICE / "frontend" / "src" / "game" / "game.css"
 SISTEMA = RADICE / "app" / "static" / "css" / "ds" / "system.css"
 CHROME = RADICE / "app" / "static" / "css" / "ds" / "chrome.css"
+COMPONENTS = RADICE / "app" / "static" / "css" / "ds" / "components.css"
+REGION_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "regione.css"
+PROVINCE_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "provincia.css"
 
 FOGLI = (SITE, SPA, GIOCO, SISTEMA, CHROME)
 
@@ -130,6 +133,39 @@ class FogliDiStileTest(unittest.TestCase):
         for morto in (".masthead", ".mobmenu", ".nav-underline", ".brand-mark"):
             with self.subTest(selettore=morto):
                 self.assertIsNone(re.search(rf"^{re.escape(morto)}[\s,:{{]", site, re.M))
+
+    def test_wide_stacked_tables_repeat_the_stack_block(self):
+        """Le tabelle larghe si impilano con lo stesso blocco delle altre.
+
+        `.stackwrap--wide` ("Tutti gli indicatori" di regione e provincia)
+        diventa blocchi sotto i 720 pixel invece che sotto i 560, e la soglia di
+        un contenitore non si passa per variabile: il corpo e' scritto due
+        volte. Se uno dei due cambia da solo, fra 560 e 720 pixel quelle tabelle
+        prendono un'impaginazione che nessuno ha guardato. E le regole di pagina
+        che valgono solo a blocchi devono chiedere lo stesso contenitore: a 560
+        la regione perdeva il filetto fra un tema e l'altro proprio nella fascia
+        dove le righe sono gia' blocchi.
+        """
+        components = COMPONENTS.read_text(encoding="utf-8")
+
+        def normalized(body):
+            body = re.sub(r"/\*.*?\*/", "", body, flags=re.DOTALL)
+            return re.sub(r"\s+", " ", body).strip()
+
+        narrow = [b for b in _corpi(components, r"^@container \(max-width: 560px\) \{")
+                  if ".table--stack thead" in b]
+        wide = _corpi(components, r"^@container stackwide \(max-width: 719px\) \{")
+        self.assertEqual(len(narrow), 1)
+        self.assertEqual(len(wide), 1)
+        self.assertEqual(normalized(wide[0]), normalized(narrow[0]))
+        self.assertIn(".stackwrap--wide { container-name: stackwide; }", components)
+
+        for sheet, selector in ((REGION_SHEET, ".regione-area"), (PROVINCE_SHEET, ".provincia-table")):
+            text = sheet.read_text(encoding="utf-8")
+            with self.subTest(foglio=sheet.name):
+                at_560 = [b for b in _corpi(text, r"^@container \(max-width: 560px\) \{") if selector in b]
+                self.assertEqual(at_560, [], f"{selector} a blocchi deve chiedere stackwide, non i 560 pixel")
+                self.assertTrue(any(selector in b for b in _corpi(text, r"^@container stackwide \(max-width: 719px\) \{")))
 
     def test_la_barra_in_alto_tiene_il_suo_nome_di_transizione(self):
         """Senza `view-transition-name` la testata si dissolve col resto."""

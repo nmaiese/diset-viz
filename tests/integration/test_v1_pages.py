@@ -29,10 +29,10 @@ import statistics
 import unittest
 from pathlib import Path
 
-from app import app, indicator_view, profiles, province_profile, sources
+from app import app, bes_data, indicator_view, profiles, province_profile, sources
 from app.atlas_catalog import get_atlas_indicator
 from app.blog import get_posts
-from app.data import REGION_GEO_AREA
+from app.data import REGION_GEO_AREA, get_rows
 from app.design import charts
 from app.design.common import PLACEHOLDER
 from app.quality_life_config import QUALITY_LIFE_PROFILES
@@ -57,8 +57,9 @@ PERCENT_IN_WORDS = re.compile(
     r'|"unit": "(?:[Vv]alori percentuali|percentuale)"')
 EXPLORE = re.compile(r'<script type="application/json" data-explore-data>(.*?)</script>', re.DOTALL)
 # La cella di una sparkline: il contenitore piu' vicino fra questi, aperto
-# prima del disegno e chiuso dopo. Oggi e' la minicard (`<a class="minicard">`),
-# domani una cella di tabella.
+# prima del disegno e chiuso dopo: la minicard (`<a class="minicard">`) della
+# scheda e dell'articolo, o la cella `<td class="trendcell">` delle tabelle di
+# regione e provincia.
 CELLA = re.compile(r"<(a|td|th|li)\b[^>]*>")
 
 
@@ -181,6 +182,7 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         self.assertEqual(len(chiavi), 20)
         guasti = self._guasti("regione", [f"/regione/{k}" for k in chiavi])
         self.assertEqual(guasti, [], guasti[:10])
+        self.assertGreater(self.sparks_seen, 0, "nessuna sparkline nelle regioni: la prova non guarda niente")
 
     def test_ogni_provincia(self):
         with app.app_context():
@@ -188,6 +190,7 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         self.assertEqual(len(chiavi), 107)
         guasti = self._guasti("provincia", [f"/provincia/{k}" for k in chiavi])
         self.assertEqual(guasti, [], guasti[:10])
+        self.assertGreater(self.sparks_seen, 0, "nessuna sparkline nelle province: la prova non guarda niente")
 
     def test_ogni_articolo(self):
         post = get_posts()
@@ -360,6 +363,137 @@ class LeUnitaPercentuali(unittest.TestCase):
         for card in cards:
             self.assertIn("\u2009punti percentuali</span>", card)
             self.assertNotIn("%", card)
+
+
+def iqr_or_none(values):
+    """Lo scarto interquartile con `statistics`, None sotto i due valori:
+    la stessa regola di `charts.spark_floor`, ricalcolata a parte."""
+    values = [v for v in values if v is not None]
+    if len(values) < 2:
+        return None
+    q1, _, q3 = statistics.quantiles(values, n=4, method="inclusive")
+    return q3 - q1
+
+
+def table_row(page, path):
+    """La riga della tabella "Tutti gli indicatori" che porta a `path`, dal
+    `<th scope="row">` alla chiusura del `<tr>`. Lo stesso indicatore compare
+    anche nei riquadri di apertura (dove eccelle, dove si e' mosso): un
+    `assertIn` sulla pagina intera non direbbe in quale riga sta il disegno."""
+    head = f'<th scope="row" role="rowheader"><a href="{html_lib.escape(path)}">'
+    assert page.count(head) == 1, (path, page.count(head))
+    start = page.index(head)
+    return page[start:page.index("</tr>", start)]
+
+
+class TablesDrawTheTerritorySeries(unittest.TestCase):
+    """Nella tabella "Tutti gli indicatori" di una regione e di una provincia
+    la sparkline e' la serie di quel territorio, anno per anno, mai una media,
+    col pavimento sullo scarto interquartile dei territori dello stesso
+    livello nell'ultimo anno della riga.
+
+    Il disegno atteso si ricalcola da capo dalle righe grezze del dataset
+    (`get_rows()` per le regioni, `bes_data.get_bes_rows` per le province),
+    non da `_region_series` ne' da `province_profile.indicatori`: se una di
+    quelle sbaglia serie, anno o pavimento, qui si vede. Il punto finale e' la
+    cifra della colonna Valore, e almeno una riga deve essere di quelle dove il
+    pavimento cambia il disegno, altrimenti la prova non distingue niente."""
+
+    REGIONS = ("puglia", "lombardia")
+    PROVINCE = "lecce"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+        cls.region_points = {}   # (regione, id) -> {anno: valore}
+        cls.region_year = {}     # (id, anno) -> [valori delle regioni]
+        for row in get_rows():
+            if row["value"] is None:
+                continue
+            cls.region_year.setdefault((row["id"], row["year"]), []).append(row["value"])
+            if row["region_key"] in cls.REGIONS:
+                cls.region_points.setdefault((row["region_key"], row["id"]), {})[row["year"]] = row["value"]
+        cls.province_points = {}  # id -> {anno: valore} di Lecce
+        cls.province_year = {}    # (id, anno) -> [valori delle province]
+        for row in bes_data.get_bes_rows("provincia"):
+            if row["value"] is None:
+                continue
+            cls.province_year.setdefault((row["id"], row["year"]), []).append(row["value"])
+            if row["territory_key"] == cls.PROVINCE:
+                cls.province_points.setdefault(row["id"], {})[row["year"]] = row["value"]
+
+    def _check_row(self, row, points, floor):
+        """La riga disegna `points` col pavimento `floor`; True se qui il
+        pavimento cambia il disegno. Sotto i due punti, nessun disegno."""
+        if len(points) < 2:
+            self.assertNotIn('class="spark ', row)
+            return False
+        drawing = charts.spark(points, "s", floor)
+        self.assertIn(drawing, row)
+        self.assertEqual(row.count('class="spark '), 1)
+        return drawing != charts.spark(points, "s", None)
+
+    def test_regions(self):
+        for key in self.REGIONS:
+            with app.app_context():
+                indicators = profiles.region_profile(key)["all_indicators"]
+            html = self.client.get(f"/regione/{key}").get_data(as_text=True)
+            self.assertIn("<th scope=\"col\" role=\"columnheader\">Andamento</th>", html)
+            seen = sensitive = 0
+            for ind in indicators:
+                if not (ind.get("name") and ind.get("path")):
+                    continue
+                with self.subTest(regione=key, indicatore=ind["id"]):
+                    years = self.region_points[(key, ind["id"])]
+                    points = [{"year": y, "value": years[y]} for y in sorted(years) if y <= ind["year"]]
+                    # Il punto finale e' la cifra della colonna Valore.
+                    self.assertEqual((points[-1]["year"], points[-1]["value"]), (ind["year"], ind["value"]))
+                    row = table_row(html, ind["path"])
+                    sensitive += self._check_row(row, points, iqr_or_none(self.region_year[(ind["id"], ind["year"])]))
+                    if len(points) > 1:
+                        first = points[0]
+                        self.assertIn(f'<span class="trend__from">dal {first["year"]} era</span> '
+                                      f'<data class="n n--cell" value="{float(first["value"]):.6g}">', row)
+                    seen += 1
+            self.assertEqual(seen, len([i for i in indicators if i.get("name") and i.get("path")]))
+            self.assertGreater(sensitive, 0, f"{key}: nessuna riga dove il pavimento cambia il disegno")
+
+    def test_province(self):
+        with app.app_context():
+            rows = province_profile.indicatori(self.PROVINCE)
+        html = self.client.get(f"/provincia/{self.PROVINCE}").get_data(as_text=True)
+        self.assertTrue(rows)
+        sensitive = 0
+        for ind in rows:
+            with self.subTest(indicatore=ind["id"]):
+                years = self.province_points[ind["id"]]
+                points = [{"year": y, "value": years[y]} for y in sorted(years)]
+                self.assertEqual((points[-1]["year"], points[-1]["value"]), (ind["year"], ind["value"]))
+                row = table_row(html, ind["path"])
+                sensitive += self._check_row(row, points, iqr_or_none(self.province_year[(ind["id"], ind["year"])]))
+                if len(points) > 1:
+                    self.assertIn(f'<span class="trend__from">dal {points[0]["year"]}</span>', row)
+        self.assertGreater(sensitive, 0, "nessuna riga dove il pavimento cambia il disegno")
+
+
+class RegionSeriesCacheDoesNotGrowWithPages(unittest.TestCase):
+    """Le serie delle regioni sono una voce sola per processo, per tutte le
+    pagine: una cache che crescesse con le regioni visitate terrebbe venti
+    copie dello stesso lavoro. Le province non aggiungono cache: la loro serie
+    viene da `province_profile._serie()`, che c'era gia'."""
+
+    def test_one_entry_for_every_region(self):
+        from app.design.pages import regione
+
+        client = app.test_client()
+        regione._region_series.cache_clear()
+        keys = ("puglia", "lombardia", "sicilia", "veneto", "molise")
+        for key in keys:
+            self.assertEqual(client.get(f"/regione/{key}").status_code, 200)
+        info = regione._region_series.cache_info()
+        self.assertEqual((info.currsize, info.misses), (1, 1))
+        # Una lettura per pagina, non una per riga.
+        self.assertEqual(info.hits, len(keys) - 1)
 
 
 class IlRipiegoTiene(unittest.TestCase):
