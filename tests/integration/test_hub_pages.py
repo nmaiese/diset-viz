@@ -1124,7 +1124,7 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         # Ogni livello sta sul suo URL: le regioni sul canonico nudo, le
         # province sulla `/province`, mai su un `?livello=`.
         self.assertIn(f"- Gli stessi dati per regioni: https://divarioitalia.it{base}\n", province)
-        self.assertNotIn("livello=regione", province)
+        self.assertNotIn("livello=", province)
         self.assertIn("# Speranza di vita alla nascita nelle province italiane", province)
 
     def test_la_provincia_in_markdown_porta_le_sorelle(self):

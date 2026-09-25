@@ -178,7 +178,7 @@ class LaTestaSegueIlLivello(unittest.TestCase):
                     self.assertNotIn(forbidden, description)
         self.assertGreater(checked, 40)
 
-    def test_nessuna_pagina_porta_a_livello_regione(self):
+    def test_nessuna_pagina_porta_a_un_livello_in_query(self):
         paths = set()
         for code, view, level, _ in self.pages:
             if len(view["levels"]) > 1 or level["key"] == "provincia" or code in PROVINCE_TWINS:
@@ -188,8 +188,8 @@ class LaTestaSegueIlLivello(unittest.TestCase):
             with self.subTest(pagina=path):
                 page = self.client.get(path).get_data(as_text=True)
                 self.assertIn('data-v1="indicatore"', page)
-                self.assertNotIn("livello=regione", page)
-                self.assertNotIn("livello=regione",
+                self.assertNotIn("livello=", page)
+                self.assertNotIn("livello=",
                                  self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True))
 
     def test_la_linguetta_corrente_non_e_un_link(self):
