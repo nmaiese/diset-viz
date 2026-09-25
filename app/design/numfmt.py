@@ -117,6 +117,24 @@ def text(value, decimals: int | None = None, sign: bool = False) -> str:
     return body
 
 
+UNCHANGED = "invariato"
+
+
+def change_text(value, decimals: int | None = None) -> str:
+    """Una variazione come si scrive: col segno, e "invariato" quando la cifra
+    arrotondata e' zero. `+0,0` direbbe "e' salito" su un numero che non si e'
+    mosso.
+
+    E' il testo del filtro `delta`, e lo usano anche i gemelli Markdown e i
+    template di ripiego: la variazione di una provincia si scriveva con i
+    decimali della fonte in HTML e con quelli di `it_numbers` nel Markdown.
+    """
+    shown = text(value, decimals, sign=True)
+    if shown == "n.d.":
+        return shown
+    return UNCHANGED if not re.search(r"[1-9]", shown) else shown
+
+
 def lower_first(text: str) -> str:
     """"Per 1.000 abitanti" -> "per 1.000 abitanti", ma "GWh" e "KTep" restano
     come sono: una sigla con la maiuscola non si abbassa, "gWh" e' un'altra
@@ -208,9 +226,9 @@ def num(value, unit: str | None = None, role: str = "figure", decimals: int | No
     if value is None or (isinstance(value, float) and math.isnan(value)):
         return Markup('<span class="n n--nd"><abbr title="dato non disponibile">n.d.</abbr></span>')
     d = FIXED.get(role, decimals)
-    shown = text(value, d, sign=(role == "delta"))
-    if role == "delta" and shown in ("0", "0,0", "0,00"):
-        return Markup('<data class="n n--delta" value="0">invariato</data>')
+    shown = change_text(value, d) if role == "delta" else text(value, d)
+    if shown == UNCHANGED:
+        return Markup(f'<data class="n n--delta" value="0">{UNCHANGED}</data>')
     u = phrase_unit(unit)
     unit_html = ""
     if u == "%":
@@ -243,4 +261,5 @@ def register(env) -> None:
     env.filters["rank"] = rank
     env.filters["delta"] = delta
     env.filters["numtext"] = text
+    env.filters["numchange"] = change_text
     env.globals["column_decimals"] = column_decimals

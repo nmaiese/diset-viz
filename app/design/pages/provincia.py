@@ -10,7 +10,9 @@ prima di usarla, e se i due non coincidono la striscia si toglie.
 
 Qui si contano e si mettono in ordine le cose, e i valori restano numeri: li
 scrive il template con i filtri `num`, `rank` e `delta` di `numfmt`, con i
-decimali della fonte quando il valore e' della fonte. Nelle frasi composte qui
+decimali della grandezza di ogni cifra, come la scheda indicatore e la pagina
+regione. I decimali della fonte erano una seconda regola, e scrivevano la
+stessa cifra in due modi a un clic di distanza. Nelle frasi composte qui
 i conteggi passano da `count_word` e le posizioni da `ordinal`.
 
 Un dato che manca toglie la frase o la sezione, non ferma la pagina.

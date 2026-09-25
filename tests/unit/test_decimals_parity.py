@@ -92,6 +92,51 @@ class ParitaDeiDecimaliTest(unittest.TestCase):
         self.assertEqual(numfmt.column_decimals([0, 0, 0, 0.4, 0.7]), 2)
         self.assertEqual(numfmt.column_decimals([0.2, 0.3, 0.5]), 2)
 
+    def test_le_cifre_delle_pagine_territorio(self):
+        """Le cifre che la pagina provincia scriveva coi decimali della fonte, e
+        la scheda con quelli della grandezza: il reddito di Milano era
+        "34.885,3" da una parte e "34.885" dall'altra. Gli euro sopra cento
+        senza decimali, le percentuali sotto l'uno con due, gli indici piccoli
+        con due e mai a zero."""
+        attese = {34885.3: "34.885", 26348.4: "26.348", 128.8: "129", 31.88: "31,9",
+                  6: "6,0", 0.3: "0,30", 0.137: "0,14", 0.0107: "0,01", -5367.2: "-5.367"}
+        for valore, scritta in attese.items():
+            with self.subTest(valore=valore):
+                self.assertEqual(numfmt.text(valore), scritta)
+
+    def test_la_variazione_ha_una_forma_sola(self):
+        """`change_text` e' il testo del filtro `delta`: la pagina, il suo
+        gemello Markdown e il template di ripiego scrivono la stessa
+        variazione, col segno e con "invariato" quando arrotondata fa zero."""
+        for valore in (5024.4, -1, 1.1, -0.7, 0.1, 0.004, -0.004, 0, 0.0005):
+            with self.subTest(valore=valore):
+                html = str(numfmt.delta(valore))
+                testo = re.sub(r"<[^>]+>", "", html)
+                self.assertEqual(numfmt.change_text(valore), testo)
+        self.assertEqual(numfmt.change_text(5024.4), "+5.024")
+        self.assertEqual(numfmt.change_text(-0.7), "-0,70")
+        self.assertEqual(numfmt.change_text(0.004), "invariato")
+        self.assertEqual(numfmt.change_text(0.0004, 3), "invariato")
+        self.assertEqual(numfmt.change_text(0.004, 3), "+0,004")
+
+    def test_nessuna_seconda_regola_dei_decimali(self):
+        """I decimali della fonte (`bes_data.source_decimals`) erano la seconda
+        regola: la provincia li leggeva dalla riga, il Markdown ci ricadeva a un
+        decimale fisso se il campo mancava. Tolta la regola, nessuno deve
+        rileggerla, ne' le pagine territorio ne' i loro gemelli."""
+        from app import bes_data
+
+        self.assertFalse(hasattr(bes_data, "source_decimals"))
+        radice = Path(__file__).resolve().parents[2] / "app"
+        for relativo in ("province_profile.py", "agent_discovery.py", "design/pages/provincia.py",
+                         "design/pages/regione.py", "templates/v1/provincia.html",
+                         "templates/v1/regione.html", "templates/province_page.html",
+                         "templates/region_page.html"):
+            sorgente = (radice / relativo).read_text(encoding="utf-8")
+            with self.subTest(file=relativo):
+                self.assertNotIn("source_decimals", sorgente)
+                self.assertNotRegex(sorgente, r"""\bi\.decimals\b|\[["']decimals["']\]|get\(["']decimals["']""")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,6 +9,7 @@ from pathlib import Path
 from flask import Response, request
 
 from app import it_numbers
+from app.design import numfmt
 
 
 AGENT_SKILL_SCHEMA = "https://schemas.agentskills.io/discovery/0.2.0/schema.json"
@@ -766,17 +767,20 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
                   "",
                   "| indicatore | tema | valore | posizione | movimento |",
                   "| --- | --- | ---: | ---: | ---: |"]
+        # Le cifre come nella pagina HTML alla stessa URL: `numfmt`, coi
+        # decimali della grandezza di ciascuna. Il Markdown leggeva i decimali
+        # della fonte dalla riga, e senza quel campo sarebbe tornato in
+        # silenzio a un decimale fisso.
         for row in indicators:
-            decimals = row.get("decimals", 1)
-            value = it_numbers.number(row["value"], decimals)
+            value = numfmt.text(row["value"])
             value_cell = f"{_with_unit(value, row.get('unit'))}, {row['year']}"
             if row.get("variazione") is not None:
-                value_cell += f", dal {row['year_from']} {it_numbers.change(row['variazione'], decimals)}"
+                value_cell += f", dal {row['year_from']} {numfmt.change_text(row['variazione'])}"
             rank_cell = f"{row['rank']} su {row['province_count']}"
             if row.get("in_regione"):
                 ir = row["in_regione"]
                 rank_cell += (f", {ir['posizione']}ª di {ir['quante']} in {region}, media delle altre "
-                              f"{ir['quante'] - 1}: {it_numbers.number(ir['media'], decimals)}")
+                              f"{ir['quante'] - 1}: {numfmt.text(ir['media'])}")
             movement = row.get("movement")
             move_cell = "-" if movement is None else ("=" if movement == 0 else f"{movement:+d}")
             lines.append(f"| [{row['name']}]({_absolute(site_url, row['path'])}) | {row['theme']} "
@@ -785,7 +789,7 @@ def province_markdown(profile, neighbours, site_url, indicators=None,
     def _value_list(title, rows):
         lines.extend(["", f"## {title}", ""])
         for row in rows:
-            figure = _with_unit(it_numbers.number(row['value'], row.get('decimals', 1)), row.get("unit"))
+            figure = _with_unit(numfmt.text(row["value"]), row.get("unit"))
             lines.append(f"- [{row['name']}]({_absolute(site_url, row['path'])}), {figure}, {row['year']}")
 
     if first_in_region or last_in_region:
@@ -878,7 +882,11 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         profile["description"],
         "",
         f"Macro-area: {profile['macro_area']}",
-        f"Indicatori: {profile['indicator_count']}",
+        # Il livello come nel title della pagina HTML: gli indicatori del tema
+        # sono il catalogo dell'atlante, regionale, e le schede con i valori
+        # delle province si contano a parte, dalla sezione "Per provincia".
+        f"Indicatori per regione: {profile['indicator_count']}",
+        *([f"Schede per provincia: {len(province_indicators)}"] if province_indicators else []),
         f"URL canonica: {_absolute(site_url, profile['theme_path'])}",
         "",
     ]
