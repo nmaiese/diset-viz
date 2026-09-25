@@ -456,22 +456,24 @@ def atlante():
     di una riga, che sceglie l'indicatore della mappa su quel livello.
 
     Le province non sono un documento a se': il canonical resta `/atlante`, e
-    `?livello=` (come ogni parametro di `seo_policy.EXPLORE_PARAMS`) rende la
-    pagina `noindex, follow` e la tiene fuori dalla sitemap. L'header si mette
-    qui, fuori dalla cache, il meta lo scrive il template dal livello."""
-    explore_state = seo_policy.has_explore_params(request.args)
+    `?livello=provincia` rende la pagina `noindex, follow` e la tiene fuori
+    dalla sitemap. Header e meta li decide il livello e nient'altro: il meta
+    sta nel corpo in cache, che conosce solo (livello, indicatore), e un
+    header deciso da altri parametri (`?anno=`, `?regione=`) direbbe
+    `noindex` sopra un meta `index`. Gli altri parametri restano come prima,
+    `index` col canonical `/atlante`."""
+    level = "provincia" if request.args.get("livello") == "provincia" else "regione"
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
             agent_discovery.atlas_markdown(_home_featured_indicator_links(), SITE_URL),
             f"{SITE_URL}/atlante",
         )
-        if explore_state:
+        if level == "provincia":
             response.headers["X-Robots-Tag"] = "noindex, follow"
         return response
     target = _atlante_redirect(request.args)
     if target:
         return redirect(target, code=301)
-    level = "provincia" if request.args.get("livello") == "provincia" else "regione"
     start = atlas_page.MAP_INDICATORS[level]
     shown = start
     if "mappa" in request.args:
@@ -489,7 +491,7 @@ def atlante():
         # millisecondi.
         body = _render_atlante(level, shown)
     response = make_response(body)
-    if explore_state:
+    if level == "provincia":
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 

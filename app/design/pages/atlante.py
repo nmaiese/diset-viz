@@ -38,7 +38,6 @@ from app.taxonomy import (
     CATEGORY_NAME_TO_SLUG,
     MACRO_AREAS,
     category_path,
-    slugify_taxonomy,
 )
 
 # L'indicatore della mappa sulle regioni: `featured_indicator_id` del catalogo
@@ -216,7 +215,7 @@ def _province_rows() -> tuple[dict[str, list[dict]], list[dict]]:
         themes = []
         for slug in slugs:
             name = CANONICAL_CATEGORIES[slug]["name"]
-            themes.append({"name": name, "path": category_path(slug), "slug": slugify_taxonomy(name)})
+            themes.append({"name": name, "path": category_path(slug), "slug": slug})
         areas.append({"name": area, "themes": themes})
     return by_theme, areas
 

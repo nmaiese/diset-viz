@@ -426,6 +426,22 @@ class LeProvinceNellAtlante(unittest.TestCase):
                     self.assertNotIn("presenti in tutti gli anni", body)
                 self.assertIn(f"<small>{level['territory_count']} province</small>", body)
 
+    def test_i_temi_hanno_slug_e_percorso_delle_regioni(self):
+        """A parita' di tema, l'ancora `t-<slug>` e il percorso del tema sono
+        gli stessi sui due livelli: lo slug e' quello della categoria."""
+        def themes(level_key):
+            return {g["name"]: (g["slug"], g["path"])
+                    for area in atlas_page.rows(level_key)["areas"] for g in area["groups"]}
+        regions, provinces = themes("regione"), themes("provincia")
+        shared = set(regions) & set(provinces)
+        self.assertTrue(shared)
+        for name in shared:
+            with self.subTest(tema=name):
+                self.assertEqual(provinces[name], regions[name])
+        for name, (slug, _) in provinces.items():
+            with self.subTest(tema=name):
+                self.assertEqual(slug, CATEGORY_NAME_TO_SLUG[name])
+
     def test_fuori_dall_indice_con_il_canonical_sull_atlante(self):
         self.assertEqual(self.headers.get("X-Robots-Tag"), "noindex, follow")
         self.assertIn('<meta name="robots" content="noindex, follow">', self.html)
@@ -585,12 +601,27 @@ class LaCacheSuDueLivelli(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.headers["Location"], PROVINCE)
 
-    def test_un_livello_sconosciuto_e_l_atlante_delle_regioni_fuori_dall_indice(self):
+    def test_un_livello_sconosciuto_e_l_atlante_delle_regioni(self):
         response = self.client.get("/atlante?livello=comune")
         self.assertEqual(response.status_code, 200)
         self.assertIn("serie regionali", response.get_data(as_text=True))
-        self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
-        self.assertNotEqual(self.client.get("/atlante").headers.get("X-Robots-Tag"), "noindex, follow")
+        self.assertNotIn("noindex", response.headers.get("X-Robots-Tag") or "")
+
+    def test_header_e_meta_dicono_la_stessa_cosa(self):
+        """Robots lo decide il livello e nient'altro: il meta sta nel corpo in
+        cache, e un header deciso da `?anno=` gli direbbe il contrario."""
+        meta = re.compile(r'<meta name="robots" content="([^"]+)"')
+        for url, noindex in (("/atlante", False), ("/atlante?anno=2020", False),
+                             ("/atlante?regione=Lazio", False), ("/atlante?livello=comune", False),
+                             ("/atlante?livello=regione", False), (PROVINCE, True),
+                             (PROVINCE + "&anno=2020", True)):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                header = response.headers.get("X-Robots-Tag") or ""
+                content = meta.search(response.get_data(as_text=True)).group(1)
+                self.assertEqual("noindex" in header, noindex)
+                self.assertEqual(content.startswith("noindex"), noindex)
 
 
 class IlPannelloFissoDelleProvince(unittest.TestCase):
