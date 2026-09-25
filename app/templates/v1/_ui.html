@@ -189,6 +189,13 @@
         {% for t in m.territories | sort(attribute='name') %}<option value="{{ t.key }}">{{ t.name }}</option>{% endfor %}
       </select>
     </label>
+    {#- Con le righe a ancora (le province) il campo accende la riga e basta,
+        e alla riga porta questo link (#p-<key>): lo mostra v1.js quando la
+        provincia scelta ha una riga nell'anno. Far scorrere la pagina al
+        cambio del campo la faceva saltare a ogni freccia. -#}
+    {% if m.row_id %}
+    <a class="toolbar__jump" href="#classifica-dati" data-rank-goto hidden>Vai alla riga nella classifica</a>
+    {% endif %}
   </div>
 
   <div class="module__body">
@@ -207,22 +214,27 @@
           dentro un `details` (SISTEMA.md, "Classifica a barre"): tre tabelle,
           perche' un `details` non sta dentro una tabella. Al cambio d'anno
           v1.js riscrive solo i tre corpi (`data-rank-part`), e il `details`
-          resta com'era, aperto o chiuso. -#}
+          resta com'era, aperto o chiuso. La didascalia visibile dice quale
+          pezzo e' ("Le prime 10 province"), e una parte per i lettori di
+          schermo dice misura, anno e unita' come quella della tabella unica:
+          v1.js riscrive solo il pezzo, e l'anno lo aggiorna con gli altri
+          `data-year-label`. -#}
+      {% set rank_what %}<span class="sr-only"> nel <span data-year-label>{{ m.year }}</span>. {{ m.name }}{% if m.unit_note %}, {{ m.unit_note }}{% endif %}</span>{% endset %}
       <table class="table">
-        <caption data-rank-caption>{{ m.fold.head_caption }}</caption>
+        <caption><span data-rank-caption>{{ m.fold.head_caption }}</span>{{ rank_what }}</caption>
         {{ rank_head }}
         {{ rank_body(m, m.fold.head, 'head') }}
       </table>
       <details class="more" data-rank-more>
         <summary data-rank-summary>{{ m.fold.label }}</summary>
         <table class="table">
-          <caption class="sr-only" data-rank-summary>{{ m.fold.label }}</caption>
+          <caption class="sr-only"><span data-rank-summary>{{ m.fold.label }}</span>{{ rank_what }}</caption>
           {{ rank_head }}
           {{ rank_body(m, m.fold.middle, 'middle') }}
         </table>
       </details>
       <table class="table" data-rank-tail>
-        <caption>{{ m.fold.tail_caption }}</caption>
+        <caption>{{ m.fold.tail_caption }}{{ rank_what }}</caption>
         {{ rank_head }}
         {{ rank_body(m, m.fold.tail, 'tail') }}
       </table>

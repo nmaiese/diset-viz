@@ -38,6 +38,7 @@ from app.seo_titles import (
     _widest_within_region,
     from_place,
     in_region,
+    region_gaps,
     to_place,
 )
 
@@ -81,74 +82,84 @@ def _ends(members: list[dict], pick: dict, profile_path: str | None) -> dict:
     return {"value": pick["value"], "places": places if len(tied) <= 2 else None, "count": len(tied)}
 
 
+def _in_regions(regions: list[str]) -> str:
+    """"nel Lazio e in Veneto": lo stato in luogo davanti a ogni regione, fino
+    a tre. Oltre, quante sono ("in 4 regioni")."""
+    if len(regions) > 3:
+        return f"in {len(regions)} regioni"
+    words = [in_region(region) for region in regions]
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " e " + words[-1]
+
+
+def _ends_phrase(row: dict) -> str | None:
+    """"da Prato a Grosseto e Massa-Carrara": gli estremi di una regione come
+    li dice la cella, a pari merito tutti e due i nomi. None quando il titolo
+    non li puo' dire: oltre due a pari merito la cella dice "3 province", e
+    due nomi di cui uno ha gia' una "e" ("da Ancona e Pesaro e Urbino") non si
+    leggono in una riga. Il titolo dice allora la regione e la cifra.
+
+    "da A a B" e non "fra A e B": con "fra Monza e della Brianza e Sondrio" la
+    "e" dentro il nome si leggeva come quella fra le due."""
+    phrases = []
+    for end, place in ((row["high"], from_place), (row["low"], to_place)):
+        names = [p["name"] for p in end["places"] or []]
+        if not names or (len(names) > 1 and any(" e " in name for name in names)):
+            return None
+        phrases.append(place(names[0]) + "".join(f" e {name}" for name in names[1:]))
+    return " ".join(phrases)
+
+
 def within_regions(meta: dict, level: dict, unit: str | None) -> dict | None:
     """"Dentro le regioni": per ogni regione con il dato di almeno due province,
     la provincia piu' alta, la piu' bassa e la distanza fra le due. E' cio' che
     la vista regionale non puo' dire.
 
-    Le scelte sono quelle di `seo_titles._widest_within_region`, che scrive la
-    stessa distanza nella frase-risposta: estremi a pari merito per nome,
-    regioni a pari distanza per nome. Il titolo-affermazione prende la cifra e
-    l'unita' da li', cosi' la testata e il blocco non dicono due cose. Dove
-    quella funzione non scrive la cifra (un tasso su una base lunga) il titolo
-    nomina solo la regione e le due province, e la cifra resta nella tabella.
-    Le celle hanno i decimali della colonna dei valori, cosi' la distanza e' la
+    Le righe vengono da `seo_titles.region_gaps`, la stessa funzione da cui la
+    frase-risposta prende la sua distanza: distanze arrotondate ai decimali
+    della colonna, dalla piu' ampia, a pari distanza per nome della regione.
+    Cosi' il titolo-affermazione nomina la regione della frase-risposta e ne
+    ripete la cifra con la sua unita', e la testata e il blocco non dicono due
+    cose. Dove la frase non scrive la cifra (un tasso su una base lunga) il
+    titolo dice la regione e gli estremi, e la cifra resta nella tabella. Le
+    celle hanno i decimali della colonna dei valori, cosi' la distanza e' la
     differenza che si legge accanto: sopra i cento il titolo la arrotonda come
     ogni cifra del sito (443 punti, 449,6 meno 6,5 in tabella).
+
+    Il titolo non dice mai "la piu' ampia" di una regione sola quando un'altra
+    ha la stessa distanza scritta: le nomina tutte, fino a tre, e senza
+    province. Gli estremi li dice come la cella (`_ends_phrase`), anche a
+    pari merito.
 
     Su `UNVERIFIED_EXTREMES` niente titolo: la frase-risposta e il title non
     dicono gli estremi finche' non sono verificati, e un titolo qui li
     direbbe. La tabella resta, come la classifica.
     """
-    region_of = level.get("region_of") or {}
-    if level["key"] != "provincia" or not region_of:
+    if level["key"] != "provincia" or not level.get("region_of"):
         return None
     observed = [o for o in level.get("observations") or [] if o.get("value") is not None]
-    by_region: dict[str, list[dict]] = {}
-    for o in observed:
-        region = region_of.get(o["key"])
-        if region:
-            by_region.setdefault(region, []).append(o)
     profile_path = level.get("profile_path")
-    rows = []
-    for region, members in by_region.items():
-        if len(members) < 2:
-            continue
-        upper = min(members, key=lambda o: (-o["value"], o["name"]))
-        lower = min(members, key=lambda o: (o["value"], o["name"]))
-        rows.append({"region": region, "href": "/regione/" + region_key_for(region),
-                     "upper": upper, "lower": lower, "gap": upper["value"] - lower["value"],
-                     "high": _ends(members, upper, profile_path), "low": _ends(members, lower, profile_path)})
+    rows = [{"region": region, "href": "/regione/" + region_key_for(region), "gap": gap,
+             "high": _ends(members, upper, profile_path), "low": _ends(members, lower, profile_path)}
+            for gap, region, upper, lower, members in region_gaps(level, observed)]
     if not rows:
         return None
-    rows.sort(key=lambda r: (-r["gap"], r["region"]))
-
-    def pair(upper, lower):
-        # "da Monza e della Brianza a Sondrio": con "fra ... e ..." la "e" dentro
-        # il nome della provincia si leggeva come quella fra le due.
-        return f"{from_place(upper['name'])} {to_place(lower['name'])}"
-
-    def side(end, place):
-        """"da Foggia", "a Bari e Brindisi": un estremo a pari merito si dice
-        tutto, come nella cella sotto."""
-        names = [p["name"] for p in end["places"]]
-        return place(names[0]) + "".join(f" e {name}" for name in names[1:])
 
     claim = None
-    if _code(meta) not in UNVERIFIED_EXTREMES:
+    if _code(meta) not in UNVERIFIED_EXTREMES and rows[0]["gap"] > 0:
         widest = _widest_within_region(meta, level, observed, _is_percentage(meta))
-        first = rows[0]
-        if widest:
-            # La stessa frase della frase-risposta, anche nei nomi.
-            text, region, upper, lower = widest
-            claim = f"La distanza più ampia è {in_region(region)}, {text} {pair(upper, lower)}"
-        elif first["gap"] > 0:
-            # Senza la cifra della frase-risposta il titolo non deve accordarsi
-            # con lei, e dice gli estremi come la tabella: a pari merito tutti e
-            # due i nomi, e oltre due solo la regione ("3 province" nella cella).
-            claim = f"La distanza più ampia è {in_region(first['region'])}"
-            if first["high"]["places"] and first["low"]["places"]:
-                claim += f", {side(first['high'], from_place)} {side(first['low'], to_place)}"
+        figure = widest[0] if widest else None
+        top = [row["region"] for row in rows if row["gap"] == rows[0]["gap"]]
+        if len(top) > 1:
+            # "nel Lazio e in Veneto, 0,50 punti": a pari distanza nessuna
+            # delle due e' "la" piu' ampia. La frase-risposta nomina la prima
+            # per nome, che qui c'e'.
+            claim = f"La distanza più ampia è {_in_regions(top)}"
+            tail = figure
+        else:
+            claim = f"La distanza più ampia è {in_region(top[0])}"
+            tail = " ".join(part for part in (figure, _ends_phrase(rows[0])) if part)
+        if tail:
+            claim += f", {tail}"
     percent = numfmt.is_percent(unit)
     note = unit_note(unit, meta["name"])
     return {

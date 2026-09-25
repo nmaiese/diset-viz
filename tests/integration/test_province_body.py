@@ -18,6 +18,7 @@ guarda l'HTML che il server manda.
 
 import collections
 import html as html_lib
+import itertools
 import re
 import unittest
 
@@ -80,9 +81,10 @@ class ProvincialBody(unittest.TestCase):
 
     def test_the_claim_says_what_the_lead_says(self):
         """Dove la frase-risposta dice "In X 2,3 anni separano A da B", il
-        titolo di "Dentro le regioni" dice la stessa regione, le stesse due
-        province e la stessa cifra con la stessa unita'. Le province si leggono
-        dai link della frase, non dalle preposizioni."""
+        titolo di "Dentro le regioni" dice la stessa regione e la stessa cifra
+        con la stessa unita', e quando nomina le province comincia dalle due
+        della frase (a pari merito la cella ne dice due, e il titolo pure).
+        Le province si leggono dai link della frase, non dalle preposizioni."""
         names = {key: info["name"] for key, info in bes_data.get_bes_territories("provincia").items()}
         seen = 0
         for path, page in self.pages.items():
@@ -95,9 +97,67 @@ class ProvincialBody(unittest.TestCase):
                 where, figure = re.match(r"(.+) (-?[\d.]+(?:,\d+)? \S+) separano ", text(sentence)).groups()
                 upper, lower = re.findall(r'href="/provincia/([^"]+)"', sentence)
                 claim = text(re.search(r'<h3 class="h-sub">(.*?)</h3>', WITHIN.search(page).group(1)).group(1))
-                self.assertEqual(claim, f"La distanza più ampia è {where[:1].lower()}{where[1:]}, {figure} "
-                                        f"{from_place(names[upper])} {to_place(names[lower])}")
+                head, sep, ends = claim.partition(f", {figure}")
+                self.assertTrue(head.startswith("La distanza più ampia è "), claim)
+                self.assertIn(f"{where[:1].lower()}{where[1:]}", head)
+                self.assertEqual(sep, f", {figure}", claim)
+                if ends:
+                    self.assertTrue(ends.startswith(f" {from_place(names[upper])} {to_place(names[lower])}"), claim)
         self.assertGreater(seen, 20, "poche frasi con la distanza dentro la regione: la prova non guarda niente")
+
+    def test_a_tie_at_the_top_names_every_region(self):
+        """Nuove sofferenze bancarie: Lazio e Veneto a 0,50 punti. La
+        frase-risposta dice il vero ("Nel Lazio 0,50 punti separano..."), ma il
+        titolo che dicesse "la piu' ampia e' nel Lazio" sarebbe smentito dalla
+        riga sotto. Su ogni vista: se la prima distanza scritta e' uguale alla
+        seconda, il titolo nomina tutte le regioni pari."""
+        page = next(p for path, p in self.pages.items() if path.endswith("/bes-04BEC009P"))
+        claim = text(re.search(r'<h3 class="h-sub">(.*?)</h3>', WITHIN.search(page).group(1)).group(1))
+        self.assertEqual(claim, "La distanza più ampia è nel Lazio e in Veneto, 0,50 punti")
+        ties = 0
+        for path, page in self.pages.items():
+            block = WITHIN.search(page).group(1)
+            heading = re.search(r'<h3 class="h-sub">(.*?)</h3>', block)
+            shown = [(name, text(re.search(r'data-label="Distanza">(.*?)</td>', cells).group(1)))
+                     for _, name, cells in ROW.findall(block)]
+            if not heading or len(shown) < 2 or shown[0][1] != shown[1][1]:
+                continue
+            ties += 1
+            with self.subTest(path=path):
+                for name, gap in shown:
+                    if gap == shown[0][1]:
+                        self.assertIn(name, text(heading.group(1)))
+        self.assertGreaterEqual(ties, 1)
+
+    def test_equal_distances_go_by_region_name(self):
+        """A distanza scritta uguale le regioni vanno per nome: 84,7 meno 83,1
+        e 84,5 meno 82,9 sono tutte e due 1,6 (la Toscana passava davanti al
+        Friuli-Venezia Giulia per il rumore della virgola mobile). E la
+        distanza nel markup e' quella arrotondata, non 1.6000000000000085."""
+        for path, page in self.pages.items():
+            block = WITHIN.search(page).group(1)
+            shown = [(name, text(re.search(r'data-label="Distanza">(.*?)</td>', cells).group(1)))
+                     for _, name, cells in ROW.findall(block)]
+            with self.subTest(path=path):
+                for (a, gap_a), (b, gap_b) in itertools.pairwise(shown):
+                    if gap_a == gap_b:
+                        self.assertLess(a, b)
+                self.assertNotRegex(block, r'value="-?\d+\.\d*(?:0000|9999)\d"')
+
+    def test_tied_places_stand_one_per_line(self):
+        """Amministratori comunali under 40, Toscana: Grosseto e Massa-Carrara
+        a pari merito in fondo. Il titolo le dice tutte e due, come la cella,
+        e nella cella ogni nome sta su una riga sua: "Mantova e Monza e della
+        Brianza" su una riga sola non si leggeva."""
+        page = next(p for path, p in self.pages.items() if path.endswith("/bes-06POL003P"))
+        block = WITHIN.search(page).group(1)
+        self.assertIn('<h3 class="h-sub">La distanza più ampia è in Toscana, 16,5 punti da Prato a Grosseto e Massa-Carrara</h3>', block)
+        cells = ROW.findall(block)[0][2]
+        self.assertEqual(re.findall(r'<span class="within__place"><a href="/provincia/([^"]+)"', cells),
+                         ["prato", "grosseto", "massa-carrara"])
+        for path, page in self.pages.items():
+            with self.subTest(path=path):
+                self.assertNotRegex(text(WITHIN.search(page).group(1)), r"\w e Monza e della Brianza|\w e Pesaro e Urbino")
 
     def test_a_claim_without_a_figure_names_the_ends_like_the_table(self):
         """Dove la frase-risposta non dice la distanza (un tasso su una base
@@ -157,6 +217,28 @@ class ProvincialBody(unittest.TestCase):
         self.assertIn('data-rank-part="middle"', details)
         self.assertIn("<summary data-rank-summary>Dall&#39;11ª alla 97ª: le altre 87 province</summary>", details)
         self.assertEqual(sum("Media semplice delle 107 province" in body for body in parts.values()), 1)
+
+    def test_folded_captions_say_measure_and_year(self):
+        """Le tre tabelle piegate: la didascalia visibile dice il pezzo, e per
+        i lettori di schermo anche la misura, l'anno (aggiornato da v1.js al
+        cambio d'anno) e l'unita', come la tabella unica."""
+        wrap = re.search(r'<div class="tablewrap tablewrap--fold".*?</details>.*?</table>', self.scheda, re.DOTALL).group(0)
+        captions = re.findall(r"<caption[^>]*>(.*?)</caption>", wrap, re.DOTALL)
+        self.assertEqual(len(captions), 3)
+        for caption in captions:
+            with self.subTest(caption=caption):
+                self.assertIn('<span data-year-label>2024</span>', caption)
+                self.assertIn("Speranza di vita alla nascita, in numero medio di anni", text(caption))
+        self.assertEqual(re.sub(r"<[^>]+>", "", captions[0]),
+                         "Le prime 10 province nel 2024. Speranza di vita alla nascita, in numero medio di anni")
+        self.assertIn("<span data-rank-caption>Le prime 10 province</span>", captions[0])
+
+    def test_the_field_links_to_the_row(self):
+        """Il campo accende e basta: alla riga porta un link accanto, nascosto
+        finche' v1.js non lo mostra. Solo dove le righe hanno l'ancora."""
+        self.assertEqual(self.scheda.count("data-rank-goto hidden"), 1)
+        regional = app.test_client().get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001").get_data(as_text=True)
+        self.assertNotIn("data-rank-goto", regional)
 
     def test_a_short_ranking_is_not_folded(self):
         """29 province (elezioni regionali): sotto la soglia della classifica

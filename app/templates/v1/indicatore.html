@@ -183,7 +183,9 @@
                 {%- for r in w.rows %}
                 <tr><th scope="row"><a href="{{ r.href }}">{{ r.region }}</a></th>
                   {%- for label, end in [('Più alta', r.high), ('Più bassa', r.low)] %}
-                  <td data-label="{{ label }}">{% if loop.index == 2 and r.gap == 0 %}stesso valore{% else %}<span class="within__pair"><span>{% if end.places %}{% for p in end.places %}{% if p.href %}<a href="{{ p.href }}">{{ p.name }}</a>{% else %}{{ p.name }}{% endif %}{{ ' e ' if not loop.last }}{% endfor %}{% else %}{{ end.count }} {{ level.plural }}{% endif %}</span>{{ end.value | num(None, 'cell', w.decimals) }}</span>{% endif %}</td>
+                  {#- A pari merito un nome per riga: "Mantova e Monza e della
+                      Brianza" su una riga sola non si legge. -#}
+                  <td data-label="{{ label }}">{% if loop.index == 2 and r.high.value == r.low.value %}stesso valore{% else %}<span class="within__pair"><span>{% if end.places %}{% for p in end.places %}<span class="within__place">{% if p.href %}<a href="{{ p.href }}">{{ p.name }}</a>{% else %}{{ p.name }}{% endif %}{% if not loop.last %}<span class="sr-only">, </span>{% endif %}</span>{% endfor %}{% else %}{{ end.count }} {{ level.plural }}{% endif %}</span>{{ end.value | num(None, 'cell', w.decimals) }}</span>{% endif %}</td>
                   {%- endfor %}
                   <td class="val" data-label="Distanza">{{ r.gap | num(None, 'cell', w.decimals) }}</td></tr>
                 {%- endfor %}

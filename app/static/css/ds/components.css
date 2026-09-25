@@ -224,6 +224,10 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
 }
 .field--year { min-width: min(100%, 18rem); flex: 1 1 14rem; max-width: 26rem; }
+/* "Vai alla riga nella classifica" accanto al campo delle province: alto come
+   il campo, e nascosto finche' v1.js non lo mostra (display batterebbe hidden). */
+.toolbar__jump { display: inline-flex; align-items: center; min-height: 40px; font-size: var(--fs-ui); font-weight: 600; }
+.toolbar__jump[hidden] { display: none; }
 .year { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-3); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; margin: 0; }
 .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--control-border); border-radius: var(--radius-control); overflow: hidden; }
@@ -325,6 +329,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 [data-explore]:not(.has-js) .table tr:target > * { background: var(--surface-2); }
 [data-explore]:not(.has-js) .table tr:target > :first-child { box-shadow: inset 3px 0 0 var(--accent); padding-left: var(--space-3); }
 [data-explore]:not(.has-js) .table tr:target .bar i { background: var(--data-focus); }
+/* Sotto i 1200 la barra delle sezioni sta sotto la testata, e la riga a cui
+   porta l'ancora finiva sotto la barra: lo scroll-padding di chrome.css
+   (html:has(body.sitechrome), testata piu' --space-4) batte per specificita'
+   la regola di html qui sopra, che contava anche la barra. Il margine della
+   riga aggiunge cio' che manca, 60 pixel meno i --space-4 gia' contati, a
+   ogni larghezza: la testata la conta gia' chrome.css. v1.js (reveal) legge
+   la stessa somma. */
+@media (max-width: 1199px) { [data-explore] .table tr[id] { scroll-margin-top: calc(60px - var(--space-4)); } }
 .table tr.ref > * { border-bottom: 1px solid var(--ink); color: var(--text-2); font-size: var(--fs-small); padding-block: 6px; }
 .table tr.ref .val { font-weight: 400; }
 .table tr.ref .bar { background: transparent; height: 1px; }
@@ -388,6 +400,7 @@ details.more { margin-top: var(--space-4); border-top: 1px solid var(--rule); }
 .within { margin-top: var(--space-12); }
 .within__pair { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
 .within__pair > :last-child { white-space: nowrap; }
+.within__place { display: block; }
 details.more > summary { cursor: pointer; padding-block: var(--space-3); font-weight: 600; color: var(--link); list-style-position: inside; }
 details.more[open] > summary { color: var(--ink); }
 
