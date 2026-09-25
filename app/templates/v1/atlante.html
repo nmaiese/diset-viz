@@ -14,8 +14,9 @@
 
     Filtri, ricerca e ordine li fa js/atlante.js sulle righe gia' in pagina:
     senza JavaScript si vedono tutte, e i controlli restano nascosti. Il
-    bottone "Sulla mappa" di una riga ricarica la pagina con `?mappa=<codice>`
-    e porta quell'indicatore nel modulo dato. -#}
+    bottone "Sulla mappa" di una riga porta quell'indicatore nel modulo dato:
+    atlante.js chiede il modulo a /api/atlante/modulo e lo sostituisce, e
+    senza JavaScript il form ricarica la pagina con `?mappa=<codice>`. -#}
 {% set active_nav = 'atlas' %}
 {% set PAGE_TYPE = 'atlas' %}
 {% set m = d.map %}
@@ -59,10 +60,12 @@
 
   <section class="section" id="mappa" aria-labelledby="h-mappa">
     <h2 id="h-mappa">Sulla mappa</h2>
-    <p class="atlante-intro">Un indicatore sulle {{ d.plural }}, con la mappa accanto alla classifica: scegli l'anno e trova la tua {{ 'provincia' if prov else 'regione' }}. <a href="{{ m.href }}">La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
-    {{ ui.explore(m.module) }}
+    <p class="atlante-intro">Un indicatore sulle {{ d.plural }}, con la mappa accanto alla classifica: scegli l'anno e trova la tua {{ 'provincia' if prov else 'regione' }}. <a href="{{ m.href }}" data-atlas-map-href>La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
+    {% include "v1/_atlante_mappa.html" %}
     {#- Il modulo dei bottoni "Sulla mappa" delle righe: GET su /atlante, con
-        il solo codice dell'indicatore. atlante.js ci aggiunge i filtri. -#}
+        il solo codice dell'indicatore. atlante.js lo intercetta e cambia il
+        modulo con /api/atlante/modulo senza ricaricare la pagina: il GET del
+        form resta il ripiego, senza JavaScript o se l'API non risponde. -#}
     <form id="atl-map" action="/atlante#mappa" hidden>{% if prov %}<input type="hidden" name="livello" value="provincia">{% endif %}</form>
   </section>
 
