@@ -295,9 +295,13 @@ def map_view(indicator: tuple[str, str], level_key: str) -> dict:
 
 def level_tabs(level_key: str) -> list[dict]:
     """Il selettore Regioni/Province: un link per livello, quello corrente con
-    `aria-current`, e quante righe ha ognuno."""
+    `aria-current`, e quante righe ha ognuno. I conteggi vengono dalle due
+    fonti delle righe, non da `rows` dell'altro livello: un guasto nelle
+    righe delle province non deve mandare nel ripiego la pagina delle
+    regioni, che e' quella canonica."""
+    counts = {"regione": len(get_atlas_catalog()["indicators"]), "provincia": len(province_items())}
     return [{"key": key, "label": indicator_view.LEVELS[key]["label"], "href": path,
-             "current": key == level_key, "n": rows(key)["total"]}
+             "current": key == level_key, "n": counts[key]}
             for key, path in LEVEL_PATHS.items()]
 
 

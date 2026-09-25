@@ -13,7 +13,7 @@ Sorveglia cio' che, rompendosi, non fa fallire niente:
   loro pagina, o finiscono nella cache o nell'indice al posto delle regioni.
 
 Nessun numero del catalogo e' scritto qui: le righe si contano contro
-`get_atlas_catalog()` e `atlante.province_items()`, che cambiano quando
+`get_atlas_catalog()` e `bes_data.all_bes_indicators()`, che cambiano quando
 cambiano i dati.
 """
 
@@ -25,7 +25,7 @@ from unittest import mock
 
 from app import app, config, design, indicator_universe, indicator_view, sources
 from app.atlas_catalog import get_atlas_catalog
-from app.bes_data import bes_level_path
+from app.bes_data import all_bes_indicators, bes_level_path
 from app.cache import cache
 from app.design.pages import atlante as atlas_page
 from app.taxonomy import CATEGORY_NAME_TO_SLUG, MACRO_AREAS, PROVINCE_TWINS
@@ -365,7 +365,9 @@ class LeProvinceNellAtlante(unittest.TestCase):
         cls.status = response.status_code
         cls.headers = response.headers
         cls.html = response.get_data(as_text=True)
-        cls.items = atlas_page.province_items()
+        # Dalla funzione sorgente, non dal filtro della pagina: se il filtro
+        # cambiasse, la prova non deve cambiare con lui.
+        cls.items = [item for item in all_bes_indicators() if "provincia" in item["levels"]]
         cls.records = {(r["family"], r["raw_id"]): r for r in indicator_universe.projection()}
 
     def test_e_la_pagina_della_1_0_sulle_province(self):
@@ -523,7 +525,7 @@ class LaMappaFissaDelleProvince(unittest.TestCase):
         self.assertTrue(level["indexable"], "la /province della mappa deve essere indicizzabile")
         self.assertEqual(len(level["observations"]), indicator_view.PANEL_TOTALS["provincia"])
         self.assertEqual(level["year_max"], max(int(y) for y in level["matrix"]))
-        info = next(i for i in atlas_page.province_items() if i["id"] == raw_id)["levels"]["provincia"]
+        info = next(i for i in all_bes_indicators() if i["id"] == raw_id)["levels"]["provincia"]
         self.assertIn(info["direction"], ("higher_better", "lower_better"))
         # e' una riga dell'elenco delle province, con il bottone "Sulla mappa"
         self.assertEqual(atlas_page.map_choice(sources.indicator_code(family, raw_id), "provincia"), (family, raw_id))
