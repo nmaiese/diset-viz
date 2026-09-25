@@ -38,6 +38,31 @@ LEVELS = {
 }
 PROVINCE_CODES = DATA_DIR / "province_codes.csv"
 MIN_PUBLIC_COVERAGE = 0.8
+
+# Le celle che la fonte scrive ma che non sono una misura, come
+# (indicatore, territorio come nel CSV, anno). `get_bes_rows` le toglie, e da
+# li' ogni lettore (scheda, mappa, classifica, pagina provincia, sparkline,
+# qualita' della vita, API, llms) le vede mancanti come un dato che Istat non
+# ha pubblicato: n.d., mai 0.
+#
+# L'affollamento degli istituti di pena (06POL012P) e' detenuti su posti
+# regolamentari per cento. Macerata e Savona valgono 126,8 e 63,3 nel 2015,
+# poi 0 dal 2016 al 2024. Uno zero qui non e' un carcere vuoto ma una
+# provincia senza posti regolamentari da contare: non c'e' un affollamento da
+# misurare. Letto come valore, lo zero metteva le due province in testa alla
+# classifica, sulla mappa e nella qualita' della vita.
+#
+# Non ogni zero e' un n.d.: gli zeri degli omicidi volontari (07SIC001P) sono
+# province senza omicidi, e restano. E il 358,1 di Fermo nel 2024 non sta qui:
+# e' un valore non verificato, non l'assenza di una misura
+# (`seo_titles.UNVERIFIED_EXTREMES`). Due prove in
+# `tests/unit/test_bes_not_measured.py` tengono l'insieme onesto: ogni cella
+# e' uno zero nel CSV, e ogni zero di 06POL012P e' qui.
+NOT_MEASURED = frozenset(
+    ("06POL012P", territory, year)
+    for territory in ("Macerata", "Savona")
+    for year in range(2016, 2025)
+)
 BES_SOURCE_URLS = {
     "regione": (
         "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/"
@@ -131,13 +156,18 @@ def get_bes_rows(level):
     ogni lettura anche in-process (~14MB misurati). Il lock serializza il parsing
     del CSV da 9MB fra i thread a freddo, così non si moltiplica il picco di RAM.
     I chiamanti solo iterano e leggono le righe, non le mutano, quindi la lista
-    condivisa è sicura."""
+    condivisa è sicura.
+
+    Le celle di `NOT_MEASURED` non entrano: una riga assente e' il modo in cui
+    ogni lettore sa gia' dire n.d."""
     dataset, _ = _paths(level)
     name_to_key = _name_to_key(level)
     rows = []
     with dataset.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=";"):
             territory = row["Territorio"]
+            if (row["idIndicatore"], territory, int(row["Anno"])) in NOT_MEASURED:
+                continue
             rows.append({
                 "id": row["idIndicatore"],
                 "territory": territory,
