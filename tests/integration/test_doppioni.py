@@ -234,6 +234,12 @@ class LeListeDeiDoppioniDiconoIlVero(unittest.TestCase):
                 head_ter = _head(client.get(ter["levels"][0]["canonical_path"]))
                 self.assertNotEqual(words(head_bes["title"]), words(head_ter["title"]))
                 self.assertNotEqual(head_bes["description"], head_ter["description"])
+                # Il `<title>` dice la famiglia come l'H1 (`seo_titles._same_name_qualifier`),
+                # quello della territoriale no.
+                famiglia = sources.family_short_label("bes")
+                self.assertIn(f"({famiglia})", head_bes["title"])
+                self.assertNotIn(famiglia, head_ter["title"])
+                self.assertLessEqual(len(head_bes["title"]), seo_titles.TITLE_MAX)
                 for forbidden in ("—", "–", ";", "…"):
                     self.assertNotIn(forbidden, head_bes["title"])
                 # Il nome breve "Verde urbano per abitante" piu' la coda del

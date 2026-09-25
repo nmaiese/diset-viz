@@ -41,6 +41,7 @@ import re
 
 from app import indicator_notes, it_numbers, sources
 from app.design import numfmt
+from app.taxonomy import SAME_NAME_BES_IDS
 
 # Il budget SERP, lo stesso che usa il percorso derivato di `indicator_notes`.
 TITLE_MAX = indicator_notes._TITLE_MAX
@@ -146,6 +147,29 @@ def _is_percentage(meta):
 # due gli estremi, perche' un intervallo con un capo solo non e' un
 # intervallo. La pagina resta com'e', con la sua classifica.
 UNVERIFIED_EXTREMES = frozenset({"bes-06POL012P"})
+
+
+def _same_name_qualifier(meta, level):
+    """La famiglia da mettere accanto alla misura nel titolo derivato, o None.
+
+    Le BES col nome esatto di una territoriale e cifre diverse
+    (`taxonomy.SAME_NAME_BES_IDS`) sono due schede indicizzabili: l'H1 dice gia'
+    la famiglia (`views._page_h1`), il `<title>` derivato no, e "Ricoveri fuori
+    regione per regione" non diceva quale delle due serie fosse. Stesso
+    perimetro dell'H1, cioe' la sola vista regionale: la `/province` ha la sua
+    coda, e le territoriali restano col loro titolo. L'etichetta e' quella di
+    `sources`, la stessa dell'H1.
+
+    Non e' il `source_qualifier` che `page_title` riceve dalla view: quello vale
+    per tutte le `TERRITORIAL_NAME_TWINS` e per le collisioni solo provinciali,
+    e qui cambierebbe titoli che non collidono con niente (bes-SDG-310, la cui
+    territoriale e' `noindex`).
+    """
+    if level.get("key") != "regione" or meta.get("family") != "bes":
+        return None
+    if str(meta.get("raw_id")) not in SAME_NAME_BES_IDS:
+        return None
+    return sources.family_short_label(meta["family"])
 
 
 def _code(meta):
@@ -428,13 +452,21 @@ def answer_title(meta, level, max_len=TITLE_MAX):
     rinuncia al pezzo successivo.
 
     Sulle pagine provinciali l'ordine e' un altro, e lo scrive `_province_title`.
+
+    Una BES col nome di una territoriale (`_same_name_qualifier`) porta la sua
+    famiglia fra parentesi, e la famiglia non si sacrifica mai: viene prima
+    dell'unita', della coda del livello e delle cifre, che con trentatre
+    caratteri di qualificatore di solito non ci stanno piu'. E' lo scambio di
+    `_province_title` al contrario: li' la coda e' cio' che distingue la pagina
+    dalla sua gemella, qui e' la famiglia.
     """
     curated = indicator_notes.short_name(_code(meta), level.get("key"))
+    qualifier = _same_name_qualifier(meta, level)
     if curated:
-        measure, marker = curated, ""
+        measure, marker = curated, (f" ({qualifier})" if qualifier else "")
     else:
         measure = indicator_notes._short_name_for_title(meta.get("name") or "")
-        marker = indicator_notes._variant_marker(meta.get("name") or "")
+        marker = indicator_notes._variant_marker(meta.get("name") or "", extra=qualifier)
     if not measure:
         return None
     if level.get("key") == "provincia":
@@ -453,7 +485,8 @@ def answer_title(meta, level, max_len=TITLE_MAX):
             if room - len(marker) < MIN_MEASURE:
                 continue
             if curated:
-                text = measure if len(measure) <= room else ""
+                whole = f"{measure}{marker}"
+                text = whole if len(whole) <= room else ""
             else:
                 text = _fit(measure, marker, room, guarded=guarded, strict=False)
             if not text:

@@ -278,7 +278,9 @@ SUPERSEDED_TERRITORIAL_IDS = {
 # Col nome uguale avevano anche lo stesso H1: `views._page_h1` mette accanto al
 # nome della BES la sua famiglia (`sources.family_short_label`), sulla sola
 # vista regionale e solo quando l'H1 non e' scritto. Gli H1 delle territoriali
-# non cambiano.
+# non cambiano. Lo stesso per il `<title>` derivato
+# (`seo_titles._same_name_qualifier`): la famiglia fra parentesi, al posto delle
+# cifre e della coda del livello, che accanto non ci stanno.
 SAME_NAME_BES_IDS = {
     "10AMB008",  # -> ter-592
     "12SER006",  # -> ter-6

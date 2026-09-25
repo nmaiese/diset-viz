@@ -9,7 +9,7 @@ guasto trovato scrivendo il modulo.
 """
 import unittest
 
-from app import seo_titles
+from app import seo_titles, sources
 from app.design import common, numfmt
 
 
@@ -317,6 +317,45 @@ class EstremiNonVerificatiTest(unittest.TestCase):
         composto = "Rapporta il numero di persone detenute ai posti regolamentari."
         self.assertEqual(seo_titles.page_description({}, self.meta, self.lv, composed=composto),
                          composto)
+
+
+class OmonimaTest(unittest.TestCase):
+    """Le BES col nome di una territoriale e cifre diverse
+    (`taxonomy.SAME_NAME_BES_IDS`): il titolo derivato dice la famiglia, come
+    l'H1, e la famiglia vince su cifre e coda del livello."""
+
+    FAMIGLIA = f" ({sources.family_short_label('bes')})"
+
+    def test_la_famiglia_sta_nel_titolo_regionale(self):
+        casi = {
+            ("10AMB008", "Disponibilità di verde urbano", "m² per abitante", (319.0, 10.8)): "Verde urbano pro capite",
+            ("12SER006", "Irregolarità nella distribuzione dell'acqua", "%", (37.3, 1.2)): "Servizio idrico irregolare",
+            ("12SER025", "Emigrazione ospedaliera in altra regione", "%", (32.8, 5.3)): "Ricoveri fuori regione",
+        }
+        for (raw_id, nome, unita, (alto, basso)), breve in casi.items():
+            with self.subTest(bes=raw_id):
+                titolo = seo_titles.answer_title(
+                    meta(name=nome, unit=unita, family="bes", raw_id=raw_id),
+                    level(best=("Molise", alto), worst=("Lombardia", basso)))
+                self.assertEqual(titolo, f"{breve}{self.FAMIGLIA}")
+                self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
+
+    def test_la_territoriale_la_province_e_le_altre_gemelle_non_cambiano(self):
+        ter = seo_titles.answer_title(
+            meta(name="Emigrazione ospedaliera in altra regione", unit="%", family="territorial", raw_id="590"),
+            level(best=("Molise", 32.6), worst=("Lombardia", 5.1)))
+        self.assertEqual(ter, "Emigrazione ospedaliera per regione, dal 32,6% al 5,1%")
+        prov = seo_titles.answer_title(
+            meta(name="Emigrazione ospedaliera in altra regione", unit="%", family="bes", raw_id="12SER025"),
+            provincia(("Isernia", 35.3), ("Milano", 2.6)))
+        self.assertEqual(prov, "Ricoveri fuori regione per provincia, dal 35,3% al 2,6%")
+        # SDG-310 e' una `TERRITORIAL_NAME_TWINS`, ma la sua territoriale e'
+        # `noindex`: niente collisione, niente famiglia.
+        sdg = seo_titles.answer_title(
+            meta(name="Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado)",
+                 unit="%", family="bes", raw_id="SDG-310"),
+            level(best=("Calabria", 62.0), worst=("Trento", 33.6)))
+        self.assertNotIn(self.FAMIGLIA, sdg)
 
 
 class RipiegoTest(unittest.TestCase):
