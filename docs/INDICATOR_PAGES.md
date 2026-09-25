@@ -68,6 +68,16 @@ provinciali restano sul loro URL base.
   66% per il racconto e 75% con il metodo, su tutte le `/province`
   indicizzabili.
 
+**Il title delle BES omonime.** Le tre BES che hanno il nome di una
+territoriale con cifre diverse (`taxonomy.SAME_NAME_BES_IDS`: 10AMB008,
+12SER006, 12SER025) portano la famiglia fra parentesi nell'H1 e, dal 25
+settembre 2026, anche nel `<title>` della vista regionale
+(`seo_titles._same_name_qualifier` dentro `answer_title`, etichetta da
+`sources.family_short_label`). Il qualificatore ha la precedenza su unita',
+coda del livello e cifre, che a sessanta caratteri non ci stanno: e' l'ordine
+di `_province_title` capovolto, perche' qui cio' che distingue due pagine e' la
+fonte. Le territoriali gemelle non cambiano.
+
 **Il corpo della vista provinciale** e' fatto per chi cerca la sua provincia.
 Vale per le `/province` delle schede a due livelli e per le
 schede solo provinciali, e le compone `app/design/pages/indicatore.py`.

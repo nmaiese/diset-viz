@@ -11,7 +11,8 @@ paths:
   le porte del sito; un indicatore in evidenza **diverso a ogni visita**
   (`app/home_pick.py`, per regione o per provincia), con tutti e due i livelli
   nello stesso pannello quando tutti e due stanno nel pool; regioni e province
-  con un territorio estratto a caso e l'anteprima della sua scheda; i temi; la
+  con un territorio estratto a caso e l'anteprima della sua scheda; la fascia
+  "Gli indicatori, tema per tema" (`#temi`), che e' la porta dell'atlante; la
   qualita' della vita come porta, senza classifica; il quiz; le storie; fonti
   e metodo. Per questo **non sta nella cache di pagina**: rimetterci
   `@cache.cached` mostrerebbe lo stesso indicatore e gli stessi territori a
@@ -21,14 +22,31 @@ paths:
   un secondo alla prima home di ogni istanza. `?indicatore=<codice>&livello=`
   fissa la scelta (e `?indicator=<id>` del selettore di prima) se quella coppia
   sta nel pool, se no si torna al caso. Il canonico resta `/`. Non e'
-  l'atlante.
+  l'atlante. La fascia `#temi` (dal 25 settembre 2026) ha un solo bottone
+  primario, "Esplora i N indicatori nell'atlante", con N dalle righe regionali
+  dell'atlante (`atlante.rows("regione")["total"]`), che porta sempre alle
+  regioni; il selettore Regioni/Province di `_feature.html` con id propri
+  (`temi-*`, perche' `tab-regione` e `lv-regione` sono dell'indicatore in
+  evidenza); i conteggi d'area verso `/atlante?area=<nome intero dell'area>`
+  (con `livello=provincia` sulle province), il valore che `atlante.js`
+  confronta con `data-atlas-area`; e per ogni area l'indicatore cambiato di
+  piu' (`home.atlas_band`, `synchronized_cache`): variazione della media
+  semplice sul pannello fisso divisa per lo scarto interquartile dei territori
+  nell'ultimo anno, fra le righe indicizzabili con la linea, regola scritta
+  nella riga fonte. Il pannello Province ha solo quello, senza testa e coda.
+  La fascia si calcola fuori da `design.render` (`_home_atlas_band`, come
+  `_home_feature_pick`): se cede, restano le schede delle regioni di prima
+  invece del ripiego della pagina intera. Non costa niente a freddo, perche'
+  la proiezione la scalda gia' `home_pick`. Il gemello Markdown ha la stessa
+  sezione.
 - `/atlante` — dal 25 settembre 2026 una **pagina della 1.0 resa dal server**
   (`design.render("atlante", "v1/atlante.html", "app.html")`, composta da
   `app/design/pages/atlante.py`), non piu' la SPA. In alto "Sulla mappa", il
   modulo dato della scheda (`indicatore.explore_module`, la macro `ui.explore`)
   su un indicatore fisso, `atlante.MAP_INDICATOR` (ter-105, fisso e non estratto
   perche' la pagina sta in cache). Sotto "Tutti gli indicatori": una tabella
-  per tema con **tutte le 594 serie** del catalogo regionale all'apertura, link
+  per tema con **tutte le serie** del catalogo regionale all'apertura (597 il
+  25 settembre 2026: il numero si legge da `atlante.rows`, mai scritto), link
   canonico alla scheda, sparkline della media semplice sul pannello fisso
   (`indicator_view.fixed_panel`), variazione in chiaro, etichetta di stato
   sulle parziali. Filtri, ricerca e ordine li fa l'isola `static/js/atlante.js`
@@ -42,15 +60,32 @@ paths:
     `?mappa=`. Con la chiave del solo percorso `/atlante` serviva la risposta
     data a `/atlante?indicator=910`. Il ramo Markdown resta primo;
   - **la cache e' per (livello, indicatore)** (`_atlante_page`, `cache.memoize`)
-    e **solo sulla mappa di partenza**. `?mappa=<codice>`, il bottone "Sulla
-    mappa" di una riga, e' l'unico parametro che il server legge: si risolve
-    contro il catalogo (`atlante.map_choice`, un valore che non regge fa 301 a
-    `/atlante`) e quelle pagine non vanno in cache, perche' 594 varianti da
+    e **solo sulla mappa di partenza di ogni livello**. I parametri che il
+    server legge sono due: `livello` e `?mappa=<codice>`, il bottone "Sulla
+    mappa" di una riga, che si risolve contro le righe del livello
+    (`atlante.map_choice(code, level)`, un valore che non regge fa 301
+    all'atlante di quel livello) e quelle pagine non vanno in cache, perche' 594 varianti da
     600 KB riempirebbero la SimpleCache di tutto il sito;
   - le righe si compongono una volta per processo (`atlante.rows`,
     `synchronized_cache`) dalla proiezione: **circa 3 s alla prima richiesta
     di ogni istanza**, e `indicator_universe.cache_clear()` le svuota;
-  - la pagina pesa sotto 90 KB compressi (c'e' una prova);
+  - la pagina pesa sotto 90 KiB compressi (c'e' una prova: 87,3 con le
+    province);
+  - **le province** stanno a `/atlante?livello=provincia` (dal 25 settembre
+    2026): una riga per scheda BES con il livello provinciale, costruita da
+    `bes_data.all_bes_indicators` e dalla proiezione, **non** dal catalogo
+    dell'atlante, che resta regionale come `/api/catalog`. Link da
+    `bes_level_path(id, "provincia")`, area ricavata dal tema (un tema senza
+    area solleva un errore), mappa di partenza `MAP_INDICATOR_PROVINCE`
+    (bes-01SAL001, la prova guarda il livello provinciale e non `meta`). Il
+    selettore `.seg` e' l'unico controllo del livello, e i suoi conteggi
+    vengono dalle fonti di ciascun livello: un guasto delle province non
+    manda nel ripiego la pagina delle regioni. Le righe regionali con una
+    vista provinciale dicono "anche per provincia" (ter-910 porta a
+    bes-01SAL001/province). **Il robots lo decide solo il livello**:
+    `?livello=provincia` e' `noindex, follow` con canonical `/atlante`, header
+    e meta insieme, fuori dalla sitemap. `?anno=`, `?regione=` e un livello
+    sconosciuto restano la pagina delle regioni, indicizzabile;
   - il ripiego e' `app.html`, la SPA di prima: un ripiego e' un 200, quindi in
     produzione si controlla `data-v1="atlante"`;
   - la page view porta `page_type: "atlas"` (`PAGE_TYPE` nel template), non

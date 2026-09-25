@@ -239,6 +239,12 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   pagine regione e provincia la sparkline e' quella del territorio, mai una
   media, nella cella `.trend` con "dal 2018 era 64,1": a capo sotto i 1100 px,
   a tutta riga quando la tabella si impila (`.stackwrap--wide`, sotto i 720).
+  Nell'atlante e nella fascia dei temi della home, invece, e' la media
+  semplice sul **pannello fisso** (`indicator_view.fixed_panel`): gli anni in
+  cui almeno l'80% dei territori del livello ha il dato, i territori presenti
+  in tutti, almeno tre anni. Quando il gruppo non e' intero la riga lo dice
+  ("media di 16 regioni presenti in tutti gli anni"), sotto soglia la linea
+  lascia il posto all'etichetta "Copertura variabile".
 - Ogni grafico esce in due tagli, largo e stretto, perche' il testo resti a
   12-13 pixel veri anche sul telefono, e ha accanto una tabella con gli stessi
   dati. La striscia e la serie a fascia ne hanno un terzo da 1180 pixel, che
@@ -298,8 +304,13 @@ nel pool. Per questo la home non sta nella cache di pagina.
 
 Seguono regioni e province (per ognuno dei due livelli la mappa per scegliere,
 un territorio a caso e l'anteprima della sua scheda, con le frasi della sua
-testata), i temi (le quattro aree col distintivo, testa e coda con le
-frecce), la qualita' della vita come porta (che cosa misura, i profili di
+testata), "Gli indicatori, tema per tema" (la porta dell'atlante: un solo
+bottone primario "Esplora i N indicatori nell'atlante", il selettore
+Regioni/Province, le quattro aree col distintivo e il conteggio che apre
+l'atlante filtrato, e per ogni area l'indicatore cambiato di piu' con la sua
+sparkline e la variazione in chiaro, scelto con la regola scritta nella riga
+fonte; sulle regioni anche testa e coda con le frecce, sulle province no),
+la qualita' della vita come porta (che cosa misura, i profili di
 priorita', il bottone verso la pagina: la classifica in home non c'e'), il
 quiz in una fascia sua (lavaggio ambra, schede con illustrazione, una domanda
 lampo), le storie (una grande accanto alla foto, tre in fila) e fonti, metodo
@@ -320,7 +331,11 @@ come etichetta di stato e "Copertura variabile" al posto della linea quando il
 pannello non regge. Il bottone "Sulla mappa" di una riga e' un GET
 (`form`, `?mappa=`). Filtri, ricerca e ordine sono un'isola
 (`static/js/atlante.js`) sui `data-*` delle righe: senza JavaScript l'elenco
-c'e' tutto. I gruppi portano `content-visibility: auto`.
+c'e' tutto. I gruppi portano `content-visibility: auto`. Le province
+(`?livello=provincia`) hanno la stessa pagina: il selettore `.seg`
+Regioni/Province in testa, la mappa delle province con i confini regionali,
+le stesse righe e le stesse tabelle, e sulle righe regionali con una vista
+provinciale il link "anche per provincia".
 
 ### Regione
 
