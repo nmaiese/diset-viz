@@ -65,7 +65,7 @@
     <div class="theme-hero__main">
       {% if classifica %}
       <h1>{{ p.theme }}: dove le regioni stanno meglio e dove peggio</h1>
-      <p class="page-lead">Su {{ s.indicator_count }} indicatori di {{ p.theme | lower }}, nel {{ s.year_max }} la regione messa meglio è <a href="{{ s.rows[0].path }}">{{ s.rows[0].region }}</a> e quella messa peggio è <a href="{{ s.rows[-1].path }}">{{ s.rows[-1].region }}</a>. {{ p.description }}</p>
+      <p class="page-lead">Contando i {{ s.indicator_count }} indicatori di {{ p.theme | lower }} che hanno un verso, cioè per cui si può dire quale valore è migliore, nel {{ s.year_max }} la regione che va meglio è <a href="{{ s.rows[0].path }}">{{ s.rows[0].region }}</a> e quella che va peggio è <a href="{{ s.rows[-1].path }}">{{ s.rows[-1].region }}</a>. {{ p.description }}</p>
       {% else %}
       <h1>{{ p.theme }}</h1>
       <p class="page-lead">{{ p.description }}</p>

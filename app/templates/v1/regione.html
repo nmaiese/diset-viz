@@ -27,7 +27,7 @@
    classifica" vuole sapere. Senza posizione media si ripiega sul conteggio
    degli indicatori, che c'e' sempre. #}
 {% block title %}{% if p.avg_rank %}{{ p.region }}: {{ p.avg_rank }}ª su {{ p.region_total }} regioni, tema per tema{% else %}{{ p.region }}: il profilo su {{ p.all_indicators | length }} indicatori{% endif %}{% endblock %}
-{% block description %}Profilo {{ d.of_name }}: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.{% endblock %}
+{% block description %}{% if ritratto %}{{ ritratto.descrizione }}{% else %}Profilo {{ d.of_name }}: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.{% endif %}{% endblock %}
 
 {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/regione.css') }}">{% endblock %}
 
@@ -190,6 +190,7 @@
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
+          {% if ritratto %}<li><a href="#ritratto">Il ritratto</a></li>{% endif %}
           <li><a href="#temi">In quali temi va meglio</a></li>
           {% if d.excels or d.lags %}<li><a href="#stacca">Dove stacca</a></li>{% endif %}
           {% if d.gains or d.losses %}<li><a href="#cambiato">Che cosa è cambiato</a></li>{% endif %}
@@ -206,6 +207,12 @@
     </aside>
 
     <div class="layout__main">
+      {% if ritratto %}
+      <section class="section" id="ritratto" aria-labelledby="h-ritratto">
+        <h2 id="h-ritratto">{{ ritratto.titolo }}</h2>
+        <div class="prose">{{ ritratto.body | prose_html }}</div>
+      </section>
+      {% endif %}
       <section class="section" id="temi" aria-labelledby="h-temi">
         <h2 id="h-temi">I temi, dal migliore al peggiore</h2>
         <div class="tablewrap stackwrap regione-temi" tabindex="0" role="region" aria-label="I temi {{ d.of_name }}">

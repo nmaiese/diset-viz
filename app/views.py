@@ -194,6 +194,9 @@ def _inject_license():
         # organizzazione del publisher, la fonte va in `isBasedOn`.
         "organization_ref_jsonld": json.dumps({"@id": publisher.ORGANIZATION_ID}),
         "corrections_url": publisher.CORRECTIONS_URL,
+        "public_issues_url": publisher.PUBLIC_ISSUES_URL,
+        "editor_name": publisher.EDITOR_NAME,
+        "editor_jsonld": json.dumps(publisher.EDITOR, ensure_ascii=False),
         "contact_email": publisher.CONTACT_EMAIL,
         "consent_cmp_name": publisher.CONSENT_CMP_NAME,
         "consent_cmp_url": publisher.CONSENT_CMP_URL,
@@ -1568,11 +1571,15 @@ def region_page(region_key):
     # regione non si arrivava a nessuna delle sue province, e il collegamento
     # andava in un senso solo.
     provinces = province_profile.by_region().get(region_key, [])
+    from app import region_portraits
+
+    ritratto = region_portraits.get(region_key)
     if agent_discovery.prefers_markdown():
-        return agent_discovery.markdown_response(
-            agent_discovery.region_markdown(profile, SITE_URL, provinces=provinces),
-            f"{SITE_URL}/regione/{region_key}",
-        )
+        md = agent_discovery.region_markdown(profile, SITE_URL, provinces=provinces)
+        if ritratto:
+            testa, _, resto = md.partition("\n\n")
+            md = f"{testa}\n\n## {ritratto['titolo']}\n\n{ritratto['body']}\n\n{resto}"
+        return agent_discovery.markdown_response(md, f"{SITE_URL}/regione/{region_key}")
     # `charts` si importa qui e non in cima come fa gia' la scheda: il modulo
     # tira dentro lo strato dati, e in cima chiuderebbe un anello di import.
     from app import charts
@@ -1582,6 +1589,7 @@ def region_page(region_key):
         profile=profile,
         provinces=provinces,
         portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
+        ritratto=ritratto,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regione/{region_key}",
@@ -3136,6 +3144,18 @@ def ads_txt():
     # Serving the committed file keeps it available to the AdSense crawler even
     # when a Cloud Run revision is deployed without the optional client env var.
     return send_from_directory(app.static_folder, "ads.txt", mimetype="text/plain")
+
+
+# La chiave IndexNow: pubblica per costruzione, e' il file che Bing e Yandex
+# leggono per credere che le notifiche di URL nuovi vengano da noi.
+# `scripts/indexnow.py` le manda dopo un deploy. Bing conta anche per il GEO:
+# e' l'indice su cui cerca ChatGPT.
+INDEXNOW_KEY = "740cdf2f10598e70e4e2607d5abd5962"
+
+
+@app.route(f"/{INDEXNOW_KEY}.txt")
+def indexnow_key():
+    return Response(INDEXNOW_KEY, content_type="text/plain; charset=utf-8")
 
 
 @app.route('/favicon.ico')
