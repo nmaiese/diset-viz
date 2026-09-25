@@ -118,6 +118,12 @@ I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
   `IT113` e `IT119` (Gallura Nord-Est Sardegna, Sulcis Iglesiente), senza righe:
   restano fuori, e la nota di copertura pubblica li nomina, calcolata da
   `province_profile.unmeasured_provinces`.
+- Le celle che la fonte scrive ma che non misurano niente stanno in
+  `bes_data.NOT_MEASURED` (oggi l'affollamento delle carceri di Macerata e
+  Savona dal 2016, zero perche' non ci sono posti regolamentari da contare).
+  `get_bes_rows` non le carica, e `get_bes_manifest` toglie dalla copertura
+  dell'ultimo anno quelle che ci cadono: il manifest su disco resta quello del
+  build, cosi' una rigenerazione non annulla la correzione.
 - Nella codelist Bolzano e Trento hanno come genitore la loro provincia
   autonoma (`ITD1`, `ITD2`): `build_province_dataset` li mette nel Trentino Alto
   Adige, scritto come in `app/data.py`.

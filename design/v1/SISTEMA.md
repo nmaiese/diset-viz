@@ -336,9 +336,14 @@ stessi pezzi con il doppio podio regioni e province.
 - **Numeri** in formato italiano, spazio insecabile fra cifra e unita', unita'
   su ogni cifra isolata e nell'intestazione di colonna.
 - **Decimali** da una funzione sola (`seo_titles.format_number`): euro sopra
-  1.000 interi, percentuali e indici con un decimale, lo zero scritto "0". Le
-  due copie (`numfmt.magnitude_decimals` e `decimals` di `v1.js`) le tiene
-  allineate `tests/unit/test_decimals_parity.py`. La preposizione davanti a una
+  1.000 interi, percentuali e indici con un decimale, lo zero scritto "0", tre
+  decimali sotto 0,01 e quattro sotto 0,001, perche' una cifra che zero non e'
+  non si scrive "0,00". Le due copie (`numfmt.magnitude_decimals` e `decimals`
+  di `v1.js`) le tiene allineate `tests/unit/test_decimals_parity.py`, e la
+  stessa regola vale per scheda, pagine provincia e regione, ripieghi e gemelli
+  Markdown. Si arrotonda in un punto solo, `it_numbers.number`, col cinque in
+  su come `Intl.NumberFormat` del browser (26.348,5 fa 26.349): l'f-string di
+  Python arrotonda al pari, e pagina e mappa si separavano su un pareggio. La preposizione davanti a una
   cifra ("dall'89,1%", "allo 0,2%", "dal 116%") la sceglie
   `numfmt.articulated`, e nessun altro.
 - **Date** "17 luglio 2026" in `<time datetime>`. L'anno del dato resta distinto

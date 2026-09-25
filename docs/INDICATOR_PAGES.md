@@ -567,8 +567,12 @@ una negazione e, sulle province, nemmeno cifre, sigle e soglie. Dove nessun
 taglio regge, il nome breve e' scritto a mano in `indicator_notes.SHORT_NAMES`,
 una riga per (codice, livello) riletta contro la definizione del manifest.
 `seo_titles.UNVERIFIED_EXTREMES` elenca le schede i cui estremi non vanno in
-titolo, description e Dataset finche' non sono verificati (bes-06POL012P: gli
-zeri di Macerata e Savona sono carceri chiuse nel 2016). La description nomina
+titolo, description e Dataset finche' non sono verificati (bes-06POL012P:
+Fermo al 358% nel 2024, dal 116% dell'anno prima). Gli zeri di Macerata e
+Savona dal 2016 non erano una misura, erano province senza posti regolamentari
+da contare: `bes_data.NOT_MEASURED` li toglie in `get_bes_rows`, l'unico punto
+da cui passano scheda, mappa, pagina provincia, qualita' della vita, llms e
+API, e ognuno li vede n.d. La description nomina
 i pari merito ("in 16 province") e conta i territori col dato, e il Dataset
 non porta Markdown.
 - link alla metodologia e al contesto tematico
