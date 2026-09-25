@@ -20,6 +20,22 @@ due, con due modelli dati diversi, e le pagine sono andate alla deriva.
    dell'indicatore, come nasce il testo, come citare, immagine da condividere,
    indicatori correlati, percorso.
 
+**La testa della vista provinciale** segue il livello. Il titolo tiene sempre
+la coda " per provincia" (`seo_titles._province_title`): se sfora si rinuncia
+nell'ordine all'unita', al nome intero (per il nome breve di
+`indicator_notes.SHORT_NAMES`), all'accorciamento con guardia, alle cifre
+(", dati {anno}") e all'anno. L'H1, dove non ce n'e' uno scritto, e' "{nome}
+nelle province italiane", composto da `views._page_h1` e mai scritto dentro
+`article["h1"]`, che `page_title` leggerebbe. Frase-risposta e description
+sono la stessa frase (`seo_titles.province_answer`): gli estremi coi
+territori fra parentesi, e la distanza piu' ampia dentro una regione
+(`in_region`, `from_place` per le preposizioni). Dataset e briciola sono per
+livello, e sulla vista province di una scheda a due livelli la briciola finisce
+in "Province". Nelle linguette la voce corrente non e' un link, il primo
+livello porta al canonico nudo (nessuna pagina linka `?livello=regione`), e i
+link verso l'altro livello o la gemella dicono di che cosa parlano ("Speranza
+di vita nelle 107 province").
+
 **Le province.** Il cruscotto ha la mappa per tutti e due i livelli. Quella
 delle province la compone `app/design/pages/indicatore.py`, con i contorni di
 `design.maps` e la stessa rampa a sei gradini della home, mentre

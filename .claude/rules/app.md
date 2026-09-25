@@ -43,11 +43,15 @@ paths:
   col tema della scheda, lo stesso della sua briciola): senza, le 25 schede
   solo provinciali non stavano in nessun tema.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
+  La tabella "Tutti gli indicatori" ha la colonna Andamento, la serie della
+  regione da `_region_series()`: una voce per processo (`synchronized_cache`,
+  circa 55 ms alla prima pagina e 1,3 MB), mai una lettura per riga.
 - `/provincia/<key>` — il profilo di una delle 107 province misurate dal BES:
   posizione, punteggio, le dodici dimensioni, **i valori veri di tutti i 67
   indicatori** con unita', anno e posizione fra le province, dove e' prima e
   dove e' ultima fra le province della sua regione, gli indicatori che la
-  tirano su e giu', le vicine in classifica. I valori li legge
+  tirano su e giu', le vicine in classifica, e accanto a ogni variazione la
+  sparkline della serie della provincia. I valori li legge
   `province_profile.indicatori`, da `bes_data.get_bes_rows("provincia")`: per
   un anno la pagina ha mostrato solo punteggi standardizzati, e chi cercava
   "speranza di vita provincia di Lecce" trovava una pagina senza il numero di
