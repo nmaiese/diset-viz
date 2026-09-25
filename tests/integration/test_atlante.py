@@ -18,8 +18,9 @@ import gzip
 import html as html_lib
 import re
 import unittest
+from unittest import mock
 
-from app import app, config, indicator_universe, indicator_view, sources
+from app import app, config, design, indicator_universe, indicator_view, sources
 from app.atlas_catalog import get_atlas_catalog
 from app.bes_data import bes_level_path
 from app.cache import cache
@@ -169,6 +170,41 @@ class LAtlanteNellaV1(unittest.TestCase):
         self.assertIn('page_type: "atlas"', html)
 
 
+class IlBottoneSullaMappa(unittest.TestCase):
+    """Il bottone "Sulla mappa" di ogni riga porta quell'indicatore nel modulo dato."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+        cache.clear()
+        cls.html = cls.client.get("/atlante").get_data(as_text=True)
+
+    def test_un_bottone_per_ogni_riga_col_dato_delle_regioni(self):
+        self.assertIn('<form id="atl-map" action="/atlante#mappa"', self.html)
+        rows = ROW.findall(self.html)
+        with_n = [body for _, body in rows if re.search(r"<small>\d+ regioni</small>", body)]
+        buttons = re.findall(r'<button form="atl-map" name="mappa" value="([^"]+)">Sulla mappa</button>', self.html)
+        self.assertEqual(len(buttons), len(with_n))
+        for code in buttons:
+            self.assertIsNotNone(atlas_page.map_choice(code), code)
+
+    def test_la_mappa_scelta_e_quella_della_riga(self):
+        catalog = get_atlas_catalog()
+        item = next(i for i in catalog["indicators"]
+                    if str(i["id"]) != str(catalog["featured_indicator_id"]) and i["catalog_family"] == "bes")
+        family, raw_id = sources.split_internal_id(item["id"])
+        code = sources.indicator_code(family, raw_id)
+        self.assertEqual(atlas_page.map_choice(code), (family, raw_id))
+        response = self.client.get(f"/atlante?mappa={code}")
+        self.assertEqual(response.status_code, 200)
+        page = response.get_data(as_text=True)
+        self.assertIn('data-v1="atlante"', page)
+        section = page[page.index('id="mappa"'):page.index('id="indicatori"')]
+        self.assertIn(f'href="{item["path"]}"', section)
+        # la canonica resta l'atlante
+        self.assertIn(f'<link rel="canonical" href="{config.SITE_URL}/atlante"', page)
+
+
 class LaMappaFissa(unittest.TestCase):
     """L'indicatore della mappa e' una costante: la prova dice che regge ancora."""
 
@@ -242,6 +278,7 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
         catalog = get_atlas_catalog()
         featured = next(i for i in catalog["indicators"] if str(i["id"]) == str(catalog["featured_indicator_id"]))
         one = catalog["indicators"][len(catalog["indicators"]) // 2]
+        one_code = sources.indicator_code(*sources.split_internal_id(one["id"]))
         two_level = next(i for i in catalog["indicators"]
                          if i["catalog_family"] == "bes" and "?livello=" in bes_level_path(i["id"], "provincia"))
         cases = {
@@ -254,6 +291,14 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
             "/atlante?view=regioni&rk=atlantide": "/regioni",
             "/atlante?view=regioni": "/regioni",
             "/atlante?view=confronto": "/confronto",
+            # la vista decide prima dell'indicatore, come in activeView di main.jsx
+            "/atlante?view=confronto&indicator=105": "/confronto",
+            "/atlante?view=regioni&rk=lombardia&indicator=105": "/regione/lombardia",
+            f"/atlante?view=atlas&indicator={one['id']}": f"/atlante?mappa={one_code}#mappa",
+            "/atlante?view=atlas&indicator=non-esiste": "/atlante",
+            # un `mappa` che non e' una riga dell'elenco torna all'atlante nudo
+            "/atlante?mappa=non-esiste": "/atlante",
+            "/atlante?mappa=ter-999999999": "/atlante",
         }
         for path, target in cases.items():
             with self.subTest(path=path):
@@ -271,10 +316,24 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
 
     def test_i_filtri_non_moltiplicano_la_cache(self):
         """Filtri e ricerca li applica il JavaScript: il server rende la stessa
-        pagina per ogni query string, dalla stessa voce di cache."""
-        plain = self.client.get("/atlante").get_data()
-        filtered = self.client.get("/atlante?theme=Ambiente%20ed%20energia&partial=1&q=rifiuti").get_data()
+        pagina per ogni query string, dalla stessa voce di cache. Si contano
+        le rese: la seconda richiesta non ne fa una nuova."""
+        with mock.patch.object(design, "render", wraps=design.render) as render:
+            plain = self.client.get("/atlante").get_data()
+            filtered = self.client.get("/atlante?theme=Ambiente%20ed%20energia&partial=1&q=rifiuti").get_data()
+            self.assertEqual(render.call_count, 1)
         self.assertEqual(plain, filtered)
+
+    def test_le_altre_mappe_si_rendono_senza_cache(self):
+        """Seicento varianti da 600 KB non entrano nella cache del sito: la
+        pagina con un'altra mappa si rende ogni volta."""
+        other = "/atlante?mappa=bes-10AMB014"
+        with mock.patch.object(design, "render", wraps=design.render) as render:
+            self.client.get("/atlante")
+            self.client.get(other)
+            self.client.get(other)
+            self.client.get("/atlante")
+            self.assertEqual(render.call_count, 3)
 
     def test_il_gemello_markdown_viene_prima_di_tutto(self):
         response = self.client.get("/atlante?indicator=910", headers={"Accept": "text/markdown"})

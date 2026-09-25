@@ -178,6 +178,16 @@
 
   /* ---------- i controlli ---------- */
   form.addEventListener("submit", function (ev) { ev.preventDefault(); });
+  // "Sulla mappa" di una riga: la pagina si ricarica con `mappa` e con i
+  // filtri gia' scelti, che il modulo da solo perderebbe.
+  var mapForm = document.getElementById("atl-map");
+  if (mapForm) mapForm.addEventListener("submit", function (ev) {
+    if (!ev.submitter || !ev.submitter.value) return;
+    ev.preventDefault();
+    var url = new URL(location.href);
+    url.searchParams.set("mappa", ev.submitter.value);
+    location.assign(url.pathname + url.search + "#mappa");
+  });
   areaButtons.forEach(function (b) {
     b.addEventListener("click", function () {
       state.area = b.getAttribute("data-atlas-area");

@@ -37,21 +37,32 @@ MAP_INDICATOR = ("territorial", "105")
 SORTS = (("complete", "Completezza"), ("recent", "Più recente"), ("az", "A-Z"), ("theme", "Tema"))
 
 
+def _shown(value: float, decimals: int) -> float:
+    """Il valore come il lettore lo legge, arrotondato come lo scrive `numfmt`."""
+    body = numfmt.text(value, decimals).replace(".", "").replace(",", ".")
+    return float(body.replace(numfmt.MINUS, "-"))
+
+
 def _change(meta: dict, panel: dict, plural: str) -> dict:
     """La variazione di una riga, in chiaro: la differenza nell'unita' delle
     variazioni ("+54,3 punti percentuali" per una percentuale,
     `change_unit_label`), poi i due valori e i due anni. Quando il gruppo del
-    pannello non e' intero la riga dice su quante regioni e' la media."""
+    pannello non e' intero la riga dice su quante regioni e' la media.
+
+    Le tre cifre hanno gli stessi decimali (`column_decimals` sui due
+    estremi), e la variazione e' la differenza dei due valori come sono
+    scritti: "+0,004 da 0,29 a 0,30" sembrava smentire le cifre accanto."""
     first, last = panel["points"][0], panel["points"][-1]
     unit = meta.get("value_unit") or meta.get("unit")
     change_unit = meta.get("change_unit") or unit
-    delta = last["value"] - first["value"]
-    shown = numfmt.change_text(delta)
+    decimals = numfmt.column_decimals([first["value"], last["value"]])
+    delta = round(_shown(last["value"], decimals) - _shown(first["value"], decimals), decimals)
+    shown = numfmt.change_text(delta, decimals)
     if shown == numfmt.UNCHANGED:
         head = "invariata"
     else:
-        head = signed(delta, change_unit)
-    tail = (f"da {with_unit(first['value'], unit)} a {with_unit(last['value'], unit)}, "
+        head = signed(delta, change_unit, decimals)
+    tail = (f"da {with_unit(first['value'], unit, decimals)} a {with_unit(last['value'], unit, decimals)}, "
             f"dal {first['year']} al {last['year']}")
     if panel["members"] < panel["total"]:
         tail += f", media di {panel['members']} {plural} presenti in tutti gli anni"
@@ -64,7 +75,8 @@ def _row(item: dict, record: dict) -> dict:
     panel = level.get("panel")
     spark = charts.spark(panel["points"], "m", panel.get("floor"), compact=True) if panel else ""
     row = {
-        "id": str(item["id"]), "name": item["name"], "path": item["path"],
+        "id": str(item["id"]), "code": sources.indicator_code(*sources.split_internal_id(item["id"])),
+        "name": item["name"], "path": item["path"],
         "family": item["catalog_family"], "y0": item["year_min"], "y1": item["year_max"],
         "complete": bool(item["complete"]), "completeness": round(100 * (item.get("completeness") or 0)),
         "n": level.get("territory_count"), "indexable": bool(meta.get("indexable")),
@@ -123,6 +135,23 @@ def rows(level_key: str = "regione") -> dict:
         "years": (min(row["y0"] for row in flat), max(row["y1"] for row in flat)),
         "sources": [{"id": fam["id"], "label": fam["label"]} for fam in catalog["source_families"]],
     }
+
+
+def map_choice(code: str | None) -> tuple[str, str] | None:
+    """L'indicatore della mappa scelto con il bottone "Sulla mappa" di una
+    riga (`?mappa=<codice>`, come `ter-105`), o None se il codice non e' una
+    riga dell'elenco con il dato delle regioni. Il valore arriva dall'URL: si
+    risolve contro le righe, e solo la coppia risolta va avanti."""
+    parsed = sources.parse_indicator_code(str(code or "").strip())
+    if parsed is None:
+        return None
+    wanted = sources.internal_id(*parsed)
+    for area in rows()["areas"]:
+        for group in area["groups"]:
+            for row in group["rows"]:
+                if row["id"] == wanted and row["n"]:
+                    return parsed
+    return None
 
 
 def map_view(indicator: tuple[str, str] = MAP_INDICATOR) -> dict:

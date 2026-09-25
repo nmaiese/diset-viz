@@ -10,7 +10,9 @@
     e arriva qui come `d`. `app.html`, la SPA, resta il ripiego.
 
     Filtri, ricerca e ordine li fa js/atlante.js sulle righe gia' in pagina:
-    senza JavaScript si vedono tutte, e i controlli restano nascosti. -#}
+    senza JavaScript si vedono tutte, e i controlli restano nascosti. Il
+    bottone "Sulla mappa" di una riga ricarica la pagina con `?mappa=<codice>`
+    e porta quell'indicatore nel modulo dato. -#}
 {% set active_nav = 'atlas' %}
 {% set PAGE_TYPE = 'atlas' %}
 {% set m = d.map %}
@@ -46,6 +48,9 @@
     <h2 id="h-mappa">Sulla mappa</h2>
     <p class="atlante-intro">Un indicatore sulle regioni, con la mappa accanto alla classifica: scegli l'anno e trova la tua regione. <a href="{{ m.meta.canonical_path }}">La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
     {{ ui.explore(m.module) }}
+    {#- Il modulo dei bottoni "Sulla mappa" delle righe: GET su /atlante, con
+        il solo codice dell'indicatore. atlante.js ci aggiunge i filtri. -#}
+    <form id="atl-map" action="/atlante#mappa" hidden></form>
   </section>
 
   <section class="section" id="indicatori" aria-labelledby="h-indicatori">
@@ -94,7 +99,7 @@
             <thead><tr><th scope="col">Indicatore</th><th scope="col">Andamento</th><th class="r" scope="col">Ultimo anno</th></tr></thead>
             <tbody>
             {%- for r in g.rows %}
-            <tr data-id="{{ r.id }}" data-s="{{ r.family }}" data-y0="{{ r.y0 }}" data-y1="{{ r.y1 }}" data-c="{{ r.completeness }}"{% if not r.complete %} data-p{% endif %}{% if r.search %} data-q="{{ r.search }}"{% endif %}><th scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if not r.complete %} <span class="status">Serie parziale</span>{% endif %}</th><td class="trendcell" data-label="Andamento">{% if r.spark %}<span class="trend">{{ r.spark | safe }}<span class="trend__txt">{{ r.change.head }} <span class="trend__from">{{ r.change.tail }}</span></span></span>{% else %}<span class="status">Copertura variabile</span>{% endif %}</td><td class="val" data-label="Ultimo anno">{{ r.y1 }}{% if r.n %} <small>{{ r.n }} regioni</small>{% endif %}</td></tr>
+            <tr data-id="{{ r.id }}" data-s="{{ r.family }}" data-y0="{{ r.y0 }}" data-y1="{{ r.y1 }}" data-c="{{ r.completeness }}"{% if not r.complete %} data-p{% endif %}{% if r.search %} data-q="{{ r.search }}"{% endif %}><th scope="row"><a href="{{ r.path }}">{{ r.name }}</a>{% if not r.complete %} <span class="status">Serie parziale</span>{% endif %}{% if r.n %}<button form="atl-map" name="mappa" value="{{ r.code }}">Sulla mappa</button>{% endif %}</th><td class="trendcell" data-label="Andamento">{% if r.spark %}<span class="trend">{{ r.spark | safe }}<span class="trend__txt">{{ r.change.head }} <span class="trend__from">{{ r.change.tail }}</span></span></span>{% else %}<span class="status">Copertura variabile</span>{% endif %}</td><td class="val" data-label="Ultimo anno">{{ r.y1 }}{% if r.n %} <small>{{ r.n }} regioni</small>{% endif %}</td></tr>
             {%- endfor %}
             </tbody>
           </table>

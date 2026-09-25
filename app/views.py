@@ -439,7 +439,9 @@ def atlante():
     in cache con la chiave del solo percorso serviva a `/atlante` la risposta
     data a `/atlante?indicator=910`. La cache e' su `_atlante_page`, con la
     chiave (livello, indicatore) e nient'altro della query string: filtri,
-    ricerca e ordine li applica `atlante.js` sulla pagina gia' resa."""
+    ricerca e ordine li applica `atlante.js` sulla pagina gia' resa. Il solo
+    parametro che il server legge e' `mappa`, il bottone "Sulla mappa" di una
+    riga, e sceglie l'indicatore della mappa."""
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.atlas_markdown(_home_featured_indicator_links(), SITE_URL),
@@ -448,20 +450,48 @@ def atlante():
     target = _atlante_redirect(request.args)
     if target:
         return redirect(target, code=301)
-    return _atlante_page("regione", atlas_page.MAP_INDICATOR)
+    shown = atlas_page.MAP_INDICATOR
+    if "mappa" in request.args:
+        # Il bottone "Sulla mappa" di una riga: il codice si risolve contro il
+        # catalogo, e un valore che non regge torna all'atlante nudo.
+        shown = atlas_page.map_choice(request.args.get("mappa"))
+        if shown is None:
+            return redirect("/atlante", code=301)
+    if shown == atlas_page.MAP_INDICATOR:
+        return _atlante_page("regione", shown)
+    # Le altre mappe non vanno in cache: la pagina pesa 600 KB non compressi,
+    # e 594 varianti riempirebbero la SimpleCache di tutto il sito. Le righe
+    # sono gia' per processo, la resa costa pochi millisecondi.
+    return _render_atlante("regione", shown)
 
 
 def _atlante_redirect(args):
     """Dove porta uno stato della SPA di prima, o None se la pagina e' l'atlante.
 
+    - La vista decide prima dell'indicatore, come nella SPA:
+      `?view=regioni&rk=<regione>` va al profilo della regione,
+      `?view=regioni` all'indice delle regioni, `?view=confronto` al
+      confronto, `?view=atlas&indicator=<id>` alla mappa di quell'indicatore.
     - `?indicator=<id>` e `?view=detail` portano alla scheda: il percorso e'
       quello del catalogo, o `bes_level_path` quando il link chiede le
       province. Senza id, la SPA apriva l'indicatore della mappa, e cosi' qui.
       Un id che il catalogo non ha torna all'atlante nudo.
-    - `?view=regioni&rk=<regione>` va al profilo della regione, `?view=regioni`
-      all'indice delle regioni, `?view=confronto` al confronto.
     """
     view = args.get("view")
+    # L'ordine della SPA (activeView di main.jsx): la vista decide prima
+    # dell'indicatore, e `?view=confronto&indicator=105` era il confronto.
+    if view == "confronto":
+        return "/confronto"
+    if view == "regioni":
+        key = args.get("rk")
+        if key and key in {profiles.region_key_for(name) for name in REGION_ORDER}:
+            return f"/regione/{key}"
+        return "/regioni"
+    if view == "atlas" and args.get("indicator"):
+        # L'atlante con un indicatore scelto: e' la mappa di quell'indicatore.
+        family, raw_id = sources.split_internal_id(args.get("indicator"))
+        code = sources.indicator_code(family, raw_id)
+        return f"/atlante?mappa={code}#mappa" if atlas_page.map_choice(code) else "/atlante"
     if args.get("indicator") or view == "detail":
         catalog = get_atlas_catalog()
         wanted = str(args.get("indicator") or catalog["featured_indicator_id"])
@@ -471,20 +501,12 @@ def _atlante_redirect(args):
         if args.get("livello") == "provincia" and item["catalog_family"] == "bes":
             return bes_data.bes_level_path(item["id"], "provincia")
         return item["path"]
-    if view == "regioni":
-        key = args.get("rk")
-        if key and key in {profiles.region_key_for(name) for name in REGION_ORDER}:
-            return f"/regione/{key}"
-        return "/regioni"
-    if view == "confronto":
-        return "/confronto"
     return None
 
 
-@cache.memoize(timeout=300)
-def _atlante_page(level, map_indicator):
-    """La pagina, in cache per (livello, indicatore della mappa). Il ripiego e'
-    la SPA di prima (`app.html`), che legge `featured_indicators` e `percorso`."""
+def _render_atlante(level, map_indicator):
+    """La pagina per (livello, indicatore della mappa). Il ripiego e' la SPA
+    di prima (`app.html`), che legge `featured_indicators` e `percorso`."""
     return design.render(
         "atlante", "v1/atlante.html", "app.html",
         level=level, map_indicator=map_indicator,
@@ -494,6 +516,10 @@ def _atlante_page(level, map_indicator):
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/atlante",
     )
+
+
+# In cache solo la pagina con la mappa di partenza, per (livello, indicatore).
+_atlante_page = cache.memoize(timeout=300)(_render_atlante)
 
 
 @app.route("/catalogo-dati")
