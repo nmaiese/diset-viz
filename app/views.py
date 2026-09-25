@@ -14,6 +14,7 @@ from app.atlas_catalog import (
     search_atlas_indicators,
 )
 from app import design
+from app.design import numfmt
 from app import divari
 from app import profiles
 from app import province_profile
@@ -1558,7 +1559,8 @@ def _theme_description(profile, standings):
         coda = (f" Le {len(standings['rows'])} regioni ordinate su "
                 f"{standings['indicator_count']} indicatori, con mappa e classifica.")
     else:
-        testo = f"{tema}: {profile['indicator_count']} indicatori Istat per le regioni italiane."
+        testo = (f"{tema}: {profile['indicator_count']} indicatori {profile['institutions_label']} "
+                 "per le regioni italiane.")
         coda = " Ogni serie con fonte, classifica e andamento negli anni."
     return testo + coda if len(testo) + len(coda) <= 155 else testo
 
@@ -2734,8 +2736,11 @@ def _llms_indicator_full_block(indicator_id):
         f"Copertura: {meta['year_min']}-{meta['year_max']}, {len(meta['regions'])} regioni."
     )
     lines += ["", f"Classifica {year} (posizione. regione: valore):"]
+    # Le cifre come nella tabella della scheda, che l'intestazione del file
+    # promette uguali: i decimali della colonna, non due fissi ("50.398,90").
+    decimals = numfmt.column_decimals([row["value"] for row in values])
     for position, row in enumerate(values, 1):
-        lines.append(f"{position}. {row['region']}: {it_num(row['value'], 2)} {unit}".rstrip())
+        lines.append(f"{position}. {row['region']}: {numfmt.text(row['value'], decimals)} {unit}".rstrip())
     lines.append("")
     return "\n".join(lines)
 

@@ -259,8 +259,11 @@ def skill_index_document(site_url):
     }
 
 
-def _number(value, decimals=2):
-    return it_numbers.number(value, decimals)
+def _number(value, decimals=None):
+    """La cifra come la scrive la scheda HTML alla stessa URL: `numfmt.text`,
+    coi decimali della sua grandezza o con quelli dati. Con due decimali fissi
+    il gemello scriveva "34.885,30 euro" dove la pagina scrive "34.885"."""
+    return numfmt.text(value, decimals)
 
 
 def _with_unit(text, unit):
@@ -624,10 +627,13 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
     ]
     # Ogni riga porta al profilo del territorio, come nella tabella HTML alla
     # stessa URL.
+    # I decimali sono quelli della colonna, come nella tabella HTML: la stessa
+    # regola sulle stesse righe (`numfmt.column_decimals`).
     profile = level.get("profile_path")
+    decimals = numfmt.column_decimals([row["value"] for row in level["observations"]])
     for position, row in enumerate(level["observations"], 1):
         name = f"[{row['name']}]({site_url}{profile}{row['key']})" if profile and row.get("key") else row["name"]
-        lines.append(f"| {position} | {name} | {_with_unit(_number(row['value']), unit)} |")
+        lines.append(f"| {position} | {name} | {_with_unit(_number(row['value'], decimals), unit)} |")
 
     lines += ["", "## Fonti e download", ""]
     if meta.get("source_data_url"):

@@ -14,7 +14,7 @@ import re
 import unittest
 from pathlib import Path
 
-from app import seo_titles
+from app import it_numbers, seo_titles
 from app.design import numfmt
 
 V1_JS = Path(__file__).resolve().parents[2] / "app" / "static" / "js" / "v1.js"
@@ -25,7 +25,8 @@ _IF = re.compile(r"if \(m (===|>=|<) ([\d.]+)\) return (\d+);")
 _TERNARY = re.compile(r"return m (<|>=) ([\d.]+) \? (\d+) : (\d+);")
 _OPS = {"===": lambda a, b: a == b, ">=": lambda a, b: a >= b, "<": lambda a, b: a < b}
 
-VALUES = (0, 0.0, -0.0, 0.004, 0.137, 0.999, 1, 1.5, 9.99, 10, 10.5, 99.9, 100, 116, 34343, -2.6, -64.7, -150)
+VALUES = (0, 0.0, -0.0, 0.00044, 0.001, 0.004, 0.0095, 0.01, 0.0107, 0.137, 0.999, 1, 1.5, 9.99, 10, 10.5,
+          99.9, 100, 116, 34343, -0.004, -2.6, -64.7, -150)
 
 
 def js_decimals():
@@ -72,8 +73,11 @@ class ParitaDeiDecimaliTest(unittest.TestCase):
                 self.assertEqual(js(value), python)
 
     def test_le_soglie_sono_quelle_della_regola(self):
-        """Zero, uno, dieci, cento: la tabella che la regola promette."""
-        attesi = {0: 0, 0.137: 2, 1: 1, 9.99: 1, 10: 1, 99.9: 1, 100: 0}
+        """Zero, un millesimo, un centesimo, uno, dieci, cento: la tabella che
+        la regola promette. Sotto un centesimo i decimali arrivano alla prima
+        cifra significativa, fino a quattro."""
+        attesi = {0: 0, 0.00044: 4, 0.001: 3, 0.0045: 3, 0.01: 2, 0.137: 2, 1: 1, 9.99: 1, 10: 1, 99.9: 1,
+                  100: 0}
         js = js_decimals()
         for value, decimali in attesi.items():
             with self.subTest(valore=value):
@@ -98,8 +102,9 @@ class ParitaDeiDecimaliTest(unittest.TestCase):
         "34.885,3" da una parte e "34.885" dall'altra. Gli euro sopra cento
         senza decimali, le percentuali sotto l'uno con due, gli indici piccoli
         con due e mai a zero."""
-        attese = {34885.3: "34.885", 26348.4: "26.348", 128.8: "129", 31.88: "31,9",
-                  6: "6,0", 0.3: "0,30", 0.137: "0,14", 0.0107: "0,01", -5367.2: "-5.367"}
+        attese = {34885.3: "34.885", 26348.5: "26.349", 128.8: "129", 31.88: "31,9",
+                  6: "6,0", 0.3: "0,30", 0.137: "0,14", 0.0107: "0,01", -5367.2: "-5.367",
+                  0.0044917107519759: "0,004", 0.000439952532688906: "0,0004"}
         for valore, scritta in attese.items():
             with self.subTest(valore=valore):
                 self.assertEqual(numfmt.text(valore), scritta)
@@ -115,9 +120,35 @@ class ParitaDeiDecimaliTest(unittest.TestCase):
                 self.assertEqual(numfmt.change_text(valore), testo)
         self.assertEqual(numfmt.change_text(5024.4), "+5.024")
         self.assertEqual(numfmt.change_text(-0.7), "-0,70")
-        self.assertEqual(numfmt.change_text(0.004), "invariato")
+        # Coi decimali della sua grandezza una variazione diversa da zero non
+        # e' mai "invariato": lo e' solo coi decimali di un'altra cifra.
+        self.assertEqual(numfmt.change_text(0.004), "+0,004")
+        self.assertEqual(numfmt.change_text(0.004, 2), "invariato")
         self.assertEqual(numfmt.change_text(0.0004, 3), "invariato")
         self.assertEqual(numfmt.change_text(0.004, 3), "+0,004")
+
+    def test_il_pareggio_va_per_eccesso_come_nel_browser(self):
+        """Il formato di Python arrotonda il cinque al pari e sul binario,
+        `Intl.NumberFormat` di v1.js lo porta in su partendo dalla cifra come si
+        scrive. La retribuzione di Milano, 26348,5, era "26.348" sulla pagina e
+        "26.349" sulla mappa appena la si ridisegnava. Le cifre attese sono
+        quelle di `Intl.NumberFormat("it-IT")` con gli stessi decimali: pagina,
+        title e numeri all'italiana arrotondano allo stesso modo."""
+        attese = {26348.5: "26.349", 754.5: "755", 13.25: "13,3", 1.45: "1,5", 0.285: "0,29",
+                  0.125: "0,13", -2.5: "-2,5", -754.5: "-755"}
+        for valore, scritta in attese.items():
+            with self.subTest(valore=valore):
+                self.assertEqual(numfmt.text(valore), scritta)
+                self.assertEqual(seo_titles.format_number(valore), scritta)
+                self.assertEqual(it_numbers.number(valore, numfmt.magnitude_decimals(valore)), scritta)
+        self.assertEqual(numfmt.change_text(2778.5), "+2.779")
+        # Coi decimali dati: 1,005 e 2,675 in binario stanno appena sotto il
+        # cinque, e il formato di Python dava "1,00" e "2,67".
+        self.assertEqual(it_numbers.number(1.005, 2), "1,01")
+        self.assertEqual(it_numbers.number(2.675, 2), "2,68")
+        self.assertEqual(numfmt.text(2.675, 2), "2,68")
+        self.assertEqual(it_numbers.number(2.5, 0), "3")
+        self.assertEqual(it_numbers.change(0.05), "+0,1")
 
     def test_nessuna_seconda_regola_dei_decimali(self):
         """I decimali della fonte (`bes_data.source_decimals`) erano la seconda
@@ -136,6 +167,10 @@ class ParitaDeiDecimaliTest(unittest.TestCase):
             with self.subTest(file=relativo):
                 self.assertNotIn("source_decimals", sorgente)
                 self.assertNotRegex(sorgente, r"""\bi\.decimals\b|\[["']decimals["']\]|get\(["']decimals["']""")
+                # Il ripiego della regione scriveva il valore con `it_num`, un
+                # decimale fisso: "28.154,3 euro" e "0,0". Il punteggio
+                # (`p.score | it_num`) ha un decimale per regola, e resta.
+                self.assertNotRegex(sorgente, r"\b(i|voce|row|r)\.value\s*\|\s*it_num\b")
 
 
 if __name__ == "__main__":

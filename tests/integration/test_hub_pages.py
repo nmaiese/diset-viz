@@ -630,9 +630,15 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
         """Il numero del title, della scheda in `/temi`, dei dati disponibili,
         del link all'atlante e del gemello Markdown e' quello delle serie che la
         pagina elenca, e la sezione "Per provincia" elenca le schede che dice.
-        La somma delle sezioni per provincia e' quella che `/temi` dichiara."""
-        from app import atlas_catalog
+        La somma delle sezioni per provincia e' quella che `/temi` dichiara.
+        Il JSON-LD dice chi pubblica le serie del tema: "Indicatori Istat" stava
+        anche sul tema con due serie Eurostat."""
+        from app import atlas_catalog, sources
 
+        famiglie = {}
+        for item in atlas_catalog.get_atlas_catalog()["indicators"]:
+            famiglie.setdefault(item["theme"], set()).add(item["catalog_family"])
+        self.assertIn("eurostat", famiglie["Ricerca, innovazione e digitale"])
         sulle_card = {t_path: int(n) for t_path, n in re.findall(
             r'<a class="theme-index-card" href="([^"]+)".*?<small>(\d+) indicator', self.html, re.DOTALL)}
         per_provincia = solo_provincia = 0
@@ -646,7 +652,17 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
             solo_provincia += _section(html, '<section class="theme-all" id="province">').count(
                 "solo per provincia")
             titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.DOTALL).group(1))
+            collezione = next(nodo for nodo in (json.loads(blocco) for blocco in re.findall(
+                r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL))
+                if nodo.get("@type") == "CollectionPage")
             with self.subTest(tema=voce["theme"]):
+                istituzioni = sources.institutions_label(famiglie[voce["theme"]])
+                self.assertTrue(collezione["description"].startswith(f"Indicatori {istituzioni} del tema "),
+                                collezione["description"])
+                descrizione = meta_content(html, "description")
+                if "in testa" not in descrizione:
+                    # I temi senza classifica dicono le istituzioni anche in SERP.
+                    self.assertIn(f"indicatori {istituzioni} per le regioni italiane", descrizione)
                 self.assertEqual(elencati, voce["indicator_count"])
                 self.assertEqual(sulle_card[voce["path"]], elencati)
                 self.assertIn(f"<small>Indicatori</small><strong>{elencati}</strong>", html)

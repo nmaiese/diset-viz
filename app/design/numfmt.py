@@ -32,6 +32,7 @@ from html import escape
 
 from markupsafe import Markup
 
+from app import it_numbers
 from app.indicator_notes import is_percentage_unit
 
 MINUS = "-"
@@ -43,16 +44,21 @@ def magnitude_decimals(value: float) -> int:
     """La regola di seo_titles._decimals: la grandezza decide se il decimale conta.
 
     Lo zero si scrive "0": "0,00" diceva una precisione che uno zero non ha, e
-    finiva nei title ("dal 358% al 0,00%"). La stessa regola sta in
+    finiva nei title ("dal 358% al 0,00%"). Per lo stesso motivo una cifra che
+    zero non e' non si scrive zero: sotto un centesimo i decimali crescono
+    finche' la prima cifra significativa si vede, e la pesca in Lombardia, che
+    vale 0,0045%, e' "0,004%" e non "0,00%". La stessa regola sta in
     `seo_titles._decimals` e in `decimals` di `static/js/v1.js`, e
     `tests/unit/test_decimals_parity.py` controlla che le tre concordino.
     """
     m = abs(float(value))
     if m == 0 or m >= 100:
         return 0
-    if m >= 10:
+    if m >= 1:
         return 1
-    return 2 if m < 1 else 1
+    if m >= 0.01:
+        return 2
+    return 3 if m >= 0.001 else 4
 
 
 def column_decimals(values) -> int:
@@ -103,12 +109,14 @@ def articulated(preposition: str, figure: str) -> str:
 
 
 def text(value, decimals: int | None = None, sign: bool = False) -> str:
-    """`-1234.5` -> `−1.234,5`. Con sign=True il positivo porta il `+`."""
+    """`-1234.5` -> `-1.234,5`. Con sign=True il positivo porta il `+`."""
     if value is None or (isinstance(value, float) and math.isnan(value)):
         return "n.d."
     v = float(value)
     d = magnitude_decimals(v) if decimals is None else decimals
-    body = f"{abs(v):,.{d}f}".replace(",", "\x00").replace(".", ",").replace("\x00", ".")
+    # L'arrotondamento e' quello di `it_numbers.number`, mezzo per eccesso come
+    # `Intl.NumberFormat` di v1.js: 26348,5 e' "26.349" qui e nel browser.
+    body = it_numbers.number(abs(v), d)
     rounded_zero = float(body.replace(".", "").replace(",", ".")) == 0
     if v < 0 and not rounded_zero:
         return MINUS + body
