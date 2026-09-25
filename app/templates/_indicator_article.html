@@ -25,6 +25,14 @@
 {%- elif item -%}{{ item.name }}{%- endif -%}
 {%- endmacro %}
 
+{#- "della Sicilia", "del Piemonte", "di Milano", con il nome linkato. Prima la
+    frase diceva "l'aumento maggiore e' di Sicilia". -#}
+{% macro territory_of(level, item) -%}
+{%- set full = (item.name | of_region) if level.singular == 'regione' else ('di ' ~ item.name) -%}
+{%- set pre = full[:(full | length) - (item.name | length)] if full.endswith(item.name) else 'di ' -%}
+{{ pre }}{{ territory(level, item) }}
+{%- endmacro %}
+
 {# Come nasce il testo non sta piu' qui dentro.
 
    Ci stava come paragrafo in coda all'articolo, e diceva che la scheda era
@@ -148,11 +156,11 @@
 {% endif %}
 {% if stats.highest_delta and stats.lowest_delta %}
 <p>Sull'intero periodo
-  {%- if stats.highest_delta.kind == 'aumento' %} l'aumento maggiore è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
-  {%- elif stats.highest_delta.kind == 'calo' %} il calo più contenuto è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
+  {%- if stats.highest_delta.kind == 'aumento' %} l'aumento maggiore è {{ territory_of(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
+  {%- elif stats.highest_delta.kind == 'calo' %} il calo più contenuto è {{ territory_of(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
   {%- else %} {{ territory(level, stats.highest_delta) }} resta sostanzialmente stabile{% endif %},
-  {%- if stats.lowest_delta.kind == 'calo' %} mentre il calo maggiore è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
-  {%- elif stats.lowest_delta.kind == 'aumento' %} mentre l'aumento più contenuto è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
+  {%- if stats.lowest_delta.kind == 'calo' %} mentre il calo maggiore è {{ territory_of(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
+  {%- elif stats.lowest_delta.kind == 'aumento' %} mentre l'aumento più contenuto è {{ territory_of(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }}
   {%- else %} mentre {{ territory(level, stats.lowest_delta) }} resta sostanzialmente stabile{% endif %}.
   {#- No "it depends on the direction" caveat here. On a directional indicator the
       direction is known and the sentence is simply false; on a contextual one the

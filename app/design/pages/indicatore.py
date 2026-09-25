@@ -390,8 +390,8 @@ def derive(ctx: dict) -> dict:
     hd, ld = stats.get("highest_delta"), stats.get("lowest_delta")
     lk = level["key"]
     if hd and ld and hd.get("kind") == "aumento" and ld.get("kind") == "aumento":
-        series_note = (f"Su tutto il periodo cresce di più {the_place(hd['name'], lk)} ({signed(hd['delta'], change_unit)}), "
-                       f"di meno {the_place(ld['name'], lk)} ({signed(ld['delta'], change_unit)}).")
+        series_note = (f"Su tutto il periodo l'aumento più forte è {of_place(hd['name'], lk)} ({signed(hd['delta'], change_unit)}), "
+                       f"il più debole {of_place(ld['name'], lk)} ({signed(ld['delta'], change_unit)}).")
     elif hd and ld:
         series_note = (f"Su tutto il periodo la variazione va da {signed(ld['delta'], change_unit)} {of_place(ld['name'], lk)} "
                        f"a {signed(hd['delta'], change_unit)} {of_place(hd['name'], lk)}.")

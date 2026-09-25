@@ -1,0 +1,16 @@
+---
+regione: sicilia
+titolo: In Sicilia la scuola perde più ragazzi che altrove
+fonti:
+  - https://demo.istat.it/app/?i=POS&l=it
+  - https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0019/index.html
+---
+In Sicilia la scuola perde più ragazzi che in qualsiasi altra regione. Nel 2024 il 15,2 per cento dei giovani fra 18 e 24 anni ha lasciato gli studi con al massimo la licenza media, la quota più alta fra le 20 regioni negli [abbandoni precoci di istruzione e formazione](/indicatore/giovani-che-abbandonano-prematuramente-i-percorsi-di-istruzione-e-formazione-pro/ter-102). Nello stesso anno solo il 78,7 per cento dei giovani fra 20 e 24 anni ha almeno il diploma, e anche per [scolarizzazione superiore](/indicatore/tasso-di-scolarizzazione-superiore/ter-101) l'isola è ultima. Il ritardo riguarda anche gli adulti: nel 2024 il 44,1 per cento dei siciliani fra 25 e 64 anni si è fermato al più alla licenza media, la quota più alta d'Italia per [livello di istruzione della popolazione adulta](/indicatore/livello-di-istruzione-della-popolazione-adulta/ter-104).
+
+La Sicilia ha il capoluogo a Palermo e conta 4.775.194 residenti al 1° gennaio 2026 secondo la [stima dell'Istat](https://demo.istat.it/app/?i=POS&l=it). Il rapporto della Banca d'Italia [L'economia della Sicilia](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0019/index.html) descrive un 2025 in cui l'attività economica è cresciuta dello 0,6 per cento, poco più che in Italia, rallentando nella seconda metà dell'anno. I servizi producono quattro quinti del valore aggiunto. Nell'industria sono salite le esportazioni non petrolifere, grazie soprattutto alla cantieristica navale, all'agroalimentare e all'elettronica, e le opere pubbliche hanno trainato le costruzioni. Le presenze turistiche sono cresciute mentre il traffico negli aeroporti dell'isola è rimasto fermo, e il trasporto marittimo di passeggeri e merci è andato bene.
+
+Il lavoro è cresciuto ancora, scrive la Banca d'Italia, ma è diminuita l'occupazione femminile e, in misura maggiore, quella dei lavoratori fra 25 e 34 anni e dei laureati. Il rapporto segnala difficoltà di inserimento per disoccupati e inattivi, dentro un quadro demografico di calo e invecchiamento della popolazione. Il [tasso di disoccupazione](/indicatore/tasso-di-disoccupazione/ter-12) è al 12,2 per cento nel 2025, diciannovesimo su 20.
+
+Secondo la Banca d'Italia il reddito delle famiglie siciliane è cresciuto nel 2025 anche al netto dell'inflazione, ma il benessere dei residenti, come il reddito pro capite, resta inferiore alla media del paese. Il reddito è anche distribuito in modo diseguale. Nel 2024 l'[indice di Gini](/indicatore/indice-di-gini-del-reddito/ter-930), che misura la disuguaglianza dei redditi familiari su una scala da 0 a 1, vale 0,345, il più alto fra le 20 regioni. La popolazione resta invece fra le più giovani del paese: l'[età media](/indicatore/eta-media-della-popolazione/ter-920) è di 46,0 anni all'inizio del 2026, la terza più bassa dopo Campania e Trentino-Alto Adige.
+
+Nessuna provincia siciliana si stacca dal fondo. Nella classifica della qualità della vita di Divario Italia tutte e nove stanno nell'ultimo quarto delle 107 province. [Palermo](/provincia/palermo) è la prima dell'isola, seguita da Messina, mentre [Siracusa](/provincia/siracusa) è l'ultima.

@@ -29,12 +29,12 @@
 <article class="page prose-wrap" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
   <h1>Contatti</h1>
-  <p class="page-lead">Si scrive a <!--email_off--><a href="mailto:{{ contact_email }}">{{ contact_email }}</a><!--email_on-->. È l'indirizzo della redazione di Divario Italia, e le risposte arrivano da lì.</p>
+  <p class="page-lead">Si scrive a <!--email_off--><a href="mailto:{{ contact_email }}">{{ contact_email }}</a><!--email_on-->. È l'indirizzo della redazione di Divario Italia, e a leggerlo e a rispondere è {{ editor_name }}, che cura il progetto.</p>
 
-  <section>
+  <section id="segnala-un-errore">
     <h2>Per segnalare un errore</h2>
     <p>È la ragione più utile per scrivere. Indica l'indirizzo della pagina, il passaggio o il valore da controllare e, se ce l'hai, la fonte corretta. Le segnalazioni si leggono tutte, e una cifra sbagliata si corregge appena è verificata.</p>
-    <p>Se preferisci un canale pubblico, dove la segnalazione e la risposta restano visibili a chiunque, puoi <a href="{{ corrections_url }}">aprire una segnalazione aperta</a>. Le due strade portano allo stesso posto, cambia solo chi può leggere.</p>
+    <p>Se preferisci un canale pubblico, dove la segnalazione e la risposta restano visibili a chiunque, puoi <a href="{{ public_issues_url }}" rel="noopener">aprire una segnalazione su GitHub</a>, che chiede un account. Le due strade portano allo stesso posto, cambia solo chi può leggere.</p>
   </section>
 
   <section>
