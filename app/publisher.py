@@ -38,6 +38,19 @@ CONTACT_EMAIL = "divarioitalia@protonmail.com"
 CONSENT_CMP_NAME = "Iubenda"
 CONSENT_CMP_URL = "https://www.iubenda.com/privacy-policy/"
 
+# La persona che fonda il progetto, approva ogni pagina e ne risponde. Un nome
+# vero e non una firma di comodo: e' la persona fisica che regge l'esenzione
+# dell'art. 50(4) dell'AI Act (controllo editoriale e responsabilita'
+# dichiarata), ed e' il titolare del trattamento in /privacy.
+EDITOR_NAME = "Aniello Maiese"
+EDITOR_ID = f"{SITE_URL}/chi-siamo#chi-lo-cura"
+EDITOR = {
+    "@type": "Person",
+    "@id": EDITOR_ID,
+    "name": EDITOR_NAME,
+    "url": f"{SITE_URL}/chi-siamo#chi-lo-cura",
+}
+
 ORGANIZATION_ID = f"{SITE_URL}/chi-siamo#organizzazione"
 ORGANIZATION = {
     "@type": "Organization",
@@ -48,6 +61,7 @@ ORGANIZATION = {
         "@type": "ImageObject",
         "url": f"{SITE_URL}/static/img/logo-mark.png",
     },
+    "founder": EDITOR,
     "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "editorial",
@@ -57,7 +71,12 @@ ORGANIZATION = {
     },
 }
 
-CORRECTIONS_URL = "https://github.com/nmaiese/diset-viz/issues/new"
+# "Segnala un errore" porta alla pagina contatti, dove si scrive per email. Fino
+# al 25/9/2026 portava a una issue GitHub, che chiede un account e il login a
+# chi vuole solo dire che una cifra e' sbagliata. GitHub resta come canale
+# pubblico, dichiarato in /contatti.
+CORRECTIONS_URL = "/contatti#segnala-un-errore"
+PUBLIC_ISSUES_URL = "https://github.com/nmaiese/diset-viz/issues/new"
 
 _SOURCE_STATE = Path(__file__).resolve().parents[1] / "data" / "source_state.json"
 _STATE_KEYS = {

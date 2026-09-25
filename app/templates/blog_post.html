@@ -43,6 +43,7 @@
   "datePublished": "{{ post.date.isoformat() }}",
   "dateModified": "{{ post.date_modified.isoformat() }}",
   "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
+  "editor": {{ editor_jsonld | safe }},
   "publisher": {{ publisher_jsonld | safe }},
   "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
   {% if post.indicator_meta %}"about": {

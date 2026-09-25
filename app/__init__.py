@@ -234,9 +234,18 @@ def not_found(error):
     )
 
 
+# Le pagine su cui lo script degli annunci non si carica: quelle senza
+# contenuto editoriale (ricerca, account, classifica del quiz) e ogni errore,
+# dove `request.endpoint` e' None. AdSense rifiuta un sito anche per annunci
+# "su schermate senza contenuto dell'editore", e /login era un 404 con lo
+# script caricato. Le schede noindex lo spengono dal loro template.
+ADS_OFF_ENDPOINTS = frozenset({"ricerca", "account_page", "game_leaderboard_page"})
+
+
 @app.context_processor
 def inject_site_config():
     return {
+        "ADS_OFF": request.endpoint is None or request.endpoint in ADS_OFF_ENDPOINTS,
         "SITE_NAME": config.SITE_NAME,
         "SITE_URL": config.SITE_URL,
         "STAGING": config.STAGING,

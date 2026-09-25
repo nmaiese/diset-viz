@@ -123,7 +123,7 @@
       {{ ui.arealegend(d.strip.legend) }}
     </figcaption>
     <div class="chart chart--hero" data-series>{{ d.strip.svg | safe }}</div>
-    <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.values_note %}, {{ d.values_note }}{% endif %}. Tutte le cifre sono nella classifica qui sotto.</p>
+    <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.values_note %}, {{ d.values_note }}{% endif %}.</p>
   </figure>
   {% endif %}
 
@@ -267,9 +267,9 @@
               testo da ridisegnare. -#}
           <div><dt>Come è calcolato</dt><dd>La media mostrata nella scheda è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
           <div><dt>Come nasce questa scheda</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della scheda sono ricalcolate dal codice a ogni caricamento.
-            {%- if page_article.authored_count or page_article.lead %} Il racconto è scritto con l'aiuto di strumenti automatici a partire da quei dati e da citazioni verificate, e non va online senza l'approvazione di una persona, che ne risponde.
-            {%- else %} Le frasi che accompagnano i numeri sono composte dal codice a partire dai metadati della fonte, quindi non possono invecchiare rispetto ai dati.{% endif %}
-            <a href="/metodologia#come-nasce-il-testo">Come nasce il testo, e chi ne risponde</a>.</dd></div>
+            {%- if page_article.authored_count or page_article.lead %} Il racconto lo legge e lo approva {{ editor_name }} prima che vada online.
+            {%- else %} Il commento ai numeri è costruito sui dati della fonte e si aggiorna con loro, quindi non può invecchiare rispetto ai dati.{% endif %}
+            <a href="/metodologia#come-nasce-il-testo">Come lavoriamo</a>.</dd></div>
           {% if level.annual_change or level.annual_note %}
           <div><dt>Che cosa confronta il calcolo</dt><dd>
             {%- if level.annual_change %}Il confronto fra {{ level.annual_change.previous_year }} e {{ level.annual_change.year }} usa le {{ level.annual_change.common_count }} {{ level.annual_change.common_count | it_plural(level.singular, level.plural) }} presenti in entrambi gli anni. {% endif %}
