@@ -104,6 +104,8 @@
      sta da solo), se no il documento: dentro stanno la striscia e la serie
      che il territorio scelto accende. Il JSON sta nel modulo (ui.explore) o,
      in home, accanto nel pannello. */
+  // Il modulo agganciato per ultimo in ogni confine, per la striscia che sta fuori.
+  var liveExplore = new WeakMap();
   function initExplore(mod) {
     var page = mod.closest("[data-page-root]") || document;
     var dataEl = mod.querySelector("[data-explore-data]") || page.querySelector("[data-explore-data]");
@@ -226,12 +228,18 @@
     if (select) select.addEventListener("change", function () { highlight(select.value); });
     // Il campo ripristinato dal browser dopo un Indietro riaccende la sua evidenza.
     if (select && select.value) highlight(select.value);
-    page.querySelectorAll(".strip").forEach(function (svg) {
+    // La striscia sta fuori dal modulo, nel confine: un modulo sostituito sul
+    // posto la ritrova gia' agganciata. Il suo clic si aggancia una volta sola
+    // e parla col modulo agganciato per ultimo, non con quello che l'ha vista
+    // per primo e che forse non e' piu' nella pagina.
+    liveExplore.set(page, { select: select, highlight: highlight });
+    each(page, ".strip", function (svg) {
       svg.addEventListener("click", function (ev) {
         var c = ev.target.closest(".strip__dot");
-        if (!c || !select) return;
-        select.value = select.value === c.dataset.key ? "" : c.dataset.key;
-        highlight(select.value);
+        var cur = liveExplore.get(page);
+        if (!c || !cur || !cur.select) return;
+        cur.select.value = cur.select.value === c.dataset.key ? "" : c.dataset.key;
+        cur.highlight(cur.select.value);
       });
     });
     mod.addEventListener("click", function (ev) {
