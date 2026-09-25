@@ -19,9 +19,11 @@ import random
 import re
 import struct
 from functools import lru_cache
+from urllib.parse import urlencode
 
 from app import indicator_notes, profiles, quality_life_bes, sources
 from app.blog import STATIC_DIR, social_image_size
+from app.cache_util import synchronized_cache
 from app.data import REGION_GEO_AREA
 from app.design import charts, maps, numfmt
 from app.design.common import (
@@ -494,6 +496,91 @@ def territories(rng: random.Random | None = None) -> list[dict]:
     return blocks
 
 
+# ---------------------------------------------------------------- l'atlante in home
+
+def area_href(area: str, level_key: str) -> str:
+    """L'atlante filtrato su un'area, sul livello del pannello. `atlante.js`
+    applica `?area=` solo quando e' il nome intero di un'area di quel livello
+    (il `data-atlas-area` dei bottoni), quindi qui va il nome, non lo slug."""
+    query = {"area": area} if level_key == "regione" else {"livello": level_key, "area": area}
+    return "/atlante?" + urlencode(query)
+
+
+def _mover_score(panel: dict | None) -> float | None:
+    """Quanto e' cambiata la media semplice di una riga, in rapporto a quanto
+    differiscono i territori nell'ultimo anno: la differenza fra il primo e
+    l'ultimo punto del pannello fisso, in valore assoluto, divisa per il suo
+    pavimento (lo scarto interquartile, `charts.spark_floor`). Cosi' si
+    confrontano misure con unita' diverse. None senza pannello o con uno scarto
+    nullo."""
+    if not panel or not panel.get("floor"):
+        return None
+    first, last = panel["points"][0]["value"], panel["points"][-1]["value"]
+    return abs(last - first) / panel["floor"]
+
+
+def _mover(level_key: str, rows: list[dict], records: dict) -> dict | None:
+    """L'indicatore cambiato di piu' fra le righe di un'area, o None.
+
+    La regola e' quella che la riga fonte della fascia scrive: solo righe che
+    portano a una scheda indicizzabile e hanno la sparkline, il punteggio di
+    `_mover_score`, a pari punteggio il nome. La frase e la sparkline sono
+    quelle della riga dell'atlante, per costruzione."""
+    best = None
+    for row in rows:
+        if not row["indexable"] or not row["spark"]:
+            continue
+        record = records.get(row["id"])
+        level = next((lv for lv in (record or {}).get("levels") or [] if lv["key"] == level_key), None)
+        panel = (level or {}).get("panel")
+        score = _mover_score(panel)
+        if score is None:
+            continue
+        key = (-score, row["name"].lower())
+        if best is None or key < best[0]:
+            best = (key, row, panel)
+    if best is None:
+        return None
+    _, row, panel = best
+    return {"name": row["name"], "path": row["path"], "code": row["code"], "spark": row["spark"],
+            "change": row["change"], "members": panel["members"], "total": panel["total"],
+            "dropped": panel["dropped"], "points": panel["points"]}
+
+
+@synchronized_cache(maxsize=1)
+def atlas_band() -> dict:
+    """La fascia "Gli indicatori, tema per tema": per ogni livello le aree
+    dell'atlante con quante righe ha ognuna, il link all'atlante filtrato e
+    l'indicatore cambiato di piu' con la sua sparkline.
+
+    Tutto viene dalle righe dell'atlante (`atlante.rows`), cosi' il conteggio
+    di un'area e' quello che l'atlante mostra con quel filtro, e la frase della
+    variazione e' la stessa della riga. Una volta per processo: la home non sta
+    nella cache di pagina, e la proiezione che le righe leggono la scalda gia'
+    `home_pick` (circa tre secondi a freddo, pagati comunque)."""
+    from app import indicator_universe, indicator_view
+    from app.design.pages import atlante
+
+    records = {sources.internal_id(r["family"], r["raw_id"]): r for r in indicator_universe.projection()}
+    records.update({str(r["meta"]["id"]): r for r in indicator_universe.projection()})
+    levels = []
+    for key, path in atlante.LEVEL_PATHS.items():
+        data = atlante.rows(key)
+        conf = indicator_view.LEVELS[key]
+        areas = []
+        for area in data["areas"]:
+            flat = [row for group in area["groups"] for row in group["rows"]]
+            areas.append({"area": area["name"], "count": len(flat), "href": area_href(area["name"], key),
+                          "mover": _mover(key, flat, records)})
+        levels.append({"key": key, "tab": conf["label"], "plural": conf["plural"], "n": data["total"],
+                       "href": path, "areas": areas})
+    return {
+        "total": levels[0]["n"], "href": atlante.LEVEL_PATHS["regione"], "levels": levels,
+        "need": {key: indicator_view.panel_need(key) for key in atlante.LEVEL_PATHS},
+        "panel_total": dict(indicator_view.PANEL_TOTALS),
+    }
+
+
 # ---------------------------------------------------------------- qualita' della vita
 
 def quality(ctx: dict) -> dict | None:
@@ -712,6 +799,44 @@ AREA_LOOK = {
 }
 
 
+def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
+    """La fascia "Gli indicatori, tema per tema": un pannello per livello.
+
+    Regioni: le aree coi loro temi, la regione in testa e in coda (le schede di
+    `_home_themes_preview`) e l'indicatore cambiato di piu'. Province: solo
+    l'indicatore cambiato di piu' per area, perche' nessuna pagina del sito
+    ordina le province per area e la home non e' il posto dove far nascere una
+    classifica nuova. Senza `band` (un guasto, gia' nel log) restano le schede
+    delle regioni come prima, senza bottone e senza selettore."""
+    by_area = {area["area"]: area for area in areas}
+    if not band:
+        if not areas:
+            return None
+        return {"total": None, "href": None, "rule": None,
+                "levels": [{"key": "regione", "tab": "Regioni", "areas": areas}]}
+    levels = []
+    for level in band["levels"]:
+        cards = []
+        for area in level["areas"]:
+            look = AREA_LOOK.get(area["area"], {"icon": "catalog", "tone": "neutral"})
+            card = {**look, "area": area["area"], "count": area["count"], "count_href": area["href"],
+                    "mover": area["mover"]}
+            if level["key"] == "regione":
+                preview = by_area.get(area["area"]) or {}
+                card.update({key: preview.get(key) for key in
+                             ("area_path", "themes", "best", "worst", "best_key", "worst_key")})
+            cards.append(card)
+        levels.append({"key": level["key"], "tab": level["tab"], "plural": level["plural"], "n": level["n"],
+                       "href": level["href"], "areas": cards})
+    need, total = band["need"], band["panel_total"]
+    rule = ("Per ogni area, l'indicatore la cui media semplice è cambiata di più fra il primo e l'ultimo anno, "
+            "in rapporto allo scarto interquartile fra i territori nell'ultimo anno, a pari merito in ordine "
+            "alfabetico. Solo schede indicizzabili, con almeno tre anni in cui almeno "
+            f"{need['regione']} regioni su {total['regione']} ({need['provincia']} province su "
+            f"{total['provincia']}) hanno il dato, e con la media dei territori presenti in tutti quegli anni.")
+    return {"total": band["total"], "href": band["href"], "rule": rule, "levels": levels}
+
+
 # ---------------------------------------------------------------- tutta la pagina
 
 def derive(ctx: dict) -> dict:
@@ -728,7 +853,7 @@ def derive(ctx: dict) -> dict:
         "best_key": next((k for k, v in names.items() if v == area.get("best")), None),
         "worst_key": next((k for k, v in names.items() if v == area.get("worst")), None),
     } for area in ctx.get("themes_preview") or []]
-    citation = (f"Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati "
+    citation =(f"Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati "
                 f"{ctx.get('sources_label')}. {ctx.get('canonical')}")
     return {
         "indicators": ctx.get("total_indicators"),
@@ -742,6 +867,7 @@ def derive(ctx: dict) -> dict:
         "games": [{**g, **GAME_LOOK.get(g["href"].rsplit("/", 1)[-1], {"icon": "bolt", "tone": "amber"})}
                   for g in ctx.get("quiz_games") or []],
         "areas": areas,
+        "temi": themes_band(ctx.get("atlas_band"), areas),
         "stories": [story(p) for p in posts],
         "citation": citation,
         "games_word": count_word(len(ctx.get("quiz_games") or []), feminine=False).capitalize(),

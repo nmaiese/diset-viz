@@ -385,10 +385,12 @@ def home():
     # I conteggi dei territori si calcolano: "20 regioni" era scritto a mano in
     # sei posti, e le province non comparivano in nessuno.
     territories = {"regions": len(profiles.regions_overview()), "provinces": province_profile.total()}
+    # La fascia dei temi prima del ramo Markdown: il gemello porta le stesse cifre.
+    atlas_band = _home_atlas_band()
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.home_markdown(summary, featured, recent_posts, SITE_URL,
-                                          territories=territories),
+                                          territories=territories, atlas_band=atlas_band),
             f"{SITE_URL}/",
         )
     themes_preview = _home_themes_preview()
@@ -407,6 +409,7 @@ def home():
         year_min=summary["year_min"],
         year_max=summary["year_max"],
         themes_preview=themes_preview,
+        atlas_band=atlas_band,
         quiz_games=_home_quiz_games(),
         # Quattro per la fascia delle storie (una grande, tre in fila); il
         # markdown per gli agenti resta sulle tre di `recent_posts`.
@@ -420,6 +423,24 @@ def home():
         qol_module=_home_qol_module(),
         trust_cards=_home_trust_cards(summary, territories),
     )
+
+
+def _home_atlas_band():
+    """La fascia "Gli indicatori, tema per tema" (`home.atlas_band`).
+
+    Fuori da `design.render` come `_home_feature_pick`: se le righe
+    dell'atlante cedessero, la home perderebbe solo il bottone, il selettore e
+    gli indicatori cambiati di piu', non tutta la regia della 1.0. In
+    produzione l'errore va nel log, nei test esce."""
+    from app.design.pages import home as home_page
+
+    try:
+        return home_page.atlas_band()
+    except Exception:
+        if os.environ.get("DIVARIO_V1_STRICT"):
+            raise
+        app.logger.exception("home: fascia dei temi non disponibile")
+        return None
 
 
 def _home_feature_pick():
