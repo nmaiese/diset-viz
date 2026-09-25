@@ -4,12 +4,12 @@
    di pagina chiara a ogni navigazione. Un file esterno arriverebbe troppo
    tardi anche da cache.
 
-   Perche' un include e non tre copie: lo stesso script stava scritto a mano in
-   `app.html`, `blog_base.html` e `confronto.html`. Tre copie della stessa
-   regola vanno fuori sincrono senza che nessuno se ne accorga, ed e' la cosa
-   che CLAUDE.md dice in testa di non fare. Cambiare come si decide il tema
-   toccando due file su tre lascerebbe l'atlante con un tema e il blog con un
-   altro.
+   Perche' un include: lo stesso script stava scritto a mano in tre shell, e
+   tre copie della stessa regola vanno fuori sincrono senza che nessuno se ne
+   accorga, ed e' la cosa che CLAUDE.md dice in testa di non fare. Le due
+   shell della SPA se ne sono andate il 25 settembre 2026 e oggi lo include
+   solo `blog_base.html`, da cui passano tutte le pagine: resta un file a se'
+   perche' la regola sta scritta in un posto solo, accanto al perche'.
 
    La regola. Una scelta esplicita vince sempre: l'interruttore scrive `light`
    o `dark` in `localStorage`, e da quel momento il sistema non conta piu'.

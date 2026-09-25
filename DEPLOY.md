@@ -1,6 +1,8 @@
 # Deploy di Divario Italia
 
-App Flask + React stateless. Produzione consigliata su Google Cloud Run con
+App Flask stateless, con le pagine rese dal server e un frontend React solo
+per il gioco (`frontend/`, compilato da Vite insieme a `site.js`, il controllo
+di accesso della testata). Produzione consigliata su Google Cloud Run con
 immagine Docker costruita da Cloud Build.
 
 ## Variabili d'ambiente
@@ -286,7 +288,7 @@ ancora committato.
 Configura un trigger Cloud Build sul repository GitHub, branch `^master$`, build
 config `cloudbuild.yaml`. Il file:
 
-1. costruisce l'immagine dal `Dockerfile`, incluso il frontend React,
+1. costruisce l'immagine dal `Dockerfile`, compresa la build di `frontend/` (il gioco e `site.js`),
 2. la pubblica su Artifact Registry in `europe-west1`,
 3. aggiorna Cloud Run senza toccare le env var del servizio.
 

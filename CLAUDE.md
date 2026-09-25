@@ -55,9 +55,10 @@ direttamente su `master`.
 territoriali Istat, più un blog server-rendered per la SEO e una sezione
 qualità della vita per regioni e province. A `/` c'è la **home
 server-rendered**, non l'atlante: l'atlante sta a `/atlante`, anche lui una
-pagina della 1.0 resa dal server. React (sorgente in `frontend/`, build in
-`app/static/dist/`) serve ormai solo `/confronto`, più il ripiego
-dell'atlante. Ogni indicatore di ogni famiglia a
+pagina della 1.0 resa dal server, come il confronto a `/confronto`. React
+(sorgente in `frontend/`, build in `app/static/dist/`) serve ormai solo il
+gioco sotto `/quiz`, accanto al controllo di accesso della testata (`site.js`,
+senza framework). Ogni indicatore di ogni famiglia a
 `/indicatore/<slug>/<acronimo>-<id>`, e la vista provinciale di una scheda a
 due livelli a `/indicatore/<slug>/<acronimo>-<id>/province`, servite da **un
 template su un view model**; i temi a `/temi` e `/tema/<slug>`; le regioni a `/regioni` e
@@ -100,7 +101,7 @@ risolve in un posto solo (`$DIVARIO_PYTHON`, poi `.venv/bin/python` del repo, po
 ```bash
 bin/py scripts/tool_failures.py                  # i guasti che si ripetono
 
-# build della SPA (obbligatoria dopo ogni modifica in frontend/)
+# build del frontend, gioco e site.js (obbligatoria dopo ogni modifica in frontend/)
 cd frontend && npm run build && cd ..
 
 # in locale (dalla radice del repo)
@@ -160,8 +161,8 @@ macro-area, senza che niente fallisca.
   font o un'ombra; nascono da `design/v1/tokens/tokens.json`, dove si verificano
   contrasti e daltonismo. `/legacy` e' l'unica pagina rimasta sul suo stile, di
   proposito.
-  Le sette pagine chiave (scheda indicatore, home, regione, provincia, articolo,
-  indice e classifica della qualita' della vita) escono da `app/templates/v1/`
+  Le pagine chiave (scheda indicatore, home, regione, provincia, articolo,
+  indice e classifica della qualita' della vita, atlante, confronto) escono da `app/templates/v1/`
   con `css/ds/components.css` e il CSS della pagina, e cio' che chiedono ai dati
   lo compone `app/design/` (`numfmt` per come si scrive una cifra, `charts` per
   i grafici, un modulo per pagina). Le altre pagine restano su `site.css`, che
@@ -170,6 +171,9 @@ macro-area, senza che niente fallisca.
   sui valori della 1.0. `design.render` serve il template di prima se la regia
   nuova cede, e lo scrive nel log ("pagina 1.0 ... ripiego"): un ripiego e' un
   200, quindi in produzione si controlla `data-v1="<pagina>"`, non lo stato.
+  L'atlante e il confronto non hanno un template di prima (erano la SPA):
+  `design.render` li chiama con `fallback=None`, e se la regia cede la risposta
+  e' un 500 loggato ("nessun ripiego, 500"), non un 200 senza dati.
   Due regole che si rompono in silenzio. **Mai cuocere un colore** (un esadecimale
   o un `rgba()`) dentro una regola: i neutri e `--seq-*` vengono ridefiniti sotto
   `<html data-theme="dark">`, quindi un colore cotto tiene quell'elemento sulla

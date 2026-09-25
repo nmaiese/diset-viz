@@ -130,8 +130,9 @@ della categoria, così i link già indicizzati non si perdono.
    `"Altro"` e che non compaia in due categorie.
 4. **Ricalcolo**: è runtime + cache 1h. Per vederlo subito **riavvia gunicorn**
    (o aspetta la scadenza). I test girano senza cache, quindi sono sempre freschi.
-5. **Frontend**: `cd frontend && npm run build && cd ..` (il catalogo cambia, la
-   SPA va ricostruita).
+5. **Frontend**: niente da ricostruire. L'atlante e il confronto sono pagine
+   rese dal server e leggono il catalogo al render, e il gioco lo chiede
+   all'API. `npm run build` serve solo dopo una modifica in `frontend/`.
 6. **Test**: `.venv/bin/python -m unittest discover -s tests -v` (tutti verdi).
 7. **Verifica tematiche**: controlla quali temi sono ora valutabili (>= 3
    indicatori core + direzionali) e quali restano descrittivi. Usa la diagnostica
