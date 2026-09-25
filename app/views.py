@@ -450,30 +450,50 @@ def atlante():
     in cache con la chiave del solo percorso serviva a `/atlante` la risposta
     data a `/atlante?indicator=910`. La cache e' su `_atlante_page`, con la
     chiave (livello, indicatore) e nient'altro della query string: filtri,
-    ricerca e ordine li applica `atlante.js` sulla pagina gia' resa. Il solo
-    parametro che il server legge e' `mappa`, il bottone "Sulla mappa" di una
-    riga, e sceglie l'indicatore della mappa."""
+    ricerca e ordine li applica `atlante.js` sulla pagina gia' resa. I soli
+    parametri che il server legge sono `livello` (`provincia` apre le
+    province, il selettore della pagina) e `mappa`, il bottone "Sulla mappa"
+    di una riga, che sceglie l'indicatore della mappa su quel livello.
+
+    Le province non sono un documento a se': il canonical resta `/atlante`, e
+    `?livello=provincia` rende la pagina `noindex, follow` e la tiene fuori
+    dalla sitemap. Header e meta li decide il livello e nient'altro: il meta
+    sta nel corpo in cache, che conosce solo (livello, indicatore), e un
+    header deciso da altri parametri (`?anno=`, `?regione=`) direbbe
+    `noindex` sopra un meta `index`. Gli altri parametri restano come prima,
+    `index` col canonical `/atlante`."""
+    level = "provincia" if request.args.get("livello") == "provincia" else "regione"
     if agent_discovery.prefers_markdown():
-        return agent_discovery.markdown_response(
+        response = agent_discovery.markdown_response(
             agent_discovery.atlas_markdown(_home_featured_indicator_links(), SITE_URL),
             f"{SITE_URL}/atlante",
         )
+        if level == "provincia":
+            response.headers["X-Robots-Tag"] = "noindex, follow"
+        return response
     target = _atlante_redirect(request.args)
     if target:
         return redirect(target, code=301)
-    shown = atlas_page.MAP_INDICATOR
+    start = atlas_page.MAP_INDICATORS[level]
+    shown = start
     if "mappa" in request.args:
-        # Il bottone "Sulla mappa" di una riga: il codice si risolve contro il
-        # catalogo, e un valore che non regge torna all'atlante nudo.
-        shown = atlas_page.map_choice(request.args.get("mappa"))
+        # Il bottone "Sulla mappa" di una riga: il codice si risolve contro le
+        # righe del livello, e un valore che non regge torna al livello nudo.
+        shown = atlas_page.map_choice(request.args.get("mappa"), level)
         if shown is None:
-            return redirect("/atlante", code=301)
-    if shown == atlas_page.MAP_INDICATOR:
-        return _atlante_page("regione", shown)
-    # Le altre mappe non vanno in cache: la pagina pesa 600 KB non compressi,
-    # e 594 varianti riempirebbero la SimpleCache di tutto il sito. Le righe
-    # sono gia' per processo, la resa costa pochi millisecondi.
-    return _render_atlante("regione", shown)
+            return redirect(atlas_page.LEVEL_PATHS[level], code=301)
+    if shown == start:
+        body = _atlante_page(level, shown)
+    else:
+        # Le altre mappe non vanno in cache: la pagina pesa 600 KB non
+        # compressi, e 594 varianti riempirebbero la SimpleCache di tutto il
+        # sito. Le righe sono gia' per processo, la resa costa pochi
+        # millisecondi.
+        body = _render_atlante(level, shown)
+    response = make_response(body)
+    if level == "provincia":
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 
 def _atlante_redirect(args):
@@ -502,7 +522,7 @@ def _atlante_redirect(args):
         # L'atlante con un indicatore scelto: e' la mappa di quell'indicatore.
         family, raw_id = sources.split_internal_id(args.get("indicator"))
         code = sources.indicator_code(family, raw_id)
-        return f"/atlante?mappa={code}#mappa" if atlas_page.map_choice(code) else "/atlante"
+        return f"/atlante?mappa={code}#mappa" if atlas_page.map_choice(code, "regione") else "/atlante"
     if args.get("indicator") or view == "detail":
         catalog = get_atlas_catalog()
         wanted = str(args.get("indicator") or catalog["featured_indicator_id"])

@@ -33,6 +33,9 @@ PAGINE_PER_TIPO = (
     # Una vista provinciale fuori dall'indice: i suoi link valgono lo stesso.
     "/indicatore/posti-km-offerti-dal-tpl/bes-12SER008/province",
     "/indicatore/medici-specialisti/bes-12SER002P",
+    # L'atlante delle province: ogni riga porta a `bes_level_path`, e la
+    # classifica della mappa alle pagine provincia.
+    "/atlante?livello=provincia",
     "/temi",
     "/tema/lavoro-e-conciliazione",
     "/catalogo-dati",
