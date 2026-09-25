@@ -1,0 +1,16 @@
+---
+regione: piemonte
+titolo: Il Piemonte ha redditi da Nord e pochi laureati
+fonti:
+  - https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0001/index.html
+  - https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/
+---
+Il Piemonte ha i redditi di una regione del Nord, ma su studio e lavoro sta a metà classifica. Il [reddito disponibile delle famiglie per abitante](/indicatore/reddito-disponibile-delle-famiglie-per-abitante/ter-902) è di 25.426 euro nel 2024, sesto fra le 20 regioni. I giovani adulti laureati sono invece pochi: il [tasso di istruzione terziaria fra i 30 e i 34 anni](/indicatore/tasso-di-istruzione-terziaria-nella-fascia-d-eta-30-34-anni/ter-339) si ferma al 27,2% nel 2023, quindicesimo su 20.
+
+La regione conta circa 4,26 milioni di residenti al primo gennaio 2026, secondo gli [indicatori demografici dell'Istat](https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/). Il capoluogo è Torino, il territorio va dalle Alpi alla pianura del Po. Il rapporto della Banca d'Italia [L'economia del Piemonte](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0001/index.html) dice che nel 2025 il prodotto è cresciuto dello 0,4%, contro lo 0,5 del Nord e dell'Italia, e che sull'attività pesano le difficoltà dell'automotive. L'esposizione dell'economia regionale a quel settore è più alta della media nazionale, non solo in una parte importante della manifattura ma anche in alcuni comparti del terziario. Fra i settori in crescita il rapporto indica l'aerospaziale, che in Piemonte pesa sul valore aggiunto più che nel resto del Paese.
+
+Il lavoro ha frenato. Secondo la stessa fonte, nel 2025 l'occupazione ha rallentato, nell'industria il numero di lavoratori è diminuito, il ricorso agli strumenti di integrazione salariale è aumentato ancora e il tasso di disoccupazione è salito fino al livello medio italiano. Il [tasso di disoccupazione](/indicatore/tasso-di-disoccupazione/ter-12) piemontese è al 6,0% nel 2025, tredicesimo fra le regioni e il più alto fra le otto del Nord. Va meglio sui giovani: il [tasso di NEET](/indicatore/tasso-giovani-neet-totale/ter-408), la quota di ragazzi fra i 15 e i 29 anni che non lavorano e non studiano, è al 9,8% nel 2024, quarto fra le 20 regioni.
+
+Anche sul benessere delle famiglie la Banca d'Italia colloca il Piemonte a metà strada. Reddito e ricchezza per abitante, povertà relativa e ricorso ai sostegni per le famiglie in difficoltà sono migliori della media del Paese ma meno favorevoli che nelle altre regioni settentrionali. Il rapporto aggiunge che la spesa delle famiglie piemontesi è distribuita in modo meno diseguale che nella media del Paese e anche in quella del Nord. È una popolazione anziana: l'[indice di vecchiaia](/indicatore/indice-di-vecchiaia/ter-921) vale 248,3 nel 2026, cioè 248 residenti con 65 anni e più ogni 100 ragazzi sotto i 15 anni. Il rapporto segnala che l'assistenza agli anziani è destinata a crescere con l'invecchiamento e che una parte dei costi resta a carico delle famiglie.
+
+Le otto province sono lontane fra loro. [Torino](/provincia/torino) è la prima della regione per qualità della vita, tredicesima fra le 107 province italiane, seguita da Novara e Biella. [Vercelli](/provincia/vercelli) è l'ultima della regione, sessantottesima.

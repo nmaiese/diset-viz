@@ -1,0 +1,16 @@
+---
+regione: puglia
+titolo: Il divario più largo d'Italia fra uomini e donne al lavoro
+fonti:
+  - https://demo.istat.it/app/?i=POS&l=it
+  - https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0016/index.html
+---
+In Puglia la distanza fra uomini e donne sul lavoro è la più ampia del paese. Nel 2025 il tasso di occupazione maschile supera quello femminile di 26,3 punti, il [divario più largo fra le 20 regioni](/indicatore/differenza-tra-tasso-di-occupazione-maschile-e-femminile/ter-57). Lavora il 37,9 per cento delle donne fra 15 e 64 anni, e per [occupazione femminile](/indicatore/tasso-di-occupazione-femmine/ter-178) la regione è diciassettesima su 20.
+
+La Puglia ha il capoluogo a Bari e si allunga sull'Adriatico dal Gargano al Salento. Al 1° gennaio 2026 conta 3.865.277 residenti secondo la [stima dell'Istat](https://demo.istat.it/app/?i=POS&l=it). Il rapporto della Banca d'Italia [L'economia della Puglia](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0016/index.html) descrive un 2025 di crescita contenuta, con il prodotto salito dello 0,4 per cento, meno che nel Mezzogiorno e in Italia. L'industria è rimasta debole, e nel siderurgico pesano le difficoltà dello stabilimento di Acciaierie d'Italia a Taranto, che produce meno dei suoi valori storici. Le costruzioni sono cresciute molto, spinte anche dalle opere pubbliche del PNRR, mentre l'agricoltura si è contratta. Il turismo continua ad allargarsi, ma con una produttività del lavoro più bassa della media regionale e salari particolarmente bassi.
+
+Sul lavoro la stessa Banca d'Italia scrive che il tasso di occupazione resta significativamente inferiore alla media nazionale, soprattutto fra le donne e i giovani, e che la quota di giovani che non lavorano e non studiano resta superiore al resto del paese nonostante il forte calo degli ultimi anni. Il [tasso di disoccupazione](/indicatore/tasso-di-disoccupazione/ter-12) è al 10,0 per cento nel 2025, diciottesimo su 20. Il divario di genere convive con una rete di servizi per i bambini piccoli fra le più estese: nel 2023 il 94,2 per cento dei comuni pugliesi aveva attivato asili nido, micronidi o servizi integrativi, e per [diffusione dei servizi per l'infanzia](/indicatore/diffusione-dei-servizi-per-l-infanzia/ter-142) la Puglia è quarta su 20.
+
+Il reddito resta basso. Il [PIL pro capite](/indicatore/pil-pro-capite/ter-901) è di 24.328 euro nel 2024, diciottesimo su 20. Nello stesso anno il 29,1 per cento dei pugliesi vive in famiglie sotto la soglia di [povertà relativa](/indicatore/indice-di-poverta-relativa-regionale-individuale-popolazione/ter-631), la quota più alta fra le 20 regioni. La Banca d'Italia aggiunge che la spesa delle famiglie pugliesi è inferiore di circa un terzo alla media nazionale, ma distribuita in modo meno diseguale, e che le più penalizzate sono le famiglie con figli minori, quelle numerose e quelle in cui la persona di riferimento ha un basso livello di istruzione.
+
+Il rapporto segnala anche che l'andamento di lungo periodo ha allargato i divari economici e di benessere fra le province. Nella classifica della qualità della vita di Divario Italia [Bari](/provincia/bari) è la prima provincia pugliese, mentre [Foggia](/provincia/foggia) chiude fra le ultime quattro d'Italia.

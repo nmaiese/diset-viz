@@ -1,0 +1,16 @@
+---
+regione: veneto
+titolo: Il Veneto vive a lungo, le donne lavorano meno
+fonti:
+  - https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0005/index.html
+  - https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/
+---
+In Veneto si vive più a lungo che quasi ovunque in Italia e la disoccupazione è bassa, ma le donne restano più lontane dal lavoro che nel resto del Nord. La [speranza di vita alla nascita](/indicatore/speranza-di-vita-alla-nascita/ter-910) è di 84,4 anni nel 2025, seconda fra le 20 regioni, e il [tasso di disoccupazione](/indicatore/tasso-di-disoccupazione/ter-12) è al 3,4%, terzo più basso. Il [tasso di occupazione femminile](/indicatore/tasso-di-occupazione-femmine/ter-178) si ferma invece al 60,7% nel 2025, undicesimo su 20 e ultimo fra le otto regioni del Nord.
+
+La regione conta circa 4,85 milioni di residenti al primo gennaio 2026, secondo gli [indicatori demografici dell'Istat](https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/), e ha il capoluogo a Venezia. Secondo il rapporto della Banca d'Italia [L'economia del Veneto](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0005/index.html), nel 2025 il prodotto è rimasto quasi fermo, più 0,1% contro lo 0,5 dell'Italia, come l'anno prima. La manifattura è in lieve calo e le esportazioni si sono ridotte, con le vendite negli Stati Uniti, terzo mercato dei prodotti veneti, in diminuzione. Il rapporto collega le difficoltà dell'industria anche a quelle dell'economia tedesca e della filiera dell'auto. Le costruzioni sono cresciute con il PNRR e la ripresa del mercato immobiliare, e le presenze turistiche, già su livelli elevati, sono aumentate di poco e solo in montagna. Il rapporto segnala anche il settore fieristico, molto sviluppato in regione, che dopo la pandemia ha perso meno partecipanti che nel resto del Paese e ha visto crescere gli espositori.
+
+Il divario fra uomini e donne è il tratto che distingue il Veneto dalle regioni vicine. La [differenza fra il tasso di occupazione maschile e quello femminile](/indicatore/differenza-tra-tasso-di-occupazione-maschile-e-femminile/ter-57) è di 16,8 punti nel 2025: la regione è tredicesima su 20, anche qui ultima nel Nord. La Banca d'Italia scrive che nel 2025 il numero di occupati in Veneto si è ridotto, a differenza di quanto è accaduto nel Paese, e che il calo è stato più forte fra le donne e fra chi lavora a tempo parziale. Sono invece aumentati i dipendenti con contratto a tempo indeterminato e diminuiti quelli a termine.
+
+Sul benessere delle famiglie il quadro è migliore. L'[indice di povertà relativa](/indicatore/indice-di-poverta-relativa-regionale-individuale-popolazione/ter-631) è al 7,3% nel 2024, quarto fra le regioni, e anche l'indice di Gini del reddito colloca il Veneto fra le prime sei per equità. Secondo la Banca d'Italia, però, nel 2025 i redditi delle famiglie in termini reali sono rimasti fermi, con un'inflazione salita all'1,7%, mentre i consumi sono cresciuti di poco. Per il 2026 le imprese venete prevedono ancora un fatturato fermo e investimenti in calo.
+
+Fra le sette province, [Padova](/provincia/padova) è la prima per qualità della vita, ottava fra le 107 province italiane, seguita da Vicenza e Verona. [Rovigo](/provincia/rovigo) è l'ultima, cinquantasettesima.

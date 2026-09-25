@@ -1,0 +1,16 @@
+---
+regione: sardegna
+titolo: La regione con meno figli e più anziani d'Italia
+fonti:
+  - https://demo.istat.it/app/?i=POS&l=it
+  - https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0020/index.html
+---
+La Sardegna è la regione italiana dove nascono meno figli e dove la popolazione è più anziana. Nel 2025 il [numero medio di figli per donna](/indicatore/numero-medio-di-figli-per-donna/ter-922) è di 0,85, il più basso fra le 20 regioni. All'inizio del 2026 l'[indice di vecchiaia](/indicatore/indice-di-vecchiaia/ter-921) conta quasi 300 residenti con 65 anni e più ogni 100 ragazzi sotto i 15, il valore più alto d'Italia, e l'età media è di 49,6 anni, seconda solo alla Liguria.
+
+L'isola ha il capoluogo a Cagliari e conta 1.554.490 residenti al 1° gennaio 2026 secondo la [stima dell'Istat](https://demo.istat.it/app/?i=POS&l=it). Il rapporto della Banca d'Italia [L'economia della Sardegna](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0020/index.html) descrive un 2025 di crescita più lenta dell'anno prima, con il prodotto salito dello 0,7 per cento, in linea con il Mezzogiorno. La domanda turistica è cresciuta con forza, soprattutto quella estera, e i lavori pubblici legati al PNRR hanno sostenuto le costruzioni. L'industria è rimasta debole: sono calate le vendite all'estero di prodotti alimentari, e il lattiero-caseario è il comparto più esposto alle politiche commerciali degli Stati Uniti. Il turismo pesa sui consumi in regione più che nella media del paese, soprattutto per la spesa degli stranieri, salita nettamente dopo la pandemia.
+
+Nel 2025 il [tasso di occupazione](/indicatore/tasso-di-occupazione-totale/ter-13) è al 58,2 per cento, quattordicesimo su 20. Secondo la Banca d'Italia la disoccupazione è salita nell'anno perché la partecipazione al mercato del lavoro è aumentata più dell'occupazione. Il reddito disponibile delle famiglie è cresciuto, e con lui il potere d'acquisto, ma le retribuzioni reali restano nettamente sotto i livelli precedenti la crisi del 2008. Sul fronte pubblico, nell'ultimo biennio i Comuni sardi hanno aumentato molto gli investimenti in tecnologie, rafforzando i servizi digitali, e nel 2025 il debito degli enti territoriali dell'isola è sceso più che nella media nazionale.
+
+La scuola è il punto più debole. Nel 2024 il 14,5 per cento dei giovani fra 18 e 24 anni ha lasciato gli studi con al massimo la licenza media, e per [abbandoni precoci di istruzione e formazione](/indicatore/giovani-che-abbandonano-prematuramente-i-percorsi-di-istruzione-e-formazione-pro/ter-102) la Sardegna è diciannovesima su 20. È diciannovesima anche per [scolarizzazione superiore](/indicatore/tasso-di-scolarizzazione-superiore/ter-101), la quota di giovani fra 20 e 24 anni con almeno il diploma. L'ambiente va meglio: la [raccolta differenziata](/indicatore/raccolta-differenziata-dei-rifiuti-urbani/ter-52) arriva al 76,6 per cento dei rifiuti urbani nel 2024, terza fra le regioni.
+
+Dentro l'isola le distanze fra le province sono ampie. Nella classifica della qualità della vita di Divario Italia [Cagliari](/provincia/cagliari) è la prima provincia sarda e sta nella metà alta della graduatoria, mentre il [Sud Sardegna](/provincia/sud-sardegna) è fra le ultime tre delle 107 province. Oristano, Sassari e Nuoro stanno tutte nella metà bassa.

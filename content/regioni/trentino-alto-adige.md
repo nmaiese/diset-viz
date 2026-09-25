@@ -1,0 +1,16 @@
+---
+regione: trentino-alto-adige
+titolo: Il Trentino Alto Adige è primo per lavoro e salute
+fonti:
+  - https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0004/index.html
+  - https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/
+---
+Il Trentino Alto Adige è la regione dove si lavora di più e si vive più a lungo. Il [tasso di disoccupazione](/indicatore/tasso-di-disoccupazione/ter-12) è al 2,0% nel 2025, il più basso fra le 20 regioni, e il [tasso di occupazione](/indicatore/tasso-di-occupazione-totale/ter-13) è al 72,9%, il più alto. La [speranza di vita alla nascita](/indicatore/speranza-di-vita-alla-nascita/ter-910) è di 84,8 anni nel 2025, anche questa la prima d'Italia.
+
+La regione conta circa 1,09 milioni di residenti al primo gennaio 2026, secondo gli [indicatori demografici dell'Istat](https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/), divisi quasi a metà fra le due province autonome di Trento e di Bolzano. Il rapporto della Banca d'Italia [L'economia delle Province autonome di Trento e di Bolzano](https://www.bancaditalia.it/pubblicazioni/economie-regionali/2026/2026-0004/index.html) stima per il 2025 una crescita del PIL dello 0,5% in Trentino, in linea con il dato nazionale, e dello 0,6% in Alto Adige. L'attività delle imprese manifatturiere è rimasta debole e le esportazioni si sono ridotte in entrambe le province per la debolezza dei mercati europei di lingua tedesca, mentre alberghi e ristoranti hanno continuato a crescere con la domanda turistica. In agricoltura è aumentata la produzione di mele e di uva da vino, e le costruzioni sono cresciute con i cantieri del PNRR e delle infrastrutture per le Olimpiadi invernali.
+
+Il reddito segue il lavoro. Il [PIL per abitante](/indicatore/pil-pro-capite/ter-901) è di 54.637 euro nel 2024, primo fra le regioni, e anche il reddito disponibile delle famiglie per abitante è il più alto d'Italia. Secondo la Banca d'Italia nel 2025 l'occupazione è cresciuta in provincia di Trento ed è rimasta stabile, su livelli storicamente elevati, in quella di Bolzano, mentre la disoccupazione è scesa ancora, su valori particolarmente contenuti nel confronto nazionale. Lo stesso rapporto segnala però che, in un mercato del lavoro migliore della media italiana, restano divari per donne, giovani e stranieri nella partecipazione, nei trattamenti economici e nei tipi di contratto. La regione ha anche la quota più bassa di NEET, i giovani fra i 15 e i 29 anni che non lavorano e non studiano.
+
+La scuola non tiene lo stesso passo. I [giovani che abbandonano prematuramente gli studi e la formazione](/indicatore/giovani-che-abbandonano-prematuramente-i-percorsi-di-istruzione-e-formazione-pro/ter-102) sono il 10,7% nel 2024, e la regione è quindicesima su 20, dietro a tutte le altre del Nord tranne la Valle d'Aosta. Chi arriva alla laurea invece trova lavoro: per condizione occupazionale dei laureati a uno o tre anni dal titolo la regione è prima nel 2024. Nascono poche imprese: il tasso di natalità delle imprese la mette ultima fra le 20 regioni nel 2023.
+
+Le due province autonome stanno entrambe fra le prime dieci d'Italia per qualità della vita: [Trento](/provincia/trento) è sesta fra le 107 province, [Bolzano](/provincia/bolzano) nona.
