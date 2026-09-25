@@ -40,7 +40,7 @@ paths:
   pagina tema legge il catalogo dell'atlante, che e' regionale, e in fondo ha
   la sezione "Per provincia" con le schede del tema che hanno i valori delle
   province, aperte sulle province (`indicator_view.province_indicators_by_theme`,
-  col tema della scheda, lo stesso della sua briciola): senza, le 25 schede
+  col tema della scheda, lo stesso della sua briciola): senza, le schede
   solo provinciali non stavano in nessun tema.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
   La tabella "Tutti gli indicatori" ha la colonna Andamento, la serie della
