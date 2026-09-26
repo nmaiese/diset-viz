@@ -176,10 +176,48 @@ emetteva gli eventi dell'atlante e del confronto, se n'e' andata il 25
 settembre 2026: gli eventi dell'interazione li emettono le isole delle due
 pagine, con i nomi di prima, salvo `compare_select_indicator` del confronto.
 
+### `page_type`
+
+Dal 26 settembre 2026 ogni `page_view` porta il tipo della sua famiglia di
+pagine, deciso dal percorso in un posto solo, `app/page_types.py`
+(`PAGE_TYPE_DEFAULT` nel contesto dei template). Prima tutto cio' che non era
+atlante, confronto o blog diceva `server`, e in GA4 la dimensione non separava
+niente. La classificazione vale anche per il ripiego di `design.render` e per le
+pagine fuori dalla regia della 1.0. Un template che dichiara `PAGE_TYPE` vince:
+lo fanno la 404 (`error`), l'atlante e il confronto (`atlas`).
+
+| `page_type` | Pagine |
+|---|---|
+| `home` | `/` |
+| `indicator` | `/indicatore/...`, compresa la vista `/province` di una scheda |
+| `region` | `/regione/<key>`, `/regioni` |
+| `province` | `/provincia/<key>`, `/province` |
+| `atlas` | `/atlante` e `/confronto`, gli strumenti interattivi dell'atlante (il valore che avevano da SPA) |
+| `theme` | `/tema/<slug>`, `/temi` |
+| `blog` | `/blog`, `/blog/<slug>` (non `/blogxyz`: il prefisso vale per segmento intero) |
+| `quality_of_life` | `/qualita-della-vita`, `/qualita-della-vita/classifica/...` |
+| `game` | `/quiz...`, `/gioco...`, lo stesso valore che portano gli eventi del quiz |
+| `search` | `/ricerca` |
+| `hub` | `/divari-regionali`, `/catalogo-dati` |
+| `info` | `/metodologia`, `/chi-siamo`, `/contatti`, `/termini`, `/privacy` |
+| `account` | `/account` |
+| `legacy` | `/legacy`, `/legacy-reddito` |
+| `error` | ogni 404 |
+| `other` | cio' che nessun prefisso copre |
+
+La serie di `server` in GA4 si ferma al rilascio: prima di quella data `server`
+vuol dire "tutto il resto". `tests/integration/test_page_type.py` guarda una
+pagina vera per famiglia.
+
+`page_location` e `page_path` si compongono senza i parametri del ritorno dal
+login (`code`, `state`, `error*`, `access_token`, `refresh_token`, `token`,
+`token_hash`, `type`) e senza frammento: il page_view parte in testa, prima
+che `frontend/src/site/auth.js` pulisca l'URL, e fino al 26 settembre 2026
+mandava a GA4 il codice o il token di Supabase e un URL unico per ogni accesso.
+
 Dal 25 settembre 2026 l'atlante (`/atlante`) e' una pagina server-rendered: la
-sua `page_view` parte dal server con `page_type: "atlas"` (il template dichiara
-`PAGE_TYPE`, che `_third_party_head.html` legge al posto di `server`), cosi' la
-serie in GA4 non cambia tipo. Gli eventi del catalogo li emette l'isola
+sua `page_view` parte dal server con `page_type: "atlas"`, cosi' la serie in
+GA4 non cambia tipo. Gli eventi del catalogo li emette l'isola
 `app/static/js/atlante.js` con gli stessi nomi e parametri della SPA
 (`filter_macro_area`, `filter_theme`, `filter_data_source`,
 `filter_year_range`, `sort_indicators`, `toggle_partial_data`,
@@ -201,21 +239,23 @@ profilo di una provincia aperto dalla tabella e' `open_province` con
 "apertura di un indicatore dall'atlante", e il selettore del confronto la
 gonfierebbe a ogni cambio.
 
+Nessun codice emette piu' `back_to_atlas`, `select_sibling_indicator`,
+`change_visualization`, ne' `change_year` e `change_region` dalla scheda
+indicatore: li emetteva la SPA. Un tag GTM su quei nomi non scatta mai.
+
 `TRACK_SERVER_PAGE_VIEW=false` in un template spegne la pageview del server
 (`_third_party_head.html`): oggi nessun template lo imposta.
 
 | Evento | Quando parte | Uso |
 |---|---|---|
 | `page_view` | apertura di ogni pagina, dal server | navigazione |
-| `select_indicator` | apertura di un indicatore dall'atlante | interesse indicatore |
-| `back_to_atlas` | ritorno dalla scheda all'atlante | navigazione |
-| `change_year` | cambio anno nella scheda indicatore o nel confronto | esplorazione temporale |
-| `change_region` | cambio regione nella scheda indicatore, o delle regioni del confronto | esplorazione territoriale |
+| `select_indicator` | apertura di un indicatore dall'atlante (clic sul nome di una riga di `/atlante`, `atlante.js`) | interesse indicatore, key event |
+| `change_year` | cambio anno nel confronto | esplorazione temporale |
+| `change_region` | cambio delle regioni o delle province del confronto | esplorazione territoriale |
+| `filter_macro_area`, `filter_data_source`, `filter_year_range` | filtri del catalogo dell'atlante | segmentazione |
 | `compare_select_indicator` | cambio indicatore nel confronto | interesse indicatore, fuori dalla conversione |
 | `open_region` | apertura del profilo di una regione dalla tabella del confronto | navigazione |
 | `open_province` | apertura del profilo di una provincia dalla tabella del confronto fra province | navigazione |
-| `select_sibling_indicator` | click su indicatore correlato | navigazione tematica |
-| `change_visualization` | cambio vista tra mappa, classifica e serie | uso visualizzazioni |
 | `filter_theme` | filtro tema nel catalogo | segmentazione |
 | `sort_indicators` | cambio ordinamento catalogo | comportamento catalogo |
 | `toggle_partial_data` | mostra o nasconde indicatori parziali | comportamento catalogo |
@@ -302,6 +342,18 @@ Configurazione richiesta:
 - mantieni create le custom dimension evento per ogni parametro utile all'analisi
 - marca come key event solo eventi che rappresentano un obiettivo reale, non `page_view`
 - non salvare dati personali o testo libero non controllato
+- tieni fuori dai rapporti il traffico che non viene da `divarioitalia.it`: il
+  container gira su ogni host che serve l'immagine di produzione (l'URL
+  `*.run.app` di Cloud Run, e `localhost` se uno sviluppatore esporta
+  `GOOGLE_TAG_MANAGER_ID`, che `.env.example` porta col valore vero). Il filtro
+  sta in GA4 o nel trigger GTM, non nell'app: dietro Cloudflare l'`Host` che
+  arriva a Cloud Run non e' verificabile dal repo, e un controllo sbagliato
+  spegnerebbe tutto il tracciamento
+- tieni il traffico interno (Nello, test manuali del quiz) come `internal`, con la
+  regola "Definisci traffico interno" dello stream e il filtro dati attivo
+- gli eventi del quiz passano da due strade finche' GTM non ha tag GA4 nativi per
+  loro (sezione Giochi): un tag GTM su quei nomi, o un tag "tutti gli eventi
+  personalizzati", li conterebbe due volte
 
 Dimensioni evento create nella property `542300588` il 2026-07-17:
 
@@ -318,9 +370,17 @@ Dimensioni evento create nella property `542300588` il 2026-07-17:
 - `correct`
 - `won`
 
+Parametri che il codice manda e che non sono dimensioni registrate (in GA4 si
+vedono solo in DebugView ed esplorazioni grezze finche' non si registrano):
+`from`, `macro_area`, `source_family`, `year_from`, `year_to`, `level`,
+`region_key`, `province_key`, `mode`, `result`, `streak`, `difficulty`,
+`attempt`, `attempts`, `score`.
+
 Key event creato:
 
-- `select_indicator`, counting method `ONCE_PER_EVENT`
+- `select_indicator`, counting method `ONCE_PER_EVENT`. Dal 25 settembre 2026
+  parte solo dal clic sul nome di una riga di `/atlante`: il volume basso e'
+  quello, non un guasto
 
 Key event aggiunto per i giochi:
 

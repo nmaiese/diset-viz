@@ -658,6 +658,52 @@ aggiornato quando se ne aggiunge uno.
 Non aggiungere paragrafi di riempimento. Le varianti quasi duplicate, incomplete
 o obsolete seguono le regole di indicizzazione definite in `app/profiles.py`.
 
+### Perche' le serie sono piu' delle schede in sitemap
+
+L'atlante dichiara tutte le serie regionali del catalogo (597 il 26 settembre
+2026, il numero lo legge `atlante.rows`), la sitemap solo le schede
+indicizzabili. Non ogni serie merita una pagina in indice, e la regola e' una:
+`indicator_view.indexability`, che da' anche il motivo del no. Al 26 settembre
+2026, sulle 597 serie regionali:
+
+| | serie |
+|---|---|
+| in sitemap come scheda regionale | 345 (ter 173, bes 113, ims 46, dem 11, eur 2) |
+| `copertura`: meno di 20 regioni o completezza sotto 0,98 (ter 110, bes 3, ims 2) | 115 |
+| `variante`: la meta' maschile o femminile di una serie che ha il totale (ter 60, dem 2) | 62 |
+| `vecchia`: ultimo anno prima del 2020 per le territoriali, fuori dalla finestra della famiglia per il BES (ter 48, bes 27) | 75 |
+
+La sitemap porta poi 26 schede BES solo provinciali e 17 viste `/province`
+di schede a due livelli: 345 + 26 + 17 = 388 URL sotto `/indicatore`. Le
+regioni di bes-01SAL001 non ci sono perche' hanno il canonical su ter-910.
+Una scheda fuori indice resta una pagina servita, linkata e `noindex, follow`:
+il motivo si legge in `meta.indexable_reason`. Fino al 26 settembre 2026 le 48
+territoriali vecchie risultavano `copertura`, perche' il payload dell'atlante
+non porta copertura e numero di regioni: il motivo ora li prende dal catalogo,
+come la regola.
+
+### Redirect e URL definitive
+
+Ogni indirizzo vecchio arriva al canonico con **un 301 solo**, tenendo `anno` e
+`regione`: l'URL numerica di prima della migrazione (`/indicatore/901-pil-pro-capite`),
+il codice prima dello slug, lo slug sbagliato, `?livello=`. Su `www.` il 301 va
+all'apex, e per l'URL numerica risolve anche il percorso nello stesso salto
+(`app/__init__.py`, `redirect_www_to_apex`). Una barra finale su una pagina che
+esiste senza (`/regione/lazio/`) fa 301 alla forma senza barra (il gestore
+della 404). Il passaggio da http a https non lo fa l'app: lo fa Cloudflare, e
+l'app manda HSTS. `tests/integration/test_redirect_e_sitemap.py` guarda i salti
+e che ogni scheda della sitemap risponda 200 con il canonical su se stessa.
+
+### "Da non confondere con"
+
+Alcune misure si scambiano con un'altra che il lettore cercava: il PIL pro
+capite con il PIL totale o col reddito, l'occupazione con la disoccupazione.
+`indicator_notes.DISTINCT_FROM` porta per quelle schede una frase di
+definizione, senza cifre, e i codici delle schede che misurano l'altra cosa;
+i link li risolve `indicator_view` sul catalogo, e una scheda che non c'e' si
+toglie invece di diventare un link inventato. La riga sta nel blocco "Secondo
+la fonte" e nel gemello Markdown.
+
 ## Verifica
 
 Prima della pubblicazione:

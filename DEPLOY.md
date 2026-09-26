@@ -317,3 +317,53 @@ curl -I https://divarioitalia.it/ads.txt
 `/qualita-della-vita/province` esiste solo se i file BES provinciali sono
 presenti. Se la pagina risponde 404 in un ambiente pulito, rigenera o includi gli
 artefatti descritti in [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).
+
+## Cloudflare: crawler, bot e 403
+
+Cloudflare sta davanti a Cloud Run e fa tre cose che l'app non fa: il passaggio
+da http a https, il `www.` quando non arriva all'origine, e il filtro dei bot.
+**L'app non risponde mai 403**: non ha controlli sullo user-agent ne' limiti di
+richieste sulle pagine (l'unico 429 e' su `POST /api/events` e sull'invio della
+classifica del quiz), e lo stage risponde 401. Un 403 visto da un crawler viene
+quindi da Cloudflare: Bot Fight Mode o Super Bot Fight Mode, le regole gestite
+del WAF, o "Block AI bots". `scripts/indexnow.py` lo ha gia' incontrato con lo
+user-agent di urllib.
+
+La politica verso i crawler sta in `robots.txt`, che serve l'app (`views.py`,
+dal 1 luglio 2026 al posto di quello gestito da Cloudflare): ricerca e risposte
+AI si', addestramento no (`Content-Signal: search=yes,ai-input=yes,ai-train=no`,
+`Disallow: /` ai crawler di addestramento), `/api/`, `/data` e `/legacy` fuori.
+Il filtro dei bot di Cloudflare deve restare coerente con quel file, non
+sostituirlo.
+
+Quando uno strumento SEO legittimo (un crawler di audit che si dichiara, come
+quello che il 26 settembre 2026 ha preso 403 mentre Googlebot e Firecrawl
+leggevano le stesse pagine) va fatto passare, senza spegnere il WAF e senza
+aprire la porta a tutti:
+
+1. In Cloudflare, **Security → Events**, filtra per lo user-agent o l'IP dello
+   strumento nell'ora del crawl e leggi quale servizio lo ha bloccato
+   (`Bot fight mode`, `Managed rules`, `Custom rules`, `Block AI bots`) e con
+   quale regola.
+2. Se lo strumento e' fra i **Verified Bots** di Cloudflare, non serve niente:
+   basta che le regole non blocchino la categoria dei bot verificati. Se non lo
+   e', crea una **regola personalizzata del WAF** con azione *Skip* limitata a
+   quel caso: user-agent esatto dello strumento **e** gli IP pubblicati dal
+   fornitore (o l'ASN), solo metodi `GET` e `HEAD`, e percorsi che non
+   iniziano con `/api/`, `/data` o `/legacy`. Salta solo il componente che ha
+   bloccato (per esempio Super Bot Fight Mode), non tutto il WAF.
+3. Se il blocco viene da Bot Fight Mode (la versione gratuita non ammette
+   eccezioni), l'alternativa e' far girare lo strumento con un IP fisso e un
+   token in un'intestazione, e fare la regola *Skip* su quella intestazione.
+4. Rilancia il crawl e controlla in **Security → Events** che le richieste
+   passino, e che Googlebot, Bingbot e i crawler di risposta AI continuino a
+   ricevere 200 (`curl -A "Googlebot" -I https://divarioitalia.it/`).
+
+Non si autorizzano i bot in blocco, non si cambia il consenso e non si apre
+`/api/`, `/data` o `/legacy`: il `Disallow` di `robots.txt` resta la regola.
+
+Una nota di politica: `Google-Extended` sta nel gruppo dei crawler ammessi di
+`robots.txt`. Non tocca la Ricerca Google, ma decide se i contenuti si usano per
+addestrare Gemini e per il grounding delle app Gemini: ammesso, e' in tensione
+con `ai-train=no`. E' una scelta editoriale, non un guasto, e resta com'e'
+finche' non la si prende.
