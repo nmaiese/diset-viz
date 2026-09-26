@@ -14,6 +14,7 @@ from app.atlas_catalog import (
     search_atlas_indicators,
 )
 from app import design
+from app.design import common as design_common
 from app.design import numfmt
 from app.design.pages import atlante as atlas_page
 from app.design.pages import confronto as compare_page
@@ -1864,7 +1865,7 @@ def _titolo_provincia(profilo):
     return testa
 
 
-def _descrizione_provincia(profilo):
+def _descrizione_provincia(profilo, indicator_count=None):
     """La descrizione SERP di una pagina provincia, dentro i 160 caratteri.
 
     Si compone qui e non nel template per la stessa ragione della pagina tema:
@@ -1872,22 +1873,34 @@ def _descrizione_provincia(profilo):
     accessibilita'" e in un template non si misura niente. Scritta in Jinja
     sforava di sei caratteri su Lecce.
 
+    Apre con "Qualita' della vita e dati della provincia di Lecce" (o "della
+    citta' metropolitana di Milano"): fino al 26 settembre 2026 diceva solo
+    "Qualita' della vita a Lecce", e la pagina, che porta i valori veri di
+    tutti gli indicatori del BES della provincia, non diceva ne' "provincia"
+    ne' "dati" a chi cerca "dati provincia di Lecce". Il conteggio degli
+    indicatori entra quando c'e' posto, perche' e' cio' che la pagina ha in
+    piu' di una classifica.
+
     Si sacrifica in ordine: prima cade "peggio su", che e' la meta' meno
-    cercata, poi anche "meglio su". L'apertura con posizione e punteggio sta
-    sempre dentro, perche' e' il motivo per cui la pagina esiste.
+    cercata, poi il conteggio, poi anche "meglio su", che distingue una
+    provincia dall'altra meglio del conteggio. L'apertura con posizione e
+    punteggio sta sempre dentro, perche' e' il motivo per cui la pagina esiste.
     """
-    testa = (f"Qualità della vita {seo_titles.at_place(profilo['name'])}: {profilo['rank']}ª su "
+    kind = "città metropolitana" if profilo.get("metro_city") else "provincia"
+    of_name = design_common.of_place(profilo["name"], "provincia")
+    testa = (f"Qualità della vita e dati della {kind} {of_name}: {profilo['rank']}ª su "
              f"{profilo['total']} province, punteggio "
              f"{it_numbers.number(profilo['score'])} su 100.")
     forte = profilo["strongest"][0]["name"].lower() if profilo.get("strongest") else None
     debole = profilo["weakest"][0]["name"].lower() if profilo.get("weakest") else None
+    fonte = f" I valori di {indicator_count} indicatori Istat BES." if indicator_count else " Dati Istat BES."
 
     code = []
     if forte and debole:
-        code.append(f" Meglio su {forte}, peggio su {debole}. Dati Istat BES.")
+        code.append(f" Meglio su {forte}, peggio su {debole}.{fonte}")
     if forte:
-        code.append(f" Meglio su {forte}. Dati Istat BES.")
-    code.append(" Dati Istat BES.")
+        code += [f" Meglio su {forte}.{fonte}", f" Meglio su {forte}. Dati Istat BES."]
+    code += [fonte, " Dati Istat BES."]
     for coda in code:
         if len(testa) + len(coda) <= 160:
             return testa + coda
@@ -1899,7 +1912,7 @@ def _descrizione_provincia(profilo):
 def province_page(province_key):
     """Il profilo di una provincia.
 
-    Il sito misura 103 province nella classifica della qualita' della vita e
+    Il sito misura 107 province nella classifica della qualita' della vita e
     nessuna di loro aveva una pagina: chi cercava "qualita' della vita
     provincia di Lecce" arrivava su una tabella di 103 righe, e da li' poteva
     solo salire alla regione. Il commento che costruisce quella classifica lo
@@ -1947,7 +1960,7 @@ def province_page(province_key):
         movimenti_giu=giu,
         prime_in_regione=prime,
         ultime_in_regione=ultime,
-        seo_description=_descrizione_provincia(profilo),
+        seo_description=_descrizione_provincia(profilo, len(righe)),
         seo_title=_titolo_provincia(profilo),
         site_url=SITE_URL,
         site_name=SITE_NAME,
