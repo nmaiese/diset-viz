@@ -336,6 +336,10 @@ addEventListener("pagereveal", function (e) {
               {% if meta.archive %}<div><dt>Definizione della fonte</dt><dd>{{ meta.archive }} <a href="{{ meta.source_url }}">Consulta la fonte {{ meta.institution or "Istat" }}</a></dd></div>{% endif %}
               <div><dt>Verso</dt><dd>{{ d.verso }}{% if not meta.scoreable %}: un valore alto descrive più intensità del fenomeno, non un territorio migliore{% endif %}.</dd></div>
               {% if explain.caveat %}<div><dt>Il limite principale</dt><dd>{{ explain.caveat }}</dd></div>{% endif %}
+              {#- La misura che chi cerca scambia con questa (PIL pro capite e
+                  PIL totale o reddito, occupazione e disoccupazione):
+                  `indicator_notes.DISTINCT_FROM`, link risolti sul catalogo. -#}
+              {% if explain.distinct %}<div><dt>Da non confondere con</dt><dd>{{ explain.distinct }}{% if meta.distinct_from %} Vedi {% for c in meta.distinct_from %}<a href="{{ c.path }}">{{ c.name | lower if c.name[1:2].islower() else c.name }}</a>{{ ", " if not loop.last and loop.revindex > 2 else (" e " if not loop.last else ".") }}{% endfor %}{% endif %}</dd></div>{% endif %}
             </dl>
           </div>
         </div>

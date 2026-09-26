@@ -903,6 +903,45 @@ def seo_description(
     return prefix + kept + tail
 
 
+# Le misure che chi cerca scambia con questa, e che la scheda deve distinguere.
+# Chi cerca "pil regioni italiane" o "pil per regione" arriva sul PIL pro
+# capite, e la scheda non diceva che non e' il PIL totale ne' il reddito: una
+# frase di definizione, senza cifre, e i link alle schede che misurano l'altra
+# cosa quando il sito le ha. Solo definizioni verificabili sulla fonte, mai
+# un'interpretazione. I link li risolve `indicator_view` sul catalogo.
+DISTINCT_FROM = {
+    "901": {
+        "text": (
+            "Non è il PIL totale della regione, che somma quanto si produce in tutto il territorio "
+            "e cresce con il numero degli abitanti. E non è il reddito: il PIL conta il valore di ciò "
+            "che si produce nella regione, il reddito ciò che entra alle famiglie che ci vivono."
+        ),
+        "see": ("902", "906"),
+    },
+    "902": {
+        "text": (
+            "Non è il PIL pro capite: il PIL conta il valore di ciò che si produce nella regione, il "
+            "reddito disponibile ciò che resta alle famiglie dopo imposte, contributi e trasferimenti."
+        ),
+        "see": ("901", "906"),
+    },
+    "12": {
+        "text": (
+            "Non è il rovescio del tasso di occupazione: la disoccupazione si calcola su chi lavora o "
+            "cerca lavoro, l'occupazione su tutta la popolazione fra 15 e 64 anni."
+        ),
+        "see": ("13",),
+    },
+    "13": {
+        "text": (
+            "Non è il rovescio del tasso di disoccupazione: l'occupazione si calcola su tutta la "
+            "popolazione fra 15 e 64 anni, la disoccupazione solo su chi lavora o cerca lavoro."
+        ),
+        "see": ("12",),
+    },
+}
+
+
 def build_indicator_explain(item):
     name = _clean(item.get("indicator") or item.get("name"))
     theme = _clean(item.get("theme"))
@@ -921,6 +960,7 @@ def build_indicator_explain(item):
         "reading": _reading_text(name, theme, unit, direction),
         "caveat": _caveat_text(name, theme, lens),
         "direction": direction,
+        "distinct": (DISTINCT_FROM.get(indicator_id) or {}).get("text"),
     }
 
 
@@ -1147,7 +1187,8 @@ def _unit_explanation(name, unit, definition=""):
         return "Il valore indica quanti microgrammi di inquinante sono presenti in media in un metro cubo d'aria."
     if "m2 per abitante" in lowered_unit or "metri quadrati per abitante" in lowered_unit:
         return "Il valore indica quanti metri quadrati sono disponibili in media per ogni abitante."
-    if "per abitante" in lowered_unit or "pro capite" in lowered_unit or "per abitante" in lowered_name:
+    if ("per abitante" in lowered_unit or "pro capite" in lowered_unit
+            or "per abitante" in lowered_name or "pro capite" in lowered_name):
         return "Il totale è diviso per il numero di abitanti, così territori grandi e piccoli sono più confrontabili."
     if "per km" in lowered_unit or "per chilometro quadrato" in lowered_unit:
         return "Il valore rapporta il fenomeno alla superficie del territorio, non al numero di abitanti."

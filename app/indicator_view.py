@@ -54,6 +54,7 @@ from app.external_data import freshness_label, freshness_status
 from app.multiscopo_data import all_multiscopo_indicators
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_CANONICALS, REGIONAL_TWINS
 from app.indicator_notes import (
+    DISTINCT_FROM,
     annual_change_framing,
     change_unit_label,
     cover_bars,
@@ -303,7 +304,26 @@ def _build_meta(family, raw_id, source_meta):
         "canonical_path": source_meta.get("path")
         or sources.indicator_url(family, raw_id, profiles.indicator_slug(name)),
         "downloads": _downloads(source_meta["id"]),
+        "distinct_from": _distinct_from(source_meta["id"]),
     }
+
+
+def _distinct_from(indicator_id):
+    """The cards of the measures this one is mistaken for (`DISTINCT_FROM`),
+    with their canonical path from the catalog. A card the catalog does not
+    have is dropped, never linked by a guessed URL."""
+    entry = DISTINCT_FROM.get(str(indicator_id))
+    if not entry:
+        return []
+    cards = []
+    for other in entry["see"]:
+        payload = get_atlas_indicator(other)
+        if payload is None:
+            continue
+        other_meta = payload["metadata"]
+        cards.append({"name": other_meta["name"],
+                      "path": other_meta.get("path") or profiles.indicator_path(other, other_meta["name"])})
+    return cards
 
 
 @functools.lru_cache(maxsize=2)
