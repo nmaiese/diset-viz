@@ -259,6 +259,50 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   colorata ("Serie ferma al 2015", "Citta' metropolitana", "n.d.").
 - **Slot pubblicitario**: vedi sotto.
 
+- **Le barre ferme: una misura sola.** La testata visibile (`--hdr-h`), la
+  barra delle sezioni sotto i 1200 pixel (`--toc-bar`) e la striscia che resta
+  (`--stripbar-h`) stanno sulla radice, e `--sticky-top` e' il bordo basso di
+  testata e barra: ogni elemento fermo in alto parte da li', e lo
+  `scroll-padding-top` delle ancore somma le tre (chrome.css). Nessun `top` si
+  scrive a mano. Sotto i 960 pixel, e su un telefono in orizzontale, **la
+  testata si ritira** scendendo e torna risalendo (v1.js, `html.is-hdr-off`),
+  mai nei primi 120 pixel, col menu aperto o col fuoco dentro. Sui telefoni
+  bassi (sotto i 500 pixel di altezza) la striscia che resta non scende e la
+  mappa ferma del modulo torna nel flusso. "Torna su" sotto i 960 e' solo la
+  freccia, e compare risalendo.
+- **Le mappe al tocco.** Il suggerimento segue solo il mouse (`pointermove`,
+  `pointerType === "mouse"`). Sulle mappe per scegliere il primo tocco
+  contorna il territorio e scrive sotto la mappa nome, cifra e "Apri il
+  profilo" (`.navmap__card`), il secondo apre. Sulla striscia vale il punto piu'
+  vicino entro 22 pixel. Le mappe coi dati hanno la costa (`--map-coast`, il
+  grigio di contesto a 3:1): il primo gradino della rampa sul fondo sta a
+  1,2:1 e senza si perdeva.
+- **L'Italia a tessere** (`app/design/tiles.py`, `.tilemap`, `.tmap-cell`):
+  le 20 regioni in una griglia di 5 colonne per 9 righe, una casella uguale per
+  regione, col colore del gradino della mappa e il testo che regge il
+  contrasto (`--on-seq-4`). Nella scheda regionale "Striscia | Italia": i
+  punti della striscia volano nelle loro caselle (v1.js, `initTilemap`, Web
+  Animations, niente con prefers-reduced-motion). Senza JavaScript resta la
+  striscia. Solo per le regioni.
+- **Il tuo territorio.** Dal profilo di una regione o di una provincia ("E' la
+  mia", `data-mine-set`) si sceglie il proprio, che resta nel browser
+  (`di:mio`): un segno nella testata da 600 pixel, e ogni scheda lo accende e
+  scrive dove sta sotto la figura d'apertura (`.mine-note`). Una scheda solo
+  regionale accende la regione della provincia scelta. Niente passa dal
+  server: la pagina per i motori e' la stessa per tutti.
+- **Regione per regione** (`charts.small_multiples`): nella scheda regionale,
+  sotto la serie, venti linee sulla stessa scala in ordine di classifica, con
+  la media semplice tratteggiata. Il territorio scelto prende la linea in
+  evidenza.
+- **La cifra d'apertura.** Nel titolo di regione e provincia (`h1[data-count]`)
+  la posizione e' piu' grande e all'arrivo conta fino al suo valore, su un
+  doppione `aria-hidden`: il numero nell'HTML e' gia' quello giusto.
+- **L'immagine da condividere** di ogni regione e provincia
+  (`scripts/og_territori.py`, PNG committati in `static/img/og/territori/`,
+  `app/design/og.py`): nome, posizione in qualita' della vita, la regione
+  ingrandita con le province. La pagina la passa a `blog_base.html` con
+  `og_image_path` e `og_image_alt`.
+
 ### I grafici
 
 - **La striscia del divario** e' il segno della 1.0: ogni territorio un punto
@@ -518,6 +562,12 @@ WCAG 2.2 AA come minimo: testo a 4,5:1, controlli e grafici a 3:1, un solo
 `<main id="contenuto">` per pagina, focus visibile e uguale dappertutto, mappe
 mai con figli focalizzabili dentro `role="img"`, una tabella accanto a ogni
 mappa e grafico, bersagli di 44px su telefono, niente scorrimento orizzontale a
-320px, `prefers-reduced-motion` rispettato. Il tema scuro ridefinisce ogni
+320px, `prefers-reduced-motion` rispettato. Al tocco un blocco solo in
+components.css porta i controlli a 44 pixel; un link dentro una frase segue
+l'interlinea del testo (e' l'eccezione della WCAG 2.5.8). L'audit del telefono
+(`node scripts/audit_viewport.cjs`, e `tests/integration/test_viewport_mobile.py`
+dove c'e' Playwright per Node) guarda a 390x844, 320x640 e 844x390: niente
+scorrimento di lato, barre ferme sotto il 25% dello schermo in verticale e il
+35% in orizzontale, controlli da 44, ancore sotto le barre, nessun errore. Il tema scuro ridefinisce ogni
 colore per tenere lo stesso contrasto del chiaro, e la rampa va da poco a molto
 contrasto col fondo.
