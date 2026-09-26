@@ -197,6 +197,13 @@
   // riaprono la stessa vista. Se l'API non risponde, la pagina si ricarica
   // con `mappa`, come faceva il form da solo.
   var mapForm = document.getElementById("atl-map");
+  // Seicento bottoni "Sulla mappa" con lo stesso nome non si distinguono in
+  // un lettore di schermo. Il nome della riga si aggiunge qui e non
+  // nell'HTML, che ha un tetto di peso (tests/integration/test_atlante.py).
+  document.querySelectorAll('button[form="atl-map"][name="mappa"]').forEach(function (b) {
+    var a = b.parentNode.querySelector("a");
+    if (a) b.setAttribute("aria-label", a.textContent.trim() + " sulla mappa");
+  });
   var mapSection = document.getElementById("mappa");
   var loading = null;
   function reloadWith(url) { location.assign(url.pathname + url.search + "#mappa"); }
