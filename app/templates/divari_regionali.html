@@ -47,18 +47,19 @@
         <small>{{ d.theme }} · {{ d.year }}</small>
         <h3><a href="{{ d.path }}">{{ d.name }}</a></h3>
         <ul class="divari-bars">
+          {% set dec = column_decimals([d.areas.Nord.mean, d.areas.Centro.mean, d.areas.Mezzogiorno.mean]) %}
           {% for area in ('Nord', 'Centro', 'Mezzogiorno') %}
           {% set a = d.areas[area] %}
           <li>
             <span class="divari-bars__area">{{ area }}</span>
             <span class="divari-bars__bar"><i style="width: {{ (a.mean / d.bar_max * 100) | round(1) }}%"></i></span>
-            <span class="divari-bars__val">{{ a.mean | it_num(1) }}</span>
+            <span class="divari-bars__val">{{ a.mean | numtext(dec) }}</span>
           </li>
           {% endfor %}
         </ul>
         <p class="divari-core-card__note">
-          Divario tra {{ d.leader }} e {{ d.last }}: {{ d.gap | it_num(1) }} {{ d.change_unit }}.
-          Media semplice delle venti regioni {{ d.regions_mean | it_num(1) }} {{ d.unit }}, in testa {{ d.top_region.name }} con {{ d.top_region.value | it_num(1) }}, ultima {{ d.bottom_region.name }} con {{ d.bottom_region.value | it_num(1) }}.
+          Divario tra {{ d.leader }} e {{ d.last }}: {{ d.gap | numtext(dec) }} {{ d.change_unit }}.
+          Media semplice delle venti regioni {{ d.regions_mean | numtext(dec) }} {{ d.unit }}, in testa {{ d.top_region.name }} con {{ d.top_region.value | numtext(dec) }}, ultima {{ d.bottom_region.name }} con {{ d.bottom_region.value | numtext(dec) }}.
         </p>
       </article>
       {% endfor %}
@@ -88,16 +89,17 @@
 
     <div class="divari-cards">
       {% for card in a.cards %}
+      {% set dec = column_decimals([card.mean, card.lead.value, card.lag.value]) %}
       <article class="divari-card{{ ' is-better' if card.better_than_mean else ' is-worse' }}">
         <small>{{ card.theme }} · {{ card.year }}</small>
         <h3><a href="{{ card.path }}">{{ card.indicator }}</a></h3>
-        <strong>{{ card.mean | it_num(1) }} <span class="u">{{ card.unit }}</span></strong>
+        <strong>{{ card.mean | numtext(dec) }} <span class="u">{{ card.unit }}</span></strong>
         <span class="divari-card__delta">
-          {{ 'Sopra' if card.delta > 0 else 'Sotto' }} la media delle venti regioni di {{ card.delta | abs | it_num(1) }} {{ card.change_unit }},
+          {{ 'Sopra' if card.delta > 0 else 'Sotto' }} la media delle venti regioni di {{ card.delta | abs | numtext(dec) }} {{ card.change_unit }},
           {{ 'un vantaggio' if card.better_than_mean else 'un ritardo' }}
         </span>
         <span class="divari-card__extremes">
-          Meglio <a href="/regione/{{ card.lead.key }}">{{ card.lead.name }}</a> con {{ card.lead.value | it_num(1) }}, peggio <a href="/regione/{{ card.lag.key }}">{{ card.lag.name }}</a> con {{ card.lag.value | it_num(1) }}
+          Meglio <a href="/regione/{{ card.lead.key }}">{{ card.lead.name }}</a> con {{ card.lead.value | numtext(dec) }}, peggio <a href="/regione/{{ card.lag.key }}">{{ card.lag.name }}</a> con {{ card.lag.value | numtext(dec) }}
         </span>
       </article>
       {% endfor %}
@@ -137,10 +139,11 @@
               <a href="{{ d.path }}">{{ d.name }}</a>
               <span class="divari-table__meta">{{ d.unit }} · {{ d.year }} · in testa {{ d.leader }}</span>
             </td>
-            <td class="num">{{ d.areas.Nord.mean | it_num(1) }}</td>
-            <td class="num">{{ d.areas.Centro.mean | it_num(1) }}</td>
-            <td class="num">{{ d.areas.Mezzogiorno.mean | it_num(1) }}</td>
-            <td class="num">{{ d.gap | it_num(1) }}</td>
+            {% set dec = column_decimals([d.areas.Nord.mean, d.areas.Centro.mean, d.areas.Mezzogiorno.mean]) %}
+            <td class="num">{{ d.areas.Nord.mean | numtext(dec) }}</td>
+            <td class="num">{{ d.areas.Centro.mean | numtext(dec) }}</td>
+            <td class="num">{{ d.areas.Mezzogiorno.mean | numtext(dec) }}</td>
+            <td class="num">{{ d.gap | numtext(dec) }}</td>
           </tr>
           {% endfor %}
         </tbody>

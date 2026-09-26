@@ -89,8 +89,8 @@
           {% endif %}
           {% if t.lead %}
           <div class="theme-index-card__standing">
-            <span><i class="dot dot--lead"></i>{{ t.lead }}</span>
-            <span><i class="dot dot--lag"></i>{{ t.lag }}</span>
+            <span><i class="dot dot--lead" aria-hidden="true"></i>In testa: {{ t.lead }}</span>
+            <span><i class="dot dot--lag" aria-hidden="true"></i>In coda: {{ t.lag }}</span>
           </div>
           {% endif %}
         </a>

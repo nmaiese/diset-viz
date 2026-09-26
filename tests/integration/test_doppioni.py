@@ -372,7 +372,7 @@ class LaNavigazioneMostraLaSchedaGiusta(unittest.TestCase):
                 self.assertEqual(profile["quality_life_count"],
                                  sum(item["quality_life_scored"] for item in profile["indicators"]))
                 page = self.client.get(theme["path"]).get_data(as_text=True)
-                shown = re.search(r"<small>Nel punteggio</small><strong>(\d+)</strong>", page)
+                shown = re.search(r"<small>Nella qualità della vita</small><strong>(\d+)</strong>", page)
                 self.assertIsNotNone(shown)
                 self.assertEqual(int(shown.group(1)), len(scored))
 
