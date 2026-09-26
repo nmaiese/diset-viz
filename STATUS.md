@@ -66,9 +66,8 @@ cd frontend && npm run build && cd ..
 - [x] Registrazione del repository `divarioitalia` in Orca (ID `d2ae0385-1020-40e5-8859-7fbd55a33e03`).
 - [x] Separazione totale da repository esterni: hook, regole e documentazione operativa puntano a questo `STATUS.md`; la vecchia pipeline editoriale non viene più invocata.
 - [x] Consolidamento dell'aggiornamento UI della home e bersaglio tattile dello spotlight portato ad almeno 44 px.
-- [x] Tooling condiviso in `~/dev/ops` con `doctor.sh`, accesso operativo verificato per GCloud, Cloud Run, GCS, GA4 e Search Console.
+- [x] Tooling condiviso in `~/dev/ops` con `doctor.sh`, accesso operativo verificato per GCloud, Cloud Run, GCS, GA4, Search Console e Cloudflare.
 - [x] Suite completa unit + integration: 1.334 test passati il 26 settembre 2026.
 
 ### In Corso / Prossimi:
-- [ ] Configurare localmente `~/dev/ops/.env.cloudflare` con un token API Cloudflare; `doctor.sh` segnala correttamente l'assenza della credenziale senza bloccare gli altri controlli.
 - [ ] Progettare da zero l'eventuale nuova pipeline editoriale, solo quando tornerà prioritaria rispetto al sito e al runtime.
