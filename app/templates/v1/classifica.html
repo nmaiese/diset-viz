@@ -131,7 +131,7 @@
     <figure class="module">
       <figcaption class="module__head">
         {% if d.table_claim %}<h3 class="h-sub">{{ d.table_claim }}</h3>{% endif %}
-        <p class="subline">Punteggio da 0 a 100 con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso, con il punto forte e il punto debole di ognuna.</p>
+        <p class="subline">{{ ui.term('punteggio', 'Punteggio da 0 a 100') }} con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso, con il punto forte e il punto debole di ognuna.</p>
       </figcaption>
       <div class="toolbar cl-toolbar">
         <div class="field"><span>Livello</span>

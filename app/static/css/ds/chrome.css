@@ -16,9 +16,15 @@
    le conosce la regola si ignora. Il movimento lo leggono dalla radice, per
    questo --dur e --ease-out stanno in :root. */
 @view-transition { navigation: auto; }
-::view-transition-group(root) {
+::view-transition-group(root), ::view-transition-group(page-title), ::view-transition-group(lead-figure) {
   animation-duration: var(--dur);
   animation-timing-function: var(--ease-out);
+}
+/* Chi chiede meno movimento non ha transizioni. Il selettore universale non
+   raggiunge questi pseudo-elementi, e la regola stava solo in site.css, che
+   le pagine della 1.0 non caricano. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
 .sitechrome { display: flex; flex-direction: column; min-height: 100vh; }

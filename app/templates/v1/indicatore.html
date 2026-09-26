@@ -99,7 +99,7 @@
         questo attacco, e la prova lo confronta col testo visibile. -#}
     <div class="answer"><p class="page-lead">{{ page_lead | analyst_html }}</p></div>
     <p class="meta">
-      <span class="direction">{{ d.verso }}</span>
+      <span class="direction">{{ ui.term('verso', d.verso) }}</span>
       {% if dataset_updated %}<span>Fonte aggiornata il <time datetime="{{ dataset_updated }}">{{ d.updated }}</time></span>{% endif %}
       <a href="{{ corrections_url }}">Segnala un errore</a>
       {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
@@ -203,7 +203,7 @@
         <figure class="module">
           <figcaption class="module__head">
             {% if d.series_claim %}<h3 class="h-sub">{{ d.series_claim }}</h3>{% endif %}
-            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la {{ ui.term('media-semplice') }}. Scegli una {{ level.singular }} qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}

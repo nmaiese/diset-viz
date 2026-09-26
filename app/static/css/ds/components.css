@@ -827,3 +827,84 @@ details.more[open] > summary { color: var(--ink); }
 
 /* ---------- ritmo ---------- */
 .section + .section { margin-top: var(--space-8); }
+
+/* ==========================================================================
+   Leggere e orientarsi: definizioni a portata di mano, intestazioni che
+   restano, avanzamento di lettura, torna su, tabelle che scorrono di lato.
+   ========================================================================== */
+
+/* La parola con la definizione: si clicca, quindi il filetto e' nell'accento,
+   ma resta testo nel testo. Il popover e' un foglio sopra la pagina, col
+   bordo d'inchiostro invece dell'ombra. */
+.term {
+  padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer;
+  text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 0.2em;
+}
+.term:hover { color: var(--ink); text-decoration-style: solid; }
+.term__pop {
+  margin: 0; padding: var(--space-3) var(--space-4); max-width: min(22rem, calc(100vw - 2 * var(--space-4)));
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control);
+  font-family: var(--font-ui); font-size: var(--fs-small); line-height: var(--lh-small); font-weight: 400; text-align: left; white-space: normal;
+}
+.term__pop a { display: inline-block; margin-top: var(--space-1); color: var(--accent); }
+@supports (position-area: bottom) {
+  .term__pop { inset: auto; margin-top: var(--space-2); position-area: bottom span-right; position-try-fallbacks: flip-block, flip-inline; }
+}
+
+/* Le tabelle lunghe di regione e provincia ("Tutti gli indicatori", fino a 158
+   righe): l'intestazione resta sotto la testata mentre si scende. Uno scroll
+   container ferma lo sticky, quindi da 960 pixel, dove la tabella ci sta
+   (misurata: 1376 su 1376 a 1440, 896 su 896 a 960), il contenitore taglia
+   invece di scorrere. Fra 960 e 1199 sotto la testata c'e' anche la barra
+   delle sezioni. */
+@media (min-width: 960px) {
+  .tablewrap.stackwrap--wide { overflow: clip; }
+  .stackwrap--wide .table thead th {
+    position: sticky; top: calc(var(--masthead-l) + var(--toc-bar, 0px)); z-index: 2;
+    background: var(--bg); box-shadow: inset 0 -1px 0 var(--rule-strong);
+  }
+}
+@media (min-width: 960px) and (max-width: 1199px) { :root:has(.toc) { --toc-bar: 52px; } }
+
+/* Una tabella che scorre di lato lo dice: un'ombra sul bordo dove c'e'
+   altro, che sparisce a fine corsa (gli sfondi "local" coprono quelli
+   "scroll"). Il fondo di copertura segue la superficie della fascia. */
+.tablewrap {
+  --tw-bg: var(--bg);
+  background:
+    linear-gradient(to right, var(--tw-bg) 30%, transparent) left center / 32px 100% no-repeat local,
+    linear-gradient(to left, var(--tw-bg) 30%, transparent) right center / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--ink) 16%, transparent), transparent) left center / 10px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--ink) 16%, transparent), transparent) right center / 10px 100% no-repeat scroll;
+}
+.zone--tint .tablewrap, .band:not(svg) .tablewrap { --tw-bg: var(--surface-1); }
+
+/* Avanzamento di lettura: un filetto d'accento sotto la barra delle sezioni,
+   legato allo scroll della pagina. Dove animation-timeline non c'e', niente. */
+@supports (animation-timeline: scroll()) {
+  @media (max-width: 1199px) {
+    .toc::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+      background: var(--accent); transform-origin: left center; transform: scaleX(0);
+      animation: di-read linear both; animation-timeline: scroll(root block);
+    }
+  }
+}
+@keyframes di-read { to { transform: scaleX(1); } }
+
+/* Torna su: compare dopo due schermate sulle pagine lunghe (v1.js). */
+.totop {
+  position: fixed; right: max(var(--space-4), env(safe-area-inset-right, 0px)); bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px)); z-index: 30;
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-4);
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control);
+  font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 600; text-decoration: none;
+  opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.totop.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.ds a.totop, .ds a.totop:hover { color: var(--ink); text-decoration: none; }
+.totop:hover { background: var(--surface-1); }
+
+/* Continuita' fra pagine: il titolo e la figura d'apertura passano da una
+   pagina all'altra invece di ricomparire (le transizioni stanno in chrome.css). */
+main.v1 h1 { view-transition-name: page-title; }
+.lead-figure .chart--hero { view-transition-name: lead-figure; }

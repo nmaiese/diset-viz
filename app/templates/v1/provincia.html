@@ -167,7 +167,7 @@
         <figure class="module">
           <figcaption class="module__head">
             {% if d.dims.claim %}<h3 class="h-sub">{{ d.dims.claim }}</h3>{% endif %}
-            <p class="subline">Punteggio da 0 a 100 sul profilo {{ d.profile_name }}. Ogni barra parte dalla linea della media 50: verso destra sopra, verso sinistra sotto.</p>
+            <p class="subline">{{ ui.term('punteggio', 'Punteggio da 0 a 100') }} sul profilo {{ d.profile_name }}. Ogni barra parte dalla linea della media 50: verso destra sopra, verso sinistra sotto.</p>
           </figcaption>
           <div class="tablewrap" tabindex="0" role="region" aria-label="Le dimensioni in tabella">
             <table class="table provincia-dims">

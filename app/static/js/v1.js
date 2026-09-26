@@ -555,6 +555,26 @@
     }
   }
 
+  /* ---------- torna su: sulle pagine lunghe, dopo due schermate ----------
+     Una volta per documento. Porta a `data-totop` del <main> (l'atlante lo
+     manda ai filtri) o all'inizio del contenuto. */
+  function initTotop() {
+    var main = document.getElementById("contenuto");
+    if (!main || document.querySelector(".totop")) return;
+    if (document.documentElement.scrollHeight < innerHeight * 5) return;
+    var target = main.getAttribute("data-totop") || "#contenuto";
+    var a = document.createElement("a");
+    a.className = "totop";
+    a.href = target;
+    a.textContent = main.getAttribute("data-totop-label") || "Torna su";
+    a.insertAdjacentHTML("afterbegin", '<span aria-hidden="true">\u2191</span>');
+    document.body.appendChild(a);
+    var ticking = false;
+    function update() { ticking = false; a.classList.toggle("is-on", scrollY > innerHeight * 2); }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+
   /* ---------- gli agganci, nell'ordine di sempre ---------- */
   function init(root) {
     root = root || document;
@@ -569,4 +589,5 @@
 
   window.DiV1 = { init: init };
   init(document);
+  initTotop();
 })();

@@ -119,6 +119,17 @@
 </div>
 {%- endmacro %}
 
+{#- Una parola con la sua definizione a portata di mano: un bottone che apre un
+    popover accanto (Popover API, ancorato con anchor positioning dove c'e',
+    al centro dove non c'e'). I testi stanno in `app/design/terms.py`, una
+    volta sola. Mai dentro un blocco `aria-hidden`, e mai nella prosa degli
+    articoli: serve alle parole tecniche di tessere, righe fonte e sottotitoli. -#}
+{% macro term(key, label=None) -%}
+{%- set t = v1_term(key) -%}
+{%- if t -%}<button type="button" class="term" popovertarget="{{ t.id }}" style="anchor-name: --{{ t.id }}">{{ label or t.label }}</button><span class="term__pop" id="{{ t.id }}" popover style="position-anchor: --{{ t.id }}">{{ t.text }} <a href="{{ t.href }}">Come si calcola</a></span>
+{%- else %}{{ label }}{% endif -%}
+{%- endmacro %}
+
 {% macro arealegend(items) -%}
 <ul class="arealegend" aria-label="Ripartizioni">
   {%- for a in items %}<li><span class="area-dot area-dot--{{ a.area }}" aria-hidden="true"></span><b>{{ a.label }}</b>{{ a.count | num(None, 'count') }}</li>{% endfor %}
