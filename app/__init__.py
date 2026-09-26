@@ -6,9 +6,12 @@ from functools import lru_cache
 
 from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
 from flask_compress import Compress
+from werkzeug.exceptions import HTTPException
 
 from app import config
 from app import agent_discovery
+from app import page_types
+from app import sources
 from app.cache import cache
 
 app = Flask(__name__, static_url_path="/static")
@@ -118,6 +121,16 @@ def redirect_www_to_apex():
     target_host = host_name[4:] + (sep + port if port else "")
     scheme = "https" if config.SITE_URL.startswith("https://") else request.scheme
     target_url = request.url.replace(f"{request.scheme}://{host_header}", f"{scheme}://{target_host}", 1)
+    # Un indirizzo di prima della migrazione su www (`/indicatore/901-pil-...`)
+    # faceva due salti, www e poi il canonico: qui si risolve anche il
+    # percorso, e il salto e' uno. La query resta.
+    legacy_id = sources.legacy_territorial_id(request.path.removeprefix("/indicatore/")) \
+        if request.path.startswith("/indicatore/") and request.path.count("/") == 2 else None
+    if legacy_id is not None:
+        canonical = views.legacy_indicator_path(legacy_id)
+        if canonical is not None:
+            query = request.query_string.decode("utf-8")
+            target_url = f"{scheme}://{target_host}{canonical}" + (f"?{query}" if query else "")
     return redirect(target_url, code=301)
 
 
@@ -222,6 +235,20 @@ def not_found(error):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
         return response
 
+    # `/regione/lazio/`, `/blog/`, `/indicatore/<slug>/ter-901/`: la barra
+    # finale faceva 404 su ogni pagina che senza barra esiste. Se il percorso
+    # senza barra ha una rotta, un 301 li'; se poi la pagina non c'e' la 404
+    # arriva da quella, al secondo passo.
+    if request_path != "/" and request_path.endswith("/") and request.method in ("GET", "HEAD"):
+        stripped = request_path.rstrip("/") or "/"
+        try:
+            app.url_map.bind("localhost").match(stripped, method="GET")
+        except HTTPException:
+            pass
+        else:
+            query = request.query_string.decode("utf-8")
+            return redirect(stripped + (f"?{query}" if query else ""), code=301)
+
     return (
         render_template(
             "404.html",
@@ -251,6 +278,9 @@ def inject_site_config():
         "STAGING": config.STAGING,
         "GA_MEASUREMENT_ID": config.GA_MEASUREMENT_ID,
         "GOOGLE_TAG_MANAGER_ID": config.GOOGLE_TAG_MANAGER_ID,
+        # Il tipo di pagina del page_view, dal percorso (`app/page_types.py`).
+        # Un template che dichiara `PAGE_TYPE` vince (la 404).
+        "PAGE_TYPE_DEFAULT": page_types.page_type(request.path),
         "ADSENSE_CLIENT": config.ADSENSE_CLIENT,
         "ADSENSE_SLOT_BANNER": config.ADSENSE_SLOT_BANNER,
         "GOOGLE_SITE_VERIFICATION": config.GOOGLE_SITE_VERIFICATION,

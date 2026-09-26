@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{#- Il page_view di una 404 dice "error" su qualunque percorso (`app/page_types.py`). -#}
+{% set PAGE_TYPE = "error" %}
 
 {% block title %}Pagina non trovata | {{ site_name }}{% endblock %}
 {% block description %}La pagina richiesta non esiste o non è più disponibile. Riparti da atlante, regioni, province, temi, blog o metodologia.{% endblock %}
