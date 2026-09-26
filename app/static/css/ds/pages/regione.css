@@ -11,7 +11,10 @@
 }
 @media (min-width: 960px) {
   .regione-head:has(> .locator) { grid-template-columns: minmax(0, 1fr) 13rem; }
-  .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 20rem; }
+  .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 22rem; }
+}
+@media (min-width: 1200px) {
+  .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; }
 }
 
 /* ---------- la tabella della figura d'apertura, larga quanto il grafico ---------- */

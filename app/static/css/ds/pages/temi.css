@@ -52,4 +52,4 @@
 .temi-card__ends a:hover { color: var(--accent-strong); }
 .temi-card__none { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
-.temi-source { max-width: var(--measure); margin-top: var(--space-12); }
+.temi-source { max-width: var(--measure); margin-top: var(--space-6); }

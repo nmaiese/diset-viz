@@ -12,6 +12,12 @@
 .confronto-form__ind { flex: 1 1 100%; }
 .confronto-form__ind select { width: 100%; }
 .confronto-form .field select { min-width: 11rem; }
+@media (max-width: 599px) {
+  .confronto-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .confronto-form__ind { grid-column: 1 / -1; }
+  .confronto-form .field select { min-width: 0; width: 100%; }
+  .confronto-form button[type="submit"] { grid-column: 1 / -1; }
+}
 
 /* ---------- i colori delle serie ---------- */
 .swatch { display: inline-block; width: 12px; height: 12px; margin-right: var(--space-2); vertical-align: -1px; }
@@ -78,7 +84,10 @@
 .confronto-source { margin-top: var(--space-8); max-width: var(--measure); }
 .confronto-more { margin-top: var(--space-12); max-width: var(--measure); color: var(--text-2); }
 
-/* Le regioni del confronto sulla mappa: col tratto dietro il riempimento se
-   ne vedeva un pixel, e il territorio piu' scuro della rampa (che nel
-   confronto non c'e') restava la cosa piu' evidente. Sempre in inchiostro. */
-.v1-confronto .map [data-key].is-on { stroke-width: 3; paint-order: normal; }
+/* Le regioni del confronto sulla mappa: contorno in evidenza con l'accento e ombra per staccare */
+.v1-confronto .map [data-key].is-on {
+  stroke: var(--accent) !important;
+  stroke-width: 3.5px !important;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+}

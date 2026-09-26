@@ -396,7 +396,10 @@
           p.style.fill = nd ? "url(#" + nd.id + ")" : "";
           p.setAttribute("data-value", "");
         }
-        if (state.regions.indexOf(k) >= 0) p.classList.add("is-on");
+        if (state.regions.indexOf(k) >= 0) {
+          p.classList.add("is-on");
+          if (p.parentNode) p.parentNode.appendChild(p);
+        }
       });
       window.DiV1.choroLegend(box, sc);
       // Come `legend_nd` della pagina: si contano i contorni, non i territori della serie.

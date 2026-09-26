@@ -109,12 +109,12 @@
   --lh-title: 1.1;
   --fw-title: 700;
   --tr-title: -0.015em;
-  --fs-section: clamp(23px, 20.727px + 0.6061vw, 28px);
-  --lh-section: 1.2;
+  --fs-section: clamp(26px, 23.111px + 0.7407vw, 32px);
+  --lh-section: 1.15;
   /* Il titolo di sezione sugli schermi larghi, da 1200 pixel: a 28 si
      confondeva coi titoli-affermazione dei grafici da 20. */
-  --fs-section-l: 34px;
-  --lh-section-l: 1.15;
+  --fs-section-l: 36px;
+  --lh-section-l: 1.12;
   --fw-section: 700;
   --tr-section: -0.01em;
   --fs-subsection: clamp(19px, 18.545px + 0.1212vw, 20px);

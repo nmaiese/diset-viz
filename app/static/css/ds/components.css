@@ -101,20 +101,23 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    cominciava l'altra: la testata di sezione porta ora un filetto d'inchiostro
    di 3px e piu' aria sopra, e il titolo cresce sugli schermi larghi. Resta un
    filetto e non una scatola (SISTEMA.md, "Regia"). */
-.section, .come-leggere { padding-top: var(--space-12); }
+.section, .come-leggere { padding-top: var(--space-8); }
 /* Ogni sezione che non apre il suo contenitore sta alla stessa distanza da
    cio' che la precede, sezione o no: con la regola fra sezioni sole, quella
    dopo la testata, le tessere o uno spazio pubblicitario perdeva 32 pixel. */
 :is(.section, .come-leggere):not(:first-child) { margin-top: var(--space-8); }
 /* La testata di pagina porta gia' i suoi 32 pixel sotto. */
 .pagehead + :is(.section, .come-leggere) { margin-top: 0; }
-@media (min-width: 960px) { .section, .come-leggere { padding-top: var(--space-16); } }
+@media (min-width: 960px) {
+  .section, .come-leggere { padding-top: var(--space-12); }
+  :is(.section, .come-leggere):not(:first-child) { margin-top: var(--space-10); }
+}
 /* `h2.h-section` e non solo `.h-section`: `.ds h2 { margin: 0 }` di
    system.css pesa di piu' di una classe sola, e il titolo di "Continua da qui"
    perdeva margine, interlinea e spaziatura (0 pixel fra titolo e contenuto). */
 .section > h2, .come-leggere > h2, h2.h-section, .h-section {
   font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
-  padding-top: var(--space-4); border-top: 3px solid var(--ink);
+  padding-top: var(--space-5); border-top: 4px solid var(--ink);
   margin-bottom: var(--space-6);
 }
 @media (min-width: 1200px) {
@@ -130,7 +133,8 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 /* `:not(svg)`: la serie a fascia (`charts.band`) e' un <svg class="band">, e
    senza il filtro prendeva margine, imbottitura e fondo della fascia: un
    riquadro grigio con 110 pixel vuoti sopra ogni "Com'e' cambiato". */
-.band:not(svg) { margin-top: var(--space-16); padding-block: var(--space-12); background: var(--surface-1); }
+.band:not(svg) { margin-top: var(--space-8); padding-block: var(--space-8); background: var(--surface-1); }
+@media (min-width: 960px) { .band:not(svg) { margin-top: var(--space-12); padding-block: var(--space-10); } }
 .band .section:first-child { padding-top: 0; }
 
 /* La fascia: una sezione a tutta larghezza, col suo contenitore dentro. Le
@@ -138,14 +142,14 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    la superficie, cosi' ogni sezione ha un inizio e una fine visibili anche
    da lontano. La testata della fascia tiene a sinistra il titolo con la sua
    frase e a destra il link alla sezione intera, sotto lo stesso filetto. */
-.zone { padding-block: var(--space-12); }
-@media (min-width: 960px) { .zone { padding-block: var(--space-16) var(--space-20); } }
+.zone { padding-block: var(--space-8); }
+@media (min-width: 960px) { .zone { padding-block: var(--space-12); } }
 .zone--tint { background: var(--surface-1); }
 .zone__head {
-  display: grid; gap: var(--space-3) var(--space-8); margin-bottom: var(--space-8);
-  padding-top: var(--space-4); border-top: 3px solid var(--ink);
+  display: grid; gap: var(--space-3) var(--space-8); margin-bottom: var(--space-6);
+  padding-top: var(--space-5); border-top: 4px solid var(--ink);
 }
-@media (min-width: 960px) { .zone__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
+@media (min-width: 960px) { .zone__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; margin-bottom: var(--space-8); } }
 .zone__head .h-section, .zone__head h2.h-section { border-top: 0; padding-top: 0; margin-bottom: 0; }
 .zone__title { display: grid; gap: var(--space-2); }
 .zone__lead { max-width: var(--measure); color: var(--text-2); }
@@ -250,7 +254,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .toolbar__jump { display: inline-flex; align-items: center; min-height: var(--target-min); font-size: var(--fs-ui); font-weight: 600; }
 .year { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-3); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; margin: 0; }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--control-border); border-radius: var(--radius-control); overflow: hidden; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--control-border); border-radius: var(--radius-control); overflow: hidden; width: fit-content; max-width: 100%; }
 .seg > a, .seg > button, .seg > span {
   display: inline-flex; align-items: center; min-height: var(--target-min); padding: 0 var(--space-4);
   font: inherit; font-weight: 600; color: var(--ink); background: var(--bg); text-decoration: none;
@@ -303,11 +307,18 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
    scurire la rampa e senza ripetere i tracciati. */
 .map__land { filter: drop-shadow(1px 0 0 var(--map-coast)) drop-shadow(-1px 0 0 var(--map-coast)) drop-shadow(0 1px 0 var(--map-coast)) drop-shadow(0 -1px 0 var(--map-coast)); }
 .navmap:not(.navmap--data) .map__land, .navmap--zoom .map__land { filter: none; }
-.map [data-key].is-on { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+.map [data-key].is-on,
+.navmap--data a.is-on use,
+.navmap--zoom a.is-on path {
+  stroke: var(--accent) !important;
+  stroke-width: 3.5px !important;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+}
 /* Le province: filo sottile fra una e l'altra, e i confini delle regioni
    ridisegnati sopra piu' larghi, nello stesso colore del fondo. */
 .map--province [data-key] { stroke-width: 0.5; }
-.map--province [data-key].is-on { stroke-width: 1.8; }
+.map--province [data-key].is-on { stroke-width: 2.2px !important; }
 .map__borders { fill: none; stroke: var(--map-edge); stroke-width: 2.2; stroke-linejoin: round; pointer-events: none; }
 /* Lo sprite dei tracciati (app/design/maps.py): in pagina, ma senza spazio. */
 .map-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -320,10 +331,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .navmap a use { fill: var(--surface-2); stroke: var(--bg); stroke-width: 1; stroke-linejoin: round; transition: fill var(--motion-fast) var(--motion-ease); }
 .navmap--provincia a use { stroke-width: 0.5; }
 .navmap a:hover use { fill: var(--rule-strong); }
-.navmap a.is-on use { fill: var(--accent); }
+.navmap:not(.navmap--data) a.is-on use { fill: var(--accent); stroke: var(--ink); stroke-width: 2px; }
 .navmap--data a use { stroke: var(--map-edge); stroke-width: 0.9; }
 .navmap--provincia.navmap--data a use { stroke-width: 0.4; }
-.navmap--data a:hover use, .navmap--data a.is-on use { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+.navmap--data a:hover use { stroke: var(--ink); stroke-width: 2px; paint-order: stroke; }
 /* Il primo tocco su una mappa per scegliere scrive qui il territorio e il
    link al profilo (v1.js, initNavmap). */
 /* I tracciati sono fuori dalla tabulazione (la pagina ha il campo o
@@ -336,7 +347,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .navmap__card a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; }
 .navmap--zoom svg { overflow: hidden; }
 .navmap--zoom a path { stroke: var(--map-edge); stroke-width: 0.5; stroke-linejoin: round; }
-.navmap--zoom a:hover path, .navmap--zoom a.is-on path { stroke: var(--ink); stroke-width: 1.6; paint-order: stroke; }
+.navmap--zoom a:hover path { stroke: var(--ink); stroke-width: 1.6; paint-order: stroke; }
 .navmap__ctx { fill: var(--surface-2); stroke: var(--bg); stroke-width: 0.4; }
 .navmap--zoom .navmap__borders { stroke-width: 0.7; }
 .navmap__borders { fill: none; stroke: var(--control-border); stroke-width: 1.1; stroke-linejoin: round; pointer-events: none; }
@@ -1046,12 +1057,21 @@ main.v1 h1 { view-transition-name: page-title; }
 @media (min-width: 960px) { .jump--scroll ul { flex-wrap: wrap; overflow-x: visible; } }
 
 /* ---------- la mappa della regione (ui.regionmap) nella testata ----------
-   Sul telefono la mappa a sinistra e la didascalia con la legenda accanto,
-   nel margine della testata da 960 una sotto l'altra. */
-.regionmap { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); gap: var(--space-4); align-items: center; margin: 0 0 var(--space-6); }
+   Sul telefono la mappa prende tutta la larghezza con una presenza verticale generosa;
+   da 600 la mappa a sinistra e la didascalia accanto; nel margine della testata da 960
+   una sotto l'altra, espansa per riempire il respiro della testata. */
+.regionmap { display: grid; gap: var(--space-4); align-items: start; margin: 0 0 var(--space-6); width: 100%; }
+.regionmap .navmap--zoom { width: 100%; max-width: 100%; }
+.regionmap .navmap--zoom svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
 .regionmap figcaption { display: grid; gap: var(--space-3); min-width: 0; }
+@media (min-width: 600px) {
+  .regionmap { grid-template-columns: minmax(0, 16rem) minmax(0, 1fr); align-items: center; }
+  .regionmap .navmap--zoom { max-width: none; margin-inline: 0; }
+  .regionmap .navmap--zoom svg { max-height: 400px; min-height: 0; }
+}
 @media (min-width: 960px) {
   .regionmap { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
+  .regionmap .navmap--zoom svg { max-height: 500px; }
 }
 
 /* ---------- i pezzi comuni degli indici ----------

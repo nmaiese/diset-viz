@@ -343,7 +343,11 @@
     }
 
     function highlight(key) {
-      mod.querySelectorAll(".map [data-key]").forEach(function (p) { p.classList.toggle("is-on", p.dataset.key === key); });
+      mod.querySelectorAll(".map [data-key]").forEach(function (p) {
+        var on = p.dataset.key === key;
+        p.classList.toggle("is-on", on);
+        if (on && p.parentNode) p.parentNode.appendChild(p);
+      });
       // Piu' di un corpo quando la home affianca le prime e le ultime dieci province.
       mod.querySelectorAll("[data-rank-body] tr[data-key]").forEach(function (tr) {
         var on = tr.dataset.key === key;
@@ -584,7 +588,11 @@
         '<p class="terr__lead">' + esc(p.lead) + "</p>" +
         (facts ? '<dl class="terr__facts">' + facts + "</dl>" : "") +
         '<p class="terr__cta"><a class="btn" href="' + esc(p.href) + '">' + esc(p.cta) + "</a></p>";
-      box.querySelectorAll("[data-navmap] a[data-key]").forEach(function (a) { a.classList.toggle("is-on", a.dataset.key === key); });
+      box.querySelectorAll("[data-navmap] a[data-key]").forEach(function (a) {
+        var on = a.dataset.key === key;
+        a.classList.toggle("is-on", on);
+        if (on && a.parentNode) a.parentNode.appendChild(a);
+      });
       if (select && select.value !== key) select.value = key;
     }
     // Dopo un Indietro il browser rimette nel campo la scelta di prima, mentre
@@ -981,6 +989,9 @@
     each(root, "[data-tabs]", initTabs);
     each(root, "details[data-collapse-mobile]", initCollapse);
     each(root, ".toc", initToc);
+    each(root, ".map [data-key].is-on, .navmap a.is-on, .navmap--zoom a.is-on", function (el) {
+      if (el.parentNode) el.parentNode.appendChild(el);
+    });
   }
 
   window.DiV1 = { init: init, choroScale: choroScale, choroStep: choroStep, choroLegend: choroLegend };

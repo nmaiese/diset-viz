@@ -7,32 +7,42 @@
 
 /* ---------- testata: il titolo sopra, la frase e la ricerca affiancate da 960 ---------- */
 .home-top { background: var(--surface-1); padding-top: 0; }
-.home-head { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+.home-head { padding-top: var(--space-6); padding-bottom: var(--space-6); }
 /* Da 960 il titolo e la frase a sinistra, la ricerca a destra alla loro
    altezza: col titolo steso su tutta la riga l'angolo in alto a destra restava
    vuoto. */
 @media (min-width: 960px) {
-  /* Le righe della colonna sinistra restano alte quanto il loro testo: lo
-     spazio in piu' della colonna con la mappa va tutto in fondo. */
-  .home-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto auto auto 1fr; column-gap: var(--space-16); align-content: start; padding-top: var(--space-12); }
+  /* Le righe della colonna sinistra contengono titolo, frase, ricerca e spotlight dell'indicatore.
+     La colonna della mappa riceve spazio abbondante per valorizzarla e bilanciare la colonna sinistra. */
+  .home-head { grid-template-columns: minmax(0, 6.5fr) minmax(0, 5.5fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-12); align-content: start; padding-top: var(--space-10); padding-bottom: var(--space-8); }
   .home-head > * { grid-column: 1; }
-  .home-head > .home-map { grid-column: 2; grid-row: 1 / span 5; align-self: center; }
+  .home-head > .home-map { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
+@media (min-width: 1200px) {
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); column-gap: var(--space-16); }
+}
 /* La mappa della testata: la qualita' della vita per regione, con la sua
-   legenda. Sul telefono sotto la ricerca, larga quanto serve a toccare una
-   regione, da 960 nella colonna destra, alta quanto la testata. */
-.home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; }
-.home-map .navmap { width: 100%; max-width: 360px; justify-self: center; }
-.home-map .legend { max-width: 360px; }
+   legenda. Sul telefono sotto la ricerca, riempie lo spazio in larghezza e in
+   altezza, da 960 nella colonna destra, alta quanto la testata. */
+.home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; width: 100%; }
+.home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
+.home-map .navmap svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
+.home-map .legend { max-width: 100%; }
 .home-map__head { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); max-width: 36rem; }
 .home-map__head b { color: var(--ink); font-weight: 600; }
 .home-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
 .home-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 @media (min-width: 960px) {
-  .home-map { margin: 0; align-content: start; }
-  .home-map .navmap { max-width: 400px; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 400px; justify-self: center; width: 100%; }
+  .home-map { margin: 0; align-content: center; }
+  .home-map .navmap { max-width: 460px; }
+  .home-map .navmap svg { max-height: 520px; min-height: 0; }
+  .home-map .legend, .home-map__head, .home-map__hint { max-width: 460px; justify-self: center; width: 100%; }
+}
+@media (min-width: 1200px) {
+  .home-map .navmap { max-width: 520px; }
+  .home-map .navmap svg { max-height: 580px; }
+  .home-map .legend, .home-map__head, .home-map__hint { max-width: 520px; }
 }
 .home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }
@@ -46,6 +56,84 @@
 .home-find input::placeholder { color: var(--muted); }
 .home-find .btn { min-height: var(--space-12); }
 
+/* ---------- spotlight indicatore in testata ---------- */
+.home-spotlight {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  max-width: 36rem;
+}
+.home-spotlight__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+}
+.home-spotlight__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 11px;
+}
+.home-spotlight__badge svg {
+  width: 14px;
+  height: 14px;
+}
+.home-spotlight__theme {
+  color: var(--muted);
+}
+.home-spotlight__theme a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.home-spotlight__theme a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+.home-spotlight__title {
+  font-size: clamp(17px, 16px + 0.25vw, 19px);
+  line-height: 1.25;
+  font-weight: 600;
+  margin: 0;
+}
+.home-spotlight__title a {
+  color: var(--ink);
+  text-decoration-color: var(--rule-strong);
+}
+.home-spotlight__title a:hover {
+  color: var(--link);
+}
+.home-spotlight__claim {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--text-2);
+  margin: 0;
+}
+.home-spotlight__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-1);
+  font-size: var(--fs-small);
+}
+.home-spotlight__scheda {
+  color: var(--text-2);
+}
+.home-spotlight__scheda:hover {
+  color: var(--ink);
+}
+
 /* ---------- le porte del sito ---------- */
 /* Le quattro grandi: la cifra che le misura, il titolo che e' il link (esteso a
    tutta la scheda), una frase. Sul fondo della pagina, sopra la superficie
@@ -55,18 +143,16 @@
    quattro porte occupavano quasi un'altezza e mezza di schermo. */
 .doors__main { list-style: none; display: grid; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 600px) { .doors__main { gap: var(--gutter-l); } }
-/* Sul telefono ogni scheda e' alta quanto il suo contenuto: con le righe
-   della griglia tirate alla piu' alta, Temi restava con 70 pixel vuoti sotto
-   il titolo accanto a Qualita' della vita, che va su due righe. */
 @media (max-width: 599px) {
   .door__text { display: none; }
-  .door__unit { font-size: var(--fs-small); }
-  .doors__main { align-items: start; }
+  .door__unit { font-size: var(--fs-small); line-height: var(--lh-small); }
+  .door__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
 }
 @media (min-width: 1200px) { .doors__main { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .door {
   position: relative; display: grid; align-content: start; gap: var(--space-2); min-width: 0;
-  padding: var(--space-4) var(--space-4) var(--space-5); background: var(--bg); border-top: 3px solid var(--ink);
+  padding: var(--space-4) var(--space-4) var(--space-5); background: var(--bg);
+  border-top: 2px solid var(--rule-strong); border-radius: var(--radius-sm);
 }
 @media (min-width: 960px) { .door { padding: var(--space-5) var(--space-6) var(--space-6); gap: var(--space-3); } }
 .door:hover { border-top-color: var(--accent); }
@@ -117,7 +203,7 @@
 .feat__meta a { color: var(--text-2); text-decoration-color: var(--rule-strong); }
 .feat__meta a:hover { color: var(--ink); }
 .feat__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
-.feat__name { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); }
+.feat__name { font-size: clamp(20px, 18.5px + 0.35vw, 22px); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
 .feat__name a { color: var(--ink); text-decoration: none; }
 .feat__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 /* Il selettore dei livelli: due schede (tab) che senza JavaScript sono link. */
@@ -145,8 +231,9 @@
 .feat__pairhead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4) var(--space-8); }
 .feat__pairhead .feat__cap { margin-bottom: 0; }
 .feat__find { min-width: min(100%, 16rem); }
-.feat__map { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
-.feat__map .map { max-width: 360px; margin-inline: auto; width: 100%; }
+.feat__map { display: grid; gap: var(--space-4); align-content: start; min-width: 0; width: 100%; }
+.feat__map .map { max-width: 100%; margin-inline: auto; width: 100%; }
+.feat__map .map svg { max-height: 48vh; min-height: 280px; }
 .feat__rank { margin: 0; min-width: 0; }
 /* Due colonne da dieci righe: la mappa e la classifica finiscono insieme. */
 .feat__cols { display: grid; gap: var(--space-4) var(--space-8); align-items: start; }
@@ -166,10 +253,10 @@
 @media (min-width: 960px) {
   .feat__head { padding: var(--space-6) var(--space-10); }
   .feat__level { padding: var(--space-8) var(--space-10); gap: var(--space-8); }
-  .feat__pair { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: start; }
+  .feat__pair { grid-template-columns: minmax(0, 5.2fr) minmax(0, 6.8fr); align-items: start; }
   .feat__pairhead { grid-column: 1 / -1; }
   .feat__map .map { max-width: none; }
-  .feat__map .map svg { max-height: 390px; }
+  .feat__map .map svg { max-height: 520px; min-height: 0; }
   /* Sul computer la classifica e' sempre aperta: il sommario non serve. */
   /* Solo se e' aperta: chiusa sotto i 600 al caricamento e poi allargata,
      senza il sommario la classifica non si potrebbe piu' aprire. */
@@ -182,19 +269,20 @@
    per scegliere e accanto la scheda del territorio scelto. */
 .terr { display: grid; gap: var(--space-10) var(--gutter-l); }
 @media (min-width: 1200px) { .terr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.terr__block { display: grid; align-content: start; gap: var(--space-5); min-width: 0; padding: var(--space-5); background: var(--bg); border-top: 3px solid var(--ink); }
+.terr__block { display: grid; align-content: start; gap: var(--space-5); min-width: 0; padding: var(--space-5); background: var(--bg); border: 1px solid var(--rule-strong); border-radius: var(--radius-sm); }
 @media (min-width: 960px) { .terr__block { padding: var(--space-6) var(--space-8) var(--space-8); } }
 .terr__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-6); }
 .terr__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
 .terr__body { display: grid; gap: var(--space-6); align-items: start; }
 @media (min-width: 600px) { .terr__body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
-.terr__body .navmap { max-width: 260px; margin-inline: auto; width: 100%; }
-@media (min-width: 600px) { .terr__body .navmap { max-width: none; } }
+.terr__body .navmap { max-width: 100%; margin-inline: auto; width: 100%; }
+.terr__body .navmap svg { max-height: 46vh; min-height: 260px; }
+@media (min-width: 600px) { .terr__body .navmap { max-width: none; } .terr__body .navmap svg { max-height: 380px; min-height: 0; } }
 .terr__side { display: grid; gap: var(--space-5); align-content: start; min-width: 0; }
 .terr__find select { width: 100%; }
 .terr__card { display: grid; gap: var(--space-3); align-content: start; }
 .terr__kicker { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
-.terr__name { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); }
+.terr__name { font-size: clamp(20px, 18.5px + 0.35vw, 22px); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
 .terr__name a { color: var(--ink); text-decoration: none; }
 .terr__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .terr__lead { color: var(--text-2); }
@@ -295,7 +383,7 @@
 .home-areas { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 600px) { .home-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1200px) { .home-areas { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.home-area { display: grid; align-content: start; gap: var(--space-3); padding-top: var(--space-4); border-top: 3px solid var(--ink); }
+.home-area { display: grid; align-content: start; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--rule-strong); }
 .home-area__top { display: flex; align-items: center; gap: var(--space-3); }
 .badge { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); color: var(--ink); background: var(--surface-2); }
 .badge--amber { background: var(--amber-wash); color: var(--amber-600); }

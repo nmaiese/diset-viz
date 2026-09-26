@@ -141,6 +141,11 @@
     {% elif p.metro_city %}
     <p class="provincia-status"><span class="status">Città metropolitana</span></p>
     {% endif %}
+    {% if d.tiles %}
+    <div class="provincia-top__tiles">
+      {{ ui.tiles(d.tiles) }}
+    </div>
+    {% endif %}
   </div>
 
   {% if d.strip and d.strip.svg %}
@@ -154,8 +159,6 @@
       e le vicine in classifica restano piu' sotto, in tabella. -#}
   <p class="provincia-strip-link"><a class="linkarrow" href="/qualita-della-vita/classifica/province">Le {{ d.strip.count | num(None, 'count') }} province in tabella, nella classifica completa</a></p>
   {% endif %}
-
-  {{ ui.tiles(d.tiles) }}
 
   <div class="layout">
     <aside class="layout__aside" aria-label="In questa pagina">

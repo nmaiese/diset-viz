@@ -4,7 +4,7 @@
 
 .v1-atlante .pagehead .meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
 /* Il selettore Regioni/Province: due link, l'unico controllo del livello. */
-.atlante-level { margin-top: var(--space-4); }
+.atlante-level { margin-top: var(--space-4); width: fit-content; max-width: 100%; }
 .atlante-level__n { margin-left: var(--space-1); font-size: var(--fs-small); font-variant-numeric: tabular-nums; }
 
 /* ---------- la barra dei filtri: `.filter` di components.css ---------- */

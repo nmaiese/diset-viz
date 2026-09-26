@@ -37,6 +37,25 @@
       {% endif %}
     </figure>
     {% endif %}
+
+    {% if d.feature %}
+    {% set f = d.feature %}
+    {% set lv = f.levels[0] %}
+    <aside class="home-spotlight" aria-labelledby="spot-title">
+      <div class="home-spotlight__head">
+        <span class="home-spotlight__badge">{{ ui.icon('shuffle') }} Indicatore a caso</span>
+        {% if f.theme %}<span class="home-spotlight__theme">{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}</span>{% endif %}
+      </div>
+      <h2 class="home-spotlight__title" id="spot-title"><a href="{{ lv.scheda }}">{{ f.name }}</a></h2>
+      {% if lv.lead_claim %}
+      <p class="home-spotlight__claim">{{ lv.lead_claim }}</p>
+      {% endif %}
+      <div class="home-spotlight__links">
+        <a class="linkarrow" href="#dato">Esplora la mappa in basso</a>
+        <a class="home-spotlight__scheda" href="{{ lv.scheda }}">Tutta la scheda <span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </aside>
+    {% endif %}
   </header>
 
   {#- Le porte del sito: le quattro grandi con la cifra che le misura, le altre
