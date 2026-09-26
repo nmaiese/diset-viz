@@ -10,7 +10,7 @@
 
 /* ---------- la mappa ---------- */
 .dr-map .toolbar { align-items: end; }
-.dr-map .toolbar .btn { min-height: var(--target-min); }
+@media (pointer: fine) { .dr-map .toolbar .btn { min-height: var(--target-min); } }
 /* Con l'isola una regione della mappa porta al suo profilo. */
 .dr-map .map.is-linked [data-key] { cursor: pointer; }
 .dr-map .arealegend { margin-bottom: var(--space-3); }
