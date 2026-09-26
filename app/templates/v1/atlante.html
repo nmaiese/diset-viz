@@ -113,8 +113,12 @@
           atlante.js lo riapre quando un filtro o la ricerca ci trova righe.
           Il conteggio resta nel sommario. -#}
       <section class="atlante-group" data-theme="{{ g.name }}" aria-labelledby="{{ 't-' ~ g.slug }}" style="--rows:{{ g.rows | length }}">
-        <details open data-collapse-mobile><summary><h4 class="h-sub" id="{{ 't-' ~ g.slug }}"><a href="{{ g.path }}">{{ g.name }}</a> <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4></summary>
-        <div class="tablewrap stackwrap">
+        <details open data-collapse-mobile><summary><h4 class="h-sub" id="{{ 't-' ~ g.slug }}">{{ g.name }} <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4></summary>
+        {#- Il link al tema sta fuori dal sommario: un link dentro un <summary>
+            e' un comando dentro un comando, e il tocco sul nome apriva la
+            pagina invece di aprire il tema. -#}
+        <p class="atlante-group__link"><a class="linkarrow" href="{{ g.path }}">La pagina del tema</a></p>
+        <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="{{ g.name }}, le serie">
           <table class="table table--compact table--stack atlante-table">
             <caption class="sr-only">{{ g.name }}: le serie {{ adj }}, con l'andamento della media semplice e l'ultimo anno</caption>
             <thead><tr><th scope="col">Indicatore</th><th scope="col">Andamento</th><th class="r" scope="col">Ultimo anno</th></tr></thead>

@@ -57,7 +57,7 @@
 }
 .atlante-group details[open] > summary::after { transform: rotate(45deg); }
 .atlante-group details:not([open]) > summary { margin-bottom: 0; }
-.atlante-group h4 a { color: var(--ink); }
+.atlante-group__link { margin: 0 0 var(--space-3); font-size: var(--fs-small); }
 .atlante-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
 /* Un tema chiuso e' alto quanto il suo sommario: la stima delle righe lo
    farebbe saltare mentre si scorre. */

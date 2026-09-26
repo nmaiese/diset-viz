@@ -276,7 +276,7 @@ html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-a
 .sitechrome .drawer__top > span { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
 .sitechrome .drawer__actions { display: flex; gap: var(--space-1); align-items: center; }
 .sitechrome .drawer__group { border-top: 1px solid var(--rule); padding-block: var(--space-4); }
-.sitechrome .drawer__group h4 {
+.sitechrome .drawer__group h2 {
   font-family: var(--font-ui); font-size: var(--fs-label); font-weight: 600; color: var(--muted);
   margin: 0 0 var(--space-2);
 }

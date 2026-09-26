@@ -2,7 +2,11 @@
 <html lang="it">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {#- viewport-fit=cover accende i margini di sicurezza (env(safe-area-inset-*))
+        gia' scritti in testata, barre e margini, che senza valevano sempre 0.
+        interactive-widget: la tastiera ridimensiona il contenuto, cosi' le
+        barre ferme non finiscono sotto la tastiera (Chrome, e WebKit dal 2026). -#}
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <title>{% block title %}{{ site_name }}{% endblock %}</title>
     <meta name="description" content="{% block description %}Dati e analisi sul divario territoriale italiano.{% endblock %}">
     {% block robots_meta %}

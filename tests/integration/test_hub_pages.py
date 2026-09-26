@@ -134,7 +134,7 @@ class DivariRegionaliPageTest(unittest.TestCase):
         self.assertIn('data-v1="divari-regionali"', self.html)
         self.assertIn('action="/divari-regionali"', self.html)
         self.assertIn("data-map", self.html)
-        self.assertIn('<div class="legend" aria-hidden="true">', self.html)
+        self.assertIn('<div class="legend__scale" aria-hidden="true">', self.html)
         self.assertEqual(self.html.count('class="q'), 20 + 6, "venti regioni sulla rampa, sei gradini in legenda")
         self.assertNotIn("home-map.js", self.html)
         self.assertNotIn("Passa il mouse", self.html)
@@ -448,13 +448,14 @@ class MapAccessibilityTest(unittest.TestCase):
     def test_the_compare_map_takes_a_label_and_keeps_the_legend_hidden(self):
         """La mappa React del confronto e dell'atlante se n'e' andata con il
         bundle: la mappa del confronto e' la macro `ui.map` della 1.0, con
-        un'etichetta che nomina il dato e l'anno e la legenda fuori dalla
-        lettura assistita, perche' gli stessi valori stanno nella tabella."""
+        un'etichetta che nomina il dato e l'anno, e le cifre della legenda fuori
+        dalla lettura assistita, perche' gli stessi valori stanno nella tabella
+        (la frase della legenda invece si legge)."""
         html = app.test_client().get("/confronto").data.decode("utf-8")
         label = re.search(r'<svg viewBox="0 0 560 660" role="img" aria-label="([^"]+)"', html)
         self.assertIsNotNone(label)
         self.assertRegex(unescape(label.group(1)), r"^Mappa delle regioni italiane per .+, \d{4}, con le regioni a confronto in evidenza$")
-        self.assertIn('<div class="legend" aria-hidden="true">', html)
+        self.assertIn('<div class="legend__scale" aria-hidden="true">', html)
 
 
 class PathScopedViewTest(unittest.TestCase):
@@ -587,7 +588,7 @@ class LaPaginaTemaRisponde(unittest.TestCase):
         classi = re.findall(r'<path d="[^"]+" data-key="[^"]+"[^>]*class="(q[1-6])', mappa.group(0))
         self.assertEqual(len(classi), 20, classi)
         self.assertNotRegex(mappa.group(0), r'fill="#|fill:\s*#', "colore cotto nella mappa")
-        soglie = re.search(r'<div class="legend__scale">(.*?)</div>', self.html, re.S)
+        soglie = re.search(r'<div class="legend__scale"[^>]*>(.*?)</div>', self.html, re.S)
         self.assertIsNotNone(soglie, "la legenda non dice le soglie")
         self.assertRegex(soglie.group(1), r"\d")
 

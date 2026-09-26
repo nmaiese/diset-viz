@@ -18,7 +18,7 @@
 /* La copertina: segnaposto sulla superficie finche' l'immagine non arriva. */
 .blog-media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 1200 / 630; }
 .blog-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
-.blog-card:hover .blog-media img { transform: scale(1.03); }
+@media (hover: hover) { .blog-card:hover .blog-media img { transform: scale(1.03); } }
 @media (prefers-reduced-motion: reduce) { .blog-media img, .blog-card:hover .blog-media img { transition: none; transform: none; } }
 .blog-credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
 .blog-credit a { position: relative; z-index: 1; color: inherit; }

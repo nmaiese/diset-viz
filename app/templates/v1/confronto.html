@@ -87,7 +87,7 @@
         {{ ui.map(d.map_classes, 'confronto', d.map_names, d.map_values, label='Mappa delle ' ~ d.plural ~ ' italiane per ' ~ ind.name ~ ', ' ~ d.year ~ ', con le ' ~ d.plural ~ ' a confronto in evidenza', level=d.level) }}
         {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le ' ~ d.plural ~ ' a confronto.', nd_hidden=not d.legend_nd) }}{% endif %}
       </div>
-      <div class="tablewrap">
+      <div class="tablewrap" tabindex="0" role="region" aria-label="Le {{ d.plural }} a confronto">
         <table class="table confronto-table">
           <caption><span data-cmp-name>{{ ind.name }}</span>, <span data-cmp-year-label>{{ d.year }}</span></caption>
           <thead><tr><th scope="col">{{ d.singular | capitalize }}</th><th class="r" scope="col">Valore</th><th class="r" scope="col">Posizione</th></tr></thead>

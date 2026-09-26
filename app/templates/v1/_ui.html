@@ -74,10 +74,12 @@
         <rect width="4" height="4" style="fill: var(--data-null)"/><line x1="0" y1="0" x2="0" y2="4" style="stroke: var(--data-null-stripe); stroke-width: 1"/>
       </pattern>
     </defs>
+    <g class="map__land">
     {%- for key, d in shapes.items() %}
     {%- set attrs %} data-key="{{ key }}" data-name="{{ names.get(key, key) }}"{% if values %} data-value="{{ values.get(key, '') }}"{% endif %} class="{{ classes.get(key, '') }}{{ ' is-on' if key == selected }}"{% if key not in classes or 'is-nd' in classes[key].split() %} style="fill: url(#{{ 'nd-' ~ keyname }})"{% endif %}{% endset %}
     {% if use %}<use href="#{{ prefix ~ key }}"{{ attrs }}/>{% else %}<path d="{{ d }}"{{ attrs }}/>{% endif %}
     {%- endfor %}
+    </g>
     {%- if level != 'regione' %}
     <g class="map__borders">{% for key, d in v1_paths.items() %}{% if use %}<use href="#mr-{{ key }}"/>{% else %}<path d="{{ d }}"/>{% endif %}{% endfor %}</g>
     {%- endif %}
@@ -105,7 +107,7 @@
 {%- set prefix = 'mr-' if level == 'regione' else 'mp-' -%}
 <div class="navmap navmap--{{ level }}{{ ' navmap--data' if steps }}" data-navmap>
   <svg viewBox="0 0 560 660" aria-hidden="true" focusable="false">
-    {%- for key in shapes %}{% if key in names %}<a href="{{ base ~ key }}" tabindex="-1" data-key="{{ key }}" data-name="{{ names[key] }}"{% if key == selected %} class="is-on"{% endif %}><use href="#{{ prefix ~ key }}"{% if steps and steps.get(key) %} class="q{{ steps[key] }}"{% endif %}/></a>{% elif steps %}<use href="#{{ prefix ~ key }}" class="navmap__ctx"/>{% endif %}{% endfor %}
+    <g class="map__land">{%- for key in shapes %}{% if key in names %}<a href="{{ base ~ key }}" tabindex="-1" data-key="{{ key }}" data-name="{{ names[key] }}"{% if key == selected %} class="is-on"{% endif %}><use href="#{{ prefix ~ key }}"{% if steps and steps.get(key) %} class="q{{ steps[key] }}"{% endif %}/></a>{% elif steps %}<use href="#{{ prefix ~ key }}" class="navmap__ctx"/>{% endif %}{% endfor %}</g>
     {%- if level != 'regione' %}<g class="navmap__borders">{% for key in v1_paths %}<use href="#mr-{{ key }}"/>{% endfor %}</g>{% endif %}
   </svg>
   <div class="map__tip" data-navmap-tip hidden></div>
@@ -121,7 +123,7 @@
 {% macro regionmap(m, selected=None) -%}
 <div class="navmap navmap--data navmap--zoom" data-navmap>
   <svg viewBox="{{ m.viewbox }}" aria-hidden="true" focusable="false">
-    {%- for s in m.shapes %}{% if s.own %}<a href="{{ s.href }}" tabindex="-1" data-key="{{ s.key }}" data-name="{{ s.name }}"{% if s.key == selected %} class="is-on"{% endif %}><path d="{{ s.d }}"{% if s.step %} class="q{{ s.step }}"{% endif %}/></a>{% else %}<path class="navmap__ctx" d="{{ s.d }}"/>{% endif %}{% endfor %}
+    <g class="map__land">{%- for s in m.shapes %}{% if s.own %}<a href="{{ s.href }}" tabindex="-1" data-key="{{ s.key }}" data-name="{{ s.name }}"{% if s.key == selected %} class="is-on"{% endif %}><path d="{{ s.d }}"{% if s.step %} class="q{{ s.step }}"{% endif %}/></a>{% else %}<path class="navmap__ctx" d="{{ s.d }}"/>{% endif %}{% endfor %}</g>
     <g class="navmap__borders">{% for d in m.borders %}<path d="{{ d }}"/>{% endfor %}</g>
   </svg>
   <div class="map__tip" data-navmap-tip hidden></div>
@@ -133,9 +135,12 @@
 {#- `nd_hidden`: la voce n.d. c'e' ma nascosta, per chi la riaccende da JS
     quando cambia l'anno o l'indicatore (il confronto). -#}
 {% macro legend(lg, caption, nd=True, nd_hidden=False) -%}
-<div class="legend" aria-hidden="true">
-  <div class="legend__ramp">{% for i in range(1, 7) %}<i class="q{{ i }}" style="background: var(--seq-{{ i }})"></i>{% endfor %}</div>
-  <div class="legend__scale"><span data-legend="min">{{ lg.min }}</span><span data-legend="mid">{{ lg.mid }}</span><span data-legend="max">{{ lg.max }}</span></div>
+{#- La rampa e le tre cifre sono per l'occhio; la frase (che cosa vuol dire
+    piu' intenso, come sono fatti i gradini, che cos'e' n.d.) arriva anche ai
+    lettori di schermo, che le cifre le hanno nella tabella accanto. -#}
+<div class="legend">
+  <div class="legend__ramp" aria-hidden="true">{% for i in range(1, 7) %}<i class="q{{ i }}" style="background: var(--seq-{{ i }})"></i>{% endfor %}</div>
+  <div class="legend__scale" aria-hidden="true"><span data-legend="min">{{ lg.min }}</span><span data-legend="mid">{{ lg.mid }}</span><span data-legend="max">{{ lg.max }}</span></div>
   {#- La frase sui gradini la scrive la legenda, perche' dipende dai dati
       (`choropleth_scale`): uguali di norma, quantili con un valore fuori
       scala. v1.js la riscrive quando cambia l'anno. -#}

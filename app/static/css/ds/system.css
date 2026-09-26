@@ -64,6 +64,11 @@
   --data-null-stripe: #7a8086;
   --map-edge: #ffffff;
   --map-outline: #c9ced4;
+  /* La costa: il contorno di tutta la terra sulle mappe coi dati. Il primo
+     gradino della rampa sta a 1,2:1 sul fondo, e senza la costa le regioni
+     chiare si perdevano (WCAG 1.4.11). E' il grigio di contesto, gia'
+     verificato a 3:1 sui fondi in chiaro e in scuro (tokens.json, cmp). */
+  --map-coast: var(--cmp);
   --cat-1: #2d6fbe;
   --cat-2: #471b3a;
   --cat-3: #63591d;
@@ -144,9 +149,11 @@
   --measure: 38rem;
   --gutter-s: 16px;
   --gutter-l: 24px;
-  --margin-s: 16px;
-  --margin-m: 24px;
-  --margin-l: 32px;
+  /* I margini non scendono mai sotto la tacca del telefono in orizzontale
+     (viewport-fit=cover, blog_base.html). */
+  --margin-s: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --margin-m: max(24px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --margin-l: max(32px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   --masthead-s: 56px;
   --masthead-l: 64px;
   --radius-control: 4px;

@@ -152,7 +152,7 @@
   {{ ui.tiles(d.tiles) }}
 
   <div class="layout">
-    <aside class="layout__aside">
+    <aside class="layout__aside" aria-label="In questa pagina">
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
@@ -230,7 +230,7 @@
         <div class="podiums">
           {% for side in [('up', 'Dove ha guadagnato più posizioni', d.moves.up), ('down', 'Dove ne ha perse di più', d.moves.down)] if side[2] %}
           <div>
-            <h4 class="h-sub provincia-colhead">{{ side[1] }}</h4>
+            <h3 class="h-sub provincia-colhead">{{ side[1] }}</h3>
             <ul class="moves provincia-moves">
               {%- for i in side[2] %}
               <li><span class="arrow">{{ ui.icon(side[0]) }}</span><span class="what"><a href="{{ i.path }}">{{ i.name }}</a><span class="provincia-when">{{ i.rank | rank(i.province_count) }} nel {{ i.year }}, era {{ i.previous | rank }} {% if i.fewer_now %}quando le province con un dato erano di più{% else %}nella rilevazione precedente{% endif %}</span></span><span class="how">{{ i.movement | delta('posizione' if i.movement in (1, -1) else 'posizioni', 0) }}</span></li>

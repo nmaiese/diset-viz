@@ -297,6 +297,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .map [data-key] { stroke: var(--map-edge); stroke-width: 0.9; stroke-linejoin: round; fill: var(--data-null); transition: fill var(--motion-base) var(--motion-ease); }
 .map [data-key].is-null { fill: url(#nd-stripes); }
 .map .outline { fill: none; stroke: var(--map-outline); stroke-width: 1; pointer-events: none; }
+/* La costa: un filetto di 1 pixel attorno all'unione dei territori, fatto con
+   quattro ombre senza sfocatura sul gruppo della terra (le ombre stanno solo
+   fuori, dove la terra finisce, perche' dentro i territori si toccano). Cosi'
+   il primo gradino della rampa resta delimitato anche sul fondo bianco, senza
+   scurire la rampa e senza ripetere i tracciati. */
+.map__land { filter: drop-shadow(1px 0 0 var(--map-coast)) drop-shadow(-1px 0 0 var(--map-coast)) drop-shadow(0 1px 0 var(--map-coast)) drop-shadow(0 -1px 0 var(--map-coast)); }
+.navmap:not(.navmap--data) .map__land, .navmap--zoom .map__land { filter: none; }
 .map [data-key].is-on { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
 /* Le province: filo sottile fra una e l'altra, e i confini delle regioni
    ridisegnati sopra piu' larghi, nello stesso colore del fondo. */
@@ -389,7 +396,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .table tr.ref > * { border-bottom: 1px solid var(--ink); color: var(--text-2); font-size: var(--fs-small); padding-block: 6px; }
 .table tr.ref .val { font-weight: 400; }
 .table tr.ref .bar { background: transparent; height: 1px; }
-.table tbody tr:hover > * { background: var(--surface-1); }
+@media (hover: hover) { .table tbody tr:hover > * { background: var(--surface-1); } }
 .table tbody tr.is-on:hover > * { background: var(--surface-2); }
 [data-explore]:not(.has-js) .table tbody tr:target:hover > * { background: var(--surface-2); }
 /* La classifica piegata delle province: prime dieci, le altre nel details,
@@ -861,7 +868,11 @@ details.more[open] > summary { color: var(--ink); }
 .hero-img figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .card__media { transition: filter var(--motion-base) var(--motion-ease); }
 .card__media img { transition: transform 400ms var(--motion-ease); }
-.card:hover .card__media img { transform: scale(1.03); }
+@media (hover: hover) { .card:hover .card__media img { transform: scale(1.03); } }
+@supports selector(:has(a)) {
+  .card:has(.card__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .card__title a:focus-visible { outline: none; }
+}
 @media (prefers-reduced-motion: reduce) { .card:hover .card__media img { transform: none; } }
 
 
@@ -1000,7 +1011,7 @@ main.v1 h1 { view-transition-name: page-title; }
 .story__fig { display: grid; gap: var(--space-1); min-width: 0; }
 .story__media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 16 / 9; }
 .story__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
-.story:hover .story__media img { transform: scale(1.03); }
+@media (hover: hover) { .story:hover .story__media img { transform: scale(1.03); } }
 @media (prefers-reduced-motion: reduce) { .story__media img, .story:hover .story__media img { transition: none; transform: none; } }
 .story__credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
 .story__credit a { position: relative; z-index: 1; color: inherit; }
