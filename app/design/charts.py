@@ -155,7 +155,12 @@ def _strip(rows, avg, unit, width, short, ratio_text, highlight=None, avg_label=
         cy = mid + level * (2 * r + 1)
         area = row.get("area") or "none"
         on = " is-on" if highlight and row["key"] == highlight else ""
-        parts.append(f'<circle class="strip__dot area--{area}{on}" data-key="{escape(row["key"])}" cx="{cx:.1f}" cy="{cy:.1f}" r="{r}"><title>{escape(row["name"])} {escape(n.text(row["value"], decimals))}</title></circle>')
+        # Il nome e la cifra del punto stanno in `data-tip`, non in un `<title>`:
+        # la striscia e' in tre tagli (e 107 punti sulle province), e i
+        # `<title>` finivano tutti nel testo che un estrattore legge, tre volte
+        # per territorio. Il suggerimento al passaggio lo rimette v1.js.
+        parts.append(f'<circle class="strip__dot area--{area}{on}" data-key="{escape(row["key"])}" cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" '
+                     f'data-tip="{escape(row["name"])} {escape(n.text(row["value"], decimals))}"/>')
     # Il territorio della pagina, se c'e', nominato sotto l'asse.
     low, high = min(rows, key=lambda q: q["value"]), max(rows, key=lambda q: q["value"])
     if highlight and highlight not in (low["key"], high["key"]):
@@ -239,7 +244,7 @@ def mini_strip(rows: list[dict], avg: float | None, width: int = 720) -> str:
     for row in sorted(rows, key=lambda row: row["value"]):
         area = row.get("area") or "none"
         parts.append(f'<circle class="strip__dot area--{area}" data-key="{escape(row["key"])}" '
-                     f'cx="{x(row["value"]):.1f}" cy="{mid:.1f}" r="{r}"><title>{escape(row["name"])}</title></circle>')
+                     f'cx="{x(row["value"]):.1f}" cy="{mid:.1f}" r="{r}" data-tip="{escape(row["name"])}"/>')
     parts.append("</svg>")
     return "".join(parts)
 

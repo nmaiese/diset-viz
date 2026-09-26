@@ -67,15 +67,25 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 {% if GOOGLE_TAG_MANAGER_ID and TRACK_SERVER_PAGE_VIEW | default(true) %}
 <script>
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
-    event: 'page_view',
-    page_location: window.location.href,
-    page_path: window.location.pathname + window.location.search,
-    page_title: document.title,
-    {#- Una pagina che era della SPA tiene il suo tipo (`PAGE_TYPE`, l'atlante
-        dice "atlas"): i rapporti GA4 non devono vederla cambiare tipo solo
-        perche' ora la rende il server. -#}
-    page_type: {% if PAGE_TYPE is defined %}{{ PAGE_TYPE | tojson }}{% else %}window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'{% endif %}
-  });
+  (function () {
+    {#- Il ritorno dal login Google porta `?code=`/`state` o `#access_token=`
+        nell'URL, e `auth.js` li toglie solo dopo: il page_view parte prima, in
+        testa, e li mandava a GA4 in page_location e page_path (un token, e un
+        URL unico per ogni accesso). Qui si tolgono i parametri di
+        autenticazione e il frammento, che GA4 non usa. -#}
+    var url = new URL(window.location.href);
+    ['code', 'state', 'error', 'error_code', 'error_description', 'access_token', 'refresh_token', 'token', 'token_hash', 'type'].forEach(function (k) { url.searchParams.delete(k); });
+    url.hash = '';
+    window.dataLayer.push({
+      event: 'page_view',
+      page_location: url.href,
+      page_path: url.pathname + url.search,
+      page_title: document.title,
+      {#- Il tipo di pagina (`app/page_types.py`, dal percorso), o quello che
+          il template dichiara (`PAGE_TYPE`: la 404 dice "error"). L'atlante e
+          il confronto restano "atlas", come quando erano la SPA. -#}
+      page_type: {{ (PAGE_TYPE if PAGE_TYPE is defined else PAGE_TYPE_DEFAULT) | tojson }}
+    });
+  })();
 </script>
 {% endif %}

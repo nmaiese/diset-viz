@@ -131,6 +131,19 @@
     tip.style.top = y + "px";
   }
 
+  /* ---------- la striscia: nome e cifra del punto al passaggio ----------
+     Il punto porta il testo in `data-tip` e non in un `<title>` (tre tagli
+     della stessa striscia, e i `<title>` finivano nel testo che gli
+     estrattori leggono): il `<title>` si crea qui, al primo passaggio, e il
+     suggerimento del browser resta quello di prima. */
+  document.addEventListener("pointerover", function (ev) {
+    var d = ev.target.closest && ev.target.closest(".strip__dot[data-tip]");
+    if (!d || d.querySelector("title")) return;
+    var t = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    t.textContent = d.getAttribute("data-tip");
+    d.appendChild(t);
+  });
+
   /* ---------- mappa: il valore al passaggio del mouse ---------- */
   function initMap(box) {
     var tip = box.querySelector("[data-map-tip]");

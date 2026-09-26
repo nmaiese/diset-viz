@@ -334,6 +334,9 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(missing.status_code, 404)
         self.assertIn(b"Pagina non trovata", missing.data)
         self.assertIn("noindex", missing.headers["X-Robots-Tag"])
+        # Nessun canonical su una 404: non ha una versione preferita.
+        self.assertNotIn(b'rel="canonical"', missing.data)
+        self.assertNotIn(b'property="og:url"', missing.data)
 
         api_missing = client.get("/api/indicator/not-found")
         self.assertEqual(api_missing.status_code, 404)
@@ -925,19 +928,20 @@ class AppSmokeTest(unittest.TestCase):
             self.assertNotIn("googlefc.controlledMessagingFunction", html)
             self.assertNotIn("diApplyGoogleConsent", html)
 
-            # The homepage and /blog are both plain server-rendered pages (no
-            # SPA to track its own page view), so both get the default push.
+            # Ogni altra pagina porta il tipo che le da' `app/page_types.py`
+            # dal percorso, non piu' "server" per tutte.
             home = client.get("/")
             self.assertEqual(home.status_code, 200)
             home_html = home.data.decode("utf-8")
-            self.assertIn("event: 'page_view'", home_html)
-            self.assertIn("page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'", home_html)
+            self.assertEqual(home_html.count("event: 'page_view'"), 1)
+            self.assertIn('page_type: "home"', home_html)
 
             blog = client.get("/blog")
             self.assertEqual(blog.status_code, 200)
             blog_html = blog.data.decode("utf-8")
-            self.assertIn("event: 'page_view'", blog_html)
-            self.assertIn("page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'", blog_html)
+            self.assertEqual(blog_html.count("event: 'page_view'"), 1)
+            self.assertIn('page_type: "blog"', blog_html)
+            self.assertNotIn("'server'", blog_html)
         finally:
             config.ADSENSE_CLIENT = original_client
             config.GOOGLE_TAG_MANAGER_ID = original_gtm

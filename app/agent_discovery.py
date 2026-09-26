@@ -606,6 +606,9 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         lines += ["", "## Come si interpreta", "", explain["reading"]]
     if explain.get("caveat"):
         lines += ["", "## Limiti", "", explain["caveat"]]
+    if explain.get("distinct"):
+        see = ", ".join(f"[{c['name']}]({_absolute(site_url, c['path'])})" for c in meta.get("distinct_from") or [])
+        lines += ["", "## Da non confondere con", "", explain["distinct"] + (f" Vedi {see}." if see else "")]
 
     for section in article.get("sections") or []:
         body = section.get("body") or _composed_indicator_section(

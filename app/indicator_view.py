@@ -54,6 +54,7 @@ from app.external_data import freshness_label, freshness_status
 from app.multiscopo_data import all_multiscopo_indicators
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_CANONICALS, REGIONAL_TWINS
 from app.indicator_notes import (
+    DISTINCT_FROM,
     annual_change_framing,
     change_unit_label,
     cover_bars,
@@ -303,7 +304,26 @@ def _build_meta(family, raw_id, source_meta):
         "canonical_path": source_meta.get("path")
         or sources.indicator_url(family, raw_id, profiles.indicator_slug(name)),
         "downloads": _downloads(source_meta["id"]),
+        "distinct_from": _distinct_from(source_meta["id"]),
     }
+
+
+def _distinct_from(indicator_id):
+    """The cards of the measures this one is mistaken for (`DISTINCT_FROM`),
+    with their canonical path from the catalog. A card the catalog does not
+    have is dropped, never linked by a guessed URL."""
+    entry = DISTINCT_FROM.get(str(indicator_id))
+    if not entry:
+        return []
+    cards = []
+    for other in entry["see"]:
+        payload = get_atlas_indicator(other)
+        if payload is None:
+            continue
+        other_meta = payload["metadata"]
+        cards.append({"name": other_meta["name"],
+                      "path": other_meta.get("path") or profiles.indicator_path(other, other_meta["name"])})
+    return cards
 
 
 @functools.lru_cache(maxsize=2)
@@ -338,8 +358,17 @@ def indexability(family, raw_id, source_meta):
         return True, None
     if profiles.is_gender_variant(source_meta):
         return False, "variante"
-    if (source_meta.get("region_count", len(source_meta.get("regions", []))) < seo_policy.REQUIRED_REGION_COUNT
-            or (source_meta.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
+    # Il payload dell'atlante non porta copertura e numero di regioni (None):
+    # letti cosi' davano "copertura" anche alle 48 schede fuori indice solo
+    # perche' vecchie. La regola li prende dal catalogo, e cosi' il motivo.
+    item = source_meta
+    if item.get("region_count") is None or item.get("completeness") is None:
+        entry = next((e for e in profiles.get_catalog()["indicators"]
+                      if str(e["id"]) == str(item.get("id"))), None)
+        if entry:
+            item = {**item, **entry}
+    if (item.get("region_count", len(item.get("regions", []))) < seo_policy.REQUIRED_REGION_COUNT
+            or (item.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
         return False, "copertura"
     return False, "vecchia"
 

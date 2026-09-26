@@ -56,7 +56,7 @@ class LaSchedaProvinciale(unittest.TestCase):
             with self.subTest(provincia=name):
                 self.assertNotRegex(self.html, rf'<tr data-key="{key}"[ >]')
                 self.assertNotIn(f'data-key="{key}" cx=', self.html)
-                self.assertNotIn(f"<title>{name} 0</title>", self.html)
+                self.assertNotIn(f'data-tip="{name} 0"', self.html)
                 self.assertNotIn(f'<tspan class="callout__nm">{name}</tspan>', self.html)
                 self.assertNotIn(f'<tspan class="strip__nm">{name}</tspan>', self.html)
                 self.assertNotIn(f'href="/provincia/{key}"', self.html)

@@ -131,7 +131,7 @@
     <figure class="regionmap">
       {{ ui.regionmap(rm, p.key) }}
       <figcaption>
-        <span class="regionmap__cap">{{ where }}{% if rm.n > 1 %}, con le altre {{ (rm.n - 1) | num(None, 'count') }} province della regione per qualità della vita{% endif %}.</span>
+        <span class="regionmap__cap">{{ where }}{% if rm.n == 2 %}, con l'altra provincia della regione per qualità della vita{% elif rm.n > 2 %}, con le altre {{ (rm.n - 1) | num(None, 'count') }} province della regione per qualità della vita{% endif %}.</span>
         {{ ui.legend(rm.legend, 'Più intenso, punteggio più alto, sulla scala delle ' ~ rm.total ~ ' province.', nd=False) }}
       </figcaption>
     </figure>
@@ -254,7 +254,10 @@
 
   {% if indicatori %}
   <section class="section" id="indicatori" aria-labelledby="h-indicatori">
-    <h2 id="h-indicatori">Tutti gli indicatori misurati {{ p.name | at_place }}</h2>
+    {#- "I dati della provincia di Lecce": la sezione con i valori veri e' cio'
+        che chi cerca "dati provincia di Lecce" vuole, e prima il titolo non
+        diceva ne' "provincia" ne' "dati". -#}
+    <h2 id="h-indicatori">I dati {{ 'della città metropolitana' if p.metro_city else 'della provincia' }} {{ d.of_name }}, indicatore per indicatore</h2>
     <p class="provincia-note">{{ indicatori | length | num(None, 'count') }} indicatori, per area. Il valore è quello pubblicato dalla fonte, arrotondato secondo la sua grandezza, nell'anno più recente per {{ p.name }}, e la variazione è dal primo anno della serie. La linea accanto è la serie della provincia anno per anno, e resta quasi piatta quando la provincia si è mossa poco rispetto alla distanza fra le province. La posizione in Italia si conta fra le province che quell'anno hanno un dato, quindi il denominatore cambia da riga a riga, e la prima è la migliore secondo il verso dell'indicatore. {% if p.region %}In {{ p.region }} il confronto è con le altre province della regione, e la media è la loro, non il valore regionale.{% endif %}</p>
     {% if d.groups | length > 1 %}
     <nav class="provincia-jump" aria-label="Aree della tabella">

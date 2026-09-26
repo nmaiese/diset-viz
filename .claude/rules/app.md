@@ -310,4 +310,27 @@ serie Istat sotto il nome di Eurostat.
 
 Host canonico apex, 404 pubblica con `noindex`, `X-Robots-Tag` su API e dati,
 HSTS, sitemap di sole URL canoniche pubbliche, JSON-LD solo dove la pagina
-visibile lo sostiene.
+visibile lo sostiene. Ogni URL vecchia arriva al canonico in un 301 solo, anche
+da `www.` (`redirect_www_to_apex` risolve l'URL numerica di una scheda), e la
+barra finale su una pagina che esiste fa 301 alla forma senza (il gestore della
+404). `tests/integration/test_redirect_e_sitemap.py` lo guarda.
+
+**I titoli di regione e provincia non portano posizioni** (dal 26 settembre
+2026). Li compongono `views._region_title` ("Lombardia in numeri: 312
+indicatori su lavoro e redditi", la cifra e' il conteggio) e `views._titolo_provincia` ("Lecce, dati della
+provincia e qualita' della vita"), per la 1.0 e per il ripiego: il nome e le
+parole con cui la pagina si cerca. Una posizione nel titolo si leggeva come
+un'altra classifica (la media sugli indicatori accanto alla qualita' della vita)
+e rispondeva solo a chi cerca la classifica, che ha la sua pagina. Le posizioni
+stanno nell'H1, nella figura e nella descrizione, sempre con il nome della loro
+misura (`tests/integration/test_titoli_regioni.py`, `test_province_seo.py`).
+
+**Il `page_type` del page_view** lo decide `app/page_types.py` dal percorso, per
+ogni pagina e per ogni ripiego. Un template lo sovrascrive solo dichiarando
+`PAGE_TYPE` (atlante e confronto `atlas`, la 404 `error`). La tabella dei valori
+sta in `docs/tracking_spec.md`.
+
+**I punti delle strisce** (`design.charts._strip`, `mini_strip`) portano nome e
+cifra in `data-tip`, mai in un `<title>`: la striscia e' in tre tagli, e i
+`<title>` finivano tre volte nel testo che un estrattore legge. `v1.js` crea il
+`<title>` al primo passaggio del mouse.

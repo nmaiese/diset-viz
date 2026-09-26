@@ -27,6 +27,13 @@ def _prima_frase(testo):
     frase = re.split(r"(?<=[.!?])\s", piano, maxsplit=1)[0]
     if len(frase) <= DESCRIZIONE_MAX:
         return frase
+    # Troppo lunga: si chiude all'ultima virgola che sta dentro, se lascia una
+    # frase che regge da sola, invece di troncare con "..." a meta' parola.
+    # "L'Abruzzo e' la regione del Mezzogiorno dove si lavora di piu' e dove la
+    # ricchezza per abitante e' piu' alta, ma resta dietro a..." usciva cosi'.
+    cut = frase[:DESCRIZIONE_MAX - 1].rfind(", ")
+    if cut >= 60:
+        return frase[:cut].rstrip() + "."
     return frase[: DESCRIZIONE_MAX - 3].rsplit(" ", 1)[0] + "..."
 
 

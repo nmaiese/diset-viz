@@ -12,7 +12,7 @@
     {% block robots_meta %}
     {% if STAGING %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">{% endif %}
     {% endblock %}
-    <link rel="canonical" href="{{ canonical }}">
+    {% if canonical %}<link rel="canonical" href="{{ canonical }}">{% endif %}
     {# Il feed sta in testa a ogni pagina del design system, non solo su /blog:
        e' cosi' che un lettore di feed lo trova da qualunque pagina si arrivi. #}
     <link rel="alternate" type="application/rss+xml" title="{{ SITE_NAME }}, storie dai dati" href="{{ SITE_URL }}/blog/feed.xml">
@@ -23,7 +23,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ self.title() }}">
     <meta property="og:description" content="{{ self.description() }}">
-    <meta property="og:url" content="{{ canonical }}">
+    {% if canonical %}<meta property="og:url" content="{{ canonical }}">{% endif %}
     {#- Una pagina puo' portare la sua immagine (`og_image_path`, per esempio
         le regioni e le province, app/design/og.py), se no quella del sito. -#}
     <meta property="og:image" content="{{ SITE_URL }}{{ og_image_path or '/static/img/og-divario-italia.png' }}">
