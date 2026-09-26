@@ -128,6 +128,14 @@ paths:
   La tabella "Tutti gli indicatori" ha la colonna Andamento, la serie della
   regione da `_region_series()`: una voce per processo (`synchronized_cache`,
   circa 55 ms alla prima pagina e 1,3 MB), mai una lettura per riga.
+  **Regione e provincia hanno la loro immagine da condividere**: l'`og:image` e'
+  `static/img/og/territori/<livello>-<key>.png` (`design.og.og_image`), 127 PNG
+  committati, generati da `scripts/og_territori.py` e non al render. Un
+  territorio senza file torna all'immagine del sito, e
+  `tests/unit/test_og_territori.py` vuole un file per ognuno: dopo una nuova
+  classifica della qualita' della vita si rigenerano. "E' la mia" e il segno
+  nella testata vivono solo nel browser (`localStorage`, `di:mio`): la pagina
+  che il server rende e' la stessa per tutti, e cosi' deve restare.
 - `/provincia/<key>` — il profilo di una delle 107 province misurate dal BES:
   posizione, punteggio, le dodici dimensioni, **i valori veri di tutti i 67
   indicatori** con unita', anno e posizione fra le province, dove e' prima e
