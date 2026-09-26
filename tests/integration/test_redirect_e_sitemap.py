@@ -56,6 +56,11 @@ class TestLegacyRedirects(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.headers["Location"], f"{CANONICAL}?anno=2020&regione=lazio")
 
+    def test_atlante_indicator_link_keeps_year(self):
+        response = self.client.get("/atlante?indicator=901&anno=2020", base_url=APEX)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.headers["Location"], f"{CANONICAL}?anno=2020")
+
     def test_www_plus_legacy_is_one_hop(self):
         chain = _hops(self.client, f"{LEGACY}?anno=2019", WWW)
         self.assertEqual(chain[0], (301, f"{APEX}{CANONICAL}?anno=2019"))

@@ -1035,7 +1035,9 @@ class LePagineProvincia(unittest.TestCase):
 
     def test_titolo_e_descrizione_stanno_nel_budget(self):
         """Il nome piu' lungo, "Verbano-Cusio-Ossola", portava il titolo a
-        sessantaquattro: li' cade la coda "per qualita' della vita"."""
+        sessantaquattro. Dal 26 settembre 2026 il titolo non porta la posizione
+        ("Lecce, dati della provincia e qualita' della vita"), e sui nomi lunghi
+        cade "della provincia"."""
         for chiave in self.chiavi:
             with self.subTest(provincia=chiave):
                 html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
@@ -1044,7 +1046,7 @@ class LePagineProvincia(unittest.TestCase):
                     re.search(r'<meta name="description" content="(.*?)"', html, re.S).group(1))
                 self.assertLessEqual(len(titolo), 60, titolo)
                 self.assertLessEqual(len(descrizione), 160, descrizione)
-                self.assertIn("province", titolo)
+                self.assertIn("qualità della vita", titolo)
 
     def test_una_sola_intestazione_e_un_canonico_che_punta_a_se(self):
         for chiave in self.chiavi[:12]:

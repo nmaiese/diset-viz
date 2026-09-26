@@ -53,13 +53,18 @@ class TestProvinceSeo(unittest.TestCase):
             with self.subTest(provincia=key):
                 self.assertNotIn("altre 1 province", page)
 
-    def test_title_still_carries_name_and_position(self):
+    def test_title_leads_with_the_name_and_carries_no_position(self):
+        titles = set()
         for key, page in self.pages.items():
             with self.subTest(provincia=key):
                 profile = province_profile.profilo(key)
                 title = html_lib.unescape(re.search(r"<title>(.*?)</title>", page).group(1))
-                self.assertTrue(title.startswith(f"{profile['name']}: {profile['rank']}ª su"), title)
+                self.assertTrue(title.startswith(profile["name"]), title)
+                self.assertIn("qualità della vita", title)
+                self.assertNotRegex(title, r"\d+ª")
                 self.assertLessEqual(len(title), 60)
+                titles.add(title)
+        self.assertEqual(len(titles), 107)
 
 
 if __name__ == "__main__":

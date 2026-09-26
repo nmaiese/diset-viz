@@ -543,9 +543,13 @@ def _atlante_redirect(args):
         item = next((i for i in catalog["indicators"] if str(i["id"]) == wanted), None)
         if item is None:
             return _bes_fuori_atlante(wanted, args.get("livello")) or "/atlante"
+        # `anno` e `regione` restano, come in ogni altro 301 della scheda: un
+        # link vecchio a un anno non deve aprire l'ultimo.
+        keep = [(k, args.get(k)) for k in ("anno", "regione") if args.get(k)]
+        suffix = f"?{urlencode(keep)}" if keep else ""
         if args.get("livello") == "provincia" and item["catalog_family"] == "bes":
-            return bes_data.bes_level_path(item["id"], "provincia")
-        return item["path"]
+            return bes_data.bes_level_path(item["id"], "provincia") + suffix
+        return item["path"] + suffix
     return None
 
 
@@ -1794,33 +1798,26 @@ def region_page(region_key):
 def _region_title(profile):
     """Il `<title>` di una pagina regione, dentro i sessanta caratteri.
 
-    Porta la posizione media sugli indicatori, lo stesso numero dell'H1, e
-    **dice che e' una media**. Fino al 26 settembre 2026 diceva "Lombardia: 7ª
-    su 20 regioni, tema per tema", che si legge come una classifica, mentre la
-    figura d'apertura della stessa pagina mette la Lombardia 2ª per qualita'
-    della vita: due misure diverse, e il titolo non diceva quale fosse la sua.
-    La posizione media e' la media arrotondata delle posizioni sugli
-    indicatori confrontabili (`profiles.region_profile`), non una graduatoria:
-    piu' regioni possono avere lo stesso numero.
+    Il nome, poi le parole con cui si cerca una regione ("in numeri", i temi) e
+    quanti indicatori la pagina porta. Nessuna posizione: fino al 26 settembre
+    2026 il titolo portava la posizione media sugli indicatori ("Lombardia: 7ª
+    su 20 regioni, tema per tema"), che accanto alla figura d'apertura (la
+    Lombardia 2ª per qualita' della vita) si leggeva come un'altra classifica.
+    La posizione resta nell'H1 e nella figura, con la sua misura. La cifra del
+    titolo e' il conteggio, che dice che cosa c'e' nella pagina (gli hub
+    portano un numero, `test_ogni_hub_porta_un_numero_tranne_dove_non_ha_senso`).
 
-    Si sacrifica in ordine: prima "regioni" (il "su 20" lo lascia capire),
-    poi il conteggio degli indicatori. Il nome e "in media" restano sempre.
+    Un nome lungo (Friuli-Venezia Giulia, Trentino Alto Adige) perde i temi.
     """
     name = profile["region"]
-    rank = profile.get("avg_rank")
-    count = profile.get("comparable_count")
-    total = profile.get("region_total")
-    if not rank or not count or not total:
-        n = len(profile.get("all_indicators") or [])
-        return f"{name}: il profilo su {n} indicatori"
+    count = len(profile.get("all_indicators") or [])
     for option in (
-        f"{name}: in media {rank}ª su {total} regioni in {count} indicatori",
-        f"{name}: in media {rank}ª su {total} in {count} indicatori",
-        f"{name}: in media {rank}ª su {total} regioni",
+        f"{name} in numeri: {count} indicatori su lavoro e redditi",
+        f"{name} in numeri: {count} indicatori Istat",
     ):
         if len(option) <= seo_titles.TITLE_MAX:
             return option
-    return f"{name}: in media {rank}ª su {total} regioni"
+    return f"{name}: {count} indicatori Istat"
 
 
 def _region_description(profile, ritratto, quality):
@@ -1852,17 +1849,25 @@ def _region_description(profile, ritratto, quality):
 def _titolo_provincia(profilo):
     """Il `<title>` di una pagina provincia, dentro i sessanta caratteri.
 
-    "Verbano-Cusio-Ossola" da solo ne prende venti, e la forma piena arrivava a
-    sessantaquattro. Cade la coda "per qualita' della vita", che il resto della
-    frase lascia gia' capire: "53a su 103 province" non si legge in nessun
-    altro modo. Restano il nome, che e' la parola cercata, e la posizione, che
-    e' il motivo per cliccare.
+    Il nome, che e' la parola cercata, poi "dati della provincia" e "qualita'
+    della vita", che sono le due cose che la pagina porta e le due forme in cui
+    la si cerca ("qualita' della vita Lecce", "dati provincia di Lecce"). Fino
+    al 26 settembre 2026 portava la posizione ("Lecce: 79ª su 107 province per
+    qualita' della vita"): la pagina riceveva quattro impression in tutto, e un
+    numero d'ordine nel titolo rispondeva solo a chi cercava la classifica, che
+    ha la sua pagina. La posizione resta nell'H1 e nella descrizione.
+
+    "Provincia" vale anche per le citta' metropolitane: e' la parola con cui le
+    si cerca, e la pagina dice "Citta' metropolitana" in descrizione e in testa.
     """
-    testa = f"{profilo['name']}: {profilo['rank']}ª su {profilo['total']} province"
-    for coda in (" per qualità della vita", ""):
-        if len(testa) + len(coda) <= 60:
-            return testa + coda
-    return testa
+    name = profilo["name"]
+    for option in (
+        f"{name}, dati della provincia e qualità della vita",
+        f"{name}: dati e qualità della vita",
+    ):
+        if len(option) <= 60:
+            return option
+    return name
 
 
 def _descrizione_provincia(profilo, indicator_count=None):

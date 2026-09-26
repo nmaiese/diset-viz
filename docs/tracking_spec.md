@@ -345,7 +345,7 @@ Configurazione richiesta:
 - tieni fuori dai rapporti il traffico che non viene da `divarioitalia.it`: il
   container gira su ogni host che serve l'immagine di produzione (l'URL
   `*.run.app` di Cloud Run, e `localhost` se uno sviluppatore esporta
-  `GOOGLE_TAG_MANAGER_ID`, che `.env.example` porta col valore vero). Il filtro
+  `GOOGLE_TAG_MANAGER_ID`, che dal 26 settembre 2026 `.env.example` lascia vuoto). Il filtro
   sta in GA4 o nel trigger GTM, non nell'app: dietro Cloudflare l'`Host` che
   arriva a Cloud Run non e' verificabile dal repo, e un controllo sbagliato
   spegnerebbe tutto il tracciamento

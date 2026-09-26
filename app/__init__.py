@@ -254,7 +254,9 @@ def not_found(error):
             "404.html",
             site_url=config.SITE_URL,
             site_name=config.SITE_NAME,
-            canonical=f"{config.SITE_URL}{request_path}",
+            # Nessun canonical: una 404 non ha una versione preferita, e un
+            # canonical su se stessa diceva ai motori che l'URL rotta lo era.
+            canonical=None,
         ),
         404,
         {"X-Robots-Tag": "noindex, follow"},

@@ -1,5 +1,5 @@
-"""Titolo, H1, descrizione e figura d'apertura delle 20 pagine regione dicono
-la stessa cosa, e ogni posizione porta il nome della sua misura.
+"""Titolo, descrizione e figura d'apertura delle 20 pagine regione: il titolo
+non porta posizioni, e ogni posizione scritta porta il nome della sua misura.
 
 Fino al 26 settembre 2026 il `<title>` diceva "Lombardia: 7ª su 20 regioni,
 tema per tema" mentre la figura d'apertura della stessa pagina la metteva 2ª
@@ -44,22 +44,19 @@ class TestTitoliRegioni(unittest.TestCase):
     def test_ci_sono_tutte_le_regioni(self):
         self.assertEqual(len(self.keys), len(REGION_ORDER))
 
-    def test_titolo_e_h1_portano_la_stessa_posizione_media_e_la_dicono_media(self):
+    def test_il_titolo_non_porta_posizioni_e_nomina_la_regione(self):
+        titles = set()
         for key, (status, page) in self.pages.items():
             with self.subTest(regione=key):
                 self.assertEqual(status, 200)
                 profile = profiles.region_profile(key)
                 title = _first(r"<title>(.*?)</title>", page)
-                h1 = _plain(_first(r"<h1[^>]*>(.*?)</h1>", page))
                 self.assertEqual(title, _region_title(profile))
                 self.assertLessEqual(len(title), TITLE_MAX)
-                self.assertNotIn("tema per tema", title)
-                if profile.get("avg_rank"):
-                    self.assertIn(f"in media {profile['avg_rank']}ª su 20", title)
-                    self.assertIn("In media", h1)
-                    self.assertIn(f"{profile['avg_rank']}ª su 20 regioni", h1)
-                    # Qualunque "Nª" nel titolo e' la posizione media.
-                    self.assertEqual(re.findall(r"(\d+)ª", title), [str(profile["avg_rank"])])
+                self.assertTrue(title.startswith(f"{profile['region']} in numeri: "), title)
+                self.assertNotRegex(title, r"\d+ª")
+                titles.add(title)
+        self.assertEqual(len(titles), len(self.pages))
 
     def test_og_title_e_il_titolo(self):
         for key, (_, page) in self.pages.items():
@@ -83,17 +80,16 @@ class TestTitoliRegioni(unittest.TestCase):
                     self.assertIn(quality["claim"], _plain(html_lib.unescape(page)))
 
     def test_la_lombardia_e_il_trentino_non_si_contraddicono_piu(self):
-        """I casi dell'audit: un titolo che dice 7ª e 6ª accanto a una figura
-        che dice 2ª e 1ª. Ora il titolo dice che e' una media, e la posizione
-        nella qualita' della vita sta in descrizione con il suo nome."""
+        """I casi dell'audit: un titolo che diceva 7ª e 6ª accanto a una
+        figura che dice 2ª e 1ª. Ora il titolo non porta posizioni, e quella
+        della qualita' della vita sta in descrizione con il suo nome."""
         for key in ("lombardia", "trentino-alto-adige", "calabria"):
             with self.subTest(regione=key):
                 quality = region_design._quality(key, profiles.region_profile(key)["region"])
                 if quality is None:
                     self.skipTest("classifica della qualita' della vita non disponibile")
                 page = self.pages[key][1]
-                title = _first(r"<title>(.*?)</title>", page)
-                self.assertIn("in media", title)
+                self.assertNotRegex(_first(r"<title>(.*?)</title>", page), r"\d+ª")
                 description = _first(r'name="description" content="(.*?)"', page)
                 if f"{quality['rank']}ª" in description:
                     self.assertIn(f"Qualità della vita: {quality['rank']}ª", description)
@@ -104,20 +100,20 @@ class TestGeneratoreTitoloRegione(unittest.TestCase):
 
     def _profile(self, name, rank=7, count=142):
         return {"region": name, "avg_rank": rank, "comparable_count": count,
-                "region_total": 20, "all_indicators": [1, 2, 3]}
+                "region_total": 20, "all_indicators": list(range(312))}
 
     def test_la_forma_piena(self):
         self.assertEqual(_region_title(self._profile("Lombardia")),
-                         "Lombardia: in media 7ª su 20 regioni in 142 indicatori")
+                         "Lombardia in numeri: 312 indicatori su lavoro e redditi")
 
-    def test_un_nome_lungo_perde_prima_regioni(self):
+    def test_un_nome_lungo_perde_i_temi(self):
         title = _region_title(self._profile("Friuli-Venezia Giulia", 8))
-        self.assertEqual(title, "Friuli-Venezia Giulia: in media 8ª su 20 in 142 indicatori")
+        self.assertEqual(title, "Friuli-Venezia Giulia in numeri: 312 indicatori Istat")
         self.assertLessEqual(len(title), TITLE_MAX)
 
-    def test_senza_posizione_media_il_profilo(self):
-        profile = self._profile("Molise", rank=None)
-        self.assertEqual(_region_title(profile), "Molise: il profilo su 3 indicatori")
+    def test_senza_posizione_media_il_titolo_non_cambia(self):
+        self.assertEqual(_region_title(self._profile("Molise", rank=None)),
+                         "Molise in numeri: 312 indicatori su lavoro e redditi")
 
     def test_la_descrizione_non_aggiunge_niente_a_una_frase_troncata(self):
         profile = self._profile("Abruzzo")

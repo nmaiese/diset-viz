@@ -334,6 +334,9 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(missing.status_code, 404)
         self.assertIn(b"Pagina non trovata", missing.data)
         self.assertIn("noindex", missing.headers["X-Robots-Tag"])
+        # Nessun canonical su una 404: non ha una versione preferita.
+        self.assertNotIn(b'rel="canonical"', missing.data)
+        self.assertNotIn(b'property="og:url"', missing.data)
 
         api_missing = client.get("/api/indicator/not-found")
         self.assertEqual(api_missing.status_code, 404)

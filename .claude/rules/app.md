@@ -315,12 +315,15 @@ da `www.` (`redirect_www_to_apex` risolve l'URL numerica di una scheda), e la
 barra finale su una pagina che esiste fa 301 alla forma senza (il gestore della
 404). `tests/integration/test_redirect_e_sitemap.py` lo guarda.
 
-**Il titolo della pagina regione** lo compone `views._region_title`, per la 1.0
-e per il ripiego: porta la posizione media sugli indicatori, lo stesso numero
-dell'H1, e dice "in media". La figura d'apertura mostra un'altra misura, la
-qualita' della vita, che la descrizione (`_region_description`) nomina per
-esteso: "7ª su 20 regioni" senza la sua misura si leggeva come quella
-(`tests/integration/test_titoli_regioni.py`, su tutte le 20).
+**I titoli di regione e provincia non portano posizioni** (dal 26 settembre
+2026). Li compongono `views._region_title` ("Lombardia in numeri: 312
+indicatori su lavoro e redditi", la cifra e' il conteggio) e `views._titolo_provincia` ("Lecce, dati della
+provincia e qualita' della vita"), per la 1.0 e per il ripiego: il nome e le
+parole con cui la pagina si cerca. Una posizione nel titolo si leggeva come
+un'altra classifica (la media sugli indicatori accanto alla qualita' della vita)
+e rispondeva solo a chi cerca la classifica, che ha la sua pagina. Le posizioni
+stanno nell'H1, nella figura e nella descrizione, sempre con il nome della loro
+misura (`tests/integration/test_titoli_regioni.py`, `test_province_seo.py`).
 
 **Il `page_type` del page_view** lo decide `app/page_types.py` dal percorso, per
 ogni pagina e per ogni ripiego. Un template lo sovrascrive solo dichiarando

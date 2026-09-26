@@ -27,9 +27,9 @@
 
 {# Titolo e descrizione li compone la view (`_region_title`,
    `_region_description` in app/views.py), per questa pagina e per il ripiego.
-   Il titolo porta la posizione media, lo stesso numero dell'H1, e dice che e'
-   una media: la figura d'apertura mostra un'altra misura, la qualita' della
-   vita, e "7ª su 20 regioni" senza la sua misura si leggeva come quella. #}
+   Il titolo non porta posizioni: il nome e cio' che si cerca ("in numeri",
+   lavoro, redditi, qualita' della vita). La descrizione nomina la qualita'
+   della vita con la sua posizione. #}
 {% block title %}{{ seo_title }}{% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
 
