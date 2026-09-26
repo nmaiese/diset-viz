@@ -1,0 +1,120 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- L'indice delle regioni della 1.0.
+
+    Stesso contenuto di regions_index.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la risposta con le cifre vere
+    (quante regioni per ripartizione, prima e ultima per qualita' della vita),
+    da 960 pixel la mappa per scegliere accanto alla testata, poi le regioni
+    raggruppate per ripartizione, una scheda ognuna. Cio' che la pagina chiede
+    in piu' ai dati lo compone app/design/pages/regioni.py e arriva qui come `d`.
+
+    La testa (title, description, JSON-LD, briciole) e' quella di
+    regions_index.html, riga per riga. L'`ItemList` resta nell'ordine della
+    vista, lo stesso delle schede qui sotto. -#}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Regioni", "path": "/regioni"}] %}
+{% set active_nav = 'regioni' %}
+
+{% block title %}Le {{ regions | length }} regioni italiane a confronto, tema per tema{% endblock %}
+{% block description %}Scegli una regione italiana e scopri il suo profilo sugli indicatori territoriali Istat: punti di forza, debolezze e regioni con un profilo simile.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/regioni.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Le regioni italiane a confronto",
+  "description": {{ ('Il profilo di ognuna delle venti regioni italiane sugli indicatori territoriali Istat.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Le regioni italiane",
+  "numberOfItems": {{ regions | length }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- for r in regions %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ r.region | tojson }},
+      "url": "{{ site_url }}{{ r.path }}"
+    }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{%- set area_in = {"Nord": "al Nord", "Centro": "al Centro", "Mezzogiorno": "nel Mezzogiorno"} -%}
+<main id="contenuto" class="v1 v1-regioni" data-v1="regioni" tabindex="-1">
+{{ v1_map_sprite('regione') }}
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead regioni-head">
+    <p class="eyebrow">Indicatori territoriali Istat<span class="sep" aria-hidden="true">·</span>un profilo per regione</p>
+    <h1 class="h-title">Le regioni italiane a confronto</h1>
+    <p class="answer">Sono {{ d.n | num(None, 'count') }}:
+      {%- for a in d.area_counts %} {{ a.count | num(None, 'count') }} {{ area_in[a.label] }}{% if loop.revindex == 2 %} e{% elif not loop.last %},{% endif %}{% endfor %}.
+      {%- if d.quality %} Per qualità della vita, con il profilo {{ d.quality.profile or 'predefinito' }}, la prima è <a href="{{ d.quality.first.href }}">{{ d.quality.first.the_name }}</a> e l'ultima <a href="{{ d.quality.last.href }}">{{ d.quality.last.the_name }}</a>.{% endif %}</p>
+    <p class="regioni-lead">Ogni scheda porta al profilo della regione: i temi in cui va meglio e peggio, che cosa è cambiato, le sue province e le regioni con un profilo simile.</p>
+    <p class="meta">
+      <a class="linkarrow" href="/province">Tutte le {{ province_total }} province, regione per regione</a>
+      <a href="/qualita-della-vita/classifica/regioni">La classifica della qualità della vita</a>
+    </p>
+    {#- Da 960 pixel la mappa per andare dritti a una regione. Sul telefono non
+        c'e': l'elenco qui sotto basta, e la tastiera ha i suoi link. -#}
+    <div class="regioni-map">
+      {{ ui.navmap('regione', d.names, None, '/regione/') }}
+      <p class="regioni-map__hint">Oppure scegli una regione sulla mappa.</p>
+    </div>
+  </header>
+
+  <nav class="regioni-jump" aria-label="Ripartizioni">
+    <ul>
+      {%- for g in d.groups %}
+      <li><a href="#{{ g.id }}"><span class="area-dot area-dot--{{ g.area }}" aria-hidden="true"></span>{{ g.label }}</a></li>
+      {%- endfor %}
+    </ul>
+  </nav>
+
+  <p class="regioni-note">La posizione in un tema è fra le {{ d.n | num(None, 'count') }} regioni, sulla media dei percentili dei suoi indicatori. La qualità della vita è la classifica del BES dei Territori di Istat con il profilo {{ (d.quality.profile if d.quality else None) or 'predefinito' }}: il metodo è in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
+
+  {% for g in d.groups %}
+  <section class="section regioni-group" id="{{ g.id }}" aria-labelledby="h-{{ g.id }}">
+    <h2 id="h-{{ g.id }}"><span class="area-dot area-dot--{{ g.area }}" aria-hidden="true"></span>{{ g.label }}</h2>
+    <ol class="cards regioni-cards">
+      {%- for c in g.regions %}
+      <li class="card regioni-card">
+        <h3 class="card__title"><a href="{{ c.href }}">{{ c.name }}</a></h3>
+        {% if c.provinces %}<p class="card__meta">{{ c.provinces | num(None, 'count') }} {{ c.provinces | it_plural('provincia', 'province') }}</p>{% endif %}
+        <dl class="regioni-facts">
+          {%- if c.strong %}
+          <div><dt>Va meglio in</dt><dd><span class="regioni-facts__theme">{{ c.strong.theme }}</span> {{ c.strong.rank | rank(c.strong.total) }}</dd></div>
+          {%- endif %}
+          {%- if c.weak %}
+          <div><dt>Va peggio in</dt><dd><span class="regioni-facts__theme">{{ c.weak.theme }}</span> {{ c.weak.rank | rank(c.weak.total) }}</dd></div>
+          {%- endif %}
+          {%- if c.quality_rank %}
+          <div class="regioni-facts__qv"><dt>Qualità della vita</dt><dd>{{ c.quality_rank | rank(d.quality.total if d.quality else None) }}{% if c.quality_track is not none %}<span class="track" aria-hidden="true"><i style="left: {{ c.quality_track }}%"></i></span>{% endif %}</dd></div>
+          {%- endif %}
+        </dl>
+      </li>
+      {%- endfor %}
+    </ol>
+  </section>
+  {% endfor %}
+
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

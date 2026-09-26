@@ -2037,8 +2037,8 @@ def regions_index():
     overview = profiles.regions_overview()
     regions = list(overview.values())
     provinces = province_profile.by_region()
-    return render_template(
-        "regions_index.html",
+    return design.render(
+        "regioni", "v1/regioni.html", "regions_index.html",
         regions=regions,
         province_counts={key: len(items) for key, items in provinces.items()},
         province_total=sum(len(items) for items in provinces.values()),
@@ -2069,8 +2069,8 @@ def provinces_index():
             agent_discovery.provinces_index_markdown(regions, total, SITE_URL),
             f"{SITE_URL}/province",
         )
-    return render_template(
-        "provinces_index.html",
+    return design.render(
+        "province", "v1/province.html", "provinces_index.html",
         regions=regions,
         provinces=[entry for region in regions for entry in region["provinces"]],
         total=total,
