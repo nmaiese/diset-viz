@@ -10,23 +10,20 @@ senza che nessuno se ne accorga, e questo progetto lo ha già pagato.
 
 **Se un argomento qui sotto ha un documento, leggi il documento. Non agire sul riassunto.**
 
-## Lo stato non è qui
+## Autonomia del Progetto e Stato Locale
 
-Questo repo dice **come funziona il sito**. A che punto siamo, che cosa stiamo
-facendo, che cosa viene dopo e perché lo stiamo facendo stanno in un posto solo,
-`QUADRO.md` del repo `nmaiese/redazione-ai`, che l'hook di avvio ti mette già in
-contesto quando è agganciato.
+Questo progetto (**Divario Italia**) è **completamente autonomo e separato** da
+qualsiasi altro sito o repository (come `praticandoildiritto` o `vecchio-conio`).
+Non dipende da quadri centralizzati esterni.
 
-Quindi: **nessun documento di questo repo porta caselle di spunta, avanzamenti,
-"prossimo passo" o date di piano.** Se ti viene da scrivere lo stato in `docs/`,
-va nel Quadro. Il 5 settembre nove posti dicevano che cosa c'era da fare, e si
-contraddicevano.
+A che punto siamo, gli obiettivi correnti, la roadmap e i prossimi passi
+stanno in [`STATUS.md`](STATUS.md) nella radice di questo repository.
 
 Le **PR** servono per il codice del sito (`app/`, `frontend/`, `scripts/`,
 `config/`, `tests/`) e per gli articoli (`content/`): lì il merge è il gate
 umano, e per divarioitalia il merge è la pubblicazione. La **documentazione non
-passa da PR**: `docs/`, `CLAUDE.md`, `README.md` e `.claude/` si scrivono
-direttamente su `master`.
+passa da PR**: `docs/`, `CLAUDE.md`, `STATUS.md`, `README.md` e `.claude/` si
+possono scrivere direttamente su `master`.
 
 ## La mappa
 
@@ -78,17 +75,17 @@ una serie Istat sotto il nome di Eurostat.
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
 Strato blog: `app/blog.py` (legge `content/posts/*.md`).
 
-## Chi scrive gli articoli
+## Pipeline Editoriale e Contenuti
 
-Non questo repo. La redazione vive in `nmaiese/redazione-ai`: `motore/` calcola
-il dossier e il brief, un team di agent in onde scrive, edita e verifica,
-`motore pubblica` scrive in `content/indicators/` di qui e `motore pr` apre la
-PR. Il contratto del pezzo è `REDAZIONE.md` di quel repo, le regole del sito
-`siti/divarioitalia.md`.
+I contenuti del sito risiedono in `content/` (articoli degli indicatori in
+`content/indicators/*.md`, post del blog in `content/posts/*.md`).
+La guida di stile per voce e forma è in [`content/STYLE.md`](content/STYLE.md).
 
-Qui restano solo gli agganci: `content/indicators/` dove i pezzi atterrano,
-`content/STYLE.md` per la voce, e le regole con scope in `.claude/rules/`
-(`app.md`, `data.md`, `editorial.md`, `frontend.md`, `python.md`).
+La vecchia catena di generazione esterna è dismessa; qualsiasi futura pipeline
+editoriale verrà progettata da zero in modo indipendente.
+In questa fase, il focus esclusivo di questo repository è sul **sito**: codice Flask,
+design system 1.0 "Cronaca", test di regressione, integrità dei dati territoriali
+e strumenti di accesso ai servizi operativi.
 
 ## Comandi
 

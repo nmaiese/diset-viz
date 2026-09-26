@@ -23,9 +23,10 @@ the map of which document owns which subject, the commands (starting with
 shell function without the dependencies), and the constraints that are true
 everywhere.
 
-Two things worth stating twice, because they are the fastest way to do damage
-without noticing. The chain that writes the indicator articles does **not** live
-here: it lives in the `nmaiese/redazione-ai` repository, and it publishes to
-`content/indicators/`, which is the public site. And the project state does not
-live here either: it lives in that repository's `QUADRO.md`. No document in this
-repository carries checkboxes, progress or a "next step".
+Two things worth stating twice, because they are fundamental to how we work:
+1. **Autonomia del progetto**: Divario Italia è un progetto a sé stante. I suoi
+obiettivi, avanzamenti e la roadmap vivono qui, in [`STATUS.md`](STATUS.md). Non dipende
+da quadri centralizzati di altri repository.
+2. **Focus sul sito e runtime**: La vecchia pipeline editoriale esterna è dismessa e
+verrà riscritta da zero. Il focus operativo qui è sul sito, sulle sue pagine, sui test
+e sugli strumenti di accesso ai servizi operativi.

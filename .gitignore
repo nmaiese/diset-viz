@@ -56,3 +56,7 @@ data/lab/narrativa/
 # foto candidate servono a scegliere, non entrano nel repo. La scelta resta
 # registrata nella scheda <slug>.photo.json accanto alla copertina.
 data/articles/*/photo-candidates/
+
+# Antigravity / Orca agent working files (not project source)
+.agents/
+ORIGINAL_REQUEST.md
