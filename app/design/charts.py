@@ -215,7 +215,8 @@ def mini_strip(rows: list[dict], avg: float | None, width: int = 720) -> str:
     Stessi punti della striscia grande (`strip__dot`, `data-key`, il colore della
     ripartizione), cosi' la scelta di un territorio la accende come le altre e
     un clic sceglie; niente nomi e niente assi: le cifre sono nella striscia
-    grande e nel modulo. I pari merito si impilano di mezzo punto.
+    grande e nel modulo. I pari merito restano sovrapposti: la barra dice
+    dove sta un territorio, non quanti gli stanno accanto.
     """
     rows = [row for row in rows if row.get("value") is not None]
     if len(rows) < 2:

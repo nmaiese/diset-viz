@@ -87,7 +87,7 @@
     </ul>
   </nav>
 
-  <p class="regioni-note">La posizione in un tema è fra le {{ d.n | num(None, 'count') }} regioni, sulla media dei percentili dei suoi indicatori. La qualità della vita è la classifica del BES dei Territori di Istat con il profilo {{ (d.quality.profile if d.quality else None) or 'predefinito' }}: il metodo è in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
+  <p class="regioni-note">La posizione in un tema è il posto fra le {{ d.n | num(None, 'count') }} regioni per piazzamento medio negli indicatori del tema che hanno un verso, come nel profilo di ogni regione. La qualità della vita è la classifica del BES dei Territori di Istat con il profilo {{ (d.quality.profile if d.quality else None) or 'predefinito' }}: il metodo è in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
 
   {% for g in d.groups %}
   <section class="section regioni-group" id="{{ g.id }}" aria-labelledby="h-{{ g.id }}">

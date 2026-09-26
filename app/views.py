@@ -893,11 +893,33 @@ _SEARCH_KIND_BY_PARAM = {param: kind for param, kind, _ in _SEARCH_KINDS}
 # che nel nome la parola non la portano: stavano al 50° e al 62° posto, dietro
 # dieci "Produttivita' del lavoro" di settori. Le chiavi e i sinonimi sono nella
 # forma di `_search_fold`, e un sinonimo vale come inizio di parola nel titolo.
+# Un sinonimo entra solo se sta davvero nei nomi degli indicatori (contati sul
+# catalogo il 26 settembre 2026): una parola che nessun titolo porta non
+# alzerebbe niente.
 _SEARCH_SYNONYMS = {
     "lavoro": ("occupazione", "disoccupazione", "occupati", "lavoratori"),
     "reddito": ("pil", "pensioni", "redditi", "retribuzioni"),
     "salute": ("mortalita", "speranza di vita", "medici", "ospedal"),
     "scuola": ("istruzione", "scolastic", "studenti", "diplomati"),
+    "poverta": ("rischio di poverta", "deprivazione"),
+    "casa": ("abitazion", "affitto", "sovraffollamento"),
+    "universita": ("laureat", "terziari", "universit"),
+    "internet": ("banda larga", "connessione", "digitali"),
+    "sanita": ("sanitari", "ospedal", "medici", "posti letto"),
+    "anziani": ("65 anni", "non autosufficient", "over"),
+    "giovani": ("neet", "15-34"),
+    "donne": ("femmine", "femminile", "di genere"),
+    "inquinamento": ("pm2.5", "qualita dell'aria", "emissioni"),
+    "rifiuti": ("raccolta differenziata", "discarica"),
+    "energia": ("rinnovabil", "elettrica"),
+    "trasporti": ("trasporto", "tpl", "mobilita"),
+    "criminalita": ("furti", "rapine", "omicidi", "borsegg"),
+    "sicurezza": ("furti", "rapine", "omicidi", "borsegg"),
+    "politica": ("elettorale", "fiducia", "partecipazione"),
+    "felicita": ("soddisfazione", "soddisfatt"),
+    "economia": ("pil", "valore aggiunto", "produttivita", "esportare"),
+    "nascite": ("natalita",),
+    "cultura": ("musei", "spettacol", "patrimonio", "bibliotech"),
 }
 
 
