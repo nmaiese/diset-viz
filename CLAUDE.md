@@ -162,7 +162,9 @@ macro-area, senza che niente fallisca.
   contrasti e daltonismo. `/legacy` e' l'unica pagina rimasta sul suo stile, di
   proposito.
   Le pagine chiave (scheda indicatore, home, regione, provincia, articolo,
-  indice e classifica della qualita' della vita, atlante, confronto) escono da `app/templates/v1/`
+  indice e classifica della qualita' della vita, atlante, confronto, e dal 26
+  settembre 2026 anche regioni, province, temi, tema, divari regionali,
+  ricerca, indice del blog, metodologia, catalogo dati) escono da `app/templates/v1/`
   con `css/ds/components.css` e il CSS della pagina, e cio' che chiedono ai dati
   lo compone `app/design/` (`numfmt` per come si scrive una cifra, `charts` per
   i grafici, un modulo per pagina). Le altre pagine restano su `site.css`, che

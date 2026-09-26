@@ -208,6 +208,21 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
 - **Ricerca**: una per pagina, suggerimenti raggruppati per tipo.
 - **Indice di pagina**: domande brevi ("Chi e' in testa", "Com'e' cambiato"),
   sticky nel margine da 1200.
+- **Definizione a portata di mano** (`ui.term`): una parola tecnica apre
+  accanto a se' la sua definizione breve (Popover API, ancorata con anchor
+  positioning dove c'e'). I testi stanno una volta sola in
+  `app/design/terms.py` e rimandano alla metodologia. Solo su tessere, righe
+  fonte, sottotitoli e meta, mai nella prosa degli articoli e mai dentro un
+  blocco `aria-hidden`.
+- **Intestazione che resta**: le tabelle lunghe ("Tutti gli indicatori" di
+  regione e provincia, `.stackwrap--wide`) tengono l'intestazione sotto la
+  testata da 960 pixel; nell'atlante resta in alto il nome del tema.
+- **Torna su**: sulle pagine oltre cinque schermate, dopo le prime due
+  (`initTotop` in `v1.js`); `data-totop` sul `<main>` lo manda altrove
+  (l'atlante ai filtri).
+- **Avanzamento di lettura**: un filetto d'accento sotto la barra delle sezioni
+  del telefono, legato allo scroll con `animation-timeline`, assente dove il
+  browser non lo conosce.
 - **Figura dell'articolo**: titolo-tesi in HTML, grafico con testo a taglia
   reale, riga fonte, tabella dei valori.
 - **Azione**: un primario al massimo per schermata, secondario a contorno, link
@@ -264,6 +279,18 @@ localizzatore (macro `locator`), la barra attorno a 50 (`.divbar`), il podio
 di una pagina.
 
 ## Pagine
+
+### Pagine indice e di servizio
+
+Dal 26 settembre 2026 escono dalla 1.0 anche regioni, province, temi, tema,
+divari regionali, ricerca, indice del blog, metodologia e catalogo dati, un
+modulo per pagina in `app/design/pages/` e il template di prima come ripiego.
+Tutte aprono con la risposta (una frase con cifre calcolate), hanno le sezioni
+col filetto d'inchiostro e diventano blocchi sul telefono. Le mappe per
+scegliere compaiono da 960 pixel, perche' sul telefono l'elenco accanto porta
+agli stessi posti. Con piu' di tre voci il controllo segmentato e' una griglia
+di celle uguali, e quando mappa e tabella non stanno affiancate la mappa viene
+prima, col suo titolo.
 
 ### Scheda indicatore
 
