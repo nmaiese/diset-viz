@@ -16,7 +16,13 @@
    le conosce la regola si ignora. Il movimento lo leggono dalla radice, per
    questo --dur e --ease-out stanno in :root. */
 @view-transition { navigation: auto; }
-::view-transition-group(root), ::view-transition-group(page-title), ::view-transition-group(lead-figure) {
+::view-transition-group(root) {
+  animation-duration: var(--dur);
+  animation-timing-function: var(--ease-out);
+}
+/* Il titolo e la figura d'apertura passano da una pagina all'altra
+   (view-transition-name in components.css), allo stesso passo della pagina. */
+::view-transition-group(page-title), ::view-transition-group(lead-figure) {
   animation-duration: var(--dur);
   animation-timing-function: var(--ease-out);
 }
