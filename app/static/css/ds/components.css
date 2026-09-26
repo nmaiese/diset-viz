@@ -261,10 +261,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
    classifica (`.cl-profiles`). */
 .seg:has(> :nth-child(4)) {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
-  gap: 1px; background: var(--control-border); width: 100%;
+  width: 100%; border: 0; padding: 1px 0 0 1px; overflow: visible;
 }
 @media (min-width: 960px) { .seg:has(> :nth-child(4)) { width: auto; grid-auto-flow: column; grid-auto-columns: max-content; grid-template-columns: none; } }
-.seg:has(> :nth-child(4)) > * { border-left: 0; justify-content: center; text-align: center; }
+/* Il campo che la contiene e' un elemento della barra strumenti: senza, prende
+   la larghezza minima e la griglia resta di una colonna. */
+@media (max-width: 959px) { .field:has(> .seg > :nth-child(4)) { flex: 1 1 100%; } }
+/* I filetti li disegnano le celle, sovrapposte di un pixel: col fondo della
+   griglia a fare da filetto, una cella che manca in fondo restava un blocco grigio. */
+.seg:has(> :nth-child(4)) > * { border: 1px solid var(--control-border); margin: -1px 0 0 -1px; justify-content: center; text-align: center; }
 /* Sul telefono i controlli sono bersagli da dito: 44 pixel, come dice il sistema. */
 @media (pointer: coarse) { .seg > a, .seg > button, .seg > span { min-height: var(--target); } }
 .seg [aria-current], .seg [aria-pressed="true"] { background: var(--ink); color: var(--bg); }
