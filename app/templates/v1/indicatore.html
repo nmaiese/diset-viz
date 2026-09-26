@@ -155,10 +155,10 @@ addEventListener("pagereveal", function (e) {
     <div class="tilemap" data-tilemap hidden>
       <div class="tilemap__grid" role="group" aria-label="Le {{ n }} {{ level.plural }} a forma d'Italia, {{ meta.name }}, {{ year }}">
         {%- for t in d.tilemap %}
-        <button type="button" class="tile {{ t.step or 'is-nd' }}" style="grid-column: {{ t.col }}; grid-row: {{ t.row }}" data-key="{{ t.key }}" aria-label="{{ t.name }}, {{ t.value }}"><b>{{ t.abbr }}</b><span>{{ t.short }}</span></button>
+        <button type="button" class="tmap-cell {{ t.step or 'is-nd' }}" style="grid-column: {{ t.col }}; grid-row: {{ t.row }}" data-key="{{ t.key }}" aria-label="{{ t.name }}, {{ t.value }}"><b>{{ t.abbr }}</b><span>{{ t.short }}</span></button>
         {%- endfor %}
       </div>
-      {% if d.module.legend %}{{ ui.legend(d.module.legend, 'Più intenso, valore più alto.', d.module.legend_nd) }}{% endif %}
+      {% if d.module.legend %}{{ ui.legend(d.module.legend, 'Più intenso, valore più alto.', d.tilemap | selectattr('step', 'equalto', '') | list | length > 0) }}{% endif %}
     </div>
     {% endif %}
     <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.values_note %}, {{ d.values_note }}{% endif %}.</p>

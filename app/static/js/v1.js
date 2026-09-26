@@ -352,7 +352,7 @@
         }
       });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
-      page.querySelectorAll(".tile[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
+      page.querySelectorAll(".tmap-cell[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
       page.querySelectorAll(".sm__item[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
       // La barra della striscia che resta dice chi e' scelto, col valore
       // dell'anno della striscia (l'ultimo); e la scelta si ricorda fra le
@@ -802,7 +802,7 @@
     box.hidden = false;
     toggle.hidden = false;
     var still = matchMedia("(prefers-reduced-motion: reduce)");
-    function tilesOf() { var m = {}; box.querySelectorAll(".tile[data-key]").forEach(function (t) { m[t.dataset.key] = t; }); return m; }
+    function tilesOf() { var m = {}; box.querySelectorAll(".tmap-cell[data-key]").forEach(function (t) { m[t.dataset.key] = t; }); return m; }
     function dotsOf() { var m = {}; strip.querySelectorAll(".strip__dot[data-key]").forEach(function (d) { m[d.dataset.key] = d; }); return m; }
     function apply(view) {
       fig.classList.toggle("is-tiles", view === "tiles");
@@ -856,7 +856,7 @@
       if (b) show(b.dataset.view, true);
     });
     box.addEventListener("click", function (ev) {
-      var t = ev.target.closest(".tile[data-key]");
+      var t = ev.target.closest(".tmap-cell[data-key]");
       var cur = t && liveExplore.get(page);
       if (!t || !cur || !cur.select) return;
       cur.select.value = cur.select.value === t.dataset.key ? "" : t.dataset.key;

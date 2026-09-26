@@ -30,7 +30,7 @@ class LaScheda(unittest.TestCase):
     def test_le_tessere_sono_venti_bottoni_con_nome_e_valore(self):
         grid = re.search(r'<div class="tilemap" data-tilemap hidden>(.*?)</div>\s*</div>', self.regioni, re.S)
         self.assertIsNotNone(grid)
-        buttons = re.findall(r'<button type="button" class="tile (q[1-6]|is-nd)"[^>]*data-key="([^"]+)" aria-label="([^"]+)"', grid.group(1))
+        buttons = re.findall(r'<button type="button" class="tmap-cell (q[1-6]|is-nd)"[^>]*data-key="([^"]+)" aria-label="([^"]+)"', grid.group(1))
         self.assertEqual(len(buttons), 20)
         self.assertTrue(all("," in label for _, _, label in buttons), "ogni tessera dice nome e valore")
 

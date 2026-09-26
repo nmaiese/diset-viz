@@ -1106,7 +1106,11 @@ main.v1 h1 { view-transition-name: page-title; }
    ::after trasparente o con un padding che su un elemento in linea non
    sposta niente. */
 @media (pointer: coarse) {
-  .pagehead .meta a, .toolbar__jump, .cite .btn, .check { display: inline-flex; align-items: center; min-height: var(--target); }
+  .toolbar__jump, .cite .btn, .check { display: inline-flex; align-items: center; min-height: var(--target); }
+  /* I link della riga meta hanno testo misto ("Istat, <n>4</n> banche dati"):
+     un inline-flex ne mangiava gli spazi. L'area cresce col padding, e il
+     margine negativo la toglie all'impaginazione. */
+  .meta a { padding-block: 12px; margin-block: -12px; }
   input[type="range"] { height: var(--target); }
   .toc a, .crumbs a, .term { position: relative; }
   .toc a::after, .crumbs a::after, .term::after { content: ""; position: absolute; inset: -7px -4px; }
@@ -1119,7 +1123,7 @@ main.v1 h1 { view-transition-name: page-title; }
   /* Le voci che sono un link intero (catalogo, risultati, elenchi di schede)
      arrivano a 44 senza allungare l'elenco: padding e margine negativo. */
   .provincia-list li > a, .tema-list li > a, .blog-index li > a, .dr-examples li > a, .catalogo-item__name, .search-result__title { padding-block: 12px; margin-block: -12px; }
-  .provincia-jump a, .meta a, .dr-map .btn, .terr__name a { display: inline-flex; align-items: center; min-height: var(--target); }
+  .provincia-jump a, .dr-map .btn, .terr__name a { display: inline-flex; align-items: center; min-height: var(--target); }
   .linkarrow, .regione-area > summary, select, .field input:not([type="range"]), .hdr__brand { min-height: var(--target); }
   .linkarrow { display: inline-flex; align-items: center; }
 }
