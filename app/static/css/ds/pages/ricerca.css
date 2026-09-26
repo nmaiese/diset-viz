@@ -1,0 +1,79 @@
+/* ==========================================================================
+   ricerca: la ricerca interna. Il campo grande in testa, il filtro per tipo
+   (`.seg` di components.css, link veri), i gruppi per tipo sotto il loro
+   filetto, le righe con il termine in `<mark>`, la paginazione numerata con
+   bersagli da 44 pixel. Niente scatole: aria e filetti.
+   ========================================================================== */
+
+.v1-ricerca .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; overflow-wrap: anywhere; }
+
+/* Il campo: largo quanto la misura del testo, alto 56 pixel, il bottone accanto. */
+.ricerca-form { display: flex; gap: var(--space-2); max-width: 44rem; }
+.ricerca-form__field {
+  position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: center;
+}
+.ricerca-form__field svg { position: absolute; left: var(--space-4); width: 22px; height: 22px; color: var(--muted); pointer-events: none; }
+.ricerca-form input[type="search"] {
+  width: 100%; min-width: 0; height: 56px; padding: 0 var(--space-4) 0 calc(var(--space-4) * 2 + 22px);
+  font: inherit; font-size: var(--fs-lede); color: var(--ink);
+  background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
+}
+.ricerca-form input[type="search"]::placeholder { color: var(--muted); }
+.ricerca-form input[type="search"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ricerca-form .btn { min-height: 56px; flex: none; }
+
+/* Il filtro per tipo, con la riga meta della paginazione sotto. */
+.ricerca-filter { display: grid; justify-items: start; gap: var(--space-3); padding-bottom: var(--space-4); }
+.ricerca-filter > * { max-width: 100%; }
+.ricerca-filter .seg > a { min-height: var(--target, 44px); gap: 6px; }
+.ricerca-filter__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ricerca-filter .seg [aria-current] .ricerca-filter__n { color: inherit; }
+.ricerca-filter .meta:empty { display: none; }
+
+/* Un gruppo: il filetto d'inchiostro e il nome del tipo col conteggio. */
+.ricerca-group { padding-top: var(--space-8); }
+.ricerca-group__head {
+  padding-top: var(--space-3); border-top: 3px solid var(--ink);
+  font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading);
+}
+.ricerca-group__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ricerca-group__more { margin-top: var(--space-4); }
+
+/* Le righe: titolo-link in inchiostro, descrizione a misura, meta piccola. */
+.search-results { list-style: none; padding: 0; max-width: 48rem; }
+.search-result { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-bottom: 1px solid var(--rule); }
+.search-result__title {
+  justify-self: start; font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection);
+  font-weight: 700; color: var(--ink); text-decoration: none; overflow-wrap: anywhere;
+}
+.ds a.search-result__title { text-decoration: none; }
+.ds a.search-result__title:hover { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; }
+.search-result__sum { max-width: var(--measure); color: var(--text-2); }
+.search-result__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.search-result mark { background: var(--accent-wash); color: inherit; padding: 0 1px; border-radius: 2px; }
+
+/* La paginazione: numeri da 44 pixel, la pagina corrente a fondo pieno. */
+.ricerca-pager { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-top: var(--space-8); }
+.ricerca-pager ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-1); padding: 0; }
+.ricerca-pager ol a {
+  display: inline-flex; align-items: center; justify-content: center; min-width: var(--target, 44px); min-height: var(--target, 44px);
+  padding: 0 var(--space-2); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); text-decoration: none;
+  border: 1px solid var(--rule-strong); border-radius: var(--radius-control);
+}
+.ds .ricerca-pager ol a { text-decoration: none; }
+.ricerca-pager ol a:hover { background: var(--surface-1); color: var(--ink); }
+.ricerca-pager ol a[aria-current] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.ricerca-pager__gap { display: inline-flex; align-items: center; min-height: var(--target, 44px); padding: 0 var(--space-1); color: var(--muted); }
+.ricerca-pager__step { display: inline-flex; align-items: center; min-height: var(--target, 44px); font-weight: 600; }
+
+/* La pagina vuota: esempi e porte. */
+.ricerca-examples { max-width: var(--measure); font-size: var(--fs-lede); line-height: var(--lh-lede); }
+.ricerca-doors { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--space-6); margin-top: var(--space-4); }
+.ricerca-doors a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target, 44px); }
+
+@media (max-width: 599px) {
+  .ricerca-form { flex-wrap: wrap; }
+  .ricerca-form__field { flex-basis: 100%; }
+  .ricerca-form .btn { min-height: var(--target, 44px); }
+  .ricerca-filter { justify-items: stretch; }
+}

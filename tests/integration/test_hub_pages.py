@@ -303,8 +303,9 @@ class SearchPageTest(unittest.TestCase):
     def test_results_are_html_from_both_catalog_and_blog(self):
         client = app.test_client()
         html = client.get("/ricerca?q=neet").data.decode("utf-8")
-        self.assertIn("Indicatore", html)
-        self.assertIn("Articolo", html)
+        # I risultati stanno in gruppi per tipo (la pagina della 1.0).
+        self.assertIn('data-kind="indicatore"', html)
+        self.assertIn('data-kind="articolo"', html)
         indicator_links = set(re.findall(r'href="(/indicatore/[^"]+)"', html))
         blog_links = set(re.findall(r'href="(/blog/[^"]+)"', html))
         self.assertTrue(indicator_links)
@@ -312,10 +313,10 @@ class SearchPageTest(unittest.TestCase):
         for path in list(indicator_links) + list(blog_links):
             self.assertEqual(client.get(path).status_code, 200, path)
 
-    def test_pagination_caps_at_fifty_results(self):
+    def test_pagination_caps_at_twenty_results(self):
         client = app.test_client()
         first = client.get("/ricerca?q=tasso").data.decode("utf-8")
-        self.assertLessEqual(first.count('class="search-result"'), 50)
+        self.assertLessEqual(first.count('class="search-result"'), 20)
         self.assertIn("pagina=2", first)
         second = client.get("/ricerca?q=tasso&pagina=2").data.decode("utf-8")
         self.assertIn("Pagina 2 di", second)

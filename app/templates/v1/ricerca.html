@@ -1,0 +1,138 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{#- La ricerca interna della 1.0.
+
+    Stesso contenuto di ricerca.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: il campo grande in testa, la
+    risposta con i conteggi, il filtro per tipo come controllo segmentato di
+    link veri (`?tipo=`), i risultati della pagina raggruppati per tipo col
+    termine evidenziato, la paginazione numerata. Cio' che la pagina chiede in
+    piu' alle righe lo compone app/design/pages/ricerca.py e arriva qui come `d`.
+
+    La testa (title, description, robots) e' quella di ricerca.html, riga per
+    riga: la pagina resta `noindex, follow`, anche nell'header della vista. -#}
+{% set active_nav = 'ricerca' %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Ricerca", "path": "/ricerca"}] %}
+
+{% block title %}{% if query %}Risultati per "{{ query }}"{% else %}Cerca nel catalogo{% endif %} · {{ site_name }}{% endblock %}
+{% block description %}{% if query %}Indicatori e articoli di Divario Italia che rispondono a "{{ query }}".{% else %}Cerca tra gli indicatori territoriali e gli articoli di Divario Italia.{% endif %}{% endblock %}
+
+{# La ricerca interna resta fuori dall'indice per scelta: uno spazio ?q= genera
+   pagine arbitrarie e quasi identiche alle schede che elenca. I link restano
+   follow, così l'equity arriva alle pagine vere. #}
+{% block robots_meta %}
+<meta name="robots" content="noindex, follow">
+{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/ricerca.css') }}">{% endblock %}
+
+{% block content %}
+{%- macro plural(n, one, many) -%}{{ n | num(None, 'count') }} {{ one if n == 1 else many }}{%- endmacro %}
+<main id="contenuto" class="v1 v1-ricerca" data-v1="ricerca" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <h1>{% if query %}Risultati per “{{ query }}”{% else %}Cerca nel catalogo{% endif %}</h1>
+
+    <form class="ricerca-form" method="get" action="/ricerca" role="search">
+      <label class="sr-only" for="ricerca-q">Cerca territori, temi, indicatori e articoli</label>
+      <span class="ricerca-form__field">
+        {{ ui.icon('search') }}
+        <input type="search" id="ricerca-q" name="q" value="{{ query }}" placeholder="Lecce, occupazione, speranza di vita" autocomplete="off">
+      </span>
+      {% if kind_param %}<input type="hidden" name="tipo" value="{{ kind_param }}">{% endif %}
+      <button class="btn btn--primary" type="submit">Cerca</button>
+    </form>
+
+    {% if query and all_total %}
+    <p class="answer">
+      Per “{{ query }}” ci sono
+      {%- set parts = [] %}
+      {%- if territory_count %}{% set _ = parts.append(plural(territory_count, 'territorio', 'territori')) %}{% endif %}
+      {%- if theme_count %}{% set _ = parts.append(plural(theme_count, 'tema', 'temi')) %}{% endif %}
+      {%- if indicator_count %}{% set _ = parts.append(plural(indicator_count, 'indicatore', 'indicatori')) %}{% endif %}
+      {%- if post_count %}{% set _ = parts.append(plural(post_count, 'articolo', 'articoli')) %}{% endif %}
+      {% if parts | length > 1 %}{{ parts[:-1] | join(', ') }} e {{ parts[-1] }}{% else %}{{ parts[0] }}{% endif %}.
+      In cima i più vicini: prima il nome, poi il tema.
+    </p>
+    {% elif query %}
+    <p class="answer">Nessun risultato per “{{ query }}”. Prova con una parola sola, oppure sfoglia i <a href="/temi">temi</a>, le <a href="/regioni">regioni</a> e le <a href="/province">province</a>.</p>
+    {% else %}
+    <p class="answer">Scrivi una parola per cercare fra le {{ d.scope.regions | num(None, 'count') }} regioni, le {{ d.scope.provinces | num(None, 'count') }} province, i {{ d.scope.themes | num(None, 'count') }} temi, gli indicatori del catalogo e i {{ d.scope.posts | num(None, 'count') }} articoli.</p>
+    {% endif %}
+  </header>
+
+  {% if not query or not all_total %}
+  <section class="section ricerca-start" aria-labelledby="h-prova">
+    <h2 id="h-prova">Da dove partire</h2>
+    <p class="ricerca-examples">Prova con
+      {%- for ex in d.examples %} <a href="{{ ex.href }}">{{ ex.label }}</a>{{ ',' if not loop.last else '.' }}{% endfor %}
+    </p>
+    <ul class="ricerca-doors">
+      <li><a class="linkarrow" href="/temi">I temi</a></li>
+      <li><a class="linkarrow" href="/regioni">Le regioni</a></li>
+      <li><a class="linkarrow" href="/province">Le province</a></li>
+      <li><a class="linkarrow" href="/atlante">L'atlante di tutti gli indicatori</a></li>
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if d.seg %}
+  <nav class="ricerca-filter" aria-label="Filtra per tipo">
+    <div class="seg">
+      {%- for s in d.seg %}
+      {%- if s.current %}<a href="{{ s.href }}" aria-current="page">{{ s.label }} <span class="ricerca-filter__n">{{ s.count }}</span></a>
+      {%- else %}<a href="{{ s.href }}">{{ s.label }} <span class="ricerca-filter__n">{{ s.count }}</span></a>{% endif %}
+      {%- endfor %}
+    </div>
+    <p class="meta">
+      {% if pages > 1 %}<span>Pagina {{ page_number }} di {{ pages }}, risultati dal {{ first_index }} al {{ last_index }}</span>{% endif %}
+      {% if truncated %}<span>La ricerca si ferma ai primi {{ indicator_count }} indicatori: aggiungi una parola per restringere.</span>{% endif %}
+    </p>
+  </nav>
+  {% endif %}
+
+  {% for g in d.groups %}
+  <section class="ricerca-group" data-kind="{{ g.kind }}" aria-labelledby="h-{{ g.param }}">
+    <h2 class="ricerca-group__head" id="h-{{ g.param }}">{{ g.label }} <span class="ricerca-group__n">{{ g.count }}</span></h2>
+    <ol class="search-results">
+      {%- for row in g.rows %}
+      <li class="search-result">
+        <a class="search-result__title" href="{{ row.url }}">{{ row.title_html }}</a>
+        {%- if row.summary_html %}
+        <p class="search-result__sum">{{ row.summary_html }}</p>
+        {%- endif %}
+        <p class="search-result__meta">
+          {%- if row.kind == 'articolo' and row.date_label -%}
+          <time datetime="{{ row.date }}">{{ row.date_label }}</time>{% if row.read_time %}, {{ row.read_time | num(None, 'count') }} {{ 'minuto' if row.read_time == 1 else 'minuti' }} di lettura{% endif %}
+          {%- elif row.kind == 'territorio' -%}
+          {{ row.kind_label }}{% if row.meta %} · {{ row.meta }}{% endif %}
+          {%- else -%}
+          {{ row.meta }}
+          {%- endif -%}
+        </p>
+      </li>
+      {%- endfor %}
+    </ol>
+    {% if g.more %}<p class="ricerca-group__more"><a class="linkarrow" href="{{ g.more }}">Tutti i {{ g.count }} {{ g.label | lower }}</a></p>{% endif %}
+  </section>
+  {% endfor %}
+
+  {% if d.pager %}
+  <nav class="ricerca-pager" aria-label="Pagine dei risultati">
+    {% if d.pager.prev %}<a class="ricerca-pager__step" href="{{ d.pager.prev }}" rel="prev">Precedente</a>{% endif %}
+    <ol>
+      {%- for it in d.pager['items'] %}
+      {%- if it.gap %}<li class="ricerca-pager__gap" aria-hidden="true">·</li>
+      {%- elif it.current %}<li><a href="{{ it.href }}" aria-current="page"><span class="sr-only">Pagina </span>{{ it.n }}</a></li>
+      {%- else %}<li><a href="{{ it.href }}"><span class="sr-only">Pagina </span>{{ it.n }}</a></li>{% endif %}
+      {%- endfor %}
+    </ol>
+    {% if d.pager.next %}<a class="ricerca-pager__step" href="{{ d.pager.next }}" rel="next">Successiva</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

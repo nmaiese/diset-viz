@@ -1,0 +1,73 @@
+/* ==========================================================================
+   blog: l'indice delle storie. La piu' recente grande accanto alla
+   copertina (la stessa regia della fascia storie della home), le altre in
+   `.cards` di components.css, l'indice per tema in fondo. Il titolo e' il
+   link, esteso a tutta la scheda: niente sottolineatura sul corpo.
+   ========================================================================== */
+
+.v1-blog .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.v1-blog .meta .sep, .v1-blog .card__meta .sep, .blog-lead__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
+
+/* Il filtro per tema: ancore verso l'indice, in fila, bersagli da 44 pixel. */
+.blog-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-4); }
+.blog-tags__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.blog-tags ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-4); padding: 0; }
+.blog-tags a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target, 44px); font-weight: 600; }
+.blog-tags__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* La copertina: segnaposto sulla superficie finche' l'immagine non arriva. */
+.blog-media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 1200 / 630; }
+.blog-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
+.blog-lead:hover .blog-media img, .blog-card:hover .blog-media img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .blog-media img, .blog-lead:hover .blog-media img, .blog-card:hover .blog-media img { transition: none; transform: none; } }
+.blog-credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
+.blog-credit a { position: relative; z-index: 1; color: inherit; }
+
+/* La storia in apertura. */
+.blog-lead { position: relative; display: grid; gap: var(--space-4); padding-bottom: var(--space-8); border-bottom: 1px solid var(--rule-strong); }
+.blog-lead__fig { order: -1; display: grid; gap: var(--space-1); min-width: 0; }
+.blog-lead__body { display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
+.blog-lead__title { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); }
+.blog-lead__title a { color: var(--ink); text-decoration: none; }
+.ds .blog-lead__title a { text-decoration: none; }
+.blog-lead__title a::after { content: ""; position: absolute; inset: 0; }
+.ds .blog-lead:hover .blog-lead__title a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; }
+.blog-lead__text { font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); max-width: var(--measure); }
+.blog-lead__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.blog-lead__go { display: inline-flex; align-items: center; gap: var(--space-1); font-weight: 700; color: var(--accent-strong); }
+@supports selector(:has(a)) {
+  .blog-lead:has(.blog-lead__title a:focus-visible), .blog-card:has(.card__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .blog-lead__title a:focus-visible, .blog-card .card__title a:focus-visible { outline: none; }
+}
+@media (min-width: 960px) {
+  .blog-lead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-10); align-items: center; }
+  .blog-lead__title { font-size: var(--fs-section-l, var(--fs-section)); }
+}
+
+/* Le schede: la copertina sopra, poi titolo, meta e sommario. */
+.blog-cards { margin-top: var(--space-2); }
+.ds .blog-card .card__title a { color: var(--ink); text-decoration: none; }
+.ds .blog-card:hover .card__title a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; }
+.blog-card .card__media { background: var(--surface-2); margin-bottom: var(--space-1); aspect-ratio: 1200 / 630; }
+.blog-card .blog-credit { order: -1; margin-top: calc(-1 * var(--space-1)); margin-bottom: var(--space-1); }
+.blog-card .card__media { order: -2; }
+
+/* Sul telefono le schede diventano righe: miniatura quadrata e titolo. */
+@media (max-width: 599px) {
+  .blog-card { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-1) var(--space-4); align-items: start; }
+  .blog-card > * { grid-column: 2; }
+  .blog-card .card__media { grid-column: 1; grid-row: 1 / span 3; aspect-ratio: 1 / 1; margin: 0; }
+  .blog-card .card__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
+  .blog-card .card__text { display: none; }
+  .blog-card .blog-credit { order: 0; grid-column: 1 / -1; margin: 0; }
+}
+
+/* L'indice per tema: colonne di elenchi, niente scatole. */
+.blog-index { display: grid; gap: var(--space-8) var(--gutter-l); }
+@media (min-width: 720px) { .blog-index { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .blog-index { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.blog-index__group { display: grid; align-content: start; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); scroll-margin-top: calc(var(--masthead-l, 64px) + var(--space-4)); }
+.blog-index__group ul { list-style: none; padding: 0; display: grid; gap: var(--space-2); }
+.blog-index__group li { display: grid; gap: 2px; }
+.blog-index__date { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.blog-follow { margin-top: var(--space-12); }
