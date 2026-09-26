@@ -16,14 +16,10 @@ fallisce su quelli). Il Markdown ha `smarty` spento apposta: `--` e `...`
 restano come sono, tenere pulito il sorgente.
 
 Un articolo non si misura con una rubrica a punti: quella è stata ritirata il
-4 settembre insieme al lint della prosa. Quello che ferma un pezzo sono le quattro
-guardie di `motore verifica`, nel repo della redazione, piu' i controlli di
-struttura: una cifra che non sta nel dossier, un link interno che non esiste,
-una fonte che non risponde, un link a una fonte nella prosa che non sta anche
-nell'elenco. Un'affermazione su un insieme che la classifica smentisce e la
-media semplice delle regioni chiamata media nazionale sono smentite
-ricalcolabili, ma oggi nessuna guardia le controlla: le trova chi rilegge. Il resto è una lettura, e i rilievi hanno una
-gravità.
+4 settembre insieme al lint della prosa. La vecchia verifica automatica esterna
+è dismessa. Prima di pubblicare si controllano struttura, cifre, link interni,
+fonti e marcatori di figura con i test locali e con una rilettura umana. Una
+media semplice delle regioni non è una media nazionale.
 
 ## Pagine indicatore
 
@@ -38,24 +34,25 @@ Un file di `content/indicators/` e' Markdown con frontmatter, come un post del
 blog: i campi in testa (`fonti` con `testo` e `url`, `vintage`, `level`, `h1`,
 `seo_title`), poi il lead, poi le sezioni, ognuna aperta da
 `<!-- sezione: ruolo -->` e col suo `## titolo`. Il contratto e' quello di
-`scripts/indicator_store.py`. Le cifre vengono dal dossier, e `fonti` puo'
-restare vuota quando non c'e' contesto esterno verificabile (non e' un difetto,
-si segnala nella PR).
+`scripts/indicator_store.py`. Le cifre devono essere ricavate dai dati del
+progetto e verificate. `fonti` puo' restare vuota quando non c'e' contesto
+esterno verificabile (non e' un difetto, si segnala nella PR).
 
 Il formato e' Markdown perche' la PR e' il momento in cui il pezzo si legge: in
 JSON una sezione stava su una riga sola con gli a capo scritti `\n`, e il diff
 di una correzione non si poteva giudicare.
 
-Sempre dal brief deterministico, mai da chiamate API ad hoc:
+La definizione si controlla con lo strumento deterministico, mai con chiamate
+API ad hoc:
 
 ```bash
-python3 scripts/definition_check.py --show ter-178      # che cosa conta, per la fonte
+bin/py scripts/definition_check.py --show ter-178      # che cosa conta, per la fonte
 ```
 
-Il dossier e la coda stanno nella redazione:
-`motore brief divarioitalia ter-178` e `motore coda divarioitalia`.
+Non esistono oggi un dossier o una coda editoriali operativi. Un futuro
+workflow verrà progettato da zero dentro questo progetto.
 
-La seconda riga è la meno ovvia: confronta la prosa con la **definizione**
+Il controllo confronta la prosa con la **definizione**
 della fonte, non con la serie. Esiste perché rileggere undici articoli contro
 i dati ha trovato zero errori aritmetici e quattro descrizioni sbagliate di
 che cosa l'indicatore conta. Le classi di errore che solo una lettura

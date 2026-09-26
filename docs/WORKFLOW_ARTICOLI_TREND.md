@@ -4,14 +4,12 @@ Come si passa da **che cosa si cerca oggi in Italia** a un articolo del blog
 che dia a quella ricerca il contesto dei dati: un indicatore completo, con
 grafici, fonti, metodo e una foto vera con licenza.
 
-Questo documento possiede il processo. Gli strumenti stanno in
+Questo documento descrive un processo storico. Gli strumenti stanno in
 `scripts/trend_articles/`, uno per fase, e la mappa dei temi in
-`config/trend_topics.json`. Non usa la catena della redazione
-(`nmaiese/redazione-ai`): e' un canale diverso, piu' corto, per un altro tipo
-di pezzo. La catena scrive la prosa delle **schede indicatore**
-(`content/indicators/`), che restano la risposta di riferimento a "che cos'e'
-questo dato". Questo workflow scrive **articoli del blog** (`content/posts/`)
-che rispondono a "perche' se ne parla oggi, e che cosa dicono i dati".
+`config/trend_topics.json`, ma non costituiscono oggi una pipeline editoriale
+operativa. Le **schede indicatore** vivono in `content/indicators/`; gli
+**articoli del blog** vivono in `content/posts/`. Un futuro workflow editoriale
+verrà progettato da zero dentro questo progetto.
 
 ## Il principio
 

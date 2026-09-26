@@ -32,7 +32,7 @@ possono scrivere direttamente su `master`.
 | account utente, login Google, preferiti, statistiche/achievements, confronti salvati, GDPR | [`docs/ACCOUNT.md`](docs/ACCOUNT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | che cosa si può citare in un articolo | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
-| **scrivere un articolo indicatore**: brief, verifica, pubblicazione | il repo `redazione-ai` (`REDAZIONE.md` e `siti/divarioitalia.md`) |
+| **scrivere un articolo indicatore**: formato e controlli | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md), [`content/STYLE.md`](content/STYLE.md); la pipeline automatica non è attiva |
 | **un articolo del blog da un trend di ricerca**: segnali, classifica, dossier, grafici, foto con licenza | [`docs/WORKFLOW_ARTICOLI_TREND.md`](docs/WORKFLOW_ARTICOLI_TREND.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | **famiglie di indicatori**: stessa misura, dimensioni diverse (genere, età, regione/provincia) | [`docs/FAMIGLIE_INDICATORI.md`](docs/FAMIGLIE_INDICATORI.md) |
@@ -127,14 +127,12 @@ del processo (`lru_cache`, non un TTL). Il deploy è Cloud Run via Cloud Build
 Una voce sola per blog e pagine indicatore, posseduta da `content/STYLE.md`.
 Gli assoluti: niente em-dash `—`, niente en-dash `–`, niente `;`, niente `…`;
 solo numeri veri e verificati, mai una fonte inventata; link canonici agli
-indicatori (`/indicatore/<slug>/ter-105`, mai `/?indicator=`). Le guardie che
-fermano un pezzo sono le quattro di `motore verifica` nel repo della redazione,
-piu' i controlli di struttura: una cifra che non sta nel dossier, un link interno
-che non esiste, una fonte che non risponde, un link a una fonte nella prosa che
-non sta anche nell'elenco. Un'affermazione su un insieme che la classifica
-smentisce ("nessuna regione supera X") e la media semplice delle regioni chiamata
-media nazionale non le ferma nessuna guardia: le trova chi rilegge. Non c'è una
-rubrica a punti e non c'è un lint della prosa.
+indicatori (`/indicatore/<slug>/ter-105`, mai `/?indicator=`). La vecchia
+verifica automatica esterna non è più operativa. Prima di pubblicare si
+controllano struttura, cifre, link interni, fonti e marcatori di figura con i
+test del repository e con una rilettura umana. In particolare, una media
+semplice delle regioni non va chiamata media nazionale. Non c'è una rubrica a
+punti e non c'è un lint della prosa.
 
 ## Dati, leggi [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md)
 

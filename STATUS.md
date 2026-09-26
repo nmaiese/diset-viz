@@ -64,10 +64,11 @@ cd frontend && npm run build && cd ..
 ### Completati di recente:
 - [x] Riorganizzazione workspace: cartella rinominata da `diset-viz` a `divarioitalia` con symlink per retrocompatibilità.
 - [x] Registrazione del repository `divarioitalia` in Orca (ID `d2ae0385-1020-40e5-8859-7fbd55a33e03`).
-- [x] Separazione totale da repository esterni e rimozione della dipendenza dal vecchio `QUADRO.md`.
-- [x] Verifica suite test unitari (412 test passati con successo).
+- [x] Separazione totale da repository esterni: hook, regole e documentazione operativa puntano a questo `STATUS.md`; la vecchia pipeline editoriale non viene più invocata.
+- [x] Consolidamento dell'aggiornamento UI della home e bersaglio tattile dello spotlight portato ad almeno 44 px.
+- [x] Tooling condiviso in `~/dev/ops` con `doctor.sh`, accesso operativo verificato per GCloud, Cloud Run, GCS, GA4 e Search Console.
+- [x] Suite completa unit + integration: 1.334 test passati il 26 settembre 2026.
 
 ### In Corso / Prossimi:
-- [ ] Setup tooling condiviso `~/dev/ops` con `ops/doctor.sh` per verifica istantanea dei servizi esterni (GCloud, GCS, GA4, Search Console, Cloudflare).
-- [ ] Consolidamento modifiche CSS e token Design System pendenti nel working tree.
-- [ ] Esecuzione completa suite integrazione end-to-end.
+- [ ] Configurare localmente `~/dev/ops/.env.cloudflare` con un token API Cloudflare; `doctor.sh` segnala correttamente l'assenza della credenziale senza bloccare gli altri controlli.
+- [ ] Progettare da zero l'eventuale nuova pipeline editoriale, solo quando tornerà prioritaria rispetto al sito e al runtime.

@@ -4,9 +4,8 @@ Questo documento raccoglie la **ricerca** su come sono fatte le famiglie: che
 cosa esiste oggi, che cosa manca, dove si tocca. Serve perché una sessione nuova
 non la rifaccia da capo.
 
-A che punto siamo non sta qui: sta nel Quadro di `redazione-ai`, obiettivo
-`div-famiglie`. Il primo pilota (il catalogo storico, 345/346/347) è online e
-il suo pezzo è pubblicato.
+Lo stato operativo sta in [`../STATUS.md`](../STATUS.md). Il primo pilota (il
+catalogo storico, 345/346/347) è online e il suo pezzo è pubblicato.
 
 ## Il problema
 
@@ -97,9 +96,9 @@ già ma è sempre vuoto: la riga Italia per lo stesso indicatore/anno è il
 candidato naturale per popolarlo (confronto regione-vs-Italia in un pezzo),
 non ancora fatto.
 
-Verifica riproducibile con `scripts/audit_famiglie_fonti.py` (riscarica il
-CSV Istat e ristampa questi numeri) e, per le 30 famiglie in dettaglio,
-`analisi/famiglie_conta.py` in `nmaiese/redazione-ai`.
+Verifica riproducibile con `scripts/audit_famiglie_fonti.py`, che riscarica il
+CSV Istat e ristampa questi numeri. La configurazione versionata delle famiglie
+è in `config/indicator_families.csv`.
 
 **Conseguenza**: qui la dimensione va letta dal testo del titolo (parser
 euristico): resta necessario, `DESCRIZIONE_ASSE_QCS` lo conferma come
@@ -248,8 +247,8 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
 - Contenuto: `content/indicators/<id>.md`, uno per id oggi, sezioni con
   `role` in `{definizione, quadro, dinamica, limiti}`.
 - Frontend: il componente che rende la pagina indicatore (in `frontend/src/`).
-- Redazione (`nmaiese/redazione-ai`): `motore/dossier.py`, `motore/brief.py`,
-  `motore/verifica.py`, `motore/coda.py`, `motore/pubblica.py`.
+- Pipeline editoriale: quella esterna è dismessa; un eventuale nuovo workflow
+  verrà progettato da zero all'interno del progetto.
 
 ## Punti aperti
 
@@ -299,4 +298,4 @@ passo (a) li affronta prima di scrivere codice.
    di occupazione 20-64 anni", fra le pagine con più impression): è quella
    già collegata dalla navigazione in pagina (passo c) e quella del pezzo
    pubblicato (passo d). BES resta un candidato per un secondo pilota, non
-   ancora collegato né alla pagina né alla redazione.
+   ancora collegato né alla pagina né a un workflow editoriale.

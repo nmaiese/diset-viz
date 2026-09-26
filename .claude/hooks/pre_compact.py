@@ -1,24 +1,9 @@
 #!/usr/bin/env python3
-"""Hook PreCompact: quello che sta su disco, ridetto prima che il contesto si accorci.
+"""Hook PreCompact: ricorda le fonti locali senza duplicarne lo stato.
 
-Quando la conversazione viene compattata, quello che sta solo nella
-conversazione può perdersi. Quello che sta in un file no: questo hook lo rilegge
-da lì e lo ristampa, così il riassunto che entra nel nuovo contesto se lo porta
-dietro. Non inventa stato, lo cita.
-
-Leggeva le schede di run sotto `data/pipeline/runs/`, che erano lo stato della
-catena editoriale autonoma. Quella catena non esiste più, e le schede sono
-ferme a luglio: l'hook continuava a stampare "stadio writer, esito merged" a
-ogni compattazione, cioè a insegnare a chi legge il vocabolario di una macchina
-spenta, con in fondo il rimando a due file cancellati. È esattamente il guasto
-contro cui `CLAUDE.md` apre: un prompt che ripete un contratto invece di
-puntarlo.
-
-Adesso cita quello che la catena minima lascia davvero su disco: i dossier
-montati, le bozze congelate da `motore verifica --salva` e gli articoli scritti.
-Sono le tre cose il cui percorso serve per riprendere un giro a metà.
-
-Best effort: stampare meno è sempre meglio che fallire.
+Quando la conversazione viene compattata, il contesto può perdersi. Il branch
+corrente e ``STATUS.md`` bastano per riprendere il lavoro senza ricostruire una
+pipeline dismessa o dipendere da un altro repository.
 """
 
 import json
@@ -27,26 +12,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-
-# Che cosa la catena minima lascia dietro di sé, nell'ordine in cui la si
-# attraversa. `content/indicators/` non è qui apposta: sono 300 file e solo gli
-# ultimi due o tre vengono da una run: i suoi cambiamenti si leggono in git,
-# che è la fonte giusta per un file versionato.
-TRACCE = (
-    ("dossier montati", Path("data") / "lab" / "dossier"),
-    ("bozze congelate", Path("data") / "lab" / "bozze"),
-    ("articoli di prova", Path("data") / "lab" / "articoli"),
-)
-
-
-def _recenti(cartella, quanti=3):
-    try:
-        file = [percorso for percorso in cartella.glob("*.json") if percorso.is_file()]
-    except OSError:
-        return []
-    file.sort(key=lambda percorso: percorso.stat().st_mtime, reverse=True)
-    return file[:quanti]
-
 
 def main():
     try:
@@ -63,14 +28,8 @@ def main():
             lines.append(f"- branch corrente: {branch}")
     except OSError:
         pass
-    for etichetta, relativo in TRACCE:
-        recenti = _recenti(ROOT / relativo)
-        if recenti:
-            nomi = ", ".join(percorso.name for percorso in recenti)
-            lines.append(f"- {etichetta} più di recente ({relativo}): {nomi}")
-    lines.append("- gli articoli non si scrivono qui: la redazione e' il repo "
-                 "nmaiese/redazione-ai (motore coda, motore brief, motore verifica); "
-                 "lo stato del progetto sta nel suo QUADRO.md, non in docs/")
+    lines.append("- stato, obiettivi e prossimi passi: STATUS.md di questo repository")
+    lines.append("- la vecchia pipeline editoriale esterna e' dismessa")
     print("\n".join(lines))
     return 0
 

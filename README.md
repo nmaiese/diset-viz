@@ -97,10 +97,11 @@ regole con scope in `.claude/rules/`, che si caricano da sole dove si applicano.
 
 - Interprete Python: `bin/py`, sempre (`export DIVARIO_PYTHON=...` se il
   worktree non ha un venv).
-- **Lo stato del progetto non è qui**: sta in `QUADRO.md` del repo
-  `nmaiese/redazione-ai`, e l'hook di avvio te lo mette in contesto.
-- **Gli articoli indicatore non si scrivono qui**: li scrive la redazione
-  (`nmaiese/redazione-ai`), che pubblica in `content/indicators/` e apre la PR.
+- **Lo stato del progetto è in [`STATUS.md`](STATUS.md)**, fonte locale unica
+  per obiettivi, avanzamento e prossimi passi.
+- La vecchia pipeline editoriale esterna è dismessa. I contenuti pubblicati
+  restano in `content/`; un eventuale nuovo workflow verrà progettato da zero
+  dentro i confini di questo progetto.
 - Prima di commit e push: `bin/py -m unittest discover -s tests -v`.
 
 Public indicator sheets follow [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md):

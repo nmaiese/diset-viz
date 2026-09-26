@@ -128,6 +128,9 @@
   font-size: var(--fs-small);
 }
 .home-spotlight__scheda {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
   color: var(--text-2);
 }
 .home-spotlight__scheda:hover {

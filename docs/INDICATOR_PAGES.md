@@ -226,8 +226,7 @@ e `vintage`.
 la pagina mantiene lo stesso scheletro. È un fallback funzionante, non una pagina
 finita: serve perché il layout sia uniforme su tutti i 621 indicatori mentre solo
 una parte è passata da un editor. Lo stato di ciascuno lo calcola
-`app/editorial_state.py`, ed è quello che legge la coda della redazione
-(`motore coda divarioitalia`, nel repo `redazione-ai`).
+`app/editorial_state.py`, che è il criterio locale unico.
 
 Il testo composto **non** viene congelato nel file, di proposito: così non può
 invecchiare in silenzio dietro un aggiornamento dei dati, e la guardia sul
@@ -268,8 +267,8 @@ Le regole, tutte meccaniche:
   su 52 aprivano allo stesso modo: il freno di sicurezza di un rilascio
   graduale era diventato il motivo per cui il rilascio non partiva. Adesso la
   guardia controlla la coerenza di chi opta, non il fatto che qualcuno opti.
-- **Un ruolo assorbito non è un ruolo mancante.** La coda della redazione e
-  `scripts/pending_notes.py` contano contro i ruoli emessi, altrimenti chi
+- **Un ruolo assorbito non è un ruolo mancante.** `scripts/pending_notes.py`
+  conta contro i ruoli emessi, altrimenti chi
   scrive troverebbe per sempre la `definizione` «da scrivere» e la
   riscriverebbe a ogni giro.
 - **Assorbire la definizione cambia l'impronta della prosa.** Cambia cosa la
@@ -315,8 +314,8 @@ Tre conseguenze che vale la pena sapere:
   e cambiano appena qualcuno riordina il pezzo.
 - **Una sezione libera senza titolo non arriva in pagina.** La pagina non ha un
   titolo di scorta da darle e un H2 vuoto e' peggio di una sezione in meno.
-  Lettore tollerante, scrittore severo: il renderer la scarta, `motore verifica`
-  della redazione la rifiuta prima.
+  Lettore tollerante, scrittore severo: il renderer la scarta e i controlli di
+  struttura devono segnalarla prima della pubblicazione.
 - **La lista di consegna lo sa.** `scripts/pending_notes` rispecchia la regola,
   quindi un articolo libero risulta completo e il produttore non lo rilancia a
   ogni giro chiedendo sezioni che quell'articolo ha deciso di non avere.
@@ -368,8 +367,8 @@ e un aggiornamento della fonte lo lascerebbe indietro in silenzio.
 Indicatore inesistente, dati mancanti, meno di otto territori in comune: il
 marcatore viene tolto e non arriva niente in pagina. Il pezzo va scritto perche'
 regga anche senza. Il rovescio e' che una figura persa non lascia traccia, e per
-questo `motore verifica` della redazione tratta un marcatore che punta a un
-indicatore inesistente come un difetto **bloccante**, non come un rilievo.
+per questo un controllo pre-pubblicazione deve trattare un marcatore che punta
+a un indicatore inesistente come un difetto **bloccante**, non come un rilievo.
 
 L'SVG e' `aria-hidden`: una nuvola di punti non si legge ad alta voce. Il
 contenuto sta nella `<figcaption>`, che nomina i due indicatori, i due anni,
@@ -377,33 +376,18 @@ quante regioni entrano nel confronto e quali sono accese.
 
 ## Scrivere un articolo
 
-Si comincia sempre da qui, e **non da questo repo**: il dossier e il brief li
-calcola la redazione, in `nmaiese/redazione-ai`.
+La vecchia pipeline editoriale esterna è dismessa. Non esistono oggi un
+dossier, un brief o una coda automatici da eseguire. I file pubblicati restano
+in `content/indicators/` e devono rispettare il formato descritto in questo
+documento e la voce di `content/STYLE.md`. Un futuro workflow verrà progettato
+da zero dentro questo progetto, senza dipendenze operative da altri repository.
 
-```bash
-motore brief divarioitalia ter-178   # il testo che si mette davanti a chi scrive
-```
-
-Il dossier (cifre, angoli, contesto) lo costruisce `motore/dossier.py` di quel
-repo e lo scrive qui in `data/lab/dossier/`. Chi scrive un articolo non lancia
-niente a mano da questo repo:
-
-Che cosa contiene il brief, sezione per sezione, lo possiede `REDAZIONE.md` §3
-del repo della redazione, e il codice che lo scrive e' `motore/brief.py` di
-quel repo: qui non si ripete, perche' la descrizione che stava qui (un blocco
-`INDICATORI CORRELATI` con `rho`, un pacchetto che stampava il valore di
-`level`) era rimasta a una versione che non esiste piu'.
-
-Le regole editoriali complete stanno in `content/STYLE.md`. Le classi di
-errore che solo una lettura trova non le trova uno strumento: le trova chi
-rilegge. Quello che ferma un pezzo sono le quattro guardie di `motore verifica`
-nel repo della redazione, piu' i controlli di struttura (lead, sezioni, ruoli,
-fonti con testo e url, marcatori di figura): una cifra fuori dal dossier, un
-link interno inesistente, una fonte che non risponde, un link a una fonte nella
-prosa che non sta anche nell'elenco. Un'affermazione su un insieme che la
-classifica smentisce ("nessuna regione supera X") e la media semplice delle
-regioni chiamata media nazionale **non** le ferma nessuna guardia: le trova
-chi rilegge. Non c'è una rubrica a punti. Le fonti secondarie
+Le regole editoriali complete stanno in `content/STYLE.md`. Prima della
+pubblicazione si controllano struttura (lead, sezioni, ruoli, fonti con testo e
+URL, marcatori di figura), cifre, link e fonti con i test locali e una rilettura
+umana. Un'affermazione su un insieme che la classifica smentisce ("nessuna
+regione supera X") e la media semplice delle regioni chiamata media nazionale
+sono errori da intercettare. Non c'è una rubrica a punti. Le fonti secondarie
 ammesse stanno in [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme a
 quello che resta da guardare a mano: un aggregato nazionale ponderato non è la
 nostra media semplice delle venti regioni, e le due si possono ancora
@@ -515,40 +499,32 @@ quasi sempre un'approssimazione ("circa 27%", "quasi 78%").
 indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
 pagina viene resa per verificare che non ci siano 500.
 
-Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
-`motore coda divarioitalia` cerca esattamente questi pattern e
-mette in fila gli articoli per quanto è probabile che siano sbagliati. Li
-rilegge la redazione, dove chi scrive si rilegge il proprio testo e a valle il
-verificatore indipendente prova a smentirlo.
+Restano **fuori dai test**, e vanno rivisti a mano con l'obiettivo esplicito di
+smentire il testo, non soltanto di correggerne la forma.
 
-Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
-solo con entrambi esce dalla coda. I due campi restano vivi anche adesso che
-nessun agente firma: li scrivevano il revisore e poi il produttore della catena
-ritirata, e oggi la redazione riscrive l'articolo intero con `motore pubblica`. Il
-secondo è il `vintage` che chi ha riletto aveva davanti: quando l'articolo si
-aggiorna su un anno nuovo tutte le
-cifre cambiano, i due valori smettono di combaciare e l'articolo **rientra** in
-coda col segnale `rilettura`, che pesa più di ogni segnale di rischio. Gli altri
-marcano una frase che potrebbe essere sbagliata, quello marca un articolo in cui
-non è stato controllato niente.
+Un articolo può portare **due** campi, `reviewed_at` e `reviewed_vintage`. Sono
+tracce storiche della revisione e restano utili: il secondo registra il
+`vintage` che chi ha riletto aveva davanti. Se l'articolo si aggiorna su un anno
+nuovo, i valori smettono di combaciare e la revisione va ripetuta. Non esiste
+oggi una coda automatica che lo faccia rispettare.
 
-- le affermazioni universali su un andamento ("è cresciuto ovunque"): il brief
-  ha un blocco apposta, `SI MUOVONO CONTROCORRENTE`,
+- le affermazioni universali su un andamento ("è cresciuto ovunque"): vanno
+  cercati esplicitamente i territori che si muovono controcorrente,
 - le attribuzioni causali ("grazie a", "spinto da"): o si documentano o si
   riformulano come contesto, non come causa accertata,
 - i confronti con l'estero ("tra i più alti d'Europa"): richiedono una fonte in
   `fonti`, verificata, altrimenti vanno tolti,
 - **una provincia scritta con un nome che il dataset non usa** ("Reggio Emilia"
-  per "Reggio nell'Emilia"): la guardia non trova il nome e passa. Manca
-  copertura, non inventa un errore. Fino ad agosto 2026 qui c'era un buco molto
+  per "Reggio nell'Emilia"): un controllo basato sui nomi può non trovarlo.
+  Manca copertura, non inventa un errore. Fino ad agosto 2026 qui c'era un buco molto
   più largo, cioè l'intero livello provinciale: la regex elencava a mano le venti
   regioni, quindi 67 indicatori su 103 province non erano verificati da niente e
-  le guardie restavano verdi senza incontrare un solo nome. Ora l'elenco dei
+  i test restavano verdi senza incontrare un solo nome. Ora l'elenco dei
   territori si deriva dai dati, e `test_the_guard_actually_reaches_the_provinces`
   fallisce se la copertura si rispegne,
 - **se l'incrocio con un altro indicatore è onesto**: il verbo calibrato sulla
   prova (una correlazione di rango è una co-occorrenza, non un meccanismo), il
-  confondente nominato, almeno un'eccezione al pattern. Le guardie controllano
+  confondente nominato, almeno un'eccezione al pattern. I test controllano
   che il link funzioni, non che la frase intorno regga.
 
 A metà strada c'è `scripts/prose_lint.py`, che non fa fallire niente e conta: i
@@ -557,16 +533,16 @@ catalogo. Serve a scegliere il lotto da rileggere e a misurare se un giro di
 riscritture ha spostato qualcosa, invece di stabilirlo a occhio.
 
 ```bash
-python3 scripts/prose_lint.py --show 178
-python3 scripts/prose_lint.py --summary
+bin/py scripts/prose_lint.py --show 178
+bin/py scripts/prose_lint.py --summary
 ```
 
 ## La definizione, che è un'altra cosa dai numeri
 
-Tutto quello che sta qui sopra confronta l'articolo con **la serie**. Nessuna di
-quelle guardie confronta l'articolo con la **definizione della fonte**, e questa
-è la distinzione che conta: un numero sbagliato muore al primo lettore che apre
-il brief, una definizione sbagliata sopravvive a ogni rilettura che controlla
+Tutto quello che sta qui sopra confronta l'articolo con **la serie**. I controlli
+sulla serie non confrontano l'articolo con la **definizione della fonte**, e
+questa è la distinzione che conta: un numero sbagliato emerge confrontando i
+dati, una definizione sbagliata sopravvive a ogni rilettura che controlla solo
 l'aritmetica, perché l'aritmetica è giusta.
 
 Non è un'ipotesi. Rileggendo undici articoli contro i dati non è uscito **un
@@ -584,15 +560,14 @@ indagini Multiscopo e demografiche, i metadati Eurostat e le serie locali che
 il vecchio foglio territoriale non contiene:
 
 ```bash
-python3 scripts/fetch_definitions.py            # riscrive data/definitions/istat_territoriali.csv
-.venv/bin/python scripts/fetch_federated_definitions.py  # riscrive data/definitions/federated.csv
-python3 scripts/definition_check.py --show ter-402
-python3 scripts/definition_check.py --summary
+bin/py scripts/fetch_definitions.py            # riscrive data/definitions/istat_territoriali.csv
+bin/py scripts/fetch_federated_definitions.py  # riscrive data/definitions/federated.csv
+bin/py scripts/definition_check.py --show ter-402
+bin/py scripts/definition_check.py --summary
 ```
 
-`scripts/xls_reader.py` legge il `.xls` con la sola libreria standard, perché
-gli script della catena girano su un checkout pulito prima che esista un venv.
-Il fetcher federato usa invece l'ambiente del progetto: legge i workbook `.xlsx`
+`scripts/xls_reader.py` legge il `.xls` con la sola libreria standard. Il
+fetcher federato usa l'ambiente del progetto: legge i workbook `.xlsx`
 e interroga le strutture SDMX con cache e rispetto del limite della fonte. Ogni
 riga conserva URL e riferimento preciso al workbook, alla codelist o al dataset
 da cui deriva.
@@ -607,7 +582,7 @@ la cosa sbagliata. Quattro segnali, in ordine di quanto vale fidarsene:
 | `contraddizione` | l'articolo dice una cosa **diversa**, non una in meno: la classe di età della fonte non compare e ne compare un'altra, oppure "almeno N" dove la fonte dice "più di N". È l'unico che afferma invece di suggerire |
 | `base` | il denominatore che la fonte nomina non compare nella `definizione` scritta |
 | `soglia` | una soglia o una classe di età della fonte non compare da nessuna parte nell'articolo |
-| `termini` | l'articolo riprende meno di un terzo delle parole portanti della definizione. È la rete più larga e la più rumorosa, e per questo **non** entra nella coda |
+| `termini` | l'articolo riprende meno di un terzo delle parole portanti della definizione. È la rete più larga e la più rumorosa, e per questo non è bloccante |
 
 I primi tre diventano il segnale `definizione` di `scripts/prose_lint.py`, che
 pesa più di ogni altro, `rilettura` compreso. `scoperto` significa che il codice

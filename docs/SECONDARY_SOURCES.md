@@ -16,7 +16,7 @@ colpo d'occhio se la fonte serve a questo articolo.
 dove guardare, non che cosa c'è scritto oggi. Una citazione senza URL verificato
 si taglia, e una fonte inventata è l'unico errore da cui non si torna indietro.
 
-## La trappola dell'aggregato, e la guardia che adesso la vede
+## La trappola dell'aggregato
 
 Quasi tutte queste fonti pubblicano **aggregati ponderati**, nazionali o di
 ripartizione. Le nostre pagine calcolano la **media semplice dei valori
@@ -26,16 +26,17 @@ ne accorgeva, e il 30 giugno 2026 un pezzo sul PIL pro capite chiamava "media
 nazionale", in un bullet, il numero che il bullet precedente chiamava "media
 semplice delle 20 regioni".
 
-**Adesso una guardia di `motore verifica` lo blocca**: la media semplice delle
-regioni non può essere chiamata "media nazionale", "media italiana", "la media
-dell'Italia" o "il dato nazionale". Blocca perché è una smentita ricalcolabile,
-non un giudizio.
+La media semplice delle regioni non può essere chiamata "media nazionale",
+"media italiana", "la media dell'Italia" o "il dato nazionale". È una
+smentita ricalcolabile, non un giudizio, e va controllata prima della
+pubblicazione.
 
-Quello che la guardia **non** vede resta tuo: se citi un aggregato ponderato di
+Se citi un aggregato ponderato di
 una fonte esterna, scrivi "dato nazionale <fonte>" e tienilo staccato dalla
 "media semplice delle regioni". Non affiancarli come se uno confermasse l'altro.
-La guardia impedisce di dare il nome sbagliato alla nostra media, non di
-accostare due grandezze diverse come se fossero confrontabili.
+Il controllo terminologico evita di dare il nome sbagliato alla nostra media,
+ma non basta a impedire di accostare due grandezze diverse come se fossero
+confrontabili.
 
 ## Il registro
 
@@ -134,7 +135,7 @@ riflesso giusto altrove ("se non la apro la taglio") qui taglia una fonte buona.
 
 ## Come si usa, in pratica
 
-1. Guarda il tema dell'indicatore nel brief e apri **una o due** voci pertinenti.
+1. Guarda il tema e i metadati dell'indicatore e apri **una o due** voci pertinenti.
    Non è una rassegna stampa, e tre fonti in un pezzo da 600 parole sono troppe.
 2. Cerca una cosa sola: qualcosa che il cruscotto non può dire. Il commento
    dell'istituto sull'ultimo movimento, la posizione italiana in Europa, un
