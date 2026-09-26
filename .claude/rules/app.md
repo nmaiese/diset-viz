@@ -7,7 +7,9 @@ paths:
 
 - `/` — la home, **server-rendered** (`app/templates/v1/home.html` con un
   partial per fascia in `app/templates/v1/home/`, e `home.html` come ripiego):
-  la testata con la ricerca e, da 960 px, la mappa per andare a una regione;
+  la testata con la ricerca e la mappa per andare a una regione, nei colori
+  della qualita' della vita (`home.hero_map`, profilo predefinito, con la sua
+  legenda; senza classifica torna la mappa grigia);
   le porte del sito; un indicatore in evidenza **diverso a ogni visita**
   (`app/home_pick.py`, per regione o per provincia), con tutti e due i livelli
   nello stesso pannello quando tutti e due stanno nel pool; regioni e province
