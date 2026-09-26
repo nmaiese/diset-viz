@@ -617,8 +617,10 @@
   /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ----------
      Solo al primo aggancio: un secondo init non richiude cio' che il lettore
      ha aperto. */
+  // Chiusi sul telefono, anche in orizzontale: a 844x390 l'atlante con tutti
+  // i temi aperti era lungo 63.000 pixel.
   function initCollapse(d) {
-    if (matchMedia("(max-width: 599px)").matches) d.open = false;
+    if (matchMedia("(max-width: 599px), (pointer: coarse) and (max-height: 500px)").matches) d.open = false;
   }
 
   /* ---------- indice di pagina: la voce della sezione che si sta leggendo ---------- */

@@ -252,6 +252,13 @@ html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-a
   transition: color var(--motion-fast) var(--motion-ease);
 }
 .fav-star:hover, .fav-star.is-on { color: var(--accent); }
+/* Al tocco: il piede, l'accesso e la stella a 44 pixel (anche le pagine
+   rimaste su site.css caricano questo foglio). */
+@media (pointer: coarse) {
+  .sitechrome .ftr__cols ul { gap: 0; }
+  .sitechrome .ftr__cols a, .sitechrome .ftr__legal a { display: inline-flex; align-items: center; min-height: var(--target); }
+  .sitechrome .site-auth__login, .fav-star { min-height: var(--target); min-width: var(--target); }
+}
 
 /* --- cassetto del telefono ---------------------------------------------- */
 .sitechrome .drawer { position: fixed; inset: 0; background: var(--scrim); z-index: var(--z-modal); }

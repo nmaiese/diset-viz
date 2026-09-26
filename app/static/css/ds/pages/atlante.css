@@ -36,6 +36,9 @@
    circa 130 quando la tabella diventa blocchi. */
 .atlante-group { content-visibility: auto; contain-intrinsic-size: auto calc(var(--rows, 15) * 56px + 64px); margin-top: var(--space-8); }
 @media (max-width: 599px) { .atlante-group { contain-intrinsic-size: auto calc(var(--rows, 15) * 130px + 64px); } }
+/* Al tocco da 600 in su il bottone "Sulla mappa" da 44 pixel porta la riga
+   a circa 80. `--rows` lo aggiorna atlante.js col numero di righe a vista. */
+@media (min-width: 600px) and (pointer: coarse) { .atlante-group { contain-intrinsic-size: auto calc(var(--rows, 15) * 80px + 64px); } }
 /* Il nome del tema resta in alto mentre si scorrono le sue righe (fino a 86):
    si sa sempre in che tema si e'. Il modulo dei filtri e' troppo alto per
    restare fermo (219 pixel a 1440, 709 sul telefono), ci riporta "Torna ai

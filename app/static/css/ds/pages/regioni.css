@@ -32,4 +32,3 @@
 /* Su fondo bianco il grigio della superficie quasi sparisce: la terra un passo
    piu' scura, come la mappa della home. */
 @media (min-width: 960px) { .regioni-map .navmap a use { fill: var(--rule-strong); } }
-@media (pointer: coarse) { .regioni-head .meta a { display: inline-flex; align-items: center; min-height: var(--target); } }

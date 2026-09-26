@@ -53,4 +53,3 @@
 .province-list__rank .n { color: inherit; }
 @media (min-width: 960px) { .province-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); } }
 .province-group > h2 a { display: inline-flex; align-items: center; min-height: var(--target); }
-@media (pointer: coarse) { .v1-province .pagehead .meta a { display: inline-flex; align-items: center; min-height: var(--target); } }

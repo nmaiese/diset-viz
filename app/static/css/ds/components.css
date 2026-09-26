@@ -1049,3 +1049,24 @@ main.v1 h1 { view-transition-name: page-title; }
 @media (min-width: 960px) {
   .regionmap { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
 }
+
+/* ---------- bersagli al tocco: 44 pixel dove il sistema li promette ----------
+   Un blocco solo, per ogni pagina della 1.0 (prima stava pagina per pagina).
+   Dove un'altezza da 44 allungherebbe la riga (la barra delle sezioni, le
+   briciole, il link di una parola) si allarga solo l'area del tocco, con un
+   ::after trasparente o con un padding che su un elemento in linea non
+   sposta niente. */
+@media (pointer: coarse) {
+  .pagehead .meta a, .toolbar__jump, .cite .btn, .check { display: inline-flex; align-items: center; min-height: var(--target); }
+  input[type="range"] { height: var(--target); }
+  .toc a, .crumbs a, .term { position: relative; }
+  .toc a::after, .crumbs a::after, .term::after { content: ""; position: absolute; inset: -7px -4px; }
+  .crumbs a::after, .term::after { inset: -12px -6px; }
+  .table td a, .table th a, .legend a, .source a { padding-block: 14px; }
+  /* I link di testo in un elenco (fonti, province, voci del catalogo, risultati)
+     restano righe di testo: l'area del tocco cresce senza allungare
+     l'elenco, e sta sopra i 24 pixel della WCAG. I controlli restano a 44. */
+  .prose li > a, .v1-metodologia li > a:not(.toc a), .provincia-list li > a, .tema-list li > a, .blog-index li > a, .catalogo-item__name, .search-result__title { padding-block: 8px; margin-block: -8px; }
+  .linkarrow, .regione-area > summary, select, .field input:not([type="range"]), .hdr__brand { min-height: var(--target); }
+  .linkarrow { display: inline-flex; align-items: center; }
+}

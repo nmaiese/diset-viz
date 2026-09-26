@@ -165,6 +165,8 @@
         else if (!filtering && g._auto) { fold.open = false; g._auto = false; }
       }
       g.querySelector("[data-atlas-n]").textContent = n;
+      // La stima dell'altezza del tema non ancora disegnato segue le righe a vista.
+      g.style.setProperty("--rows", n);
       shown += n;
     });
     areas.forEach(function (a) { a.hidden = !a.querySelector(".atlante-group:not([hidden])"); });
