@@ -222,6 +222,15 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
 - **Intestazione che resta**: le tabelle lunghe ("Tutti gli indicatori" di
   regione e provincia, `.stackwrap--wide`) tengono l'intestazione sotto la
   testata da 960 pixel; nell'atlante resta in alto il nome del tema.
+- **La striscia che resta** (scheda indicatore): quando la striscia del
+  divario esce dallo schermo, la stessa in una riga (`charts.mini_strip`) si
+  ferma sotto la testata (sul telefono sotto la barra delle sezioni), col
+  territorio scelto e il suo valore, fino all'analisi. Un clic su un punto
+  sceglie. Fra le schede della stessa famiglia (le dimensioni di
+  `dimension_siblings` e gli altri livelli, in `data-family`) ogni punto
+  prende un nome di transizione per quel passaggio (`pageswap` in v1.js,
+  `pagereveal` in testa alla scheda) e scivola nella posizione nuova, e il
+  territorio scelto resta scelto.
 - **Torna su**: sulle pagine oltre cinque schermate, dopo le prime due
   (`initTotop` in `v1.js`); `data-totop` sul `<main>` lo manda altrove
   (l'atlante ai filtri).

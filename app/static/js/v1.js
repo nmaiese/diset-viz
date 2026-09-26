@@ -331,6 +331,16 @@
         }
       });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
+      // La barra della striscia che resta dice chi e' scelto, col valore
+      // dell'anno della striscia (l'ultimo); e la scelta si ricorda fra le
+      // schede della stessa famiglia (initFamily).
+      var lastYear = data.years[data.years.length - 1];
+      page.querySelectorAll("[data-stripbar-sel]").forEach(function (el) {
+        var hit = key ? rows(lastYear).filter(function (x) { return x.key === key; })[0] : null;
+        if (hit) el.innerHTML = "<b>" + esc(hit.name) + "</b> " + esc(withUnit(hit.value, data.unit));
+        else el.textContent = key && data.names[key] ? data.names[key] + ": n.d." : el.dataset.empty;
+      });
+      try { if (key) sessionStorage.setItem("di:territorio", key); else sessionStorage.removeItem("di:territorio"); } catch (e) { /* senza storage non si ricorda */ }
       // "Pavia: 82,6 anni nel 2024, 86ª su 107 province dal valore più alto":
       // la posizione col suo denominatore (chi ha il dato quell'anno) e il
       // criterio, lo stesso ordine della classifica.
@@ -410,6 +420,13 @@
     exploreOf.set(mod, { choose: choose });
     // Il campo ripristinato dal browser dopo un Indietro riaccende la sua evidenza.
     if (select && select.value) highlight(select.value);
+    // Arrivati da una scheda della stessa famiglia, il territorio scelto la'
+    // resta scelto qui (se qui c'e').
+    else if (select && fromFamily()) {
+      var kept = null;
+      try { kept = sessionStorage.getItem("di:territorio"); } catch (e) { kept = null; }
+      if (kept && data.names[kept]) { select.value = kept; highlight(kept); }
+    }
     // Arrivati da /provincia/<key> con #p-<key>: la riga diventa la scelta, e
     // se il browser non ha aperto il details da se' lo apre reveal.
     var target = hashId();
@@ -594,6 +611,62 @@
     }
   }
 
+  /* ---------- la famiglia della scheda: le pagine fra cui la striscia si ricompone ---------- */
+  function familyPaths() {
+    var fig = document.querySelector(".lead-figure[data-family]");
+    if (!fig) return [];
+    try { return JSON.parse(fig.dataset.family); } catch (e) { return []; }
+  }
+  function inFamily(url) {
+    if (!url) return false;
+    try { return familyPaths().indexOf(new URL(url, location.href).pathname) >= 0; } catch (e) { return false; }
+  }
+  function fromFamily() {
+    var nav = window.navigation && navigation.activation && navigation.activation.from;
+    return inFamily(nav ? nav.url : document.referrer) && (nav ? nav.url : document.referrer) !== location.href;
+  }
+  // La pagina che si lascia: se si va a una sorella, ogni punto della striscia
+  // grande prende il suo nome di transizione e scivola nella posizione nuova.
+  // L'altra meta' (pagereveal) sta in testa alla scheda.
+  addEventListener("pageswap", function (e) {
+    if (!e.viewTransition || !e.activation || !e.activation.entry || !inFamily(e.activation.entry.url)) return;
+    document.querySelectorAll(".lead-figure .strip__dot").forEach(function (c) {
+      if (c.getClientRects().length) c.style.viewTransitionName = "dot-" + c.dataset.key;
+    });
+  });
+
+  /* ---------- la striscia che resta ----------
+     Scende sotto la testata quando la striscia grande esce dallo schermo verso
+     l'alto, e se ne va quando comincia l'analisi (o la nota sul metodo). Sul
+     telefono sta sotto la barra delle sezioni, che e' sticky: la sua altezza
+     vera si misura. */
+  function initStripbar(bar) {
+    var fig = document.querySelector(".lead-figure");
+    var stop = document.getElementById("analisi") || document.getElementById("come-leggere");
+    if (!fig) return;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var head = document.querySelector(".hdr");
+      var top = head ? head.getBoundingClientRect().bottom : 0;
+      var toc = document.querySelector(".toc");
+      if (toc && getComputedStyle(toc).position === "sticky") {
+        var tb = toc.getBoundingClientRect();
+        if (tb.top <= top + 1) top = Math.max(top, tb.bottom);
+      }
+      bar.style.setProperty("--stripbar-top", Math.round(top) + "px");
+      var past = fig.getBoundingClientRect().bottom < top;
+      var before = !stop || stop.getBoundingClientRect().top > top + 80;
+      var on = past && before;
+      bar.classList.toggle("is-on", on);
+      // Un'ancora seguita con la barra giu' atterra sotto la barra.
+      document.documentElement.style.scrollPaddingTop = on ? Math.round(top + bar.offsetHeight + 16) + "px" : "";
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    addEventListener("resize", update);
+    update();
+  }
+
   /* ---------- torna su: sulle pagine lunghe, dopo due schermate ----------
      Una volta per documento. Porta a `data-totop` del <main> (l'atlante lo
      manda ai filtri) o all'inizio del contenuto. */
@@ -629,4 +702,5 @@
   window.DiV1 = { init: init, choroScale: choroScale, choroStep: choroStep, choroLegend: choroLegend };
   init(document);
   initTotop();
+  each(document, "[data-stripbar]", initStripbar);
 })();

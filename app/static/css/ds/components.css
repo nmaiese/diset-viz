@@ -921,3 +921,37 @@ details.more[open] > summary { color: var(--ink); }
    pagina all'altra invece di ricomparire (le transizioni stanno in chrome.css). */
 main.v1 h1 { view-transition-name: page-title; }
 .lead-figure .chart--hero { view-transition-name: lead-figure; }
+
+/* La striscia che resta (scheda indicatore): quando la striscia del divario
+   esce dallo schermo, la stessa in una riga si ferma sotto la testata, e
+   sotto la barra delle sezioni sul telefono (`--stripbar-top`, da v1.js).
+   Scende quando serve e se ne va prima dell'analisi: accompagna i dati, non
+   la prosa. */
+.stripbar {
+  position: fixed; left: 0; right: 0; z-index: 25; top: var(--stripbar-top, var(--masthead-s));
+  background: var(--bg); border-bottom: 1px solid var(--rule);
+  transform: translateY(-100%); opacity: 0; visibility: hidden;
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+}
+@media (min-width: 960px) { .stripbar { top: var(--stripbar-top, var(--masthead-l)); } }
+.stripbar.is-on { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
+.stripbar__in {
+  width: min(100% - 2 * var(--margin-s), var(--container)); margin-inline: auto; padding-block: var(--space-2);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-4); align-items: baseline;
+}
+@media (min-width: 600px) { .stripbar__in { width: min(100% - 2 * var(--margin-m), var(--container)); } }
+@media (min-width: 960px) { .stripbar__in { width: min(100% - 2 * var(--margin-l), var(--container)); grid-template-columns: minmax(12rem, 22rem) minmax(0, 1fr) auto; align-items: center; } }
+.stripbar__t, .stripbar__sel { font-size: var(--fs-small); line-height: var(--lh-small); margin: 0; }
+.stripbar__t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 599px) { .stripbar__meta { display: none; } }
+.stripbar__name { font-weight: 600; color: var(--ink); }
+.stripbar__meta, .stripbar__sel { color: var(--text-2); }
+.stripbar__sel { text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 16rem; }
+.stripbar__sel b { color: var(--ink); font-weight: 600; }
+.stripbar__chart { grid-column: 1 / -1; min-width: 0; }
+@media (min-width: 960px) { .stripbar__chart { grid-column: 2; grid-row: 1; } .stripbar__sel { grid-column: 3; } }
+.stripbar__chart svg { display: block; width: 100%; height: auto; max-height: 26px; overflow: visible; cursor: pointer; }
+.stripbar .strip__dot { stroke: var(--bg); stroke-width: 1.5; }
+.stripbar .strip__dot.is-on { stroke: var(--accent); stroke-width: 3; }
+.strip--mini .strip__avg { stroke-dasharray: 3 3; }
+@media (prefers-reduced-motion: reduce) { .stripbar { transition: none; } }

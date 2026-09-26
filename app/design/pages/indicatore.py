@@ -172,6 +172,21 @@ def within_regions(meta: dict, level: dict, unit: str | None) -> dict | None:
     }
 
 
+def family_paths(ctx: dict) -> list[str]:
+    """Le pagine della stessa famiglia: questa, le sue dimensioni (genere, eta')
+    e gli altri livelli. Fra queste la striscia del divario si ricompone invece
+    di ricomparire (v1.js, pageswap e pagereveal), e il territorio scelto resta
+    scelto."""
+    from urllib.parse import urlsplit
+
+    paths = [urlsplit(ctx.get("canonical") or "").path]
+    for item in (ctx.get("dimension_siblings") or []) + (ctx.get("other_views") or []):
+        path = urlsplit(item.get("path") or "").path
+        if path.startswith("/indicatore/") and path not in paths:
+            paths.append(path)
+    return [p for p in paths if p]
+
+
 def ranking_claim(level: dict) -> str | None:
     """Il titolo-affermazione della classifica: un fatto verificato sul
     Mezzogiorno, o quante stanno sopra e quante sotto la media semplice."""
@@ -426,6 +441,8 @@ def derive(ctx: dict) -> dict:
         "unit": numfmt.lower_first(unit) if unit else unit, "tiles": tiles, "verso": verso,
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
         "series": series, "strip": strip, "module": module, "within": within_regions(meta, level, unit),
+        "strip_mini": charts.mini_strip(rows, stats.get("year_avg")) if strip.get("svg") else "",
+        "family": family_paths(ctx),
         "series_claim": series_claim, "series_note": series_note,
         "updated": date_it(ctx.get("dataset_updated")),
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),

@@ -209,6 +209,40 @@ def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_rat
             "legend": legend}
 
 
+def mini_strip(rows: list[dict], avg: float | None, width: int = 720) -> str:
+    """La striscia del divario ridotta a una riga, per la barra che resta in alto.
+
+    Stessi punti della striscia grande (`strip__dot`, `data-key`, il colore della
+    ripartizione), cosi' la scelta di un territorio la accende come le altre e
+    un clic sceglie; niente nomi e niente assi: le cifre sono nella striscia
+    grande e nel modulo. I pari merito si impilano di mezzo punto.
+    """
+    rows = [row for row in rows if row.get("value") is not None]
+    if len(rows) < 2:
+        return ""
+    r = 5 if len(rows) <= 30 else 3.4
+    pad = r + 2
+    lo, hi = min(row["value"] for row in rows), max(row["value"] for row in rows)
+    span = (hi - lo) or 1.0
+
+    def x(v):
+        return pad + (v - lo) / span * (width - 2 * pad)
+
+    height = 2 * r + 12
+    mid = height / 2
+    parts = [f'<svg viewBox="0 0 {width} {height:.0f}" aria-hidden="true" focusable="false" class="strip strip--mini">',
+             f'<line class="strip__axis" x1="{pad}" x2="{width - pad}" y1="{mid:.1f}" y2="{mid:.1f}"/>']
+    if avg is not None:
+        ax = x(avg)
+        parts.append(f'<line class="strip__avg" x1="{ax:.1f}" x2="{ax:.1f}" y1="1" y2="{height - 1:.0f}"/>')
+    for row in sorted(rows, key=lambda row: row["value"]):
+        area = row.get("area") or "none"
+        parts.append(f'<circle class="strip__dot area--{area}" data-key="{escape(row["key"])}" '
+                     f'cx="{x(row["value"]):.1f}" cy="{mid:.1f}" r="{r}"><title>{escape(row["name"])}</title></circle>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 # ---------------------------------------------------------------- serie a fascia
 
 def _band(level, areas, width, height, right, short):

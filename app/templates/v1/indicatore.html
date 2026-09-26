@@ -32,6 +32,24 @@
 {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}">{% endblock %}
 
 {% block head_extra %}
+{#- Fra schede della stessa famiglia (genere, eta', regioni e province) i punti
+    della striscia si ricompongono invece di ricomparire: ogni punto prende un
+    nome di transizione solo per quel passaggio. `pagereveal` scatta prima del
+    primo disegno, quindi prima che v1.js arrivi: per questo sta qui, in
+    testa. L'altra meta' (`pageswap`, la pagina che si lascia) sta in v1.js. -#}
+<script>
+addEventListener("pagereveal", function (e) {
+  var from = window.navigation && navigation.activation && navigation.activation.from;
+  if (!e.viewTransition || !from) return;
+  var fig = document.querySelector(".lead-figure[data-family]");
+  if (!fig) return;
+  var fam = []; try { fam = JSON.parse(fig.dataset.family); } catch (err) { return; }
+  if (fam.indexOf(new URL(from.url).pathname) < 0) return;
+  var dots = fig.querySelectorAll(".strip__dot");
+  dots.forEach(function (c) { if (c.getClientRects().length) c.style.viewTransitionName = "dot-" + c.dataset.key; });
+  e.viewTransition.finished.finally(function () { dots.forEach(function (c) { c.style.viewTransitionName = ""; }); });
+});
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -117,7 +135,7 @@
   </div>
 
   {% if d.strip.svg %}
-  <figure class="lead-figure" aria-labelledby="divario-t">
+  <figure class="lead-figure" aria-labelledby="divario-t" data-family="{{ d.family | tojson | forceescape }}">
     <figcaption class="lead-figure__head">
       <span class="lead-figure__title" id="divario-t">Il divario nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
       {{ ui.arealegend(d.strip.legend) }}
@@ -125,6 +143,20 @@
     <div class="chart chart--hero" data-series>{{ d.strip.svg | safe }}</div>
     <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.values_note %}, {{ d.values_note }}{% endif %}.</p>
   </figure>
+  {#- La striscia che resta: quando quella grande esce dallo schermo, la stessa
+      striscia in una riga si ferma sotto la testata (e sotto la barra delle
+      sezioni sul telefono), col territorio scelto. E' un aiuto visivo che
+      ripete la figura qui sopra, quindi aria-hidden; un clic su un punto
+      sceglie come sulla striscia grande. La accende v1.js (initStripbar). -#}
+  {% if d.strip_mini %}
+  <div class="stripbar" data-stripbar aria-hidden="true">
+    <div class="stripbar__in">
+      <p class="stripbar__t"><span class="stripbar__name">{{ meta.name }}</span> <span class="stripbar__meta">{{ n }} {{ level.plural }}, {{ year }}</span></p>
+      <p class="stripbar__sel" data-stripbar-sel data-empty="Tocca un punto per scegliere">Tocca un punto per scegliere</p>
+      <div class="stripbar__chart">{{ d.strip_mini | safe }}</div>
+    </div>
+  </div>
+  {% endif %}
   {% endif %}
 
   <div class="layout">
