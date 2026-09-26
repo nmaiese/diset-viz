@@ -10,7 +10,7 @@
   .province-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: var(--gutter-l); }
   .province-map {
     display: grid; gap: var(--space-3); margin: 0;
-    position: sticky; top: calc(var(--masthead-l) + var(--space-6));
+    position: sticky; top: calc(var(--sticky-top) + var(--space-6));
   }
   .province-map .navmap { width: 100%; }
   .province-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
@@ -30,7 +30,7 @@
 .province-jump { margin-top: var(--space-6); }
 
 /* ---------- le regioni e le loro province ---------- */
-.province-group { padding-top: var(--space-8); scroll-margin-top: calc(var(--masthead-l) + var(--space-4)); }
+.province-group { padding-top: var(--space-8); }
 .province-group[hidden] { display: none; }
 .province-group > h2 { padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); margin-bottom: var(--space-3); }
 .province-group > h2 a { color: var(--ink); text-decoration: none; }

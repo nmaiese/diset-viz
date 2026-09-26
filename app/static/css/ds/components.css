@@ -7,7 +7,7 @@
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--masthead-l) + var(--space-4)); }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   margin: 0;
   background: var(--bg);
@@ -89,7 +89,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .layout { display: grid; gap: var(--space-12); align-items: start; }
 @media (min-width: 1200px) {
   .layout { grid-template-columns: minmax(0, 1fr) 13rem; gap: var(--space-16); }
-  .layout__aside { position: sticky; top: calc(var(--masthead-l) + var(--space-6)); order: 2; }
+  .layout__aside { position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-6)); order: 2; }
 }
 .layout__main { min-width: 0; }
 .measure { max-width: var(--measure); }
@@ -158,10 +158,6 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .toc a { display: block; padding: 6px 0 6px var(--space-3); margin-left: -1px; border-left: 3px solid transparent; color: var(--text-2); text-decoration: none; }
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
-/* Sotto i 1200 alla testata si aggiunge la barra delle sezioni: un'ancora non
-   deve far finire il titolo sotto l'una o l'altra. */
-@media (max-width: 1199px) { html { scroll-padding-top: calc(var(--masthead-s) + 60px); } }
-@media (min-width: 960px) and (max-width: 1199px) { html { scroll-padding-top: calc(var(--masthead-l) + 60px); } }
 @media (max-width: 1199px) {
   /* Un elemento sticky resta dentro il suo contenitore: dentro l'aside (alto
      quanto l'indice) o in una cella di griglia non resterebbe mai in alto.
@@ -175,7 +171,8 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
      testata: sulle pagine lunghe (la regione passa i 36.000 pixel sul telefono)
      e' il solo modo di sapere dove si e'. */
   .toc {
-    position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20;
+    position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--hdr-h)); z-index: 20;
+    transition: top var(--motion-base) var(--motion-ease);
     margin-inline: calc(-1 * var(--margin-s)); padding: var(--space-2) var(--margin-s);
     background: var(--bg); border-bottom: 1px solid var(--rule);
   }
@@ -192,7 +189,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   .toc ol.is-more-l.is-more-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
 }
 @media (min-width: 600px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-m)); padding-inline: var(--margin-m); } }
-@media (min-width: 960px) and (max-width: 1199px) { .toc { top: var(--masthead-l); margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
+@media (min-width: 960px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
 .aside-block { margin-top: var(--space-8); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .aside-block p + p { margin-top: var(--space-2); }
 .aside-block__label { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
@@ -288,7 +285,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .module__body { display: grid; gap: var(--space-8); align-items: start; }
 @container (min-width: 720px) {
   .module__body { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-8); }
-  .module__body > .module__map { position: sticky; top: calc(var(--masthead-l) + var(--stripbar-h, 0px) + var(--space-6)); transition: top var(--motion-base) var(--motion-ease); }
+  .module__body > .module__map { position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-6)); transition: top var(--motion-base) var(--motion-ease); }
 }
 .source { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .source a { color: var(--text-2); }
@@ -378,14 +375,6 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 [data-explore]:not(.has-js) .table tr:target > * { background: var(--surface-2); }
 [data-explore]:not(.has-js) .table tr:target > :first-child { box-shadow: inset 3px 0 0 var(--accent); padding-left: var(--space-3); }
 [data-explore]:not(.has-js) .table tr:target .bar i { background: var(--data-focus); }
-/* Sotto i 1200 la barra delle sezioni sta sotto la testata, e la riga a cui
-   porta l'ancora finiva sotto la barra: lo scroll-padding di chrome.css
-   (html:has(body.sitechrome), testata piu' --space-4) batte per specificita'
-   la regola di html qui sopra, che contava anche la barra. Il margine della
-   riga aggiunge cio' che manca, 60 pixel meno i --space-4 gia' contati, a
-   ogni larghezza: la testata la conta gia' chrome.css. v1.js (reveal) legge
-   la stessa somma. */
-@media (max-width: 1199px) { [data-explore] .table tr[id] { scroll-margin-top: calc(60px - var(--space-4)); } }
 .table tr.ref > * { border-bottom: 1px solid var(--ink); color: var(--text-2); font-size: var(--fs-small); padding-block: 6px; }
 .table tr.ref .val { font-weight: 400; }
 .table tr.ref .bar { background: transparent; height: 1px; }
@@ -478,7 +467,7 @@ details.more[open] > summary { color: var(--ink); }
   .analysis:has(> .analysis__map) > * { grid-column: 1; }
   .analysis > .analysis__map {
     display: grid; gap: var(--space-3); grid-column: 2; grid-row: 2; align-self: start;
-    position: sticky; top: calc(var(--masthead-l) + var(--toc-bar, 0px) + var(--stripbar-h, 0px) + var(--space-6));
+    position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-6));
     max-width: 22rem; justify-self: center; width: 100%;
   }
 }
@@ -897,11 +886,10 @@ details.more[open] > summary { color: var(--ink); }
 @media (min-width: 960px) {
   .tablewrap.stackwrap--wide { overflow: clip; }
   .stackwrap--wide .table thead th {
-    position: sticky; top: calc(var(--masthead-l) + var(--toc-bar, 0px)); z-index: 2;
+    position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h)); z-index: 2;
     background: var(--bg); box-shadow: inset 0 -1px 0 var(--rule-strong);
   }
 }
-@media (min-width: 960px) and (max-width: 1199px) { :root:has(.toc) { --toc-bar: 52px; } }
 
 /* Una tabella che scorre di lato lo dice: un'ombra sul bordo dove c'e'
    altro, che sparisce a fine corsa (gli sfondi "local" coprono quelli
@@ -931,7 +919,7 @@ details.more[open] > summary { color: var(--ink); }
 
 /* Torna su: compare dopo due schermate sulle pagine lunghe (v1.js). */
 .totop {
-  position: fixed; right: max(var(--space-4), env(safe-area-inset-right, 0px)); bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px)); z-index: 30;
+  position: fixed; right: calc(var(--space-4) + env(safe-area-inset-right, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 30;
   display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-4);
   background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control);
   font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 600; text-decoration: none;
@@ -940,6 +928,18 @@ details.more[open] > summary { color: var(--ink); }
 .totop.is-on { opacity: 1; transform: none; pointer-events: auto; }
 .ds a.totop, .ds a.totop:hover { color: var(--ink); text-decoration: none; }
 .totop:hover { background: var(--surface-1); }
+/* Sotto i 960 pixel solo la freccia, in un cerchio da 44: il nome resta
+   nell'aria-label. */
+@media (max-width: 959px) {
+  .totop { width: var(--target); padding: 0; justify-content: center; border-radius: 50%; font-size: 20px; }
+  .totop__t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+/* Sui telefoni bassi la mappa ferma del modulo non si ferma: era piu' alta
+   dello schermo e la sua parte bassa non si raggiungeva. */
+@media (max-height: 500px) {
+  .module__body > .module__map { position: static; }
+  .module__map .map svg { max-height: calc(100svh - var(--hdr-h) - 2rem); }
+}
 
 /* Continuita' fra pagine: il titolo e la figura d'apertura passano da una
    pagina all'altra invece di ricomparire (le transizioni stanno in chrome.css). */
@@ -948,16 +948,15 @@ main.v1 h1 { view-transition-name: page-title; }
 
 /* La striscia che resta (scheda indicatore): quando la striscia del divario
    esce dallo schermo, la stessa in una riga si ferma sotto la testata, e
-   sotto la barra delle sezioni sul telefono (`--stripbar-top`, da v1.js).
+   sotto la barra delle sezioni sul telefono (`--sticky-top`, chrome.css).
    Scende quando serve e se ne va prima dell'analisi: accompagna i dati, non
    la prosa. */
 .stripbar {
-  position: fixed; left: 0; right: 0; z-index: 25; top: var(--stripbar-top, var(--masthead-s));
+  position: fixed; left: 0; right: 0; z-index: 25; top: var(--sticky-top);
   background: var(--bg); border-bottom: 1px solid var(--rule);
   transform: translateY(-100%); opacity: 0; visibility: hidden;
-  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease), visibility 0s linear var(--dur), top var(--motion-base) var(--motion-ease);
 }
-@media (min-width: 960px) { .stripbar { top: var(--stripbar-top, var(--masthead-l)); } }
 .stripbar.is-on { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
 .stripbar__in {
   width: min(100% - 2 * var(--margin-s), var(--container)); margin-inline: auto; padding-block: var(--space-2);
@@ -971,6 +970,7 @@ main.v1 h1 { view-transition-name: page-title; }
 .stripbar__name { font-weight: 600; color: var(--ink); }
 .stripbar__meta, .stripbar__sel { color: var(--text-2); }
 .stripbar__sel { text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 16rem; }
+@media (max-width: 599px) { .stripbar__sel { max-width: 50%; } }
 .stripbar__sel b { color: var(--ink); font-weight: 600; }
 .stripbar__chart { grid-column: 1 / -1; min-width: 0; }
 @media (min-width: 960px) { .stripbar__chart { grid-column: 2; grid-row: 1; } .stripbar__sel { grid-column: 3; } }

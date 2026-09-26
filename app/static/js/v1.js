@@ -637,31 +637,24 @@
 
   /* ---------- la striscia che resta ----------
      Scende sotto la testata quando la striscia grande esce dallo schermo verso
-     l'alto, e se ne va quando comincia l'analisi (o la nota sul metodo). Sul
-     telefono sta sotto la barra delle sezioni, che e' sticky: la sua altezza
-     vera si misura. */
+     l'alto, e se ne va quando comincia l'analisi (o la nota sul metodo). Il
+     suo posto lo dice il CSS (`--sticky-top`, chrome.css): qui si decide solo
+     se c'e', e se c'e' la sua altezza va in `--stripbar-h`, che le ancore e la
+     mappa ferma del modulo contano. Sui telefoni bassi (in orizzontale) non
+     scende: con testata e barra delle sezioni lo schermo restava a meta'. */
   function initStripbar(bar) {
     var fig = document.querySelector(".lead-figure");
     var stop = document.getElementById("analisi") || document.getElementById("come-leggere");
     if (!fig) return;
+    var low = matchMedia("(max-height: 500px)");
     var ticking = false;
     function update() {
       ticking = false;
-      var head = document.querySelector(".hdr");
-      var top = head ? head.getBoundingClientRect().bottom : 0;
-      var toc = document.querySelector(".toc");
-      if (toc && getComputedStyle(toc).position === "sticky") {
-        var tb = toc.getBoundingClientRect();
-        if (tb.top <= top + 1) top = Math.max(top, tb.bottom);
-      }
-      bar.style.setProperty("--stripbar-top", Math.round(top) + "px");
+      var top = parseFloat(getComputedStyle(bar).top) || 0;
       var past = fig.getBoundingClientRect().bottom < top;
       var before = !stop || stop.getBoundingClientRect().top > top + 80;
-      var on = past && before;
+      var on = past && before && !low.matches;
       bar.classList.toggle("is-on", on);
-      // Un'ancora seguita con la barra giu' atterra sotto la barra.
-      document.documentElement.style.scrollPaddingTop = on ? Math.round(top + bar.offsetHeight + 16) + "px" : "";
-      // La mappa ferma nel suo margine scende sotto la barra (--stripbar-h).
       document.documentElement.style.setProperty("--stripbar-h", on ? bar.offsetHeight + "px" : "0px");
     }
     addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
@@ -669,22 +662,66 @@
     update();
   }
 
+  /* ---------- la testata che si ritira, sul telefono ----------
+     Scendendo la testata esce dallo schermo, risalendo torna: la barra delle
+     sezioni e la striscia salgono con lei, perche' leggono `--hdr-h`
+     (chrome.css). Mai nei primi 120 pixel, mai col menu aperto o col fuoco
+     dentro la testata, e solo sotto i 960 pixel o su un telefono in
+     orizzontale. Una volta per documento. */
+  var hdrOff = false;
+  function initHdr() {
+    var root = document.documentElement;
+    var hdr = document.querySelector(".sitechrome .hdr");
+    if (!hdr || root.hasAttribute("data-hdr-hide")) return;
+    root.setAttribute("data-hdr-hide", "");
+    var small = matchMedia("(max-width: 959px), (pointer: coarse) and (max-height: 500px)");
+    var drawer = document.getElementById("ds-drawer");
+    var last = scrollY, ticking = false;
+    function set(off) {
+      if (off === hdrOff) return;
+      hdrOff = off;
+      root.classList.toggle("is-hdr-off", off);
+      document.dispatchEvent(new CustomEvent("di:hdr", { detail: { off: off } }));
+    }
+    function update() {
+      ticking = false;
+      var y = scrollY;
+      var busy = (drawer && !drawer.hidden) || hdr.contains(document.activeElement);
+      if (!small.matches || y < 120 || busy) { set(false); last = y; return; }
+      if (Math.abs(y - last) < 8) return;
+      set(y > last);
+      last = y;
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    hdr.addEventListener("focusin", function () { set(false); });
+    small.addEventListener("change", update);
+  }
+
   /* ---------- torna su: sulle pagine lunghe, dopo due schermate ----------
      Una volta per documento. Porta a `data-totop` del <main> (l'atlante lo
-     manda ai filtri) o all'inizio del contenuto. */
+     manda ai filtri) o all'inizio del contenuto. Sotto i 960 pixel e' solo la
+     freccia, e compare quando si risale (quando torna la testata): mentre si
+     legge verso il basso copriva le cifre a destra delle classifiche. */
   function initTotop() {
     var main = document.getElementById("contenuto");
     if (!main || document.querySelector(".totop")) return;
     if (document.documentElement.scrollHeight < innerHeight * 5) return;
     var target = main.getAttribute("data-totop") || "#contenuto";
+    var label = main.getAttribute("data-totop-label") || "Torna su";
     var a = document.createElement("a");
     a.className = "totop";
     a.href = target;
-    a.textContent = main.getAttribute("data-totop-label") || "Torna su";
-    a.insertAdjacentHTML("afterbegin", '<span aria-hidden="true">\u2191</span>');
+    a.setAttribute("aria-label", label);
+    a.innerHTML = '<span aria-hidden="true">\u2191</span><span class="totop__t">' + esc(label) + "</span>";
     document.body.appendChild(a);
-    var ticking = false;
-    function update() { ticking = false; a.classList.toggle("is-on", scrollY > innerHeight * 2); }
+    var small = matchMedia("(max-width: 959px)");
+    var last = scrollY, ticking = false, rising = false;
+    function update() {
+      ticking = false;
+      var y = scrollY;
+      if (Math.abs(y - last) >= 8) { rising = y < last; last = y; }
+      a.classList.toggle("is-on", y > innerHeight * 2 && (!small.matches || rising));
+    }
     addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     update();
   }
@@ -704,5 +741,6 @@
   window.DiV1 = { init: init, choroScale: choroScale, choroStep: choroStep, choroLegend: choroLegend };
   init(document);
   initTotop();
+  initHdr();
   each(document, "[data-stripbar]", initStripbar);
 })();

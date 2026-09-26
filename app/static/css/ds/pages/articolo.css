@@ -26,8 +26,8 @@
 .art-brief__list li::before { content: ""; position: absolute; left: 0; top: calc(var(--space-3) + 0.6em); width: 8px; height: 8px; background: var(--ink); }
 
 /* ---------- impaginazione: sotto i 1200 l'indice e' la barra delle sezioni ---------- */
-/* La barra resta sotto la testata solo se il suo contenitore e' alto quanto
-   l'articolo: qui il margine diventa un blocco, e a restare fermo e' lui. */
+/* Sotto i 1200 il margine smette di essere una scatola (`.layout__aside`,
+   components.css) e la barra delle sezioni resta ferma per tutto l'articolo. */
 .art-layout { margin-top: var(--space-12); }
 /* Da 1200 il margine sta accanto alla colonna del testo, non in fondo al
    contenitore: con `1fr` la colonna era larga 1100 pixel per un testo di 38rem
@@ -39,11 +39,8 @@
 }
 @media (max-width: 1199px) {
   .art-layout { display: block; }
-  .art-aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20; }
   .art-aside + .layout__main { margin-top: var(--space-8); }
-  .art-body h2[id], .art-data { scroll-margin-top: calc(var(--masthead-l) + var(--space-16)); }
 }
-@media (min-width: 960px) and (max-width: 1199px) { .art-aside { top: var(--masthead-l); } }
 
 /* ---------- corpo: testo a misura, figure alla loro larghezza vera ---------- */
 .art-body.prose { max-width: none; }

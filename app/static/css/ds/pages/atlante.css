@@ -42,7 +42,7 @@
    filtri". */
 .atlante-group summary {
   display: flex; align-items: center; gap: var(--space-3); min-height: var(--target, 44px);
-  margin-bottom: var(--space-3); position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 3;
+  margin-bottom: var(--space-3); position: sticky; top: var(--sticky-top); z-index: 3; transition: top var(--motion-base) var(--motion-ease);
   padding-block: var(--space-2); background: var(--bg); border-bottom: 1px solid var(--rule);
   list-style: none; cursor: pointer;
 }
@@ -54,7 +54,6 @@
 }
 .atlante-group details[open] > summary::after { transform: rotate(45deg); }
 .atlante-group details:not([open]) > summary { margin-bottom: 0; }
-@media (min-width: 960px) { .atlante-group summary { top: var(--masthead-l); } }
 .atlante-group h4 a { color: var(--ink); }
 .atlante-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
 /* Un tema chiuso e' alto quanto il suo sommario: la stima delle righe lo

@@ -23,7 +23,7 @@
    mappa (vista d'insieme) viene prima delle venti righe, col suo titolo. */
 @container (max-width: 1119px) { .tema-side { order: -1; } }
 @container (min-width: 1120px) { .tema-side__title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
-@container (min-width: 1120px) { .tema-side { position: sticky; top: calc(var(--masthead-l, 64px) + var(--space-6)); } .tema-side .map { max-width: none; } }
+@container (min-width: 1120px) { .tema-side { position: sticky; top: calc(var(--sticky-top) + var(--space-6)); } .tema-side .map { max-width: none; } }
 .tema-standings .table--rank .note a { color: var(--text-2); }
 .tema-standings .table--rank .note a:hover { color: var(--accent-strong); }
 .tema-standings > .source { margin-top: var(--space-4); }

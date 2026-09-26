@@ -33,11 +33,26 @@
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
-.sitechrome { display: flex; flex-direction: column; min-height: 100vh; }
-html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--space-4)); }
-@media (min-width: 960px) {
-  html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-l) + var(--space-4)); }
+.sitechrome { display: flex; flex-direction: column; min-height: 100svh; }
+
+/* --- le barre ferme: una misura sola ----------------------------------------
+   Tre altezze, sulla radice, e chi si ferma in alto le somma, cosi' nessuno
+   le riscrive a mano:
+   --hdr-h      la testata visibile, 0 quando sul telefono si ritira (v1.js,
+                `html.is-hdr-off`);
+   --toc-bar    la barra delle sezioni, che sotto i 1200 resta sotto la
+                testata sulle pagine che hanno un indice;
+   --stripbar-h la striscia che resta della scheda, quando c'e' (v1.js).
+   --sticky-top e' il bordo basso della testata e della barra: da li' partono
+   gli elementi fermi, e le ancore atterrano sotto tutte e tre. */
+:root {
+  --hdr-h: var(--masthead-s); --toc-bar: 0px; --stripbar-h: 0px;
+  --sticky-top: calc(env(safe-area-inset-top, 0px) + var(--hdr-h) + var(--toc-bar));
 }
+@media (min-width: 960px) { :root { --hdr-h: var(--masthead-l); } }
+@media (max-width: 1199px) { :root:has(.toc) { --toc-bar: 52px; } }
+html.is-hdr-off { --hdr-h: 0px; }
+html:has(body.sitechrome) { scroll-padding-top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-4)); }
 
 .sitechrome .skiplink {
   position: absolute; left: var(--space-4); top: calc(env(safe-area-inset-top, 0px) + var(--space-2));
@@ -58,7 +73,12 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
   /* La barra e' identica su ogni pagina: il nome la tiene ferma da una
      navigazione all'altra invece di dissolverla col resto. */
   view-transition-name: masthead;
+  transition: transform var(--motion-base) var(--motion-ease);
 }
+/* Sul telefono la testata si ritira scendendo e torna appena si risale
+   (v1.js): in orizzontale testata, barra delle sezioni e striscia prendevano
+   il 44% dello schermo. */
+html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px))); }
 .sitechrome .hdr__bar {
   display: flex; align-items: center; gap: var(--space-4);
   width: min(100% - 2 * var(--margin-s), var(--container));

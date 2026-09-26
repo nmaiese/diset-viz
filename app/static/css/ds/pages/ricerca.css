@@ -86,7 +86,7 @@
   .ricerca-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); gap: var(--gutter-l); }
   .ricerca-aside {
     display: grid; gap: var(--space-3); padding-top: var(--space-8);
-    position: sticky; top: calc(var(--masthead-l) + var(--space-2));
+    position: sticky; top: calc(var(--sticky-top) + var(--space-6));
   }
 }
 .ricerca-aside__t { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); padding-top: var(--space-3); border-top: 3px solid var(--ink); }
