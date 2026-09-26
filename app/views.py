@@ -1432,15 +1432,27 @@ def indicator_page(first, second=None, third=None):
         raw_id = sources.legacy_territorial_id(first)
         if raw_id is None:
             abort(404)
-        payload = get_atlas_indicator(raw_id)
-        if payload is None:
+        target = legacy_indicator_path(raw_id)
+        if target is None:
             abort(404)
-        return redirect(
-            sources.indicator_url("territorial", raw_id, profiles.indicator_slug(payload["metadata"]["name"])),
-            code=301,
-        )
+        # Come ogni altro 301 della scheda tiene `anno` e `regione`: fino al 26
+        # settembre 2026 questo ramo li perdeva, e un link vecchio a un anno
+        # apriva l'ultimo.
+        return redirect(_without_level_param(target), code=301)
     family, raw_id = parsed
     return _render_indicator(family, raw_id)
+
+
+def legacy_indicator_path(raw_id):
+    """Il canonico di una scheda territoriale dal suo id nudo, o None.
+
+    Lo usa il ramo delle URL di prima della migrazione (`/indicatore/901-...`)
+    e il 301 da `www.` (`app/__init__.py`), che cosi' arriva al canonico in un
+    salto solo invece di due."""
+    payload = get_atlas_indicator(raw_id)
+    if payload is None:
+        return None
+    return sources.indicator_url("territorial", raw_id, profiles.indicator_slug(payload["metadata"]["name"]))
 
 
 def _query_map_for_article(query_map, article):
