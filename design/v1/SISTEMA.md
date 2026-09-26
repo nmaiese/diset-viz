@@ -176,6 +176,20 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   il mouse nell'accento, perche' e' un link. Ogni tracciato porta al profilo
   senza JavaScript, fuori dall'ordine di tabulazione e nascosto ai lettori di
   schermo: la tastiera ha il campo o l'indice accanto.
+  Con `steps` (`{chiave: gradino}`) diventa anche una **mappa di un dato**
+  (`navmap--data`): la rampa, la sua `ui.legend` accanto e una riga che dice
+  che cosa colora. Resta un link al profilo, e sotto il mouse il territorio
+  prende il contorno d'inchiostro, non l'accento, che coprirebbe il suo colore.
+  Un territorio senza dato resta disegnato in grigio e senza link. La usano la
+  testata della home e il margine di ricerca (qualita' della vita delle
+  regioni, `home.hero_map`), l'indice delle province e la mappa accanto
+  all'analisi della scheda.
+- **La regione ingrandita** (`ui.regionmap`, dati da `common.region_map`): il
+  riquadro di una regione (`maps.zoom`) con le sue province nei colori della
+  qualita' della vita, sui gradini di tutte le 107, cosi' un colore vale lo
+  stesso in ogni regione, le province vicine in grigio e i confini regionali
+  sopra. Sta nella testata di regione e provincia al posto del localizzatore,
+  che resta solo dove la regione non ha province misurate.
 - **Distintivo**: un quadrato di 44 pixel con un'icona, su un lavaggio
   dell'interfaccia (ambra, verde, blu, rosso, o la superficie). Riconosce
   un'area o un impegno a colpo d'occhio. Non e' un colore dei dati e non da'
@@ -296,6 +310,12 @@ di una pagina.
 
 ### Pagine indice e di servizio
 
+Una regola per tutte: **nessuna colonna resta vuota accanto a un elenco
+lungo**. Da 960 pixel il margine porta qualcosa che serve a quella pagina: la
+mappa coi dati per scegliere un territorio (indice delle province, ricerca), i
+dataset per tema accanto alla testata (catalogo), e una tabella che puo'
+distendersi lo fa (Dove eccelle mette le prime tre in fila).
+
 Dal 26 settembre 2026 escono dalla 1.0 anche regioni, province, temi, tema,
 divari regionali, ricerca, indice del blog, metodologia e catalogo dati, un
 modulo per pagina in `app/design/pages/` e il template di prima come ripiego.
@@ -316,7 +336,11 @@ prima, col suo titolo.
 4. Indice di pagina nel margine.
 5. Confronta i territori: modulo dato, largo.
 6. Com'e' cambiato: serie storica con tabella, largo.
-7. L'analisi: la prosa scritta con le sue figure, larghezza testo.
+7. L'analisi: la prosa scritta con le sue figure, larghezza testo. Da 960
+   pixel accanto alla prosa la mappa dell'ultimo anno resta ferma mentre si
+   legge (`analysis__map`), sugli stessi gradini del modulo: la prosa nomina i
+   territori, la mappa dice dove stanno. La scheda mette lo sprite del livello
+   una volta, e le due mappe lo richiamano con `<use>`.
 8. Come leggere il dato: nota metodo, largo.
 9. Fonti, dati e citazione: cita e riusa.
 10. Continua da qui, pieno.
@@ -413,7 +437,7 @@ province. Solo le schede con la `/province` che passa la regola, e dalla
 
 ### Regione
 
-Testata-risposta con il localizzatore nel margine, numeri chiave, i temi dal
+Testata-risposta con la regione ingrandita nel margine (`ui.regionmap`), numeri chiave, i temi dal
 migliore al peggiore, dove stacca e dove resta indietro con i valori veri, che
 cosa e' cambiato, le province della regione, tutti gli indicatori per
 macro-area, regioni simili, fonti e citazione.
@@ -424,7 +448,8 @@ H1 che e' gia' la risposta ("Lecce e' 79ª su 107 province"), numeri chiave che
 non ripetono l'H1, le dimensioni con la linea della media 50, una sola sintesi
 forte e debole, che cosa e' cambiato, tutti gli indicatori in colonne pulite
 (valore con unita' e anno, variazione, posizione in Italia, posizione nella
-regione), le vicine e le sorelle, fonti.
+regione), le vicine e le sorelle, fonti. Nella testata la sua regione
+ingrandita, con la provincia contornata.
 
 ### Articolo
 
