@@ -118,13 +118,26 @@
     catch (e) { done(false); }
   });
 
+  /* ---------- il suggerimento delle mappe: solo col mouse ----------
+     Al tocco un suggerimento che segue il dito non si legge (il dito lo
+     copre), e su iOS un contenuto nuovo mostrato al mousemove di
+     compatibilita' si mangiava il click: per questo `pointermove` e solo
+     `pointerType === "mouse"`. Resta dentro la mappa e va a capo. */
+  function placeTip(box, tip, ev) {
+    var r = box.getBoundingClientRect();
+    var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
+    if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
+    tip.style.left = Math.max(0, Math.min(x, r.width - tip.offsetWidth)) + "px";
+    tip.style.top = y + "px";
+  }
+
   /* ---------- mappa: il valore al passaggio del mouse ---------- */
   function initMap(box) {
     var tip = box.querySelector("[data-map-tip]");
-    box.addEventListener("mousemove", function (ev) {
+    box.addEventListener("pointermove", function (ev) {
+      if (ev.pointerType !== "mouse") return;
       var p = ev.target.closest(".map [data-key]");
       if (!p) { tip.hidden = true; return; }
-      var r = box.getBoundingClientRect();
       tip.innerHTML = "";
       var name = document.createElement("span");
       name.textContent = p.dataset.name + " ";
@@ -132,12 +145,20 @@
       val.textContent = p.dataset.value || "n.d.";
       tip.append(name, val);
       tip.hidden = false;
-      var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
-      if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
-      tip.style.left = x + "px";
-      tip.style.top = y + "px";
+      placeTip(box, tip, ev);
     });
-    box.addEventListener("mouseleave", function () { tip.hidden = true; });
+    box.addEventListener("pointerleave", function () { tip.hidden = true; });
+  }
+
+  function nearestDot(svg, ev, radius) {
+    var best = null, bestD = radius * radius;
+    svg.querySelectorAll(".strip__dot").forEach(function (d) {
+      var r = d.getBoundingClientRect();
+      var dx = r.left + r.width / 2 - ev.clientX, dy = r.top + r.height / 2 - ev.clientY;
+      var dd = dx * dx + dy * dy;
+      if (dd <= bestD) { bestD = dd; best = d; }
+    });
+    return best;
   }
 
   /* ---------- il modulo dato della scheda ----------
@@ -441,7 +462,8 @@
     liveExplore.set(page, { select: select, highlight: highlight });
     each(page, ".strip", function (svg) {
       svg.addEventListener("click", function (ev) {
-        var c = ev.target.closest(".strip__dot");
+        // Un punto e' piccolo: al tocco vale il piu' vicino entro 22 pixel.
+        var c = ev.target.closest(".strip__dot") || nearestDot(svg, ev, 22);
         var cur = liveExplore.get(page);
         if (!c || !cur || !cur.select) return;
         cur.select.value = cur.select.value === c.dataset.key ? "" : c.dataset.key;
@@ -458,22 +480,46 @@
     });
   }
 
-  /* ---------- mappe per scegliere un territorio: il nome al passaggio del mouse ---------- */
+  /* ---------- mappe per scegliere un territorio ----------
+     Col mouse il nome al passaggio e il clic apre il profilo. Al tocco il
+     primo tocco mostra: contorna il territorio e scrive sotto la mappa il suo
+     nome (con la posizione o il valore che la mappa porta in `data-name`) e
+     il link al profilo, da 44 pixel. Il secondo tocco sullo stesso territorio,
+     o il link, lo apre. Senza JavaScript ogni tracciato resta un link. Le
+     mappe dentro un `[data-picker]` (la fascia dei territori della home)
+     scelgono gia' da sole, e qui non si toccano. */
   function initNavmap(box) {
     var tip = box.querySelector("[data-navmap-tip]");
     if (!tip) return;
-    box.addEventListener("mousemove", function (ev) {
+    box.addEventListener("pointermove", function (ev) {
+      if (ev.pointerType !== "mouse") return;
       var a = ev.target.closest("a[data-key]");
       if (!a) { tip.hidden = true; return; }
-      var r = box.getBoundingClientRect();
       tip.textContent = a.dataset.name;
       tip.hidden = false;
-      var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
-      if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
-      tip.style.left = x + "px";
-      tip.style.top = y + "px";
+      placeTip(box, tip, ev);
     });
-    box.addEventListener("mouseleave", function () { tip.hidden = true; });
+    box.addEventListener("pointerleave", function () { tip.hidden = true; });
+    if (box.closest("[data-picker]")) return;
+    var touch = false, card = null, picked = null;
+    box.addEventListener("pointerdown", function (ev) { touch = ev.pointerType !== "mouse"; });
+    box.addEventListener("click", function (ev) {
+      var a = ev.target.closest("a[data-key]");
+      if (!a || !touch || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+      if (picked === a) return; // secondo tocco: il link apre il profilo
+      ev.preventDefault();
+      if (picked) picked.classList.remove("is-on");
+      picked = a;
+      a.classList.add("is-on");
+      if (!card) {
+        card = document.createElement("p");
+        card.className = "navmap__card";
+        card.setAttribute("role", "status");
+        box.appendChild(card);
+      }
+      card.innerHTML = '<span class="navmap__card-t">' + esc(a.dataset.name) + '</span> <a class="linkarrow" href="' + esc(a.getAttribute("href")) + '">Apri il profilo</a>';
+      card.hidden = false;
+    });
   }
 
   /* ---------- regioni e province della home: l'anteprima del territorio scelto ----------

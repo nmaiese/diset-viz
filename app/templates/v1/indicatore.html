@@ -153,7 +153,10 @@ addEventListener("pagereveal", function (e) {
   <div class="stripbar" data-stripbar aria-hidden="true">
     <div class="stripbar__in">
       <p class="stripbar__t"><span class="stripbar__name">{{ meta.name }}</span> <span class="stripbar__meta">{{ n }} {{ level.plural }}, {{ year }}</span></p>
-      <p class="stripbar__sel" data-stripbar-sel data-empty="Tocca un punto per scegliere">Tocca un punto per scegliere</p>
+      {#- Con 107 province i punti sono troppo vicini per il dito: la frase
+          manda al campo della classifica. -#}
+      {% set pick_hint = "Scegli dal campo «Trova la tua provincia»" if level.key == 'provincia' else "Tocca un punto per scegliere" %}
+      <p class="stripbar__sel" data-stripbar-sel data-empty="{{ pick_hint }}">{{ pick_hint }}</p>
       <div class="stripbar__chart">{{ d.strip_mini | safe }}</div>
     </div>
   </div>

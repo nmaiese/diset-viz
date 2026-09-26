@@ -317,7 +317,18 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .navmap a.is-on use { fill: var(--accent); }
 .navmap--data a use { stroke: var(--map-edge); stroke-width: 0.9; }
 .navmap--provincia.navmap--data a use { stroke-width: 0.4; }
-.navmap--data a:hover use { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+.navmap--data a:hover use, .navmap--data a.is-on use { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+/* Il primo tocco su una mappa per scegliere scrive qui il territorio e il
+   link al profilo (v1.js, initNavmap). */
+/* I tracciati sono fuori dalla tabulazione (la pagina ha il campo o
+   l'elenco): il tocco li mette a fuoco, e il riquadro del fuoco attorno al
+   rettangolo della regione copriva la mappa. Il territorio scelto lo dice il
+   contorno d'inchiostro. */
+.navmap a:focus { outline: none; }
+.navmap__card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-4); margin: var(--space-2) 0 0; padding: var(--space-2) 0; border-top: 1px solid var(--rule); font-size: var(--fs-small); line-height: var(--lh-small); }
+.navmap__card[hidden] { display: none; }
+.navmap__card-t { font-weight: 600; color: var(--ink); }
+.navmap__card a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; }
 .navmap--zoom svg { overflow: hidden; }
 .navmap--zoom a path { stroke: var(--map-edge); stroke-width: 0.5; stroke-linejoin: round; }
 .navmap--zoom a:hover path, .navmap--zoom a.is-on path { stroke: var(--ink); stroke-width: 1.6; paint-order: stroke; }
@@ -331,7 +342,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .map__tip {
   position: absolute; pointer-events: none; z-index: 5;
   padding: var(--space-2) var(--space-3); background: var(--ink); color: var(--bg);
-  font-size: var(--fs-small); line-height: var(--lh-small); white-space: nowrap;
+  font-size: var(--fs-small); line-height: var(--lh-small); max-width: min(16rem, 100%);
   box-shadow: var(--shadow-panel);
 }
 .map__tip b { font-weight: 700; font-variant-numeric: tabular-nums; }
