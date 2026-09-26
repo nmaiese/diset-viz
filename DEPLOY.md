@@ -336,10 +336,12 @@ AI si', addestramento no (`Content-Signal: search=yes,ai-input=yes,ai-train=no`,
 Il filtro dei bot di Cloudflare deve restare coerente con quel file, non
 sostituirlo.
 
-Quando uno strumento SEO legittimo (un crawler di audit che si dichiara, come
-quello che il 26 settembre 2026 ha preso 403 mentre Googlebot e Firecrawl
-leggevano le stesse pagine) va fatto passare, senza spegnere il WAF e senza
-aprire la porta a tutti:
+Il 26 settembre 2026 GSC Wizard ha preso 403 mentre Googlebot e Firecrawl
+leggevano le stesse pagine. In una verifica successiva dello stesso giorno GSC
+Wizard, Googlebot e Bingbot hanno ricevuto tutti HTTP 200, quindi non c'e' un
+blocco corrente da correggere. Se il problema ricompare, uno strumento SEO
+legittimo va fatto passare senza spegnere il WAF e senza aprire la porta a
+tutti:
 
 1. In Cloudflare, **Security → Events**, filtra per lo user-agent o l'IP dello
    strumento nell'ora del crawl e leggi quale servizio lo ha bloccato

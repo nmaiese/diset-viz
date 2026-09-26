@@ -68,6 +68,16 @@ cd frontend && npm run build && cd ..
 - [x] Consolidamento dell'aggiornamento UI della home e bersaglio tattile dello spotlight portato ad almeno 44 px.
 - [x] Tooling condiviso in `~/dev/ops` con `doctor.sh`, accesso operativo verificato per GCloud, Cloud Run, GCS, GA4, Search Console e Cloudflare.
 - [x] Suite completa unit + integration: 1.334 test passati il 26 settembre 2026.
+- [x] Rilascio della PR `nmaiese/diset-viz#279` verificato in produzione il 26 settembre: titoli di regioni e province, redirect legacy con query, `page_type` e suggerimenti delle strisce sono live.
+- [x] Verifica tecnica post-rilascio: sitemap canonica reinviata in Search Console il 25 settembre, 573 URL, zero errori e zero avvisi. Home, `ter-12` e `/provincia/milano` risultano indicizzate, con fetch e canonical corretti.
+- [x] Il 403 incontrato da GSC Wizard non e' piu' riproducibile: GSC Wizard, Googlebot e Bingbot ricevono HTTP 200. La procedura circoscritta per eventuali ricorrenze resta in `DEPLOY.md`.
+- [x] Le 107 pagine provincia hanno titoli, descrizioni e sintesi distintive derivate dai dati verificati. Le decisioni su H1 regionali e tre tagli responsive della striscia sono recepite nel sistema corrente.
 
 ### In Corso / Prossimi:
+- [ ] Allineare il container GTM al codice corrente: rimuovere i tag morti `back_to_atlas`, `select_sibling_indicator` e `change_visualization`; aggiungere i tag mancanti per atlante e confronto; limitare i tag di produzione all'hostname `divarioitalia.it`.
+- [ ] In GA4 verificare dalla UI la regola per il traffico interno e il relativo filtro dati, registrare solo dimensioni e metriche utili ancora mancanti e annotare il rilascio del 26 settembre. Il dettaglio verificato e' in `docs/tracking_spec.md`.
+- [ ] Correggere l'apertura di `content/indicators/13.md`: la pagina misura il tasso di occupazione totale, mentre il lead apre sul solo tasso femminile. `ter-12` non richiede la stessa riscrittura.
+- [ ] Verificare in Bing Webmaster Tools lo stato della sitemap. Search Console e' gia' verificata e non richiede un nuovo invio.
+- [ ] Decidere se bloccare `Google-Extended` per rendere la regola di `robots.txt` pienamente coerente con `ai-train=no`.
+- [ ] Il 24 ottobre 2026 misurare il primo periodo post-rilascio: click, impression, CTR e posizione GSC; sessioni organiche GA4; distribuzione di `page_type`; eventi di atlante, confronto e quiz; traffico di test e `(not set)`; CTR delle pagine regione e provincia.
 - [ ] Progettare da zero l'eventuale nuova pipeline editoriale, solo quando tornerà prioritaria rispetto al sito e al runtime.

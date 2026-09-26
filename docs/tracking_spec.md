@@ -355,7 +355,8 @@ Configurazione richiesta:
   loro (sezione Giochi): un tag GTM su quei nomi, o un tag "tutti gli eventi
   personalizzati", li conterebbe due volte
 
-Dimensioni evento create nella property `542300588` il 2026-07-17:
+Dimensioni evento presenti nella property `542300588`, verificate via Admin API
+il 26 settembre 2026:
 
 - `page_type`
 - `indicator_id`
@@ -367,14 +368,21 @@ Dimensioni evento create nella property `542300588` il 2026-07-17:
 - `theme`
 - `sort`
 - `enabled`
+- `mode`
+- `result`
+- `period`
+- `source`
 - `correct`
 - `won`
 
 Parametri che il codice manda e che non sono dimensioni registrate (in GA4 si
 vedono solo in DebugView ed esplorazioni grezze finche' non si registrano):
 `from`, `macro_area`, `source_family`, `year_from`, `year_to`, `level`,
-`region_key`, `province_key`, `mode`, `result`, `streak`, `difficulty`,
-`attempt`, `attempts`, `score`.
+`region_key`, `province_key`, `difficulty`. Non registrarli in blocco: hanno
+priorita' `level`, le chiavi territoriali e i parametri che servono davvero a
+una domanda di analisi. I parametri numerici `streak`, `attempt`, `attempts`,
+`score`, `total` e `count` vanno valutati come metriche personalizzate, non come
+dimensioni.
 
 Key event creato:
 
@@ -421,3 +429,33 @@ Verifica live eseguita con Chrome headless e API Google:
 - il JavaScript GTM non contiene piu `iubenda_gtm_consent_event` come trigger del Google Tag
 - la stream GA4 mantiene Enhanced Measurement attivo ma con `pageChangesEnabled` disattivato
 - il codice applicativo emette una sola `page_view` manuale per pagina server-rendered
+
+### Audit del container pubblicato, 26 settembre 2026
+
+Il controllo in sola lettura del container pubblico e della property ha trovato
+questo stato, da usare come checklist del prossimo intervento in GTM e GA4:
+
+- nei dati degli ultimi 28 giorni tutte le 301 sessioni con hostname valorizzato
+  sono su `divarioitalia.it`, ma nel container pubblicato non e' riconoscibile
+  una condizione esplicita sull'hostname: va aggiunta ai tag di produzione
+- il container contiene ancora i tag morti `back_to_atlas`,
+  `select_sibling_indicator` e `change_visualization`
+- sono presenti i tag storici per `select_indicator`, `change_year`,
+  `change_region`, `filter_theme`, `sort_indicators` e
+  `toggle_partial_data`; mancano quelli per `filter_macro_area`,
+  `filter_data_source`, `filter_year_range`, `compare_select_indicator`,
+  `open_region` e `open_province`
+- il container non intercetta gli eventi del quiz. Il doppio percorso nel
+  codice non produce quindi un doppio conteggio oggi: il `dataLayer` resta
+  pronto per GTM e la hit arriva dal `gtag` diretto. Prima di aggiungere tag
+  quiz in GTM bisogna togliere l'invio diretto nello stesso rilascio
+- i rapporti degli ultimi 28 giorni contengono 4 sessioni da Tag Assistant e 2
+  sessioni con referral `127.0.0.1`. La regola di traffico interno e il filtro
+  dati vanno verificati dalla UI prima di considerarli chiusi
+- `(not set)` vale 4 sessioni e 8 eventi: sette righe di dettaglio, quasi tutte
+  `user_engagement`, e una sola `page_view`. Non coinvolge gli eventi del quiz
+  e non indica una regressione applicativa urgente
+- non risulta alcuna reporting data annotation per il rilascio del 26 settembre
+
+Questa e' una fotografia della configurazione pubblicata, non una modifica
+automatica. La riconciliazione GTM e GA4 resta un'attivita' operativa esplicita.
