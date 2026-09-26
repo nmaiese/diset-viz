@@ -358,8 +358,17 @@ def indexability(family, raw_id, source_meta):
         return True, None
     if profiles.is_gender_variant(source_meta):
         return False, "variante"
-    if (source_meta.get("region_count", len(source_meta.get("regions", []))) < seo_policy.REQUIRED_REGION_COUNT
-            or (source_meta.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
+    # Il payload dell'atlante non porta copertura e numero di regioni (None):
+    # letti cosi' davano "copertura" anche alle 48 schede fuori indice solo
+    # perche' vecchie. La regola li prende dal catalogo, e cosi' il motivo.
+    item = source_meta
+    if item.get("region_count") is None or item.get("completeness") is None:
+        entry = next((e for e in profiles.get_catalog()["indicators"]
+                      if str(e["id"]) == str(item.get("id"))), None)
+        if entry:
+            item = {**item, **entry}
+    if (item.get("region_count", len(item.get("regions", []))) < seo_policy.REQUIRED_REGION_COUNT
+            or (item.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
         return False, "copertura"
     return False, "vecchia"
 
