@@ -380,10 +380,11 @@ html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-a
 @media (min-width: 600px) { .sitechrome .mine-chip:not([hidden]) { display: inline-flex; } }
 
 /* --- la cifra d'apertura (v1.js, initCount) --------------------------------
-   Nel titolo di regione e provincia la posizione e' piu' grande del resto, e
+   Nel titolo di regione e provincia (la testata porta data-count, l'h1 resta
+   com'e': lo cerca il contratto pubblico) la posizione e' piu' grande, e
    all'arrivo conta fino al suo valore: il doppione animato sta sopra il
    numero vero, che resta nel documento ma invisibile mentre si conta. */
-h1[data-count] .n--rank { font-size: 1.3em; line-height: 1; letter-spacing: -0.01em; }
-h1[data-count] .n--rank .n__u { font-size: 0.77em; }
-h1[data-count] .is-counting { position: absolute; opacity: 0; }
-h1[data-count] .count-up { font-variant-numeric: tabular-nums; }
+[data-count] > h1 .n--rank { font-size: 1.3em; line-height: 1; letter-spacing: -0.01em; }
+[data-count] > h1 .n--rank .n__u { font-size: 0.77em; }
+[data-count] > h1 .is-counting { position: absolute; opacity: 0; }
+[data-count] > h1 .count-up { font-variant-numeric: tabular-nums; }

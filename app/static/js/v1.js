@@ -977,6 +977,6 @@
   each(document, "[data-stripbar]", initStripbar);
   each(document, "[data-tilemap]", initTilemap);
   each(document, "[data-mine-set]", initMine);
-  each(document, "h1[data-count]", initCount);
+  each(document, "[data-count] > h1", initCount);
   initMineChip();
 })();

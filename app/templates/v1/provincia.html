@@ -112,9 +112,9 @@
   {{ ui.crumbs(percorso) }}
 
   <div class="provincia-top">
-    <header class="pagehead provincia-head">
+    <header class="pagehead provincia-head" data-count>
       <p class="eyebrow"><a href="/qualita-della-vita/classifica/province">Classifica delle province</a><span class="sep" aria-hidden="true">·</span>{{ d.source }}{% if d.year_to %}<span class="sep" aria-hidden="true">·</span>dati fino al {{ d.year_to }}{% endif %}</p>
-      <h1 data-count>{{ p.name }} è {{ p.rank | rank }} su {{ p.total | num(None, 'count') }} province per qualità della vita</h1>
+      <h1>{{ p.name }} è {{ p.rank | rank }} su {{ p.total | num(None, 'count') }} province per qualità della vita</h1>
       <p class="answer">Con il profilo {{ d.profile_name }} ottiene {{ p.score | num(None, 'score') }} su 100, dove 50 è la media delle province.{% if d.best and d.worst %} Va meglio su {{ d.best.name | lower }} ({{ d.best.score | num(None, 'score') }}) e peggio su {{ d.worst.name | lower }} ({{ d.worst.score | num(None, 'score') }}).{% endif %}</p>
       {#- Niente stella "Salva": i preferiti sono indicatori (docs/ACCOUNT.md),
           e un bottone che non salva niente e' peggio di nessun bottone. -#}

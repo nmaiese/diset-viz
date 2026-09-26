@@ -294,7 +294,7 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   sotto la serie, venti linee sulla stessa scala in ordine di classifica, con
   la media semplice tratteggiata. Il territorio scelto prende la linea in
   evidenza.
-- **La cifra d'apertura.** Nel titolo di regione e provincia (`h1[data-count]`)
+- **La cifra d'apertura.** Nel titolo di regione e provincia (`[data-count] > h1`: l'attributo sta sulla testata, l'h1 resta quello del contratto pubblico)
   la posizione e' piu' grande e all'arrivo conta fino al suo valore, su un
   doppione `aria-hidden`: il numero nell'HTML e' gia' quello giusto.
 - **L'immagine da condividere** di ogni regione e provincia
