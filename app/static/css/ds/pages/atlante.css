@@ -40,13 +40,26 @@
    si sa sempre in che tema si e'. Il modulo dei filtri e' troppo alto per
    restare fermo (219 pixel a 1440, 709 sul telefono), ci riporta "Torna ai
    filtri". */
-.atlante-group > h4 {
+.atlante-group summary {
+  display: flex; align-items: center; gap: var(--space-3); min-height: var(--target, 44px);
   margin-bottom: var(--space-3); position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 3;
   padding-block: var(--space-2); background: var(--bg); border-bottom: 1px solid var(--rule);
+  list-style: none; cursor: pointer;
 }
-@media (min-width: 960px) { .atlante-group > h4 { top: var(--masthead-l); } }
-.atlante-group > h4 a { color: var(--ink); }
+.atlante-group summary::-webkit-details-marker { display: none; }
+/* Il segno del tema chiuso o aperto, nel colore del testo. */
+.atlante-group summary::after {
+  content: ""; flex: none; width: 8px; height: 8px; margin-left: auto; margin-right: var(--space-1);
+  border-right: 2px solid var(--text-2); border-bottom: 2px solid var(--text-2); transform: rotate(-45deg);
+}
+.atlante-group details[open] > summary::after { transform: rotate(45deg); }
+.atlante-group details:not([open]) > summary { margin-bottom: 0; }
+@media (min-width: 960px) { .atlante-group summary { top: var(--masthead-l); } }
+.atlante-group h4 a { color: var(--ink); }
 .atlante-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
+/* Un tema chiuso e' alto quanto il suo sommario: la stima delle righe lo
+   farebbe saltare mentre si scorre. */
+.atlante-group:has(> details:not([open])) { contain-intrinsic-size: auto 64px; margin-top: var(--space-2); }
 /* Le righe a blocchi sono griglie: l'attributo hidden del filtro va imposto. */
 .v1-atlante [data-area][hidden], .v1-atlante .atlante-group[hidden], .atlante-table tr[hidden] { display: none !important; }
 .atlante-empty[hidden] { display: none; }

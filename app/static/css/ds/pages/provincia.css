@@ -23,7 +23,21 @@
 
 /* dimensioni: la colonna della barra, e lo scarto che sul telefono lascia il posto */
 .provincia-dims .provincia-dims__bar { width: 44%; }
-@container (max-width: 520px) { .provincia-dims__diff { display: none; } }
+/* Sotto i 560 pixel di modulo ogni dimensione e' un blocco: il nome a tutta
+   riga col punteggio accanto, la barra sotto a tutta larghezza. Accanto a una
+   barra di 6rem i nomi andavano a capo su tre righe. La scala 0, 50, 100
+   resta nel sottotitolo ("la linea della media 50"). */
+@container (max-width: 560px) {
+  .provincia-dims__diff { display: none; }
+  .provincia-dims thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .provincia-dims, .provincia-dims tbody { display: block; }
+  .provincia-dims tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-3); align-items: baseline; padding-block: var(--space-3); border-bottom: 1px solid var(--rule); }
+  .provincia-dims tbody th, .provincia-dims tbody td { display: block; padding: 0; border: 0; }
+  .provincia-dims tbody th { grid-column: 1; grid-row: 1; }
+  .provincia-dims tbody .val { grid-column: 2; grid-row: 1; }
+  .provincia-dims tbody .provincia-dims__bar { grid-column: 1 / -1; grid-row: 2; width: auto; margin-top: var(--space-3); }
+  .provincia-dims tbody .provincia-dims__diff { display: none; }
+}
 
 /* sintesi: nome, cifre, traccia della posizione in Italia */
 .provincia-list { list-style: none; }

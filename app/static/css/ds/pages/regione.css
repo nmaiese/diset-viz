@@ -42,3 +42,6 @@
   .regione-area tr.group { padding-top: var(--space-6); padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
   .regione-area td[colspan] { grid-column: span 2; }
 }
+
+/* La frase che dice la scala della traccia in "Dove stacca". */
+.regione-stacca__lead { max-width: var(--measure); color: var(--text-2); margin-bottom: var(--space-6); }

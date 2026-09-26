@@ -22,16 +22,23 @@
 .qv-profiles__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .qv-profiles__desc { color: var(--text-2); }
 .qv-profiles__why { font-size: var(--fs-small); line-height: var(--lh-small); }
-.qv-profiles__links { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: var(--fs-small); line-height: var(--lh-small); }
+/* I due link sono bersagli pieni da 44 pixel, alla taglia dell'interfaccia
+   e staccati: a 14 pixel e a 16 l'uno dall'altro sembravano una riga sola. */
+.qv-profiles__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-8); margin-top: var(--space-1); font-size: var(--fs-ui); line-height: var(--lh-ui); }
 .qv-profiles__links a { display: inline-flex; align-items: center; min-height: var(--target, 44px); }
 
-/* Dove eccelle: nomi e punteggio nella stessa cella, il punteggio in colonna.
-   Sul telefono regione e provincia stanno affiancate. */
-.qv-pair { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
-.qv-pair .n { flex: none; color: var(--text-2); }
+/* Dove eccelle: il nome, e subito dopo il suo punteggio in colonna. Da
+   tabella le colonne stanno sul loro contenuto: a tutta larghezza il
+   punteggio finiva a 300 pixel dal nome che misura. Sul telefono ogni
+   territorio sta accanto al suo punteggio. */
 .qv-where { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .qv-cats tbody th { font-weight: 600; }
-@container (max-width: 560px) { .table--stack.qv-cats tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (min-width: 561px) {
+  .qv-cats { width: auto; }
+  .qv-cats tbody th, .qv-cats td.val { padding-right: var(--space-8); }
+  .qv-cats td:not(.val) { padding-right: var(--space-4); }
+}
+@container (max-width: 560px) { .table--stack.qv-cats tbody tr { grid-template-columns: minmax(0, 1fr) auto; } }
 
 .qv-method-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-6); font-size: var(--fs-ui); }
 .qv-download-note { max-width: var(--measure); color: var(--text-2); }

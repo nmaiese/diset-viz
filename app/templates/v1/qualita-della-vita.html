@@ -152,13 +152,20 @@
       <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="La prima regione e la prima provincia per dimensione">
         <table class="table table--compact table--stack qv-cats">
           <caption class="sr-only">La prima regione e la prima provincia in ogni dimensione della qualità della vita, punteggio da 0 a 100</caption>
-          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima regione</th><th scope="col">Prima provincia</th></tr></thead>
+          {#- Il punteggio sta nella sua colonna, subito dopo il nome che misura:
+              nella stessa cella, spinto a destra, finiva a 300 pixel dal nome. -#}
+          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima regione</th><th class="r" scope="col">Punteggio</th><th scope="col">Prima provincia</th><th class="r" scope="col">Punteggio</th></tr></thead>
           <tbody>
             {%- for c in d.champions %}
             <tr>
               <th scope="row">{% if c.href %}<a href="{{ c.href }}">{{ c.name }}</a>{% else %}{{ c.name }}{% endif %}</th>
               {%- for group, label in [(c.regions, 'Prima regione'), (c.provinces, 'Prima provincia')] %}
-              <td data-label="{{ label }}">{% if group %}<span class="qv-pair"><span>{% for t in group %}<a href="{{ t.href }}">{{ t.name }}</a>{% if t.where %} <span class="qv-where">{{ t.where }}</span>{% endif %}{% if not loop.last %} e {% endif %}{% endfor %}{% if group | length > 1 %}<span class="qv-where">a pari merito</span>{% endif %}</span>{{ group[0].score | num(None, 'score') }}</span>{% else %}<span class="status">Nessun dato provinciale</span>{% endif %}</td>
+              {%- if group %}
+              <td data-label="{{ label }}">{% for t in group %}<a href="{{ t.href }}">{{ t.name }}</a>{% if t.where %} <span class="qv-where">{{ t.where }}</span>{% endif %}{% if not loop.last %} e {% endif %}{% endfor %}{% if group | length > 1 %}<span class="qv-where">a pari merito</span>{% endif %}</td>
+              <td class="val" data-label="Punteggio">{{ group[0].score | num(None, 'score') }}</td>
+              {%- else %}
+              <td data-label="{{ label }}" colspan="2"><span class="status">Nessun dato provinciale</span></td>
+              {%- endif %}
               {%- endfor %}
             </tr>
             {%- endfor %}

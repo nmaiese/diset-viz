@@ -50,7 +50,14 @@
    quattro porte occupavano quasi un'altezza e mezza di schermo. */
 .doors__main { list-style: none; display: grid; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 600px) { .doors__main { gap: var(--gutter-l); } }
-@media (max-width: 599px) { .door__text { display: none; } .door__unit { font-size: var(--fs-small); } }
+/* Sul telefono ogni scheda e' alta quanto il suo contenuto: con le righe
+   della griglia tirate alla piu' alta, Temi restava con 70 pixel vuoti sotto
+   il titolo accanto a Qualita' della vita, che va su due righe. */
+@media (max-width: 599px) {
+  .door__text { display: none; }
+  .door__unit { font-size: var(--fs-small); }
+  .doors__main { align-items: start; }
+}
 @media (min-width: 1200px) { .doors__main { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .door {
   position: relative; display: grid; align-content: start; gap: var(--space-2); min-width: 0;
@@ -206,7 +213,6 @@
 .qol__main .h-section { margin-bottom: 0; }
 /* La domanda sta sotto il titolo di sezione, piu' piccola: due titoli della
    stessa taglia non si capiva quale fosse quello della fascia. */
-.qol__big { font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); max-width: 22em; }
 .qol__text { max-width: var(--measure); color: var(--text-2); font-size: var(--fs-lede); line-height: var(--lh-lede); }
 .qol__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin: var(--space-2) 0 0; }
 .btn--lg { min-height: 56px; padding-inline: var(--space-6); font-size: var(--fs-subsection); }
@@ -238,13 +244,15 @@
 @media (min-width: 1200px) { .home-quiz__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
 .home-games { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 600px) { .home-games { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Niente ombre (SISTEMA.md): la scheda si stacca dal lavaggio con il fondo
+   e un filetto, e al passaggio il filetto passa all'inchiostro. */
 .game {
   position: relative; display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5);
-  background: var(--bg); border-radius: var(--radius-md); box-shadow: var(--shadow-panel);
-  transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease);
+  background: var(--bg); border: 1px solid var(--rule-strong); border-radius: var(--radius-md);
+  transition: border-color var(--motion-fast) var(--motion-ease);
 }
-.game:hover { transform: translateY(-3px); box-shadow: var(--shadow-pop); }
-@media (prefers-reduced-motion: reduce) { .game, .game:hover { transition: none; transform: none; } }
+.game:hover { border-color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .game { transition: none; } }
 @supports selector(:has(a)) {
   .game:has(a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
   .game__title a:focus-visible { outline: none; }

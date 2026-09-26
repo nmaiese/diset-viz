@@ -8,9 +8,11 @@
 <div class="wrap">
   <div class="qol">
     <div class="qol__main">
-      <h2 class="h-section" id="h-qualita">Qualità della vita</h2>
-      <p class="qol__big">Dove si vive meglio, fra le {{ q.regions | num(None, 'count') }} regioni{% if q.provinces %} e le {{ q.provinces | num(None, 'count') }} province{% endif %}?</p>
-      <p class="qol__text">L'indice mette insieme {{ q.dims_regions | num(None, 'count') }} dimensioni del benessere{% if q.dims_provinces %} ({{ q.dims_provinces | num(None, 'count') }} per le province){% endif %}{% if q.institutions %}, con i dati di {{ q.institutions }}{% endif %}. Quanto pesa ognuna lo decidi tu, e la classifica cambia con le tue priorità.</p>
+      {#- Un titolo solo: l'H2 dice la sezione e la domanda insieme, e la frase
+          sotto porta i conteggi. Prima l'H2 "Qualita' della vita" era seguito
+          da un secondo titolo grande, e la fascia aveva due teste. -#}
+      <h2 class="h-section" id="h-qualita">Qualità della vita: dove si vive meglio</h2>
+      <p class="qol__text">L'indice mette in fila le {{ q.regions | num(None, 'count') }} regioni{% if q.provinces %} e le {{ q.provinces | num(None, 'count') }} province{% endif %} su {{ q.dims_regions | num(None, 'count') }} dimensioni del benessere{% if q.dims_provinces %} ({{ q.dims_provinces | num(None, 'count') }} per le province){% endif %}{% if q.institutions %}, con i dati di {{ q.institutions }}{% endif %}. Quanto pesa ognuna lo decidi tu, e la classifica cambia con le tue priorità.</p>
       <p class="actions qol__actions">
         <a class="btn btn--primary btn--lg" href="/qualita-della-vita">Scopri dove si vive meglio {{ ui.icon('arrow') }}</a>
         <a class="linkarrow" href="/metodologia#qualita-della-vita">Come si calcola</a>

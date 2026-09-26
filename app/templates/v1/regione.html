@@ -250,6 +250,10 @@
       {% if d.excels or d.lags %}
       <section class="section" id="stacca" aria-labelledby="h-stacca">
         <h2 id="h-stacca">Dove stacca e dove resta indietro</h2>
+        {#- La scala della traccia: nell'intestazione della tabella c'e' (1ª e
+            {{ d.total }}ª), ma nelle due colonne la tabella va a blocchi e
+            l'intestazione sparisce. La dice la frase, come nella provincia. -#}
+        <p class="regione-stacca__lead">Il pallino su ogni linea è la posizione {{ d.of_name }}: a sinistra la {{ 1 | rank }} regione, a destra la {{ d.total | rank }}.</p>
         <div class="podiums">
           {% for block in [
             {"items": d.excels, "title": "Più avanti delle altre regioni", "id": "h-avanti", "note": "Gli indicatori in cui " ~ d.the_name ~ " " ~ d.verb.is ~ " più in alto in classifica, tenuto conto del verso di ognuno."},

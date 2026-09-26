@@ -11,7 +11,9 @@
     <form class="home-find" role="search" action="/ricerca" method="get" aria-labelledby="l-trova">
       <label id="l-trova" for="trova">Trova il tuo territorio</label>
       <div class="home-find__row">
-        <input id="trova" name="q" type="search" placeholder="Una regione, una provincia o un indicatore" autocomplete="off">
+        {#- Il segnaposto sta nel campo anche a 320 pixel: "Una regione, una
+            provincia o un indicatore" si fermava a "o". -#}
+        <input id="trova" name="q" type="search" placeholder="Luogo o indicatore" autocomplete="off">
         <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
       </div>
     </form>

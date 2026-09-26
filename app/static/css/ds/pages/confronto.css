@@ -26,6 +26,25 @@
 @media (min-width: 960px) {
   .confronto-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
 }
+/* Da 1200 la mappa occupa la colonna sinistra per l'altezza di valori e
+   serie, e a destra stanno la tabella e poi "Com'e' cambiato". Prima la mappa
+   (680 pixel con la legenda) stava accanto alla sola tabella di quattro righe
+   (260 pixel), e sotto la tabella restavano 400 pixel vuoti. Le due sezioni
+   restano due `section`: "I valori" e' una subgrid che copre tutte e due le
+   colonne, la sua griglia interna si scioglie (`display: contents` su un
+   `div` senza ruolo), e la serie si mette nella cella sotto la tabella. */
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 1200px) {
+    .confronto-body { display: grid; grid-template-columns: minmax(0, 26rem) minmax(0, 1fr); grid-template-rows: auto auto 1fr; column-gap: var(--space-16); }
+    .confronto-body > #valori { grid-column: 1 / -1; grid-row: 1 / -1; display: grid; grid-template-columns: subgrid; grid-template-rows: subgrid; }
+    .confronto-body > #valori > h2 { grid-column: 1 / -1; grid-row: 1; }
+    .confronto-body .confronto-grid { display: contents; }
+    .confronto-body .confronto-grid__map { grid-column: 1; grid-row: 2 / -1; }
+    .confronto-body .confronto-grid > .tablewrap { grid-column: 2; grid-row: 2; max-width: 46rem; }
+    .confronto-body > #serie { grid-column: 2; grid-row: 3; margin-top: 0; padding-top: var(--space-12); }
+    .confronto-body > #serie > h2 { font-size: var(--fs-subsection); line-height: var(--lh-subsection); border-top-width: 1px; border-top-color: var(--rule-strong); margin-bottom: var(--space-3); }
+  }
+}
 .confronto-grid__map { max-width: 34rem; }
 /* `.legend__nd` e' un inline-flex, che batterebbe `hidden`: l'isola lo
    nasconde quando nell'anno scelto ogni regione ha il dato. */

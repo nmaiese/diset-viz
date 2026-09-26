@@ -75,6 +75,11 @@
     <button class="btn btn--primary" type="submit" data-cmp-submit>Confronta</button>
   </form>
 
+  {#- Da 1200 pixel la mappa sta a sinistra per tutta l'altezza di valori e
+      serie, e a destra la tabella con sotto "Com'e' cambiato": accanto a una
+      tabella di quattro righe la mappa lasciava 400 pixel vuoti. Le due
+      sezioni restano due sezioni (confronto.css, subgrid). -#}
+  <div class="confronto-body">
   <section class="section" id="valori" aria-labelledby="h-valori">
     <h2 id="h-valori">I valori nel <span data-cmp-year-label>{{ d.year }}</span></h2>
     <div class="confronto-grid">
@@ -124,6 +129,7 @@
       </div>
     </details>
   </section>
+  </div>
 
   <p class="source confronto-source">Fonte: <a href="{{ ind.source_url }}" data-cmp-source>{{ ind.source_label }}</a>. Elaborazione Divario Italia. <a href="{{ ind.path }}" data-cmp-scheda>La scheda dell'indicatore</a> ha la definizione, tutte le {{ d.plural }} e i dati da scaricare.</p>
 

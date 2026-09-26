@@ -212,9 +212,13 @@
           {% if d.used %}<div id="dati-usati"><dt>Dati usati</dt><dd>{{ d.used | safe }}</dd></div>{% endif %}
           {% if d.sources %}<div id="fonti"><dt>Fonti</dt><dd>{{ d.sources | safe }}</dd></div>
           {% elif d.data_note %}<div id="fonti"><dt>Fonti</dt><dd>{{ d.data_note | safe }}</dd></div>{% endif %}
+          {#- Quando la redazione ha scritto "Dati usati", la descrizione e il
+              metodo del front matter lo ripetono: restano nel JSON-LD, e in
+              pagina resta solo il link al file della fonte. -#}
           {% if ds %}
-          <div><dt>I dati di questo articolo</dt><dd><p>{{ ds.description }}</p>{% if ds.source_url %}<p><a href="{{ ds.source_url }}">Il file originale della fonte</a></p>{% endif %}</dd></div>
-          {% if ds.method %}<div><dt>Metodo</dt><dd>{{ ds.method }}</dd></div>{% endif %}
+          {% if d.dataset_text %}<div><dt>I dati di questo articolo</dt><dd><p>{{ d.dataset_text }}</p>{% if ds.source_url %}<p><a href="{{ ds.source_url }}">Il file originale della fonte</a></p>{% endif %}</dd></div>
+          {% elif ds.source_url %}<div><dt>Il file della fonte</dt><dd><a href="{{ ds.source_url }}">Il file originale, come lo pubblica la fonte</a></dd></div>{% endif %}
+          {% if d.method %}<div><dt>Metodo</dt><dd>{{ d.method }}</dd></div>{% endif %}
           {% if ds.temporal %}<div><dt>Periodo</dt><dd>{{ d.period }}</dd></div>{% endif %}
           {% if ds.spatial %}<div><dt>Territori</dt><dd>{{ ds.spatial }}</dd></div>{% endif %}
           {% endif %}
@@ -222,7 +226,10 @@
           <div><dt>L'indicatore in parole semplici</dt><dd>
             <p><strong>{{ meta.name }}.</strong> {{ meta.explain.plain }}</p>
             {% if meta.explain.example %}<p><strong>In pratica.</strong> {{ meta.explain.example }}</p>{% endif %}
-            {% if meta.explain.reading %}<p><strong>Come si legge.</strong> {{ meta.explain.reading }}</p>{% endif %}
+            {#- "Come si legge" della scheda parla della sua graduatoria ("ordinata
+                dal dato minore al maggiore"): le figure dell'articolo hanno il
+                loro ordine, detto nel titolo e nella tabella, e la frase le
+                contraddiceva. Qui non va. -#}
             {% if meta.explain.caveat %}<p><strong>Limite.</strong> {{ meta.explain.caveat }}</p>{% endif %}
           </dd></div>
           {% endif %}

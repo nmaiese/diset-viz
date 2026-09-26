@@ -35,12 +35,31 @@
 .cl-profile-note { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .cl-profile-note b { color: var(--ink); font-weight: 600; }
 
-/* Dove eccelle: nome e punteggio nella stessa cella, il punteggio in colonna.
-   Sul telefono le quattro posizioni vanno a due a due. */
-.cl-pair { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
-.cl-pair .n { flex: none; color: var(--text-2); }
+/* La classifica: il nome su una riga sola (Trentino Alto Adige andava a capo
+   accanto a una barra che aveva spazio) e la barra a una larghezza massima. */
+@container rank (min-width: 720px) {
+  .cl-tables .table--rank .name { white-space: nowrap; }
+  .cl-tables .table--rank .rankcell-bar { width: 12rem; }
+}
+
+/* Dove eccelle: le prime tre in una cella, una per riga col punteggio subito
+   dopo il nome, e l'ultima. Sul telefono le due celle stanno affiancate. */
 .cl-cats tbody th { font-weight: 600; }
-@container (max-width: 560px) { .table--stack.cl-cats tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cl-top { list-style: none; display: grid; gap: var(--space-1); }
+.cl-top__rank { display: inline-block; min-width: 2ch; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cl-top__score { margin-left: var(--space-2); color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@container (min-width: 561px) {
+  .cl-cats { width: auto; }
+  .cl-cats tbody th, .cl-cats td { vertical-align: top; padding-right: var(--space-12); }
+}
+@container (max-width: 560px) { .table--stack.cl-cats tbody tr { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
+
+/* Fonti, dati e citazione: da 960 le fonti a sinistra, scaricare e citare a
+   destra. */
+.cl-sources { display: grid; gap: var(--space-8); align-items: start; }
+.cl-sources > * { min-width: 0; }
+.cl-sources__use > .actions:first-child { margin-top: 0; }
+@media (min-width: 960px) { .cl-sources { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-12); } }
 
 /* La mappa porta al profilo della regione cliccata, come la mappa di prima. */
 .cl-side .map [data-key] { cursor: pointer; }

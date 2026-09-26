@@ -820,6 +820,25 @@ def indicator_card(post: dict) -> dict | None:
 
 # ---------------------------------------------------------------- pagina
 
+# Il percorso di uno script interno non dice niente a chi legge: la regia lo
+# toglie dalle righe di "Dati e metodo" (resta nel front matter, nel JSON-LD
+# e nel repo). Tre forme: la frase che e' solo il percorso ("Script
+# `scripts/...`."), l'inciso fra parentesi, la coda di una frase ("con lo
+# script scripts/...", ", calcolata da scripts/...").
+_PATH = r"(?:<code>)?scripts/[\w/.-]*\w(?:</code>)?"
+_PATH_ALONE = re.compile(r"\s*\bScript\s+" + _PATH + r"\s*\.")
+_PATH_PAREN = re.compile(r"\s*\((?:[^()]*?\s)?" + _PATH + r"\)")
+_PATH_TAIL = re.compile(r",?\s*(?:con lo |lo )?(?:script\s+|(?:calcolat[oa] )?(?:da|con)\s+)" + _PATH)
+
+
+def without_paths(html: str | None) -> str | None:
+    if not html:
+        return html
+    for rx in (_PATH_ALONE, _PATH_PAREN, _PATH_TAIL):
+        html = rx.sub("", html)
+    return html
+
+
 def derive(ctx: dict) -> dict:
     post = ctx["post"]
     meta = post.get("indicator_meta") or {}
@@ -903,7 +922,11 @@ def derive(ctx: dict) -> dict:
         "body_before": "\n".join(items[:split]),
         "body_after": "\n".join(items[split:]),
         "toc": toc,
-        "used": "".join(used[1:]) if used else None,
+        "used": without_paths("".join(used[1:])) if used else None,
+        # Il metodo del front matter ripete "Dati usati" quando la redazione
+        # l'ha scritto: in pagina va una volta sola.
+        "method": None if used else without_paths(dataset.get("method")),
+        "dataset_text": None if used else dataset.get("description"),
         "sources": "".join(sources_[1:]).replace("<ul>", '<ul class="reflist">', 1) if sources_ else None,
         "data_note": re.sub(r"</?em>", "", data_note) if data_note else None,
         "named": named,

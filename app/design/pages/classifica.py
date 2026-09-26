@@ -463,6 +463,39 @@ def south_claim(ranking: list[dict], level: str, paths: dict) -> str | None:
     return text + f", {count_word(head)} fra le prime {count_word(EDGE)}"
 
 
+def fifty_claim(ranking: list[dict], level: str, paths: dict) -> str | None:
+    """Il titolo-affermazione della striscia della classifica: chi sta sopra 50,
+    la media semplice, per parte del paese. L'indice ha sulla sua striscia
+    `south_claim`: la classifica ne dice un'altra cosa vera, non la stessa.
+    Solo quando 50 e' davvero la media (`mean_is_fifty`), e verificato sulle
+    righe."""
+    if not mean_is_fifty(ranking):
+        return None
+    spec = LEVELS[level]
+    groups = south_split(ranking, level, paths)
+    if groups["unknown"]["n"] or not (groups["north"]["n"] and groups["south"]["n"]):
+        return None
+    north = sum(r["score"] > 50 for r in groups["north"]["rows"])
+    south = sum(r["score"] > 50 for r in groups["south"]["rows"])
+    n_north = groups["north"]["n"]
+    if not north and not south:
+        return None
+    if not south:
+        if north == n_north:
+            return (f"Tutte le {count_word(n_north)} {spec['plural']} del Centro-Nord stanno sopra la media di 50, "
+                    "nessuna del Mezzogiorno")
+        verb = "sta" if north == 1 else "stanno"
+        noun = spec["singular"] if north == 1 else spec["plural"]
+        return (f"{count_word(north).capitalize()} {noun} del Centro-Nord su {count_word(n_north)} "
+                f"{verb} sopra la media di 50, nessuna del Mezzogiorno")
+    above = north + south
+    verb = "sta" if above == 1 else "stanno"
+    noun = spec["singular"] if above == 1 else spec["plural"]
+    return (f"{count_word(above).capitalize()} {noun} su {len(ranking)} {verb} sopra 50: "
+            f"{count_word(north)} del Centro-Nord su {count_word(n_north)}, "
+            f"{count_word(south)} del Mezzogiorno su {count_word(groups['south']['n'])}")
+
+
 def map_block(ranking: list[dict]) -> dict | None:
     """Classi, nomi, valori e legenda della mappa regionale.
 
@@ -653,7 +686,7 @@ def derive(ctx: dict) -> dict:
         "first": end(first, level), "last": end(last, level),
         "gap": (first["score"] - last["score"]) if first else None,
         "movers": move, "fifty": fifty, "tiles": tiles,
-        "claim": south_claim(ranking, level, paths),
+        "claim": fifty_claim(ranking, level, paths),
         "strip": score_strip(ranking), "area_label": charts.AREA_LABEL,
         "table_claim": dimensions_claim(ranking, level),
         "levels": levels, "profiles": profile_links, "profile": profile,

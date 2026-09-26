@@ -107,8 +107,13 @@
     <div class="atlante-area" data-area="{{ area.name }}">
       <h3 class="atlante-area__title" id="{{ 'a-' ~ area.slug }}">{{ area.name }}</h3>
       {% for g in area.groups %}
+      {#- Ogni tema e' un `details` aperto: senza JavaScript si legge tutto.
+          Sotto i 600 pixel v1.js lo chiude (`data-collapse-mobile`), perche'
+          con tutti i temi aperti la pagina passava i 100.000 pixel, e
+          atlante.js lo riapre quando un filtro o la ricerca ci trova righe.
+          Il conteggio resta nel sommario. -#}
       <section class="atlante-group" data-theme="{{ g.name }}" aria-labelledby="{{ 't-' ~ g.slug }}" style="--rows:{{ g.rows | length }}">
-        <h4 class="h-sub" id="{{ 't-' ~ g.slug }}"><a href="{{ g.path }}">{{ g.name }}</a> <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4>
+        <details open data-collapse-mobile><summary><h4 class="h-sub" id="{{ 't-' ~ g.slug }}"><a href="{{ g.path }}">{{ g.name }}</a> <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4></summary>
         <div class="tablewrap stackwrap">
           <table class="table table--compact table--stack atlante-table">
             <caption class="sr-only">{{ g.name }}: le serie {{ adj }}, con l'andamento della media semplice e l'ultimo anno</caption>
@@ -120,6 +125,7 @@
             </tbody>
           </table>
         </div>
+        </details>
       </section>
       {% endfor %}
     </div>
