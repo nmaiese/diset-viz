@@ -122,6 +122,8 @@
         {% if d.institution %}<span>Fonte: <a href="#fonti">{{ d.institution }}, {{ d.sources | length | num(None, 'count') }} {{ d.sources | length | it_plural('banca dati', 'banche dati') }}</a>. Elaborazione Divario Italia</span>{% endif %}
         <a href="{{ corrections_url }}">Segnala un errore</a>
       </p>
+      {#- "Il tuo territorio" (v1.js, initMine). -#}
+      <button type="button" class="btn mine-set" data-mine-set data-level="regione" data-key="{{ d.key }}" data-name="{{ p.region }}" aria-pressed="false" hidden>È la mia regione</button>
     </header>
 
     {#- La regione ingrandita con le sue province nei colori della qualita'

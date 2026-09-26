@@ -1,0 +1,50 @@
+/* La scheda indicatore: cio' che e' solo suo. Tutto il resto (striscia,
+   modulo dato, serie, tessere, analisi) sta in components.css. Legge solo
+   token. */
+
+/* ---------- la striscia che diventa Italia ----------
+   Il comando "Striscia | Italia" nella testata della figura d'apertura, e la
+   griglia delle 20 regioni a tessere (app/design/tiles.py): una casella
+   uguale per regione, nel colore del suo gradino (gli stessi della mappa del
+   modulo), con la sigla e la cifra. Il passaggio fra le due viste e' una
+   transizione della pagina (v1.js, initTilemap): ogni punto della striscia
+   diventa la sua casella. */
+.lead-figure__view { margin-left: auto; }
+.lead-figure__view[hidden] { display: none; }
+.lead-figure__view > button { min-width: 5.5rem; }
+.tilemap[hidden] { display: none; }
+.tilemap { display: grid; gap: var(--space-4); justify-items: center; padding-block: var(--space-4); }
+.tilemap__grid {
+  display: grid; gap: 3px; width: min(100%, 19rem);
+  grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(9, auto);
+}
+.tile {
+  aspect-ratio: 1; min-width: 0; min-height: var(--target);
+  display: grid; align-content: center; justify-items: center; gap: 1px; padding: 2px;
+  font: inherit; font-family: var(--font-ui); line-height: 1.1; cursor: pointer;
+  border: 0; border-radius: var(--radius-sm); background: var(--data-null); color: var(--ink);
+  transition: box-shadow var(--motion-fast) var(--motion-ease);
+}
+.tile b { font-size: var(--fs-small); font-weight: 700; }
+.tile span { font-size: var(--fs-label); font-variant-numeric: tabular-nums; opacity: 0.9; }
+.tile.q1 { background: var(--seq-1); } .tile.q2 { background: var(--seq-2); } .tile.q3 { background: var(--seq-3); }
+.tile.q4 { background: var(--seq-4); color: var(--on-seq-4); }
+.tile.q5 { background: var(--seq-5); color: var(--bg); } .tile.q6 { background: var(--seq-6); color: var(--bg); }
+.tile.is-nd { background: var(--data-null); color: var(--muted); }
+.tile:hover, .tile.is-on { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
+.tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.tilemap .legend { width: min(100%, 19rem); margin-top: 0; }
+@media (min-width: 720px) {
+  .tilemap { grid-template-columns: auto minmax(12rem, 18rem); justify-content: center; align-items: center; column-gap: var(--space-16); }
+  .tilemap__grid { width: 19rem; }
+}
+/* Una vista alla volta: la classe la mette v1.js (initTilemap). */
+.lead-figure.is-tiles .chart--hero, .lead-figure.is-tiles > .source { display: none; }
+.lead-figure:not(.is-tiles) .tilemap { display: none; }
+/* Il volo: un segno per regione, sopra la pagina, dal punto alla casella. */
+.morph-layer { position: fixed; inset: 0; z-index: var(--z-raised); pointer-events: none; }
+.morph-layer i { position: absolute; display: block; transform-origin: center; }
+
+/* ---------- il tuo territorio, sotto la figura d'apertura ---------- */
+.mine-note { margin-top: var(--space-3); padding-left: var(--space-3); border-left: 3px solid var(--ink); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink); max-width: var(--measure); }
+.mine-note[hidden] { display: none; }

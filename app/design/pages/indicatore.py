@@ -12,6 +12,7 @@ from __future__ import annotations
 import re
 
 from app.design import charts, maps, numfmt
+from app.design import tiles as tile_grid
 from app.design.common import (
     MEZZOGIORNO,
     PATHS,
@@ -467,6 +468,11 @@ def derive(ctx: dict) -> dict:
         "series": series, "strip": strip, "module": module, "within": within_regions(meta, level, unit),
         "strip_mini": charts.mini_strip(rows, stats.get("year_avg")) if strip.get("svg") else "",
         "family": family_paths(ctx),
+        # La striscia che diventa Italia: le 20 regioni a tessere, sugli stessi
+        # gradini della mappa del modulo (tiles.py). Solo per le regioni.
+        "tilemap": tile_grid.layout(module["map_classes"], module["map_names"], module["map_values"],
+                                    {o["key"]: num(o["value"]) for o in level.get("observations") or []})
+        if level["key"] == "regione" and module.get("show_map") and strip.get("svg") else None,
         "series_claim": series_claim, "series_note": series_note,
         "updated": date_it(ctx.get("dataset_updated")),
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),

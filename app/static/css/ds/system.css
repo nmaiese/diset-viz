@@ -43,6 +43,10 @@
   --seq-4: #4383c8;
   --seq-5: #1c5fa1;
   --seq-6: #093e6f;
+  /* Il testo sopra il quarto gradino della rampa: inchiostro in chiaro
+     (4,6:1), fondo in scuro (5,5:1). Sotto e sopra e' sempre inchiostro o
+     fondo, uguale nei due temi (le tessere dell'Italia, indicatore.css). */
+  --on-seq-4: var(--ink);
   --seq-label-1: #121519;
   --seq-label-2: #121519;
   --seq-label-3: #121519;
@@ -438,6 +442,7 @@ body.ds {
   --seq-4: #5890cd;
   --seq-5: #8ab8ec;
   --seq-6: #c8e1fe;
+  --on-seq-4: var(--bg);
   --seq-label-1: #eceef1;
   --seq-label-2: #eceef1;
   --seq-label-3: #eceef1;

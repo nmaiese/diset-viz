@@ -29,7 +29,7 @@
 {% endif %}
 {% endblock %}
 
-{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}">{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/indicatore.css') }}">{% endblock %}
 
 {% block head_extra %}
 {#- Fra schede della stessa famiglia (genere, eta', regioni e province) i punti
@@ -140,9 +140,31 @@ addEventListener("pagereveal", function (e) {
     <figcaption class="lead-figure__head">
       <span class="lead-figure__title" id="divario-t">Il divario nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
       {{ ui.arealegend(d.strip.legend) }}
+      {#- La striscia che diventa Italia: gli stessi venti punti si ricompongono
+          in una griglia a forma d'Italia, una casella per regione, e prendono
+          il colore del valore. Il comando lo accende v1.js (initTilemap):
+          senza JavaScript resta la striscia. -#}
+      {% if d.tilemap %}
+      <div class="seg lead-figure__view" role="group" aria-label="Vista della figura" data-view-toggle hidden>
+        <button type="button" data-view="strip" aria-pressed="true">Striscia</button><button type="button" data-view="tiles" aria-pressed="false">Italia</button>
+      </div>
+      {% endif %}
     </figcaption>
     <div class="chart chart--hero" data-series>{{ d.strip.svg | safe }}</div>
+    {% if d.tilemap %}
+    <div class="tilemap" data-tilemap hidden>
+      <div class="tilemap__grid" role="group" aria-label="Le {{ n }} {{ level.plural }} a forma d'Italia, {{ meta.name }}, {{ year }}">
+        {%- for t in d.tilemap %}
+        <button type="button" class="tile {{ t.step or 'is-nd' }}" style="grid-column: {{ t.col }}; grid-row: {{ t.row }}" data-key="{{ t.key }}" aria-label="{{ t.name }}, {{ t.value }}"><b>{{ t.abbr }}</b><span>{{ t.short }}</span></button>
+        {%- endfor %}
+      </div>
+      {% if d.module.legend %}{{ ui.legend(d.module.legend, 'Più intenso, valore più alto.', d.module.legend_nd) }}{% endif %}
+    </div>
+    {% endif %}
     <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.values_note %}, {{ d.values_note }}{% endif %}.</p>
+    {#- Il tuo territorio, se l'hai scelto dal suo profilo: la riga la scrive
+        v1.js con i dati che la pagina ha gia'. -#}
+    <p class="mine-note" data-mine-note hidden></p>
   </figure>
   {#- La striscia che resta: quando quella grande esce dallo schermo, la stessa
       striscia in una riga si ferma sotto la testata (e sotto la barra delle

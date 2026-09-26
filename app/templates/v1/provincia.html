@@ -118,6 +118,9 @@
       <p class="meta">
         <a href="{{ corrections_url }}">Segnala un errore</a>
       </p>
+      {#- "Il tuo territorio": sceglierla qui la mette in evidenza in ogni
+          scheda (v1.js, initMine). Senza JavaScript il bottone non compare. -#}
+      <button type="button" class="btn mine-set" data-mine-set data-level="provincia" data-key="{{ p.key }}" data-name="{{ p.name }}"{% if d.region_key %} data-region="{{ d.region_key }}" data-region-name="{{ p.region }}"{% endif %} aria-pressed="false" hidden>È la mia provincia</button>
     </header>
     {% if d.region_key %}
     {% set where %}{{ 'Città metropolitana' if p.metro_city else 'Provincia' }} {{ d.of_name }}, in <a href="{{ p.region_path }}">{{ p.region }}</a>{% endset %}

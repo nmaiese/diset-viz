@@ -352,6 +352,7 @@
         }
       });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
+      page.querySelectorAll(".tile[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
       // La barra della striscia che resta dice chi e' scelto, col valore
       // dell'anno della striscia (l'ultimo); e la scelta si ricorda fra le
       // schede della stessa famiglia (initFamily).
@@ -447,6 +448,27 @@
       var kept = null;
       try { kept = sessionStorage.getItem("di:territorio"); } catch (e) { kept = null; }
       if (kept && data.names[kept]) { select.value = kept; highlight(kept); }
+    }
+    // Il tuo territorio, quando non c'e' gia' un'altra scelta: acceso in
+    // striscia, mappa e classifica, e una riga sotto la figura d'apertura.
+    else if (select && page.querySelector("[data-mine-note]")) {
+      var mine = readMine();
+      var mk = mine && (data.names[mine.key] ? mine.key : (mine.region && data.names[mine.region] ? mine.region : null));
+      var note = page.querySelector("[data-mine-note]");
+      if (mk) {
+        select.value = mk;
+        highlight(mk);
+        if (note) {
+          var yr = data.years[data.years.length - 1], list = rows(yr), at = -1;
+          list.forEach(function (x, i) { if (x.key === mk) at = i; });
+          var who = mk === mine.key ? "La tua " + (mine.level === "provincia" ? "provincia" : "regione") + ", " + mine.name
+                                    : data.names[mk] + ", la regione di " + mine.name;
+          note.textContent = at >= 0
+            ? who + ": " + withUnit(list[at].value, data.unit) + " nel " + yr + ", " + (at + 1) + "ª su " + list.length + " " + data.plural + (lowerBetter ? " dal valore più basso." : " dal valore più alto.")
+            : who + ": dato non disponibile nel " + yr + ".";
+          note.hidden = false;
+        }
+      }
     }
     // Arrivati da /provincia/<key> con #p-<key>: la riga diventa la scelta, e
     // se il browser non ha aperto il details da se' lo apre reveal.
@@ -683,6 +705,139 @@
     });
   });
 
+  /* ---------- il tuo territorio ----------
+     Si sceglie una volta, dal profilo di una regione o di una provincia ("E'
+     la mia"), e resta nel browser (`di:mio`, JSON con livello, chiave, nome e,
+     per una provincia, la sua regione). Da li': un segno nella testata che
+     porta al profilo, e in ogni scheda il territorio acceso in striscia, mappa
+     e classifica, con una riga che dice dove sta. Una scheda solo regionale,
+     con una provincia scelta, accende la sua regione. Niente passa dal server:
+     la pagina per Google e' la stessa per tutti. */
+  function readMine() {
+    try { var v = JSON.parse(localStorage.getItem("di:mio") || "null"); return v && v.key && v.level ? v : null; }
+    catch (e) { return null; }
+  }
+  function writeMine(v) {
+    try { if (v) localStorage.setItem("di:mio", JSON.stringify(v)); else localStorage.removeItem("di:mio"); } catch (e) { /* senza storage non si ricorda */ }
+    document.dispatchEvent(new CustomEvent("di:mio"));
+  }
+  function initMine(btn) {
+    btn.hidden = false;
+    var me = { level: btn.dataset.level, key: btn.dataset.key, name: btn.dataset.name };
+    if (btn.dataset.region) { me.region = btn.dataset.region; me.regionName = btn.dataset.regionName; }
+    var word = me.level === "provincia" ? "provincia" : "regione";
+    function paint() {
+      var m = readMine(), on = !!m && m.level === me.level && m.key === me.key;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = on ? "La tua " + word + ": togli la scelta" : "È la mia " + word;
+    }
+    btn.addEventListener("click", function () {
+      var m = readMine();
+      writeMine(m && m.level === me.level && m.key === me.key ? null : me);
+    });
+    document.addEventListener("di:mio", paint);
+    paint();
+  }
+  function initMineChip() {
+    var right = document.querySelector(".sitechrome .hdr__right");
+    if (!right || document.querySelector(".mine-chip")) return;
+    var chip = document.createElement("a");
+    chip.className = "mine-chip";
+    right.insertBefore(chip, right.firstChild);
+    function paint() {
+      var m = readMine();
+      chip.hidden = !m;
+      if (!m) return;
+      chip.href = (m.level === "provincia" ? "/provincia/" : "/regione/") + m.key;
+      chip.textContent = "La tua: " + m.name;
+    }
+    document.addEventListener("di:mio", paint);
+    paint();
+  }
+
+  /* ---------- la striscia che diventa Italia ----------
+     Nella figura d'apertura di una scheda regionale il comando "Striscia |
+     Italia" ricompone gli stessi venti punti in una griglia a forma d'Italia
+     (app/design/tiles.py). Il passaggio e' un volo: si misurano i punti e le
+     caselle, e un segno per regione va dall'uno all'altra cambiando forma e
+     colore (la ripartizione diventa il valore). Senza JavaScript il comando
+     non c'e' e resta la striscia; con prefers-reduced-motion la vista cambia
+     e basta. La scelta della vista si ricorda (`di:vista`), e toccare una
+     casella sceglie il territorio come un punto della striscia. */
+  function initTilemap(box) {
+    var fig = box.closest(".lead-figure");
+    var toggle = fig && fig.querySelector("[data-view-toggle]");
+    var strip = fig && fig.querySelector(".chart--hero");
+    if (!toggle || !strip) return;
+    var page = fig.closest("[data-page-root]") || document;
+    box.hidden = false;
+    toggle.hidden = false;
+    var still = matchMedia("(prefers-reduced-motion: reduce)");
+    function tilesOf() { var m = {}; box.querySelectorAll(".tile[data-key]").forEach(function (t) { m[t.dataset.key] = t; }); return m; }
+    function dotsOf() { var m = {}; strip.querySelectorAll(".strip__dot[data-key]").forEach(function (d) { m[d.dataset.key] = d; }); return m; }
+    function apply(view) {
+      fig.classList.toggle("is-tiles", view === "tiles");
+      toggle.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.view === view ? "true" : "false"); });
+    }
+    function fly(view) {
+      var toTiles = view === "tiles";
+      var fromEls = toTiles ? dotsOf() : tilesOf();
+      var from = {};
+      Object.keys(fromEls).forEach(function (k) {
+        var el = fromEls[k], r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+        from[k] = { r: r, color: toTiles ? cs.fill : cs.backgroundColor };
+      });
+      apply(view);
+      var toEls = toTiles ? tilesOf() : dotsOf();
+      var layer = document.createElement("div");
+      layer.className = "morph-layer";
+      layer.setAttribute("aria-hidden", "true");
+      document.body.appendChild(layer);
+      var targets = Object.keys(toEls).filter(function (k) { return from[k]; });
+      targets.forEach(function (k) { toEls[k].style.visibility = "hidden"; });
+      var runs = targets.map(function (k, i) {
+        var el = toEls[k], b = el.getBoundingClientRect(), a = from[k].r, cs = getComputedStyle(el);
+        var endColor = toTiles ? cs.backgroundColor : cs.fill;
+        var endRadius = toTiles ? cs.borderRadius : "50%";
+        var startRadius = toTiles ? "50%" : getComputedStyle(fromEls[k]).borderRadius;
+        var mark = document.createElement("i");
+        mark.style.left = b.left + "px"; mark.style.top = b.top + "px";
+        mark.style.width = b.width + "px"; mark.style.height = b.height + "px";
+        layer.appendChild(mark);
+        var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
+        var sx = a.width / b.width, sy = a.height / b.height;
+        return mark.animate([
+          { transform: "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")", borderRadius: startRadius, backgroundColor: from[k].color },
+          { transform: "none", borderRadius: endRadius, backgroundColor: endColor }
+        ], { duration: 650, delay: i * 12, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)", fill: "both" }).finished;
+      });
+      Promise.all(runs).then(done, done);
+      function done() {
+        targets.forEach(function (k) { toEls[k].style.visibility = ""; });
+        layer.remove();
+      }
+    }
+    function show(view, animate) {
+      if (fig.classList.contains("is-tiles") === (view === "tiles")) return;
+      if (animate && !still.matches && Element.prototype.animate) fly(view); else apply(view);
+      try { localStorage.setItem("di:vista", view); } catch (e) { /* senza storage non si ricorda */ }
+    }
+    toggle.addEventListener("click", function (ev) {
+      var b = ev.target.closest("[data-view]");
+      if (b) show(b.dataset.view, true);
+    });
+    box.addEventListener("click", function (ev) {
+      var t = ev.target.closest(".tile[data-key]");
+      var cur = t && liveExplore.get(page);
+      if (!t || !cur || !cur.select) return;
+      cur.select.value = cur.select.value === t.dataset.key ? "" : t.dataset.key;
+      cur.highlight(cur.select.value);
+    });
+    var kept = null;
+    try { kept = localStorage.getItem("di:vista"); } catch (e) { kept = null; }
+    if (kept === "tiles") show("tiles", false);
+  }
+
   /* ---------- la striscia che resta ----------
      Scende sotto la testata quando la striscia grande esce dallo schermo verso
      l'alto, e se ne va quando comincia l'analisi (o la nota sul metodo). Il
@@ -791,4 +946,7 @@
   initTotop();
   initHdr();
   each(document, "[data-stripbar]", initStripbar);
+  each(document, "[data-tilemap]", initTilemap);
+  each(document, "[data-mine-set]", initMine);
+  initMineChip();
 })();
