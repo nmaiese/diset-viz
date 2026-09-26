@@ -706,6 +706,34 @@
     });
   });
 
+  /* ---------- la cifra d'apertura ----------
+     Nel titolo di una regione o di una provincia la posizione arriva
+     contando: dieci posti prima del suo, fino al suo, in mezzo secondo, una
+     volta sola. Il numero nell'HTML e' gia' quello giusto (senza JavaScript,
+     per i lettori di schermo e per Google): si anima un doppione in
+     aria-hidden sopra di lui, e con prefers-reduced-motion non si anima
+     niente. */
+  function initCount(h1) {
+    var data = h1.querySelector(".n--rank data");
+    if (!data || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var end = parseInt(data.getAttribute("value"), 10);
+    if (!(end > 0)) return;
+    var start = end + 10, t0 = null;
+    var shown = document.createElement("span");
+    shown.className = "count-up";
+    shown.setAttribute("aria-hidden", "true");
+    data.classList.add("is-counting");
+    data.parentNode.insertBefore(shown, data);
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / 500), ease = 1 - Math.pow(1 - k, 3);
+      shown.textContent = String(Math.round(start + (end - start) * ease));
+      if (k < 1) requestAnimationFrame(step);
+      else { shown.remove(); data.classList.remove("is-counting"); }
+    }
+    requestAnimationFrame(step);
+  }
+
   /* ---------- il tuo territorio ----------
      Si sceglie una volta, dal profilo di una regione o di una provincia ("E'
      la mia"), e resta nel browser (`di:mio`, JSON con livello, chiave, nome e,
@@ -949,5 +977,6 @@
   each(document, "[data-stripbar]", initStripbar);
   each(document, "[data-tilemap]", initTilemap);
   each(document, "[data-mine-set]", initMine);
+  each(document, "h1[data-count]", initCount);
   initMineChip();
 })();

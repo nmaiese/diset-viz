@@ -61,6 +61,10 @@ class IlProfilo(unittest.TestCase):
                 self.assertRegex(html, rf'<meta property="og:image" content="https://[^"]+/static/img/og/territori/{image}">')
         self.assertIn("og-divario-italia.png", client.get("/regioni").get_data(as_text=True))
 
+    def test_la_cifra_d_apertura_e_gia_giusta_nell_html(self):
+        html = app.test_client().get("/provincia/lecce").get_data(as_text=True)
+        self.assertRegex(html, r'<h1 data-count>Lecce è <span class="n n--rank"><data value="\d+">\d+</data>')
+
     def test_regione_e_provincia_hanno_il_bottone_nascosto(self):
         client = app.test_client()
         regione = client.get("/regione/campania").get_data(as_text=True)
