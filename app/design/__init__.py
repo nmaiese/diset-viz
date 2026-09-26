@@ -40,11 +40,25 @@ def register(app) -> None:
     from app.design import terms
 
     app.jinja_env.globals["v1_term"] = terms.term
+    app.jinja_env.globals["legend_mode_text"] = legend_mode_text
     app.jinja_env.globals["v1_paths"] = _paths()
     from app.design import maps
 
     app.jinja_env.globals["v1_province_paths"] = maps.PROVINCE_PATHS
     app.jinja_env.globals["v1_map_sprite"] = maps.sprite
+
+
+# Le due frasi della legenda sui gradini (`ui.legend`), le stesse che v1.js
+# scrive quando la mappa cambia anno (LEGEND_MODE in v1.js).
+LEGEND_MODE = {
+    "equal": "Sei gradini uguali fra minimo e massimo.",
+    "quantile": ("Sei gruppi con lo stesso numero di territori, perché un valore fuori scala "
+                 "metterebbe quasi tutti gli altri nello stesso colore. Al centro la mediana."),
+}
+
+
+def legend_mode_text(mode: str | None) -> str:
+    return LEGEND_MODE.get(mode or "equal", LEGEND_MODE["equal"])
 
 
 def _of_place(name: str, level_key: str) -> str:

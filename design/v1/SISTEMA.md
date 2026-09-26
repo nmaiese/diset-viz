@@ -154,7 +154,12 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   `<main>`, perche' la striscia in testa e la serie di "Com'e' cambiato" sono
   fuori dal modulo. Da solo (`root=True`) il modulo e' il confine di se stesso.
 - **Mappa coropletica**: sei gradini da poco a molto contrasto seguendo la
-  grandezza, qualunque sia il verso, legenda con tutti e sei. Dato mancante
+  grandezza, qualunque sia il verso, legenda con tutti e sei. I gradini sono
+  uguali fra minimo e massimo, tranne quando uno solo prenderebbe almeno meta'
+  dei territori (un valore fuori scala): allora sono sei gruppi di pari
+  numerosita', per posizione, e la legenda lo dice a parole con la mediana al
+  centro. Una regola sola, `indicator_notes.choropleth_scale`, con la copia
+  `choroScale` di `v1.js` tenuta uguale da `test_choropleth_parity`. Dato mancante
   tratteggiato, "n.d.". Selezione con contorno in inchiostro, mai in accento.
   Regioni o province (`ui.map(..., level=)`): sulle province i confini
   regionali si ridisegnano sopra, piu' larghi nel colore del fondo. I contorni

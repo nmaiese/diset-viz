@@ -34,7 +34,8 @@ from collections import Counter
 
 from app import sources
 from app.data import REGION_GEO_AREA
-from app.design import charts, numfmt
+from app.design import charts, common, numfmt
+from app.indicator_notes import choropleth_scale
 from app.design.common import PATHS, count_word, of_place, ordinal, with_unit
 from app.seo_titles import of_region
 
@@ -465,18 +466,16 @@ def south_claim(ranking: list[dict], level: str, paths: dict) -> str | None:
 def map_block(ranking: list[dict]) -> dict | None:
     """Classi, nomi, valori e legenda della mappa regionale.
 
-    Il gradino viene dal colore che l'app ha gia' assegnato (`var(--seq-N)`,
-    sei parti uguali fra minimo e massimo), cosi' mappa e sito non divergono.
+    I gradini sono quelli di tutte le mappe (`choropleth_scale`): uguali di
+    norma, quantili quando un punteggio fuori scala schiaccerebbe gli altri.
     """
-    classes = {}
-    for row in ranking:
-        m = re.search(r"--seq-(\d)", row.get("color") or "")
-        if m:
-            classes[row["key"]] = f"q{m.group(1)}"
-    scores = [r["score"] for r in ranking if r.get("score") is not None]
-    if not classes or not scores:
+    scored = {r["key"]: r["score"] for r in ranking if r.get("score") is not None}
+    if not scored:
         return None
-    lo, hi = min(scores), max(scores)
+    classes = {k: f"q{step}" for k, step in common.map_steps(scored).items()}
+    scale = choropleth_scale(list(scored.values()))
+    lo, hi = scale["lo"], scale["hi"]
+    mid = scale["median"] if scale["mode"] == "quantile" else lo + (hi - lo) / 2
     first, last = ranking[0], ranking[-1]
     # I due estremi nominati sulla mappa, con il filo dal baricentro.
     callouts = charts.map_callouts(PATHS, [(r["key"], r["name"], f"{points(r['score'])} punti")
@@ -485,7 +484,7 @@ def map_block(ranking: list[dict]) -> dict | None:
         "classes": classes,
         "names": {r["key"]: r["name"] for r in ranking},
         "tips": {r["key"]: f"{points(r['score'])} punti" for r in ranking},
-        "legend": {"min": points(lo), "mid": points(lo + (hi - lo) / 2), "max": points(hi), "unit": None},
+        "legend": {"min": points(lo), "mid": points(mid), "max": points(hi), "unit": None, "mode": scale["mode"]},
         "callouts": callouts,
     }
 

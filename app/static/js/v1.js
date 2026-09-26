@@ -35,6 +35,45 @@
     var zero = Number(s.replace(/\./g, "").replace(",", ".")) === 0;
     return (v < 0 && !zero ? "-" : "") + s;
   }
+  /* ---------- i gradini della mappa, stessa regola di choropleth_scale ----------
+     Sei gradini uguali fra minimo e massimo; sei gruppi di pari numerosita'
+     (quantili) quando un gradino solo prenderebbe almeno meta' dei territori.
+     La regola vive in app/indicator_notes.py, e tests/unit/test_choropleth_parity.py
+     esegue queste righe con node e le confronta con la copia Python. */
+  /* choro:start */
+  var QUANTILE_SHARE = 0.5, QUANTILE_MIN_N = 6;
+  var LEGEND_MODE = {
+    equal: "Sei gradini uguali fra minimo e massimo.",
+    quantile: "Sei gruppi con lo stesso numero di territori, perché un valore fuori scala metterebbe quasi tutti gli altri nello stesso colore. Al centro la mediana."
+  };
+  function choroScale(values) {
+    var v = values.slice().sort(function (a, b) { return a - b; });
+    var n = v.length;
+    if (!n) return null;
+    var lo = v[0], hi = v[n - 1], span = (hi - lo) || 1;
+    var counts = [0, 0, 0, 0, 0, 0];
+    v.forEach(function (x) { counts[Math.min(5, Math.floor((x - lo) / span * 6))] += 1; });
+    var mid = Math.floor(n / 2), median = n % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+    if (n >= QUANTILE_MIN_N && hi > lo && Math.max.apply(null, counts) >= QUANTILE_SHARE * n) {
+      return { mode: "quantile", lo: lo, hi: hi, median: median, sorted: v };
+    }
+    return { mode: "equal", lo: lo, hi: hi, median: median, sorted: v };
+  }
+  function choroStep(x, sc) {
+    if (sc.mode === "equal") return Math.min(6, Math.floor((x - sc.lo) / ((sc.hi - sc.lo) || 1) * 6) + 1);
+    var i = 0;
+    while (i < sc.sorted.length && sc.sorted[i] < x) i++;
+    return Math.min(6, Math.floor(i * 6 / sc.sorted.length) + 1);
+  }
+  /* choro:end */
+  // La legenda di una mappa ricolorata: soglie e frase sui gradini.
+  function choroLegend(box, sc) {
+    var lg = { min: sc.lo, mid: sc.mode === "quantile" ? sc.median : sc.lo + (sc.hi - sc.lo) / 2, max: sc.hi };
+    box.querySelectorAll("[data-legend]").forEach(function (el) {
+      var key = el.dataset.legend;
+      el.textContent = key === "mode" ? LEGEND_MODE[sc.mode] : fmt(lg[key]);
+    });
+  }
   function withUnit(v, unit) {
     if (v === null || v === undefined) return "n.d.";
     if (unit === "%") return fmt(v) + "%";
@@ -179,7 +218,8 @@
       var list = rows(year);
       if (!list.length) return;
       var vals = list.map(function (r) { return r.value; });
-      var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+      var sc = choroScale(vals);
+      var lo = sc.lo, hi = sc.hi;
       var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
       var max = Math.max(hi, 0) || 1;
       var byKey = {};
@@ -193,7 +233,7 @@
         var r = byKey[p.dataset.key];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6");
         if (r) {
-          p.classList.add("q" + Math.min(6, Math.floor((r.value - lo) / span * 6) + 1));
+          p.classList.add("q" + choroStep(r.value, sc));
           p.style.fill = "";
           p.dataset.value = withUnit(r.value, data.unit);
         } else {
@@ -201,8 +241,7 @@
           p.dataset.value = "n.d.";
         }
       });
-      var lg = { min: lo, mid: lo + span / 2, max: hi };
-      mod.querySelectorAll("[data-legend]").forEach(function (el) { el.textContent = fmt(lg[el.dataset.legend]); });
+      choroLegend(mod, sc);
 
       var sel = select ? select.value : "";
       // Piegata come sul server (indicatore.fold): le prime e le ultime
@@ -587,7 +626,7 @@
     each(root, ".toc", initToc);
   }
 
-  window.DiV1 = { init: init };
+  window.DiV1 = { init: init, choroScale: choroScale, choroStep: choroStep, choroLegend: choroLegend };
   init(document);
   initTotop();
 })();

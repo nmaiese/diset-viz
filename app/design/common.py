@@ -195,10 +195,27 @@ def map_classes(level: dict) -> dict[str, str]:
 
 
 def legend(values: list[float], unit: str | None) -> dict:
-    """Soglie dei sei gradini a intervalli uguali, come ds_choropleth_colors."""
-    lo, hi = min(values), max(values)
-    mid = lo + (hi - lo) / 2
-    return {"min": num(lo), "mid": num(mid), "max": num(hi), "unit": unit}
+    """La legenda dei sei gradini, con i gradini di `ds_choropleth_colors`.
+
+    Coi gradini uguali al centro c'e' il punto di mezzo fra minimo e massimo,
+    coi quantili la mediana: `mode` dice a `ui.legend` quale frase scrivere.
+    """
+    from app.indicator_notes import choropleth_scale
+
+    scale = choropleth_scale(values)
+    lo, hi = scale["lo"], scale["hi"]
+    mid = scale["median"] if scale["mode"] == "quantile" else lo + (hi - lo) / 2
+    return {"min": num(lo), "mid": num(mid), "max": num(hi), "unit": unit, "mode": scale["mode"]}
+
+
+def map_steps(values: dict[str, float]) -> dict[str, int]:
+    """{chiave: gradino 1..6} coi gradini di `ds_choropleth_colors`."""
+    from app.indicator_notes import choropleth_scale, choropleth_step
+
+    if not values:
+        return {}
+    scale = choropleth_scale(list(values.values()))
+    return {k: choropleth_step(v, scale) for k, v in values.items()}
 
 
 def ranking(level: dict, unit: str | None) -> list[dict]:

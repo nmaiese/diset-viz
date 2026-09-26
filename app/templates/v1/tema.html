@@ -130,7 +130,7 @@
         <h3 class="h-sub tema-side__title">Il punteggio sulla mappa, {{ s.year_max }}</h3>
         {{ ui.map(d.map.classes, 'tema', d.map.names, d.map.tips, overlay=d.map.callouts,
                   label='Mappa delle regioni italiane per punteggio sul tema ' ~ p.theme ~ ', ' ~ s.year_max) }}
-        {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto. Sei gradini uguali fra il più basso e il più alto.', nd=False) }}
+        {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto.', nd=False) }}
       </div>
       {% endif %}
     </div>

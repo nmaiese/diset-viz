@@ -81,7 +81,7 @@
 
         <div class="feat__map">
           {{ ui.map(lv.map_classes, 'dato-' ~ lv.key, lv.map_names, lv.map_values, overlay=lv.callouts, label="Mappa cliccabile delle " ~ lv.plural ~ " italiane per " ~ f.name ~ ", " ~ lv.year, level=lv.key, use=True) }}
-          {% if lv.legend %}{{ ui.legend(lv.legend, 'Più intenso, valore più alto. Sei gradini uguali fra minimo e massimo.', lv.missing) }}{% endif %}
+          {% if lv.legend %}{{ ui.legend(lv.legend, 'Più intenso, valore più alto.', lv.missing) }}{% endif %}
         </div>
 
         {#- Sul telefono la classifica si chiude (v1.js, data-collapse-mobile):

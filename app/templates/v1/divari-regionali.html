@@ -72,7 +72,7 @@
       <div class="module__body">
         <div class="module__map">
           {{ ui.map(m.classes, 'divari', m.names, m.tips, overlay=m.callouts, label='Mappa cliccabile delle regioni italiane per ' ~ m.name ~ ', ' ~ m.year) }}
-          {{ ui.legend(m.legend, 'Più intenso, valore più alto. Sei gradini uguali fra minimo e massimo.', m.missing) }}
+          {{ ui.legend(m.legend, 'Più intenso, valore più alto.', m.missing) }}
         </div>
         {% set rm = {"decimals": m.decimals, "areas": m.areas, "area_label": d.area_label, "profile_path": "/regione/", "row_id": None} %}
         <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle regioni per {{ m.name }}">

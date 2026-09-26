@@ -1,3 +1,5 @@
+import bisect
+import math
 import re
 
 
@@ -1513,19 +1515,67 @@ def ds_ramp_color(fraction):
     return DS_SEQ_RAMP[min(steps - 1, max(0, int(fraction * steps)))]
 
 
+# Gradini adattivi. Di norma i sei gradini dividono in parti uguali la
+# distanza fra minimo e massimo, cosi' il colore segue la grandezza. Ma basta
+# un territorio fuori scala (il Trentino nel turismo, 52 giornate contro una
+# media di 10) per mettere diciassette regioni su venti nello stesso colore, e
+# la mappa non dice piu' niente. Quando un gradino solo prenderebbe almeno meta'
+# dei territori, i gradini diventano sei gruppi di pari numerosita' (quantili):
+# la mappa mostra l'ordine, e la legenda lo dice a parole. Le distanze vere
+# restano nella striscia e nella classifica accanto.
+# La stessa regola sta in `choroScale` di app/static/js/v1.js (la mappa che
+# cambia anno senza ricaricare), e tests/unit/test_choropleth_parity.py tiene
+# uguali le due copie.
+QUANTILE_SHARE = 0.5
+QUANTILE_MIN_N = 6
+
+
+def choropleth_scale(numeric):
+    """Il modo dei sei gradini per una lista di valori.
+
+    {"mode": "equal" | "quantile", "lo", "hi", "median", "sorted"}. Coi
+    gradini uguali conta la distanza dal minimo; coi quantili conta il posto:
+    un valore sta nel gradino della prima posizione che occupa nella lista
+    ordinata, cosi' i pari merito restano insieme, il minimo e' nel primo
+    gradino e il massimo nell'ultimo.
+    """
+    vals = sorted(float(v) for v in numeric)
+    if not vals:
+        raise ValueError("choropleth_scale: nessun valore da mettere sulla mappa")
+    n, lo, hi = len(vals), vals[0], vals[-1]
+    span = (hi - lo) or 1.0
+    counts = [0] * 6
+    for v in vals:
+        counts[min(5, int((v - lo) / span * 6))] += 1
+    mid = n // 2
+    median = vals[mid] if n % 2 else (vals[mid - 1] + vals[mid]) / 2
+    if n >= QUANTILE_MIN_N and hi > lo and max(counts) >= QUANTILE_SHARE * n:
+        return {"mode": "quantile", "lo": lo, "hi": hi, "median": median, "sorted": vals}
+    return {"mode": "equal", "lo": lo, "hi": hi, "median": median, "sorted": vals}
+
+
+def choropleth_step(value, scale):
+    """Il gradino 1..6 di un valore nella scala di `choropleth_scale`."""
+    if scale["mode"] == "equal":
+        span = (scale["hi"] - scale["lo"]) or 1.0
+        return min(6, int((value - scale["lo"]) / span * 6) + 1)
+    vals = scale["sorted"]
+    return min(6, bisect.bisect_left(vals, float(value)) * 6 // len(vals) + 1)
+
+
 def ds_choropleth_colors(values):
     """{region_key: "var(--seq-N)"} sulla rampa del design system.
 
     Unica rampa del sito: la migrazione al design system e' finita, e la
-    vecchia scala blu (interpolata fra due estremi) non ha piu' chiamanti.
+    vecchia scala blu (interpolata fra due estremi) non ha piu' chiamanti. I
+    gradini sono quelli di `choropleth_scale`.
     """
     numeric = [row["value"] for row in values if row.get("value") is not None]
     if not numeric:
         return {}
-    low, high = min(numeric), max(numeric)
-    span = (high - low) or 1.0
+    scale = choropleth_scale(numeric)
     return {
-        row["region_key"]: ds_ramp_color((row["value"] - low) / span)
+        row["region_key"]: DS_SEQ_RAMP[choropleth_step(row["value"], scale) - 1]
         for row in values
         if row.get("value") is not None
     }

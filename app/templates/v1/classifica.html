@@ -170,7 +170,7 @@
               profilo della regione cliccata (lo script in fondo). -#}
           {{ ui.map(d.map.classes, 'punteggio', d.map.names, d.map.tips, overlay=d.map.callouts,
                     label='Mappa cliccabile delle regioni italiane per punteggio di qualità della vita, profilo ' ~ d.profile.name) }}
-          {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto. Sei gradini uguali fra il più basso e il più alto.') }}
+          {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto.') }}
           {% else %}
           <div class="cl-find">
             <p class="cl-find__title">Trova la tua {{ s.singular }}</p>
