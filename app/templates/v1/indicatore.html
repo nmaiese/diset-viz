@@ -266,6 +266,21 @@ addEventListener("pagereveal", function (e) {
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
           <p class="source">Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
+          {#- Regione per regione: una linea per regione, tutte sulla stessa scala
+              (charts.small_multiples), in ordine di classifica sull'ultimo anno,
+              con la media semplice tratteggiata dietro. La tua regione e quella
+              scelta si accendono (v1.js). -#}
+          {% if d.multiples %}
+          <div class="sm" aria-labelledby="h-sm">
+            <h3 class="h-sub sm__t" id="h-sm">{{ level.singular | capitalize }} per {{ level.singular }}</h3>
+            <p class="subline">Ogni riquadro ha la stessa scala, dal valore più basso al più alto di tutte le {{ level.plural }} in tutti gli anni. Tratteggiata la media semplice. In ordine di classifica nel {{ d.series.last }}.</p>
+            <ol class="sm__grid">
+              {%- for s in d.multiples %}
+              <li class="sm__item" data-key="{{ s.key }}"><span class="sm__name">{{ s.name }}</span><span class="sm__val">{{ s.last_text }}<span class="sm__yr"> nel {{ s.last[0] }}</span></span>{{ s.svg | safe }}</li>
+              {%- endfor %}
+            </ol>
+          </div>
+          {% endif %}
           <details class="more">
             <summary>La serie in tabella</summary>
             <div class="tablewrap" tabindex="0" role="region" aria-label="Serie storica in tabella">

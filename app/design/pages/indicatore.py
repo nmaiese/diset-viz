@@ -473,6 +473,10 @@ def derive(ctx: dict) -> dict:
         "tilemap": tile_grid.layout(module["map_classes"], module["map_names"], module["map_values"],
                                     {o["key"]: num(o["value"]) for o in level.get("observations") or []})
         if level["key"] == "regione" and module.get("show_map") and strip.get("svg") else None,
+        # Regione per regione: le venti linee sulla stessa scala (charts.small_multiples).
+        "multiples": [{**sm, "last_text": num(sm["last"][1])}
+                      for sm in charts.small_multiples(level, module["lower_better"])]
+        if level["key"] == "regione" else [],
         "series_claim": series_claim, "series_note": series_note,
         "updated": date_it(ctx.get("dataset_updated")),
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),

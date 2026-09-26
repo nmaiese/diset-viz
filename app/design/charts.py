@@ -638,3 +638,54 @@ def map_callouts(paths: dict[str, str], items: list[tuple[str, str, str]]) -> st
                    f'<text x="{tx}" y="{ty - 4:.1f}" text-anchor="{anchor}"><tspan class="callout__nm">{escape(name)}</tspan>'
                    f'<tspan x="{tx}" dy="24" class="callout__v">{escape(value)}</tspan></text></g>')
     return "".join(out)
+
+
+# ---------------------------------------------------------------- piccoli multipli
+
+SMALL_W, SMALL_H, SMALL_PAD = 132, 44, 4
+
+
+def small_multiples(level: dict, lower_better: bool) -> list[dict]:
+    """Una piccola linea per territorio, tutte sulla stessa scala: "Regione per
+    regione" della scheda. Stesse x (gli anni della serie) e stesse y (minimo e
+    massimo di tutti i territori in tutti gli anni), cosi' le linee si
+    confrontano a occhio; dietro, tratteggiata, la media semplice di ogni anno.
+    In ordine di classifica sull'ultimo anno. Un territorio con meno di due
+    anni resta fuori; sotto i due territori non esce niente."""
+    matrix = level.get("matrix") or {}
+    years = sorted(int(y) for y in matrix)
+    if len(years) < 2:
+        return []
+    names = {t["key"]: t["name"] for t in level.get("territories") or []}
+    series: dict[str, list[tuple[int, float]]] = {}
+    for yr in years:
+        for key, value in (matrix.get(str(yr)) or matrix.get(yr) or {}).items():
+            if value is not None:
+                series.setdefault(key, []).append((yr, float(value)))
+    series = {k: v for k, v in series.items() if len(v) >= 2}
+    if len(series) < 2:
+        return []
+    values = [v for pts in series.values() for _, v in pts]
+    lo, hi = min(values), max(values)
+    y0, y1 = years[0], years[-1]
+    inner_w, inner_h = SMALL_W - 2 * SMALL_PAD, SMALL_H - 2 * SMALL_PAD
+
+    def x(yr):
+        return SMALL_PAD + (yr - y0) / ((y1 - y0) or 1) * inner_w
+
+    def y(v):
+        return SMALL_H / 2 if hi == lo else SMALL_PAD + (hi - v) / (hi - lo) * inner_h
+
+    means = [(p["year"], p["avg"]) for p in level.get("annual_means") or [] if p.get("avg") is not None]
+    avg_line = " ".join(f"{x(int(yr)):.1f},{y(float(v)):.1f}" for yr, v in means)
+    out = []
+    for key, pts in series.items():
+        line = " ".join(f"{x(yr):.1f},{y(v):.1f}" for yr, v in pts)
+        lx, ly = x(pts[-1][0]), y(pts[-1][1])
+        svg = (f'<svg class="sm__chart" viewBox="0 0 {SMALL_W} {SMALL_H}" aria-hidden="true" focusable="false">'
+               + (f'<polyline class="sm__avg" points="{avg_line}"/>' if avg_line else "")
+               + f'<polyline class="sm__line" points="{line}"/>'
+               f'<circle class="sm__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="2.5"/></svg>')
+        out.append({"key": key, "name": names.get(key, key), "first": pts[0], "last": pts[-1], "svg": svg})
+    out.sort(key=lambda s: (s["last"][1] if lower_better else -s["last"][1], s["name"]))
+    return out

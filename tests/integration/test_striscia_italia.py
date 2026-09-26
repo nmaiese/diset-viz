@@ -40,6 +40,13 @@ class LaScheda(unittest.TestCase):
     def test_le_province_non_hanno_la_griglia(self):
         self.assertNotIn("data-tilemap", self.province)
 
+    def test_regione_per_regione_venti_riquadri_sulla_stessa_scala(self):
+        items = re.findall(r'<li class="sm__item" data-key="([^"]+)">.*?<svg class="sm__chart" viewBox="0 0 (\d+) (\d+)"', self.regioni, re.S)
+        self.assertEqual(len(items), 20)
+        self.assertEqual({(w, h) for _, w, h in items}, {("132", "44")})
+        self.assertIn("Regione per regione", self.regioni)
+        self.assertNotIn('class="sm__item"', self.province)
+
     def test_la_riga_del_tuo_territorio_c_e_ma_vuota(self):
         for html in (self.regioni, self.province):
             self.assertIn('<p class="mine-note" data-mine-note hidden></p>', html)

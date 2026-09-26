@@ -353,6 +353,7 @@
       });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
       page.querySelectorAll(".tile[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
+      page.querySelectorAll(".sm__item[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
       // La barra della striscia che resta dice chi e' scelto, col valore
       // dell'anno della striscia (l'ultimo); e la scelta si ricorda fra le
       // schede della stessa famiglia (initFamily).
