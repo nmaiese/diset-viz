@@ -108,7 +108,7 @@ class LeStorie(unittest.TestCase):
 
         posts = get_posts()
         main = self.html[self.html.index("<main"):self.html.index("</main>")]
-        self.assertIn(f'class="blog-lead__title"><a href="/blog/{posts[0]["slug"]}"', main)
+        self.assertIn(f'class="story__title"><a href="/blog/{posts[0]["slug"]}"', main)
         cards = re.findall(r'<h3 class="card__title"><a href="(/blog/[^"]+)"', main)
         self.assertEqual(cards, [f"/blog/{p['slug']}" for p in posts[1:]])
 

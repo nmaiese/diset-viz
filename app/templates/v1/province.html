@@ -86,7 +86,7 @@
 
       <p class="province-note" id="province-nota">Il numero accanto al nome è la posizione della provincia nella classifica della qualità della vita, profilo {{ d.profile or 'predefinito' }}, fra le {{ d.quality_total | num(None, 'count') }} province: la prima è quella con il punteggio più alto. Il metodo è in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
 
-      <nav class="province-jump" aria-label="Vai a una regione">
+      <nav class="jump jump--scroll province-jump" aria-label="Vai a una regione">
         <ul>
           {%- for g in d.groups %}
           <li><a href="#{{ g.id }}">{{ g.name }}</a></li>

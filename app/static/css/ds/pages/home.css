@@ -331,37 +331,7 @@
 .home-area__move .trend__txt, .home-area__move .trend__from { white-space: normal; }
 .home-temi__source { margin-top: var(--space-6); }
 
-/* ---------- storie: una grande accanto alla sua foto, tre in fila ----------
-   Tutta la scheda si clicca (il titolo si allarga), tranne i link del
-   credito della foto, che stanno sopra. Le foto hanno proporzioni diverse
-   (1200x630, 1376x768): si tagliano tutte a 16:9. */
-.story { position: relative; display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
-.story__fig { display: grid; gap: var(--space-1); min-width: 0; }
-.story__media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 16 / 9; }
-.story__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
-.story:hover .story__media img { transform: scale(1.03); }
-@media (prefers-reduced-motion: reduce) { .story__media img, .story:hover .story__media img { transition: none; transform: none; } }
-.story__credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
-.story__credit a { position: relative; z-index: 1; color: inherit; }
-.story__body { display: grid; align-content: start; gap: var(--space-2); min-width: 0; }
-.story__tag { justify-self: start; padding: 2px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); background: var(--surface-2); border-radius: var(--radius-sm); }
-.story__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
-.story__title a { color: var(--ink); text-decoration: none; }
-.story__title a::after { content: ""; position: absolute; inset: 0; }
-.story:hover .story__title a { text-decoration: underline; text-decoration-thickness: 2px; }
-@supports selector(:has(a)) {
-  .story:has(.story__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
-  .story__title a:focus-visible { outline: none; }
-}
-.story__text { color: var(--text-2); }
-.story__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
-.story__go { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); font-weight: 700; color: var(--accent-strong); }
-.story--lead { padding-bottom: var(--space-8); margin-bottom: var(--space-8); border-bottom: 1px solid var(--rule-strong); }
-.story--lead .story__title { font-size: var(--fs-section); line-height: var(--lh-section); }
-.story--lead .story__text { font-size: var(--fs-lede); line-height: var(--lh-lede); max-width: var(--measure); }
-@media (min-width: 960px) {
-  .story--lead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-10); align-items: center; }
-}
+/* ---------- storie: il componente `.story` sta in components.css ---------- */
 .stories { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
 @media (min-width: 720px) { .stories { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 /* Sul telefono le tre in fila diventano righe con la miniatura a sinistra. */

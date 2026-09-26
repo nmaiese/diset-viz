@@ -15,13 +15,7 @@
 }
 .regioni-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
-/* ---------- le ripartizioni, per saltare ---------- */
-.regioni-jump ul { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-6); padding: 0; }
-.regioni-jump a {
-  display: inline-flex; align-items: center; min-height: var(--target);
-  font-weight: 600; color: var(--ink); text-decoration: none;
-}
-.regioni-jump a:hover { text-decoration: underline; }
+/* ---------- le ripartizioni, per saltare: `.jump` di components.css ---------- */
 .regioni-note { max-width: var(--measure); margin-top: var(--space-4); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
 /* ---------- le schede ---------- */

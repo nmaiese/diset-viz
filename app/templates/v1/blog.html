@@ -77,16 +77,16 @@
 
   {% if d.lead %}
   {% set lead = d.lead %}
-  <article class="blog-lead">
-    <div class="blog-lead__body">
-      <h2 class="blog-lead__title"><a href="{{ '/blog/' ~ lead.slug }}">{{ lead.title }}</a></h2>
-      {% if lead.description %}<p class="blog-lead__text">{{ lead.description }}</p>{% endif %}
-      {{ meta(lead, 'blog-lead__meta') }}
-      <p class="blog-lead__go" aria-hidden="true">Leggi la storia {{ ui.icon('arrow') }}</p>
-    </div>
-    <div class="blog-lead__fig">
-      <div class="blog-media">{% if lead.cover %}<img src="{{ lead.cover }}" alt="{{ lead.cover_alt }}"{% if lead.size %} width="{{ lead.size[0] }}" height="{{ lead.size[1] }}"{% endif %} decoding="async">{% endif %}</div>
+  <article class="story story--lead">
+    <div class="story__fig">
+      <div class="story__media">{% if lead.cover %}<img src="{{ lead.cover }}" alt="{{ lead.cover_alt }}"{% if lead.size %} width="{{ lead.size[0] }}" height="{{ lead.size[1] }}"{% endif %} decoding="async">{% endif %}</div>
       {{ credit(lead) }}
+    </div>
+    <div class="story__body">
+      <h2 class="story__title"><a href="{{ '/blog/' ~ lead.slug }}">{{ lead.title }}</a></h2>
+      {% if lead.description %}<p class="story__text">{{ lead.description }}</p>{% endif %}
+      {{ meta(lead, 'story__meta') }}
+      <p class="story__go" aria-hidden="true">Leggi la storia {{ ui.icon('arrow') }}</p>
     </div>
   </article>
   {% elif not posts %}
