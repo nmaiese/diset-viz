@@ -12,8 +12,8 @@
    gia' in cima ("Media 13ª su 20") e la cosa che chi cerca "molise regioni
    classifica" vuole sapere. Senza posizione media si ripiega sul conteggio
    degli indicatori, che c'e' sempre. #}
-{% block title %}{% if p.avg_rank %}{{ p.region }}: {{ p.avg_rank }}ª su {{ p.region_total }} regioni, tema per tema{% else %}{{ p.region }}: il profilo su {{ p.all_indicators | length }} indicatori{% endif %}{% endblock %}
-{% block description %}Profilo di {{ p.region }}: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">

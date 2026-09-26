@@ -25,12 +25,13 @@
   {"name": p.region, "path": "/regione/" ~ p.region_key},
 ] %}
 
-{# Il titolo porta la posizione media, che e' il numero che la pagina mostra
-   gia' in cima ("Media 13ª su 20") e la cosa che chi cerca "molise regioni
-   classifica" vuole sapere. Senza posizione media si ripiega sul conteggio
-   degli indicatori, che c'e' sempre. #}
-{% block title %}{% if p.avg_rank %}{{ p.region }}: {{ p.avg_rank }}ª su {{ p.region_total }} regioni, tema per tema{% else %}{{ p.region }}: il profilo su {{ p.all_indicators | length }} indicatori{% endif %}{% endblock %}
-{% block description %}{% if ritratto %}{{ ritratto.descrizione }}{% else %}Profilo {{ d.of_name }}: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.{% endif %}{% endblock %}
+{# Titolo e descrizione li compone la view (`_region_title`,
+   `_region_description` in app/views.py), per questa pagina e per il ripiego.
+   Il titolo porta la posizione media, lo stesso numero dell'H1, e dice che e'
+   una media: la figura d'apertura mostra un'altra misura, la qualita' della
+   vita, e "7ª su 20 regioni" senza la sua misura si leggeva come quella. #}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
 
 {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/regione.css') }}">{% endblock %}
 

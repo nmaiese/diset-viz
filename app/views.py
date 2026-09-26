@@ -1760,9 +1760,15 @@ def region_page(region_key):
     # tira dentro lo strato dati, e in cima chiuderebbe un anello di import.
     from app import charts
 
+    from app.design.pages import regione as region_design
+
+    # None se la classifica manca: la descrizione resta la tesi del ritratto.
+    quality = region_design._quality(region_key, profile["region"])
     return design.render(
         "regione", "v1/regione.html", "region_page.html",
         profile=profile,
+        seo_title=_region_title(profile),
+        seo_description=_region_description(profile, ritratto, quality),
         provinces=provinces,
         portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
         ritratto=ritratto,
@@ -1770,6 +1776,64 @@ def region_page(region_key):
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regione/{region_key}",
     )
+
+
+def _region_title(profile):
+    """Il `<title>` di una pagina regione, dentro i sessanta caratteri.
+
+    Porta la posizione media sugli indicatori, lo stesso numero dell'H1, e
+    **dice che e' una media**. Fino al 26 settembre 2026 diceva "Lombardia: 7ª
+    su 20 regioni, tema per tema", che si legge come una classifica, mentre la
+    figura d'apertura della stessa pagina mette la Lombardia 2ª per qualita'
+    della vita: due misure diverse, e il titolo non diceva quale fosse la sua.
+    La posizione media e' la media arrotondata delle posizioni sugli
+    indicatori confrontabili (`profiles.region_profile`), non una graduatoria:
+    piu' regioni possono avere lo stesso numero.
+
+    Si sacrifica in ordine: prima "regioni" (il "su 20" lo lascia capire),
+    poi il conteggio degli indicatori. Il nome e "in media" restano sempre.
+    """
+    name = profile["region"]
+    rank = profile.get("avg_rank")
+    count = profile.get("comparable_count")
+    total = profile.get("region_total")
+    if not rank or not count or not total:
+        n = len(profile.get("all_indicators") or [])
+        return f"{name}: il profilo su {n} indicatori"
+    for option in (
+        f"{name}: in media {rank}ª su {total} regioni in {count} indicatori",
+        f"{name}: in media {rank}ª su {total} in {count} indicatori",
+        f"{name}: in media {rank}ª su {total} regioni",
+    ):
+        if len(option) <= seo_titles.TITLE_MAX:
+            return option
+    return f"{name}: in media {rank}ª su {total} regioni"
+
+
+def _region_description(profile, ritratto, quality):
+    """La descrizione SERP di una pagina regione, dentro i 155 caratteri.
+
+    La prima frase del ritratto, quando c'e', e' la tesi della pagina e resta
+    in testa. Dietro, se c'e' posto, la posizione nella qualita' della vita
+    **con il nome della sua misura**: e' la classifica che la figura
+    d'apertura mostra, e scritta cosi' non si confonde con la posizione media
+    del titolo. Molte prime frasi stanno sotto i settanta caratteri ("La
+    Liguria ha la popolazione piu' anziana d'Italia."), e il resto dello
+    spazio restava vuoto.
+    """
+    name = profile["region"]
+    if ritratto and ritratto.get("descrizione"):
+        testa = ritratto["descrizione"]
+    else:
+        testa = (f"Profilo {seo_titles.of_region(name)}: temi in cui eccelle, dove resta "
+                 f"indietro e le regioni più simili, sugli indicatori territoriali Istat.")
+    code = []
+    if quality and quality.get("rank") and quality.get("total"):
+        code.append(f" Qualità della vita: {quality['rank']}ª su {quality['total']} regioni.")
+    for coda in code:
+        if len(testa) + len(coda) <= seo_titles.DESCRIPTION_MAX and not testa.endswith("..."):
+            return testa + coda
+    return testa
 
 
 def _titolo_provincia(profilo):
