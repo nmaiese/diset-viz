@@ -53,6 +53,14 @@ class LaScheda(unittest.TestCase):
 
 
 class IlProfilo(unittest.TestCase):
+    def test_l_anteprima_social_e_quella_del_territorio(self):
+        client = app.test_client()
+        for path, image in (("/regione/molise", "regione-molise.png"), ("/provincia/lecce", "provincia-lecce.png")):
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                self.assertRegex(html, rf'<meta property="og:image" content="https://[^"]+/static/img/og/territori/{image}">')
+        self.assertIn("og-divario-italia.png", client.get("/regioni").get_data(as_text=True))
+
     def test_regione_e_provincia_hanno_il_bottone_nascosto(self):
         client = app.test_client()
         regione = client.get("/regione/campania").get_data(as_text=True)

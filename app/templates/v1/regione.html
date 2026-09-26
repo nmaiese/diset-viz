@@ -16,6 +16,9 @@
     per riga: il ridisegno non tocca cio' che vedono i motori. -#}
 {% set active_nav = 'regioni' %}
 {% set p = profile %}
+{#- L'immagine da condividere della regione (scripts/og_territori.py). -#}
+{% set og_image_path = v1_og_image('regione', d.key) %}
+{% set og_image_alt = p.region ~ ', la posizione nella qualità della vita e le sue province sulla mappa' %}
 {% set percorso = [
   {"name": "Home", "path": "/"},
   {"name": "Regioni", "path": "/regioni"},

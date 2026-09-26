@@ -19,6 +19,9 @@
     riga per riga: il ridisegno non tocca cio' che vedono i motori. -#}
 {% set active_nav = 'province' %}
 {% set p = profile %}
+{#- L'immagine da condividere della provincia (scripts/og_territori.py). -#}
+{% set og_image_path = v1_og_image('provincia', p.key) %}
+{% set og_image_alt = p.name ~ ', la posizione nella qualità della vita e la sua regione sulla mappa' %}
 {# Italia, regione, provincia: la briciola passava dalla qualita' della vita,
    come se la provincia fosse una riga di classifica e non un territorio. #}
 {% if p.region_path %}

@@ -37,9 +37,10 @@ def register(app) -> None:
     app.jinja_env.filters["phrase_unit"] = numfmt.phrase_unit
     app.jinja_env.filters["of_place"] = _of_place
     app.jinja_env.globals["column_decimals"] = numfmt.column_decimals
-    from app.design import terms
+    from app.design import og, terms
 
     app.jinja_env.globals["v1_term"] = terms.term
+    app.jinja_env.globals["v1_og_image"] = og.og_image
     app.jinja_env.globals["legend_mode_text"] = legend_mode_text
     app.jinja_env.globals["v1_paths"] = _paths()
     from app.design import maps
