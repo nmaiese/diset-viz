@@ -29,6 +29,7 @@
 {% block content %}
 {%- macro plural(n, one, many) -%}{{ n | num(None, 'count') }} {{ one if n == 1 else many }}{%- endmacro %}
 <main id="contenuto" class="v1 v1-ricerca" data-v1="ricerca" tabindex="-1">
+{{ v1_map_sprite('regione') }}
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
 
@@ -63,6 +64,8 @@
     {% endif %}
   </header>
 
+  <div class="ricerca-layout">
+  <div class="ricerca-main">
   {% if not query or not all_total %}
   <section class="section ricerca-start" aria-labelledby="h-prova">
     <h2 id="h-prova">Da dove partire</h2>
@@ -132,6 +135,25 @@
     {% if d.pager.next %}<a class="ricerca-pager__step" href="{{ d.pager.next }}" rel="next">Successiva</a>{% endif %}
   </nav>
   {% endif %}
+  </div>
+
+  {#- Da 960 pixel, accanto ai risultati, la mappa per andare dritti a una
+      regione (`home.hero_map`): la stessa della testata della home. Sul
+      telefono no, i risultati vengono prima. -#}
+  {% if d.region_names %}
+  <aside class="ricerca-aside" aria-labelledby="h-mappa">
+    <h2 class="ricerca-aside__t" id="h-mappa">Cerchi una regione?</h2>
+    {% if d.nav_map %}
+    <p class="ricerca-aside__note">Nei colori della qualità della vita{% if d.nav_map.profile %}, profilo {{ d.nav_map.profile }}{% endif %}. Scegline una per aprire il profilo.</p>
+    {{ ui.navmap('regione', d.nav_map.names, None, '/regione/', steps=d.nav_map.steps) }}
+    {{ ui.legend(d.nav_map.legend, 'Più intenso, punteggio più alto.', nd=False) }}
+    {% else %}
+    {{ ui.navmap('regione', d.region_names, None, '/regione/') }}
+    {% endif %}
+    <p class="ricerca-aside__links"><a class="linkarrow" href="/regioni">Tutte le regioni</a> <a class="linkarrow" href="/province">Le province</a></p>
+  </aside>
+  {% endif %}
+  </div>
 </div>
 </main>
 <script src="{{ asset_url('js/v1.js') }}" defer></script>

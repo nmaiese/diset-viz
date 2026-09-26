@@ -121,7 +121,17 @@
     </header>
     {% if d.region_key %}
     {% set where %}{{ 'Città metropolitana' if p.metro_city else 'Provincia' }} {{ d.of_name }}, in <a href="{{ p.region_path }}">{{ p.region }}</a>{% endset %}
+    {% if d.region_map %}{% set rm = d.region_map %}
+    <figure class="regionmap">
+      {{ ui.regionmap(rm, p.key) }}
+      <figcaption>
+        <span class="regionmap__cap">{{ where }}{% if rm.n > 1 %}, con le altre {{ (rm.n - 1) | num(None, 'count') }} province della regione per qualità della vita{% endif %}.</span>
+        {{ ui.legend(rm.legend, 'Più intenso, punteggio più alto, sulla scala delle ' ~ rm.total ~ ' province.', nd=False) }}
+      </figcaption>
+    </figure>
+    {% else %}
     {{ ui.locator(d.region_key, where) }}
+    {% endif %}
     {% elif p.metro_city %}
     <p class="provincia-status"><span class="status">Città metropolitana</span></p>
     {% endif %}

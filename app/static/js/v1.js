@@ -661,6 +661,8 @@
       bar.classList.toggle("is-on", on);
       // Un'ancora seguita con la barra giu' atterra sotto la barra.
       document.documentElement.style.scrollPaddingTop = on ? Math.round(top + bar.offsetHeight + 16) + "px" : "";
+      // La mappa ferma nel suo margine scende sotto la barra (--stripbar-h).
+      document.documentElement.style.setProperty("--stripbar-h", on ? bar.offsetHeight + "px" : "0px");
     }
     addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     addEventListener("resize", update);

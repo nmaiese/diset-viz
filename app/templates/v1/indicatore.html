@@ -102,6 +102,7 @@ addEventListener("pagereveal", function (e) {
     territorio scelto nel modulo si accende anche sulla striscia in testa e
     sulla serie di "Com'e' cambiato", che stanno fuori dal modulo. -#}
 <main id="contenuto" class="v1 v1-indicatore page-indicator" data-v1="indicatore" tabindex="-1" data-page-root>
+{% if d.module and d.module.show_map %}{{ v1_map_sprite(d.module.level) }}{% endif %}
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
 
@@ -195,7 +196,7 @@ addEventListener("pagereveal", function (e) {
             nome con cui le prove lo cercano da prima della 1.0. Il modulo
             dato e' il componente di `v1/_ui.html`, composto in `d.module`. -#}
         <div class="indicator-cockpit">
-        {{ ui.explore(d.module, root=False) }}
+        {{ ui.explore(d.module, root=False, use=d.module.show_map) }}
         </div>
         {#- "Dentro le regioni", solo sulle province: la provincia piu' alta e
             la piu' bassa di ogni regione e la distanza fra le due, cio' che la
@@ -260,6 +261,17 @@ addEventListener("pagereveal", function (e) {
       <div class="section analysis" id="analisi">
         <p class="analysis__kicker">L'analisi</p>
         {{ article.body(page_article, meta, level) }}
+        {#- Accanto alla prosa, da 960 pixel, la mappa dell'ultimo anno resta
+            ferma mentre si legge: la prosa nomina i territori, la mappa dice
+            dove stanno. Stessi gradini del modulo, il valore sotto il mouse,
+            il clic al profilo. Sul telefono c'e' gia' la mappa del modulo. -#}
+        {% if d.module and d.module.mini %}{% set mm = d.module.mini %}
+        <aside class="analysis__map" aria-label="La mappa del dato">
+          <p class="analysis__map-t"><b>{{ d.module.name }}</b>, {{ d.module.year }}</p>
+          {{ ui.navmap(mm.level, mm.names, None, mm.base, steps=mm.steps) }}
+          {% if d.module.legend %}{{ ui.legend(d.module.legend, 'Più intenso, valore più alto.', d.module.legend_nd) }}{% endif %}
+        </aside>
+        {% endif %}
       </div>
       {% endif %}
 

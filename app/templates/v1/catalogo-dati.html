@@ -38,6 +38,7 @@
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
 
+  <div class="catalogo-head">
   <header class="pagehead">
     <p class="eyebrow"><a href="/atlante">Atlante</a>{% if d.institutions %}<span class="sep" aria-hidden="true">·</span>{{ d.institutions | join(' e ') }}{% endif %}<span class="sep" aria-hidden="true">·</span>{{ d.themes | num(None, 'count') }} temi</p>
     <h1 class="h-title">Catalogo dati di Divario Italia</h1>
@@ -45,6 +46,21 @@
     <p class="lede">{{ catalog_description }} Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>
     <p class="meta"><span>{{ d.sources | num(None, 'count') }} banche dati</span><a href="/metodologia">Metodologia e fonti</a><a href="{{ corrections_url }}">Segnala un errore</a></p>
   </header>
+
+  {#- Da 960 pixel, accanto alla testata, quanti dataset ha ogni tema: una
+      barra per tema nel colore di contesto, il nome porta al suo gruppo. -#}
+  {% set most = d.groups | map(attribute='items') | map('length') | max if d.groups else 0 %}
+  {% if most %}
+  <figure class="catalogo-temi">
+    <figcaption class="catalogo-temi__t">I dataset, tema per tema</figcaption>
+    <ol>
+      {%- for g in d.groups %}
+      <li><a href="#{{ g.id }}">{{ g.name }}</a><span class="catalogo-temi__bar" aria-hidden="true"><i style="width: {{ (g['items'] | length / most * 100) | round(1) }}%"></i></span><span class="catalogo-temi__n">{{ g['items'] | length | num(None, 'count') }}</span></li>
+      {%- endfor %}
+    </ol>
+  </figure>
+  {% endif %}
+  </div>
 
   <section class="section" id="dataset" aria-labelledby="dataset-title" data-cat>
     <h2 id="dataset-title">Dataset disponibili</h2>

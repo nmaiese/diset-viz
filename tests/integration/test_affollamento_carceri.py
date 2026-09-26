@@ -40,7 +40,7 @@ class LaSchedaProvinciale(unittest.TestCase):
     def test_sulla_mappa_sono_tratteggiate(self):
         for key in NOT_MEASURED_KEYS:
             with self.subTest(provincia=key):
-                path = re.search(rf'<path [^>]*data-key="{key}"[^>]*>', self.html)
+                path = re.search(rf'<(?:path|use) [^>]*data-key="{key}"[^>]*>', self.html)
                 self.assertIsNotNone(path)
                 self.assertIn('data-value=""', path.group(0))
                 self.assertIn("url(#nd-", path.group(0))

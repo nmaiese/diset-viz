@@ -17,15 +17,25 @@
         <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
       </div>
     </form>
-    {#- Da 960 pixel, accanto al titolo e alla ricerca, la mappa per andare
-        dritti a una regione: il clic apre il suo profilo. Sul telefono non
-        c'e', la ricerca e le porte bastano. La tastiera ha il campo di
-        ricerca e la porta "Regioni". -#}
+    {#- Accanto al titolo e alla ricerca la mappa per andare dritti a una
+        regione, nei colori della qualita' della vita (`home.hero_map`): il
+        clic apre il profilo, il nome sotto il mouse porta la posizione. Sul
+        telefono sta sotto la ricerca, piu' piccola. La tastiera ha il campo
+        di ricerca e la porta "Regioni". Senza la classifica torna la mappa
+        grigia per scegliere. -#}
     {% if d.region_names %}
-    <div class="home-map">
+    {% set hm = d.hero_map %}
+    <figure class="home-map">
+      {% if hm %}
+      <figcaption class="home-map__head"><b>Dove si vive meglio</b>, per la qualità della vita del BES dei Territori di Istat{% if hm.profile %}, profilo {{ hm.profile }}{% endif %}: in testa {{ hm.top.name }}, in coda {{ hm.bottom.name }}.</figcaption>
+      {{ ui.navmap('regione', hm.names, None, '/regione/', steps=hm.steps) }}
+      {{ ui.legend(hm.legend, 'Più intenso, punteggio più alto.', nd=False) }}
+      <p class="home-map__hint">Scegli una regione per aprirne il profilo, o <a href="/qualita-della-vita/classifica/regioni">la classifica</a>.</p>
+      {% else %}
       {{ ui.navmap('regione', d.region_names, None, '/regione/') }}
       <p class="home-map__hint">Oppure scegli una regione sulla mappa.</p>
-    </div>
+      {% endif %}
+    </figure>
     {% endif %}
   </header>
 

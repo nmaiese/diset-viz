@@ -124,7 +124,20 @@
       </p>
     </header>
 
+    {#- La regione ingrandita con le sue province nei colori della qualita'
+        della vita (`common.region_map`); senza province misurate resta il
+        localizzatore. -#}
+    {% if d.region_map %}{% set rm = d.region_map %}
+    <figure class="regionmap">
+      {{ ui.regionmap(rm) }}
+      <figcaption>
+        <span class="regionmap__cap">{% if rm.n > 1 %}Le {{ rm.n | num(None, 'count') }} province {{ d.of_name }} per qualità della vita: {{ rm.best.name }} {{ rm.best.rank | rank(rm.total) }}, {{ rm.worst.name }} {{ rm.worst.rank | rank(rm.total) }}.{% else %}{{ rm.best.name }} è {{ rm.best.rank | rank(rm.total) }} province per qualità della vita.{% endif %}</span>
+        {{ ui.legend(rm.legend, 'Più intenso, punteggio più alto, sulla scala delle ' ~ rm.total ~ ' province.', nd=False) }}
+      </figcaption>
+    </figure>
+    {% else %}
     {{ ui.locator(d.key, p.region ~ (', ' ~ d.area_in if d.area_in else '')) }}
+    {% endif %}
   </div>
 
   {#- La figura d'apertura: la qualita' della vita delle regioni sulla stessa

@@ -464,6 +464,7 @@ def derive(ctx: dict) -> dict:
         "excels": excels, "lags": lags,
         "gains": gains, "losses": losses, "moved_up": moved_up, "moved_down": moved_down, "moved_same": moved_same,
         "provinces": provinces, "province_total": province_total,
+        "region_map": common.region_map(key),
         "province_profile": pq["profile"],
         "province_scale": pscale,
         "areas": areas, "similar": similar,

@@ -77,3 +77,22 @@
   .ricerca-form .btn { min-height: var(--target, 44px); }
   .ricerca-filter { justify-items: stretch; }
 }
+
+/* ---------- i risultati e, da 960, la mappa accanto ---------- */
+.ricerca-layout { display: grid; gap: var(--space-12); align-items: start; }
+.ricerca-main { min-width: 0; }
+.ricerca-aside { display: none; }
+@media (min-width: 960px) {
+  .ricerca-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); gap: var(--gutter-l); }
+  .ricerca-aside {
+    display: grid; gap: var(--space-3); padding-top: var(--space-8);
+    position: sticky; top: calc(var(--masthead-l) + var(--space-2));
+  }
+}
+.ricerca-aside__t { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); padding-top: var(--space-3); border-top: 3px solid var(--ink); }
+.ricerca-aside__note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.ricerca-aside .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
+.ricerca-aside__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); }
+.ricerca-aside .navmap:not(.navmap--data) a use { fill: var(--rule-strong); }
+.ricerca-aside .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
+.ricerca-layout .search-results { max-width: none; }

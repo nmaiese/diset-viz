@@ -9,13 +9,15 @@
 @media (min-width: 960px) {
   .province-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: var(--gutter-l); }
   .province-map {
-    display: grid; gap: var(--space-2); justify-items: center;
+    display: grid; gap: var(--space-3); margin: 0;
     position: sticky; top: calc(var(--masthead-l) + var(--space-6));
   }
   .province-map .navmap { width: 100%; }
-  .province-map .navmap a:hover use { fill: var(--accent); }
+  .province-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 }
 .province-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.province-map__hint b { color: var(--ink); font-weight: 600; }
+.province-map .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
 
 /* ---------- il campo, poi la nota, poi l'indice ---------- */
 .province-filter { margin-bottom: var(--space-4); }
@@ -49,6 +51,6 @@
 .province-list__name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
 .province-list__rank { flex: none; font-size: var(--fs-small); color: var(--text-2); font-variant-numeric: tabular-nums; }
 .province-list__rank .n { color: inherit; }
-@media (min-width: 960px) { .province-map .navmap a use { fill: var(--rule-strong); } }
+@media (min-width: 960px) { .province-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); } }
 .province-group > h2 a { display: inline-flex; align-items: center; min-height: var(--target); }
 @media (pointer: coarse) { .v1-province .pagehead .meta a { display: inline-flex; align-items: center; min-height: var(--target); } }

@@ -94,13 +94,35 @@
     JavaScript il clic porta alla scheda; fuori dall'ordine di tabulazione
     (127 fermate) e nascosto ai lettori di schermo, che hanno l'elenco e il
     campo accanto. I tracciati vengono dallo sprite (`v1_map_sprite()`). -#}
-{% macro navmap(level, names, selected=None, base='/regione/') -%}
+{#- `steps` ({chiave: gradino 1..6}) la fa diventare anche una mappa di un
+    dato, nella rampa dei dati e con la sua `legend` accanto: il clic porta
+    ancora al profilo, e sotto il mouse il territorio prende il contorno
+    d'inchiostro invece dell'accento, che coprirebbe il suo colore. Un
+    territorio che non sta in `names` (senza dato) resta disegnato, in grigio
+    e senza link. -#}
+{% macro navmap(level, names, selected=None, base='/regione/', steps=None) -%}
 {%- set shapes = v1_paths if level == 'regione' else v1_province_paths -%}
 {%- set prefix = 'mr-' if level == 'regione' else 'mp-' -%}
-<div class="navmap navmap--{{ level }}" data-navmap>
+<div class="navmap navmap--{{ level }}{{ ' navmap--data' if steps }}" data-navmap>
   <svg viewBox="0 0 560 660" aria-hidden="true" focusable="false">
-    {%- for key in shapes %}{% if key in names %}<a href="{{ base ~ key }}" tabindex="-1" data-key="{{ key }}" data-name="{{ names[key] }}"{% if key == selected %} class="is-on"{% endif %}><use href="#{{ prefix ~ key }}"/></a>{% endif %}{% endfor %}
+    {%- for key in shapes %}{% if key in names %}<a href="{{ base ~ key }}" tabindex="-1" data-key="{{ key }}" data-name="{{ names[key] }}"{% if key == selected %} class="is-on"{% endif %}><use href="#{{ prefix ~ key }}"{% if steps and steps.get(key) %} class="q{{ steps[key] }}"{% endif %}/></a>{% elif steps %}<use href="#{{ prefix ~ key }}" class="navmap__ctx"/>{% endif %}{% endfor %}
     {%- if level != 'regione' %}<g class="navmap__borders">{% for key in v1_paths %}<use href="#mr-{{ key }}"/>{% endfor %}</g>{% endif %}
+  </svg>
+  <div class="map__tip" data-navmap-tip hidden></div>
+</div>
+{%- endmacro %}
+
+{#- La mappa di una regione (`common.region_map`): ingrandita sul suo
+    riquadro, le sue province nei colori della qualita' della vita (gradini
+    delle 107, uguali in ogni regione), le vicine in grigio per il contesto e
+    i confini regionali sopra. Ogni provincia della regione e' un link al
+    profilo, fuori dalla tabulazione come in `navmap`: la pagina ha l'elenco.
+    `selected` contorna la provincia della pagina. -#}
+{% macro regionmap(m, selected=None) -%}
+<div class="navmap navmap--data navmap--zoom" data-navmap>
+  <svg viewBox="{{ m.viewbox }}" aria-hidden="true" focusable="false">
+    {%- for s in m.shapes %}{% if s.own %}<a href="{{ s.href }}" tabindex="-1" data-key="{{ s.key }}" data-name="{{ s.name }}"{% if s.key == selected %} class="is-on"{% endif %}><path d="{{ s.d }}"{% if s.step %} class="q{{ s.step }}"{% endif %}/></a>{% else %}<path class="navmap__ctx" d="{{ s.d }}"/>{% endif %}{% endfor %}
+    <g class="navmap__borders">{% for d in m.borders %}<path d="{{ d }}"/>{% endfor %}</g>
   </svg>
   <div class="map__tip" data-navmap-tip hidden></div>
 </div>
@@ -174,7 +196,10 @@
 
     Il JSON sta in fondo alla figura: una `figcaption` deve essere il primo o
     l'ultimo figlio. -#}
-{% macro explore(m, root=True) -%}
+{#- `use=True` quando la pagina ha lo sprite del livello (`v1_map_sprite`):
+    la scheda lo mette una volta per questa mappa e per quella accanto
+    all'analisi. -#}
+{% macro explore(m, root=True, use=False) -%}
 <figure class="module" data-explore{% if root %} data-page-root{% endif %}>
   <figcaption class="module__head">
     {% if m.claim %}<h3 class="h-sub" data-claim>{{ m.claim }}</h3>{% endif %}
@@ -217,7 +242,7 @@
   <div class="module__body">
     {% if m.show_map %}
     <div class="module__map">
-      {{ map(m.map_classes, 'esplora', m.map_names, m.map_values, overlay=m.callouts, label='Mappa cliccabile delle ' ~ m.plural ~ ' italiane per ' ~ m.name, level=m.level) }}
+      {{ map(m.map_classes, 'esplora', m.map_names, m.map_values, overlay=m.callouts, label='Mappa cliccabile delle ' ~ m.plural ~ ' italiane per ' ~ m.name, level=m.level, use=use) }}
       {{ legend(m.legend, 'Più intenso, valore più alto.', m.legend_nd) }}
       {% if m.level == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
     </div>

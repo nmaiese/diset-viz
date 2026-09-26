@@ -5,6 +5,26 @@
 .v1-catalogo-dati .pagehead { max-width: 52rem; }
 .v1-catalogo-dati .pagehead .meta { gap: var(--space-2) var(--space-6); }
 
+/* ---------- la testata e, da 960, i dataset per tema accanto ---------- */
+.catalogo-head { display: grid; gap: var(--space-8); align-items: start; }
+.catalogo-temi { display: none; margin: 0; }
+@media (min-width: 960px) {
+  .catalogo-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-16); }
+  .catalogo-temi { display: grid; gap: var(--space-3); padding-top: var(--space-8); }
+}
+.catalogo-temi__t { font-size: var(--fs-small); line-height: var(--lh-small); font-weight: 600; color: var(--ink); }
+.catalogo-temi ol { list-style: none; padding: 0; display: grid; }
+.catalogo-temi li {
+  display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) 2.5rem; gap: var(--space-3); align-items: center;
+  border-top: 1px solid var(--rule); font-size: var(--fs-small); line-height: var(--lh-small);
+}
+.catalogo-temi li:last-child { border-bottom: 1px solid var(--rule); }
+.catalogo-temi a { display: flex; align-items: center; min-height: 32px; color: var(--ink); }
+@media (pointer: coarse) { .catalogo-temi a { min-height: var(--target); } }
+.catalogo-temi__bar { display: block; height: 8px; background: var(--cmp-track); border-radius: 1px; }
+.catalogo-temi__bar i { display: block; height: 100%; background: var(--cmp); border-radius: 1px; }
+.catalogo-temi__n { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+
 /* ---------- il filtro ---------- */
 .catalogo-filter { margin-bottom: var(--space-8); gap: var(--space-3) var(--space-6); align-items: end; }
 .catalogo-filter[hidden] { display: none; }

@@ -13,7 +13,7 @@ nomina dalla stessa classifica (`regione._province_quality`).
 
 from __future__ import annotations
 
-from app.design import charts
+from app.design import charts, common
 from app.design.common import the_place
 from app.design.pages import regione
 
@@ -61,7 +61,16 @@ def derive(ctx: dict) -> dict:
             "area": areas.get(key), "provinces": region["provinces"],
         })
     quality = regione._province_quality()
+    scores = {p["key"]: p["score"] for g in groups for p in g["provinces"] if p.get("score") is not None}
+    total = quality.get("total") or ctx.get("total")
     return {
+        # La mappa accanto all'elenco nei colori della qualita' della vita,
+        # come nella testata della home: il nome sotto il mouse porta la
+        # posizione, il clic apre il profilo.
+        "map_steps": common.map_steps(scores) if len(scores) > 1 else None,
+        "map_legend": common.legend(list(scores.values()), None) if len(scores) > 1 else None,
+        "map_names": {p["key"]: (f"{p['name']}, {p['rank']}ª su {total}" if p.get("rank") and total else p["name"])
+                      for g in groups for p in g["provinces"]},
         "groups": groups,
         "regions": len(groups),
         "spread": _spread(groups),

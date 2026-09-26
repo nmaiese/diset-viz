@@ -6,10 +6,13 @@
 .regione-head { display: grid; gap: 0 var(--gutter-l); align-items: start; }
 .regione-head > .locator { display: none; padding-top: var(--space-8); }
 @media (min-width: 600px) {
-  .regione-head { grid-template-columns: minmax(0, 1fr) 9rem; }
+  .regione-head:has(> .locator) { grid-template-columns: minmax(0, 1fr) 9rem; }
   .regione-head > .locator { display: grid; }
 }
-@media (min-width: 960px) { .regione-head { grid-template-columns: minmax(0, 1fr) 13rem; } }
+@media (min-width: 960px) {
+  .regione-head:has(> .locator) { grid-template-columns: minmax(0, 1fr) 13rem; }
+  .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 20rem; }
+}
 
 /* ---------- la tabella della figura d'apertura, larga quanto il grafico ---------- */
 .regione-qdv { max-width: 920px; }

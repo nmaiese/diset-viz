@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from app import quality_life_bes as qb
 from app import sources
-from app.design import charts, numfmt
+from app.design import charts, common, numfmt
 from app.design.common import count_word, of_place, ordinal, the_place
 from app.seo_titles import at_place, of_region, to_place
 from app.taxonomy import CANONICAL_CATEGORIES, slugify_taxonomy
@@ -376,6 +376,7 @@ def derive(ctx: dict) -> dict:
         "profile_name": ((profile.get("profile") or {}).get("name") or "").lower(),
         "equal_weights": equal_weights,
         "region_key": region_path.rstrip("/").rsplit("/", 1)[-1] if region_path else None,
+        "region_map": common.region_map(region_path.rstrip("/").rsplit("/", 1)[-1]) if region_path else None,
         "strip": _strip(profile),
         "tiles": _tiles(ctx, rows, neighbours["sisters"], covered),
         "dims": _dimensions(profile),

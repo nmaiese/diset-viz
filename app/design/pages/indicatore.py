@@ -9,6 +9,8 @@ passa al template, e non ne cambia niente.
 
 from __future__ import annotations
 
+import re
+
 from app.design import charts, maps, numfmt
 from app.design.common import (
     MEZZOGIORNO,
@@ -304,6 +306,28 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "source_url": meta.get("source_url"), "source_label": meta.get("source_label"),
         "csv": downloads.get("csv") if level["key"] == "regione" else None,
         "js": explore_js,
+        "mini": _mini_map(level["key"], classes, map_names,
+                          {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []}) if show_map else None,
+    }
+
+
+def _mini_map(level_key: str, classes: dict, names: dict, values: dict) -> dict:
+    """La mappa piccola accanto all'analisi: gli stessi gradini della mappa
+    del modulo, per l'ultimo anno, con il valore nel nome sotto il mouse e il
+    clic che porta al profilo del territorio."""
+    steps = {}
+    for key, cls in classes.items():
+        m = re.search(r"\bq([1-6])\b", cls or "")
+        if m:
+            steps[key] = int(m.group(1))
+    return {
+        "level": level_key,
+        "steps": steps,
+        # Solo i territori col dato portano un link: gli altri la mappa li
+        # disegna in grigio (un link a una provincia non misurata sarebbe uno
+        # zero che il dato non dice).
+        "names": {k: f"{n}, {values[k]}" for k, n in names.items() if values.get(k)},
+        "base": "/regione/" if level_key == "regione" else "/provincia/",
     }
 
 

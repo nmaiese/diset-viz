@@ -19,15 +19,20 @@
   .home-head > .home-map { grid-column: 2; grid-row: 1 / span 5; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
-/* La mappa accanto alla ricerca: solo da 960. Sul fondo grigio della testata
-   la terra e' un grigio piu' scuro, i confini nel colore del fondo, e la
-   regione sotto il mouse prende l'accento (e' un link). */
-.home-map { display: none; }
+/* La mappa della testata: la qualita' della vita per regione, con la sua
+   legenda. Sul telefono sotto la ricerca, larga quanto serve a toccare una
+   regione, da 960 nella colonna destra, alta quanto la testata. */
+.home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; }
+.home-map .navmap { width: 100%; max-width: 360px; justify-self: center; }
+.home-map .legend { max-width: 360px; }
+.home-map__head { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); max-width: 36rem; }
+.home-map__head b { color: var(--ink); font-weight: 600; }
+.home-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
+.home-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 @media (min-width: 960px) {
-  .home-map { display: grid; gap: var(--space-2); justify-items: center; }
-  .home-map .navmap { width: 100%; max-width: 320px; }
-  .home-map .navmap a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
-  .home-map .navmap a:hover use { fill: var(--accent); }
+  .home-map { margin: 0; align-content: start; }
+  .home-map .navmap { max-width: 400px; }
+  .home-map .legend, .home-map__head, .home-map__hint { max-width: 400px; justify-self: center; width: 100%; }
 }
 .home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }

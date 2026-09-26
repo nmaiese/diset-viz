@@ -288,7 +288,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .module__body { display: grid; gap: var(--space-8); align-items: start; }
 @container (min-width: 720px) {
   .module__body { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-8); }
-  .module__body > .module__map { position: sticky; top: calc(var(--masthead-l) + var(--space-6)); }
+  .module__body > .module__map { position: sticky; top: calc(var(--masthead-l) + var(--stripbar-h, 0px) + var(--space-6)); transition: top var(--motion-base) var(--motion-ease); }
 }
 .source { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .source a { color: var(--text-2); }
@@ -318,6 +318,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .navmap--provincia a use { stroke-width: 0.5; }
 .navmap a:hover use { fill: var(--rule-strong); }
 .navmap a.is-on use { fill: var(--accent); }
+.navmap--data a use { stroke: var(--map-edge); stroke-width: 0.9; }
+.navmap--provincia.navmap--data a use { stroke-width: 0.4; }
+.navmap--data a:hover use { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+.navmap--zoom svg { overflow: hidden; }
+.navmap--zoom a path { stroke: var(--map-edge); stroke-width: 0.5; stroke-linejoin: round; }
+.navmap--zoom a:hover path, .navmap--zoom a.is-on path { stroke: var(--ink); stroke-width: 1.6; paint-order: stroke; }
+.navmap__ctx { fill: var(--surface-2); stroke: var(--bg); stroke-width: 0.4; }
+.navmap--zoom .navmap__borders { stroke-width: 0.7; }
 .navmap__borders { fill: none; stroke: var(--control-border); stroke-width: 1.1; stroke-linejoin: round; pointer-events: none; }
 .map [data-key]:focus { outline: none; }
 .map a:focus-visible path { stroke: var(--focus); stroke-width: 3; }
@@ -461,6 +469,22 @@ details.more[open] > summary { color: var(--ink); }
 @media (min-width: 1200px) { .analysis__kicker { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); } }
 .analysis .prose > h2 { font-size: clamp(22px, 20.5px + 0.35vw, 25px); line-height: 1.25; font-weight: var(--fw-heading); letter-spacing: var(--tr-section); margin-top: var(--space-12); }
 .analysis .prose > h2:first-child { margin-top: 0; }
+/* La mappa accanto alla prosa: solo da 960, dove fra la misura del testo e il
+   margine restavano 300-540 pixel vuoti. Ferma sotto la testata (e sotto la
+   barra della striscia, quando c'e'). */
+.analysis__map { display: none; }
+@media (min-width: 960px) {
+  .analysis:has(> .analysis__map) { display: grid; grid-template-columns: minmax(0, var(--measure, 38rem)) minmax(14rem, 1fr); column-gap: var(--space-12); align-items: start; }
+  .analysis:has(> .analysis__map) > * { grid-column: 1; }
+  .analysis > .analysis__map {
+    display: grid; gap: var(--space-3); grid-column: 2; grid-row: 2; align-self: start;
+    position: sticky; top: calc(var(--masthead-l) + var(--toc-bar, 0px) + var(--stripbar-h, 0px) + var(--space-6));
+    max-width: 22rem; justify-self: center; width: 100%;
+  }
+}
+.analysis__map-t { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin: 0; }
+.analysis__map-t b { color: var(--ink); font-weight: 600; }
+.analysis__map .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
 .prose h2 { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 700; letter-spacing: var(--tr-section); margin-top: 2em; }
 .prose h3 { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; margin-top: 1.6em; }
 .prose h2 + *, .prose h3 + * { margin-top: 0.6em; }
@@ -1003,3 +1027,14 @@ main.v1 h1 { view-transition-name: page-title; }
 .jump--scroll a { font-size: var(--fs-small); color: var(--text-2); }
 .jump--scroll a:hover { color: var(--ink); }
 @media (min-width: 960px) { .jump--scroll ul { flex-wrap: wrap; overflow-x: visible; } }
+
+/* ---------- la mappa della regione (ui.regionmap) nella testata ----------
+   Sul telefono la mappa a sinistra e la didascalia con la legenda accanto,
+   nel margine della testata da 960 una sotto l'altra. */
+.regionmap { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); gap: var(--space-4); align-items: center; margin: 0 0 var(--space-6); }
+.regionmap figcaption { display: grid; gap: var(--space-3); min-width: 0; }
+.regionmap__cap { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.regionmap .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
+@media (min-width: 960px) {
+  .regionmap { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
+}

@@ -52,6 +52,15 @@
   .cl-cats { width: auto; }
   .cl-cats tbody th, .cl-cats td { vertical-align: top; padding-right: var(--space-12); }
 }
+/* Da 1100 pixel di contenitore la tabella prende tutta la riga e le prime tre
+   stanno in fila, ognuna nella sua colonna: la tabella si dimezza in altezza
+   e a destra non restano 700 pixel vuoti. */
+@container (min-width: 1100px) {
+  .cl-cats { width: 100%; }
+  .cl-cats thead th:first-child { width: 22%; }
+  .cl-cats thead th:last-child { width: 18%; }
+  .cl-top { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+}
 @container (max-width: 560px) { .table--stack.cl-cats tbody tr { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
 
 /* Fonti, dati e citazione: da 960 le fonti a sinistra, scaricare e citare a

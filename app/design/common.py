@@ -359,3 +359,35 @@ def _series_svg(level: dict, width: int, height: int, right: int, short: bool) -
     return {"svg": "".join(parts), "single_year": False, "first": years[0], "last": years[-1]}
 
 
+
+
+def region_map(region_key: str) -> dict | None:
+    """La mappa della regione: le sue province nei colori della qualita' della
+    vita, sui gradini di tutte le 107 (un colore vale lo stesso in ogni
+    regione), ingrandita sul suo riquadro con le vicine in grigio.
+
+    None se la regione non ha province misurate (la pagina tiene il
+    localizzatore). Il nome sotto il mouse porta la posizione.
+    """
+    from app import province_profile
+    from app.design import maps
+
+    grouped = province_profile.by_region()
+    everyone = {p["key"]: p["score"] for rows in grouped.values() for p in rows if p.get("score") is not None}
+    own = [p for p in grouped.get(region_key, []) if p.get("score") is not None]
+    if not own or len(everyone) < 2:
+        return None
+    steps = map_steps(everyone)
+    view = maps.zoom(region_key)
+    total = len(everyone)
+    shapes = []
+    for key, d in view["provinces"].items():
+        mine = next((p for p in own if p["key"] == key), None)
+        shapes.append({"key": key, "d": d, "own": bool(mine),
+                       "href": mine["path"] if mine else None,
+                       "name": f"{mine['name']}, {mine['rank']}ª su {total}" if mine else None,
+                       "step": steps.get(key) if mine else None})
+    return {"viewbox": view["viewbox"], "shapes": shapes, "borders": list(view["borders"].values()),
+            "legend": legend(list(everyone.values()), None), "total": total,
+            "best": min(own, key=lambda p: p["rank"]), "worst": max(own, key=lambda p: p["rank"]),
+            "n": len(own)}

@@ -25,7 +25,7 @@ from app import indicator_notes, profiles, quality_life_bes, sources
 from app.blog import STATIC_DIR, social_image_size
 from app.cache_util import synchronized_cache
 from app.data import REGION_GEO_AREA
-from app.design import charts, maps, numfmt
+from app.design import charts, common, maps, numfmt
 from app.design.common import (
     LOWER_BETTER,
     count_word,
@@ -840,6 +840,34 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
 
 # ---------------------------------------------------------------- tutta la pagina
 
+def hero_map(names: dict[str, str]) -> dict | None:
+    """La mappa della testata: le regioni nei colori della qualita' della vita.
+
+    Resta la mappa per andare a una regione (ogni tracciato e' un link al
+    profilo), ma dice anche qualcosa: il punteggio della classifica BES col
+    profilo predefinito, sei gradini con la sua legenda. Il nome sotto il
+    mouse porta la posizione. None se la classifica non c'e': la testata
+    torna alla mappa grigia per scegliere.
+    """
+    from app.design.pages import regione
+
+    quality = regione._region_quality()
+    if not quality:
+        return None
+    scores = {r["key"]: r["score"] for r in quality["rows"] if r["key"] in names}
+    if len(scores) < 2:
+        return None
+    total = len(quality["rows"])
+    return {
+        "steps": common.map_steps(scores),
+        "names": {k: f"{names[k]}, {quality['ranks'][k]}ª su {total}" if k in quality["ranks"] else names[k]
+                  for k in names},
+        "legend": common.legend(list(scores.values()), None),
+        "profile": quality.get("profile"),
+        "top": quality["rows"][0], "bottom": quality["rows"][-1], "total": total,
+    }
+
+
 def derive(ctx: dict) -> dict:
     """Tutto cio' che il template della home chiede in piu' rispetto al contesto."""
     counts = ctx.get("territories") or {}
@@ -863,6 +891,7 @@ def derive(ctx: dict) -> dict:
         "feature": feat,
         "territories": territories(ctx.get("territory_rng")),
         "region_names": names,
+        "hero_map": hero_map(names),
         "quality": qol,
         "quiz_try": quiz_try(ctx, (feat or {}).get("path")),
         "games": [{**g, **GAME_LOOK.get(g["href"].rsplit("/", 1)[-1], {"icon": "bolt", "tone": "amber"})}

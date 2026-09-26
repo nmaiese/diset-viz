@@ -111,10 +111,16 @@
 
     {#- Da 960 pixel la mappa per scegliere, accanto all'elenco. Sul telefono
         no: il campo e l'elenco bastano, e la tastiera ha i link dell'elenco. -#}
-    <div class="province-map">
+    <figure class="province-map">
+      {% if d.map_steps %}
+      <figcaption class="province-map__hint"><b>La qualità della vita</b>, profilo {{ d.profile or 'predefinito' }}. Scegli una provincia per aprirne il profilo.</figcaption>
+      {{ ui.navmap('provincia', d.map_names, None, '/provincia/', steps=d.map_steps) }}
+      {{ ui.legend(d.map_legend, 'Più intenso, punteggio più alto.', nd=False) }}
+      {% else %}
       {{ ui.navmap('provincia', d.names, None, '/provincia/') }}
       <p class="province-map__hint">Oppure scegli una provincia sulla mappa.</p>
-    </div>
+      {% endif %}
+    </figure>
   </div>
 </div>
 </main>

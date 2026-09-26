@@ -150,7 +150,15 @@ def derive(ctx: dict) -> dict:
     from app.data import REGION_ORDER
     from app.atlas_catalog import atlas_themes_by_macro_area
 
+    # Accanto ai risultati, da 960, la mappa per andare a una regione, nei
+    # colori della qualita' della vita come nella testata della home: chi
+    # cerca un luogo ci arriva con un clic, e la colonna non resta vuota.
+    from app.design.pages import home
+
+    names = home.region_names()
+    nav_map = home.hero_map(names)
     return {
+        "nav_map": nav_map, "region_names": names,
         "seg": seg,
         "groups": groups,
         "pager": pager(query, kind, ctx.get("page_number") or 1, ctx.get("pages") or 1),

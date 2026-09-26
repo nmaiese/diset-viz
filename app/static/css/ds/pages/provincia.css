@@ -6,8 +6,12 @@
 .provincia-head > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
 .provincia-top { display: grid; }
 .provincia-top .locator { grid-template-columns: 4.5rem minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-bottom: var(--space-8); }
+@media (min-width: 960px) {
+  .provincia-top:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 18rem; column-gap: var(--space-12); align-items: start; }
+}
 @media (min-width: 1200px) {
   .provincia-top { grid-template-columns: minmax(0, 1fr) 13rem; column-gap: var(--space-16); align-items: start; }
+  .provincia-top:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 20rem; }
   .provincia-top .locator { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
 }
 /* il nome della provincia sotto la media va a sinistra, lontano dalla linea della media */
