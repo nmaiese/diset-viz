@@ -34,6 +34,7 @@ import statistics
 import sys
 from html import escape
 
+from app.design.common import _nice_ticks, tick_label
 from scripts.trend_articles import common
 
 WIDTH = 680
@@ -79,7 +80,8 @@ def _subtitle(name: str, period: str, unit: str, extra: str = "") -> str:
     unit = "" if unit.lower() in name.lower() else f" {unit[:1].upper()}{unit[1:]}."
     text = f"{name}, {period}.{extra}{unit}"
     if len(text) > 105:
-        text = f"{re.sub(r'\s*\([^)]*\)', '', name)}, {period}.{extra}{unit}"
+        bare = re.sub(r"\s*\([^)]*\)", "", name)
+        text = f"{bare}, {period}.{extra}{unit}"
     return text
 
 
@@ -190,6 +192,10 @@ def lines(slug, key, territories, title, simple_areas=True, with_key=None):
     lo, hi = min(every), max(every)
     margin = (hi - lo) * 0.08 or 1
     lo, hi = max(0, lo - margin), hi + margin
+    # Tacche tonde (5, 10, 15), e il disegno va da una all'altra: dividere in
+    # quarti il dominio grezzo scriveva 9,2 / 10,6 / 12,1 sull'asse.
+    y_ticks = _nice_ticks(lo, hi)
+    lo, hi = y_ticks[0], y_ticks[-1]
 
     def x(year):
         return left + (year - years[0]) / max(1, years[-1] - years[0]) * (WIDTH - left - right)
@@ -203,10 +209,9 @@ def lines(slug, key, territories, title, simple_areas=True, with_key=None):
         for name, _, s in drawn if s
     )
     parts = _head(title, subtitle, height, description)
-    for k in range(5):
-        v = lo + (hi - lo) * k / 4
+    for v in y_ticks:
         parts.append(f'<line class="fig__grid" x1="{left}" y1="{y(v):.1f}" x2="{WIDTH - right}" y2="{y(v):.1f}"/>')
-        parts.append(f'<text class="fig__axis" x="{left - 6}" y="{y(v) + 4:.1f}" text-anchor="end">{escape(common.fmt(v, decimals if hi - lo < 10 else 0))}</text>')
+        parts.append(f'<text class="fig__axis" x="{left - 6}" y="{y(v) + 4:.1f}" text-anchor="end">{escape(tick_label(v, y_ticks))}</text>')
     for year in years:
         if len(years) <= 12 or year % 2 == years[-1] % 2:
             parts.append(f'<text class="fig__axis" x="{x(year):.1f}" y="{height - bottom + 18}" text-anchor="middle">{year}</text>')
@@ -278,6 +283,8 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
     y0, y1 = (min([*ys, 0]) if len(years_y) == 2 else min(ys)), max(ys)
     mx, my = (x1 - x0) * 0.08, (y1 - y0) * 0.08
     x0, x1, y0, y1 = x0 - mx, x1 + mx, y0 - my, y1 + my
+    x_ticks, y_ticks = _nice_ticks(x0, x1), _nice_ticks(y0, y1)
+    x0, x1, y0, y1 = x_ticks[0], x_ticks[-1], y_ticks[0], y_ticks[-1]
 
     def px(v):
         return left + (v - x0) / (x1 - x0) * (WIDTH - left - right)
@@ -298,11 +305,10 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
         parts.append(f'<line class="fig__grid" x1="{px(0):.1f}" y1="{top}" x2="{px(0):.1f}" y2="{height - bottom}"/>')
     if y0 < 0 < y1:
         parts.append(f'<line class="fig__grid" x1="{left}" y1="{py(0):.1f}" x2="{WIDTH - right}" y2="{py(0):.1f}"/>')
-    for k in range(5):
-        v = x0 + (x1 - x0) * k / 4
-        parts.append(f'<text class="fig__axis" x="{px(v):.1f}" y="{height - bottom + 16}" text-anchor="middle">{escape(common.fmt(v, 1))}</text>')
-        w = y0 + (y1 - y0) * k / 4
-        parts.append(f'<text class="fig__axis" x="{left - 6}" y="{py(w) + 4:.1f}" text-anchor="end">{escape(common.fmt(w, 1))}</text>')
+    for v in x_ticks:
+        parts.append(f'<text class="fig__axis" x="{px(v):.1f}" y="{height - bottom + 16}" text-anchor="middle">{escape(tick_label(v, x_ticks))}</text>')
+    for w in y_ticks:
+        parts.append(f'<text class="fig__axis" x="{left - 6}" y="{py(w) + 4:.1f}" text-anchor="end">{escape(tick_label(w, y_ticks))}</text>')
     parts.append(f'<text class="fig__axis-name" x="{WIDTH - right}" y="{height - bottom + 34}" text-anchor="end">{escape(name_x)} →</text>')
     parts.append(f'<text class="fig__axis-name" x="{left}" y="{top - 8}">↑ {escape(name_y)}</text>')
     name_all = len(points) <= 25  # con 100 province si nominano solo quelle di cui il testo parla
@@ -329,7 +335,8 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
         anchor = "" if to_right else ' text-anchor="end"'
         parts.append(f'<text class="fig__pt-name{on}" x="{x_text:.1f}" y="{yy:.1f}"{anchor}>{escape(t)}</text>')
     unit = "Una regione" if name_all else "Una provincia"
-    parts.append(f'<text class="fig__note" x="0" y="{height - 26}">{unit} per punto. Cerchi: Centro-Nord. Quadrati: Mezzogiorno.</text>')
+    lit = " In evidenza quelle di cui parla il testo." if highlight else ""
+    parts.append(f'<text class="fig__note" x="0" y="{height - 26}">{unit} per punto. Cerchi: Centro-Nord. Quadrati: Mezzogiorno.{lit}</text>')
     institutions = []
     for m in (ex["meta"], ey["meta"]):
         name = m["source"].split(" -")[0].split(",")[0].strip()

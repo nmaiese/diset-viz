@@ -46,7 +46,7 @@
 {% block content %}
 {%- macro rank_rows(rows) -%}
 {%- for row in rows %}
-      <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ row.href }}">{{ row.name }}</a>{% if row.region %}<span class="where">{% if row.region.href %}<a href="{{ row.region.href }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}</span>{% endif %}{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.score | num(None, 'score') }}</td></tr>
+      <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ row.href }}">{{ row.name }}</a>{% if row.region %}<span class="where">{% if row.region.href %}<a href="{{ row.region.href }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}</span>{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}{% elif row.area %}<span class="where">{{ d.area_label[row.area] }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.score | num(None, 'score') }}</td></tr>
 {%- endfor %}
 {%- endmacro %}
 {%- macro rank_table(b, caption, head, tail=None, labelledby=None) -%}

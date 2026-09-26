@@ -416,6 +416,8 @@
       return { name: s.name, cls: s.cls, points: m.years.map(function (yr) { var v = m.matrix[yr][s.key]; return [yr, v === undefined ? null : v]; }) };
     });
     var chart = compareChart(m.years, lines, averages, year);
+    var subline = $("[data-cmp-subline]");
+    if (subline) subline.textContent = meta.name + (unit ? ", in " + unit : "") + ", dal " + m.years[0] + " al " + m.years[m.years.length - 1] + ".";
     $("[data-cmp-chart]").innerHTML = chart;
     $("[data-cmp-chartnote]").textContent = chart
       ? "La media semplice si disegna negli anni in cui almeno " + cfg.need + " " + cfg.plural + " hanno il dato. La linea tratteggiata verticale segna l'anno della tabella."

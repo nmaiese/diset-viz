@@ -107,7 +107,7 @@
     <div class="atlante-area" data-area="{{ area.name }}">
       <h3 class="atlante-area__title" id="{{ 'a-' ~ area.slug }}">{{ area.name }}</h3>
       {% for g in area.groups %}
-      <section class="atlante-group" data-theme="{{ g.name }}" aria-labelledby="{{ 't-' ~ g.slug }}">
+      <section class="atlante-group" data-theme="{{ g.name }}" aria-labelledby="{{ 't-' ~ g.slug }}" style="--rows:{{ g.rows | length }}">
         <h4 class="h-sub" id="{{ 't-' ~ g.slug }}"><a href="{{ g.path }}">{{ g.name }}</a> <span class="atlante-group__n" data-atlas-n>{{ g.rows | length }}</span></h4>
         <div class="tablewrap stackwrap">
           <table class="table table--compact table--stack atlante-table">

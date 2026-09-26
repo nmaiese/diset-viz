@@ -540,6 +540,19 @@
     }
     addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     update();
+    /* Sotto i 1200 la lista scorre di lato: la sfumatura dice da che parte
+       ci sono altre voci. */
+    var list = toc.querySelector("ol");
+    if (list) {
+      var edges = function () {
+        var more = list.scrollWidth - list.clientWidth;
+        list.classList.toggle("is-more-l", more > 1 && list.scrollLeft > 1);
+        list.classList.toggle("is-more-r", more > 1 && list.scrollLeft < more - 1);
+      };
+      list.addEventListener("scroll", edges, { passive: true });
+      addEventListener("resize", edges);
+      edges();
+    }
   }
 
   /* ---------- gli agganci, nell'ordine di sempre ---------- */

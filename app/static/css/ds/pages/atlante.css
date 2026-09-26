@@ -25,13 +25,17 @@
 /* ---------- le aree e i temi ---------- */
 .atlante-area + .atlante-area { margin-top: var(--space-12); }
 .atlante-area__title {
-  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; letter-spacing: 0.04em;
-  text-transform: uppercase; color: var(--text-2);
+  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2);
   padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
 }
 /* Seicento righe con una sparkline ciascuna: il browser salta layout e
    disegno dei temi fuori dallo schermo finche' non ci si arriva. */
-.atlante-group { content-visibility: auto; contain-intrinsic-size: auto 900px; margin-top: var(--space-8); }
+/* La stima e' per gruppo (`--rows`, dal template): 900 pixel per tutti
+   sbagliavano di quattro-dieci volte sui temi da 86 righe, e la barra di
+   scorrimento saltava mentre si scendeva. Una riga vale circa 56 pixel, e
+   circa 130 quando la tabella diventa blocchi. */
+.atlante-group { content-visibility: auto; contain-intrinsic-size: auto calc(var(--rows, 15) * 56px + 64px); margin-top: var(--space-8); }
+@media (max-width: 599px) { .atlante-group { contain-intrinsic-size: auto calc(var(--rows, 15) * 130px + 64px); } }
 .atlante-group > h4 { margin-bottom: var(--space-3); }
 .atlante-group > h4 a { color: var(--ink); }
 .atlante-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
@@ -52,6 +56,7 @@
   text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer;
 }
 .atlante-table [form="atl-map"]:hover { color: var(--accent-strong); }
+@media (pointer: coarse) { .atlante-table [form="atl-map"] { display: inline-flex; align-items: center; min-height: var(--target); margin-top: 0; } }
 .atlante-table .trend__from { white-space: normal; }
 .atlante-table .trend__txt { display: grid; }
 /* a blocchi: il nome a tutta riga, l'andamento sotto, l'ultimo anno accanto */

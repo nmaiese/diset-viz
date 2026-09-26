@@ -117,7 +117,10 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 }
 .h-sub { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); }
 .subline { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-top: var(--space-1); }
-.band { margin-top: var(--space-16); padding-block: var(--space-12); background: var(--surface-1); }
+/* `:not(svg)`: la serie a fascia (`charts.band`) e' un <svg class="band">, e
+   senza il filtro prendeva margine, imbottitura e fondo della fascia: un
+   riquadro grigio con 110 pixel vuoti sopra ogni "Com'e' cambiato". */
+.band:not(svg) { margin-top: var(--space-16); padding-block: var(--space-12); background: var(--surface-1); }
 .band .section:first-child { padding-top: 0; }
 
 /* La fascia: una sezione a tutta larghezza, col suo contenitore dentro. Le
@@ -171,6 +174,12 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   .toc ol::-webkit-scrollbar { display: none; }
   .toc a { padding: 6px 0; margin: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; white-space: nowrap; }
   .toc a[aria-current] { border-bottom-color: var(--accent); }
+  /* La barra scorre di lato: senza un segno l'ultima voce tagliata a meta'
+     ("Che cosa misu") sembrava un difetto, e le voci dopo non si vedevano.
+     La sfumatura sta dal lato dove c'e' altro (`initToc` in v1.js). */
+  .toc ol.is-more-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+  .toc ol.is-more-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); }
+  .toc ol.is-more-l.is-more-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
 }
 @media (min-width: 600px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-m)); padding-inline: var(--margin-m); } }
 @media (min-width: 960px) and (max-width: 1199px) { .toc { top: var(--masthead-l); margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
@@ -198,7 +207,12 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   .tile + .tile { border-left: 1px solid var(--rule); }
 }
 .tile dt { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
-.tile dd { margin: 0; }
+.tile dd { margin: 0; min-width: 0; }
+/* Nelle tessere l'unita' va a capo sotto la cifra quando non ci sta: sul
+   telefono "+0,28 giornate per abitante" arrivava a toccare il filetto
+   della tessera accanto. La cifra resta intera. */
+.tile .n { white-space: normal; }
+.tile .n__u:not(.n__u--pct) { display: inline-block; line-height: var(--lh-small); vertical-align: baseline; }
 .figure-num {
   display: block;
   font-size: var(--fs-figure-sm); line-height: var(--lh-figure-sm); font-weight: var(--fw-figure-sm); letter-spacing: var(--tr-figure-sm);
@@ -241,6 +255,18 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .seg > span { cursor: default; }
 .seg > :first-child { border-left: 0; }
 .seg > a:hover, .seg > button:hover { background: var(--surface-1); color: var(--ink); }
+/* Da quattro voci in su (le aree della regione e dell'atlante) la fila andava a
+   capo dentro il bordo in righe di larghezza diversa, con i filetti a meta'.
+   Diventa una griglia di celle uguali divise da un pixel, come i profili della
+   classifica (`.cl-profiles`). */
+.seg:has(> :nth-child(4)) {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+  gap: 1px; background: var(--control-border); width: 100%;
+}
+@media (min-width: 960px) { .seg:has(> :nth-child(4)) { width: auto; grid-auto-flow: column; grid-auto-columns: max-content; grid-template-columns: none; } }
+.seg:has(> :nth-child(4)) > * { border-left: 0; justify-content: center; text-align: center; }
+/* Sul telefono i controlli sono bersagli da dito: 44 pixel, come dice il sistema. */
+@media (pointer: coarse) { .seg > a, .seg > button, .seg > span { min-height: var(--target); } }
 .seg [aria-current], .seg [aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .seg [aria-current]:hover, .seg [aria-pressed="true"]:hover { background: var(--ink); color: var(--bg); }
 
@@ -408,7 +434,18 @@ details.more[open] > summary { color: var(--ink); }
 .prose { font-family: var(--font-text); font-size: var(--fs-prose); line-height: var(--lh-prose); max-width: var(--measure); }
 .prose a { color: var(--link); text-decoration-color: currentColor; }
 .prose > * + * { margin-top: 1em; }
-.analysis .prose > h2:first-child { margin-top: 0; padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
+/* "L'analisi" apre come ogni sezione della scheda, col filetto d'inchiostro e
+   il suo nome, cosi' chi scorre vede dove comincia il racconto. Il nome e' un
+   <p> e non un titolo: gli H2 della prosa restano H2, perche' sono le ancore
+   che l'indice, il gemello Markdown e le query citano. Dentro la sezione
+   prendono la taglia di sottosezione. */
+.analysis__kicker {
+  font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
+  padding-top: var(--space-4); border-top: 3px solid var(--ink); margin-bottom: var(--space-6); color: var(--ink);
+}
+@media (min-width: 1200px) { .analysis__kicker { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); } }
+.analysis .prose > h2 { font-size: clamp(22px, 20.5px + 0.35vw, 25px); line-height: 1.25; font-weight: var(--fw-heading); letter-spacing: var(--tr-section); margin-top: var(--space-12); }
+.analysis .prose > h2:first-child { margin-top: 0; }
 .prose h2 { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 700; letter-spacing: var(--tr-section); margin-top: 2em; }
 .prose h3 { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; margin-top: 1.6em; }
 .prose h2 + *, .prose h3 + * { margin-top: 0.6em; }
@@ -581,8 +618,10 @@ details.more[open] > summary { color: var(--ink); }
 .ad--side { min-height: 600px; margin-block: var(--space-8) 0; }
 
 /* ---------- in fondo alla pagina ---------- */
-/* Una pagina che finisce con una fascia la attacca al piede, senza bianco in mezzo. */
-.sitechrome main:has(> .band:last-child) + .ftr { padding-top: 0; }
+/* Una pagina che finisce con una fascia la attacca al piede, senza bianco in
+   mezzo. `~` e non `+`: fra il <main> e il piede ci sono gli <script> della
+   pagina, e col fratello adiacente la regola non prendeva mai. */
+.sitechrome main:has(> .band:last-child, > .zone--tint:last-child) ~ .ftr { padding-top: 0; }
 .linklike { padding: 0; border: 0; background: none; font: inherit; color: var(--text-2); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; cursor: pointer; }
 .linklike:hover { color: var(--ink); }
 .reflist { list-style: none; display: grid; gap: var(--space-3); overflow-wrap: anywhere; }

@@ -63,3 +63,8 @@
 
 .confronto-source { margin-top: var(--space-8); max-width: var(--measure); }
 .confronto-more { margin-top: var(--space-12); max-width: var(--measure); color: var(--text-2); }
+
+/* Le regioni del confronto sulla mappa: col tratto dietro il riempimento se
+   ne vedeva un pixel, e il territorio piu' scuro della rampa (che nel
+   confronto non c'e') restava la cosa piu' evidente. Sempre in inchiostro. */
+.v1-confronto .map [data-key].is-on { stroke-width: 3; paint-order: normal; }

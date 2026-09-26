@@ -163,6 +163,9 @@
         </div>
         <div class="cl-side">
           {% if d.map %}
+          {#- Il titolo serve quando la mappa sta sopra o sotto la tabella, sul
+              telefono: senza, arrivava dopo le righe senza dire che cosa fosse. -#}
+          <h3 class="h-sub cl-side__title">Il punteggio sulla mappa, profilo {{ d.profile.name }}</h3>
           {#- L'etichetta e' quella della mappa di prima: la mappa porta al
               profilo della regione cliccata (lo script in fondo). -#}
           {{ ui.map(d.map.classes, 'punteggio', d.map.names, d.map.tips, overlay=d.map.callouts,
