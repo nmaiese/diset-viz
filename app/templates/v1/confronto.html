@@ -75,6 +75,11 @@
     <button class="btn btn--primary" type="submit" data-cmp-submit>Confronta</button>
   </form>
 
+  {#- Da 1200 pixel la mappa sta a sinistra per tutta l'altezza di valori e
+      serie, e a destra la tabella con sotto "Com'e' cambiato": accanto a una
+      tabella di quattro righe la mappa lasciava 400 pixel vuoti. Le due
+      sezioni restano due sezioni (confronto.css, subgrid). -#}
+  <div class="confronto-body">
   <section class="section" id="valori" aria-labelledby="h-valori">
     <h2 id="h-valori">I valori nel <span data-cmp-year-label>{{ d.year }}</span></h2>
     <div class="confronto-grid">
@@ -82,7 +87,7 @@
         {{ ui.map(d.map_classes, 'confronto', d.map_names, d.map_values, label='Mappa delle ' ~ d.plural ~ ' italiane per ' ~ ind.name ~ ', ' ~ d.year ~ ', con le ' ~ d.plural ~ ' a confronto in evidenza', level=d.level) }}
         {% if d.legend %}{{ ui.legend(d.legend, 'Più intenso, valore più alto. Contornate le ' ~ d.plural ~ ' a confronto.', nd_hidden=not d.legend_nd) }}{% endif %}
       </div>
-      <div class="tablewrap">
+      <div class="tablewrap" tabindex="0" role="region" aria-label="Le {{ d.plural }} a confronto">
         <table class="table confronto-table">
           <caption><span data-cmp-name>{{ ind.name }}</span>, <span data-cmp-year-label>{{ d.year }}</span></caption>
           <thead><tr><th scope="col">{{ d.singular | capitalize }}</th><th class="r" scope="col">Valore</th><th class="r" scope="col">Posizione</th></tr></thead>
@@ -100,6 +105,9 @@
 
   <section class="section" id="serie" aria-labelledby="h-serie">
     <h2 id="h-serie">Com'è cambiato</h2>
+    {#- Che cosa misura la serie e su quali anni: senza, il grafico si leggeva
+        senza unita' (l'asse y non la porta). confronto.js la riscrive. -#}
+    <p class="subline" data-cmp-subline>{{ ind.name }}{% if d.unit %}, in {{ d.unit }}{% endif %}, dal {{ d.year_min }} al {{ d.year_max }}.</p>
     <ul class="confronto-key" data-cmp-key>
       {%- for s in d.selected %}<li><span class="swatch {{ s.cls }}" aria-hidden="true"></span>{{ s.name }}</li>{% endfor %}
       <li><span class="swatch swatch--avg" aria-hidden="true"></span>Media semplice delle {{ d.plural }}</li>
@@ -121,6 +129,7 @@
       </div>
     </details>
   </section>
+  </div>
 
   <p class="source confronto-source">Fonte: <a href="{{ ind.source_url }}" data-cmp-source>{{ ind.source_label }}</a>. Elaborazione Divario Italia. <a href="{{ ind.path }}" data-cmp-scheda>La scheda dell'indicatore</a> ha la definizione, tutte le {{ d.plural }} e i dati da scaricare.</p>
 

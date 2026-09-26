@@ -721,18 +721,19 @@ class ExploreModuleIsAComponent(unittest.TestCase):
         return response.get_data(as_text=True), seen[0]
 
     @staticmethod
-    def _macro(module, root):
+    def _macro(module, root, use=False):
         from flask import render_template_string
 
         with app.test_request_context():
-            return render_template_string('{% import "v1/_ui.html" as ui %}{{ ui.explore(m, root=root) }}',
-                                          m=module, root=root)
+            return render_template_string('{% import "v1/_ui.html" as ui %}{{ ui.explore(m, root=root, use=use) }}',
+                                          m=module, root=root, use=use)
 
     def test_the_page_renders_the_macro_under_its_own_root(self):
         for path in self.PATHS:
             with self.subTest(path=path):
                 html, module = self._page(path)
-                inside = self._macro(module, False)
+                # La scheda lo rende sullo sprite del livello (`use`), come la mappa accanto all'analisi.
+                inside = self._macro(module, False, use=bool(module["show_map"]))
                 self.assertTrue(inside.startswith('<figure class="module" data-explore>'), inside[:80])
                 self.assertIn(inside, html)
                 self.assertRegex(html, r'<main\b[^>]*\bdata-v1="indicatore"[^>]*\bdata-page-root[\s>]')

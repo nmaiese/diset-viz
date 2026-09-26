@@ -1,0 +1,46 @@
+/* La metodologia della 1.0: solo l'impaginazione sua. Testata, indice di
+   pagina, sezioni col filetto, prosa, tabella a blocchi e `details.more` sono
+   componenti comuni (components.css). Legge solo token. */
+
+.v1-metodologia .pagehead { max-width: 52rem; }
+.v1-metodologia .layout__main > .section:first-child { padding-top: var(--space-8); }
+.v1-metodologia .aside-block a { color: var(--text-2); }
+
+/* Fra un blocco e l'altro della stessa sezione: la prosa, la tabella chiusa,
+   i profili, le serie. */
+.metodologia-more, .metodologia-after, .metodologia-profiles, .metodologia-used { margin-top: var(--space-8); }
+.metodologia-more > summary { min-height: var(--target); display: flex; align-items: center; }
+.metodologia-more[open] > summary { margin-bottom: var(--space-4); }
+
+/* La tabella delle categorie: sul telefono la descrizione va a tutta riga,
+   le due cifre accanto sotto. */
+.metodologia-cat .table thead th:nth-child(2) { width: 50%; }
+.metodologia-cat__desc { color: var(--text-2); }
+@container (max-width: 560px) {
+  .metodologia-cat .metodologia-cat__desc { grid-column: 1 / -1; }
+}
+
+/* I profili dei pesi: nome e frase, in colonna sotto i 960 e su due colonne
+   sopra, separati da filetti e non da scatole. */
+.metodologia-profiles { list-style: none; display: grid; gap: 0 var(--space-8); max-width: 52rem; }
+@media (min-width: 960px) { .metodologia-profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.metodologia-profiles li { padding-block: var(--space-4); border-top: 1px solid var(--rule); }
+.metodologia-profiles h4 { font-family: var(--font-display); font-size: var(--fs-ui); line-height: var(--lh-ui); font-weight: 700; }
+.metodologia-profiles p { margin-top: var(--space-1); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* Le serie del punteggio, una colonna per categoria dove c'e' spazio. */
+.metodologia-used__intro { max-width: var(--measure); margin-top: var(--space-2); color: var(--text-2); }
+.metodologia-groups { display: grid; gap: var(--space-8) var(--space-8); }
+@media (min-width: 720px) { .metodologia-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.metodologia-group h4 {
+  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2);
+  padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
+}
+.metodologia-group ul { list-style: none; margin-top: var(--space-2); }
+.metodologia-group li { padding-block: 6px; font-size: var(--fs-small); line-height: var(--lh-small); border-bottom: 1px solid var(--rule); }
+.metodologia-group small { color: var(--muted); font-size: var(--fs-small); }
+
+.metodologia-cta > p:not(.actions) { color: var(--text-2); }
+.metodologia-cta .actions { gap: var(--space-3) var(--space-6); margin-top: var(--space-4); }
+.v1-metodologia .actions { gap: var(--space-3) var(--space-6); }
+.v1-metodologia .actions .linkarrow { display: inline-flex; align-items: center; min-height: var(--target); }

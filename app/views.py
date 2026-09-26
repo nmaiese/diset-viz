@@ -642,6 +642,10 @@ def data_catalog():
             # BES solo provinciali, che il download non ce l'hanno: si conta
             # dai download della voce, non si presume.
             "downloadable": bool(entry["downloads"]),
+            # Per la pagina della 1.0: il gruppo per tema e i link ai file.
+            "theme": meta.get("theme") or "",
+            "theme_path": meta.get("theme_path"),
+            "downloads": entry["downloads"] or {},
         })
     description = (
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
@@ -668,8 +672,8 @@ def data_catalog():
             for item in datasets
         ],
     }
-    return render_template(
-        "data_catalog.html",
+    return design.render(
+        "catalogo-dati", "v1/catalogo-dati.html", "data_catalog.html",
         datasets=datasets,
         catalog_description=description,
         catalog_jsonld=catalog_jsonld,
@@ -692,7 +696,13 @@ def divari_regionali():
     view = divari.build_divari_view()
     if view is None:
         abort(404)
-    return render_template(
+    # La 1.0 (`app/design/pages/divari_regionali.py`, `v1/divari-regionali.html`),
+    # con divari_regionali.html come ripiego se la regia cede. La mappa e' la
+    # macro `ui.map` con la legenda e la classifica accanto: `_map_hero` resta
+    # la fonte dell'indicatore scelto (`?indicator=`) e dei suoi colori.
+    return design.render(
+        "divari-regionali",
+        "v1/divari-regionali.html",
         "divari_regionali.html",
         divari=view,
         map_hero=_map_hero(divari.MAP_DIVARI),
@@ -864,10 +874,53 @@ def _search_indicators(query, theme=None, limit=50):
     return results
 
 
-_SEARCH_PAGE_SIZE = 50
+_SEARCH_PAGE_SIZE = 20
 # Oltre questo tetto la ricerca smette di raccogliere: una query di una lettera
 # altrimenti impaginerebbe l'intero catalogo, e nessuno arriva a pagina dodici.
 _SEARCH_MAX_RESULTS = 300
+
+# I tipi di risultato, nell'ordine in cui la pagina li raggruppa: il valore di
+# `?tipo=`, il `kind` della riga e l'etichetta del filtro.
+_SEARCH_KINDS = (
+    ("territori", "territorio", "Territori"),
+    ("temi", "tema", "Temi"),
+    ("indicatori", "indicatore", "Indicatori"),
+    ("articoli", "articolo", "Articoli"),
+)
+_SEARCH_KIND_BY_PARAM = {param: kind for param, kind, _ in _SEARCH_KINDS}
+
+# Chi scrive "lavoro" cerca il tasso di occupazione e quello di disoccupazione,
+# che nel nome la parola non la portano: stavano al 50° e al 62° posto, dietro
+# dieci "Produttivita' del lavoro" di settori. Le chiavi e i sinonimi sono nella
+# forma di `_search_fold`, e un sinonimo vale come inizio di parola nel titolo.
+# Un sinonimo entra solo se sta davvero nei nomi degli indicatori (contati sul
+# catalogo il 26 settembre 2026): una parola che nessun titolo porta non
+# alzerebbe niente.
+_SEARCH_SYNONYMS = {
+    "lavoro": ("occupazione", "disoccupazione", "occupati", "lavoratori"),
+    "reddito": ("pil", "pensioni", "redditi", "retribuzioni"),
+    "salute": ("mortalita", "speranza di vita", "medici", "ospedal"),
+    "scuola": ("istruzione", "scolastic", "studenti", "diplomati"),
+    "poverta": ("rischio di poverta", "deprivazione"),
+    "casa": ("abitazion", "affitto", "sovraffollamento"),
+    "universita": ("laureat", "terziari", "universit"),
+    "internet": ("banda larga", "connessione", "digitali"),
+    "sanita": ("sanitari", "ospedal", "medici", "posti letto"),
+    "anziani": ("65 anni", "non autosufficient", "over"),
+    "giovani": ("neet", "15-34"),
+    "donne": ("femmine", "femminile", "di genere"),
+    "inquinamento": ("pm2.5", "qualita dell'aria", "emissioni"),
+    "rifiuti": ("raccolta differenziata", "discarica"),
+    "energia": ("rinnovabil", "elettrica"),
+    "trasporti": ("trasporto", "tpl", "mobilita"),
+    "criminalita": ("furti", "rapine", "omicidi", "borsegg"),
+    "sicurezza": ("furti", "rapine", "omicidi", "borsegg"),
+    "politica": ("elettorale", "fiducia", "partecipazione"),
+    "felicita": ("soddisfazione", "soddisfatt"),
+    "economia": ("pil", "valore aggiunto", "produttivita", "esportare"),
+    "nascite": ("natalita",),
+    "cultura": ("musei", "spettacol", "patrimonio", "bibliotech"),
+}
 
 
 def _search_fold(value):
@@ -876,27 +929,63 @@ def _search_fold(value):
     return " ".join(folded.lower().split())
 
 
-def _search_rank(title, secondary, query):
-    """3 se la query apre il titolo, 2 se sta nel titolo, 1 se sta nel resto.
+def _search_word(term, folded_text):
+    """True se `term` apre una parola di `folded_text` (tutti e due piegati)."""
+    return re.search(r"(?<![a-z0-9])" + re.escape(term), folded_text) is not None
 
-    Serve solo a ordinare, non a filtrare: chi cerca "neet" deve trovare in cima
-    l'indicatore che si chiama NEET, non un articolo che lo nomina di passaggio.
+
+def _search_rank(title, theme, secondary, query, synonyms=()):
+    """Il punteggio di pertinenza di una riga: serve a ordinare, non a filtrare.
+
+    Dall'alto: la query apre il titolo, la query sta nel titolo come parola e il
+    tema e' quello della query, un sinonimo sta nel titolo e il tema e' quello
+    della query, la query sta nel titolo, un sinonimo sta nel titolo, la query
+    sta solo nel tema, sta solo nella descrizione. Il tema pesa perche' separa
+    "Tasso di disoccupazione" (tema Lavoro) da "Produttivita' del lavoro nel
+    turismo" (tema Cultura): prima la corrispondenza nel tema valeva quanto
+    quella nella descrizione, e i due tassi del lavoro finivano in fondo.
+    Chi cerca "neet" deve trovare in cima l'indicatore che si chiama NEET, non
+    un articolo che lo nomina di passaggio.
     """
     title_folded = _search_fold(title)
+    theme_folded = _search_fold(theme)
+    in_theme = query in theme_folded or any(_search_word(s, theme_folded) for s in synonyms)
     if title_folded.startswith(query):
-        return 3
+        return 60
     if query in title_folded:
-        return 2
+        if _search_word(query, title_folded):
+            return 58 if in_theme else 50
+        return 45
+    if any(_search_word(s, title_folded) for s in synonyms):
+        return 55 if in_theme else 40
+    if in_theme:
+        return 20
     if query in _search_fold(secondary):
-        return 1
+        return 10
     return 0
 
 
+def _search_indicator_row(item, folded, synonyms):
+    explain = item.get("explain") or {}
+    return {
+        "kind": "indicatore",
+        "kind_label": "Indicatore",
+        "title": item["name"],
+        "url": item["path"],
+        "summary": explain.get("plain") or "",
+        "meta": f"{item['theme']} · {item['catalog_family_label']} · ultimo anno {item['year_max']}",
+        "rank": _search_rank(item["name"], item["theme"], explain.get("plain", ""), folded, synonyms),
+    }
+
+
 def _search_results(query):
-    """Indicatori e articoli che rispondono alla query, ordinati per pertinenza."""
+    """Territori, temi, indicatori e articoli che rispondono alla query, dal piu'
+    pertinente. A parita' di punteggio vince il titolo piu' corto: "Tasso di
+    disoccupazione" prima di "Tasso di disoccupazione giovanile (femmine)"."""
     folded = _search_fold(query)
     if not folded:
         return []
+    synonyms = _SEARCH_SYNONYMS.get(folded, ())
 
     results = []
     for territory in territory_search.search_territories(query, limit=20):
@@ -909,19 +998,38 @@ def _search_results(query):
             "meta": territory["context"],
             # Sopra tutto: chi scrive "Lecce" cerca Lecce, non un indicatore
             # che la nomina.
-            "rank": 4,
+            "rank": 100,
         })
+    for area in atlas_themes_by_macro_area():
+        for theme in area["themes"]:
+            theme_folded = _search_fold(theme["theme"])
+            if folded not in theme_folded and not any(_search_word(s, theme_folded) for s in synonyms):
+                continue
+            count = theme.get("indicator_count") or 0
+            results.append({
+                "kind": "tema",
+                "kind_label": "Tema",
+                "title": theme["theme"],
+                "url": theme["path"],
+                "summary": "",
+                "meta": f"{area['macro_area']} · {count} {'indicatore' if count == 1 else 'indicatori'}",
+                # Un tema e' la pagina che raccoglie tutto cio' che la query
+                # tocca: sta sotto il territorio e sopra le singole schede.
+                "rank": 90,
+            })
+
+    seen = set()
     for item in _search_indicators(query, limit=_SEARCH_MAX_RESULTS):
-        explain = item.get("explain") or {}
-        results.append({
-            "kind": "indicatore",
-            "kind_label": "Indicatore",
-            "title": item["name"],
-            "url": item["path"],
-            "summary": explain.get("plain") or "",
-            "meta": f"{item['theme']} · {item['catalog_family_label']} · ultimo anno {item['year_max']}",
-            "rank": _search_rank(item["name"], f"{item['theme']} {explain.get('plain', '')}", folded),
-        })
+        seen.add(item["path"])
+        results.append(_search_indicator_row(item, folded, synonyms))
+    # I sinonimi allargano anche la raccolta, ma solo ai titoli che li portano:
+    # "reddito" deve trovare il PIL pro capite, che la parola non la contiene.
+    for synonym in synonyms:
+        for item in _search_indicators(synonym, limit=_SEARCH_MAX_RESULTS):
+            if item["path"] in seen or not _search_word(synonym, _search_fold(item["name"])):
+                continue
+            seen.add(item["path"])
+            results.append(_search_indicator_row(item, folded, synonyms))
 
     for post in get_posts():
         haystack = " ".join([
@@ -939,12 +1047,23 @@ def _search_results(query):
             "url": f"/blog/{post['slug']}",
             "summary": post.get("description") or "",
             "meta": f"Blog · {post['date'].strftime('%d.%m.%Y')} · {post['read_time']} min di lettura",
-            "rank": _search_rank(post["title"], haystack, folded),
+            "date": post["date"].isoformat(),
+            "read_time": post["read_time"],
+            "rank": _search_rank(post["title"], " ".join(post.get("tags") or []), haystack, folded, synonyms),
         })
 
-    # Ordine stabile: prima la pertinenza, poi l'ordine in cui le due fonti li
-    # hanno prodotti (catalogo per gli indicatori, data per gli articoli).
-    results.sort(key=lambda row: -row["rank"])
+    from collections import Counter
+
+    # Una descrizione che si ripete uguale su piu' righe non distingue niente:
+    # si toglie da tutte, e resta il titolo con il suo tema.
+    repeated = {summary for summary, n in Counter(row["summary"] for row in results if row["summary"]).items() if n > 1}
+    for row in results:
+        if row["summary"] in repeated:
+            row["summary"] = ""
+
+    # Ordine stabile: prima la pertinenza, poi il titolo piu' corto, poi
+    # l'ordine in cui le fonti li hanno prodotti.
+    results.sort(key=lambda row: (-row["rank"], len(row["title"]) if row["rank"] < 90 else 0))
     return results
 
 
@@ -957,42 +1076,60 @@ def ricerca():
     esistono già sulle schede. Qui la pagina serve a chi cerca, non a Google:
     funziona senza JavaScript, si condivide, e i suoi link restano `follow`
     così l'equity scorre verso le pagine indicatore e gli articoli.
+
+    `?tipo=` (territori, temi, indicatori, articoli) tiene un tipo solo; un
+    valore che non esiste vale tutti.
     """
     query = (request.args.get("q") or "").strip()
+    kind_param = request.args.get("tipo") or ""
+    if kind_param not in _SEARCH_KIND_BY_PARAM:
+        kind_param = ""
     try:
         page = max(1, int(request.args.get("pagina", 1)))
     except (TypeError, ValueError):
         page = 1
 
-    results = _search_results(query)
+    every = _search_results(query)
+    kind_counts = {param: sum(1 for row in every if row["kind"] == kind) for param, kind, _ in _SEARCH_KINDS}
+    results = [row for row in every if row["kind"] == _SEARCH_KIND_BY_PARAM[kind_param]] if kind_param else every
     total = len(results)
     # Il tetto vale sulla raccolta degli indicatori: contare anche gli articoli
     # farebbe annunciare "ci fermiamo qui" con qualche risultato di anticipo.
-    truncated = sum(1 for row in results if row["kind"] == "indicatore") >= _SEARCH_MAX_RESULTS
+    truncated = kind_param in ("", "indicatori") and kind_counts["indicatori"] >= _SEARCH_MAX_RESULTS
     pages = max(1, (total + _SEARCH_PAGE_SIZE - 1) // _SEARCH_PAGE_SIZE)
     page = min(page, pages)
     start = (page - 1) * _SEARCH_PAGE_SIZE
     visible = results[start:start + _SEARCH_PAGE_SIZE]
 
     canonical_query = f"?q={quote_plus(query)}" if query else ""
+    if kind_param and query:
+        canonical_query = f"{canonical_query}&tipo={kind_param}"
     canonical = f"{SITE_URL}/ricerca{canonical_query}"
     if page > 1:
         canonical = f"{canonical}{'&' if canonical_query else '?'}pagina={page}"
 
-    response = make_response(render_template(
-        "ricerca.html",
+    folded = _search_fold(query)
+    response = make_response(design.render(
+        "ricerca", "v1/ricerca.html", "ricerca.html",
         query=query,
         results=visible,
         total=total,
-        page=page,
+        # Non `page`: e' il primo argomento di `design.render`.
+        page_number=page,
         pages=pages,
         first_index=start + 1,
         last_index=start + len(visible),
         page_size=_SEARCH_PAGE_SIZE,
         truncated=truncated,
-        territory_count=sum(1 for row in results if row["kind"] == "territorio"),
-        indicator_count=sum(1 for row in results if row["kind"] == "indicatore"),
-        post_count=sum(1 for row in results if row["kind"] == "articolo"),
+        territory_count=kind_counts["territori"],
+        indicator_count=kind_counts["indicatori"],
+        post_count=kind_counts["articoli"],
+        theme_count=kind_counts["temi"],
+        all_total=len(every),
+        kind_param=kind_param,
+        kind_counts=kind_counts,
+        search_kinds=_SEARCH_KINDS,
+        highlight_terms=[folded, *_SEARCH_SYNONYMS.get(folded, ())] if folded else [],
         query_param=canonical_query,
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -1090,8 +1227,8 @@ def blog_index():
             agent_discovery.blog_index_markdown(posts, SITE_URL),
             f"{SITE_URL}/blog",
         )
-    return render_template(
-        "blog_list.html",
+    return design.render(
+        "blog", "v1/blog.html", "blog_list.html",
         posts=posts,
         tags=all_tags(),
         site_url=SITE_URL,
@@ -1215,8 +1352,8 @@ def methodology():
         )
     regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
     province = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
-    return render_template(
-        "methodology.html",
+    return design.render(
+        "metodologia", "v1/metodologia.html", "methodology.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/metodologia",
@@ -1795,8 +1932,8 @@ def theme_page(theme_slug):
                                            province_indicators=province_indicators),
             f"{SITE_URL}{profile['theme_path']}",
         )
-    return render_template(
-        "theme_page.html",
+    return design.render(
+        "tema", "v1/tema.html", "theme_page.html",
         profile=profile,
         province_indicators=province_indicators,
         province_paths={item["canonical_path"] for item in province_indicators},
@@ -1922,8 +2059,8 @@ def regions_index():
     overview = profiles.regions_overview()
     regions = list(overview.values())
     provinces = province_profile.by_region()
-    return render_template(
-        "regions_index.html",
+    return design.render(
+        "regioni", "v1/regioni.html", "regions_index.html",
         regions=regions,
         province_counts={key: len(items) for key, items in provinces.items()},
         province_total=sum(len(items) for items in provinces.values()),
@@ -1954,8 +2091,8 @@ def provinces_index():
             agent_discovery.provinces_index_markdown(regions, total, SITE_URL),
             f"{SITE_URL}/province",
         )
-    return render_template(
-        "provinces_index.html",
+    return design.render(
+        "province", "v1/province.html", "provinces_index.html",
         regions=regions,
         provinces=[entry for region in regions for entry in region["provinces"]],
         total=total,
@@ -1988,8 +2125,8 @@ def themes_index():
     summary = catalog_summary()
     province = [item for items in indicator_view.province_indicators_by_theme().values()
                 for item in items]
-    return render_template(
-        "themes_index.html",
+    return design.render(
+        "temi", "v1/temi.html", "themes_index.html",
         areas=areas,
         total=summary["total"],
         institutions=summary["institutions_label"],
@@ -3375,13 +3512,19 @@ def _themes_index_areas():
                 by_theme.get(theme["theme"], []),
                 key=lambda i: (not i["complete"], i["name"].lower()),
             )
-            names = [i["name"] for i in items]
+            # Gli esempi di una scheda sono quelli con cui la pagina del tema
+            # apre (`_theme_featured`), non i primi in ordine alfabetico: su
+            # "Lavoro e conciliazione" uscivano cinque varianti di "Addetti" e
+            # "Differenza tra tasso".
+            featured = _theme_featured({"indicators": items})
+            names = [i["name"] for i in featured]
             themes.append({
                 "theme": theme["theme"],
                 "path": theme["path"],
                 "indicator_count": theme["indicator_count"],
-                "indicators": names[:5],
-                "extra_count": max(0, len(names) - 5),
+                "indicators": names,
+                "featured": [{"name": i["name"], "path": i["path"]} for i in featured],
+                "extra_count": max(0, len(items) - len(names)),
                 "lead": lead,
                 "lag": lag,
             })

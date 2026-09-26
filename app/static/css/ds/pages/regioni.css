@@ -1,0 +1,29 @@
+/* L'indice delle regioni: solo l'impaginazione sua. Schede (.card), traccia di
+   posizione (.track), pallini delle ripartizioni e mappa per scegliere
+   (`.map-pick`, con `.map-hint`) sono in components.css. Legge solo token. */
+
+/* ---------- testata con la mappa per scegliere, da 960 ---------- */
+.regioni-head { align-items: start; }
+.regioni-lead { max-width: var(--measure); color: var(--text-2); }
+.regioni-map { display: none; }
+@media (min-width: 960px) {
+  .regioni-head { grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); column-gap: var(--gutter-l); }
+  .regioni-head > * { grid-column: 1; }
+  .regioni-head > .regioni-map { grid-column: 2; grid-row: 1 / span 5; display: grid; gap: var(--space-2); justify-items: center; }
+  .regioni-map .navmap { width: 100%; max-width: 300px; }
+}
+
+/* ---------- le ripartizioni, per saltare: `.jump` di components.css ---------- */
+.regioni-note { max-width: var(--measure); margin-top: var(--space-4); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* ---------- le schede ---------- */
+.regioni-group > h2 .area-dot { width: 12px; height: 12px; vertical-align: 3px; margin-right: var(--space-3); }
+.regioni-cards { padding: 0; }
+@media (min-width: 1200px) { .regioni-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.regioni-card .card__title a { display: inline-flex; align-items: center; min-height: var(--target); }
+.regioni-facts { display: grid; gap: var(--space-2); margin: 0; font-size: var(--fs-ui); line-height: var(--lh-ui); }
+.regioni-facts > div { display: grid; gap: 0; }
+.regioni-facts dt { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.regioni-facts dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+.regioni-facts dd .n { color: var(--text-2); white-space: nowrap; }
+.regioni-facts__qv dd { display: grid; grid-template-columns: auto minmax(6rem, 12rem); gap: var(--space-3); align-items: center; justify-content: start; }

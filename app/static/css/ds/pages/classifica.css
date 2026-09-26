@@ -12,6 +12,11 @@
 .cl-tables { display: grid; gap: var(--space-4); min-width: 0; }
 .cl-side .map, .cl-side .legend { max-width: 22rem; }
 @container (min-width: 1120px) { .cl-side .map { max-width: none; } }
+/* Finche' mappa e tabella non stanno affiancate, la mappa viene prima: e' la
+   vista d'insieme, la tabella il dettaglio. Il titolo serve solo li'. */
+.cl-side__title { margin-bottom: var(--space-3); }
+@container (max-width: 1119px) { .cl-side { order: -1; } }
+@container (min-width: 1120px) { .cl-side__title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
 .cl-find { display: grid; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .cl-find__title { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); }
 
@@ -19,7 +24,7 @@
    stanno su una riga, con bersagli da 44px. */
 .cl-toolbar .cl-field { flex: 1 1 100%; }
 .seg.cl-profiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--control-border); }
-.seg.cl-profiles > a { border-left: 0; min-height: var(--target, 44px); padding-block: var(--space-2); line-height: 1.25; }
+.seg.cl-profiles > a { border-left: 0; min-height: var(--target); padding-block: var(--space-2); line-height: 1.25; }
 @container (min-width: 560px) { .seg.cl-profiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @container (min-width: 1040px) {
   .cl-toolbar .cl-field { flex: 0 1 auto; }
@@ -30,12 +35,40 @@
 .cl-profile-note { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .cl-profile-note b { color: var(--ink); font-weight: 600; }
 
-/* Dove eccelle: nome e punteggio nella stessa cella, il punteggio in colonna.
-   Sul telefono le quattro posizioni vanno a due a due. */
-.cl-pair { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
-.cl-pair .n { flex: none; color: var(--text-2); }
+/* La classifica: il nome su una riga sola (Trentino Alto Adige andava a capo
+   accanto a una barra che aveva spazio) e la barra a una larghezza massima. */
+@container rank (min-width: 720px) {
+  .cl-tables .table--rank .name { white-space: nowrap; }
+  .cl-tables .table--rank .rankcell-bar { width: 12rem; }
+}
+
+/* Dove eccelle: le prime tre in una cella, una per riga col punteggio subito
+   dopo il nome, e l'ultima. Sul telefono le due celle stanno affiancate. */
 .cl-cats tbody th { font-weight: 600; }
-@container (max-width: 560px) { .table--stack.cl-cats tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cl-top { list-style: none; display: grid; gap: var(--space-1); }
+.cl-top__rank { display: inline-block; min-width: 2ch; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cl-top__score { margin-left: var(--space-2); color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@container (min-width: 561px) {
+  .cl-cats { width: auto; }
+  .cl-cats tbody th, .cl-cats td { vertical-align: top; padding-right: var(--space-12); }
+}
+/* Da 1100 pixel di contenitore la tabella prende tutta la riga e le prime tre
+   stanno in fila, ognuna nella sua colonna: la tabella si dimezza in altezza
+   e a destra non restano 700 pixel vuoti. */
+@container (min-width: 1100px) {
+  .cl-cats { width: 100%; }
+  .cl-cats thead th:first-child { width: 22%; }
+  .cl-cats thead th:last-child { width: 18%; }
+  .cl-top { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+}
+@container (max-width: 560px) { .table--stack.cl-cats tbody tr { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
+
+/* Fonti, dati e citazione: da 960 le fonti a sinistra, scaricare e citare a
+   destra. */
+.cl-sources { display: grid; gap: var(--space-8); align-items: start; }
+.cl-sources > * { min-width: 0; }
+.cl-sources__use > .actions:first-child { margin-top: 0; }
+@media (min-width: 960px) { .cl-sources { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-12); } }
 
 /* La mappa porta al profilo della regione cliccata, come la mappa di prima. */
 .cl-side .map [data-key] { cursor: pointer; }

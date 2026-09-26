@@ -29,9 +29,27 @@
 {% endif %}
 {% endblock %}
 
-{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}">{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/indicatore.css') }}">{% endblock %}
 
 {% block head_extra %}
+{#- Fra schede della stessa famiglia (genere, eta', regioni e province) i punti
+    della striscia si ricompongono invece di ricomparire: ogni punto prende un
+    nome di transizione solo per quel passaggio. `pagereveal` scatta prima del
+    primo disegno, quindi prima che v1.js arrivi: per questo sta qui, in
+    testa. L'altra meta' (`pageswap`, la pagina che si lascia) sta in v1.js. -#}
+<script>
+addEventListener("pagereveal", function (e) {
+  var from = window.navigation && navigation.activation && navigation.activation.from;
+  if (!e.viewTransition || !from) return;
+  var fig = document.querySelector(".lead-figure[data-family]");
+  if (!fig) return;
+  var fam = []; try { fam = JSON.parse(fig.dataset.family); } catch (err) { return; }
+  if (fam.indexOf(new URL(from.url).pathname) < 0) return;
+  var dots = fig.querySelectorAll(".strip__dot");
+  dots.forEach(function (c) { if (c.getClientRects().length) c.style.viewTransitionName = "dot-" + c.dataset.key; });
+  e.viewTransition.finished.finally(function () { dots.forEach(function (c) { c.style.viewTransitionName = ""; }); });
+});
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -84,6 +102,7 @@
     territorio scelto nel modulo si accende anche sulla striscia in testa e
     sulla serie di "Com'e' cambiato", che stanno fuori dal modulo. -#}
 <main id="contenuto" class="v1 v1-indicatore page-indicator" data-v1="indicatore" tabindex="-1" data-page-root>
+{% if d.module and d.module.show_map %}{{ v1_map_sprite(d.module.level) }}{% endif %}
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
 
@@ -99,7 +118,7 @@
         questo attacco, e la prova lo confronta col testo visibile. -#}
     <div class="answer"><p class="page-lead">{{ page_lead | analyst_html }}</p></div>
     <p class="meta">
-      <span class="direction">{{ d.verso }}</span>
+      <span class="direction">{{ ui.term('verso', d.verso) }}</span>
       {% if dataset_updated %}<span>Fonte aggiornata il <time datetime="{{ dataset_updated }}">{{ d.updated }}</time></span>{% endif %}
       <a href="{{ corrections_url }}">Segnala un errore</a>
       {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
@@ -117,18 +136,57 @@
   </div>
 
   {% if d.strip.svg %}
-  <figure class="lead-figure" aria-labelledby="divario-t">
+  <figure class="lead-figure" aria-labelledby="divario-t" data-family="{{ d.family | tojson | forceescape }}">
     <figcaption class="lead-figure__head">
       <span class="lead-figure__title" id="divario-t">Il divario nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
       {{ ui.arealegend(d.strip.legend) }}
+      {#- La striscia che diventa Italia: gli stessi venti punti si ricompongono
+          in una griglia a forma d'Italia, una casella per regione, e prendono
+          il colore del valore. Il comando lo accende v1.js (initTilemap):
+          senza JavaScript resta la striscia. -#}
+      {% if d.tilemap %}
+      <div class="seg lead-figure__view" role="group" aria-label="Vista della figura" data-view-toggle hidden>
+        <button type="button" data-view="strip" aria-pressed="true">Striscia</button><button type="button" data-view="tiles" aria-pressed="false">Italia</button>
+      </div>
+      {% endif %}
     </figcaption>
     <div class="chart chart--hero" data-series>{{ d.strip.svg | safe }}</div>
+    {% if d.tilemap %}
+    <div class="tilemap" data-tilemap hidden>
+      <div class="tilemap__grid" role="group" aria-label="Le {{ n }} {{ level.plural }} a forma d'Italia, {{ meta.name }}, {{ year }}">
+        {%- for t in d.tilemap %}
+        <button type="button" class="tmap-cell {{ t.step or 'is-nd' }}" style="grid-column: {{ t.col }}; grid-row: {{ t.row }}" data-key="{{ t.key }}" aria-label="{{ t.name }}, {{ t.value }}"><b>{{ t.abbr }}</b><span>{{ t.short }}</span></button>
+        {%- endfor %}
+      </div>
+      {% if d.module.legend %}{{ ui.legend(d.module.legend, 'Più intenso, valore più alto.', d.tilemap | selectattr('step', 'equalto', '') | list | length > 0) }}{% endif %}
+    </div>
+    {% endif %}
     <p class="source">Ogni punto è {{ 'una' if level.singular in ('regione', 'provincia') else 'un' }} {{ level.singular }}, nel colore della sua ripartizione{% if d.values_note %}, {{ d.values_note }}{% endif %}.</p>
+    {#- Il tuo territorio, se l'hai scelto dal suo profilo: la riga la scrive
+        v1.js con i dati che la pagina ha gia'. -#}
+    <p class="mine-note" data-mine-note hidden></p>
   </figure>
+  {#- La striscia che resta: quando quella grande esce dallo schermo, la stessa
+      striscia in una riga si ferma sotto la testata (e sotto la barra delle
+      sezioni sul telefono), col territorio scelto. E' un aiuto visivo che
+      ripete la figura qui sopra, quindi aria-hidden; un clic su un punto
+      sceglie come sulla striscia grande. La accende v1.js (initStripbar). -#}
+  {% if d.strip_mini %}
+  <div class="stripbar" data-stripbar aria-hidden="true">
+    <div class="stripbar__in">
+      <p class="stripbar__t"><span class="stripbar__name">{{ meta.name }}</span> <span class="stripbar__meta">{{ n }} {{ level.plural }}, {{ year }}</span></p>
+      {#- Con 107 province i punti sono troppo vicini per il dito: la frase
+          manda al campo della classifica. -#}
+      {% set pick_hint = "Scegli dal campo «Trova la tua provincia»" if level.key == 'provincia' else "Tocca un punto per scegliere" %}
+      <p class="stripbar__sel" data-stripbar-sel data-empty="{{ pick_hint }}">{{ pick_hint }}</p>
+      <div class="stripbar__chart">{{ d.strip_mini | safe }}</div>
+    </div>
+  </div>
+  {% endif %}
   {% endif %}
 
   <div class="layout">
-    <aside class="layout__aside">
+    <aside class="layout__aside" aria-label="In questa pagina">
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
@@ -163,7 +221,7 @@
             nome con cui le prove lo cercano da prima della 1.0. Il modulo
             dato e' il componente di `v1/_ui.html`, composto in `d.module`. -#}
         <div class="indicator-cockpit">
-        {{ ui.explore(d.module, root=False) }}
+        {{ ui.explore(d.module, root=False, use=d.module.show_map) }}
         </div>
         {#- "Dentro le regioni", solo sulle province: la provincia piu' alta e
             la piu' bassa di ogni regione e la distanza fra le due, cio' che la
@@ -203,11 +261,26 @@
         <figure class="module">
           <figcaption class="module__head">
             {% if d.series_claim %}<h3 class="h-sub">{{ d.series_claim }}</h3>{% endif %}
-            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la media semplice. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la {{ ui.term('media-semplice') }}. Scegli una {{ level.singular }} qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
           <p class="source">Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
+          {#- Regione per regione: una linea per regione, tutte sulla stessa scala
+              (charts.small_multiples), in ordine di classifica sull'ultimo anno,
+              con la media semplice tratteggiata dietro. La tua regione e quella
+              scelta si accendono (v1.js). -#}
+          {% if d.multiples %}
+          <div class="sm" aria-labelledby="h-sm">
+            <h3 class="h-sub sm__t" id="h-sm">{{ level.singular | capitalize }} per {{ level.singular }}</h3>
+            <p class="subline">Ogni riquadro ha la stessa scala, dal valore più basso al più alto di tutte le {{ level.plural }} in tutti gli anni. Tratteggiata la media semplice. In ordine di classifica nel {{ d.series.last }}.</p>
+            <ol class="sm__grid">
+              {%- for s in d.multiples %}
+              <li class="sm__item" data-key="{{ s.key }}"><span class="sm__name">{{ s.name }}</span><span class="sm__val">{{ s.last_text }}<span class="sm__yr"> nel {{ s.last[0] }}</span></span>{{ s.svg | safe }}</li>
+              {%- endfor %}
+            </ol>
+          </div>
+          {% endif %}
           <details class="more">
             <summary>La serie in tabella</summary>
             <div class="tablewrap" tabindex="0" role="region" aria-label="Serie storica in tabella">
@@ -226,7 +299,19 @@
 
       {% if page_article.sections %}
       <div class="section analysis" id="analisi">
+        <p class="analysis__kicker">L'analisi</p>
         {{ article.body(page_article, meta, level) }}
+        {#- Accanto alla prosa, da 960 pixel, la mappa dell'ultimo anno resta
+            ferma mentre si legge: la prosa nomina i territori, la mappa dice
+            dove stanno. Stessi gradini del modulo, il valore sotto il mouse,
+            il clic al profilo. Sul telefono c'e' gia' la mappa del modulo. -#}
+        {% if d.module and d.module.mini %}{% set mm = d.module.mini %}
+        <aside class="analysis__map" aria-label="La mappa del dato">
+          <p class="analysis__map-t"><b>{{ d.module.name }}</b>, {{ d.module.year }}</p>
+          {{ ui.navmap(mm.level, mm.names, None, mm.base, steps=mm.steps) }}
+          {% if d.module.legend %}{{ ui.legend(d.module.legend, 'Più intenso, valore più alto.', d.module.legend_nd) }}{% endif %}
+        </aside>
+        {% endif %}
       </div>
       {% endif %}
 

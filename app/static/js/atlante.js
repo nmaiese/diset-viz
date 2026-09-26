@@ -139,6 +139,7 @@
   }
   function apply() {
     var needle = norm(state.q.trim());
+    var filtering = !!(needle || state.area || state.theme || state.source || state.yfrom || state.yto || state.complete || state.fav);
     var counts = {}; // per tema, senza il filtro del tema e della ricerca, come la SPA
     var shown = 0;
     groups.forEach(function (g) {
@@ -156,7 +157,16 @@
       });
       counts[name] = pool;
       g.hidden = n === 0;
+      // Sul telefono i temi partono chiusi: un filtro o una ricerca che ci
+      // trova righe li apre, e tolti i filtri si richiudono quelli aperti qui.
+      var fold = g.querySelector("details");
+      if (fold) {
+        if (filtering && n > 0 && !fold.open) { fold.open = true; g._auto = true; }
+        else if (!filtering && g._auto) { fold.open = false; g._auto = false; }
+      }
       g.querySelector("[data-atlas-n]").textContent = n;
+      // La stima dell'altezza del tema non ancora disegnato segue le righe a vista.
+      g.style.setProperty("--rows", n);
       shown += n;
     });
     areas.forEach(function (a) { a.hidden = !a.querySelector(".atlante-group:not([hidden])"); });
@@ -187,6 +197,13 @@
   // riaprono la stessa vista. Se l'API non risponde, la pagina si ricarica
   // con `mappa`, come faceva il form da solo.
   var mapForm = document.getElementById("atl-map");
+  // Seicento bottoni "Sulla mappa" con lo stesso nome non si distinguono in
+  // un lettore di schermo. Il nome della riga si aggiunge qui e non
+  // nell'HTML, che ha un tetto di peso (tests/integration/test_atlante.py).
+  document.querySelectorAll('button[form="atl-map"][name="mappa"]').forEach(function (b) {
+    var a = b.parentNode.querySelector("a");
+    if (a) b.setAttribute("aria-label", a.textContent.trim() + " sulla mappa");
+  });
   var mapSection = document.getElementById("mappa");
   var loading = null;
   function reloadWith(url) { location.assign(url.pathname + url.search + "#mappa"); }

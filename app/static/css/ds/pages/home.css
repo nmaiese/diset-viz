@@ -19,15 +19,20 @@
   .home-head > .home-map { grid-column: 2; grid-row: 1 / span 5; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
-/* La mappa accanto alla ricerca: solo da 960. Sul fondo grigio della testata
-   la terra e' un grigio piu' scuro, i confini nel colore del fondo, e la
-   regione sotto il mouse prende l'accento (e' un link). */
-.home-map { display: none; }
+/* La mappa della testata: la qualita' della vita per regione, con la sua
+   legenda. Sul telefono sotto la ricerca, larga quanto serve a toccare una
+   regione, da 960 nella colonna destra, alta quanto la testata. */
+.home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; }
+.home-map .navmap { width: 100%; max-width: 360px; justify-self: center; }
+.home-map .legend { max-width: 360px; }
+.home-map__head { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); max-width: 36rem; }
+.home-map__head b { color: var(--ink); font-weight: 600; }
+.home-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
+.home-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 @media (min-width: 960px) {
-  .home-map { display: grid; gap: var(--space-2); justify-items: center; }
-  .home-map .navmap { width: 100%; max-width: 320px; }
-  .home-map .navmap a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
-  .home-map .navmap a:hover use { fill: var(--accent); }
+  .home-map { margin: 0; align-content: start; }
+  .home-map .navmap { max-width: 400px; }
+  .home-map .legend, .home-map__head, .home-map__hint { max-width: 400px; justify-self: center; width: 100%; }
 }
 .home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }
@@ -50,7 +55,14 @@
    quattro porte occupavano quasi un'altezza e mezza di schermo. */
 .doors__main { list-style: none; display: grid; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 600px) { .doors__main { gap: var(--gutter-l); } }
-@media (max-width: 599px) { .door__text { display: none; } .door__unit { font-size: var(--fs-small); } }
+/* Sul telefono ogni scheda e' alta quanto il suo contenuto: con le righe
+   della griglia tirate alla piu' alta, Temi restava con 70 pixel vuoti sotto
+   il titolo accanto a Qualita' della vita, che va su due righe. */
+@media (max-width: 599px) {
+  .door__text { display: none; }
+  .door__unit { font-size: var(--fs-small); }
+  .doors__main { align-items: start; }
+}
 @media (min-width: 1200px) { .doors__main { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .door {
   position: relative; display: grid; align-content: start; gap: var(--space-2); min-width: 0;
@@ -111,19 +123,15 @@
 /* Il selettore dei livelli: due schede (tab) che senza JavaScript sono link. */
 .seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control); }
 .seg__btn {
-  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: 0 var(--space-4);
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-min); padding: 0 var(--space-4);
   font-weight: 600; color: var(--text-2); text-decoration: none; border-radius: var(--radius-sm);
 }
 .seg__btn:hover { color: var(--ink); background: var(--surface-1); }
-.seg__btn.is-on { color: var(--on-ink); background: var(--ink); }
+.seg__btn.is-on { color: var(--bg); background: var(--ink); }
 .seg__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .seg__n { font-size: var(--fs-label); font-weight: 500; font-variant-numeric: tabular-nums; }
 .feat__level { display: grid; gap: var(--space-8); padding: var(--space-6) var(--space-5); }
 .feat__level:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
-.feat__level[hidden] { display: none; }
-/* `.field` e' una griglia e batterebbe il [hidden] del browser: senza
-   JavaScript il campo "Scegli" deve restare nascosto. */
-.terr__find[hidden] { display: none; }
 .feat__block { margin: 0; min-width: 0; }
 .feat__cap { display: grid; gap: var(--space-1); margin-bottom: var(--space-4); }
 .feat__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
@@ -206,7 +214,6 @@
 .qol__main .h-section { margin-bottom: 0; }
 /* La domanda sta sotto il titolo di sezione, piu' piccola: due titoli della
    stessa taglia non si capiva quale fosse quello della fascia. */
-.qol__big { font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); max-width: 22em; }
 .qol__text { max-width: var(--measure); color: var(--text-2); font-size: var(--fs-lede); line-height: var(--lh-lede); }
 .qol__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin: var(--space-2) 0 0; }
 .btn--lg { min-height: 56px; padding-inline: var(--space-6); font-size: var(--fs-subsection); }
@@ -238,13 +245,15 @@
 @media (min-width: 1200px) { .home-quiz__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
 .home-games { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 600px) { .home-games { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Niente ombre (SISTEMA.md): la scheda si stacca dal lavaggio con il fondo
+   e un filetto, e al passaggio il filetto passa all'inchiostro. */
 .game {
   position: relative; display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5);
-  background: var(--bg); border-radius: var(--radius-md); box-shadow: var(--shadow-panel);
-  transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease);
+  background: var(--bg); border: 1px solid var(--rule-strong); border-radius: var(--radius-md);
+  transition: border-color var(--motion-fast) var(--motion-ease);
 }
-.game:hover { transform: translateY(-3px); box-shadow: var(--shadow-pop); }
-@media (prefers-reduced-motion: reduce) { .game, .game:hover { transition: none; transform: none; } }
+.game:hover { border-color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .game { transition: none; } }
 @supports selector(:has(a)) {
   .game:has(a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
   .game__title a:focus-visible { outline: none; }
@@ -310,7 +319,6 @@
    e la variazione deve andare a capo sotto il disegno (`.trend` in
    components.css si piega solo dentro un contenitore). */
 .home-temi__seg { margin-bottom: var(--space-6); }
-.home-temi__level[hidden] { display: none; }
 .home-temi__level:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 .home-area { container-type: inline-size; }
 .home-area__move { display: grid; gap: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--rule); }
@@ -323,37 +331,7 @@
 .home-area__move .trend__txt, .home-area__move .trend__from { white-space: normal; }
 .home-temi__source { margin-top: var(--space-6); }
 
-/* ---------- storie: una grande accanto alla sua foto, tre in fila ----------
-   Tutta la scheda si clicca (il titolo si allarga), tranne i link del
-   credito della foto, che stanno sopra. Le foto hanno proporzioni diverse
-   (1200x630, 1376x768): si tagliano tutte a 16:9. */
-.story { position: relative; display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
-.story__fig { display: grid; gap: var(--space-1); min-width: 0; }
-.story__media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 16 / 9; }
-.story__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
-.story:hover .story__media img { transform: scale(1.03); }
-@media (prefers-reduced-motion: reduce) { .story__media img, .story:hover .story__media img { transition: none; transform: none; } }
-.story__credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
-.story__credit a { position: relative; z-index: 1; color: inherit; }
-.story__body { display: grid; align-content: start; gap: var(--space-2); min-width: 0; }
-.story__tag { justify-self: start; padding: 2px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); background: var(--surface-2); border-radius: var(--radius-sm); }
-.story__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
-.story__title a { color: var(--ink); text-decoration: none; }
-.story__title a::after { content: ""; position: absolute; inset: 0; }
-.story:hover .story__title a { text-decoration: underline; text-decoration-thickness: 2px; }
-@supports selector(:has(a)) {
-  .story:has(.story__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
-  .story__title a:focus-visible { outline: none; }
-}
-.story__text { color: var(--text-2); }
-.story__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
-.story__go { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); font-weight: 700; color: var(--accent-strong); }
-.story--lead { padding-bottom: var(--space-8); margin-bottom: var(--space-8); border-bottom: 1px solid var(--rule-strong); }
-.story--lead .story__title { font-size: var(--fs-section); line-height: var(--lh-section); }
-.story--lead .story__text { font-size: var(--fs-lede); line-height: var(--lh-lede); max-width: var(--measure); }
-@media (min-width: 960px) {
-  .story--lead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-10); align-items: center; }
-}
+/* ---------- storie: il componente `.story` sta in components.css ---------- */
 .stories { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
 @media (min-width: 720px) { .stories { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 /* Sul telefono le tre in fila diventano righe con la miniatura a sinistra. */

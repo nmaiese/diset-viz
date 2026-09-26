@@ -20,12 +20,39 @@
   animation-duration: var(--dur);
   animation-timing-function: var(--ease-out);
 }
-
-.sitechrome { display: flex; flex-direction: column; min-height: 100vh; }
-html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--space-4)); }
-@media (min-width: 960px) {
-  html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-l) + var(--space-4)); }
+/* Il titolo e la figura d'apertura passano da una pagina all'altra
+   (view-transition-name in components.css), allo stesso passo della pagina. */
+::view-transition-group(page-title), ::view-transition-group(lead-figure) {
+  animation-duration: var(--dur);
+  animation-timing-function: var(--ease-out);
 }
+/* Chi chiede meno movimento non ha transizioni. Il selettore universale non
+   raggiunge questi pseudo-elementi, e la regola stava solo in site.css, che
+   le pagine della 1.0 non caricano. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
+.sitechrome { display: flex; flex-direction: column; min-height: 100svh; }
+
+/* --- le barre ferme: una misura sola ----------------------------------------
+   Tre altezze, sulla radice, e chi si ferma in alto le somma, cosi' nessuno
+   le riscrive a mano:
+   --hdr-h      la testata visibile, 0 quando sul telefono si ritira (v1.js,
+                `html.is-hdr-off`);
+   --toc-bar    la barra delle sezioni, che sotto i 1200 resta sotto la
+                testata sulle pagine che hanno un indice;
+   --stripbar-h la striscia che resta della scheda, quando c'e' (v1.js).
+   --sticky-top e' il bordo basso della testata e della barra: da li' partono
+   gli elementi fermi, e le ancore atterrano sotto tutte e tre. */
+:root {
+  --hdr-h: var(--masthead-s); --toc-bar: 0px; --stripbar-h: 0px;
+  --sticky-top: calc(env(safe-area-inset-top, 0px) + var(--hdr-h) + var(--toc-bar));
+}
+@media (min-width: 960px) { :root { --hdr-h: var(--masthead-l); } }
+@media (max-width: 1199px) { :root:has(.toc) { --toc-bar: 52px; } }
+html.is-hdr-off { --hdr-h: 0px; }
+html:has(body.sitechrome) { scroll-padding-top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-4)); }
 
 .sitechrome .skiplink {
   position: absolute; left: var(--space-4); top: calc(env(safe-area-inset-top, 0px) + var(--space-2));
@@ -46,7 +73,12 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
   /* La barra e' identica su ogni pagina: il nome la tiene ferma da una
      navigazione all'altra invece di dissolverla col resto. */
   view-transition-name: masthead;
+  transition: transform var(--motion-base) var(--motion-ease);
 }
+/* Sul telefono la testata si ritira scendendo e torna appena si risale
+   (v1.js): in orizzontale testata, barra delle sezioni e striscia prendevano
+   il 44% dello schermo. */
+html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px))); }
 .sitechrome .hdr__bar {
   display: flex; align-items: center; gap: var(--space-4);
   width: min(100% - 2 * var(--margin-s), var(--container));
@@ -220,6 +252,13 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
   transition: color var(--motion-fast) var(--motion-ease);
 }
 .fav-star:hover, .fav-star.is-on { color: var(--accent); }
+/* Al tocco: il piede, l'accesso e la stella a 44 pixel (anche le pagine
+   rimaste su site.css caricano questo foglio). */
+@media (pointer: coarse) {
+  .sitechrome .ftr__cols ul { gap: 0; }
+  .sitechrome .ftr__cols a, .sitechrome .ftr__legal a { display: inline-flex; align-items: center; min-height: var(--target); }
+  .sitechrome .site-auth__login, .fav-star { min-height: var(--target); min-width: var(--target); }
+}
 
 /* --- cassetto del telefono ---------------------------------------------- */
 .sitechrome .drawer { position: fixed; inset: 0; background: var(--scrim); z-index: var(--z-modal); }
@@ -237,7 +276,7 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
 .sitechrome .drawer__top > span { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
 .sitechrome .drawer__actions { display: flex; gap: var(--space-1); align-items: center; }
 .sitechrome .drawer__group { border-top: 1px solid var(--rule); padding-block: var(--space-4); }
-.sitechrome .drawer__group h4 {
+.sitechrome .drawer__group h2 {
   font-family: var(--font-ui); font-size: var(--fs-label); font-weight: 600; color: var(--muted);
   margin: 0 0 var(--space-2);
 }
@@ -324,3 +363,28 @@ html:has(body.sitechrome) { scroll-padding-top: calc(var(--masthead-s) + var(--s
 @media (prefers-reduced-motion: reduce) {
   .sitechrome .navlink > summary svg, .fav-star { transition: none; }
 }
+
+/* --- il tuo territorio (v1.js, initMine) ----------------------------------
+   Il bottone del profilo e il segno nella testata. Il segno sta solo da 600
+   pixel: sul telefono la testata ha gia' marchio, ricerca e menu. */
+.mine-set { justify-self: start; margin-top: var(--space-4); }
+.mine-set[hidden], .mine-chip[hidden] { display: none; }
+.mine-set[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sitechrome .mine-chip {
+  display: none; align-items: center; min-height: var(--target-min); padding: 0 var(--space-3);
+  border: 1px solid var(--rule-strong); border-radius: var(--radius-control);
+  font: 600 var(--fs-small)/1 var(--font-ui); color: var(--ink); text-decoration: none; white-space: nowrap;
+  max-width: 14rem; overflow: hidden; text-overflow: ellipsis;
+}
+.sitechrome .mine-chip:hover { border-color: var(--ink); color: var(--ink); }
+@media (min-width: 600px) { .sitechrome .mine-chip:not([hidden]) { display: inline-flex; } }
+
+/* --- la cifra d'apertura (v1.js, initCount) --------------------------------
+   Nel titolo di regione e provincia (la testata porta data-count, l'h1 resta
+   com'e': lo cerca il contratto pubblico) la posizione e' piu' grande, e
+   all'arrivo conta fino al suo valore: il doppione animato sta sopra il
+   numero vero, che resta nel documento ma invisibile mentre si conta. */
+[data-count] > h1 .n--rank { font-size: 1.3em; line-height: 1; letter-spacing: -0.01em; }
+[data-count] > h1 .n--rank .n__u { font-size: 0.77em; }
+[data-count] > h1 .is-counting { position: absolute; opacity: 0; }
+[data-count] > h1 .count-up { font-variant-numeric: tabular-nums; }

@@ -383,13 +383,13 @@
     // mappa, con i gradini di v1.js
     var box = $("[data-cmp-map]");
     if (values.length) {
-      var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values), span = (hi - lo) || 1;
+      var sc = window.DiV1.choroScale(values);
       var nd = box.querySelector(".map pattern[id]");
       all(".map [data-key]", box).forEach(function (p) {
         var k = p.getAttribute("data-key"), v = now[k];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6", "is-on", "is-nd");
         if (v !== undefined) {
-          p.classList.add("q" + Math.min(6, Math.floor((v - lo) / span * 6) + 1));
+          p.classList.add("q" + window.DiV1.choroStep(v, sc));
           p.style.fill = "";
           p.setAttribute("data-value", withUnit(v, unit));
         } else {
@@ -398,8 +398,7 @@
         }
         if (state.regions.indexOf(k) >= 0) p.classList.add("is-on");
       });
-      var lg = { min: lo, mid: lo + (hi - lo) / 2, max: hi };
-      all("[data-legend]", box).forEach(function (el) { el.textContent = fmt(lg[el.getAttribute("data-legend")]); });
+      window.DiV1.choroLegend(box, sc);
       // Come `legend_nd` della pagina: si contano i contorni, non i territori della serie.
       var shapes = all(".map [data-key]", box).length;
       all(".legend__nd", box).forEach(function (el) { el.hidden = keys.length >= shapes; });
@@ -416,6 +415,8 @@
       return { name: s.name, cls: s.cls, points: m.years.map(function (yr) { var v = m.matrix[yr][s.key]; return [yr, v === undefined ? null : v]; }) };
     });
     var chart = compareChart(m.years, lines, averages, year);
+    var subline = $("[data-cmp-subline]");
+    if (subline) subline.textContent = meta.name + (unit ? ", in " + unit : "") + ", dal " + m.years[0] + " al " + m.years[m.years.length - 1] + ".";
     $("[data-cmp-chart]").innerHTML = chart;
     $("[data-cmp-chartnote]").textContent = chart
       ? "La media semplice si disegna negli anni in cui almeno " + cfg.need + " " + cfg.plural + " hanno il dato. La linea tratteggiata verticale segna l'anno della tabella."

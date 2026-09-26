@@ -7,7 +7,7 @@
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--masthead-l) + var(--space-4)); }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   margin: 0;
   background: var(--bg);
@@ -89,7 +89,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .layout { display: grid; gap: var(--space-12); align-items: start; }
 @media (min-width: 1200px) {
   .layout { grid-template-columns: minmax(0, 1fr) 13rem; gap: var(--space-16); }
-  .layout__aside { position: sticky; top: calc(var(--masthead-l) + var(--space-6)); order: 2; }
+  .layout__aside { position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-6)); order: 2; }
 }
 .layout__main { min-width: 0; }
 .measure { max-width: var(--measure); }
@@ -102,22 +102,35 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    di 3px e piu' aria sopra, e il titolo cresce sugli schermi larghi. Resta un
    filetto e non una scatola (SISTEMA.md, "Regia"). */
 .section, .come-leggere { padding-top: var(--space-12); }
-.section + .section, .section + .come-leggere, .come-leggere + .section { margin-top: var(--space-4); }
-@media (min-width: 960px) {
-  .section, .come-leggere { padding-top: var(--space-16); }
-  .section + .section, .section + .come-leggere, .come-leggere + .section { margin-top: var(--space-8); }
-}
-.section > h2, .come-leggere > h2, .h-section {
+/* Ogni sezione che non apre il suo contenitore sta alla stessa distanza da
+   cio' che la precede, sezione o no: con la regola fra sezioni sole, quella
+   dopo la testata, le tessere o uno spazio pubblicitario perdeva 32 pixel. */
+:is(.section, .come-leggere):not(:first-child) { margin-top: var(--space-8); }
+/* La testata di pagina porta gia' i suoi 32 pixel sotto. */
+.pagehead + :is(.section, .come-leggere) { margin-top: 0; }
+@media (min-width: 960px) { .section, .come-leggere { padding-top: var(--space-16); } }
+/* `h2.h-section` e non solo `.h-section`: `.ds h2 { margin: 0 }` di
+   system.css pesa di piu' di una classe sola, e il titolo di "Continua da qui"
+   perdeva margine, interlinea e spaziatura (0 pixel fra titolo e contenuto). */
+.section > h2, .come-leggere > h2, h2.h-section, .h-section {
   font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
   padding-top: var(--space-4); border-top: 3px solid var(--ink);
   margin-bottom: var(--space-6);
 }
 @media (min-width: 1200px) {
-  .section > h2, .come-leggere > h2, .h-section { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); }
+  .section > h2, .come-leggere > h2, h2.h-section, .h-section { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); }
 }
+/* La frase che introduce una sezione sta a 16 pixel dal titolo, su ogni
+   pagina. Prima ogni foglio la tirava su a modo suo (-12, -8, niente), e la
+   stessa cosa stava a 20, 24 o 32 pixel. Il contenuto dopo la frase resta
+   alla distanza di blocco. */
+.section > h2:has(+ p) { margin-bottom: var(--space-4); }
 .h-sub { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); }
 .subline { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-top: var(--space-1); }
-.band { margin-top: var(--space-16); padding-block: var(--space-12); background: var(--surface-1); }
+/* `:not(svg)`: la serie a fascia (`charts.band`) e' un <svg class="band">, e
+   senza il filtro prendeva margine, imbottitura e fondo della fascia: un
+   riquadro grigio con 110 pixel vuoti sopra ogni "Com'e' cambiato". */
+.band:not(svg) { margin-top: var(--space-16); padding-block: var(--space-12); background: var(--surface-1); }
 .band .section:first-child { padding-top: 0; }
 
 /* La fascia: una sezione a tutta larghezza, col suo contenitore dentro. Le
@@ -133,7 +146,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   padding-top: var(--space-4); border-top: 3px solid var(--ink);
 }
 @media (min-width: 960px) { .zone__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
-.zone__head .h-section { border-top: 0; padding-top: 0; margin-bottom: 0; }
+.zone__head .h-section, .zone__head h2.h-section { border-top: 0; padding-top: 0; margin-bottom: 0; }
 .zone__title { display: grid; gap: var(--space-2); }
 .zone__lead { max-width: var(--measure); color: var(--text-2); }
 .zone__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); }
@@ -145,10 +158,6 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .toc a { display: block; padding: 6px 0 6px var(--space-3); margin-left: -1px; border-left: 3px solid transparent; color: var(--text-2); text-decoration: none; }
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
-/* Sotto i 1200 alla testata si aggiunge la barra delle sezioni: un'ancora non
-   deve far finire il titolo sotto l'una o l'altra. */
-@media (max-width: 1199px) { html { scroll-padding-top: calc(var(--masthead-s) + 60px); } }
-@media (min-width: 960px) and (max-width: 1199px) { html { scroll-padding-top: calc(var(--masthead-l) + 60px); } }
 @media (max-width: 1199px) {
   /* Un elemento sticky resta dentro il suo contenitore: dentro l'aside (alto
      quanto l'indice) o in una cella di griglia non resterebbe mai in alto.
@@ -162,7 +171,8 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
      testata: sulle pagine lunghe (la regione passa i 36.000 pixel sul telefono)
      e' il solo modo di sapere dove si e'. */
   .toc {
-    position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20;
+    position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--hdr-h)); z-index: 20;
+    transition: top var(--motion-base) var(--motion-ease);
     margin-inline: calc(-1 * var(--margin-s)); padding: var(--space-2) var(--margin-s);
     background: var(--bg); border-bottom: 1px solid var(--rule);
   }
@@ -171,9 +181,15 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   .toc ol::-webkit-scrollbar { display: none; }
   .toc a { padding: 6px 0; margin: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; white-space: nowrap; }
   .toc a[aria-current] { border-bottom-color: var(--accent); }
+  /* La barra scorre di lato: senza un segno l'ultima voce tagliata a meta'
+     ("Che cosa misu") sembrava un difetto, e le voci dopo non si vedevano.
+     La sfumatura sta dal lato dove c'e' altro (`initToc` in v1.js). */
+  .toc ol.is-more-r { -webkit-mask-image: linear-gradient(to right, var(--ink) calc(100% - 40px), transparent); mask-image: linear-gradient(to right, var(--ink) calc(100% - 40px), transparent); }
+  .toc ol.is-more-l { -webkit-mask-image: linear-gradient(to left, var(--ink) calc(100% - 40px), transparent); mask-image: linear-gradient(to left, var(--ink) calc(100% - 40px), transparent); }
+  .toc ol.is-more-l.is-more-r { -webkit-mask-image: linear-gradient(to right, transparent, var(--ink) 40px, var(--ink) calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, var(--ink) 40px, var(--ink) calc(100% - 40px), transparent); }
 }
 @media (min-width: 600px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-m)); padding-inline: var(--margin-m); } }
-@media (min-width: 960px) and (max-width: 1199px) { .toc { top: var(--masthead-l); margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
+@media (min-width: 960px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
 .aside-block { margin-top: var(--space-8); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .aside-block p + p { margin-top: var(--space-2); }
 .aside-block__label { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
@@ -198,7 +214,12 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   .tile + .tile { border-left: 1px solid var(--rule); }
 }
 .tile dt { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
-.tile dd { margin: 0; }
+.tile dd { margin: 0; min-width: 0; }
+/* Nelle tessere l'unita' va a capo sotto la cifra quando non ci sta: sul
+   telefono "+0,28 giornate per abitante" arrivava a toccare il filetto
+   della tessera accanto. La cifra resta intera. */
+.tile .n { white-space: normal; }
+.tile .n__u:not(.n__u--pct) { display: inline-block; line-height: var(--lh-small); vertical-align: baseline; }
 .figure-num {
   display: block;
   font-size: var(--fs-figure-sm); line-height: var(--lh-figure-sm); font-weight: var(--fw-figure-sm); letter-spacing: var(--tr-figure-sm);
@@ -219,20 +240,19 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .field { display: grid; gap: 6px; font-size: var(--fs-label); font-weight: 600; color: var(--text-2); }
 .field output { font-size: var(--fs-ui); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .field select, .field input[type="search"] {
-  height: 40px; min-width: 14rem; max-width: 100%; padding: 0 var(--space-3);
+  height: var(--target-min); min-width: 14rem; max-width: 100%; padding: 0 var(--space-3);
   font: inherit; font-size: 16px; font-weight: 400; color: var(--ink);
   background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
 }
 .field--year { min-width: min(100%, 18rem); flex: 1 1 14rem; max-width: 26rem; }
 /* "Vai alla riga nella classifica" accanto al campo delle province: alto come
-   il campo, e nascosto finche' v1.js non lo mostra (display batterebbe hidden). */
-.toolbar__jump { display: inline-flex; align-items: center; min-height: 40px; font-size: var(--fs-ui); font-weight: 600; }
-.toolbar__jump[hidden] { display: none; }
+   il campo, e nascosto finche' v1.js non lo mostra (`hidden`, regola sotto). */
+.toolbar__jump { display: inline-flex; align-items: center; min-height: var(--target-min); font-size: var(--fs-ui); font-weight: 600; }
 .year { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-3); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; margin: 0; }
 .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--control-border); border-radius: var(--radius-control); overflow: hidden; }
 .seg > a, .seg > button, .seg > span {
-  display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--space-4);
+  display: inline-flex; align-items: center; min-height: var(--target-min); padding: 0 var(--space-4);
   font: inherit; font-weight: 600; color: var(--ink); background: var(--bg); text-decoration: none;
   border: 0; border-left: 1px solid var(--control-border); cursor: pointer;
 }
@@ -241,13 +261,30 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .seg > span { cursor: default; }
 .seg > :first-child { border-left: 0; }
 .seg > a:hover, .seg > button:hover { background: var(--surface-1); color: var(--ink); }
+/* Da quattro voci in su (le aree della regione e dell'atlante) la fila andava a
+   capo dentro il bordo in righe di larghezza diversa, con i filetti a meta'.
+   Diventa una griglia di celle uguali divise da un pixel, come i profili della
+   classifica (`.cl-profiles`). */
+.seg:has(> :nth-child(4)) {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+  width: 100%; border: 0; padding: 1px 0 0 1px; overflow: visible;
+}
+@media (min-width: 960px) { .seg:has(> :nth-child(4)) { width: auto; grid-auto-flow: column; grid-auto-columns: max-content; grid-template-columns: none; } }
+/* Il campo che la contiene e' un elemento della barra strumenti: senza, prende
+   la larghezza minima e la griglia resta di una colonna. */
+@media (max-width: 959px) { .field:has(> .seg > :nth-child(4)) { flex: 1 1 100%; } }
+/* I filetti li disegnano le celle, sovrapposte di un pixel: col fondo della
+   griglia a fare da filetto, una cella che manca in fondo restava un blocco grigio. */
+.seg:has(> :nth-child(4)) > * { border: 1px solid var(--control-border); margin: -1px 0 0 -1px; justify-content: center; text-align: center; }
+/* Sul telefono i controlli sono bersagli da dito: 44 pixel, come dice il sistema. */
+@media (pointer: coarse) { .seg > a, .seg > button, .seg > span { min-height: var(--target); } }
 .seg [aria-current], .seg [aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .seg [aria-current]:hover, .seg [aria-pressed="true"]:hover { background: var(--ink); color: var(--bg); }
 
 .module__body { display: grid; gap: var(--space-8); align-items: start; }
 @container (min-width: 720px) {
   .module__body { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-8); }
-  .module__body > .module__map { position: sticky; top: calc(var(--masthead-l) + var(--space-6)); }
+  .module__body > .module__map { position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-6)); transition: top var(--motion-base) var(--motion-ease); }
 }
 .source { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .source a { color: var(--text-2); }
@@ -259,6 +296,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .map [data-key] { stroke: var(--map-edge); stroke-width: 0.9; stroke-linejoin: round; fill: var(--data-null); transition: fill var(--motion-base) var(--motion-ease); }
 .map [data-key].is-null { fill: url(#nd-stripes); }
 .map .outline { fill: none; stroke: var(--map-outline); stroke-width: 1; pointer-events: none; }
+/* La costa: un filetto di 1 pixel attorno all'unione dei territori, fatto con
+   quattro ombre senza sfocatura sul gruppo della terra (le ombre stanno solo
+   fuori, dove la terra finisce, perche' dentro i territori si toccano). Cosi'
+   il primo gradino della rampa resta delimitato anche sul fondo bianco, senza
+   scurire la rampa e senza ripetere i tracciati. */
+.map__land { filter: drop-shadow(1px 0 0 var(--map-coast)) drop-shadow(-1px 0 0 var(--map-coast)) drop-shadow(0 1px 0 var(--map-coast)) drop-shadow(0 -1px 0 var(--map-coast)); }
+.navmap:not(.navmap--data) .map__land, .navmap--zoom .map__land { filter: none; }
 .map [data-key].is-on { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
 /* Le province: filo sottile fra una e l'altra, e i confini delle regioni
    ridisegnati sopra piu' larghi, nello stesso colore del fondo. */
@@ -277,15 +321,33 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .navmap--provincia a use { stroke-width: 0.5; }
 .navmap a:hover use { fill: var(--rule-strong); }
 .navmap a.is-on use { fill: var(--accent); }
+.navmap--data a use { stroke: var(--map-edge); stroke-width: 0.9; }
+.navmap--provincia.navmap--data a use { stroke-width: 0.4; }
+.navmap--data a:hover use, .navmap--data a.is-on use { stroke: var(--ink); stroke-width: 2.5; paint-order: stroke; }
+/* Il primo tocco su una mappa per scegliere scrive qui il territorio e il
+   link al profilo (v1.js, initNavmap). */
+/* I tracciati sono fuori dalla tabulazione (la pagina ha il campo o
+   l'elenco): il tocco li mette a fuoco, e il riquadro del fuoco attorno al
+   rettangolo della regione copriva la mappa. Il territorio scelto lo dice il
+   contorno d'inchiostro. */
+.navmap a:focus { outline: none; }
+.navmap__card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-4); margin: var(--space-2) 0 0; padding: var(--space-2) 0; border-top: 1px solid var(--rule); font-size: var(--fs-small); line-height: var(--lh-small); }
+.navmap__card-t { font-weight: 600; color: var(--ink); }
+.navmap__card a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; }
+.navmap--zoom svg { overflow: hidden; }
+.navmap--zoom a path { stroke: var(--map-edge); stroke-width: 0.5; stroke-linejoin: round; }
+.navmap--zoom a:hover path, .navmap--zoom a.is-on path { stroke: var(--ink); stroke-width: 1.6; paint-order: stroke; }
+.navmap__ctx { fill: var(--surface-2); stroke: var(--bg); stroke-width: 0.4; }
+.navmap--zoom .navmap__borders { stroke-width: 0.7; }
 .navmap__borders { fill: none; stroke: var(--control-border); stroke-width: 1.1; stroke-linejoin: round; pointer-events: none; }
 .map [data-key]:focus { outline: none; }
 .map a:focus-visible path { stroke: var(--focus); stroke-width: 3; }
 .q1 { fill: var(--seq-1) !important; } .q2 { fill: var(--seq-2) !important; } .q3 { fill: var(--seq-3) !important; }
 .q4 { fill: var(--seq-4) !important; } .q5 { fill: var(--seq-5) !important; } .q6 { fill: var(--seq-6) !important; }
 .map__tip {
-  position: absolute; pointer-events: none; z-index: 5;
+  position: absolute; pointer-events: none; z-index: var(--z-tooltip);
   padding: var(--space-2) var(--space-3); background: var(--ink); color: var(--bg);
-  font-size: var(--fs-small); line-height: var(--lh-small); white-space: nowrap;
+  font-size: var(--fs-small); line-height: var(--lh-small); max-width: min(16rem, 100%);
   box-shadow: var(--shadow-panel);
 }
 .map__tip b { font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -295,7 +357,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .legend__scale { display: flex; justify-content: space-between; gap: var(--space-2); font-variant-numeric: tabular-nums; }
 .legend__nd { display: inline-flex; align-items: center; gap: var(--space-2); }
 .legend__nd i { width: 14px; height: 12px; background: repeating-linear-gradient(45deg, var(--data-null-stripe) 0 1px, var(--data-null) 1px 4px); }
-.legend__caption { color: var(--text-2); font-weight: 400; }
+.legend__caption { line-height: var(--lh-label); color: var(--text-2); font-weight: 400; }
 
 /* ---------- tabella dati e classifica ---------- */
 .tablewrap { overflow-x: auto; }
@@ -329,18 +391,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 [data-explore]:not(.has-js) .table tr:target > * { background: var(--surface-2); }
 [data-explore]:not(.has-js) .table tr:target > :first-child { box-shadow: inset 3px 0 0 var(--accent); padding-left: var(--space-3); }
 [data-explore]:not(.has-js) .table tr:target .bar i { background: var(--data-focus); }
-/* Sotto i 1200 la barra delle sezioni sta sotto la testata, e la riga a cui
-   porta l'ancora finiva sotto la barra: lo scroll-padding di chrome.css
-   (html:has(body.sitechrome), testata piu' --space-4) batte per specificita'
-   la regola di html qui sopra, che contava anche la barra. Il margine della
-   riga aggiunge cio' che manca, 60 pixel meno i --space-4 gia' contati, a
-   ogni larghezza: la testata la conta gia' chrome.css. v1.js (reveal) legge
-   la stessa somma. */
-@media (max-width: 1199px) { [data-explore] .table tr[id] { scroll-margin-top: calc(60px - var(--space-4)); } }
 .table tr.ref > * { border-bottom: 1px solid var(--ink); color: var(--text-2); font-size: var(--fs-small); padding-block: 6px; }
 .table tr.ref .val { font-weight: 400; }
 .table tr.ref .bar { background: transparent; height: 1px; }
-.table tbody tr:hover > * { background: var(--surface-1); }
+@media (hover: hover) { .table tbody tr:hover > * { background: var(--surface-1); } }
 .table tbody tr.is-on:hover > * { background: var(--surface-2); }
 [data-explore]:not(.has-js) .table tbody tr:target:hover > * { background: var(--surface-2); }
 /* La classifica piegata delle province: prime dieci, le altre nel details,
@@ -362,7 +416,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .is-on .score i { background: var(--data-focus); }
 
 /* ---------- serie storica ---------- */
-.chart { width: 100%; max-width: 56rem; container-type: inline-size; }
+.chart { width: 100%; container-type: inline-size; }
 .chart__s { display: none; }
 @container (max-width: 560px) { .chart__l { display: none; } .chart__s { display: block; } }
 .tiles + .layout { margin-top: var(--space-8); }
@@ -408,11 +462,35 @@ details.more[open] > summary { color: var(--ink); }
 .prose { font-family: var(--font-text); font-size: var(--fs-prose); line-height: var(--lh-prose); max-width: var(--measure); }
 .prose a { color: var(--link); text-decoration-color: currentColor; }
 .prose > * + * { margin-top: 1em; }
-.analysis .prose > h2:first-child { margin-top: 0; padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
+/* "L'analisi" apre come ogni sezione della scheda, col filetto d'inchiostro e
+   il suo nome, cosi' chi scorre vede dove comincia il racconto. Il nome e' un
+   <p> e non un titolo: gli H2 della prosa restano H2, perche' sono le ancore
+   che l'indice, il gemello Markdown e le query citano. Dentro la sezione
+   prendono la taglia di sottosezione. */
+.analysis__kicker {
+  font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
+  padding-top: var(--space-4); border-top: 3px solid var(--ink); margin-bottom: var(--space-6); color: var(--ink);
+}
+@media (min-width: 1200px) { .analysis__kicker { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); } }
+.analysis .prose > h2 { font-size: clamp(22px, 20.5px + 0.35vw, 25px); line-height: 1.25; font-weight: var(--fw-heading); letter-spacing: var(--tr-section); margin-top: var(--space-12); }
+.analysis .prose > h2:first-child { margin-top: 0; }
+/* La mappa accanto alla prosa: solo da 960, dove fra la misura del testo e il
+   margine restavano 300-540 pixel vuoti. Ferma sotto la testata (e sotto la
+   barra della striscia, quando c'e'). */
+.analysis__map { display: none; }
+@media (min-width: 960px) {
+  .analysis:has(> .analysis__map) { display: grid; grid-template-columns: minmax(0, var(--measure)) minmax(14rem, 1fr); column-gap: var(--space-12); align-items: start; }
+  .analysis:has(> .analysis__map) > * { grid-column: 1; }
+  .analysis > .analysis__map {
+    display: grid; gap: var(--space-3); grid-column: 2; grid-row: 2; align-self: start;
+    position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h) + var(--space-6));
+    max-width: 22rem; justify-self: center; width: 100%;
+  }
+}
+.analysis__map-t { margin: 0; }
 .prose h2 { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 700; letter-spacing: var(--tr-section); margin-top: 2em; }
 .prose h3 { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; margin-top: 1.6em; }
 .prose h2 + *, .prose h3 + * { margin-top: 0.6em; }
-.prose a { color: var(--link); }
 .prose strong { font-weight: 700; }
 .prose em { font-style: italic; }
 .prose ul, .prose ol { padding-left: 1.2em; }
@@ -471,7 +549,7 @@ details.more[open] > summary { color: var(--ink); }
 .specs code { font-family: var(--font-mono); font-size: 14px; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .btn {
-  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-5, 20px);
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-5);
   font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
   border-radius: var(--radius-control); border: 1px solid var(--control-border); background: var(--bg); color: var(--ink);
 }
@@ -581,8 +659,10 @@ details.more[open] > summary { color: var(--ink); }
 .ad--side { min-height: 600px; margin-block: var(--space-8) 0; }
 
 /* ---------- in fondo alla pagina ---------- */
-/* Una pagina che finisce con una fascia la attacca al piede, senza bianco in mezzo. */
-.sitechrome main:has(> .band:last-child) + .ftr { padding-top: 0; }
+/* Una pagina che finisce con una fascia la attacca al piede, senza bianco in
+   mezzo. `~` e non `+`: fra il <main> e il piede ci sono gli <script> della
+   pagina, e col fratello adiacente la regola non prendeva mai. */
+.sitechrome main:has(> .band:last-child, > .zone--tint:last-child) ~ .ftr { padding-top: 0; }
 .linklike { padding: 0; border: 0; background: none; font: inherit; color: var(--text-2); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; cursor: pointer; }
 .linklike:hover { color: var(--ink); }
 .reflist { list-style: none; display: grid; gap: var(--space-3); overflow-wrap: anywhere; }
@@ -783,8 +863,267 @@ details.more[open] > summary { color: var(--ink); }
 .hero-img figcaption { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .card__media { transition: filter var(--motion-base) var(--motion-ease); }
 .card__media img { transition: transform 400ms var(--motion-ease); }
-.card:hover .card__media img { transform: scale(1.03); }
+@media (hover: hover) { .card:hover .card__media img { transform: scale(1.03); } }
+@supports selector(:has(a)) {
+  .card:has(.card__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .card__title a:focus-visible { outline: none; }
+}
 @media (prefers-reduced-motion: reduce) { .card:hover .card__media img { transform: none; } }
 
-/* ---------- ritmo ---------- */
-.section + .section { margin-top: var(--space-8); }
+
+/* ==========================================================================
+   Leggere e orientarsi: definizioni a portata di mano, intestazioni che
+   restano, avanzamento di lettura, torna su, tabelle che scorrono di lato.
+   ========================================================================== */
+
+/* La parola con la definizione: si clicca, quindi il filetto e' nell'accento,
+   ma resta testo nel testo. Il popover e' un foglio sopra la pagina, col
+   bordo d'inchiostro invece dell'ombra. */
+.term {
+  padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer;
+  text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 0.2em;
+}
+.term:hover { color: var(--ink); text-decoration-style: solid; }
+.term__pop {
+  margin: 0; padding: var(--space-3) var(--space-4); max-width: min(22rem, calc(100vw - 2 * var(--space-4)));
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control);
+  font-family: var(--font-ui); font-size: var(--fs-small); line-height: var(--lh-small); font-weight: 400; text-align: left; white-space: normal;
+}
+.term__pop a { display: inline-block; margin-top: var(--space-1); color: var(--accent); }
+@supports (position-area: bottom) {
+  .term__pop { inset: auto; margin-top: var(--space-2); position-area: bottom span-right; position-try-fallbacks: flip-block, flip-inline; }
+}
+
+/* Le tabelle lunghe di regione e provincia ("Tutti gli indicatori", fino a 158
+   righe): l'intestazione resta sotto la testata mentre si scende. Uno scroll
+   container ferma lo sticky, quindi da 960 pixel, dove la tabella ci sta
+   (misurata: 1376 su 1376 a 1440, 896 su 896 a 960), il contenitore taglia
+   invece di scorrere. Fra 960 e 1199 sotto la testata c'e' anche la barra
+   delle sezioni. */
+@media (min-width: 960px) {
+  .tablewrap.stackwrap--wide { overflow: clip; }
+  .stackwrap--wide .table thead th {
+    position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h)); z-index: var(--z-raised);
+    background: var(--bg); box-shadow: inset 0 -1px 0 var(--rule-strong);
+  }
+}
+
+/* Una tabella che scorre di lato lo dice: un'ombra sul bordo dove c'e'
+   altro, che sparisce a fine corsa (gli sfondi "local" coprono quelli
+   "scroll"). Il fondo di copertura segue la superficie della fascia. */
+.tablewrap {
+  --tw-bg: var(--bg);
+  background:
+    linear-gradient(to right, var(--tw-bg) 30%, transparent) left center / 32px 100% no-repeat local,
+    linear-gradient(to left, var(--tw-bg) 30%, transparent) right center / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--ink) 16%, transparent), transparent) left center / 10px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--ink) 16%, transparent), transparent) right center / 10px 100% no-repeat scroll;
+}
+.zone--tint .tablewrap, .band:not(svg) .tablewrap { --tw-bg: var(--surface-1); }
+
+/* Avanzamento di lettura: un filetto d'accento sotto la barra delle sezioni,
+   legato allo scroll della pagina. Dove animation-timeline non c'e', niente. */
+@supports (animation-timeline: scroll()) {
+  @media (max-width: 1199px) {
+    .toc::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+      background: var(--accent); transform-origin: left center; transform: scaleX(0);
+      animation: di-read linear both; animation-timeline: scroll(root block);
+    }
+  }
+}
+@keyframes di-read { to { transform: scaleX(1); } }
+
+/* Torna su: compare dopo due schermate sulle pagine lunghe (v1.js). */
+.totop {
+  position: fixed; right: calc(var(--space-4) + env(safe-area-inset-right, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: var(--z-sticky);
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-4);
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control);
+  font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 600; text-decoration: none;
+  opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.totop.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.ds a.totop, .ds a.totop:hover { color: var(--ink); text-decoration: none; }
+.totop:hover { background: var(--surface-1); }
+/* Sotto i 960 pixel solo la freccia, in un cerchio da 44: il nome resta
+   nell'aria-label. */
+@media (max-width: 959px) {
+  .totop { width: var(--target); padding: 0; justify-content: center; border-radius: 50%; font-size: 20px; }
+  .totop__t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+/* Sui telefoni bassi la mappa ferma del modulo non si ferma: era piu' alta
+   dello schermo e la sua parte bassa non si raggiungeva. */
+@media (max-height: 500px) {
+  .module__body > .module__map { position: static; }
+  .module__map .map svg { max-height: calc(100svh - var(--hdr-h) - 2rem); }
+}
+
+/* Continuita' fra pagine: il titolo e la figura d'apertura passano da una
+   pagina all'altra invece di ricomparire (le transizioni stanno in chrome.css). */
+main.v1 h1 { view-transition-name: page-title; }
+.lead-figure .chart--hero { view-transition-name: lead-figure; }
+
+/* La striscia che resta (scheda indicatore): quando la striscia del divario
+   esce dallo schermo, la stessa in una riga si ferma sotto la testata, e
+   sotto la barra delle sezioni sul telefono (`--sticky-top`, chrome.css).
+   Scende quando serve e se ne va prima dell'analisi: accompagna i dati, non
+   la prosa. */
+.stripbar {
+  position: fixed; left: 0; right: 0; z-index: 25; top: var(--sticky-top);
+  background: var(--bg); border-bottom: 1px solid var(--rule);
+  transform: translateY(-100%); opacity: 0; visibility: hidden;
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease), visibility 0s linear var(--dur), top var(--motion-base) var(--motion-ease);
+}
+.stripbar.is-on { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
+.stripbar__in {
+  width: min(100% - 2 * var(--margin-s), var(--container)); margin-inline: auto; padding-block: var(--space-2);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-4); align-items: baseline;
+}
+@media (min-width: 600px) { .stripbar__in { width: min(100% - 2 * var(--margin-m), var(--container)); } }
+@media (min-width: 960px) { .stripbar__in { width: min(100% - 2 * var(--margin-l), var(--container)); grid-template-columns: minmax(12rem, 22rem) minmax(0, 1fr) auto; align-items: center; } }
+.stripbar__t, .stripbar__sel { font-size: var(--fs-small); line-height: var(--lh-small); margin: 0; }
+.stripbar__t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 599px) { .stripbar__meta { display: none; } }
+.stripbar__name { font-weight: 600; color: var(--ink); }
+.stripbar__meta, .stripbar__sel { color: var(--text-2); }
+.stripbar__sel { text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 16rem; }
+@media (max-width: 599px) { .stripbar__sel { max-width: 50%; } }
+.stripbar__sel b { color: var(--ink); font-weight: 600; }
+.stripbar__chart { grid-column: 1 / -1; min-width: 0; }
+@media (min-width: 960px) { .stripbar__chart { grid-column: 2; grid-row: 1; } .stripbar__sel { grid-column: 3; } }
+.stripbar__chart svg { display: block; width: 100%; height: auto; max-height: 26px; overflow: visible; cursor: pointer; }
+.stripbar .strip__dot { stroke: var(--bg); stroke-width: 1.5; }
+.stripbar .strip__dot.is-on { stroke: var(--accent); stroke-width: 3; }
+.strip--mini .strip__avg { stroke-dasharray: 3 3; }
+@media (prefers-reduced-motion: reduce) { .stripbar { transition: none; } }
+
+/* ---------- la storia: la scheda di un articolo (home e blog) ----------
+   Una grande accanto alla sua foto (`.story--lead`), le altre in fila.
+   Tutta la scheda si clicca (il titolo si allarga), tranne i link del
+   credito della foto, che stanno sopra. Le foto hanno proporzioni diverse
+   (1200x630, 1376x768): si tagliano tutte a 16:9. */
+.story { position: relative; display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
+.story__fig { display: grid; gap: var(--space-1); min-width: 0; }
+.story__media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 16 / 9; }
+.story__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
+@media (hover: hover) { .story:hover .story__media img { transform: scale(1.03); } }
+@media (prefers-reduced-motion: reduce) { .story__media img, .story:hover .story__media img { transition: none; transform: none; } }
+.story__credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
+.story__credit a { position: relative; z-index: var(--z-raised); color: inherit; }
+.story__body { display: grid; align-content: start; gap: var(--space-2); min-width: 0; }
+.story__tag { justify-self: start; padding: 2px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); background: var(--surface-2); border-radius: var(--radius-sm); }
+.story__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.story__title a { color: var(--ink); text-decoration: none; }
+.story__title a::after { content: ""; position: absolute; inset: 0; }
+.story:hover .story__title a { text-decoration: underline; text-decoration-thickness: 2px; }
+@supports selector(:has(a)) {
+  .story:has(.story__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .story__title a:focus-visible { outline: none; }
+}
+.story__text { color: var(--text-2); }
+.story__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.story__go { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); font-weight: 700; color: var(--accent-strong); }
+.story--lead { padding-bottom: var(--space-8); margin-bottom: var(--space-8); border-bottom: 1px solid var(--rule-strong); }
+.story--lead .story__title { font-size: var(--fs-section); line-height: var(--lh-section); }
+.story--lead .story__text { font-size: var(--fs-lede); line-height: var(--lh-lede); max-width: var(--measure); }
+@media (min-width: 960px) {
+  .story--lead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-10); align-items: center; }
+}
+
+/* ---------- l'indice di salto: ancore verso i gruppi della pagina ----------
+   Bersagli da 44 pixel, niente scatole. `.jump--scroll` e' per gli elenchi
+   lunghi (le venti regioni delle province): sul telefono una riga che scorre,
+   perche' venti nomi in colonna spingerebbero l'elenco sotto la piega, e da
+   960 due righe. */
+.jump ul { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-6); padding: 0; }
+.jump li { flex: none; }
+.jump a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.jump a:hover { text-decoration: underline; }
+.jump--scroll { border-block: 1px solid var(--rule); }
+.jump--scroll ul { flex-wrap: nowrap; gap: var(--space-1) var(--space-4); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.jump--scroll a { font-size: var(--fs-small); color: var(--text-2); }
+.jump--scroll a:hover { color: var(--ink); }
+@media (min-width: 960px) { .jump--scroll ul { flex-wrap: wrap; overflow-x: visible; } }
+
+/* ---------- la mappa della regione (ui.regionmap) nella testata ----------
+   Sul telefono la mappa a sinistra e la didascalia con la legenda accanto,
+   nel margine della testata da 960 una sotto l'altra. */
+.regionmap { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); gap: var(--space-4); align-items: center; margin: 0 0 var(--space-6); }
+.regionmap figcaption { display: grid; gap: var(--space-3); min-width: 0; }
+@media (min-width: 960px) {
+  .regionmap { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
+}
+
+/* ---------- i pezzi comuni degli indici ----------
+   Nati uguali pagina per pagina (atlante, catalogo, tema, temi, province,
+   regioni, ricerca, blog, divari regionali, qualita' della vita), stanno qui
+   una volta sola. Il margine attorno lo decide la pagina. */
+
+/* `hidden` vince sempre. Un filtro, un gruppo o uno stato vuoto che si
+   dispongono in griglia o in flex batterebbero il `display: none` del
+   browser, e senza JavaScript comparirebbero: al posto di una regola per
+   ogni classe, pagina per pagina, una per tutte. */
+.ds [hidden] { display: none !important; }
+
+/* Il filtro di un elenco gia' in pagina: il campo largo fino a 32rem, i
+   controlli della barra alti un bersaglio, il conteggio che il JavaScript
+   riscrive. Senza JavaScript la barra resta nascosta. */
+.filter__q { flex: 1 1 18rem; max-width: 32rem; }
+.filter__q input[type="search"] { width: 100%; min-width: 0; height: var(--target); }
+.filter .field select { height: var(--target); }
+.filter .seg > button { min-height: var(--target); }
+.filter__count { margin: 0; }
+
+/* Il conteggio nel titolo di un gruppo: in tondo, grigio, cifre in colonna.
+   Accanto a un titolo scende alla taglia piccola dell'interfaccia, dentro
+   l'intestazione di una tabella resta alla sua. */
+.group__n { margin-left: var(--space-2); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+:is(h2, h3, h4) > .group__n { font-family: var(--font-ui); font-size: var(--fs-small); }
+
+/* Lo stato vuoto di un filtro: una frase e una via d'uscita. */
+.empty { max-width: var(--measure); padding-block: var(--space-8); color: var(--text-2); }
+
+/* La frase che apre una sezione sotto il suo titolo. */
+.intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+
+/* La riga che dice che cosa colora una mappa, o che la mappa serve a
+   scegliere. La usano anche la mappa accanto all'analisi e la regione
+   ingrandita, coi loro nomi. */
+.map-hint, .analysis__map-t, .regionmap__cap { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.map-hint b, .analysis__map-t b { color: var(--ink); font-weight: 600; }
+
+/* La mappa per scegliere nel margine di un indice, sul fondo della pagina:
+   il grigio della superficie quasi sparisce, quindi la terra sta un passo
+   piu' scura e sotto il mouse prende l'accento. La classe va sul contenitore
+   (`ui.navmap` non ne prende). Non vale per la mappa di un dato. */
+.map-pick .navmap:not(.navmap--data) a use { fill: var(--rule-strong); }
+.map-pick .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
+
+/* ---------- bersagli al tocco: 44 pixel dove il sistema li promette ----------
+   Un blocco solo, per ogni pagina della 1.0 (prima stava pagina per pagina).
+   Dove un'altezza da 44 allungherebbe la riga (la barra delle sezioni, le
+   briciole, il link di una parola) si allarga solo l'area del tocco, con un
+   ::after trasparente o con un padding che su un elemento in linea non
+   sposta niente. */
+@media (pointer: coarse) {
+  .toolbar__jump, .cite .btn, .check { display: inline-flex; align-items: center; min-height: var(--target); }
+  /* I link della riga meta hanno testo misto ("Istat, <n>4</n> banche dati"):
+     un inline-flex ne mangiava gli spazi. L'area cresce col padding, e il
+     margine negativo la toglie all'impaginazione. */
+  .meta a { padding-block: 12px; margin-block: -12px; }
+  input[type="range"] { height: var(--target); }
+  .toc a, .crumbs a, .term { position: relative; }
+  .toc a::after, .crumbs a::after, .term::after { content: ""; position: absolute; inset: -7px -4px; }
+  .crumbs a::after, .term::after { inset: -12px -6px; }
+  .table td a, .table th a, .legend a, .source a { padding-block: 14px; }
+  /* I link di testo in un elenco (fonti, province, voci del catalogo, risultati)
+     restano righe di testo: l'area del tocco cresce senza allungare
+     l'elenco, e sta sopra i 24 pixel della WCAG. I controlli restano a 44. */
+  .prose li > a, .v1-metodologia li > a:not(.toc a) { padding-block: 8px; margin-block: -8px; }
+  /* Le voci che sono un link intero (catalogo, risultati, elenchi di schede)
+     arrivano a 44 senza allungare l'elenco: padding e margine negativo. */
+  .provincia-list li > a, .tema-list li > a, .blog-index li > a, .dr-examples li > a, .catalogo-item__name, .search-result__title { padding-block: 12px; margin-block: -12px; }
+  .provincia-jump a, .dr-map .btn, .terr__name a { display: inline-flex; align-items: center; min-height: var(--target); }
+  .linkarrow, .regione-area > summary, select, .field input:not([type="range"]), .hdr__brand { min-height: var(--target); }
+  .linkarrow { display: inline-flex; align-items: center; }
+}

@@ -3,42 +3,59 @@
    comuni (components.css). Legge solo token. */
 
 .v1-atlante .pagehead .meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
-.atlante-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
 /* Il selettore Regioni/Province: due link, l'unico controllo del livello. */
 .atlante-level { margin-top: var(--space-4); }
 .atlante-level__n { margin-left: var(--space-1); font-size: var(--fs-small); font-variant-numeric: tabular-nums; }
 
-/* ---------- la barra dei filtri ---------- */
+/* ---------- la barra dei filtri: `.filter` di components.css ---------- */
 .atlante-filter { margin-bottom: var(--space-8); gap: var(--space-4) var(--space-6); }
-.atlante-filter[hidden] { display: none; }
 .atlante-filter .field select { min-width: 10rem; }
-.atlante-filter__q { flex: 1 1 18rem; }
-.atlante-filter__q input[type="search"] { width: 100%; }
 .atlante-filter .check {
-  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px;
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target);
   font-size: var(--fs-ui); color: var(--ink); cursor: pointer;
 }
 .atlante-filter .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
-.atlante-filter .check[hidden] { display: none; }
-.atlante-filter__count { flex-basis: 100%; margin: 0; }
+.atlante-filter__count { flex-basis: 100%; }
 
 /* ---------- le aree e i temi ---------- */
 .atlante-area + .atlante-area { margin-top: var(--space-12); }
 .atlante-area__title {
-  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; letter-spacing: 0.04em;
-  text-transform: uppercase; color: var(--text-2);
+  font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2);
   padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);
 }
 /* Seicento righe con una sparkline ciascuna: il browser salta layout e
    disegno dei temi fuori dallo schermo finche' non ci si arriva. */
-.atlante-group { content-visibility: auto; contain-intrinsic-size: auto 900px; margin-top: var(--space-8); }
-.atlante-group > h4 { margin-bottom: var(--space-3); }
-.atlante-group > h4 a { color: var(--ink); }
-.atlante-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
-/* Le righe a blocchi sono griglie: l'attributo hidden del filtro va imposto. */
-.v1-atlante [data-area][hidden], .v1-atlante .atlante-group[hidden], .atlante-table tr[hidden] { display: none !important; }
-.atlante-empty[hidden] { display: none; }
-.atlante-empty { padding-block: var(--space-8); color: var(--text-2); }
+/* La stima e' per gruppo (`--rows`, dal template): 900 pixel per tutti
+   sbagliavano di quattro-dieci volte sui temi da 86 righe, e la barra di
+   scorrimento saltava mentre si scendeva. Una riga vale circa 56 pixel, e
+   circa 130 quando la tabella diventa blocchi. */
+.atlante-group { content-visibility: auto; contain-intrinsic-size: auto calc(var(--rows, 15) * 56px + 64px); margin-top: var(--space-8); }
+@media (max-width: 599px) { .atlante-group { contain-intrinsic-size: auto calc(var(--rows, 15) * 130px + 64px); } }
+/* Al tocco da 600 in su il bottone "Sulla mappa" da 44 pixel porta la riga
+   a circa 80. `--rows` lo aggiorna atlante.js col numero di righe a vista. */
+@media (min-width: 600px) and (pointer: coarse) { .atlante-group { contain-intrinsic-size: auto calc(var(--rows, 15) * 80px + 64px); } }
+/* Il nome del tema resta in alto mentre si scorrono le sue righe (fino a 86):
+   si sa sempre in che tema si e'. Il modulo dei filtri e' troppo alto per
+   restare fermo (219 pixel a 1440, 709 sul telefono), ci riporta "Torna ai
+   filtri". */
+.atlante-group summary {
+  display: flex; align-items: center; gap: var(--space-3); min-height: var(--target);
+  margin-bottom: var(--space-3); position: sticky; top: var(--sticky-top); z-index: var(--z-raised); transition: top var(--motion-base) var(--motion-ease);
+  padding-block: var(--space-2); background: var(--bg); border-bottom: 1px solid var(--rule);
+  list-style: none; cursor: pointer;
+}
+.atlante-group summary::-webkit-details-marker { display: none; }
+/* Il segno del tema chiuso o aperto, nel colore del testo. */
+.atlante-group summary::after {
+  content: ""; flex: none; width: 8px; height: 8px; margin-left: auto; margin-right: var(--space-1);
+  border-right: 2px solid var(--text-2); border-bottom: 2px solid var(--text-2); transform: rotate(-45deg);
+}
+.atlante-group details[open] > summary::after { transform: rotate(45deg); }
+.atlante-group details:not([open]) > summary { margin-bottom: 0; }
+.atlante-group__link { margin: 0 0 var(--space-3); font-size: var(--fs-small); }
+/* Un tema chiuso e' alto quanto il suo sommario: la stima delle righe lo
+   farebbe saltare mentre si scorre. */
+.atlante-group:has(> details:not([open])) { contain-intrinsic-size: auto 64px; margin-top: var(--space-2); }
 
 /* ---------- le righe ---------- */
 .atlante-table { table-layout: auto; }
@@ -52,6 +69,7 @@
   text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer;
 }
 .atlante-table [form="atl-map"]:hover { color: var(--accent-strong); }
+@media (pointer: coarse) { .atlante-table [form="atl-map"] { display: flex; width: fit-content; align-items: center; min-height: var(--target); margin-top: 0; } }
 .atlante-table .trend__from { white-space: normal; }
 .atlante-table .trend__txt { display: grid; }
 /* a blocchi: il nome a tutta riga, l'andamento sotto, l'ultimo anno accanto */

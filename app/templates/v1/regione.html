@@ -16,6 +16,9 @@
     per riga: il ridisegno non tocca cio' che vedono i motori. -#}
 {% set active_nav = 'regioni' %}
 {% set p = profile %}
+{#- L'immagine da condividere della regione (scripts/og_territori.py). -#}
+{% set og_image_path = v1_og_image('regione', d.key) %}
+{% set og_image_alt = p.region ~ ', la posizione nella qualità della vita e le sue province sulla mappa' %}
 {% set percorso = [
   {"name": "Home", "path": "/"},
   {"name": "Regioni", "path": "/regioni"},
@@ -93,7 +96,7 @@
   {{ ui.crumbs(percorso) }}
 
   <div class="regione-head">
-    <header class="pagehead">
+    <header class="pagehead" data-count>
       <p class="eyebrow"><a href="/regioni">Regioni</a>{% if d.geo %}<span class="sep" aria-hidden="true">·</span>{{ d.geo }}{% endif %}<span class="sep" aria-hidden="true">·</span>{{ d.indicator_count | num(None, 'count') }} indicatori{{ inst }}{% if d.year_min %}<span class="sep" aria-hidden="true">·</span>dati {% if d.year_min != d.year_max %}dal {{ d.year_min }} al {{ d.year_max }}{% else %}{{ d.year_max }}{% endif %}{% endif %}</p>
       {#- L'H1 porta la posizione media sugli indicatori, lo stesso numero del
           `<title>`: e' la decisione presa sui prototipi. La posizione media e'
@@ -122,9 +125,24 @@
         {% if d.institution %}<span>Fonte: <a href="#fonti">{{ d.institution }}, {{ d.sources | length | num(None, 'count') }} {{ d.sources | length | it_plural('banca dati', 'banche dati') }}</a>. Elaborazione Divario Italia</span>{% endif %}
         <a href="{{ corrections_url }}">Segnala un errore</a>
       </p>
+      {#- "Il tuo territorio" (v1.js, initMine). -#}
+      <button type="button" class="btn mine-set" data-mine-set data-level="regione" data-key="{{ d.key }}" data-name="{{ p.region }}" aria-pressed="false" hidden>È la mia regione</button>
     </header>
 
+    {#- La regione ingrandita con le sue province nei colori della qualita'
+        della vita (`common.region_map`); senza province misurate resta il
+        localizzatore. -#}
+    {% if d.region_map %}{% set rm = d.region_map %}
+    <figure class="regionmap">
+      {{ ui.regionmap(rm) }}
+      <figcaption>
+        <span class="regionmap__cap">{% if rm.n > 1 %}Le {{ rm.n | num(None, 'count') }} province {{ d.of_name }} per qualità della vita: {{ rm.best.name }} {{ rm.best.rank | rank(rm.total) }}, {{ rm.worst.name }} {{ rm.worst.rank | rank(rm.total) }}.{% else %}{{ rm.best.name }} è {{ rm.best.rank | rank(rm.total) }} province per qualità della vita.{% endif %}</span>
+        {{ ui.legend(rm.legend, 'Più intenso, punteggio più alto, sulla scala delle ' ~ rm.total ~ ' province.', nd=False) }}
+      </figcaption>
+    </figure>
+    {% else %}
     {{ ui.locator(d.key, p.region ~ (', ' ~ d.area_in if d.area_in else '')) }}
+    {% endif %}
   </div>
 
   {#- La figura d'apertura: la qualita' della vita delle regioni sulla stessa
@@ -186,7 +204,7 @@
   {{ ui.tiles(tiles) }}
 
   <div class="layout">
-    <aside class="layout__aside">
+    <aside class="layout__aside" aria-label="In questa pagina">
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
@@ -250,6 +268,10 @@
       {% if d.excels or d.lags %}
       <section class="section" id="stacca" aria-labelledby="h-stacca">
         <h2 id="h-stacca">Dove stacca e dove resta indietro</h2>
+        {#- La scala della traccia: nell'intestazione della tabella c'e' (1ª e
+            {{ d.total }}ª), ma nelle due colonne la tabella va a blocchi e
+            l'intestazione sparisce. La dice la frase, come nella provincia. -#}
+        <p class="regione-stacca__lead">Il pallino su ogni linea è la posizione {{ d.of_name }}: a sinistra la {{ 1 | rank }} regione, a destra la {{ d.total | rank }}.</p>
         <div class="podiums">
           {% for block in [
             {"items": d.excels, "title": "Più avanti delle altre regioni", "id": "h-avanti", "note": "Gli indicatori in cui " ~ d.the_name ~ " " ~ d.verb.is ~ " più in alto in classifica, tenuto conto del verso di ognuno."},

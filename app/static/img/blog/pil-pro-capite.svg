@@ -1,27 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="Archivo, Arial, sans-serif">
-  <rect width="1200" height="630" fill="#fbfaf7"/>
-  <g stroke="rgba(21,35,59,0.07)"><line x1="0" y1="28" x2="1200" y2="28"/><line x1="0" y1="56" x2="1200" y2="56"/><line x1="0" y1="84" x2="1200" y2="84"/><line x1="0" y1="112" x2="1200" y2="112"/><line x1="0" y1="140" x2="1200" y2="140"/></g>
-  <text x="56" y="92" font-size="22" font-family="'Space Mono', monospace" fill="#e4572e" letter-spacing="3">DIVARIO ITALIA · DATI 2024</text>
-  <text x="54" y="170" font-size="60" font-weight="800" fill="#15233b">PIL pro capite per regione</text>
-  <text x="56" y="208" font-size="22" font-family="'Space Mono', monospace" fill="#6b7785">Prodotto interno lordo per abitante · euro, valori correnti</text>
-  <g>
-    <text x="56" y="286" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Trentino-Alto Adige</text>
-    <rect x="470" y="266" width="560" height="26" rx="2" fill="#15233b"/>
-    <text x="1042" y="286" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">54.637</text>
-    <text x="56" y="344" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Lombardia</text>
-    <rect x="470" y="324" width="517" height="26" rx="2" fill="#15233b"/>
-    <text x="999" y="344" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">50.399</text>
-    <text x="56" y="402" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Lazio</text>
-    <rect x="470" y="382" width="442" height="26" rx="2" fill="#15233b"/>
-    <text x="924" y="402" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">43.167</text>
-    <text x="56" y="460" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Campania</text>
-    <rect x="470" y="440" width="252" height="26" rx="2" fill="#15233b"/>
-    <text x="734" y="460" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">24.564</text>
-    <text x="56" y="518" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Calabria</text>
-    <rect x="470" y="498" width="222" height="26" rx="2" fill="#e4572e"/>
-    <text x="704" y="518" font-size="20" fill="#e4572e" text-anchor="start" font-family="'Space Mono', monospace">21.702</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="'Sofia Sans', Arial, sans-serif">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <text x="56" y="84" font-size="22" font-weight="600" fill="#3e4650">Divario Italia · dati 2024</text>
+  <text x="54" y="150" font-size="56" font-weight="700" font-family="'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif" fill="#121519">PIL pro capite per regione</text>
+  <text x="56" y="192" font-size="22" fill="#3e4650">Prodotto interno lordo per abitante · euro, valori correnti</text>
+  <g font-size="18" fill="#3e4650">
+    <circle cx="62" cy="232" r="6" fill="#2466c3"/><text x="74" y="238">Nord</text>
+    <circle cx="144" cy="232" r="6" fill="#504907"/><text x="156" y="238">Centro</text>
+    <circle cx="244" cy="232" r="6" fill="#983c75"/><text x="256" y="238">Mezzogiorno</text>
   </g>
-  <line x1="56" y1="560" x2="1144" y2="560" stroke="rgba(21,35,59,0.16)"/>
-  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat, Conti economici territoriali</text>
-  <text x="1144" y="592" font-size="18" font-weight="700" fill="#15233b" text-anchor="end">divarioitalia.it</text>
+  <g>
+    <circle cx="63" cy="279" r="7" fill="#2466c3"/>
+    <text x="80" y="287" font-size="22" fill="#121519">Trentino-Alto Adige</text>
+    <rect x="440" y="266" width="600" height="26" fill="#093e6f"/>
+    <text x="1052" y="286" font-size="21" font-weight="700" font-family="'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif" fill="#121519">54.637</text>
+    <circle cx="63" cy="337" r="7" fill="#2466c3"/>
+    <text x="80" y="345" font-size="22" fill="#121519">Lombardia</text>
+    <rect x="440" y="324" width="554" height="26" fill="#093e6f"/>
+    <text x="1006" y="344" font-size="21" font-weight="700" font-family="'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif" fill="#121519">50.399</text>
+    <circle cx="63" cy="395" r="7" fill="#504907"/>
+    <text x="80" y="403" font-size="22" fill="#121519">Lazio</text>
+    <rect x="440" y="382" width="474" height="26" fill="#093e6f"/>
+    <text x="926" y="402" font-size="21" font-weight="700" font-family="'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif" fill="#121519">43.167</text>
+    <circle cx="63" cy="453" r="7" fill="#983c75"/>
+    <text x="80" y="461" font-size="22" fill="#121519">Campania</text>
+    <rect x="440" y="440" width="270" height="26" fill="#1c5fa1"/>
+    <text x="722" y="460" font-size="21" font-weight="700" font-family="'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif" fill="#121519">24.564</text>
+    <circle cx="63" cy="511" r="7" fill="#983c75"/>
+    <text x="80" y="519" font-size="22" fill="#121519">Calabria</text>
+    <rect x="440" y="498" width="238" height="26" fill="#1c5fa1"/>
+    <text x="690" y="518" font-size="21" font-weight="700" font-family="'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif" fill="#121519">21.702</text>
+  </g>
+  <line x1="56" y1="560" x2="1144" y2="560" stroke="#e3e6ea" stroke-width="2"/>
+  <text x="56" y="596" font-size="18" fill="#5e646a">Fonte: Istat, Conti economici territoriali</text>
+  <text x="1144" y="596" font-size="18" font-weight="700" fill="#121519" text-anchor="end">divarioitalia.it</text>
 </svg>

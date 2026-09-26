@@ -13,12 +13,11 @@ sarebbe una dipendenza in piu' sul percorso della richiesta per un file che e'
 sempre lo stesso. Qui la conversione e' un passo di manutenzione: si rilancia
 quando si tocca una copertina, e il risultato si committa accanto al sorgente.
 
-I font. Le copertine nominano Archivo e Space Mono, che erano l'identita' fino
-al design system 2026 e che il sito non carica piu'. Vuol dire che in pagina
-gia' oggi ripiegano su Arial e sul monospace di sistema, e il PNG fa lo stesso:
-la figura condivisa e' identica a quella che si vede sul sito, che e' la cosa
-che conta. Riscriverle con i font nuovi e' un lavoro sulle copertine, non sulla
-conversione, e va fatto sul sorgente SVG.
+I font. Dal 26 settembre 2026 le copertine nominano Sofia Sans, nella rampa
+blu e coi colori delle ripartizioni. Dentro un <img> un SVG non carica i font
+del sito, quindi in pagina ripiegano sul sans-serif di sistema, e il PNG fa lo
+stesso: la figura condivisa e' identica a quella che si vede sul sito, che e'
+la cosa che conta.
 
     bin/py scripts/rasterize_og_images.py            # converte cio' che manca
     bin/py scripts/rasterize_og_images.py --forza    # riconverte tutto

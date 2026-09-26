@@ -1,0 +1,46 @@
+/* L'indice delle province: solo l'impaginazione sua. Campo e filtro
+   (`.filter`), mappa per scegliere (`.map-pick`) con la sua didascalia
+   (`.map-hint`) e pallini delle ripartizioni sono in components.css. Legge
+   solo token. */
+
+/* ---------- elenco e, da 960, la mappa accanto ---------- */
+.province-layout { display: grid; gap: var(--space-12); align-items: start; }
+.province-main { min-width: 0; }
+.province-map { display: none; }
+@media (min-width: 960px) {
+  .province-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: var(--gutter-l); }
+  .province-map {
+    display: grid; gap: var(--space-3); margin: 0;
+    position: sticky; top: calc(var(--sticky-top) + var(--space-6));
+  }
+  .province-map .navmap { width: 100%; }
+}
+
+/* ---------- il campo, poi la nota, poi l'indice ---------- */
+.province-filter { margin-bottom: var(--space-4); }
+.province-note { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* L'indice delle regioni e' `.jump--scroll` di components.css. */
+.province-jump { margin-top: var(--space-6); }
+
+/* ---------- le regioni e le loro province ---------- */
+.province-group { padding-top: var(--space-8); }
+.province-group > h2 { padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); margin-bottom: var(--space-3); }
+.province-group > h2 a { color: var(--ink); text-decoration: none; }
+.province-group > h2 a:hover { text-decoration: underline; }
+.province-list {
+  list-style: none; padding: 0; display: grid; gap: var(--space-2);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+}
+.province-list a {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  min-height: var(--target); padding: var(--space-2) var(--space-3);
+  background: var(--surface-1); border-bottom: 1px solid var(--rule);
+  color: var(--ink); text-decoration: none;
+}
+.province-list a:hover { background: var(--surface-2); }
+.province-list a:hover .province-list__name { text-decoration: underline; }
+.province-list__name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.province-list__rank { flex: none; font-size: var(--fs-small); color: var(--text-2); font-variant-numeric: tabular-nums; }
+.province-list__rank .n { color: inherit; }
+.province-group > h2 a { display: inline-flex; align-items: center; min-height: var(--target); }

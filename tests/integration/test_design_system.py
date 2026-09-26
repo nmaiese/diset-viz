@@ -249,7 +249,7 @@ class DesignSystemMigration(unittest.TestCase):
         )
         mappa = re.search(r'<div class="map[^"]*" data-map>.*?</svg>', html, re.S)
         self.assertIsNotNone(mappa, "la scheda non disegna la mappa")
-        classi = re.findall(r'<path d="[^"]+" data-key="[^"]+"[^>]*class="(q[1-6])', mappa.group(0))
+        classi = re.findall(r'<(?:path d|use href)="[^"]+" data-key="[^"]+"[^>]*class="(q[1-6])', mappa.group(0))
         self.assertGreaterEqual(len(classi), 15, "la mappa dell'indicatore non dipinge le regioni")
         self.assertNotRegex(mappa.group(0), r'fill="#|fill:\s*#', "colore cotto nella mappa")
         css = self._statico("/static/css/ds/components.css").decode("utf-8")

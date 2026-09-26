@@ -1,0 +1,68 @@
+/* ==========================================================================
+   blog: l'indice delle storie. La piu' recente grande accanto alla
+   copertina (la stessa regia della fascia storie della home), le altre in
+   `.cards` di components.css, l'indice per tema in fondo. Il titolo e' il
+   link, esteso a tutta la scheda: niente sottolineatura sul corpo.
+   ========================================================================== */
+
+.v1-blog .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.v1-blog .meta .sep, .v1-blog .card__meta .sep, .story__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
+
+/* Il filtro per tema: ancore verso l'indice, in fila, bersagli da 44 pixel. */
+.blog-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-4); }
+.blog-tags__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.blog-tags ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-4); padding: 0; }
+.blog-tags a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target); font-weight: 600; }
+.blog-tags__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* La copertina: segnaposto sulla superficie finche' l'immagine non arriva. */
+.blog-media { overflow: hidden; border-radius: var(--radius-sm); background: var(--surface-2); aspect-ratio: 1200 / 630; }
+.blog-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--motion-base) var(--motion-ease); }
+@media (hover: hover) { .blog-card:hover .blog-media img { transform: scale(1.03); } }
+@media (prefers-reduced-motion: reduce) { .blog-media img, .blog-card:hover .blog-media img { transition: none; transform: none; } }
+.blog-credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
+.blog-credit a { position: relative; z-index: var(--z-raised); color: inherit; }
+
+/* La storia in apertura e' la `.story--lead` di components.css, come in
+   home. Qui la copertina tiene le sue proporzioni (dentro c'e' il titolo, e
+   il taglio a 16:9 lo mangerebbe) e il lead chiude sul suo filetto. */
+.v1-blog .story--lead { margin-bottom: 0; }
+.v1-blog .story--lead .story__media { aspect-ratio: 1200 / 630; }
+.v1-blog .story--lead .story__title { font-weight: var(--fw-heading); }
+@supports selector(:has(a)) {
+  .blog-card:has(.card__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .blog-card .card__title a:focus-visible { outline: none; }
+}
+@media (min-width: 960px) { .v1-blog .story--lead .story__title { font-size: var(--fs-section-l); } }
+
+/* Le schede: la copertina sopra, poi titolo, meta e sommario. */
+.blog-cards { margin-top: var(--space-2); }
+.ds .blog-card .card__title a { color: var(--ink); text-decoration: none; }
+.ds .blog-card:hover .card__title a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; }
+.blog-card .card__media { background: var(--surface-2); margin-bottom: var(--space-1); aspect-ratio: 1200 / 630; }
+.blog-card .blog-credit { order: -1; margin-top: calc(-1 * var(--space-1)); margin-bottom: var(--space-1); }
+.blog-card .card__media { order: -2; }
+
+/* Sul telefono le schede diventano righe: miniatura quadrata e titolo. */
+@media (max-width: 599px) {
+  .blog-card { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-1) var(--space-4); align-items: start; }
+  .blog-card > * { grid-column: 2; }
+  .blog-card .card__media { grid-column: 1; grid-row: 1 / span 3; aspect-ratio: 1 / 1; margin: 0; }
+  .blog-card .card__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
+  .blog-card .card__text { display: none; }
+  .blog-card .blog-credit { order: 0; grid-column: 1 / -1; margin: 0; }
+}
+
+/* L'indice per tema: colonne di elenchi, niente scatole. */
+.blog-index { display: grid; gap: var(--space-8) var(--gutter-l); }
+@media (min-width: 720px) { .blog-index { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .blog-index { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.blog-index__group { display: grid; align-content: start; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
+.blog-index__group ul { list-style: none; padding: 0; display: grid; gap: var(--space-2); }
+.blog-index__group li { display: grid; gap: 2px; }
+.blog-index__date { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.blog-follow { margin-top: var(--space-12); }
+
+/* La storia d'apertura chiude col suo filetto e i suoi 32 pixel: la sezione
+   dopo non ne aggiunge altri. */
+.story--lead + .section { margin-top: 0; }

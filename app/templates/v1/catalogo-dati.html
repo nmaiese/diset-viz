@@ -1,0 +1,95 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- Il catalogo dati della 1.0.
+
+    Stesse voci di data_catalog.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la testata con le cifre del
+    catalogo, un campo che filtra le voci mentre si scrive, e le voci per
+    tema, ognuno in un `details` aperto su schermo grande e chiuso dal
+    JavaScript sul telefono (v1.js). Una riga per voce: il nome che porta alla
+    scheda, la fonte, e i file CSV e JSON quando la voce li ha. Cio' che la
+    pagina chiede in piu' ai dati lo compone app/design/pages/catalogo_dati.py
+    e arriva qui come `d`.
+
+    La testa (title, description, briciole, JSON-LD DataCatalog) e' quella di
+    data_catalog.html, riga per riga: il grafo lo compone la vista e
+    test_data_catalog_jsonld.py lo tiene fermo. Ogni voce del grafo ha il suo
+    link visibile, anche dentro un gruppo chiuso: il `details` chiuso resta
+    nel DOM. Il filtro e' js/catalogo-dati.js: senza JavaScript il campo resta
+    nascosto e l'elenco c'e' tutto. -#}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}, {"name": "Catalogo dati", "path": "/catalogo-dati"}] %}
+{% set active_nav = 'atlas' %}
+
+{# Il catalogo e' l'unica pagina il cui contenuto **e'** un conteggio, e il
+   titolo non lo diceva. La marca cade come sugli altri hub. #}
+{% block title %}Catalogo dati: {{ datasets | length }} indicatori territoriali{% endblock %}
+{% block description %}{{ catalog_description }}{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/catalogo-dati.css') }}">{% endblock %}
+
+{% block head_extra %}
+{{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">{{ catalog_jsonld | tojson }}</script>
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-catalogo-dati" data-v1="catalogo-dati" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <div class="catalogo-head">
+  <header class="pagehead">
+    <p class="eyebrow"><a href="/atlante">Atlante</a>{% if d.institutions %}<span class="sep" aria-hidden="true">·</span>{{ d.institutions | join(' e ') }}{% endif %}<span class="sep" aria-hidden="true">·</span>{{ d.themes | num(None, 'count') }} temi</p>
+    <h1 class="h-title">Catalogo dati di Divario Italia</h1>
+    <p class="answer">Il catalogo collega {{ d.total | num(None, 'count') }} dataset indicizzabili, {{ d.downloadable | num(None, 'count') }} con la serie scaricabile in CSV e JSON.</p>
+    <p class="lede">{{ catalog_description }} Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>
+    <p class="meta"><span>{{ d.sources | num(None, 'count') }} banche dati</span><a href="/metodologia">Metodologia e fonti</a><a href="{{ corrections_url }}">Segnala un errore</a></p>
+  </header>
+
+  {#- Da 960 pixel, accanto alla testata, quanti dataset ha ogni tema: una
+      barra per tema nel colore di contesto, il nome porta al suo gruppo. -#}
+  {% set most = d.groups | map(attribute='items') | map('length') | max if d.groups else 0 %}
+  {% if most %}
+  <figure class="catalogo-temi">
+    <figcaption class="catalogo-temi__t">I dataset, tema per tema</figcaption>
+    <ol>
+      {%- for g in d.groups %}
+      <li><a href="#{{ g.id }}">{{ g.name }}</a><span class="catalogo-temi__bar" aria-hidden="true"><i style="width: {{ (g['items'] | length / most * 100) | round(1) }}%"></i></span><span class="catalogo-temi__n">{{ g['items'] | length | num(None, 'count') }}</span></li>
+      {%- endfor %}
+    </ol>
+  </figure>
+  {% endif %}
+  </div>
+
+  <section class="section" id="dataset" aria-labelledby="dataset-title" data-cat>
+    <h2 id="dataset-title">Dataset disponibili</h2>
+    <form class="toolbar filter catalogo-filter" data-cat-controls hidden role="search" aria-label="Filtra il catalogo">
+      <label class="field filter__q" for="cat-q">Cerca un indicatore o una fonte
+        <input id="cat-q" type="search" autocomplete="off" placeholder="occupazione, rifiuti, Eurostat" data-cat-q>
+      </label>
+      <p class="subline filter__count catalogo-filter__count" role="status" aria-live="polite" data-cat-live>{{ d.total | num(None, 'count') }} indicatori</p>
+    </form>
+
+    {% for g in d.groups %}
+    <details class="catalogo-group" data-cat-group data-collapse-mobile open>
+      <summary><h3 class="h-sub" id="{{ g.id }}">{{ g.name }} <span class="group__n" data-cat-n>{{ g['items'] | length | num(None, 'count') }} {{ g['items'] | length | it_plural('indicatore', 'indicatori') }}</span></h3></summary>
+      {% if g.area or g.path %}<p class="catalogo-group__meta">{% if g.area %}{{ g.area }}{% endif %}{% if g.area and g.path %}<span class="sep" aria-hidden="true">·</span>{% endif %}{% if g.path %}<a href="{{ g.path }}">La pagina del tema</a>{% endif %}</p>{% endif %}
+      <ul class="catalogo-list" aria-labelledby="{{ g.id }}">
+        {% for item in g['items'] %}
+        <li class="catalogo-item" data-cat-item data-name="{{ (item.name ~ ' ' ~ item.source) | lower }}">
+          <a class="catalogo-item__name" href="{{ item.path }}">{{ item.name }}</a>
+          {% if item.source %}<span class="catalogo-item__src">{{ item.source }}</span>{% endif %}
+          {% if item.downloads.csv or item.downloads.json %}<span class="catalogo-item__dl">{% if item.downloads.csv %}<a href="{{ item.downloads.csv }}" aria-label="CSV: {{ item.name }}">CSV</a>{% endif %}{% if item.downloads.json %}<a href="{{ item.downloads.json }}" aria-label="JSON: {{ item.name }}">JSON</a>{% endif %}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endfor %}
+    <p class="empty" data-cat-empty hidden>Nessun indicatore trovato. Prova con un'altra parola, o apri <a href="/atlante">l'atlante</a> per cercare per tema.</p>
+  </section>
+</div>
+</main>
+<script src="{{ asset_url('js/catalogo-dati.js') }}" defer></script>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

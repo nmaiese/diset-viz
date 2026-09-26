@@ -1,0 +1,128 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- L'indice delle province della 1.0.
+
+    Stesso contenuto di provinces_index.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la risposta su quante sono e come
+    si dividono, il campo che filtra l'elenco (list-filter.js, senza
+    JavaScript l'elenco e' intero), la nota che spiega il numero accanto ai
+    nomi prima dell'elenco, l'indice per saltare a una regione, poi le regioni
+    una sotto l'altra con le loro province. Da 960 pixel la mappa per scegliere
+    sta accanto all'elenco.
+
+    La testa (title, description, JSON-LD, briciole) e' quella di
+    provinces_index.html, riga per riga. L'`ItemList` resta nell'ordine della
+    vista, lo stesso dell'elenco qui sotto. -#}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Province", "path": "/province"}] %}
+{% set active_nav = 'province' %}
+
+{% block title %}Le {{ total }} province italiane, regione per regione{% endblock %}
+{% block description %}Trova la tua provincia fra le {{ total }} misurate dal BES dei Territori di Istat: il profilo, i valori veri di ogni indicatore e la posizione per qualità della vita.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/province.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ ('Le ' ~ total ~ ' province italiane, regione per regione') | tojson }},
+  "description": {{ ('Il profilo di ognuna delle ' ~ total ~ ' province italiane misurate dal BES dei Territori di Istat.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": {{ site_name | tojson }}, "url": {{ (site_url ~ '/') | tojson }} }
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Le province italiane",
+  "numberOfItems": {{ total }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- for p in provinces %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ p.name | tojson }},
+      "url": {{ (site_url ~ p.path) | tojson }}
+    }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+<script src="{{ url_for('static', filename='js/list-filter.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+{%- set sp = d.spread -%}
+<main id="contenuto" class="v1 v1-province" data-v1="province" tabindex="-1">
+{{ v1_map_sprite('regione') }}
+{{ v1_map_sprite('provincia') }}
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">BES dei Territori, Istat<span class="sep" aria-hidden="true">·</span>in ordine geografico</p>
+    <h1 class="h-title">Le {{ total }} province italiane, regione per regione</h1>
+    <p class="answer">Le {{ total | num(None, 'count') }} province misurate dal BES dei Territori di Istat stanno in {{ d.regions | num(None, 'count') }} regioni
+      {%- if sp and sp.top and sp.bottom %}, <a href="{{ sp.top.href }}">{{ sp.top.from }}</a>, che ne ha {{ sp.most | num(None, 'count') }}, <a href="{{ sp.bottom.href }}">{{ sp.bottom.to }}</a>, che ne ha {% if sp.least == 1 %}una{% else %}{{ sp.least | num(None, 'count') }}{% endif %}
+      {%- elif sp %}, da {{ sp.least | num(None, 'count') }} a {{ sp.most | num(None, 'count') }} per regione{% endif %}.</p>
+    <p class="meta">
+      <span>Ogni nome porta al profilo della provincia, con i valori veri di tutti gli indicatori</span>
+      <a class="linkarrow" href="/qualita-della-vita/classifica/province">La classifica delle province</a>
+    </p>
+  </header>
+
+  <div class="province-layout">
+    <div class="province-main">
+      <div class="filter province-filter" hidden>
+        <label class="field filter__q" for="cerca-provincia">Cerca una provincia
+          <input id="cerca-provincia" type="search" data-list-filter="#province-per-regione" placeholder="Per esempio Lecce o Forlì" autocomplete="off" aria-controls="province-per-regione" aria-describedby="province-nota">
+        </label>
+      </div>
+
+      <p class="province-note" id="province-nota">Il numero accanto al nome è la posizione della provincia nella classifica della qualità della vita, profilo {{ d.profile or 'predefinito' }}, fra le {{ d.quality_total | num(None, 'count') }} province: la prima è quella con il punteggio più alto. Il metodo è in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
+
+      <nav class="jump jump--scroll province-jump" aria-label="Vai a una regione">
+        <ul>
+          {%- for g in d.groups %}
+          <li><a href="#{{ g.id }}">{{ g.name }}</a></li>
+          {%- endfor %}
+        </ul>
+      </nav>
+
+      <div id="province-per-regione" class="province-index">
+        {% for g in d.groups %}
+        <section class="province-group" id="{{ g.id }}" data-filter-group aria-labelledby="h-{{ g.id }}">
+          <h2 class="h-sub" id="h-{{ g.id }}">{% if g.area %}<span class="area-dot area-dot--{{ g.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ g.href }}">{{ g.name }}</a>{% if g.area %}<span class="sr-only">, {{ d.area_label[g.area] }}</span>{% endif %}</h2>
+          <ul class="province-list">
+            {%- for p in g.provinces %}
+            <li data-filter-name="{{ p.name }}"><a href="{{ p.path }}"><span class="province-list__name">{{ p.name }}</span> {% if p.rank %}<span class="province-list__rank"><span class="sr-only">posizione </span>{{ p.rank | rank }}</span>{% endif %}</a></li>
+            {%- endfor %}
+          </ul>
+        </section>
+        {% endfor %}
+        <p class="province-note" role="status" data-filter-empty hidden>Nessuna provincia con questo nome.</p>
+      </div>
+    </div>
+
+    {#- Da 960 pixel la mappa per scegliere, accanto all'elenco. Sul telefono
+        no: il campo e l'elenco bastano, e la tastiera ha i link dell'elenco. -#}
+    <figure class="province-map map-pick">
+      {% if d.map_steps %}
+      <figcaption class="map-hint"><b>La qualità della vita</b>, profilo {{ d.profile or 'predefinito' }}. Scegli una provincia per aprirne il profilo.</figcaption>
+      {{ ui.navmap('provincia', d.map_names, None, '/provincia/', steps=d.map_steps) }}
+      {{ ui.legend(d.map_legend, 'Più intenso, punteggio più alto.', nd=False) }}
+      {% else %}
+      {{ ui.navmap('provincia', d.names, None, '/provincia/') }}
+      <figcaption class="map-hint">Oppure scegli una provincia sulla mappa.</figcaption>
+      {% endif %}
+    </figure>
+  </div>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}

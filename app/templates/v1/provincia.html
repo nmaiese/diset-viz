@@ -19,6 +19,9 @@
     riga per riga: il ridisegno non tocca cio' che vedono i motori. -#}
 {% set active_nav = 'province' %}
 {% set p = profile %}
+{#- L'immagine da condividere della provincia (scripts/og_territori.py). -#}
+{% set og_image_path = v1_og_image('provincia', p.key) %}
+{% set og_image_alt = p.name ~ ', la posizione nella qualità della vita e la sua regione sulla mappa' %}
 {# Italia, regione, provincia: la briciola passava dalla qualita' della vita,
    come se la provincia fosse una riga di classifica e non un territorio. #}
 {% if p.region_path %}
@@ -109,7 +112,7 @@
   {{ ui.crumbs(percorso) }}
 
   <div class="provincia-top">
-    <header class="pagehead provincia-head">
+    <header class="pagehead provincia-head" data-count>
       <p class="eyebrow"><a href="/qualita-della-vita/classifica/province">Classifica delle province</a><span class="sep" aria-hidden="true">·</span>{{ d.source }}{% if d.year_to %}<span class="sep" aria-hidden="true">·</span>dati fino al {{ d.year_to }}{% endif %}</p>
       <h1>{{ p.name }} è {{ p.rank | rank }} su {{ p.total | num(None, 'count') }} province per qualità della vita</h1>
       <p class="answer">Con il profilo {{ d.profile_name }} ottiene {{ p.score | num(None, 'score') }} su 100, dove 50 è la media delle province.{% if d.best and d.worst %} Va meglio su {{ d.best.name | lower }} ({{ d.best.score | num(None, 'score') }}) e peggio su {{ d.worst.name | lower }} ({{ d.worst.score | num(None, 'score') }}).{% endif %}</p>
@@ -118,10 +121,23 @@
       <p class="meta">
         <a href="{{ corrections_url }}">Segnala un errore</a>
       </p>
+      {#- "Il tuo territorio": sceglierla qui la mette in evidenza in ogni
+          scheda (v1.js, initMine). Senza JavaScript il bottone non compare. -#}
+      <button type="button" class="btn mine-set" data-mine-set data-level="provincia" data-key="{{ p.key }}" data-name="{{ p.name }}"{% if d.region_key %} data-region="{{ d.region_key }}" data-region-name="{{ p.region }}"{% endif %} aria-pressed="false" hidden>È la mia provincia</button>
     </header>
     {% if d.region_key %}
     {% set where %}{{ 'Città metropolitana' if p.metro_city else 'Provincia' }} {{ d.of_name }}, in <a href="{{ p.region_path }}">{{ p.region }}</a>{% endset %}
+    {% if d.region_map %}{% set rm = d.region_map %}
+    <figure class="regionmap">
+      {{ ui.regionmap(rm, p.key) }}
+      <figcaption>
+        <span class="regionmap__cap">{{ where }}{% if rm.n > 1 %}, con le altre {{ (rm.n - 1) | num(None, 'count') }} province della regione per qualità della vita{% endif %}.</span>
+        {{ ui.legend(rm.legend, 'Più intenso, punteggio più alto, sulla scala delle ' ~ rm.total ~ ' province.', nd=False) }}
+      </figcaption>
+    </figure>
+    {% else %}
     {{ ui.locator(d.region_key, where) }}
+    {% endif %}
     {% elif p.metro_city %}
     <p class="provincia-status"><span class="status">Città metropolitana</span></p>
     {% endif %}
@@ -142,7 +158,7 @@
   {{ ui.tiles(d.tiles) }}
 
   <div class="layout">
-    <aside class="layout__aside">
+    <aside class="layout__aside" aria-label="In questa pagina">
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
@@ -167,7 +183,7 @@
         <figure class="module">
           <figcaption class="module__head">
             {% if d.dims.claim %}<h3 class="h-sub">{{ d.dims.claim }}</h3>{% endif %}
-            <p class="subline">Punteggio da 0 a 100 sul profilo {{ d.profile_name }}. Ogni barra parte dalla linea della media 50: verso destra sopra, verso sinistra sotto.</p>
+            <p class="subline">{{ ui.term('punteggio', 'Punteggio da 0 a 100') }} sul profilo {{ d.profile_name }}. Ogni barra parte dalla linea della media 50: verso destra sopra, verso sinistra sotto.</p>
           </figcaption>
           <div class="tablewrap" tabindex="0" role="region" aria-label="Le dimensioni in tabella">
             <table class="table provincia-dims">
@@ -220,7 +236,7 @@
         <div class="podiums">
           {% for side in [('up', 'Dove ha guadagnato più posizioni', d.moves.up), ('down', 'Dove ne ha perse di più', d.moves.down)] if side[2] %}
           <div>
-            <h4 class="h-sub provincia-colhead">{{ side[1] }}</h4>
+            <h3 class="h-sub provincia-colhead">{{ side[1] }}</h3>
             <ul class="moves provincia-moves">
               {%- for i in side[2] %}
               <li><span class="arrow">{{ ui.icon(side[0]) }}</span><span class="what"><a href="{{ i.path }}">{{ i.name }}</a><span class="provincia-when">{{ i.rank | rank(i.province_count) }} nel {{ i.year }}, era {{ i.previous | rank }} {% if i.fewer_now %}quando le province con un dato erano di più{% else %}nella rilevazione precedente{% endif %}</span></span><span class="how">{{ i.movement | delta('posizione' if i.movement in (1, -1) else 'posizioni', 0) }}</span></li>

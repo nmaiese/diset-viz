@@ -1,0 +1,150 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- L'indice dei temi della 1.0 (`/temi`).
+
+    Stesso contenuto di themes_index.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la risposta con i conteggi del
+    catalogo, poi le quattro aree col loro distintivo (lo stesso della fascia
+    `#temi` della home) e in ognuna i suoi temi. Ogni tema e' una scheda col
+    titolo che porta alla pagina del tema, il conteggio, gli indicatori con cui
+    quella pagina apre (link veri, non dentro un link padre) e la regione in
+    testa e in coda, dette con le frecce e non con un colore. Cio' che la pagina
+    chiede in piu' ai dati lo compone app/design/pages/temi.py.
+
+    La testa (title, description, JSON-LD, briciole) e' quella di
+    themes_index.html, riga per riga. Le ancore `#area-<slug>` restano: la home
+    e la briciola della pagina tema ci portano (`views._area_anchor`). -#}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Temi", "path": "/temi"}] %}
+{% set active_nav = 'temi' %}
+
+{% block title %}I {{ theme_total }} temi dell'atlante, {{ total }} indicatori per regione{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/temi.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "I temi degli indicatori territoriali",
+  "description": {{ ('Indicatori di ' ~ institutions ~ ' per le regioni italiane, raggruppati per macro-area e tema.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{# La stessa griglia di schede che si vede qui sotto, macro-area per
+   macro-area: l'elenco esiste in pagina, il blocco lo dichiara e basta. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "I temi degli indicatori territoriali",
+  "numberOfItems": {{ theme_total }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- set ns = namespace(i=0) %}
+    {%- for a in areas %}{% for t in a.themes %}{% set ns.i = ns.i + 1 %}
+    {
+      "@type": "ListItem",
+      "position": {{ ns.i }},
+      "name": {{ t.theme | tojson }},
+      "url": "{{ site_url }}{{ t.path }}"
+    }{{ "," if not (loop.last and a == areas[-1]) }}
+    {%- endfor %}{% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-temi" data-v1="temi" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">{{ institutions }}<span class="sep" aria-hidden="true">·</span>dati dal {{ year_min }} al {{ year_max }}</p>
+    <h1 class="h-title">Gli indicatori delle regioni italiane, tema per tema</h1>
+    {#- Il totale e' quello del catalogo dell'atlante, che e' regionale: i
+        valori delle province non ci stanno, e le schede che li hanno le conta
+        la sezione "Per provincia" dei temi (`indicator_view.province_indicators_by_theme`). #}
+    <p class="answer">{{ total | num(None, 'count') }} indicatori per regione, di {{ institutions }}, divisi in {{ theme_total | num(None, 'count') }} temi e {{ d.area_count | num(None, 'count') }} aree.{% if province_count %} Nella sezione Per provincia dei temi ci {{ 'è' if province_count == 1 else 'sono' }} anche {{ 'la' if province_count == 1 else 'le' }} {{ province_count }} {{ province_count | it_plural('scheda', 'schede') }} con i valori delle province{% if province_only %}, {{ province_only }} solo per provincia{% endif %}.{% endif %}</p>
+    <p class="lede">Ogni tema apre con la classifica delle regioni, la mappa e le serie da cui partire, e sotto ha tutte le sue serie con fonte e andamento negli anni.</p>
+    <p class="meta">
+      {% for a in d.areas %}<a href="#area-{{ a.slug }}">{{ a.area }}</a>{% endfor %}
+    </p>
+  </header>
+
+  <form class="toolbar filter temi-filter" data-temi-filter hidden role="search" aria-label="Filtra i temi" onsubmit="return false">
+    <label class="field filter__q" for="temi-q">Cerca un tema
+      <input id="temi-q" type="search" autocomplete="off" placeholder="lavoro, salute, ambiente">
+    </label>
+    <p class="subline filter__count" role="status" aria-live="polite" data-temi-live>{{ theme_total }} temi</p>
+  </form>
+
+  {% for a in d.areas %}
+  <section class="section temi-area" id="area-{{ a.slug }}" data-temi-area aria-labelledby="h-area-{{ a.slug }}">
+    <h2 id="h-area-{{ a.slug }}"><span class="temi-badge temi-badge--{{ a.tone }}" aria-hidden="true">{{ ui.icon(a.icon) }}</span><span>{{ a.area }}</span></h2>
+    <p class="temi-area__count">{{ a.count }} {{ 'indicatore' if a.count == 1 else 'indicatori' }} in {{ a.theme_count }} {{ 'tema' if a.theme_count == 1 else 'temi' }}</p>
+    <ul class="temi-cards">
+      {%- for t in a.themes %}
+      <li class="temi-card" data-temi-theme="{{ t.theme | lower }}">
+        <h3 class="temi-card__title"><a href="{{ t.path }}">{{ t.theme }}</a></h3>
+        <p class="temi-card__n">{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</p>
+        {% if t.examples %}
+        <ul class="temi-card__examples" aria-label="Da cui partire">
+          {%- for ex in t.examples %}<li><a href="{{ ex.path }}">{{ ex.name }}</a></li>{% endfor %}
+          {%- if t.more > 0 %}<li class="temi-card__more"><a href="{{ t.path }}#tutti">{{ 'L\'altro' if t.more == 1 else 'Gli altri ' ~ t.more }} del tema</a></li>{% endif %}
+        </ul>
+        {% endif %}
+        {% if t.head %}
+        <dl class="temi-card__ends">
+          <div><dt>{{ ui.icon('up') }} In testa</dt><dd>{% if t.head.href %}<a href="{{ t.head.href }}">{{ t.head.name }}</a>{% else %}{{ t.head.name }}{% endif %}</dd></div>
+          <div><dt>{{ ui.icon('down') }} In coda</dt><dd>{% if t.tail.href %}<a href="{{ t.tail.href }}">{{ t.tail.name }}</a>{% else %}{{ t.tail.name }}{% endif %}</dd></div>
+        </dl>
+        {% else %}
+        <p class="temi-card__none">Nessuna classifica: i dati completi non bastano</p>
+        {% endif %}
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+  <p class="empty" data-temi-empty hidden>Nessun tema corrisponde alla ricerca. <a href="/atlante">Cerca fra tutti gli indicatori nell'atlante</a></p>
+  <p class="source temi-source">In testa e in coda: la regione con la posizione media migliore e quella con la peggiore sugli indicatori del tema che hanno un verso, cioè per cui si può dire quale valore è migliore. Su {{ theme_total - d.ranked }} {{ 'tema' if theme_total - d.ranked == 1 else 'temi' }} i dati completi non bastano per una classifica. <a href="/metodologia">Come sono calcolati confronti e medie</a></p>
+</div>
+
+<section class="band" id="continua" aria-labelledby="h-continua">
+  <div class="wrap">
+    <h2 class="h-section" id="h-continua">Continua da qui</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>Tutte le serie</h3>
+        <ul>
+          <li><a href="/atlante">I {{ total }} indicatori nell'atlante, da filtrare per fonte e anni</a></li>
+          <li><a href="/catalogo-dati">Il catalogo dei dati, da scaricare</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>I territori</h3>
+        <ul>
+          <li><a href="/regioni">Il profilo di ognuna delle regioni</a></li>
+          <li><a href="/province">Il profilo di ognuna delle province</a></li>
+          <li><a href="/confronto">Mettere due o tre territori sullo stesso piano</a></li>
+        </ul>
+      </div>
+      <div class="lane">
+        <h3>Le sintesi</h3>
+        <ul>
+          <li><a href="/qualita-della-vita">Dove si vive meglio, la qualità della vita</a></li>
+          <li><a href="/divari-regionali">Quanto pesa davvero il divario Nord-Sud</a></li>
+          <li><a href="/quiz">Metti alla prova quello che sai con Quiz Italia</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script src="{{ asset_url('js/temi.js') }}" defer></script>
+{% endblock %}

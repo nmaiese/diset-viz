@@ -42,7 +42,7 @@ import unicodedata
 from app import bes_data, indicator_universe, indicator_view, profiles, province_profile, sources
 from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
 from app.design import charts, maps, numfmt
-from app.design.common import LOWER_BETTER, legend
+from app.design.common import LOWER_BETTER, legend, map_steps
 
 # Fino a tre territori, come la SPA: tre linee e tre colori si leggono ancora.
 MAX_TERRITORIES = 3
@@ -333,11 +333,8 @@ def derive(ctx: dict) -> dict:
     chart = charts.compare_series(years, lines, avg_line, year) if len(years) > 1 else ""
 
     values = list(now.values())
-    span = (max(values) - min(values)) or 1 if values else 1
-    lo = min(values) if values else 0
     classes = {}
-    for key, value in now.items():
-        step = min(6, int((value - lo) / span * 6) + 1)
+    for key, step in map_steps(now).items():
         classes[key] = f"q{step}" + (" is-on" if key in state["regions"] else "")
     # Un territorio a confronto senza il dato dell'anno resta contornato e
     # tratteggiato: `is-nd` dice alla mappa di dargli il motivo del n.d.

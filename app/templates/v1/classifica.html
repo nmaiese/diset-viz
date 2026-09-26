@@ -131,7 +131,7 @@
     <figure class="module">
       <figcaption class="module__head">
         {% if d.table_claim %}<h3 class="h-sub">{{ d.table_claim }}</h3>{% endif %}
-        <p class="subline">Punteggio da 0 a 100 con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso, con il punto forte e il punto debole di ognuna.</p>
+        <p class="subline">{{ ui.term('punteggio', 'Punteggio da 0 a 100') }} con il profilo {{ d.profile.name }}, su {{ d.dims_total }} dimensioni.{% if d.fifty %} La tacca segna 50, la media semplice delle {{ d.n }} {{ s.plural }}.{% endif %} Dal punteggio più alto al più basso, con il punto forte e il punto debole di ognuna.</p>
       </figcaption>
       <div class="toolbar cl-toolbar">
         <div class="field"><span>Livello</span>
@@ -163,11 +163,14 @@
         </div>
         <div class="cl-side">
           {% if d.map %}
+          {#- Il titolo serve quando la mappa sta sopra o sotto la tabella, sul
+              telefono: senza, arrivava dopo le righe senza dire che cosa fosse. -#}
+          <h3 class="h-sub cl-side__title">Il punteggio sulla mappa, profilo {{ d.profile.name }}</h3>
           {#- L'etichetta e' quella della mappa di prima: la mappa porta al
               profilo della regione cliccata (lo script in fondo). -#}
           {{ ui.map(d.map.classes, 'punteggio', d.map.names, d.map.tips, overlay=d.map.callouts,
                     label='Mappa cliccabile delle regioni italiane per punteggio di qualità della vita, profilo ' ~ d.profile.name) }}
-          {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto. Sei gradini uguali fra il più basso e il più alto.') }}
+          {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto.') }}
           {% else %}
           <div class="cl-find">
             <p class="cl-find__title">Trova la tua {{ s.singular }}</p>
@@ -191,19 +194,20 @@
         {% if d.champions_claim %}<h3 class="h-sub">{{ d.champions_claim }}</h3>{% endif %}
         <p class="subline">Per ognuna delle {{ d.dims_total }} dimensioni le tre {{ s.plural }} con il punteggio più alto e l'ultima. Il punteggio di una dimensione va da 0 a 100 e non cambia con il profilo.</p>
       </figcaption>
+      {#- Le tre prime stanno in una cella sola, una per riga col suo punteggio
+          accanto: in nove colonne a 14 pixel la tabella non si leggeva. -#}
       <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="Le prime {{ s.plural }} per dimensione">
-        <table class="table table--compact table--stack cl-cats">
+        <table class="table table--stack cl-cats">
           <caption class="sr-only">Le tre {{ s.plural }} con il punteggio più alto e l'ultima, per dimensione, punteggio da 0 a 100</caption>
-          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima</th><th scope="col">Seconda</th><th scope="col">Terza</th><th scope="col">Ultima</th></tr></thead>
+          <thead><tr><th scope="col">Dimensione</th><th scope="col">Le prime tre</th><th scope="col">L'ultima</th></tr></thead>
           <tbody>
             {%- for c in d.categories %}
             <tr>
               <th scope="row">{% if c.href %}<a href="{{ c.href }}">{{ c.name }}</a>{% else %}{{ c.name }}{% endif %}</th>
-              {%- for label in ['Prima', 'Seconda', 'Terza'] %}
-              {%- set t = c.top[loop.index0] if loop.index0 < c.top | length else none %}
-              <td data-label="{{ label }}">{% if t %}<span class="cl-pair"><a href="{{ t.href }}">{{ t.name }}</a>{{ t.score | num(None, 'score') }}</span>{% else %}n.d.{% endif %}</td>
-              {%- endfor %}
-              <td data-label="Ultima">{% if c.last %}<span class="cl-pair"><a href="{{ c.last.href }}">{{ c.last.name }}</a>{{ c.last.score | num(None, 'score') }}</span>{% else %}n.d.{% endif %}</td>
+              <td data-label="Le prime tre">{% if c.top %}<ol class="cl-top">
+                {%- for t in c.top[:3] %}<li><span class="cl-top__rank">{{ loop.index | rank }}</span> <a href="{{ t.href }}">{{ t.name }}</a> <span class="cl-top__score">{{ t.score | num(None, 'score') }}</span></li>{% endfor -%}
+              </ol>{% else %}n.d.{% endif %}</td>
+              <td data-label="L'ultima">{% if c.last %}<a href="{{ c.last.href }}">{{ c.last.name }}</a> <span class="cl-top__score">{{ c.last.score | num(None, 'score') }}</span>{% else %}n.d.{% endif %}</td>
             </tr>
             {%- endfor %}
           </tbody>
@@ -236,6 +240,9 @@
 
   <section class="section" id="fonti-dati" aria-labelledby="h-fonti">
     <h2 id="h-fonti">Fonti, dati e citazione</h2>
+    {#- Da 960 pixel le fonti a sinistra, scaricare e citare nella colonna
+        destra: in colonna sola la sezione lasciava vuota meta' pagina. -#}
+    <div class="cl-sources">
     <dl class="specs">
       {% if d.breakdown %}<div><dt>Da dove vengono i dati</dt><dd><ul class="reflist">{% for b in d.breakdown %}<li>{{ b.label }}: {{ b.count | num(None, 'count') }} indicatori</li>{% endfor %}</ul></dd></div>{% endif %}
       {% if d.year_counts %}<div><dt>Anni dei dati</dt><dd>{% for y in d.year_counts %}{% if loop.first %}{{ y.n | num(None, 'count') }} {{ 'indicatore ha' if y.n == 1 else 'indicatori hanno' }} il dato più recente del {{ y.year }}{% else %}, {{ y.n | num(None, 'count') }} del {{ y.year }}{% endif %}{% endfor %}.</dd></div>{% endif %}
@@ -244,11 +251,14 @@
       <div><dt>Metodologia</dt><dd><a href="/metodologia#qualita-della-vita">Come si calcola la qualità della vita</a> e <a href="/metodologia#indicatori-usati">quali indicatori entrano nel punteggio</a></dd></div>
       <div><dt>Licenza</dt><dd><a href="{{ data_license_url }}">{{ data_license_label }}</a></dd></div>
     </dl>
+    <div class="cl-sources__use">
     <div class="actions" id="scarica">
       <a class="btn btn--primary" href="{{ d.downloads.csv }}">{{ ui.icon('download') }} Scarica la classifica in CSV</a>
       <a class="btn" href="{{ d.downloads.json }}">{{ ui.icon('download') }} JSON</a>
     </div>
     {{ ui.cite(d.citation) }}
+    </div>
+    </div>
   </section>
 </div>
 <section class="band" aria-labelledby="continua-da-qui">

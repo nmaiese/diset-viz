@@ -30,7 +30,7 @@
     {{ total }} {{ total | it_plural('risultato', 'risultati') }}
     ({% if territory_count %}{{ territory_count }} {{ territory_count | it_plural('territorio', 'territori') }}, {% endif %}{{ indicator_count }} {{ indicator_count | it_plural('indicatore', 'indicatori') }},
     {{ post_count }} {{ post_count | it_plural('articolo', 'articoli') }}).
-    {% if pages > 1 %}Pagina {{ page }} di {{ pages }}, righe dalla {{ first_index }} alla {{ last_index }}.{% endif %}
+    {% if pages > 1 %}Pagina {{ page_number }} di {{ pages }}, righe dalla {{ first_index }} alla {{ last_index }}.{% endif %}
     {% if truncated %}La ricerca si ferma ai primi {{ total }} risultati, quindi restringi la query per vedere il resto.{% endif %}
     {% else %}
     Nessun risultato. Prova con una parola sola, oppure sfoglia i <a href="/temi">temi</a>, le <a href="/regioni">regioni</a> e le <a href="/province">province</a>.
@@ -54,9 +54,9 @@
 
   {% if pages > 1 %}
   <nav class="search-pager" aria-label="Pagine dei risultati">
-    {% if page > 1 %}<a href="/ricerca{{ query_param }}{{ '&' if query_param else '?' }}pagina={{ page - 1 }}" rel="prev">&larr; Pagina precedente</a>{% endif %}
-    <span>Pagina {{ page }} di {{ pages }}</span>
-    {% if page < pages %}<a href="/ricerca{{ query_param }}{{ '&' if query_param else '?' }}pagina={{ page + 1 }}" rel="next">Pagina successiva &rarr;</a>{% endif %}
+    {% if page_number > 1 %}<a href="/ricerca{{ query_param }}{{ '&' if query_param else '?' }}pagina={{ page_number - 1 }}" rel="prev">&larr; Pagina precedente</a>{% endif %}
+    <span>Pagina {{ page_number }} di {{ pages }}</span>
+    {% if page_number < pages %}<a href="/ricerca{{ query_param }}{{ '&' if query_param else '?' }}pagina={{ page_number + 1 }}" rel="next">Pagina successiva &rarr;</a>{% endif %}
   </nav>
   {% endif %}
   {% endif %}

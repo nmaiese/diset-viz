@@ -209,6 +209,41 @@ def divario_strip(rows: list[dict], avg: float | None, unit: str | None, gap_rat
             "legend": legend}
 
 
+def mini_strip(rows: list[dict], avg: float | None, width: int = 720) -> str:
+    """La striscia del divario ridotta a una riga, per la barra che resta in alto.
+
+    Stessi punti della striscia grande (`strip__dot`, `data-key`, il colore della
+    ripartizione), cosi' la scelta di un territorio la accende come le altre e
+    un clic sceglie; niente nomi e niente assi: le cifre sono nella striscia
+    grande e nel modulo. I pari merito restano sovrapposti: la barra dice
+    dove sta un territorio, non quanti gli stanno accanto.
+    """
+    rows = [row for row in rows if row.get("value") is not None]
+    if len(rows) < 2:
+        return ""
+    r = 5 if len(rows) <= 30 else 3.4
+    pad = r + 2
+    lo, hi = min(row["value"] for row in rows), max(row["value"] for row in rows)
+    span = (hi - lo) or 1.0
+
+    def x(v):
+        return pad + (v - lo) / span * (width - 2 * pad)
+
+    height = 2 * r + 12
+    mid = height / 2
+    parts = [f'<svg viewBox="0 0 {width} {height:.0f}" aria-hidden="true" focusable="false" class="strip strip--mini">',
+             f'<line class="strip__axis" x1="{pad}" x2="{width - pad}" y1="{mid:.1f}" y2="{mid:.1f}"/>']
+    if avg is not None:
+        ax = x(avg)
+        parts.append(f'<line class="strip__avg" x1="{ax:.1f}" x2="{ax:.1f}" y1="1" y2="{height - 1:.0f}"/>')
+    for row in sorted(rows, key=lambda row: row["value"]):
+        area = row.get("area") or "none"
+        parts.append(f'<circle class="strip__dot area--{area}" data-key="{escape(row["key"])}" '
+                     f'cx="{x(row["value"]):.1f}" cy="{mid:.1f}" r="{r}"><title>{escape(row["name"])}</title></circle>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 # ---------------------------------------------------------------- serie a fascia
 
 def _band(level, areas, width, height, right, short):
@@ -603,3 +638,54 @@ def map_callouts(paths: dict[str, str], items: list[tuple[str, str, str]]) -> st
                    f'<text x="{tx}" y="{ty - 4:.1f}" text-anchor="{anchor}"><tspan class="callout__nm">{escape(name)}</tspan>'
                    f'<tspan x="{tx}" dy="24" class="callout__v">{escape(value)}</tspan></text></g>')
     return "".join(out)
+
+
+# ---------------------------------------------------------------- piccoli multipli
+
+SMALL_W, SMALL_H, SMALL_PAD = 132, 44, 4
+
+
+def small_multiples(level: dict, lower_better: bool) -> list[dict]:
+    """Una piccola linea per territorio, tutte sulla stessa scala: "Regione per
+    regione" della scheda. Stesse x (gli anni della serie) e stesse y (minimo e
+    massimo di tutti i territori in tutti gli anni), cosi' le linee si
+    confrontano a occhio; dietro, tratteggiata, la media semplice di ogni anno.
+    In ordine di classifica sull'ultimo anno. Un territorio con meno di due
+    anni resta fuori; sotto i due territori non esce niente."""
+    matrix = level.get("matrix") or {}
+    years = sorted(int(y) for y in matrix)
+    if len(years) < 2:
+        return []
+    names = {t["key"]: t["name"] for t in level.get("territories") or []}
+    series: dict[str, list[tuple[int, float]]] = {}
+    for yr in years:
+        for key, value in (matrix.get(str(yr)) or matrix.get(yr) or {}).items():
+            if value is not None:
+                series.setdefault(key, []).append((yr, float(value)))
+    series = {k: v for k, v in series.items() if len(v) >= 2}
+    if len(series) < 2:
+        return []
+    values = [v for pts in series.values() for _, v in pts]
+    lo, hi = min(values), max(values)
+    y0, y1 = years[0], years[-1]
+    inner_w, inner_h = SMALL_W - 2 * SMALL_PAD, SMALL_H - 2 * SMALL_PAD
+
+    def x(yr):
+        return SMALL_PAD + (yr - y0) / ((y1 - y0) or 1) * inner_w
+
+    def y(v):
+        return SMALL_H / 2 if hi == lo else SMALL_PAD + (hi - v) / (hi - lo) * inner_h
+
+    means = [(p["year"], p["avg"]) for p in level.get("annual_means") or [] if p.get("avg") is not None]
+    avg_line = " ".join(f"{x(int(yr)):.1f},{y(float(v)):.1f}" for yr, v in means)
+    out = []
+    for key, pts in series.items():
+        line = " ".join(f"{x(yr):.1f},{y(v):.1f}" for yr, v in pts)
+        lx, ly = x(pts[-1][0]), y(pts[-1][1])
+        svg = (f'<svg class="sm__chart" viewBox="0 0 {SMALL_W} {SMALL_H}" aria-hidden="true" focusable="false">'
+               + (f'<polyline class="sm__avg" points="{avg_line}"/>' if avg_line else "")
+               + f'<polyline class="sm__line" points="{line}"/>'
+               f'<circle class="sm__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="2.5"/></svg>')
+        out.append({"key": key, "name": names.get(key, key), "first": pts[0], "last": pts[-1], "svg": svg})
+    out.sort(key=lambda s: (s["last"][1] if lower_better else -s["last"][1], s["name"]))
+    return out

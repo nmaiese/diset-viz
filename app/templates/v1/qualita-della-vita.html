@@ -46,7 +46,7 @@
 {% block content %}
 {%- macro rank_rows(rows) -%}
 {%- for row in rows %}
-      <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ row.href }}">{{ row.name }}</a>{% if row.region %}<span class="where">{% if row.region.href %}<a href="{{ row.region.href }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}</span>{% endif %}{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.score | num(None, 'score') }}</td></tr>
+      <tr data-key="{{ row.key }}"><td class="rank">{{ row.rank | rank }}</td><th class="name" scope="row">{% if row.area %}<span class="area-dot area-dot--{{ row.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ row.href }}">{{ row.name }}</a>{% if row.region %}<span class="where">{% if row.region.href %}<a href="{{ row.region.href }}">{{ row.region.name }}</a>{% else %}{{ row.region.name }}{% endif %}</span>{% if row.area %}<span class="sr-only">, {{ d.area_label[row.area] }}</span>{% endif %}{% elif row.area %}<span class="where">{{ d.area_label[row.area] }}</span>{% endif %}</th><td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ row.width }}%"></i></span></td><td class="val">{{ row.score | num(None, 'score') }}</td></tr>
 {%- endfor %}
 {%- endmacro %}
 {%- macro rank_table(b, caption, head, tail=None, labelledby=None) -%}
@@ -105,7 +105,7 @@
   {% if d.levels %}
   <section class="section" id="podio" aria-labelledby="h-podio">
     <h2 id="h-podio">Chi è in testa e chi in coda</h2>
-    <p class="subline qv-lead">Punteggio da 0 a 100 con il profilo {{ d.default_name }}.{% if d.fifty %} La tacca segna 50, la media semplice dei territori dello stesso livello.{% endif %} Ogni nome porta al profilo del territorio.</p>
+    <p class="subline intro">Punteggio da 0 a 100 con il profilo {{ d.default_name }}.{% if d.fifty %} La tacca segna 50, la media semplice dei territori dello stesso livello.{% endif %} Ogni nome porta al profilo del territorio.</p>
     <div class="podiums">
       {% for b in d.levels %}
       <figure class="qv-podium">
@@ -128,7 +128,7 @@
 
   <section class="section" id="profili" aria-labelledby="h-profili">
     <h2 id="h-profili">Cambia le priorità</h2>
-    <p class="subline qv-lead">Ogni profilo pesa le dimensioni in modo diverso, e la classifica cambia. Accanto a ognuno, chi guadagna più posizioni rispetto a {{ d.default_name }}.</p>
+    <p class="subline intro">Ogni profilo pesa le dimensioni in modo diverso, e la classifica cambia. Accanto a ognuno, chi guadagna più posizioni rispetto a {{ d.default_name }}.</p>
     <ul class="qv-profiles">
       {% for item in d.profiles %}
       <li>
@@ -152,13 +152,20 @@
       <div class="tablewrap stackwrap" tabindex="0" role="region" aria-label="La prima regione e la prima provincia per dimensione">
         <table class="table table--compact table--stack qv-cats">
           <caption class="sr-only">La prima regione e la prima provincia in ogni dimensione della qualità della vita, punteggio da 0 a 100</caption>
-          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima regione</th><th scope="col">Prima provincia</th></tr></thead>
+          {#- Il punteggio sta nella sua colonna, subito dopo il nome che misura:
+              nella stessa cella, spinto a destra, finiva a 300 pixel dal nome. -#}
+          <thead><tr><th scope="col">Dimensione</th><th scope="col">Prima regione</th><th class="r" scope="col">Punteggio</th><th scope="col">Prima provincia</th><th class="r" scope="col">Punteggio</th></tr></thead>
           <tbody>
             {%- for c in d.champions %}
             <tr>
               <th scope="row">{% if c.href %}<a href="{{ c.href }}">{{ c.name }}</a>{% else %}{{ c.name }}{% endif %}</th>
               {%- for group, label in [(c.regions, 'Prima regione'), (c.provinces, 'Prima provincia')] %}
-              <td data-label="{{ label }}">{% if group %}<span class="qv-pair"><span>{% for t in group %}<a href="{{ t.href }}">{{ t.name }}</a>{% if t.where %} <span class="qv-where">{{ t.where }}</span>{% endif %}{% if not loop.last %} e {% endif %}{% endfor %}{% if group | length > 1 %}<span class="qv-where">a pari merito</span>{% endif %}</span>{{ group[0].score | num(None, 'score') }}</span>{% else %}<span class="status">Nessun dato provinciale</span>{% endif %}</td>
+              {%- if group %}
+              <td data-label="{{ label }}">{% for t in group %}<a href="{{ t.href }}">{{ t.name }}</a>{% if t.where %} <span class="qv-where">{{ t.where }}</span>{% endif %}{% if not loop.last %} e {% endif %}{% endfor %}{% if group | length > 1 %}<span class="qv-where">a pari merito</span>{% endif %}</td>
+              <td class="val" data-label="Punteggio">{{ group[0].score | num(None, 'score') }}</td>
+              {%- else %}
+              <td data-label="{{ label }}" colspan="2"><span class="status">Nessun dato provinciale</span></td>
+              {%- endif %}
               {%- endfor %}
             </tr>
             {%- endfor %}

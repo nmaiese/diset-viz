@@ -154,7 +154,12 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   `<main>`, perche' la striscia in testa e la serie di "Com'e' cambiato" sono
   fuori dal modulo. Da solo (`root=True`) il modulo e' il confine di se stesso.
 - **Mappa coropletica**: sei gradini da poco a molto contrasto seguendo la
-  grandezza, qualunque sia il verso, legenda con tutti e sei. Dato mancante
+  grandezza, qualunque sia il verso, legenda con tutti e sei. I gradini sono
+  uguali fra minimo e massimo, tranne quando uno solo prenderebbe almeno meta'
+  dei territori (un valore fuori scala): allora sono sei gruppi di pari
+  numerosita', per posizione, e la legenda lo dice a parole con la mediana al
+  centro. Una regola sola, `indicator_notes.choropleth_scale`, con la copia
+  `choroScale` di `v1.js` tenuta uguale da `test_choropleth_parity`. Dato mancante
   tratteggiato, "n.d.". Selezione con contorno in inchiostro, mai in accento.
   Regioni o province (`ui.map(..., level=)`): sulle province i confini
   regionali si ridisegnano sopra, piu' larghi nel colore del fondo. I contorni
@@ -171,6 +176,20 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   il mouse nell'accento, perche' e' un link. Ogni tracciato porta al profilo
   senza JavaScript, fuori dall'ordine di tabulazione e nascosto ai lettori di
   schermo: la tastiera ha il campo o l'indice accanto.
+  Con `steps` (`{chiave: gradino}`) diventa anche una **mappa di un dato**
+  (`navmap--data`): la rampa, la sua `ui.legend` accanto e una riga che dice
+  che cosa colora. Resta un link al profilo, e sotto il mouse il territorio
+  prende il contorno d'inchiostro, non l'accento, che coprirebbe il suo colore.
+  Un territorio senza dato resta disegnato in grigio e senza link. La usano la
+  testata della home e il margine di ricerca (qualita' della vita delle
+  regioni, `home.hero_map`), l'indice delle province e la mappa accanto
+  all'analisi della scheda.
+- **La regione ingrandita** (`ui.regionmap`, dati da `common.region_map`): il
+  riquadro di una regione (`maps.zoom`) con le sue province nei colori della
+  qualita' della vita, sui gradini di tutte le 107, cosi' un colore vale lo
+  stesso in ogni regione, le province vicine in grigio e i confini regionali
+  sopra. Sta nella testata di regione e provincia al posto del localizzatore,
+  che resta solo dove la regione non ha province misurate.
 - **Distintivo**: un quadrato di 44 pixel con un'icona, su un lavaggio
   dell'interfaccia (ambra, verde, blu, rosso, o la superficie). Riconosce
   un'area o un impegno a colpo d'occhio. Non e' un colore dei dati e non da'
@@ -208,6 +227,30 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
 - **Ricerca**: una per pagina, suggerimenti raggruppati per tipo.
 - **Indice di pagina**: domande brevi ("Chi e' in testa", "Com'e' cambiato"),
   sticky nel margine da 1200.
+- **Definizione a portata di mano** (`ui.term`): una parola tecnica apre
+  accanto a se' la sua definizione breve (Popover API, ancorata con anchor
+  positioning dove c'e'). I testi stanno una volta sola in
+  `app/design/terms.py` e rimandano alla metodologia. Solo su tessere, righe
+  fonte, sottotitoli e meta, mai nella prosa degli articoli e mai dentro un
+  blocco `aria-hidden`.
+- **Intestazione che resta**: le tabelle lunghe ("Tutti gli indicatori" di
+  regione e provincia, `.stackwrap--wide`) tengono l'intestazione sotto la
+  testata da 960 pixel; nell'atlante resta in alto il nome del tema.
+- **La striscia che resta** (scheda indicatore): quando la striscia del
+  divario esce dallo schermo, la stessa in una riga (`charts.mini_strip`) si
+  ferma sotto la testata (sul telefono sotto la barra delle sezioni), col
+  territorio scelto e il suo valore, fino all'analisi. Un clic su un punto
+  sceglie. Fra le schede della stessa famiglia (le dimensioni di
+  `dimension_siblings` e gli altri livelli, in `data-family`) ogni punto
+  prende un nome di transizione per quel passaggio (`pageswap` in v1.js,
+  `pagereveal` in testa alla scheda) e scivola nella posizione nuova, e il
+  territorio scelto resta scelto.
+- **Torna su**: sulle pagine oltre cinque schermate, dopo le prime due
+  (`initTotop` in `v1.js`); `data-totop` sul `<main>` lo manda altrove
+  (l'atlante ai filtri).
+- **Avanzamento di lettura**: un filetto d'accento sotto la barra delle sezioni
+  del telefono, legato allo scroll con `animation-timeline`, assente dove il
+  browser non lo conosce.
 - **Figura dell'articolo**: titolo-tesi in HTML, grafico con testo a taglia
   reale, riga fonte, tabella dei valori.
 - **Azione**: un primario al massimo per schermata, secondario a contorno, link
@@ -215,6 +258,50 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
 - **Etichetta di stato**: testo piccolo con icona facoltativa, senza pillola
   colorata ("Serie ferma al 2015", "Citta' metropolitana", "n.d.").
 - **Slot pubblicitario**: vedi sotto.
+
+- **Le barre ferme: una misura sola.** La testata visibile (`--hdr-h`), la
+  barra delle sezioni sotto i 1200 pixel (`--toc-bar`) e la striscia che resta
+  (`--stripbar-h`) stanno sulla radice, e `--sticky-top` e' il bordo basso di
+  testata e barra: ogni elemento fermo in alto parte da li', e lo
+  `scroll-padding-top` delle ancore somma le tre (chrome.css). Nessun `top` si
+  scrive a mano. Sotto i 960 pixel, e su un telefono in orizzontale, **la
+  testata si ritira** scendendo e torna risalendo (v1.js, `html.is-hdr-off`),
+  mai nei primi 120 pixel, col menu aperto o col fuoco dentro. Sui telefoni
+  bassi (sotto i 500 pixel di altezza) la striscia che resta non scende e la
+  mappa ferma del modulo torna nel flusso. "Torna su" sotto i 960 e' solo la
+  freccia, e compare risalendo.
+- **Le mappe al tocco.** Il suggerimento segue solo il mouse (`pointermove`,
+  `pointerType === "mouse"`). Sulle mappe per scegliere il primo tocco
+  contorna il territorio e scrive sotto la mappa nome, cifra e "Apri il
+  profilo" (`.navmap__card`), il secondo apre. Sulla striscia vale il punto piu'
+  vicino entro 22 pixel. Le mappe coi dati hanno la costa (`--map-coast`, il
+  grigio di contesto a 3:1): il primo gradino della rampa sul fondo sta a
+  1,2:1 e senza si perdeva.
+- **L'Italia a tessere** (`app/design/tiles.py`, `.tilemap`, `.tmap-cell`):
+  le 20 regioni in una griglia di 5 colonne per 9 righe, una casella uguale per
+  regione, col colore del gradino della mappa e il testo che regge il
+  contrasto (`--on-seq-4`). Nella scheda regionale "Striscia | Italia": i
+  punti della striscia volano nelle loro caselle (v1.js, `initTilemap`, Web
+  Animations, niente con prefers-reduced-motion). Senza JavaScript resta la
+  striscia. Solo per le regioni.
+- **Il tuo territorio.** Dal profilo di una regione o di una provincia ("E' la
+  mia", `data-mine-set`) si sceglie il proprio, che resta nel browser
+  (`di:mio`): un segno nella testata da 600 pixel, e ogni scheda lo accende e
+  scrive dove sta sotto la figura d'apertura (`.mine-note`). Una scheda solo
+  regionale accende la regione della provincia scelta. Niente passa dal
+  server: la pagina per i motori e' la stessa per tutti.
+- **Regione per regione** (`charts.small_multiples`): nella scheda regionale,
+  sotto la serie, venti linee sulla stessa scala in ordine di classifica, con
+  la media semplice tratteggiata. Il territorio scelto prende la linea in
+  evidenza.
+- **La cifra d'apertura.** Nel titolo di regione e provincia (`[data-count] > h1`: l'attributo sta sulla testata, l'h1 resta quello del contratto pubblico)
+  la posizione e' piu' grande e all'arrivo conta fino al suo valore, su un
+  doppione `aria-hidden`: il numero nell'HTML e' gia' quello giusto.
+- **L'immagine da condividere** di ogni regione e provincia
+  (`scripts/og_territori.py`, PNG committati in `static/img/og/territori/`,
+  `app/design/og.py`): nome, posizione in qualita' della vita, la regione
+  ingrandita con le province. La pagina la passa a `blog_base.html` con
+  `og_image_path` e `og_image_alt`.
 
 ### I grafici
 
@@ -265,6 +352,24 @@ di una pagina.
 
 ## Pagine
 
+### Pagine indice e di servizio
+
+Una regola per tutte: **nessuna colonna resta vuota accanto a un elenco
+lungo**. Da 960 pixel il margine porta qualcosa che serve a quella pagina: la
+mappa coi dati per scegliere un territorio (indice delle province, ricerca), i
+dataset per tema accanto alla testata (catalogo), e una tabella che puo'
+distendersi lo fa (Dove eccelle mette le prime tre in fila).
+
+Dal 26 settembre 2026 escono dalla 1.0 anche regioni, province, temi, tema,
+divari regionali, ricerca, indice del blog, metodologia e catalogo dati, un
+modulo per pagina in `app/design/pages/` e il template di prima come ripiego.
+Tutte aprono con la risposta (una frase con cifre calcolate), hanno le sezioni
+col filetto d'inchiostro e diventano blocchi sul telefono. Le mappe per
+scegliere compaiono da 960 pixel, perche' sul telefono l'elenco accanto porta
+agli stessi posti. Con piu' di tre voci il controllo segmentato e' una griglia
+di celle uguali, e quando mappa e tabella non stanno affiancate la mappa viene
+prima, col suo titolo.
+
 ### Scheda indicatore
 
 1. Briciole, voce attiva Temi.
@@ -275,7 +380,11 @@ di una pagina.
 4. Indice di pagina nel margine.
 5. Confronta i territori: modulo dato, largo.
 6. Com'e' cambiato: serie storica con tabella, largo.
-7. L'analisi: la prosa scritta con le sue figure, larghezza testo.
+7. L'analisi: la prosa scritta con le sue figure, larghezza testo. Da 960
+   pixel accanto alla prosa la mappa dell'ultimo anno resta ferma mentre si
+   legge (`analysis__map`), sugli stessi gradini del modulo: la prosa nomina i
+   territori, la mappa dice dove stanno. La scheda mette lo sprite del livello
+   una volta, e le due mappe lo richiamano con `<use>`.
 8. Come leggere il dato: nota metodo, largo.
 9. Fonti, dati e citazione: cita e riusa.
 10. Continua da qui, pieno.
@@ -372,7 +481,7 @@ province. Solo le schede con la `/province` che passa la regola, e dalla
 
 ### Regione
 
-Testata-risposta con il localizzatore nel margine, numeri chiave, i temi dal
+Testata-risposta con la regione ingrandita nel margine (`ui.regionmap`), numeri chiave, i temi dal
 migliore al peggiore, dove stacca e dove resta indietro con i valori veri, che
 cosa e' cambiato, le province della regione, tutti gli indicatori per
 macro-area, regioni simili, fonti e citazione.
@@ -383,7 +492,8 @@ H1 che e' gia' la risposta ("Lecce e' 79ª su 107 province"), numeri chiave che
 non ripetono l'H1, le dimensioni con la linea della media 50, una sola sintesi
 forte e debole, che cosa e' cambiato, tutti gli indicatori in colonne pulite
 (valore con unita' e anno, variazione, posizione in Italia, posizione nella
-regione), le vicine e le sorelle, fonti.
+regione), le vicine e le sorelle, fonti. Nella testata la sua regione
+ingrandita, con la provincia contornata.
 
 ### Articolo
 
@@ -452,6 +562,12 @@ WCAG 2.2 AA come minimo: testo a 4,5:1, controlli e grafici a 3:1, un solo
 `<main id="contenuto">` per pagina, focus visibile e uguale dappertutto, mappe
 mai con figli focalizzabili dentro `role="img"`, una tabella accanto a ogni
 mappa e grafico, bersagli di 44px su telefono, niente scorrimento orizzontale a
-320px, `prefers-reduced-motion` rispettato. Il tema scuro ridefinisce ogni
+320px, `prefers-reduced-motion` rispettato. Al tocco un blocco solo in
+components.css porta i controlli a 44 pixel; un link dentro una frase segue
+l'interlinea del testo (e' l'eccezione della WCAG 2.5.8). L'audit del telefono
+(`node scripts/audit_viewport.cjs`, e `tests/integration/test_viewport_mobile.py`
+dove c'e' Playwright per Node) guarda a 390x844, 320x640 e 844x390: niente
+scorrimento di lato, barre ferme sotto il 25% dello schermo in verticale e il
+35% in orizzontale, controlli da 44, ancore sotto le barre, nessun errore. Il tema scuro ridefinisce ogni
 colore per tenere lo stesso contrasto del chiaro, e la rampa va da poco a molto
 contrasto col fondo.

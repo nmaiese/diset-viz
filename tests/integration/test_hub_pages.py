@@ -127,10 +127,75 @@ class DivariRegionaliPageTest(unittest.TestCase):
     def test_shows_the_three_partitions_with_the_interactive_map(self):
         for area in ("Nord", "Centro", "Mezzogiorno"):
             self.assertIn(f'id="divari-{area.lower()}"', self.html)
-        # Stesso componente mappa della home: selettore, colori per regione, readout.
-        self.assertIn('id="home-map-data"', self.html)
+        # La mappa della 1.0 (`ui.map`) con la legenda a soglie e la classifica
+        # accanto, e il selettore dell'indicatore come GET che funziona senza
+        # JavaScript. Il pannello di prima (home-map.js, "passa il mouse") non
+        # torna: su un telefono non diceva niente.
+        self.assertIn('data-v1="divari-regionali"', self.html)
         self.assertIn('action="/divari-regionali"', self.html)
-        self.assertIn("home-map.js", self.html)
+        self.assertIn("data-map", self.html)
+        self.assertIn('<div class="legend__scale" aria-hidden="true">', self.html)
+        self.assertEqual(self.html.count('class="q'), 20 + 6, "venti regioni sulla rampa, sei gradini in legenda")
+        self.assertNotIn("home-map.js", self.html)
+        self.assertNotIn("Passa il mouse", self.html)
+
+    def test_map_names_its_extremes_and_ranks_the_twenty_regions(self):
+        """La mappa nomina i due estremi e la classifica accanto ha le venti
+        regioni con il link al profilo, piu' la riga della media semplice."""
+        from app.atlas_catalog import get_atlas_indicator
+        from app.design import numfmt
+        from app import divari
+
+        meta = get_atlas_indicator(divari.MAP_DIVARI[0])["metadata"]
+        self.assertIn(meta["name"], self.html)
+        self.assertEqual(self.html.count('class="callout"'), 2)
+        rows = re.search(r"<tbody data-rank-body>(.*?)</tbody>", self.html, re.S).group(1)
+        self.assertEqual(len(re.findall(r'href="/regione/[^"]+"', rows)), 20)
+        self.assertIn('class="ref"', rows)
+        self.assertIn("Media semplice delle 20 regioni", rows)
+        # Le cifre passano dai filtri: il PIL senza decimali, mai "44.413,0".
+        pil = next(d for d in divari.build_divari_view()["core"] if d["id"] == divari.MAP_DIVARI[0])
+        self.assertIn(numfmt.text(pil["areas"]["Nord"]["mean"], 0), self.html)
+
+    def test_numbers_share_the_decimals_of_their_group(self):
+        """Il Gini esce 0,29 / 0,30 / 0,32 con divario 0,02: i decimali della
+        colonna, anche per il divario, come le correzioni del template di prima."""
+        from app import divari
+        from app.design import numfmt
+
+        gini = next(d for d in divari.build_divari_view()["others"] if d["id"] == "930")
+        row = re.search(r'<tr>\s*<th scope="row"><a href="%s">.*?</tr>' % re.escape(gini["path"]), self.html, re.S).group(0)
+        dec = numfmt.column_decimals([gini["areas"][a]["mean"] for a in ("Nord", "Centro", "Mezzogiorno")])
+        self.assertEqual(dec, 2)
+        for area in ("Nord", "Centro", "Mezzogiorno"):
+            self.assertIn(numfmt.text(gini["areas"][area]["mean"], dec), row)
+        self.assertIn(f'data-label="Divario"><data class="n n--cell" value="{float(gini["gap"]):.6g}">{numfmt.text(gini["gap"], dec)}<', row)
+
+    def test_v1_layout_rules(self):
+        """Le regole della 1.0 che, rotte, non fanno fallire niente: la tabella
+        degli altri divari diventa blocchi sul telefono, nessun bordo colorato
+        giudica una scheda, un solo bottone primario, sezioni col filetto."""
+        self.assertRegex(self.html, r'class="tablewrap stackwrap"[^>]*>\s*<table class="table table--stack dr-others">')
+        self.assertNotIn("is-better", self.html)
+        self.assertNotIn("is-worse", self.html)
+        self.assertEqual(self.html.count("btn--primary"), 1)
+        self.assertRegex(self.html, r'<a class="btn btn--primary" href="/confronto">')
+        self.assertEqual(len(re.findall(r'<section class="section[^"]*"[^>]*>\s*<h2', self.html)),
+                         len(re.findall(r"<h2\b", self.html[self.html.index("<main"):self.html.index("</main>")])))
+        self.assertEqual(len(re.findall(r"<h1\b", self.html)), 1)
+        css = (Path(app.root_path) / "static" / "css" / "ds" / "pages" / "divari-regionali.css").read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"#[0-9a-fA-F]{3,8}\b|rgba?\(", css), "colore cotto nel foglio della pagina")
+        self.assertNotIn("uppercase", css)
+
+    def test_every_map_choice_renders_the_v1_page(self):
+        """Ogni indicatore del selettore rende la pagina della 1.0, non il ripiego."""
+        from app import divari
+
+        for indicator_id in divari.MAP_DIVARI:
+            with self.subTest(indicator=indicator_id):
+                page = self.client.get(f"/divari-regionali?indicator={indicator_id}").get_data(as_text=True)
+                self.assertIn('data-v1="divari-regionali"', page)
+                self.assertRegex(page, r'aria-label="Mappa cliccabile delle regioni italiane per [^"]+, \d{4}"')
 
     def test_numbers_come_from_the_data(self):
         from app import divari
@@ -238,8 +303,9 @@ class SearchPageTest(unittest.TestCase):
     def test_results_are_html_from_both_catalog_and_blog(self):
         client = app.test_client()
         html = client.get("/ricerca?q=neet").data.decode("utf-8")
-        self.assertIn("Indicatore", html)
-        self.assertIn("Articolo", html)
+        # I risultati stanno in gruppi per tipo (la pagina della 1.0).
+        self.assertIn('data-kind="indicatore"', html)
+        self.assertIn('data-kind="articolo"', html)
         indicator_links = set(re.findall(r'href="(/indicatore/[^"]+)"', html))
         blog_links = set(re.findall(r'href="(/blog/[^"]+)"', html))
         self.assertTrue(indicator_links)
@@ -247,10 +313,10 @@ class SearchPageTest(unittest.TestCase):
         for path in list(indicator_links) + list(blog_links):
             self.assertEqual(client.get(path).status_code, 200, path)
 
-    def test_pagination_caps_at_fifty_results(self):
+    def test_pagination_caps_at_twenty_results(self):
         client = app.test_client()
         first = client.get("/ricerca?q=tasso").data.decode("utf-8")
-        self.assertLessEqual(first.count('class="search-result"'), 50)
+        self.assertLessEqual(first.count('class="search-result"'), 20)
         self.assertIn("pagina=2", first)
         second = client.get("/ricerca?q=tasso&pagina=2").data.decode("utf-8")
         self.assertIn("Pagina 2 di", second)
@@ -382,13 +448,14 @@ class MapAccessibilityTest(unittest.TestCase):
     def test_the_compare_map_takes_a_label_and_keeps_the_legend_hidden(self):
         """La mappa React del confronto e dell'atlante se n'e' andata con il
         bundle: la mappa del confronto e' la macro `ui.map` della 1.0, con
-        un'etichetta che nomina il dato e l'anno e la legenda fuori dalla
-        lettura assistita, perche' gli stessi valori stanno nella tabella."""
+        un'etichetta che nomina il dato e l'anno, e le cifre della legenda fuori
+        dalla lettura assistita, perche' gli stessi valori stanno nella tabella
+        (la frase della legenda invece si legge)."""
         html = app.test_client().get("/confronto").data.decode("utf-8")
         label = re.search(r'<svg viewBox="0 0 560 660" role="img" aria-label="([^"]+)"', html)
         self.assertIsNotNone(label)
         self.assertRegex(unescape(label.group(1)), r"^Mappa delle regioni italiane per .+, \d{4}, con le regioni a confronto in evidenza$")
-        self.assertIn('<div class="legend" aria-hidden="true">', html)
+        self.assertIn('<div class="legend__scale" aria-hidden="true">', html)
 
 
 class PathScopedViewTest(unittest.TestCase):
@@ -513,11 +580,17 @@ class LaPaginaTemaRisponde(unittest.TestCase):
             self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
 
     def test_la_mappa_e_colorata_dalla_rampa_del_design_system(self):
-        """Un colore cotto qui non seguirebbe il tema scuro."""
-        fills = re.findall(r'\.theme-map \[data-key="[^"]+"\]\{fill:([^}]+)\}', self.html)
-        self.assertEqual(len(fills), 20, fills)
-        for fill in fills:
-            self.assertRegex(fill.strip(), r"^var\(--seq-[1-6]\)$")
+        """Un colore cotto qui non seguirebbe il tema scuro: le venti regioni
+        si dipingono per classe (`q1`..`q6`), che components.css lega a
+        `var(--seq-N)`, e la legenda dice le soglie in numeri."""
+        mappa = re.search(r'<div class="map[^"]*" data-map>.*?</svg>', self.html, re.S)
+        self.assertIsNotNone(mappa, "la pagina tema non disegna la mappa")
+        classi = re.findall(r'<path d="[^"]+" data-key="[^"]+"[^>]*class="(q[1-6])', mappa.group(0))
+        self.assertEqual(len(classi), 20, classi)
+        self.assertNotRegex(mappa.group(0), r'fill="#|fill:\s*#', "colore cotto nella mappa")
+        soglie = re.search(r'<div class="legend__scale"[^>]*>(.*?)</div>', self.html, re.S)
+        self.assertIsNotNone(soglie, "la legenda non dice le soglie")
+        self.assertRegex(soglie.group(1), r"\d")
 
     def test_la_pagina_dichiara_il_metodo_invece_di_nasconderlo(self):
         testo = visible_text(self.html)
@@ -537,8 +610,8 @@ class LaPaginaTemaRisponde(unittest.TestCase):
 
     def test_c_e_un_uscita_in_fondo(self):
         """Era l'unica pagina del sito senza blocco finale."""
-        self.assertIn('class="theme-next"', self.html)
-        self.assertIn("indicator-cta", self.html)
+        self.assertIn('id="continua"', self.html)
+        self.assertIn("nell'atlante, da filtrare per fonte e anni", self.html)
 
     def test_il_titolo_e_la_descrizione_stanno_nel_budget(self):
         from app import atlas_catalog
@@ -562,7 +635,8 @@ class LaPaginaTemaRisponde(unittest.TestCase):
         for voce in senza:
             html = self.client.get(voce["path"]).get_data(as_text=True)
             with self.subTest(tema=voce["theme"]):
-                self.assertNotIn('class="theme-standings"', html)
+                self.assertNotIn("tema-standings", html)
+                self.assertNotIn("data-map>", html)
                 self.assertNotIn("ItemList", html)
                 self.assertIn("non esce una classifica regionale", visible_text(html))
 
@@ -608,13 +682,13 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
     def test_titolo_testo_aree_e_catalogo_dicono_lo_stesso_numero(self):
         titolo = unescape(re.search(r"<title>(.*?)</title>", self.html, re.DOTALL).group(1)).strip()
         nel_titolo = int(re.search(r"(\d+) indicatori per regione", titolo).group(1))
-        aree = [int(n) for n in re.findall(r'theme-group__count">(\d+) indicator', self.html)]
+        aree = [int(n) for n in re.findall(r'temi-area__count">(\d+) indicator', self.html)]
         self.assertEqual(len(aree), len(self.catalog["macro_areas"]))
         self.assertEqual(nel_titolo, sum(aree))
         self.assertEqual(nel_titolo, len(self.catalog["indicators"]))
         testo = visible_text(self.html)
         self.assertIn(f"{nel_titolo} indicatori per regione", testo)
-        self.assertIn(f"<small>Indicatori per regione</small><strong>{nel_titolo}</strong>", self.html)
+        self.assertIn(f'<data class="n n--count" value="{nel_titolo}">', self.html)
         descrizione = meta_content(self.html, "description")
         self.assertIn(f"{nel_titolo} indicatori per regione", descrizione)
         self.assertLessEqual(len(titolo), 60, titolo)
@@ -622,10 +696,12 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
         self.assertGreaterEqual(len(descrizione), 80, descrizione)
 
     def test_ogni_area_e_la_somma_dei_suoi_temi(self):
-        for blocco in re.findall(r'<section class="theme-group".*?</section>', self.html, re.DOTALL):
-            area = int(re.search(r'theme-group__count">(\d+) indicator', blocco).group(1))
-            temi = [int(n) for n in re.findall(r"<small>(\d+) indicator[ei]</small>", blocco)]
-            with self.subTest(area=re.search(r"<h2>(.*?)</h2>", blocco).group(1)):
+        blocchi = re.findall(r'<section class="section temi-area".*?</section>', self.html, re.DOTALL)
+        self.assertTrue(blocchi)
+        for blocco in blocchi:
+            area = int(re.search(r'temi-area__count">(\d+) indicator', blocco).group(1))
+            temi = [int(n) for n in re.findall(r'temi-card__n">(\d+) indicator[ei]<', blocco)]
+            with self.subTest(area=re.search(r'<h2 id="[^"]+">.*?<span>(.*?)</span></h2>', blocco).group(1)):
                 self.assertTrue(temi)
                 self.assertEqual(area, sum(temi))
 
@@ -652,17 +728,24 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
             famiglie.setdefault(item["theme"], set()).add(item["catalog_family"])
         self.assertIn("eurostat", famiglie["Ricerca, innovazione e digitale"])
         sulle_card = {t_path: int(n) for t_path, n in re.findall(
-            r'<a class="theme-index-card" href="([^"]+)".*?<small>(\d+) indicator', self.html, re.DOTALL)}
+            r'<h3 class="temi-card__title"><a href="([^"]+)">.*?temi-card__n">(\d+) indicator', self.html, re.DOTALL)}
+        self.assertEqual(len(sulle_card), len(atlas_catalog.all_atlas_themes_index()))
         per_provincia = solo_provincia = 0
         for voce in atlas_catalog.all_atlas_themes_index():
             html = self.client.get(voce["path"]).get_data(as_text=True)
             markdown = self.client.get(voce["path"], headers={"Accept": "text/markdown"}).get_data(as_text=True)
-            elencati = (_section(html, '<section class="theme-featured">').count('<a class="ind-card"')
-                        + _section(html, '<section class="theme-all" id="tutti">').count("<li>"))
-            provinciali = _section(html, '<section class="theme-all" id="province">').count("<li>")
+            # "Tutti gli indicatori del tema" elenca ogni serie, anche quelle da
+            # cui partire, che stanno tutte anche li'.
+            tutti = _section(html, '<section class="section" id="tutti"')
+            elencati = tutti.count("<tr data-tema-row")
+            partire = re.findall(r'<h3 class="card__title tema-featured__title"><a href="([^"]+)"',
+                                 _section(html, '<section class="section" id="da-cui-partire"'))
+            for percorso in partire:
+                self.assertIn(f'<a href="{percorso}">', tutti)
+            per_provincia_html = _section(html, '<section class="section" id="province"')
+            provinciali = per_provincia_html.count("<li data-tema-province>")
             per_provincia += provinciali
-            solo_provincia += _section(html, '<section class="theme-all" id="province">').count(
-                "solo per provincia")
+            solo_provincia += per_provincia_html.count("solo per provincia")
             titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.DOTALL).group(1))
             collezione = next(nodo for nodo in (json.loads(blocco) for blocco in re.findall(
                 r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL))
@@ -677,9 +760,9 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
                     self.assertIn(f"indicatori {istituzioni} per le regioni italiane", descrizione)
                 self.assertEqual(elencati, voce["indicator_count"])
                 self.assertEqual(sulle_card[voce["path"]], elencati)
-                self.assertIn(f"<small>Indicatori</small><strong>{elencati}</strong>", html)
+                self.assertRegex(html, rf'<dt>Indicatori</dt>\s*<dd><span class="figure-num"><data class="n n--count" value="{elencati}">')
                 self.assertIn(f"Gli stessi {elencati} indicatori nell'atlante", html)
-                self.assertIn(f"<p>{elencati} indicatori su ", html)
+                self.assertIn(f"Le {elencati} serie del tema", html)
                 dichiarato = re.search(r": (\d+) indicatori", titolo)
                 if dichiarato:
                     self.assertEqual(int(dichiarato.group(1)), elencati)
@@ -1261,7 +1344,8 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
 
         for voce in atlas_catalog.all_atlas_themes_index():
             html = self.client.get(voce["path"]).get_data(as_text=True)
-            dichiarati = int(re.search(r"<small>Indicatori</small><strong>(\d+)</strong>", html).group(1))
+            dichiarati = int(re.search(r'<dt>Indicatori</dt>\s*<dd><span class="figure-num">'
+                                       r'<data class="n n--count" value="(\d+)">', html).group(1))
             rimandi = self._rimandi(html)
             with self.subTest(tema=voce["theme"]):
                 self.assertEqual(len(rimandi), 2, rimandi)

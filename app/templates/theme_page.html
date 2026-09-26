@@ -78,7 +78,7 @@
       <div class="region-facts">
         <div><small>Indicatori</small><strong>{{ p.indicator_count }}</strong></div>
         <div><small>Completi</small><strong>{{ p.complete_count }}</strong></div>
-        <div><small>Nel punteggio</small><strong>{{ p.quality_life_count }}</strong></div>
+        <div><small>Nella qualità della vita</small><strong>{{ p.quality_life_count }}</strong></div>
         <div><small>Ultimo anno</small><strong>{{ (p.indicators | map(attribute='year_max') | max) if p.indicators else 'n.d.' }}</strong></div>
       </div>
     </div>

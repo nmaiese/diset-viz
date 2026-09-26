@@ -26,16 +26,21 @@
 .art-brief__list li::before { content: ""; position: absolute; left: 0; top: calc(var(--space-3) + 0.6em); width: 8px; height: 8px; background: var(--ink); }
 
 /* ---------- impaginazione: sotto i 1200 l'indice e' la barra delle sezioni ---------- */
-/* La barra resta sotto la testata solo se il suo contenitore e' alto quanto
-   l'articolo: qui il margine diventa un blocco, e a restare fermo e' lui. */
+/* Sotto i 1200 il margine smette di essere una scatola (`.layout__aside`,
+   components.css) e la barra delle sezioni resta ferma per tutto l'articolo. */
 .art-layout { margin-top: var(--space-12); }
+/* Da 1200 il margine sta accanto alla colonna del testo, non in fondo al
+   contenitore: con `1fr` la colonna era larga 1100 pixel per un testo di 38rem
+   e fra la prosa e l'indice restavano 500 pixel vuoti. La colonna e' la
+   larghezza della figura piu' larga (42,5rem) con un po' d'aria, come testo e
+   margine della griglia (colonne 1-7 e 9-12). */
+@media (min-width: 1200px) {
+  .art-layout { grid-template-columns: minmax(0, 46rem) 15rem; justify-content: start; }
+}
 @media (max-width: 1199px) {
   .art-layout { display: block; }
-  .art-aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--masthead-s)); z-index: 20; }
   .art-aside + .layout__main { margin-top: var(--space-8); }
-  .art-body h2[id], .art-data { scroll-margin-top: calc(var(--masthead-l) + var(--space-16)); }
 }
-@media (min-width: 960px) and (max-width: 1199px) { .art-aside { top: var(--masthead-l); } }
 
 /* ---------- corpo: testo a misura, figure alla loro larghezza vera ---------- */
 .art-body.prose { max-width: none; }
@@ -45,6 +50,14 @@
 .art-body > .tablewrap, .art-body > .stackwrap { margin-block: var(--space-8); }
 .art-body .table thead th { white-space: normal; }
 .art-body .pull p { margin: 0; }
+/* Gli H2 del corpo sono battute del racconto, non sezioni della pagina: come
+   nella prosa della scheda stanno a una taglia intermedia, e qui portano un
+   filetto sottile che le separa. Il filetto d'inchiostro da 3 pixel resta
+   alle sezioni della pagina ("Dati e metodo", "Continua a esplorare"). */
+.art-body > h2 {
+  font-size: clamp(22px, 20.5px + 0.35vw, 25px); line-height: 1.25; letter-spacing: var(--tr-section);
+  margin-top: var(--space-12); padding-top: var(--space-4); border-top: 1px solid var(--rule-strong);
+}
 
 /* ---------- il testo delle figure a 13 pixel veri, i colori per classe ---------- */
 .art-fig .fig text { font-size: 13px; stroke: none; }

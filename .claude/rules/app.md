@@ -7,7 +7,9 @@ paths:
 
 - `/` — la home, **server-rendered** (`app/templates/v1/home.html` con un
   partial per fascia in `app/templates/v1/home/`, e `home.html` come ripiego):
-  la testata con la ricerca e, da 960 px, la mappa per andare a una regione;
+  la testata con la ricerca e la mappa per andare a una regione, nei colori
+  della qualita' della vita (`home.hero_map`, profilo predefinito, con la sua
+  legenda; senza classifica torna la mappa grigia);
   le porte del sito; un indicatore in evidenza **diverso a ogni visita**
   (`app/home_pick.py`, per regione o per provincia), con tutti e due i livelli
   nello stesso pannello quando tutti e due stanno nel pool; regioni e province
@@ -105,7 +107,11 @@ paths:
     `server`, e l'isola emette gli stessi eventi GTM che emetteva la SPA
     (`docs/tracking_spec.md`). Il token dei preferiti lo prende da
     `window.diAuth.token()` (`frontend/src/site/auth.js`).
-- `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema. La
+- `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema, dal 26
+  settembre 2026 **pagine della 1.0** (`design.render("temi"|"tema", ...)`,
+  `app/design/pages/temi.py` e `tema.py`, ripiego `themes_index.html` e
+  `theme_page.html`). Gli esempi di ogni tema, nell'indice come nella pagina,
+  vengono da `_theme_featured`, mai dai primi in ordine alfabetico. La
   pagina tema legge il catalogo dell'atlante, che e' regionale, e in fondo ha
   la sezione "Per provincia" con le schede del tema che hanno i valori delle
   province, aperte sulle province (`indicator_view.province_indicators_by_theme`,
@@ -115,9 +121,21 @@ paths:
   avere la `/province` fuori dall'indice, e si guarda la regola del livello
   (`level_passes_rule`), non l'interruttore `seo_policy.LEVEL_PAGES_INDEXABLE`.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
+  L'indice e' una pagina della 1.0 dal 26 settembre 2026 (`design/pages/regioni.py`,
+  ripiego `regions_index.html`): le regioni per ripartizione, i fatti di ogni
+  scheda dalle stesse funzioni della pagina regione, la mappa per scegliere
+  solo da 960 pixel.
   La tabella "Tutti gli indicatori" ha la colonna Andamento, la serie della
   regione da `_region_series()`: una voce per processo (`synchronized_cache`,
   circa 55 ms alla prima pagina e 1,3 MB), mai una lettura per riga.
+  **Regione e provincia hanno la loro immagine da condividere**: l'`og:image` e'
+  `static/img/og/territori/<livello>-<key>.png` (`design.og.og_image`), 127 PNG
+  committati, generati da `scripts/og_territori.py` e non al render. Un
+  territorio senza file torna all'immagine del sito, e
+  `tests/unit/test_og_territori.py` vuole un file per ognuno: dopo una nuova
+  classifica della qualita' della vita si rigenerano. "E' la mia" e il segno
+  nella testata vivono solo nel browser (`localStorage`, `di:mio`): la pagina
+  che il server rende e' la stessa per tutti, e cosi' deve restare.
 - `/provincia/<key>` — il profilo di una delle 107 province misurate dal BES:
   posizione, punteggio, le dodici dimensioni, **i valori veri di tutti i 67
   indicatori** con unita', anno e posizione fra le province, dove e' prima e
@@ -141,8 +159,11 @@ paths:
   provincia passa dalla sua regione (Italia, regione, provincia), ogni pagina
   regione elenca le sue province, e `/provincia` e `/provincia/` fanno 301 qui.
   I raggruppamenti li fa `province_profile.by_region`, che solleva un errore se
-  una provincia cade in una regione senza pagina.
-- `/catalogo-dati` — l'elenco piatto di ogni indicatore indicizzabile.
+  una provincia cade in una regione senza pagina. Pagina della 1.0 dal 26
+  settembre 2026 (`design/pages/province.py`, ripiego `provinces_index.html`).
+- `/catalogo-dati` — ogni indicatore indicizzabile, raggruppato per tema con un
+  filtro (pagina della 1.0 dal 26 settembre 2026, `design/pages/catalogo_dati.py`,
+  ripiego `data_catalog.html`). Il JSON-LD `DataCatalog` non cambia con la regia.
 - `/chi-siamo`, `/contatti`, `/termini`, `/privacy` — le quattro pagine di
   fiducia. Stanno nel contratto di `PUBLIC_DISCOVERABILITY_EXPECTATIONS`, dove
   fino al 22 settembre 2026 non c'erano: l'audit contro produzione non si
@@ -151,7 +172,8 @@ paths:
   all'identita' che dichiarano, e il `mailto:` va in chiaro: un indirizzo che
   solo JavaScript sa comporre non e' un contatto.
 - `/blog`, `/blog/<slug>` — blog server-rendered (Jinja) dai Markdown in
-  `content/posts/`.
+  `content/posts/`. L'indice e' una pagina della 1.0 dal 26 settembre 2026
+  (`design/pages/blog.py`, ripiego `blog_list.html`).
 - `/blog/feed.xml` — il feed RSS 2.0 del blog, con `/feed.xml` e `/rss.xml` che
   ci arrivano con un 301. Le date vanno in RFC 822, non nell'ISO della sitemap.
 - `/qualita-della-vita`, `/qualita-della-vita/classifica/<regioni|province>` —
@@ -181,9 +203,12 @@ paths:
 - `/divari-regionali` — l'hub editoriale sul divario, da `app/divari.py`. Non
   è una seconda tassonomia: argomenta una tesi e la misura, quindi **ogni
   numero e ogni quota nella sua prosa è ricalcolata dal catalogo al render**.
-  Mai una cifra hardcoded in quel template. Riusa la mappa della homepage via
-  `_map_panel.html` (`_map_hero` in `app/views.py`); le medie delle partizioni
-  sono medie semplici dei valori regionali, limite che la pagina dichiara.
+  Mai una cifra hardcoded in quel template. Dal 26 settembre 2026 e' una
+  pagina della 1.0 (`design/pages/divari_regionali.py`, ripiego
+  `divari_regionali.html`): la mappa e' `ui.map` con la sua legenda, sui dati
+  di `_map_hero`, e l'indicatore si sceglie con un form GET. Le medie delle
+  partizioni sono medie semplici dei valori regionali, limite che la pagina
+  dichiara.
 - `/confronto`: dal 25 settembre 2026 una **pagina della 1.0 resa dal
   server** (`design.render("confronto", "v1/confronto.html", None)`, composta
   da `app/design/pages/confronto.py`), non piu' la SPA. Un indicatore, fino a
@@ -250,7 +275,10 @@ paths:
     (`docs/tracking_spec.md`).
   - testata, briciole e piede li rende Flask da `blog_base.html`, come su ogni
     pagina: non c'e' piu' una testata dentro una SPA.
-- `/ricerca?q=` — ricerca interna, server-rendered, **`noindex, follow` di
+- `/ricerca?q=` — ricerca interna, server-rendered, pagina della 1.0 dal 26
+  settembre 2026 (`design/pages/ricerca.py`): risultati per tipo con
+  `?tipo=`, 20 per pagina, pertinenza in `_search_rank` (territorio, tema,
+  titolo, poi descrizione, piu' una tabella breve di sinonimi). **`noindex, follow` di
   proposito** (uno spazio `?q=` illimitato sarebbe pagine sottili duplicate).
   L'header sta nella view perché `add_security_headers` timbra `index, follow`
   su ciò che non dichiara altro. Fuori dalla sitemap e deliberatamente NON nel

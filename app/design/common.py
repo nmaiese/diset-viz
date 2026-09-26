@@ -195,10 +195,27 @@ def map_classes(level: dict) -> dict[str, str]:
 
 
 def legend(values: list[float], unit: str | None) -> dict:
-    """Soglie dei sei gradini a intervalli uguali, come ds_choropleth_colors."""
-    lo, hi = min(values), max(values)
-    mid = lo + (hi - lo) / 2
-    return {"min": num(lo), "mid": num(mid), "max": num(hi), "unit": unit}
+    """La legenda dei sei gradini, con i gradini di `ds_choropleth_colors`.
+
+    Coi gradini uguali al centro c'e' il punto di mezzo fra minimo e massimo,
+    coi quantili la mediana: `mode` dice a `ui.legend` quale frase scrivere.
+    """
+    from app.indicator_notes import choropleth_scale
+
+    scale = choropleth_scale(values)
+    lo, hi = scale["lo"], scale["hi"]
+    mid = scale["median"] if scale["mode"] == "quantile" else lo + (hi - lo) / 2
+    return {"min": num(lo), "mid": num(mid), "max": num(hi), "unit": unit, "mode": scale["mode"]}
+
+
+def map_steps(values: dict[str, float]) -> dict[str, int]:
+    """{chiave: gradino 1..6} coi gradini di `ds_choropleth_colors`."""
+    from app.indicator_notes import choropleth_scale, choropleth_step
+
+    if not values:
+        return {}
+    scale = choropleth_scale(list(values.values()))
+    return {k: choropleth_step(v, scale) for k, v in values.items()}
 
 
 def ranking(level: dict, unit: str | None) -> list[dict]:
@@ -342,3 +359,35 @@ def _series_svg(level: dict, width: int, height: int, right: int, short: bool) -
     return {"svg": "".join(parts), "single_year": False, "first": years[0], "last": years[-1]}
 
 
+
+
+def region_map(region_key: str) -> dict | None:
+    """La mappa della regione: le sue province nei colori della qualita' della
+    vita, sui gradini di tutte le 107 (un colore vale lo stesso in ogni
+    regione), ingrandita sul suo riquadro con le vicine in grigio.
+
+    None se la regione non ha province misurate (la pagina tiene il
+    localizzatore). Il nome sotto il mouse porta la posizione.
+    """
+    from app import province_profile
+    from app.design import maps
+
+    grouped = province_profile.by_region()
+    everyone = {p["key"]: p["score"] for rows in grouped.values() for p in rows if p.get("score") is not None}
+    own = [p for p in grouped.get(region_key, []) if p.get("score") is not None]
+    if not own or len(everyone) < 2:
+        return None
+    steps = map_steps(everyone)
+    view = maps.zoom(region_key)
+    total = len(everyone)
+    shapes = []
+    for key, d in view["provinces"].items():
+        mine = next((p for p in own if p["key"] == key), None)
+        shapes.append({"key": key, "d": d, "own": bool(mine),
+                       "href": mine["path"] if mine else None,
+                       "name": f"{mine['name']}, {mine['rank']}ª su {total}" if mine else None,
+                       "step": steps.get(key) if mine else None})
+    return {"viewbox": view["viewbox"], "shapes": shapes, "borders": list(view["borders"].values()),
+            "legend": legend(list(everyone.values()), None), "total": total,
+            "best": min(own, key=lambda p: p["rank"]), "worst": max(own, key=lambda p: p["rank"]),
+            "n": len(own)}

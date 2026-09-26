@@ -74,10 +74,12 @@
         <rect width="4" height="4" style="fill: var(--data-null)"/><line x1="0" y1="0" x2="0" y2="4" style="stroke: var(--data-null-stripe); stroke-width: 1"/>
       </pattern>
     </defs>
+    <g class="map__land">
     {%- for key, d in shapes.items() %}
     {%- set attrs %} data-key="{{ key }}" data-name="{{ names.get(key, key) }}"{% if values %} data-value="{{ values.get(key, '') }}"{% endif %} class="{{ classes.get(key, '') }}{{ ' is-on' if key == selected }}"{% if key not in classes or 'is-nd' in classes[key].split() %} style="fill: url(#{{ 'nd-' ~ keyname }})"{% endif %}{% endset %}
     {% if use %}<use href="#{{ prefix ~ key }}"{{ attrs }}/>{% else %}<path d="{{ d }}"{{ attrs }}/>{% endif %}
     {%- endfor %}
+    </g>
     {%- if level != 'regione' %}
     <g class="map__borders">{% for key, d in v1_paths.items() %}{% if use %}<use href="#mr-{{ key }}"/>{% else %}<path d="{{ d }}"/>{% endif %}{% endfor %}</g>
     {%- endif %}
@@ -94,13 +96,35 @@
     JavaScript il clic porta alla scheda; fuori dall'ordine di tabulazione
     (127 fermate) e nascosto ai lettori di schermo, che hanno l'elenco e il
     campo accanto. I tracciati vengono dallo sprite (`v1_map_sprite()`). -#}
-{% macro navmap(level, names, selected=None, base='/regione/') -%}
+{#- `steps` ({chiave: gradino 1..6}) la fa diventare anche una mappa di un
+    dato, nella rampa dei dati e con la sua `legend` accanto: il clic porta
+    ancora al profilo, e sotto il mouse il territorio prende il contorno
+    d'inchiostro invece dell'accento, che coprirebbe il suo colore. Un
+    territorio che non sta in `names` (senza dato) resta disegnato, in grigio
+    e senza link. -#}
+{% macro navmap(level, names, selected=None, base='/regione/', steps=None) -%}
 {%- set shapes = v1_paths if level == 'regione' else v1_province_paths -%}
 {%- set prefix = 'mr-' if level == 'regione' else 'mp-' -%}
-<div class="navmap navmap--{{ level }}" data-navmap>
+<div class="navmap navmap--{{ level }}{{ ' navmap--data' if steps }}" data-navmap>
   <svg viewBox="0 0 560 660" aria-hidden="true" focusable="false">
-    {%- for key in shapes %}{% if key in names %}<a href="{{ base ~ key }}" tabindex="-1" data-key="{{ key }}" data-name="{{ names[key] }}"{% if key == selected %} class="is-on"{% endif %}><use href="#{{ prefix ~ key }}"/></a>{% endif %}{% endfor %}
+    <g class="map__land">{%- for key in shapes %}{% if key in names %}<a href="{{ base ~ key }}" tabindex="-1" data-key="{{ key }}" data-name="{{ names[key] }}"{% if key == selected %} class="is-on"{% endif %}><use href="#{{ prefix ~ key }}"{% if steps and steps.get(key) %} class="q{{ steps[key] }}"{% endif %}/></a>{% elif steps %}<use href="#{{ prefix ~ key }}" class="navmap__ctx"/>{% endif %}{% endfor %}</g>
     {%- if level != 'regione' %}<g class="navmap__borders">{% for key in v1_paths %}<use href="#mr-{{ key }}"/>{% endfor %}</g>{% endif %}
+  </svg>
+  <div class="map__tip" data-navmap-tip hidden></div>
+</div>
+{%- endmacro %}
+
+{#- La mappa di una regione (`common.region_map`): ingrandita sul suo
+    riquadro, le sue province nei colori della qualita' della vita (gradini
+    delle 107, uguali in ogni regione), le vicine in grigio per il contesto e
+    i confini regionali sopra. Ogni provincia della regione e' un link al
+    profilo, fuori dalla tabulazione come in `navmap`: la pagina ha l'elenco.
+    `selected` contorna la provincia della pagina. -#}
+{% macro regionmap(m, selected=None) -%}
+<div class="navmap navmap--data navmap--zoom" data-navmap>
+  <svg viewBox="{{ m.viewbox }}" aria-hidden="true" focusable="false">
+    <g class="map__land">{%- for s in m.shapes %}{% if s.own %}<a href="{{ s.href }}" tabindex="-1" data-key="{{ s.key }}" data-name="{{ s.name }}"{% if s.key == selected %} class="is-on"{% endif %}><path d="{{ s.d }}"{% if s.step %} class="q{{ s.step }}"{% endif %}/></a>{% else %}<path class="navmap__ctx" d="{{ s.d }}"/>{% endif %}{% endfor %}</g>
+    <g class="navmap__borders">{% for d in m.borders %}<path d="{{ d }}"/>{% endfor %}</g>
   </svg>
   <div class="map__tip" data-navmap-tip hidden></div>
 </div>
@@ -111,12 +135,29 @@
 {#- `nd_hidden`: la voce n.d. c'e' ma nascosta, per chi la riaccende da JS
     quando cambia l'anno o l'indicatore (il confronto). -#}
 {% macro legend(lg, caption, nd=True, nd_hidden=False) -%}
-<div class="legend" aria-hidden="true">
-  <div class="legend__ramp">{% for i in range(1, 7) %}<i class="q{{ i }}" style="background: var(--seq-{{ i }})"></i>{% endfor %}</div>
-  <div class="legend__scale"><span data-legend="min">{{ lg.min }}</span><span data-legend="mid">{{ lg.mid }}</span><span data-legend="max">{{ lg.max }}</span></div>
-  <span class="legend__caption">{{ caption }}</span>
+{#- La rampa e le tre cifre sono per l'occhio; la frase (che cosa vuol dire
+    piu' intenso, come sono fatti i gradini, che cos'e' n.d.) arriva anche ai
+    lettori di schermo, che le cifre le hanno nella tabella accanto. -#}
+<div class="legend">
+  <div class="legend__ramp" aria-hidden="true">{% for i in range(1, 7) %}<i class="q{{ i }}" style="background: var(--seq-{{ i }})"></i>{% endfor %}</div>
+  <div class="legend__scale" aria-hidden="true"><span data-legend="min">{{ lg.min }}</span><span data-legend="mid">{{ lg.mid }}</span><span data-legend="max">{{ lg.max }}</span></div>
+  {#- La frase sui gradini la scrive la legenda, perche' dipende dai dati
+      (`choropleth_scale`): uguali di norma, quantili con un valore fuori
+      scala. v1.js la riscrive quando cambia l'anno. -#}
+  <span class="legend__caption">{{ caption }} <span data-legend="mode">{{ legend_mode_text(lg.mode) }}</span></span>
   {% if nd %}<span class="legend__nd"{% if nd_hidden %} hidden{% endif %}><i></i> n.d., dato non disponibile</span>{% endif %}
 </div>
+{%- endmacro %}
+
+{#- Una parola con la sua definizione a portata di mano: un bottone che apre un
+    popover accanto (Popover API, ancorato con anchor positioning dove c'e',
+    al centro dove non c'e'). I testi stanno in `app/design/terms.py`, una
+    volta sola. Mai dentro un blocco `aria-hidden`, e mai nella prosa degli
+    articoli: serve alle parole tecniche di tessere, righe fonte e sottotitoli. -#}
+{% macro term(key, label=None) -%}
+{%- set t = v1_term(key) -%}
+{%- if t -%}<button type="button" class="term" popovertarget="{{ t.id }}" style="anchor-name: --{{ t.id }}">{{ label or t.label }}</button><span class="term__pop" id="{{ t.id }}" popover style="position-anchor: --{{ t.id }}">{{ t.text }} <a href="{{ t.href }}">Come si calcola</a></span>
+{%- else %}{{ label }}{% endif -%}
 {%- endmacro %}
 
 {% macro arealegend(items) -%}
@@ -160,7 +201,10 @@
 
     Il JSON sta in fondo alla figura: una `figcaption` deve essere il primo o
     l'ultimo figlio. -#}
-{% macro explore(m, root=True) -%}
+{#- `use=True` quando la pagina ha lo sprite del livello (`v1_map_sprite`):
+    la scheda lo mette una volta per questa mappa e per quella accanto
+    all'analisi. -#}
+{% macro explore(m, root=True, use=False) -%}
 <figure class="module" data-explore{% if root %} data-page-root{% endif %}>
   <figcaption class="module__head">
     {% if m.claim %}<h3 class="h-sub" data-claim>{{ m.claim }}</h3>{% endif %}
@@ -203,8 +247,8 @@
   <div class="module__body">
     {% if m.show_map %}
     <div class="module__map">
-      {{ map(m.map_classes, 'esplora', m.map_names, m.map_values, overlay=m.callouts, label='Mappa cliccabile delle ' ~ m.plural ~ ' italiane per ' ~ m.name, level=m.level) }}
-      {{ legend(m.legend, 'Più intenso, valore più alto. I gradini dividono in sei parti uguali la distanza fra minimo e massimo.', m.legend_nd) }}
+      {{ map(m.map_classes, 'esplora', m.map_names, m.map_values, overlay=m.callouts, label='Mappa cliccabile delle ' ~ m.plural ~ ' italiane per ' ~ m.name, level=m.level, use=use) }}
+      {{ legend(m.legend, 'Più intenso, valore più alto.', m.legend_nd) }}
       {% if m.level == 'provincia' %}<p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>{% endif %}
     </div>
     {% endif %}

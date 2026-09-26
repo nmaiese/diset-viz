@@ -9,7 +9,10 @@ passa al template, e non ne cambia niente.
 
 from __future__ import annotations
 
+import re
+
 from app.design import charts, maps, numfmt
+from app.design import tiles as tile_grid
 from app.design.common import (
     MEZZOGIORNO,
     PATHS,
@@ -172,6 +175,21 @@ def within_regions(meta: dict, level: dict, unit: str | None) -> dict | None:
     }
 
 
+def family_paths(ctx: dict) -> list[str]:
+    """Le pagine della stessa famiglia: questa, le sue dimensioni (genere, eta')
+    e gli altri livelli. Fra queste la striscia del divario si ricompone invece
+    di ricomparire (v1.js, pageswap e pagereveal), e il territorio scelto resta
+    scelto."""
+    from urllib.parse import urlsplit
+
+    paths = [urlsplit(ctx.get("canonical") or "").path]
+    for item in (ctx.get("dimension_siblings") or []) + (ctx.get("other_views") or []):
+        path = urlsplit(item.get("path") or "").path
+        if path.startswith("/indicatore/") and path not in paths:
+            paths.append(path)
+    return [p for p in paths if p]
+
+
 def ranking_claim(level: dict) -> str | None:
     """Il titolo-affermazione della classifica: un fatto verificato sul
     Mezzogiorno, o quante stanno sopra e quante sotto la media semplice."""
@@ -289,6 +307,28 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "source_url": meta.get("source_url"), "source_label": meta.get("source_label"),
         "csv": downloads.get("csv") if level["key"] == "regione" else None,
         "js": explore_js,
+        "mini": _mini_map(level["key"], classes, map_names,
+                          {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []}) if show_map else None,
+    }
+
+
+def _mini_map(level_key: str, classes: dict, names: dict, values: dict) -> dict:
+    """La mappa piccola accanto all'analisi: gli stessi gradini della mappa
+    del modulo, per l'ultimo anno, con il valore nel nome sotto il mouse e il
+    clic che porta al profilo del territorio."""
+    steps = {}
+    for key, cls in classes.items():
+        m = re.search(r"\bq([1-6])\b", cls or "")
+        if m:
+            steps[key] = int(m.group(1))
+    return {
+        "level": level_key,
+        "steps": steps,
+        # Solo i territori col dato portano un link: gli altri la mappa li
+        # disegna in grigio (un link a una provincia non misurata sarebbe uno
+        # zero che il dato non dice).
+        "names": {k: f"{n}, {values[k]}" for k, n in names.items() if values.get(k)},
+        "base": "/regione/" if level_key == "regione" else "/provincia/",
     }
 
 
@@ -426,6 +466,17 @@ def derive(ctx: dict) -> dict:
         "unit": numfmt.lower_first(unit) if unit else unit, "tiles": tiles, "verso": verso,
         "unit_note": unit_note(unit, meta["name"]), "values_note": values_note(unit),
         "series": series, "strip": strip, "module": module, "within": within_regions(meta, level, unit),
+        "strip_mini": charts.mini_strip(rows, stats.get("year_avg")) if strip.get("svg") else "",
+        "family": family_paths(ctx),
+        # La striscia che diventa Italia: le 20 regioni a tessere, sugli stessi
+        # gradini della mappa del modulo (tiles.py). Solo per le regioni.
+        "tilemap": tile_grid.layout(module["map_classes"], module["map_names"], module["map_values"],
+                                    {o["key"]: num(o["value"]) for o in level.get("observations") or []})
+        if level["key"] == "regione" and module.get("show_map") and strip.get("svg") else None,
+        # Regione per regione: le venti linee sulla stessa scala (charts.small_multiples).
+        "multiples": [{**sm, "last_text": num(sm["last"][1])}
+                      for sm in charts.small_multiples(level, module["lower_better"])]
+        if level["key"] == "regione" else [],
         "series_claim": series_claim, "series_note": series_note,
         "updated": date_it(ctx.get("dataset_updated")),
         "subtitle": f"{meta['name']}, {('in ' + unit) if unit else ''}, {year}. {n} {plural} dal valore più alto al più basso.".replace(", ,", ","),

@@ -35,6 +35,45 @@
     var zero = Number(s.replace(/\./g, "").replace(",", ".")) === 0;
     return (v < 0 && !zero ? "-" : "") + s;
   }
+  /* ---------- i gradini della mappa, stessa regola di choropleth_scale ----------
+     Sei gradini uguali fra minimo e massimo; sei gruppi di pari numerosita'
+     (quantili) quando un gradino solo prenderebbe almeno meta' dei territori.
+     La regola vive in app/indicator_notes.py, e tests/unit/test_choropleth_parity.py
+     esegue queste righe con node e le confronta con la copia Python. */
+  /* choro:start */
+  var QUANTILE_SHARE = 0.5, QUANTILE_MIN_N = 6;
+  var LEGEND_MODE = {
+    equal: "Sei gradini uguali fra minimo e massimo.",
+    quantile: "Sei gruppi con lo stesso numero di territori, perché un valore fuori scala metterebbe quasi tutti gli altri nello stesso colore. Al centro la mediana."
+  };
+  function choroScale(values) {
+    var v = values.slice().sort(function (a, b) { return a - b; });
+    var n = v.length;
+    if (!n) return null;
+    var lo = v[0], hi = v[n - 1], span = (hi - lo) || 1;
+    var counts = [0, 0, 0, 0, 0, 0];
+    v.forEach(function (x) { counts[Math.min(5, Math.floor((x - lo) / span * 6))] += 1; });
+    var mid = Math.floor(n / 2), median = n % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+    if (n >= QUANTILE_MIN_N && hi > lo && Math.max.apply(null, counts) >= QUANTILE_SHARE * n) {
+      return { mode: "quantile", lo: lo, hi: hi, median: median, sorted: v };
+    }
+    return { mode: "equal", lo: lo, hi: hi, median: median, sorted: v };
+  }
+  function choroStep(x, sc) {
+    if (sc.mode === "equal") return Math.min(6, Math.floor((x - sc.lo) / ((sc.hi - sc.lo) || 1) * 6) + 1);
+    var i = 0;
+    while (i < sc.sorted.length && sc.sorted[i] < x) i++;
+    return Math.min(6, Math.floor(i * 6 / sc.sorted.length) + 1);
+  }
+  /* choro:end */
+  // La legenda di una mappa ricolorata: soglie e frase sui gradini.
+  function choroLegend(box, sc) {
+    var lg = { min: sc.lo, mid: sc.mode === "quantile" ? sc.median : sc.lo + (sc.hi - sc.lo) / 2, max: sc.hi };
+    box.querySelectorAll("[data-legend]").forEach(function (el) {
+      var key = el.dataset.legend;
+      el.textContent = key === "mode" ? LEGEND_MODE[sc.mode] : fmt(lg[key]);
+    });
+  }
   function withUnit(v, unit) {
     if (v === null || v === undefined) return "n.d.";
     if (unit === "%") return fmt(v) + "%";
@@ -79,13 +118,26 @@
     catch (e) { done(false); }
   });
 
+  /* ---------- il suggerimento delle mappe: solo col mouse ----------
+     Al tocco un suggerimento che segue il dito non si legge (il dito lo
+     copre), e su iOS un contenuto nuovo mostrato al mousemove di
+     compatibilita' si mangiava il click: per questo `pointermove` e solo
+     `pointerType === "mouse"`. Resta dentro la mappa e va a capo. */
+  function placeTip(box, tip, ev) {
+    var r = box.getBoundingClientRect();
+    var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
+    if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
+    tip.style.left = Math.max(0, Math.min(x, r.width - tip.offsetWidth)) + "px";
+    tip.style.top = y + "px";
+  }
+
   /* ---------- mappa: il valore al passaggio del mouse ---------- */
   function initMap(box) {
     var tip = box.querySelector("[data-map-tip]");
-    box.addEventListener("mousemove", function (ev) {
+    box.addEventListener("pointermove", function (ev) {
+      if (ev.pointerType !== "mouse") return;
       var p = ev.target.closest(".map [data-key]");
       if (!p) { tip.hidden = true; return; }
-      var r = box.getBoundingClientRect();
       tip.innerHTML = "";
       var name = document.createElement("span");
       name.textContent = p.dataset.name + " ";
@@ -93,12 +145,20 @@
       val.textContent = p.dataset.value || "n.d.";
       tip.append(name, val);
       tip.hidden = false;
-      var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
-      if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
-      tip.style.left = x + "px";
-      tip.style.top = y + "px";
+      placeTip(box, tip, ev);
     });
-    box.addEventListener("mouseleave", function () { tip.hidden = true; });
+    box.addEventListener("pointerleave", function () { tip.hidden = true; });
+  }
+
+  function nearestDot(svg, ev, radius) {
+    var best = null, bestD = radius * radius;
+    svg.querySelectorAll(".strip__dot").forEach(function (d) {
+      var r = d.getBoundingClientRect();
+      var dx = r.left + r.width / 2 - ev.clientX, dy = r.top + r.height / 2 - ev.clientY;
+      var dd = dx * dx + dy * dy;
+      if (dd <= bestD) { bestD = dd; best = d; }
+    });
+    return best;
   }
 
   /* ---------- il modulo dato della scheda ----------
@@ -179,7 +239,8 @@
       var list = rows(year);
       if (!list.length) return;
       var vals = list.map(function (r) { return r.value; });
-      var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+      var sc = choroScale(vals);
+      var lo = sc.lo, hi = sc.hi;
       var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
       var max = Math.max(hi, 0) || 1;
       var byKey = {};
@@ -193,7 +254,7 @@
         var r = byKey[p.dataset.key];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6");
         if (r) {
-          p.classList.add("q" + Math.min(6, Math.floor((r.value - lo) / span * 6) + 1));
+          p.classList.add("q" + choroStep(r.value, sc));
           p.style.fill = "";
           p.dataset.value = withUnit(r.value, data.unit);
         } else {
@@ -201,8 +262,7 @@
           p.dataset.value = "n.d.";
         }
       });
-      var lg = { min: lo, mid: lo + span / 2, max: hi };
-      mod.querySelectorAll("[data-legend]").forEach(function (el) { el.textContent = fmt(lg[el.dataset.legend]); });
+      choroLegend(mod, sc);
 
       var sel = select ? select.value : "";
       // Piegata come sul server (indicatore.fold): le prime e le ultime
@@ -292,6 +352,18 @@
         }
       });
       page.querySelectorAll(".strip__dot").forEach(function (c) { c.classList.toggle("is-on", c.dataset.key === key); });
+      page.querySelectorAll(".tmap-cell[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
+      page.querySelectorAll(".sm__item[data-key]").forEach(function (t) { t.classList.toggle("is-on", t.dataset.key === key); });
+      // La barra della striscia che resta dice chi e' scelto, col valore
+      // dell'anno della striscia (l'ultimo); e la scelta si ricorda fra le
+      // schede della stessa famiglia (initFamily).
+      var lastYear = data.years[data.years.length - 1];
+      page.querySelectorAll("[data-stripbar-sel]").forEach(function (el) {
+        var hit = key ? rows(lastYear).filter(function (x) { return x.key === key; })[0] : null;
+        if (hit) el.innerHTML = "<b>" + esc(hit.name) + "</b> " + esc(withUnit(hit.value, data.unit));
+        else el.textContent = key && data.names[key] ? data.names[key] + ": n.d." : el.dataset.empty;
+      });
+      try { if (key) sessionStorage.setItem("di:territorio", key); else sessionStorage.removeItem("di:territorio"); } catch (e) { /* senza storage non si ricorda */ }
       // "Pavia: 82,6 anni nel 2024, 86ª su 107 province dal valore più alto":
       // la posizione col suo denominatore (chi ha il dato quell'anno) e il
       // criterio, lo stesso ordine della classifica.
@@ -371,6 +443,34 @@
     exploreOf.set(mod, { choose: choose });
     // Il campo ripristinato dal browser dopo un Indietro riaccende la sua evidenza.
     if (select && select.value) highlight(select.value);
+    // Arrivati da una scheda della stessa famiglia, il territorio scelto la'
+    // resta scelto qui (se qui c'e').
+    else if (select && fromFamily()) {
+      var kept = null;
+      try { kept = sessionStorage.getItem("di:territorio"); } catch (e) { kept = null; }
+      if (kept && data.names[kept]) { select.value = kept; highlight(kept); }
+    }
+    // Il tuo territorio, quando non c'e' gia' un'altra scelta: acceso in
+    // striscia, mappa e classifica, e una riga sotto la figura d'apertura.
+    else if (select && page.querySelector("[data-mine-note]")) {
+      var mine = readMine();
+      var mk = mine && (data.names[mine.key] ? mine.key : (mine.region && data.names[mine.region] ? mine.region : null));
+      var note = page.querySelector("[data-mine-note]");
+      if (mk) {
+        select.value = mk;
+        highlight(mk);
+        if (note) {
+          var yr = data.years[data.years.length - 1], list = rows(yr), at = -1;
+          list.forEach(function (x, i) { if (x.key === mk) at = i; });
+          var who = mk === mine.key ? "La tua " + (mine.level === "provincia" ? "provincia" : "regione") + ", " + mine.name
+                                    : data.names[mk] + ", la regione di " + mine.name;
+          note.textContent = at >= 0
+            ? who + ": " + withUnit(list[at].value, data.unit) + " nel " + yr + ", " + (at + 1) + "ª su " + list.length + " " + data.plural + (lowerBetter ? " dal valore più basso." : " dal valore più alto.")
+            : who + ": dato non disponibile nel " + yr + ".";
+          note.hidden = false;
+        }
+      }
+    }
     // Arrivati da /provincia/<key> con #p-<key>: la riga diventa la scelta, e
     // se il browser non ha aperto il details da se' lo apre reveal.
     var target = hashId();
@@ -385,7 +485,8 @@
     liveExplore.set(page, { select: select, highlight: highlight });
     each(page, ".strip", function (svg) {
       svg.addEventListener("click", function (ev) {
-        var c = ev.target.closest(".strip__dot");
+        // Un punto e' piccolo: al tocco vale il piu' vicino entro 22 pixel.
+        var c = ev.target.closest(".strip__dot") || nearestDot(svg, ev, 22);
         var cur = liveExplore.get(page);
         if (!c || !cur || !cur.select) return;
         cur.select.value = cur.select.value === c.dataset.key ? "" : c.dataset.key;
@@ -402,22 +503,46 @@
     });
   }
 
-  /* ---------- mappe per scegliere un territorio: il nome al passaggio del mouse ---------- */
+  /* ---------- mappe per scegliere un territorio ----------
+     Col mouse il nome al passaggio e il clic apre il profilo. Al tocco il
+     primo tocco mostra: contorna il territorio e scrive sotto la mappa il suo
+     nome (con la posizione o il valore che la mappa porta in `data-name`) e
+     il link al profilo, da 44 pixel. Il secondo tocco sullo stesso territorio,
+     o il link, lo apre. Senza JavaScript ogni tracciato resta un link. Le
+     mappe dentro un `[data-picker]` (la fascia dei territori della home)
+     scelgono gia' da sole, e qui non si toccano. */
   function initNavmap(box) {
     var tip = box.querySelector("[data-navmap-tip]");
     if (!tip) return;
-    box.addEventListener("mousemove", function (ev) {
+    box.addEventListener("pointermove", function (ev) {
+      if (ev.pointerType !== "mouse") return;
       var a = ev.target.closest("a[data-key]");
       if (!a) { tip.hidden = true; return; }
-      var r = box.getBoundingClientRect();
       tip.textContent = a.dataset.name;
       tip.hidden = false;
-      var x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
-      if (x + tip.offsetWidth > r.width) x = ev.clientX - r.left - tip.offsetWidth - 10;
-      tip.style.left = x + "px";
-      tip.style.top = y + "px";
+      placeTip(box, tip, ev);
     });
-    box.addEventListener("mouseleave", function () { tip.hidden = true; });
+    box.addEventListener("pointerleave", function () { tip.hidden = true; });
+    if (box.closest("[data-picker]")) return;
+    var touch = false, card = null, picked = null;
+    box.addEventListener("pointerdown", function (ev) { touch = ev.pointerType !== "mouse"; });
+    box.addEventListener("click", function (ev) {
+      var a = ev.target.closest("a[data-key]");
+      if (!a || !touch || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+      if (picked === a) return; // secondo tocco: il link apre il profilo
+      ev.preventDefault();
+      if (picked) picked.classList.remove("is-on");
+      picked = a;
+      a.classList.add("is-on");
+      if (!card) {
+        card = document.createElement("p");
+        card.className = "navmap__card";
+        card.setAttribute("role", "status");
+        box.appendChild(card);
+      }
+      card.innerHTML = '<span class="navmap__card-t">' + esc(a.dataset.name) + '</span> <a class="linkarrow" href="' + esc(a.getAttribute("href")) + '">Apri il profilo</a>';
+      card.hidden = false;
+    });
   }
 
   /* ---------- regioni e province della home: l'anteprima del territorio scelto ----------
@@ -515,8 +640,10 @@
   /* ---------- tabelle lunghe: chiuse sul telefono, sempre nel DOM ----------
      Solo al primo aggancio: un secondo init non richiude cio' che il lettore
      ha aperto. */
+  // Chiusi sul telefono, anche in orizzontale: a 844x390 l'atlante con tutti
+  // i temi aperti era lungo 63.000 pixel.
   function initCollapse(d) {
-    if (matchMedia("(max-width: 599px)").matches) d.open = false;
+    if (matchMedia("(max-width: 599px), (pointer: coarse) and (max-height: 500px)").matches) d.open = false;
   }
 
   /* ---------- indice di pagina: la voce della sezione che si sta leggendo ---------- */
@@ -540,6 +667,295 @@
     }
     addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     update();
+    /* Sotto i 1200 la lista scorre di lato: la sfumatura dice da che parte
+       ci sono altre voci. */
+    var list = toc.querySelector("ol");
+    if (list) {
+      var edges = function () {
+        var more = list.scrollWidth - list.clientWidth;
+        list.classList.toggle("is-more-l", more > 1 && list.scrollLeft > 1);
+        list.classList.toggle("is-more-r", more > 1 && list.scrollLeft < more - 1);
+      };
+      list.addEventListener("scroll", edges, { passive: true });
+      addEventListener("resize", edges);
+      edges();
+    }
+  }
+
+  /* ---------- la famiglia della scheda: le pagine fra cui la striscia si ricompone ---------- */
+  function familyPaths() {
+    var fig = document.querySelector(".lead-figure[data-family]");
+    if (!fig) return [];
+    try { return JSON.parse(fig.dataset.family); } catch (e) { return []; }
+  }
+  function inFamily(url) {
+    if (!url) return false;
+    try { return familyPaths().indexOf(new URL(url, location.href).pathname) >= 0; } catch (e) { return false; }
+  }
+  function fromFamily() {
+    var nav = window.navigation && navigation.activation && navigation.activation.from;
+    return inFamily(nav ? nav.url : document.referrer) && (nav ? nav.url : document.referrer) !== location.href;
+  }
+  // La pagina che si lascia: se si va a una sorella, ogni punto della striscia
+  // grande prende il suo nome di transizione e scivola nella posizione nuova.
+  // L'altra meta' (pagereveal) sta in testa alla scheda.
+  addEventListener("pageswap", function (e) {
+    if (!e.viewTransition || !e.activation || !e.activation.entry || !inFamily(e.activation.entry.url)) return;
+    document.querySelectorAll(".lead-figure .strip__dot").forEach(function (c) {
+      if (c.getClientRects().length) c.style.viewTransitionName = "dot-" + c.dataset.key;
+    });
+  });
+
+  /* ---------- la cifra d'apertura ----------
+     Nel titolo di una regione o di una provincia la posizione arriva
+     contando: dieci posti prima del suo, fino al suo, in mezzo secondo, una
+     volta sola. Il numero nell'HTML e' gia' quello giusto (senza JavaScript,
+     per i lettori di schermo e per Google): si anima un doppione in
+     aria-hidden sopra di lui, e con prefers-reduced-motion non si anima
+     niente. */
+  function initCount(h1) {
+    var data = h1.querySelector(".n--rank data");
+    if (!data || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var end = parseInt(data.getAttribute("value"), 10);
+    if (!(end > 0)) return;
+    var start = end + 10, t0 = null;
+    var shown = document.createElement("span");
+    shown.className = "count-up";
+    shown.setAttribute("aria-hidden", "true");
+    data.classList.add("is-counting");
+    data.parentNode.insertBefore(shown, data);
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / 500), ease = 1 - Math.pow(1 - k, 3);
+      shown.textContent = String(Math.round(start + (end - start) * ease));
+      if (k < 1) requestAnimationFrame(step);
+      else { shown.remove(); data.classList.remove("is-counting"); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- il tuo territorio ----------
+     Si sceglie una volta, dal profilo di una regione o di una provincia ("E'
+     la mia"), e resta nel browser (`di:mio`, JSON con livello, chiave, nome e,
+     per una provincia, la sua regione). Da li': un segno nella testata che
+     porta al profilo, e in ogni scheda il territorio acceso in striscia, mappa
+     e classifica, con una riga che dice dove sta. Una scheda solo regionale,
+     con una provincia scelta, accende la sua regione. Niente passa dal server:
+     la pagina per Google e' la stessa per tutti. */
+  function readMine() {
+    try { var v = JSON.parse(localStorage.getItem("di:mio") || "null"); return v && v.key && v.level ? v : null; }
+    catch (e) { return null; }
+  }
+  function writeMine(v) {
+    try { if (v) localStorage.setItem("di:mio", JSON.stringify(v)); else localStorage.removeItem("di:mio"); } catch (e) { /* senza storage non si ricorda */ }
+    document.dispatchEvent(new CustomEvent("di:mio"));
+  }
+  function initMine(btn) {
+    btn.hidden = false;
+    var me = { level: btn.dataset.level, key: btn.dataset.key, name: btn.dataset.name };
+    if (btn.dataset.region) { me.region = btn.dataset.region; me.regionName = btn.dataset.regionName; }
+    var word = me.level === "provincia" ? "provincia" : "regione";
+    function paint() {
+      var m = readMine(), on = !!m && m.level === me.level && m.key === me.key;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = on ? "La tua " + word + ": togli la scelta" : "È la mia " + word;
+    }
+    btn.addEventListener("click", function () {
+      var m = readMine();
+      writeMine(m && m.level === me.level && m.key === me.key ? null : me);
+    });
+    document.addEventListener("di:mio", paint);
+    paint();
+  }
+  function initMineChip() {
+    var right = document.querySelector(".sitechrome .hdr__right");
+    if (!right || document.querySelector(".mine-chip")) return;
+    var chip = document.createElement("a");
+    chip.className = "mine-chip";
+    right.insertBefore(chip, right.firstChild);
+    function paint() {
+      var m = readMine();
+      chip.hidden = !m;
+      if (!m) return;
+      chip.href = (m.level === "provincia" ? "/provincia/" : "/regione/") + m.key;
+      chip.textContent = "La tua: " + m.name;
+    }
+    document.addEventListener("di:mio", paint);
+    paint();
+  }
+
+  /* ---------- la striscia che diventa Italia ----------
+     Nella figura d'apertura di una scheda regionale il comando "Striscia |
+     Italia" ricompone gli stessi venti punti in una griglia a forma d'Italia
+     (app/design/tiles.py). Il passaggio e' un volo: si misurano i punti e le
+     caselle, e un segno per regione va dall'uno all'altra cambiando forma e
+     colore (la ripartizione diventa il valore). Senza JavaScript il comando
+     non c'e' e resta la striscia; con prefers-reduced-motion la vista cambia
+     e basta. La scelta della vista si ricorda (`di:vista`), e toccare una
+     casella sceglie il territorio come un punto della striscia. */
+  function initTilemap(box) {
+    var fig = box.closest(".lead-figure");
+    var toggle = fig && fig.querySelector("[data-view-toggle]");
+    var strip = fig && fig.querySelector(".chart--hero");
+    if (!toggle || !strip) return;
+    var page = fig.closest("[data-page-root]") || document;
+    box.hidden = false;
+    toggle.hidden = false;
+    var still = matchMedia("(prefers-reduced-motion: reduce)");
+    function tilesOf() { var m = {}; box.querySelectorAll(".tmap-cell[data-key]").forEach(function (t) { m[t.dataset.key] = t; }); return m; }
+    function dotsOf() { var m = {}; strip.querySelectorAll(".strip__dot[data-key]").forEach(function (d) { m[d.dataset.key] = d; }); return m; }
+    function apply(view) {
+      fig.classList.toggle("is-tiles", view === "tiles");
+      toggle.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.view === view ? "true" : "false"); });
+    }
+    function fly(view) {
+      var toTiles = view === "tiles";
+      var fromEls = toTiles ? dotsOf() : tilesOf();
+      var from = {};
+      Object.keys(fromEls).forEach(function (k) {
+        var el = fromEls[k], r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+        from[k] = { r: r, color: toTiles ? cs.fill : cs.backgroundColor };
+      });
+      apply(view);
+      var toEls = toTiles ? tilesOf() : dotsOf();
+      var layer = document.createElement("div");
+      layer.className = "morph-layer";
+      layer.setAttribute("aria-hidden", "true");
+      document.body.appendChild(layer);
+      var targets = Object.keys(toEls).filter(function (k) { return from[k]; });
+      targets.forEach(function (k) { toEls[k].style.visibility = "hidden"; });
+      var runs = targets.map(function (k, i) {
+        var el = toEls[k], b = el.getBoundingClientRect(), a = from[k].r, cs = getComputedStyle(el);
+        var endColor = toTiles ? cs.backgroundColor : cs.fill;
+        var endRadius = toTiles ? cs.borderRadius : "50%";
+        var startRadius = toTiles ? "50%" : getComputedStyle(fromEls[k]).borderRadius;
+        var mark = document.createElement("i");
+        mark.style.left = b.left + "px"; mark.style.top = b.top + "px";
+        mark.style.width = b.width + "px"; mark.style.height = b.height + "px";
+        layer.appendChild(mark);
+        var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
+        var sx = a.width / b.width, sy = a.height / b.height;
+        return mark.animate([
+          { transform: "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")", borderRadius: startRadius, backgroundColor: from[k].color },
+          { transform: "none", borderRadius: endRadius, backgroundColor: endColor }
+        ], { duration: 650, delay: i * 12, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)", fill: "both" }).finished;
+      });
+      Promise.all(runs).then(done, done);
+      function done() {
+        targets.forEach(function (k) { toEls[k].style.visibility = ""; });
+        layer.remove();
+      }
+    }
+    function show(view, animate) {
+      if (fig.classList.contains("is-tiles") === (view === "tiles")) return;
+      if (animate && !still.matches && Element.prototype.animate) fly(view); else apply(view);
+      try { localStorage.setItem("di:vista", view); } catch (e) { /* senza storage non si ricorda */ }
+    }
+    toggle.addEventListener("click", function (ev) {
+      var b = ev.target.closest("[data-view]");
+      if (b) show(b.dataset.view, true);
+    });
+    box.addEventListener("click", function (ev) {
+      var t = ev.target.closest(".tmap-cell[data-key]");
+      var cur = t && liveExplore.get(page);
+      if (!t || !cur || !cur.select) return;
+      cur.select.value = cur.select.value === t.dataset.key ? "" : t.dataset.key;
+      cur.highlight(cur.select.value);
+    });
+    var kept = null;
+    try { kept = localStorage.getItem("di:vista"); } catch (e) { kept = null; }
+    if (kept === "tiles") show("tiles", false);
+  }
+
+  /* ---------- la striscia che resta ----------
+     Scende sotto la testata quando la striscia grande esce dallo schermo verso
+     l'alto, e se ne va quando comincia l'analisi (o la nota sul metodo). Il
+     suo posto lo dice il CSS (`--sticky-top`, chrome.css): qui si decide solo
+     se c'e', e se c'e' la sua altezza va in `--stripbar-h`, che le ancore e la
+     mappa ferma del modulo contano. Sui telefoni bassi (in orizzontale) non
+     scende: con testata e barra delle sezioni lo schermo restava a meta'. */
+  function initStripbar(bar) {
+    var fig = document.querySelector(".lead-figure");
+    var stop = document.getElementById("analisi") || document.getElementById("come-leggere");
+    if (!fig) return;
+    var low = matchMedia("(max-height: 500px)");
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var top = parseFloat(getComputedStyle(bar).top) || 0;
+      var past = fig.getBoundingClientRect().bottom < top;
+      var before = !stop || stop.getBoundingClientRect().top > top + 80;
+      var on = past && before && !low.matches;
+      bar.classList.toggle("is-on", on);
+      document.documentElement.style.setProperty("--stripbar-h", on ? bar.offsetHeight + "px" : "0px");
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    addEventListener("resize", update);
+    update();
+  }
+
+  /* ---------- la testata che si ritira, sul telefono ----------
+     Scendendo la testata esce dallo schermo, risalendo torna: la barra delle
+     sezioni e la striscia salgono con lei, perche' leggono `--hdr-h`
+     (chrome.css). Mai nei primi 120 pixel, mai col menu aperto o col fuoco
+     dentro la testata, e solo sotto i 960 pixel o su un telefono in
+     orizzontale. Una volta per documento. */
+  var hdrOff = false;
+  function initHdr() {
+    var root = document.documentElement;
+    var hdr = document.querySelector(".sitechrome .hdr");
+    if (!hdr || root.hasAttribute("data-hdr-hide")) return;
+    root.setAttribute("data-hdr-hide", "");
+    var small = matchMedia("(max-width: 959px), (pointer: coarse) and (max-height: 500px)");
+    var drawer = document.getElementById("ds-drawer");
+    var last = scrollY, ticking = false;
+    function set(off) {
+      if (off === hdrOff) return;
+      hdrOff = off;
+      root.classList.toggle("is-hdr-off", off);
+      document.dispatchEvent(new CustomEvent("di:hdr", { detail: { off: off } }));
+    }
+    function update() {
+      ticking = false;
+      var y = scrollY;
+      var busy = (drawer && !drawer.hidden) || hdr.contains(document.activeElement);
+      if (!small.matches || y < 120 || busy) { set(false); last = y; return; }
+      if (Math.abs(y - last) < 8) return;
+      set(y > last);
+      last = y;
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    hdr.addEventListener("focusin", function () { set(false); });
+    small.addEventListener("change", update);
+  }
+
+  /* ---------- torna su: sulle pagine lunghe, dopo due schermate ----------
+     Una volta per documento. Porta a `data-totop` del <main> (l'atlante lo
+     manda ai filtri) o all'inizio del contenuto. Sotto i 960 pixel e' solo la
+     freccia, e compare quando si risale (quando torna la testata): mentre si
+     legge verso il basso copriva le cifre a destra delle classifiche. */
+  function initTotop() {
+    var main = document.getElementById("contenuto");
+    if (!main || document.querySelector(".totop")) return;
+    if (document.documentElement.scrollHeight < innerHeight * 5) return;
+    var target = main.getAttribute("data-totop") || "#contenuto";
+    var label = main.getAttribute("data-totop-label") || "Torna su";
+    var a = document.createElement("a");
+    a.className = "totop";
+    a.href = target;
+    a.setAttribute("aria-label", label);
+    a.innerHTML = '<span aria-hidden="true">\u2191</span><span class="totop__t">' + esc(label) + "</span>";
+    document.body.appendChild(a);
+    var small = matchMedia("(max-width: 959px)");
+    var last = scrollY, ticking = false, rising = false;
+    function update() {
+      ticking = false;
+      var y = scrollY;
+      if (Math.abs(y - last) >= 8) { rising = y < last; last = y; }
+      a.classList.toggle("is-on", y > innerHeight * 2 && (!small.matches || rising));
+    }
+    addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
   }
 
   /* ---------- gli agganci, nell'ordine di sempre ---------- */
@@ -554,6 +970,13 @@
     each(root, ".toc", initToc);
   }
 
-  window.DiV1 = { init: init };
+  window.DiV1 = { init: init, choroScale: choroScale, choroStep: choroStep, choroLegend: choroLegend };
   init(document);
+  initTotop();
+  initHdr();
+  each(document, "[data-stripbar]", initStripbar);
+  each(document, "[data-tilemap]", initTilemap);
+  each(document, "[data-mine-set]", initMine);
+  each(document, "[data-count] > h1", initCount);
+  initMineChip();
 })();

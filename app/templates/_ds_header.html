@@ -66,7 +66,7 @@
       {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
       {# Placeholder a dimensioni fisse per il controllo login: il bundle site.js
          lo riempie. Riservare lo spazio evita il layout shift su ogni pagina. #}
-      <div id="site-auth" class="site-auth" aria-label="Account"></div>
+      <div id="site-auth" class="site-auth" role="group" aria-label="Account"></div>
       {% endif %}
 
       <button type="button" class="iconbtn desktop-only" data-ds-theme-toggle
@@ -110,13 +110,13 @@
          terza sarebbe nata invisibile sul telefono. #}
       {% for tendina in nav.PRIMARY if tendina.group %}
       <div class="drawer__group">
-        <h4>{{ tendina.label }}</h4>
+        <h2>{{ tendina.label }}</h2>
         {% for sotto in tendina.group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
         {% endfor %}
       </div>
       {% endfor %}
       <div class="drawer__group">
-        <h4>Altro</h4>
+        <h2>Altro</h2>
         {% for voce in nav.drawer_other() %}<a href="{{ voce.path }}">{{ voce.label }}</a>
         {% endfor %}
       </div>

@@ -43,6 +43,10 @@
   --seq-4: #4383c8;
   --seq-5: #1c5fa1;
   --seq-6: #093e6f;
+  /* Il testo sopra il quarto gradino della rampa: inchiostro in chiaro
+     (4,6:1), fondo in scuro (5,5:1). Sotto e sopra e' sempre inchiostro o
+     fondo, uguale nei due temi (le tessere dell'Italia, indicatore.css). */
+  --on-seq-4: var(--ink);
   --seq-label-1: #121519;
   --seq-label-2: #121519;
   --seq-label-3: #121519;
@@ -64,6 +68,11 @@
   --data-null-stripe: #7a8086;
   --map-edge: #ffffff;
   --map-outline: #c9ced4;
+  /* La costa: il contorno di tutta la terra sulle mappe coi dati. Il primo
+     gradino della rampa sta a 1,2:1 sul fondo, e senza la costa le regioni
+     chiare si perdevano (WCAG 1.4.11). E' il grigio di contesto, gia'
+     verificato a 3:1 sui fondi in chiaro e in scuro (tokens.json, cmp). */
+  --map-coast: var(--cmp);
   --cat-1: #2d6fbe;
   --cat-2: #471b3a;
   --cat-3: #63591d;
@@ -144,9 +153,11 @@
   --measure: 38rem;
   --gutter-s: 16px;
   --gutter-l: 24px;
-  --margin-s: 16px;
-  --margin-m: 24px;
-  --margin-l: 32px;
+  /* I margini non scendono mai sotto la tacca del telefono in orizzontale
+     (viewport-fit=cover, blog_base.html). */
+  --margin-s: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --margin-m: max(24px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --margin-l: max(32px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   --masthead-s: 56px;
   --masthead-l: 64px;
   --radius-control: 4px;
@@ -431,6 +442,7 @@ body.ds {
   --seq-4: #5890cd;
   --seq-5: #8ab8ec;
   --seq-6: #c8e1fe;
+  --on-seq-4: var(--bg);
   --seq-label-1: #eceef1;
   --seq-label-2: #eceef1;
   --seq-label-3: #eceef1;

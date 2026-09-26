@@ -34,7 +34,8 @@ from collections import Counter
 
 from app import sources
 from app.data import REGION_GEO_AREA
-from app.design import charts, numfmt
+from app.design import charts, common, numfmt
+from app.indicator_notes import choropleth_scale
 from app.design.common import PATHS, count_word, of_place, ordinal, with_unit
 from app.seo_titles import of_region
 
@@ -462,21 +463,52 @@ def south_claim(ranking: list[dict], level: str, paths: dict) -> str | None:
     return text + f", {count_word(head)} fra le prime {count_word(EDGE)}"
 
 
+def fifty_claim(ranking: list[dict], level: str, paths: dict) -> str | None:
+    """Il titolo-affermazione della striscia della classifica: chi sta sopra 50,
+    la media semplice, per parte del paese. L'indice ha sulla sua striscia
+    `south_claim`: la classifica ne dice un'altra cosa vera, non la stessa.
+    Solo quando 50 e' davvero la media (`mean_is_fifty`), e verificato sulle
+    righe."""
+    if not mean_is_fifty(ranking):
+        return None
+    spec = LEVELS[level]
+    groups = south_split(ranking, level, paths)
+    if groups["unknown"]["n"] or not (groups["north"]["n"] and groups["south"]["n"]):
+        return None
+    north = sum(r["score"] > 50 for r in groups["north"]["rows"])
+    south = sum(r["score"] > 50 for r in groups["south"]["rows"])
+    n_north = groups["north"]["n"]
+    if not north and not south:
+        return None
+    if not south:
+        if north == n_north:
+            return (f"Tutte le {count_word(n_north)} {spec['plural']} del Centro-Nord stanno sopra la media di 50, "
+                    "nessuna del Mezzogiorno")
+        verb = "sta" if north == 1 else "stanno"
+        noun = spec["singular"] if north == 1 else spec["plural"]
+        return (f"{count_word(north).capitalize()} {noun} del Centro-Nord su {count_word(n_north)} "
+                f"{verb} sopra la media di 50, nessuna del Mezzogiorno")
+    above = north + south
+    verb = "sta" if above == 1 else "stanno"
+    noun = spec["singular"] if above == 1 else spec["plural"]
+    return (f"{count_word(above).capitalize()} {noun} su {len(ranking)} {verb} sopra 50: "
+            f"{count_word(north)} del Centro-Nord su {count_word(n_north)}, "
+            f"{count_word(south)} del Mezzogiorno su {count_word(groups['south']['n'])}")
+
+
 def map_block(ranking: list[dict]) -> dict | None:
     """Classi, nomi, valori e legenda della mappa regionale.
 
-    Il gradino viene dal colore che l'app ha gia' assegnato (`var(--seq-N)`,
-    sei parti uguali fra minimo e massimo), cosi' mappa e sito non divergono.
+    I gradini sono quelli di tutte le mappe (`choropleth_scale`): uguali di
+    norma, quantili quando un punteggio fuori scala schiaccerebbe gli altri.
     """
-    classes = {}
-    for row in ranking:
-        m = re.search(r"--seq-(\d)", row.get("color") or "")
-        if m:
-            classes[row["key"]] = f"q{m.group(1)}"
-    scores = [r["score"] for r in ranking if r.get("score") is not None]
-    if not classes or not scores:
+    scored = {r["key"]: r["score"] for r in ranking if r.get("score") is not None}
+    if not scored:
         return None
-    lo, hi = min(scores), max(scores)
+    classes = {k: f"q{step}" for k, step in common.map_steps(scored).items()}
+    scale = choropleth_scale(list(scored.values()))
+    lo, hi = scale["lo"], scale["hi"]
+    mid = scale["median"] if scale["mode"] == "quantile" else lo + (hi - lo) / 2
     first, last = ranking[0], ranking[-1]
     # I due estremi nominati sulla mappa, con il filo dal baricentro.
     callouts = charts.map_callouts(PATHS, [(r["key"], r["name"], f"{points(r['score'])} punti")
@@ -485,7 +517,7 @@ def map_block(ranking: list[dict]) -> dict | None:
         "classes": classes,
         "names": {r["key"]: r["name"] for r in ranking},
         "tips": {r["key"]: f"{points(r['score'])} punti" for r in ranking},
-        "legend": {"min": points(lo), "mid": points(lo + (hi - lo) / 2), "max": points(hi), "unit": None},
+        "legend": {"min": points(lo), "mid": points(mid), "max": points(hi), "unit": None, "mode": scale["mode"]},
         "callouts": callouts,
     }
 
@@ -654,7 +686,7 @@ def derive(ctx: dict) -> dict:
         "first": end(first, level), "last": end(last, level),
         "gap": (first["score"] - last["score"]) if first else None,
         "movers": move, "fifty": fifty, "tiles": tiles,
-        "claim": south_claim(ranking, level, paths),
+        "claim": fifty_claim(ranking, level, paths),
         "strip": score_strip(ranking), "area_label": charts.AREA_LABEL,
         "table_claim": dimensions_claim(ranking, level),
         "levels": levels, "profiles": profile_links, "profile": profile,

@@ -1,0 +1,140 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{#- L'indice delle storie della 1.0.
+
+    Stesso contenuto di blog_list.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la risposta con quante storie ci
+    sono e quando e' uscita l'ultima, la piu' recente grande accanto alla sua
+    copertina (come la fascia storie della home), le altre in schede della
+    1.0 col titolo-link esteso a tutta la scheda, e l'indice per tema, a cui
+    portano i filtri in testa: ancore, link veri anche senza JavaScript. Cio'
+    che la pagina chiede in piu' ai post lo compone app/design/pages/blog.py
+    e arriva qui come `d`.
+
+    La testa (title, description, JSON-LD del Blog) e' quella di
+    blog_list.html, riga per riga. -#}
+{% set active_nav = 'blog' %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Storie", "path": "/blog"}] %}
+
+{% block title %}Blog · {{ site_name }}: analisi sul divario territoriale{% endblock %}
+{% block description %}Articoli e analisi data-driven sul divario tra le regioni italiane: lavoro, istruzione, turismo, ambiente e altro, dagli indicatori territoriali Istat.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/blog.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "{{ site_name }}: Blog",
+  "url": "{{ canonical }}",
+  "description": "Analisi data-driven sul divario territoriale italiano.",
+  "blogPost": [
+    {% for post in posts %}
+    {
+      "@type": "BlogPosting",
+      "headline": {{ post.title | tojson }},
+      "url": {{ post.url | tojson }},
+      "datePublished": "{{ post.date.isoformat() }}",
+      "author": { "@type": "Organization", "name": {{ post.author | tojson }} }
+    }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{%- macro credit(s) -%}
+{%- if s.credit %}<p class="blog-credit">Foto {% if s.credit.source_url %}<a href="{{ s.credit.source_url }}">{{ s.credit.author }}</a>{% else %}{{ s.credit.author }}{% endif %}{% if s.credit.source %}, {{ s.credit.source }}{% endif %}{% if s.credit.license %}, {% if s.credit.license_url %}<a href="{{ s.credit.license_url }}">{{ s.credit.license }}</a>{% else %}{{ s.credit.license }}{% endif %}{% endif %}</p>{% endif -%}
+{%- endmacro %}
+{%- macro meta(s, cls) -%}
+<p class="{{ cls }}">{% if s.date %}<time datetime="{{ s.date }}">{{ s.date_label }}</time>{% endif %}{% if s.read_time %}{% if s.date %}, {% endif %}{{ s.read_time | num(None, 'count') }} {{ 'minuto' if s.read_time == 1 else 'minuti' }} di lettura{% endif %}{% if s.tags %}<span class="sep" aria-hidden="true">·</span>{{ s.tags[0].name }}{% endif %}</p>
+{%- endmacro %}
+<main id="contenuto" class="v1 v1-blog" data-v1="blog" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <h1>Storie: i numeri del divario, letti da vicino</h1>
+    {% if d.count %}
+    {#- "Analisi brevi e basate sui dati" e' il marcatore della pagina nel
+        contratto pubblico (PUBLIC_DISCOVERABILITY_EXPECTATIONS in views.py). #}
+    <p class="answer">Analisi brevi e basate sui dati ufficiali: {{ d.count | num(None, 'count') }} articoli, l'ultimo uscito il <time datetime="{{ d.latest }}">{{ d.latest_label }}</time>. Ogni storia parte da un indicatore dell'<a href="/atlante">atlante</a>, con la sua fonte e il suo anno, e porta alla sua scheda.</p>
+    {% endif %}
+    {% if d.top_tags %}
+    <nav class="blog-tags" aria-label="Storie per tema">
+      <span class="blog-tags__label">Per tema</span>
+      <ul>
+        {%- for t in d.top_tags %}
+        <li><a href="#{{ t.anchor }}">{{ t.name }} <span class="blog-tags__n">{{ t.stories | length }}</span></a></li>
+        {%- endfor %}
+        {% if d.index | length > d.top_tags | length %}<li><a href="#temi">Tutti i temi</a></li>{% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </header>
+
+  {% if d.lead %}
+  {% set lead = d.lead %}
+  <article class="story story--lead">
+    <div class="story__fig">
+      <div class="story__media">{% if lead.cover %}<img src="{{ lead.cover }}" alt="{{ lead.cover_alt }}"{% if lead.size %} width="{{ lead.size[0] }}" height="{{ lead.size[1] }}"{% endif %} decoding="async">{% endif %}</div>
+      {{ credit(lead) }}
+    </div>
+    <div class="story__body">
+      <h2 class="story__title"><a href="{{ '/blog/' ~ lead.slug }}">{{ lead.title }}</a></h2>
+      {% if lead.description %}<p class="story__text">{{ lead.description }}</p>{% endif %}
+      {{ meta(lead, 'story__meta') }}
+      <p class="story__go" aria-hidden="true">Leggi la storia {{ ui.icon('arrow') }}</p>
+    </div>
+  </article>
+  {% elif not posts %}
+  <p class="answer">Ancora nessun articolo pubblicato. Torna presto.</p>
+  {% endif %}
+
+  {% if d.rest %}
+  <section class="section" id="tutte" aria-labelledby="h-tutte">
+    <h2 id="h-tutte">Tutte le storie</h2>
+    <ul class="cards cards--3 blog-cards">
+      {%- for s in d.rest %}
+      <li class="card blog-card">
+        <h3 class="card__title"><a href="{{ '/blog/' ~ s.slug }}">{{ s.title }}</a></h3>
+        {{ meta(s, 'card__meta') }}
+        {% if s.description %}<p class="card__text">{{ s.description }}</p>{% endif %}
+        <div class="card__media blog-media">{% if s.cover %}<img src="{{ s.cover }}" alt="{{ s.cover_alt }}"{% if s.size %} width="{{ s.size[0] }}" height="{{ s.size[1] }}"{% endif %} loading="lazy" decoding="async">{% endif %}</div>
+        {{ credit(s) }}
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if d.index %}
+  <section class="section" id="temi" aria-labelledby="h-temi">
+    <h2 id="h-temi">Le storie per tema</h2>
+    <div class="blog-index">
+      {%- for t in d.index %}
+      <section class="blog-index__group" id="{{ t.anchor }}" aria-labelledby="h-{{ t.anchor }}">
+        <h3 class="h-sub" id="h-{{ t.anchor }}">{{ t.name }} <span class="group__n">{{ t.stories | length }}</span></h3>
+        <ul>
+          {%- for s in t.stories %}
+          <li><a href="{{ '/blog/' ~ s.slug }}">{{ s.title }}</a> <time class="blog-index__date" datetime="{{ s.date }}">{{ s.date_label }}</time></li>
+          {%- endfor %}
+        </ul>
+      </section>
+      {%- endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {#- Il feed in coda, dopo le storie: il primo link a /blog/ della pagina
+      resta quello di una storia. #}
+  <p class="meta blog-follow">
+    <a href="/blog/feed.xml">Segui le storie con il feed RSS</a>
+    <a href="/metodologia">Come lavoriamo sui dati</a>
+  </p>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}
