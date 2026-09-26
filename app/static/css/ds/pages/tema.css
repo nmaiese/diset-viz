@@ -1,0 +1,81 @@
+/* La pagina di un tema della 1.0: solo l'impaginazione sua. La classifica
+   (.table--rank dentro .rankwrap), la mappa (.map, .legend), la striscia
+   (.lead-figure), le tessere, le schede (.card), la tabella a blocchi
+   (.table--stack dentro .stackwrap), la sparkline (.trend) e le corsie
+   (.lanes) sono componenti comuni (components.css). Legge solo token. */
+
+.v1-tema .pagehead .meta { gap: var(--space-1) var(--space-6); }
+.v1-tema .pagehead .lede { margin-top: calc(-1 * var(--space-2)); }
+
+/* La nota del metodo sta sotto il titolo della sezione, prima dei numeri che
+   spiega: dopo la tabella non la leggeva nessuno. */
+.tema-method { max-width: var(--measure); margin-top: calc(-1 * var(--space-3)); margin-bottom: var(--space-6); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.tema-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+
+/* ---------- la classifica e la mappa ---------- */
+.tema-standings { container-type: inline-size; }
+.tema-body { display: grid; gap: var(--space-8); align-items: start; }
+@container (min-width: 1120px) { .tema-body { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+.tema-body > * { min-width: 0; }
+.tema-side { display: grid; gap: var(--space-3); }
+.tema-side .map, .tema-side .legend { max-width: 22rem; }
+/* Come nella classifica: finche' mappa e tabella non stanno affiancate, la
+   mappa (vista d'insieme) viene prima delle venti righe, col suo titolo. */
+@container (max-width: 1119px) { .tema-side { order: -1; } }
+@container (min-width: 1120px) { .tema-side__title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+@container (min-width: 1120px) { .tema-side { position: sticky; top: calc(var(--masthead-l, 64px) + var(--space-6)); } .tema-side .map { max-width: none; } }
+.tema-standings .table--rank .note a { color: var(--text-2); }
+.tema-standings .table--rank .note a:hover { color: var(--accent-strong); }
+.tema-standings > .source { margin-top: var(--space-4); }
+
+/* ---------- da cui partire ----------
+   Una scheda per serie, nessuna orfana: da 1200 tutte su una riga (sono al
+   massimo cinque), fra 600 e 1199 due colonne e, se sono dispari, la prima
+   prende la riga intera. */
+.tema-featured { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) {
+  .tema-featured { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tema-featured.is-odd > li:first-child { grid-column: 1 / -1; }
+}
+@media (min-width: 1200px) {
+  .tema-featured { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); }
+  .tema-featured.is-odd > li:first-child { grid-column: auto; }
+}
+.tema-featured .card__text { font-size: var(--fs-small); line-height: var(--lh-small); }
+.tema-featured .trend { flex-wrap: wrap; margin-top: var(--space-1); }
+.tema-featured .trend__txt, .tema-featured .trend__from { white-space: normal; }
+.tema-featured .trend__txt { display: grid; }
+
+/* ---------- tutti gli indicatori ---------- */
+.tema-filter { margin-bottom: var(--space-6); }
+.tema-filter[hidden] { display: none; }
+.tema-filter__q { flex: 1 1 18rem; max-width: 32rem; }
+.tema-filter__q input[type="search"] { width: 100%; min-width: 0; height: var(--target); }
+.tema-filter__count { margin: 0; }
+.tema-table { table-layout: auto; }
+.tema-table th[scope="row"] { width: 46%; font-weight: 400; }
+.tema-table th[scope="row"] .status { margin-left: var(--space-2); }
+.tema-table .val small { display: block; font-size: var(--fs-small); color: var(--muted); }
+.tema-table .trend__from { white-space: normal; }
+.tema-table .trend__txt { display: grid; }
+.tema-table tr.group th { text-align: left; }
+.tema-group__n { margin-left: var(--space-2); font-weight: 400; color: var(--muted); }
+.tema-table tr[hidden], .tema-table tbody[hidden] { display: none !important; }
+.tema-empty { padding-block: var(--space-6); color: var(--text-2); }
+.tema-empty[hidden] { display: none; }
+@container (max-width: 560px) {
+  .tema-table th[scope="row"] { width: auto; }
+  .tema-table tbody tr { grid-template-columns: minmax(0, 1fr) auto; }
+  .tema-table .trendcell { grid-column: 1; }
+  .tema-table .val { grid-column: 2; }
+  .tema-table .val small { display: inline; }
+  .tema-table .val small + small { display: block; }
+}
+
+/* ---------- per provincia: un elenco a righe ---------- */
+.tema-list { list-style: none; display: grid; max-width: 56rem; }
+.tema-list li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); padding-block: var(--space-3); border-top: 1px solid var(--rule); }
+.tema-list li:last-child { border-bottom: 1px solid var(--rule); }
+.tema-list a { color: var(--ink); min-width: 0; }
+.tema-list a:hover { color: var(--accent-strong); }
+.tema-list__meta { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }

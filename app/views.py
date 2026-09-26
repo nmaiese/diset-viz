@@ -1805,8 +1805,8 @@ def theme_page(theme_slug):
                                            province_indicators=province_indicators),
             f"{SITE_URL}{profile['theme_path']}",
         )
-    return render_template(
-        "theme_page.html",
+    return design.render(
+        "tema", "v1/tema.html", "theme_page.html",
         profile=profile,
         province_indicators=province_indicators,
         province_paths={item["canonical_path"] for item in province_indicators},
@@ -1998,8 +1998,8 @@ def themes_index():
     summary = catalog_summary()
     province = [item for items in indicator_view.province_indicators_by_theme().values()
                 for item in items]
-    return render_template(
-        "themes_index.html",
+    return design.render(
+        "temi", "v1/temi.html", "themes_index.html",
         areas=areas,
         total=summary["total"],
         institutions=summary["institutions_label"],
@@ -3385,13 +3385,19 @@ def _themes_index_areas():
                 by_theme.get(theme["theme"], []),
                 key=lambda i: (not i["complete"], i["name"].lower()),
             )
-            names = [i["name"] for i in items]
+            # Gli esempi di una scheda sono quelli con cui la pagina del tema
+            # apre (`_theme_featured`), non i primi in ordine alfabetico: su
+            # "Lavoro e conciliazione" uscivano cinque varianti di "Addetti" e
+            # "Differenza tra tasso".
+            featured = _theme_featured({"indicators": items})
+            names = [i["name"] for i in featured]
             themes.append({
                 "theme": theme["theme"],
                 "path": theme["path"],
                 "indicator_count": theme["indicator_count"],
-                "indicators": names[:5],
-                "extra_count": max(0, len(names) - 5),
+                "indicators": names,
+                "featured": [{"name": i["name"], "path": i["path"]} for i in featured],
+                "extra_count": max(0, len(items) - len(names)),
                 "lead": lead,
                 "lag": lag,
             })

@@ -1,0 +1,63 @@
+/* L'indice dei temi della 1.0: solo l'impaginazione sua. Sezioni, testata,
+   bande e corsie sono componenti comuni (components.css). Legge solo token.
+
+   `.temi-badge` e' il distintivo della fascia #temi della home (`.badge` di
+   pages/home.css): stessa misura e stessi lavaggi, qui col nome della pagina
+   finche' non sta in components.css. */
+
+.v1-temi .pagehead .meta { gap: var(--space-1) var(--space-6); }
+.v1-temi .pagehead .meta a { display: inline-flex; align-items: center; min-height: var(--target); }
+.v1-temi .pagehead .lede { margin-top: calc(-1 * var(--space-2)); }
+
+/* ---------- il filtro ---------- */
+.temi-filter { margin-top: var(--space-2); }
+.temi-filter[hidden] { display: none; }
+.temi-filter__q { flex: 1 1 18rem; max-width: 32rem; }
+.temi-filter__q input[type="search"] { width: 100%; min-width: 0; height: var(--target); }
+.temi-filter__count { margin: 0; }
+
+/* ---------- il distintivo ---------- */
+.temi-badge { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); color: var(--ink); background: var(--surface-2); }
+.temi-badge--amber { background: var(--amber-wash); color: var(--amber-600); }
+.temi-badge--green { background: var(--green-wash); color: var(--green-600); }
+.temi-badge--blue { background: var(--blue-wash); color: var(--ink); }
+.temi-badge--red { background: var(--red-wash); color: var(--red-600); }
+
+/* ---------- le aree ---------- */
+.temi-area[hidden] { display: none; }
+.temi-area > h2 { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+@media (min-width: 1200px) { .temi-area > h2 { margin-bottom: var(--space-2); } }
+.temi-area__count { margin-bottom: var(--space-6); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+/* ---------- le schede dei temi ----------
+   Il titolo e' il link alla pagina del tema; gli esempi e le regioni sono
+   link loro, quindi la scheda non si estende a tutto il riquadro. */
+.temi-cards { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .temi-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .temi-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.temi-card { display: flex; flex-direction: column; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); min-width: 0; }
+.temi-card[hidden] { display: none; }
+.temi-card__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.temi-card__title a { color: var(--ink); text-decoration: none; }
+.temi-card__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.temi-card__n { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.temi-card__examples { list-style: none; margin-top: var(--space-1); }
+.temi-card__examples li { border-top: 1px solid var(--rule); }
+.temi-card__examples a { display: flex; align-items: center; min-height: var(--target); padding-block: var(--space-1); color: var(--ink); line-height: 1.3; }
+.temi-card__examples a:hover { color: var(--accent-strong); }
+.temi-card__more a { font-size: var(--fs-small); color: var(--text-2); }
+.temi-card__none { margin-top: auto; padding-top: var(--space-2); }
+
+/* In testa e in coda: le frecce in colore di testo, mai un colore che giudica. */
+.temi-card__ends { display: grid; margin: auto 0 0; background: var(--surface-1); border-radius: var(--radius-sm); }
+.temi-card__ends > div { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-3); padding: 0 var(--space-3); }
+.temi-card__ends > div + div { border-top: 1px solid var(--rule); }
+.temi-card__ends dt { display: inline-flex; align-items: center; gap: 6px; min-width: 5.5rem; font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
+.temi-card__ends dd { margin: 0; font-weight: 600; }
+.temi-card__ends a { display: inline-flex; align-items: center; min-height: var(--target); color: var(--ink); }
+.temi-card__ends a:hover { color: var(--accent-strong); }
+.temi-card__none { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+
+.temi-empty { padding-block: var(--space-8); color: var(--text-2); }
+.temi-empty[hidden] { display: none; }
+.temi-source { max-width: var(--measure); margin-top: var(--space-12); }

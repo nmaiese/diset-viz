@@ -1,0 +1,243 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- La pagina di un tema della 1.0 (`/tema/<slug>`).
+
+    Stesso contenuto di theme_page.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la risposta su chi sta meglio e
+    chi peggio, le tessere, la classifica delle regioni con la mappa accanto e
+    il metodo sotto il titolo, le serie da cui partire, tutte le serie del tema
+    in un elenco a righe con la loro linea (filtrabile), le schede con i valori
+    delle province e le uscite. Cio' che la pagina chiede in piu' ai dati lo
+    compone app/design/pages/tema.py e arriva qui come `d`.
+
+    La testa (title, description, JSON-LD, briciole) e' quella di
+    theme_page.html, riga per riga. Dove la classifica non si calcola (due temi,
+    per i motivi di `profiles.theme_standings`) la pagina non la finge: niente
+    mappa, niente tabella, niente ItemList. -#}
+{% set active_nav = 'temi' %}
+{% set p = profile %}
+{% set s = standings %}
+{% set classifica = s.rated and s.rows %}
+{# La macro-area entra nel percorso solo da quando `/temi` ha davvero un'ancora
+   per area: prima il link c'era e non atterrava da nessuna parte. #}
+{% set percorso = ([{"name": "Home", "path": "/"}, {"name": "Temi", "path": "/temi"}]
+  + ([{"name": p.macro_area, "path": macro_area_path}] if macro_area_path else [])
+  + [{"name": p.theme, "path": p.theme_path}]) %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/tema.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ (p.theme ~ ', gli indicatori regionali') | tojson }},
+  "description": {{ ('Indicatori ' ~ p.institutions_label ~ ' del tema ' ~ p.theme ~ ' per le regioni italiane.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% if classifica %}
+{# Dichiarato solo quando la classifica e' in pagina: `.claude/rules/app.md`
+   vuole JSON-LD dove il visibile lo sostiene, e qui il visibile e' la tabella. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ (p.theme ~ ', le regioni italiane ordinate') | tojson }},
+  "numberOfItems": {{ s.rows | length }},
+  "itemListOrder": "https://schema.org/ItemListOrderDescending",
+  "itemListElement": [
+    {%- for r in s.rows %}
+    { "@type": "ListItem", "position": {{ r.rank }}, "name": {{ r.region | tojson }}, "url": "{{ site_url }}{{ r.path }}" }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{%- macro row(item) -%}
+<tr data-tema-row data-q="{{ (item.name ~ ' ' ~ (item.source_theme or '')) | lower }}"><th scope="row"><a href="{{ item.path }}">{{ item.name }}</a>{% if not item.complete %} <span class="status">Serie parziale</span>{% endif %}</th><td class="trendcell" data-label="Andamento">{% if item.spark %}<span class="trend">{{ item.spark | safe }}<span class="trend__txt"><data class="n" value="{{ item.change.delta }}">{{ item.change.head }}</data> <span class="trend__from">{{ item.change.tail }}</span></span></span>{% else %}<span class="status">Copertura variabile</span>{% endif %}</td><td class="val" data-label="Ultimo anno">{{ item.y1 }}{% if item.n %} <small>{{ item.n }} regioni</small>{% endif %}{% if item.also %} <small><a href="{{ item.also }}">anche per provincia</a></small>{% endif %}</td></tr>
+{%- endmacro -%}
+{#- `page-theme` e' il segno che l'audit della reperibilita' pubblica cerca
+    (`PUBLIC_DISCOVERABILITY_EXPECTATIONS` in views.py): resta sul `<main>`. -#}
+<main id="contenuto" class="v1 v1-tema page-theme" data-v1="tema" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">{% if macro_area_path %}<a href="{{ macro_area_path }}">{{ p.macro_area }}</a>{% else %}{{ p.macro_area }}{% endif %}<span class="sep" aria-hidden="true">·</span>{{ p.institutions_label }}{% if d.years_span %}<span class="sep" aria-hidden="true">·</span>dati {{ d.years_span }}{% endif %}</p>
+    {% if classifica %}
+    <h1 class="h-title">{{ p.theme }}: dove le regioni stanno meglio e dove peggio</h1>
+    <p class="answer">Contando i {{ s.indicator_count }} indicatori di {{ p.theme | lower }} che hanno un verso, cioè per cui si può dire quale valore è migliore, nel {{ s.year_max }} la regione che va meglio è <a href="{{ d.first.href }}">{{ d.first.name }}</a>, con {{ d.first.score | num(None, 'score') }} punti su 100, e quella che va peggio è <a href="{{ d.last.href }}">{{ d.last.name }}</a>, con {{ d.last.score | num(None, 'score') }}.</p>
+    <p class="lede">{{ p.description }}</p>
+    {% else %}
+    <h1 class="h-title">{{ p.theme }}</h1>
+    <p class="answer">{{ p.description }}</p>
+    <p class="lede">Su questo tema non esce una classifica regionale: gli indicatori direzionali con dati completi su tutte e {{ region_total }} le regioni non bastano, e un confronto su copertura parziale direbbe più di quello che i dati sanno. Qui sotto ci sono tutte le serie disponibili.</p>
+    {% endif %}
+    <p class="meta">
+      <span>Sottotemi delle fonti: {{ p.source_themes | join(', ') }}</span>
+      {% if classifica %}<a href="#classifica">La classifica</a>{% endif %}
+      <a href="#tutti">Tutti gli indicatori</a>
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  {% if classifica and d.strip.svg %}
+  {{ ui.leadfigure('striscia', d.claim or ('Le ' ~ d.ranking | length ~ ' regioni sulla scala da 0 a 100'), d.strip,
+     'Ogni punto è una regione, nel colore della sua ripartizione, con il punteggio del tema da 0 a 100. Tutti i punteggi sono nella classifica qui sotto. Elaborazione Divario Italia su dati ' ~ p.institutions_label ~ '.') }}
+  {% endif %}
+
+  {{ ui.tiles(d.tiles) }}
+
+  {% if classifica %}
+  <section class="section tema-standings" id="classifica" aria-labelledby="h-classifica">
+    <h2 id="h-classifica">Le regioni su {{ p.theme | lower }}, {{ s.year_max }}</h2>
+    <p class="tema-method">Il punteggio è la media semplice dei percentili orientati dei {{ s.indicator_count }} indicatori con un verso, da 0 a 100. Non è una classifica ufficiale e non pesa gli indicatori per importanza. <a href="/metodologia">Come sono calcolati confronti e medie</a></p>
+    <div class="tema-body">
+      <div class="tablewrap rankwrap" tabindex="0" role="region" aria-labelledby="h-classifica">
+        <table class="table table--rank">
+          <caption class="sr-only">Le {{ s.rows | length }} regioni ordinate sul tema {{ p.theme }}, anno {{ s.year_max }}, punteggio da 0 a 100</caption>
+          <thead><tr>
+            <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
+            <th scope="col">Regione</th>
+            <th class="rankcell-bar" scope="col"><span class="sr-only">Barra del punteggio</span></th>
+            <th class="r" scope="col">Punteggio</th>
+            <th scope="col">Il suo indicatore migliore</th>
+          </tr></thead>
+          <tbody>
+            {%- for r in d.ranking %}
+            <tr data-key="{{ r.key }}">
+              <td class="rank">{{ r.rank | rank }}</td>
+              <th class="name" scope="row">{% if r.area %}<span class="area-dot area-dot--{{ r.area }}" aria-hidden="true"></span>{% endif %}<a href="{{ r.href }}">{{ r.name }}</a>{% if r.area %}<span class="sr-only">, {{ d.area_label[r.area] }}</span>{% endif %}</th>
+              <td class="rankcell-bar" aria-hidden="true"><span class="score"><i style="width: {{ r.width }}%"></i></span></td>
+              <td class="val">{{ r.score | num(None, 'score') }}</td>
+              <td class="note" data-label="Indicatore migliore">{% if r.best %}<a href="{{ r.best.path }}">{{ r.best.name }}</a>{% else %}n.d.{% endif %}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if d.map %}
+      <div class="tema-side">
+        <h3 class="h-sub tema-side__title">Il punteggio sulla mappa, {{ s.year_max }}</h3>
+        {{ ui.map(d.map.classes, 'tema', d.map.names, d.map.tips, overlay=d.map.callouts,
+                  label='Mappa delle regioni italiane per punteggio sul tema ' ~ p.theme ~ ', ' ~ s.year_max) }}
+        {{ ui.legend(d.map.legend, 'Più intenso, punteggio più alto. Sei gradini uguali fra il più basso e il più alto.', nd=False) }}
+      </div>
+      {% endif %}
+    </div>
+    <p class="source">Fonte: {{ p.institutions_label }}, {{ s.indicator_count }} indicatori del tema. Elaborazione Divario Italia.</p>
+  </section>
+  {% endif %}
+
+  {% if d.featured %}
+  <section class="section" id="da-cui-partire" aria-labelledby="h-partire">
+    <h2 id="h-partire">Gli indicatori da cui partire</h2>
+    <p class="tema-intro">{{ d.featured | length }} serie scelte per solidità: prima quelle complete su tutte le regioni, poi quelle che entrano nella qualità della vita, poi le più aggiornate, una per misura.</p>
+    <ul class="tema-featured{{ ' is-odd' if d.featured_odd }}" style="--n: {{ d.featured | length }}">
+      {%- for item in d.featured %}
+      <li class="card">
+        <h3 class="card__title tema-featured__title"><a href="{{ item.path }}">{{ item.name }}</a></h3>
+        {% if item.plain %}<p class="card__text">{{ item.plain }}</p>{% endif %}
+        {% if item.spark %}<p class="trend">{{ item.spark | safe }}<span class="trend__txt"><data class="n" value="{{ item.change.delta }}">{{ item.change.head }}</data> <span class="trend__from">{{ item.change.tail }}</span></span></p>{% endif %}
+        <p class="card__meta">{{ item.y0 }}-{{ item.y1 }}{% if item.n %}, {{ item.n }} regioni{% endif %}{% if item.also %}, anche per provincia{% endif %}{% if item.scored %}, nella qualità della vita{% endif %}</p>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="section" id="tutti" aria-labelledby="h-tutti">
+    <h2 id="h-tutti">Tutti gli indicatori del tema</h2>
+    <p class="tema-intro">Le {{ d.total }} serie del tema, ognuna con la sua scheda. La linea è la media semplice delle regioni, anno per anno, sugli anni in cui quasi tutte hanno il dato{% if d.with_spark < d.total %}: dove la copertura cambia troppo da un anno all'altro resta l'etichetta al suo posto{% endif %}.</p>
+    <p class="tema-intro"><a class="linkarrow" href="{{ atlas_theme_url(p.theme) }}">Le stesse serie nell'atlante, con i filtri per fonte e anni</a></p>
+    <form class="toolbar tema-filter" data-tema-filter hidden role="search" aria-label="Filtra gli indicatori del tema" onsubmit="return false">
+      <label class="field tema-filter__q" for="tema-q">Cerca fra gli indicatori del tema
+        <input id="tema-q" type="search" autocomplete="off" placeholder="Una parola del nome">
+      </label>
+      <p class="subline tema-filter__count" role="status" aria-live="polite" data-tema-live>{{ d.total }} indicatori</p>
+    </form>
+    <div class="tablewrap stackwrap">
+      <table class="table table--compact table--stack tema-table">
+        <caption class="sr-only">{{ p.theme }}: tutte le serie regionali, con l'andamento della media semplice e l'ultimo anno</caption>
+        <thead><tr><th scope="col">Indicatore</th><th scope="col">Andamento</th><th class="r" scope="col">Ultimo anno</th></tr></thead>
+        {%- for g in d.groups %}
+        <tbody data-tema-group>
+          {%- if g.name %}
+          <tr class="group"><th scope="rowgroup" colspan="3">{{ g.name }} <span class="tema-group__n">{{ g.series | length }}</span></th></tr>
+          {%- endif %}
+          {%- for item in g.series %}
+          {{ row(item) }}
+          {%- endfor %}
+        </tbody>
+        {%- endfor %}
+      </table>
+    </div>
+    <p class="tema-empty" data-tema-empty hidden>Nessun indicatore del tema corrisponde alla ricerca.</p>
+  </section>
+
+  {% if province_indicators %}
+  {#- Le schede del tema con i valori per provincia, aperte sulle province. Le
+      solo provinciali non stanno nell'elenco qui sopra, che e' il catalogo
+      dell'atlante, e senza questo blocco non erano in nessun tema. -#}
+  <section class="section" id="province" aria-labelledby="h-province">
+    <h2 id="h-province">Per provincia</h2>
+    <p class="tema-intro">{{ province_indicators | length }} {{ 'scheda di questo tema ha' if province_indicators | length == 1 else 'schede di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
+    <ul class="tema-list">
+      {%- for ind in province_indicators %}
+      <li data-tema-province><a href="{{ ind.path }}">{{ ind.name }}</a><span class="tema-list__meta">{{ ind.year_min }}{% if ind.year_max != ind.year_min %}-{{ ind.year_max }}{% endif %}, {{ ind.count }} province{% if ind.only_province %}, solo per provincia{% endif %}</span></li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
+
+<section class="band tema-next" id="continua" aria-labelledby="h-continua">
+  <div class="wrap">
+    <h2 class="h-section" id="h-continua">Continua da qui</h2>
+    <div class="lanes">
+      {% if classifica %}
+      <div class="lane">
+        <h3>Le regioni agli estremi</h3>
+        <ul>
+          {%- for r in d.ends %}
+          <li><a href="{{ r.href }}">{{ r.name }}, {{ r.rank }}ª su {{ s.rows | length }}</a></li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if siblings %}
+      <div class="lane">
+        <h3>Gli altri temi di {{ p.macro_area | lower }}</h3>
+        <ul>
+          {%- for t in siblings %}
+          <li><a href="{{ t.path }}">{{ t.theme }}, {{ t.indicator_count }} indicatori</a></li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <div class="lane">
+        <h3>Gli altri modi di guardare</h3>
+        <ul>
+          <li><a href="{{ atlas_theme_url(p.theme) }}">Gli stessi {{ p.indicator_count }} indicatori nell'atlante, da filtrare per fonte e anni</a></li>
+          <li><a href="/regioni">Il profilo di ognuna delle {{ region_total }} regioni</a></li>
+          <li><a href="/province">Il profilo di ognuna delle {{ province_total }} province</a></li>
+          <li><a href="/confronto">Mettere due o tre territori sullo stesso piano</a></li>
+          <li><a href="/divari-regionali">Quanto pesa davvero il divario Nord-Sud</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+<script src="{{ asset_url('js/tema.js') }}" defer></script>
+{% endblock %}
