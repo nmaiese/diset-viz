@@ -78,15 +78,18 @@ decisione aperta, non una convenzione.
 
 La regola che tiene insieme tutto il resto, e che nasce da un guasto misurato.
 
-La sera del 27 settembre 2026, `scripts/tool_failures.py` elencava **41 guasti
-ripetuti in 48 ore**, e 39 di quei 41 erano la stessa frase:
+La sera del 27 settembre 2026, `scripts/tool_failures.py` elencava **49 guasti
+ripetuti in 48 ore**, raccolti in 8 firme diverse, e 40 dei 49 erano la stessa
+frase:
 
 > This agent is isolated in the worktree `.claude/worktrees/wf_...`, but this command ...
 
 Tutti agenti Claude dentro `.claude/worktrees/`, che si erano messi a scrivere o a
 leggere fuori dal proprio worktree: il `cd` in un altro worktree, uno script in
-`/tmp` di un'altra sessione, un `cat >` in una scratchpad altrui. Sono 41 occasioni
-in cui un agent ha speso un turno e prodotto niente.
+`/tmp` di un'altra sessione, un `cat >` in una scratchpad altrui. Sono 40 occasioni
+in cui un agent ha speso un turno e prodotto niente, e le altre 9 sono un
+`sed -i` su un file fuori worktree, un traceback e due `ruff` per import non
+ordinati: la stessa disattenzione, con meno danni.
 
 Ne segue:
 
