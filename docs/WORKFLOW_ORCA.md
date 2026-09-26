@@ -1,6 +1,11 @@
 # Metodologia di Lavoro Multi-Agente con Orca
 
-Questo documento stabilisce il protocollo di collaborazione tra **Nello (umano)** e i tre agenti AI (**Claude**, **ChatGPT/Codex**, **Gemini/Antigravity**) orchestrati all'interno della suite **Orca**.
+Questo documento stabilisce il protocollo di collaborazione tra **Nello (umano)** e gli agenti AI orchestrati all'interno della suite **Orca**.
+
+Le ultime sezioni sono state scritte la sera del 27 settembre 2026, e contengono cose
+**misurate** quella notte, non intenzioni. Le misure sono datate per poter essere
+smentite: una riga senza data è un'opinione, e in questo documento le opinioni sono
+poche.
 
 ---
 
@@ -11,6 +16,18 @@ Questo documento stabilisce il protocollo di collaborazione tra **Nello (umano)*
 | **Claude** | $100/mese | **Chief Architect & Lead Reviewer** | • Design di nuove sezioni o modifiche strutturali complesse.<br>• Review di PR e applicazione rigorosa delle linee guida di stile e design.<br>• Audit di coerenza e refactoring ad alto impatto. |
 | **Codex** | ~$25/mese | **Specialist Implementer / Worker** | • Implementazione di task specifici, classi o funzioni isolate.<br>• Generazione e aggiornamento di unit test.<br>• Script di parsing dati, trasformazioni CSV/SDMX. |
 | **Gemini** | ~$25/mese | **Navigator & Context Hub** | • Ingestione di mega-contesti (dataset interi, log chilometrici, trascrizioni complete).<br>• Analisi e audit cross-file.<br>• Creazione delle specifiche dei task (`TASK.md`) e pair-programming live. |
+
+La tabella è un **piano di ruoli**, non una misura di disponibilità. Un agente con
+quota esaurita fallisce con un messaggio che sembra un altro problema, quindi la
+disponibilità si verifica **prima** di assegnare, e i numeri vivono fuori da qui, in
+`~/dev/dev-tools/docs/opencode-quota.md` e `opencode-modelli.md`, che li tengono
+aggiornati. Qui non si copiano: due copie di un numero di quota vanno fuori
+sincrono, e quella è la lezione che questo repository ha già pagato.
+
+**Il canale che dice la verità sullo stato degli agenti** è
+`bin/py scripts/tool_failures.py`: elenca i guasti ripetuti nelle ultime 48 ore. Se
+un agente fallisce sempre per lo stesso motivo, lo dice lì, e quella riga va letta
+prima di riassegnargli il task.
 
 ---
 
@@ -51,22 +68,103 @@ Per superare la volatilità delle chat e sostituire gli Artifacts di Claude con 
 - [Data/Ora]: [Decisione architetturale o passaggio completato]
 ```
 
+`TASK.md` sta nella radice del worktree, quindi **finisce nel ramo**: decidere se
+entra nel merge o se si cancella prima del merge è di Nello, e questa volta è una
+decisione aperta, non una convenzione.
+
 ---
 
-## 3. Comandi Orca CLI Essenziali
+## 3. Un worktree per agente, e niente di più
 
-La CLI di Orca (tramite bridge WSL in `/mnt/c/Users/Nilo/AppData/Local/Programs/orca/resources/bin/orca.exe` o alias `orca-ide`) gestisce il ciclo di vita:
+La regola che tiene insieme tutto il resto, e che nasce da un guasto misurato.
 
-### Avviare un nuovo task con un agente:
+La sera del 27 settembre 2026, `scripts/tool_failures.py` elencava **41 guasti
+ripetuti in 48 ore**, e 39 di quei 41 erano la stessa frase:
+
+> This agent is isolated in the worktree `.claude/worktrees/wf_...`, but this command ...
+
+Tutti agenti Claude dentro `.claude/worktrees/`, che si erano messi a scrivere o a
+leggere fuori dal proprio worktree: il `cd` in un altro worktree, uno script in
+`/tmp` di un'altra sessione, un `cat >` in una scratchpad altrui. Sono 41 occasioni
+in cui un agent ha speso un turno e prodotto niente.
+
+Ne segue:
+
+- **Un task, un worktree, un agente.** Due agenti nello stesso checkout non si
+  coordinano, e Orca non li blocca.
+- **Un agente non esce dal suo worktree.** Se serve un file di lavoro, quello è il
+  `TASK.md` del suo worktree. Se serve uno script, è dentro il suo worktree e si
+  cancella prima del commit, oppure in `/tmp` con un nome suo.
+- **`cd` in un altro worktree è il modo più economico di sprecare un turno.**
+- **L'interprete è `bin/py`, e va puntato a mano.** In un worktree nuovo `.venv` non
+  esiste, e `python3` qui è una funzione di shell che cade su un interprete senza
+  dipendenze. Senza questo, `bin/py` esce con `127` e l'agente la prende per un
+  problema del progetto:
+
+  ```bash
+  export DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python
+  bin/py -c "import app; print(app.__file__)"
+  ```
+
+  La risposta deve contenere il percorso **del worktree dell'agente**: l'ambiente
+  delle dipendenze è lo stesso, ma se il codice importato è quello di un altro
+  checkout il verdetto dei test è su un altro codice.
+
+---
+
+## 4. Comandi Orca CLI Essenziali
+
+**Il comando non è `orca`.** In WSL, fuori da un terminale Orca, `orca` risolve
+`/usr/bin/orca`, che è il lettore di schermo GNOME, e lo avvia. In un terminale
+Orca, e in WSL, il binario è quello che Orca esporta:
+
 ```bash
-# Avvio task indipendente con Codex in un nuovo worktree:
-orca worktree create --name fix-routing --no-parent --agent codex --prompt "Leggi TASK.md ed esegui l'implementazione" --json
-
-# Avvio task di review o architettura con Claude:
-orca worktree create --name review-design --no-parent --agent claude --prompt "Leggi TASK.md ed esegui la code review su app/templates/v1" --json
+echo "$ORCA_CLI_COMMAND"   # orca-ide
 ```
 
+Nell'esempi sotto, `orca` sta per il valore di quella variabile.
+
+### Avviare un nuovo task con un agente
+
+```bash
+# Avvio task indipendente con Codex in un nuovo worktree.
+# --setup skip evita di lanciare gli hook di setup del repo in un worktree
+# che serve solo a un lavoro di testo o di codice isolato.
+orca worktree create --name fix-routing --no-parent --base-branch master \
+  --setup skip --agent codex --prompt "Leggi TASK.md ed esegui l'implementazione" --json
+```
+
+`--agent` mette l'agente **nel primo terminale** e va preferito: evita il terminale
+di fallback a vuoto che si crea con un worktree nudo. Non va poi creato un secondo
+terminale per lo stesso agente.
+
+**Prima di inviare qualsiasi prompt a un agente, va aspettato che la TUI sia pronta.**
+Un prompt scritto in una TUI che sta ancora partendo va perso, e si scopre solo
+perché il task non parte:
+
+```bash
+orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json
+# si legge satisfied: true, non il fatto che abbia stampato qualcosa
+```
+
+### Lavoro headless, quando la TUI non serve
+
+`--agent` avvia il launcher configurato, e non ha flag per modello o ragionamento.
+Quando il lavoro è una specifica chiusa e il risultato è un file, si usa il
+programma in modalità headless dentro il terminale:
+
+```bash
+orca worktree create --name lead-ter-13 --no-parent --base-branch master --setup skip --json
+orca terminal create --worktree path:<percorso-del-worktree> --title "codex" \
+  --command 'codex exec --skip-git-repo-check "Leggi TASK.md ed esegui il task"' --json
+```
+
+Il vantaggio non è la comodità, è la verificabilità: l'output finisce in un file,
+l'agente non ha uno stato interattivo da tenere, e il risultato del turno è il
+commit.
+
 ### Aggiornare lo stato e i commenti sulla Card di Orca:
+
 ```bash
 # Aggiorna il commento visibile nella dashboard di Orca:
 orca worktree set --worktree active --comment "Implementati i test; in attesa di review" --workspace-status in-review --json
@@ -75,6 +173,41 @@ orca worktree set --worktree active --comment "Implementati i test; in attesa di
 ```
 
 ### Inviare comandi a un terminale esistente:
+
 ```bash
-orca terminal send --terminal <handle> --text "leggi il feedback aggiornato in TASK.md e correggi" --enter --json
+orca terminal send --terminal <handle> --text "leggi il feedback aggiornato in TASK.md e correggi" --enter --wait-submit 10 --json
 ```
+
+`--wait-submit` dà la prova che il prompt è stato **consegnato**; non prova che
+l'agente sia partito. Su silenzio non si reinserisce: si legge il terminale.
+
+### Due difetti della CLI, da non scambiare per errori propri
+
+- **`runtime_unavailable` dopo aver già applicato la modifica.** La creazione di un
+  worktree è stata osservata rispondere `runtime_unavailable` *avendo* creato il
+  worktree, due volte in una notte. Prima di ripetere il comando, `orca worktree
+  list`: se il worktree c'è già, non va ricreato, e il secondo tentativo produce un
+  duplicato da pulire.
+- **L'id di un worktree è un indirizzo in due parti**, `<repoId>::<percorso>`, e va
+  copiato per intero. Il solo `repoId` non basta. Il selettore `path:<percorso>`
+  funziona e va bene quando si ragiona con i path di WSL.
+
+---
+
+## 5. Cosa non fa un agente, in ogni caso
+
+- **Niente push, niente PR, niente merge.** Su questo repository il merge è la
+  pubblicazione, e la coda di `content/` e `app/` passa da PR con gate umano. Un
+  agente lascia il ramo e il commit, e la decisione di pubblicare è di Nello.
+- **Niente segreti.** Nessuna lettura di `.env`, chiavi o credenziali, nessuna
+  scrittura di `auth.json`.
+- **Niente deploy.**
+- **Niente `Co-Authored-By`** nei messaggi di commit.
+
+## 6. Cosa richiede mano umana
+
+Ci sono cose che nessun agente deve fare, e vale la pena tenerle scritte per non
+perderle: il container GTM (tag morti, hostname di produzione), la regola per il
+traffico interno in GA4 e la creazione di dimensioni e metriche, Bing Webmaster
+Tools, il deploy, e le decisioni che sono di Nello (Google-Extended, il merge, il
+push).

@@ -45,6 +45,7 @@ possono scrivere direttamente su `master`.
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
 | **la versione 1.0**: griglia, tipografia, componenti, pagine, direzione "Cronaca", prototipi, e le pagine del sito che ne escono (`app/design/`, `app/templates/v1/`) | [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md), [`design/README.md`](design/README.md) |
 | deploy su Cloud Run | [`DEPLOY.md`](DEPLOY.md) |
+| **lavoro multi-agente con Orca**: un worktree per agente, `TASK.md`, quale agente per quale task, cosa non fa un agente | [`docs/WORKFLOW_ORCA.md`](docs/WORKFLOW_ORCA.md) |
 
 ## Che cos'è
 

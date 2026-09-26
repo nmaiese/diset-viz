@@ -260,6 +260,40 @@ indicatore: li emetteva la SPA. Un tag GTM su quei nomi non scatta mai.
 | `sort_indicators` | cambio ordinamento catalogo | comportamento catalogo |
 | `toggle_partial_data` | mostra o nasconde indicatori parziali | comportamento catalogo |
 
+### Il lavoro da fare nel container, con la lista esatta
+
+Il 27 settembre 2026 il delta fra i tag del container e gli eventi che il codice
+emette è stato contato sul codice, non a memoria. Il container ha dodici tag
+evento, il codice ne emette dodici nomi, e i due insiemi non coincidono.
+
+Da **rimuovere**, perché nessun codice li emette piu' e il trigger non scatta mai:
+`back_to_atlas`, `select_sibling_indicator`, `change_visualization`.
+
+Da **creare**, perché il codice li emette e il container non ha un tag che li raccolga:
+`compare_select_indicator`, `open_region`, `open_province`, `filter_macro_area`,
+`filter_data_source`, `filter_year_range`.
+
+Il nome del tag e' libero, il trigger e' un `CE - <nome evento>` e la creazione va
+ripetuta con lo stesso schema degli altri: `measurementIdOverride` e `send_to` a
+`G-THTPZZ02QH`. `filter_macro_area`, `filter_data_source` e `filter_year_range`
+condividono un tag solo se si vuole, ma un tag per nome evento e' piu' semplice da
+leggere in GA4.
+
+Il limite di produzione, hostname `divarioitalia.it`, e' una condizione del trigger
+`CE - page_view`, e va messa insieme alla rimozione dei tre tag morti: un tag evento
+senza condizione hostname continua a raccogliere traffico di anteprima.
+
+### Se un evento non arriva, dove si guarda
+
+`POST /api/events` scrive ogni evento che il codice emette con `app.logger.info` e il
+prefisso `analytics_event`, quindi il log applicativo e' un canale che non passa da
+GTM. **Aperto, e va verificato**: il 27 settembre 2026, cercando `analytics_event`
+nei log di Cloud Run del servizio `diset-viz` con `--freshness=7d`, non e' tornato
+niente, e non e' chiaro se dipenda dal fatto che nessuno ha interagito con atlante o
+confronto in quella finestra, o dal campo in cui gunicorn lascia le righe dell'app.
+Non si usa quel canale come dato di fatto finche' non si e' capito quale delle due
+e'.
+
 Ogni evento include:
 
 - `page_type`
