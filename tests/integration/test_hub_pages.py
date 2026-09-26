@@ -127,10 +127,75 @@ class DivariRegionaliPageTest(unittest.TestCase):
     def test_shows_the_three_partitions_with_the_interactive_map(self):
         for area in ("Nord", "Centro", "Mezzogiorno"):
             self.assertIn(f'id="divari-{area.lower()}"', self.html)
-        # Stesso componente mappa della home: selettore, colori per regione, readout.
-        self.assertIn('id="home-map-data"', self.html)
+        # La mappa della 1.0 (`ui.map`) con la legenda a soglie e la classifica
+        # accanto, e il selettore dell'indicatore come GET che funziona senza
+        # JavaScript. Il pannello di prima (home-map.js, "passa il mouse") non
+        # torna: su un telefono non diceva niente.
+        self.assertIn('data-v1="divari-regionali"', self.html)
         self.assertIn('action="/divari-regionali"', self.html)
-        self.assertIn("home-map.js", self.html)
+        self.assertIn("data-map", self.html)
+        self.assertIn('<div class="legend" aria-hidden="true">', self.html)
+        self.assertEqual(self.html.count('class="q'), 20 + 6, "venti regioni sulla rampa, sei gradini in legenda")
+        self.assertNotIn("home-map.js", self.html)
+        self.assertNotIn("Passa il mouse", self.html)
+
+    def test_map_names_its_extremes_and_ranks_the_twenty_regions(self):
+        """La mappa nomina i due estremi e la classifica accanto ha le venti
+        regioni con il link al profilo, piu' la riga della media semplice."""
+        from app.atlas_catalog import get_atlas_indicator
+        from app.design import numfmt
+        from app import divari
+
+        meta = get_atlas_indicator(divari.MAP_DIVARI[0])["metadata"]
+        self.assertIn(meta["name"], self.html)
+        self.assertEqual(self.html.count('class="callout"'), 2)
+        rows = re.search(r"<tbody data-rank-body>(.*?)</tbody>", self.html, re.S).group(1)
+        self.assertEqual(len(re.findall(r'href="/regione/[^"]+"', rows)), 20)
+        self.assertIn('class="ref"', rows)
+        self.assertIn("Media semplice delle 20 regioni", rows)
+        # Le cifre passano dai filtri: il PIL senza decimali, mai "44.413,0".
+        pil = next(d for d in divari.build_divari_view()["core"] if d["id"] == divari.MAP_DIVARI[0])
+        self.assertIn(numfmt.text(pil["areas"]["Nord"]["mean"], 0), self.html)
+
+    def test_numbers_share_the_decimals_of_their_group(self):
+        """Il Gini esce 0,29 / 0,30 / 0,32 con divario 0,02: i decimali della
+        colonna, anche per il divario, come le correzioni del template di prima."""
+        from app import divari
+        from app.design import numfmt
+
+        gini = next(d for d in divari.build_divari_view()["others"] if d["id"] == "930")
+        row = re.search(r'<tr>\s*<th scope="row"><a href="%s">.*?</tr>' % re.escape(gini["path"]), self.html, re.S).group(0)
+        dec = numfmt.column_decimals([gini["areas"][a]["mean"] for a in ("Nord", "Centro", "Mezzogiorno")])
+        self.assertEqual(dec, 2)
+        for area in ("Nord", "Centro", "Mezzogiorno"):
+            self.assertIn(numfmt.text(gini["areas"][area]["mean"], dec), row)
+        self.assertIn(f'data-label="Divario"><data class="n n--cell" value="{float(gini["gap"]):.6g}">{numfmt.text(gini["gap"], dec)}<', row)
+
+    def test_v1_layout_rules(self):
+        """Le regole della 1.0 che, rotte, non fanno fallire niente: la tabella
+        degli altri divari diventa blocchi sul telefono, nessun bordo colorato
+        giudica una scheda, un solo bottone primario, sezioni col filetto."""
+        self.assertRegex(self.html, r'class="tablewrap stackwrap"[^>]*>\s*<table class="table table--stack dr-others">')
+        self.assertNotIn("is-better", self.html)
+        self.assertNotIn("is-worse", self.html)
+        self.assertEqual(self.html.count("btn--primary"), 1)
+        self.assertRegex(self.html, r'<a class="btn btn--primary" href="/confronto">')
+        self.assertEqual(len(re.findall(r'<section class="section[^"]*"[^>]*>\s*<h2', self.html)),
+                         len(re.findall(r"<h2\b", self.html[self.html.index("<main"):self.html.index("</main>")])))
+        self.assertEqual(len(re.findall(r"<h1\b", self.html)), 1)
+        css = (Path(app.root_path) / "static" / "css" / "ds" / "pages" / "divari-regionali.css").read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"#[0-9a-fA-F]{3,8}\b|rgba?\(", css), "colore cotto nel foglio della pagina")
+        self.assertNotIn("uppercase", css)
+
+    def test_every_map_choice_renders_the_v1_page(self):
+        """Ogni indicatore del selettore rende la pagina della 1.0, non il ripiego."""
+        from app import divari
+
+        for indicator_id in divari.MAP_DIVARI:
+            with self.subTest(indicator=indicator_id):
+                page = self.client.get(f"/divari-regionali?indicator={indicator_id}").get_data(as_text=True)
+                self.assertIn('data-v1="divari-regionali"', page)
+                self.assertRegex(page, r'aria-label="Mappa cliccabile delle regioni italiane per [^"]+, \d{4}"')
 
     def test_numbers_come_from_the_data(self):
         from app import divari

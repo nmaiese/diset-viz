@@ -642,6 +642,10 @@ def data_catalog():
             # BES solo provinciali, che il download non ce l'hanno: si conta
             # dai download della voce, non si presume.
             "downloadable": bool(entry["downloads"]),
+            # Per la pagina della 1.0: il gruppo per tema e i link ai file.
+            "theme": meta.get("theme") or "",
+            "theme_path": meta.get("theme_path"),
+            "downloads": entry["downloads"] or {},
         })
     description = (
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
@@ -668,8 +672,8 @@ def data_catalog():
             for item in datasets
         ],
     }
-    return render_template(
-        "data_catalog.html",
+    return design.render(
+        "catalogo-dati", "v1/catalogo-dati.html", "data_catalog.html",
         datasets=datasets,
         catalog_description=description,
         catalog_jsonld=catalog_jsonld,
@@ -692,7 +696,13 @@ def divari_regionali():
     view = divari.build_divari_view()
     if view is None:
         abort(404)
-    return render_template(
+    # La 1.0 (`app/design/pages/divari_regionali.py`, `v1/divari-regionali.html`),
+    # con divari_regionali.html come ripiego se la regia cede. La mappa e' la
+    # macro `ui.map` con la legenda e la classifica accanto: `_map_hero` resta
+    # la fonte dell'indicatore scelto (`?indicator=`) e dei suoi colori.
+    return design.render(
+        "divari-regionali",
+        "v1/divari-regionali.html",
         "divari_regionali.html",
         divari=view,
         map_hero=_map_hero(divari.MAP_DIVARI),
@@ -1215,8 +1225,8 @@ def methodology():
         )
     regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
     province = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
-    return render_template(
-        "methodology.html",
+    return design.render(
+        "metodologia", "v1/metodologia.html", "methodology.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/metodologia",

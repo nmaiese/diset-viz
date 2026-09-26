@@ -1,0 +1,61 @@
+/* ==========================================================================
+   dr: /divari-regionali. La mappa (.module + ui.map + ui.legend), la
+   classifica (.table + ui.rank_body), le schede (.cards, .card) e la tabella
+   a blocchi (.stackwrap + .table--stack) sono componenti comuni: qui resta
+   l'impaginazione della pagina. Solo token, nessun colore cotto.
+   ========================================================================== */
+
+.dr-lead { max-width: var(--measure); color: var(--text-2); margin-top: calc(-1 * var(--space-2)); margin-bottom: var(--space-8); }
+
+/* Il pallino della ripartizione accanto al titolo della sua sezione. */
+.dr-area > h2 .area-dot { width: 14px; height: 14px; margin-right: var(--space-3); vertical-align: 0.1em; }
+
+/* ---------- la mappa ---------- */
+.dr-map .toolbar { align-items: end; }
+.dr-map .toolbar .btn { min-height: 40px; }
+/* Con l'isola una regione della mappa porta al suo profilo. */
+.dr-map .map.is-linked [data-key] { cursor: pointer; }
+.dr-map .arealegend { margin-bottom: var(--space-3); }
+
+/* ---------- i tre divari d'apertura ---------- */
+.dr-core .card { gap: var(--space-3); }
+.dr-bars { margin-top: var(--space-1); }
+.dr-bars th { white-space: nowrap; }
+.dr-bars .barcell { width: 50%; }
+.dr-bars tbody tr:hover > * { background: transparent; }
+
+/* ---------- le schede di una ripartizione ----------
+   Un filetto sopra, niente scatola e nessun bordo colorato: il vantaggio o
+   il ritardo li dice la frase, non il colore. */
+.dr-cards { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
+@media (min-width: 600px) { .dr-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 960px) { .dr-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.dr-card { display: grid; align-content: start; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); min-width: 0; }
+.dr-card__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
+.dr-card__title a { text-decoration: none; }
+.dr-card__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.dr-card__delta { color: var(--ink); }
+.dr-card__ends { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.dr-card__ends a { color: var(--text-2); }
+
+/* Dove la ripartizione ha la media migliore, e le sue regioni. */
+.dr-foot { display: grid; gap: var(--space-8) var(--gutter-l); margin-top: var(--space-12); }
+@media (min-width: 960px) { .dr-foot { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dr-foot > div { min-width: 0; }
+.dr-foot .h-sub { margin-bottom: var(--space-3); }
+.dr-examples ul { list-style: none; display: grid; }
+.dr-examples li { display: grid; gap: 2px; padding-block: var(--space-3); border-top: 1px solid var(--rule); }
+.dr-examples li span { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.dr-regions ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-6); border-top: 1px solid var(--rule); padding-top: var(--space-1); }
+.dr-regions li a { display: inline-flex; align-items: center; min-height: var(--target); }
+
+/* ---------- gli altri divari ---------- */
+.dr-others tbody th { min-width: 14rem; }
+.dr-meta { display: block; margin-top: 2px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.dr-others thead .area-dot { margin-right: 6px; }
+/* A blocchi: Nord e Centro, poi Mezzogiorno e divario, due per riga. Tre per
+   riga lasciavano il divario da solo sotto le tre medie. */
+@container (max-width: 560px) {
+  .table--stack.dr-others tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dr-others tbody th { min-width: 0; }
+}

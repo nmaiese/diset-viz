@@ -1,0 +1,225 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- /divari-regionali nella 1.0. Stesso contenuto di divari_regionali.html
+    (che resta come ripiego, vedi app/design/__init__.py), un'altra regia: la
+    risposta con le tre distanze vere, le tessere, la mappa dell'indicatore
+    scelto con la legenda e la classifica accanto, la tesi in prosa, i tre
+    divari d'apertura, una sezione per ripartizione, gli altri divari in una
+    tabella che sul telefono diventa blocchi, il confronto e il metodo.
+    Cio' che la pagina chiede in piu' ai dati lo compone
+    app/design/pages/divari_regionali.py e arriva qui come `d`.
+
+    Ogni cifra viene da `divari.build_divari_view` e da `_map_hero`: mai una
+    cifra scritta a mano. Nessun colore dice meglio o peggio: il vantaggio e il
+    ritardo li dicono le parole, e i colori delle ripartizioni le identificano.
+
+    La testa (title, description, briciole JSON-LD) e' quella di
+    divari_regionali.html, riga per riga. -#}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Divari regionali", "path": "/divari-regionali"}] %}
+{% set active_nav = 'divari' %}
+{% set m = d.map %}
+
+{% block title %}Divari regionali in Italia: economia, lavoro, salute{% endblock %}
+{% block description %}Quanto distano Nord, Centro e Mezzogiorno su reddito, lavoro e salute: {{ divari.indicator_links }} divari misurati sui dati Istat, regione per regione.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/divari-regionali.css') }}">{% endblock %}
+
+{% block head_extra %}
+{{ breadcrumb.jsonld(percorso, SITE_URL) }}
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-divari-regionali" data-v1="divari-regionali" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow">Nord, Centro, Mezzogiorno<span class="sep" aria-hidden="true">·</span>dati {{ d.years }}</p>
+    <h1 class="h-title" id="divari-title">I divari regionali italiani non sono una linea sola</h1>
+    <p class="answer">
+      {%- if d.pair -%}
+      Fra la media del {{ d.pair[0] }} e quella del {{ d.pair[1] }} ci sono {% for a in d.answer %}{{ a.gap | num(a.unit, 'figure', a.dec) }} di {{ a.short }}{% if loop.revindex == 2 %} e {% elif not loop.last %}, {% endif %}{% endfor %}.
+      {%- else -%}
+      Le distanze fra la ripartizione in testa e l'ultima: {% for a in d.answer %}{{ a.gap | num(a.unit, 'figure', a.dec) }} di {{ a.short }} fra {{ a.leader }} e {{ a.last }}{% if loop.revindex == 2 %} e {% elif not loop.last %}, {% endif %}{% endfor %}.
+      {%- endif %} Tre divari veri, tre ordini di grandezza diversi.</p>
+    <p class="meta">
+      <span>Medie semplici delle regioni, non pesate per popolazione</span>
+      <a href="#metodo">Come si calcola</a>
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  {{ ui.tiles(d.tiles) }}
+
+  <section class="section" id="mappa" aria-labelledby="h-mappa">
+    <h2 id="h-mappa">Dove cade ogni divario</h2>
+    <figure class="module dr-map" data-dr-map>
+      <figcaption class="module__head">
+        <h3 class="h-sub">In testa {{ m.best.name }} con {{ m.best.value | num(m.unit, 'figure', m.decimals) }}, ultima {{ m.worst.name }} con {{ m.worst.value | num(m.unit, 'figure', m.decimals) }}</h3>
+        <p class="subline"><a href="{{ m.path }}">{{ m.name }}</a>, {{ m.year }}. Le {{ m.n }} regioni {% if m.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
+      </figcaption>
+      <form class="toolbar" method="get" action="/divari-regionali">
+        <label class="field" for="dr-indicator">Indicatore sulla mappa
+          <select id="dr-indicator" name="indicator">
+            {%- for opt in m.options %}
+            <option value="{{ opt.id }}"{% if opt.id == m.id %} selected{% endif %}>{{ opt.name }}</option>
+            {%- endfor %}
+          </select>
+        </label>
+        <button class="btn" type="submit">Mostra sulla mappa</button>
+      </form>
+      <div class="module__body">
+        <div class="module__map">
+          {{ ui.map(m.classes, 'divari', m.names, m.tips, overlay=m.callouts, label='Mappa cliccabile delle regioni italiane per ' ~ m.name ~ ', ' ~ m.year) }}
+          {{ ui.legend(m.legend, 'Più intenso, valore più alto. Sei gradini uguali fra minimo e massimo.', m.missing) }}
+        </div>
+        {% set rm = {"decimals": m.decimals, "areas": m.areas, "area_label": d.area_label, "profile_path": "/regione/", "row_id": None} %}
+        <div class="tablewrap" tabindex="0" role="region" aria-label="Classifica delle regioni per {{ m.name }}">
+          {{ ui.arealegend(m.area_legend) }}
+          <table class="table">
+            <caption class="sr-only">{{ m.name }}, le {{ m.n }} regioni nel {{ m.year }}</caption>
+            <thead><tr><th class="rank" scope="col">#</th><th scope="col">Regione</th><th class="barcell" scope="col"><span class="sr-only">Barra</span></th><th class="r" scope="col">{{ (m.short_unit or 'Valore') | capitalize }}</th></tr></thead>
+            {{ ui.rank_body(rm, m.rows) }}
+          </table>
+        </div>
+      </div>
+      <p class="source">Fonte: {% if m.source_url %}<a href="{{ m.source_url }}">{{ m.source_label }}</a>{% else %}{{ m.source_label }}{% endif %} ({{ m.year }}). Elaborazione Divario Italia. Scegli una regione sulla mappa o nella classifica per aprire il suo profilo, oppure apri <a href="/atlante">l'atlante</a> per tutti gli altri indicatori.</p>
+    </figure>
+  </section>
+
+  <section class="section" id="che-cosa-misuriamo" aria-labelledby="h-misura">
+    <h2 id="h-misura">Che cosa misuriamo quando diciamo divario</h2>
+    <div class="prose">
+      <p>Il divario territoriale italiano viene raccontato come una linea che taglia il paese all'altezza di Roma. I dati dicono qualcosa di più preciso e di più scomodo. Le linee sono tante e non passano tutte nello stesso punto.</p>
+      <p>Su {{ divari.scanned }} indicatori del catalogo che hanno una direzione dichiarata, cioè per cui si può dire quale valore è preferibile, il Nord ha la media migliore {{ divari.tally.Nord }} volte, il Centro {{ divari.tally.Centro }}, il Mezzogiorno {{ divari.tally.Mezzogiorno }}. Il Nord resta davanti nella maggioranza dei casi. Ma il {{ divari.share.Centro }}% degli indicatori mette in testa il Centro e il {{ divari.share.Mezzogiorno }}% il Mezzogiorno, e sono indicatori veri, non dettagli.</p>
+      <p>Poi c'è la questione della scala. Le tre distanze in cima a questa pagina sono tutte vere, e stanno su tre ordini di grandezza diversi. Chi legge solo le percentuali finisce per mettere sullo stesso piano una differenza di reddito enorme e una differenza di longevità che si misura in mesi.</p>
+      <p>Per questo qui ogni divario resta con la sua unità di misura e la sua fonte: prima i tre d'apertura, poi una sezione per ripartizione, con gli stessi tre divari misurati ogni volta contro la media delle venti regioni, e in chiusura gli altri {{ d.others | length }}, dal più ampio al più contenuto. Nessun punteggio unico. Se cerchi il punteggio composito, sta nella <a href="/qualita-della-vita/classifica/regioni">classifica della qualità della vita</a>, che dichiara i suoi limiti in <a href="/metodologia#qualita-della-vita">metodologia</a>.</p>
+    </div>
+  </section>
+
+  <section class="section" id="tre-divari" aria-labelledby="h-tre">
+    <h2 id="h-tre">Quanto si produce, quanti lavorano, quanto si vive</h2>
+    <p class="dr-lead">I tre divari d'apertura: la media semplice delle regioni di ogni ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni.</p>
+    <ul class="cards cards--3 dr-core">
+      {% for c in d.core %}
+      <li class="card">
+        <p class="card__kicker">{{ c.theme }}, {{ c.year }}</p>
+        <h3 class="card__title"><a href="{{ c.path }}">{{ c.name }}</a></h3>
+        <table class="table table--compact dr-bars">
+          <caption class="sr-only">{{ c.name }}, media semplice delle regioni per ripartizione, {{ c.year }}</caption>
+          <tbody>
+            {%- for b in c.bars %}
+            <tr><th scope="row"><span class="area-dot area-dot--{{ b.key }}" aria-hidden="true"></span>{{ b.area }}</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width: {{ b.width }}%"></i></span></td><td class="val">{{ b.mean | num(c.unit, 'cell', c.dec) }}</td></tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+        {#- Gli estremi di un divario che la mappa sta gia' mostrando li nomina il
+            titolo della mappa: una cifra una volta. -#}
+        <p class="card__meta">Media semplice delle venti regioni {{ c.regions_mean | num(c.unit, 'figure', c.dec) }}.{% if c.id != m.id %} In testa {{ c.top_region.name }} con {{ c.top_region.value | num(c.unit, 'figure', c.dec) }}, ultima {{ c.bottom_region.name }} con {{ c.bottom_region.value | num(c.unit, 'figure', c.dec) }}.{% else %} Gli estremi li nomina la mappa qui sopra.{% endif %}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {% for a in divari.areas %}
+  {% set slug = a.name | lower %}
+  <section class="section dr-area" id="divari-{{ slug }}" aria-labelledby="divari-{{ slug }}-title">
+    <h2 id="divari-{{ slug }}-title"><span class="area-dot area-dot--{{ d.area_key[a.name] }}" aria-hidden="true"></span>{{ a.name }}</h2>
+    {#- "meglio" e "peggio" della media, non "sopra" e "sotto": su un indicatore
+        come i NEET stare sotto la media e' una buona notizia, e la frase deve
+        restare vera anche se il set d'apertura cambia. La media e' quella delle
+        venti regioni, mai chiamata nazionale: e' un numero diverso. -#}
+    {% set n = a.above_mean %}{% set tot = a.cards | length %}
+    {% set all_of_them = "tutti e tre i" if tot == 3 else "tutti i " ~ tot %}
+    {% set standing %}{% if n == tot %}sta meglio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% elif n == 0 %}sta peggio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% else %}sta meglio della media delle venti regioni su {{ n }} dei {{ tot }} divari d'apertura{% endif %}{% endset %}
+    <p class="dr-lead">
+      {% if a.name == 'Nord' %}
+      Otto regioni, da Piemonte e Valle d'Aosta fino all'Emilia-Romagna. Il Nord ha la media migliore su {{ a.leads }} dei {{ divari.scanned }} indicatori confrontati, il {{ a.share }}% del totale, e {{ standing }}.
+      {% elif a.name == 'Centro' %}
+      Quattro regioni, e non una via di mezzo.{% if a.leads %} Il Centro ha la media migliore su {{ a.leads }} indicatori, il {{ a.share }}% del totale, e su quelli sta davanti anche al Nord.{% endif %} Qui {{ standing }}. Il Lazio pesa molto sulle medie di questa ripartizione, quindi vale la pena aprire le schede regione una per una.
+      {% else %}
+      Otto regioni tra Sud e Isole, la ripartizione che paga il conto più alto su reddito e lavoro: {{ standing }}.{% if a.leads %} Ma resta in testa su {{ a.leads }} indicatori, il {{ a.share }}% del totale, e sono indicatori di ambiente, sicurezza percepita e dinamica d'impresa.{% endif %}
+      {% endif %}
+    </p>
+
+    <ul class="dr-cards">
+      {% for card in a.cards %}
+      {% set dec = column_decimals([card.mean, card.lead.value, card.lag.value]) %}
+      <li class="dr-card">
+        <p class="card__kicker">{{ card.theme }}, {{ card.year }}</p>
+        <h3 class="dr-card__title"><a href="{{ card.path }}">{{ card.indicator }}</a></h3>
+        <p class="figure-num">{{ card.mean | num(card.unit, 'figure', dec) }}</p>
+        <p class="dr-card__delta">{{ 'Sopra' if card.delta > 0 else 'Sotto' }} la media delle venti regioni di {{ card.delta | abs | num(card.change_unit, 'figure', dec) }}, {{ 'un vantaggio' if card.better_than_mean else 'un ritardo' }}.</p>
+        <p class="dr-card__ends">Meglio <a href="/regione/{{ card.lead.key }}">{{ card.lead.name }}</a> con {{ card.lead.value | num(card.unit, 'figure', dec) }}, peggio <a href="/regione/{{ card.lag.key }}">{{ card.lag.name }}</a> con {{ card.lag.value | num(card.unit, 'figure', dec) }}.</p>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="dr-foot">
+      {% if a.examples %}
+      <div class="dr-examples">
+        <h3 class="h-sub">Dove il {{ a.name }} ha la media migliore</h3>
+        <ul>
+          {% for e in a.examples %}
+          <li><a href="{{ e.path }}">{{ e.name }}</a> <span>{{ e.theme }}, {{ e.year }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <div class="dr-regions">
+        <h3 class="h-sub">Le {{ a.regions | length }} regioni della ripartizione</h3>
+        <ul>
+          {% for r in a.regions %}<li><a href="/regione/{{ r.key }}">{{ r.name }}</a></li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+
+  <section class="section" id="altre-distanze" aria-labelledby="h-altre">
+    <h2 id="h-altre">Altre {{ d.others | length }} distanze, dalla più ampia alla più contenuta</h2>
+    <p class="dr-lead">Media semplice dei valori regionali per ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni. Il divario è la distanza fra la ripartizione con la media migliore e quella con la peggiore, letta secondo il verso dell'indicatore, ed è in punti percentuali per gli indicatori espressi in percentuale.</p>
+    <div class="tablewrap stackwrap" tabindex="0" role="region" aria-labelledby="h-altre">
+      <table class="table table--stack dr-others">
+        <caption class="sr-only">Gli altri divari: media semplice delle regioni di Nord, Centro e Mezzogiorno e distanza fra la migliore e la peggiore</caption>
+        <thead>
+          <tr><th scope="col">Indicatore</th>{% for area in ('Nord', 'Centro', 'Mezzogiorno') %}<th class="r" scope="col"><span class="area-dot area-dot--{{ d.area_key[area] }}" aria-hidden="true"></span>{{ area }}</th>{% endfor %}<th class="r" scope="col">Divario</th></tr>
+        </thead>
+        <tbody>
+          {% for o in d.others %}
+          <tr>
+            <th scope="row"><a href="{{ o.path }}">{{ o.name }}</a><span class="dr-meta">{{ o.unit_label }}, {{ o.year }}, in testa {{ o.leader }}</span></th>
+            {% for area in ('Nord', 'Centro', 'Mezzogiorno') %}
+            <td class="val" data-label="{{ area }}">{{ o.areas[area].mean | num(None, 'cell', o.dec) }}</td>
+            {% endfor %}
+            <td class="val dr-gap" data-label="Divario">{{ o.gap | num(None, 'cell', o.dec) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="confronta" aria-labelledby="h-confronta">
+    <h2 id="h-confronta">Ora fallo con le regioni che ti interessano</h2>
+    <p class="dr-lead">Le medie di ripartizione servono a inquadrare. La differenza che conta per chi ci vive è tra due regioni precise, sull'indicatore che gli sta a cuore.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="/confronto">Confronta le tue regioni {{ ui.icon('arrow') }}</a>
+    </div>
+  </section>
+
+  <section class="section" id="metodo" aria-labelledby="h-metodo">
+    <h2 id="h-metodo">Come sono calcolati questi numeri</h2>
+    <div class="prose">
+      <p>Ogni indicatore arriva dal catalogo di Divario Italia, che federa gli indicatori territoriali Istat, il Benessere equo e sostenibile, l'indagine sulla vita quotidiana delle famiglie e le serie regionali Eurostat. Per ogni indicatore cerchiamo l'ultimo anno in cui tutte e venti le regioni hanno un valore, poi calcoliamo la media dei valori regionali di ciascuna ripartizione. Se l'anno più recente è ancora parziale scendiamo a quello prima, perché mediare venti regioni o diciannove non dà la stessa distanza.</p>
+      <p>Il limite da tenere presente: sono medie semplici, non pesate per popolazione. Per questo in pagina si legge sempre "media delle venti regioni" e mai "media nazionale": il valore italiano di un indicatore per abitante si calcola con i denominatori demografici, che qui non entrano, e sarebbe un numero diverso. Queste medie servono a confrontare i territori tra loro. Le ripartizioni seguono la classificazione Istat, con Sud e Isole insieme sotto Mezzogiorno.</p>
+      <p>Entrano nel conto solo gli indicatori con una direzione dichiarata, copertura completa e anno recente, perché "media migliore" ha senso solo dove è chiaro quale valore è preferibile. Il metodo completo sta in <a href="/metodologia">metodologia</a>, e ogni scheda indicatore dichiara fonte, definizione e anni disponibili.</p>
+      <p>Da qui puoi continuare con <a href="/temi">gli indicatori per tema</a>, con le <a href="/regioni">venti schede regione</a> o con le <a href="/blog">analisi del blog</a>.</p>
+    </div>
+  </section>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+<script src="{{ asset_url('js/divari-regionali.js') }}" defer></script>
+{% endblock %}

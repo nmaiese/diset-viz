@@ -1,0 +1,51 @@
+/* Il catalogo dati della 1.0: solo l'impaginazione sua. Testata, sezione col
+   filetto, barra del filtro e campo sono componenti comuni (components.css).
+   Legge solo token. */
+
+.v1-catalogo-dati .pagehead { max-width: 52rem; }
+.v1-catalogo-dati .pagehead .meta { gap: var(--space-2) var(--space-6); }
+
+/* ---------- il filtro ---------- */
+.catalogo-filter { margin-bottom: var(--space-8); gap: var(--space-3) var(--space-6); align-items: end; }
+.catalogo-filter[hidden] { display: none; }
+.catalogo-filter__q { flex: 1 1 18rem; max-width: 32rem; }
+.catalogo-filter__q input[type="search"] { width: 100%; min-width: 0; height: var(--target); }
+.catalogo-filter__count { margin: 0; padding-bottom: 10px; }
+
+/* ---------- i temi ---------- */
+.catalogo-group + .catalogo-group { margin-top: var(--space-8); }
+.catalogo-group[hidden] { display: none; }
+.catalogo-group > summary {
+  cursor: pointer; min-height: var(--target); padding-block: var(--space-2);
+  border-bottom: 1px solid var(--rule-strong);
+}
+.catalogo-group > summary > h3 { display: inline; }
+.catalogo-group__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
+.catalogo-group__meta { margin-top: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.catalogo-group__meta a { color: var(--text-2); }
+.catalogo-group__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
+
+/* ---------- una voce per riga ---------- */
+/* Nome e fonte a sinistra, i file a destra. Da 960 pixel i temi lunghi
+   stanno su due colonne, le righe restano righe. */
+.catalogo-list { list-style: none; margin-top: var(--space-2); }
+@media (min-width: 960px) {
+  .catalogo-list { column-count: 2; column-gap: var(--space-12); }
+}
+.catalogo-item {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-4); align-items: baseline;
+  padding-block: var(--space-2); border-bottom: 1px solid var(--rule);
+  break-inside: avoid;
+}
+.catalogo-item[hidden] { display: none; }
+.catalogo-item__name { grid-column: 1; }
+.catalogo-item__src { grid-column: 1; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
+.catalogo-item__dl { grid-column: 2; grid-row: 1 / span 2; align-self: center; display: inline-flex; gap: var(--space-1); }
+.catalogo-item__dl a {
+  display: inline-flex; align-items: center; justify-content: center; min-width: var(--target); min-height: var(--target);
+  font-size: var(--fs-small); font-weight: 600; color: var(--text-2);
+}
+.catalogo-item__dl a:hover { color: var(--accent-strong); }
+
+.catalogo-empty { margin-top: var(--space-6); max-width: var(--measure); color: var(--text-2); }
+.catalogo-empty[hidden] { display: none; }

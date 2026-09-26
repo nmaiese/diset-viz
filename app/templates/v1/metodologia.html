@@ -1,0 +1,282 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{#- La metodologia della 1.0.
+
+    Stesse parole di methodology.html (che resta come ripiego, vedi
+    app/design/__init__.py), un'altra regia: la testata allineata a sinistra,
+    l'indice di pagina nel margine da 1200 pixel (sotto, la barra delle
+    sezioni che resta in alto), le sezioni col filetto e la prosa a misura. La
+    tabella delle categorie diventa blocchi sul telefono e sta in un
+    `details`, come l'elenco delle serie del punteggio: sono le parti lunghe
+    e ripetitive, e chi le cerca le apre. Cio' che la pagina chiede in piu' ai
+    dati lo compone app/design/pages/metodologia.py e arriva qui come `d`.
+
+    Le ancore sono quelle di prima: #come-nasce-il-testo (le schede),
+    #qualita-della-vita e #indicatori-usati (la qualita' della vita).
+
+    La testa (title, description, JSON-LD della pagina, briciole, FAQ) e'
+    quella di methodology.html, riga per riga. La FAQ visibile sta sotto
+    `class="prose faq"`: test_hub_pages.py confronta da li' il testo con
+    quello dichiarato. -#}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Metodologia", "path": "/metodologia"}] %}
+{% set active_nav = 'metodologia' %}
+{% set mr = methodology_regioni %}
+{% set mp = methodology_province %}
+
+{% block title %}Metodologia e fonti | {{ site_name }}{% endblock %}
+{% block description %}Metodo, fonti e limiti di Divario Italia: indicatori Istat per regioni e province, pagine indicatore e classifiche della qualità della vita.{% endblock %}
+
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/metodologia.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Metodologia e fonti",
+  "description": "Metodo, fonti e limiti di Divario Italia.",
+  "url": {{ canonical | tojson }},
+  "publisher": { "@id": {{ publisher['@id'] | tojson }} },
+  "isPartOf": { "@type": "WebSite", "name": {{ site_name | tojson }}, "url": "{{ site_url }}/" },
+  "about": [
+    { "@type": "Thing", "name": "indicatori territoriali" },
+    { "@type": "Thing", "name": "dati Istat" }
+  ],
+  "isAccessibleForFree": true
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Da dove arrivano i dati di Divario Italia?",
+      "acceptedAnswer": { "@type": "Answer", "text": "I dati provengono dalla Banca dati territoriale per le politiche di sviluppo di Istat e, per la qualità della vita, dal BES dei Territori. Ogni pagina indicatore riporta la fonte e l'ultimo anno disponibile." }
+    },
+    {
+      "@type": "Question",
+      "name": "I confronti tra regioni e province sono affidabili?",
+      "acceptedAnswer": { "@type": "Answer", "text": "I confronti mostrano differenze osservate tra territori, non dimostrano da soli un rapporto di causa. Gli indicatori possono avere anni e coperture diverse, quindi vanno letti insieme alla loro definizione." }
+    },
+    {
+      "@type": "Question",
+      "name": "Posso scaricare i dati?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sì. Le schede indicatore con una serie regionale offrono il download in formato CSV e JSON. I valori provinciali si leggono nelle pagine delle province. La licenza dei dati è {{ data_license_label }}." }
+    },
+    {
+      "@type": "Question",
+      "name": "Ogni quanto vengono aggiornati gli indicatori?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Temi, punteggi e classifiche vengono ricalcolati a ogni pubblicazione. I valori si aggiornano quando Istat rilascia una nuova annualità dell'indicatore, e la freschezza del dato è indicata su ciascuna scheda." }
+    },
+    {
+      "@type": "Question",
+      "name": "Posso citare Divario Italia in un articolo o in una risposta generata da un modello?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sì. Cita \"Divario Italia\" e la fonte primaria Istat. I contenuti sono liberamente consultabili e citabili con attribuzione." }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1 v1-metodologia" data-v1="metodologia" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+
+  <header class="pagehead">
+    <p class="eyebrow"><a href="/atlante">Atlante e dati</a>{% if mr and mr.catalog_institutions %}<span class="sep" aria-hidden="true">·</span>{{ mr.catalog_institutions }}{% endif %}</p>
+    <h1 class="h-title">Metodologia e fonti</h1>
+    <p class="answer">Divario Italia usa dati territoriali pubblici per rendere confrontabili regioni, province, temi e indicatori. Ogni pagina deve permettere di capire che cosa misura il dato, da dove arriva, quale anno copre e quali limiti ha.</p>
+    <p class="meta">
+      {% if mr %}<span>{{ mr.manifest_indicators_total | num(None, 'count') }} serie regionali nel catalogo, {{ mr.score_indicators_total | num(None, 'count') }} nel punteggio della qualità della vita</span>{% endif %}
+      <a href="{{ corrections_url }}">Segnala un errore</a>
+    </p>
+  </header>
+
+  <div class="layout">
+    <aside class="layout__aside">
+      <nav class="toc" aria-label="In questa pagina">
+        <p>In questa pagina</p>
+        <ol>
+          {% for t in d.toc %}<li><a href="#{{ t.id }}">{{ t.label }}</a></li>{% endfor %}
+        </ol>
+      </nav>
+      <div class="aside-block">
+        <p>Fonte principale: <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noopener noreferrer">Istat, Banca dati territoriale per le politiche di sviluppo</a>.</p>
+        <p>Licenza dei dati: <a href="{{ data_license_url }}">{{ data_license_label }}</a>.</p>
+      </div>
+    </aside>
+
+    <div class="layout__main">
+      <section class="section" id="fonte" aria-labelledby="h-fonte">
+        <h2 id="h-fonte">Fonte principale</h2>
+        <div class="prose">
+          <p>La fonte primaria dell'atlante è la Banca dati territoriale per le politiche di sviluppo di Istat. Le pagine indicatore riportano il nome dell'indicatore, il tema, l'unità di misura, l'ultimo anno disponibile, la copertura territoriale e la definizione leggibile.</p>
+          <p><a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noopener noreferrer">Consulta la fonte Istat</a>.</p>
+        </div>
+      </section>
+
+      <section class="section" id="leggere" aria-labelledby="h-leggere">
+        <h2 id="h-leggere">Come leggere gli indicatori</h2>
+        <div class="prose">
+          <p>Le schede indicatore mostrano il confronto tra territori e, quando i dati lo consentono, una serie storica. Le classifiche usano la direzione dell'indicatore solo quando il significato è chiaro: per alcuni dati un valore più alto è positivo, per altri è negativo, per altri ancora serve solo contesto.</p>
+          <p>Le pagine fuori soglia di qualità non vengono spinte in sitemap quando l'indicatore è troppo vecchio, incompleto o duplicativo rispetto a una pagina migliore.</p>
+        </div>
+      </section>
+
+      {# Come e' fatto quello che si legge sul sito, in un posto solo. La storia
+         di questa sezione (articolo 50(4) dell'AI Act, la riscrittura del 22
+         settembre 2026, il paragrafo sui limiti che non cambia) sta nel
+         commento di methodology.html. Le parole sono le stesse. #}
+      <section class="section" id="come-nasce-il-testo" aria-labelledby="h-come-nasce">
+        <h2 id="h-come-nasce">Come nasce il testo delle schede, e chi ne risponde</h2>
+        <div class="prose">
+          <p>Il racconto che accompagna i numeri di una scheda indicatore è scritto con l'aiuto di strumenti automatici, e prima di andare online lo legge e lo approva una persona. Lo diciamo qui, una volta per tutto il sito, perché è un'informazione che serve a chi legge, e perché l'articolo 50 del regolamento europeo sull'intelligenza artificiale, in vigore dal 2 agosto 2026, chiede che chi pubblica sia chiaro su come nasce quello che pubblica.</p>
+
+          <h3>Che cosa è generato e che cosa no</h3>
+          <p>I dati non sono generati: vengono dalla fonte istituzionale citata in ogni scheda, ripubblicati senza correzioni. Le sintesi che vedete nel cruscotto, media, divario, classifica, variazione, sono calcolate dal codice a ogni caricamento della pagina, quindi non possono invecchiare rispetto ai dati. È generato il testo discorsivo, quando la scheda ne ha uno firmato: l'attacco e le sezioni che raccontano che cosa dicono quei numeri.</p>
+
+          <h3>Che cosa viene controllato prima della pubblicazione</h3>
+          <p>Ogni cifra attribuita a un territorio viene riverificata contro il valore vero di quell'anno, ricalcolato dalla fonte: una cifra che non combacia non esce. Le spiegazioni sul perché un fenomeno si muove non possono essere dedotte dai dati, quindi ogni scheda che ne dà una porta accanto una citazione verificata di un'istituzione, e la citazione viene ricontrollata come testo contro l'indirizzo da cui proviene. Quando quel contesto non esiste, la scheda dice che cosa succede e dichiara che non sa perché.</p>
+          <p>Poi c'è il passaggio che i controlli automatici non sostituiscono. Niente arriva online da solo: ogni scheda nuova e ogni modifica passano da una proposta di modifica che una persona apre, legge e approva, e finché non la approva la pagina pubblica resta quella di prima. Quella persona è <a href="/chi-siamo#chi-lo-cura">{{ editor_name }}</a>, che fonda e cura il progetto e risponde di quello che si legge.</p>
+
+          <h3>Che cosa questo controllo non garantisce</h3>
+          <p>Che i numeri siano esatti non vuol dire che la lettura sia l'unica possibile. Un testo può essere aritmeticamente corretto e scegliere male che cosa mettere in evidenza, e nessun controllo automatico lo intercetta. L'approvazione è il giudizio di una persona, non una dimostrazione: dice che quel testo è stato ritenuto difendibile, non che sia l'unica lettura difendibile di quei numeri.</p>
+          <p>E i dati restano quelli della fonte. Se la fonte rivede una serie, la pagina cambia con lei al primo aggiornamento, e un testo scritto su valori precedenti può restare indietro rispetto al numero che mostra. È per questo che i numeri in pagina sono ricalcolati e non congelati nel testo, e che una scheda rivista dalla fonte torna in coda per essere riletta.</p>
+
+          <h3>Chi ne risponde</h3>
+          <p>La responsabilità editoriale di quello che si legge su questo sito è di una persona, non di un sistema. Non firmiamo le schede con nomi di redattori che non esistono. <a href="/chi-siamo">Chi siamo</a> e <a href="/contatti">come raggiungerci</a>, e ogni scheda ha in alto un collegamento per segnalare un errore: le segnalazioni si leggono e le correzioni si fanno.</p>
+        </div>
+      </section>
+
+      <section class="section" id="qualita-della-vita" aria-labelledby="h-qdv">
+        <h2 id="h-qdv">Qualità della vita: come è costruita la classifica</h2>
+        <div class="prose">
+          <p>La classifica della qualità della vita parte dallo stesso catalogo dell'Atlante e ne documenta fonte, selezione, direzioni, copertura e pesi, così può essere verificata e discussa a partire dagli stessi dati.</p>
+
+          <h3>Un catalogo, una selezione per il punteggio</h3>
+          <p>Atlante, temi e qualità della vita partono dallo stesso catalogo. Per le regioni selezioniamo sia indicatori del BES nazionale con dati almeno al 2025, sia indicatori territoriali DISET completi e con dati almeno al 2023. Possono rientrare anche altre fonti istituzionali, come Eurostat, una volta verificati il verso e la copertura. I duplicati esatti vengono contati una sola volta. Per le province usiamo il BES dei Territori, l'unica fonte omogenea disponibile a quel livello.</p>
+
+          <h3>Cos'è uno z-score orientato</h3>
+          <p>Gli indicatori hanno unità diverse, euro, anni, percentuali, indici. Non si possono sommare così come sono. Per renderli confrontabili standardizziamo ogni indicatore dentro se stesso: misuriamo quanto ogni territorio si discosta dalla media, in deviazioni standard. A differenza del semplice ordinamento, lo z-score conserva le distanze: un divario grande resta grande, uno piccolo resta piccolo. Poi applichiamo la direzione. Per alcuni un valore alto è positivo, per esempio l'occupazione. Per altri un valore alto è negativo, per esempio la mortalità evitabile. Lo z-score orientato mette sempre il segno più dalla parte buona. In pagina lo mostriamo su una scala da 0 a 100 dove 50 è la media.</p>
+
+          {% if mr %}
+          <h3>Quali indicatori entrano</h3>
+          <p>Entrano nel punteggio solo gli indicatori con una direzione interpretabile e copertura sufficiente. La selezione regionale usa <strong>{{ mr.score_indicators_total }} indicatori</strong>: {% for s in mr.source_breakdown %}<strong>{{ s.count }}</strong> {{ s.label }}{% if not loop.last %} &middot; {% endif %}{% endfor %}. La selezione provinciale ne usa <strong>{{ mp.score_indicators_total }}</strong>. Tutti gli altri restano consultabili nell'Atlante e nelle pagine per tema, senza influire sullo score.</p>
+
+          <h3>Le categorie</h3>
+          <p>Usiamo le stesse dodici categorie dell'Atlante, inclusa una dimensione esplicita di benessere soggettivo. Nel punteggio entrano solo gli indicatori con una direzione interpretabile e una copertura sufficiente. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
+          {% endif %}
+        </div>
+
+        {% if mr %}
+        <details class="more metodologia-more">
+          <summary>Le {{ categories | length | num(None, 'count') }} categorie, con gli indicatori di regioni e province</summary>
+          <div class="tablewrap stackwrap metodologia-cat" tabindex="0" role="region" aria-label="Le categorie della qualità della vita">
+            <table class="table table--stack" role="table">
+              <caption class="sr-only">Le categorie della qualità della vita, che cosa misurano e quanti indicatori entrano nel punteggio per le regioni e per le province</caption>
+              <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Categoria</th><th scope="col" role="columnheader">Cosa misura</th><th class="r" scope="col" role="columnheader">Ind. regioni</th><th class="r" scope="col" role="columnheader">Ind. province</th></tr></thead>
+              <tbody role="rowgroup">
+                {% for category in categories %}
+                <tr role="row">
+                  <th scope="row" role="rowheader"><strong>{{ category.name }}</strong></th>
+                  <td class="metodologia-cat__desc" data-label="Cosa misura" role="cell">{{ category.description }}</td>
+                  <td class="val" data-label="Ind. regioni" role="cell">{{ mr.indicator_counts[category.slug] | num(None, 'count') }}</td>
+                  <td class="val" data-label="Ind. province" role="cell">{{ mp.indicator_counts[category.slug] | num(None, 'count') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        {% endif %}
+
+        <div class="prose metodologia-after">
+          <h3>Come si calcola il punteggio</h3>
+          <ul>
+            <li><strong>Punteggio indicatore</strong>: z-score orientato (segno più = meglio).</li>
+            <li><strong>Punteggio categoria</strong>: media degli z-score degli indicatori della categoria.</li>
+            <li><strong>Punteggio finale</strong>: media dei punteggi di categoria pesata secondo il profilo.</li>
+          </ul>
+          <p>Se per un territorio una categoria non ha indicatori disponibili, non blocchiamo la classifica: ridistribuiamo i pesi sulle categorie rimaste e mostriamo la copertura.</p>
+
+          <h3>I profili e il movimento</h3>
+          <p>Ogni profilo modifica i pesi delle dodici categorie, poi li normalizza a 1. Accanto al punteggio mostriamo il <strong>movimento</strong>: quante posizioni un territorio guadagna o perde rispetto al profilo Equilibrato. Il confronto rende visibile l'effetto concreto delle priorità scelte.</p>
+        </div>
+        <ul class="metodologia-profiles">
+          {% for profile in profiles %}
+          <li><h4>{{ profile.name }}</h4><p>{{ profile.description }}</p></li>
+          {% endfor %}
+        </ul>
+
+        <div class="prose metodologia-after">
+          <h3>I limiti, dichiarati</h3>
+          <p>La media di un territorio nasconde le differenze interne. Lo z-score misura una posizione relativa tra i territori, non una distanza dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente per poterla discutere. Sul livello provinciale si misurano {{ measured_provinces }} province, tutte quelle con dati nel BES dei Territori.{% if unmeasured_provinces %} Nella codifica Istat ci sono anche {{ unmeasured_provinces | join(' e ') }}, per cui il BES dei Territori non pubblica ancora dati.{% endif %} Le quattro province sarde soppresse prima del 2016 sono escluse.</p>
+
+          <h3>In cosa siamo diversi dal Sole 24 Ore e da ItaliaOggi</h3>
+          <p>La classifica Divario Italia è una sintesi autonoma su una selezione dichiarata di indicatori Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria. Il nostro obiettivo è far vedere come cambia il quadro quando cambiano categorie e pesi, e dove ogni territorio eccelle.</p>
+        </div>
+
+        {% if d.indicator_groups %}
+        <div id="indicatori-usati" class="metodologia-used">
+          <h3 class="h-sub">Gli indicatori usati nel punteggio regionale</h3>
+          <p class="metodologia-used__intro">Queste voci appartengono allo stesso catalogo dell'Atlante. L'etichetta della fonte distingue BES e indicatori territoriali, mentre la categoria indica dove ciascuna misura contribuisce.</p>
+          <details class="more metodologia-more">
+            <summary>Le {{ d.indicator_count | num(None, 'count') }} serie, categoria per categoria</summary>
+            <div class="metodologia-groups">
+              {% for g in d.indicator_groups %}
+              <div class="metodologia-group">
+                <h4>{{ g.name }}</h4>
+                <ul>
+                  {% for item in g['items'] %}
+                  <li><a href="{{ item.path }}">{{ item.name }}</a> <small>({{ item.catalog_family_label }}, dati {{ item.year_max }})</small></li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </div>
+        {% endif %}
+
+        <p class="actions"><a class="linkarrow" href="/qualita-della-vita/classifica/regioni">Apri la classifica delle regioni e cambia profilo</a><a class="linkarrow" href="/qualita-della-vita/classifica/province">La classifica delle province</a></p>
+      </section>
+
+      <section class="section" id="limiti" aria-labelledby="h-limiti">
+        <h2 id="h-limiti">Limiti</h2>
+        <div class="prose">
+          <p>I dati possono avere anni diversi, coperture diverse e interruzioni di serie. Un confronto territoriale descrive una differenza osservata, non dimostra da solo una causa. Quando un articolo interpreta un divario, deve distinguere il dato dalla spiegazione.</p>
+        </div>
+      </section>
+
+      <section class="section" id="domande" aria-labelledby="h-domande">
+        <h2 id="h-domande">Domande frequenti</h2>
+        <div class="prose faq">
+          <h3>Da dove arrivano i dati di Divario Italia?</h3>
+          <p>I dati provengono dalla Banca dati territoriale per le politiche di sviluppo di Istat e, per la qualità della vita, dal BES dei Territori. Ogni pagina indicatore riporta la fonte e l'ultimo anno disponibile.</p>
+          <h3>I confronti tra regioni e province sono affidabili?</h3>
+          <p>I confronti mostrano differenze osservate tra territori, non dimostrano da soli un rapporto di causa. Gli indicatori possono avere anni e coperture diverse, quindi vanno letti insieme alla loro definizione.</p>
+          <h3>Posso scaricare i dati?</h3>
+          <p>Sì. Le schede indicatore con una serie regionale offrono il download in formato CSV e JSON. I valori provinciali si leggono nelle <a href="/province">pagine delle province</a>. La licenza dei dati è {{ data_license_label }}.</p>
+          <h3>Ogni quanto vengono aggiornati gli indicatori?</h3>
+          <p>Temi, punteggi e classifiche vengono ricalcolati a ogni pubblicazione. I valori si aggiornano quando Istat rilascia una nuova annualità dell'indicatore, e la freschezza del dato è indicata su ciascuna scheda.</p>
+          <h3>Posso citare Divario Italia in un articolo o in una risposta generata da un modello?</h3>
+          <p>Sì. Cita "Divario Italia" e la fonte primaria Istat. I contenuti sono liberamente consultabili e citabili con attribuzione.</p>
+        </div>
+      </section>
+
+      <nav class="section metodologia-cta" aria-labelledby="h-esplora">
+        <h2 id="h-esplora">Esplora i dati</h2>
+        <p>Apri regioni, province, temi o indicatori dell'atlante</p>
+        <p class="actions"><a class="linkarrow" href="/regioni">Regioni</a><a class="linkarrow" href="/province">Province</a><a class="linkarrow" href="/temi">Temi</a><a class="linkarrow" href="/atlante">Atlante</a></p>
+      </nav>
+    </div>
+  </div>
+</div>
+</main>
+<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% endblock %}
