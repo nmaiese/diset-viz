@@ -25,7 +25,7 @@
 /* Il filtro per tipo, con la riga meta della paginazione sotto. */
 .ricerca-filter { display: grid; justify-items: start; gap: var(--space-3); padding-bottom: var(--space-4); }
 .ricerca-filter > * { max-width: 100%; }
-.ricerca-filter .seg > a { min-height: var(--target, 44px); gap: 6px; }
+.ricerca-filter .seg > a { min-height: var(--target); gap: 6px; }
 .ricerca-filter__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 .ricerca-filter .seg [aria-current] .ricerca-filter__n { color: inherit; }
 .ricerca-filter .meta:empty { display: none; }
@@ -36,7 +36,6 @@
   padding-top: var(--space-3); border-top: 3px solid var(--ink);
   font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading);
 }
-.ricerca-group__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 .ricerca-group__more { margin-top: var(--space-4); }
 
 /* Le righe: titolo-link in inchiostro, descrizione a misura, meta piccola. */
@@ -56,25 +55,25 @@
 .ricerca-pager { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-top: var(--space-8); }
 .ricerca-pager ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-1); padding: 0; }
 .ricerca-pager ol a {
-  display: inline-flex; align-items: center; justify-content: center; min-width: var(--target, 44px); min-height: var(--target, 44px);
+  display: inline-flex; align-items: center; justify-content: center; min-width: var(--target); min-height: var(--target);
   padding: 0 var(--space-2); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); text-decoration: none;
   border: 1px solid var(--rule-strong); border-radius: var(--radius-control);
 }
 .ds .ricerca-pager ol a { text-decoration: none; }
 .ricerca-pager ol a:hover { background: var(--surface-1); color: var(--ink); }
 .ricerca-pager ol a[aria-current] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
-.ricerca-pager__gap { display: inline-flex; align-items: center; min-height: var(--target, 44px); padding: 0 var(--space-1); color: var(--muted); }
-.ricerca-pager__step { display: inline-flex; align-items: center; min-height: var(--target, 44px); font-weight: 600; }
+.ricerca-pager__gap { display: inline-flex; align-items: center; min-height: var(--target); padding: 0 var(--space-1); color: var(--muted); }
+.ricerca-pager__step { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; }
 
 /* La pagina vuota: esempi e porte. */
 .ricerca-examples { max-width: var(--measure); font-size: var(--fs-lede); line-height: var(--lh-lede); }
 .ricerca-doors { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--space-6); margin-top: var(--space-4); }
-.ricerca-doors a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target, 44px); }
+.ricerca-doors a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target); }
 
 @media (max-width: 599px) {
   .ricerca-form { flex-wrap: wrap; }
   .ricerca-form__field { flex-basis: 100%; }
-  .ricerca-form .btn { min-height: var(--target, 44px); }
+  .ricerca-form .btn { min-height: var(--target); }
   .ricerca-filter { justify-items: stretch; }
 }
 
@@ -90,9 +89,5 @@
   }
 }
 .ricerca-aside__t { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); padding-top: var(--space-3); border-top: 3px solid var(--ink); }
-.ricerca-aside__note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.ricerca-aside .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
 .ricerca-aside__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); }
-.ricerca-aside .navmap:not(.navmap--data) a use { fill: var(--rule-strong); }
-.ricerca-aside .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 .ricerca-layout .search-results { max-width: none; }

@@ -5,14 +5,12 @@
    l'impaginazione della pagina. Solo token, nessun colore cotto.
    ========================================================================== */
 
-.dr-lead { max-width: var(--measure); color: var(--text-2); margin-bottom: var(--space-6); }
-
 /* Il pallino della ripartizione accanto al titolo della sua sezione. */
 .dr-area > h2 .area-dot { width: 14px; height: 14px; margin-right: var(--space-3); vertical-align: 0.1em; }
 
 /* ---------- la mappa ---------- */
 .dr-map .toolbar { align-items: end; }
-.dr-map .toolbar .btn { min-height: 40px; }
+.dr-map .toolbar .btn { min-height: var(--target-min); }
 /* Con l'isola una regione della mappa porta al suo profilo. */
 .dr-map .map.is-linked [data-key] { cursor: pointer; }
 .dr-map .arealegend { margin-bottom: var(--space-3); }

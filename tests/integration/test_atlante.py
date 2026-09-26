@@ -95,7 +95,7 @@ class LAtlanteNellaV1(unittest.TestCase):
     def test_nessuna_riga_senza_tema_e_senza_area(self):
         """Il guasto silenzioso di CLAUDE.md: un tema non mappato perde le sue
         righe senza che niente fallisca."""
-        blocks = re.findall(r'<div class="atlante-area" data-area="([^"]*)">(.*?)(?=<div class="atlante-area"|<p class="atlante-empty")',
+        blocks = re.findall(r'<div class="atlante-area" data-area="([^"]*)">(.*?)(?=<div class="atlante-area"|<p class="empty" data-atlas-empty)',
                             self.html, re.DOTALL)
         self.assertEqual(sum(len(ROW.findall(body)) for _, body in blocks), len(self.catalog["indicators"]))
         for area, body in blocks:
@@ -405,7 +405,7 @@ class LeProvinceNellAtlante(unittest.TestCase):
     def test_nessuna_riga_senza_area(self):
         """Le 33 solo provinciali non hanno una `macro_area`: l'area viene dal
         tema. Una riga senza area sparirebbe da ogni filtro."""
-        blocks = re.findall(r'<div class="atlante-area" data-area="([^"]*)">(.*?)(?=<div class="atlante-area"|<p class="atlante-empty")',
+        blocks = re.findall(r'<div class="atlante-area" data-area="([^"]*)">(.*?)(?=<div class="atlante-area"|<p class="empty" data-atlas-empty)',
                             self.html, re.DOTALL)
         self.assertEqual(sum(len(ROW.findall(body)) for _, body in blocks), len(self.items))
         only = {sources.internal_id("bes", i["id"]) for i in self.items if "regione" not in i["levels"]}

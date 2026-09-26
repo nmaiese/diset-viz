@@ -1,6 +1,6 @@
 /* L'indice delle regioni: solo l'impaginazione sua. Schede (.card), traccia di
-   posizione (.track), pallini delle ripartizioni e mappa per scegliere sono in
-   components.css. Legge solo token. */
+   posizione (.track), pallini delle ripartizioni e mappa per scegliere
+   (`.map-pick`, con `.map-hint`) sono in components.css. Legge solo token. */
 
 /* ---------- testata con la mappa per scegliere, da 960 ---------- */
 .regioni-head { align-items: start; }
@@ -11,9 +11,7 @@
   .regioni-head > * { grid-column: 1; }
   .regioni-head > .regioni-map { grid-column: 2; grid-row: 1 / span 5; display: grid; gap: var(--space-2); justify-items: center; }
   .regioni-map .navmap { width: 100%; max-width: 300px; }
-  .regioni-map .navmap a:hover use { fill: var(--accent); }
 }
-.regioni-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 
 /* ---------- le ripartizioni, per saltare: `.jump` di components.css ---------- */
 .regioni-note { max-width: var(--measure); margin-top: var(--space-4); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
@@ -29,6 +27,3 @@
 .regioni-facts dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
 .regioni-facts dd .n { color: var(--text-2); white-space: nowrap; }
 .regioni-facts__qv dd { display: grid; grid-template-columns: auto minmax(6rem, 12rem); gap: var(--space-3); align-items: center; justify-content: start; }
-/* Su fondo bianco il grigio della superficie quasi sparisce: la terra un passo
-   piu' scura, come la mappa della home. */
-@media (min-width: 960px) { .regioni-map .navmap a use { fill: var(--rule-strong); } }

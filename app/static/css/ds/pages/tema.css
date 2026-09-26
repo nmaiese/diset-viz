@@ -10,7 +10,6 @@
 /* La nota del metodo sta sotto il titolo della sezione, prima dei numeri che
    spiega: dopo la tabella non la leggeva nessuno. */
 .tema-method { max-width: var(--measure); margin-bottom: var(--space-6); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.tema-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
 
 /* ---------- la classifica e la mappa ---------- */
 .tema-standings { container-type: inline-size; }
@@ -46,12 +45,8 @@
 .tema-featured .trend__txt, .tema-featured .trend__from { white-space: normal; }
 .tema-featured .trend__txt { display: grid; }
 
-/* ---------- tutti gli indicatori ---------- */
+/* ---------- tutti gli indicatori: il filtro e' `.filter` di components.css ---------- */
 .tema-filter { margin-bottom: var(--space-6); }
-.tema-filter[hidden] { display: none; }
-.tema-filter__q { flex: 1 1 18rem; max-width: 32rem; }
-.tema-filter__q input[type="search"] { width: 100%; min-width: 0; height: var(--target); }
-.tema-filter__count { margin: 0; }
 .tema-table { table-layout: auto; }
 .tema-table th[scope="row"] { width: 46%; font-weight: 400; }
 .tema-table th[scope="row"] .status { margin-left: var(--space-2); }
@@ -59,10 +54,6 @@
 .tema-table .trend__from { white-space: normal; }
 .tema-table .trend__txt { display: grid; }
 .tema-table tr.group th { text-align: left; }
-.tema-group__n { margin-left: var(--space-2); font-weight: 400; color: var(--muted); }
-.tema-table tr[hidden], .tema-table tbody[hidden] { display: none !important; }
-.tema-empty { padding-block: var(--space-6); color: var(--text-2); }
-.tema-empty[hidden] { display: none; }
 @container (max-width: 560px) {
   .tema-table th[scope="row"] { width: auto; }
   .tema-table tbody tr { grid-template-columns: minmax(0, 1fr) auto; }

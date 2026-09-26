@@ -62,7 +62,7 @@ class LePagine(unittest.TestCase):
         self.assertEqual(html.count('class="map-sprite"'), 1)
 
     def test_ricerca_e_province_hanno_la_mappa_nel_margine(self):
-        self.assertIn('class="ricerca-aside"', self._get("/ricerca?q=lavoro"))
+        self.assertRegex(self._get("/ricerca?q=lavoro"), r'class="ricerca-aside[ "]')
         self.assertIn("navmap--data", self._get("/province"))
 
 

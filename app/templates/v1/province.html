@@ -78,8 +78,8 @@
 
   <div class="province-layout">
     <div class="province-main">
-      <div class="province-filter" hidden>
-        <label class="field" for="cerca-provincia">Cerca una provincia
+      <div class="filter province-filter" hidden>
+        <label class="field filter__q" for="cerca-provincia">Cerca una provincia
           <input id="cerca-provincia" type="search" data-list-filter="#province-per-regione" placeholder="Per esempio Lecce o Forlì" autocomplete="off" aria-controls="province-per-regione" aria-describedby="province-nota">
         </label>
       </div>
@@ -111,14 +111,14 @@
 
     {#- Da 960 pixel la mappa per scegliere, accanto all'elenco. Sul telefono
         no: il campo e l'elenco bastano, e la tastiera ha i link dell'elenco. -#}
-    <figure class="province-map">
+    <figure class="province-map map-pick">
       {% if d.map_steps %}
-      <figcaption class="province-map__hint"><b>La qualità della vita</b>, profilo {{ d.profile or 'predefinito' }}. Scegli una provincia per aprirne il profilo.</figcaption>
+      <figcaption class="map-hint"><b>La qualità della vita</b>, profilo {{ d.profile or 'predefinito' }}. Scegli una provincia per aprirne il profilo.</figcaption>
       {{ ui.navmap('provincia', d.map_names, None, '/provincia/', steps=d.map_steps) }}
       {{ ui.legend(d.map_legend, 'Più intenso, punteggio più alto.', nd=False) }}
       {% else %}
       {{ ui.navmap('provincia', d.names, None, '/provincia/') }}
-      <figcaption class="province-map__hint">Oppure scegli una provincia sulla mappa.</figcaption>
+      <figcaption class="map-hint">Oppure scegli una provincia sulla mappa.</figcaption>
       {% endif %}
     </figure>
   </div>

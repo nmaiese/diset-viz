@@ -25,13 +25,10 @@
 /* ---------- tutti gli indicatori ---------- */
 .regione-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
 .regione-filter { margin-bottom: var(--space-6); }
-.regione-filter[hidden] { display: none; }
 .regione-area + .regione-area { margin-top: var(--space-8); }
 .regione-area > summary { cursor: pointer; padding-block: var(--space-2); }
 .regione-area > summary > h3 { display: inline; }
 .regione-area__n { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
-/* Le righe a blocchi sono griglie: l'attributo hidden del filtro va imposto. */
-.regione-area [hidden] { display: none !important; }
 /* L'intestazione di tema dentro la tabella (tr.group) non ha ancora uno stile
    comune fuori dalle righe a blocchi. */
 .regione-area tr.group > th {

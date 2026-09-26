@@ -100,7 +100,7 @@
 
   <section class="section" id="tre-divari" aria-labelledby="h-tre">
     <h2 id="h-tre">Quanto si produce, quanti lavorano, quanto si vive</h2>
-    <p class="dr-lead">I tre divari d'apertura: la media semplice delle regioni di ogni ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni.</p>
+    <p class="intro">I tre divari d'apertura: la media semplice delle regioni di ogni ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni.</p>
     <ul class="cards cards--3 dr-core">
       {% for c in d.core %}
       <li class="card">
@@ -133,7 +133,7 @@
     {% set n = a.above_mean %}{% set tot = a.cards | length %}
     {% set all_of_them = "tutti e tre i" if tot == 3 else "tutti i " ~ tot %}
     {% set standing %}{% if n == tot %}sta meglio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% elif n == 0 %}sta peggio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% else %}sta meglio della media delle venti regioni su {{ n }} dei {{ tot }} divari d'apertura{% endif %}{% endset %}
-    <p class="dr-lead">
+    <p class="intro">
       {% if a.name == 'Nord' %}
       Otto regioni, da Piemonte e Valle d'Aosta fino all'Emilia-Romagna. Il Nord ha la media migliore su {{ a.leads }} dei {{ divari.scanned }} indicatori confrontati, il {{ a.share }}% del totale, e {{ standing }}.
       {% elif a.name == 'Centro' %}
@@ -179,7 +179,7 @@
 
   <section class="section" id="altre-distanze" aria-labelledby="h-altre">
     <h2 id="h-altre">Altre {{ d.others | length }} distanze, dalla più ampia alla più contenuta</h2>
-    <p class="dr-lead">Media semplice dei valori regionali per ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni. Il divario è la distanza fra la ripartizione con la media migliore e quella con la peggiore, letta secondo il verso dell'indicatore, ed è in punti percentuali per gli indicatori espressi in percentuale.</p>
+    <p class="intro">Media semplice dei valori regionali per ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni. Il divario è la distanza fra la ripartizione con la media migliore e quella con la peggiore, letta secondo il verso dell'indicatore, ed è in punti percentuali per gli indicatori espressi in percentuale.</p>
     <div class="tablewrap stackwrap" tabindex="0" role="region" aria-labelledby="h-altre">
       <table class="table table--stack dr-others">
         <caption class="sr-only">Gli altri divari: media semplice delle regioni di Nord, Centro e Mezzogiorno e distanza fra la migliore e la peggiore</caption>
@@ -203,7 +203,7 @@
 
   <section class="section" id="confronta" aria-labelledby="h-confronta">
     <h2 id="h-confronta">Ora fallo con le regioni che ti interessano</h2>
-    <p class="dr-lead">Le medie di ripartizione servono a inquadrare. La differenza che conta per chi ci vive è tra due regioni precise, sull'indicatore che gli sta a cuore.</p>
+    <p class="intro">Le medie di ripartizione servono a inquadrare. La differenza che conta per chi ci vive è tra due regioni precise, sull'indicatore che gli sta a cuore.</p>
     <div class="actions">
       <a class="btn btn--primary" href="/confronto">Confronta le tue regioni {{ ui.icon('arrow') }}</a>
     </div>

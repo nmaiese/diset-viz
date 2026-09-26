@@ -141,7 +141,7 @@
   {% if d.featured %}
   <section class="section" id="da-cui-partire" aria-labelledby="h-partire">
     <h2 id="h-partire">Gli indicatori da cui partire</h2>
-    <p class="tema-intro">{{ d.featured | length }} serie scelte per solidità: prima quelle complete su tutte le regioni, poi quelle che entrano nella qualità della vita, poi le più aggiornate, una per misura.</p>
+    <p class="intro">{{ d.featured | length }} serie scelte per solidità: prima quelle complete su tutte le regioni, poi quelle che entrano nella qualità della vita, poi le più aggiornate, una per misura.</p>
     <ul class="tema-featured{{ ' is-odd' if d.featured_odd }}" style="--n: {{ d.featured | length }}">
       {%- for item in d.featured %}
       <li class="card">
@@ -157,13 +157,13 @@
 
   <section class="section" id="tutti" aria-labelledby="h-tutti">
     <h2 id="h-tutti">Tutti gli indicatori del tema</h2>
-    <p class="tema-intro">Le {{ d.total }} serie del tema, ognuna con la sua scheda. La linea è la media semplice delle regioni, anno per anno, sugli anni in cui quasi tutte hanno il dato{% if d.with_spark < d.total %}: dove la copertura cambia troppo da un anno all'altro resta l'etichetta al suo posto{% endif %}.</p>
-    <p class="tema-intro"><a class="linkarrow" href="{{ atlas_theme_url(p.theme) }}">Le stesse serie nell'atlante, con i filtri per fonte e anni</a></p>
-    <form class="toolbar tema-filter" data-tema-filter hidden role="search" aria-label="Filtra gli indicatori del tema" onsubmit="return false">
-      <label class="field tema-filter__q" for="tema-q">Cerca fra gli indicatori del tema
+    <p class="intro">Le {{ d.total }} serie del tema, ognuna con la sua scheda. La linea è la media semplice delle regioni, anno per anno, sugli anni in cui quasi tutte hanno il dato{% if d.with_spark < d.total %}: dove la copertura cambia troppo da un anno all'altro resta l'etichetta al suo posto{% endif %}.</p>
+    <p class="intro"><a class="linkarrow" href="{{ atlas_theme_url(p.theme) }}">Le stesse serie nell'atlante, con i filtri per fonte e anni</a></p>
+    <form class="toolbar filter tema-filter" data-tema-filter hidden role="search" aria-label="Filtra gli indicatori del tema" onsubmit="return false">
+      <label class="field filter__q" for="tema-q">Cerca fra gli indicatori del tema
         <input id="tema-q" type="search" autocomplete="off" placeholder="Una parola del nome">
       </label>
-      <p class="subline tema-filter__count" role="status" aria-live="polite" data-tema-live>{{ d.total }} indicatori</p>
+      <p class="subline filter__count" role="status" aria-live="polite" data-tema-live>{{ d.total }} indicatori</p>
     </form>
     <div class="tablewrap stackwrap">
       <table class="table table--compact table--stack tema-table">
@@ -172,7 +172,7 @@
         {%- for g in d.groups %}
         <tbody data-tema-group>
           {%- if g.name %}
-          <tr class="group"><th scope="rowgroup" colspan="3">{{ g.name }} <span class="tema-group__n">{{ g.series | length }}</span></th></tr>
+          <tr class="group"><th scope="rowgroup" colspan="3">{{ g.name }} <span class="group__n">{{ g.series | length }}</span></th></tr>
           {%- endif %}
           {%- for item in g.series %}
           {{ row(item) }}
@@ -181,7 +181,7 @@
         {%- endfor %}
       </table>
     </div>
-    <p class="tema-empty" data-tema-empty hidden>Nessun indicatore del tema corrisponde alla ricerca.</p>
+    <p class="empty" data-tema-empty hidden>Nessun indicatore del tema corrisponde alla ricerca.</p>
   </section>
 
   {% if province_indicators %}
@@ -190,7 +190,7 @@
       dell'atlante, e senza questo blocco non erano in nessun tema. -#}
   <section class="section" id="province" aria-labelledby="h-province">
     <h2 id="h-province">Per provincia</h2>
-    <p class="tema-intro">{{ province_indicators | length }} {{ 'scheda di questo tema ha' if province_indicators | length == 1 else 'schede di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
+    <p class="intro">{{ province_indicators | length }} {{ 'scheda di questo tema ha' if province_indicators | length == 1 else 'schede di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
     <ul class="tema-list">
       {%- for ind in province_indicators %}
       <li data-tema-province><a href="{{ ind.path }}">{{ ind.name }}</a><span class="tema-list__meta">{{ ind.year_min }}{% if ind.year_max != ind.year_min %}-{{ ind.year_max }}{% endif %}, {{ ind.count }} province{% if ind.only_province %}, solo per provincia{% endif %}</span></li>

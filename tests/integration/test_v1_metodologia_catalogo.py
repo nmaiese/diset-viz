@@ -112,7 +112,7 @@ class IlCatalogoDati(unittest.TestCase):
         self.assertEqual(self.html.count(">CSV</a>"), len(with_files))
 
     def test_il_filtro_resta_nascosto_senza_javascript(self):
-        self.assertRegex(self.html, r'<form class="toolbar catalogo-filter" data-cat-controls hidden')
+        self.assertRegex(self.html, r'<form class="[^"]*\bcatalogo-filter\b[^"]*" data-cat-controls hidden')
 
 
 if __name__ == "__main__":

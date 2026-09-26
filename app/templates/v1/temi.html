@@ -76,11 +76,11 @@
     </p>
   </header>
 
-  <form class="toolbar temi-filter" data-temi-filter hidden role="search" aria-label="Filtra i temi" onsubmit="return false">
-    <label class="field temi-filter__q" for="temi-q">Cerca un tema
+  <form class="toolbar filter temi-filter" data-temi-filter hidden role="search" aria-label="Filtra i temi" onsubmit="return false">
+    <label class="field filter__q" for="temi-q">Cerca un tema
       <input id="temi-q" type="search" autocomplete="off" placeholder="lavoro, salute, ambiente">
     </label>
-    <p class="subline temi-filter__count" role="status" aria-live="polite" data-temi-live>{{ theme_total }} temi</p>
+    <p class="subline filter__count" role="status" aria-live="polite" data-temi-live>{{ theme_total }} temi</p>
   </form>
 
   {% for a in d.areas %}
@@ -111,7 +111,7 @@
     </ul>
   </section>
   {% endfor %}
-  <p class="temi-empty" data-temi-empty hidden>Nessun tema corrisponde alla ricerca. <a href="/atlante">Cerca fra tutti gli indicatori nell'atlante</a></p>
+  <p class="empty" data-temi-empty hidden>Nessun tema corrisponde alla ricerca. <a href="/atlante">Cerca fra tutti gli indicatori nell'atlante</a></p>
   <p class="source temi-source">In testa e in coda: la regione con la posizione media migliore e quella con la peggiore sugli indicatori del tema che hanno un verso, cioè per cui si può dire quale valore è migliore. Su {{ theme_total - d.ranked }} {{ 'tema' if theme_total - d.ranked == 1 else 'temi' }} i dati completi non bastano per una classifica. <a href="/metodologia">Come sono calcolati confronti e medie</a></p>
 </div>
 

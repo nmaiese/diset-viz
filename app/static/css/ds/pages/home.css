@@ -123,19 +123,15 @@
 /* Il selettore dei livelli: due schede (tab) che senza JavaScript sono link. */
 .seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control); }
 .seg__btn {
-  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: 0 var(--space-4);
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-min); padding: 0 var(--space-4);
   font-weight: 600; color: var(--text-2); text-decoration: none; border-radius: var(--radius-sm);
 }
 .seg__btn:hover { color: var(--ink); background: var(--surface-1); }
-.seg__btn.is-on { color: var(--on-ink); background: var(--ink); }
+.seg__btn.is-on { color: var(--bg); background: var(--ink); }
 .seg__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .seg__n { font-size: var(--fs-label); font-weight: 500; font-variant-numeric: tabular-nums; }
 .feat__level { display: grid; gap: var(--space-8); padding: var(--space-6) var(--space-5); }
 .feat__level:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
-.feat__level[hidden] { display: none; }
-/* `.field` e' una griglia e batterebbe il [hidden] del browser: senza
-   JavaScript il campo "Scegli" deve restare nascosto. */
-.terr__find[hidden] { display: none; }
 .feat__block { margin: 0; min-width: 0; }
 .feat__cap { display: grid; gap: var(--space-1); margin-bottom: var(--space-4); }
 .feat__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
@@ -323,7 +319,6 @@
    e la variazione deve andare a capo sotto il disegno (`.trend` in
    components.css si piega solo dentro un contenitore). */
 .home-temi__seg { margin-bottom: var(--space-6); }
-.home-temi__level[hidden] { display: none; }
 .home-temi__level:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 .home-area { container-type: inline-size; }
 .home-area__move { display: grid; gap: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--rule); }

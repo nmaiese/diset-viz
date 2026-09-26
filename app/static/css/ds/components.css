@@ -184,9 +184,9 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   /* La barra scorre di lato: senza un segno l'ultima voce tagliata a meta'
      ("Che cosa misu") sembrava un difetto, e le voci dopo non si vedevano.
      La sfumatura sta dal lato dove c'e' altro (`initToc` in v1.js). */
-  .toc ol.is-more-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
-  .toc ol.is-more-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); }
-  .toc ol.is-more-l.is-more-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
+  .toc ol.is-more-r { -webkit-mask-image: linear-gradient(to right, var(--ink) calc(100% - 40px), transparent); mask-image: linear-gradient(to right, var(--ink) calc(100% - 40px), transparent); }
+  .toc ol.is-more-l { -webkit-mask-image: linear-gradient(to left, var(--ink) calc(100% - 40px), transparent); mask-image: linear-gradient(to left, var(--ink) calc(100% - 40px), transparent); }
+  .toc ol.is-more-l.is-more-r { -webkit-mask-image: linear-gradient(to right, transparent, var(--ink) 40px, var(--ink) calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, var(--ink) 40px, var(--ink) calc(100% - 40px), transparent); }
 }
 @media (min-width: 600px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-m)); padding-inline: var(--margin-m); } }
 @media (min-width: 960px) and (max-width: 1199px) { .toc { margin-inline: calc(-1 * var(--margin-l)); padding-inline: var(--margin-l); } }
@@ -240,20 +240,19 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .field { display: grid; gap: 6px; font-size: var(--fs-label); font-weight: 600; color: var(--text-2); }
 .field output { font-size: var(--fs-ui); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .field select, .field input[type="search"] {
-  height: 40px; min-width: 14rem; max-width: 100%; padding: 0 var(--space-3);
+  height: var(--target-min); min-width: 14rem; max-width: 100%; padding: 0 var(--space-3);
   font: inherit; font-size: 16px; font-weight: 400; color: var(--ink);
   background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
 }
 .field--year { min-width: min(100%, 18rem); flex: 1 1 14rem; max-width: 26rem; }
 /* "Vai alla riga nella classifica" accanto al campo delle province: alto come
-   il campo, e nascosto finche' v1.js non lo mostra (display batterebbe hidden). */
-.toolbar__jump { display: inline-flex; align-items: center; min-height: 40px; font-size: var(--fs-ui); font-weight: 600; }
-.toolbar__jump[hidden] { display: none; }
+   il campo, e nascosto finche' v1.js non lo mostra (`hidden`, regola sotto). */
+.toolbar__jump { display: inline-flex; align-items: center; min-height: var(--target-min); font-size: var(--fs-ui); font-weight: 600; }
 .year { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-3); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; margin: 0; }
 .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--control-border); border-radius: var(--radius-control); overflow: hidden; }
 .seg > a, .seg > button, .seg > span {
-  display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--space-4);
+  display: inline-flex; align-items: center; min-height: var(--target-min); padding: 0 var(--space-4);
   font: inherit; font-weight: 600; color: var(--ink); background: var(--bg); text-decoration: none;
   border: 0; border-left: 1px solid var(--control-border); cursor: pointer;
 }
@@ -333,7 +332,6 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
    contorno d'inchiostro. */
 .navmap a:focus { outline: none; }
 .navmap__card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-4); margin: var(--space-2) 0 0; padding: var(--space-2) 0; border-top: 1px solid var(--rule); font-size: var(--fs-small); line-height: var(--lh-small); }
-.navmap__card[hidden] { display: none; }
 .navmap__card-t { font-weight: 600; color: var(--ink); }
 .navmap__card a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; }
 .navmap--zoom svg { overflow: hidden; }
@@ -347,7 +345,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .q1 { fill: var(--seq-1) !important; } .q2 { fill: var(--seq-2) !important; } .q3 { fill: var(--seq-3) !important; }
 .q4 { fill: var(--seq-4) !important; } .q5 { fill: var(--seq-5) !important; } .q6 { fill: var(--seq-6) !important; }
 .map__tip {
-  position: absolute; pointer-events: none; z-index: 5;
+  position: absolute; pointer-events: none; z-index: var(--z-tooltip);
   padding: var(--space-2) var(--space-3); background: var(--ink); color: var(--bg);
   font-size: var(--fs-small); line-height: var(--lh-small); max-width: min(16rem, 100%);
   box-shadow: var(--shadow-panel);
@@ -359,7 +357,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .legend__scale { display: flex; justify-content: space-between; gap: var(--space-2); font-variant-numeric: tabular-nums; }
 .legend__nd { display: inline-flex; align-items: center; gap: var(--space-2); }
 .legend__nd i { width: 14px; height: 12px; background: repeating-linear-gradient(45deg, var(--data-null-stripe) 0 1px, var(--data-null) 1px 4px); }
-.legend__caption { color: var(--text-2); font-weight: 400; }
+.legend__caption { line-height: var(--lh-label); color: var(--text-2); font-weight: 400; }
 
 /* ---------- tabella dati e classifica ---------- */
 .tablewrap { overflow-x: auto; }
@@ -418,7 +416,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 .is-on .score i { background: var(--data-focus); }
 
 /* ---------- serie storica ---------- */
-.chart { width: 100%; max-width: 56rem; container-type: inline-size; }
+.chart { width: 100%; container-type: inline-size; }
 .chart__s { display: none; }
 @container (max-width: 560px) { .chart__l { display: none; } .chart__s { display: block; } }
 .tiles + .layout { margin-top: var(--space-8); }
@@ -481,7 +479,7 @@ details.more[open] > summary { color: var(--ink); }
    barra della striscia, quando c'e'). */
 .analysis__map { display: none; }
 @media (min-width: 960px) {
-  .analysis:has(> .analysis__map) { display: grid; grid-template-columns: minmax(0, var(--measure, 38rem)) minmax(14rem, 1fr); column-gap: var(--space-12); align-items: start; }
+  .analysis:has(> .analysis__map) { display: grid; grid-template-columns: minmax(0, var(--measure)) minmax(14rem, 1fr); column-gap: var(--space-12); align-items: start; }
   .analysis:has(> .analysis__map) > * { grid-column: 1; }
   .analysis > .analysis__map {
     display: grid; gap: var(--space-3); grid-column: 2; grid-row: 2; align-self: start;
@@ -489,13 +487,10 @@ details.more[open] > summary { color: var(--ink); }
     max-width: 22rem; justify-self: center; width: 100%;
   }
 }
-.analysis__map-t { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin: 0; }
-.analysis__map-t b { color: var(--ink); font-weight: 600; }
-.analysis__map .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
+.analysis__map-t { margin: 0; }
 .prose h2 { font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 700; letter-spacing: var(--tr-section); margin-top: 2em; }
 .prose h3 { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; margin-top: 1.6em; }
 .prose h2 + *, .prose h3 + * { margin-top: 0.6em; }
-.prose a { color: var(--link); }
 .prose strong { font-weight: 700; }
 .prose em { font-style: italic; }
 .prose ul, .prose ol { padding-left: 1.2em; }
@@ -554,7 +549,7 @@ details.more[open] > summary { color: var(--ink); }
 .specs code { font-family: var(--font-mono); font-size: 14px; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .btn {
-  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-5, 20px);
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-5);
   font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
   border-radius: var(--radius-control); border: 1px solid var(--control-border); background: var(--bg); color: var(--ink);
 }
@@ -908,7 +903,7 @@ details.more[open] > summary { color: var(--ink); }
 @media (min-width: 960px) {
   .tablewrap.stackwrap--wide { overflow: clip; }
   .stackwrap--wide .table thead th {
-    position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h)); z-index: 2;
+    position: sticky; top: calc(var(--sticky-top) + var(--stripbar-h)); z-index: var(--z-raised);
     background: var(--bg); box-shadow: inset 0 -1px 0 var(--rule-strong);
   }
 }
@@ -941,7 +936,7 @@ details.more[open] > summary { color: var(--ink); }
 
 /* Torna su: compare dopo due schermate sulle pagine lunghe (v1.js). */
 .totop {
-  position: fixed; right: calc(var(--space-4) + env(safe-area-inset-right, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  position: fixed; right: calc(var(--space-4) + env(safe-area-inset-right, 0px)); bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); z-index: var(--z-sticky);
   display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-4);
   background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control);
   font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 600; text-decoration: none;
@@ -1014,7 +1009,7 @@ main.v1 h1 { view-transition-name: page-title; }
 @media (hover: hover) { .story:hover .story__media img { transform: scale(1.03); } }
 @media (prefers-reduced-motion: reduce) { .story__media img, .story:hover .story__media img { transition: none; transform: none; } }
 .story__credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
-.story__credit a { position: relative; z-index: 1; color: inherit; }
+.story__credit a { position: relative; z-index: var(--z-raised); color: inherit; }
 .story__body { display: grid; align-content: start; gap: var(--space-2); min-width: 0; }
 .story__tag { justify-self: start; padding: 2px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--ink); background: var(--surface-2); border-radius: var(--radius-sm); }
 .story__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
@@ -1055,11 +1050,54 @@ main.v1 h1 { view-transition-name: page-title; }
    nel margine della testata da 960 una sotto l'altra. */
 .regionmap { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); gap: var(--space-4); align-items: center; margin: 0 0 var(--space-6); }
 .regionmap figcaption { display: grid; gap: var(--space-3); min-width: 0; }
-.regionmap__cap { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.regionmap .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
 @media (min-width: 960px) {
   .regionmap { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
 }
+
+/* ---------- i pezzi comuni degli indici ----------
+   Nati uguali pagina per pagina (atlante, catalogo, tema, temi, province,
+   regioni, ricerca, blog, divari regionali, qualita' della vita), stanno qui
+   una volta sola. Il margine attorno lo decide la pagina. */
+
+/* `hidden` vince sempre. Un filtro, un gruppo o uno stato vuoto che si
+   dispongono in griglia o in flex batterebbero il `display: none` del
+   browser, e senza JavaScript comparirebbero: al posto di una regola per
+   ogni classe, pagina per pagina, una per tutte. */
+.ds [hidden] { display: none !important; }
+
+/* Il filtro di un elenco gia' in pagina: il campo largo fino a 32rem, i
+   controlli della barra alti un bersaglio, il conteggio che il JavaScript
+   riscrive. Senza JavaScript la barra resta nascosta. */
+.filter__q { flex: 1 1 18rem; max-width: 32rem; }
+.filter__q input[type="search"] { width: 100%; min-width: 0; height: var(--target); }
+.filter .field select { height: var(--target); }
+.filter .seg > button { min-height: var(--target); }
+.filter__count { margin: 0; }
+
+/* Il conteggio nel titolo di un gruppo: in tondo, grigio, cifre in colonna.
+   Accanto a un titolo scende alla taglia piccola dell'interfaccia, dentro
+   l'intestazione di una tabella resta alla sua. */
+.group__n { margin-left: var(--space-2); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+:is(h2, h3, h4) > .group__n { font-family: var(--font-ui); font-size: var(--fs-small); }
+
+/* Lo stato vuoto di un filtro: una frase e una via d'uscita. */
+.empty { max-width: var(--measure); padding-block: var(--space-8); color: var(--text-2); }
+
+/* La frase che apre una sezione sotto il suo titolo. */
+.intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+
+/* La riga che dice che cosa colora una mappa, o che la mappa serve a
+   scegliere. La usano anche la mappa accanto all'analisi e la regione
+   ingrandita, coi loro nomi. */
+.map-hint, .analysis__map-t, .regionmap__cap { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.map-hint b, .analysis__map-t b { color: var(--ink); font-weight: 600; }
+
+/* La mappa per scegliere nel margine di un indice, sul fondo della pagina:
+   il grigio della superficie quasi sparisce, quindi la terra sta un passo
+   piu' scura e sotto il mouse prende l'accento. La classe va sul contenitore
+   (`ui.navmap` non ne prende). Non vale per la mappa di un dato. */
+.map-pick .navmap:not(.navmap--data) a use { fill: var(--rule-strong); }
+.map-pick .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 
 /* ---------- bersagli al tocco: 44 pixel dove il sistema li promette ----------
    Un blocco solo, per ogni pagina della 1.0 (prima stava pagina per pagina).

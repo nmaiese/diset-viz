@@ -14,7 +14,9 @@ ognuna e' del tipo che non si vede in una PR e non rompe nessun test:
 3. un colore cotto nel foglio di una pagina della 1.0. Fino al 25 settembre
    2026 la prova guardava il `:root` di ripiego della SPA
    (`frontend/src/styles.css`), che se n'e' andato con il bundle dell'atlante:
-   adesso guarda i fogli di pagina, dove stanno l'atlante e il confronto.
+   adesso guarda i fogli di pagina, dove stanno l'atlante e il confronto, e
+   dal 26 settembre anche i componenti comuni e la testata (`components.css`,
+   `chrome.css`). Il solo foglio che scrive colori e' `system.css`.
 """
 import re
 import unittest
@@ -95,16 +97,20 @@ class FogliDiStileTest(unittest.TestCase):
         self.assertEqual(usati - radice, set())
 
     def test_i_fogli_di_pagina_non_cuociono_colori(self):
-        """Nei fogli delle pagine della 1.0 un colore sta solo nei token.
+        """Nei fogli della 1.0 un colore sta solo nei token.
 
         Un esadecimale o un `rgba()` in una regola non segue il tema scuro: il
         bollino "Qualita' della vita" dell'atlante React restava grigio chiaro
         sulla pagina scura. Quel foglio non c'e' piu', e la stessa regola vale
         per i fogli che hanno preso il suo posto: le tre serie del confronto
-        leggono `--cat-*`, mai un colore scritto.
+        leggono `--cat-*`, mai un colore scritto. Vale anche per i componenti
+        comuni e per la testata, che ogni pagina carica: anche una maschera
+        (dove conta solo l'opacita') legge `var(--ink)`. `system.css` no, e'
+        il posto dove i colori si scrivono.
         """
         fogli = sorted(PAGINE.glob("*.css"))
         self.assertIn("confronto.css", [f.name for f in fogli])
+        fogli += [COMPONENTS, CHROME]
         for foglio in fogli:
             with self.subTest(foglio=foglio.name):
                 testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)

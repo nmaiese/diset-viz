@@ -98,7 +98,7 @@
 
   {% for g in d.groups %}
   <section class="ricerca-group" data-kind="{{ g.kind }}" aria-labelledby="h-{{ g.param }}">
-    <h2 class="ricerca-group__head" id="h-{{ g.param }}">{{ g.label }} <span class="ricerca-group__n">{{ g.count }}</span></h2>
+    <h2 class="ricerca-group__head" id="h-{{ g.param }}">{{ g.label }} <span class="group__n">{{ g.count }}</span></h2>
     <ol class="search-results">
       {%- for row in g.rows %}
       <li class="search-result">
@@ -141,10 +141,10 @@
       regione (`home.hero_map`): la stessa della testata della home. Sul
       telefono no, i risultati vengono prima. -#}
   {% if d.region_names %}
-  <aside class="ricerca-aside" aria-labelledby="h-mappa">
+  <aside class="ricerca-aside map-pick" aria-labelledby="h-mappa">
     <h2 class="ricerca-aside__t" id="h-mappa">Cerchi una regione?</h2>
     {% if d.nav_map %}
-    <p class="ricerca-aside__note">Nei colori della qualità della vita{% if d.nav_map.profile %}, profilo {{ d.nav_map.profile }}{% endif %}. Scegline una per aprire il profilo.</p>
+    <p class="map-hint">Nei colori della qualità della vita{% if d.nav_map.profile %}, profilo {{ d.nav_map.profile }}{% endif %}. Scegline una per aprire il profilo.</p>
     {{ ui.navmap('regione', d.nav_map.names, None, '/regione/', steps=d.nav_map.steps) }}
     {{ ui.legend(d.nav_map.legend, 'Più intenso, punteggio più alto.', nd=False) }}
     {% else %}

@@ -4,7 +4,6 @@
    .table--stack) sono componenti comuni: qui resta l'impaginazione.
    ========================================================================== */
 
-.qv-lead { max-width: var(--measure); margin-bottom: var(--space-6); }
 .qv-strip > details.more { margin-top: 0; }
 
 /* Una colonna del doppio podio: titolo con filetto, tabella, i due link. */
@@ -25,7 +24,7 @@
 /* I due link sono bersagli pieni da 44 pixel, alla taglia dell'interfaccia
    e staccati: a 14 pixel e a 16 l'uno dall'altro sembravano una riga sola. */
 .qv-profiles__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-8); margin-top: var(--space-1); font-size: var(--fs-ui); line-height: var(--lh-ui); }
-.qv-profiles__links a { display: inline-flex; align-items: center; min-height: var(--target, 44px); }
+.qv-profiles__links a { display: inline-flex; align-items: center; min-height: var(--target); }
 
 /* Dove eccelle: il nome, e subito dopo il suo punteggio in colonna. Da
    tabella le colonne stanno sul loro contenuto: a tutta larghezza il

@@ -1,6 +1,7 @@
-/* L'indice delle province: solo l'impaginazione sua. Campo, mappa per
-   scegliere e pallini delle ripartizioni sono in components.css. Legge solo
-   token. */
+/* L'indice delle province: solo l'impaginazione sua. Campo e filtro
+   (`.filter`), mappa per scegliere (`.map-pick`) con la sua didascalia
+   (`.map-hint`) e pallini delle ripartizioni sono in components.css. Legge
+   solo token. */
 
 /* ---------- elenco e, da 960, la mappa accanto ---------- */
 .province-layout { display: grid; gap: var(--space-12); align-items: start; }
@@ -13,25 +14,17 @@
     position: sticky; top: calc(var(--sticky-top) + var(--space-6));
   }
   .province-map .navmap { width: 100%; }
-  .province-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 }
-.province-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.province-map__hint b { color: var(--ink); font-weight: 600; }
-.province-map .legend__caption { font-size: var(--fs-label); line-height: var(--lh-label); }
 
 /* ---------- il campo, poi la nota, poi l'indice ---------- */
 .province-filter { margin-bottom: var(--space-4); }
-.province-filter[hidden] { display: none; }
-.province-filter .field input[type="search"] { height: var(--target); width: 100%; max-width: 26rem; min-width: 0; }
 .province-note { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.province-note[hidden] { display: none; }
 
 /* L'indice delle regioni e' `.jump--scroll` di components.css. */
 .province-jump { margin-top: var(--space-6); }
 
 /* ---------- le regioni e le loro province ---------- */
 .province-group { padding-top: var(--space-8); }
-.province-group[hidden] { display: none; }
 .province-group > h2 { padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); margin-bottom: var(--space-3); }
 .province-group > h2 a { color: var(--ink); text-decoration: none; }
 .province-group > h2 a:hover { text-decoration: underline; }
@@ -39,7 +32,6 @@
   list-style: none; padding: 0; display: grid; gap: var(--space-2);
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
 }
-.province-list li[hidden] { display: none; }
 .province-list a {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
   min-height: var(--target); padding: var(--space-2) var(--space-3);
@@ -51,5 +43,4 @@
 .province-list__name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
 .province-list__rank { flex: none; font-size: var(--fs-small); color: var(--text-2); font-variant-numeric: tabular-nums; }
 .province-list__rank .n { color: inherit; }
-@media (min-width: 960px) { .province-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); } }
 .province-group > h2 a { display: inline-flex; align-items: center; min-height: var(--target); }

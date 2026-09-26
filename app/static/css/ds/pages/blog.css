@@ -12,7 +12,7 @@
 .blog-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-4); }
 .blog-tags__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
 .blog-tags ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-4); padding: 0; }
-.blog-tags a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target, 44px); font-weight: 600; }
+.blog-tags a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--target); font-weight: 600; }
 .blog-tags__n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 /* La copertina: segnaposto sulla superficie finche' l'immagine non arriva. */
@@ -21,7 +21,7 @@
 @media (hover: hover) { .blog-card:hover .blog-media img { transform: scale(1.03); } }
 @media (prefers-reduced-motion: reduce) { .blog-media img, .blog-card:hover .blog-media img { transition: none; transform: none; } }
 .blog-credit { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
-.blog-credit a { position: relative; z-index: 1; color: inherit; }
+.blog-credit a { position: relative; z-index: var(--z-raised); color: inherit; }
 
 /* La storia in apertura e' la `.story--lead` di components.css, come in
    home. Qui la copertina tiene le sue proporzioni (dentro c'e' il titolo, e
@@ -33,7 +33,7 @@
   .blog-card:has(.card__title a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
   .blog-card .card__title a:focus-visible { outline: none; }
 }
-@media (min-width: 960px) { .v1-blog .story--lead .story__title { font-size: var(--fs-section-l, var(--fs-section)); } }
+@media (min-width: 960px) { .v1-blog .story--lead .story__title { font-size: var(--fs-section-l); } }
 
 /* Le schede: la copertina sopra, poi titolo, meta e sommario. */
 .blog-cards { margin-top: var(--space-2); }

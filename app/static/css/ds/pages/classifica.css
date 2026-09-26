@@ -24,7 +24,7 @@
    stanno su una riga, con bersagli da 44px. */
 .cl-toolbar .cl-field { flex: 1 1 100%; }
 .seg.cl-profiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--control-border); }
-.seg.cl-profiles > a { border-left: 0; min-height: var(--target, 44px); padding-block: var(--space-2); line-height: 1.25; }
+.seg.cl-profiles > a { border-left: 0; min-height: var(--target); padding-block: var(--space-2); line-height: 1.25; }
 @container (min-width: 560px) { .seg.cl-profiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @container (min-width: 1040px) {
   .cl-toolbar .cl-field { flex: 0 1 auto; }

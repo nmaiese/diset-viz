@@ -116,7 +116,7 @@
     <div class="blog-index">
       {%- for t in d.index %}
       <section class="blog-index__group" id="{{ t.anchor }}" aria-labelledby="h-{{ t.anchor }}">
-        <h3 class="h-sub" id="h-{{ t.anchor }}">{{ t.name }} <span class="blog-tags__n">{{ t.stories | length }}</span></h3>
+        <h3 class="h-sub" id="h-{{ t.anchor }}">{{ t.name }} <span class="group__n">{{ t.stories | length }}</span></h3>
         <ul>
           {%- for s in t.stories %}
           <li><a href="{{ '/blog/' ~ s.slug }}">{{ s.title }}</a> <time class="blog-index__date" datetime="{{ s.date }}">{{ s.date_label }}</time></li>

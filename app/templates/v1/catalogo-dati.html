@@ -64,16 +64,16 @@
 
   <section class="section" id="dataset" aria-labelledby="dataset-title" data-cat>
     <h2 id="dataset-title">Dataset disponibili</h2>
-    <form class="toolbar catalogo-filter" data-cat-controls hidden role="search" aria-label="Filtra il catalogo">
-      <label class="field catalogo-filter__q" for="cat-q">Cerca un indicatore o una fonte
+    <form class="toolbar filter catalogo-filter" data-cat-controls hidden role="search" aria-label="Filtra il catalogo">
+      <label class="field filter__q" for="cat-q">Cerca un indicatore o una fonte
         <input id="cat-q" type="search" autocomplete="off" placeholder="occupazione, rifiuti, Eurostat" data-cat-q>
       </label>
-      <p class="subline catalogo-filter__count" role="status" aria-live="polite" data-cat-live>{{ d.total | num(None, 'count') }} indicatori</p>
+      <p class="subline filter__count catalogo-filter__count" role="status" aria-live="polite" data-cat-live>{{ d.total | num(None, 'count') }} indicatori</p>
     </form>
 
     {% for g in d.groups %}
     <details class="catalogo-group" data-cat-group data-collapse-mobile open>
-      <summary><h3 class="h-sub" id="{{ g.id }}">{{ g.name }} <span class="catalogo-group__n" data-cat-n>{{ g['items'] | length | num(None, 'count') }} {{ g['items'] | length | it_plural('indicatore', 'indicatori') }}</span></h3></summary>
+      <summary><h3 class="h-sub" id="{{ g.id }}">{{ g.name }} <span class="group__n" data-cat-n>{{ g['items'] | length | num(None, 'count') }} {{ g['items'] | length | it_plural('indicatore', 'indicatori') }}</span></h3></summary>
       {% if g.area or g.path %}<p class="catalogo-group__meta">{% if g.area %}{{ g.area }}{% endif %}{% if g.area and g.path %}<span class="sep" aria-hidden="true">·</span>{% endif %}{% if g.path %}<a href="{{ g.path }}">La pagina del tema</a>{% endif %}</p>{% endif %}
       <ul class="catalogo-list" aria-labelledby="{{ g.id }}">
         {% for item in g['items'] %}
@@ -86,7 +86,7 @@
       </ul>
     </details>
     {% endfor %}
-    <p class="catalogo-empty" data-cat-empty hidden>Nessun indicatore trovato. Prova con un'altra parola, o apri <a href="/atlante">l'atlante</a> per cercare per tema.</p>
+    <p class="empty" data-cat-empty hidden>Nessun indicatore trovato. Prova con un'altra parola, o apri <a href="/atlante">l'atlante</a> per cercare per tema.</p>
   </section>
 </div>
 </main>

@@ -105,7 +105,7 @@
   {% if d.levels %}
   <section class="section" id="podio" aria-labelledby="h-podio">
     <h2 id="h-podio">Chi è in testa e chi in coda</h2>
-    <p class="subline qv-lead">Punteggio da 0 a 100 con il profilo {{ d.default_name }}.{% if d.fifty %} La tacca segna 50, la media semplice dei territori dello stesso livello.{% endif %} Ogni nome porta al profilo del territorio.</p>
+    <p class="subline intro">Punteggio da 0 a 100 con il profilo {{ d.default_name }}.{% if d.fifty %} La tacca segna 50, la media semplice dei territori dello stesso livello.{% endif %} Ogni nome porta al profilo del territorio.</p>
     <div class="podiums">
       {% for b in d.levels %}
       <figure class="qv-podium">
@@ -128,7 +128,7 @@
 
   <section class="section" id="profili" aria-labelledby="h-profili">
     <h2 id="h-profili">Cambia le priorità</h2>
-    <p class="subline qv-lead">Ogni profilo pesa le dimensioni in modo diverso, e la classifica cambia. Accanto a ognuno, chi guadagna più posizioni rispetto a {{ d.default_name }}.</p>
+    <p class="subline intro">Ogni profilo pesa le dimensioni in modo diverso, e la classifica cambia. Accanto a ognuno, chi guadagna più posizioni rispetto a {{ d.default_name }}.</p>
     <ul class="qv-profiles">
       {% for item in d.profiles %}
       <li>
