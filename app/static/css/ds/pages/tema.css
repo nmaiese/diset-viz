@@ -9,7 +9,7 @@
 
 /* La nota del metodo sta sotto il titolo della sezione, prima dei numeri che
    spiega: dopo la tabella non la leggeva nessuno. */
-.tema-method { max-width: var(--measure); margin-top: calc(-1 * var(--space-3)); margin-bottom: var(--space-6); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.tema-method { max-width: var(--measure); margin-bottom: var(--space-6); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .tema-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
 
 /* ---------- la classifica e la mappa ---------- */

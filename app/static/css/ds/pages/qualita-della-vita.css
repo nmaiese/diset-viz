@@ -4,7 +4,7 @@
    .table--stack) sono componenti comuni: qui resta l'impaginazione.
    ========================================================================== */
 
-.qv-lead { max-width: var(--measure); margin-top: calc(-1 * var(--space-3)); margin-bottom: var(--space-6); }
+.qv-lead { max-width: var(--measure); margin-bottom: var(--space-6); }
 .qv-strip > details.more { margin-top: 0; }
 
 /* Una colonna del doppio podio: titolo con filetto, tabella, i due link. */

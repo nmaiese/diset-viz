@@ -102,19 +102,29 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    di 3px e piu' aria sopra, e il titolo cresce sugli schermi larghi. Resta un
    filetto e non una scatola (SISTEMA.md, "Regia"). */
 .section, .come-leggere { padding-top: var(--space-12); }
-.section + .section, .section + .come-leggere, .come-leggere + .section { margin-top: var(--space-4); }
-@media (min-width: 960px) {
-  .section, .come-leggere { padding-top: var(--space-16); }
-  .section + .section, .section + .come-leggere, .come-leggere + .section { margin-top: var(--space-8); }
-}
-.section > h2, .come-leggere > h2, .h-section {
+/* Ogni sezione che non apre il suo contenitore sta alla stessa distanza da
+   cio' che la precede, sezione o no: con la regola fra sezioni sole, quella
+   dopo la testata, le tessere o uno spazio pubblicitario perdeva 32 pixel. */
+:is(.section, .come-leggere):not(:first-child) { margin-top: var(--space-8); }
+/* La testata di pagina porta gia' i suoi 32 pixel sotto. */
+.pagehead + :is(.section, .come-leggere) { margin-top: 0; }
+@media (min-width: 960px) { .section, .come-leggere { padding-top: var(--space-16); } }
+/* `h2.h-section` e non solo `.h-section`: `.ds h2 { margin: 0 }` di
+   system.css pesa di piu' di una classe sola, e il titolo di "Continua da qui"
+   perdeva margine, interlinea e spaziatura (0 pixel fra titolo e contenuto). */
+.section > h2, .come-leggere > h2, h2.h-section, .h-section {
   font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
   padding-top: var(--space-4); border-top: 3px solid var(--ink);
   margin-bottom: var(--space-6);
 }
 @media (min-width: 1200px) {
-  .section > h2, .come-leggere > h2, .h-section { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); }
+  .section > h2, .come-leggere > h2, h2.h-section, .h-section { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); }
 }
+/* La frase che introduce una sezione sta a 16 pixel dal titolo, su ogni
+   pagina. Prima ogni foglio la tirava su a modo suo (-12, -8, niente), e la
+   stessa cosa stava a 20, 24 o 32 pixel. Il contenuto dopo la frase resta
+   alla distanza di blocco. */
+.section > h2:has(+ p) { margin-bottom: var(--space-4); }
 .h-sub { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); }
 .subline { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-top: var(--space-1); }
 /* `:not(svg)`: la serie a fascia (`charts.band`) e' un <svg class="band">, e
@@ -136,7 +146,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   padding-top: var(--space-4); border-top: 3px solid var(--ink);
 }
 @media (min-width: 960px) { .zone__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
-.zone__head .h-section { border-top: 0; padding-top: 0; margin-bottom: 0; }
+.zone__head .h-section, .zone__head h2.h-section { border-top: 0; padding-top: 0; margin-bottom: 0; }
 .zone__title { display: grid; gap: var(--space-2); }
 .zone__lead { max-width: var(--measure); color: var(--text-2); }
 .zone__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); }
@@ -830,8 +840,6 @@ details.more[open] > summary { color: var(--ink); }
 .card:hover .card__media img { transform: scale(1.03); }
 @media (prefers-reduced-motion: reduce) { .card:hover .card__media img { transform: none; } }
 
-/* ---------- ritmo ---------- */
-.section + .section { margin-top: var(--space-8); }
 
 /* ==========================================================================
    Leggere e orientarsi: definizioni a portata di mano, intestazioni che

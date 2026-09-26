@@ -5,7 +5,7 @@
    l'impaginazione della pagina. Solo token, nessun colore cotto.
    ========================================================================== */
 
-.dr-lead { max-width: var(--measure); color: var(--text-2); margin-top: calc(-1 * var(--space-2)); margin-bottom: var(--space-8); }
+.dr-lead { max-width: var(--measure); color: var(--text-2); margin-bottom: var(--space-6); }
 
 /* Il pallino della ripartizione accanto al titolo della sua sezione. */
 .dr-area > h2 .area-dot { width: 14px; height: 14px; margin-right: var(--space-3); vertical-align: 0.1em; }
