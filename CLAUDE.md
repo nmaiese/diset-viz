@@ -42,6 +42,7 @@ possono scrivere direttamente su `master`.
 | fonti verticali esterne | [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
+| come il sito si presenta ai crawler AI: `Content-Signal`, bot di risposta, bot di addestramento, `Google-Extended` | [`docs/AI_CRAWLERS.md`](docs/AI_CRAWLERS.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
 | **la versione 1.0**: griglia, tipografia, componenti, pagine, direzione "Cronaca", prototipi, e le pagine del sito che ne escono (`app/design/`, `app/templates/v1/`) | [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md), [`design/README.md`](design/README.md) |
 | deploy su Cloud Run | [`DEPLOY.md`](DEPLOY.md) |
