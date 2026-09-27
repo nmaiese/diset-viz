@@ -93,6 +93,7 @@ ordinati: la stessa disattenzione, con meno danni.
 
 Ne segue:
 
+- **Visibilità Totale delle Conversazioni in Orca**: Nessun agente o sub-agente (Codex, Gemini, Claude, OpenCode) deve essere avviato come processo background invisibile sotto AGY (`invoke_subagent`). Ogni task o sub-task deve essere spawnato come un worktree nativo e una scheda di terminale visibile nella dashboard GUI/TUI di Orca via `orca-ide worktree create` o `bin/py scripts/orca_dispatch.py`.
 - **Un task, un worktree, un agente.** Due agenti nello stesso checkout non si
   coordinano, e Orca non li blocca.
 - **Un agente non esce dal suo worktree.** Se serve un file di lavoro, quello è il
