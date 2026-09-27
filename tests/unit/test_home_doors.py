@@ -9,6 +9,7 @@ annuncia.
 """
 
 import unittest
+from unittest.mock import patch
 
 from app import nav
 from app.design.pages import home
@@ -54,6 +55,25 @@ class LePorte(unittest.TestCase):
         self.assertNotIn("1.594", atlas_text({"total_indicators": 1594}))
         self.assertIn("tutti con i dati completi",
                       atlas_text({"total_indicators": 594, "complete_indicators": 594}))
+
+    def test_la_mappa_della_home_porta_la_lista_dei_punteggi_e_i_non_valutati(self):
+        from app.design.pages import regione
+
+        rows = (
+            {"key": "puglia", "name": "Puglia", "rank": 1, "score": 63.2},
+            {"key": "lazio", "name": "Lazio", "rank": 2, "score": 51.4},
+        )
+        quality = {"rows": rows, "ranks": {"puglia": 1, "lazio": 2},
+                   "profile": "predefinito", "source": "Istat"}
+        with patch.object(regione, "_region_quality", return_value=quality), \
+                patch.object(home.common, "map_steps", return_value={"puglia": "q6", "lazio": "q2"}), \
+                patch.object(home.common, "legend", return_value=[]):
+            result = home.hero_map({"puglia": "Puglia", "lazio": "Lazio", "valle-d-aosta": "Valle d'Aosta"})
+
+        self.assertEqual(result["rows"], rows)
+        self.assertEqual(result["unrated"], ["Valle d'Aosta"])
+        self.assertEqual(result["total"], 2)
+        self.assertEqual(result["source"], "Istat")
 
 
 if __name__ == "__main__":

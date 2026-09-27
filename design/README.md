@@ -14,6 +14,10 @@ la documentazione.
 
 ## Che cosa c'e'
 
+- `DESIGN_CRONACA_2.md`: il blueprint per l'evoluzione della 1.0. Definisce
+  decisioni, token proposti, griglie responsive, navigazione, hero, uso del
+  bento, movimento, accessibilita' e criteri di accettazione. Non modifica il
+  runtime da solo.
 - `v1/SISTEMA.md`: griglia, tipografia, componenti, pagine e regole di
   contenuto. E' il documento da leggere prima di toccare un template della 1.0.
 - `v1/tokens/tokens.json`: i valori della direzione scelta, "Cronaca". Da qui

@@ -36,6 +36,13 @@ class OgniCoppiaDelPool(unittest.TestCase):
         self.assertGreater(len(self.pool["regione"]), 100)
         self.assertGreater(len(self.pool["provincia"]), 20)
 
+    def test_la_mappa_ha_un_alternativa_testuale_completa(self):
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertIn('class="home-map-values"', html)
+        self.assertIn("Punteggi normalizzati da zero a cento", html)
+        self.assertIn('class="home-map-values__list"', html)
+        self.assertIn("Apri la classifica completa", html)
+
     def test_ogni_territorio_ha_la_sua_ripartizione(self):
         """Le frasi della home sul Mezzogiorno ("nessuna regione del
         Mezzogiorno arriva...") valgono sull'insieme: se un territorio non ha
