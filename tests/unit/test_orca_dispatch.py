@@ -1,7 +1,5 @@
 """Test unitario per scripts/orca_dispatch.py (Orchestratore Multi-Agente Orca)."""
-import tempfile
 import unittest
-from pathlib import Path
 
 from scripts import orca_dispatch
 
@@ -23,16 +21,17 @@ class OrcaDispatchTest(unittest.TestCase):
         self.assertEqual(code, 0)
 
     def test_task_template_formatting(self):
-        content = orca_dispatch.TASK_TEMPLATE.format(
-            title="Titolo Prova",
-            agent="Codex",
-            role="worker",
+        content = orca_dispatch.build_task_content(
             slug="prova-slug",
+            title="Titolo Prova",
             objective="Obiettivo di prova",
+            role="worker",
+            agent="codex",
         )
         self.assertIn("# Task: Titolo Prova", content)
         self.assertIn("> Assegnato a: Codex (worker)", content)
         self.assertIn("DIVARIO_PYTHON=", content)
+        self.assertIn(".venv/bin/python", content)
         self.assertIn("CLAUDE.md", content)
 
 
