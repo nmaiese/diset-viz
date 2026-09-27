@@ -42,13 +42,23 @@ Ho contato quante sequenze condivise contengono una cifra, e cosa dicono.
 I numeri che si ripetono sono **anni** e **l'esempio illustrativo del metodo**, non
 i valori che costituiscono la notizia. «Il valore è diminuito» è la stessa frase
 su 98 pagine perché la stessa frase dà l'informazione su 98 pagine: è il telaio.
-Nessuna sequenza condivisa riprende il valore di una regione insieme al nome di
-quella regione.
+
+La domanda che conta è se una pagina riporti il **dato** di un'altra, cioè se una
+sequenza condivisa metta una cifra accanto al nome di un territorio. Su 880
+sequenze condivise le risposte sono **6**, e tutte e sei sono la stessa frase: «Dal
+2018 la distanza fra Trentino Alto Adige e …», su 24 pagine, e «Dal 2018 la
+distanza fra Valle d'Aosta e …», su 10. Si ripetono i nomi delle due regioni
+estreme, che sono le stesse in molti indicatori, mentre la distanza in punti che
+segue sta fuori dalla finestra condivisa ed è diversa da pagina a pagina. Quindi
+nessuna pagina riporta il valore di un'altra: il difetto che si cercava non c'è, e
+le sei frasi sono un'unica sentenza da rivedere a parte, non un problema di dati.
 
 La prova complementare: ripetendo la quota con ogni numero mascherato — cifre,
 decimali e percentuali diventano `<n>` — la percentuale **sale** (28,3% → 33,4% e
-46,2% → 49,9%). Se la ripetizione fosse stata data, mascherare i dati l'avrebbe
-fatta crollare.
+46,2% → 49,9%). Questo conferma che a ripetersi è la cornice, ma con un avvertimento:
+mascherare è un'operazione che può solo far salire la quota, perché trasforma
+sequenze diverse in una sequenza sola. Una quota mascherata non può quindi scendere
+sotto quella grezza, e non va mai usata come indicatore di rischio.
 
 ## Il blocco «come leggere» non è un boilerplate
 
@@ -101,10 +111,10 @@ cambia solo con PR e merge. Il nome e il docstring di `duplicazione.py` dicono
 ancora «testo identico», che è la formulazione che ha fatto leggere un difetto
 dove c'è una scelta: correggerlo è una riga di codice e un test, quindi aspetta la
 PR. Lo script di mascheramento con cui sono prodotte le tabelle qui sopra non è
-nel repository, perché `scripts/` è codice: la correzione duratura sarebbe
-insegnare a `duplicazione.py` a riportare **le due quote**, con e senza numeri, e
-a dire quante sequenze condivise contengono una cifra, perché con una sola quota il
-numero non si può leggere.
+nel repository, perché `scripts/` è codice. La correzione duratura è già preparata
+nel ramo `nmaiese/duplicazione-due-quote`: le due quote, con e senza numeri, più il
+conteggio delle sequenze che legano una cifra a un territorio, che è il numero che
+serve davvero.
 
 ## Come riprodurre la misura
 
@@ -118,6 +128,13 @@ bin/py scripts/duplicazione.py --frasi 8  # le sequenze più condivise
 Per le due tabelle mancanti il metodo è questo, e sono poche righe: riusare
 `_quota` e `_sequenze` sulle stesse pagine, poi (a) contare le sequenze condivise
 che contengono `\d`, e (b) ricalcolare la quota dopo aver sostituito ogni
-`\d+(?:[.,]\d+)?\s*%?` con `<n>`. Se un giorno la quota mascherata scende sotto
-quella grezza, è comparso un dato ripreso e la seconda tabella diventa un allarme
-invece di una spiegazione.
+`\d+(?:[.,]\d+)?\s*%?` con `<n>`.
+
+Il numero che indica un rischio è un altro, e non è una percentuale: quante
+sequenze condivise contengono **una cifra e un nome di territorio** insieme, con i
+nomi presi da `app.data.REGION_ORDER`. Le sei frasi della distanza fra regioni sono
+il riferimento su `master`. Se quel numero cresce, una pagina sta riportando il
+dato di un'altra e va guardata a mano; se resta a sei, è cornice.
+
+La quota mascherata non va confrontata con quella grezza per decidere: come
+scritto sopra, il confronto non può dare l'esito che sembra.
