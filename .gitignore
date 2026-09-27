@@ -60,3 +60,7 @@ data/articles/*/photo-candidates/
 # Antigravity / Orca agent working files (not project source)
 .agents/
 ORIGINAL_REQUEST.md
+
+# Stato locale e note live dei worktree Orca
+/.orca/
+/TASK.md
