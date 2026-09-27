@@ -5,19 +5,21 @@
    la testata con le porte sta sulla superficie, poi si alterna fondo e
    superficie fino al piede. */
 
-/* ---------- testata: il titolo sopra, la frase e la ricerca affiancate da 960 ---------- */
+/* ---------- testata: titolo, ricerca e mappa ---------- */
 .home-top { background: var(--surface-1); padding-top: 0; }
 .home-head { padding-top: var(--space-6); padding-bottom: var(--space-6); }
-/* Da 960 il titolo e la frase a sinistra, la ricerca a destra alla loro
-   altezza: col titolo steso su tutta la riga l'angolo in alto a destra restava
-   vuoto. */
-@media (min-width: 960px) {
+/* Da 768 c'e' gia' spazio per testo, ricerca e spotlight a sinistra e mappa a
+   destra. I gradini successivi mantengono le proporzioni desktop. */
+@media (min-width: 768px) {
   /* Le righe della colonna sinistra contengono titolo, frase, ricerca e spotlight dell'indicatore.
-     Fra 960 e 1200 le colonne sono pari: a 5 contro 7 il titolo andava su quattro righe. */
-  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-top: var(--space-10); padding-bottom: var(--space-8); }
+     Sul tablet la colonna di testo resta appena piu' larga per non spezzare il titolo. */
+  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-top: var(--space-8); padding-bottom: var(--space-8); }
   .home-head > * { grid-column: 1; }
   .home-head > .home-map { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
+}
+@media (min-width: 960px) {
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); padding-top: var(--space-10); }
 }
 @media (min-width: 1200px) {
   /* Da 1200 la mappa prende i sette dodicesimi. */
@@ -25,8 +27,8 @@
 }
 /* La mappa della testata: la qualita' della vita per regione, con la sua
    legenda. Sotto i 600 pixel non si disegna: la sostituisce la lista dei
-   punteggi dopo le porte (`.home-map-values`). Fra 600 e 960 sotto la ricerca,
-   da 960 nella colonna destra, alta quanto la testata. */
+   punteggi dopo le porte (`.home-map-values`). Fra 600 e 768 sta sotto la
+   ricerca, da 768 nella colonna destra, alta quanto la testata. */
 .home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; width: 100%; }
 .home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
 .home-map .navmap svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
@@ -35,11 +37,16 @@
 .home-map__head b { color: var(--ink); font-weight: 600; }
 .home-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
 .home-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
-@media (min-width: 960px) {
+@media (min-width: 768px) {
   .home-map { margin: 0; align-content: center; }
+  .home-map .navmap { max-width: 400px; }
+  .home-map .navmap svg { max-height: 460px; min-height: 0; }
+  .home-map .legend, .home-map__head, .home-map__hint { max-width: 400px; justify-self: center; width: 100%; }
+}
+@media (min-width: 960px) {
   .home-map .navmap { max-width: 460px; }
-  .home-map .navmap svg { max-height: 520px; min-height: 0; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 460px; justify-self: center; width: 100%; }
+  .home-map .navmap svg { max-height: 520px; }
+  .home-map .legend, .home-map__head, .home-map__hint { max-width: 460px; }
 }
 @media (min-width: 1200px) {
   .home-map .navmap { max-width: 520px; }
