@@ -17,13 +17,16 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 def main_checkout_root() -> Path:
     """Il checkout principale: da un worktree Orca PROJECT_ROOT e' il worktree stesso."""
-    result = subprocess.run(
-        ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-        cwd=PROJECT_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:  # immagini senza git, come quella dei test di Cloud Build
+        return PROJECT_ROOT
     if result.returncode != 0 or not result.stdout.strip():
         return PROJECT_ROOT
     return Path(result.stdout.strip()).parent
@@ -249,8 +252,11 @@ def dispatch_task(
     try:
         orca_cmd = get_orca_cmd()
     except RuntimeError as exc:
-        print(f"[!] {exc}", file=sys.stderr)
-        return 1
+        # Il dry-run stampa soltanto: deve funzionare anche dove Orca non c'e' (CI, Cloud Build).
+        if not dry_run:
+            print(f"[!] {exc}", file=sys.stderr)
+            return 1
+        orca_cmd = "orca-ide"
 
     initial_task = build_task_content(
         slug=slug,
