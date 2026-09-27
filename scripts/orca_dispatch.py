@@ -17,19 +17,48 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 def main_checkout_root() -> Path:
     """Il checkout principale: da un worktree Orca PROJECT_ROOT e' il worktree stesso."""
-    result = subprocess.run(
-        ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-        cwd=PROJECT_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:  # immagini senza git, come quella dei test di Cloud Build
+        return PROJECT_ROOT
     if result.returncode != 0 or not result.stdout.strip():
         return PROJECT_ROOT
     return Path(result.stdout.strip()).parent
 
 
 MAIN_ROOT = main_checkout_root()
+
+
+def _wslpath(flag: str, value: str) -> str | None:
+    if not shutil.which("wslpath"):
+        return None
+    result = subprocess.run(
+        ["wslpath", flag, value], capture_output=True, text=True, check=False
+    )
+    return result.stdout.strip() or None if result.returncode == 0 else None
+
+
+def to_orca_repo_path(path: Path) -> str:
+    """Orca registra i repo WSL come percorsi UNC: ``path:/home/...`` da' repo_not_found."""
+    return _wslpath("-w", str(path)) or str(path)
+
+
+ORCA_REPO_PATH = to_orca_repo_path(MAIN_ROOT)
+
+
+def from_orca_path(value: str) -> Path:
+    """Converte il percorso UNC restituito da Orca in un percorso WSL."""
+    if value.startswith("\\\\"):
+        converted = _wslpath("-u", value)
+        if converted:
+            return Path(converted)
+    return Path(value)
 
 AGENT_ROUTING = {
     "worker": "codex",
@@ -127,7 +156,7 @@ def extract_worktree_details(payload: dict[str, Any]) -> tuple[Path, str]:
         if path_value and branch_value:
             clean_path = path_value.removeprefix("path:")
             clean_branch = branch_value.removeprefix("refs/heads/")
-            return Path(clean_path), clean_branch
+            return from_orca_path(clean_path), clean_branch
     raise OrcaOutputError(
         "La risposta Orca non contiene il percorso e il ramo del worktree."
     )
@@ -175,7 +204,7 @@ def _check_uncertain_create(orca_cmd: str, slug: str) -> None:
         "worktree",
         "list",
         "--repo",
-        f"path:{MAIN_ROOT}",
+        f"path:{ORCA_REPO_PATH}",
         "--json",
     ]
     try:
@@ -223,8 +252,11 @@ def dispatch_task(
     try:
         orca_cmd = get_orca_cmd()
     except RuntimeError as exc:
-        print(f"[!] {exc}", file=sys.stderr)
-        return 1
+        # Il dry-run stampa soltanto: deve funzionare anche dove Orca non c'e' (CI, Cloud Build).
+        if not dry_run:
+            print(f"[!] {exc}", file=sys.stderr)
+            return 1
+        orca_cmd = "orca-ide"
 
     initial_task = build_task_content(
         slug=slug,
@@ -239,7 +271,7 @@ def dispatch_task(
         "worktree",
         "create",
         "--repo",
-        f"path:{MAIN_ROOT}",
+        f"path:{ORCA_REPO_PATH}",
         "--name",
         slug,
         "--no-parent",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -201,6 +202,37 @@ class CleanTest(unittest.TestCase):
         self.assertEqual(commands[-1], ["git", "branch", "-D", "nmaiese/prova-2"])
         self.assertNotIn("-f", commands[1])
 
+
+
+@unittest.skipUnless(shutil.which("wslpath"), "serve WSL")
+class OrcaPathTest(unittest.TestCase):
+    def test_repo_path_diventa_unc(self):
+        self.assertTrue(
+            orca_dispatch.to_orca_repo_path(Path("/home")).startswith("\\\\")
+        )
+
+    def test_percorso_unc_di_orca_torna_wsl(self):
+        unc = orca_dispatch.to_orca_repo_path(Path("/home"))
+        self.assertEqual(orca_dispatch.from_orca_path(unc), Path("/home"))
+
+
+
+class DryRunSenzaOrcaTest(unittest.TestCase):
+    """In CI e in Cloud Build orca-ide non c'e': il dry-run deve passare lo stesso."""
+
+    def test_dry_run_non_richiede_il_binario(self):
+        with mock.patch.object(
+            orca_dispatch, "get_orca_cmd", side_effect=RuntimeError("orca-ide assente")
+        ):
+            code = orca_dispatch.dispatch_task("prova", "T", "O", dry_run=True)
+        self.assertEqual(code, 0)
+
+    def test_senza_binario_la_create_reale_esce_uno(self):
+        with mock.patch.object(
+            orca_dispatch, "get_orca_cmd", side_effect=RuntimeError("orca-ide assente")
+        ):
+            code = orca_dispatch.dispatch_task("prova", "T", "O")
+        self.assertEqual(code, 1)
 
 if __name__ == "__main__":
     unittest.main()
