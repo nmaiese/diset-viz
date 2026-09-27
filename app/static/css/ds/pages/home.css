@@ -13,18 +13,20 @@
    vuoto. */
 @media (min-width: 960px) {
   /* Le righe della colonna sinistra contengono titolo, frase, ricerca e spotlight dell'indicatore.
-     La colonna della mappa riceve spazio abbondante per valorizzarla e bilanciare la colonna sinistra. */
-  .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-top: var(--space-10); padding-bottom: var(--space-8); }
+     Fra 960 e 1200 le colonne sono pari: a 5 contro 7 il titolo andava su quattro righe. */
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-top: var(--space-10); padding-bottom: var(--space-8); }
   .home-head > * { grid-column: 1; }
   .home-head > .home-map { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
 @media (min-width: 1200px) {
-  .home-head { column-gap: var(--space-12); }
+  /* Da 1200 la mappa prende i sette dodicesimi. */
+  .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); }
 }
 /* La mappa della testata: la qualita' della vita per regione, con la sua
-   legenda. Sul telefono sotto la ricerca, riempie lo spazio in larghezza e in
-   altezza, da 960 nella colonna destra, alta quanto la testata. */
+   legenda. Sotto i 600 pixel non si disegna: la sostituisce la lista dei
+   punteggi dopo le porte (`.home-map-values`). Fra 600 e 960 sotto la ricerca,
+   da 960 nella colonna destra, alta quanto la testata. */
 .home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; width: 100%; }
 .home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
 .home-map .navmap svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
@@ -168,7 +170,9 @@
 @media (min-width: 600px) and (max-width: 959px) {
   .doors__main { grid-template-columns: repeat(8, minmax(0, 1fr)); }
   .door { grid-column: span 4; }
-  .door:first-child { grid-column: 1 / -1; }
+  /* La prima e l'ultima a tutta riga, le due di mezzo affiancate: con quattro
+     porte su otto colonne l'ultima restava sola a meta' riga. */
+  .door:first-child, .door:nth-child(4) { grid-column: 1 / -1; }
 }
 @media (min-width: 960px) {
   .doors__main { grid-template-columns: repeat(12, minmax(0, 1fr)); }
@@ -182,7 +186,15 @@
   border-top: 2px solid var(--rule-strong); border-radius: var(--radius-sm);
 }
 .door:first-child { padding: var(--space-6); border-top-width: 3px; }
-@media (min-width: 960px) { .door:first-child { align-content: center; padding: var(--space-8); } }
+/* Da 960 la prima porta e' alta due righe: la cifra sta in alto, titolo e
+   frase in basso, cosi' il riquadro non resta vuoto a meta'. */
+@media (min-width: 960px) {
+  .door:first-child { grid-template-rows: 1fr auto auto; padding: var(--space-8); }
+  .door:first-child .door__num { align-self: start; }
+  /* La cifra vera e' lo span `.n`, che `.figure-num .n` tiene alla taglia piccola. */
+  .door:first-child .door__num .n { font-size: var(--fs-figure); line-height: var(--lh-figure); letter-spacing: var(--tr-figure); }
+  .door:first-child .door__title { font-size: var(--fs-section); line-height: var(--lh-section); }
+}
 @media (min-width: 960px) { .door { padding: var(--space-5) var(--space-6) var(--space-6); gap: var(--space-3); } }
 .door:hover { border-top-color: var(--accent); }
 /* Il focus si sposta dal link alla scheda intera solo dove :has() c'e': dove

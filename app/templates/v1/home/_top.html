@@ -24,7 +24,7 @@
     {% set hm = d.hero_map %}
     <figure class="home-map">
       {% if hm %}
-      <figcaption class="home-map__head"><b>Qualità della vita nelle regioni</b>{% if hm.profile %}, profilo {{ hm.profile }}{% endif %}. In testa {{ hm.top.name }}, in coda {{ hm.bottom.name }}. La classifica usa gli ultimi dati disponibili per ciascun indicatore{% if hm.source %}, da {{ hm.source }}{% endif %}.</figcaption>
+      <figcaption class="home-map__head"><b>Qualità della vita nelle regioni</b>{% if hm.profile %}, profilo {{ hm.profile }}{% endif %}. In testa {{ hm.top.name }}, in coda {{ hm.bottom.name }}. La classifica usa gli ultimi dati disponibili per ciascun indicatore.{% if hm.source %} Fonte: {{ hm.source }}.{% endif %}</figcaption>
       {{ ui.navmap('regione', hm.names, None, '/regione/', steps=hm.steps) }}
       {{ ui.legend(hm.legend, 'Più intenso, punteggio più alto.', nd=False) }}
       <p class="home-map__hint">Scegli una regione per aprirne il profilo, o <a href="/qualita-della-vita/classifica/regioni">la classifica</a>.</p>
