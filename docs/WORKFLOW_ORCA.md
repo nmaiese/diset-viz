@@ -194,6 +194,33 @@ l'agente sia partito. Su silenzio non si reinserisce: si legge il terminale.
 - **L'id di un worktree è un indirizzo in due parti**, `<repoId>::<percorso>`, e va
   copiato per intero. Il solo `repoId` non basta. Il selettore `path:<percorso>`
   funziona e va bene quando si ragiona con i path di WSL.
+- **`index.lock: Read-only file system` al momento del commit, e solo li.** Il
+  filesystem di questa macchina passa da sola lettura a scrivibile senza avviso.
+  Il caso osservato: l'agente aveva finito tutto, verificato 413 test di unità e 1335
+  della suite completa, e si è fermato unicamente perché non poteva scrivere
+  l'indice. Le modifiche erano integre e non staged. La risposta non è aggirare il
+  lock: è controllare `findmnt` sul path del progetto, e se è tornato scrivibile
+  committare a mano, rieseguendo prima il test. Il contratto della specifica deve
+  dire all'agente di fermarsi e riferire in questo caso, non di riprovare all'infinito.
+
+### Due cose che una specifica può sbagliare, e che un agente onesto fa notare
+
+- **Una specifica può chiedere un impossibile, e l'agente che lo segue alla lettera
+  si blocca invece di fingere.** Il caso è reale: la specifica chiedeva un allarme
+  quando la quota di testo mascherato scendeva sotto quella non mascherata, cioè un
+  test che verifica `quota_senza_numeri < quota`. L'agente ha dimostrato che la
+  disuguaglianza è impossibile — mascherare i numeri può solo far salire la quota,
+  perché trasforma sequenze diverse in una sequenza sola — e si è fermato a
+  riportarlo, invece di produrre un test con un doppione finto che sarebbe passato
+  senza provare niente. È il comportamento giusto, ed è un motivo per cui vale la
+  pena che un agente legga la specifica come un contratto da discutere e non come
+  un ordine da eseguire. Ma è anche un motivo per non fidarsi del proprio primo
+  ragionamento: l'errore era nella specifica, cioè nella mia testa.
+- **La specifica va riscritta, non rattoppatata.** Dopo l'equivoco, la correzione non
+  è stata un test più tollerante: è stato un discriminante diverso e vero, e la
+  specifica è stata riscritta prima di rilanciare l'agente. Rilanciare con la stessa
+  specifica, o con la specifica solo addolcita, avrebbe prodotto un altro blocco o
+  un test falso.
 
 ---
 
