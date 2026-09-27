@@ -30,10 +30,23 @@ AGENT_ROUTING = {
 OPENCODE_MODELS = {
     "fast": "opencode/ling-3.0-flash-fin-free",  # 80 tok/s: titoli, link, micro-audit
     "workhorse": "opencode/big-pickle",           # Default bilanciato per coding
-    "coding_speed": "ollama-cloud/gpt-oss:120b",  # 189 tok/s: generazione test e script
+    "coding_speed": "ollama-cloud/gpt-oss:120b",  # 189 tok/s: generazione test e script (1 connes. max)
     "reasoning": "opencode/nemotron-3-ultra-free",# 36 tok/s: audit e riflessioni
     "backup_free": "openrouter/liquid/lfm-2.5-2.6b:free", # 175 tok/s: fallback
 }
+
+LOCK_DIR = PROJECT_ROOT / ".orca" / "locks"
+
+
+def check_provider_lock(role: str) -> bool:
+    """Verifica e gestisce la coda di lock per provider ad una sola connessione concorrente (Ollama Cloud)."""
+    if role == "worker":
+        LOCK_DIR.mkdir(parents=True, exist_ok=True)
+        lock_file = LOCK_DIR / "ollama_cloud.lock"
+        if lock_file.exists():
+            print(f"[!] Avviso Concorrenza: Provider Ollama Cloud libero da 1 sola connessione in corso. Task accodato.")
+            return False
+    return True
 
 TASK_TEMPLATE = """# Task: {title}
 

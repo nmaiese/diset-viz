@@ -34,6 +34,11 @@ def run_clean(slug: str, dry_run: bool = False) -> int:
         return 0
 
     if worktree_path.exists():
+        # Verifico che nel worktree non ci siano modifiche uncommitted non salvate
+        status_res = subprocess.run(["git", "-C", str(worktree_path), "status", "--porcelain"], capture_output=True, text=True)
+        if status_res.stdout.strip():
+            print(f"[!] Attenzione: Il worktree {slug} contiene modifiche non committate. Procedo con la rimozione forzata sicura.")
+
         print(f"[+] Rimozione worktree {worktree_path}...")
         subprocess.run(["git", "worktree", "remove", "-f", str(worktree_path)], check=False)
     else:
