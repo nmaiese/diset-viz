@@ -41,6 +41,7 @@ possono scrivere direttamente su `master`.
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | fonti verticali esterne | [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
+| quanto la voce delle schede si ripete, e se è un difetto | [`docs/AUDIT_VOCE.md`](docs/AUDIT_VOCE.md) |
 | priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
 | come il sito si presenta ai crawler AI: `Content-Signal`, bot di risposta, bot di addestramento, `Google-Extended` | [`docs/AI_CRAWLERS.md`](docs/AI_CRAWLERS.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
