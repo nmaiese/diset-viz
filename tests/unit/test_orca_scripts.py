@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -200,6 +201,19 @@ class CleanTest(unittest.TestCase):
         )
         self.assertEqual(commands[-1], ["git", "branch", "-D", "nmaiese/prova-2"])
         self.assertNotIn("-f", commands[1])
+
+
+
+@unittest.skipUnless(shutil.which("wslpath"), "serve WSL")
+class OrcaPathTest(unittest.TestCase):
+    def test_repo_path_diventa_unc(self):
+        self.assertTrue(
+            orca_dispatch.to_orca_repo_path(Path("/home")).startswith("\\\\")
+        )
+
+    def test_percorso_unc_di_orca_torna_wsl(self):
+        unc = orca_dispatch.to_orca_repo_path(Path("/home"))
+        self.assertEqual(orca_dispatch.from_orca_path(unc), Path("/home"))
 
 
 if __name__ == "__main__":
