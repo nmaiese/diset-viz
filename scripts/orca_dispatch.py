@@ -22,8 +22,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 AGENT_ROUTING = {
     "worker": "codex",
-    "researcher": "gemini",
-    "architect": "claude",
+    "researcher": "antigravity",
+    "architect": "codex",
 }
 
 # Modelli OpenCode operativi e testati (da ~/dev/dev-tools/docs/opencode-modelli.md)

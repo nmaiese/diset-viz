@@ -9,8 +9,8 @@ from scripts import orca_dispatch
 class OrcaDispatchTest(unittest.TestCase):
     def test_routing_maps_roles_to_expected_agents(self):
         self.assertEqual(orca_dispatch.AGENT_ROUTING["worker"], "codex")
-        self.assertEqual(orca_dispatch.AGENT_ROUTING["researcher"], "gemini")
-        self.assertEqual(orca_dispatch.AGENT_ROUTING["architect"], "claude")
+        self.assertEqual(orca_dispatch.AGENT_ROUTING["researcher"], "antigravity")
+        self.assertEqual(orca_dispatch.AGENT_ROUTING["architect"], "codex")
 
     def test_dry_run_executes_without_error(self):
         code = orca_dispatch.dispatch_task(
