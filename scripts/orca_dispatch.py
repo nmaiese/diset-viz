@@ -26,6 +26,15 @@ AGENT_ROUTING = {
     "architect": "claude",
 }
 
+# Modelli OpenCode operativi e testati (da ~/dev/dev-tools/docs/opencode-modelli.md)
+OPENCODE_MODELS = {
+    "fast": "opencode/ling-3.0-flash-fin-free",  # 80 tok/s: titoli, link, micro-audit
+    "workhorse": "opencode/big-pickle",           # Default bilanciato per coding
+    "coding_speed": "ollama-cloud/gpt-oss:120b",  # 189 tok/s: generazione test e script
+    "reasoning": "opencode/nemotron-3-ultra-free",# 36 tok/s: audit e riflessioni
+    "backup_free": "openrouter/liquid/lfm-2.5-2.6b:free", # 175 tok/s: fallback
+}
+
 TASK_TEMPLATE = """# Task: {title}
 
 > Status: in-progress
