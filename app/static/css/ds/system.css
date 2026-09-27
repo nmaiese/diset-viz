@@ -101,7 +101,7 @@
   --font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --fw-heading: 760;
   --fw-num: 700;
-  --fs-display: clamp(36px, 26.909px + 2.4242vw, 56px);
+  --fs-display: clamp(40px, 29.091px + 2.9091vw, 64px);
   --lh-display: 1.04;
   --fw-display: 800;
   --tr-display: -0.02em;
@@ -109,7 +109,7 @@
   --lh-title: 1.1;
   --fw-title: 700;
   --tr-title: -0.015em;
-  --fs-section: clamp(26px, 23.111px + 0.7407vw, 32px);
+  --fs-section: clamp(26px, 21.455px + 1.2121vw, 36px);
   --lh-section: 1.15;
   /* Il titolo di sezione sugli schermi larghi, da 1200 pixel: a 28 si
      confondeva coi titoli-affermazione dei grafici da 20. */
@@ -141,7 +141,7 @@
   --lh-label: 1.38;
   --fw-label: 600;
   --tr-label: 0.01em;
-  --fs-figure: clamp(44px, 34.909px + 2.4242vw, 64px);
+  --fs-figure: clamp(48px, 37.091px + 2.9091vw, 72px);
   --lh-figure: 1;
   --fw-figure: 700;
   --tr-figure: -0.02em;
@@ -161,10 +161,13 @@
   --masthead-s: 56px;
   --masthead-l: 64px;
   --radius-control: 4px;
+  --radius-panel: 6px;
   --radius-0: 0;
   --target: 44px;
   --motion-fast: 120ms;
-  --motion-base: 150ms;
+  --motion-base: 180ms;
+  --motion-slow: 320ms;
+  --motion-distance: 8px;
   --motion-ease: cubic-bezier(.2,.7,.2,1);
 
   /* === I NOMI DEL SISTEMA 2026, CON I VALORI DELLA 1.0 =================== */
@@ -333,8 +336,8 @@
   /* === MOVIMENTO (in radice: lo leggono le view transition) ============== */
   --dur-instant: 80ms;
   --dur-fast: 120ms;
-  --dur: 150ms;
-  --dur-slow: 240ms;
+  --dur: var(--motion-base);
+  --dur-slow: var(--motion-slow);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);

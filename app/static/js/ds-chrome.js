@@ -81,8 +81,15 @@
     });
   }
 
+  function syncMenuDisclosure(menu) {
+    var summary = menu.querySelector(":scope > summary");
+    if (summary) summary.setAttribute("aria-expanded", menu.open ? "true" : "false");
+  }
+
   menus.forEach(function (menu) {
+    syncMenuDisclosure(menu);
     menu.addEventListener("toggle", function () {
+      syncMenuDisclosure(menu);
       if (menu.open) closeMenus(menu);
     });
   });
@@ -245,6 +252,13 @@
   // --- Escape globale ------------------------------------------------------
   document.addEventListener("keydown", function (event) {
     if (event.key !== "Escape") return;
+    var focusedMenu = menus.find(function (menu) { return menu.open && menu.contains(document.activeElement); });
+    if (focusedMenu) {
+      var trigger = focusedMenu.querySelector(":scope > summary");
+      focusedMenu.open = false;
+      if (trigger) trigger.focus();
+      event.preventDefault();
+    }
     closeMenus(null);
     if (drawer && !drawer.hidden) {
       event.preventDefault();

@@ -858,6 +858,7 @@ def hero_map(names: dict[str, str]) -> dict | None:
     if len(scores) < 2:
         return None
     total = len(quality["rows"])
+    scored_keys = {row["key"] for row in quality["rows"]}
     return {
         "steps": common.map_steps(scores),
         "names": {k: f"{names[k]}, {quality['ranks'][k]}ª su {total}" if k in quality["ranks"] else names[k]
@@ -865,6 +866,9 @@ def hero_map(names: dict[str, str]) -> dict | None:
         "legend": common.legend(list(scores.values()), None),
         "profile": quality.get("profile"),
         "top": quality["rows"][0], "bottom": quality["rows"][-1], "total": total,
+        "rows": quality["rows"],
+        "unrated": [names[key] for key in names if key not in scored_keys],
+        "source": quality.get("source"),
     }
 
 

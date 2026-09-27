@@ -127,7 +127,7 @@ html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-a
 .sitechrome .dropdown {
   position: absolute; top: 100%; left: 0; min-width: 240px; z-index: var(--z-dropdown);
   display: grid; padding: var(--space-2) 0;
-  background: var(--bg); border: 1px solid var(--rule-strong);
+  background: var(--bg); border: 1px solid var(--rule-strong); border-radius: var(--radius-panel);
   box-shadow: var(--shadow-pop);
 }
 .sitechrome .dropdown a {

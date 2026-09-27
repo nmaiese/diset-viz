@@ -13,18 +13,20 @@
    vuoto. */
 @media (min-width: 960px) {
   /* Le righe della colonna sinistra contengono titolo, frase, ricerca e spotlight dell'indicatore.
-     La colonna della mappa riceve spazio abbondante per valorizzarla e bilanciare la colonna sinistra. */
-  .home-head { grid-template-columns: minmax(0, 6.5fr) minmax(0, 5.5fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-12); align-content: start; padding-top: var(--space-10); padding-bottom: var(--space-8); }
+     Fra 960 e 1200 le colonne sono pari: a 5 contro 7 il titolo andava su quattro righe. */
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-top: var(--space-10); padding-bottom: var(--space-8); }
   .home-head > * { grid-column: 1; }
   .home-head > .home-map { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
 @media (min-width: 1200px) {
-  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); column-gap: var(--space-16); }
+  /* Da 1200 la mappa prende i sette dodicesimi. */
+  .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); }
 }
 /* La mappa della testata: la qualita' della vita per regione, con la sua
-   legenda. Sul telefono sotto la ricerca, riempie lo spazio in larghezza e in
-   altezza, da 960 nella colonna destra, alta quanto la testata. */
+   legenda. Sotto i 600 pixel non si disegna: la sostituisce la lista dei
+   punteggi dopo le porte (`.home-map-values`). Fra 600 e 960 sotto la ricerca,
+   da 960 nella colonna destra, alta quanto la testata. */
 .home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; width: 100%; }
 .home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
 .home-map .navmap svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
@@ -45,6 +47,18 @@
   .home-map .legend, .home-map__head, .home-map__hint { max-width: 520px; }
 }
 .home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+@media (max-width: 599px) { .home-map { display: none; } }
+.home-map-values { display: none; }
+@media (max-width: 599px) {
+  .home-map-values { display: block; margin-top: var(--space-6); border-top: 1px solid var(--rule-strong); }
+  .home-map-values > summary { display: flex; align-items: center; min-height: var(--target); padding-block: var(--space-2); color: var(--ink); font-weight: 600; cursor: pointer; }
+  .home-map-values > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .home-map-values > p { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-block: var(--space-3); }
+  .home-map-values__list { display: grid; gap: 0; padding: 0; margin: 0; list-style: none; }
+  .home-map-values__list li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); border-top: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+  .home-map-values__list a { color: var(--ink); }
+  .home-map-values__list data { color: var(--text-2); white-space: nowrap; }
+}
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }
 .home-find > * { min-width: 0; }
 .home-find label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
@@ -65,6 +79,7 @@
   background: var(--bg);
   border: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
+  border-radius: var(--radius-panel);
   max-width: 36rem;
 }
 .home-spotlight__head {
@@ -147,15 +162,38 @@
 .doors__main { list-style: none; display: grid; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 600px) { .doors__main { gap: var(--gutter-l); } }
 @media (max-width: 599px) {
+  .doors__main { grid-template-columns: minmax(0, 1fr); }
   .door__text { display: none; }
   .door__unit { font-size: var(--fs-small); line-height: var(--lh-small); }
   .door__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
 }
-@media (min-width: 1200px) { .doors__main { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 600px) and (max-width: 959px) {
+  .doors__main { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .door { grid-column: span 4; }
+  /* La prima e l'ultima a tutta riga, le due di mezzo affiancate: con quattro
+     porte su otto colonne l'ultima restava sola a meta' riga. */
+  .door:first-child, .door:nth-child(4) { grid-column: 1 / -1; }
+}
+@media (min-width: 960px) {
+  .doors__main { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .door { grid-column: span 3; }
+  .door:first-child { grid-column: span 6; grid-row: span 2; }
+  .door:nth-child(4) { grid-column: span 6; }
+}
 .door {
   position: relative; display: grid; align-content: start; gap: var(--space-2); min-width: 0;
   padding: var(--space-4) var(--space-4) var(--space-5); background: var(--bg);
   border-top: 2px solid var(--rule-strong); border-radius: var(--radius-sm);
+}
+.door:first-child { padding: var(--space-6); border-top-width: 3px; }
+/* Da 960 la prima porta e' alta due righe: la cifra sta in alto, titolo e
+   frase in basso, cosi' il riquadro non resta vuoto a meta'. */
+@media (min-width: 960px) {
+  .door:first-child { grid-template-rows: 1fr auto auto; padding: var(--space-8); }
+  .door:first-child .door__num { align-self: start; }
+  /* La cifra vera e' lo span `.n`, che `.figure-num .n` tiene alla taglia piccola. */
+  .door:first-child .door__num .n { font-size: var(--fs-figure); line-height: var(--lh-figure); letter-spacing: var(--tr-figure); }
+  .door:first-child .door__title { font-size: var(--fs-section); line-height: var(--lh-section); }
 }
 @media (min-width: 960px) { .door { padding: var(--space-5) var(--space-6) var(--space-6); gap: var(--space-3); } }
 .door:hover { border-top-color: var(--accent); }
@@ -196,10 +234,10 @@
    di sezione) e il selettore dei livelli, il corpo la striscia a tutta
    larghezza e poi la mappa accanto alla classifica. Ogni blocco ha la sua
    etichetta, cosi' si capisce a che cosa si riferisce ogni titolo. */
-.feat { border: 1px solid var(--rule-strong); background: var(--bg); }
+.feat { border: 1px solid var(--rule-strong); background: var(--bg); border-radius: var(--radius-panel); }
 .feat__head {
   display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4) var(--space-8);
-  padding: var(--space-5); background: var(--surface-1); border-bottom: 1px solid var(--rule-strong);
+  padding: var(--space-5); background: var(--surface-1); border-bottom: 1px solid var(--rule-strong); border-radius: calc(var(--radius-panel) - 1px) calc(var(--radius-panel) - 1px) 0 0;
 }
 .feat__id { display: grid; gap: var(--space-2); min-width: 0; max-width: 60rem; }
 .feat__meta { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); }

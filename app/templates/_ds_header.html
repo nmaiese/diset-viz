@@ -32,10 +32,10 @@
       {% for voce in nav.PRIMARY %}
       {% if voce.group %}
       <details class="navlink" name="hdr-nav">
-        <summary{% if voce.key == nav_active_group %} class="is-active"{% endif %}>{{ voce.label }}
+        <summary aria-controls="hdr-menu-{{ voce.key }}"{% if voce.key == nav_active_group %} class="is-active"{% endif %}>{{ voce.label }}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
-        <div class="dropdown">
+        <div class="dropdown" id="hdr-menu-{{ voce.key }}">
           {% for sotto in voce.group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
           {% endfor %}
         </div>

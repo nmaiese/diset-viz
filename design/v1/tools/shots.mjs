@@ -9,7 +9,8 @@
 //        il sito servito (locale o produzione): piega e pagina intera a 1440 e 375
 //        nel tema di THEME (chiaro se manca), scorrimento orizzontale a 320, 360 e
 //        375 in chiaro e in scuro, errori di console, eccezioni, richieste fallite
-//        e risposte >= 400 (un font che manca, una regola CSP che blocca)
+//        e risposte >= 400 (un font che manca, una regola CSP che blocca).
+//        MOTION=no-preference opta per il moto normale; il default e' reduce.
 //
 // Zero dipendenze: Node 24 ha WebSocket e fetch globali. Un Chrome alla volta,
 // pagine in sequenza, per non stressare una macchina da 8 GB.
@@ -125,9 +126,10 @@ async function openPage(cdp, { viewport, theme, blocked, initScript }) {
   await s("Network.enable");
   if (blocked) await s("Network.setBlockedURLs", { urls: blocked });
   await s("Emulation.setDeviceMetricsOverride", viewport);
+  const motion = process.env.MOTION === "no-preference" ? "no-preference" : "reduce";
   await s("Emulation.setEmulatedMedia", { features: [
     { name: "prefers-color-scheme", value: theme },
-    { name: "prefers-reduced-motion", value: "reduce" },
+    { name: "prefers-reduced-motion", value: motion },
   ] });
   if (initScript) await s("Page.addScriptToEvaluateOnNewDocument", { source: initScript });
   return { s, sessionId, targetId };
@@ -137,6 +139,13 @@ async function evaluate(s, expression) {
   const r = await s("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
   if (r.exceptionDetails) throw new Error(`eval: ${r.exceptionDetails.text} ${r.exceptionDetails.exception?.description || ""}`);
   return r.result.value;
+}
+
+async function press(s, key, code, windowsVirtualKeyCode) {
+  const text = key === "Enter" ? "\r" : key === " " ? " " : undefined;
+  await s("Input.dispatchKeyEvent", { type: "keyDown", key, code, windowsVirtualKeyCode, text });
+  await s("Input.dispatchKeyEvent", { type: "keyUp", key, code, windowsVirtualKeyCode });
+  await sleep(60);
 }
 
 // Scorre la pagina per far scattare IntersectionObserver e immagini lazy, poi
@@ -306,7 +315,7 @@ async function giro(base, outDir, paths) {
     for (const path of paths) {
       const url = base + path;
       const slug = path.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "-").replace(/-+$/, "") || "home";
-      const entry = { path, errors: [], failed: [], overflow: [] };
+      const entry = { path, theme, motion: process.env.MOTION === "no-preference" ? "no-preference" : "reduce", errors: [], failed: [], overflow: [] };
       try {
       // Errori e richieste fallite, a 1440.
       {
@@ -338,6 +347,33 @@ async function giro(base, outDir, paths) {
       {
         const { s, sessionId, targetId } = await openPage(cdp, { viewport: VIEWPORTS[375], theme, blocked });
         await go(cdp, s, sessionId, url);
+        if (path === "/") {
+          const headerScroll = await evaluate(s, `(async () => {
+            const root = document.documentElement;
+            const wait = () => new Promise(r => setTimeout(r, 90));
+            scrollTo(0, 0); await wait();
+            scrollTo(0, 80); await wait();
+            const withinFirst120 = !root.classList.contains("is-hdr-off");
+            scrollTo(0, 180); await wait();
+            const hiddenOnDown = root.classList.contains("is-hdr-off");
+            scrollTo(0, 240); await wait();
+            scrollTo(0, 180); await wait();
+            const shownOnUp = !root.classList.contains("is-hdr-off");
+            scrollTo(0, 0); await wait();
+            const brand = document.querySelector(".hdr__brand");
+            brand && brand.focus(); scrollTo(0, 180); await wait();
+            const visibleOnFocus = !root.classList.contains("is-hdr-off");
+            brand && brand.blur(); scrollTo(0, 0); await wait();
+            const opener = document.querySelector("[data-ds-drawer-open]");
+            opener && opener.click(); await wait(); scrollTo(0, 180); await wait();
+            const visibleWithDrawer = !root.classList.contains("is-hdr-off");
+            const closer = document.querySelector("[data-ds-drawer-close]");
+            closer && closer.click(); scrollTo(0, 0); await wait();
+            return { withinFirst120, hiddenOnDown, shownOnUp, visibleOnFocus, visibleWithDrawer };
+          })()`);
+          const badScroll = Object.entries(headerScroll).filter(([, ok]) => !ok);
+          if (badScroll.length) entry.errors.push(`testata allo scroll: ${JSON.stringify(headerScroll)}`);
+        }
         const info = await evaluate(s, SETTLE);
         entry.h375 = info.h;
         const fold = await s("Page.captureScreenshot", { format: "webp", quality: 80 });
@@ -396,6 +432,28 @@ async function tastiera(base, paths) {
         if (!first || !/contenuto/i.test(first.text + first.cls)) { problems++; console.log(`TASTIERA ${path}: la prima fermata non e' il salto al contenuto`, first); }
         const hidden = stops.filter((f) => !f.visible);
         if (hidden.length) { problems++; console.log(`TASTIERA ${path}: focus non visibile su`, hidden.slice(0, 4)); }
+        const menu = await evaluate(s, `(() => {
+          const details = document.querySelector(".hdr__nav details.navlink");
+          const summary = details && details.querySelector(":scope > summary");
+          if (!details || !summary) return null;
+          summary.focus(); return true;
+        })()`);
+        if (!menu) {
+          problems++;
+          console.log(`MENU ${path}: tendina desktop assente`);
+        } else {
+          await press(s, "Enter", "Enter", 13);
+          await sleep(120);
+          const opened = await evaluate(s, `(() => { const d=document.querySelector(".hdr__nav details.navlink"); const s=d.querySelector(":scope > summary"); return d.open && s.getAttribute("aria-expanded")==="true" && document.activeElement===s; })()`);
+          await press(s, "Tab", "Tab", 9);
+          const inside = await evaluate(s, `!!document.activeElement.closest(".hdr__nav details.navlink")`);
+          await press(s, "Escape", "Escape", 27);
+          const closed = await evaluate(s, `(() => { const d=document.querySelector(".hdr__nav details.navlink"); const s=d.querySelector(":scope > summary"); return !d.open && s.getAttribute("aria-expanded")==="false" && document.activeElement===s; })()`);
+          if (!opened || !inside || !closed) {
+            problems++;
+            console.log(`MENU ${path}: disclosure`, { opened, inside, closed });
+          }
+        }
         await cdp.send("Target.closeTarget", { targetId });
       }
       {

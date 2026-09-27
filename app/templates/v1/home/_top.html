@@ -17,17 +17,14 @@
         <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
       </div>
     </form>
-    {#- Accanto al titolo e alla ricerca la mappa per andare dritti a una
-        regione, nei colori della qualita' della vita (`home.hero_map`): il
-        clic apre il profilo, il nome sotto il mouse porta la posizione. Sul
-        telefono sta sotto la ricerca, piu' piccola. La tastiera ha il campo
-        di ricerca e la porta "Regioni". Senza la classifica torna la mappa
-        grigia per scegliere. -#}
+    {#- La mappa affianca il testo da 960 pixel. Sul telefono la figura viene
+        sostituita dalla classifica testuale dopo le porte, con gli stessi
+        punteggi e gli eventuali territori senza dato. -#}
     {% if d.region_names %}
     {% set hm = d.hero_map %}
     <figure class="home-map">
       {% if hm %}
-      <figcaption class="home-map__head"><b>Dove si vive meglio</b>, per la qualità della vita del BES dei Territori di Istat{% if hm.profile %}, profilo {{ hm.profile }}{% endif %}: in testa {{ hm.top.name }}, in coda {{ hm.bottom.name }}.</figcaption>
+      <figcaption class="home-map__head"><b>Qualità della vita nelle regioni</b>{% if hm.profile %}, profilo {{ hm.profile }}{% endif %}. In testa {{ hm.top.name }}, in coda {{ hm.bottom.name }}. La classifica usa gli ultimi dati disponibili per ciascun indicatore.{% if hm.source %} Fonte: {{ hm.source }}.{% endif %}</figcaption>
       {{ ui.navmap('regione', hm.names, None, '/regione/', steps=hm.steps) }}
       {{ ui.legend(hm.legend, 'Più intenso, punteggio più alto.', nd=False) }}
       <p class="home-map__hint">Scegli una regione per aprirne il profilo, o <a href="/qualita-della-vita/classifica/regioni">la classifica</a>.</p>
@@ -77,5 +74,23 @@
       {%- endfor %}
     </ul>
   </nav>
+
+  <details class="home-map-values"{% if d.hero_map %} aria-labelledby="home-map-values-title"{% endif %}>
+    <summary id="home-map-values-title">{% if d.hero_map %}Leggi i punteggi della mappa{% else %}Scegli una regione{% endif %}</summary>
+    {% if d.hero_map %}
+    <p>Profilo {{ d.hero_map.profile or 'predefinito' }}. Punteggi normalizzati da zero a cento, calcolati sugli ultimi dati disponibili per ciascun indicatore. Gli anni possono variare fra indicatori.</p>
+    <ol class="home-map-values__list">
+      {% for row in d.hero_map.rows %}
+      <li><a href="/regione/{{ row.key }}">{{ row.name }}</a><data value="{{ row.score }}">{{ row.score | num(None, 'score') }}</data></li>
+      {% endfor %}
+    </ol>
+    {% if d.hero_map.unrated %}<p>Non valutate: {{ d.hero_map.unrated | join(', ') }}.</p>{% endif %}
+    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica completa</a></p>
+    {% else %}
+    <ul class="home-map-values__list">
+      {% for key, name in d.region_names.items() %}<li><a href="/regione/{{ key }}">{{ name }}</a></li>{% endfor %}
+    </ul>
+    {% endif %}
+  </details>
 </div>
 </div>
