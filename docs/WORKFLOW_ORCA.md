@@ -129,6 +129,15 @@ Nell'esempi sotto, `orca` sta per il valore di quella variabile.
 
 ### Avviare un nuovo task con un agente
 
+Puoi usare l'helper automatico del repository:
+
+```bash
+# Inizializza worktree, TASK.md e avvia l'agente Orca appropriato (worker=codex, researcher=gemini, architect=claude):
+bin/py scripts/orca_dispatch.py <slug> --title "Titolo Task" --objective "Descrizione" --role worker
+```
+
+Oppure direttamente via CLI Orca:
+
 ```bash
 # Avvio task indipendente con Codex in un nuovo worktree.
 # --setup skip evita di lanciare gli hook di setup del repo in un worktree
