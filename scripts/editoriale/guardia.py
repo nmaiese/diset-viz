@@ -14,7 +14,7 @@ un lint, quindi qui non c'e' niente che giudichi la prosa.
 
 Cinque controlli, tutti meccanici:
 
-1. **Cifre contro il dossier**, solo quando `--dossier` e' dato. Ogni numero
+1. **Cifre contro il dossier**, solo quando `--dossier` o `--fonti` e' dato. Ogni numero
    scritto in cifre nel testo deve corrispondere, con l'arrotondamento con cui
    e' scritto, a una cifra del dossier o della colonna "citazione letterale"
    di `--fonti`. Quando il numero non porta un segno esplicito (la direzione e'
@@ -101,7 +101,7 @@ def _excerpt(text, start, end, radius=30):
 #   conteggio: non si controlla, perche' la fonte di questi numeri non e' mai
 #   una cifra del dossier ma il catalogo dei territori o il calendario.
 NUMBER_RE = re.compile(
-    r"(?<![\w.,%])(?P<sign>[+-])?(?P<int>\d{1,3}(?:\.\d{3})+|\d+)(?:,(?P<dec>\d+))?"
+    r"(?<![\w.,%])(?P<sign>[+-])?(?P<int>\d{1,3}(?:\.\d{3})+|\d+)(?:(?P<sep>[,.])(?P<dec>\d+))?"
 )
 RANK_SUFFIXES = ("ª", "°")
 
@@ -167,7 +167,7 @@ def source_figures(path):
     return found
 
 
-def check_figures(fields, dossier, source_values):
+def check_figures(fields, internal_key, dossier, source_values):
     """Il controllo 1: ogni cifra scritta contro il dossier (e le fonti).
 
     Un numero senza segno esplicito passa se il dossier porta la stessa cifra
@@ -177,13 +177,67 @@ def check_figures(fields, dossier, source_values):
     il difetto di `gate2_verify.py`, non una cifra assente.
     """
     pool = dossier_figures(dossier) + list(source_values)
+
+    from app.divari import _area_means
+
+    parsed = sources.split_internal_id(internal_key)
+    if parsed:
+        family, raw_id = parsed
+        try:
+            view = build_indicator_view(family, raw_id)
+            if view:
+                views = [view]
+                for sibling in view.get("dimension_siblings", []):
+                    sib_view = build_indicator_view(family, sibling["id"])
+                    if sib_view:
+                        views.append(sib_view)
+
+                for v in views:
+                    for level in v.get("levels", []):
+                        matrix = level.get("matrix", {})
+                        is_regione = level["key"] == "regione"
+
+                        for year_data in matrix.values():
+                            values_for_means = []
+                            for t_key, val in year_data.items():
+                                num = None
+                                if isinstance(val, (int, float)) and not isinstance(val, bool):
+                                    num = float(val)
+                                elif isinstance(val, dict) and "v" in val and isinstance(val.get("v"), (int, float)) and not isinstance(val["v"], bool):
+                                    num = float(val["v"])
+
+                                if num is not None:
+                                    pool.append(num)
+                                    if is_regione:
+                                        values_for_means.append({"region_key": t_key, "value": num})
+
+                            if is_regione:
+                                means = _area_means(values_for_means)
+                                if means is not None:
+                                    for area_data in means.values():
+                                        pool.append(area_data["mean"])
+        except (KeyError, ValueError, LookupError, TypeError) as error:
+            print(f"guardia: impossibile costruire il pool largo per {internal_key}: {error}", file=sys.stderr)
+
     defects = []
     for field, text in fields:
         for match in NUMBER_RE.finditer(text):
             if not _is_checkable(match, text):
                 continue
+
+            quote = _excerpt(text, match.start(), match.end())
+            if match.group("sep") == ".":
+                defects.append(Defect("cifre", field, quote, f"{match.group(0)!r} usa il punto decimale all'inglese: la forma italiana vuole la virgola"))
+                continue
+
             signed = bool(match.group("sign"))
-            decimals = len(match.group("dec")) if match.group("dec") else 0
+            target_str = match.group("int").replace(".", "")
+            if not match.group("dec") and "." in match.group("int") and target_str.endswith("0"):
+                zeros = len(target_str) - len(target_str.rstrip("0"))
+                decimals = -zeros
+            else:
+                decimals = len(match.group("dec")) if match.group("dec") else 0
+
             target = round(_number_value(match.group("sign"), match.group("int"), match.group("dec")), decimals)
             if any(abs(round(value, decimals) - target) < 1e-9 for value in pool):
                 continue
@@ -191,7 +245,6 @@ def check_figures(fields, dossier, source_values):
             wrong_sign = any(abs(round(abs(value), decimals) - target_abs) < 1e-9 for value in pool)
             if wrong_sign and not signed:
                 continue  # il valore assoluto corrisponde, e il testo non dichiarava un segno
-            quote = _excerpt(text, match.start(), match.end())
             if wrong_sign:
                 defects.append(Defect(
                     "cifre", field, quote,
@@ -199,7 +252,7 @@ def check_figures(fields, dossier, source_values):
                     "con il segno opposto"
                 ))
             else:
-                nearby = sorted({numfmt.text(value, decimals) for value in pool
+                nearby = sorted({numfmt.text(value, max(0, decimals)) for value in pool
                                   if abs(abs(value) - target_abs) < target_abs * 0.2 + 5})[:5]
                 note = f" (valori vicini nel dossier: {', '.join(nearby)})" if nearby else ""
                 defects.append(Defect(
@@ -228,7 +281,7 @@ def check_links(fields):
             url = match.group(2)
             quote = _excerpt(text, match.start(), match.end())
             if "?indicator=" in url:
-                defects.append(Defect("link", field, quote, f"{url!r} non e' un link canonico: usa /?indicator="))
+                defects.append(Defect("link", field, quote, f"{url!r} non e' un link canonico: usa /indicatore/<slug>/<codice>"))
                 continue
             if not url.startswith("/indicatore/"):
                 continue
@@ -291,7 +344,7 @@ def check_free_sections(entry):
         if not (section.get("h") or "").strip():
             field = f"sections.{LIBERA}[{index}]"
             defects.append(Defect(
-                field, field, _excerpt(body, 0, min(60, len(body))),
+                "sezione", field, _excerpt(body, 0, min(60, len(body))),
                 "sezione libera senza titolo: la pagina la scarta in silenzio"
             ))
     return defects
@@ -329,8 +382,8 @@ def check_article(internal_key, entry, dossier=None, source_values=None):
     defects += check_free_sections(entry)
     defects += check_links(fields)
     defects += check_markers(fields, internal_key, level_key)
-    if dossier is not None:
-        defects += check_figures(fields, dossier, source_values or [])
+    if dossier is not None or source_values:
+        defects += check_figures(fields, internal_key, dossier or {}, source_values or [])
     return defects
 
 
@@ -355,8 +408,20 @@ def main(argv=None):
         print(f"guardia: nessun articolo scritto per {args.code}, niente da controllare")
         return 0
 
-    dossier = json.loads(args.dossier.read_text(encoding="utf-8")) if args.dossier is not None else None
-    source_values = source_figures(args.fonti) if args.fonti is not None else []
+    dossier = None
+    if args.dossier is not None:
+        try:
+            dossier = json.loads(args.dossier.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            parser.error(f"il dossier {args.dossier} non esiste")
+
+    source_values = []
+    if args.fonti is not None:
+        if not args.fonti.exists():
+            parser.error(f"il file {args.fonti} non esiste")
+        source_values = source_figures(args.fonti)
+        if not source_values:
+            print(f"guardia: --fonti è dato ma nessuna citazione letta da {args.fonti}", file=sys.stderr)
 
     defects = check_article(internal_key, entry, dossier=dossier, source_values=source_values)
     if not defects:
