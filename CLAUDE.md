@@ -67,7 +67,7 @@ feed a `/blog/feed.xml`; l'hub editoriale a `/divari-regionali`;
 la ricerca a `/ricerca`; la dashboard D3 originale a `/legacy` (non va rotta);
 l'API JSON sotto `/api/`. Le verità rotta per rotta
 (canonico, noindex e perché, che cosa si ricalcola al render) stanno in
-`.claude/rules/app.md`.
+`.claude/rules/app.md` e, per home, atlante e confronto, `app-home.md`, `app-atlante.md`, `app-confronto.md`.
 
 **I nomi delle fonti hanno una sola fonte di verità, `app/sources.py`**, detto
 qui perché romperla è invisibile: le etichette pubbliche sono nomi in chiaro
