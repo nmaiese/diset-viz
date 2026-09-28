@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -133,6 +134,7 @@ class ReviewTest(unittest.TestCase):
                 mock.patch.object(
                     orca_review, "_run_capture", side_effect=results
                 ) as run,
+                mock.patch("os.remove") as mock_remove,
             ):
                 code = orca_review.run_review("prova", issue_id=42)
 
@@ -339,6 +341,76 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
         self.assertIn("gh pr create", out)
         self.assertIn("--base develop", out)
         self.assertIn("--label run:team", out)
+        self.assertIn("<corpo-della-pr>", out)
+
+    def test_dry_run_non_crea_file_temporaneo(self):
+        tmp_dir = tempfile.gettempdir()
+        before = set(os.listdir(tmp_dir))
+
+        output = io.StringIO()
+        with (
+            mock.patch.object(orca_review, "_dry_run_identity", return_value=(Path("/finto"), "nmaiese/finto")),
+            redirect_stdout(output)
+        ):
+            orca_review.run_review("finto", issue_id=42, dry_run=True, scheda="indicatore")
+
+        after = set(os.listdir(tmp_dir))
+        self.assertEqual(before, after)
+
+    def test_run_rimuove_file_corpo_anche_su_errore(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prova-2"
+            path.mkdir()
+            results = [
+                completed(),
+                completed(stdout="2\n"),
+                completed(),
+                completed(returncode=1, stderr="Errore gh pr create"),
+            ]
+            tmp_dir = tempfile.gettempdir()
+            before = set(os.listdir(tmp_dir))
+
+            with (
+                mock.patch.object(orca_review, "resolve_worktree", return_value=(path, "nmaiese/prova-2")),
+                mock.patch.object(orca_review, "_run_capture", side_effect=results),
+                mock.patch("sys.stderr", new_callable=io.StringIO)
+            ):
+                code = orca_review.run_review("prova", issue_id=42)
+
+            self.assertEqual(code, 1)
+            after = set(os.listdir(tmp_dir))
+            self.assertEqual(before, after)
+
+    def test_scheda_invalida_rifiutata(self):
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code = orca_review.run_review("prova", issue_id=42, scheda="../fuori")
+            self.assertEqual(code, 1)
+            self.assertIn("Chiave scheda non valida", err.getvalue())
+
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code = orca_review.run_review("prova", issue_id=42, scheda="con / slash")
+            self.assertEqual(code, 1)
+
+    def test_scheda_store_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prova-2"
+            path.mkdir()
+
+            class DummyStoreError(Exception):
+                pass
+
+            with (
+                mock.patch.object(orca_review, "resolve_worktree", return_value=(path, "nmaiese/prova-2")),
+                mock.patch("scripts.indicator_store.filename_for", side_effect=DummyStoreError("Chiave errata"), create=True),
+                mock.patch("scripts.indicator_store.StoreError", DummyStoreError, create=True),
+                mock.patch("sys.stderr", new_callable=io.StringIO) as err
+            ):
+                code = orca_review.run_review("prova", issue_id=42, scheda="errata")
+
+            self.assertEqual(code, 1)
+            self.assertIn("Chiave errata", err.getvalue())
+
 
 if __name__ == "__main__":
+    import os
     unittest.main()

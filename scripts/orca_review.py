@@ -110,7 +110,11 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
         testo_nuovo = ""
 
         if indicator_store:
-            file_name = indicator_store.filename_for(scheda)
+            try:
+                file_name = indicator_store.filename_for(scheda)
+            except indicator_store.StoreError as exc:
+                raise ValueError(str(exc))
+
             rel_path = f"content/indicators/{file_name}"
 
             old_cmd = ["git", "show", f"origin/{base}:{rel_path}"]
@@ -119,6 +123,8 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
                 try:
                     old_entry = indicator_store.analizza(old_result.stdout, f"origin/{base}")
                     testo_prima = indicator_store.rendi(scheda, old_entry)
+                except indicator_store.StoreError as exc:
+                    raise ValueError(str(exc))
                 except Exception:
                     testo_prima = old_result.stdout.strip()
             else:
@@ -134,6 +140,8 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
                         testo_nuovo = new_file.read_text(encoding="utf-8").strip()
                     else:
                         testo_nuovo = "_File nuovo non trovato_"
+            except indicator_store.StoreError as exc:
+                raise ValueError(str(exc))
             except Exception as e:
                 testo_nuovo = f"_Errore nella lettura del nuovo testo: {e}_"
         else:
@@ -170,6 +178,11 @@ def _dry_run_identity(slug: str) -> tuple[Path, str]:
 
 def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, base: str = "master", labels: list[str] | None = None, scheda: str | None = None) -> int:
     """Verifica il worktree, pubblica il ramo e crea una draft PR."""
+    if scheda is not None:
+        if not re.fullmatch(r"^[A-Za-z0-9_:-]+$", scheda):
+            print(f"[!] Chiave scheda non valida: {scheda!r}", file=sys.stderr)
+            return 1
+
     if issue_id is None:
         match = re.match(r"^(\d+)-", slug)
         if match:
@@ -184,18 +197,23 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, ba
             print(f"[!] {exc}", file=sys.stderr)
             return 1
 
+    try:
+        body = _task_body(worktree_path, issue_id, base=base, scheda=scheda)
+    except ValueError as exc:
+        print(f"[!] {exc}", file=sys.stderr)
+        return 1
+
     title = f"Risolve #{issue_id}: {slug}" if issue_id else slug
-    body = _task_body(worktree_path, issue_id, base=base, scheda=scheda)
     push_cmd = ["git", "push", "-u", "origin", branch]
     import tempfile
+    import os
 
-    # Per il corpo lungo, usiamo un file temporaneo
-    # in dry_run potremmo non voler creare il file se worktree_path non esiste,
-    # ma lo creiamo lo stesso in una temp directory
-
-    body_fd, body_path = tempfile.mkstemp(suffix=".md", text=True)
-    with open(body_fd, "w", encoding="utf-8") as f:
-        f.write(body)
+    if dry_run:
+        body_path = "<corpo-della-pr>"
+    else:
+        body_fd, body_path = tempfile.mkstemp(suffix=".md", text=True)
+        with open(body_fd, "w", encoding="utf-8") as f:
+            f.write(body)
 
     pr_cmd = [
         "gh",
@@ -209,7 +227,7 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, ba
         "--title",
         title,
         "--body-file",
-        body_path if not dry_run else "PR_BODY.md",
+        body_path,
     ]
     if labels:
         for label in labels:
@@ -221,41 +239,51 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, ba
     if dry_run:
         print(shlex.join(push_cmd))
         print(shlex.join(pr_cmd))
+        print("\n--- Corpo PR ---")
+        print(body)
+        print("----------------")
         return 0
 
-    status_cmd = ["git", "status", "--porcelain"]
-    status_result = _run_capture(status_cmd, cwd=worktree_path)
-    if status_result.returncode != 0:
-        _print_failure(status_cmd, status_result)
-        return 1
-    if status_result.stdout.strip():
-        print("[!] Il worktree contiene modifiche non committate.", file=sys.stderr)
-        return 1
-
-    count_cmd = ["git", "rev-list", "--count", f"origin/{base}..HEAD"]
-    count_result = _run_capture(count_cmd, cwd=worktree_path)
-    if count_result.returncode != 0:
-        _print_failure(count_cmd, count_result)
-        return 1
     try:
-        commit_count = int(count_result.stdout.strip())
-    except ValueError:
-        _print_failure(count_cmd, count_result)
-        return 1
-    if commit_count < 1:
-        print(f"[!] Nessun commit sopra origin/{base}: review rifiutata.", file=sys.stderr)
-        return 1
+        status_cmd = ["git", "status", "--porcelain"]
+        status_result = _run_capture(status_cmd, cwd=worktree_path)
+        if status_result.returncode != 0:
+            _print_failure(status_cmd, status_result)
+            return 1
+        if status_result.stdout.strip():
+            print("[!] Il worktree contiene modifiche non committate.", file=sys.stderr)
+            return 1
 
-    push_result = _run_capture(push_cmd, cwd=worktree_path)
-    if push_result.returncode != 0:
-        _print_failure(push_cmd, push_result)
-        return push_result.returncode or 1
-    pr_result = _run_capture(pr_cmd, cwd=worktree_path)
-    if pr_result.returncode != 0:
-        _print_failure(pr_cmd, pr_result)
-        return pr_result.returncode or 1
-    print("[+] Ramo pubblicato e draft PR creata.")
-    return 0
+        count_cmd = ["git", "rev-list", "--count", f"origin/{base}..HEAD"]
+        count_result = _run_capture(count_cmd, cwd=worktree_path)
+        if count_result.returncode != 0:
+            _print_failure(count_cmd, count_result)
+            return 1
+        try:
+            commit_count = int(count_result.stdout.strip())
+        except ValueError:
+            _print_failure(count_cmd, count_result)
+            return 1
+        if commit_count < 1:
+            print(f"[!] Nessun commit sopra origin/{base}: review rifiutata.", file=sys.stderr)
+            return 1
+
+        push_result = _run_capture(push_cmd, cwd=worktree_path)
+        if push_result.returncode != 0:
+            _print_failure(push_cmd, push_result)
+            return push_result.returncode or 1
+        pr_result = _run_capture(pr_cmd, cwd=worktree_path)
+        if pr_result.returncode != 0:
+            _print_failure(pr_cmd, pr_result)
+            return pr_result.returncode or 1
+        print("[+] Ramo pubblicato e draft PR creata.")
+        return 0
+    finally:
+        if not dry_run:
+            try:
+                os.remove(body_path)
+            except OSError:
+                pass
 
 
 def main(argv=None) -> int:
