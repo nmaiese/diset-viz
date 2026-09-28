@@ -100,10 +100,15 @@ Una scala di otto passi, con ruoli nominati per funzione:
 | cifra chiave | 44 | 64 | 1 | 700 | il numero di una pagina |
 
 La scala ha otto passi. A parita' di taglia la gerarchia la fa il peso.
-Nei fogli della 1.0 non si scrivono font-size letterali.
+Nei fogli della 1.0 non si scrivono font-size letterali, con due eccezioni
+elencate nella guardia (`tests/unit/test_css_tokens.py`): il wordmark della
+testata, e il testo dentro gli SVG dei grafici. Quello si misura in unita'
+del viewBox, non in pixel, e riquadri, richiami e scarti fra etichette in
+`charts.py` sono calcolati su quelle taglie: un token in pixel ne
+cambierebbe la taglia vera.
 
 - Le etichette sono in minuscolo con l'iniziale maiuscola: mai tutto maiuscolo,
-  mai monospazio. 14px e' il minimo. La scala e' tarata su un occhio medio di
+  mai monospazio. 14px e' il minimo del testo HTML. La scala e' tarata su un occhio medio di
   0,49 e `font-size-adjust` la tiene uguale se si cambia famiglia.
 - **Le cifre hanno un sistema solo**, `tools/numfmt.py`, per ruoli: cifra (tessere
   e frasi, decimali dalla grandezza), cella (decimali uguali per tutta la
