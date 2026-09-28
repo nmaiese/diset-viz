@@ -28,8 +28,9 @@ quindi i task che lo usano vanno avviati in sequenza, senza lock fittizi nel rep
 La tabella è un **piano di ruoli**, non una misura di disponibilità. Un agente con
 quota esaurita fallisce con un messaggio che sembra un altro problema, quindi la
 disponibilità si verifica **prima** di assegnare, con
-`~/dev/dev-tools/scripts/agent-probe.sh` (dieci secondi); i numeri di quota vivono
-in `~/dev/dev-tools/docs/opencode-quota.md` e `opencode-modelli.md` e qui non si
+`~/dev/dev-tools/scripts/agent-probe.sh` (fino a circa sei minuti, le tre sonde
+ollama girano in serie). I numeri di quota vivono in
+`~/dev/dev-tools/docs/opencode-quota.md` e `opencode-modelli.md` e qui non si
 copiano.
 
 **Il canale che dice la verità sullo stato degli agenti** è
@@ -198,7 +199,7 @@ orca-ide worktree set --worktree active --comment "Implementati i test; in attes
 
 Prima diagnosi (sbagliata, corretta qui): `worker-start --agent antigravity` sembrava fallire
 sempre con `agent_prompt_blocked`, indipendente dal modello. Non è il modello. Letto lo schermo
-del terminale con `orca terminal read --terminal <handle> --screen --json` **prima** di rilasciarlo
+del terminale con `orca-ide terminal read --terminal <handle> --screen --json` **prima** di rilasciarlo
 (non dopo: il rilascio chiude il terminale e la prova sparisce), la causa reale è una catena di tre
 problemi distinti, tutti aggirabili:
 
@@ -206,12 +207,12 @@ problemi distinti, tutti aggirabili:
    worktree chiede "Do you trust the contents of this project?" con un menu a frecce
    (`> Yes, I trust this folder` / `No, exit`). L'iniezione del prompt di Orca manda testo, il menu
    lo scarta, e il turno fallisce con `agent_prompt_blocked` prima ancora di vedere la spec. Si
-   sblocca con un solo invio: `orca terminal send --terminal <handle> --enter --json`. Spiega perché
+   sblocca con un solo invio: `orca-ide terminal send --terminal <handle> --enter --json`. Spiega perché
    a Nello era già andata bene altrove: quel worktree aveva già superato il dialogo.
 2. **Anche a fiducia concessa, l'invio automatico non conferma la sottomissione.** Un secondo
    `worker-start --terminal <handle-ora-fidato>` incolla la spec nella casella di input
    ("`[Pasted text #1 +82 lines]`"), ma il turno non parte da solo: serve un altro
-   `orca terminal send --terminal <handle> --enter --json` per premere davvero Invio. Senza
+   `orca-ide terminal send --terminal <handle> --enter --json` per premere davvero Invio. Senza
    quel secondo invio manuale il dispatch fallisce di nuovo con lo stesso `agent_prompt_blocked`,
    e la capability di quel dispatch viene revocata nello stesso istante: anche riuscendo a far
    partire il turno dopo, il canale per mandare `worker_done` è già morto.
@@ -221,7 +222,7 @@ problemi distinti, tutti aggirabili:
    `orca-ide orchestration send --type worker_done` e' rimasto a `running` senza mai consegnare
    il messaggio (capability già revocata al punto 2), e il worker ha scritto in chiaro "notificato
    il coordinatore" senza aver verificato l'esito del comando: non fidarsi della narrazione di un
-   worker sul proprio `worker_done`, il canale autorevole è `orca orchestration check`.
+   worker sul proprio `worker_done`, il canale autorevole è `orca-ide orchestration check`.
 
 4. **Il prompt può arrivare prima che l'interfaccia sia pronta.** Visto lo stesso giorno in un
    worktree già fidato, quindi senza dialogo: il dispatch è finito `outcome_unknown` e lo schermo
@@ -231,8 +232,8 @@ problemi distinti, tutti aggirabili:
 In sintesi: **antigravity funziona in orchestrazione**, ma non al primo avvio di un worktree nuovo
 e non senza un intervento manuale per far ripartire la sottomissione dopo il trust dialog. Finché
 questi tre punti non sono risolti lato Orca, il ripiego pulito resta l'headless fuori
-orchestrazione, come `~/dev/dev-tools/docs/orca.md` già indicava: `agy --model <id>
---dangerously-skip-permissions -p "<prompt>"`. Ha fatto ricerca web reale (fonti verificabili
+orchestrazione, come `~/dev/dev-tools/docs/orca.md` già indicava: `timeout 900 agy --model <id>
+--dangerously-skip-permissions -p "<prompt>" --print-timeout 900s < /dev/null`. Ha fatto ricerca web reale (fonti verificabili
 nell'output) e prodotto un'analisi di 700+ parole in un turno, senza toccare file: l'output va
 salvato da chi coordina, l'headless non scrive nel repo.
 

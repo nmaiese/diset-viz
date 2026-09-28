@@ -56,8 +56,8 @@ sono, e in tre casi diverge per una scelta di Nello.
   vincoli:
   - li lancia un worker Orca, mai il leader
   - non bloccano
-  - il secondo parere risponde solo alle domande di leggibilità, e un
-    disaccordo va a Nello senza aprire un altro giro.
+  - il secondo parere risponde solo alle domande 1 e 3, quelle di
+    leggibilità, e un disaccordo va a Nello senza aprire un altro giro.
 - **Rilievo 20** è accolto nella forma che propone Codex: strumenti su rami non
   uniti, pilota impilato sopra, documenti normativi dopo l'esito. Lo ha scelto
   Nello: prima l'articolo, poi il merge degli strumenti.
@@ -105,7 +105,7 @@ più sulla RAM: sono processi figli di breve durata.
   Ripiego: `gemini-3.8-flash-high`.
 - **Secondo parere del revisore.** `timeout 600 opencode run "<consegna>" -m
   ollama-cloud/gpt-oss:120b -f <articolo> -f <brief> < /dev/null`. Risponde
-  solo alle domande 1-3, quelle di leggibilità, senza vedere il verdetto del
+  solo alle domande 1 e 3, quelle di leggibilità, senza vedere il verdetto del
   revisore. Il revisore riporta risposte e disaccordi nel suo commento. **Non è
   bloccante**, e un disaccordo non apre un altro giro: finisce nella PR per
   Nello (rilievo 13). Ripiego: `ollama-cloud/gemma4:31b`.
@@ -117,11 +117,18 @@ Vincoli già misurati:
 - Zen gratuiti mai sul percorso critico.
 
 **Quota protetta prima, non misurata dopo** (rilievo 22):
-- prima di aprire la issue si legge la finestra Codex
+- prima di aprire la issue si legge la finestra Codex, sullo schermo di una
+  sessione Codex aperta apposta (riga "5h limit: N% left"): `agent-probe.sh`
+  non dà una percentuale
 - sotto il 30% la scheda non parte
-- tetto per scheda: scout 1 dispatch con 1 giro `agy`, scrittore 1 più 2
-  riparazioni, grafico 1, revisore 3, ciascuno con 1 secondo parere
-- se il modello primario non c'è, si usa un ripiego solo e poi ci si ferma
+- tetto per scheda: scout 1 dispatch con 1 giro `agy`, scrittore 1 dispatch
+  più al massimo 1 riparazione chiesta dal grafico più al massimo 2
+  riparazioni dopo review, grafico 1, revisore 3, ciascuno con 1 secondo
+  parere
+- se il modello primario di uno dei quattro ruoli non c'è, si usa un ripiego
+  solo e poi ci si ferma. Il giro `agy` e il secondo parere non bloccano: se
+  falliscono anche col ripiego, il ruolo va avanti senza e lo scrive nel
+  `worker_done`
 - **misura del 28 settembre**: tre review Codex gpt-5.6-sol medium sui documenti della fase 1 hanno consumato circa 27 punti della finestra di 5 ore, circa 9 a review. Un lavoro high di scrittura di codice ne consuma di più. La finestra si legge sullo schermo del worker Codex ("5h limit: N% left").
 
 ## Lo scout: un contratto con una tabella obbligatoria
@@ -151,7 +158,8 @@ dopo il merge. Lo scout non tocca il registro.
 
 Lo scrive il team leader in `lavoro/<chiave>/brief.md`, dopo lo scout: le cifre
 vengono dal dossier, le cause e l'attualità da `fonti.md`. È l'unico input
-numerico dello scrittore.
+numerico dello scrittore, oltre alle cifre dentro le citazioni letterali di
+`fonti.md`.
 
 Rilievo 14 e 06b. Le parti non hanno un ordine prescritto, non si mettono in una
 posizione e non devono essere tutte usate.
@@ -264,22 +272,26 @@ Rilievi 10 e 23.
 
 1. **Controlli preliminari.** Si leggono quota e RAM (`free -m`). Poi la issue
    con `gh issue create --label run:team --body-file`: domanda, riga 1 del brief,
-   file attesi, commento Stato. Nessun Gate A e nessuna label `gate-a`.
+   file attesi, sezione `## Stato` del corpo. Nessun Gate A e nessuna label
+   `gate-a`.
 2. **Worktree senza agente**, così non c'è un secondo coordinatore:
    `orca-ide worktree create --name ind-ter-12 --issue <n> --base-branch origin/<base> --no-parent --setup skip`.
    Non si usa `orca_dispatch.py --role worker`. `<base>` è `master` a regime. Nel
    pilota è l'ultimo ramo degli strumenti (decisione 9).
 3. **Scout.** `worker-start --worktree issue:<n> --agent claude --model sonnet`.
-   Poi `check --wait`, poi `--ack <deliveryId>` su ogni batch, poi
-   `worker-release`. Il leader scrive `lavoro/<chiave>/brief.md` dal dossier e da `fonti.md`, con la figura da proporre se ce n'è una, e ne pubblica una copia sulla issue.
+   Poi `check --wait`, poi `worker-release`, poi un solo `check --ack <deliveryId>`
+   per l'intera delivery. Il leader scrive `lavoro/<chiave>/brief.md` dal dossier e da `fonti.md`, con la figura da proporre se ce n'è una, e ne pubblica una copia sulla issue.
 4. **Scrittore.** Stesso schema, parte solo dopo il release dello scout.
 5. **Grafico.** Stesso schema, parte solo dopo il release dello scrittore.
-6. **Guardia e PR draft.** Il leader lancia la guardia, fa il commit e apre la
-   PR in **draft** con `orca_review.py` esteso. Il body viene da `--body-file`,
-   con vecchio e nuovo testo, fonti e SHA, più `--label run:team` e `Closes #n`.
-7. **Revisore.**
-   `worker-start --worktree new-top-level --base-branch origin/<ramo> --agent codex`,
-   con lo SHA scritto nella spec. Poi `check`, `ack` e `release`.
+6. **Guardia e PR draft.** Il leader lancia la guardia, fa il commit e, finché
+   `orca_review.py` non pubblica ancora con `--base` diverso da `master`, apre
+   la PR a mano, in **draft**, con `gh pr create --draft --base <ramo-2c>`
+   (04, sezione 8): vecchio e nuovo testo, fonti e SHA nel body, più
+   `--label run:team` e `Closes #n`.
+7. **Revisore.** Prima il worktree, da solo:
+   `orca-ide worktree create --name <slug>-review-<n> --repo id:<id> --base-branch origin/<ramo> --no-parent --setup skip`.
+   Poi `worker-start --worktree branch:nmaiese/<slug>-review-<n> --agent codex`,
+   con lo SHA scritto nella spec (04, sezione 9). Poi `check`, `release` e `ack`.
 8. **Riparazione.** Se il verdetto è `DA CORREGGERE`, parte un **nuovo** worker
    scrittore sul worktree dell'indicatore, con i rilievi, lo SHA e i soli file
    autorizzati. Poi guardia, push e un revisore nuovo. Tre giri al massimo, poi
@@ -355,7 +367,8 @@ Riusa `scripts/dump_indicator_stats.py`, lanciato con `-m`. I test girano su
 ter-12 e su `bes:06POL012P`.
 
 **2b, la guardia.** Un test in `tests/integration/` più uno script da lanciare
-su una bozza. Controlla:
+su una bozza, con la CLI fissata da qui: `bin/py -m scripts.editoriale.guardia
+<chiave> --dossier <file>`. Controlla:
 - le cifre contro il dossier, con il valore assoluto quando la direzione è detta
   a parole: è il difetto di `gate2_verify.py`
 - i link canonici
@@ -367,7 +380,8 @@ Non conta le sezioni. Riusa `scripts/prose_lint.py` e
 `scripts/indicator_store.py`.
 
 **2c, `orca_review.py`.** Aggiunge:
-- `--draft`
+- `--base`, con il conteggio dei commit fatto rispetto a quella base invece
+  che a `origin/master..HEAD` (`--draft` c'è già)
 - `--label`
 - `--body-file`, con il testo prima e dopo da `indicator_store.rendi` e lo SHA.
 
@@ -379,8 +393,10 @@ revisore scritto qui sopra.
 
 Si esegue il runbook dal passo 1 al passo 10.
 - Il worktree parte da `origin/<ramo 2c>`.
-- La PR di contenuto ha come base il ramo 2c, quindi il diff mostra solo
-  l'articolo.
+- La PR di contenuto ha come base il ramo 2c, quindi il diff mostra l'articolo
+  e i tre file di `lavoro/ter-12/` (dossier, fonti, brief), che il revisore
+  legge dal worktree della PR. Con il merge quei file arrivano su `master`:
+  se non devono restarci, si decide come toglierli dopo.
 - La CI gira già con la guardia nuova.
 - **Primo passo:** un worker vivo alla volta.
 - **Misure prima e dopo ogni worker:** `free -m`, `swapon --show`, finestra
@@ -389,7 +405,10 @@ Si esegue il runbook dal passo 1 al passo 10.
 ### Fase 4. La valutazione
 
 - Lettura cieca del vecchio e del nuovo ter-12, da parte di Claude sonnet, di
-  gpt-oss e di Nello.
+  gpt-oss e di Nello. Claude sonnet e gpt-oss non appartengono a nessuno dei
+  quattro ruoli: la lettura cieca la lancia il team leader in headless, come
+  deroga dichiarata alla regola che i modelli gratuiti li lancia sempre un
+  worker Orca.
 - **Se l'articolo convince Nello**, unisce in ordine 2a, 2b, 2c e poi il pilota.
 - **Se non convince**, gli strumenti restano non uniti. Si rilegge il brief e si
   corregge sui rami.
@@ -432,7 +451,9 @@ di Nello, perché è un altro repo.
 
 - Niente lotti e niente due indicatori insieme.
 - Niente Routine né automazioni Orca a orario.
-- Niente Antigravity od OpenCode in un passaggio orchestrato.
+- Niente Antigravity od OpenCode come worker Orca (`worker-start --agent
+  antigravity` o `opencode`). Solo in headless, lanciati dal worker del ruolo
+  dentro il suo turno, con `timeout` e `< /dev/null`.
 - Nessun ruolo oltre i quattro.
 - Niente push su `master` né merge senza Nello.
 - Niente CLAUDE.md sul flusso prima del pilota.
@@ -449,8 +470,9 @@ di Nello, perché è un altro repo.
 - **2b.** La guardia resta verde su ter-901 e su ter-12 com'è oggi. Deve fallire
   su una bozza costruita con un marcatore rotto, una cifra col segno sbagliato
   e una sezione libera senza titolo.
-- **Il grafico del pilota.** `.venv/bin/gunicorn run:app -b 127.0.0.1:5050` sul
-  worktree del pilota, poi ter-12. Il marcatore `dispersione` deve essere reso:
+- **Il grafico del pilota.** `DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python
+  bin/py -m gunicorn run:app -b 127.0.0.1:5050` dalla radice del worktree del
+  pilota, poi ter-12. Il marcatore `dispersione` deve essere reso:
   SVG presente, `figcaption` con i due indicatori e gli anni, 375 e 768 px, tema
   scuro. La guardia 2b deve fallire se il marcatore punta a un indicatore che
   non esiste.
