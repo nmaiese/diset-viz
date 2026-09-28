@@ -84,13 +84,87 @@ def _print_failure(command: list[str], result: subprocess.CompletedProcess[str])
         print(result.stderr.strip(), file=sys.stderr)
 
 
-def _task_body(worktree_path: Path, issue_id: int | None) -> str:
+def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", scheda: str | None = None, internal_key: str | None = None, url_code: str | None = None) -> str:
     task_file = worktree_path / "TASK.md"
     parts = []
-    if task_file.is_file():
-        parts.append(task_file.read_text(encoding="utf-8").rstrip())
-    if issue_id is not None:
-        parts.append(f"Closes #{issue_id}")
+
+    if scheda:
+        # 1. SHA del commit
+        sha_cmd = ["git", "rev-parse", "HEAD"]
+        sha_result = _run_capture(sha_cmd, cwd=worktree_path)
+        sha = sha_result.stdout.strip()
+        parts.append(f"**Commit**: {sha}")
+
+        # 2. La domanda della issue (da TASK.md)
+        if task_file.is_file():
+            parts.append(task_file.read_text(encoding="utf-8").rstrip())
+
+        # 3. Testi prima e nuovo resi o letti con read
+        sys.path.insert(0, str(PROJECT_ROOT))
+        try:
+            from scripts import indicator_store
+        except ImportError:
+            indicator_store = None
+
+        testo_prima = ""
+        testo_nuovo = ""
+
+        if indicator_store:
+            try:
+                file_name = indicator_store.filename_for(internal_key)
+            except indicator_store.StoreError as exc:
+                raise ValueError(str(exc))
+
+            rel_path = f"content/indicators/{file_name}"
+
+            old_cmd = ["git", "show", f"origin/{base}:{rel_path}"]
+            old_result = _run_capture(old_cmd, cwd=worktree_path)
+            if old_result.returncode == 0:
+                try:
+                    old_entry = indicator_store.analizza(old_result.stdout, f"origin/{base}")
+                    testo_prima = indicator_store.rendi(internal_key, old_entry)
+                except indicator_store.StoreError as exc:
+                    raise ValueError(str(exc))
+                except Exception:
+                    testo_prima = old_result.stdout.strip()
+            else:
+                testo_prima = f"_Nessun testo precedente o file non trovato in origin/{base}_"
+
+            try:
+                new_entry = indicator_store.read(internal_key, root=worktree_path / "content" / "indicators")
+                if new_entry:
+                    testo_nuovo = indicator_store.rendi(internal_key, new_entry)
+                else:
+                    new_file = worktree_path / rel_path
+                    if new_file.is_file():
+                        testo_nuovo = new_file.read_text(encoding="utf-8").strip()
+                    else:
+                        testo_nuovo = "_File nuovo non trovato_"
+            except indicator_store.StoreError as exc:
+                raise ValueError(str(exc))
+            except Exception as e:
+                testo_nuovo = f"_Errore nella lettura del nuovo testo: {e}_"
+        else:
+            testo_prima = "_Errore: scripts.indicator_store non trovato_"
+            testo_nuovo = ""
+
+        parts.append(f"### Testo precedente (`origin/{base}`)\n\n```markdown\n{testo_prima}\n```")
+        parts.append(f"### Testo nuovo (`HEAD`)\n\n```markdown\n{testo_nuovo}\n```")
+
+        # 4. Fonti nuove
+        fonti_file = worktree_path / "lavoro" / url_code / "fonti.md"
+        if fonti_file.is_file():
+            fonti = fonti_file.read_text(encoding="utf-8").strip()
+            parts.append(f"### Fonti nuove\n\n```markdown\n{fonti}\n```")
+
+        if issue_id is not None:
+            parts.append(f"Closes #{issue_id}")
+    else:
+        if task_file.is_file():
+            parts.append(task_file.read_text(encoding="utf-8").rstrip())
+        if issue_id is not None:
+            parts.append(f"Closes #{issue_id}")
+
     return "\n\n".join(parts) or "Review del lavoro Orca completato."
 
 
@@ -102,8 +176,27 @@ def _dry_run_identity(slug: str) -> tuple[Path, str]:
         return Path(f"<worktree:{slug}>"), "<ramo-del-worktree>"
 
 
-def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False) -> int:
+def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, base: str = "master", labels: list[str] | None = None, scheda: str | None = None) -> int:
     """Verifica il worktree, pubblica il ramo e crea una draft PR."""
+    internal_key = None
+    url_code = None
+
+    if scheda is not None:
+        if not re.fullmatch(r"^[A-Za-z0-9_:-]+$", scheda):
+            print(f"[!] Chiave scheda non valida: {scheda!r}", file=sys.stderr)
+            return 1
+
+        sys.path.insert(0, str(PROJECT_ROOT))
+        try:
+            from scripts.editoriale import brief
+            from app import sources
+            family, raw_id = brief.resolve(scheda)
+            internal_key = sources.internal_id(family, raw_id)
+            url_code = sources.indicator_code(family, raw_id)
+        except Exception as exc:
+            print(f"[!] {exc}", file=sys.stderr)
+            return 1
+
     if issue_id is None:
         match = re.match(r"^(\d+)-", slug)
         if match:
@@ -118,23 +211,41 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False) ->
             print(f"[!] {exc}", file=sys.stderr)
             return 1
 
+    try:
+        body = _task_body(worktree_path, issue_id, base=base, scheda=scheda, internal_key=internal_key, url_code=url_code)
+    except ValueError as exc:
+        print(f"[!] {exc}", file=sys.stderr)
+        return 1
+
     title = f"Risolve #{issue_id}: {slug}" if issue_id else slug
-    body = _task_body(worktree_path, issue_id)
     push_cmd = ["git", "push", "-u", "origin", branch]
+    import tempfile
+    import os
+
+    if dry_run:
+        body_path = "<corpo-della-pr>"
+    else:
+        body_fd, body_path = tempfile.mkstemp(suffix=".md", text=True)
+        with open(body_fd, "w", encoding="utf-8") as f:
+            f.write(body)
+
     pr_cmd = [
         "gh",
         "pr",
         "create",
         "--draft",
         "--base",
-        "master",
+        base,
         "--head",
         branch,
         "--title",
         title,
-        "--body",
-        body,
+        "--body-file",
+        body_path,
     ]
+    if labels:
+        for label in labels:
+            pr_cmd.extend(["--label", label])
 
     print("=== Orca + GitHub Review ===")
     print(f"Worktree  : {worktree_path}")
@@ -142,41 +253,51 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False) ->
     if dry_run:
         print(shlex.join(push_cmd))
         print(shlex.join(pr_cmd))
+        print("\n--- Corpo PR ---")
+        print(body)
+        print("----------------")
         return 0
 
-    status_cmd = ["git", "status", "--porcelain"]
-    status_result = _run_capture(status_cmd, cwd=worktree_path)
-    if status_result.returncode != 0:
-        _print_failure(status_cmd, status_result)
-        return 1
-    if status_result.stdout.strip():
-        print("[!] Il worktree contiene modifiche non committate.", file=sys.stderr)
-        return 1
-
-    count_cmd = ["git", "rev-list", "--count", "origin/master..HEAD"]
-    count_result = _run_capture(count_cmd, cwd=worktree_path)
-    if count_result.returncode != 0:
-        _print_failure(count_cmd, count_result)
-        return 1
     try:
-        commit_count = int(count_result.stdout.strip())
-    except ValueError:
-        _print_failure(count_cmd, count_result)
-        return 1
-    if commit_count < 1:
-        print("[!] Nessun commit sopra origin/master: review rifiutata.", file=sys.stderr)
-        return 1
+        status_cmd = ["git", "status", "--porcelain"]
+        status_result = _run_capture(status_cmd, cwd=worktree_path)
+        if status_result.returncode != 0:
+            _print_failure(status_cmd, status_result)
+            return 1
+        if status_result.stdout.strip():
+            print("[!] Il worktree contiene modifiche non committate.", file=sys.stderr)
+            return 1
 
-    push_result = _run_capture(push_cmd, cwd=worktree_path)
-    if push_result.returncode != 0:
-        _print_failure(push_cmd, push_result)
-        return push_result.returncode or 1
-    pr_result = _run_capture(pr_cmd, cwd=worktree_path)
-    if pr_result.returncode != 0:
-        _print_failure(pr_cmd, pr_result)
-        return pr_result.returncode or 1
-    print("[+] Ramo pubblicato e draft PR creata.")
-    return 0
+        count_cmd = ["git", "rev-list", "--count", f"origin/{base}..HEAD"]
+        count_result = _run_capture(count_cmd, cwd=worktree_path)
+        if count_result.returncode != 0:
+            _print_failure(count_cmd, count_result)
+            return 1
+        try:
+            commit_count = int(count_result.stdout.strip())
+        except ValueError:
+            _print_failure(count_cmd, count_result)
+            return 1
+        if commit_count < 1:
+            print(f"[!] Nessun commit sopra origin/{base}: review rifiutata.", file=sys.stderr)
+            return 1
+
+        push_result = _run_capture(push_cmd, cwd=worktree_path)
+        if push_result.returncode != 0:
+            _print_failure(push_cmd, push_result)
+            return push_result.returncode or 1
+        pr_result = _run_capture(pr_cmd, cwd=worktree_path)
+        if pr_result.returncode != 0:
+            _print_failure(pr_cmd, pr_result)
+            return pr_result.returncode or 1
+        print("[+] Ramo pubblicato e draft PR creata.")
+        return 0
+    finally:
+        if not dry_run:
+            try:
+                os.remove(body_path)
+            except OSError:
+                pass
 
 
 def main(argv=None) -> int:
@@ -184,8 +305,12 @@ def main(argv=None) -> int:
     parser.add_argument("slug", help="Nome / slug del task")
     parser.add_argument("--issue", type=int, default=None, help="ID della Issue collegata")
     parser.add_argument("--dry-run", action="store_true", help="Mostra i comandi")
+
+    parser.add_argument("--base", default="master", help="Ramo base della PR")
+    parser.add_argument("--label", action="append", help="Label da aggiungere alla PR (ripetibile)")
+    parser.add_argument("--scheda", help="Chiave per comporre la scheda nel corpo della PR")
     args = parser.parse_args(argv)
-    return run_review(slug=args.slug, issue_id=args.issue, dry_run=args.dry_run)
+    return run_review(slug=args.slug, issue_id=args.issue, dry_run=args.dry_run, base=args.base, labels=args.label, scheda=args.scheda)
 
 
 if __name__ == "__main__":
