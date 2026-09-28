@@ -64,3 +64,6 @@ ORIGINAL_REQUEST.md
 # Stato locale e note live dei worktree Orca
 /.orca/
 /TASK.md
+
+# Output grezzo del giro web dello scout del team editoriale: traccia locale, non va nelle PR
+lavoro/*/scout_web.md
