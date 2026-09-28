@@ -2,8 +2,8 @@
 
 ter-12 (disoccupazione) ha i fratelli di genere 175 e 176 e tutte le venti
 regioni nelle tre ripartizioni. bes-06POL012P (affollamento delle carceri) e'
-solo provinciale, ha un estremo non verificato (`seo_titles.UNVERIFIED_EXTREMES`)
-e due province dove la fonte non misura.
+solo provinciale, ha un solo estremo non verificato, Fermo, e due province
+dove la fonte non misura: tolte quelle, il minimo rimasto e' un valore vero.
 """
 
 import json
@@ -79,6 +79,21 @@ class Ter12(unittest.TestCase):
         self.assertIsNone(long_run["relativa"])
         self.assertIn("punti percentuali", long_run["assoluta"]["testo"])
 
+    def test_variazione_di_ogni_regione(self):
+        changes = self.level["serie"]["variazione_per_territorio"]
+        self.assertEqual(changes["territori"]["valore"], 20)
+        self.assertEqual(len(changes["valori"]), 20)
+        self.assertEqual(changes["da"], 2018)
+        self.assertEqual(changes["a"], 2025)
+        # Un territorio che non sta fra i tre cali, con le tre cifre gia' scritte.
+        cali = {m["territorio"] for m in self.level["serie"]["territori_piu_mossi"]["cali"]}
+        molise = next(r for r in changes["valori"] if r["territorio"] == "Molise")
+        self.assertNotIn("Molise", cali)
+        self.assertIn("punti percentuali", molise["variazione"]["testo"])
+        self.assertAlmostEqual(
+            molise["variazione"]["valore"], molise["dopo"]["valore"] - molise["prima"]["valore"], places=5
+        )
+
     def test_contesto_economico(self):
         context = self.dossier["contesto_economico"]
         self.assertEqual([i["codice"] for i in context["indicatori"]], list(brief.CONTEXT_CODES))
@@ -119,18 +134,55 @@ class Carceri(unittest.TestCase):
 
     def test_fermo_estremo_non_verificato(self):
         extremes = self.dossier["avvisi"]["estremi_non_verificati"]
-        self.assertTrue(extremes)
-        self.assertEqual(extremes[0]["piu_alto"]["territorio"], "Fermo")
+        self.assertEqual(len(extremes), 1)
+        self.assertEqual(extremes[0]["livello"], "provincia")
+        self.assertEqual(extremes[0]["territorio"], "Fermo")
+        self.assertEqual(extremes[0]["anno"], 2024)
+        self.assertEqual(extremes[0]["valore"]["valore"], 358.1)
         snapshot = self.level["fotografia"]
         top = snapshot["piu_alti"][0]
         self.assertEqual(top["territorio"], "Fermo")
         self.assertTrue(top[brief.EXTREME_FLAG])
-        # Le cifre derivate dagli estremi portano il segno anche loro.
+        # Le cifre derivate dagli estremi portano il segno anche loro: l'intervallo
+        # poggia sul capo non verificato, qualunque sia l'altro capo.
         self.assertTrue(snapshot["rapporto_fra_estremi"][brief.EXTREME_FLAG])
         self.assertTrue(snapshot["distanza_fra_estremi"][brief.EXTREME_FLAG])
         self.assertTrue(self.dossier["contesto_economico"]["territori"][0][brief.EXTREME_FLAG])
         last_year = self.level["serie"]["media_semplice_per_anno"][-1]
         self.assertTrue(last_year["distanza_fra_estremi"][brief.EXTREME_FLAG])
+
+    def test_il_minimo_e_arezzo_e_un_valore_vero(self):
+        # Gli zeri di Macerata e Savona erano buchi di fonte, non misure: tolti
+        # quelli, il minimo rimasto e' Arezzo e non porta nessun segno.
+        snapshot = self.level["fotografia"]
+        bottom = snapshot["valori"][-1]
+        self.assertEqual(bottom["territorio"], "Arezzo")
+        self.assertNotIn(brief.EXTREME_FLAG, bottom)
+        self.assertEqual([r["territorio"] for r in snapshot["valori"] if brief.EXTREME_FLAG in r], ["Fermo"])
+        for row in snapshot["piu_bassi"]:
+            self.assertNotIn(brief.EXTREME_FLAG, row)
+        for area in snapshot["ripartizioni"]["valori"]:
+            self.assertNotIn(brief.EXTREME_FLAG, area["piu_basso"])
+        extremes = self.dossier["avvisi"]["estremi_non_verificati"]
+        self.assertNotIn("Arezzo", json.dumps(extremes, ensure_ascii=False))
+        contesto = {t["territorio"]: brief.EXTREME_FLAG in t for t in self.dossier["contesto_economico"]["territori"]}
+        self.assertEqual(contesto, {"Fermo": True, "Brescia": False, "Como": False,
+                                    "Sud Sardegna": False, "Nuoro": False, "Arezzo": False})
+
+    def test_variazione_di_ogni_provincia(self):
+        changes = self.level["serie"]["variazione_per_territorio"]
+        self.assertEqual(changes["territori"]["valore"], 104)
+        self.assertEqual(len(changes["valori"]), 104)
+        self.assertEqual(changes["da"], 2015)
+        self.assertEqual(changes["a"], 2024)
+        # Una provincia che non sta fra i tre aumenti e i tre cali.
+        mossi = self.level["serie"]["territori_piu_mossi"]
+        in_top = {m["territorio"] for m in mossi["aumenti"] + mossi["cali"]}
+        provincia = next(r for r in changes["valori"] if r["territorio"] not in in_top)
+        self.assertIn("punti percentuali", provincia["variazione"]["testo"])
+        self.assertAlmostEqual(
+            provincia["variazione"]["valore"], provincia["dopo"]["valore"] - provincia["prima"]["valore"], places=5
+        )
 
     def test_ter12_non_porta_il_segno(self):
         ter12 = brief.dumps(brief.build("ter-12"))

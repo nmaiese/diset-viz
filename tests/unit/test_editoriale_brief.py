@@ -103,5 +103,64 @@ class Movers(unittest.TestCase):
         self.assertEqual(decreases[0], ("d", 10, 2, -8))
 
 
+class TerritoryChanges(unittest.TestCase):
+    """La lista intera: `movers` tiene i tre di ciascun verso, questa no."""
+
+    def test_tutti_i_comuni_per_ampiezza_della_variazione(self):
+        start = {"a": 10, "b": 10, "c": 10, "d": 10, "solo-prima": 1}
+        end = {"a": 15, "b": 8, "c": 13, "d": 2, "solo-dopo": 99}
+        rows = brief.territory_changes(start, end)
+        # Nessuno dei due capi si ferma a tre, e il calo piu' profondo sta primo.
+        self.assertEqual([r[0] for r in rows], ["d", "a", "c", "b"])
+        self.assertEqual(rows[0], ("d", 10, 2, -8))
+        self.assertEqual(rows[3], ("b", 10, 8, -2))
+
+    def test_a_parita_per_chiave_e_invariati_in_fondo(self):
+        rows = brief.territory_changes({"b": 1, "a": 1, "c": 1}, {"a": 1, "b": 1, "c": 1})
+        self.assertEqual([r[0] for r in rows], ["a", "b", "c"])
+        self.assertEqual([r[3] for r in rows], [0, 0, 0])
+
+    def test_nessun_territorio_comune(self):
+        self.assertEqual(brief.territory_changes({"a": 1}, {}), [])
+        self.assertEqual(brief.territory_changes({}, {}), [])
+
+
+class EstremoNonVerificato(unittest.TestCase):
+    """Un solo capo e' non verificato: quello che la fonte nomina."""
+
+    LIVELLO = {
+        "key": "provincia",
+        "year_max": 2024,
+        "observations": [
+            {"key": "fermo", "name": "Fermo", "value": 358.1},
+            {"key": "arezzo", "name": "Arezzo", "value": 35.2},
+        ],
+    }
+
+    def test_torna_il_territorio_nominato(self):
+        found = brief._unverified_observation("bes-06POL012P", self.LIVELLO)
+        self.assertEqual(found["name"], "Fermo")
+        self.assertEqual(found["value"], 358.1)
+
+    def test_il_minimo_restante_non_e_un_estremo_non_verificato(self):
+        # Arezzo e' il minimo ed e' un valore vero: la ricerca ne restituisce uno
+        # solo, e non e' lui. Il segno sulle righe lo mette il chiamante.
+        found = brief._unverified_observation("bes-06POL012P", self.LIVELLO)
+        scelti = [o["name"] for o in self.LIVELLO["observations"] if o is found]
+        self.assertEqual(scelti, ["Fermo"])
+
+    def test_scheda_fuori_dalla_tabella(self):
+        self.assertIsNone(brief._unverified_observation("ter-12", self.LIVELLO))
+
+    def test_anno_diversi_dall_ultimo_del_livello(self):
+        # L'estremo si vede solo nell'ultimo anno: un anno diverso non e' l'avviso
+        # di questa fotografia, e segnarlo qui sbaglierebbe dove guardare.
+        self.assertIsNone(brief._unverified_observation("bes-06POL012P", dict(self.LIVELLO, year_max=2025)))
+
+    def test_territorio_assente_nel_livello(self):
+        level = dict(self.LIVELLO, observations=self.LIVELLO["observations"][1:])
+        self.assertIsNone(brief._unverified_observation("bes-06POL012P", level))
+
+
 if __name__ == "__main__":
     unittest.main()
