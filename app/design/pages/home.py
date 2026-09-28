@@ -630,34 +630,6 @@ def quality(ctx: dict) -> dict | None:
             "profile_word": count_word(len(profiles_list), feminine=False) if profiles_list else None}
 
 
-# ---------------------------------------------------------------- quiz
-
-def quiz_try(ctx: dict, feature_path: str | None = None) -> dict | None:
-    """Una domanda di "Chi è maggiore?" fatta con una lettura in evidenza del
-    contesto: due regioni, un indicatore, quale ha il valore piu' alto. Mai
-    sull'indicatore che la pagina ha appena mostrato."""
-    game = next((g for g in ctx.get("quiz_games") or [] if g["href"].endswith("chi-e-maggiore")), None)
-    card = next((c for c in ctx.get("insight_cards") or [] if c.get("path") != feature_path), None)
-    if not game or not card:
-        return None
-    a = {"name": card["lead_region"], "value": parse_it(card.get("lead_value"))}
-    b = {"name": card["lag_region"], "value": parse_it(card.get("lag_value"))}
-    if a["value"] is None or b["value"] is None or math.isclose(a["value"], b["value"]):
-        return None
-    # Le cifre si scrivono coi decimali della grandezza, come nelle tessere
-    # della scheda. Se scritte cosi' coincidono, la domanda non ha risposta.
-    if numfmt.text(a["value"]) == numfmt.text(b["value"]):
-        return None
-    right, wrong = (a, b) if a["value"] > b["value"] else (b, a)
-    options = sorted([a, b], key=lambda o: o["name"])
-    return {
-        "game": game, "indicator": card["name"], "path": card["path"], "year": card["year"],
-        "source_label": card.get("source_label"), "unit": card.get("unit"),
-        "options": [{"name": o["name"], "right": o is right} for o in options],
-        "right": right, "wrong": wrong,
-    }
-
-
 # ---------------------------------------------------------------- storie
 
 def _jpeg_size(data: bytes) -> tuple[int, int] | None:
@@ -754,13 +726,13 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     ranked = sum(n for n in (qol["regions"], qol["provinces"]) if n) if qol else None
     main = {
         "/regioni": {"num": counts.get("regions"), "unit": None, "title": "Regioni",
-                     "text": "Il profilo di ogni regione: dove stacca, dove resta indietro, i valori di ogni indicatore."},
+                     "text": "Dove stacca e dove resta indietro."},
         "/province": {"num": counts.get("provinces"), "unit": None, "title": "Province",
-                      "text": "Posizione, dimensioni del benessere e tutti gli indicatori di ogni provincia."},
+                      "text": "Posizione, benessere e tutti gli indicatori."},
         "/temi": {"num": ctx.get("theme_total"), "unit": None, "title": "Temi",
-                  "text": "Gli indicatori raccolti per argomento, con la mappa e chi sta in testa su ognuno."},
+                  "text": "Gli indicatori raccolti per argomento."},
         "/qualita-della-vita": {"num": ranked or None, "unit": "territori in classifica", "title": "Qualità della vita",
-                                "text": "Dove si vive meglio: la classifica delle regioni e quella delle province, con il profilo di priorità che scegli tu."},
+                                "text": "La classifica, con i pesi che scegli."},
     }
     # La mappa dell'atlante si colora con uno di sei indicatori, e solo
     # all'ultimo anno: "sulla mappa, anno per anno" prometteva quello che la
@@ -782,12 +754,6 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     }
 
 
-# I tre giochi del quiz con la loro illustrazione e il lavaggio della scheda.
-GAME_LOOK = {
-    "indovina-la-regione": {"icon": "game-map", "tone": "blue"},
-    "chi-e-maggiore": {"icon": "game-versus", "tone": "green"},
-    "ordina": {"icon": "game-sort", "tone": "red"},
-}
 
 # Le quattro aree dei temi con la loro icona e il lavaggio del distintivo. Non
 # sono colori dei dati (rampa, ripartizioni) ne' l'accento: servono solo a
@@ -829,13 +795,7 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
             cards.append(card)
         levels.append({"key": level["key"], "tab": level["tab"], "plural": level["plural"], "n": level["n"],
                        "href": level["href"], "areas": cards})
-    need, total = band["need"], band["panel_total"]
-    rule = ("Per ogni area, l'indicatore la cui media semplice è cambiata di più fra il primo e l'ultimo anno, "
-            "in rapporto allo scarto interquartile fra i territori nell'ultimo anno, a pari merito in ordine "
-            f"alfabetico. Solo schede indicizzabili, con almeno {count_word(band['min_years'], feminine=False)} "
-            f"anni in cui almeno {need['regione']} regioni su {total['regione']} ({need['provincia']} province su "
-            f"{total['provincia']}) hanno il dato, e con la media dei territori presenti in tutti quegli anni.")
-    return {"total": band["total"], "href": band["href"], "rule": rule, "levels": levels}
+    return {"total": band["total"], "href": band["href"], "levels": levels}
 
 
 # ---------------------------------------------------------------- tutta la pagina
@@ -886,8 +846,6 @@ def derive(ctx: dict) -> dict:
         "best_key": next((k for k, v in names.items() if v == area.get("best")), None),
         "worst_key": next((k for k, v in names.items() if v == area.get("worst")), None),
     } for area in ctx.get("themes_preview") or []]
-    citation = (f"Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati "
-                f"{ctx.get('sources_label')}. {ctx.get('canonical')}")
     return {
         "indicators": ctx.get("total_indicators"),
         "regions": counts.get("regions"), "provinces": counts.get("provinces"),
@@ -897,15 +855,7 @@ def derive(ctx: dict) -> dict:
         "region_names": names,
         "hero_map": hero_map(names),
         "quality": qol,
-        "quiz_try": quiz_try(ctx, (feat or {}).get("path")),
-        "games": [{**g, **GAME_LOOK.get(g["href"].rsplit("/", 1)[-1], {"icon": "bolt", "tone": "amber"})}
-                  for g in ctx.get("quiz_games") or []],
         "areas": areas,
         "temi": themes_band(ctx.get("atlas_band"), areas),
         "stories": [story(p) for p in posts],
-        "citation": citation,
-        "games_word": count_word(len(ctx.get("quiz_games") or []), feminine=False).capitalize(),
-        # Le schede di fiducia di prima, per chiave. "Copertura" ripete la
-        # definizione in testa alla pagina, quindi il template ne usa solo il testo.
-        "trust": {card["kicker"]: card for card in ctx.get("trust_cards") or []},
     }
