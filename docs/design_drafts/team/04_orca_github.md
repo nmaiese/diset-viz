@@ -279,11 +279,31 @@ orca-ide orchestration task-create --run "$RUN_ID" --task-title revisore \
   --spec "Target: PR #$PR_NUMBER al ramo $PR_BRANCH, commit atteso $HEAD_SHA. Change: review read-only, cinque domande (attacco chiaro, perché spiegato, prosa discorsiva non a elenco, coerenza col dossier e con fonti.md, grafico richiamato dal testo). Per ogni no: frase citata, motivo, correzione minima. Prima di pubblicare confronta git rev-parse HEAD nel tuo worktree con l'headRefOid corrente da gh pr view; se sono diversi non pubblicare. Pubblica sempre con gh pr review --comment, mai --approve né --request-changes (stessa identità GitHub dell'autore). Verdetto testuale DA CORREGGERE o PRONTA PER NELLO più lo SHA. Lancia anche, dentro il tuo turno, il secondo parere: timeout 600 opencode run '<consegna, solo domande 1-3 di leggibilità>' -m ollama-cloud/gpt-oss:120b -f <path-articolo> -f <path-brief> < /dev/null. Non bloccante, riporta risposte e disaccordi nel tuo commento senza aprire un altro giro. Aggiorna la sezione Stato nel corpo della issue (gh issue view --json body, poi gh issue edit --body-file). Constraints: nessuna modifica al repo, nessun merge. Ownership: referto su PR e issue." \
   --json
 
+# prima il worktree, da solo: dentro worker-start la creazione puo' superare
+# il timeout del dispatch, e allora il prompt non arriva mai all'agente
+orca-ide worktree create --name "$REVIEW_SLUG" \
+  --repo id:d2ae0385-1020-40e5-8859-7fbd55a33e03 \
+  --base-branch "origin/$PR_BRANCH" --no-parent --setup skip --json
+
 orca-ide orchestration worker-start --run "$RUN_ID" --task "$REVIEW_TASK" \
-  --worktree new-top-level --name "$REVIEW_SLUG" \
-  --repo path:/home/nilo/dev/sites/divarioitalia \
-  --base-branch "origin/$PR_BRANCH" --setup skip --agent codex --model gpt-5.6-sol --effort high --json
+  --worktree "branch:nmaiese/$REVIEW_SLUG" \
+  --agent codex --model gpt-5.6-sol --effort high --json
 ```
+
+Tre cose misurate il 28 settembre alla prima review vera, sulla issue #285:
+- **`--repo path:/home/nilo/...` fallisce con `repo_not_found`.** Orca registra
+  il repo con il percorso Windows (`\\wsl.localhost\Ubuntu-24.04\...`), quindi il
+  selettore giusto è l'id, `id:d2ae0385-1020-40e5-8859-7fbd55a33e03`, che si
+  legge con `orca-ide repo list --json`.
+- **`worker-start --worktree new-top-level` può andare in timeout.** La
+  creazione del worktree ha superato i 120 secondi. Il dispatch è finito
+  `failed` con `lastError: timeout`, e l'agente è partito con la casella vuota.
+  Per questo il worktree si crea prima, con `worktree create`, e il worker si
+  lancia dopo sul worktree che esiste già.
+- **Un terminale non si riusa dopo la fine del suo dispatch**, né con
+  `--terminal` né con `--retry-of`: Orca risponde "is not running a recognized
+  agent". Si rilascia il worker e se ne lancia uno nuovo sullo stesso worktree,
+  con `--task <id> --retry-of <dispatch>`.
 
 Ciclo della sezione 0: `check --wait`, `ack` di ogni delivery, poi
 `worker-release --dispatch <dispatchId>`.
