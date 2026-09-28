@@ -262,13 +262,18 @@ class RealArticlesWithDossier(unittest.TestCase):
 
                 dossier = brief.build(code)
 
-                defects = guardia.check_article(internal_key, article, dossier=dossier)
+                fonti = ROOT / "lavoro" / code / "fonti.md"
+                source_values = guardia.source_figures(fonti) if fonti.exists() else []
+
+                defects = guardia.check_article(
+                    internal_key, article, dossier=dossier, source_values=source_values,
+                )
                 cifre = [d.quote for d in defects if d.check == "cifre"]
 
                 expected = []
                 if code == "ter-12":
-                    # 2,71: lo scarto calcolato dallo scrittore
-                    expected = ["...largo di tutta la classifica, 2,71 punti in un colpo solo. Sopra..."]
+                    # riscritto dal pilota del team (#293): le cifre vengono dal dossier e da lavoro/ter-12/fonti.md
+                    expected = []
                 elif code == "ter-17":
                     # 0,2: la variazione dell'ultimo anno di due territori
                     expected = ["...uli-Venezia Giulia e l'Umbria 0,2, e di un soffio la Valle d'Ao..."]
