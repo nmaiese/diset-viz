@@ -115,11 +115,12 @@
   border-top: 2px solid var(--rule-strong); border-radius: var(--radius-sm);
 }
 .door:first-child { padding: var(--space-6); border-top-width: 3px; }
-/* Da 960 la prima porta e' alta due righe: la cifra sta in alto, titolo e
-   frase in basso, cosi' il riquadro non resta vuoto a meta'. */
+/* Da 960 la prima porta e' alta due righe. Cifra, titolo e frase stanno
+   insieme in fondo al riquadro: con la cifra in alto e il titolo in basso
+   il vuoto in mezzo li staccava, e la cifra non si leggeva piu' come la
+   misura del titolo. */
 @media (min-width: 960px) {
-  .door:first-child { grid-template-rows: 1fr auto auto; padding: var(--space-8); }
-  .door:first-child .door__num { align-self: start; }
+  .door:first-child { grid-template-rows: auto auto auto; align-content: end; padding: var(--space-8); }
   /* La cifra vera e' lo span `.n`, che `.figure-num .n` tiene alla taglia piccola. */
   .door:first-child .door__num .n { font-size: var(--fs-figure); line-height: var(--lh-figure); letter-spacing: var(--tr-figure); }
   .door:first-child .door__title { font-size: var(--fs-section); line-height: var(--lh-section); }
