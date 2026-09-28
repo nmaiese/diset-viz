@@ -3,6 +3,9 @@ paths:
   - "app/design/pages/confronto.py"
   - "app/templates/v1/confronto.html"
   - "app/static/js/confronto.js"
+  - "app/views.py"
+  - "app/indicator_universe.py"
+  - "tests/**/test_confronto*.py"
 ---
 
 # Il confronto: le regole che non si vedono rompendole

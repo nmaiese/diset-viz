@@ -152,9 +152,16 @@ macro-area, senza che niente fallisca.
   lancia `~/dev/dev-tools/scripts/agent-probe.sh` e scegli tra chi ha quota. Quale
   ruolo va a quale agente sta in `docs/WORKFLOW_ORCA.md` §1: chi coordina non
   assegna a sé stesso per abitudine.
-- Gli agenti si lanciano in un terminale di Orca (`worker-start`; per opencode
-  `scripts/orca-spawn-agent.sh`). `claude -p` e `codex exec` sono per una domanda
-  breve senza modifiche: un lavoro fatto lì non compare in Orca.
+- Un lavoro con modifiche gira in un terminale di Orca, non in headless: lì
+  compare nella sidebar e si può leggere. `worker-start` consegna la spec a
+  claude (sonnet) e a codex, ma **si legge lo schermo nel primo minuto**
+  (`terminal read --screen`): Codex può fermarsi su "Update available", haiku
+  non riceve la consegna. Antigravity e OpenCode partono senza spec: si manda con
+  `terminal send --text` e `--enter` (Antigravity ne vuole due, per il dialogo di
+  fiducia), e la fine si legge da schermo e file, non da `worker_done`. Il
+  dettaglio è in `docs/WORKFLOW_ORCA.md` §6.
+- L'headless (`claude -p`, `codex exec`, `opencode run`, `agy -p`) è per una
+  domanda o una review senza modifiche, sempre con `< /dev/null` e `timeout`.
 
 ## Vincoli
 

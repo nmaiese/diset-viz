@@ -6,6 +6,8 @@ paths:
   - "app/templates/v1/home/**"
   - "app/static/js/ds-home.js"
   - "app/static/js/home-map.js"
+  - "app/views.py"
+  - "tests/**/test_home_*.py"
 ---
 
 # La home: le regole che non si vedono rompendole

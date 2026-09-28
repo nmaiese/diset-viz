@@ -4,6 +4,8 @@ paths:
   - "app/templates/v1/atlante.html"
   - "app/templates/v1/_atlante_mappa.html"
   - "app/static/js/atlante.js"
+  - "app/views.py"
+  - "tests/**/test_atlante*.py"
 ---
 
 # L'atlante: le regole che non si vedono rompendole
