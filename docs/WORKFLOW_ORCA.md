@@ -223,6 +223,11 @@ problemi distinti, tutti aggirabili:
    il coordinatore" senza aver verificato l'esito del comando: non fidarsi della narrazione di un
    worker sul proprio `worker_done`, il canale autorevole è `orca orchestration check`.
 
+4. **Il prompt può arrivare prima che l'interfaccia sia pronta.** Visto lo stesso giorno in un
+   worktree già fidato, quindi senza dialogo: il dispatch è finito `outcome_unknown` e lo schermo
+   mostrava la casella di input vuota, la spec persa. Anche qui la prova si legge a schermo prima
+   di rilasciare. Rimedio: `worker-stop` e ripiego headless, non un secondo tentativo alla cieca.
+
 In sintesi: **antigravity funziona in orchestrazione**, ma non al primo avvio di un worktree nuovo
 e non senza un intervento manuale per far ripartire la sottomissione dopo il trust dialog. Finché
 questi tre punti non sono risolti lato Orca, il ripiego pulito resta l'headless fuori
@@ -234,6 +239,18 @@ salvato da chi coordina, l'headless non scrive nel repo.
 Un gotcha separato su `opencode run`: il messaggio posizionale deve stare **prima** dei flag `-f`,
 altrimenti il parser tratta il testo del prompt come un nome di file e fallisce con
 `File not found: <tutto il prompt>`.
+
+Un secondo gotcha, più insidioso perché non dà errore: **`opencode run` lanciato in background
+aspetta la fine dello stdin.** Se lo stdin è un socket o una pipe che nessuno chiude, come nei
+comandi in background di Claude Code, il processo carica la configurazione, scrive `init` nel log
+e resta fermo per sempre: nessuna sessione, nessuna connessione, pochi secondi di CPU. Il 28
+settembre due lavori sono rimasti così 14 minuti. Si lancia sempre con `< /dev/null` e dentro un
+`timeout`, e si controlla presto `~/.local/share/opencode/log/opencode.log`: se dopo `init` non
+compare `session.id`, il processo è bloccato. Stesso accorgimento per `agy -p`.
+
+I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e finiscono senza
+preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
+credits`. Non va messo su un passaggio che il flusso aspetta.
 
 ## 7. Cosa richiede mano umana
 

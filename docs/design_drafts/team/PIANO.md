@@ -88,7 +88,7 @@ Da qui cinque regole, che il resto del piano applica.
 | **Scrittore** | scrive la scheda in forma `libera`, senza sezioni predefinite, con un solo modello di registro da `content/esempi/`. Quante sezioni, in che ordine, con quali titoli e quanto lungo lo decide il materiale | `content/indicators/<chiave>.md` | quel file | Claude opus high, worker Orca | Codex gpt-5.6-sol high |
 | **Grafico** | legge il testo finito, decide quali grafici lo spiegano e dove, inserisce i marcatori, verifica che si disegnino. Se serve un tipo di grafico che il sito non ha, apre una PR di codice separata | marcatori nel testo e, se serve, PR su `app/charts.py` | i marcatori, dopo il passaggio di proprietà dallo scrittore | Codex gpt-5.6-sol high, worker Orca | Claude sonnet |
 | **Revisore** | nasce da Orca in un worktree nuovo sul ramo della PR, di un'altra famiglia rispetto allo scrittore. Esegue la guardia, poi la rubrica in due passaggi (testo da solo, poi testo con brief e dossier). Pubblica l'esito sulla PR e sulla issue | commento di review sulla PR, commento sulla issue | niente nel repo | Codex gpt-5.6-sol high, worker Orca su PR | Claude opus, se ha scritto Codex |
-| **Secondo parere sul revisore** | ricontrolla che ogni frase citata dal revisore esista e rifà da zero i due criteri dove il giudizio pesa (L1, L2) | commento sulla PR | niente | GLM-5.3-Flash headless | gpt-oss:120b su ollama-cloud |
+| **Secondo parere sul revisore** | ricontrolla che ogni frase citata dal revisore esista e rifà da zero i due criteri dove il giudizio pesa (L1, L2) | commento sulla PR | niente | `ollama-cloud/gpt-oss:120b` headless (una richiesta alla volta, quindi mai due secondi pareri insieme) | `ollama-cloud/gemma4:31b`. GLM-5.3-Flash è fuori fino al rinnovo mensile: il 28 settembre i crediti Hugging Face sono finiti a metà di un lavoro |
 | **Riparatore** | è lo scrittore, nel suo stesso terminale: corregge solo i rilievi bloccanti | nuovo commit sul ramo | i soli file indicati | come lo scrittore | come lo scrittore |
 
 Perché questa assegnazione, in breve. La scrittura italiana è il punto dove la
@@ -98,6 +98,16 @@ lui stesso. Il codice dei grafici va a Codex. La ricerca web ha due motori
 diversi, perché uno scout solo trova quello che il suo motore di ricerca gli
 mostra. I secondi pareri costano zero quota a pagamento. Il confronto con la
 proposta alternativa di nemotron è in `05_modelli_ruoli.md`.
+
+Dove nemotron propone altro, e perché qui no. Mette lo scout su Codex high: ma
+Codex regge già grafico e revisore ed è il ripiego dello scrittore, con una
+finestra di cinque ore che il 27 settembre era al 98%, e lo scout è il ruolo che
+consuma più turni. Sonnet ha ricerca web nativa e costa meno quota di Opus. Mette
+il secondo parere su `ling-3.0-flash-fin-free`, adatto ai refusi ma non a
+rifare da zero un giudizio di leggibilità. Concordiamo sul resto: scrittore
+Opus, revisore di un'altra famiglia, OpenCode solo in headless, un indicatore
+alla volta per la RAM, i modelli Zen gratuiti trattati come banda in più e mai
+come percorso critico.
 
 Una nota su Antigravity. In orchestrazione ha oggi quattro difetti misurati:
 trust dialog, prompt incollato ma non inviato, `orca-ide` fuori dal `PATH`, e il
