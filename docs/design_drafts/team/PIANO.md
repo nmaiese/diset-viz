@@ -35,6 +35,9 @@ e leggibilità, e Nello fa il merge.
    Nello**, perché su `master` il merge è la pubblicazione.
 5. **I revisori sono sempre agenti lanciati da Orca sulla PR o sulla issue**,
    mai un controllo fatto dentro il worktree di chi ha scritto.
+6. **Nessuna sezione predefinita nell'articolo.** Niente definizione, quadro,
+   dinamica e limiti come fermate obbligate: il pezzo prende la forma di quello
+   che c'è da dire su quell'indicatore. Vedi la sezione 3 bis.
 
 ## 1. Perché non rifacciamo il vecchio Agent Team
 
@@ -82,7 +85,7 @@ Da qui cinque regole, che il resto del piano applica.
 | **Team leader** | apre la issue, scrive la riga "per una persona normale", lancia e segue i worker, integra, esegue la guardia, committa, apre la PR, lancia il revisore, porta il pezzo a Nello | issue, PR, commenti di stato | `lavoro/<chiave>/TASK.md`, Git | Claude (questa sessione) | nessuno |
 | **Scout dossierista** | due metà. La prima è codice, non un LLM: il dossier deterministico. La seconda è ricerca: fonti istituzionali, chi altri ne ha scritto, il dato più recente, anteprime e previsioni 2026, l'economia delle regioni in cima e in fondo, i posti dove cercare il perché | `lavoro/<chiave>/brief.md` (parti 2-5 del brief) e `dossier.json` | `lavoro/<chiave>/` | Claude sonnet, worker Orca, con WebSearch e WebFetch | Codex gpt-5.6-sol medium |
 | **Scout, secondo giro web** | la ricerca di "chi altri ne ha scritto" e delle previsioni 2026, in parallelo, su un motore diverso | `lavoro/<chiave>/scout_web.md` | quel file | Antigravity gemini-3.1-pro-high, headless | GLM-5.3-Flash headless |
-| **Scrittore** | scrive la scheda in forma `libera`, 500-900 parole, con un solo modello di registro da `content/esempi/` | `content/indicators/<chiave>.md` | quel file | Claude opus high, worker Orca | Codex gpt-5.6-sol high |
+| **Scrittore** | scrive la scheda in forma `libera`, senza sezioni predefinite, con un solo modello di registro da `content/esempi/`. Quante sezioni, in che ordine, con quali titoli e quanto lungo lo decide il materiale | `content/indicators/<chiave>.md` | quel file | Claude opus high, worker Orca | Codex gpt-5.6-sol high |
 | **Grafico** | legge il testo finito, decide quali grafici lo spiegano e dove, inserisce i marcatori, verifica che si disegnino. Se serve un tipo di grafico che il sito non ha, apre una PR di codice separata | marcatori nel testo e, se serve, PR su `app/charts.py` | i marcatori, dopo il passaggio di proprietà dallo scrittore | Codex gpt-5.6-sol high, worker Orca | Claude sonnet |
 | **Revisore** | nasce da Orca in un worktree nuovo sul ramo della PR, di un'altra famiglia rispetto allo scrittore. Esegue la guardia, poi la rubrica in due passaggi (testo da solo, poi testo con brief e dossier). Pubblica l'esito sulla PR e sulla issue | commento di review sulla PR, commento sulla issue | niente nel repo | Codex gpt-5.6-sol high, worker Orca su PR | Claude opus, se ha scritto Codex |
 | **Secondo parere sul revisore** | ricontrolla che ogni frase citata dal revisore esista e rifà da zero i due criteri dove il giudizio pesa (L1, L2) | commento sulla PR | niente | GLM-5.3-Flash headless | gpt-oss:120b su ollama-cloud |
@@ -125,7 +128,44 @@ Lo scrittore **non** riceve: le frasi fatte del dossier (`scope`, `reading`,
 `caveat`), l'esempio generico "un valore di 20 indica...", la polarità come
 giudizio, le cifre di servizio (distanza fra estremi, variazione percentuale di
 una percentuale, copertura in frazione), numeri non arrotondati, il gergo
-interno, un angolo già deciso.
+interno, un angolo già deciso, una scaletta.
+
+Le cinque parti sono il materiale, non l'indice dell'articolo. Il brief non
+dice in quante sezioni dividere il pezzo né con quali titoli.
+
+## 3 bis. La forma dell'articolo: libera, decisa da quello che c'è da dire
+
+Decisione di Nello del 28 settembre. Oggi 300 schede passano dalle stesse
+quattro fermate, definizione, quadro, dinamica, limiti, nello stesso ordine,
+qualunque cosa i dati abbiano da dire. ter-12 è una di queste. Il nuovo team non
+le usa più.
+
+- **Sempre forma `libera`.** Il meccanismo esiste già ed è in produzione:
+  `app/indicator_texts.py`, documentato in `docs/INDICATOR_PAGES.md` ("La forma
+  libera"), usato da ter-901. Con una sola sezione `libera` l'articolo è
+  esattamente quello che l'autore ha scritto, nel suo ordine, e la pagina non
+  compone nessun ruolo mancante. Non serve codice nuovo.
+- **La struttura la decide lo scrittore**, dopo aver letto il brief: una
+  sezione sola se il pezzo ha un filo solo, quattro se ha quattro cose da dire.
+  Un titolo va messo dove il pezzo cambia argomento, non per scandire.
+- **Ogni titolo è un'affermazione che la sezione dimostra**, come in ter-901
+  ("Il conto si divide fra tutti, non fra chi lavora"). Un titolo che è
+  un'etichetta ("Il quadro", "I limiti del dato", "La dinamica") non passa.
+- **I limiti stanno nella prosa**, nel punto dove cambiano la lettura di una
+  cifra, come nei modelli di `content/esempi/`, non in una sezione di cautele in
+  fondo. Un limite che vale per qualunque indicatore non si scrive.
+- **La definizione non apre per forza.** Il blocco "Come leggere il dato" la
+  pagina lo compone comunque dai metadati, dopo l'articolo. Lo scrittore la
+  porta nel testo solo se serve a capire la tesi, e dove serve.
+- **Restano fissi solo i pezzi della pagina**, non dell'articolo: il cruscotto
+  in alto, il blocco "Come leggere il dato" e l'apparato (fonti, citazione,
+  correlati) in fondo. Li compone il template e lo scrittore non li scrive.
+
+Che cosa cambia negli altri ruoli. Il revisore boccia i titoli-etichetta e la
+sezione di cautele generiche (criterio aggiunto alla rubrica di
+`03_diagnosi_qualita.md`, accanto a L10), e non chiede mai una sezione che
+manca. La guardia deterministica non conta le sezioni: blocca solo una sezione
+`libera` senza titolo, che oggi il renderer scarta in silenzio.
 
 ## 4. Il flusso di un indicatore
 
@@ -176,10 +216,18 @@ delicato del contenuto.
 
 1. **Documenti allineati** (commit diretto, sono documenti). `INDICATOR_PAGES.md`
    dice ancora "quattro sezioni in ordine fisso" e documenta anche la forma
-   libera: va detta una cosa sola. `STYLE.md` rimanda alla redazione esterna
-   dismessa: va tolto. `WORKFLOW_ORCA.md` riceve la deroga (più ruoli nel
-   worktree di un indicatore, uno che scrive alla volta, revisore sempre
-   fuori) e il quarto difetto di Antigravity.
+   libera: va detta una cosa sola, e cioè che le schede nuove sono libere e le
+   300 a quattro ruoli restano finché il team non le riscrive. `STYLE.md`
+   rimanda alla redazione esterna dismessa: va tolto. `WORKFLOW_ORCA.md` riceve
+   la deroga (più ruoli nel worktree di un indicatore, uno che scrive alla
+   volta, revisore sempre fuori) e il quarto difetto di Antigravity. Il
+   `CLAUDE.md` del repo dice "la pipeline automatica non è attiva" e "non c'è un
+   lint della prosa": va aggiornato insieme agli altri file che istruiscono gli
+   agenti (`AGENTS.md`, `.claude/rules/`, le istruzioni globali di dev-tools per
+   la parte Orca). L'elenco riga per riga è in `07_documenti_da_aggiornare.md`.
+   Si scrivono quando il piano è approvato, non prima: un `CLAUDE.md` che
+   descrive un flusso non ancora collaudato è lo stesso errore dei documenti
+   che oggi descrivono una guardia che non esiste più.
 2. **Il costruttore del brief** (`scripts/editoriale/brief.py`, PR). Parte da
    `app/indicator_view.py` e aggiunge quello che al pilota mancava: il conteggio
    sopra la soglia anno per anno, la forma della serie, le dimensioni (fratelli
