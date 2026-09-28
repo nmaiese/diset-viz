@@ -102,7 +102,7 @@ più sulla RAM: sono processi figli di breve durata.
   Cerca un motore diverso: previsioni 2026, chi ne ha scritto, economia delle
   regioni. Lo scout porta in `fonti.md` solo le voci di cui ha aperto l'URL e
   trovato la citazione, come si è fatto oggi su `01b`, con 4 URL su 5 e un 403.
-  Ripiego: `gemini-3.6-flash`.
+  Ripiego: `gemini-3.8-flash-high`.
 - **Secondo parere del revisore.** `timeout 600 opencode run "<consegna>" -m
   ollama-cloud/gpt-oss:120b -f <articolo> -f <brief> < /dev/null`. Risponde
   solo alle domande 1-3, quelle di leggibilità, senza vedere il verdetto del
@@ -148,6 +148,10 @@ dopo il merge. Lo scout non tocca il registro.
 
 ## Il brief dello scrittore: materiale, non una scaletta
 
+Lo scrive il team leader in `lavoro/<chiave>/brief.md`, dopo lo scout: le cifre
+vengono dal dossier, le cause e l'attualità da `fonti.md`. È l'unico input
+numerico dello scrittore.
+
 Rilievo 14 e 06b. Le parti non hanno un ordine prescritto, non si mettono in una
 posizione e non devono essere tutte usate.
 
@@ -190,8 +194,10 @@ Rilievi 13 e 15. Sostituiscono gli 11+6 criteri di `03`.
    l'indicatore e qual è la notizia?
 2. Il pezzo spiega perché i numeri sono quelli, con le fonti di `fonti.md`, o
    dice apertamente che cosa non si sa?
-3. Si legge come prosa discorsiva? Non deve essere un elenco travestito, ha
-   titoli-affermazione e nessuna sezione di cautele.
+3. Si legge come prosa discorsiva, in italiano corretto? Nessun errore di
+   grammatica, concordanza, accento o refuso, nessuna frase che regge due idee.
+   Non deve essere un elenco travestito, ha titoli-affermazione e nessuna
+   sezione di cautele.
 4. Ogni affermazione torna con il dossier e con `fonti.md`? Non manca una
    differenza fra dimensioni che cambia la lettura?
 5. Ogni grafico è richiamato dal testo e mostra una cosa che il testo dice?
@@ -220,8 +226,10 @@ e l'audit `02`: prima le storie, poi solo i tipi che servono.
 
 Per ter-12 il candidato naturale è
 `<!-- grafico: dispersione con=ter-901 evidenzia=... didascalia="..." -->`:
-disoccupazione e PIL pro capite, una regione per punto, con i colori delle
-ripartizioni. È il "perché" in figura, e non richiede codice.
+disoccupazione e PIL pro capite, una regione per punto. È il "perché" in
+figura, e non richiede codice. Il renderer di oggi disegna i punti grigi e
+accende in arancio le regioni in `evidenzia`: i colori delle ripartizioni
+richiederebbero una PR di `app/charts.py`, che nel pilota non si fa.
 
 La differenza donne e uomini (ter-175, ter-176) sulla pagina di oggi è solo un
 elenco di link (`dimension_siblings` in `v1/indicatore.html`), non un grafico.
@@ -235,14 +243,16 @@ Ogni figura ha una specifica:
 - una didascalia che si regge da sola;
 - la resa a 375 e 768 px;
 - i temi chiaro e scuro;
-- i colori delle ripartizioni e mai l'arancio.
+- l'arancio solo per le regioni in evidenza, mai come colore dei dati.
 
 ## Lo stato e la ripresa
 
 Rilievi 10 e 23.
 
-- **La issue è l'unico posto dello stato.** C'è un solo commento "Stato"
-  modificato sul posto: fase, SHA, prossimo passo, chi lo fa. Label, PR,
+- **La issue è l'unico posto dello stato.** È la sezione `## Stato` nel corpo
+  della issue, riscritta sul posto: fase, SHA, prossimo passo, chi lo fa. Non è
+  un commento, perché con un'identità sola `gh issue comment --edit-last`
+  toccherebbe il commento sbagliato. Label, PR,
   `TASK.md` e scheda Orca sono viste derivate.
 - **Ripresa dopo un'interruzione**, con due comandi documentati nel runbook,
   senza script nuovi:
@@ -260,7 +270,7 @@ Rilievi 10 e 23.
    pilota è l'ultimo ramo degli strumenti (decisione 9).
 3. **Scout.** `worker-start --worktree issue:<n> --agent claude --model sonnet`.
    Poi `check --wait`, poi `--ack <deliveryId>` su ogni batch, poi
-   `worker-release`. Il leader pubblica il brief sulla issue.
+   `worker-release`. Il leader scrive `lavoro/<chiave>/brief.md` dal dossier e da `fonti.md`, con la figura da proporre se ce n'è una, e ne pubblica una copia sulla issue.
 4. **Scrittore.** Stesso schema, parte solo dopo il release dello scout.
 5. **Grafico.** Stesso schema, parte solo dopo il release dello scrittore.
 6. **Guardia e PR draft.** Il leader lancia la guardia, fa il commit e apre la

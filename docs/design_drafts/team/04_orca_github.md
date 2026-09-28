@@ -163,7 +163,7 @@ Da qui in poi `$RUN_ID` è l'id restituito. Ogni `task-create` e ogni
 ```bash
 orca-ide orchestration task-create --run "$RUN_ID" --task-title scout \
   --display-name "#$ISSUE scout" \
-  --spec "Target: lavoro/ter-12/dossier.json e lavoro/ter-12/fonti.md. Change: dossier deterministico da scripts/editoriale/brief.py e tabella fonti con dato osservato più recente, previsioni 2026, economia della regione più alta e più bassa, fattori che muovono l'indicatore, chi altri ne ha scritto. Colonne fonti.md: istituzione, data di pubblicazione, URL aperto, citazione letterale, limite d'uso; per le previsioni anche orizzonte e cautela. Una voce senza fonte si scrive 'non trovato'. Constraints: sola lettura sul resto del repo, nessuna modifica a content/ o app/. Lancia in parallelo alla tua ricerca: timeout 900 agy --model gemini-3.1-pro-high --dangerously-skip-permissions -p '<consegna del giro web>' --print-timeout 900s < /dev/null > lavoro/ter-12/scout_web.md. Porta in fonti.md solo le voci di cui hai aperto l'URL e trovato la citazione. Observable acceptance: dossier.json presente, fonti.md con tutte le voci obbligatorie o 'non trovato'." \
+  --spec "Leggi skills/editorial-team/scout/SKILL.md e seguila, questa spec la precisa: dove dicono cose diverse vale la spec, e lo scrivi nel worker_done. Target: lavoro/ter-12/dossier.json e lavoro/ter-12/fonti.md. Change: dossier deterministico da scripts/editoriale/brief.py e tabella fonti con dato osservato più recente, previsioni 2026, economia della regione più alta e più bassa, fattori che muovono l'indicatore, chi altri ne ha scritto. Colonne fonti.md: istituzione, data di pubblicazione, URL aperto, citazione letterale, limite d'uso; per le previsioni anche orizzonte e cautela. Una voce senza fonte si scrive 'non trovato'. Constraints: sola lettura sul resto del repo, nessuna modifica a content/ o app/. Lancia in parallelo alla tua ricerca: timeout 900 agy --model gemini-3.1-pro-high --dangerously-skip-permissions -p '<consegna del giro web>' --print-timeout 900s < /dev/null > lavoro/ter-12/scout_web.md. Porta in fonti.md solo le voci di cui hai aperto l'URL e trovato la citazione. Observable acceptance: dossier.json presente, fonti.md con tutte le voci obbligatorie o 'non trovato'." \
   --json
 
 orca-ide orchestration worker-start --run "$RUN_ID" --task "$SCOUT_TASK" \
@@ -172,12 +172,16 @@ orca-ide orchestration worker-start --run "$RUN_ID" --task "$SCOUT_TASK" \
 
 Poi il ciclo della sezione 0: `check --wait`, `check --ack <deliveryId>` su
 ogni delivery del batch, `worker-release --dispatch <dispatchId>`. Solo dopo
-il rilascio il team leader legge `lavoro/ter-12/fonti.md` e pubblica la riga
-di una frase più la fotografia iniziale sulla issue, come materiale per lo
-scrittore (non come scaletta).
+il rilascio il team leader scrive `lavoro/ter-12/brief.md` con le parti di
+`PIANO.md`, "Il brief dello scrittore": che cosa misura in una riga, la
+fotografia, le dimensioni, il perché, l'attualità, il file di `content/esempi/`
+da usare come modello, e se c'è una figura da proporre (per ter-12 la
+dispersione con ter-901). Prende le cifre dal dossier e le cause da `fonti.md`,
+e ne pubblica una copia come commento sulla issue. È materiale per lo
+scrittore, non una scaletta.
 
 Ripiego se Claude sonnet non è disponibile: Codex gpt-5.6-sol medium. Ripiego
-per `agy` se `gemini-3.1-pro-high` non risponde: `gemini-3.6-flash`. Un solo
+per `agy` se `gemini-3.1-pro-high` non risponde: `gemini-3.8-flash-high`. Un solo
 ripiego, poi ci si ferma.
 
 ## 6. Scrittore
@@ -187,7 +191,7 @@ Parte solo dopo il `worker-release` dello scout, mai in parallelo.
 ```bash
 orca-ide orchestration task-create --run "$RUN_ID" --task-title scrittore \
   --display-name "#$ISSUE scrittore" --deps "[\"$SCOUT_TASK\"]" \
-  --spec "Target: content/indicators/12.md. Change: articolo in forma libera (LIBERA in app/indicator_texts.py), nessuna sezione predefinita, titoli-affermazione dove il pezzo cambia argomento. Materiale disponibile: riga di una frase e fotografia dalla issue, dimensioni da ter-175 e ter-176, perché da fonti.md o 'non spiegato', attualità da fonti.md, un modello di registro da content/esempi/. Non ricevi: frasi fatte del dossier, polarità come giudizio, cifre di servizio, gergo interno, un angolo già deciso, una scaletta. Vietati: em-dash, en-dash, ';', '…'. Constraints: solo content/indicators/12.md, niente git add/commit, niente asset. Observable acceptance: articolo leggibile come prosa discorsiva, ogni cifra riconducibile al dossier o a fonti.md." \
+  --spec "Leggi skills/editorial-team/scrittore/SKILL.md e seguila, questa spec la precisa: dove dicono cose diverse vale la spec, e lo scrivi nel worker_done. Target: content/indicators/12.md. Change: articolo in forma libera (LIBERA in app/indicator_texts.py), nessuna sezione predefinita, titoli-affermazione dove il pezzo cambia argomento. Materiale disponibile: riga di una frase e fotografia dalla issue, dimensioni da ter-175 e ter-176, perché da fonti.md o 'non spiegato', attualità da fonti.md, un modello di registro da content/esempi/. Non ricevi: frasi fatte del dossier, polarità come giudizio, cifre di servizio, gergo interno, un angolo già deciso, una scaletta. Vietati: em-dash, en-dash, ';', '…'. Constraints: solo content/indicators/12.md, niente git add/commit, niente asset. Observable acceptance: articolo leggibile come prosa discorsiva, ogni cifra riconducibile al dossier o a fonti.md." \
   --json
 
 orca-ide orchestration worker-start --run "$RUN_ID" --task "$WRITER_TASK" \
@@ -203,7 +207,7 @@ Parte solo dopo il `worker-release` dello scrittore.
 ```bash
 orca-ide orchestration task-create --run "$RUN_ID" --task-title grafico \
   --display-name "#$ISSUE grafico" --deps "[\"$WRITER_TASK\"]" \
-  --spec "Target: marcatore <!-- grafico --> dentro content/indicators/12.md, tipo dispersione con=ter-901. Change: una figura sola, disoccupazione contro PIL pro capite, una regione per punto, colori delle ripartizioni, mai l'arancio. Vietato ridisegnare serie, mappa o classifica già nel cruscotto, e vietato costruire un tipo di grafico nuovo in questo pilota. Specifica richiesta: provenienza e unità, anni e dati mancanti, didascalia autonoma, resa a 375 e 768px, tema chiaro e scuro. Constraints: solo il marcatore assegnato, niente testo, niente git add/commit. Observable acceptance: marcatore reso, figcaption con i due indicatori e gli anni, tema scuro corretto." \
+  --spec "Leggi skills/editorial-team/grafico/SKILL.md e seguila, questa spec la precisa: dove dicono cose diverse vale la spec, e lo scrivi nel worker_done. Target: marcatore <!-- grafico --> dentro content/indicators/12.md, tipo dispersione con=ter-901. Change: una figura sola, disoccupazione contro PIL pro capite, una regione per punto, i punti grigi e l'arancio solo per le regioni in evidenza, come fa oggi il renderer (i colori delle ripartizioni richiederebbero una PR di app/charts.py da unire prima). Vietato ridisegnare serie, mappa o classifica già nel cruscotto, e vietato costruire un tipo di grafico nuovo in questo pilota. Specifica richiesta: provenienza e unità, anni e dati mancanti, didascalia autonoma, resa a 375 e 768px, tema chiaro e scuro. Constraints: solo il marcatore assegnato, niente testo, niente git add/commit. Observable acceptance: marcatore reso, figcaption con i due indicatori e gli anni, tema scuro corretto." \
   --json
 
 orca-ide orchestration worker-start --run "$RUN_ID" --task "$GRAPHIC_TASK" \
@@ -211,6 +215,10 @@ orca-ide orchestration worker-start --run "$RUN_ID" --task "$GRAPHIC_TASK" \
 ```
 
 Ciclo della sezione 0. Ripiego: Claude sonnet, una volta sola.
+
+Se il `worker_done` del grafico chiede di cambiare una frase, parte una
+riparazione dello scrittore **prima** del commit (sezione 10, con le frasi del
+grafico come rilievi), non dopo la review.
 
 ## 8. Guardia, commit e draft PR
 
@@ -223,7 +231,7 @@ git -C "$WT_PATH" diff --check
 (cd "$WT_PATH" && DIVARIO_PYTHON="$DIVARIO_PYTHON" \
   bin/py -m unittest discover -s tests -v)
 git -C "$WT_PATH" status --short
-git -C "$WT_PATH" add content/indicators/12.md lavoro/ter-12/
+git -C "$WT_PATH" add content/indicators/12.md lavoro/ter-12/dossier.json lavoro/ter-12/fonti.md lavoro/ter-12/brief.md
 git -C "$WT_PATH" commit -m "Scheda ter-12 riscritta dal team: <una frase su che cosa dice il pezzo>"
 ```
 
@@ -276,7 +284,7 @@ export REVIEW_SLUG="${SLUG}-review-${ITERATION}"
 orca-ide orchestration task-create --run "$RUN_ID" --task-title revisore \
   --display-name "PR #$PR_NUMBER review $ITERATION" \
   --deps "[\"$WRITER_TASK\",\"$GRAPHIC_TASK\"]" \
-  --spec "Target: PR #$PR_NUMBER al ramo $PR_BRANCH, commit atteso $HEAD_SHA. Change: review read-only, cinque domande (attacco chiaro, perché spiegato, prosa discorsiva non a elenco, coerenza col dossier e con fonti.md, grafico richiamato dal testo). Per ogni no: frase citata, motivo, correzione minima. Prima di pubblicare confronta git rev-parse HEAD nel tuo worktree con l'headRefOid corrente da gh pr view; se sono diversi non pubblicare. Pubblica sempre con gh pr review --comment, mai --approve né --request-changes (stessa identità GitHub dell'autore). Verdetto testuale DA CORREGGERE o PRONTA PER NELLO più lo SHA. Lancia anche, dentro il tuo turno, il secondo parere: timeout 600 opencode run '<consegna, solo domande 1-3 di leggibilità>' -m ollama-cloud/gpt-oss:120b -f <path-articolo> -f <path-brief> < /dev/null, con i due file dentro il worktree perche' opencode rifiuta i path esterni come /tmp. Se l'output e' vuoto il parere non c'e', anche con exit 0. Non bloccante, riporta risposte e disaccordi nel tuo commento senza aprire un altro giro. Aggiorna la sezione Stato nel corpo della issue (gh issue view --json body, poi gh issue edit --body-file). Constraints: nessuna modifica al repo, nessun merge. Ownership: referto su PR e issue." \
+  --spec "Leggi skills/editorial-team/revisore/SKILL.md e seguila, questa spec la precisa: dove dicono cose diverse vale la spec, e lo scrivi nel worker_done. Guardia: DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m scripts.editoriale.guardia ter-12 --dossier lavoro/ter-12/dossier.json. Issue: #$ISSUE. Target: PR #$PR_NUMBER al ramo $PR_BRANCH, commit atteso $HEAD_SHA. Change: review read-only, cinque domande (attacco chiaro, perché spiegato, prosa discorsiva non a elenco, coerenza col dossier e con fonti.md, grafico richiamato dal testo). Per ogni no: frase citata, motivo, correzione minima. Prima di pubblicare confronta git rev-parse HEAD nel tuo worktree con l'headRefOid corrente da gh pr view; se sono diversi non pubblicare. Pubblica sempre con gh pr review --comment, mai --approve né --request-changes (stessa identità GitHub dell'autore). Verdetto testuale DA CORREGGERE o PRONTA PER NELLO più lo SHA. Lancia anche, dentro il tuo turno, il secondo parere: timeout 600 opencode run '<consegna, solo domande 1-3 di leggibilità>' -m ollama-cloud/gpt-oss:120b -f <path-articolo> -f <path-brief> < /dev/null, con i due file dentro il worktree perche' opencode rifiuta i path esterni come /tmp. Se l'output e' vuoto il parere non c'e', anche con exit 0. Non bloccante, riporta risposte e disaccordi nel tuo commento senza aprire un altro giro. Aggiorna la sezione Stato nel corpo della issue (gh issue view --json body, poi gh issue edit --body-file). Constraints: nessuna modifica al repo, nessun merge. Ownership: referto su PR e issue." \
   --json
 
 # prima il worktree, da solo: dentro worker-start la creazione puo' superare
@@ -342,7 +350,7 @@ worktree dell'indicatore, con i soli path indicati dal revisore.
 ```bash
 orca-ide orchestration task-create --run "$RUN_ID" --task-title riparazione \
   --deps "[\"$REVIEW_TASK\"]" \
-  --spec "Target: <soli path indicati dal revisore>. Change: correggere solo i rilievi confermati nel commento PR #$PR_NUMBER, iterazione $ITERATION. Constraints: nessun allargamento di scopo, niente file oltre quelli indicati, niente git add/commit. Observable acceptance: rilievi risolti, test del repository ancora verdi." \
+  --spec "Leggi skills/editorial-team/scrittore/SKILL.md, la parte In una riparazione. Target: <soli path indicati dal revisore>. Change: correggere solo i rilievi confermati nel commento PR #$PR_NUMBER, iterazione $ITERATION. Constraints: nessun allargamento di scopo, niente file oltre quelli indicati, niente git add/commit. Observable acceptance: rilievi risolti, test del repository ancora verdi." \
   --json
 
 orca-ide orchestration worker-start --run "$RUN_ID" --task "$REPAIR_TASK" \
@@ -453,7 +461,7 @@ confine, ogni ruolo scrive solo i propri path:
 
 | Ruolo | Può scrivere | Non può fare |
 | --- | --- | --- |
-| scout | `lavoro/<chiave>/dossier.json`, `lavoro/<chiave>/fonti.md` | toccare `content/`, `app/`, promuovere fonti nel registro |
+| scout | `lavoro/<chiave>/dossier.json`, `lavoro/<chiave>/fonti.md`, `lavoro/<chiave>/scout_web.md` (traccia, non va nella PR) | toccare `content/`, `app/`, promuovere fonti nel registro |
 | scrittore | il file contenuto assegnato | asset, config, `git add`/`commit` |
 | grafico | il marcatore grafico assegnato | testo, `git add`/`commit` |
 | revisore | niente nel worktree indicatore, referto nel proprio worktree separato | entrare nel worktree dell'autore o correggere durante la review |
