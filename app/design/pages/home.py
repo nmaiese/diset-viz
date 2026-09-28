@@ -795,7 +795,11 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
             cards.append(card)
         levels.append({"key": level["key"], "tab": level["tab"], "plural": level["plural"], "n": level["n"],
                        "href": level["href"], "areas": cards})
-    return {"total": band["total"], "href": band["href"], "levels": levels}
+    # La regola della scelta resta scritta, in una riga: "cambiato di piu'"
+    # e' un giudizio, e chi legge deve poter sapere come e' fatto.
+    rule = ("Cambiato di più: la media semplice dei territori, dal primo all'ultimo anno, "
+            "in rapporto allo scarto interquartile dell'ultimo anno.")
+    return {"total": band["total"], "href": band["href"], "rule": rule, "levels": levels}
 
 
 # ---------------------------------------------------------------- tutta la pagina

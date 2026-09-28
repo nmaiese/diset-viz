@@ -411,6 +411,7 @@ def home():
         hero_map=_home_hero_map(),
         paths=_home_paths(summary, themes_preview, territories),
         featured_story=_home_featured_story(),
+        insight_cards=_home_insight_cards(),
         series_module=_home_series_module(),
         qol_module=_home_qol_module(),
         trust_cards=_home_trust_cards(summary, territories),

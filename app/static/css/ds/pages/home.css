@@ -193,7 +193,7 @@
    a 1320 (home.HOME_STRIP_WIDTH), non ai 1180 della scheda indicatore. */
 .home-feature .chart, .home-feature .chart:has(> .chart__xl), .home-feature .chart__xl svg { max-width: none; }
 .home-feature .chart--hero { margin-top: 0; }
-.feat__pair { display: grid; gap: var(--space-6) var(--space-12); padding-top: var(--space-section); border-top: 1px solid var(--rule); }
+.feat__pair { display: grid; gap: var(--space-6) var(--space-12); padding-top: var(--space-8); border-top: 1px solid var(--rule); }
 .feat__pairhead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-4) var(--space-8); }
 .feat__pairhead .feat__cap { margin-bottom: 0; }
 .feat__find { min-width: min(100%, 16rem); }
@@ -206,7 +206,7 @@
 .feat__cols caption { font-weight: 600; color: var(--ink); text-align: left; }
 @media (min-width: 720px) { .feat__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .feat__source { margin: 0; }
-.feat__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); padding-top: var(--space-section); border-top: 1px solid var(--rule); }
+.feat__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--rule); }
 .feat__end .source { flex: 1 1 24rem; }
 .feat__only { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 /* Sul telefono la scheda perde il margine interno largo e la colonna delle
@@ -283,11 +283,7 @@
 .qol__profiles a:hover { border-color: var(--ink); }
 .qol__profiles a:hover b { color: var(--accent-strong); text-decoration: underline; }
 .qol__profiles b { font-weight: 700; }
-.qol__profiles span { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); }
 .qol__levels { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin: 0; }
-.qol__dims { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.qol__only { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
-.qol__dims li { padding: 4px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); background: var(--bg); border-radius: var(--radius-sm); }
 
 /* ---------- temi: le quattro aree col loro distintivo ----------
    Il distintivo ha un lavaggio per area (ambra, verde, blu, rosso): colori
@@ -305,9 +301,6 @@
 .home-area__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
 .home-area__title a { color: var(--ink); text-decoration: none; }
 .home-area__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
-.home-area__themes { list-style: none; }
-.home-area__themes li { border-top: 1px solid var(--rule); }
-.home-area__themes a { display: flex; align-items: center; min-height: var(--target); }
 .home-area__ends { display: grid; margin: var(--space-2) 0 0; background: var(--surface-1); border-radius: var(--radius-sm); }
 .home-area__ends > div { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); padding: var(--space-2) var(--space-3); }
 .home-area__ends > div + div { border-top: 1px solid var(--rule); }
@@ -329,7 +322,6 @@
 .home-area__move .home-area__link:hover .home-area__name { color: var(--accent-strong); text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 .home-area__move .trend { flex-wrap: wrap; margin-top: var(--space-1); }
 .home-area__move .trend__txt, .home-area__move .trend__from { white-space: normal; }
-.home-temi__source { margin-top: var(--space-6); }
 
 /* ---------- storie: il componente `.story` sta in components.css ---------- */
 .stories { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
@@ -352,8 +344,6 @@
    l'illustrazione accanto al testo. */
 @media (max-width: 599px) {
   .qol__profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .qol__profiles span { display: none; }
-  .qol__dims, .qol__dims + *, .qol__side > .qol__h:nth-of-type(2) { display: none; }
   
   
   
@@ -366,3 +356,8 @@
   .terr__block { padding: var(--space-4); gap: var(--space-4); }
   
 }
+
+/* La riga di fonti, metodo e correzioni sotto le storie: prende il posto
+   della fascia che c'era prima, con gli stessi quattro rimandi. */
+.home-temi__source { margin-top: var(--space-6); }
+.story__sources { margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--rule); }

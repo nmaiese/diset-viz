@@ -133,7 +133,7 @@ class LaFascia(unittest.TestCase):
             self.assertNotIn(bad, text)
         self.assertIsNone(FUGHE.search(text))
         # La regola della scelta sta scritta nella riga fonte.
-        # self.assertIn("scarto interquartile", text) rimosso
+        self.assertIn("scarto interquartile", text)
         self.assertNotIn("anno per anno", visible_text(self.page))
 
 

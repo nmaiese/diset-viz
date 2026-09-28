@@ -41,7 +41,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"css/ds/system.css", home.data)
         self.assertIn(b"css/ds/pages/home.css", home.data)
         self.assertIn(b'data-v1="home"', home.data)
-        self.assertIn("Le differenze che contano, sui dati.".encode("utf-8"), home.data)
+        self.assertIn("I numeri delle regioni e delle province italiane".encode("utf-8"), home.data)
         self.assertIn(b"/atlante", home.data)
         # Il masthead legacy non deve sopravvivere accanto a quello nuovo.
         self.assertNotIn(b'<header class="masthead">', home.data)
