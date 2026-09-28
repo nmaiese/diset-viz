@@ -146,6 +146,16 @@ mappa dei temi in `config/theme_categories.csv`, separazione provinciale) sta in
 mappato tiene il suo indicatore nel catalogo e lo toglie da ogni totale di
 macro-area, senza che niente fallisca.
 
+## Chi lavora, leggi [`docs/WORKFLOW_ORCA.md`](docs/WORKFLOW_ORCA.md)
+
+- Prima di assegnare un lavoro a un altro agente (implementazione, review, ricerca)
+  lancia `~/dev/dev-tools/scripts/agent-probe.sh` e scegli tra chi ha quota. Quale
+  ruolo va a quale agente sta in `docs/WORKFLOW_ORCA.md` §1: chi coordina non
+  assegna a sé stesso per abitudine.
+- Gli agenti si lanciano in un terminale di Orca (`worker-start`; per opencode
+  `scripts/orca-spawn-agent.sh`). `claude -p` e `codex exec` sono per una domanda
+  breve senza modifiche: un lavoro fatto lì non compare in Orca.
+
 ## Vincoli
 
 - Non rompere `/legacy` né lo schema dati (`tests/integration/test_app.py` guarda entrambi).
