@@ -37,31 +37,48 @@ Poi guarda lo stato su GitHub, perché le issue sono l'unico posto dello stato:
   `DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m unittest <moduli>`.
   La CI della PR è il controllo completo.
 
-## Dove eravamo
+## Dove eravamo (28 settembre, sera, dopo il pilota)
 
-1. **#291 (2c):** PRONTA PER NELLO.
-2. **#289 (2a) e #290 (2b):** review 2 lanciate in headless.
-   - Le spec sono `ripresa/spec_review2_289_headless.txt` (Antigravity) e `…_290_…` (big-pickle).
-   - Se nella PR non c'è una review più recente di quelle delle 16:01 (#289) e delle 15:12
-     (#290), la review 2 non è stata pubblicata: rilanciala con la stessa spec.
-   - Il verdetto DA CORREGGERE porta a una riparazione con un modello diverso dall'autore, poi a
-     una review 3. PRONTA porta a `gh pr ready`, alla label `gate-b` e allo Stato della issue
-     (#286 e #287).
-3. **Allineare la pila** con merge e senza force push: `origin/nmaiese/strumento-2a-brief` in
-   `nmaiese/strumento-2b-guardia`, poi 2b in `nmaiese/strumento-2c-review`, poi push.
-4. **Pilota ter-12, issue #292.** I ruoli sono nel corpo della issue, la copia è
-   `ripresa/issue_292_corpo.md`.
-   - Lo scout è partito fuori dal worktree con `ripresa/spec_scout_ter12.md`. Se i suoi output
-     non sono in `ripresa/scout_ter12/`, rilancialo.
-   - Poi crea il worktree `ind-ter-12` dalla cima della pila (runbook, passo 2). Il dossier si
-     rigenera con `bin/py -m scripts.editoriale.brief ter-12 --out lavoro/ter-12/dossier.json`.
-     Il leader verifica le citazioni di `fonti.md` aprendo gli URL.
-   - Poi il brief del leader, lo scrittore, il grafico (dispersione con ter-901), la guardia, la
-     PR draft con base il ramo 2c, e il revisore con il secondo parere.
-   - Alla fine la lettura cieca e il giudizio di Nello.
-5. **Dopo il pilota:** la fase 5 del piano (CLAUDE.md, AGENTS.md, README, WORKFLOW_ORCA,
-   INDICATOR_PAGES, rules, label `run:team`, template della issue).
-6. **Da chiedere a Nello:**
-   - la pulizia dei worktree `rev-*`, compreso il doppione `rev-285-2-2`;
+Tutto è su GitHub: le issue portano lo Stato nel corpo, le PR hanno le review pubblicate.
+
+1. **#289 (2a, brief e skill):** PRONTA PER NELLO, ready più `gate-b`.
+2. **#290 (2b, guardia):** tre giri fatti.
+   - La review 3 dà DA CORREGGERE su un punto solo: l'arrotondamento al centinaio va confrontato
+     con dossier e `fonti.md`, non con tutta la matrice. Più due test.
+   - La correzione è già provata dal revisore.
+   - **Nello decide** se fare un quarto giro o unire così e riparare dopo. La spec del quarto
+     giro si scrive dalla review 3.
+3. **#291 (2c, `orca_review.py`):** era PRONTA, poi l'uso sul pilota ha trovato il difetto di
+   `--scheda` (chiave interna contro codice dell'URL).
+   - Riparazione con Antigravity lanciata: `ripresa/spec_riparazione_2c_3.md`.
+   - Se non è committata sul ramo `nmaiese/strumento-2c-review` (oggi a `bb1464db`), rilanciala.
+   - Poi review 3 con OpenCode big-pickle, in un worktree nuovo.
+4. **Pila allineata:** la 2c contiene la 2b, che contiene la 2a (`bb1464db`). Il ramo del
+   pilota contiene la 2c allineata.
+5. **#293 (pilota ter-12):** PRONTA PER NELLO dopo tre giri, ready più `gate-b`.
+   - La valutazione è `docs/design_drafts/team/09_valutazione_pilota_ter12.md`.
+   - La lettura cieca preferisce il nuovo per le fonti e il vecchio per l'attacco e la prosa.
+   - **Nello legge e decide.** Se convince, unisce in ordine #289, #290, #291 e #293.
+6. **Prima della prossima scheda (ter-281):** brief più corto (una cifra per idea), un tetto di
+   parole indicativo di 600-800, e la domanda 3 del revisore estesa alla lunghezza.
+7. **Dopo il giudizio di Nello:** la fase 5 del piano (CLAUDE.md, AGENTS.md, README,
+   WORKFLOW_ORCA, INDICATOR_PAGES, rules, label `run:team`, template della issue).
+8. **Da chiedere a Nello:**
+   - la pulizia dei worktree `rev-*` (compreso il doppione `rev-285-2-2`), di `ind-ter-12`
+     dopo il merge e dei terminali Orca vecchi;
    - la nota su `< /dev/null` in dev-tools;
    - la quarantena stabile delle tre skill.
+
+## Come si lancia un ruolo in headless (le lezioni della sera)
+
+- **OpenCode:** `cd <worktree> && timeout 2400 opencode run "$(cat spec)" -m opencode/big-pickle
+  < /dev/null > out 2> err`.
+  - Nella spec va scritto "niente fuori dal worktree, niente percorsi assoluti, neanche
+    /dev/null o /tmp, temporanei in `.<nome>/`".
+  - Due `opencode run` non partono nello stesso istante (database bloccato).
+- **Antigravity:** `timeout 2400 agy --model gemini-3.1-pro-high --dangerously-skip-permissions
+  -p "$(cat spec)" --print-timeout 2350s < /dev/null`.
+  - Lascia file di lavoro nella radice: spostali prima del `git add`.
+  - In una riparazione elenca le correzioni una per una, altrimenti ne salta.
+- **Le citazioni** si verificano con `ripresa/verifica_fonti.py`, la figura con
+  `ripresa/shot_figura.py`.
