@@ -248,6 +248,12 @@ settembre due lavori sono rimasti così 14 minuti. Si lancia sempre con `< /dev/
 `timeout`, e si controlla presto `~/.local/share/opencode/log/opencode.log`: se dopo `init` non
 compare `session.id`, il processo è bloccato. Stesso accorgimento per `agy -p`.
 
+Un terzo, visto alla prima review vera sulla issue #285: **`opencode run -f` rifiuta i file fuori
+dalla cartella di lavoro.** Un diff salvato in `/tmp` e passato con `-f /tmp/diff.txt` produce
+`permission requested: external_directory (/tmp/*); auto-rejecting`. Il wrapper esce comunque con
+0 e il parere non c'è, quindi non basta guardare il codice d'uscita. I file da allegare vanno
+scritti dentro il worktree, per esempio in `lavoro/`, e cancellati dopo.
+
 I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e finiscono senza
 preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
 credits`. Non va messo su un passaggio che il flusso aspetta.
