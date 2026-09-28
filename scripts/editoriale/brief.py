@@ -61,10 +61,26 @@ THRESHOLDS = {
     },
 }
 
+# L'estremo non verificato di ogni scheda in `seo_titles.UNVERIFIED_EXTREMES`:
+# quale territorio, in quale anno. Quel set dice che il sito non scrive
+# l'intervallo fra gli estremi in title, description e Dataset, non quale capo
+# e' il sospetto: quello lo sa solo la fonte, e sta in due commenti che la
+# spiegano. In `app/seo_titles.py` la scheda e' elencata e si legge che gli zeri
+# di Macerata e Savona dal 2016 non erano una misura; nel commento a
+# `NOT_MEASURED` di `app/bes_data.py` si legge che il 358,1 di Fermo nel 2024
+# non sta fra quelli, e quindi resta un valore, non un buco. Un solo capo: il
+# minimo rimasto e' un valore vero, e segnarlo farebbe scrivere al lettore un
+# dubbio che il dato non ha. Il valore non e' scritto qui perche' esce dai dati
+# del sito, che sono la fonte; se l'anno della fonte cambia, questa tabella
+# cambia con lui.
+UNVERIFIED_OBSERVATION = {
+    "bes-06POL012P": {"territorio": "Fermo", "anno": 2024},
+}
+
 AREA_ORDER = ("Nord", "Centro", "Mezzogiorno")
 
-# Il segno sulle righe e sulle cifre che dipendono dagli estremi di una serie in
-# `seo_titles.UNVERIFIED_EXTREMES`: chi copia "10,2 volte" deve vedere che la
+# Il segno sulla riga del territorio non verificato e sulle cifre che dipendono
+# dagli estremi della sua serie: chi copia "10,2 volte" deve vedere che la
 # cifra poggia su un valore non verificato, senza cercare l'avviso altrove.
 EXTREME_FLAG = "vedi_avviso_estremi"
 
@@ -204,6 +220,20 @@ def movers(start, end, k=TOP_N):
     increases = sorted((d for d in deltas if d[3] > 0), key=lambda d: (-d[3], d[0]))[:k]
     decreases = sorted((d for d in deltas if d[3] < 0), key=lambda d: (d[3], d[0]))[:k]
     return increases, decreases
+
+
+def territory_changes(start, end):
+    """La variazione di **ogni** territorio presente in entrambe le fotografie.
+
+    Una lista sola di `(chiave, prima, dopo, delta)`, dalla variazione piu'
+    ampita' in valore assoluto alla piu' stretta e, a parita', dalla chiave:
+    l'ordine non cambia fra due esecuzioni ne' fra due versioni dei dati, e il
+    primo di lista e' il territorio che si e' mosso di piu'. `movers` tiene i
+    soli tre di ciascun verso, e non basta: il lettore dell'articolo spesso
+    scrive di una provincia che non e' fra i tre.
+    """
+    deltas = [(key, start[key], end[key], end[key] - start[key]) for key in sorted(set(start) & set(end))]
+    return sorted(deltas, key=lambda d: (-abs(d[3]), d[0]))
 
 
 def year_values(level, year):
@@ -389,6 +419,7 @@ def _snapshot(meta, code, level, universe, area_of, units, official):
     year = level["year_max"]
     stats = level["stats"]
     by_value = sorted(level["observations"], key=lambda o: (-o["value"], o["name"]))
+    unverified = _unverified_observation(code, level)
 
     def row(position, obs):
         area, region = area_of[obs["key"]]
@@ -401,13 +432,11 @@ def _snapshot(meta, code, level, universe, area_of, units, official):
         if region:
             out["regione"] = region
         out["valore"] = figure(obs["value"], unit)
+        if unverified is not None and obs["key"] == unverified["key"]:
+            out[EXTREME_FLAG] = True
         return out
 
     rows = [row(i + 1, obs) for i, obs in enumerate(by_value)]
-    unverified = code in _unverified()
-    if unverified and rows:
-        rows[0][EXTREME_FLAG] = True
-        rows[-1][EXTREME_FLAG] = True
     values = [obs["value"] for obs in by_value]
     high, low = (values[0], values[-1]) if values else (None, None)
     points_unit = numfmt.phrase_unit(unit) == numfmt.POINTS or "differenza" in meta["name"].lower()
@@ -506,6 +535,7 @@ def _series(meta, level, units):
     unit = units["value"]
     coverage = {y: len(year_values(level, y)) for y in level["years"]}
     need = panel_need(level["key"])
+    unverified = _unverified_observation(_unverified_code(meta), level)
     per_year = []
     for point in level["annual_means"]:
         snapshot = year_values(level, point["year"])
@@ -516,7 +546,7 @@ def _series(meta, level, units):
             "copertura_parziale": coverage.get(point["year"], 0) < need,
             "distanza_fra_estremi": _flagged(
                 figure(max(snapshot.values()) - min(snapshot.values()), units["change"]),
-                point["year"] == level["year_max"] and _unverified_code(meta) in _unverified(),
+                point["year"] == level["year_max"] and unverified is not None,
             ),
         })
 
@@ -579,6 +609,7 @@ def _series(meta, level, units):
         "variazione_lungo_periodo": long_run,
         "variazione_ultimo_anno": _annual(level["annual_change"], unit, units["change"]),
         "territori_piu_mossi": _movers(level, units["change"]),
+        "variazione_per_territorio": _changes(level, units["value"], units["change"]),
     }
 
 
@@ -630,6 +661,36 @@ def _movers(level, change_unit):
         "territori_comuni": count(len(set(start) & set(end))),
         "aumenti": rows(increases),
         "cali": rows(decreases),
+    }
+
+
+def _changes(level, value_unit, change_unit):
+    """La variazione dal primo all'ultimo anno di ogni territorio, tutta intera.
+
+    `territori_piu_mossi` tiene i tre di ciascun verso e serve a dire dove il
+    movimento e' maggiore; questa lista e' quella completa, e ci sta perche' il
+    pezzo che si scrive spesso e' proprio un territorio che non sta fra i tre.
+    Ogni riga porta il valore di partenza, quello di arrivo e la variazione,
+    gia' scritti: il team leader non ricalcola niente."""
+    first, last = level["year_min"], level["year_max"]
+    if first == last:
+        return None
+    names = {t["key"]: t["name"] for t in level["territories"]}
+    rows = territory_changes(year_values(level, first), year_values(level, last))
+    return {
+        "da": first,
+        "a": last,
+        "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+        "territori": count(len(rows)),
+        "valori": [
+            {
+                "territorio": names[key],
+                "prima": figure(before, value_unit),
+                "dopo": figure(after, value_unit),
+                "variazione": change(delta, change_unit),
+            }
+            for key, before, after, delta in rows
+        ],
     }
 
 
@@ -721,17 +782,19 @@ def _warnings(meta, code, view):
     unit = _value_unit(meta)
     extremes, missing, partial = [], [], []
     for level in view["levels"]:
-        by_value = sorted(level["observations"], key=lambda o: (-o["value"], o["name"]))
-        if code in _unverified() and by_value:
+        unverified = _unverified_observation(code, level)
+        if unverified is not None:
             extremes.append({
                 "livello": level["key"],
                 "anno": level["year_max"],
-                "piu_alto": {"territorio": by_value[0]["name"], "valore": figure(by_value[0]["value"], unit)},
-                "piu_basso": {"territorio": by_value[-1]["name"], "valore": figure(by_value[-1]["value"], unit)},
-                "motivo": "codice in seo_titles.UNVERIFIED_EXTREMES: la serie ha un estremo non verificato, "
-                          "e il sito non ne scrive l'intervallo in title, description e Dataset. Quale valore "
-                          "lo dice app/bes_data.py, nel commento a NOT_MEASURED",
-                "cifre_segnate": f"le righe e le cifre derivate dagli estremi portano {EXTREME_FLAG}",
+                "territorio": unverified["name"],
+                "valore": figure(unverified["value"], unit),
+                "motivo": "codice in seo_titles.UNVERIFIED_EXTREMES: il sito non scrive in title, description e "
+                          "Dataset l'intervallo fra gli estremi di questa serie. L'estremo non verificato e' solo "
+                          "quello qui indicato, l'altro capo e' un valore vero e non porta il segno. La ragione "
+                          "e' nel commento a UNVERIFIED_EXTREMES in app/seo_titles.py, il valore nel commento a "
+                          "NOT_MEASURED in app/bes_data.py",
+                "cifre_segnate": f"la riga di questo territorio e le cifre derivate dagli estremi portano {EXTREME_FLAG}",
             })
         present = {o["key"] for o in level["observations"]}
         for key, name in sorted(_universe(level).items(), key=lambda item: item[1]):
@@ -773,6 +836,22 @@ def _unverified():
     return UNVERIFIED_EXTREMES
 
 
+def _unverified_observation(code, level):
+    """L'osservazione non verificata di questo livello, o None.
+
+    Un solo capo per scheda, quello che `UNVERIFIED_OBSERVATION` indica, e solo
+    se e' l'ultimo anno del livello: e' l'anno che la scheda mostra, quindi
+    l'unico in cui l'estremo si vede. La scheda resta in `UNVERIFIED_EXTREMES`
+    altrimenti: e' il sito a decidere se l'intervallo si scrive, e una tabella
+    locale che lo contraddicesse direbbe il falso. Torna l'osservazione del
+    livello, non il suo valore: la cifra esce dai dati.
+    """
+    spec = UNVERIFIED_OBSERVATION.get(code)
+    if spec is None or spec["anno"] != level["year_max"] or code not in _unverified():
+        return None
+    return next((o for o in level["observations"] if o["name"] == spec["territorio"]), None)
+
+
 def _value_unit(meta):
     from app.indicator_notes import figure_unit
 
@@ -798,7 +877,7 @@ def _economic_context(view, units):
     picks = by_value[:TOP_N] + [o for o in by_value[-TOP_N:] if o not in by_value[:TOP_N]]
     provincial = base["key"] == "provincia"
     region_of = base.get("region_of") or {}
-    unverified = _unverified_code(view["meta"]) in _unverified()
+    unverified = _unverified_observation(_unverified_code(view["meta"]), base)
     from app.profiles import region_key_for
 
     territories = []
@@ -816,7 +895,7 @@ def _economic_context(view, units):
             code: figure(year_values(level, level["year_max"]).get(region_key), _value_unit(meta))
             for code, meta, level in contexts
         }
-        if unverified and obs in (by_value[0], by_value[-1]):
+        if unverified is not None and obs["key"] == unverified["key"]:
             entry[EXTREME_FLAG] = True
         territories.append(entry)
 
