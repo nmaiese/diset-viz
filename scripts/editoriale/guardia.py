@@ -115,7 +115,7 @@ def _number_value(sign, int_part, dec):
 def _is_checkable(match, text):
     if match.group("dec") or "." in match.group("int"):
         return text[match.end():match.end() + 1] not in RANK_SUFFIXES
-    return text[match.end():match.end() + 1] == "%"
+    return text[match.end():match.end() + 1] == "%" or bool(re.match(r"\.\d{1,2}(?!\d)", text[match.end():]))
 
 
 def dossier_figures(dossier):
@@ -167,7 +167,7 @@ def source_figures(path):
     return found
 
 
-def check_figures(fields, dossier, source_values):
+def check_figures(fields, internal_key, dossier, source_values):
     """Il controllo 1: ogni cifra scritta contro il dossier (e le fonti).
 
     Un numero senza segno esplicito passa se il dossier porta la stessa cifra
@@ -177,6 +177,60 @@ def check_figures(fields, dossier, source_values):
     il difetto di `gate2_verify.py`, non una cifra assente.
     """
     pool = dossier_figures(dossier) + list(source_values)
+
+    from app.indicator_view import build_indicator_view
+    from app import sources
+    from app.divari import _AREA_BY_KEY
+    from app.profiles import region_key_for
+
+    parsed = sources.split_internal_id(internal_key)
+    if parsed:
+        family, raw_id = parsed
+        try:
+            view = build_indicator_view(family, raw_id)
+            if view:
+                views = [view]
+                for sibling in view.get("dimension_siblings", []):
+                    sib_view = build_indicator_view(family, sibling["id"])
+                    if sib_view:
+                        views.append(sib_view)
+
+                for v in views:
+                    for level in v.get("levels", []):
+                        matrix = level.get("matrix", {})
+                        area_of = {}
+                        for t in level.get("territories", []):
+                            t_key = t.get("key")
+                            if level["key"] == "regione":
+                                area = _AREA_BY_KEY.get(t_key)
+                            else:
+                                region = t.get("region")
+                                area = _AREA_BY_KEY.get(region_key_for(region or "")) if region else None
+                            if area:
+                                area_of[t_key] = area
+
+                        for year_data in matrix.values():
+                            area_sums = {}
+                            area_counts = {}
+                            for t_key, val in year_data.items():
+                                num = None
+                                if isinstance(val, (int, float)) and not isinstance(val, bool):
+                                    num = float(val)
+                                elif isinstance(val, dict) and "v" in val and isinstance(val.get("v"), (int, float)) and not isinstance(val["v"], bool):
+                                    num = float(val["v"])
+
+                                if num is not None:
+                                    pool.append(num)
+                                    area = area_of.get(t_key)
+                                    if area:
+                                        area_sums[area] = area_sums.get(area, 0.0) + num
+                                        area_counts[area] = area_counts.get(area, 0) + 1
+
+                            for area, total in area_sums.items():
+                                if area_counts[area] > 0:
+                                    pool.append(total / area_counts[area])
+        except Exception:
+            pass
     defects = []
     for field, text in fields:
         for match in NUMBER_RE.finditer(text):
@@ -228,7 +282,7 @@ def check_links(fields):
             url = match.group(2)
             quote = _excerpt(text, match.start(), match.end())
             if "?indicator=" in url:
-                defects.append(Defect("link", field, quote, f"{url!r} non e' un link canonico: usa /?indicator="))
+                defects.append(Defect("link", field, quote, f"{url!r} non e' un link canonico: usa /indicatore/<slug>/<codice>"))
                 continue
             if not url.startswith("/indicatore/"):
                 continue
@@ -291,7 +345,7 @@ def check_free_sections(entry):
         if not (section.get("h") or "").strip():
             field = f"sections.{LIBERA}[{index}]"
             defects.append(Defect(
-                field, field, _excerpt(body, 0, min(60, len(body))),
+                "sezione", field, _excerpt(body, 0, min(60, len(body))),
                 "sezione libera senza titolo: la pagina la scarta in silenzio"
             ))
     return defects
@@ -329,8 +383,8 @@ def check_article(internal_key, entry, dossier=None, source_values=None):
     defects += check_free_sections(entry)
     defects += check_links(fields)
     defects += check_markers(fields, internal_key, level_key)
-    if dossier is not None:
-        defects += check_figures(fields, dossier, source_values or [])
+    if dossier is not None or source_values:
+        defects += check_figures(fields, internal_key, dossier or {}, source_values or [])
     return defects
 
 
@@ -355,7 +409,12 @@ def main(argv=None):
         print(f"guardia: nessun articolo scritto per {args.code}, niente da controllare")
         return 0
 
-    dossier = json.loads(args.dossier.read_text(encoding="utf-8")) if args.dossier is not None else None
+    dossier = None
+    if args.dossier is not None:
+        try:
+            dossier = json.loads(args.dossier.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            parser.error(f"il dossier {args.dossier} non esiste")
     source_values = source_figures(args.fonti) if args.fonti is not None else []
 
     defects = check_article(internal_key, entry, dossier=dossier, source_values=source_values)
