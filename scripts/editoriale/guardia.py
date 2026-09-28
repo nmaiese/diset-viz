@@ -176,7 +176,8 @@ def check_figures(fields, internal_key, dossier, source_values):
     segno nel dossier; se il dossier ha la cifra ma con il segno opposto, e'
     il difetto di `gate2_verify.py`, non una cifra assente.
     """
-    pool = dossier_figures(dossier) + list(source_values)
+    base_pool = dossier_figures(dossier) + list(source_values)
+    pool = list(base_pool)
 
     from app.divari import _area_means
 
@@ -216,7 +217,7 @@ def check_figures(fields, internal_key, dossier, source_values):
                                 if means is not None:
                                     for area_data in means.values():
                                         pool.append(area_data["mean"])
-        except (KeyError, ValueError, LookupError, TypeError) as error:
+        except (ValueError, LookupError, TypeError) as error:
             print(f"guardia: impossibile costruire il pool largo per {internal_key}: {error}", file=sys.stderr)
 
     defects = []
@@ -239,10 +240,11 @@ def check_figures(fields, internal_key, dossier, source_values):
                 decimals = len(match.group("dec")) if match.group("dec") else 0
 
             target = round(_number_value(match.group("sign"), match.group("int"), match.group("dec")), decimals)
-            if any(abs(round(value, decimals) - target) < 1e-9 for value in pool):
+            active_pool = base_pool if decimals < 0 else pool
+            if any(abs(round(value, decimals) - target) < 1e-9 for value in active_pool):
                 continue
             target_abs = abs(target)
-            wrong_sign = any(abs(round(abs(value), decimals) - target_abs) < 1e-9 for value in pool)
+            wrong_sign = any(abs(round(abs(value), decimals) - target_abs) < 1e-9 for value in active_pool)
             if wrong_sign and not signed:
                 continue  # il valore assoluto corrisponde, e il testo non dichiarava un segno
             if wrong_sign:
@@ -252,7 +254,7 @@ def check_figures(fields, internal_key, dossier, source_values):
                     "con il segno opposto"
                 ))
             else:
-                nearby = sorted({numfmt.text(value, max(0, decimals)) for value in pool
+                nearby = sorted({numfmt.text(value, max(0, decimals)) for value in active_pool
                                   if abs(abs(value) - target_abs) < target_abs * 0.2 + 5})[:5]
                 note = f" (valori vicini nel dossier: {', '.join(nearby)})" if nearby else ""
                 defects.append(Defect(
