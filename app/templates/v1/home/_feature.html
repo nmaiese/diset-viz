@@ -17,8 +17,7 @@
   <header class="zone__head">
     <div class="zone__title">
       <h2 class="h-section" id="h-dato">Indicatore in evidenza</h2>
-      {%- set where = 'per regione e per provincia' if two else ('per regione' if f.level == 'regione' else 'per provincia') %}
-      <p class="zone__lead">{% if f.requested %}L'indicatore che hai scelto, qui {{ where }}. Per uno a caso fra le schede di Divario Italia c'è «Un altro indicatore».{% else %}Uno a caso fra le schede di Divario Italia, qui {{ where }}. A ogni visita la home lo estrae di nuovo.{% endif %}</p>
+      <p class="zone__lead">{% if f.requested %}L'indicatore che hai scelto.{% else %}Uno a caso a ogni visita, dalle schede del sito.{% endif %}</p>
     </div>
     <p class="zone__actions"><a class="btn" href="/">{{ ui.icon('shuffle') }} Un altro indicatore</a></p>
   </header>
@@ -29,7 +28,6 @@
         <p class="feat__meta">{% if f.theme %}{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}<span class="sep" aria-hidden="true">·</span>{% endif %}{{ f.source_label }}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}</p>
         <h3 class="feat__name" id="feat-name"><a href="{{ f.levels[0].scheda }}" data-tab-href>{{ f.name }}</a></h3>
       </div>
-      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> {% if f.elsewhere_twin %}hanno una scheda loro{% else %}sono nella scheda{% endif %}.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
       {% if two %}
       {#- Senza JavaScript sono due link, tutti e due nell'ordine di
           tabulazione: ruoli, aria-selected e tabindex mobile li aggiunge
@@ -55,7 +53,7 @@
           </div>
         </figcaption>
         <div class="chart chart--hero">{{ lv.strip.svg | safe }}</div>
-        <p class="source">Ogni punto è una {{ lv.singular }}, nel colore della sua ripartizione{% if lv.values_note %}, {{ lv.values_note }}{% endif %}. Quello che scegli si accende anche sulla mappa{% if lv.middle %}, e in classifica se è fra le prime o le ultime dieci{% else %} e in classifica{% endif %}.</p>
+        <p class="source">Ogni punto è una {{ lv.singular }}, nel colore della sua ripartizione.</p>
       </figure>
       {% endif %}
 
@@ -67,9 +65,8 @@
       <div class="feat__pair" data-explore>
         <div class="feat__pairhead">
           <div class="feat__cap">
-            <p class="feat__kicker">Sulla mappa e in classifica</p>
             {% if lv.table_claim %}<span class="feat__claim">{{ lv.table_claim }}</span>{% endif %}
-            <p class="subline">{{ f.name }}{% if lv.unit_note %}, {{ lv.unit_note }}{% endif %}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %} {% if lv.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.{% if lv.middle %} Le altre {{ lv.middle | num(None, 'count') }} sono nella scheda.{% endif %}</p>
+            <p class="subline">{{ f.name }}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %}, {% if lv.lower_better %}dal valore più basso, il migliore{% else %}dal valore più alto{% endif %}.</p>
           </div>
           <label class="field feat__find" for="territorio-{{ lv.key }}">Trova la tua {{ lv.singular }}
             <select id="territorio-{{ lv.key }}" data-territory>

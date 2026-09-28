@@ -415,19 +415,11 @@ tutti e due i livelli, il selettore passa dall'uno all'altro senza ricaricare.
 `?indicatore=ter-901&livello=provincia` fissa la scelta, se quella coppia sta
 nel pool. Per questo la home non sta nella cache di pagina.
 
-Seguono regioni e province (per ognuno dei due livelli la mappa per scegliere,
-un territorio a caso e l'anteprima della sua scheda, con le frasi della sua
-testata), "Gli indicatori, tema per tema" (la porta dell'atlante: un solo
-bottone primario "Esplora i N indicatori nell'atlante", il selettore
-Regioni/Province, le quattro aree col distintivo e il conteggio che apre
-l'atlante filtrato, e per ogni area l'indicatore cambiato di piu' con la sua
-sparkline e la variazione in chiaro, scelto con la regola scritta nella riga
-fonte; sulle regioni anche testa e coda con le frecce, sulle province no),
-la qualita' della vita come porta (che cosa misura, i profili di
-priorita', il bottone verso la pagina: la classifica in home non c'e'), il
-quiz in una fascia sua (lavaggio ambra, schede con illustrazione, una domanda
-lampo), le storie (una grande accanto alla foto, tre in fila) e fonti, metodo
-e come citare. Un bottone primario per fascia.
+Seguono regioni e province, con le mappe e le anteprime dei territori. Poi i
+temi, con il selettore dei livelli e le aree dell'atlante, e per ognuna
+l'indicatore cambiato di più. Quindi la qualità della vita, che spiega l'indice
+e porta alla classifica. Chiudono le ultime storie dal blog, con i crediti
+e la riga per fonti e metodo.
 
 I prototipi in `design/v1/src/` non hanno ancora queste fasce: la home del
 sito e' andata avanti da sola.

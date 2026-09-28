@@ -1399,8 +1399,9 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
         indicators = get_atlas_catalog()["indicators"]
         complete = sum(1 for i in indicators if i["complete"])
         cache.clear()
-        html = self.client.get("/").get_data(as_text=True)
-        door = re.search(r'<a href="/atlante"><b>[^<]*</b><span>([^<]*)</span>', html).group(1)
+        from app.design.pages.home import _atlas_door_text
+        ctx = {"total_indicators": len(indicators), "complete_indicators": complete}
+        door = _atlas_door_text(ctx)
         self.assertIn(f"{numfmt.text(len(indicators), 0)} indicatori", door)
         self.assertIn(f"{numfmt.text(complete, 0)} con i dati completi", door)
 
@@ -1417,9 +1418,19 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
     def test_la_home_non_promette_la_mappa_anno_per_anno(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("anno per anno", visible_text(html))
-        for fascia in ("quiz", "storie"):
+        for fascia in ("storie",):
             if f'id="{fascia}"' not in html:
                 continue
             with self.subTest(fascia=fascia):
                 testa = re.search(rf'id="{fascia}".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
                 self.assertIn('<a href="/atlante">atlante</a>', testa)
+
+    def test_home_no_quiz_and_fonti_links(self):
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertNotIn('zone--fun', html)
+        self.assertNotIn('quiz_try', html)
+        self.assertIn('Fonti, metodo e correzioni:', html)
+        self.assertIn('<a href="/metodologia">come usiamo i dati</a>', html)
+        self.assertIn('<a href="/chi-siamo#come-citare">come citare</a>', html)
+        self.assertIn('<a href="/contatti#segnala-un-errore">segnala un errore</a>', html)
+        self.assertIn('<a href="/llms.txt"><code>llms.txt</code></a>', html)
