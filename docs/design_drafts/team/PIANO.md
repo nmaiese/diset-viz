@@ -18,17 +18,17 @@ stesso errore del vecchio Agent Team: 18-33 $ a pagina, 21 agent, zero pagine
 approvate.
 
 Che cosa chiede Nello:
-- un team vero, con Claude come team leader;
+- un team vero, con Claude come team leader
 - uno scout dossierista: numeri, fonti esterne, dato recente, anteprime 2026,
-  economia delle regioni in cima e in fondo;
+  economia delle regioni in cima e in fondo
 - uno scrittore dall'italiano impeccabile e discorsivo, che spieghi cosa misura
-  l'indicatore, cosa è cambiato e perché, su tutte le dimensioni;
-- un grafico i cui grafici spieghino il testo;
-- un revisore della correttezza e della scrittura;
-- Orca per tutto, con i modelli scelti per quota, carico e qualità;
-- un worktree isolato per ogni indicatore, con issue e PR;
-- revisori sempre lanciati da Orca sulla PR o sulla issue;
-- un articolo senza sezioni predefinite;
+  l'indicatore, cosa è cambiato e perché, su tutte le dimensioni
+- un grafico i cui grafici spieghino il testo
+- un revisore della correttezza e della scrittura
+- Orca per tutto, con i modelli scelti per quota, carico e qualità
+- un worktree isolato per ogni indicatore, con issue e PR
+- revisori sempre lanciati da Orca sulla PR o sulla issue
+- un articolo senza sezioni predefinite
 - i CLAUDE.md aggiornati al nuovo flusso.
 
 ### Il materiale di progettazione
@@ -54,8 +54,8 @@ sono, e in tre casi diverge per una scelta di Nello.
 - **Rilievi 11, 12 e 13.** Codex voleva togliere il secondo scout e il secondo
   parere. Nello ha scelto "largo da subito", quindi restano fissi, ma con tre
   vincoli:
-  - li lancia un worker Orca, mai il leader;
-  - non bloccano;
+  - li lancia un worker Orca, mai il leader
+  - non bloccano
   - il secondo parere risponde solo alle domande di leggibilità, e un
     disaccordo va a Nello senza aprire un altro giro.
 - **Rilievo 20** è accolto nella forma che propone Codex: strumenti su rami non
@@ -112,15 +112,15 @@ più sulla RAM: sono processi figli di breve durata.
 - **Lettura cieca** nella valutazione: Claude sonnet e gpt-oss.
 
 Vincoli già misurati:
-- OpenCode e `agy` solo headless, sempre con `timeout` e `< /dev/null`;
-- GLM-5.3-Flash fuori fino al rinnovo;
+- OpenCode e `agy` solo headless, sempre con `timeout` e `< /dev/null`
+- GLM-5.3-Flash fuori fino al rinnovo
 - Zen gratuiti mai sul percorso critico.
 
 **Quota protetta prima, non misurata dopo** (rilievo 22):
-- prima di aprire la issue si legge la finestra Codex;
-- sotto il 30% la scheda non parte;
+- prima di aprire la issue si legge la finestra Codex
+- sotto il 30% la scheda non parte
 - tetto per scheda: scout 1 dispatch con 1 giro `agy`, scrittore 1 più 2
-  riparazioni, grafico 1, revisore 3, ciascuno con 1 secondo parere;
+  riparazioni, grafico 1, revisore 3, ciascuno con 1 secondo parere
 - se il modello primario non c'è, si usa un ripiego solo e poi ci si ferma.
 
 ## Lo scout: un contratto con una tabella obbligatoria
@@ -131,11 +131,11 @@ Rilievi 16 e 17. Lo scout consegna due file in `lavoro/<chiave>/`.
 
 **`fonti.md`**: una tabella con una riga per voce. Le voci obbligatorie:
 - il dato osservato più recente, anche fuori dal catalogo (per esempio l'Istat
-  trimestrale);
-- le previsioni e anteprime 2026;
-- l'economia della regione più alta;
-- l'economia della regione più bassa;
-- i fattori che muovono l'indicatore;
+  trimestrale)
+- le previsioni e anteprime 2026
+- l'economia della regione più alta
+- l'economia della regione più bassa
+- i fattori che muovono l'indicatore
 - chi altri ne ha scritto di recente.
 
 Colonne: istituzione, data di pubblicazione, URL aperto, citazione letterale,
@@ -167,11 +167,11 @@ posizione e non devono essere tutte usate.
 - **Un modello di registro** da `content/esempi/`, con il movimento da copiare.
 
 Lo scrittore non riceve:
-- le frasi fatte del dossier;
-- la polarità presentata come giudizio;
-- le cifre di servizio e i numeri non arrotondati;
-- il gergo interno;
-- un angolo già deciso;
+- le frasi fatte del dossier
+- la polarità presentata come giudizio
+- le cifre di servizio e i numeri non arrotondati
+- il gergo interno
+- un angolo già deciso
 - una scaletta.
 
 ## La forma dell'articolo
@@ -218,7 +218,7 @@ Pubblica sempre con `gh pr review --comment`, con verdetto `DA CORREGGERE` oppur
 
 Rilievi 18 e 19. `docs/INDICATOR_PAGES.md` vieta di ridisegnare nel testo serie,
 mappa e classifica, che il cruscotto mostra già. Il grafico sceglie quindi fra:
-- i due tipi esistenti, `dispersione` e `ritratto`;
+- i due tipi esistenti, `dispersione` e `ritratto`
 - un tipo nuovo solo se mostra una relazione che il cruscotto non ha.
 
 **Nel pilota non si costruiscono tipi di grafico nuovi.** Lo dicono il rilievo 18
@@ -238,11 +238,11 @@ Nel pilota la porta il testo. Un grafico a due punti per regione si costruisce
 renderer si unisce prima di quella del contenuto.
 
 Ogni figura ha una specifica:
-- la provenienza e l'unità;
-- gli anni e i dati mancanti;
-- una didascalia che si regge da sola;
-- la resa a 375 e 768 px;
-- i temi chiaro e scuro;
+- la provenienza e l'unità
+- gli anni e i dati mancanti
+- una didascalia che si regge da sola
+- la resa a 375 e 768 px
+- i temi chiaro e scuro
 - l'arancio solo per le regioni in evidenza, mai come colore dei dati.
 
 ## Lo stato e la ripresa
@@ -256,7 +256,7 @@ Rilievi 10 e 23.
   `TASK.md` e scheda Orca sono viste derivate.
 - **Ripresa dopo un'interruzione**, con due comandi documentati nel runbook,
   senza script nuovi:
-  - `gh issue list -l run:team --json number,title,body`;
+  - `gh issue list -l run:team --json number,title,body`
   - `gh pr list --draft -l run:team --json number,headRefOid,reviews`.
 
 ## Il flusso di un indicatore (runbook, rilievi 1-9)
@@ -310,10 +310,10 @@ Commit locali, fatti da me.
 Commit su questo ramo. Il passaggio su `master` lo decide Nello, perché il push
 su `master` è un deploy.
 - `content/STYLE.md` righe 7-11, 61-63, 85-88 e 252-253, via i rimandi a
-  `nmaiese/redazione-ai`;
-- `REVIEW.md`, via "nel repo della redazione" e l'Agent Team;
+  `nmaiese/redazione-ai`
+- `REVIEW.md`, via "nel repo della redazione" e l'Agent Team
 - `docs/INDICATOR_PAGES.md` righe 290 e 477-496, che citano
-  `test_indicator_texts.py`, tolto in `eb2c2f72`;
+  `test_indicator_texts.py`, tolto in `eb2c2f72`
 - `.claude/rules/editorial.md` righe 18-19.
 
 Lo fa un worker Orca Claude sonnet medium, con `07` come spec. Lo rivede un
@@ -325,8 +325,8 @@ Sono inerti per il sito. Sono anche il primo collaudo del giro issue, PR e
 revisore Orca.
 
 Le PR sono **impilate**:
-- 2a parte da `master`;
-- 2b parte dal ramo di 2a;
+- 2a parte da `master`
+- 2b parte dal ramo di 2a
 - 2c parte dal ramo di 2b.
 
 Così ogni diff mostra solo la sua parte e ogni PR ha il suo revisore Orca. Nello
@@ -343,11 +343,11 @@ decisione 8: `opencode/nemotron-3-ultra-free` headless sul diff, non bloccante.
 | 2c | `orca_review.py` esteso | Claude sonnet medium | Codex medium |
 
 **2a, il brief.** Parte da `app/indicator_view.build_indicator_view`. Aggiunge:
-- il conteggio sopra soglia e la forma della serie;
+- il conteggio sopra soglia e la forma della serie
 - le dimensioni: i fratelli da `config/indicator_families.csv`, il gemello di
-  livello, le ripartizioni;
-- l'avviso su `seo_titles.UNVERIFIED_EXTREMES`;
-- il contesto economico: ter-901, ter-902, ter-13, ter-345;
+  livello, le ripartizioni
+- l'avviso su `seo_titles.UNVERIFIED_EXTREMES`
+- il contesto economico: ter-901, ter-902, ter-13, ter-345
 - le cifre già arrotondate.
 
 Riusa `scripts/dump_indicator_stats.py`, lanciato con `-m`. I test girano su
@@ -356,18 +356,18 @@ ter-12 e su `bes:06POL012P`.
 **2b, la guardia.** Un test in `tests/integration/` più uno script da lanciare
 su una bozza. Controlla:
 - le cifre contro il dossier, con il valore assoluto quando la direzione è detta
-  a parole: è il difetto di `gate2_verify.py`;
-- i link canonici;
-- i marcatori `<!-- grafico -->` che si disegnano davvero;
-- le sezioni `libera` senza titolo;
+  a parole: è il difetto di `gate2_verify.py`
+- i link canonici
+- i marcatori `<!-- grafico -->` che si disegnano davvero
+- le sezioni `libera` senza titolo
 - em-dash, en-dash, `;` e `…`.
 
 Non conta le sezioni. Riusa `scripts/prose_lint.py` e
 `scripts/indicator_store.py`.
 
 **2c, `orca_review.py`.** Aggiunge:
-- `--draft`;
-- `--label`;
+- `--draft`
+- `--label`
 - `--body-file`, con il testo prima e dopo da `indicator_store.rendi` e lo SHA.
 
 **Le skill di ruolo, nella PR 2a.** `skills/editorial-team/{scout,scrittore,grafico,revisore}/SKILL.md`,
@@ -400,16 +400,16 @@ Si esegue il runbook dal passo 1 al passo 10.
 ### Fase 5. I documenti normativi, dopo l'esito del pilota
 
 Dall'inventario `07`:
-- `CLAUDE.md`, righe 35 e 137-138: la pipeline c'è, con una guardia sola;
-- `AGENTS.md`, righe 30-32;
-- `README.md`, righe 102-104;
+- `CLAUDE.md`, righe 35 e 137-138: la pipeline c'è, con una guardia sola
+- `AGENTS.md`, righe 30-32
+- `README.md`, righe 102-104
 - `docs/WORKFLOW_ORCA.md`: la deroga "un agente alla volta nel worktree
-  dell'indicatore, revisore sempre fuori" e il runbook;
-- `docs/INDICATOR_PAGES.md` riga 17, righe 211-224 e "Scrivere un articolo";
-- `.claude/rules/editorial.md` riga 28;
-- `docs/FAMIGLIE_INDICATORI.md` riga 281;
+  dell'indicatore, revisore sempre fuori" e il runbook
+- `docs/INDICATOR_PAGES.md` riga 17, righe 211-224 e "Scrivere un articolo"
+- `.claude/rules/editorial.md` riga 28
+- `docs/FAMIGLIE_INDICATORI.md` riga 281
 - la descrizione della label `run:team`, che oggi dice "Agent Team", con
-  `gh label edit`;
+  `gh label edit`
 - il template `.github/ISSUE_TEMPLATE/indicatore-team.yml`: i form funzionano
   solo dal ramo di default, quindi nel pilota la issue si apre con
   `--body-file`.
