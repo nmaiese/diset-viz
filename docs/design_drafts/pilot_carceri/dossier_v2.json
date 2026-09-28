@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "id": "06POL012P",
+  "family": "bes",
+  "level": "provincia",
+  "level_is_default": true,
+  "name": "Affollamento degli istituti di pena",
+  "unit": "%",
+  "value_unit": "%",
+  "change_unit": "punti percentuali",
+  "percentage_like": true,
+  "direction": "lower_better",
+  "canonical_path": "/indicatore/affollamento-degli-istituti-di-pena/bes-06POL012P",
+  "source": {
+    "label": "Istat, benessere e qualità della vita",
+    "url": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/",
+    "institution": "Istat",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "definition": {
+    "plain": "Rapporta il numero di persone detenute ai posti regolamentari disponibili negli istituti di pena.",
+    "example": "Un valore di 20 indica che la condizione descritta riguarda 20 unità ogni 100 nel gruppo di riferimento.",
+    "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore.",
+    "caveat": "La percentuale non mostra da sola quante persone o unità siano coinvolte in valore assoluto. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "lower_better"
+  },
+  "facts": {
+    "meta.name": {
+      "value": "Affollamento degli istituti di pena"
+    },
+    "meta.unit": {
+      "value": "%"
+    },
+    "meta.direction": {
+      "value": "lower_better"
+    },
+    "meta.year_min": {
+      "value": 2015
+    },
+    "meta.year_max": {
+      "value": 2024
+    },
+    "level.key": {
+      "value": "provincia"
+    },
+    "level.territory_total": {
+      "value": 107
+    },
+    "level.coverage": {
+      "value": 0.9813
+    },
+    "latest.min.territory": {
+      "value": "Arezzo"
+    },
+    "latest.min.value": {
+      "value": 35.2
+    },
+    "latest.max.territory": {
+      "value": "Fermo"
+    },
+    "latest.max.value": {
+      "value": 358.1
+    },
+    "latest.year_avg": {
+      "value": 129.02
+    },
+    "latest.median": {
+      "value": 125.3
+    },
+    "latest.above_avg_count": {
+      "value": 45
+    },
+    "latest.below_avg_count": {
+      "value": 60
+    },
+    "latest.gap_abs": {
+      "value": 322.90000000000003
+    },
+    "long.year_min_avg": {
+      "value": 108.22547169811321
+    },
+    "long.avg_change_abs": {
+      "value": 20.7945283018868
+    },
+    "long.avg_change_pct": {
+      "value": 19.214079620638262
+    },
+    "long.highest_delta.territory": {
+      "value": "Fermo"
+    },
+    "long.highest_delta.value": {
+      "value": 219.10000000000002
+    },
+    "long.lowest_delta.territory": {
+      "value": "La Spezia"
+    },
+    "long.lowest_delta.value": {
+      "value": -39.10000000000001
+    },
+    "recent.previous_year": {
+      "value": 2023
+    },
+    "recent.current_avg": {
+      "value": 129.02
+    },
+    "recent.previous_avg": {
+      "value": 121.4352380952381
+    },
+    "recent.average_delta": {
+      "value": 7.584761904761905
+    },
+    "recent.average_delta_pct": {
+      "value": 6.245931595912381
+    },
+    "recent.common_count": {
+      "value": 105
+    },
+    "recent.increase_count": {
+      "value": 69
+    },
+    "recent.decrease_count": {
+      "value": 35
+    },
+    "recent.stable_count": {
+      "value": 1
+    },
+    "recent.largest_increase.territory": {
+      "value": "Fermo"
+    },
+    "recent.largest_increase.delta": {
+      "value": 241.8
+    },
+    "recent.largest_increase.previous_value": {
+      "value": 116.3
+    },
+    "recent.largest_increase.current_value": {
+      "value": 358.1
+    },
+    "recent.largest_decrease.territory": {
+      "value": "Brindisi"
+    },
+    "recent.largest_decrease.delta": {
+      "value": -41.20000000000002
+    }
+  },
+  "current_entry": null,
+  "secondary_claims": [],
+  "facts_hash": "8aadd485c4fd0254"
+}
