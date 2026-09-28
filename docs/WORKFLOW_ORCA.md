@@ -263,8 +263,9 @@ Due guasti di Orca visti lo stesso giorno, durante la fase 1 del team editoriale
   su sonnet, che è partito subito. Si controlla sempre lo schermo nel primo minuto.
 - **`worktree create` può chiudere la connessione** ("The Orca runtime closed the connection
   before responding") e creare lo stesso il worktree, sia in git sia in Orca. Prima di
-  riprovare si guarda `git worktree list` e `orca-ide worktree show --worktree branch:<ramo>`,
-  altrimenti il secondo tentativo trova il nome occupato.
+  riprovare si guarda `git worktree list`, e si aspetta che `orca-ide worktree show --worktree
+  branch:<ramo>` lo trovi, perché la registrazione in Orca arriva qualche secondo dopo quella in
+  git. Riprovare subito non dà errore: crea un doppione con il suffisso `-2` (`rev-285-2-2`).
 
 I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e finiscono senza
 preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
