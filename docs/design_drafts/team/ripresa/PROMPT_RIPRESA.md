@@ -48,14 +48,13 @@ Tutto è su GitHub: le issue portano lo Stato nel corpo, le PR hanno le review p
    - La correzione è già provata dal revisore.
    - **Nello decide** se fare un quarto giro o unire così e riparare dopo. La spec del quarto
      giro si scrive dalla review 3.
-3. **#291 (2c, `orca_review.py`):** era PRONTA, poi l'uso sul pilota ha trovato il difetto di
-   `--scheda` (chiave interna contro codice dell'URL).
-   - Riparazione con Antigravity lanciata: `ripresa/spec_riparazione_2c_3.md`.
-   - Se non è committata sul ramo `nmaiese/strumento-2c-review` (oggi a `bb1464db`), rilanciala.
-   - Poi review 3 con OpenCode big-pickle, in un worktree nuovo.
+3. **#291 (2c, `orca_review.py`):** PRONTA PER NELLO dopo tre giri (`b1ac953b`), ready più `gate-b`.
+   Il difetto di `--scheda` trovato sul pilota è riparato. Le Note della review 3 sono per una
+   pulizia dopo il merge.
 4. **Pila allineata:** la 2c contiene la 2b, che contiene la 2a (`bb1464db`). Il ramo del
    pilota contiene la 2c allineata.
-5. **#293 (pilota ter-12):** PRONTA PER NELLO dopo tre giri, ready più `gate-b`.
+5. **#293 (pilota ter-12):** PRONTA PER NELLO dopo tre giri, ready più `gate-b`, `8be35ae2`, CI
+   verde. L'ultimo commit tocca solo il test della guardia, non il testo.
    - La valutazione è `docs/design_drafts/team/09_valutazione_pilota_ter12.md`.
    - La lettura cieca preferisce il nuovo per le fonti e il vecchio per l'attacco e la prosa.
    - **Nello legge e decide.** Se convince, unisce in ordine #289, #290, #291 e #293.
