@@ -313,6 +313,29 @@ piano gratuito (`kimi-k3`, `kimi-k2.6`, `deepseek-v4-pro`, `glm-5.3`, `minimax-m
 `glm-5.1`). I provider con credito finito rispondono dopo circa 75 secondi, non subito: il ping va
 fatto con un `timeout`, altrimenti si scambia l'attesa per lavoro.
 
+**I ruoli in headless, misurati la stessa sera sul pilota ter-12 e sulle review degli strumenti.**
+- **`opencode run` muore su ogni accesso fuori dalla cwd.** Leggere `/tmp`, la libreria standard
+  di Python o un file che un webfetch ha salvato in `/tmp` chiede il permesso `external_directory`.
+  In headless il permesso viene rifiutato da solo ("auto-rejecting"), e il run finisce con exit 0
+  senza risposta. Due giri di review si sono persi così. La consegna deve dire "non leggere niente
+  fuori dal worktree, temporanei in `.<nome>/` dentro il worktree".
+- **Due `opencode run` partiti nello stesso istante** si contendono il database di OpenCode, e uno
+  muore con "Error: Unexpected error / database is locked". Partiti a qualche secondo di distanza,
+  convivono.
+- **Le citazioni dello scout si verificano scaricando l'URL.** Antigravity pro-high ha dato 8
+  citazioni letterali su 8. OpenCode nemotron-3-ultra-free ne ha date 1 su 18: le altre erano
+  parafrasi o frasi composte, e un URL rispondeva 403. Il controllo si fa con uno script che scarica
+  la pagina o il PDF (`uv run --with pypdf`) e cerca la citazione normalizzata.
+- **Il grafico ha dichiarato due ritagli "con la figura in primo piano"** che mostravano le fonti e
+  la licenza. La resa l'ha verificata davvero il leader, con Playwright su Chrome
+  (`uv run --with playwright`, `channel="chrome"`): screenshot del solo elemento `figure`, a 375 e
+  768 px, tema chiaro e scuro, più `scrollWidth`. Un'affermazione su un'immagine si controlla
+  aprendo l'immagine.
+- **Il secondo parere di gpt-oss:120b è debole sulla sostanza.** Sulla domanda 1 ha detto di no,
+  ma non ha visto che l'attacco del pilota era sbagliato nei fatti ("scende in tutte le regioni",
+  mentre nel 2025 sei regioni salgono). Sulla domanda 3 ha dato l'italiano per buono. Serve come
+  lettura in più, non come controllo.
+
 ## 7. Cosa richiede mano umana
 
 Ci sono cose che nessun agente deve fare: il container GTM (tag morti, hostname di

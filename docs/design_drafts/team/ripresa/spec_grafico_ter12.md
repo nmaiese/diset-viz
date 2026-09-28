@@ -1,0 +1,16 @@
+Sei il grafico del team editoriale di Divario Italia (issue #292 di nmaiese/diset-viz), lanciato dal team leader in headless. Lavori nel worktree corrente. NON leggere, aprire o elencare file fuori dal worktree: OpenCode headless rifiuta l'accesso e chiude la sessione. I temporanei vanno in .grafico-tmp/ dentro il worktree, e alla fine la cancelli.
+
+Prima leggi per intero skills/editorial-team/grafico/SKILL.md, il tuo unico contratto, e in docs/INDICATOR_PAGES.md la parte "Le figure dentro l'articolo". Poi leggi l'articolo appena scritto, content/indicators/12.md, e il brief lavoro/ter-12/brief.md (la parte "Una figura possibile").
+
+Nota: lo scrittore ha gia' inserito un marcatore di dispersione con ter-901 subito dopo il primo paragrafo dell'ultima sezione. Valuta se sta nel punto giusto (subito dopo il paragrafo che fa l'affermazione), se la didascalia regge da sola e se le regioni evidenziate sono quelle di cui il testo parla, e correggi SOLO il marcatore se serve.
+
+Il compito: metti nell'articolo le figure che fanno vedere quello che il testo afferma, con i marcatori che il sito rende (dispersione o ritratto). Il candidato naturale è una dispersione con il PIL pro capite (con=ter-901), subito sotto il paragrafo che dice in parole che dove il reddito è più basso la disoccupazione è più alta. Metti la figura solo se quel paragrafo c'è. Una o due figure al massimo. I nomi delle regioni come nei dati (Trentino Alto Adige senza trattino). La didascalia è una frase che si regge da sola, senza virgolette doppie né ">", niente em-dash, niente punto e virgola. Tocchi SOLO i marcatori: il testo non lo cambi. Se una frase va cambiata perché la figura regga, la scrivi parola per parola nella risposta finale.
+
+Verifica della resa (una figura che non si disegna sparisce senza errore):
+1. DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py scripts/indicator_store.py --show ter-12 esce con 0.
+2. DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m scripts.editoriale.guardia ter-12 --dossier lavoro/ter-12/dossier.json --fonti lavoro/ter-12/fonti.md esce con 0 (controlla anche i marcatori).
+3. Avvia il sito in background sulla porta 5071: DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m gunicorn run:app -b 127.0.0.1:5071 & , aspetta che risponda, poi con curl -s http://127.0.0.1:5071/indicatore/tasso-di-disoccupazione/ter-12 controlla: data-v1 presente, un titolo di sezione dell'articolo nuovo (non lo scheletro), un <svg dentro la figura, la figcaption con "In evidenza:" e tutte le regioni chieste.
+4. Screenshot con Chrome headless a due larghezze, dentro .grafico-tmp/: google-chrome --headless=new --disable-gpu --hide-scrollbars --window-size=375,5000 --screenshot=.grafico-tmp/ter12-375.png URL e lo stesso a 768. Tienili (il team leader li guarda) spostandoli poi in lavoro/ter-12/ con quei nomi.
+5. Ferma il server (kill del processo gunicorn che hai avviato).
+
+Non fare git add né commit. La tua risposta finale, in italiano: i marcatori inseriti, l'affermazione che ciascuno illustra, la prova della resa (URL locale ed elementi trovati), l'uscita della guardia, e le frasi da far cambiare allo scrittore se ce ne sono.
