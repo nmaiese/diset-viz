@@ -197,6 +197,12 @@ orca-ide worktree set --worktree active --comment "Implementati i test; in attes
 
 ## 6. Antigravity in orchestrazione, misurato e diagnosticato il 28 settembre 2026
 
+> Aggiornamento della sera del 28/09, dopo le prove in `~/dev/dev-tools/docs/orca.md`
+> ("Lanciare un worker e sapere se la spec è arrivata"): con il worktree già fidato
+> (`orca-preflight.sh --scrivi-trust`) `worker-start --agent antigravity` consegna
+> senza inviare a mano. Il lanciatore `orca-lancia.sh` fa già tutto; questa sezione
+> resta come diagnosi di com'è nato il problema.
+
 Prima diagnosi (sbagliata, corretta qui): `worker-start --agent antigravity` sembrava fallire
 sempre con `agent_prompt_blocked`, indipendente dal modello. Non è il modello. Letto lo schermo
 del terminale con `orca-ide terminal read --terminal <handle> --screen --json` **prima** di rilasciarlo

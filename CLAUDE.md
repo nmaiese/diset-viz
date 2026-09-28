@@ -67,7 +67,7 @@ feed a `/blog/feed.xml`; l'hub editoriale a `/divari-regionali`;
 la ricerca a `/ricerca`; la dashboard D3 originale a `/legacy` (non va rotta);
 l'API JSON sotto `/api/`. Le verità rotta per rotta
 (canonico, noindex e perché, che cosa si ricalcola al render) stanno in
-`.claude/rules/app.md`.
+`.claude/rules/app.md` e, per home, atlante e confronto, `app-home.md`, `app-atlante.md`, `app-confronto.md`.
 
 **I nomi delle fonti hanno una sola fonte di verità, `app/sources.py`**, detto
 qui perché romperla è invisibile: le etichette pubbliche sono nomi in chiaro
@@ -145,6 +145,20 @@ mappa dei temi in `config/theme_categories.csv`, separazione provinciale) sta in
 `.claude/rules/data.md`. Il guasto silenzioso da sapere ovunque: un tema non
 mappato tiene il suo indicatore nel catalogo e lo toglie da ogni totale di
 macro-area, senza che niente fallisca.
+
+## Chi lavora, leggi [`docs/WORKFLOW_ORCA.md`](docs/WORKFLOW_ORCA.md)
+
+- Prima di assegnare un lavoro lancia `~/dev/dev-tools/scripts/agent-probe.sh
+  <candidati>` (solo i nomi che servono) e scegli tra chi ha quota. Il ruolo di
+  ciascuno sta in `docs/WORKFLOW_ORCA.md` §1: chi coordina non assegna a sé stesso.
+- Un lavoro con modifiche gira in un terminale di Orca, non in headless:
+  `~/dev/dev-tools/scripts/orca-lancia.sh --agent <a> --worktree <nome> --spec-file
+  <file>` crea il worktree, copia la spec dentro, consegna e controlla per 60 secondi.
+  Stato: `orca-stato.sh`. Codex parte con il prompt come argomento (`worker-start`
+  fallisce su `agent_readiness`, causa non trovata) e non manda `worker_done`;
+  Antigravity vuole il worktree fidato. Dettaglio in `~/dev/dev-tools/docs/orca.md`.
+- L'headless (`claude -p`, `codex exec`, `opencode run`, `agy -p`) è per una
+  domanda o una review senza modifiche, sempre con `< /dev/null` e `timeout`.
 
 ## Vincoli
 
