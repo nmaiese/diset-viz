@@ -37,36 +37,24 @@ Poi guarda lo stato su GitHub, perché le issue sono l'unico posto dello stato:
   `DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m unittest <moduli>`.
   La CI della PR è il controllo completo.
 
-## Dove eravamo (28 settembre, sera, dopo il pilota)
+## Dove eravamo (28 settembre, notte)
 
-Tutto è su GitHub: le issue portano lo Stato nel corpo, le PR hanno le review pubblicate.
+Strumenti e pilota sono **uniti su `master`**: #289, #290, #291, #293. Le issue #286, #287,
+#288 e #292 sono chiuse. Nello ha giudicato ter-12 buono, "anche se migliorabile": l'attacco del
+vecchio testo era migliore.
 
-1. **#289 (2a, brief e skill):** PRONTA PER NELLO, ready più `gate-b`.
-2. **#290 (2b, guardia):** tre giri fatti.
-   - La review 3 dà DA CORREGGERE su un punto solo: l'arrotondamento al centinaio va confrontato
-     con dossier e `fonti.md`, non con tutta la matrice. Più due test.
-   - La correzione è già provata dal revisore.
-   - **Nello decide** se fare un quarto giro o unire così e riparare dopo. La spec del quarto
-     giro si scrive dalla review 3.
-3. **#291 (2c, `orca_review.py`):** PRONTA PER NELLO dopo tre giri (`b1ac953b`), ready più `gate-b`.
-   Il difetto di `--scheda` trovato sul pilota è riparato. Le Note della review 3 sono per una
-   pulizia dopo il merge.
-4. **Pila allineata:** la 2c contiene la 2b, che contiene la 2a (`bb1464db`). Il ramo del
-   pilota contiene la 2c allineata.
-5. **#293 (pilota ter-12):** PRONTA PER NELLO dopo tre giri, ready più `gate-b`, `8be35ae2`, CI
-   verde. L'ultimo commit tocca solo il test della guardia, non il testo.
-   - La valutazione è `docs/design_drafts/team/09_valutazione_pilota_ter12.md`.
-   - La lettura cieca preferisce il nuovo per le fonti e il vecchio per l'attacco e la prosa.
-   - **Nello legge e decide.** Se convince, unisce in ordine #289, #290, #291 e #293.
-6. **Prima della prossima scheda (ter-281):** brief più corto (una cifra per idea), un tetto di
-   parole indicativo di 600-800, e la domanda 3 del revisore estesa alla lunghezza.
-7. **Dopo il giudizio di Nello:** la fase 5 del piano (CLAUDE.md, AGENTS.md, README,
-   WORKFLOW_ORCA, INDICATOR_PAGES, rules, label `run:team`, template della issue).
-8. **Da chiedere a Nello:**
-   - la pulizia dei worktree `rev-*` (compreso il doppione `rev-285-2-2`), di `ind-ter-12`
-     dopo il merge e dei terminali Orca vecchi;
-   - la nota su `< /dev/null` in dev-tools;
-   - la quarantena stabile delle tre skill.
+Da fare, in ordine:
+1. **Fase 5** del piano, ora sbloccata: CLAUDE.md, AGENTS.md, README, WORKFLOW_ORCA (la deroga
+   "un agente alla volta nel worktree dell'indicatore, revisore sempre fuori", e il flusso
+   headless), INDICATOR_PAGES, `.claude/rules/editorial.md`, FAMIGLIE_INDICATORI, la label
+   `run:team`, il template della issue. L'inventario riga per riga è `07_documenti_da_aggiornare.md`.
+2. **Fase 4:** ter-281, da `master`, con tre correzioni che vengono dal pilota:
+   - brief più corto, una cifra per idea;
+   - tetto di parole indicativo di 600-800;
+   - domanda 3 del revisore estesa alla lunghezza e all'attacco.
+3. Il limite di disegno della guardia: una cifra giusta attribuita al territorio sbagliato
+   passa. Va progettato, non riparato in due righe.
+4. Le Note non bloccanti delle review 3 e 4 di #290 e #291, in un passaggio di pulizia.
 
 ## Come si lancia un ruolo in headless (le lezioni della sera)
 
