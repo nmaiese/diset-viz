@@ -48,6 +48,19 @@ FOGLI_TIPOGRAFIA = (
 ECCEZIONI_TAGLIA = {
     ("chrome.css", ".sitechrome .brandword"): "wordmark con misura ottica propria del logo",
 }
+# Il testo dentro gli SVG dei grafici si misura in unita' del viewBox, non in
+# pixel: la mappa si disegna a 340-400 pixel su un viewBox di 560, e i riquadri
+# dei richiami, gli scarti fra etichette e i margini in app/design/charts.py e
+# app/charts.py sono calcolati su queste taglie. Un token in pixel qui cambia la
+# taglia vera e rompe la geometria (21 diventava 14, cioe' 9 pixel veri).
+TESTO_SVG = "testo SVG in unita' del viewBox, legato alla geometria del grafico"
+ECCEZIONI_TAGLIA.update({("components.css", sel): TESTO_SVG for sel in (
+    ".chart .axis text, .chart .lab", ".chart .hl-lab",
+    ".scatter__name, .portrait__name", ".scatter__axis-name, .portrait__end",
+    ".strip__tick", ".strip__avglab", ".strip__gaplab", ".strip__name",
+    ".band__tick", ".band__lab", ".band__hllab", ".callout text",
+)})
+ECCEZIONI_TAGLIA[("pages/articolo.css", ".art-fig .fig text")] = TESTO_SVG
 
 
 def _corpi(testo, intestazione):

@@ -60,7 +60,7 @@
 }
 
 /* ---------- il testo delle figure sulla scala piccola, i colori per classe ---------- */
-.art-fig .fig text { font-size: var(--fs-small); stroke: none; }
+.art-fig .fig text { font-size: 13px; stroke: none; }
 .art-fig .fig .fig__name, .art-fig .fig .fig__value, .art-fig .fig .fig__label { fill: var(--ink); }
 .art-fig .fig .fig__value, .art-fig .fig .fig__label, .art-fig .fig .fig__ref-label { font-weight: 600; }
 .art-fig .fig .fig__axis, .art-fig .fig .fig__axis-name, .art-fig .fig .fig__gap { fill: var(--muted); }

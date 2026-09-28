@@ -154,7 +154,6 @@
 }
 .doors__more b { font-weight: 700; }
 .doors__more b::after { content: " \2192"; }
-.doors__more span { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .doors__more a:hover { color: var(--ink); }
 .doors__more a:hover b { color: var(--accent-strong); text-decoration: underline; }
 
@@ -296,7 +295,7 @@
 .home-areas { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 600px) { .home-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1200px) { .home-areas { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.home-area { display: grid; align-content: start; gap: var(--space-3); padding-top: var(--space-section); border-top: 1px solid var(--rule-strong); }
+.home-area { display: grid; align-content: start; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--rule-strong); }
 .home-area__top { display: flex; align-items: center; gap: var(--space-3); }
 .badge { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); color: var(--ink); background: var(--surface-2); }
 .badge--amber { background: var(--amber-wash); color: var(--amber-600); }
@@ -319,7 +318,7 @@
 .home-temi__seg { margin-bottom: var(--space-6); }
 .home-temi__level:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 .home-area { container-type: inline-size; }
-.home-area__move { display: grid; gap: var(--space-1); padding-top: var(--space-section); border-top: 1px solid var(--rule); }
+.home-area__move { display: grid; gap: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--rule); }
 .home-area__label { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
 .home-area__move .home-area__link { display: grid; gap: var(--space-1); text-decoration: none; }
 .home-area__move .home-area__link:hover { color: var(--ink); }
@@ -362,7 +361,8 @@
   
 }
 
-/* La riga di fonti, metodo e correzioni sotto le storie: prende il posto
-   della fascia che c'era prima, con gli stessi quattro rimandi. */
 .home-temi__source { margin-top: var(--space-6); }
-.story__sources { margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--rule); }
+/* La riga di fonti, metodo e correzioni in fondo alla pagina: prende il
+   posto della fascia che c'era prima, con gli stessi quattro rimandi. */
+.home-fonti { padding-bottom: calc(var(--space-section) / 2); }
+.home-fonti .source { padding-top: var(--space-4); border-top: 1px solid var(--rule); }

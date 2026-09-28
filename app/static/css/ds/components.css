@@ -129,7 +129,8 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 /* `:not(svg)`: la serie a fascia (`charts.band`) e' un <svg class="band">, e
    senza il filtro prendeva margine, imbottitura e fondo della fascia: un
    riquadro grigio con 110 pixel vuoti sopra ogni "Com'e' cambiato". */
-.band:not(svg) { margin-top: var(--space-section); padding-block: var(--space-block); background: var(--surface-1); }
+.band:not(svg) { margin-top: var(--space-8); padding-block: var(--space-8); background: var(--surface-1); }
+@media (min-width: 960px) { .band:not(svg) { margin-top: var(--space-12); padding-block: var(--space-10); } }
 .band .section:first-child { padding-top: 0; }
 
 /* La fascia: una sezione a tutta larghezza, col suo contenitore dentro. Le
@@ -137,7 +138,9 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    la superficie, cosi' ogni sezione ha un inizio e una fine visibili anche
    da lontano. La testata della fascia tiene a sinistra il titolo con la sua
    frase e a destra il link alla sezione intera, sotto lo stesso filetto. */
-.zone { padding-block: var(--space-section); }
+/* Due fasce di fila sommano i loro bordi: meta' dello spazio fra sezioni
+   per lato, cosi' fra una fascia e l'altra c'e' --space-section, non il doppio. */
+.zone { padding-block: calc(var(--space-section) / 2); }
 .zone--tint { background: var(--surface-1); }
 .zone__head {
   display: grid; gap: var(--space-3) var(--space-8); margin-bottom: var(--space-6);
@@ -443,14 +446,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 @media (max-width: 1199px) { .scheda-head > .tiles { padding-bottom: var(--space-6); } }
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart .grid line { stroke: var(--rule); stroke-width: 1; }
-.chart .axis text, .chart .lab { font-family: var(--font-sans); font-size: var(--fs-small); fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart .axis text, .chart .lab { font-family: var(--font-sans); font-size: 13px; fill: var(--muted); font-variant-numeric: tabular-nums; }
 .chart .lab--strong { fill: var(--ink); font-weight: 600; }
 .chart .ctx { fill: none; stroke: var(--cmp); stroke-width: 1; opacity: 0.55; }
 .chart .avg { fill: none; stroke: var(--data-reference); stroke-width: 2; stroke-dasharray: 5 4; }
 .chart .hl { fill: none; stroke: var(--data-focus); stroke-width: 3; }
 .chart .dot { fill: var(--data-focus); }
 .chart .dot--avg { fill: var(--data-reference); }
-.chart .hl-lab { fill: var(--data-focus); font-weight: 700; font-size: var(--fs-label); font-family: var(--font-sans); }
+.chart .hl-lab { fill: var(--data-focus); font-weight: 700; font-size: 13px; font-family: var(--font-sans); }
 .chart-note { font-size: var(--fs-ui); color: var(--ink); max-width: var(--measure); margin-top: var(--space-4); }
 details.more { margin-top: var(--space-4); border-top: 1px solid var(--rule); }
 /* "Dentro le regioni" della scheda sulle province: dopo il modulo dato, nella
@@ -518,8 +521,8 @@ details.more[open] > summary { color: var(--ink); }
 .scatter__axis, .portrait__track { stroke: var(--rule-strong); stroke-width: 1; }
 .scatter__dot { fill: var(--cmp); }
 .scatter__dot.is-on, .portrait__dot { fill: var(--data-focus); }
-.scatter__name, .portrait__name { font-family: var(--font-sans); font-size: var(--fs-small); fill: var(--text-2); }
-.scatter__axis-name, .portrait__end { font-family: var(--font-sans); font-size: var(--fs-small); fill: var(--muted); }
+.scatter__name, .portrait__name { font-family: var(--font-sans); font-size: 11px; fill: var(--text-2); }
+.scatter__axis-name, .portrait__end { font-family: var(--font-sans); font-size: 10px; fill: var(--muted); }
 
 /* figure del blog di scripts/trend_articles/figures.py */
 .fig { width: 100%; height: auto; }
@@ -725,36 +728,36 @@ details.more[open] > summary { color: var(--ink); }
 .chart--hero { margin-top: var(--space-2); }
 
 .strip__axis { stroke: var(--rule-strong); stroke-width: 1; }
-.strip__tick { font-size: var(--fs-small); fill: var(--muted); }
+.strip__tick { font-size: 13px; fill: var(--muted); }
 .strip__avg { stroke: var(--data-reference); stroke-width: 1.5; stroke-dasharray: 4 3; }
-.strip__avglab { font-size: var(--fs-label); fill: var(--text-2); font-weight: 600; }
+.strip__avglab { font-size: 13px; fill: var(--text-2); font-weight: 600; }
 .strip__gap { fill: none; stroke: var(--ink); stroke-width: 1.2; }
-.strip__gaplab { font-size: var(--fs-label); font-weight: 700; fill: var(--ink); }
+.strip__gaplab { font-size: 15px; font-weight: 700; fill: var(--ink); }
 .strip__dot { stroke: var(--bg); stroke-width: 1.5; }
 .strip__dot.is-on { stroke: var(--accent); stroke-width: 3; }
-.strip__name { font-size: var(--fs-small); }
+.strip__name { font-size: 13px; }
 .strip__nm { fill: var(--ink); font-weight: 700; }
 .strip__v { fill: var(--text-2); }
 .strip__name--on .strip__nm { fill: var(--accent); }
 
 .band__grid { stroke: var(--rule); stroke-width: 1; }
-.band__tick { font-size: var(--fs-small); fill: var(--muted); }
+.band__tick { font-size: 13px; fill: var(--muted); }
 .band__area { fill: var(--seq-1); opacity: 0.85; }
 .band__src { display: none; }
 .band__ext { fill: none; stroke-width: 2; }
 .band__avg { fill: none; stroke: var(--data-reference); stroke-width: 2; stroke-dasharray: 5 4; }
-.band__lab { font-size: var(--fs-label); font-weight: 700; }
+.band__lab { font-size: 13px; font-weight: 700; }
 .band__lab--avg { fill: var(--text-2); }
 .band__hl { fill: none; stroke: var(--accent); stroke-width: 3; }
 .band__dot { fill: var(--accent); }
-.band__hllab { font-size: var(--fs-label); font-weight: 700; fill: var(--accent); }
+.band__hllab { font-size: 13px; font-weight: 700; fill: var(--accent); }
 
 /* I richiami stanno sopra i tracciati: senza questo il testo e il filo
    prendevano mouse e clic, e sotto l'etichetta un territorio non si sceglieva. */
 .callout { pointer-events: none; }
 .callout line { stroke: var(--ink); stroke-width: 1; }
 .callout circle { fill: var(--ink); stroke: var(--bg); stroke-width: 1.5; }
-.callout text { font-family: var(--font-num); font-size: var(--fs-label); line-height: var(--lh-label); paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.callout text { font-family: var(--font-num); font-size: 21px; paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
 .callout__nm { font-weight: 700; fill: var(--ink); }
 .callout__v { fill: var(--text-2); font-variant-numeric: tabular-nums; }
 

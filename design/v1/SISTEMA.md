@@ -63,10 +63,14 @@ Upshot per il testo che accompagna il dato.
 - **Breakpoint** 600, 960, 1200. Dentro i componenti si usano container query
   sulla larghezza del componente, non altri breakpoint di pagina.
 - **Spazi** a passo 4, usati su nove valori: 4, 8, 12, 16, 24, 32, 48, 64, 96.
-  Fra sezioni lo spazio e' fluido, da 56 su telefono a 96 su desktop. Fra
+  Fra sezioni lo spazio e' fluido, da 56 su telefono a 96 su desktop
+  (`--space-section`), e c'e' una volta sola: la sezione lo porta sopra, la
+  fascia ne porta meta' per lato, cosi' due fasce di fila non lo raddoppiano.
+  Dentro un componente lo spazio resta quello del componente (8, 16, 24): il
+  vuoto fra sezioni non si usa per staccare un titolo dal suo grafico. Fra
   blocchi e' 24, o 16 dove il componente e' stretto.
 - **La testata di sezione** e' un filetto d'inchiostro da 3px con l'H2 sotto,
-  a 34px da 1200. Col filetto chiaro da 1px e l'H2 poco piu' grande dei titoli
+  a 32px da 1200. Col filetto chiaro da 1px e l'H2 poco piu' grande dei titoli
   dei grafici, a schermo largo le sezioni si confondevano una con l'altra.
 - **La fascia** (`.zone`) e' una sezione a tutta larghezza col suo contenitore
   dentro. Le pagine che sono un indice di sezioni, la home per prima, alternano

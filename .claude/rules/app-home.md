@@ -24,8 +24,10 @@ paths:
   nello stesso pannello quando tutti e due stanno nel pool; regioni e province
   con un territorio estratto a caso e l'anteprima della sua scheda; la fascia
   "Gli indicatori, tema per tema" (`#temi`), che e' la porta dell'atlante; la
-  qualita' della vita come porta, senza classifica; il quiz; le storie; fonti
-  e metodo. Per questo **non sta nella cache di pagina**: rimetterci
+  qualita' della vita come porta, senza classifica; le storie; in fondo una
+  riga sola con fonti, metodo, come citare e correzioni (dal 28 settembre 2026
+  il quiz e la fascia delle fonti non sono piu' fasce della home: il quiz si
+  raggiunge dalla porta Giochi). Per questo **non sta nella cache di pagina**: rimetterci
   `@cache.cached` mostrerebbe lo stesso indicatore e gli stessi territori a
   tutti per cinque minuti. Le anteprime dei territori
   (`home.territory_previews`) escono dalle stesse funzioni delle pagine

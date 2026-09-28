@@ -1418,17 +1418,15 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
     def test_la_home_non_promette_la_mappa_anno_per_anno(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("anno per anno", visible_text(html))
-        for fascia in ("storie",):
-            if f'id="{fascia}"' not in html:
-                continue
-            with self.subTest(fascia=fascia):
-                testa = re.search(rf'id="{fascia}".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
-                self.assertIn('<a href="/atlante">atlante</a>', testa)
+        self.assertIn('id="storie"', html)
+        testa = re.search(r'id="storie".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
+        self.assertIn('<a href="/atlante">atlante</a>', testa)
 
     def test_home_no_quiz_and_fonti_links(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn('zone--fun', html)
-        self.assertNotIn('quiz_try', html)
+        self.assertNotIn('id="quiz"', html)
+        self.assertNotIn('id="fonti"', html)
         self.assertIn('Fonti, metodo e correzioni:', html)
         self.assertIn('<a href="/metodologia">come usiamo i dati</a>', html)
         self.assertIn('<a href="/chi-siamo#come-citare">come citare</a>', html)

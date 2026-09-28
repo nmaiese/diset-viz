@@ -52,8 +52,8 @@
       {% endif %}
       {% if lv.key == 'regione' and a.best %}
       <dl class="home-area__ends">
-        <div class="is-head"><dt>{{ ui.icon('up') }}<span class="sr-only"> In testa</span></dt><dd>{% if a.best_key %}<a href="{{ '/regione/' ~ a.best_key }}">{{ a.best }}</a>{% else %}{{ a.best }}{% endif %}</dd></div>
-        <div class="is-tail"><dt>{{ ui.icon('down') }}<span class="sr-only"> In coda</span></dt><dd>{% if a.worst_key %}<a href="{{ '/regione/' ~ a.worst_key }}">{{ a.worst }}</a>{% else %}{{ a.worst }}{% endif %}</dd></div>
+        <div class="is-head"><dt>{{ ui.icon('up') }} In testa</dt><dd>{% if a.best_key %}<a href="{{ '/regione/' ~ a.best_key }}">{{ a.best }}</a>{% else %}{{ a.best }}{% endif %}</dd></div>
+        <div class="is-tail"><dt>{{ ui.icon('down') }} In coda</dt><dd>{% if a.worst_key %}<a href="{{ '/regione/' ~ a.worst_key }}">{{ a.worst }}</a>{% else %}{{ a.worst }}{% endif %}</dd></div>
       </dl>
       {% endif %}
     </li>
