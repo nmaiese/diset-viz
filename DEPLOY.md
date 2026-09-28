@@ -65,8 +65,8 @@ gcloud run services update diset-viz --region europe-west1 \
 ### Il cruscotto della catena non c'e' piu'
 
 Fino al 5 settembre 2026 questo servizio ospitava anche `/_pipeline`, il
-cruscotto della catena editoriale, su `monitor.divarioitalia.it`. La catena vive
-nel repo `redazione-ai` dal 4 settembre, e il processo che scriveva il battito
+cruscotto della catena editoriale, su `monitor.divarioitalia.it`. La catena era
+stata spostata in un repository esterno il 4 settembre, poi dismessa, e il processo che scriveva il battito
 (`lab/cruscotto.py`) e' stato tolto con `lab/`: la rotta e' rimasta viva senza
 nessuno che la scrivesse.
 

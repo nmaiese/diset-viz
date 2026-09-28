@@ -19,7 +19,7 @@ labels: difetto-pubblicato
 
 ## Perché è passato
 
-<!-- Quale controllo avrebbe dovuto prenderlo (verificatore, motore verifica, REVIEW.md passaggio N, review Codex) e perché non l'ha fatto. -->
+<!-- Quale controllo avrebbe dovuto prenderlo (i test del repository, REVIEW.md passaggio N, review Codex) e perché non l'ha fatto. -->
 
 ## Correzione proposta
 

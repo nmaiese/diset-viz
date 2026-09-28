@@ -1,0 +1,100 @@
+{
+  "lead": [
+    {
+      "text": "Nel 2024 l'istituto di pena più sovraffollato tra le 107 province è quello di Fermo, al 358,1% dei posti regolamentari.",
+      "support": ["latest.max.territory", "latest.max.value", "level.territory_total", "meta.year_max"]
+    },
+    {
+      "text": "Il meno affollato è quello di Arezzo, al 35,2%, una distanza di 322,9 punti percentuali tra i due estremi.",
+      "support": ["latest.min.territory", "latest.min.value", "latest.gap_abs"]
+    }
+  ],
+  "sections": [
+    {
+      "role": "definizione",
+      "h": "Che cosa misura",
+      "sentences": [
+        {
+          "text": "L'indicatore rapporta il numero di persone detenute ai posti regolamentari disponibili negli istituti di pena.",
+          "support": ["meta.unit"]
+        },
+        {
+          "text": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno, dal 2015 al 2024.",
+          "support": ["meta.year_min", "meta.year_max"]
+        },
+        {
+          "text": "Per questo indicatore il valore più basso occupa la posizione migliore, la graduatoria va quindi dal dato minore al maggiore.",
+          "support": ["meta.direction"]
+        }
+      ]
+    },
+    {
+      "role": "quadro",
+      "h": "Poche punte spingono la media",
+      "sentences": [
+        {
+          "text": "Nel 2024 la media semplice delle province è 129,0%, già oltre i posti disponibili.",
+          "support": ["latest.year_avg", "meta.year_max"]
+        },
+        {
+          "text": "Il valore mediano è più basso della media, 125,3% contro 129,0%.",
+          "support": ["latest.median", "latest.year_avg"]
+        },
+        {
+          "text": "Sopra la media si contano 45 province, sotto sono 60, su 107 osservate in tutto.",
+          "support": ["latest.above_avg_count", "latest.below_avg_count", "level.territory_total"]
+        }
+      ]
+    },
+    {
+      "role": "dinamica",
+      "h": "Un salto che sposta la media, e uno che non ha eguali",
+      "sentences": [
+        {
+          "text": "Rispetto al 2023, la media semplice delle province è salita da 121,4% a 129,0%, un aumento di 7,6 punti percentuali.",
+          "support": ["recent.previous_year", "recent.previous_avg", "recent.current_avg", "recent.average_delta"]
+        },
+        {
+          "text": "Nell'ultimo anno sono aumentate 69 province e diminuite 35, con un caso stabile.",
+          "support": ["recent.increase_count", "recent.decrease_count", "recent.stable_count"]
+        },
+        {
+          "text": "Il salto più netto è quello di Fermo, che passa dal 116,3% del 2023 al 358,1% del 2024, un aumento di 241,8 punti percentuali.",
+          "support": ["recent.largest_increase.territory", "recent.largest_increase.previous_value", "recent.largest_increase.current_value", "recent.largest_increase.delta", "recent.previous_year", "meta.year_max"]
+        },
+        {
+          "text": "Il calo più ampio è quello di Brindisi, con una variazione di -41,2 punti percentuali.",
+          "support": ["recent.largest_decrease.territory", "recent.largest_decrease.delta"]
+        },
+        {
+          "text": "Sull'intera serie, dal 2015 al 2024, la media semplice delle province passa da 108,2% a 129,0%, un aumento di 20,8 punti percentuali.",
+          "support": ["meta.year_min", "meta.year_max", "long.year_min_avg", "latest.year_avg", "long.avg_change_abs"]
+        },
+        {
+          "text": "Nello stesso periodo l'aumento più marcato resta quello di Fermo, 219,1 punti percentuali, mentre il calo più ampio è quello di La Spezia, -39,1 punti percentuali.",
+          "support": ["long.highest_delta.territory", "long.highest_delta.value", "long.lowest_delta.territory", "long.lowest_delta.value"]
+        }
+      ]
+    },
+    {
+      "role": "limiti",
+      "h": "Che cosa il numero non dice",
+      "sentences": [
+        {
+          "text": "La percentuale non mostra da sola quante persone siano coinvolte in valore assoluto.",
+          "support": ["meta.unit"]
+        },
+        {
+          "text": "Il confronto tra province descrive una differenza osservata, non ne dimostra le cause.",
+          "support": []
+        },
+        {
+          "text": "La serie copre 107 province, non tutte hanno un dato per ogni anno.",
+          "support": ["level.territory_total"]
+        }
+      ]
+    }
+  ],
+  "source_ids": ["source"],
+  "roles_covered": ["definizione", "quadro", "dinamica", "limiti"]
+}

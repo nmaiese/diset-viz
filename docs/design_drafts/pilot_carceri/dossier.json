@@ -1,0 +1,32 @@
+{
+  "id": "06POL012P",
+  "name": "Affollamento degli istituti di pena",
+  "unit": "%",
+  "direction": "lower_better",
+  "year_min": 2015,
+  "year_max": 2024,
+  "level": "provincia",
+  "count_latest": 105,
+  "territory_total": 107,
+  "coverage_latest": 0.9813,
+  "min": {
+    "territory": "Arezzo",
+    "value": 35.2
+  },
+  "max": {
+    "territory": "Fermo",
+    "value": 358.1
+  },
+  "mean_2024": 129.0,
+  "median_2024": 125.3,
+  "source": "Istat",
+  "archive": "BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06",
+  "explain": {
+    "plain": "Rapporta il numero di persone detenute ai posti regolamentari disponibili negli istituti di pena.",
+    "example": "Un valore di 20 indica che la condizione descritta riguarda 20 unità ogni 100 nel gruppo di riferimento.",
+    "scope": "Il confronto applica la stessa definizione in tutte le province e per ciascun anno.",
+    "reading": "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore.",
+    "caveat": "La percentuale non mostra da sola quante persone o unità siano coinvolte in valore assoluto. Il confronto tra province descrive una differenza osservata, ma non ne dimostra le cause.",
+    "direction": "lower_better"
+  }
+}

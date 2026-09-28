@@ -17,10 +17,9 @@ La review segue REVIEW.md. Commit senza trailer Co-Authored-By.
 ## Per un pezzo (run:team, run:routine)
 
 - **Angolo scelto**, e angoli scartati con le prove:
-- **La scaletta**, e che cosa ha mosso il `redattore` (le porta gia' il corpo della PR):
+- **La scaletta** (la porta gia' il corpo della PR):
 - **Fonti esterne** (istituzionali, riaperte sul grezzo, con data):
 - **Esito del verificatore / dei revisori**: cifre controllate, smentite, giri di correzione:
-- **Esito di `motore verifica`**: `non_trovate`, `link_inesistenti`, `bloccanti`, `bozza_salvata`:
 - **Costo e turni**:
 
 ## Per il codice (umano, config, infra)

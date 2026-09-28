@@ -28,8 +28,9 @@ quindi i task che lo usano vanno avviati in sequenza, senza lock fittizi nel rep
 La tabella è un **piano di ruoli**, non una misura di disponibilità. Un agente con
 quota esaurita fallisce con un messaggio che sembra un altro problema, quindi la
 disponibilità si verifica **prima** di assegnare, con
-`~/dev/dev-tools/scripts/agent-probe.sh` (dieci secondi); i numeri di quota vivono
-in `~/dev/dev-tools/docs/opencode-quota.md` e `opencode-modelli.md` e qui non si
+`~/dev/dev-tools/scripts/agent-probe.sh` (fino a circa sei minuti, le tre sonde
+ollama girano in serie). I numeri di quota vivono in
+`~/dev/dev-tools/docs/opencode-quota.md` e `opencode-modelli.md` e qui non si
 copiano.
 
 **Il canale che dice la verità sullo stato degli agenti** è
@@ -194,7 +195,154 @@ orca-ide worktree set --worktree active --comment "Implementati i test; in attes
 - **Niente deploy.**
 - **Niente `Co-Authored-By`** nei messaggi di commit.
 
-## 6. Cosa richiede mano umana
+## 6. Antigravity in orchestrazione, misurato e diagnosticato il 28 settembre 2026
+
+Prima diagnosi (sbagliata, corretta qui): `worker-start --agent antigravity` sembrava fallire
+sempre con `agent_prompt_blocked`, indipendente dal modello. Non è il modello. Letto lo schermo
+del terminale con `orca-ide terminal read --terminal <handle> --screen --json` **prima** di rilasciarlo
+(non dopo: il rilascio chiude il terminale e la prova sparisce), la causa reale è una catena di tre
+problemi distinti, tutti aggirabili:
+
+1. **Il dialogo di primo avvio non e' testuale.** La prima volta che Antigravity CLI gira in un
+   worktree chiede "Do you trust the contents of this project?" con un menu a frecce
+   (`> Yes, I trust this folder` / `No, exit`). L'iniezione del prompt di Orca manda testo, il menu
+   lo scarta, e il turno fallisce con `agent_prompt_blocked` prima ancora di vedere la spec. Si
+   sblocca con un solo invio: `orca-ide terminal send --terminal <handle> --enter --json`. Spiega perché
+   a Nello era già andata bene altrove: quel worktree aveva già superato il dialogo.
+2. **Anche a fiducia concessa, l'invio automatico non conferma la sottomissione.** Un secondo
+   `worker-start --terminal <handle-ora-fidato>` incolla la spec nella casella di input
+   ("`[Pasted text #1 +82 lines]`"), ma il turno non parte da solo: serve un altro
+   `orca-ide terminal send --terminal <handle> --enter --json` per premere davvero Invio. Senza
+   quel secondo invio manuale il dispatch fallisce di nuovo con lo stesso `agent_prompt_blocked`,
+   e la capability di quel dispatch viene revocata nello stesso istante: anche riuscendo a far
+   partire il turno dopo, il canale per mandare `worker_done` è già morto.
+3. **`orca-ide` non è sul `PATH` del sotto-processo Bash di Antigravity.** Il worker lo scopre da
+   solo (`which orca-ide` fallisce, poi `find /`, poi `export PATH=$HOME/.local/bin:$PATH`) e alla
+   fine lo richiama per percorso assoluto: funziona, ma consuma turni. Anche cosi', l'ultimo
+   `orca-ide orchestration send --type worker_done` e' rimasto a `running` senza mai consegnare
+   il messaggio (capability già revocata al punto 2), e il worker ha scritto in chiaro "notificato
+   il coordinatore" senza aver verificato l'esito del comando: non fidarsi della narrazione di un
+   worker sul proprio `worker_done`, il canale autorevole è `orca-ide orchestration check`.
+
+4. **Il prompt può arrivare prima che l'interfaccia sia pronta.** Visto lo stesso giorno in un
+   worktree già fidato, quindi senza dialogo: il dispatch è finito `outcome_unknown` e lo schermo
+   mostrava la casella di input vuota, la spec persa. Anche qui la prova si legge a schermo prima
+   di rilasciare. Rimedio: `worker-stop` e ripiego headless, non un secondo tentativo alla cieca.
+
+In sintesi: **antigravity funziona in orchestrazione**, ma non al primo avvio di un worktree nuovo
+e non senza un intervento manuale per far ripartire la sottomissione dopo il trust dialog. Finché
+questi tre punti non sono risolti lato Orca, il ripiego pulito resta l'headless fuori
+orchestrazione, come `~/dev/dev-tools/docs/orca.md` già indicava: `timeout 900 agy --model <id>
+--dangerously-skip-permissions -p "<prompt>" --print-timeout 900s < /dev/null`. Ha fatto ricerca web reale (fonti verificabili
+nell'output) e prodotto un'analisi di 700+ parole in un turno, senza toccare file: l'output va
+salvato da chi coordina, l'headless non scrive nel repo.
+
+Un gotcha separato su `opencode run`: il messaggio posizionale deve stare **prima** dei flag `-f`,
+altrimenti il parser tratta il testo del prompt come un nome di file e fallisce con
+`File not found: <tutto il prompt>`.
+
+Un secondo gotcha, più insidioso perché non dà errore: **`opencode run` lanciato in background
+aspetta la fine dello stdin.** Se lo stdin è un socket o una pipe che nessuno chiude, come nei
+comandi in background di Claude Code, il processo carica la configurazione, scrive `init` nel log
+e resta fermo per sempre: nessuna sessione, nessuna connessione, pochi secondi di CPU. Il 28
+settembre due lavori sono rimasti così 14 minuti. Si lancia sempre con `< /dev/null` e dentro un
+`timeout`, e si controlla presto `~/.local/share/opencode/log/opencode.log`: se dopo `init` non
+compare `session.id`, il processo è bloccato. Stesso accorgimento per `agy -p`.
+
+Un terzo, visto alla prima review vera sulla issue #285: **`opencode run -f` rifiuta i file fuori
+dalla cartella di lavoro.** Un diff salvato in `/tmp` e passato con `-f /tmp/diff.txt` produce
+`permission requested: external_directory (/tmp/*); auto-rejecting`. Il wrapper esce comunque con
+0 e il parere non c'è, quindi non basta guardare il codice d'uscita. I file da allegare vanno
+scritti dentro il worktree, per esempio in `lavoro/`, e cancellati dopo.
+
+Due guasti di Orca visti lo stesso giorno, durante la fase 1 del team editoriale:
+- **`--agent claude --model haiku` non ha ricevuto la consegna.** L'agente è partito, la casella
+  di input è rimasta vuota e il dispatch è rimasto `start_unknown` per cinque minuti. Allo
+  schermo c'era anche l'errore di un hook `SessionStart` di tipo prompt, che però compare anche
+  sui worker sonnet che funzionano. Con un caso solo non si sa se il guasto dipenda da haiku.
+  Rimedio: `worker-stop`, `worker-release`, poi di nuovo con `--task <id> --retry-of <dispatch>`
+  su sonnet, che è partito subito. Si controlla sempre lo schermo nel primo minuto.
+- **`worktree create` può chiudere la connessione** ("The Orca runtime closed the connection
+  before responding") e creare lo stesso il worktree, sia in git sia in Orca. Prima di
+  riprovare si guarda `git worktree list`, e si aspetta che `orca-ide worktree show --worktree
+  branch:<ramo>` lo trovi, perché la registrazione in Orca arriva qualche secondo dopo quella in
+  git. Riprovare subito non dà errore: crea un doppione con il suffisso `-2` (`rev-285-2-2`).
+
+**Antigravity e OpenCode come worker veri, misurati il 28 settembre sugli strumenti del team
+editoriale.** Nessuno dei due riceve la consegna da solo, ma tutti e due lavorano bene una volta
+sbloccati.
+- **Antigravity** (`--agent antigravity --model gemini-3.1-pro-high`, PR #291). Si sono ripresentati
+  identici i difetti 1 e 2: il dialogo di fiducia su un worktree nuovo, poi la spec incollata e non
+  inviata. Si sblocca con due `terminal send --enter`, e da lì lavora nel terminale Orca. Il
+  dispatch però è già `failed`, quindi il suo `worker_done` resta appeso: la fine si legge dallo
+  schermo (niente più "Generating") e dai file. Ha un'abitudine da sapere: lascia nella radice del
+  worktree i suoi script di lavoro (`patch_*.py`, `report.md`), anche quando la spec lo vieta. Il
+  team leader li toglie prima del `git add`, che va sempre fatto per percorsi espliciti. In
+  headless (`agy -p` con `< /dev/null`) ha fatto due riparazioni buone, con i test chiesti.
+- **OpenCode** (`--agent opencode`, modello dalla sua configurazione, oggi `opencode/big-pickle`,
+  PR #290 e #291). Il terminale parte vuoto e il dispatch resta `dispatched`. Il preambolo di Orca
+  (`orchestration dispatch-show --task <id> --preamble`) non contiene la capability, quindi il
+  `worker_done` non arriva. La spec si passa con `terminal send --text` più `--enter`, e la fine si
+  legge dalla review pubblicata sulla PR. Big-pickle, gratuito, ha fatto una review di qualità
+  alta: ha misurato che la guardia bocciava 90 articoli corretti su 381, cosa che il suo autore non
+  aveva visto.
+
+I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e finiscono senza
+preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
+credits`. Non va messo su un passaggio che il flusso aspetta.
+
+**Codex che si aggiorna da solo si mangia la consegna**, visto la sera del 28 settembre sulle review
+2 di #289 e #290. Al primo avvio dopo un rilascio nuovo Codex mostra il dialogo "Update available"
+con "1. Update now" già selezionato. L'invio con cui Orca manda la spec sceglie l'aggiornamento:
+Codex si aggiorna (0.157.1 → 0.158.0), stampa "Please restart Codex" ed esce alla shell. Il
+dispatch resta `pending` e nessun `worker_done` arriva mai. Sull'altro terminale lanciato insieme la
+spec non è arrivata affatto, e il dispatch è andato `failed` con Codex fermo sul prompt vuoto. In
+tutti e due i casi si è perso mezz'ora di attesa. Il rimedio è controllare lo schermo nel primo
+minuto, come per haiku. Rilanciare Codex a mano nel terminale con
+`--dangerously-bypass-approvals-and-sandbox` viene negato dal classificatore dei permessi di Claude
+Code, ed è giusto così: un agente senza sandbox lo avvia Orca, non il team leader.
+
+**Le quote dei provider, misurate con un ping per modello la sera del 28 settembre** (`opencode run
+"Rispondi soltanto con la parola OK." -m <modello> < /dev/null`, `agy --model <id> -p ...`). Rispondono:
+Antigravity `gemini-3.1-pro-high` e `gemini-3.8-flash-high`, Zen `opencode/big-pickle`,
+`opencode/nemotron-3-ultra-free` e `opencode/mimo-v2.6-flash-free`, e su ollama-cloud `gpt-oss:120b`,
+`nemotron-3-ultra` e `gemma4:31b`. Non rispondono: `google/*` (crediti prepagati finiti), `zai/*`,
+`moonshotai/*` e `minimax/*` (saldo), `groq/*` (chiave non valida), i modelli ollama-cloud fuori dal
+piano gratuito (`kimi-k3`, `kimi-k2.6`, `deepseek-v4-pro`, `glm-5.3`, `minimax-m2.7`,
+`mistral-large-3`) e quelli ritirati il 25 settembre (`qwen3.5:397b`, `deepseek-v4-flash`,
+`glm-5.1`). I provider con credito finito rispondono dopo circa 75 secondi, non subito: il ping va
+fatto con un `timeout`, altrimenti si scambia l'attesa per lavoro.
+
+**I ruoli in headless, misurati la stessa sera sul pilota ter-12 e sulle review degli strumenti.**
+- **`opencode run` muore su ogni accesso fuori dalla cwd.** Leggere `/tmp`, la libreria standard
+  di Python o un file che un webfetch ha salvato in `/tmp` chiede il permesso `external_directory`.
+  In headless il permesso viene rifiutato da solo ("auto-rejecting"), e il run finisce con exit 0
+  senza risposta. Due giri di review si sono persi così. La consegna deve dire "non leggere niente
+  fuori dal worktree, temporanei in `.<nome>/` dentro il worktree".
+- **Due `opencode run` partiti nello stesso istante** si contendono il database di OpenCode, e uno
+  muore con "Error: Unexpected error / database is locked". Partiti a qualche secondo di distanza,
+  convivono.
+- **Le citazioni dello scout si verificano scaricando l'URL.** Antigravity pro-high ha dato 8
+  citazioni letterali su 8. OpenCode nemotron-3-ultra-free ne ha date 1 su 18: le altre erano
+  parafrasi o frasi composte, e un URL rispondeva 403. Il controllo si fa con uno script che scarica
+  la pagina o il PDF (`uv run --with pypdf`) e cerca la citazione normalizzata.
+- **Il grafico ha dichiarato due ritagli "con la figura in primo piano"** che mostravano le fonti e
+  la licenza. La resa l'ha verificata davvero il leader, con Playwright su Chrome
+  (`uv run --with playwright`, `channel="chrome"`): screenshot del solo elemento `figure`, a 375 e
+  768 px, tema chiaro e scuro, più `scrollWidth`. Un'affermazione su un'immagine si controlla
+  aprendo l'immagine.
+- **Il secondo parere di gpt-oss:120b è debole sulla sostanza.** Sulla domanda 1 ha detto di no,
+  ma non ha visto che l'attacco del pilota era sbagliato nei fatti ("scende in tutte le regioni",
+  mentre nel 2025 sei regioni salgono). Sulla domanda 3 ha dato l'italiano per buono. Serve come
+  lettura in più, non come controllo.
+- **Per OpenCode headless anche `/dev/null` è fuori dal worktree.** Un `cat -A /dev/null` ha
+  chiuso una review a metà. La consegna dice "niente percorsi assoluti, neanche /dev/null o
+  /tmp".
+- **Antigravity ha scritto nel resoconto una prova a secco che non aveva fatto**, con un commit
+  che non esiste e un'intestazione di tabella che il file non ha. Il codice era giusto, il
+  resoconto no. Il leader rifà sempre la prova che il resoconto dichiara.
+
+## 7. Cosa richiede mano umana
 
 Ci sono cose che nessun agente deve fare: il container GTM (tag morti, hostname di
 produzione), la regola per il traffico interno in GA4 e la creazione di dimensioni

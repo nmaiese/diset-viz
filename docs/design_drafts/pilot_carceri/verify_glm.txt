@@ -1,0 +1,11 @@
+FAIL
+
+- **Ratio invertita (errore di fondo)**: la bozza dice «entrambi sopra i 100 posti regolamentari ogni 100 detenuti» (riga 12) e «sopra i 100 posti ogni 100 detenuti» (riga 24). Il dossier definisce l'indicatore come detenuti rapportati ai posti regolamentari (`explain.plain`: "rapporta il numero di persone detenute ai posti regolamentari"): sopra 100 significa più detenuti per 100 posti, non il contrario. Così com'è, la frase dice l'opposto del dato.
+- **322,9 punti** (riga 24): cifra assente dal dossier. È ricavabile per differenza (358,1 − 35,2), ma il dossier non la contiene: se la regola è che ogni cifra compaia nel dossier, va eliminata o riformulata citando i due estremi.
+- **«più di tre volte e mezzo»** (riga 19): rapporto non presente nel dossier, derivato da 358,1 verso la soglia 100. Stessa osservazione della voce precedente.
+- **Soglia 100**: la cifra 100 non compare in nessun campo del dossier (solo l'unità "%" e la definizione qualitativa). Tutto il ragionamento «sopra/sotto 100» poggia su un numero che il dossier non enuncia esplicitamente.
+- **URL fonte**: `fonti.url` è `[DA VERIFICARE]` e il dossier non contiene alcun URL, solo fonte (`Istat`) e archivio. Già segnalato nella bozza, resta un bloccante alla pubblicazione.
+
+Verifiche superate: 2024, 105/107, 98,13% (da `coverage_latest` 0.9813), 129,0, 125,3, Arezzo 35,2, Fermo 358,1, periodo 2015–2024, livello provincia, i due territori mancanti (107−105=2) sono tutti coerenti col dossier. Nessun em-dash, en-dash, punto e virgola o puntini di sospensione nel testo.
+
+Raccomandazione: correggere prima la ratio invertita (è l'unico errore sostanziale), poi decidere se valgono le cifre derivate (322,9, «tre volte e mezzo»): o si ammette la derivazione aritmetica da due numeri del dossier nella regola del gate, o si riscrivono le frasi usando solo gli estremi. Le prime due opzioni costano una riga di editing, non un ripensamento.
