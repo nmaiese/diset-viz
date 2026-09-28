@@ -8,18 +8,21 @@
 /* ---------- testata: titolo, ricerca e mappa ---------- */
 .home-top { background: var(--surface-1); padding-top: 0; }
 .home-head { padding-block: var(--space-section); }
-/* Da 768 c'e' gia' spazio per testo, ricerca e spotlight a sinistra e mappa a
-   destra. I gradini successivi mantengono le proporzioni desktop. */
+/* Da 768 titolo, frase e ricerca a sinistra, la mappa a destra. Le due
+   righe elastiche sopra e sotto tengono il testo al centro dell'altezza
+   della mappa: senza la scheda dell'indicatore a caso, allineato in alto
+   lasciava mezza colonna vuota. */
 @media (min-width: 768px) {
-  /* Le righe della colonna sinistra contengono titolo, frase, ricerca e spotlight dell'indicatore.
-     Sul tablet la colonna di testo resta appena piu' larga per non spezzare il titolo. */
-  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-block: var(--space-section); }
+  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); grid-template-rows: 1fr auto auto auto 1fr; column-gap: var(--space-8); padding-block: var(--space-12); }
   .home-head > * { grid-column: 1; }
-  .home-head > .home-map { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
+  .home-head > h1 { grid-row: 2; }
+  .home-head > .answer { grid-row: 3; }
+  .home-head > .home-find { grid-row: 4; }
+  .home-head > .home-map { grid-column: 2; grid-row: 1 / -1; align-self: center; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
 @media (min-width: 960px) {
-  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); padding-top: var(--space-section); }
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); }
 }
 @media (min-width: 1200px) {
   /* Da 1200 la mappa prende i sette dodicesimi. */
@@ -62,8 +65,9 @@
   .home-map-values > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   .home-map-values > p { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-block: var(--space-3); }
   .home-map-values__list { display: grid; gap: 0; padding: 0; margin: 0; list-style: none; }
-  .home-map-values__list li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); border-top: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
-  .home-map-values__list a { color: var(--ink); }
+  .home-map-values__list li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); border-top: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+  /* Il link e' il bersaglio: alto quanto un dito (44), non quanto la riga di testo. */
+  .home-map-values__list a { display: flex; align-items: center; flex: 1; min-height: var(--target); color: var(--ink); }
   .home-map-values__list data { color: var(--text-2); white-space: nowrap; }
 }
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }

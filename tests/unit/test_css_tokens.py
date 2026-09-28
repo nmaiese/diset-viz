@@ -43,7 +43,7 @@ FOGLI_TIPOGRAFIA = (
     COMPONENTS,
     CHROME,
     INDICATOR,
-    *(foglio for foglio in sorted(PAGINE.glob("*.css")) if foglio.name != "home.css"),
+    *sorted(PAGINE.glob("*.css")),
 )
 ECCEZIONI_TAGLIA = {
     ("chrome.css", ".sitechrome .brandword"): "wordmark con misura ottica propria del logo",
