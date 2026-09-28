@@ -32,6 +32,11 @@ e lo scrivi nel `worker_done` con i due SHA.
 
 ## Poi la guardia
 
+La guardia (`scripts/editoriale/guardia.py`) arriva con la PR #290, impilata sopra
+questa. Il revisore di una scheda gira sempre su un ramo che la contiene: se
+`bin/py -m scripts.editoriale.guardia --help` risponde "No module named", il
+ramo è sbagliato, e lo scrivi nel `worker_done` senza rivedere.
+
 ```bash
 DIVARIO_PYTHON=... bin/py -m scripts.editoriale.guardia <chiave> --dossier lavoro/<chiave>/dossier.json
 ```
