@@ -3,15 +3,13 @@
 Ogni PR riceve gli stessi passaggi, nello stesso ordine, con i finding
 ordinati per gravità. Chi li esegue (un agente di review o una persona)
 riporta solo finding, non riscrive. Nello legge i finding e giudica intento
-e rischio: il merge resta suo (Gate B). Le PR che toccano `content/` passano
-tutti e tre i passaggi; le PR di codice il primo solo se toccano anche loro
-`content/`.
+e rischio: il merge resta suo (Gate B). Tutte le PR passano i passaggi 2 e 3.
+Le PR che toccano `content/` passano anche il passaggio 1.
 
 ## Passaggio 1 — Cifre e fonti (blocca)
 
 - Ogni numero nel testo esiste nel dossier dell'indicatore. Oggi non c'è un
-  comando automatico che lo verifichi: una guardia è in lavorazione, descritta
-  in `docs/design_drafts/team/PIANO.md`. Una cifra senza anno, un
+  comando automatico che lo verifichi. Una cifra senza anno, un
   trend nella direzione sbagliata, un confronto fra livelli diversi
   (regione contro provincia) sono `alta`.
 - Ogni fonte esterna ha URL che risponde, data, e dice davvero ciò che il
@@ -19,19 +17,17 @@ tutti e tre i passaggi; le PR di codice il primo solo se toccano anche loro
   data è `media`.
 - Percezione presentata come fatto, parenti di tema descritti in blocco
   (#203): `alta`.
-- I conteggi ("N regioni salgono", "nessuna supera X", "solo tre") **li
-  ricalcola una guardia** dal 18 settembre 2026, e una smentita ferma il pezzo
-  prima che tu lo legga. Qui resta da guardare quello che la guardia non vede:
-  un conteggio su un insieme che il dossier non conosce, o su un sottoinsieme
-  che la frase non nomina.
+- I conteggi ("N regioni salgono", "nessuna supera X", "solo tre") oggi
+  richiedono verifica umana contro il dossier: nessuno strumento li
+  ricalcola. Qui vanno guardati un conteggio su un insieme che il dossier
+  non conosce, o su un sottoinsieme che la frase non nomina.
 
 ## Passaggio 2 — Regole editoriali (blocca sui pavimenti)
 
-- `content/STYLE.md`, e le quattro guardie di `motore verifica`: una cifra che
-  non sta nel dossier, un link interno che non esiste, una fonte che non
-  risponde, un link a una fonte nella prosa che non sta anche nell'elenco. Sono
-  `alta` e fermano il pezzo prima della review. Due smentite ricalcolabili non
-  le controlla nessuna guardia, e quindi le guarda la review, sempre `alta`:
+- `content/STYLE.md`: una cifra che non sta nel dossier, un link interno che
+  non esiste, una fonte che non risponde, un link a una fonte nella prosa che
+  non sta anche nell'elenco. Sono `alta`. Oggi non c'è uno strumento che li
+  intercetti prima della review, quindi li guarda la review, sempre `alta`:
   un'affermazione su un insieme che la classifica smentisce ("nessuna regione
   supera X") e la media semplice delle regioni chiamata media nazionale. Non
   c'è una rubrica a punti.
@@ -72,8 +68,7 @@ tutti e tre i passaggi; le PR di codice il primo solo se toccano anche loro
 
 ## Chi esegue
 
-Oggi: Nello a mano, con i test del repository come primo filtro
-deterministico. Prossimo
+Oggi Nello esegue i tre passaggi a mano. Prossimo
 passo: lo stesso contratto eseguito da un agente su ogni PR (plugin
 `code-review` o `claude-code-action` in CI), così i tre passaggi sono
 identici per tutte le PR e la persona legge solo i finding.

@@ -12,7 +12,7 @@ produzione si e' spostata sulle pagine indicatore e il blog e' fermo.
 **Una cosa pero' vale per tutti e due, ed e' la sezione "Tecniche da
 giornalista" qui sotto**, che questo file possiede: erano le regole di
 costruzione migliori del progetto, in un file che nessun agent della redazione
-caricava. Adesso la skill `voce` ne porta la forma corta e rimanda qui.
+caricava.
 
 ## Regole tipografiche (vincolanti)
 
@@ -56,10 +56,9 @@ metriche del suo contatore: `mente` e `gerundite` possono salire su un testo pi�
 leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello.
 
 Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
-cambio da misurare su una run prima di tenerlo: oggi non esiste un agente che
-scriva pezzi del blog, la catena che aveva l'agent `narratore` è stata tolta
-insieme al resto l'8 agosto 2026 (commit `eb2c2f72`), quindi la domanda non si
-pone finché non ne nasce uno nuovo.
+cambio da misurare su una run prima di tenerlo: oggi questo repository non ha
+un agente che scriva pezzi del blog, quindi la domanda non si pone finché non
+ne nasce uno nuovo.
 
 ## Tono: scrivi come una persona
 
@@ -248,8 +247,7 @@ Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida ch
 una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
 pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge, e quello
 che ferma un pezzo oggi e' la rilettura umana: non esiste una verifica
-automatica del testo scritto a mano. Una guardia nuova e' in lavorazione,
-descritta in `docs/design_drafts/team/PIANO.md`. Per template, frontend e SVG testuali controlla
+automatica del testo scritto a mano. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I

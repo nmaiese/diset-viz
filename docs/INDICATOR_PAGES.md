@@ -288,10 +288,9 @@ province. Un'entrata dichiara il livello che descrive con il campo `level`, che
 vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
 pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
 Nessun test lo garantisce con un nome dedicato oggi: la logica del ripiego sta
-in `build_article` (`app/indicator_texts.py:318`), e i test che rendono ogni
-pagina (`tests/integration/test_app.py`,
-`tests/integration/test_indicator_view_pages.py`) la esercitano di passaggio,
-senza un'asserzione che la isoli.
+in `build_article` (`app/indicator_texts.py:318`), e il test che rende ogni
+pagina (`tests/integration/test_indicator_view_pages.py`) la esercita di
+passaggio, senza un'asserzione che la isoli.
 
 ## La forma libera: un articolo che non fa le quattro fermate
 
@@ -478,30 +477,28 @@ a ogni ricarico. Quel nome finisce nella prosa.
 
 ## Che cosa è verificato e che cosa no
 
-`tests/integration/test_indicator_texts.py` non esiste più: è stato tolto
-l'8 agosto 2026 insieme alla catena editoriale esterna (commit `eb2c2f72`).
-Oggi la struttura sopravvive per un'altra via: ruoli noti, sezione senza
-ruolo, marcatore di sezione nel corpo sono rifiutati al caricamento da
+Oggi la struttura sopravvive per una via sola: sezione senza ruolo e
+marcatore di sezione nel corpo sono rifiutati al caricamento da
 `scripts/indicator_store.py`, coperto da `tests/unit/test_indicator_store.py`.
-La sicurezza del testo generato (articoli mai senza articolo, fonti rese
-davvero in pagina, il FAQ coerente col suo JSON-LD) sta in
-`tests/integration/test_indicator_text.py`, al singolare.
+La sicurezza del testo generato sta in `tests/integration/test_indicator_text.py`,
+al singolare: l'articolo grammaticale non manca mai davanti a un termine
+generato, la fonte dell'indicatore 178 è visibile in pagina, e il blocco FAQ
+e il suo schema `FAQPage` sono entrambi assenti.
 
 Nessun test verifica oggi una cifra con decimale attribuita a una regione
 contro il dato dell'anno, una soglia asserita su un elenco di regioni, o la
-forma canonica di un link dentro la prosa di un indicatore: erano le guardie
-di `motore verifica`, andate via con la catena esterna. Servivano, e la prova
-è reale: una nota diceva che l'affollamento carcerario supera "ovunque" la
-capienza mentre tre regioni erano sotto, e un'altra metteva la Sardegna sopra
-il 78% di differenziata quando stava al 76,6%. Una guardia nuova per la prosa
-scritta a mano è in lavorazione, descritta in
-`docs/design_drafts/team/PIANO.md`. Un intero senza decimale non era comunque
-controllato, perché in questa prosa è quasi sempre un'approssimazione ("circa
-27%", "quasi 78%").
+forma canonica di un link dentro la prosa di un indicatore. Il buco è reale
+e ha già prodotto testo sbagliato pubblicato: una nota diceva che
+l'affollamento carcerario supera "ovunque" la capienza mentre tre regioni
+erano sotto, e un'altra metteva la Sardegna sopra il 78% di differenziata
+quando stava al 76,6%. Un intero senza decimale non era comunque controllato,
+perché in questa prosa è quasi sempre un'approssimazione ("circa 27%", "quasi
+78%").
 
-`tests/integration/test_indicator_view.py` copre i numeri: ogni aggregato di tutti i 621
-indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
-pagina viene resa per verificare che non ci siano 500.
+`tests/integration/test_indicator_view.py` copre i numeri: ogni aggregato di
+tutti gli indicatori della fixture è confrontato con una fixture estratta dal
+codice precedente, e ogni pagina viene resa per verificare che non ci siano
+500.
 
 Restano **fuori dai test**, e vanno rivisti a mano con l'obiettivo esplicito di
 smentire il testo, non soltanto di correggerne la forma.

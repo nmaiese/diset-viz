@@ -12,13 +12,13 @@ gratis da ripetere: niente em-dash `—`, niente en-dash `–`, niente `;`, nien
 numeri veri e verificabili, mai una fonte inventata. I link a un indicatore
 usano il percorso canonico (`/indicatore/<slug>/ter-105`), mai
 `/?indicator=...` né `/atlante?indicator=...` (`tests/integration/test_url_migration.py`
-fallisce su quelli). Il Markdown ha `smarty` spento apposta: `--` e `...`
+fallisce su quelli nei post del blog: le pagine indicatore non hanno oggi
+quella copertura). Il Markdown ha `smarty` spento apposta: `--` e `...`
 restano come sono, tenere pulito il sorgente.
 
 Un articolo non si misura con una rubrica a punti: quella è stata ritirata il
 4 settembre insieme al lint della prosa. Oggi non c'è una verifica automatica
-del testo scritto a mano; una guardia nuova è in lavorazione, descritta in
-`docs/design_drafts/team/PIANO.md`. Prima di pubblicare si controllano struttura, cifre, link interni,
+del testo scritto a mano. Prima di pubblicare si controllano struttura, cifre, link interni,
 fonti e marcatori di figura con i test locali e con una rilettura umana. Una
 media semplice delle regioni non è una media nazionale.
 
