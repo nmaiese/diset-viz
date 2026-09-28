@@ -268,6 +268,25 @@ Due guasti di Orca visti lo stesso giorno, durante la fase 1 del team editoriale
   branch:<ramo>` lo trovi, perché la registrazione in Orca arriva qualche secondo dopo quella in
   git. Riprovare subito non dà errore: crea un doppione con il suffisso `-2` (`rev-285-2-2`).
 
+**Antigravity e OpenCode come worker veri, misurati il 28 settembre sugli strumenti del team
+editoriale.** Nessuno dei due riceve la consegna da solo, ma tutti e due lavorano bene una volta
+sbloccati.
+- **Antigravity** (`--agent antigravity --model gemini-3.1-pro-high`, PR #291). Si sono ripresentati
+  identici i difetti 1 e 2: il dialogo di fiducia su un worktree nuovo, poi la spec incollata e non
+  inviata. Si sblocca con due `terminal send --enter`, e da lì lavora nel terminale Orca. Il
+  dispatch però è già `failed`, quindi il suo `worker_done` resta appeso: la fine si legge dallo
+  schermo (niente più "Generating") e dai file. Ha un'abitudine da sapere: lascia nella radice del
+  worktree i suoi script di lavoro (`patch_*.py`, `report.md`), anche quando la spec lo vieta. Il
+  team leader li toglie prima del `git add`, che va sempre fatto per percorsi espliciti. In
+  headless (`agy -p` con `< /dev/null`) ha fatto due riparazioni buone, con i test chiesti.
+- **OpenCode** (`--agent opencode`, modello dalla sua configurazione, oggi `opencode/big-pickle`,
+  PR #290 e #291). Il terminale parte vuoto e il dispatch resta `dispatched`. Il preambolo di Orca
+  (`orchestration dispatch-show --task <id> --preamble`) non contiene la capability, quindi il
+  `worker_done` non arriva. La spec si passa con `terminal send --text` più `--enter`, e la fine si
+  legge dalla review pubblicata sulla PR. Big-pickle, gratuito, ha fatto una review di qualità
+  alta: ha misurato che la guardia bocciava 90 articoli corretti su 381, cosa che il suo autore non
+  aveva visto.
+
 I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e finiscono senza
 preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
 credits`. Non va messo su un passaggio che il flusso aspetta.
