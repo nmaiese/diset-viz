@@ -19,8 +19,8 @@ Le PR che toccano `content/` passano anche il passaggio 1.
   (#203): `alta`.
 - I conteggi ("N regioni salgono", "nessuna supera X", "solo tre") oggi
   richiedono verifica umana contro il dossier: nessuno strumento li
-  ricalcola. Qui vanno guardati un conteggio su un insieme che il dossier
-  non conosce, o su un sottoinsieme che la frase non nomina.
+  ricalcola. La review controlla anche i conteggi su insiemi che il dossier
+  non conosce e su sottoinsiemi che la frase non nomina.
 
 ## Passaggio 2 — Regole editoriali (blocca sui pavimenti)
 

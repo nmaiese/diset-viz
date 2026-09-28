@@ -287,10 +287,9 @@ lead che nominava l'Umbria e dava la media delle regioni sopra un cruscotto di
 province. Un'entrata dichiara il livello che descrive con il campo `level`, che
 vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
 pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
-Nessun test lo garantisce con un nome dedicato oggi: la logica del ripiego sta
-in `build_article` (`app/indicator_texts.py:318`), e il test che rende ogni
-pagina (`tests/integration/test_indicator_view_pages.py`) la esercita di
-passaggio, senza un'asserzione che la isoli.
+Nessun test lo garantisce con un nome dedicato oggi. La logica del ripiego sta
+in `build_article` (`app/indicator_texts.py:318`). `tests/integration/test_indicator_view_pages.py`
+la esegue incidentalmente, senza un'asserzione dedicata.
 
 ## La forma libera: un articolo che non fa le quattro fermate
 
@@ -478,7 +477,7 @@ a ogni ricarico. Quel nome finisce nella prosa.
 ## Che cosa è verificato e che cosa no
 
 Oggi la struttura sopravvive per una via sola: sezione senza ruolo e
-marcatore di sezione nel corpo sono rifiutati al caricamento da
+marcatore di sezione nel corpo sono rifiutati durante la serializzazione da
 `scripts/indicator_store.py`, coperto da `tests/unit/test_indicator_store.py`.
 La sicurezza del testo generato sta in `tests/integration/test_indicator_text.py`,
 al singolare: l'articolo grammaticale non manca mai davanti a un termine
@@ -495,10 +494,9 @@ quando stava al 76,6%. Un intero senza decimale non era comunque controllato,
 perché in questa prosa è quasi sempre un'approssimazione ("circa 27%", "quasi
 78%").
 
-`tests/integration/test_indicator_view.py` copre i numeri: ogni aggregato di
-tutti gli indicatori della fixture è confrontato con una fixture estratta dal
-codice precedente, e ogni pagina viene resa per verificare che non ci siano
-500.
+`tests/integration/test_indicator_view.py` confronta gli aggregati elencati dal
+test con la fixture, salvo le eccezioni dichiarate. `tests/integration/test_indicator_view_pages.py`
+rende le pagine e verifica le risposte 200.
 
 Restano **fuori dai test**, e vanno rivisti a mano con l'obiettivo esplicito di
 smentire il testo, non soltanto di correggerne la forma.

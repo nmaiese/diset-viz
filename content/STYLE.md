@@ -245,9 +245,9 @@ python3 scripts/prose_lint.py --show <id>   # solo pagine indicatore
 
 Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida che
 una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
-pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge, e quello
-che ferma un pezzo oggi e' la rilettura umana: non esiste una verifica
-automatica del testo scritto a mano. Per template, frontend e SVG testuali controlla
+pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge. La
+rilettura umana resta il controllo decisivo: oggi non c'e' una verifica
+automatica completa di cifre, soglie e link nel testo scritto a mano. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I
