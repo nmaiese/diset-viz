@@ -84,7 +84,7 @@ def _print_failure(command: list[str], result: subprocess.CompletedProcess[str])
         print(result.stderr.strip(), file=sys.stderr)
 
 
-def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", scheda: str | None = None) -> str:
+def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", scheda: str | None = None, internal_key: str | None = None, url_code: str | None = None) -> str:
     task_file = worktree_path / "TASK.md"
     parts = []
 
@@ -111,7 +111,7 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
 
         if indicator_store:
             try:
-                file_name = indicator_store.filename_for(scheda)
+                file_name = indicator_store.filename_for(internal_key)
             except indicator_store.StoreError as exc:
                 raise ValueError(str(exc))
 
@@ -122,7 +122,7 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
             if old_result.returncode == 0:
                 try:
                     old_entry = indicator_store.analizza(old_result.stdout, f"origin/{base}")
-                    testo_prima = indicator_store.rendi(scheda, old_entry)
+                    testo_prima = indicator_store.rendi(internal_key, old_entry)
                 except indicator_store.StoreError as exc:
                     raise ValueError(str(exc))
                 except Exception:
@@ -131,9 +131,9 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
                 testo_prima = f"_Nessun testo precedente o file non trovato in origin/{base}_"
 
             try:
-                new_entry = indicator_store.read(scheda, root=worktree_path / "content" / "indicators")
+                new_entry = indicator_store.read(internal_key, root=worktree_path / "content" / "indicators")
                 if new_entry:
-                    testo_nuovo = indicator_store.rendi(scheda, new_entry)
+                    testo_nuovo = indicator_store.rendi(internal_key, new_entry)
                 else:
                     new_file = worktree_path / rel_path
                     if new_file.is_file():
@@ -152,7 +152,7 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
         parts.append(f"### Testo nuovo (`HEAD`)\n\n```markdown\n{testo_nuovo}\n```")
 
         # 4. Fonti nuove
-        fonti_file = worktree_path / "lavoro" / scheda / "fonti.md"
+        fonti_file = worktree_path / "lavoro" / url_code / "fonti.md"
         if fonti_file.is_file():
             fonti = fonti_file.read_text(encoding="utf-8").strip()
             parts.append(f"### Fonti nuove\n\n```markdown\n{fonti}\n```")
@@ -178,9 +178,23 @@ def _dry_run_identity(slug: str) -> tuple[Path, str]:
 
 def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, base: str = "master", labels: list[str] | None = None, scheda: str | None = None) -> int:
     """Verifica il worktree, pubblica il ramo e crea una draft PR."""
+    internal_key = None
+    url_code = None
+
     if scheda is not None:
         if not re.fullmatch(r"^[A-Za-z0-9_:-]+$", scheda):
             print(f"[!] Chiave scheda non valida: {scheda!r}", file=sys.stderr)
+            return 1
+
+        sys.path.insert(0, str(PROJECT_ROOT))
+        try:
+            from scripts.editoriale import brief
+            from app import sources
+            family, raw_id = brief.resolve(scheda)
+            internal_key = sources.internal_id(family, raw_id)
+            url_code = sources.indicator_code(family, raw_id)
+        except Exception as exc:
+            print(f"[!] {exc}", file=sys.stderr)
             return 1
 
     if issue_id is None:
@@ -198,7 +212,7 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, ba
             return 1
 
     try:
-        body = _task_body(worktree_path, issue_id, base=base, scheda=scheda)
+        body = _task_body(worktree_path, issue_id, base=base, scheda=scheda, internal_key=internal_key, url_code=url_code)
     except ValueError as exc:
         print(f"[!] {exc}", file=sys.stderr)
         return 1
