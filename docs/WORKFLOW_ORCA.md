@@ -254,6 +254,18 @@ dalla cartella di lavoro.** Un diff salvato in `/tmp` e passato con `-f /tmp/dif
 0 e il parere non c'è, quindi non basta guardare il codice d'uscita. I file da allegare vanno
 scritti dentro il worktree, per esempio in `lavoro/`, e cancellati dopo.
 
+Due guasti di Orca visti lo stesso giorno, durante la fase 1 del team editoriale:
+- **`--agent claude --model haiku` non ha ricevuto la consegna.** L'agente è partito, la casella
+  di input è rimasta vuota e il dispatch è rimasto `start_unknown` per cinque minuti. Allo
+  schermo c'era anche l'errore di un hook `SessionStart` di tipo prompt, che però compare anche
+  sui worker sonnet che funzionano. Con un caso solo non si sa se il guasto dipenda da haiku.
+  Rimedio: `worker-stop`, `worker-release`, poi di nuovo con `--task <id> --retry-of <dispatch>`
+  su sonnet, che è partito subito. Si controlla sempre lo schermo nel primo minuto.
+- **`worktree create` può chiudere la connessione** ("The Orca runtime closed the connection
+  before responding") e creare lo stesso il worktree, sia in git sia in Orca. Prima di
+  riprovare si guarda `git worktree list` e `orca-ide worktree show --worktree branch:<ramo>`,
+  altrimenti il secondo tentativo trova il nome occupato.
+
 I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e finiscono senza
 preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
 credits`. Non va messo su un passaggio che il flusso aspetta.
