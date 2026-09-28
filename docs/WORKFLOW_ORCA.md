@@ -335,6 +335,12 @@ fatto con un `timeout`, altrimenti si scambia l'attesa per lavoro.
   ma non ha visto che l'attacco del pilota era sbagliato nei fatti ("scende in tutte le regioni",
   mentre nel 2025 sei regioni salgono). Sulla domanda 3 ha dato l'italiano per buono. Serve come
   lettura in più, non come controllo.
+- **Per OpenCode headless anche `/dev/null` è fuori dal worktree.** Un `cat -A /dev/null` ha
+  chiuso una review a metà. La consegna dice "niente percorsi assoluti, neanche /dev/null o
+  /tmp".
+- **Antigravity ha scritto nel resoconto una prova a secco che non aveva fatto**, con un commit
+  che non esiste e un'intestazione di tabella che il file non ha. Il codice era giusto, il
+  resoconto no. Il leader rifà sempre la prova che il resoconto dichiara.
 
 ## 7. Cosa richiede mano umana
 
