@@ -302,7 +302,7 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
             fonti_dir = path / "lavoro" / "indicatore_1"
             fonti_dir.mkdir(parents=True)
             (fonti_dir / "fonti.md").write_text("Fonte: ISTAT\n", encoding="utf-8")
-            
+
             def mock_run(command, cwd=None, **kwargs):
                 if command[0:2] == ["git", "rev-parse"]:
                     return completed(stdout="abc123def\n")
@@ -333,7 +333,7 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
             redirect_stdout(output)
         ):
             code = orca_review.run_review("finto", issue_id=42, dry_run=True, base="develop", labels=["run:team"])
-        
+
         self.assertEqual(code, 0)
         out = output.getvalue()
         self.assertIn("gh pr create", out)
@@ -342,4 +342,3 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
