@@ -194,20 +194,42 @@ orca-ide worktree set --worktree active --comment "Implementati i test; in attes
 - **Niente deploy.**
 - **Niente `Co-Authored-By`** nei messaggi di commit.
 
-## 6. Antigravity in orchestrazione, misurato il 28 settembre 2026
+## 6. Antigravity in orchestrazione, misurato e diagnosticato il 28 settembre 2026
 
-`worker-start --agent antigravity` fallisce **2 tentativi su 2** con
-`lastError: agent_prompt_blocked`, `failedStage: dispatch_input`, sia passando
-`--model gemini-3.1-pro-high` sia senza `--model`: il difetto non dipende dal modello.
-Codex e Claude, stesso worktree, stessa spec su una riga, hanno funzionato al primo colpo.
-Ogni tentativo fallito lascia un terminale residuo: si chiude con
-`orca orchestration worker-release --dispatch <id>`, non si rilancia una terza volta sulla
-stessa via.
+Prima diagnosi (sbagliata, corretta qui): `worker-start --agent antigravity` sembrava fallire
+sempre con `agent_prompt_blocked`, indipendente dal modello. Non è il modello. Letto lo schermo
+del terminale con `orca terminal read --terminal <handle> --screen --json` **prima** di rilasciarlo
+(non dopo: il rilascio chiude il terminale e la prova sparisce), la causa reale è una catena di tre
+problemi distinti, tutti aggirabili:
 
-Il ripiego che ha funzionato è l'headless fuori orchestrazione, come `~/dev/dev-tools/docs/orca.md`
-già indicava per Antigravity e Grok: `agy --model <id> --dangerously-skip-permissions -p "<prompt>"`.
-Ha fatto ricerca web reale (fonti verificabili nell'output) e prodotto un'analisi di 700+ parole in
-un turno, senza toccare file: l'output va salvato da chi coordina, l'headless non scrive nel repo.
+1. **Il dialogo di primo avvio non e' testuale.** La prima volta che Antigravity CLI gira in un
+   worktree chiede "Do you trust the contents of this project?" con un menu a frecce
+   (`> Yes, I trust this folder` / `No, exit`). L'iniezione del prompt di Orca manda testo, il menu
+   lo scarta, e il turno fallisce con `agent_prompt_blocked` prima ancora di vedere la spec. Si
+   sblocca con un solo invio: `orca terminal send --terminal <handle> --enter --json`. Spiega perché
+   a Nello era già andata bene altrove: quel worktree aveva già superato il dialogo.
+2. **Anche a fiducia concessa, l'invio automatico non conferma la sottomissione.** Un secondo
+   `worker-start --terminal <handle-ora-fidato>` incolla la spec nella casella di input
+   ("`[Pasted text #1 +82 lines]`"), ma il turno non parte da solo: serve un altro
+   `orca terminal send --terminal <handle> --enter --json` per premere davvero Invio. Senza
+   quel secondo invio manuale il dispatch fallisce di nuovo con lo stesso `agent_prompt_blocked`,
+   e la capability di quel dispatch viene revocata nello stesso istante: anche riuscendo a far
+   partire il turno dopo, il canale per mandare `worker_done` è già morto.
+3. **`orca-ide` non è sul `PATH` del sotto-processo Bash di Antigravity.** Il worker lo scopre da
+   solo (`which orca-ide` fallisce, poi `find /`, poi `export PATH=$HOME/.local/bin:$PATH`) e alla
+   fine lo richiama per percorso assoluto: funziona, ma consuma turni. Anche cosi', l'ultimo
+   `orca-ide orchestration send --type worker_done` e' rimasto a `running` senza mai consegnare
+   il messaggio (capability già revocata al punto 2), e il worker ha scritto in chiaro "notificato
+   il coordinatore" senza aver verificato l'esito del comando: non fidarsi della narrazione di un
+   worker sul proprio `worker_done`, il canale autorevole è `orca orchestration check`.
+
+In sintesi: **antigravity funziona in orchestrazione**, ma non al primo avvio di un worktree nuovo
+e non senza un intervento manuale per far ripartire la sottomissione dopo il trust dialog. Finché
+questi tre punti non sono risolti lato Orca, il ripiego pulito resta l'headless fuori
+orchestrazione, come `~/dev/dev-tools/docs/orca.md` già indicava: `agy --model <id>
+--dangerously-skip-permissions -p "<prompt>"`. Ha fatto ricerca web reale (fonti verificabili
+nell'output) e prodotto un'analisi di 700+ parole in un turno, senza toccare file: l'output va
+salvato da chi coordina, l'headless non scrive nel repo.
 
 Un gotcha separato su `opencode run`: il messaggio posizionale deve stare **prima** dei flag `-f`,
 altrimenti il parser tratta il testo del prompt come un nome di file e fallisce con
