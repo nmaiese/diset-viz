@@ -194,7 +194,26 @@ orca-ide worktree set --worktree active --comment "Implementati i test; in attes
 - **Niente deploy.**
 - **Niente `Co-Authored-By`** nei messaggi di commit.
 
-## 6. Cosa richiede mano umana
+## 6. Antigravity in orchestrazione, misurato il 28 settembre 2026
+
+`worker-start --agent antigravity` fallisce **2 tentativi su 2** con
+`lastError: agent_prompt_blocked`, `failedStage: dispatch_input`, sia passando
+`--model gemini-3.1-pro-high` sia senza `--model`: il difetto non dipende dal modello.
+Codex e Claude, stesso worktree, stessa spec su una riga, hanno funzionato al primo colpo.
+Ogni tentativo fallito lascia un terminale residuo: si chiude con
+`orca orchestration worker-release --dispatch <id>`, non si rilancia una terza volta sulla
+stessa via.
+
+Il ripiego che ha funzionato è l'headless fuori orchestrazione, come `~/dev/dev-tools/docs/orca.md`
+già indicava per Antigravity e Grok: `agy --model <id> --dangerously-skip-permissions -p "<prompt>"`.
+Ha fatto ricerca web reale (fonti verificabili nell'output) e prodotto un'analisi di 700+ parole in
+un turno, senza toccare file: l'output va salvato da chi coordina, l'headless non scrive nel repo.
+
+Un gotcha separato su `opencode run`: il messaggio posizionale deve stare **prima** dei flag `-f`,
+altrimenti il parser tratta il testo del prompt come un nome di file e fallisce con
+`File not found: <tutto il prompt>`.
+
+## 7. Cosa richiede mano umana
 
 Ci sono cose che nessun agente deve fare: il container GTM (tag morti, hostname di
 produzione), la regola per il traffico interno in GA4 e la creazione di dimensioni
