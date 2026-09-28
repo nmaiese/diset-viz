@@ -132,11 +132,20 @@ class Figures(unittest.TestCase):
         defects = guardia.check_article("9999999", article, dossier={"a": {"valore": 99.8, "testo": "99,8"}})
         cifre = [d for d in defects if d.check == "cifre"]
         self.assertEqual(len(cifre), 1)
+        self.assertIn("'99.8'", cifre[0].message)
 
         article = entry([{"role": "quadro", "h": "T", "body": "il valore e' 99.5%"}])
         defects = guardia.check_article("9999999", article, dossier={"a": {"valore": 99.5, "testo": "99.5"}})
         cifre = [d for d in defects if d.check == "cifre"]
         self.assertEqual(len(cifre), 1)
+        self.assertIn("'99.5'", cifre[0].message)
+
+    def test_decimale_inglese_con_dossier_diverso_e_difetto(self):
+        article = entry([{"role": "quadro", "h": "T", "body": "Il tasso e' 9.8 per mille."}])
+        defects = guardia.check_article("9999999", article, dossier={"a": {"valore": 9.4, "testo": "9,4"}})
+        cifre = [d for d in defects if d.check == "cifre"]
+        self.assertEqual(len(cifre), 1)
+        self.assertIn("'9.8'", cifre[0].message)
 
     def test_cifra_col_segno_sbagliato_e_bloccante(self):
         article = entry([{
@@ -261,11 +270,12 @@ class RealArticlesWithDossier(unittest.TestCase):
                 )
                 cifre = [d.quote for d in defects if d.check == "cifre"]
 
+                expected = []
                 if code == "ter-12":
                     # riscritto dal pilota del team (#293): le cifre vengono dal dossier e da lavoro/ter-12/fonti.md
                     expected = []
                 elif code == "ter-17":
-                    # 0,2: lo scarto calcolato dallo scrittore
+                    # 0,2: la variazione dell'ultimo anno di due territori
                     expected = ["...uli-Venezia Giulia e l'Umbria 0,2, e di un soffio la Valle d'Ao..."]
                 elif code == "ter-167":
                     # 5,4 e 8,6: ripartizioni a due livelli non previste nel sito
@@ -274,12 +284,27 @@ class RealArticlesWithDossier(unittest.TestCase):
                         "..., dal 5,4% del Nord-ovest all'8,6% del Centro. Sono variazioni...",
                     ]
                 elif code == "ter-901":
-                    # 9.603: media parziale calcolata dallo scrittore
+                    # 9.603: la variazione della media delle venti regioni fra due anni
                     expected = ["...dia delle regioni è salita di 9.603 euro per abitante. Sono euro..."]
 
                 self.assertEqual(cifre, expected, f"{code} ha difetti imprevisti sulle cifre")
 
+    def test_ter_902_arrotondamento_dossier_vero(self):
+        from scripts.editoriale import brief
+        from app import sources
+        dossier = brief.build("ter-902")
+        family, raw_id = brief.resolve("ter-902")
+        internal_key = sources.internal_id(family, raw_id)
 
+        # "va dai 16.800 euro della Calabria" è verde
+        article_ok = entry([{"role": "quadro", "h": "T", "body": "va dai 16.800 euro della Calabria"}])
+        defects_ok = guardia.check_article(internal_key, article_ok, dossier=dossier)
+        self.assertEqual(len([d for d in defects_ok if d.check == "cifre"]), 0)
+
+        # "va dai 16.900 euro della Calabria" è un difetto
+        article_err = entry([{"role": "quadro", "h": "T", "body": "va dai 16.900 euro della Calabria"}])
+        defects_err = guardia.check_article(internal_key, article_err, dossier=dossier)
+        self.assertEqual(len([d for d in defects_err if d.check == "cifre"]), 1)
 
 class Cli(unittest.TestCase):
     def test_verde_su_ter_12(self):

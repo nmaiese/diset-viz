@@ -319,7 +319,7 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
                 mock.patch("scripts.indicator_store.read", return_value={"nuovo": "si"}, create=True),
                 mock.patch("scripts.indicator_store.rendi", side_effect=lambda k, entry: "Reso vecchio" if "vecchio" in entry else "Reso nuovo", create=True),
             ):
-                body = orca_review._task_body(path, 42, base="develop", scheda="indicatore_1")
+                body = orca_review._task_body(path, 42, base="develop", scheda="indicatore_1", internal_key="indicatore_1", url_code="indicatore_1")
 
             self.assertIn("**Commit**: abc123def", body)
             self.assertIn("Testo della issue", body)
@@ -327,6 +327,53 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
             self.assertIn("Fonte: ISTAT", body)
             self.assertIn("Reso vecchio", body)
             self.assertIn("Reso nuovo", body)
+
+    def test_scheda_accetta_il_codice_url_e_la_chiave_interna(self):
+        """`--scheda` scrive i testi con la chiave interna e legge le fonti dal
+        codice dell'URL, quindi `ter-12` e `12` compongono lo stesso corpo."""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prova-2"
+            path.mkdir()
+            (path / "TASK.md").write_text("Testo della issue\n", encoding="utf-8")
+            fonti_dir = path / "lavoro" / "ter-12"
+            fonti_dir.mkdir(parents=True)
+            (fonti_dir / "fonti.md").write_text("Fonte: ISTAT\n", encoding="utf-8")
+
+            def mock_run(command, cwd=None, **kwargs):
+                if command[0:2] == ["git", "rev-parse"]:
+                    return completed(stdout="abc123def\n")
+                if command[0:2] == ["git", "show"]:
+                    return completed(stdout="Vecchio file")
+                return completed()
+
+            def mock_rendi(key, entry):
+                return f"Reso {key}: " + ("vecchio" if "vecchio" in entry else "nuovo")
+
+            corpi = {}
+            for scheda in ("ter-12", "12"):
+                output = io.StringIO()
+                with (
+                    mock.patch.object(orca_review, "_dry_run_identity", return_value=(path, "nmaiese/prova-2")),
+                    mock.patch.object(orca_review, "_run_capture", side_effect=mock_run),
+                    mock.patch("scripts.indicator_store.filename_for", return_value="12.yml", create=True),
+                    mock.patch("scripts.indicator_store.analizza", return_value={"vecchio": "si"}, create=True),
+                    mock.patch("scripts.indicator_store.read", return_value={"nuovo": "si"}, create=True),
+                    mock.patch("scripts.indicator_store.rendi", side_effect=mock_rendi, create=True),
+                    redirect_stdout(output),
+                ):
+                    code = orca_review.run_review("prova", issue_id=42, dry_run=True, scheda=scheda)
+                self.assertEqual(code, 0)
+                corpi[scheda] = output.getvalue().split("--- Corpo PR ---\n", 1)[1].rsplit("----------------", 1)[0]
+
+            self.assertEqual(corpi["ter-12"], corpi["12"])
+
+        corpo = corpi["ter-12"]
+        self.assertIn("### Testo precedente", corpo)
+        self.assertIn("Reso 12: vecchio", corpo)
+        self.assertIn("### Testo nuovo", corpo)
+        self.assertIn("Reso 12: nuovo", corpo)
+        self.assertIn("### Fonti nuove", corpo)
+        self.assertIn("Fonte: ISTAT", corpo)
 
     def test_dry_run_stampa_nuove_opzioni(self):
         output = io.StringIO()
@@ -401,6 +448,9 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
 
             with (
                 mock.patch.object(orca_review, "resolve_worktree", return_value=(path, "nmaiese/prova-2")),
+                mock.patch("scripts.editoriale.brief.resolve", return_value=("fam", "id"), create=True),
+                mock.patch("app.sources.internal_id", return_value="errata", create=True),
+                mock.patch("app.sources.indicator_code", return_value="errata", create=True),
                 mock.patch("scripts.indicator_store.filename_for", side_effect=DummyStoreError("Chiave errata"), create=True),
                 mock.patch("scripts.indicator_store.StoreError", DummyStoreError, create=True),
                 mock.patch("sys.stderr", new_callable=io.StringIO) as err
@@ -409,6 +459,19 @@ class ReviewNuoveOpzioniTest(unittest.TestCase):
 
             self.assertEqual(code, 1)
             self.assertIn("Chiave errata", err.getvalue())
+
+    def test_scheda_che_non_risolve_esce_uno_prima_del_worktree(self):
+        with (
+            mock.patch.object(orca_review, "resolve_worktree", return_value=(Path("/finto"), "nmaiese/finto")) as resolve,
+            mock.patch("sys.stderr", new_callable=io.StringIO) as err
+        ):
+            code = orca_review.run_review("finto", issue_id=42, scheda="ter-99999")
+
+        self.assertEqual(code, 1)
+        self.assertIn("[!]", err.getvalue())
+        self.assertIn("ter-99999", err.getvalue())
+        self.assertNotIn("Traceback", err.getvalue())
+        resolve.assert_not_called()
 
 
 if __name__ == "__main__":
