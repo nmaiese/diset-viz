@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shlex
 import subprocess
@@ -84,7 +85,14 @@ def _print_failure(command: list[str], result: subprocess.CompletedProcess[str])
         print(result.stderr.strip(), file=sys.stderr)
 
 
-def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", scheda: str | None = None, internal_key: str | None = None, url_code: str | None = None) -> str:
+def _firma(firma: str | None) -> str | None:
+    """La firma della riga in fondo al corpo: `--firma` vale più di `AGENT_ID`."""
+    if firma is not None:
+        return firma.strip() or None
+    return os.environ.get("AGENT_ID", "").strip() or None
+
+
+def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", scheda: str | None = None, internal_key: str | None = None, url_code: str | None = None, firma: str | None = None) -> str:
     task_file = worktree_path / "TASK.md"
     parts = []
 
@@ -165,7 +173,13 @@ def _task_body(worktree_path: Path, issue_id: int | None, base: str = "master", 
         if issue_id is not None:
             parts.append(f"Closes #{issue_id}")
 
-    return "\n\n".join(parts) or "Review del lavoro Orca completato."
+    body = "\n\n".join(parts) or "Review del lavoro Orca completato."
+
+    firma_risolta = _firma(firma)
+    if firma_risolta:
+        body = f"{body}\n\n— {firma_risolta}"
+
+    return body
 
 
 def _dry_run_identity(slug: str) -> tuple[Path, str]:
@@ -176,7 +190,7 @@ def _dry_run_identity(slug: str) -> tuple[Path, str]:
         return Path(f"<worktree:{slug}>"), "<ramo-del-worktree>"
 
 
-def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, base: str = "master", labels: list[str] | None = None, scheda: str | None = None) -> int:
+def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, base: str = "master", labels: list[str] | None = None, scheda: str | None = None, firma: str | None = None) -> int:
     """Verifica il worktree, pubblica il ramo e crea una draft PR."""
     internal_key = None
     url_code = None
@@ -212,7 +226,7 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, ba
             return 1
 
     try:
-        body = _task_body(worktree_path, issue_id, base=base, scheda=scheda, internal_key=internal_key, url_code=url_code)
+        body = _task_body(worktree_path, issue_id, base=base, scheda=scheda, internal_key=internal_key, url_code=url_code, firma=firma)
     except ValueError as exc:
         print(f"[!] {exc}", file=sys.stderr)
         return 1
@@ -220,7 +234,6 @@ def run_review(slug: str, issue_id: int | None = None, dry_run: bool = False, ba
     title = f"Risolve #{issue_id}: {slug}" if issue_id else slug
     push_cmd = ["git", "push", "-u", "origin", branch]
     import tempfile
-    import os
 
     if dry_run:
         body_path = "<corpo-della-pr>"
@@ -309,8 +322,9 @@ def main(argv=None) -> int:
     parser.add_argument("--base", default="master", help="Ramo base della PR")
     parser.add_argument("--label", action="append", help="Label da aggiungere alla PR (ripetibile)")
     parser.add_argument("--scheda", help="Chiave per comporre la scheda nel corpo della PR")
+    parser.add_argument("--firma", default=None, help="Agente da firmare in fondo al corpo della PR (prevale su AGENT_ID)")
     args = parser.parse_args(argv)
-    return run_review(slug=args.slug, issue_id=args.issue, dry_run=args.dry_run, base=args.base, labels=args.label, scheda=args.scheda)
+    return run_review(slug=args.slug, issue_id=args.issue, dry_run=args.dry_run, base=args.base, labels=args.label, scheda=args.scheda, firma=args.firma)
 
 
 if __name__ == "__main__":
