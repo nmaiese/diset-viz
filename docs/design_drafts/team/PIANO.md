@@ -121,7 +121,8 @@ Vincoli già misurati:
 - sotto il 30% la scheda non parte
 - tetto per scheda: scout 1 dispatch con 1 giro `agy`, scrittore 1 più 2
   riparazioni, grafico 1, revisore 3, ciascuno con 1 secondo parere
-- se il modello primario non c'è, si usa un ripiego solo e poi ci si ferma.
+- se il modello primario non c'è, si usa un ripiego solo e poi ci si ferma
+- **misura del 28 settembre**: tre review Codex gpt-5.6-sol medium sui documenti della fase 1 hanno consumato circa 27 punti della finestra di 5 ore, circa 9 a review. Un lavoro high di scrittura di codice ne consuma di più. La finestra si legge sullo schermo del worker Codex ("5h limit: N% left").
 
 ## Lo scout: un contratto con una tabella obbligatoria
 
