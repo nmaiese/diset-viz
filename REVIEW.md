@@ -3,15 +3,15 @@
 Ogni PR riceve gli stessi passaggi, nello stesso ordine, con i finding
 ordinati per gravità. Chi li esegue (un agente di review o una persona)
 riporta solo finding, non riscrive. Nello legge i finding e giudica intento
-e rischio: il merge resta suo (Gate B). Le PR `automation/*` (pezzi scritti
-dalla catena o dall'Agent Team) passano tutti e tre i passaggi; le PR di
-codice il primo solo se toccano `content/`.
+e rischio: il merge resta suo (Gate B). Le PR che toccano `content/` passano
+tutti e tre i passaggi; le PR di codice il primo solo se toccano anche loro
+`content/`.
 
 ## Passaggio 1 — Cifre e fonti (blocca)
 
-- Ogni numero nel testo esiste nel dossier dell'indicatore
-  (`motore verifica divarioitalia <codice> --bozza ...`, nel repo della
-  redazione). Una cifra senza anno, un
+- Ogni numero nel testo esiste nel dossier dell'indicatore. Oggi non c'è un
+  comando automatico che lo verifichi: una guardia è in lavorazione, descritta
+  in `docs/design_drafts/team/PIANO.md`. Una cifra senza anno, un
   trend nella direzione sbagliata, un confronto fra livelli diversi
   (regione contro provincia) sono `alta`.
 - Ogni fonte esterna ha URL che risponde, data, e dice davvero ciò che il
@@ -72,8 +72,8 @@ codice il primo solo se toccano `content/`.
 
 ## Chi esegue
 
-Oggi: Nello a mano, con `motore verifica` (nel repo della redazione) come primo
-filtro deterministico. Prossimo
+Oggi: Nello a mano, con i test del repository come primo filtro
+deterministico. Prossimo
 passo: lo stesso contratto eseguito da un agente su ogni PR (plugin
 `code-review` o `claude-code-action` in CI), così i tre passaggi sono
 identici per tutte le PR e la persona legge solo i finding.

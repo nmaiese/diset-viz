@@ -5,10 +5,9 @@ testi coerenti e a farli sembrare scritti da una persona, non da un bot. Vale si
 per chi scrive a mano sia per gli agenti AI che pubblicano in automatico.
 
 **Le pagine indicatore, `content/indicators/`, non si scrivono da qui.** Il loro
-contratto e' `REDAZIONE.md` del repo `nmaiese/redazione-ai`, e chi scrive carica
-la skill `voce`. Fino al 18 settembre 2026 questa riga diceva "ogni articolo", e
-non era vero da luglio: la produzione si e' spostata sulle pagine indicatore e il
-blog e' fermo.
+contratto e' [`docs/INDICATOR_PAGES.md`](../docs/INDICATOR_PAGES.md). Fino al 18
+settembre 2026 questa riga diceva "ogni articolo", e non era vero da luglio: la
+produzione si e' spostata sulle pagine indicatore e il blog e' fermo.
 
 **Una cosa pero' vale per tutti e due, ed e' la sezione "Tecniche da
 giornalista" qui sotto**, che questo file possiede: erano le regole di
@@ -57,10 +56,10 @@ metriche del suo contatore: `mente` e `gerundite` possono salire su un testo pi�
 leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello.
 
 Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
-cambio da misurare su una run prima di tenerlo: chi scrive è l'agent
-`narratore` del repo `nmaiese/redazione-ai` (l'agent `scrittore` è stato
-cancellato il 18 settembre 2026 insieme alla catena semplice), e finché la sua
-definizione non richiama la skill il comportamento non cambia.
+cambio da misurare su una run prima di tenerlo: oggi non esiste un agente che
+scriva pezzi del blog, la catena che aveva l'agent `narratore` è stata tolta
+insieme al resto l'8 agosto 2026 (commit `eb2c2f72`), quindi la domanda non si
+pone finché non ne nasce uno nuovo.
 
 ## Tono: scrivi come una persona
 
@@ -82,10 +81,9 @@ propria, e lo si tiene aperto. Non si mediano: otto registri mescolati fanno
 l'assenza di registro. Le sei mosse qui sotto dicono che cosa cercare in quel
 testo, non lo sostituiscono.
 
-**Questa sezione le possiede.** Chi scrive le pagine indicatore non legge questo
-file: carica la skill `voce` di `nmaiese/redazione-ai`, che ne porta tre in forma
-corta, quella che serve mentre si scrive, e rimanda qui per la versione lunga con
-gli esempi. Se una mossa cambia, cambia qui, e la skill segue.
+**Questa sezione le possiede.** Non esiste più una skill esterna `voce` che la
+sostituisca: chi scrive una pagina indicatore legge questo file, come chi
+scrive un post del blog. Se una mossa cambia, cambia qui.
 
 - **Rispondi a "e allora?".** Ogni pezzo fa un punto, non un inventario. Il
   lettore deve finire sapendo perché quei numeri contano, non solo che forma ha la
@@ -249,8 +247,9 @@ python3 scripts/prose_lint.py --show <id>   # solo pagine indicatore
 Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida che
 una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
 pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge, e quello
-che ferma un pezzo sono le quattro guardie di `motore verifica` nel repo
-della redazione, piu' i suoi controlli di struttura. Per template, frontend e SVG testuali controlla
+che ferma un pezzo oggi e' la rilettura umana: non esiste una verifica
+automatica del testo scritto a mano. Una guardia nuova e' in lavorazione,
+descritta in `docs/design_drafts/team/PIANO.md`. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I

@@ -287,7 +287,11 @@ lead che nominava l'Umbria e dava la media delle regioni sopra un cruscotto di
 province. Un'entrata dichiara il livello che descrive con il campo `level`, che
 vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
 pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
-Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_indicator_texts.py`.
+Nessun test lo garantisce con un nome dedicato oggi: la logica del ripiego sta
+in `build_article` (`app/indicator_texts.py:318`), e i test che rendono ogni
+pagina (`tests/integration/test_app.py`,
+`tests/integration/test_indicator_view_pages.py`) la esercitano di passaggio,
+senza un'asserzione che la isoli.
 
 ## La forma libera: un articolo che non fa le quattro fermate
 
@@ -474,26 +478,26 @@ a ogni ricarico. Quel nome finisce nella prosa.
 
 ## Che cosa è verificato e che cosa no
 
-`tests/integration/test_indicator_texts.py` copre la parte meccanica:
+`tests/integration/test_indicator_texts.py` non esiste più: è stato tolto
+l'8 agosto 2026 insieme alla catena editoriale esterna (commit `eb2c2f72`).
+Oggi la struttura sopravvive per un'altra via: ruoli noti, sezione senza
+ruolo, marcatore di sezione nel corpo sono rifiutati al caricamento da
+`scripts/indicator_store.py`, coperto da `tests/unit/test_indicator_store.py`.
+La sicurezza del testo generato (articoli mai senza articolo, fonti rese
+davvero in pagina, il FAQ coerente col suo JSON-LD) sta in
+`tests/integration/test_indicator_text.py`, al singolare.
 
-- struttura, ruoli noti e non duplicati, punteggiatura editoriale, `vintage` e
-  risoluzione dell'indicatore,
-- lunghezza della prima frase del `lead`, che deve reggere da sola in SERP,
-- H2 scritti a mano non riutilizzati su più indicatori,
-- **ogni cifra con decimale attribuita a una regione** ("il 24,3% del Molise")
-  confrontata con il dato di quell'anno,
-- **ogni soglia asserita su un elenco di regioni** ("supera il 78% in A, B e C")
-  verificata regione per regione,
-- **ogni link interno nella prosa**: forma canonica (mai `/?indicator=` né
-  `/atlante?indicator=`, che arrivano alla scheda solo via JavaScript), un
-  indicatore che esiste davvero, un percorso che il sito serve, e un'anchor che
-  dice dove porta invece di "clicca qui".
-
-Le ultime due nascono da errori reali: una nota diceva che l'affollamento
-carcerario supera "ovunque" la capienza mentre tre regioni erano sotto, e
-un'altra metteva la Sardegna sopra il 78% di differenziata quando stava al
-76,6%. Un intero senza decimale non viene controllato, perché in questa prosa è
-quasi sempre un'approssimazione ("circa 27%", "quasi 78%").
+Nessun test verifica oggi una cifra con decimale attribuita a una regione
+contro il dato dell'anno, una soglia asserita su un elenco di regioni, o la
+forma canonica di un link dentro la prosa di un indicatore: erano le guardie
+di `motore verifica`, andate via con la catena esterna. Servivano, e la prova
+è reale: una nota diceva che l'affollamento carcerario supera "ovunque" la
+capienza mentre tre regioni erano sotto, e un'altra metteva la Sardegna sopra
+il 78% di differenziata quando stava al 76,6%. Una guardia nuova per la prosa
+scritta a mano è in lavorazione, descritta in
+`docs/design_drafts/team/PIANO.md`. Un intero senza decimale non era comunque
+controllato, perché in questa prosa è quasi sempre un'approssimazione ("circa
+27%", "quasi 78%").
 
 `tests/integration/test_indicator_view.py` copre i numeri: ogni aggregato di tutti i 621
 indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
