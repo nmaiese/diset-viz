@@ -291,6 +291,28 @@ I crediti del provider `huggingface` (GLM-5.3-Flash) sono 0,10 dollari al mese e
 preavviso a metà di un lavoro, con `Payment Required: You have depleted your monthly included
 credits`. Non va messo su un passaggio che il flusso aspetta.
 
+**Codex che si aggiorna da solo si mangia la consegna**, visto la sera del 28 settembre sulle review
+2 di #289 e #290. Al primo avvio dopo un rilascio nuovo Codex mostra il dialogo "Update available"
+con "1. Update now" già selezionato. L'invio con cui Orca manda la spec sceglie l'aggiornamento:
+Codex si aggiorna (0.157.1 → 0.158.0), stampa "Please restart Codex" ed esce alla shell. Il
+dispatch resta `pending` e nessun `worker_done` arriva mai. Sull'altro terminale lanciato insieme la
+spec non è arrivata affatto, e il dispatch è andato `failed` con Codex fermo sul prompt vuoto. In
+tutti e due i casi si è perso mezz'ora di attesa. Il rimedio è controllare lo schermo nel primo
+minuto, come per haiku. Rilanciare Codex a mano nel terminale con
+`--dangerously-bypass-approvals-and-sandbox` viene negato dal classificatore dei permessi di Claude
+Code, ed è giusto così: un agente senza sandbox lo avvia Orca, non il team leader.
+
+**Le quote dei provider, misurate con un ping per modello la sera del 28 settembre** (`opencode run
+"Rispondi soltanto con la parola OK." -m <modello> < /dev/null`, `agy --model <id> -p ...`). Rispondono:
+Antigravity `gemini-3.1-pro-high` e `gemini-3.8-flash-high`, Zen `opencode/big-pickle`,
+`opencode/nemotron-3-ultra-free` e `opencode/mimo-v2.6-flash-free`, e su ollama-cloud `gpt-oss:120b`,
+`nemotron-3-ultra` e `gemma4:31b`. Non rispondono: `google/*` (crediti prepagati finiti), `zai/*`,
+`moonshotai/*` e `minimax/*` (saldo), `groq/*` (chiave non valida), i modelli ollama-cloud fuori dal
+piano gratuito (`kimi-k3`, `kimi-k2.6`, `deepseek-v4-pro`, `glm-5.3`, `minimax-m2.7`,
+`mistral-large-3`) e quelli ritirati il 25 settembre (`qwen3.5:397b`, `deepseek-v4-flash`,
+`glm-5.1`). I provider con credito finito rispondono dopo circa 75 secondi, non subito: il ping va
+fatto con un `timeout`, altrimenti si scambia l'attesa per lavoro.
+
 ## 7. Cosa richiede mano umana
 
 Ci sono cose che nessun agente deve fare: il container GTM (tag morti, hostname di
