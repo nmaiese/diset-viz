@@ -245,28 +245,36 @@ class RealArticlesWithDossier(unittest.TestCase):
         from app import sources
 
         for code in ["ter-12", "ter-17", "ter-167", "ter-901"]:
-            family, raw_id = brief.resolve(code)
-            internal_key = sources.internal_id(family, raw_id)
-            article = indicator_store.read(internal_key)
-            if not article:
-                continue
+            with self.subTest(code=code):
+                family, raw_id = brief.resolve(code)
+                internal_key = sources.internal_id(family, raw_id)
+                article = indicator_store.read(internal_key)
+                self.assertIsNotNone(article, f"{code} non ha un articolo scritto")
 
-            from app.indicator_view import build_indicator_view
-            view = build_indicator_view(family, raw_id)
-            dossier = brief._dossier(view)
+                dossier = brief.build(code)
 
-            defects = guardia.check_article(internal_key, article, dossier=dossier)
-            cifre = [d for d in defects if d.check == "cifre"]
-            if code == "ter-12":
-                self.assertEqual(len(cifre), 2, f"{code} ha difetti imprevisti: {cifre}")
-            elif code == "ter-17":
-                self.assertEqual(len(cifre), 1, f"{code} ha difetti imprevisti: {cifre}")
-            elif code == "ter-167":
-                self.assertEqual(len(cifre), 2, f"{code} ha difetti imprevisti: {cifre}")
-            elif code == "ter-901":
-                self.assertEqual(len(cifre), 1, f"{code} ha difetti imprevisti: {cifre}")
-            else:
-                self.assertEqual(cifre, [], f"{code} ha difetti sulle cifre: {cifre}")
+                defects = guardia.check_article(internal_key, article, dossier=dossier)
+                cifre = [d.quote for d in defects if d.check == "cifre"]
+
+                if code == "ter-12":
+                    # 2,71: lo scarto calcolato dallo scrittore
+                    expected = ["...largo di tutta la classifica, 2,71 punti in un colpo solo. Sopra..."]
+                elif code == "ter-17":
+                    # 0,2: lo scarto calcolato dallo scrittore
+                    expected = ["...uli-Venezia Giulia e l'Umbria 0,2, e di un soffio la Valle d'Ao..."]
+                elif code == "ter-167":
+                    # 5,4 e 8,6: ripartizioni a due livelli non previste nel sito
+                    expected = [
+                        "...sce in ogni ripartizione, dal 5,4% del Nord-ovest all'8,6% del...",
+                        "..., dal 5,4% del Nord-ovest all'8,6% del Centro. Sono variazioni...",
+                    ]
+                elif code == "ter-901":
+                    # 9.603: media parziale calcolata dallo scrittore
+                    expected = ["...dia delle regioni è salita di 9.603 euro per abitante. Sono euro..."]
+
+                self.assertEqual(cifre, expected, f"{code} ha difetti imprevisti sulle cifre")
+
+
 
 class Cli(unittest.TestCase):
     def test_verde_su_ter_12(self):
@@ -284,6 +292,26 @@ class Cli(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 2)
         self.assertIn(b"non esiste", result.stderr)
+
+
+    def test_fonti_mancante_esce_con_errore(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "scripts.editoriale.guardia", "ter-12", "--fonti", "/tmp/non-esiste-mai-fonti.md"],
+            cwd=ROOT, capture_output=True, timeout=120,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn(b"non esiste", result.stderr)
+
+    def test_fonti_senza_citazioni_stampa_su_stderr(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".md") as tmp:
+            tmp.write(b"| claim | altra colonna |\n| --- | --- |\n| 1 | 2 |")
+            tmp.flush()
+            result = subprocess.run(
+                [sys.executable, "-m", "scripts.editoriale.guardia", "ter-12", "--fonti", tmp.name],
+                cwd=ROOT, capture_output=True, timeout=120,
+            )
+            self.assertIn(b"nessuna citazione letta da", result.stderr)
 
     def test_codice_sconosciuto_esce_con_errore(self):
         result = subprocess.run(

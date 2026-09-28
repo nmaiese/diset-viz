@@ -14,7 +14,7 @@ un lint, quindi qui non c'e' niente che giudichi la prosa.
 
 Cinque controlli, tutti meccanici:
 
-1. **Cifre contro il dossier**, solo quando `--dossier` e' dato. Ogni numero
+1. **Cifre contro il dossier**, solo quando `--dossier` o `--fonti` e' dato. Ogni numero
    scritto in cifre nel testo deve corrispondere, con l'arrotondamento con cui
    e' scritto, a una cifra del dossier o della colonna "citazione letterale"
    di `--fonti`. Quando il numero non porta un segno esplicito (la direzione e'
@@ -101,7 +101,7 @@ def _excerpt(text, start, end, radius=30):
 #   conteggio: non si controlla, perche' la fonte di questi numeri non e' mai
 #   una cifra del dossier ma il catalogo dei territori o il calendario.
 NUMBER_RE = re.compile(
-    r"(?<![\w.,%])(?P<sign>[+-])?(?P<int>\d{1,3}(?:\.\d{3})+|\d+)(?:,(?P<dec>\d+))?"
+    r"(?<![\w.,%])(?P<sign>[+-])?(?P<int>\d{1,3}(?:\.\d{3})+|\d+)(?:(?P<sep>[,.])(?P<dec>\d+))?"
 )
 RANK_SUFFIXES = ("ª", "°")
 
@@ -115,7 +115,7 @@ def _number_value(sign, int_part, dec):
 def _is_checkable(match, text):
     if match.group("dec") or "." in match.group("int"):
         return text[match.end():match.end() + 1] not in RANK_SUFFIXES
-    return text[match.end():match.end() + 1] == "%" or bool(re.match(r"\.\d{1,2}(?!\d)", text[match.end():]))
+    return text[match.end():match.end() + 1] == "%"
 
 
 def dossier_figures(dossier):
@@ -178,10 +178,7 @@ def check_figures(fields, internal_key, dossier, source_values):
     """
     pool = dossier_figures(dossier) + list(source_values)
 
-    from app.indicator_view import build_indicator_view
-    from app import sources
-    from app.divari import _AREA_BY_KEY
-    from app.profiles import region_key_for
+    from app.divari import _area_means
 
     parsed = sources.split_internal_id(internal_key)
     if parsed:
@@ -198,20 +195,10 @@ def check_figures(fields, internal_key, dossier, source_values):
                 for v in views:
                     for level in v.get("levels", []):
                         matrix = level.get("matrix", {})
-                        area_of = {}
-                        for t in level.get("territories", []):
-                            t_key = t.get("key")
-                            if level["key"] == "regione":
-                                area = _AREA_BY_KEY.get(t_key)
-                            else:
-                                region = t.get("region")
-                                area = _AREA_BY_KEY.get(region_key_for(region or "")) if region else None
-                            if area:
-                                area_of[t_key] = area
+                        is_regione = level["key"] == "regione"
 
                         for year_data in matrix.values():
-                            area_sums = {}
-                            area_counts = {}
+                            values_for_means = []
                             for t_key, val in year_data.items():
                                 num = None
                                 if isinstance(val, (int, float)) and not isinstance(val, bool):
@@ -221,23 +208,36 @@ def check_figures(fields, internal_key, dossier, source_values):
 
                                 if num is not None:
                                     pool.append(num)
-                                    area = area_of.get(t_key)
-                                    if area:
-                                        area_sums[area] = area_sums.get(area, 0.0) + num
-                                        area_counts[area] = area_counts.get(area, 0) + 1
+                                    if is_regione:
+                                        values_for_means.append({"region_key": t_key, "value": num})
 
-                            for area, total in area_sums.items():
-                                if area_counts[area] > 0:
-                                    pool.append(total / area_counts[area])
-        except Exception:
-            pass
+                            if is_regione:
+                                means = _area_means(values_for_means)
+                                if means is not None:
+                                    for area_data in means.values():
+                                        pool.append(area_data["mean"])
+        except (KeyError, ValueError, LookupError, TypeError) as error:
+            print(f"guardia: impossibile costruire il pool largo per {internal_key}: {error}", file=sys.stderr)
+
     defects = []
     for field, text in fields:
         for match in NUMBER_RE.finditer(text):
             if not _is_checkable(match, text):
                 continue
+
+            quote = _excerpt(text, match.start(), match.end())
+            if match.group("sep") == ".":
+                defects.append(Defect("cifre", field, quote, f"{match.group(0)!r} usa il punto decimale all'inglese: la forma italiana vuole la virgola"))
+                continue
+
             signed = bool(match.group("sign"))
-            decimals = len(match.group("dec")) if match.group("dec") else 0
+            target_str = match.group("int").replace(".", "")
+            if not match.group("dec") and "." in match.group("int") and target_str.endswith("0"):
+                zeros = len(target_str) - len(target_str.rstrip("0"))
+                decimals = -zeros
+            else:
+                decimals = len(match.group("dec")) if match.group("dec") else 0
+
             target = round(_number_value(match.group("sign"), match.group("int"), match.group("dec")), decimals)
             if any(abs(round(value, decimals) - target) < 1e-9 for value in pool):
                 continue
@@ -245,7 +245,6 @@ def check_figures(fields, internal_key, dossier, source_values):
             wrong_sign = any(abs(round(abs(value), decimals) - target_abs) < 1e-9 for value in pool)
             if wrong_sign and not signed:
                 continue  # il valore assoluto corrisponde, e il testo non dichiarava un segno
-            quote = _excerpt(text, match.start(), match.end())
             if wrong_sign:
                 defects.append(Defect(
                     "cifre", field, quote,
@@ -253,7 +252,7 @@ def check_figures(fields, internal_key, dossier, source_values):
                     "con il segno opposto"
                 ))
             else:
-                nearby = sorted({numfmt.text(value, decimals) for value in pool
+                nearby = sorted({numfmt.text(value, max(0, decimals)) for value in pool
                                   if abs(abs(value) - target_abs) < target_abs * 0.2 + 5})[:5]
                 note = f" (valori vicini nel dossier: {', '.join(nearby)})" if nearby else ""
                 defects.append(Defect(
@@ -415,7 +414,14 @@ def main(argv=None):
             dossier = json.loads(args.dossier.read_text(encoding="utf-8"))
         except FileNotFoundError:
             parser.error(f"il dossier {args.dossier} non esiste")
-    source_values = source_figures(args.fonti) if args.fonti is not None else []
+
+    source_values = []
+    if args.fonti is not None:
+        if not args.fonti.exists():
+            parser.error(f"il file {args.fonti} non esiste")
+        source_values = source_figures(args.fonti)
+        if not source_values:
+            print(f"guardia: --fonti è dato ma nessuna citazione letta da {args.fonti}", file=sys.stderr)
 
     defects = check_article(internal_key, entry, dossier=dossier, source_values=source_values)
     if not defects:
