@@ -75,10 +75,11 @@ non cambia il verdetto.
 ## Il secondo parere, sempre, non bloccante
 
 Dopo aver risposto tu, e senza mostrargli le tue risposte, lanci gpt-oss sulle
-sole domande 1-3. Prima controlli che i due allegati esistano (`test -f`).
+sole domande 1 e 3, quelle che si giudicano leggendo il testo. La 2 chiede
+`fonti.md`, che il secondo parere non riceve. Prima controlli che i due allegati esistano (`test -f`).
 
 ```bash
-timeout 600 opencode run "<le domande 1-3, con la stessa consegna qui sopra>" \
+timeout 600 opencode run "<le domande 1 e 3, con la stessa consegna qui sopra>" \
   -m ollama-cloud/gpt-oss:120b -f <articolo> -f lavoro/<chiave>/brief.md < /dev/null
 ```
 

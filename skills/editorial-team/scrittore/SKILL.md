@@ -21,6 +21,9 @@ esce con 127 manca il prefisso.
 
 ## Che cosa leggi, e in che ordine
 
+`<chiave>` nei percorsi `lavoro/<chiave>/` è il codice dell'URL che ti dà la
+spec (`ter-12`). La chiave interna (`12`) serve solo a `filename_for`.
+
 1. **`lavoro/<chiave>/brief.md`**, il materiale scritto dal team leader. **Non è
    una scaletta**: le sue parti non hanno un ordine, non vanno messe in una
    posizione e non devi usarle tutte. Se `brief.md` non c'è, non scrivi e mandi
