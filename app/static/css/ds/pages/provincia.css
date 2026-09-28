@@ -3,7 +3,7 @@
    blocchi sono componenti comuni. Legge solo token. */
 
 /* testata: l'H1 resta senza classe, il localizzatore sta nel margine da 1200 */
-.provincia-head > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.provincia-head > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }
 .provincia-top { display: grid; gap: var(--space-4) 0; }
 .provincia-top .locator { grid-template-columns: 4.5rem minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-bottom: var(--space-8); }
 .provincia-top__tiles { margin-top: var(--space-4); }
@@ -62,11 +62,11 @@
 .provincia-facts { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .provincia-facts .sep { color: var(--rule-strong); padding-inline: 6px; }
 .provincia-when { display: block; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); margin-top: 2px; }
-.provincia-moves .arrow svg { display: block; margin-top: 4px; }
+.provincia-moves .arrow svg { display: block; margin-top: var(--space-1); }
 
 /* tutti gli indicatori: salti alle aree, un details per area */
 .provincia-jump { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-bottom: var(--space-4); font-weight: 600; }
-.provincia-jump .n { font-weight: 400; color: var(--muted); margin-left: 4px; }
+.provincia-jump .n { font-weight: 400; color: var(--muted); margin-left: var(--space-1); }
 .provincia-group { margin-top: var(--space-6); }
 .provincia-group > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); padding-block: var(--space-3); border-bottom: 1px solid var(--rule-strong); cursor: pointer; }
 .provincia-group > summary::-webkit-details-marker { display: none; }

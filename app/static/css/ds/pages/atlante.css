@@ -18,7 +18,7 @@
 .atlante-filter__count { flex-basis: 100%; }
 
 /* ---------- le aree e i temi ---------- */
-.atlante-area + .atlante-area { margin-top: var(--space-12); }
+.atlante-area + .atlante-area { margin-top: var(--space-section); }
 .atlante-area__title {
   font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2);
   padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong);

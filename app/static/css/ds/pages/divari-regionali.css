@@ -42,7 +42,7 @@
 .dr-foot > div { min-width: 0; }
 .dr-foot .h-sub { margin-bottom: var(--space-3); }
 .dr-examples ul { list-style: none; display: grid; }
-.dr-examples li { display: grid; gap: 2px; padding-block: var(--space-3); border-top: 1px solid var(--rule); }
+.dr-examples li { display: grid; gap: var(--space-1); padding-block: var(--space-3); border-top: 1px solid var(--rule); }
 .dr-examples li span { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .dr-regions ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--space-6); border-top: 1px solid var(--rule); padding-top: var(--space-1); }
 .dr-regions li a { display: inline-flex; align-items: center; min-height: var(--target); }

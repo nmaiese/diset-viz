@@ -29,6 +29,7 @@ GIOCO = RADICE / "frontend" / "src" / "game" / "game.css"
 SISTEMA = RADICE / "app" / "static" / "css" / "ds" / "system.css"
 CHROME = RADICE / "app" / "static" / "css" / "ds" / "chrome.css"
 COMPONENTS = RADICE / "app" / "static" / "css" / "ds" / "components.css"
+INDICATOR = RADICE / "app" / "static" / "css" / "ds" / "indicator.css"
 REGION_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "regione.css"
 PROVINCE_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "provincia.css"
 
@@ -36,6 +37,17 @@ FOGLI = (SITE, GIOCO, SISTEMA, CHROME, COMPONENTS, *sorted(PAGINE.glob("*.css"))
 
 # I token che le view transition leggono dalla radice del documento.
 MOVIMENTO_IN_RADICE = ("--dur", "--ease-out")
+
+FOGLI_TIPOGRAFIA = (
+    SISTEMA,
+    COMPONENTS,
+    CHROME,
+    INDICATOR,
+    *(foglio for foglio in sorted(PAGINE.glob("*.css")) if foglio.name != "home.css"),
+)
+ECCEZIONI_TAGLIA = {
+    ("chrome.css", ".sitechrome .brandword"): "wordmark con misura ottica propria del logo",
+}
 
 
 def _corpi(testo, intestazione):
@@ -163,6 +175,37 @@ class FogliDiStileTest(unittest.TestCase):
     def test_la_barra_in_alto_tiene_il_suo_nome_di_transizione(self):
         """Senza `view-transition-name` la testata si dissolve col resto."""
         self.assertIn("view-transition-name: masthead", CHROME.read_text(encoding="utf-8"))
+
+
+class ScalaTipograficaTest(unittest.TestCase):
+    def test_nessun_font_size_letterale_nella_versione_uno(self):
+        """Una taglia scritta a mano ricrea ruoli quasi uguali fuori scala.
+
+        La home desktop era arrivata a dieci taglie e la regione a diciassette.
+        I fogli della 1.0 devono quindi leggere solo i token di ruolo, salvo il
+        wordmark che conserva la misura ottica motivata accanto alla regola.
+        """
+        letterale = re.compile(r"\bclamp\(|(?<![-\w])(?:\d+(?:\.\d+)?|\.\d+)(?:px|rem)\b")
+        dichiarazione = re.compile(r"\bfont-size\s*:\s*([^;}]+)")
+        trovate = set()
+        errori = []
+
+        for foglio in FOGLI_TIPOGRAFIA:
+            testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
+            for match in dichiarazione.finditer(testo):
+                valore = match.group(1).strip()
+                if not letterale.search(valore):
+                    continue
+                aperta = testo.rfind("{", 0, match.start())
+                inizio = max(testo.rfind("}", 0, aperta), testo.rfind("{", 0, aperta)) + 1
+                selettore = re.sub(r"\s+", " ", testo[inizio:aperta]).strip()
+                chiave = (str(foglio.relative_to(SISTEMA.parent)), selettore)
+                trovate.add(chiave)
+                if chiave not in ECCEZIONI_TAGLIA:
+                    errori.append(f"{chiave[0]}: {selettore}: font-size: {valore}")
+
+        self.assertEqual(errori, [])
+        self.assertEqual(trovate, set(ECCEZIONI_TAGLIA), "eccezione obsoleta o selettore cambiato")
 
 
 if __name__ == "__main__":

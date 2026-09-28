@@ -44,4 +44,4 @@
 
 /* L'H1 dell'indice resta un `<h1>` senza classe (il suo testo e la sua forma
    sono un contratto di test_hub_pages.py): prende qui il corpo di `.h-title`. */
-.v1-qualita-della-vita .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.v1-qualita-della-vita .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }

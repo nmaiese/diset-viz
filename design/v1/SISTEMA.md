@@ -63,8 +63,8 @@ Upshot per il testo che accompagna il dato.
 - **Breakpoint** 600, 960, 1200. Dentro i componenti si usano container query
   sulla larghezza del componente, non altri breakpoint di pagina.
 - **Spazi** a passo 4, usati su nove valori: 4, 8, 12, 16, 24, 32, 48, 64, 96.
-  Fra sezioni 64 (48 su telefono) sotto la testata di sezione, fra blocchi 24
-  (16).
+  Fra sezioni lo spazio e' fluido, da 56 su telefono a 96 su desktop. Fra
+  blocchi e' 24, o 16 dove il componente e' stretto.
 - **La testata di sezione** e' un filetto d'inchiostro da 3px con l'H2 sotto,
   a 34px da 1200. Col filetto chiaro da 1px e l'H2 poco piu' grande dei titoli
   dei grafici, a schermo largo le sezioni si confondevano una con l'altra.
@@ -78,24 +78,28 @@ Upshot per il testo che accompagna il dato.
 
 ## Tipografia
 
-Una scala di undici ruoli, nominati per funzione:
+Una scala di otto passi, con ruoli nominati per funzione:
 
-| ruolo | desktop | telefono | uso |
-| --- | --- | --- | --- |
-| display | 56/58 | 36/40 | H1 della home e degli articoli |
-| titolo | 44/48 | 30/34 | H1 di schede, territori, classifiche |
-| sezione | 28/32, 34/39 da 1200 | 23/28 | H2, sempre sotto il filetto d'inchiostro |
-| sottosezione | 20/26 | 19/24 | H3, titolo-affermazione dei grafici |
-| lede | 22/32 | 19/28 | frase-risposta, sommario |
-| prosa | 19/30 | 18/28 | articolo della scheda, blog, metodologia |
-| interfaccia | 16/24 | 16/24 | controlli, celle, schede |
-| piccolo | 14/20 | 14/20 | riga fonte, meta, briciole, didascalie |
-| etichetta | 13/18, peso 600 | 13/18 | occhielli, intestazioni di tabella, legende |
-| cifra chiave | 64/64, peso 700 | 44/44 | il numero di una pagina |
-| cifra di tessera | 36/38, peso 700 | 28/30 | tessere numero |
+| ruolo | telefono | desktop | interlinea | peso | uso |
+| --- | --- | --- | --- | --- | --- |
+| etichetta | 14 | 14 | 1,4 | 600 | occhielli, intestazioni di tabella, legende |
+| piccolo | 14 | 14 | 1,43 | 400 | riga fonte, meta, briciole, didascalie |
+| interfaccia | 16 | 16 | 1,5 | 400 | controlli, celle, schede |
+| prosa | 18 | 18 | 1,6 | 400 | articolo della scheda, blog, metodologia |
+| lede | 20 | 22 | 1,45 | 400 | frase-risposta, sommario |
+| sottosezione | 20 | 22 | 1,3 | 700 | H3, titolo-affermazione dei grafici |
+| sezione | 24 | 32 | 1,15 | 700 | H2 sotto il filetto d'inchiostro |
+| sezione grande | 32 | 32 | 1,15 | 700 | alias del valore desktop di sezione |
+| titolo | 32 | 44 | 1,1 | 700 | H1 di schede, territori, classifiche |
+| cifra di tessera | 24 | 32 | 1,05 | 700 | alias di sezione per tessere numero |
+| display | 40 | 56 | 1,05 | 760 | H1 della home e degli articoli |
+| cifra chiave | 44 | 64 | 1 | 700 | il numero di una pagina |
+
+La scala ha otto passi. A parita' di taglia la gerarchia la fa il peso.
+Nei fogli della 1.0 non si scrivono font-size letterali.
 
 - Le etichette sono in minuscolo con l'iniziale maiuscola: mai tutto maiuscolo,
-  mai monospazio. 13px e' il minimo. La scala e' tarata su un occhio medio di
+  mai monospazio. 14px e' il minimo. La scala e' tarata su un occhio medio di
   0,49 e `font-size-adjust` la tiene uguale se si cambia famiglia.
 - **Le cifre hanno un sistema solo**, `tools/numfmt.py`, per ruoli: cifra (tessere
   e frasi, decimali dalla grandezza), cella (decimali uguali per tutta la

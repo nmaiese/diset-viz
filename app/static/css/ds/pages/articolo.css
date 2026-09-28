@@ -20,7 +20,7 @@
 .art-brief__list ul { list-style: none; display: grid; }
 .art-brief__list li {
   position: relative; padding: var(--space-3) 0 var(--space-3) var(--space-6); border-top: 1px solid var(--rule);
-  font-family: var(--font-text); font-size: var(--fs-prose); line-height: 1.5;
+  font-family: var(--font-text); font-size: var(--fs-prose); line-height: var(--lh-prose);
 }
 .art-brief__list li:last-child { border-bottom: 1px solid var(--rule); }
 .art-brief__list li::before { content: ""; position: absolute; left: 0; top: calc(var(--space-3) + 0.6em); width: 8px; height: 8px; background: var(--ink); }
@@ -55,12 +55,12 @@
    filetto sottile che le separa. Il filetto d'inchiostro da 3 pixel resta
    alle sezioni della pagina ("Dati e metodo", "Continua a esplorare"). */
 .art-body > h2 {
-  font-size: clamp(22px, 20.5px + 0.35vw, 25px); line-height: 1.25; letter-spacing: var(--tr-section);
+  font-size: var(--fs-subsection); line-height: var(--lh-subsection); letter-spacing: var(--tr-section);
   margin-top: var(--space-12); padding-top: var(--space-4); border-top: 1px solid var(--rule-strong);
 }
 
-/* ---------- il testo delle figure a 13 pixel veri, i colori per classe ---------- */
-.art-fig .fig text { font-size: 13px; stroke: none; }
+/* ---------- il testo delle figure sulla scala piccola, i colori per classe ---------- */
+.art-fig .fig text { font-size: var(--fs-small); stroke: none; }
 .art-fig .fig .fig__name, .art-fig .fig .fig__value, .art-fig .fig .fig__label { fill: var(--ink); }
 .art-fig .fig .fig__value, .art-fig .fig .fig__label, .art-fig .fig .fig__ref-label { font-weight: 600; }
 .art-fig .fig .fig__axis, .art-fig .fig .fig__axis-name, .art-fig .fig .fig__gap { fill: var(--muted); }
@@ -85,4 +85,4 @@
 .art-link { margin-top: var(--space-8); max-width: var(--measure); padding-bottom: var(--space-4); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .art-data .specs dd p + p { margin-top: var(--space-2); }
 .art-data .specs dd ul { list-style: none; display: grid; gap: var(--space-2); }
-.art-more { margin-top: var(--space-16); }
+.art-more { margin-top: var(--space-section); }
