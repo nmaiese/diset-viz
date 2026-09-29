@@ -74,3 +74,5 @@ ADSENSE_SLOT_BANNER = os.getenv("ADSENSE_SLOT_BANNER", "")
 GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")
 BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "")
 
+# Livello di log dell'app Flask (default INFO in produzione per catturare analytics_event)
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()

@@ -2204,6 +2204,29 @@ def provinces_index_redirect():
     return redirect("/province", code=301)
 
 
+@app.route("/regione")
+@app.route("/regione/")
+def regions_index_redirect():
+    """`/regione/<key>` e' una pagina, `/regione` da solo portava a una 404:
+    chi accorcia l'indirizzo cerca l'elenco."""
+    return redirect("/regioni", code=301)
+
+
+@app.route("/indicatore")
+@app.route("/indicatore/")
+def indicators_index_redirect():
+    """`/indicatore/...` e' una scheda, `/indicatore` da solo portava a una 404:
+    chi accorcia l'indirizzo cerca l'atlante."""
+    return redirect("/atlante", code=301)
+
+
+@app.route("/about")
+@app.route("/about/")
+def about_redirect():
+    """`/about` portava a 404: reindirizza alla pagina chi siamo."""
+    return redirect("/chi-siamo", code=301)
+
+
 @app.route("/temi")
 def themes_index():
     """L'indice dei temi, con i conteggi dello stesso catalogo che li divide.

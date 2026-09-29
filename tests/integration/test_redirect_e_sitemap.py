@@ -83,6 +83,21 @@ class TestLegacyRedirects(unittest.TestCase):
         self.assertEqual(self.client.get("/pagina-che-non-esiste/", base_url=APEX).status_code, 404)
         self.assertEqual(self.client.get("/api/nope/", base_url=APEX).status_code, 404)
 
+    def test_short_index_redirects(self):
+        cases = [
+            ("/regione", "/regioni"),
+            ("/regione/", "/regioni"),
+            ("/indicatore", "/atlante"),
+            ("/indicatore/", "/atlante"),
+            ("/about", "/chi-siamo"),
+        ]
+        for path, expected_location in cases:
+            with self.subTest(path=path):
+                response = self.client.get(path, base_url=APEX)
+                self.assertEqual(response.status_code, 301)
+                self.assertEqual(response.headers["Location"], expected_location)
+
+
 
 class TestSitemapFinalUrls(unittest.TestCase):
     @classmethod
