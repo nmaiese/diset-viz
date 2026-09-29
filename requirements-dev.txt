@@ -5,5 +5,14 @@
 # risultato si committa, quindi il runtime non la vede mai: tenerla in
 # requirements.txt la porterebbe dentro l'immagine Cloud Run per niente.
 #
+# `requests` e `pillow` servono a scripts/trend_articles/ (collect, photo,
+# verify, i derive_* e, per la cascata, verify importa photo): la pipeline dei
+# trend gira solo in sviluppo e in CI, e fino al 29 settembre 2026 le due
+# librerie si aggiravano con PYTHONPATH=$HOME/.cache/divario-req. Dichiararle
+# qui le rende installabili come tutto il resto, e i pin sono quelli di
+# requirements.txt per la stessa ragione: un aggiornamento deve essere un diff.
+#
 #     bin/py -m pip install -r requirements-dev.txt
 cairosvg>=2.7
+requests==2.34.2
+pillow==12.3.0
