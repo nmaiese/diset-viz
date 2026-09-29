@@ -27,7 +27,7 @@ la parte in cui le fonti vengono richieste al server: restano tutte le altre
 guardie, compresa la richiesta che ogni fonte citata stia nella sezione
 "## Fonti" e il controllo dei link interni, che passa dall'app di Flask e non
 dalla rete. Serve alla CI, dove non si puo' chiedere a quattro domini se
-rispondono e dove una fonti che non si raggiunge non deve diventare un errore
+rispondono e dove una fonte che non si raggiunge non deve diventare un errore
 di piu'. Le fonti restano da aprire a mano: il controllo dice solo che l'articolo
 le cita, non che la pagina esista.
 

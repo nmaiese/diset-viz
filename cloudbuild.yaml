@@ -24,7 +24,7 @@ steps:
         apt-get update -qq && apt-get install -y -qq --no-install-recommends git
         # Anche requirements-dev.txt: la suite contiene i test di
         # scripts/trend_articles/ (photo.py e verify.py importano requests e
-        # PIL). Senza, il gate del deploy si rossegerebbe su un ModuleNotFoundError.
+        # PIL). Senza, il gate del deploy diventerebbe rosso su un ModuleNotFoundError.
         pip install --quiet -r requirements.txt -r requirements-dev.txt
         python -m unittest discover -s tests
 
