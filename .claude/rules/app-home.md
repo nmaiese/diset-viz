@@ -25,7 +25,7 @@ paths:
   con un territorio estratto a caso e l'anteprima della sua scheda; la fascia
   "Gli indicatori, tema per tema" (`#temi`), che e' la porta dell'atlante; la
   qualita' della vita come porta, con la mappa regionale della classifica BES
-  (`home.hero_map`) nella testata della fascia; le storie; in fondo una
+  (`home.hero_map`) nella colonna dei bottoni, sotto; le storie; in fondo una
   riga sola con fonti, metodo, come citare e correzioni (dal 28 settembre 2026
   il quiz e la fascia delle fonti non sono piu' fasce della home: il quiz si
   raggiunge dalla porta Giochi). Per questo **non sta nella cache di pagina**: rimetterci

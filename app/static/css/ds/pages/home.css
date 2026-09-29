@@ -18,12 +18,21 @@
    solo, largo quanto basta, cosi' la scheda non corre a tutta colonna sopra
    una mappa stretta. */
 @media (min-width: 768px) {
-  .home-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-8); align-items: center; padding-block: var(--space-10); }
+  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); column-gap: var(--space-8); align-items: center; padding-block: var(--space-10); }
   .home-head__visual { justify-self: end; width: 100%; max-width: 34rem; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
+/* Le proporzioni delle colonne sono quelle di master: la colonna del testo
+   piu' stretta manda il titolo su tre righe e alza il blocco di sinistra
+   verso l'altezza di scheda e mappa. */
+@media (min-width: 960px) {
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); }
+}
 @media (min-width: 1200px) {
-  .home-head { column-gap: var(--space-16); }
+  .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); }
+  /* Oltre 1440 la colonna si allarga col contenitore e il titolo tornava su
+     due righe: lo teniamo su tre, come su master. */
+  .home-head__intro .h-display { max-width: 8em; }
 }
 /* La mappa racconta lo stesso indicatore della scheda sopra. Sul telefono la
    sostituisce la lista completa dei valori. Da 768 la legenda sta accanto
