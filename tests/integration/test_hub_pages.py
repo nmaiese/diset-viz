@@ -1400,9 +1400,12 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
     def test_la_home_non_promette_la_mappa_anno_per_anno(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("anno per anno", visible_text(html))
-        self.assertIn('id="storie"', html)
-        testa = re.search(r'id="storie".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
-        self.assertIn('<a href="/atlante">atlante</a>', testa)
+        # La riga delle fonti c'e' sempre, anche col blog vuoto: e' la prova
+        # che la pagina e' stata letta. La fascia storie dipende dai post.
+        self.assertIn("Fonti, metodo e correzioni:", html)
+        if 'id="storie"' in html:
+            testa = re.search(r'id="storie".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
+            self.assertIn('<a href="/atlante">atlante</a>', testa)
 
     def test_home_no_quiz_and_fonti_links(self):
         html = self.client.get("/").get_data(as_text=True)

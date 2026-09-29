@@ -30,7 +30,7 @@
       </div>
       {#- Il rimando all'altro livello resta: e' l'unico link dalla home alla
           scheda gemella (le regioni di una serie BES hanno la loro su ter-*). -#}
-      {% if not two and f.elsewhere %}<p class="feat__only">Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> {% if f.elsewhere_twin %}hanno una scheda loro{% else %}sono nella scheda{% endif %}.</p>{% endif %}
+      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> {% if f.elsewhere_twin %}hanno una scheda loro{% else %}sono nella scheda{% endif %}.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
       {% if two %}
       {#- Senza JavaScript sono due link, tutti e due nell'ordine di
           tabulazione: ruoli, aria-selected e tabindex mobile li aggiunge
