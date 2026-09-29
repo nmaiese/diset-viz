@@ -367,7 +367,12 @@ fatto con un `timeout`, altrimenti si scambia l'attesa per lavoro.
 
 ## 7. Cosa richiede mano umana
 
-Ci sono cose che nessun agente deve fare: il container GTM (tag morti, hostname di
-produzione), la regola per il traffico interno in GA4 e la creazione di dimensioni
-e metriche, Bing Webmaster Tools, il deploy, e le decisioni che sono di Nello
-(Google-Extended e il merge).
+Ci sono cose che nessun agente deve fare: la regola per il traffico interno in GA4
+(l'API non espone i filtri dati), Bing Webmaster Tools, il deploy, e le decisioni che
+sono di Nello (Google-Extended e il merge).
+
+Il container GTM e la property GA4 non sono piu' in questa lista dal 29 settembre
+2026: il service account `ga4-mcp@nil-automata.iam.gserviceaccount.com` ha `Pubblica`
+sul container e `canEdit` sulla property, e le modifiche si fanno via API da chi
+coordina, con Nello che le ha chieste. Una modifica a GTM si pubblica come versione
+nuova con note, cosi' il ritorno indietro e' ripubblicare la precedente.

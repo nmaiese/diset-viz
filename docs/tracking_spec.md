@@ -1,8 +1,10 @@
 # Specifica tracciamento e consenso
 
-Stato verificato il 2026-07-17.
+Stato verificato il 2026-09-29.
 
-Versione GTM live pubblicata: `7`, nome `Disable automatic page_view 2026-06-23`.
+Versione GTM live pubblicata: `8`, nome `Riallineamento al codice e solo produzione 2026-09-29`.
+La versione `7` (`Disable automatic page_view 2026-06-23`) resta nella cronologia del
+container: ripubblicarla e' il ritorno indietro.
 
 Questa specifica applica a Divario Italia la stessa gerarchia operativa usata su
 Vecchio Conio: consenso inizializzato in pagina, Google Tag Manager come router,
@@ -80,17 +82,25 @@ Tag principali:
 |---|---|---|---|
 | `iubenda Privacy Controls and Cookie Solution` | template Iubenda | `Consent Initialization - All Pages` | da collegare manualmente a Iubenda |
 | `Consent update - Google ads from Iubenda TCF` | Custom HTML | `Consent Initialization - All Pages` | stesso schema di Vecchio Conio, concede consenso ads solo se Iubenda/TCF lo permette |
-| `Google Tag` | Google tag | `Initialization - All Pages` | usa `G-THTPZZ02QH`, con `send_page_view=false` |
+| `Google Tag` | Google tag | `Initialization - divarioitalia.it` | usa `G-THTPZZ02QH`, con `send_page_view=false`, solo sull'hostname di produzione |
 | `GA4 event - page_view` | GA4 event | `CE - page_view` | pageview unica da `dataLayer`, emessa dalle pagine server |
-| `GA4 event - select_indicator` | GA4 event | `CE - select_indicator` | apertura indicatore |
-| `GA4 event - back_to_atlas` | GA4 event | `CE - back_to_atlas` | ritorno all'atlante |
-| `GA4 event - change_year` | GA4 event | `CE - change_year` | cambio anno |
-| `GA4 event - change_region` | GA4 event | `CE - change_region` | cambio regione |
-| `GA4 event - select_sibling_indicator` | GA4 event | `CE - select_sibling_indicator` | navigazione tra indicatori correlati |
-| `GA4 event - change_visualization` | GA4 event | `CE - change_visualization` | cambio tab vista |
+| `GA4 event - select_indicator` | GA4 event | `CE - select_indicator` | apertura indicatore dall'atlante, key event |
+| `GA4 event - change_year` | GA4 event | `CE - change_year` | cambio anno nel confronto, con `level` |
+| `GA4 event - change_region` | GA4 event | `CE - change_region` | cambio territori nel confronto, con `level` |
+| `GA4 event - compare_select_indicator` | GA4 event | `CE - compare_select_indicator` | cambio indicatore nel confronto |
+| `GA4 event - open_region` | GA4 event | `CE - open_region` | profilo regione dalla tabella del confronto |
+| `GA4 event - open_province` | GA4 event | `CE - open_province` | profilo provincia dalla tabella del confronto |
 | `GA4 event - filter_theme` | GA4 event | `CE - filter_theme` | filtro tema |
+| `GA4 event - filter_macro_area` | GA4 event | `CE - filter_macro_area` | filtro area del catalogo |
+| `GA4 event - filter_data_source` | GA4 event | `CE - filter_data_source` | filtro fonte del catalogo |
+| `GA4 event - filter_year_range` | GA4 event | `CE - filter_year_range` | filtro anni del catalogo |
 | `GA4 event - sort_indicators` | GA4 event | `CE - sort_indicators` | ordinamento catalogo |
 | `GA4 event - toggle_partial_data` | GA4 event | `CE - toggle_partial_data` | inclusione dati parziali |
+
+Ogni trigger `CE - ...` (tranne quello del consenso Iubenda) e il trigger del Google
+Tag portano la condizione `{{Page Hostname}}` uguale a `divarioitalia.it`: sull'URL
+`*.run.app`, su `localhost` o su qualunque altro host l'immagine di produzione non
+manda niente a GA4.
 
 Configurazione Iubenda rilevante:
 
@@ -260,39 +270,47 @@ indicatore: li emetteva la SPA. Un tag GTM su quei nomi non scatta mai.
 | `sort_indicators` | cambio ordinamento catalogo | comportamento catalogo |
 | `toggle_partial_data` | mostra o nasconde indicatori parziali | comportamento catalogo |
 
-### Il lavoro da fare nel container, con la lista esatta
+### Il riallineamento del container, fatto il 29 settembre 2026
 
-Il 27 settembre 2026 il delta fra i tag del container e gli eventi che il codice
-emette è stato contato sul codice, non a memoria. Il container ha dodici tag
-evento, il codice ne emette dodici nomi, e i due insiemi non coincidono.
+Il delta contato il 27 settembre e' stato chiuso con la versione `8`, pubblicata via
+API dal service account `ga4-mcp@nil-automata.iam.gserviceaccount.com`, che da quel
+giorno ha il permesso `Pubblica` sul container:
 
-Da **rimuovere**, perché nessun codice li emette piu' e il trigger non scatta mai:
-`back_to_atlas`, `select_sibling_indicator`, `change_visualization`.
+- tolti i tag e i trigger di `back_to_atlas`, `select_sibling_indicator` e
+  `change_visualization`, che nessun codice emette piu';
+- creati variabili `dlv - <nome>`, trigger e tag per `compare_select_indicator`,
+  `open_region`, `open_province`, `filter_macro_area`, `filter_data_source` e
+  `filter_year_range`, con lo schema degli altri (`measurementIdOverride` e `send_to`
+  a `G-THTPZZ02QH`);
+- aggiunto `level` ai tag di `change_year` e `change_region`;
+- messa la condizione di hostname su tutti i trigger e sul Google Tag.
 
-Da **creare**, perché il codice li emette e il container non ha un tag che li raccolga:
-`compare_select_indicator`, `open_region`, `open_province`, `filter_macro_area`,
-`filter_data_source`, `filter_year_range`.
-
-Il nome del tag e' libero, il trigger e' un `CE - <nome evento>` e la creazione va
-ripetuta con lo stesso schema degli altri: `measurementIdOverride` e `send_to` a
-`G-THTPZZ02QH`. `filter_macro_area`, `filter_data_source` e `filter_year_range`
-condividono un tag solo se si vuole, ma un tag per nome evento e' piu' semplice da
-leggere in GA4.
-
-Il limite di produzione, hostname `divarioitalia.it`, e' una condizione del trigger
-`CE - page_view`, e va messa insieme alla rimozione dei tre tag morti: un tag evento
-senza condizione hostname continua a raccogliere traffico di anteprima.
+Verificato lo stesso giorno in produzione con Chrome headless, intercettando le hit
+verso `google-analytics.com/g/collect`: sul confronto partono `page_view`,
+`change_year`, `change_region` e `compare_select_indicator` con `level`, sull'atlante
+`filter_macro_area`, `filter_theme`, `filter_data_source`, `filter_year_range`,
+`sort_indicators`, `toggle_partial_data` e `select_indicator` con i loro parametri.
+Il quiz, che manda i suoi eventi con `gtag()` e quindi dipende dal Google Tag spostato
+sul trigger nuovo, manda `page_view`, `compare_start` e `compare_answer` con `result` e
+`streak`. Per vedere le hit in headless si intercetta con `context.route` su
+`**/g/collect**` e si aspetta una decina di secondi: GA4 raggruppa gli eventi e li
+spedisce anche come beacon all'uscita, e l'ascolto di `page.on("request")` a volte non li
+vede, dando falsi "nessuna hit". Le hit uscite dal browser non provano che GA4 le abbia
+elaborate: la prova definitiva e' un `runReport` del giorno dopo sui sei eventi nuovi e
+su `customEvent:level`.
+Le API di GTM concedono poche scritture al minuto: uno script che ne fa decine
+prende `429` a meta', e va rilanciato con una pausa fra le scritture.
 
 ### Se un evento non arriva, dove si guarda
 
 `POST /api/events` scrive ogni evento che il codice emette con `app.logger.info` e il
 prefisso `analytics_event`, quindi il log applicativo e' un canale che non passa da
-GTM. **Aperto, e va verificato**: il 27 settembre 2026, cercando `analytics_event`
-nei log di Cloud Run del servizio `diset-viz` con `--freshness=7d`, non e' tornato
-niente, e non e' chiaro se dipenda dal fatto che nessuno ha interagito con atlante o
-confronto in quella finestra, o dal campo in cui gunicorn lascia le righe dell'app.
-Non si usa quel canale come dato di fatto finche' non si e' capito quale delle due
-e'.
+GTM. Il 29 settembre 2026 la domanda lasciata aperta il 27 ha una risposta: in 7
+giorni Cloud Run ha registrato 140 `POST /api/events` con risposta 204 e **zero**
+righe `analytics_event`. Gli eventi arrivano, e' il log che li scarta: ne' l'app ne'
+gunicorn impostano un livello, il logger di Flask resta a `WARNING` e le `INFO`
+vanno perse. La correzione passa da PR (#298); finche'
+non e' in produzione quel canale resta muto.
 
 Ogni evento include:
 
@@ -390,7 +408,7 @@ Configurazione richiesta:
   personalizzati", li conterebbe due volte
 
 Dimensioni evento presenti nella property `542300588`, verificate via Admin API
-il 26 settembre 2026:
+il 26 settembre 2026, piu' le sette registrate il 29 settembre (in fondo alla lista):
 
 - `page_type`
 - `indicator_id`
@@ -408,13 +426,15 @@ il 26 settembre 2026:
 - `source`
 - `correct`
 - `won`
+- `level`, `region_key`, `province_key`, `macro_area`, `source_family`,
+  `year_from`, `year_to` (29 settembre 2026)
 
 Parametri che il codice manda e che non sono dimensioni registrate (in GA4 si
 vedono solo in DebugView ed esplorazioni grezze finche' non si registrano):
-`from`, `macro_area`, `source_family`, `year_from`, `year_to`, `level`,
-`region_key`, `province_key`, `difficulty`. Non registrarli in blocco: hanno
-priorita' `level`, le chiavi territoriali e i parametri che servono davvero a
-una domanda di analisi. I parametri numerici `streak`, `attempt`, `attempts`,
+`from` e `difficulty`.
+
+Conservazione dei dati evento: **14 mesi** dal 29 settembre 2026. Prima era 2 mesi,
+e le esplorazioni non potevano guardare oltre. I parametri numerici `streak`, `attempt`, `attempts`,
 `score`, `total` e `count` vanno valutati come metriche personalizzate, non come
 dimensioni.
 

@@ -80,6 +80,11 @@ per far cadere le due tabelle, togliere quelle quattro variabili da Cloud Run e
 dall'ambiente agenti, e dismettere il domain mapping di
 `monitor.divarioitalia.it`, che adesso non ha piu' una pagina propria.
 
+Il domain mapping di `monitor.divarioitalia.it` e' stato cancellato il 29 settembre
+2026: serviva ancora tutto il sito direttamente da Cloud Run, fuori da Cloudflare, con
+`index, follow`, e i bot di addestramento che l'apex blocca ricevevano 200. Resta da
+togliere il record DNS `monitor` (CNAME `ghs.googlehosted.com`) in Cloudflare.
+
 ### Fase 4 — Backend mutabile su Supabase
 
 Lo stato mutabile (classifica + vivo della catena) è su ORM SQLAlchemy: SQLite
