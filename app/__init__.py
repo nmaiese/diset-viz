@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import os
 import secrets
 from functools import lru_cache
@@ -15,6 +16,8 @@ from app import sources
 from app.cache import cache
 
 app = Flask(__name__, static_url_path="/static")
+app.logger.setLevel(getattr(logging, config.LOG_LEVEL, logging.INFO))
+
 # Without SECRET_KEY set in the environment, a fresh key is generated on every
 # process start: quiz session tokens issued before a restart stop validating.
 # Fine for local dev, must be set explicitly in production.
