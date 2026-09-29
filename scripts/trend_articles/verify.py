@@ -22,7 +22,17 @@ Ogni guardia e' una smentita ricalcolabile, non un giudizio di stile. Un
 9. Lunghezza: oltre mille parole di prosa (tabelle e fonti escluse) e' un
    avviso (REVIEW.md).
 
+`--offline` salta l'unico punto che apre una URL esterna, il controllo 7 per
+la parte in cui le fonti vengono richieste al server: restano tutte le altre
+guardie, compresa la richiesta che ogni fonte citata stia nella sezione
+"## Fonti" e il controllo dei link interni, che passa dall'app di Flask e non
+dalla rete. Serve alla CI, dove non si puo' chiedere a quattro domini se
+rispondono e dove una fonti che non si raggiunge non deve diventare un errore
+di piu'. Le fonti restano da aprire a mano: il controllo dice solo che l'articolo
+le cita, non che la pagina esista.
+
     bin/py -m scripts.trend_articles.verify content/posts/2026-09-23-<slug>.md
+    bin/py -m scripts.trend_articles.verify --offline content/posts/*.md
 """
 
 from __future__ import annotations
@@ -118,7 +128,7 @@ def _check_figures(m: dict, body: str, slug: str, errors: list, warnings: list) 
         errors.append(f"cifre: {n} non sta nel dossier ne' fra le external_figures")
 
 
-def _check_links(body: str, errors: list, warnings: list) -> None:
+def _check_links(body: str, errors: list, warnings: list, offline: bool = False) -> None:
     from app import app  # l'app si carica solo qui
 
     client = app.test_client()
@@ -134,6 +144,8 @@ def _check_links(body: str, errors: list, warnings: list) -> None:
     for url in sorted(external):
         if url not in sources_section:
             errors.append(f"fonte {url} citata nel testo ma assente dalla sezione '## Fonti'")
+        if offline:  # la richiesta al server e' l'unica cosa che --offline salta
+            continue
         try:
             r = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0 divarioitalia-verifica"}, allow_redirects=True)
         except requests.RequestException as error:
@@ -143,7 +155,7 @@ def _check_links(body: str, errors: list, warnings: list) -> None:
             errors.append(f"fonte {url} risponde {r.status_code}")
 
 
-def verify(path: Path) -> tuple[list[str], list[str]]:
+def verify(path: Path, offline: bool = False) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     post = frontmatter.load(path)
@@ -168,7 +180,7 @@ def verify(path: Path) -> tuple[list[str], list[str]]:
         if any("non " not in body.lower()[max(0, i - 20):i] for i in uses) and phrase not in external_text:
             errors.append(f"'{phrase}': il dossier ha solo medie semplici dei territori")
 
-    _check_links(body, errors, warnings)
+    _check_links(body, errors, warnings, offline)
 
     for name in re.findall(r"<!--\s*figura:\s*([a-z0-9-]+)\s*-->", body):
         if not (common.FIGURES_DIR / slug / f"{name}.svg").is_file():
@@ -185,10 +197,14 @@ def verify(path: Path) -> tuple[list[str], list[str]]:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("posts", nargs="+")
+    parser.add_argument("--offline", action="store_true",
+                        help="non aprire le fonti esterne: restano tutte le altre guardie")
     args = parser.parse_args(argv)
+    if args.offline:
+        print("--offline: le fonti esterne non vengono richieste, tutto il resto si controlla")
     failed = 0
     for p in args.posts:
-        errors, warnings = verify(Path(p))
+        errors, warnings = verify(Path(p), offline=args.offline)
         print(f"\n{p}: {len(errors)} errori, {len(warnings)} avvisi")
         for e in errors:
             print(f"  ERRORE  {e}")
