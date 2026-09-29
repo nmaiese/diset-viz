@@ -157,18 +157,6 @@
   </div>
   {% endif %}
 
-  {% if d.callout or d.brief_list %}
-  <section class="art-brief" aria-labelledby="in-breve">
-    {% if d.callout %}<p class="answer">{{ d.callout | safe }}</p>{% endif %}
-    {% if d.brief_list %}
-    <h2 class="art-brief__title" id="in-breve">{{ d.brief_title }}</h2>
-    <div class="art-brief__list">{{ d.brief_list | safe }}</div>
-    {% else %}
-    <h2 class="sr-only" id="in-breve">In breve</h2>
-    {% endif %}
-  </section>
-  {% endif %}
-
   <div class="layout art-layout">
     <aside class="layout__aside art-aside" aria-label="Strumenti dell'articolo">
       {% if d.toc %}
@@ -205,6 +193,18 @@
     </aside>
 
     <div class="layout__main">
+      {% if d.callout or d.brief_list %}
+      <section class="art-brief" aria-labelledby="in-breve">
+        {% if d.callout %}<p class="answer">{{ d.callout | safe }}</p>{% endif %}
+        {% if d.brief_list %}
+        <h2 class="art-brief__title" id="in-breve">{{ d.brief_title }}</h2>
+        <div class="art-brief__list">{{ d.brief_list | safe }}</div>
+        {% else %}
+        <h2 class="sr-only" id="in-breve">In breve</h2>
+        {% endif %}
+      </section>
+      {% endif %}
+
       <div class="prose art-body">
 {{ d.body_before | safe }}
       </div>

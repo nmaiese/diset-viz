@@ -19,7 +19,10 @@
 @media (min-width: 1200px) {
   .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; column-gap: var(--space-12); }
   .v1-regione .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: var(--space-12); }
+  .v1-regione .layout__aside { padding-top: var(--space-section); }
 }
+
+.v1-regione .prose { max-width: 74ch; }
 
 /* ---------- la tabella della figura d'apertura, larga quanto il grafico ---------- */
 .regione-qdv { max-width: 920px; }

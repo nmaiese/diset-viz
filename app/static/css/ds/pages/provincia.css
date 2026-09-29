@@ -25,7 +25,10 @@
   .provincia-top:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; grid-template-rows: auto auto; column-gap: var(--space-12); }
   .provincia-top .locator { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
   .v1-provincia .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: var(--space-12); }
+  .v1-provincia .layout__aside { padding-top: var(--space-section); }
 }
+
+.v1-provincia .prose { max-width: 74ch; }
 .provincia-lead { margin-top: var(--space-8); }
 /* il nome della provincia sotto la media va a sinistra, lontano dalla linea della media */
 .provincia-lead--left .strip__name--on { text-anchor: end; }

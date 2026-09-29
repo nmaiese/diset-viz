@@ -14,7 +14,7 @@
 
 .art-brief {
   display: grid; gap: var(--space-4); max-width: 74ch;
-  margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--rule-strong);
+  margin-bottom: var(--space-8);
 }
 .art-brief .answer strong { font-weight: 700; }
 .art-brief__title { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: var(--fw-label); color: var(--text-2); }
