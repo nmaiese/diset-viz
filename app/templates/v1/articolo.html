@@ -157,18 +157,6 @@
   </div>
   {% endif %}
 
-  {% if d.callout or d.brief_list %}
-  <section class="art-brief" aria-labelledby="in-breve">
-    {% if d.callout %}<p class="answer">{{ d.callout | safe }}</p>{% endif %}
-    {% if d.brief_list %}
-    <h2 class="art-brief__title" id="in-breve">{{ d.brief_title }}</h2>
-    <div class="art-brief__list">{{ d.brief_list | safe }}</div>
-    {% else %}
-    <h2 class="sr-only" id="in-breve">In breve</h2>
-    {% endif %}
-  </section>
-  {% endif %}
-
   <div class="layout art-layout">
     <aside class="layout__aside art-aside" aria-label="Strumenti dell'articolo">
       {% if d.toc %}
@@ -180,6 +168,23 @@
         </ol>
       </nav>
       {% endif %}
+      {% if d.named.indicatore or d.named.territorio %}
+      <div class="aside-block art-aside-extra">
+        <p class="aside-block__label">Citati nell'articolo</p>
+        <ul class="qlist">
+          {% for item in d.named.indicatore %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
+          {% for item in d.named.territorio %}<li><a href="{{ item.path }}">{{ item.label }}</a></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if d.related %}
+      <div class="aside-block art-aside-extra">
+        <p class="aside-block__label">Storie correlate</p>
+        <ul class="qlist">
+          {% for item in d.related %}<li><a href="{{ '/blog/' ~ item.slug }}">{{ item.title }}</a></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
       <div class="aside-block">
         {% if d.institution %}<p>Dati: {{ d.institution }}. Elaborazione Divario Italia.</p>{% endif %}
         {% if ds.download %}<p><a class="linkarrow" href="{{ ds.download }}">Scarica i dati in CSV</a></p>{% endif %}
@@ -188,6 +193,18 @@
     </aside>
 
     <div class="layout__main">
+      {% if d.callout or d.brief_list %}
+      <section class="art-brief" aria-labelledby="in-breve">
+        {% if d.callout %}<p class="answer">{{ d.callout | safe }}</p>{% endif %}
+        {% if d.brief_list %}
+        <h2 class="art-brief__title" id="in-breve">{{ d.brief_title }}</h2>
+        <div class="art-brief__list">{{ d.brief_list | safe }}</div>
+        {% else %}
+        <h2 class="sr-only" id="in-breve">In breve</h2>
+        {% endif %}
+      </section>
+      {% endif %}
+
       <div class="prose art-body">
 {{ d.body_before | safe }}
       </div>
