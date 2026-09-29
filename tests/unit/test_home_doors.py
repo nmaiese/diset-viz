@@ -56,7 +56,7 @@ class LePorte(unittest.TestCase):
         self.assertIn("tutti con i dati completi",
                       atlas_text({"total_indicators": 594, "complete_indicators": 594}))
 
-    def test_la_mappa_della_home_porta_la_lista_dei_punteggi_e_i_non_valutati(self):
+    def test_la_mappa_della_qualita_porta_la_lista_dei_punteggi_e_i_non_valutati(self):
         from app.design.pages import regione
 
         rows = (

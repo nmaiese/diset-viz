@@ -2,37 +2,57 @@
 <div class="zone home-top">
 <div class="wrap">
   <header class="pagehead home-head">
-    <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
-    {#- I conteggi (indicatori, regioni, province) li portano le porte qui sotto:
-        ripetuti anche nella frase, la stessa cifra compariva due volte nella
-        stessa fascia (SISTEMA.md, "Una cifra una volta"). -#}
-    <p class="answer">Gli indicatori territoriali di {{ sources_label }}, dal {{ year_min }} al {{ year_max }}. Ogni cifra porta la sua fonte e il suo anno.</p>
-    <form class="home-find" role="search" action="/ricerca" method="get" aria-labelledby="l-trova">
-      <label id="l-trova" for="trova">Trova il tuo territorio</label>
-      <div class="home-find__row">
-        {#- Il segnaposto sta nel campo anche a 320 pixel: "Una regione, una
-            provincia o un indicatore" si fermava a "o". -#}
-        <input id="trova" name="q" type="search" placeholder="Luogo o indicatore" autocomplete="off">
-        <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
-      </div>
-    </form>
-    {#- La mappa affianca il testo da 768 pixel. Sul telefono la figura viene
-        sostituita dalla classifica testuale dopo le porte, con gli stessi
-        punteggi e gli eventuali territori senza dato. -#}
-    {% if d.region_names %}
-    {% set hm = d.hero_map %}
-    <figure class="home-map">
-      {% if hm %}
-      <figcaption class="home-map__head"><b>Qualità della vita nelle regioni</b>{% if hm.profile %}, profilo {{ hm.profile }}{% endif %}.</figcaption>
-      {{ ui.navmap('regione', hm.names, None, '/regione/', steps=hm.steps) }}
-      {{ ui.legend(hm.legend, 'Più intenso, punteggio più alto.', nd=False) }}
-      {% else %}
-      {{ ui.navmap('regione', d.region_names, None, '/regione/') }}
-      <figcaption class="home-map__hint">Oppure scegli una regione sulla mappa.</figcaption>
-      {% endif %}
-    </figure>
+    <div class="home-head__intro">
+      <p class="eyebrow">L'Italia, regione per regione.</p>
+      <h1 class="h-display">I numeri delle regioni e delle province italiane</h1>
+      <p class="answer">Divario Italia mette in un posto solo gli indicatori di {{ sources_label }} sulle regioni e sulle province italiane, con serie dal {{ year_min }} al {{ year_max }}. Ogni cifra porta la sua fonte e il suo anno.</p>
+      <form class="home-find" role="search" action="/ricerca" method="get" aria-labelledby="l-trova">
+        <label id="l-trova" for="trova">Trova il tuo territorio</label>
+        <div class="home-find__row">
+          <input id="trova" name="q" type="search" placeholder="Luogo o indicatore" autocomplete="off">
+          <button class="btn btn--primary" type="submit">{{ ui.icon('search') }} Cerca</button>
+        </div>
+      </form>
+    </div>
+
+    {% if d.feature %}
+    {% set f = d.feature %}
+    {% set lv = f.levels[0] %}
+    <div class="home-head__visual" data-home-feature="{{ f.code }}" data-home-feature-level="{{ lv.key }}">
+      <aside class="home-spotlight" aria-labelledby="spot-title">
+        <div class="home-spotlight__head">
+          <span class="home-spotlight__badge">{{ ui.icon('shuffle') }} {% if f.requested %}Indicatore scelto{% else %}Indicatore a caso{% endif %}</span>
+          {% if f.theme %}<span class="home-spotlight__theme">{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}</span>{% endif %}
+        </div>
+        <h2 class="home-spotlight__title" id="spot-title"><a href="{{ lv.scheda }}">{{ f.name }}</a></h2>
+        {% if lv.lead_claim %}<p class="home-spotlight__claim">{{ lv.lead_claim }}</p>{% endif %}
+        <div class="home-spotlight__links">
+          <a class="linkarrow" href="#dato">Esplora l'indicatore in evidenza</a>
+          <a class="home-spotlight__scheda" href="{{ lv.scheda }}">Tutta la scheda <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </aside>
+      <figure class="home-map">
+        <figcaption class="sr-only">{{ f.name }} per {{ lv.plural }}, {{ lv.year }}</figcaption>
+        {{ ui.navmap(lv.key, lv.nav_names, None, lv.profile_path, steps=lv.map_steps) }}
+        {{ ui.legend(lv.legend, 'Più intenso, valore più alto. Unità: ' ~ (lv.legend.unit or 'valore') ~ '.', lv.missing) }}
+      </figure>
+    </div>
     {% endif %}
   </header>
+
+  {% if d.feature %}
+  {% set f = d.feature %}
+  {% set lv = f.levels[0] %}
+  <details class="home-map-values" aria-labelledby="home-map-values-title">
+    <summary id="home-map-values-title">Leggi i valori dell'indicatore</summary>
+    <p>{{ f.name }} per {{ lv.plural }}, {{ lv.year }}. Valori nella stessa scala della mappa.</p>
+    <ol class="home-map-values__list">
+      {% for row in lv.value_rows %}
+      <li>{% if lv.profile_path %}<a href="{{ lv.profile_path ~ row.key }}">{{ row.name }}</a>{% else %}<span>{{ row.name }}</span>{% endif %}<data value="{{ row.value }}">{{ row.text }}</data></li>
+      {% endfor %}
+    </ol>
+  </details>
+  {% endif %}
 
   {#- Le porte del sito: le quattro grandi con la cifra che le misura, le altre
       in fila. Ogni scheda e' un link intero, senza ombra e senza "Apri". -#}
@@ -49,27 +69,9 @@
     </ul>
     <ul class="doors__more">
       {%- for door in d.doors.more %}
-      <li><a href="{{ door.path }}"><b>{{ door.title }}</b></a></li>
+      <li><a href="{{ door.path }}"><b>{{ door.title }}</b><span>{{ door.text }}</span></a></li>
       {%- endfor %}
     </ul>
   </nav>
-
-  <details class="home-map-values"{% if d.hero_map %} aria-labelledby="home-map-values-title"{% endif %}>
-    <summary id="home-map-values-title">{% if d.hero_map %}Leggi i punteggi della mappa{% else %}Scegli una regione{% endif %}</summary>
-    {% if d.hero_map %}
-    <p>Profilo {{ d.hero_map.profile or 'predefinito' }}. Punteggi normalizzati da zero a cento, calcolati sugli ultimi dati disponibili per ciascun indicatore. Gli anni possono variare fra indicatori.</p>
-    <ol class="home-map-values__list">
-      {% for row in d.hero_map.rows %}
-      <li><a href="/regione/{{ row.key }}">{{ row.name }}</a><data value="{{ row.score }}">{{ row.score | num(None, 'score') }}</data></li>
-      {% endfor %}
-    </ol>
-    {% if d.hero_map.unrated %}<p>Non valutate: {{ d.hero_map.unrated | join(', ') }}.</p>{% endif %}
-    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica completa</a></p>
-    {% else %}
-    <ul class="home-map-values__list">
-      {% for key, name in d.region_names.items() %}<li><a href="/regione/{{ key }}">{{ name }}</a></li>{% endfor %}
-    </ul>
-    {% endif %}
-  </details>
 </div>
 </div>

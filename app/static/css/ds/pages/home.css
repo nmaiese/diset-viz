@@ -7,18 +7,14 @@
 
 /* ---------- testata: titolo, ricerca e mappa ---------- */
 .home-top { background: var(--surface-1); padding-top: 0; }
-.home-head { padding-block: var(--space-section); }
-/* Da 768 titolo, frase e ricerca a sinistra, la mappa a destra. Le due
-   righe elastiche sopra e sotto tengono il testo al centro dell'altezza
-   della mappa: senza la scheda dell'indicatore a caso, allineato in alto
-   lasciava mezza colonna vuota. */
+.home-head { display: grid; gap: var(--space-6); padding-block: var(--space-8); }
+.home-head__intro, .home-head__visual { display: grid; align-content: center; min-width: 0; }
+.home-head__intro { gap: var(--space-4); }
+.home-head__visual { gap: var(--space-5); }
+/* Da 768 la testata ha due blocchi reali. Il grid li stira alla stessa
+   altezza, mentre il limite della mappa governa l'altezza complessiva. */
 @media (min-width: 768px) {
-  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); grid-template-rows: 1fr auto auto auto 1fr; column-gap: var(--space-8); padding-block: var(--space-12); }
-  .home-head > * { grid-column: 1; }
-  .home-head > h1 { grid-row: 2; }
-  .home-head > .answer { grid-row: 3; }
-  .home-head > .home-find { grid-row: 4; }
-  .home-head > .home-map { grid-column: 2; grid-row: 1 / -1; align-self: center; }
+  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); column-gap: var(--space-8); align-items: stretch; padding-block: var(--space-10); }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
 @media (min-width: 960px) {
@@ -28,35 +24,28 @@
   /* Da 1200 la mappa prende i sette dodicesimi. */
   .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); }
 }
-/* La mappa della testata: la qualita' della vita per regione, con la sua
-   legenda. Sotto i 600 pixel non si disegna: la sostituisce la lista dei
-   punteggi dopo le porte (`.home-map-values`). Fra 600 e 768 sta sotto la
-   ricerca, da 768 nella colonna destra, alta quanto la testata. */
-.home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; width: 100%; }
+/* La mappa racconta lo stesso indicatore della scheda sopra. Sul telefono la
+   sostituisce la lista completa dei valori. */
+.home-map { display: grid; gap: var(--space-3); margin: 0; min-width: 0; width: 100%; }
 .home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
-.home-map .navmap svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
+.home-map .navmap svg { width: 100%; height: auto; max-height: 400px; min-height: 240px; }
 .home-map .legend { max-width: 100%; }
-.home-map__head { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); max-width: 36rem; }
-.home-map__head b { color: var(--ink); font-weight: 600; }
-.home-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
-.home-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 @media (min-width: 768px) {
-  .home-map { margin: 0; align-content: center; }
-  .home-map .navmap { max-width: 400px; }
-  .home-map .navmap svg { max-height: 460px; min-height: 0; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 400px; justify-self: center; width: 100%; }
+  .home-map { align-content: center; }
+  .home-map .navmap { max-width: 300px; }
+  .home-map .navmap svg { max-height: 350px; min-height: 0; }
+  .home-map .legend { max-width: 300px; justify-self: center; width: 100%; }
 }
 @media (min-width: 960px) {
-  .home-map .navmap { max-width: 460px; }
-  .home-map .navmap svg { max-height: 520px; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 460px; }
+  .home-map .navmap { max-width: 330px; }
+  .home-map .navmap svg { max-height: 390px; }
+  .home-map .legend { max-width: 330px; }
 }
 @media (min-width: 1200px) {
-  .home-map .navmap { max-width: 520px; }
-  .home-map .navmap svg { max-height: 580px; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 520px; }
+  .home-map .navmap { max-width: 360px; }
+  .home-map .navmap svg { max-height: 425px; }
+  .home-map .legend { max-width: 360px; }
 }
-.home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 @media (max-width: 599px) { .home-map { display: none; } }
 .home-map-values { display: none; }
 @media (max-width: 599px) {
@@ -80,6 +69,26 @@
 }
 .home-find input::placeholder { color: var(--muted); }
 .home-find .btn { min-height: var(--space-12); }
+
+/* ---------- indicatore in testata ---------- */
+.home-spotlight {
+  display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-5);
+  background: var(--bg); border: 1px solid var(--rule); border-left: 3px solid var(--accent);
+  border-radius: var(--radius-panel);
+}
+.home-spotlight__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); }
+.home-spotlight__badge { display: inline-flex; align-items: center; gap: var(--space-1); font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tr-label); }
+.home-spotlight__badge svg { width: var(--space-4); height: var(--space-4); }
+.home-spotlight__theme, .home-spotlight__theme a { color: var(--muted); }
+.home-spotlight__theme a { text-decoration: none; }
+.home-spotlight__theme a:hover { color: var(--ink); text-decoration: underline; }
+.home-spotlight__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 600; margin: 0; }
+.home-spotlight__title a { color: var(--ink); text-decoration-color: var(--rule-strong); }
+.home-spotlight__title a:hover { color: var(--link); }
+.home-spotlight__claim { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin: 0; }
+.home-spotlight__links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); font-size: var(--fs-small); }
+.home-spotlight__scheda { display: inline-flex; align-items: center; min-height: var(--target); color: var(--text-2); }
+.home-spotlight__scheda:hover { color: var(--ink); }
 
 /* ---------- le porte del sito ---------- */
 /* Le quattro grandi: la cifra che le misura, il titolo che e' il link (esteso a
@@ -154,6 +163,7 @@
 }
 .doors__more b { font-weight: 700; }
 .doors__more b::after { content: " \2192"; }
+.doors__more span { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .doors__more a:hover { color: var(--ink); }
 .doors__more a:hover b { color: var(--accent-strong); text-decoration: underline; }
 
@@ -289,6 +299,26 @@
 .qol__profiles b { font-weight: 700; }
 .qol__levels { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin: 0; }
 
+/* ---------- mappe nelle testate delle fasce ---------- */
+.zone-map { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.zone-map__graphic { display: none; }
+.zone-map__copy { display: grid; align-content: center; gap: var(--space-2); }
+.zone-map__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: var(--tr-label); }
+.zone-map__title { font-weight: 700; color: var(--ink); }
+.zone-map__title a { color: inherit; }
+@media (min-width: 960px) {
+  .zone__head:has(.zone-map) { grid-template-columns: minmax(0, 1fr) minmax(21rem, 27rem); align-items: center; }
+  .zone-map { grid-template-columns: 9rem minmax(0, 1fr); align-items: center; max-width: none; }
+  .zone-map__graphic { display: grid; gap: var(--space-2); }
+  .zone-map .navmap { width: 9rem; }
+  .zone-map .navmap svg { max-height: 170px; }
+  .zone-map .legend { width: 9rem; margin-top: 0; }
+  .zone-map .legend__caption { display: none; }
+  .zone-map--quality { grid-template-columns: 11rem minmax(0, 1fr); }
+  .zone-map--quality .navmap, .zone-map--quality .legend { width: 11rem; }
+  .zone-map--quality .navmap svg { max-height: 205px; }
+}
+
 /* ---------- temi: le quattro aree col loro distintivo ----------
    Il distintivo ha un lavaggio per area (ambra, verde, blu, rosso): colori
    dell'interfaccia per riconoscere l'area, non colori dei dati. */
@@ -316,6 +346,7 @@
    e la variazione deve andare a capo sotto il disegno (`.trend` in
    components.css si piega solo dentro un contenitore). */
 .home-temi__seg { margin-bottom: var(--space-6); }
+.home-temi__actions { margin-bottom: var(--space-6); }
 .home-temi__level:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 .home-area { container-type: inline-size; }
 .home-area__move { display: grid; gap: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--rule); }

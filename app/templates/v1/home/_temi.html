@@ -23,8 +23,19 @@
       <h2 class="h-section" id="h-temi">Gli indicatori, tema per tema</h2>
       <p class="zone__lead">I {{ t.total | num(None, 'count') }} indicatori, in quattro aree, e in ognuna quello cambiato di più.</p>
     </div>
-    <p class="zone__actions">{% if t.total %}<a class="btn btn--primary" href="{{ t.href }}"><span>Esplora i {{ t.total | num(None, 'count') }} indicatori nell'atlante</span></a>{% endif %}<a class="linkarrow" href="/temi">Tutti i temi</a></p>
+    {% if t.preview %}
+    {% set p = t.preview %}
+    <aside class="zone-map" aria-label="Anteprima di {{ p.title }}">
+      <div class="zone-map__graphic">{{ ui.navmap('regione', p.names, None, '/regione/', steps=p.steps) }}</div>
+      <div class="zone-map__copy">
+        <p class="zone-map__kicker">Un'area in anteprima</p>
+        <p class="zone-map__title">{% if p.href %}<a href="{{ p.href }}">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}</p>
+        <p>In testa <a href="/regione/{{ p.best_key }}">{{ p.best }}</a>, in coda <a href="/regione/{{ p.worst_key }}">{{ p.worst }}</a>.</p>
+      </div>
+    </aside>
+    {% endif %}
   </header>
+  <p class="zone__actions home-temi__actions">{% if t.total %}<a class="btn btn--primary" href="{{ t.href }}"><span>Esplora i {{ t.total | num(None, 'count') }} indicatori nell'atlante</span></a>{% endif %}<a class="linkarrow" href="/temi">Tutti i temi</a></p>
 
   {% if two %}
   <div class="seg home-temi__seg" aria-label="Livello dei territori" data-tabs>

@@ -37,11 +37,42 @@ class OgniCoppiaDelPool(unittest.TestCase):
         self.assertGreater(len(self.pool["provincia"]), 20)
 
     def test_la_mappa_ha_un_alternativa_testuale_completa(self):
-        html = self.client.get("/").get_data(as_text=True)
-        self.assertIn('class="home-map-values"', html)
-        self.assertIn("Punteggi normalizzati da zero a cento", html)
-        self.assertIn('class="home-map-values__list"', html)
-        self.assertIn("Apri la classifica completa", html)
+        from app.design.pages import home
+
+        html = self.client.get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
+        block = re.search(r'<details class="home-map-values".*?</details>', html, re.S).group(0)
+        with app.app_context():
+            level = home.feature(home_pick.pick("bes-01SAL001", "provincia"))["levels"][0]
+        self.assertIn("Leggi i valori dell'indicatore", block)
+        self.assertIn('class="home-map-values__list"', block)
+        self.assertEqual(block.count("<li>"), len(level["value_rows"]))
+        for row in (level["value_rows"][0], level["value_rows"][-1]):
+            self.assertIn(row["name"], block)
+            self.assertIn(row["text"], block)
+
+    def test_la_mappa_della_testata_colora_l_indicatore_in_evidenza(self):
+        """La prima mappa usa i gradini del pannello scelto, non quelli BES."""
+        from app.design.pages import home
+
+        code, level_key = "ter-901", "regione"
+        with app.app_context():
+            level = home.feature(home_pick.pick(code, level_key))["levels"][0]
+        html = self.client.get(f"/?indicatore={code}&livello={level_key}").get_data(as_text=True)
+        head = re.search(r'<header class="pagehead home-head">.*?</header>', html, re.S).group(0)
+        top_map = re.search(r'<figure class="home-map">.*?</figure>', head, re.S).group(0)
+        self.assertIn(f'data-home-feature="{code}"', head)
+        self.assertNotIn("Qualità della vita", head)
+        self.assertEqual(top_map.count('<use href="#mr-'), len(level["names"]))
+        for key, step in level["map_steps"].items():
+            self.assertRegex(top_map, rf'<use href="#mr-{re.escape(key)}" class="q{step}"')
+
+    def test_la_mappa_provinciale_ha_lo_sprite_prima_della_testata(self):
+        html = self.client.get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
+        head_at = html.index('<header class="pagehead home-head">')
+        self.assertLess(html.index('id="mp-'), head_at)
+        head = html[head_at:html.index("</header>", head_at)]
+        self.assertIn('class="navmap navmap--provincia navmap--data"', head)
+        self.assertIn('<use href="#mp-', head)
 
     def test_ogni_territorio_ha_la_sua_ripartizione(self):
         """Le frasi della home sul Mezzogiorno ("nessuna regione del

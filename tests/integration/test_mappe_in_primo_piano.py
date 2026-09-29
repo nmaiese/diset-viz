@@ -44,7 +44,9 @@ class LePagine(unittest.TestCase):
         html = self._get("/")
         head = html.split('class="doors"', 1)[0]
         self.assertIn("navmap--data", head)
-        self.assertGreaterEqual(len(re.findall(r'<use href="#mr-[^"]+" class="q[1-6]"', head)), 20)
+        level = re.search(r'data-home-feature-level="(regione|provincia)"', head).group(1)
+        prefix = "mr" if level == "regione" else "mp"
+        self.assertGreaterEqual(len(re.findall(rf'<use href="#{prefix}-[^"]+" class="q[1-6]"', head)), 20)
         self.assertIn('class="legend"', head)
 
     def test_regione_e_provincia_hanno_la_regione_ingrandita(self):

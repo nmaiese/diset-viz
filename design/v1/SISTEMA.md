@@ -194,9 +194,9 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   che cosa colora. Resta un link al profilo, e sotto il mouse il territorio
   prende il contorno d'inchiostro, non l'accento, che coprirebbe il suo colore.
   Un territorio senza dato resta disegnato in grigio e senza link. La usano la
-  testata della home e il margine di ricerca (qualita' della vita delle
-  regioni, `home.hero_map`), l'indice delle province e la mappa accanto
-  all'analisi della scheda.
+  testata della home (valori dell'indicatore in evidenza), la fascia qualita'
+  della vita (`home.hero_map`), il margine di ricerca, l'indice delle province
+  e la mappa accanto all'analisi della scheda.
 - **La regione ingrandita** (`ui.regionmap`, dati da `common.region_map`): il
   riquadro di una regione (`maps.zoom`) con le sue province nei colori della
   qualita' della vita, sui gradini di tutte le 107, cosi' un colore vale lo
@@ -410,8 +410,10 @@ serie di un anno solo, indicatore senza verso, scheda non indicizzabile.
 
 Una sequenza di fasce che alternano fondo e superficie, un partial per fascia
 in `app/templates/v1/home/`. Testata-risposta con un H1 descrittivo e la
-ricerca "trova il tuo territorio", e da 960 pixel la mappa per andare a una
-regione, sulla superficie insieme alle porte del sito.
+ricerca "trova il tuo territorio" a sinistra. A destra la scheda breve e la
+mappa dell'indicatore estratto, regionale o provinciale, coi suoi valori e la
+sua unita'. Sotto i 600 pixel la mappa lascia posto all'elenco testuale degli
+stessi valori. Le porte del sito seguono sulla stessa superficie.
 
 Poi l'indicatore in evidenza, **uno a caso a ogni visita** (`app/home_pick.py`):
 una coppia indicatore e livello dal catalogo indicizzabile, prima il livello e
@@ -425,10 +427,12 @@ tutti e due i livelli, il selettore passa dall'uno all'altro senza ricaricare.
 nel pool. Per questo la home non sta nella cache di pagina.
 
 Seguono regioni e province, con le mappe e le anteprime dei territori. Poi i
-temi, con il selettore dei livelli e le aree dell'atlante, e per ognuna
-l'indicatore cambiato di più. Quindi la qualità della vita, che spiega l'indice
-e porta alla classifica. Chiudono le ultime storie dal blog, con i crediti
-e la riga per fonti e metodo.
+temi, con il selettore dei livelli, le aree dell'atlante e una piccola mappa
+che nomina gli estremi di una delle aree. Quindi la qualità della vita, che
+spiega l'indice e porta alla classifica: qui vive la coropleta regionale del
+profilo predefinito, con legenda, testa e coda. Le mappe nelle testate delle
+fasce spariscono sotto i 960 pixel ma conservano il riepilogo testuale.
+Chiudono le ultime storie dal blog, con i crediti e la riga per fonti e metodo.
 
 I prototipi in `design/v1/src/` non hanno ancora queste fasce: la home del
 sito e' andata avanti da sola.

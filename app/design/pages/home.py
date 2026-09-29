@@ -265,6 +265,7 @@ def level_panel(meta: dict, level: dict, base: str) -> dict | None:
         columns = [{"caption": None, "rows": rows[:split]}, {"caption": None, "rows": rows[split:]}]
         columns = [c for c in columns if c["rows"]]
 
+    map_classes_by_key = map_classes({"map_colors": colors})
     return {
         "key": key, "tab": LEVEL_TAB.get(key, plural.capitalize()), "year": year, "n": n,
         "plural": plural, "singular": singular,
@@ -279,9 +280,16 @@ def level_panel(meta: dict, level: dict, base: str) -> dict | None:
         "areas": territory_areas, "area_label": charts.AREA_LABEL,
         "profile_path": level.get("profile_path"),
         "strip": strip, "callouts": callouts,
-        "map_classes": map_classes({"map_colors": colors}),
+        "map_classes": map_classes_by_key,
+        # `ui.navmap` vuole il numero del gradino, mentre il modulo grande usa
+        # la classe completa. Sono gli stessi gradini, non una seconda scala.
+        "map_steps": {k: int(v.removeprefix("q")) for k, v in map_classes_by_key.items()},
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in observations},
+        "value_rows": [{"key": o["key"], "name": o["name"], "value": o["value"],
+                        "text": with_unit(o["value"], unit, decimals)} for o in observations],
         "names": names,
+        "nav_names": {o["key"]: f"{o['name']}, {with_unit(o['value'], unit, decimals)}"
+                      for o in observations},
         # Sulla mappa ci sono anche i territori senza dato: il tooltip ne dice
         # il nome, non la chiave ("reggio-calabria n.d.").
         "map_names": {**level_names(key), **names},
@@ -726,13 +734,13 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     ranked = sum(n for n in (qol["regions"], qol["provinces"]) if n) if qol else None
     main = {
         "/regioni": {"num": counts.get("regions"), "unit": None, "title": "Regioni",
-                     "text": "Dove stacca e dove resta indietro."},
+                     "text": "Il profilo di ogni regione: dove stacca, dove resta indietro, i valori di ogni indicatore."},
         "/province": {"num": counts.get("provinces"), "unit": None, "title": "Province",
-                      "text": "Posizione, benessere e tutti gli indicatori."},
+                      "text": "Posizione, dimensioni del benessere e tutti gli indicatori di ogni provincia."},
         "/temi": {"num": ctx.get("theme_total"), "unit": None, "title": "Temi",
-                  "text": "Gli indicatori raccolti per argomento."},
+                  "text": "Gli indicatori raccolti per argomento, con la mappa e chi sta in testa su ognuno."},
         "/qualita-della-vita": {"num": ranked or None, "unit": "territori in classifica", "title": "Qualità della vita",
-                                "text": "La classifica, con i pesi che scegli."},
+                                "text": "Dove si vive meglio: la classifica delle regioni e quella delle province, con il profilo di priorità che scegli tu."},
     }
     # La mappa dell'atlante si colora con uno di sei indicatori, e solo
     # all'ultimo anno: "sulla mappa, anno per anno" prometteva quello che la
@@ -799,19 +807,28 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
     # e' un giudizio, e chi legge deve poter sapere come e' fatto.
     rule = ("Cambiato di più: la media semplice dei territori, dal primo all'ultimo anno, "
             "in rapporto allo scarto interquartile dell'ultimo anno.")
-    return {"total": band["total"], "href": band["href"], "rule": rule, "levels": levels}
+    preview = None
+    for area in areas:
+        if area.get("best_key") and area.get("worst_key"):
+            preview = {
+                "title": area["area"], "href": area.get("area_path"),
+                "names": region_names(),
+                "steps": {area["best_key"]: 6, area["worst_key"]: 1},
+                "best": area["best"], "best_key": area["best_key"],
+                "worst": area["worst"], "worst_key": area["worst_key"],
+            }
+            break
+    return {"total": band["total"], "href": band["href"], "rule": rule,
+            "levels": levels, "preview": preview}
 
 
 # ---------------------------------------------------------------- tutta la pagina
 
 def hero_map(names: dict[str, str]) -> dict | None:
-    """La mappa della testata: le regioni nei colori della qualita' della vita.
+    """La mappa della fascia qualita': regioni nei colori della classifica.
 
-    Resta la mappa per andare a una regione (ogni tracciato e' un link al
-    profilo), ma dice anche qualcosa: il punteggio della classifica BES col
-    profilo predefinito, sei gradini con la sua legenda. Il nome sotto il
-    mouse porta la posizione. None se la classifica non c'e': la testata
-    torna alla mappa grigia per scegliere.
+    Ogni tracciato porta al profilo e mostra il punteggio BES col profilo
+    predefinito. None se la classifica non c'e': la fascia resta senza mappa.
     """
     from app.design.pages import regione
 
