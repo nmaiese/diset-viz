@@ -11,40 +11,34 @@
 .home-head__intro, .home-head__visual { display: grid; align-content: center; min-width: 0; }
 .home-head__intro { gap: var(--space-4); }
 .home-head__visual { gap: var(--space-5); }
-/* Da 768 la testata ha due blocchi reali. Il grid li stira alla stessa
-   altezza, mentre il limite della mappa governa l'altezza complessiva. */
+/* Da 768 due colonne: a sinistra titolo, frase e ricerca, a destra la scheda
+   dell'indicatore a caso sopra la sua mappa. Le due colonne devono pesare
+   uguale: la sinistra e' corta (quattro righe e un campo), quindi la leva e'
+   l'altezza della mappa, non il padding. Scheda e mappa stanno in un blocco
+   solo, largo quanto basta, cosi' la scheda non corre a tutta colonna sopra
+   una mappa stretta. */
 @media (min-width: 768px) {
-  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); column-gap: var(--space-8); align-items: stretch; padding-block: var(--space-10); }
+  .home-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-8); align-items: center; padding-block: var(--space-10); }
+  .home-head__visual { justify-self: end; width: 100%; max-width: 34rem; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
-@media (min-width: 960px) {
-  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); }
-}
 @media (min-width: 1200px) {
-  /* Da 1200 la mappa prende i sette dodicesimi. */
-  .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); }
+  .home-head { column-gap: var(--space-16); }
 }
 /* La mappa racconta lo stesso indicatore della scheda sopra. Sul telefono la
-   sostituisce la lista completa dei valori. */
+   sostituisce la lista completa dei valori. Da 768 la legenda sta accanto
+   alla mappa, in basso: sotto allungava la colonna di altre tre righe. */
 .home-map { display: grid; gap: var(--space-3); margin: 0; min-width: 0; width: 100%; }
 .home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
 .home-map .navmap svg { width: 100%; height: auto; max-height: 400px; min-height: 240px; }
 .home-map .legend { max-width: 100%; }
 @media (min-width: 768px) {
-  .home-map { align-content: center; }
-  .home-map .navmap { max-width: 300px; }
-  .home-map .navmap svg { max-height: 350px; min-height: 0; }
-  .home-map .legend { max-width: 300px; justify-self: center; width: 100%; }
-}
-@media (min-width: 960px) {
-  .home-map .navmap { max-width: 330px; }
-  .home-map .navmap svg { max-height: 390px; }
-  .home-map .legend { max-width: 330px; }
+  .home-map { grid-template-columns: minmax(0, 1fr) minmax(0, 11rem); align-items: end; column-gap: var(--space-5); }
+  .home-map .navmap { max-width: none; }
+  .home-map .navmap svg { max-height: 300px; min-height: 0; }
 }
 @media (min-width: 1200px) {
-  .home-map .navmap { max-width: 360px; }
-  .home-map .navmap svg { max-height: 425px; }
-  .home-map .legend { max-width: 360px; }
+  .home-map .navmap svg { max-height: 330px; }
 }
 @media (max-width: 599px) { .home-map { display: none; } }
 .home-map-values { display: none; }
