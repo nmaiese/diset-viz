@@ -195,6 +195,23 @@ orca-ide worktree set --worktree active --comment "Implementati i test; in attes
 - **Niente deploy.**
 - **Niente `Co-Authored-By`** nei messaggi di commit.
 
+### Chi ha fatto cosa, su GitHub
+
+Dal 28/09 ogni worker lanciato con `orca-lancia.sh` di dev-tools parte da un wrapper
+che esporta `AGENT_ID=<agente>-<modello>` (per esempio `codex-gpt-5.6-sol`,
+`opencode-big-pickle`) e lo usa come autore e committer git, con l'email
+`n.maiese+<agente>@gmail.com`. Il ramo `nmaiese/firma-agenti` è nato così: un commit
+di `opencode-big-pickle`. Per il resto l'account resta uno solo, quindi:
+
+- `scripts/orca_review.py` chiude il corpo della PR con `— <AGENT_ID>`, o con il
+  valore di `--firma` se lo passa chi coordina. Issue, review e commenti scritti con
+  `gh` finiscono con la stessa riga (la regola sta negli `AGENTS.md` globali degli
+  agenti, sorgente in dev-tools `agents/AGENTS.md`).
+- Quando chi coordina committa il diff di un worker (per esempio dopo una sandbox di
+  Codex), lo fa con `git commit --author="<AGENT_ID> <n.maiese+<agente>@gmail.com>"`.
+- Per affidare un'issue a un agente si usa la label `agent:<nome>`: su GitHub
+  l'assegnatario può essere solo un utente, e l'account è quello di Nello.
+
 ## 6. Antigravity in orchestrazione, misurato e diagnosticato il 28 settembre 2026
 
 > Aggiornamento della sera del 28/09, dopo le prove in `~/dev/dev-tools/docs/orca.md`
