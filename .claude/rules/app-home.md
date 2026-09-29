@@ -14,18 +14,21 @@ paths:
 
 - `/` — la home, **server-rendered** (`app/templates/v1/home.html` con un
   partial per fascia in `app/templates/v1/home/`, e `home.html` come ripiego):
-  la testata con la ricerca e la mappa per andare a una regione, nei colori
-  della qualita' della vita (`home.hero_map`, profilo predefinito, con la sua
-  legenda; senza classifica torna la mappa grigia). Sotto i 600 pixel la mappa
-  non si disegna e al suo posto, dopo le porte, c'e' la lista dei punteggi in
-  un `<details>` (`home-map-values`), con i territori non valutati;
-  le porte del sito; un indicatore in evidenza **diverso a ogni visita**
+  la testata con la ricerca, la scheda dell'indicatore estratto e la mappa dei
+  suoi valori, regionali o provinciali. La mappa usa i gradini gia' costruiti
+  dal pannello dell'indicatore e la legenda ne dichiara l'unita'. Sotto i 600
+  pixel la mappa non si disegna e al suo posto c'e' la lista completa dei
+  valori in un `<details>` (`home-map-values`); le porte del sito; lo stesso
+  indicatore in evidenza **diverso a ogni visita**
   (`app/home_pick.py`, per regione o per provincia), con tutti e due i livelli
   nello stesso pannello quando tutti e due stanno nel pool; regioni e province
   con un territorio estratto a caso e l'anteprima della sua scheda; la fascia
   "Gli indicatori, tema per tema" (`#temi`), che e' la porta dell'atlante; la
-  qualita' della vita come porta, senza classifica; il quiz; le storie; fonti
-  e metodo. Per questo **non sta nella cache di pagina**: rimetterci
+  qualita' della vita come porta, con la mappa regionale della classifica BES
+  (`home.hero_map`) nella colonna dei bottoni, sotto; le storie; in fondo una
+  riga sola con fonti, metodo, come citare e correzioni (dal 28 settembre 2026
+  il quiz e la fascia delle fonti non sono piu' fasce della home: il quiz si
+  raggiunge dalla porta Giochi). Per questo **non sta nella cache di pagina**: rimetterci
   `@cache.cached` mostrerebbe lo stesso indicatore e gli stessi territori a
   tutti per cinque minuti. Le anteprime dei territori
   (`home.territory_previews`) escono dalle stesse funzioni delle pagine

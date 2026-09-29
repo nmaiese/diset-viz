@@ -21,12 +21,12 @@
 .tmap-cell {
   aspect-ratio: 1; min-width: 0; min-height: var(--target);
   display: grid; align-content: center; justify-items: center; gap: 1px; padding: 2px;
-  font: inherit; font-family: var(--font-ui); line-height: 1.1; cursor: pointer;
+  font: inherit; font-family: var(--font-ui); cursor: pointer;
   border: 0; border-radius: var(--radius-sm); background: var(--data-null); color: var(--ink);
   transition: box-shadow var(--motion-fast) var(--motion-ease);
 }
-.tmap-cell b { font-size: var(--fs-small); font-weight: 700; }
-.tmap-cell span { font-size: var(--fs-label); font-variant-numeric: tabular-nums; opacity: 0.9; }
+.tmap-cell b { font-size: var(--fs-small); line-height: var(--lh-small); font-weight: 700; }
+.tmap-cell span { font-size: var(--fs-label); line-height: var(--lh-label); font-variant-numeric: tabular-nums; opacity: 0.9; }
 .tmap-cell.q1 { background: var(--seq-1); } .tmap-cell.q2 { background: var(--seq-2); } .tmap-cell.q3 { background: var(--seq-3); }
 .tmap-cell.q4 { background: var(--seq-4); color: var(--on-seq-4); }
 .tmap-cell.q5 { background: var(--seq-5); color: var(--bg); } .tmap-cell.q6 { background: var(--seq-6); color: var(--bg); }

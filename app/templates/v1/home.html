@@ -59,20 +59,17 @@
 
 {% block content %}
 <main id="contenuto" class="v1 v1-home" data-v1="home" tabindex="-1">
-{#- I tracciati di regioni e province una volta sola: le cinque mappe della
-    pagina li richiamano con <use> (app/design/maps.py). Le regioni prima della
-    testata, che le usa; le province dopo, per non ritardare il titolo. -#}
+{#- I tracciati di regioni e province una volta sola: la testata puo' mostrare
+    entrambi i livelli, quindi i due sprite devono precederla. -#}
 {{ v1_map_sprite('regione') }}
-{% include "v1/home/_top.html" %}
 {{ v1_map_sprite('provincia') }}
+{% include "v1/home/_top.html" %}
 {% include "v1/home/_feature.html" %}
 {% include "v1/home/_territori.html" %}
 {% include "v1/home/_temi.html" %}
 {% include "v1/home/_qualita.html" %}
-{% include "v1/home/_quiz.html" %}
 {{ ui.ad('leader') }}
 {% include "v1/home/_storie.html" %}
-{% include "v1/home/_fonti.html" %}
 </main>
 <script src="{{ asset_url('js/v1.js') }}" defer></script>
 {% endblock %}

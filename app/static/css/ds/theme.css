@@ -21,12 +21,12 @@
 .theme-standings__grid {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: var(--space-6, 24px);
+  gap: var(--space-6);
   align-items: start;
-  margin: var(--space-4, 16px) 0 var(--space-5, 20px);
+  margin: var(--space-4) 0 var(--space-5);
 }
 
-.theme-standings__map { padding: var(--space-4, 16px); }
+.theme-standings__map { padding: var(--space-4); }
 
 /* Senza questo la sagoma riempie la colonna e spinge la tabella sotto la
    piega: su un blocco affiancato l'altezza la detta la tabella, non la mappa. */
@@ -36,7 +36,7 @@
   padding: 0;
 }
 .theme-standings__map .regions-map { max-height: 440px; }
-.theme-standings__map .map-legend { margin-top: var(--space-3, 12px); }
+.theme-standings__map .map-legend { margin-top: var(--space-3); }
 
 /* Venti righe stanno in pagina, ma le province no: lo scorrimento orizzontale
    e' la stessa scelta che fanno `.explorer-table-wrap` e `.quality-table-wrap`. */
@@ -67,13 +67,13 @@
 
 /* Tre colonne di uscite invece dei cinque blocchi impilati che facevano
    leggere la pagina come un menu. */
-.theme-next { margin-top: var(--space-10, 40px); }
+.theme-next { margin-top: var(--space-section); }
 .theme-next__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: var(--space-4, 16px);
+  gap: var(--space-4);
   align-items: start;
 }
-.theme-next__grid .panel-card { padding: var(--space-4, 16px); }
-.theme-next__grid .indicator-list { margin: var(--space-2, 8px) 0 0; gap: var(--space-2, 8px); }
-.theme-next__grid .indicator-list a { padding: var(--space-3, 12px) var(--space-4, 16px); }
+.theme-next__grid .panel-card { padding: var(--space-4); }
+.theme-next__grid .indicator-list { margin: var(--space-2) 0 0; gap: var(--space-2); }
+.theme-next__grid .indicator-list a { padding: var(--space-3) var(--space-4); }

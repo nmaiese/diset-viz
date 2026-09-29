@@ -5,7 +5,7 @@
    bersagli da 44 pixel. Niente scatole: aria e filetti.
    ========================================================================== */
 
-.v1-ricerca .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; overflow-wrap: anywhere; }
+.v1-ricerca .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; overflow-wrap: anywhere; }
 
 /* Il campo: largo quanto la misura del testo, alto 56 pixel, il bottone accanto. */
 .ricerca-form { display: flex; gap: var(--space-2); max-width: 44rem; }
@@ -34,7 +34,7 @@
 .ricerca-group { padding-top: var(--space-8); }
 .ricerca-group__head {
   padding-top: var(--space-3); border-top: 3px solid var(--ink);
-  font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading);
+  font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection);
 }
 .ricerca-group__more { margin-top: var(--space-4); }
 
@@ -88,6 +88,6 @@
     position: sticky; top: calc(var(--sticky-top) + var(--space-6));
   }
 }
-.ricerca-aside__t { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); padding-top: var(--space-3); border-top: 3px solid var(--ink); }
+.ricerca-aside__t { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); padding-top: var(--space-3); border-top: 3px solid var(--ink); }
 .ricerca-aside__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); }
 .ricerca-layout .search-results { max-width: none; }

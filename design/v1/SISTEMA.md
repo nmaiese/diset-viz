@@ -63,10 +63,14 @@ Upshot per il testo che accompagna il dato.
 - **Breakpoint** 600, 960, 1200. Dentro i componenti si usano container query
   sulla larghezza del componente, non altri breakpoint di pagina.
 - **Spazi** a passo 4, usati su nove valori: 4, 8, 12, 16, 24, 32, 48, 64, 96.
-  Fra sezioni 64 (48 su telefono) sotto la testata di sezione, fra blocchi 24
-  (16).
+  Fra sezioni lo spazio e' fluido, da 56 su telefono a 96 su desktop
+  (`--space-section`), e c'e' una volta sola: la sezione lo porta sopra, la
+  fascia ne porta meta' per lato, cosi' due fasce di fila non lo raddoppiano.
+  Dentro un componente lo spazio resta quello del componente (8, 16, 24): il
+  vuoto fra sezioni non si usa per staccare un titolo dal suo grafico. Fra
+  blocchi e' 24, o 16 dove il componente e' stretto.
 - **La testata di sezione** e' un filetto d'inchiostro da 3px con l'H2 sotto,
-  a 34px da 1200. Col filetto chiaro da 1px e l'H2 poco piu' grande dei titoli
+  a 32px da 1200. Col filetto chiaro da 1px e l'H2 poco piu' grande dei titoli
   dei grafici, a schermo largo le sezioni si confondevano una con l'altra.
 - **La fascia** (`.zone`) e' una sezione a tutta larghezza col suo contenitore
   dentro. Le pagine che sono un indice di sezioni, la home per prima, alternano
@@ -78,24 +82,33 @@ Upshot per il testo che accompagna il dato.
 
 ## Tipografia
 
-Una scala di undici ruoli, nominati per funzione:
+Una scala di otto passi, con ruoli nominati per funzione:
 
-| ruolo | desktop | telefono | uso |
-| --- | --- | --- | --- |
-| display | 56/58 | 36/40 | H1 della home e degli articoli |
-| titolo | 44/48 | 30/34 | H1 di schede, territori, classifiche |
-| sezione | 28/32, 34/39 da 1200 | 23/28 | H2, sempre sotto il filetto d'inchiostro |
-| sottosezione | 20/26 | 19/24 | H3, titolo-affermazione dei grafici |
-| lede | 22/32 | 19/28 | frase-risposta, sommario |
-| prosa | 19/30 | 18/28 | articolo della scheda, blog, metodologia |
-| interfaccia | 16/24 | 16/24 | controlli, celle, schede |
-| piccolo | 14/20 | 14/20 | riga fonte, meta, briciole, didascalie |
-| etichetta | 13/18, peso 600 | 13/18 | occhielli, intestazioni di tabella, legende |
-| cifra chiave | 64/64, peso 700 | 44/44 | il numero di una pagina |
-| cifra di tessera | 36/38, peso 700 | 28/30 | tessere numero |
+| ruolo | telefono | desktop | interlinea | peso | uso |
+| --- | --- | --- | --- | --- | --- |
+| etichetta | 14 | 14 | 1,4 | 600 | occhielli, intestazioni di tabella, legende |
+| piccolo | 14 | 14 | 1,43 | 400 | riga fonte, meta, briciole, didascalie |
+| interfaccia | 16 | 16 | 1,5 | 400 | controlli, celle, schede |
+| prosa | 18 | 18 | 1,6 | 400 | articolo della scheda, blog, metodologia |
+| lede | 20 | 22 | 1,45 | 400 | frase-risposta, sommario |
+| sottosezione | 20 | 22 | 1,3 | 700 | H3, titolo-affermazione dei grafici |
+| sezione | 24 | 32 | 1,15 | 700 | H2 sotto il filetto d'inchiostro |
+| sezione grande | 32 | 32 | 1,15 | 700 | alias del valore desktop di sezione |
+| titolo | 32 | 44 | 1,1 | 700 | H1 di schede, territori, classifiche |
+| cifra di tessera | 24 | 32 | 1,05 | 700 | alias di sezione per tessere numero |
+| display | 40 | 56 | 1,05 | 760 | H1 della home e degli articoli |
+| cifra chiave | 44 | 64 | 1 | 700 | il numero di una pagina |
+
+La scala ha otto passi. A parita' di taglia la gerarchia la fa il peso.
+Nei fogli della 1.0 non si scrivono font-size letterali, con due eccezioni
+elencate nella guardia (`tests/unit/test_css_tokens.py`): il wordmark della
+testata, e il testo dentro gli SVG dei grafici. Quello si misura in unita'
+del viewBox, non in pixel, e riquadri, richiami e scarti fra etichette in
+`charts.py` sono calcolati su quelle taglie: un token in pixel ne
+cambierebbe la taglia vera.
 
 - Le etichette sono in minuscolo con l'iniziale maiuscola: mai tutto maiuscolo,
-  mai monospazio. 13px e' il minimo. La scala e' tarata su un occhio medio di
+  mai monospazio. 14px e' il minimo del testo HTML. La scala e' tarata su un occhio medio di
   0,49 e `font-size-adjust` la tiene uguale se si cambia famiglia.
 - **Le cifre hanno un sistema solo**, `tools/numfmt.py`, per ruoli: cifra (tessere
   e frasi, decimali dalla grandezza), cella (decimali uguali per tutta la
@@ -181,9 +194,9 @@ Ventotto, e ognuno prende il posto delle sue varianti di oggi.
   che cosa colora. Resta un link al profilo, e sotto il mouse il territorio
   prende il contorno d'inchiostro, non l'accento, che coprirebbe il suo colore.
   Un territorio senza dato resta disegnato in grigio e senza link. La usano la
-  testata della home e il margine di ricerca (qualita' della vita delle
-  regioni, `home.hero_map`), l'indice delle province e la mappa accanto
-  all'analisi della scheda.
+  testata della home (valori dell'indicatore in evidenza), la fascia qualita'
+  della vita (`home.hero_map`), il margine di ricerca, l'indice delle province
+  e la mappa accanto all'analisi della scheda.
 - **La regione ingrandita** (`ui.regionmap`, dati da `common.region_map`): il
   riquadro di una regione (`maps.zoom`) con le sue province nei colori della
   qualita' della vita, sui gradini di tutte le 107, cosi' un colore vale lo
@@ -397,8 +410,10 @@ serie di un anno solo, indicatore senza verso, scheda non indicizzabile.
 
 Una sequenza di fasce che alternano fondo e superficie, un partial per fascia
 in `app/templates/v1/home/`. Testata-risposta con un H1 descrittivo e la
-ricerca "trova il tuo territorio", e da 960 pixel la mappa per andare a una
-regione, sulla superficie insieme alle porte del sito.
+ricerca "trova il tuo territorio" a sinistra. A destra la scheda breve e la
+mappa dell'indicatore estratto, regionale o provinciale, coi suoi valori e la
+sua unita'. Sotto i 600 pixel la mappa lascia posto all'elenco testuale degli
+stessi valori. Le porte del sito seguono sulla stessa superficie.
 
 Poi l'indicatore in evidenza, **uno a caso a ogni visita** (`app/home_pick.py`):
 una coppia indicatore e livello dal catalogo indicizzabile, prima il livello e
@@ -411,19 +426,13 @@ tutti e due i livelli, il selettore passa dall'uno all'altro senza ricaricare.
 `?indicatore=ter-901&livello=provincia` fissa la scelta, se quella coppia sta
 nel pool. Per questo la home non sta nella cache di pagina.
 
-Seguono regioni e province (per ognuno dei due livelli la mappa per scegliere,
-un territorio a caso e l'anteprima della sua scheda, con le frasi della sua
-testata), "Gli indicatori, tema per tema" (la porta dell'atlante: un solo
-bottone primario "Esplora i N indicatori nell'atlante", il selettore
-Regioni/Province, le quattro aree col distintivo e il conteggio che apre
-l'atlante filtrato, e per ogni area l'indicatore cambiato di piu' con la sua
-sparkline e la variazione in chiaro, scelto con la regola scritta nella riga
-fonte; sulle regioni anche testa e coda con le frecce, sulle province no),
-la qualita' della vita come porta (che cosa misura, i profili di
-priorita', il bottone verso la pagina: la classifica in home non c'e'), il
-quiz in una fascia sua (lavaggio ambra, schede con illustrazione, una domanda
-lampo), le storie (una grande accanto alla foto, tre in fila) e fonti, metodo
-e come citare. Un bottone primario per fascia.
+Seguono regioni e province, con le mappe e le anteprime dei territori. Poi i
+temi, con il selettore dei livelli, le aree dell'atlante e una piccola mappa
+che nomina gli estremi di una delle aree. Quindi la qualità della vita, che
+spiega l'indice e porta alla classifica: qui vive la coropleta regionale del
+profilo predefinito, con legenda, testa e coda. Le mappe nelle testate delle
+fasce spariscono sotto i 960 pixel ma conservano il riepilogo testuale.
+Chiudono le ultime storie dal blog, con i crediti e la riga per fonti e metodo.
 
 I prototipi in `design/v1/src/` non hanno ancora queste fasce: la home del
 sito e' andata avanti da sola.

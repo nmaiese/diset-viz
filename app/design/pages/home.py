@@ -265,6 +265,7 @@ def level_panel(meta: dict, level: dict, base: str) -> dict | None:
         columns = [{"caption": None, "rows": rows[:split]}, {"caption": None, "rows": rows[split:]}]
         columns = [c for c in columns if c["rows"]]
 
+    map_classes_by_key = map_classes({"map_colors": colors})
     return {
         "key": key, "tab": LEVEL_TAB.get(key, plural.capitalize()), "year": year, "n": n,
         "plural": plural, "singular": singular,
@@ -279,9 +280,16 @@ def level_panel(meta: dict, level: dict, base: str) -> dict | None:
         "areas": territory_areas, "area_label": charts.AREA_LABEL,
         "profile_path": level.get("profile_path"),
         "strip": strip, "callouts": callouts,
-        "map_classes": map_classes({"map_colors": colors}),
+        "map_classes": map_classes_by_key,
+        # `ui.navmap` vuole il numero del gradino, mentre il modulo grande usa
+        # la classe completa. Sono gli stessi gradini, non una seconda scala.
+        "map_steps": {k: int(v.removeprefix("q")) for k, v in map_classes_by_key.items()},
         "map_values": {o["key"]: with_unit(o["value"], unit) for o in observations},
+        "value_rows": [{"key": o["key"], "name": o["name"], "value": o["value"],
+                        "text": with_unit(o["value"], unit, decimals)} for o in observations],
         "names": names,
+        "nav_names": {o["key"]: f"{o['name']}, {with_unit(o['value'], unit, decimals)}"
+                      for o in observations},
         # Sulla mappa ci sono anche i territori senza dato: il tooltip ne dice
         # il nome, non la chiave ("reggio-calabria n.d.").
         "map_names": {**level_names(key), **names},
@@ -630,34 +638,6 @@ def quality(ctx: dict) -> dict | None:
             "profile_word": count_word(len(profiles_list), feminine=False) if profiles_list else None}
 
 
-# ---------------------------------------------------------------- quiz
-
-def quiz_try(ctx: dict, feature_path: str | None = None) -> dict | None:
-    """Una domanda di "Chi è maggiore?" fatta con una lettura in evidenza del
-    contesto: due regioni, un indicatore, quale ha il valore piu' alto. Mai
-    sull'indicatore che la pagina ha appena mostrato."""
-    game = next((g for g in ctx.get("quiz_games") or [] if g["href"].endswith("chi-e-maggiore")), None)
-    card = next((c for c in ctx.get("insight_cards") or [] if c.get("path") != feature_path), None)
-    if not game or not card:
-        return None
-    a = {"name": card["lead_region"], "value": parse_it(card.get("lead_value"))}
-    b = {"name": card["lag_region"], "value": parse_it(card.get("lag_value"))}
-    if a["value"] is None or b["value"] is None or math.isclose(a["value"], b["value"]):
-        return None
-    # Le cifre si scrivono coi decimali della grandezza, come nelle tessere
-    # della scheda. Se scritte cosi' coincidono, la domanda non ha risposta.
-    if numfmt.text(a["value"]) == numfmt.text(b["value"]):
-        return None
-    right, wrong = (a, b) if a["value"] > b["value"] else (b, a)
-    options = sorted([a, b], key=lambda o: o["name"])
-    return {
-        "game": game, "indicator": card["name"], "path": card["path"], "year": card["year"],
-        "source_label": card.get("source_label"), "unit": card.get("unit"),
-        "options": [{"name": o["name"], "right": o is right} for o in options],
-        "right": right, "wrong": wrong,
-    }
-
-
 # ---------------------------------------------------------------- storie
 
 def _jpeg_size(data: bytes) -> tuple[int, int] | None:
@@ -782,12 +762,6 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
     }
 
 
-# I tre giochi del quiz con la loro illustrazione e il lavaggio della scheda.
-GAME_LOOK = {
-    "indovina-la-regione": {"icon": "game-map", "tone": "blue"},
-    "chi-e-maggiore": {"icon": "game-versus", "tone": "green"},
-    "ordina": {"icon": "game-sort", "tone": "red"},
-}
 
 # Le quattro aree dei temi con la loro icona e il lavaggio del distintivo. Non
 # sono colori dei dati (rampa, ripartizioni) ne' l'accento: servono solo a
@@ -829,25 +803,34 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
             cards.append(card)
         levels.append({"key": level["key"], "tab": level["tab"], "plural": level["plural"], "n": level["n"],
                        "href": level["href"], "areas": cards})
-    need, total = band["need"], band["panel_total"]
-    rule = ("Per ogni area, l'indicatore la cui media semplice è cambiata di più fra il primo e l'ultimo anno, "
-            "in rapporto allo scarto interquartile fra i territori nell'ultimo anno, a pari merito in ordine "
-            f"alfabetico. Solo schede indicizzabili, con almeno {count_word(band['min_years'], feminine=False)} "
-            f"anni in cui almeno {need['regione']} regioni su {total['regione']} ({need['provincia']} province su "
-            f"{total['provincia']}) hanno il dato, e con la media dei territori presenti in tutti quegli anni.")
-    return {"total": band["total"], "href": band["href"], "rule": rule, "levels": levels}
+    # La regola della scelta resta scritta, in una riga: "cambiato di piu'"
+    # e' un giudizio, e chi legge deve poter sapere come e' fatto.
+    rule = ("Cambiato di più: la media semplice dei territori, dal primo all'ultimo anno, "
+            "in rapporto allo scarto interquartile dell'ultimo anno.")
+    preview = None
+    for area in areas:
+        if area.get("best_key") and area.get("worst_key"):
+            preview = {
+                "title": area["area"], "href": area.get("area_path"),
+                "names": region_names(),
+                # Testa e coda con lo stesso gradino: un colore dei dati non
+                # porta un giudizio, e chi e' chi lo dice il testo accanto.
+                "steps": {area["best_key"]: 5, area["worst_key"]: 5},
+                "best": area["best"], "best_key": area["best_key"],
+                "worst": area["worst"], "worst_key": area["worst_key"],
+            }
+            break
+    return {"total": band["total"], "href": band["href"], "rule": rule,
+            "levels": levels, "preview": preview}
 
 
 # ---------------------------------------------------------------- tutta la pagina
 
 def hero_map(names: dict[str, str]) -> dict | None:
-    """La mappa della testata: le regioni nei colori della qualita' della vita.
+    """La mappa della fascia qualita': regioni nei colori della classifica.
 
-    Resta la mappa per andare a una regione (ogni tracciato e' un link al
-    profilo), ma dice anche qualcosa: il punteggio della classifica BES col
-    profilo predefinito, sei gradini con la sua legenda. Il nome sotto il
-    mouse porta la posizione. None se la classifica non c'e': la testata
-    torna alla mappa grigia per scegliere.
+    Ogni tracciato porta al profilo e mostra il punteggio BES col profilo
+    predefinito. None se la classifica non c'e': la fascia resta senza mappa.
     """
     from app.design.pages import regione
 
@@ -886,8 +869,6 @@ def derive(ctx: dict) -> dict:
         "best_key": next((k for k, v in names.items() if v == area.get("best")), None),
         "worst_key": next((k for k, v in names.items() if v == area.get("worst")), None),
     } for area in ctx.get("themes_preview") or []]
-    citation = (f"Divario Italia, «I numeri delle regioni e delle province italiane», elaborazione su dati "
-                f"{ctx.get('sources_label')}. {ctx.get('canonical')}")
     return {
         "indicators": ctx.get("total_indicators"),
         "regions": counts.get("regions"), "provinces": counts.get("provinces"),
@@ -897,15 +878,7 @@ def derive(ctx: dict) -> dict:
         "region_names": names,
         "hero_map": hero_map(names),
         "quality": qol,
-        "quiz_try": quiz_try(ctx, (feat or {}).get("path")),
-        "games": [{**g, **GAME_LOOK.get(g["href"].rsplit("/", 1)[-1], {"icon": "bolt", "tone": "amber"})}
-                  for g in ctx.get("quiz_games") or []],
         "areas": areas,
         "temi": themes_band(ctx.get("atlas_band"), areas),
         "stories": [story(p) for p in posts],
-        "citation": citation,
-        "games_word": count_word(len(ctx.get("quiz_games") or []), feminine=False).capitalize(),
-        # Le schede di fiducia di prima, per chiave. "Copertura" ripete la
-        # definizione in testa alla pagina, quindi il template ne usa solo il testo.
-        "trust": {card["kicker"]: card for card in ctx.get("trust_cards") or []},
     }

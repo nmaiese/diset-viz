@@ -7,53 +7,48 @@
 
 /* ---------- testata: titolo, ricerca e mappa ---------- */
 .home-top { background: var(--surface-1); padding-top: 0; }
-.home-head { padding-top: var(--space-6); padding-bottom: var(--space-6); }
-/* Da 768 c'e' gia' spazio per testo, ricerca e spotlight a sinistra e mappa a
-   destra. I gradini successivi mantengono le proporzioni desktop. */
+.home-head { display: grid; gap: var(--space-6); padding-block: var(--space-8); }
+.home-head__intro, .home-head__visual { display: grid; align-content: center; min-width: 0; }
+.home-head__intro { gap: var(--space-4); }
+.home-head__visual { gap: var(--space-5); }
+/* Da 768 due colonne: a sinistra titolo, frase e ricerca, a destra la scheda
+   dell'indicatore a caso sopra la sua mappa. Le due colonne devono pesare
+   uguale: la sinistra e' corta (quattro righe e un campo), quindi la leva e'
+   l'altezza della mappa, non il padding. Scheda e mappa stanno in un blocco
+   solo, largo quanto basta, cosi' la scheda non corre a tutta colonna sopra
+   una mappa stretta. */
 @media (min-width: 768px) {
-  /* Le righe della colonna sinistra contengono titolo, frase, ricerca e spotlight dell'indicatore.
-     Sul tablet la colonna di testo resta appena piu' larga per non spezzare il titolo. */
-  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); grid-template-rows: auto auto auto auto auto; column-gap: var(--space-8); align-content: start; padding-top: var(--space-8); padding-bottom: var(--space-8); }
-  .home-head > * { grid-column: 1; }
-  .home-head > .home-map { grid-column: 2; grid-row: 1 / span 6; align-self: center; }
+  .home-head { grid-template-columns: minmax(0, 6.3fr) minmax(0, 5.7fr); column-gap: var(--space-8); align-items: center; padding-block: var(--space-10); }
+  .home-head__visual { justify-self: end; width: 100%; max-width: 34rem; }
   .home-find { max-width: 36rem; margin-top: var(--space-2); align-self: start; }
 }
+/* Le proporzioni delle colonne sono quelle di master: la colonna del testo
+   piu' stretta manda il titolo su tre righe e alza il blocco di sinistra
+   verso l'altezza di scheda e mappa. */
 @media (min-width: 960px) {
-  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); padding-top: var(--space-10); }
+  .home-head { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); }
 }
 @media (min-width: 1200px) {
-  /* Da 1200 la mappa prende i sette dodicesimi. */
   .home-head { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); }
+  /* Oltre 1440 la colonna si allarga col contenitore e il titolo tornava su
+     due righe: lo teniamo su tre, come su master. */
+  .home-head__intro .h-display { max-width: 8em; }
 }
-/* La mappa della testata: la qualita' della vita per regione, con la sua
-   legenda. Sotto i 600 pixel non si disegna: la sostituisce la lista dei
-   punteggi dopo le porte (`.home-map-values`). Fra 600 e 768 sta sotto la
-   ricerca, da 768 nella colonna destra, alta quanto la testata. */
-.home-map { display: grid; gap: var(--space-3); margin: var(--space-4) 0 0; min-width: 0; width: 100%; }
+/* La mappa racconta lo stesso indicatore della scheda sopra. Sul telefono la
+   sostituisce la lista completa dei valori. Da 768 la legenda sta accanto
+   alla mappa, in basso: sotto allungava la colonna di altre tre righe. */
+.home-map { display: grid; gap: var(--space-3); margin: 0; min-width: 0; width: 100%; }
 .home-map .navmap { width: 100%; max-width: 100%; justify-self: center; }
-.home-map .navmap svg { width: 100%; height: auto; max-height: 52vh; min-height: 280px; }
+.home-map .navmap svg { width: 100%; height: auto; max-height: 400px; min-height: 240px; }
 .home-map .legend { max-width: 100%; }
-.home-map__head { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); max-width: 36rem; }
-.home-map__head b { color: var(--ink); font-weight: 600; }
-.home-map .navmap:not(.navmap--data) a use { fill: var(--rule-strong); stroke: var(--surface-1); stroke-width: 1.4; }
-.home-map .navmap:not(.navmap--data) a:hover use { fill: var(--accent); }
 @media (min-width: 768px) {
-  .home-map { margin: 0; align-content: center; }
-  .home-map .navmap { max-width: 400px; }
-  .home-map .navmap svg { max-height: 460px; min-height: 0; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 400px; justify-self: center; width: 100%; }
-}
-@media (min-width: 960px) {
-  .home-map .navmap { max-width: 460px; }
-  .home-map .navmap svg { max-height: 520px; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 460px; }
+  .home-map { grid-template-columns: minmax(0, 1fr) minmax(0, 14rem); align-items: end; column-gap: var(--space-5); }
+  .home-map .navmap { max-width: none; }
+  .home-map .navmap svg { max-height: 300px; min-height: 0; }
 }
 @media (min-width: 1200px) {
-  .home-map .navmap { max-width: 520px; }
-  .home-map .navmap svg { max-height: 580px; }
-  .home-map .legend, .home-map__head, .home-map__hint { max-width: 520px; }
+  .home-map .navmap svg { max-height: 330px; }
 }
-.home-map__hint { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 @media (max-width: 599px) { .home-map { display: none; } }
 .home-map-values { display: none; }
 @media (max-width: 599px) {
@@ -62,8 +57,9 @@
   .home-map-values > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   .home-map-values > p { max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin-block: var(--space-3); }
   .home-map-values__list { display: grid; gap: 0; padding: 0; margin: 0; list-style: none; }
-  .home-map-values__list li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); border-top: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
-  .home-map-values__list a { color: var(--ink); }
+  .home-map-values__list li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); border-top: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+  /* Il link e' il bersaglio: alto quanto un dito (44), non quanto la riga di testo. */
+  .home-map-values__list a { display: flex; align-items: center; flex: 1; min-height: var(--target); color: var(--ink); }
   .home-map-values__list data { color: var(--text-2); white-space: nowrap; }
 }
 .home-find { display: grid; gap: var(--space-2); min-width: 0; }
@@ -77,87 +73,25 @@
 .home-find input::placeholder { color: var(--muted); }
 .home-find .btn { min-height: var(--space-12); }
 
-/* ---------- spotlight indicatore in testata ---------- */
+/* ---------- indicatore in testata ---------- */
 .home-spotlight {
-  display: grid;
-  gap: var(--space-2);
-  margin-top: var(--space-6);
-  padding: var(--space-4) var(--space-5);
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-left: 3px solid var(--accent);
+  display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-5);
+  background: var(--bg); border: 1px solid var(--rule); border-left: 3px solid var(--accent);
   border-radius: var(--radius-panel);
-  max-width: 36rem;
 }
-.home-spotlight__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  font-size: var(--fs-label);
-  line-height: var(--lh-label);
-}
-.home-spotlight__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 11px;
-}
-.home-spotlight__badge svg {
-  width: 14px;
-  height: 14px;
-}
-.home-spotlight__theme {
-  color: var(--muted);
-}
-.home-spotlight__theme a {
-  color: var(--muted);
-  text-decoration: none;
-}
-.home-spotlight__theme a:hover {
-  color: var(--ink);
-  text-decoration: underline;
-}
-.home-spotlight__title {
-  font-size: clamp(17px, 16px + 0.25vw, 19px);
-  line-height: 1.25;
-  font-weight: 600;
-  margin: 0;
-}
-.home-spotlight__title a {
-  color: var(--ink);
-  text-decoration-color: var(--rule-strong);
-}
-.home-spotlight__title a:hover {
-  color: var(--link);
-}
-.home-spotlight__claim {
-  font-size: var(--fs-small);
-  line-height: var(--lh-small);
-  color: var(--text-2);
-  margin: 0;
-}
-.home-spotlight__links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-5);
-  margin-top: var(--space-1);
-  font-size: var(--fs-small);
-}
-.home-spotlight__scheda {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target);
-  color: var(--text-2);
-}
-.home-spotlight__scheda:hover {
-  color: var(--ink);
-}
+.home-spotlight__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); }
+.home-spotlight__badge { display: inline-flex; align-items: center; gap: var(--space-1); font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tr-label); }
+.home-spotlight__badge svg { width: var(--space-4); height: var(--space-4); }
+.home-spotlight__theme, .home-spotlight__theme a { color: var(--muted); }
+.home-spotlight__theme a { text-decoration: none; }
+.home-spotlight__theme a:hover { color: var(--ink); text-decoration: underline; }
+.home-spotlight__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 600; margin: 0; }
+.home-spotlight__title a { color: var(--ink); text-decoration-color: var(--rule-strong); }
+.home-spotlight__title a:hover { color: var(--link); }
+.home-spotlight__claim { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); margin: 0; }
+.home-spotlight__links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); font-size: var(--fs-small); }
+.home-spotlight__scheda { display: inline-flex; align-items: center; min-height: var(--target); color: var(--text-2); }
+.home-spotlight__scheda:hover { color: var(--ink); }
 
 /* ---------- le porte del sito ---------- */
 /* Le quattro grandi: la cifra che le misura, il titolo che e' il link (esteso a
@@ -193,11 +127,12 @@
   border-top: 2px solid var(--rule-strong); border-radius: var(--radius-sm);
 }
 .door:first-child { padding: var(--space-6); border-top-width: 3px; }
-/* Da 960 la prima porta e' alta due righe: la cifra sta in alto, titolo e
-   frase in basso, cosi' il riquadro non resta vuoto a meta'. */
+/* Da 960 la prima porta e' alta due righe. Cifra, titolo e frase stanno
+   insieme in fondo al riquadro: con la cifra in alto e il titolo in basso
+   il vuoto in mezzo li staccava, e la cifra non si leggeva piu' come la
+   misura del titolo. */
 @media (min-width: 960px) {
-  .door:first-child { grid-template-rows: 1fr auto auto; padding: var(--space-8); }
-  .door:first-child .door__num { align-self: start; }
+  .door:first-child { grid-template-rows: auto auto auto; align-content: end; padding: var(--space-8); }
   /* La cifra vera e' lo span `.n`, che `.figure-num .n` tiene alla taglia piccola. */
   .door:first-child .door__num .n { font-size: var(--fs-figure); line-height: var(--lh-figure); letter-spacing: var(--tr-figure); }
   .door:first-child .door__title { font-size: var(--fs-section); line-height: var(--lh-section); }
@@ -251,7 +186,7 @@
 .feat__meta a { color: var(--text-2); text-decoration-color: var(--rule-strong); }
 .feat__meta a:hover { color: var(--ink); }
 .feat__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
-.feat__name { font-size: clamp(20px, 18.5px + 0.35vw, 22px); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
+.feat__name { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
 .feat__name a { color: var(--ink); text-decoration: none; }
 .feat__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 /* Il selettore dei livelli: due schede (tab) che senza JavaScript sono link. */
@@ -288,7 +223,7 @@
 .feat__cols caption { font-weight: 600; color: var(--ink); text-align: left; }
 @media (min-width: 720px) { .feat__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .feat__source { margin: 0; }
-.feat__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--rule); }
+.feat__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--rule); }
 .feat__end .source { flex: 1 1 24rem; }
 .feat__only { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 /* Sul telefono la scheda perde il margine interno largo e la colonna delle
@@ -330,7 +265,7 @@
 .terr__find select { width: 100%; }
 .terr__card { display: grid; gap: var(--space-3); align-content: start; }
 .terr__kicker { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
-.terr__name { font-size: clamp(20px, 18.5px + 0.35vw, 22px); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
+.terr__name { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
 .terr__name a { color: var(--ink); text-decoration: none; }
 .terr__name a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .terr__lead { color: var(--text-2); }
@@ -365,65 +300,30 @@
 .qol__profiles a:hover { border-color: var(--ink); }
 .qol__profiles a:hover b { color: var(--accent-strong); text-decoration: underline; }
 .qol__profiles b { font-weight: 700; }
-.qol__profiles span { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); }
 .qol__levels { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin: 0; }
-.qol__dims { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.qol__only { font-size: var(--fs-label); font-weight: 600; color: var(--muted); }
-.qol__dims li { padding: 4px var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2); background: var(--bg); border-radius: var(--radius-sm); }
 
-/* ---------- quiz: una fascia da gioco ----------
-   Il lavaggio ambra la stacca dalle altre, le schede dei giochi hanno
-   un'illustrazione e si cliccano per intero, la domanda lampo e' una carta
-   con due bottoni grandi. Niente colori dei dati, niente accento fuori da
-   cio' che si clicca. */
-.zone--fun { background: var(--amber-wash); }
-.home-quiz__grid { display: grid; gap: var(--space-8) var(--space-12); align-items: start; }
-@media (min-width: 1200px) { .home-quiz__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
-.home-games { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 600px) { .home-games { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-/* Niente ombre (SISTEMA.md): la scheda si stacca dal lavaggio con il fondo
-   e un filetto, e al passaggio il filetto passa all'inchiostro. */
-.game {
-  position: relative; display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5);
-  background: var(--bg); border: 1px solid var(--rule-strong); border-radius: var(--radius-md);
-  transition: border-color var(--motion-fast) var(--motion-ease);
+/* ---------- mappe nelle testate delle fasce ---------- */
+.zone-map { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); max-width: var(--measure); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
+.zone-map__graphic { display: none; }
+.zone-map__copy { display: grid; align-content: center; gap: var(--space-2); }
+.zone-map__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: var(--tr-label); }
+.zone-map__title { font-weight: 700; color: var(--ink); }
+.zone-map__title a { color: inherit; }
+@media (min-width: 960px) {
+  /* La mappa non alza la testata: resta bassa quanto titolo e frase, e il
+     titolo sta in basso come nelle altre fasce. */
+  .zone__head:has(.zone-map) { grid-template-columns: minmax(0, 1fr) minmax(21rem, 27rem); align-items: end; }
+  .zone-map { grid-template-columns: 9rem minmax(0, 1fr); align-items: center; max-width: none; }
+  .zone-map__graphic { display: grid; gap: var(--space-2); }
+  .zone-map .navmap { width: 9rem; }
+  .zone-map .navmap svg { max-height: 120px; }
+  .zone-map .legend { width: 9rem; margin-top: 0; }
+  .zone-map .legend__caption { display: none; }
+  .qol__main .zone-map--quality { margin-top: var(--space-4); padding-top: var(--space-5); border-top: 1px solid var(--rule); }
+  .zone-map--quality { grid-template-columns: 11rem minmax(0, 1fr); }
+  .zone-map--quality .navmap, .zone-map--quality .legend { width: 11rem; }
+  .zone-map--quality .navmap svg { max-height: 200px; }
 }
-.game:hover { border-color: var(--ink); }
-@media (prefers-reduced-motion: reduce) { .game { transition: none; } }
-@supports selector(:has(a)) {
-  .game:has(a:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .game__title a:focus-visible { outline: none; }
-}
-.game__art { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: var(--space-2); border-radius: var(--radius-md); }
-.game__meta { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
-.game__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
-.game__title a { color: var(--ink); text-decoration: none; }
-.game__title a::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-md); }
-.game__text { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.game { grid-template-rows: auto auto auto 1fr auto; }
-.game__go { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); align-self: end; font-weight: 700; color: var(--accent-strong); }
-.game:hover .game__go { text-decoration: underline; }
-/* La domanda lampo */
-.home-try { margin: 0; min-width: 0; padding: var(--space-6); border: 2px solid var(--ink); border-radius: var(--radius-md); background: var(--bg); }
-.home-try legend { display: grid; gap: var(--space-2); padding: 0; float: left; width: 100%; }
-.home-try legend + * { clear: both; }
-.home-try__flag { display: inline-flex; align-items: center; gap: var(--space-1); justify-self: start; padding: 4px var(--space-3); font-size: var(--fs-label); font-weight: 700; color: var(--ink); background: var(--amber-wash); border-radius: var(--radius-sm); }
-.home-try__q { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
-.home-try__opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-5); }
-.home-try__opts label {
-  display: flex; align-items: center; gap: var(--space-2); min-height: 56px; padding: var(--space-2) var(--space-4);
-  background: var(--bg); font-weight: 700; border: 2px solid var(--control-border); border-radius: var(--radius-md); cursor: pointer;
-}
-.home-try__opts label:hover { border-color: var(--ink); }
-.home-try__opts label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
-.home-try__opts label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
-.home-try__opts input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
-/* la risposta si vede solo dopo la scelta, senza JavaScript: la dicono la parola e il segno */
-.home-try__out p { display: none; align-items: center; gap: var(--space-2); margin-top: var(--space-4); }
-.home-try:has(input[data-right]:checked) .home-try__ok, .home-try:has(input:not([data-right]):checked) .home-try__no { display: flex; align-items: flex-start; }
-.home-try__out svg { flex: none; }
-.home-try .source { margin-top: var(--space-4); }
-.home-try .actions { margin-top: var(--space-4); }
 
 /* ---------- temi: le quattro aree col loro distintivo ----------
    Il distintivo ha un lavaggio per area (ambra, verde, blu, rosso): colori
@@ -441,9 +341,6 @@
 .home-area__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
 .home-area__title a { color: var(--ink); text-decoration: none; }
 .home-area__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
-.home-area__themes { list-style: none; }
-.home-area__themes li { border-top: 1px solid var(--rule); }
-.home-area__themes a { display: flex; align-items: center; min-height: var(--target); }
 .home-area__ends { display: grid; margin: var(--space-2) 0 0; background: var(--surface-1); border-radius: var(--radius-sm); }
 .home-area__ends > div { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); padding: var(--space-2) var(--space-3); }
 .home-area__ends > div + div { border-top: 1px solid var(--rule); }
@@ -455,6 +352,7 @@
    e la variazione deve andare a capo sotto il disegno (`.trend` in
    components.css si piega solo dentro un contenitore). */
 .home-temi__seg { margin-bottom: var(--space-6); }
+.home-temi__actions { margin-bottom: var(--space-6); }
 .home-temi__level:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 .home-area { container-type: inline-size; }
 .home-area__move { display: grid; gap: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--rule); }
@@ -465,7 +363,6 @@
 .home-area__move .home-area__link:hover .home-area__name { color: var(--accent-strong); text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 .home-area__move .trend { flex-wrap: wrap; margin-top: var(--space-1); }
 .home-area__move .trend__txt, .home-area__move .trend__from { white-space: normal; }
-.home-temi__source { margin-top: var(--space-6); }
 
 /* ---------- storie: il componente `.story` sta in components.css ---------- */
 .stories { list-style: none; display: grid; gap: var(--space-8) var(--gutter-l); }
@@ -481,44 +378,19 @@
   .stories .story__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
 }
 
-/* ---------- fonti, metodo e come citare ----------
-   Quattro impegni in schede bianche sul fondo della fascia, e accanto la
-   colonna di chi deve citare. */
-.trust { display: grid; gap: var(--space-8) var(--space-12); align-items: start; }
-@media (min-width: 1200px) { .trust { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
-.trust__pillars { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 600px) { .trust__pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.pillar { display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5); background: var(--bg); border-radius: var(--radius-sm); }
-.pillar .badge { margin-bottom: var(--space-2); }
-.pillar .linkarrow { justify-self: start; margin-top: var(--space-1); }
-.pillar__title { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; }
-.pillar__text { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.trust__cite { display: grid; gap: var(--space-4); align-content: start; padding-top: var(--space-4); border-top: 3px solid var(--ink); }
-.trust__cite .cite { margin: 0; }
-.trust__small { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
-.trust__small svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
-
-/* ---------- telefono: qualita' della vita e quiz piu' corti ----------
-   Sei profili con la descrizione e dodici dimensioni facevano due schermi, e
-   le tre schede dei giochi in colonna altri due: sul telefono i profili sono
-   solo nomi, le dimensioni restano alla pagina dedicata, e i giochi hanno
-   l'illustrazione accanto al testo. */
+/* ---------- telefono: qualita' della vita piu' corta ----------
+   Sul telefono i profili stanno due per riga. */
 @media (max-width: 599px) {
   .qol__profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .qol__profiles span { display: none; }
-  .qol__dims, .qol__dims + *, .qol__side > .qol__h:nth-of-type(2) { display: none; }
-  .game { grid-template-columns: 56px minmax(0, 1fr); grid-template-rows: none; column-gap: var(--space-4); row-gap: var(--space-1); padding: var(--space-4); }
-  .game__art { grid-row: 1 / span 4; width: 56px; height: 56px; margin: 0; }
-  .game__art svg { width: 34px; height: 34px; }
-  .game > :not(.game__art) { grid-column: 2; }
-  .game__go { margin-top: 0; }
 }
 @media (max-width: 599px) {
   /* Regioni e province: la mappa piu' piccola, sul telefono si sceglie anche dal campo. */
   .terr__body .navmap { max-width: 200px; }
   .terr__block { padding: var(--space-4); gap: var(--space-4); }
-  /* Fonti: il distintivo accanto al titolo, non sopra. */
-  .pillar { grid-template-columns: 44px minmax(0, 1fr); column-gap: var(--space-3); padding: var(--space-4); }
-  .pillar .badge { grid-row: 1 / span 3; margin: 0; }
-  .pillar > :not(.badge) { grid-column: 2; }
 }
+
+.home-temi__source { margin-top: var(--space-6); }
+/* La riga di fonti, metodo e correzioni in fondo alla pagina: prende il
+   posto della fascia che c'era prima, con gli stessi quattro rimandi. */
+.home-fonti { padding-bottom: calc(var(--space-section) / 2); }
+.home-fonti .source { padding-top: var(--space-4); border-top: 1px solid var(--rule); }

@@ -37,7 +37,7 @@
 .temi-card__n { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
 .temi-card__examples { list-style: none; margin-top: var(--space-1); }
 .temi-card__examples li { border-top: 1px solid var(--rule); }
-.temi-card__examples a { display: flex; align-items: center; min-height: var(--target); padding-block: var(--space-1); color: var(--ink); line-height: 1.3; }
+.temi-card__examples a { display: flex; align-items: center; min-height: var(--target); padding-block: var(--space-1); color: var(--ink); line-height: var(--lh-ui); }
 .temi-card__examples a:hover { color: var(--accent-strong); }
 .temi-card__more a { font-size: var(--fs-small); color: var(--text-2); }
 .temi-card__none { margin-top: auto; padding-top: var(--space-2); }

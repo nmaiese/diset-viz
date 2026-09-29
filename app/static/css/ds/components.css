@@ -48,7 +48,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 
 /* ---------- briciole e testata di pagina ---------- */
 .crumbs { padding-top: var(--space-6); font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); }
-.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 2px var(--space-2); }
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); }
 .crumbs li { display: inline-flex; gap: var(--space-2); }
 .crumbs li + li::before { content: "/"; color: var(--rule-strong); }
 .crumbs a { color: var(--text-2); }
@@ -65,8 +65,8 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .eyebrow a { color: var(--text-2); text-decoration-color: var(--rule-strong); }
 .eyebrow a:hover { color: var(--ink); }
 .eyebrow .sep { color: var(--rule-strong); padding-inline: 6px; }
-.h-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-heading); letter-spacing: var(--tr-display); }
-.h-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-heading); letter-spacing: var(--tr-title); max-width: 24em; }
+.h-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-display); letter-spacing: var(--tr-display); }
+.h-title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }
 .answer { font-family: var(--font-text); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--ink); max-width: var(--measure); }
 .lede { font-family: var(--font-text); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); max-width: var(--measure); }
 .answer a, .lede a { color: inherit; text-decoration-color: var(--rule-strong); }
@@ -101,22 +101,18 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    cominciava l'altra: la testata di sezione porta ora un filetto d'inchiostro
    di 3px e piu' aria sopra, e il titolo cresce sugli schermi larghi. Resta un
    filetto e non una scatola (SISTEMA.md, "Regia"). */
-.section, .come-leggere { padding-top: var(--space-8); }
+.section, .come-leggere { padding-top: var(--space-section); }
 /* Ogni sezione che non apre il suo contenitore sta alla stessa distanza da
    cio' che la precede, sezione o no: con la regola fra sezioni sole, quella
    dopo la testata, le tessere o uno spazio pubblicitario perdeva 32 pixel. */
-:is(.section, .come-leggere):not(:first-child) { margin-top: var(--space-8); }
+:is(.section, .come-leggere):not(:first-child) { margin-top: 0; }
 /* La testata di pagina porta gia' i suoi 32 pixel sotto. */
 .pagehead + :is(.section, .come-leggere) { margin-top: 0; }
-@media (min-width: 960px) {
-  .section, .come-leggere { padding-top: var(--space-12); }
-  :is(.section, .come-leggere):not(:first-child) { margin-top: var(--space-10); }
-}
 /* `h2.h-section` e non solo `.h-section`: `.ds h2 { margin: 0 }` di
    system.css pesa di piu' di una classe sola, e il titolo di "Continua da qui"
    perdeva margine, interlinea e spaziatura (0 pixel fra titolo e contenuto). */
 .section > h2, .come-leggere > h2, h2.h-section, .h-section {
-  font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
+  font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-section); letter-spacing: var(--tr-section);
   padding-top: var(--space-5); border-top: 4px solid var(--ink);
   margin-bottom: var(--space-6);
 }
@@ -142,8 +138,9 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
    la superficie, cosi' ogni sezione ha un inizio e una fine visibili anche
    da lontano. La testata della fascia tiene a sinistra il titolo con la sua
    frase e a destra il link alla sezione intera, sotto lo stesso filetto. */
-.zone { padding-block: var(--space-8); }
-@media (min-width: 960px) { .zone { padding-block: var(--space-12); } }
+/* Due fasce di fila sommano i loro bordi: meta' dello spazio fra sezioni
+   per lato, cosi' fra una fascia e l'altra c'e' --space-section, non il doppio. */
+.zone { padding-block: calc(var(--space-section) / 2); }
 .zone--tint { background: var(--surface-1); }
 .zone__head {
   display: grid; gap: var(--space-3) var(--space-8); margin-bottom: var(--space-6);
@@ -158,7 +155,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 /* ---------- indice di pagina ---------- */
 .toc { font-size: var(--fs-small); line-height: var(--lh-small); }
 .toc p { font-size: var(--fs-label); font-weight: 600; color: var(--muted); margin-bottom: var(--space-2); }
-.toc ol { list-style: none; display: grid; gap: 2px; border-left: 1px solid var(--rule-strong); }
+.toc ol { list-style: none; display: grid; gap: var(--space-1); border-left: 1px solid var(--rule-strong); }
 .toc a { display: block; padding: 6px 0 6px var(--space-3); margin-left: -1px; border-left: 3px solid transparent; color: var(--text-2); text-decoration: none; }
 .toc a:hover { color: var(--ink); border-left-color: var(--rule-strong); }
 .toc a[aria-current] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); }
@@ -232,7 +229,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .tile .sub { display: block; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--muted); margin-top: 2px; }
 .tile .sub a { color: var(--text-2); }
 .bignum { font-size: var(--fs-figure); line-height: var(--lh-figure); font-weight: var(--fw-figure); letter-spacing: var(--tr-figure); font-variant-numeric: tabular-nums lining-nums; }
-.bignum .u { font-size: var(--fs-lede); font-weight: 400; letter-spacing: 0; color: var(--text-2); margin-left: 4px; }
+.bignum .u { font-size: var(--fs-lede); font-weight: 400; letter-spacing: 0; color: var(--text-2); margin-left: var(--space-1); }
 
 /* ---------- modulo dato ---------- */
 .module { display: grid; gap: var(--space-6); container-type: inline-size; }
@@ -245,7 +242,7 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
 .field output { font-size: var(--fs-ui); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .field select, .field input[type="search"] {
   height: var(--target-min); min-width: 14rem; max-width: 100%; padding: 0 var(--space-3);
-  font: inherit; font-size: 16px; font-weight: 400; color: var(--ink);
+  font: inherit; font-size: var(--fs-ui); font-weight: 400; color: var(--ink);
   background: var(--bg); border: 1px solid var(--control-border); border-radius: var(--radius-control);
 }
 .field--year { min-width: min(100%, 18rem); flex: 1 1 14rem; max-width: 26rem; }
@@ -363,7 +360,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 }
 .map__tip b { font-weight: 700; font-variant-numeric: tabular-nums; }
 .legend { display: grid; gap: var(--space-2); margin-top: var(--space-3); font-size: var(--fs-label); color: var(--muted); }
-.legend__ramp { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; }
+.legend__ramp { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-1); }
 .legend__ramp i { display: block; height: 12px; }
 .legend__scale { display: flex; justify-content: space-between; gap: var(--space-2); font-variant-numeric: tabular-nums; }
 .legend__nd { display: inline-flex; align-items: center; gap: var(--space-2); }
@@ -373,7 +370,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; ma
 /* ---------- tabella dati e classifica ---------- */
 .tablewrap { overflow-x: auto; }
 .tablewrap:focus-visible { outline-offset: 4px; }
-.table { width: 100%; border-collapse: collapse; font-size: var(--fs-ui); line-height: 1.35; }
+.table { width: 100%; border-collapse: collapse; font-size: var(--fs-ui); line-height: var(--lh-ui); }
 .table caption { text-align: left; font-size: var(--fs-small); color: var(--text-2); padding-bottom: var(--space-2); caption-side: top; }
 .table th, .table td { padding: 10px var(--space-3); text-align: left; vertical-align: middle; border-bottom: 1px solid var(--rule); }
 .table th:first-child, .table td:first-child { padding-left: 0; }
@@ -479,11 +476,11 @@ details.more[open] > summary { color: var(--ink); }
    che l'indice, il gemello Markdown e le query citano. Dentro la sezione
    prendono la taglia di sottosezione. */
 .analysis__kicker {
-  font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-heading); letter-spacing: var(--tr-section);
+  font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: var(--fw-section); letter-spacing: var(--tr-section);
   padding-top: var(--space-4); border-top: 3px solid var(--ink); margin-bottom: var(--space-6); color: var(--ink);
 }
 @media (min-width: 1200px) { .analysis__kicker { font-size: var(--fs-section-l); line-height: var(--lh-section-l); margin-bottom: var(--space-8); } }
-.analysis .prose > h2 { font-size: clamp(22px, 20.5px + 0.35vw, 25px); line-height: 1.25; font-weight: var(--fw-heading); letter-spacing: var(--tr-section); margin-top: var(--space-12); }
+.analysis .prose > h2 { font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); letter-spacing: var(--tr-section); margin-top: var(--space-12); }
 .analysis .prose > h2:first-child { margin-top: 0; }
 /* La mappa accanto alla prosa: solo da 960, dove fra la misura del testo e il
    margine restavano 300-540 pixel vuoti. Ferma sotto la testata (e sotto la
@@ -507,10 +504,10 @@ details.more[open] > summary { color: var(--ink); }
 .prose ul, .prose ol { padding-left: 1.2em; }
 .prose li + li { margin-top: 0.4em; }
 .prose blockquote { margin-inline: 0; padding-left: var(--space-4); border-left: 3px solid var(--rule-strong); color: var(--text-2); }
-.prose table { width: 100%; border-collapse: collapse; font-size: var(--fs-ui); line-height: 1.4; font-variant-numeric: tabular-nums; }
-.prose th, .prose td { padding: 8px var(--space-3) 8px 0; border-bottom: 1px solid var(--rule); text-align: left; }
+.prose table { width: 100%; border-collapse: collapse; font-size: var(--fs-ui); line-height: var(--lh-ui); font-variant-numeric: tabular-nums; }
+.prose th, .prose td { padding: var(--space-2) var(--space-3) var(--space-2) 0; border-bottom: 1px solid var(--rule); text-align: left; }
 .prose thead th { font-size: var(--fs-label); color: var(--muted); font-weight: 600; border-bottom-color: var(--rule-strong); }
-.prose code { font-family: var(--font-mono); font-size: 0.85em; overflow-wrap: anywhere; }
+.prose code { font-family: var(--font-mono); font-size: var(--fs-ui); overflow-wrap: anywhere; }
 .prose .pull {
   font-size: var(--fs-lede); line-height: var(--lh-lede); font-weight: 600; color: var(--ink);
   border-left: 0; padding: var(--space-4) 0; border-block: 1px solid var(--rule-strong);
@@ -545,7 +542,7 @@ details.more[open] > summary { color: var(--ink); }
 .method { background: var(--surface-1); padding: var(--space-6); display: grid; gap: var(--space-6); }
 @media (min-width: 960px) { .method { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: var(--space-8); gap: var(--space-8); } }
 .method h3 { font-size: var(--fs-subsection); font-weight: 700; margin-bottom: var(--space-3); }
-.method p { font-size: var(--fs-ui); line-height: 1.55; color: var(--ink); }
+.method p { font-size: var(--fs-ui); line-height: var(--lh-ui); color: var(--ink); }
 .method p + p { margin-top: var(--space-3); }
 .method dl { display: grid; gap: var(--space-3); }
 .method dt { font-size: var(--fs-label); font-weight: 600; color: var(--text-2); }
@@ -557,7 +554,7 @@ details.more[open] > summary { color: var(--ink); }
 @media (min-width: 720px) { .specs > div { grid-template-columns: 12rem minmax(0, 1fr); } }
 .specs dt { font-size: var(--fs-label); font-weight: 600; color: var(--text-2); padding-top: 2px; }
 .specs dd { margin: 0; font-size: var(--fs-ui); overflow-wrap: anywhere; }
-.specs code { font-family: var(--font-mono); font-size: 14px; }
+.specs code { font-family: var(--font-mono); font-size: var(--fs-small); }
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .btn {
   display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-5);
@@ -573,7 +570,7 @@ details.more[open] > summary { color: var(--ink); }
   display: grid; gap: var(--space-3); padding: var(--space-4) var(--space-4) var(--space-4) var(--space-6);
   border-left: 3px solid var(--rule-strong); background: var(--surface-1);
 }
-.cite p { font-size: var(--fs-small); line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; }
+.cite p { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink); overflow-wrap: anywhere; }
 .cite .btn { justify-self: start; min-height: 36px; font-size: var(--fs-small); }
 .linkarrow { font-weight: 600; text-decoration: none; }
 .linkarrow::after { content: " \2192"; }
@@ -597,7 +594,7 @@ details.more[open] > summary { color: var(--ink); }
 .lane li > a:hover { color: var(--accent-strong); }
 .lane li > a:hover .card__title { text-decoration: underline; }
 .minicard { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1) var(--space-4); align-items: end; }
-.minicard__title { font-weight: 600; line-height: 1.3; }
+.minicard__title { font-weight: 600; line-height: var(--lh-ui); }
 .minicard__meta { grid-column: 1; font-size: var(--fs-small); color: var(--muted); }
 .minicard__spark { grid-column: 2; grid-row: 1 / span 2; }
 
@@ -665,7 +662,7 @@ details.more[open] > summary { color: var(--ink); }
   position: relative;
 }
 .ad > span { opacity: 0.8; }
-.ad::before { content: "Pubblicità"; position: absolute; top: calc(-1 * var(--space-4)); left: 0; font-weight: 600; font-size: 12px; color: var(--muted); }
+.ad::before { content: "Pubblicità"; position: absolute; top: calc(-1 * var(--space-4)); left: 0; font-weight: 600; font-size: var(--fs-label); line-height: var(--lh-label); color: var(--muted); }
 @media (min-width: 960px) { .ad--leader { min-height: 120px; } }
 .ad--side { min-height: 600px; margin-block: var(--space-8) 0; }
 
@@ -690,6 +687,7 @@ details.more[open] > summary { color: var(--ink); }
 .table .n, td .n, .rank .n, .n--cell { font-variant-numeric: lining-nums tabular-nums; }
 .n__u { font-family: var(--font-ui); font-weight: 400; color: var(--text-2); letter-spacing: 0; }
 .n__u--pct { font-family: var(--font-num); color: inherit; }
+/* Eccezione: apici, unita' e pedici in em scalano insieme alla cifra. */
 .n__o { font-size: 0.72em; vertical-align: 0.28em; margin-left: 0.04em; }
 .n--nd, .n--nd abbr { color: var(--muted); text-decoration: none; }
 .tile .n, .figure-num .n {
@@ -709,11 +707,11 @@ details.more[open] > summary { color: var(--ink); }
 .area--nord { fill: var(--area-nord); } .area--centro { fill: var(--area-centro); } .area--sud { fill: var(--area-sud); } .area--none { fill: var(--cmp); }
 .area-line--nord { stroke: var(--area-nord); } .area-line--centro { stroke: var(--area-centro); } .area-line--sud { stroke: var(--area-sud); } .area-line--none { stroke: var(--cmp); }
 .area-text--nord { fill: var(--area-nord); } .area-text--centro { fill: var(--area-centro); } .area-text--sud { fill: var(--area-sud); } .area-text--none { fill: var(--text-2); }
-.area-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--cmp); }
+.area-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: var(--space-2); vertical-align: 1px; background: var(--cmp); }
 .area-dot--nord { background: var(--area-nord); } .area-dot--centro { background: var(--area-centro); } .area-dot--sud { background: var(--area-sud); }
 .arealegend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); list-style: none; font-size: var(--fs-small); color: var(--text-2); }
 .arealegend li { display: inline-flex; align-items: center; }
-.arealegend b { color: var(--ink); font-weight: 600; margin-right: 4px; }
+.arealegend b { color: var(--ink); font-weight: 600; margin-right: var(--space-1); }
 
 /* ---------- i grafici: testo a grandezza vera, colori solo da token ---------- */
 .chart { max-width: 920px; }
@@ -766,7 +764,7 @@ details.more[open] > summary { color: var(--ink); }
 /* la figura che apre una pagina: il grafico prima delle parole */
 .lead-figure { display: grid; gap: var(--space-3); padding-block: var(--space-6) var(--space-4); border-top: 1px solid var(--rule); }
 .lead-figure__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-6); }
-.lead-figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); font-weight: var(--fw-heading); line-height: var(--lh-subsection); }
+.lead-figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); font-weight: var(--fw-subsection); line-height: var(--lh-subsection); }
 
 /* ---------- componenti portati dalle pagine ---------- */
 
@@ -864,7 +862,7 @@ details.more[open] > summary { color: var(--ink); }
 
 /* figura dell'articolo: titolo-tesi, grafico, fonte, i valori in tabella */
 .figure { display: grid; gap: var(--space-2); margin-block: var(--space-8); }
-.figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-heading); }
+.figure__title { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: var(--fw-subsection); }
 .figure__note { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-2); }
 .figure__chart { container-type: inline-size; }
 
@@ -959,7 +957,7 @@ details.more[open] > summary { color: var(--ink); }
 /* Sotto i 960 pixel solo la freccia, in un cerchio da 44: il nome resta
    nell'aria-label. */
 @media (max-width: 959px) {
-  .totop { width: var(--target); padding: 0; justify-content: center; border-radius: 50%; font-size: 20px; }
+  .totop { width: var(--target); padding: 0; justify-content: center; border-radius: 50%; font-size: var(--fs-lede); line-height: var(--lh-lede); }
   .totop__t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* Sui telefoni bassi la mappa ferma del modulo non si ferma: era piu' alta
@@ -988,7 +986,7 @@ main.v1 h1 { view-transition-name: page-title; }
 .stripbar.is-on { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
 .stripbar__in {
   width: min(100% - 2 * var(--margin-s), var(--container)); margin-inline: auto; padding-block: var(--space-2);
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-4); align-items: baseline;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1) var(--space-4); align-items: baseline;
 }
 @media (min-width: 600px) { .stripbar__in { width: min(100% - 2 * var(--margin-m), var(--container)); } }
 @media (min-width: 960px) { .stripbar__in { width: min(100% - 2 * var(--margin-l), var(--container)); grid-template-columns: minmax(12rem, 22rem) minmax(0, 1fr) auto; align-items: center; } }
@@ -1130,7 +1128,7 @@ main.v1 h1 { view-transition-name: page-title; }
   /* I link della riga meta hanno testo misto ("Istat, <n>4</n> banche dati"):
      un inline-flex ne mangiava gli spazi. L'area cresce col padding, e il
      margine negativo la toglie all'impaginazione. */
-  .meta a { padding-block: 12px; margin-block: -12px; }
+  .meta a { padding-block: var(--space-3); margin-block: calc(-1 * var(--space-3)); }
   input[type="range"] { height: var(--target); }
   .toc a, .crumbs a, .term { position: relative; }
   .toc a::after, .crumbs a::after, .term::after { content: ""; position: absolute; inset: -7px -4px; }
@@ -1139,10 +1137,10 @@ main.v1 h1 { view-transition-name: page-title; }
   /* I link di testo in un elenco (fonti, province, voci del catalogo, risultati)
      restano righe di testo: l'area del tocco cresce senza allungare
      l'elenco, e sta sopra i 24 pixel della WCAG. I controlli restano a 44. */
-  .prose li > a, .v1-metodologia li > a:not(.toc a) { padding-block: 8px; margin-block: -8px; }
+  .prose li > a, .v1-metodologia li > a:not(.toc a) { padding-block: var(--space-2); margin-block: calc(-1 * var(--space-2)); }
   /* Le voci che sono un link intero (catalogo, risultati, elenchi di schede)
      arrivano a 44 senza allungare l'elenco: padding e margine negativo. */
-  .provincia-list li > a, .tema-list li > a, .blog-index li > a, .dr-examples li > a, .catalogo-item__name, .search-result__title { padding-block: 12px; margin-block: -12px; }
+  .provincia-list li > a, .tema-list li > a, .blog-index li > a, .dr-examples li > a, .catalogo-item__name, .search-result__title { padding-block: var(--space-3); margin-block: calc(-1 * var(--space-3)); }
   .provincia-jump a, .dr-map .btn, .terr__name a { display: inline-flex; align-items: center; min-height: var(--target); }
   .linkarrow, .regione-area > summary, select, .field input:not([type="range"]), .hdr__brand { min-height: var(--target); }
   .linkarrow { display: inline-flex; align-items: center; }

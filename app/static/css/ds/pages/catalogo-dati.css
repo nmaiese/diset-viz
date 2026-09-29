@@ -48,7 +48,7 @@
   .catalogo-list { column-count: 2; column-gap: var(--space-12); }
 }
 .catalogo-item {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-4); align-items: baseline;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-1) var(--space-4); align-items: baseline;
   padding-block: var(--space-2); border-bottom: 1px solid var(--rule);
   break-inside: avoid;
 }

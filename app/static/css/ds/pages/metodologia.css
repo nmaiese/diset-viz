@@ -3,7 +3,7 @@
    componenti comuni (components.css). Legge solo token. */
 
 .v1-metodologia .pagehead { max-width: 52rem; }
-.v1-metodologia .layout__main > .section:first-child { padding-top: var(--space-8); }
+.v1-metodologia .layout__main > .section:first-child { padding-top: var(--space-section); }
 .v1-metodologia .aside-block a { color: var(--text-2); }
 
 /* Fra un blocco e l'altro della stessa sezione: la prosa, la tabella chiusa,

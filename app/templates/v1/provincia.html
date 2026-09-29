@@ -148,23 +148,12 @@
     {% endif %}
   </div>
 
-  {% if d.strip and d.strip.svg %}
-  {% set note %}Ogni punto è una provincia, nel colore della ripartizione della sua regione, con il punteggio da 0 a 100 del profilo {{ d.profile_name }}. Fonte: {{ d.source }}. Elaborazione Divario Italia, non è una classifica ufficiale.{% endset %}
-  <div class="provincia-lead{{ ' provincia-lead--left' if d.strip.label_left }}">{{ ui.leadfigure('divario-t', d.strip.title, d.strip, note) }}</div>
-  {#- Il prototipo apriva qui le 107 righe della classifica in un `details`:
-      lo stesso blocco di seicento parole su ogni provincia, che portava due
-      province della stessa regione oltre il 40% di testo in comune
-      (test_province_pages, "due province non sono la stessa pagina"). La
-      tabella ha gia' una casa, la classifica delle province: qui si porta li',
-      e le vicine in classifica restano piu' sotto, in tabella. -#}
-  <p class="provincia-strip-link"><a class="linkarrow" href="/qualita-della-vita/classifica/province">Le {{ d.strip.count | num(None, 'count') }} province in tabella, nella classifica completa</a></p>
-  {% endif %}
-
   <div class="layout">
     <aside class="layout__aside" aria-label="In questa pagina">
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
+          {% if d.strip and d.strip.svg %}<li><a href="#strisciainsight">Qualità della vita</a></li>{% endif %}
           {% if d.dims.rows %}<li><a href="#dimensioni">Dimensione per dimensione</a></li>{% endif %}
           {% if d.synthesis.strong or d.synthesis.weak %}<li><a href="#sintesi">Dove va meglio e peggio</a></li>{% endif %}
           {% if d.moves.up or d.moves.down %}<li><a href="#cambiato">Che cosa è cambiato</a></li>{% endif %}
@@ -180,6 +169,13 @@
     </aside>
 
     <div class="layout__main">
+      {% if d.strip and d.strip.svg %}
+      {% set note %}Ogni punto è una provincia, nel colore della ripartizione della sua regione, con il punteggio da 0 a 100 del profilo {{ d.profile_name }}. Fonte: {{ d.source }}. Elaborazione Divario Italia, non è una classifica ufficiale.{% endset %}
+      <section class="section" id="strisciainsight">
+        <div class="provincia-lead{{ ' provincia-lead--left' if d.strip.label_left }}">{{ ui.leadfigure('divario-t', d.strip.title, d.strip, note) }}</div>
+        <p class="provincia-strip-link"><a class="linkarrow" href="/qualita-della-vita/classifica/province">Le {{ d.strip.count | num(None, 'count') }} province in tabella, nella classifica completa</a></p>
+      </section>
+      {% endif %}
       {% if d.dims.rows %}
       <section class="section" id="dimensioni" aria-labelledby="h-dimensioni">
         <h2 id="h-dimensioni">Dimensione per dimensione</h2>
@@ -250,10 +246,7 @@
         </div>
       </section>
       {% endif %}
-    </div>
-  </div>
 
-  {{ ui.ad() }}
 
   {% if indicatori %}
   <section class="section" id="indicatori" aria-labelledby="h-indicatori">
@@ -355,6 +348,8 @@
     </dl>
     {{ ui.cite(d.citation) }}
   </section>
+    </div>
+  </div>
 </div>
 </main>
 <script src="{{ asset_url('js/v1.js') }}" defer></script>

@@ -99,33 +99,34 @@
   --font-text: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-num: "Sofia Sans Semi Condensed", "Sofia Sans", system-ui, sans-serif;
   --font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --fw-heading: 760;
+  --fw-heading: 700;
   --fw-num: 700;
-  --fs-display: clamp(40px, 29.091px + 2.9091vw, 64px);
-  --lh-display: 1.04;
-  --fw-display: 800;
+  --fs-display: clamp(40px, 32.727px + 1.9394vw, 56px);
+  --lh-display: 1.05;
+  --fw-display: 760;
   --tr-display: -0.02em;
-  --fs-title: clamp(30px, 23.636px + 1.6970vw, 44px);
+  --fs-title: clamp(32px, 26.545px + 1.4545vw, 44px);
   --lh-title: 1.1;
   --fw-title: 700;
   --tr-title: -0.015em;
-  --fs-section: clamp(26px, 21.455px + 1.2121vw, 36px);
+  --fs-section: clamp(24px, 20.364px + 0.9697vw, 32px);
   --lh-section: 1.15;
-  /* Il titolo di sezione sugli schermi larghi, da 1200 pixel: a 28 si
-     confondeva coi titoli-affermazione dei grafici da 20. */
-  --fs-section-l: 36px;
-  --lh-section-l: 1.12;
   --fw-section: 700;
   --tr-section: -0.01em;
-  --fs-subsection: clamp(19px, 18.545px + 0.1212vw, 20px);
+  /* Alias fisso del valore desktop di sezione. */
+  --fs-section-l: 32px;
+  --lh-section-l: 1.15;
+  --fw-section-l: 700;
+  --tr-section-l: -0.01em;
+  --fs-subsection: clamp(20px, 19.091px + 0.2424vw, 22px);
   --lh-subsection: 1.3;
   --fw-subsection: 700;
   --tr-subsection: 0;
-  --fs-lede: clamp(19px, 17.636px + 0.3636vw, 22px);
+  --fs-lede: clamp(20px, 19.091px + 0.2424vw, 22px);
   --lh-lede: 1.45;
   --fw-lede: 400;
   --tr-lede: 0;
-  --fs-prose: clamp(18px, 17.545px + 0.1212vw, 19px);
+  --fs-prose: 18px;
   --lh-prose: 1.6;
   --fw-prose: 400;
   --tr-prose: 0;
@@ -137,15 +138,15 @@
   --lh-small: 1.43;
   --fw-small: 400;
   --tr-small: 0.005em;
-  --fs-label: 13px;
-  --lh-label: 1.38;
+  --fs-label: 14px;
+  --lh-label: 1.4;
   --fw-label: 600;
   --tr-label: 0.01em;
-  --fs-figure: clamp(48px, 37.091px + 2.9091vw, 72px);
+  --fs-figure: clamp(44px, 34.909px + 2.4242vw, 64px);
   --lh-figure: 1;
   --fw-figure: 700;
   --tr-figure: -0.02em;
-  --fs-figure-sm: clamp(28px, 24.364px + 0.9697vw, 36px);
+  --fs-figure-sm: clamp(24px, 20.364px + 0.9697vw, 32px);
   --lh-figure-sm: 1.05;
   --fw-figure-sm: 700;
   --tr-figure-sm: -0.015em;
@@ -269,18 +270,9 @@
   --highlight: var(--data-focus);
 
   --text-hero: var(--fs-display);
-  --text-title: var(--fs-title);
   --text-h2: var(--fs-section);
   --text-h3: var(--fs-subsection);
-  --text-h4: 18px;
-  --text-prose: var(--fs-prose);
   --text-lead: var(--fs-lede);
-  --text-body-lg: 17px;
-  --text-sm: 14px;
-  --text-label: 13px;
-  --text-label-sm: 13px;
-  --text-meta: 14px;
-  --text-meta-sm: 13px;
   --w-regular: 400;
   --w-medium: 500;
   --w-semibold: 600;
@@ -313,7 +305,7 @@
   --space-20: 80px;
   --space-24: 96px;
   --space-32: 128px;
-  --space-section: clamp(48px, 7vw, 64px);
+  --space-section: clamp(56px, 7vw, 96px);
   --space-block: clamp(16px, 4vw, 24px);
   --gutter: clamp(16px, 3vw, 24px);
   --container-prose: 38rem;
@@ -537,8 +529,8 @@ body.ds {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-ui);
-  font-size: 16px;
-  line-height: var(--leading-normal);
+  font-size: var(--fs-ui);
+  line-height: var(--lh-ui);
   /* La scala e' tarata su un occhio medio di 0,49. */
   font-size-adjust: 0.49;
   text-rendering: optimizeLegibility;
@@ -561,14 +553,14 @@ body.ds {
 }
 
 /* Occhielli ed etichette di sezione: nella 1.0 non sono mai in maiuscolo
- * spaziato ne' in monospazio, ma un'etichetta da 13 pixel in Sofia Sans. */
+ * spaziato ne' in monospazio. Peso e ruolo distinguono i 14 pixel. */
 .ds .section-label,
 .ds .eyebrow {
   font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-label);
   letter-spacing: 0.01em;
-  line-height: 1.38;
+  line-height: var(--lh-label);
   text-transform: none;
 }
 .ds .section-label { color: var(--muted); }

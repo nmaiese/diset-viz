@@ -1387,23 +1387,6 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
                          if not r["meta"].get("theme") or r["meta"]["theme"] not in themes)
         self.assertEqual(unknown, [])
 
-    def test_la_porta_della_home_dice_quanti_indicatori_apre(self):
-        """La porta diceva "594 indicatori" e apriva una lista di 447: senza
-        `partial=1` l'atlante mostra solo le serie complete. Il conto si rifa'
-        sul catalogo, non su `catalog_summary`, che e' lo stesso numero che la
-        porta legge."""
-        from app import cache
-        from app.atlas_catalog import get_atlas_catalog
-        from app.design import numfmt
-
-        indicators = get_atlas_catalog()["indicators"]
-        complete = sum(1 for i in indicators if i["complete"])
-        cache.clear()
-        html = self.client.get("/").get_data(as_text=True)
-        door = re.search(r'<a href="/atlante"><b>[^<]*</b><span>([^<]*)</span>', html).group(1)
-        self.assertIn(f"{numfmt.text(len(indicators), 0)} indicatori", door)
-        self.assertIn(f"{numfmt.text(complete, 0)} con i dati completi", door)
-
     def test_la_scheda_provinciale_non_porta_all_atlante(self):
         """L'atlante e' regionale: dalle province portava a una pagina senza province."""
         html = self.client.get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province",
@@ -1417,9 +1400,20 @@ class IRimandiAllAtlanteDiconoIlVero(unittest.TestCase):
     def test_la_home_non_promette_la_mappa_anno_per_anno(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("anno per anno", visible_text(html))
-        for fascia in ("quiz", "storie"):
-            if f'id="{fascia}"' not in html:
-                continue
-            with self.subTest(fascia=fascia):
-                testa = re.search(rf'id="{fascia}".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
-                self.assertIn('<a href="/atlante">atlante</a>', testa)
+        # La riga delle fonti c'e' sempre, anche col blog vuoto: e' la prova
+        # che la pagina e' stata letta. La fascia storie dipende dai post.
+        self.assertIn("Fonti, metodo e correzioni:", html)
+        if 'id="storie"' in html:
+            testa = re.search(r'id="storie".*?<p class="zone__lead">(.*?)</p>', html, re.DOTALL).group(1)
+            self.assertIn('<a href="/atlante">atlante</a>', testa)
+
+    def test_home_no_quiz_and_fonti_links(self):
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertNotIn('zone--fun', html)
+        self.assertNotIn('id="quiz"', html)
+        self.assertNotIn('id="fonti"', html)
+        self.assertIn('Fonti, metodo e correzioni:', html)
+        self.assertIn('<a href="/metodologia">come usiamo i dati</a>', html)
+        self.assertIn('<a href="/chi-siamo#come-citare">come citare</a>', html)
+        self.assertIn('<a href="/contatti#segnala-un-errore">segnala un errore</a>', html)
+        self.assertIn('<a href="/llms.txt"><code>llms.txt</code></a>', html)
