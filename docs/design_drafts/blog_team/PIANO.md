@@ -1,6 +1,6 @@
 # Piano: la redazione degli articoli del blog, un team orchestrato con Orca
 
-Stato: **proposta del 29 settembre 2026, da approvare.** Non c'è ancora codice né skill: l'ordine è quello delle schede indicatore, prima il piano, poi gli strumenti, poi un pilota, poi i documenti normativi.
+Stato: **proposta del 29 settembre 2026, con le tre scelte di Nello in fondo (tema a scelta sua, agenti a rotazione, pilota su casa).** Da approvare nel resto. Non c'è ancora codice né skill: l'ordine è quello delle schede indicatore, prima il piano, poi gli strumenti, poi un pilota, poi i documenti normativi.
 
 Sorella di `docs/design_drafts/team/PIANO.md`, che descrive il team per le schede indicatore (approvato il 28 settembre, pilota ter-12 unito). Qui si dice che cosa il blog prende da quel team, e in che cosa deve essere diverso.
 
@@ -109,30 +109,43 @@ La lezione è confermata due volte. Nel pilota ter-12 "correggi i rilievi" ha fa
 
 Le skill del team delle schede (`revisore` in particolare) e il suo PIANO prescrivono ancora `opencode run` e `agy -p` in headless per il secondo parere e per il giro web dello scout. Dal 29 settembre una guardia in `~/.claude/settings.json` le nega. **Nel blog ogni modello gira come worker Orca**, e il secondo parere e il giro web sono worker come gli altri (`orca-lancia.sh --agent ... --sola-lettura`). Quei passi del team delle schede vanno corretti a parte.
 
-## Il team, con un agente per ruolo
+## Il team: ruoli fissi, agenti a rotazione
 
-`--attivita` sceglie il primo agente con quota, ed è per questo che il 29 settembre tre lanci su quattro sono andati a Claude. Per il blog ogni ruolo ha un `--agent` esplicito e un solo ripiego. Fatti di oggi che il piano incorpora:
+Decisione di Nello del 29 settembre: **si suppone che tutti gli agenti siano disponibili, e si ruotano secondo quota e necessità.** Il piano quindi non assegna un agente a un ruolo. Assegna a ogni ruolo **un profilo** (che cosa deve saper fare) e una **regola di scelta**, e il leader sceglie a ogni lancio.
 
-- **Codex** ha circa l'11% della quota settimanale fino al 3 ottobre: fuori dal percorso critico questa settimana.
-- **Antigravity** non parte senza un login che fa Nello a mano (schermata "not signed in"): non è un ruolo finché non c'è il login.
-- **OpenCode** funziona (big-pickle), ma chiede un permesso quando esce dal worktree: si mettono nel worktree gli allegati e si prepara un `opencode.json`, oppure si accetta una volta.
+`--attivita` da solo non basta: sceglie il primo agente con quota, ed è per questo che il 29 settembre tre lanci su quattro sono andati a Claude. Per il blog il leader sceglie con `--agent`, guardando lo stato, e scrive la scelta e il motivo nella sezione `## Stato` della issue.
+
+**I ruoli e che cosa richiedono.**
+
+| ruolo | dove | che cosa deve saper fare |
+| --- | --- | --- |
+| Leader | questa sessione | coordinare, scrivere il brief, decidere sui rilievi. Non si ruota |
+| Scout | worker Orca nel worktree del pezzo | web con URL aperti e citazioni letterali, scrivere script `derive_*` |
+| Scrittore | worker Orca, stesso worktree, dopo lo scout | italiano discorsivo, seguire un modello di registro, tenere i vincoli di `STYLE.md` |
+| Grafico e foto | worker Orca, stesso worktree, dopo lo scrittore | `figures.py`, e **vedere le immagini** per la foto |
+| Revisore | worker Orca in un worktree **nuovo** sul ramo della PR | leggere criticamente, verificare le cifre, italiano corretto |
+| Secondo parere sul registro | worker Orca, sola lettura | leggere e dire se si legge bene; non bloccante |
+
+**La regola di scelta, uguale per tutti i ruoli.**
+
+1. **Vincoli duri.** Il revisore è di **famiglia diversa** dallo scrittore. Il grafico che sceglie la foto **vede le immagini** (oggi Claude, Antigravity). Uno scout deve avere il web. Un agente senza quota sufficiente nella finestra corrente non si lancia.
+2. **Fra gli agenti che passano i vincoli, il meno usato negli ultimi pezzi.** La ripartizione si legge dalle ultime issue, e si registra a ogni lancio. È il modo di non far tornare tutto su un solo modello.
+3. **Il ruolo più difficile prende il migliore disponibile.** Lo scrittore è il ruolo che decide la qualità del pezzo: a parità di quota, la sua scelta ha la precedenza.
+4. **Una scelta che sorprende si scrive.** Se un agente ruota su un ruolo per cui non è stato provato, il pilota lo dice, così la prova diventa un dato.
+
+**Lo stato degli agenti oggi (29 settembre), da rileggere prima di ogni lancio** con `orca-stato.sh` e `agent-probe.sh`, non da questa riga:
+
+- **Codex** ha circa l'11% della quota settimanale fino al 3 ottobre. Con tutti disponibili rientra a rotazione, ma non come scrittore né revisore finché non risale.
+- **Antigravity** chiede il login di Nello. Rientra a rotazione quando il login è fatto; ha dato citazioni letterali 8 su 8 come scout (pilota ter-12).
+- **OpenCode** funziona (big-pickle e i gratuiti), ma chiede il permesso fuori dal worktree: gli allegati stanno nel worktree e si prepara un `opencode.json`. Il 29 settembre, come scrittore, ha rimesso un errore già corretto e ha lasciato una volgarità, quindi **non è il primo candidato scrittore**. Come revisore ha trovato rilievi giusti nel pilota.
 - **Claude** ha un segfault di Bun noto al primo lancio: si rilancia una volta.
 
-| ruolo | dove | agente | ripiego |
-| --- | --- | --- | --- |
-| Leader | questa sessione | Claude | nessuno |
-| Scout | worker Orca nel worktree del pezzo, con web | Claude sonnet | OpenCode big-pickle (solo per la pista, le citazioni si verificano scaricando l'URL) |
-| Scrittore | worker Orca, stesso worktree, dopo lo scout | Claude opus | Claude sonnet |
-| Grafico e foto | worker Orca, stesso worktree, dopo lo scrittore | Claude sonnet (vede le immagini) | il leader |
-| Revisore | worker Orca in un worktree **nuovo** sul ramo della PR | OpenCode big-pickle o Antigravity, **mai la famiglia dello scrittore** | Codex se ha quota |
-| Secondo parere sul registro | worker Orca, sola lettura | OpenCode gpt-oss:120b o gemma4:31b | nessuno, non bloccante |
-
-Il revisore di famiglia diversa dallo scrittore è la regola già in vigore; con uno scrittore Claude, il revisore è OpenCode o Antigravity. Nel pilota di oggi OpenCode big-pickle ha fatto una riscrittura leggibile ma ha commesso due errori, quindi **la riscrittura non si affida a OpenCode**: OpenCode fa il controllo, non la scrittura del pezzo. Se in un giro Antigravity funziona, entra come secondo revisore.
+Le prove di ruolo che la rotazione produce vanno annotate in `agents/ruoli.tsv` di dev-tools, dove vivono le quote, non in questo repo.
 
 ## Il flusso di un pezzo
 
-1. **Il giorno dei trend.** `collect` e `rank`, fasi 1-3, committati. Il leader legge i segnali e le prime righe, scarta un tema il cui aggancio non regge o che non aggiunge niente a una scheda che c'è già. Regola del mese: un tema non torna prima di 30 giorni, e lo si controlla in `content/posts/`. Tetto: 8 pagine nuove a settimana, blog e schede insieme.
-2. **Due angoli candidati.** Il leader apre la issue (`gh issue create --label run:blog`) con i due angoli, la coppia tema-indicatore, il perché oggi, e lo stato. **Nello sceglie.** Senza la scelta non parte nessun worker.
+1. **Il giorno dei trend.** `collect` e `rank`, fasi 1-3, committati. Il leader **non sceglie il tema**: presenta a Nello una **rosa di tre-cinque temi** con, per ciascuno, l'aggancio (il titolo vero della notizia con data), il punteggio e le sue motivazioni, il rischio (un aggancio debole, un tema già scritto nel mese, un dato che non tiene una storia) e se c'è già un pezzo su `content/posts/`. Regola del mese: un tema non torna prima di 30 giorni. Tetto: 8 pagine nuove a settimana, blog e schede insieme. **Il tema lo sceglie Nello.** Nessuna scelta automatica, neanche quando la classifica ha un primo netto.
+2. **Due angoli candidati.** Sul tema scelto il leader apre la issue (`gh issue create --label run:blog`) con **due angoli**, ciascuno con tesi, bersaglio della critica e prova contraria, e la coppia tema-indicatore. **Nello sceglie l'angolo** (o lo corregge in una riga). Senza le due scelte non parte nessun worker.
 3. **Worktree e scout.** Worktree senza agente (`--base-branch origin/master`), poi lo scout. Consegna: `dossier.json` (`scripts.trend_articles.dossier`, con le aree ufficiali Istat da `derive_bes_areas`), `fonti.md`, e le eventuali prove di ipotesi in `data/derived/`. Verifica delle citazioni: si scaricano gli URL e si cerca la stringa normalizzata, con lo script del pilota. Una citazione non ritrovata esce dalla tabella.
 4. **Brief.** Lo scrive il leader: la tesi confermata da Nello, il bersaglio, la prova contraria, la cifra centrale in scala umana, la scena umana, il modello di registro, le cifre ammesse (**una per idea**), le figure proposte. Se ne pubblica una copia sulla issue.
 5. **Scrittore**, poi **grafico e foto**, in serie, rilasciando ogni worker.
@@ -146,7 +159,7 @@ Il tetto di quota e RAM del team delle schede vale identico: un solo worker vivo
 
 ## Il tetto sui costi
 
-Un pezzo costa al massimo: uno scout, uno scrittore, un grafico, fino a tre revisori e due riparazioni, più il secondo parere a ogni giro. Nel pilota di oggi la parte cara non è stata il calcolo ma i turni di coordinamento. Il vincolo vero è la rilettura umana: Nello legge il pezzo una volta sola, al termine, più le due righe della scelta dell'angolo.
+Un pezzo costa al massimo: uno scout, uno scrittore, un grafico, fino a tre revisori e due riparazioni, più il secondo parere a ogni giro. Nel pilota di oggi la parte cara non è stata il calcolo ma i turni di coordinamento. Il vincolo vero è la rilettura umana: Nello legge il pezzo una volta sola, al termine, più le due scelte iniziali, tema e angolo.
 
 ## Da riparare prima (passo 0)
 
@@ -178,7 +191,7 @@ Il documento vecchio non si cancella. Va marcato "superata da `blog_team/PIANO.m
 | Il giudizio scivola in una causa non dimostrata | un'opinione è più facile di un dato | le cause solo da `fonti.md`; il revisore ha la domanda 2 e 6 |
 | Voce ancora sterile | il modello media | modello di registro scelto dal leader, lessico vietato, tetto di parole, "togliere un terzo" |
 | Regressione dopo la riparazione | visto oggi, visto nel pilota | frasi da cercare e da scrivere, lista delle frasi già corrette |
-| Quota e disponibilità degli agenti | Codex all'11%, Antigravity senza login | un agente per ruolo con un ripiego solo, controllo della quota prima di aprire la issue |
+| Quota e disponibilità degli agenti | Codex all'11%, Antigravity senza login | rotazione con vincoli duri, quota letta prima di ogni lancio, scelta scritta nella issue |
 | Foto scelta da chi non vede | pertinenza e persone riconoscibili | solo Claude, Antigravity o il leader |
 | Il team costa più della scrittura | troppi turni | un worker per volta, tre giri al massimo, tetto per ruolo |
 
@@ -200,8 +213,10 @@ La seconda prova è il tema di energia, ma solo se la prima passa.
 
 **Costruire il team, in cinque passi e in quest'ordine: il passo 0 (le riparazioni), la skill dello scrittore del blog, un solo cancello nuovo (l'angolo), il pilota su casa, poi i documenti.** Tutto il resto si prende dal team delle schede senza riscriverlo. Il rischio maggiore non è tecnico, è la tentazione di tenere la vecchia pipeline "solo per i trend veloci": produce numeri corretti e nient'altro, ed è proprio ciò che non vogliamo.
 
-## Le tre decisioni per Nello
+## Le decisioni, dopo la risposta di Nello del 29 settembre
 
-1. **Il cancello sull'angolo.** Due candidati sulla issue, scegli tu, o preferisci che il leader decida e tu legga solo alla fine? Raccomando il cancello: costa dieci secondi e cambia il pezzo.
-2. **Un agente per ruolo.** Va bene la tabella (scout e grafico Claude sonnet, scrittore Claude opus, revisore OpenCode o Antigravity, mai la famiglia dello scrittore)? Serve sapere se puoi rifare il login di Antigravity, e se Codex rientra dal 3 ottobre.
-3. **Il tema del pilota.** Casa e affitti, per il confronto alla cieca sullo stesso dato? Raccomando sì.
+1. **Il tema non si sceglie in automatico.** Lo sceglie Nello da una rosa. Resta il cancello sull'angolo, con due candidati, sul tema scelto. *(Interpretazione del leader: se il cancello sull'angolo si vuole togliere e lasciare a Nello solo il tema, lo si dice e il piano si accorcia di un passo.)*
+2. **Nessuna tabella fissa di agenti.** Ruoli con profilo, agenti a rotazione per quota e necessità, vincoli duri e registro della scelta nella issue.
+3. **Pilota su casa e affitti**, confrontato alla cieca con la versione del 29 settembre, come per ter-12. Approvato.
+
+Restano da fare, prima del pilota: il passo 0, la skill dello scrittore del blog, la rosa dei temi come formato della issue.
