@@ -1,0 +1,9 @@
+{
+  "name": "Sovraccarico del costo dell'abitazione, totale Italia",
+  "unit": "Valori percentuali",
+  "source": "Eurostat, EU-SILC",
+  "archive": "ilc_lvho07c, Housing cost overburden rate by tenure status",
+  "source_url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name",
+  "method": "Totale Italia di Eurostat, tutti i titoli di godimento, 2025, senza rielaborazione.",
+  "script": "scripts/trend_articles/derive_casa_titolo_godimento.py"
+}

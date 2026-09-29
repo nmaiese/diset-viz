@@ -10,6 +10,15 @@ tags:
 - Affitti
 - Benessere economico
 indicator: bes:SDG-222
+cover: /static/img/blog/casa-affitti-mercato.jpg
+cover_alt: "Facciata gialla di un condominio a Firenze, con balconi, tende da sole, piante e panni stesi."
+cover_credit:
+  author: "Vladimir Menkov"
+  license: "CC BY-SA 3.0"
+  license_url: "http://creativecommons.org/licenses/by-sa/3.0/"
+  source_url: "https://commons.wikimedia.org/wiki/File:Firenze-apartment-building-0899.jpg"
+  source_name: "Wikimedia Commons"
+  changes: "Ritagliata e ridimensionata"
 trend:
   topic: casa-affitti
   detected: 2026-09-29
@@ -52,6 +61,14 @@ external_figures:
   what: quota percentuale di proprietari senza mutuo con costo della casa oltre il 40% del reddito disponibile, Italia 2025
   source: Eurostat, dati EU-SILC, aggiornato il 17 settembre 2026
   url: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name
+- value: "24,2"
+  what: quota di famiglie che vivono in affitto in Campania, 2025
+  source: Istat, Indagine Multiscopo sulle famiglie, dataflow 33_290_DF_DCCV_TITGODABIT_6
+  url: https://esploradati.istat.it/
+- value: "1.200"
+  what: stipendio mensile del coniuge della donna intervistata da NapoliToday, riportato come "1.200-1.300 euro al mese"
+  source: NapoliToday, 15 aprile 2026
+  url: https://www.napolitoday.it/cronaca/famiglia-otto-persone-sfratto-casa-napoli.html
 ---
 
 [Milano ha annunciato una Società della Casa](https://www.milanotoday.it/attualita/piano-casa-nuova-azienda-housing-sociale.html) per offrire affitti calmierati al ceto medio. Per chi cerca un alloggio, la promessa significa poter restare in città senza consegnare una parte insostenibile dello stipendio al proprietario. Ma la formula scelta per raccontare il piano sposta lo sguardo sul reddito e su Milano. I dati indicano un confine diverso: il rischio di non farcela con la casa dipende soprattutto dal contratto che si paga.

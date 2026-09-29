@@ -1,0 +1,52 @@
+<svg class="fig" viewBox="0 0 680 458" role="img" aria-labelledby="fig-regioni-sovraccarico-t fig-regioni-sovraccarico-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-regioni-sovraccarico-t">Fra le regioni il sovraccarico va dal 3,0% all&#x27;8,4%</title>
+<desc id="fig-regioni-sovraccarico-d">Classifica di 14 territori nel 2025: primo Campania con 8,4, ultimo Trentino Alto Adige con 3,0.</desc>
+<text class="fig__title" x="0" y="20">Fra le regioni il sovraccarico va dal 3,0% all&#x27;8,4%</text>
+<text class="fig__subtitle" x="0" y="40">Sovraccarico del costo dell&#x27;abitazione, 2025. Valori percentuali.</text>
+<text class="fig__name is-on" x="182" y="74" text-anchor="end">Campania</text>
+<rect class="fig__bar is-on" x="190" y="63" width="430.0" height="15"/>
+<text class="fig__value is-on" x="626.0" y="74">8,4</text>
+<text class="fig__name is-on" x="182" y="96" text-anchor="end">Liguria</text>
+<rect class="fig__bar is-on" x="190" y="85" width="414.6" height="15"/>
+<text class="fig__value is-on" x="610.6" y="96">8,1</text>
+<text class="fig__name" x="182" y="118" text-anchor="end">Calabria</text>
+<rect class="fig__bar" x="190" y="107" width="322.5" height="15"/>
+<text class="fig__value" x="518.5" y="118">6,3</text>
+<text class="fig__name" x="182" y="140" text-anchor="end">Sicilia</text>
+<rect class="fig__bar" x="190" y="129" width="317.4" height="15"/>
+<text class="fig__value" x="513.4" y="140">6,2</text>
+<text class="fig__name" x="182" y="162" text-anchor="end">Lazio</text>
+<rect class="fig__bar" x="190" y="151" width="296.9" height="15"/>
+<text class="fig__value" x="492.9" y="162">5,8</text>
+<text class="fig__name" x="182" y="184" text-anchor="end">Toscana</text>
+<rect class="fig__bar" x="190" y="173" width="286.7" height="15"/>
+<text class="fig__value" x="482.7" y="184">5,6</text>
+<text class="fig__name" x="182" y="206" text-anchor="end">Piemonte</text>
+<rect class="fig__bar" x="190" y="195" width="266.2" height="15"/>
+<text class="fig__value" x="462.2" y="206">5,2</text>
+<text class="fig__name" x="182" y="228" text-anchor="end">Puglia</text>
+<rect class="fig__bar" x="190" y="217" width="235.5" height="15"/>
+<text class="fig__value" x="431.5" y="228">4,6</text>
+<text class="fig__name" x="182" y="250" text-anchor="end">Abruzzo</text>
+<rect class="fig__bar" x="190" y="239" width="209.9" height="15"/>
+<text class="fig__value" x="405.9" y="250">4,1</text>
+<text class="fig__name" x="182" y="272" text-anchor="end">Lombardia</text>
+<rect class="fig__bar" x="190" y="261" width="209.9" height="15"/>
+<text class="fig__value" x="405.9" y="272">4,1</text>
+<text class="fig__name" x="182" y="294" text-anchor="end">Marche</text>
+<rect class="fig__bar" x="190" y="283" width="209.9" height="15"/>
+<text class="fig__value" x="405.9" y="294">4,1</text>
+<text class="fig__name" x="182" y="316" text-anchor="end">Veneto</text>
+<rect class="fig__bar" x="190" y="305" width="179.2" height="15"/>
+<text class="fig__value" x="375.2" y="316">3,5</text>
+<text class="fig__name is-on" x="182" y="338" text-anchor="end">Emilia-Romagna</text>
+<rect class="fig__bar is-on" x="190" y="327" width="158.7" height="15"/>
+<text class="fig__value is-on" x="354.7" y="338">3,1</text>
+<text class="fig__name is-on" x="182" y="360" text-anchor="end">Trentino Alto Adige</text>
+<rect class="fig__bar is-on" x="190" y="349" width="153.6" height="15"/>
+<text class="fig__value is-on" x="349.6" y="360">3,0</text>
+<line class="fig__ref" x1="446.0" y1="56" x2="446.0" y2="368"/>
+<text class="fig__ref-label" x="450.0" y="382">Italia 5,0</text>
+<text class="fig__note" x="0" y="432">Ripartizioni, valori ufficiali Istat: Nord 4,1, Centro 5,3, Mezzogiorno 6,1. Senza valore 2025, non nel grafico: Basilicata, Molise e Sardegna (ultimo dato 2023), Friuli-Venezia Giulia (2024), Umbria (2022), Valle d&#x27;Aosta (2019).</text>
+<text class="fig__source" x="0" y="452">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
+</svg>

@@ -5951,6 +5951,193 @@
           "indicator": "ims:MULTI_ABIT_AFFITTO"
         }
       ]
+    },
+    {
+      "meta": {
+        "key": "ext:casa_titolo_godimento",
+        "family": "ext",
+        "code": "casa_titolo_godimento",
+        "level": "regione",
+        "theme": "",
+        "name": "Sovraccarico del costo dell'abitazione per titolo di godimento, Italia",
+        "unit": "Valori percentuali",
+        "source": "Eurostat, EU-SILC",
+        "archive": "ilc_lvho07c, Housing cost overburden rate by tenure status",
+        "file": "data/derived/casa_titolo_godimento.csv",
+        "method": "Valori Eurostat per l'Italia, 2025, senza rielaborazione: persone in famiglie dove il costo totale dell'abitazione supera il 40% del reddito disponibile. Il dato non esiste per regione. Al posto dei territori ci sono i titoli di godimento.",
+        "script": "scripts/trend_articles/derive_casa_titolo_godimento.py",
+        "derived_source_url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name",
+        "years": [
+          2025,
+          2025
+        ],
+        "territories": 4,
+        "definition": "Valori Eurostat per l'Italia, 2025, senza rielaborazione: persone in famiglie dove il costo totale dell'abitazione supera il 40% del reddito disponibile. Il dato non esiste per regione. Al posto dei territori ci sono i titoli di godimento.",
+        "sources": "Eurostat, EU-SILC",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name",
+        "source_reference": "scripts/trend_articles/derive_casa_titolo_godimento.py",
+        "page": null,
+        "decimals": 1
+      },
+      "last_year": 2025,
+      "first_year": 2025,
+      "ranking": [
+        {
+          "rank": 1,
+          "territory": "Affitto di mercato",
+          "value": 22.3,
+          "text": "22,3",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 2,
+          "territory": "Affitto ridotto/gratis",
+          "value": 6.0,
+          "text": "6,0",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 3,
+          "territory": "Proprietà senza mutuo",
+          "value": 2.1,
+          "text": "2,1",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 4,
+          "territory": "Proprietà con mutuo",
+          "value": 1.3,
+          "text": "1,3",
+          "area": "Centro-Nord"
+        }
+      ],
+      "means": {
+        "2025": {
+          "territories": 4,
+          "simple_mean": 7.925,
+          "mean_centro_nord": 7.925
+        }
+      },
+      "changes": [],
+      "series": {
+        "Affitto di mercato": {
+          "2025": 22.3
+        },
+        "Affitto ridotto/gratis": {
+          "2025": 6.0
+        },
+        "Proprietà senza mutuo": {
+          "2025": 2.1
+        },
+        "Proprietà con mutuo": {
+          "2025": 1.3
+        }
+      },
+      "figures": [
+        {
+          "figure": "22,3",
+          "what": "Affitto di mercato, 2025",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "6,0",
+          "what": "Affitto ridotto/gratis, 2025",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "2,1",
+          "what": "Proprietà senza mutuo, 2025",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "1,3",
+          "what": "Proprietà con mutuo, 2025",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "7,9",
+          "what": "simple mean dei territori, 2025 (media semplice, non pesata)",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "7,92",
+          "what": "simple mean dei territori, 2025 (media semplice, non pesata)",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "7,9",
+          "what": "mean centro nord dei territori, 2025 (media semplice, non pesata)",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "7,92",
+          "what": "mean centro nord dei territori, 2025 (media semplice, non pesata)",
+          "indicator": "ext:casa_titolo_godimento"
+        },
+        {
+          "figure": "17,2",
+          "what": "rapporto fra primo (Affitto di mercato) e ultimo (Proprietà con mutuo) nel 2025",
+          "indicator": "ext:casa_titolo_godimento"
+        }
+      ]
+    },
+    {
+      "meta": {
+        "key": "ext:casa_titolo_godimento_totale",
+        "family": "ext",
+        "code": "casa_titolo_godimento_totale",
+        "level": "ripartizione",
+        "theme": "",
+        "name": "Sovraccarico del costo dell'abitazione, totale Italia",
+        "unit": "Valori percentuali",
+        "source": "Eurostat, EU-SILC",
+        "archive": "ilc_lvho07c, Housing cost overburden rate by tenure status",
+        "file": "data/derived/casa_titolo_godimento_totale.csv",
+        "method": "Totale Italia di Eurostat, tutti i titoli di godimento, 2025, senza rielaborazione.",
+        "script": "scripts/trend_articles/derive_casa_titolo_godimento.py",
+        "derived_source_url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name",
+        "years": [
+          2025,
+          2025
+        ],
+        "territories": 1,
+        "definition": "Totale Italia di Eurostat, tutti i titoli di godimento, 2025, senza rielaborazione.",
+        "sources": "Eurostat, EU-SILC",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name",
+        "source_reference": "scripts/trend_articles/derive_casa_titolo_godimento.py",
+        "page": null,
+        "decimals": 0
+      },
+      "last_year": 2025,
+      "first_year": 2025,
+      "ranking": [
+        {
+          "rank": 1,
+          "territory": "Italia",
+          "value": 5.0,
+          "text": "5",
+          "area": "Centro-Nord"
+        }
+      ],
+      "means": {},
+      "changes": [],
+      "series": {
+        "Italia": {
+          "2025": 5.0
+        }
+      },
+      "figures": [
+        {
+          "figure": "5",
+          "what": "Italia, 2025",
+          "indicator": "ext:casa_titolo_godimento_totale"
+        },
+        {
+          "figure": "1",
+          "what": "rapporto fra primo (Italia) e ultimo (Italia) nel 2025",
+          "indicator": "ext:casa_titolo_godimento_totale"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,35 @@
+{
+  "title": "File:Firenze-apartment-building-0899.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Firenze-apartment-building-0899.jpg",
+  "original": "https://upload.wikimedia.org/wikipedia/commons/2/27/Firenze-apartment-building-0899.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "preview": null,
+  "mime": "image/jpeg",
+  "width": 2048,
+  "height": 1536,
+  "author": "Vladimir Menkov",
+  "license": "CC BY-SA 3.0",
+  "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+  "attribution_required": "true",
+  "description": "Modern apartment building in Florence, Italy",
+  "date": "2006-05-16",
+  "categories": "GFDL|Taken with Casio Exilim EX-Z50|CC-BY-SA-2.5,2.0,1.0|License migration redundant|Self-published work|Balconies in Florence|Apartment buildings in Tuscany|Houses in Florence",
+  "chosen_on": "2026-09-29",
+  "site_file": "/static/img/blog/casa-affitti-mercato.jpg",
+  "original_size": [
+    2048,
+    1536
+  ],
+  "focus": [
+    0.6,
+    0.45
+  ],
+  "changes": "ritaglio a 1200x630 e compressione JPG",
+  "cover_credit": {
+    "author": "Vladimir Menkov",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Firenze-apartment-building-0899.jpg",
+    "source_name": "Wikimedia Commons",
+    "changes": "Ritagliata e ridimensionata"
+  }
+}
