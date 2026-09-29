@@ -60,16 +60,20 @@ def from_orca_path(value: str) -> Path:
             return Path(converted)
     return Path(value)
 
-AGENT_ROUTING = {
-    "worker": "codex",
-    "researcher": "antigravity",
-    "architect": "codex",
+DEV_TOOLS = Path(os.environ.get("DEV_TOOLS", Path.home() / "dev" / "dev-tools"))
+
+# Alias di ruolo -> attivita' di ~/dev/dev-tools/agents/ruoli.tsv, che e' la fonte unica:
+# quale agente esegua l'attivita' lo decide orca-lancia.sh, in base alla quota.
+ROLE_TO_ATTIVITA = {
+    "worker": "implementazione",
+    "architect": "architettura",
+    "researcher": "ricerca",
 }
 
 TASK_TEMPLATE = """# Task: {title}
 
 > Status: in-progress
-> Assegnato a: {agent} ({role})
+> Assegnato a: {attivita}
 > Branch: nmaiese/{slug}
 
 ## Obiettivo
@@ -130,51 +134,17 @@ def is_runtime_unavailable(*values: object) -> bool:
     return "runtime_unavailable" in " ".join(str(value) for value in values).lower()
 
 
-def _walk_objects(value: object):
-    if isinstance(value, dict):
-        yield value
-        for child in value.values():
-            yield from _walk_objects(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _walk_objects(child)
-
-
-def extract_worktree_details(payload: dict[str, Any]) -> tuple[Path, str]:
-    """Estrae percorso e ramo reali dalla risposta di ``worktree create``."""
-    path_keys = ("worktreePath", "worktree_path", "path")
-    branch_keys = ("branchName", "branch_name", "branch")
-    for item in _walk_objects(payload):
-        path_value = next(
-            (item[key] for key in path_keys if isinstance(item.get(key), str)),
-            None,
-        )
-        branch_value = next(
-            (item[key] for key in branch_keys if isinstance(item.get(key), str)),
-            None,
-        )
-        if path_value and branch_value:
-            clean_path = path_value.removeprefix("path:")
-            clean_branch = branch_value.removeprefix("refs/heads/")
-            return from_orca_path(clean_path), clean_branch
-    raise OrcaOutputError(
-        "La risposta Orca non contiene il percorso e il ramo del worktree."
-    )
-
-
 def build_task_content(
     slug: str,
     title: str,
     objective: str,
-    role: str,
-    agent: str,
+    attivita: str,
     branch: str | None = None,
 ) -> str:
     """Compone il contratto da salvare nel worktree creato da Orca."""
     content = TASK_TEMPLATE.format(
         title=title,
-        agent=agent.capitalize(),
-        role=role,
+        attivita=attivita,
         slug=slug,
         objective=objective,
         python=MAIN_ROOT / ".venv" / "bin" / "python",
@@ -184,55 +154,17 @@ def build_task_content(
     return content
 
 
-def build_prompt(task_content: str) -> str:
-    """Trasforma l'intero contratto in un prompt su una sola riga."""
-    lines = (line.strip() for line in task_content.splitlines())
-    return " | ".join(line for line in lines if line)
+def orca_worktree_script() -> Path:
+    return Path(os.environ.get("ORCA_WORKTREE", DEV_TOOLS / "scripts" / "orca-worktree.sh"))
 
 
-def _print_process_output(result: subprocess.CompletedProcess[str]) -> None:
-    if result.stdout.strip():
-        print(result.stdout.strip())
-    if result.stderr.strip():
-        print(result.stderr.strip(), file=sys.stderr)
+def orca_lancia_script() -> str:
+    return os.environ.get("ORCA_LANCIA", str(DEV_TOOLS / "scripts" / "orca-lancia.sh"))
 
 
-def _check_uncertain_create(orca_cmd: str, slug: str) -> None:
-    """Controlla senza riprovare se Orca ha creato il worktree."""
-    list_cmd = [
-        orca_cmd,
-        "worktree",
-        "list",
-        "--repo",
-        f"path:{ORCA_REPO_PATH}",
-        "--json",
-    ]
-    try:
-        result = subprocess.run(
-            list_cmd,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        print(f"[!] Impossibile verificare la lista dei worktree: {exc}", file=sys.stderr)
-        print("[!] Non riprovare automaticamente la create.", file=sys.stderr)
-        return
-
-    combined = f"{result.stdout}\n{result.stderr}"
-    if f'"{slug}"' in combined or f"/{slug}" in combined:
-        print(
-            "[!] Orca elenca un worktree col nome richiesto: non ripetere la create; "
-            "verifica il worktree e completa TASK.md manualmente.",
-            file=sys.stderr,
-        )
-    else:
-        print(
-            "[!] Orca non conferma il worktree richiesto: controlla con "
-            f"`{shlex.join(list_cmd)}` prima di qualsiasi nuovo tentativo.",
-            file=sys.stderr,
-        )
+def resolve_attivita(role: str = "worker", attivita: str | None = None) -> str | None:
+    """L'attivita' esplicita vince sul ruolo; un ruolo sconosciuto da' None."""
+    return attivita or ROLE_TO_ATTIVITA.get(role.lower())
 
 
 def dispatch_task(
@@ -241,117 +173,72 @@ def dispatch_task(
     objective: str,
     role: str = "worker",
     dry_run: bool = False,
+    attivita: str | None = None,
+    sola_lettura: bool = False,
 ) -> int:
-    """Crea il worktree con Orca e solo dopo vi scrive ``TASK.md``."""
-    normalized_role = role.lower()
-    if normalized_role not in AGENT_ROUTING:
+    """Crea il worktree (orca-worktree.sh), vi scrive ``TASK.md`` e delega a orca-lancia.sh.
+
+    Il lancio, la scelta dell'agente per quota e il controllo della spec sono di
+    orca-lancia.sh: qui non si sceglie nessun agente e non si lancia in headless.
+    """
+    resolved = resolve_attivita(role, attivita)
+    if not resolved:
         print(f"[!] Ruolo Orca non valido: {role}", file=sys.stderr)
         return 1
-    agent = AGENT_ROUTING[normalized_role]
 
-    try:
-        orca_cmd = get_orca_cmd()
-    except RuntimeError as exc:
-        # Il dry-run stampa soltanto: deve funzionare anche dove Orca non c'e' (CI, Cloud Build).
-        if not dry_run:
-            print(f"[!] {exc}", file=sys.stderr)
-            return 1
-        orca_cmd = "orca-ide"
-
-    initial_task = build_task_content(
-        slug=slug,
-        title=title,
-        objective=objective,
-        role=normalized_role,
-        agent=agent,
-    )
-    prompt = build_prompt(initial_task)
-    cmd = [
-        orca_cmd,
-        "worktree",
-        "create",
-        "--repo",
-        f"path:{ORCA_REPO_PATH}",
-        "--name",
-        slug,
-        "--no-parent",
-        "--base-branch",
-        "origin/master",
-        "--setup",
-        "skip",
-        "--agent",
-        agent,
-        "--prompt",
-        prompt,
-        "--json",
-    ]
+    lancia = [orca_lancia_script(), "--attivita", resolved, "--worktree", slug]
 
     if dry_run:
+        # Solo stampa: niente Orca, niente disco (deve andare in CI e in Cloud Build).
+        spec = f"<worktree {slug}>/TASK.md"
+        cmd = [*lancia, "--spec-file", spec]
+        if sola_lettura:
+            cmd.append("--sola-lettura")
         print(shlex.join(cmd))
         return 0
 
+    wt_cmd = [
+        str(orca_worktree_script()),
+        slug,
+        "--repo",
+        ORCA_REPO_PATH,
+        "--base-branch",
+        "origin/master",
+    ]
+    print(f"[+] Esecuzione: {shlex.join(wt_cmd)}")
+    try:
+        created = subprocess.run(
+            wt_cmd, capture_output=True, text=True, stdin=subprocess.DEVNULL, check=False
+        )
+    except OSError as exc:
+        print(f"[!] Impossibile eseguire orca-worktree.sh: {exc}", file=sys.stderr)
+        return 1
+    if created.returncode != 0 or not created.stdout.strip():
+        if created.stderr.strip():
+            print(created.stderr.strip(), file=sys.stderr)
+        print(f"[!] Worktree non creato (exit {created.returncode}).", file=sys.stderr)
+        return created.returncode or 1
+    worktree_path = Path(created.stdout.strip().splitlines()[-1])
+    if not worktree_path.is_dir():
+        print(f"[!] Il worktree non e' una directory: {worktree_path}", file=sys.stderr)
+        return 1
+
+    task_file = worktree_path / "TASK.md"
+    task_file.write_text(
+        build_task_content(slug, title, objective, resolved), encoding="utf-8"
+    )
+    print(f"[+] Scritto {task_file}")
+
+    cmd = [*lancia, "--spec-file", str(task_file)]
+    if sola_lettura:
+        cmd.append("--sola-lettura")
     print(f"[+] Esecuzione: {shlex.join(cmd)}")
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=180,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
-        print("[!] Timeout Orca dopo 180 secondi.", file=sys.stderr)
-        _check_uncertain_create(orca_cmd, slug)
-        return 2
+        # Niente capture_output: l'esito e i controlli di orca-lancia.sh vanno in chiaro a chi lancia.
+        return subprocess.run(cmd, cwd=MAIN_ROOT, check=False).returncode
     except OSError as exc:
-        print(f"[!] Impossibile eseguire Orca: {exc}", file=sys.stderr)
+        print(f"[!] Impossibile eseguire orca-lancia.sh: {exc}", file=sys.stderr)
         return 1
-
-    if is_runtime_unavailable(result.stdout, result.stderr):
-        _print_process_output(result)
-        _check_uncertain_create(orca_cmd, slug)
-        return 2
-
-    try:
-        payload = parse_orca_json(result.stdout)
-    except OrcaOutputError as exc:
-        _print_process_output(result)
-        print(f"[!] {exc}", file=sys.stderr)
-        return 1
-
-    if result.returncode != 0 or payload.get("ok") is False:
-        _print_process_output(result)
-        print(
-            f"[!] Creazione Orca fallita (exit {result.returncode}, ok={payload.get('ok')}).",
-            file=sys.stderr,
-        )
-        return 1
-
-    try:
-        worktree_path, branch = extract_worktree_details(payload)
-    except OrcaOutputError as exc:
-        print(f"[!] {exc}", file=sys.stderr)
-        return 1
-    if not worktree_path.is_dir():
-        print(
-            f"[!] Il path restituito da Orca non e' una directory: {worktree_path}",
-            file=sys.stderr,
-        )
-        return 1
-
-    task_content = build_task_content(
-        slug=slug,
-        title=title,
-        objective=objective,
-        role=normalized_role,
-        agent=agent,
-        branch=branch,
-    )
-    task_file = worktree_path / "TASK.md"
-    task_file.write_text(task_content, encoding="utf-8")
-    print(f"[+] Creato {worktree_path} sul ramo {branch}")
-    print(f"[+] Scritto {task_file}")
-    return 0
 
 
 def main(argv=None) -> int:
@@ -359,14 +246,21 @@ def main(argv=None) -> int:
     parser.add_argument("slug", help="Nome breve / slug del task")
     parser.add_argument("--title", default="", help="Titolo esteso del task")
     parser.add_argument("--objective", default="", help="Obiettivo dettagliato del task")
-    routing_help = ", ".join(
-        f"{role}={agent}" for role, agent in AGENT_ROUTING.items()
-    )
+    mapping_help = ", ".join(f"{r}={a}" for r, a in ROLE_TO_ATTIVITA.items())
     parser.add_argument(
         "--role",
-        choices=list(AGENT_ROUTING),
+        choices=list(ROLE_TO_ATTIVITA),
         default="worker",
-        help=f"Ruolo richiesto ({routing_help})",
+        help=f"Ruolo, alias di un'attivita' di ruoli.tsv ({mapping_help})",
+    )
+    parser.add_argument(
+        "--attivita",
+        help="Attivita' di ruoli.tsv: vince su --role",
+    )
+    parser.add_argument(
+        "--sola-lettura",
+        action="store_true",
+        help="Lancia l'agente in sola lettura (review, ricerca)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Mostra il comando senza eseguirlo"
@@ -381,6 +275,8 @@ def main(argv=None) -> int:
         objective=objective,
         role=args.role,
         dry_run=args.dry_run,
+        attivita=args.attivita,
+        sola_lettura=args.sola_lettura,
     )
 
 

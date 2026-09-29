@@ -11,21 +11,18 @@ poche.
 
 ## 1. Routing dei Ruoli
 
-La fonte di verità è `AGENT_ROUTING` in `scripts/orca_dispatch.py`. L'help della
-CLI viene generato dalla stessa mappa.
-
-| Ruolo richiesto | Agente Orca | Quando usarlo |
-|---|---|---|
-| `worker` | **Codex** | Implementazione, test e script deterministici. |
-| `researcher` | **Antigravity** | Ricerca, ricognizione e audit cross-file. |
-| `architect` | **Codex** | Disegno tecnico e modifiche strutturali. |
+`worker`, `researcher` e `architect` sono alias delle attività `implementazione`,
+`ricerca` e `architettura` di `~/dev/dev-tools/agents/ruoli.tsv`, che è la fonte unica:
+quale agente esegua l'attività lo sceglie `~/dev/dev-tools/scripts/orca-lancia.sh`, il
+primo con quota. `AGENT_ROUTING` non esiste più: la mappa alias-attività è
+`ROLE_TO_ATTIVITA` in `scripts/orca_dispatch.py`, e l'help della CLI la stampa.
 
 Il protocollo generale di Orca e le informazioni sui provider appartengono a
 `~/dev/dev-tools/docs/orca.md`: qui non si duplicano. Un vincolo operativo resta
 in capo a chi lancia i task: Ollama Cloud accetta una sola richiesta concorrente,
 quindi i task che lo usano vanno avviati in sequenza, senza lock fittizi nel repo.
 
-La tabella è un **piano di ruoli**, non una misura di disponibilità. Un agente con
+Il ruolo è un **piano**, non una misura di disponibilità. Un agente con
 quota esaurita fallisce con un messaggio che sembra un altro problema, quindi la
 disponibilità si verifica **prima** di assegnare, con
 `~/dev/dev-tools/scripts/agent-probe.sh` (fino a circa sei minuti, le tre sonde
@@ -103,8 +100,8 @@ ordinati: la stessa disattenzione, con meno danni.
 Ne segue:
 
 - **Visibilità Totale delle Conversazioni in Orca**: ogni task o sub-task viene
-  avviato come worktree nativo e scheda visibile via `orca-ide worktree create`
-  o `bin/py scripts/orca_dispatch.py`.
+  avviato come worktree nativo e scheda visibile via `bin/py scripts/orca_dispatch.py`
+  o `~/dev/dev-tools/scripts/orca-lancia.sh`.
 - **Un task, un worktree, un agente.** Due agenti nello stesso checkout non si
   coordinano, e Orca non li blocca.
 - **Un agente non esce dal suo worktree.** Se serve un file di lavoro, quello è il
@@ -134,7 +131,7 @@ GNOME. Il protocollo completo è in `~/dev/dev-tools/docs/orca.md`; qui restano
 solo i comandi propri di questo repository.
 
 ```bash
-# Crea il worktree, avvia l'agente corretto e poi scrive TASK.md nel path reale.
+# Crea il worktree (orca-worktree.sh), scrive TASK.md e lancia l'agente con orca-lancia.sh.
 bin/py scripts/orca_dispatch.py <slug> --title "Titolo" --objective "Obiettivo" --role worker
 
 # Pubblica il ramo verificato e apre una PR in bozza.
@@ -214,6 +211,8 @@ di `opencode-big-pickle`. Per il resto l'account resta uno solo, quindi:
 
 ## 6. Antigravity in orchestrazione, misurato e diagnosticato il 28 settembre 2026
 
+*Storico 28/09/2026. Dal 29/09 headless vietato da una guardia; misure restano come dato.*
+
 > Aggiornamento della sera del 28/09, dopo le prove in `~/dev/dev-tools/docs/orca.md`
 > ("Lanciare un worker e sapere se la spec è arrivata"): con il worktree già fidato
 > (`orca-preflight.sh --scrivi-trust`) `worker-start --agent antigravity` consegna
@@ -250,15 +249,14 @@ problemi distinti, tutti aggirabili:
 4. **Il prompt può arrivare prima che l'interfaccia sia pronta.** Visto lo stesso giorno in un
    worktree già fidato, quindi senza dialogo: il dispatch è finito `outcome_unknown` e lo schermo
    mostrava la casella di input vuota, la spec persa. Anche qui la prova si legge a schermo prima
-   di rilasciare. Rimedio: `worker-stop` e ripiego headless, non un secondo tentativo alla cieca.
+   di rilasciare. Rimedio: `worker-stop` e nuovo lancio con `orca-lancia.sh`, non un secondo tentativo alla cieca.
 
 In sintesi: **antigravity funziona in orchestrazione**, ma non al primo avvio di un worktree nuovo
-e non senza un intervento manuale per far ripartire la sottomissione dopo il trust dialog. Finché
-questi tre punti non sono risolti lato Orca, il ripiego pulito resta l'headless fuori
-orchestrazione, come `~/dev/dev-tools/docs/orca.md` già indicava: `timeout 900 agy --model <id>
---dangerously-skip-permissions -p "<prompt>" --print-timeout 900s < /dev/null`. Ha fatto ricerca web reale (fonti verificabili
-nell'output) e prodotto un'analisi di 700+ parole in un turno, senza toccare file: l'output va
-salvato da chi coordina, l'headless non scrive nel repo.
+e non senza un intervento manuale per far ripartire la sottomissione dopo il trust dialog. Il
+lancio passa da `orca-lancia.sh`, non da un ripiego headless: per antigravity vedi
+`~/dev/dev-tools/docs/orca.md`, sezione antigravity. In headless aveva fatto ricerca web reale
+(fonti verificabili nell'output) e prodotto un'analisi di 700+ parole in un turno, senza toccare
+file: l'output andava salvato da chi coordinava.
 
 Un gotcha separato su `opencode run`: il messaggio posizionale deve stare **prima** dei flag `-f`,
 altrimenti il parser tratta il testo del prompt come un nome di file e fallisce con
@@ -335,6 +333,8 @@ piano gratuito (`kimi-k3`, `kimi-k2.6`, `deepseek-v4-pro`, `glm-5.3`, `minimax-m
 `mistral-large-3`) e quelli ritirati il 25 settembre (`qwen3.5:397b`, `deepseek-v4-flash`,
 `glm-5.1`). I provider con credito finito rispondono dopo circa 75 secondi, non subito: il ping va
 fatto con un `timeout`, altrimenti si scambia l'attesa per lavoro.
+
+*Storico 28/09/2026. Dal 29/09 headless vietato da una guardia; misure restano come dato.*
 
 **I ruoli in headless, misurati la stessa sera sul pilota ter-12 e sulle review degli strumenti.**
 - **`opencode run` muore su ogni accesso fuori dalla cwd.** Leggere `/tmp`, la libreria standard
