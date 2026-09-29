@@ -369,24 +369,15 @@
   .stories .story__title { font-size: var(--fs-ui); line-height: var(--lh-ui); }
 }
 
-/* ---------- telefono: qualita' della vita e quiz piu' corti ----------
-   Sei profili con la descrizione e dodici dimensioni facevano due schermi, e
-   le tre schede dei giochi in colonna altri due: sul telefono i profili sono
-   solo nomi, le dimensioni restano alla pagina dedicata, e i giochi hanno
-   l'illustrazione accanto al testo. */
+/* ---------- telefono: qualita' della vita piu' corta ----------
+   Sul telefono i profili stanno due per riga. */
 @media (max-width: 599px) {
   .qol__profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  
-  
-  
-  
-  
 }
 @media (max-width: 599px) {
   /* Regioni e province: la mappa piu' piccola, sul telefono si sceglie anche dal campo. */
   .terr__body .navmap { max-width: 200px; }
   .terr__block { padding: var(--space-4); gap: var(--space-4); }
-  
 }
 
 .home-temi__source { margin-top: var(--space-6); }
