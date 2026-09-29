@@ -146,69 +146,12 @@
     {% endif %}
   </div>
 
-  {#- La figura d'apertura: la qualita' della vita delle regioni sulla stessa
-      scala, con questa in evidenza. Estremi, media e distanza stanno nel
-      grafico, le cifre di ogni regione nella tabella sotto. -#}
-  {% if q and q.strip.svg %}
-  {% set lead_note -%}
-    Ogni punto è una regione, nel colore della sua ripartizione. Punteggio{% if q.scale %} da {{ q.scale.min | num(None, 'count') }} a {{ q.scale.max | num(None, 'count') }}{% endif %}{% if q.profile %} del profilo {{ q.profile }}{% endif %}{% if q.dimensions %} su {{ q.dimensions | num(None, 'count') }} dimensioni{% endif %}: la media semplice delle regioni è {{ q.mean | num(None, 'score') }}.{% if q.source %} Fonte: {{ q.source }}.{% endif %} Elaborazione Divario Italia. <a href="{{ q.path }}">Come si calcola</a>
-  {%- endset %}
-  {{ ui.leadfigure('qdv-t', q.claim, q.strip, lead_note) }}
-  <details class="more regione-qdv">
-    <summary>Le {{ q.total | num(None, 'count') }} regioni in tabella</summary>
-    <div class="rankwrap">
-      <table class="table table--rank">
-        <caption>Qualità della vita delle {{ q.total | num(None, 'count') }} regioni{% if q.profile %}, profilo {{ q.profile }}{% endif %}, dalla prima all'ultima. La barra parte dalla media semplice delle regioni{% if q.scale %}, {{ q.scale.mid | num(None, 'count') }} sulla scala da {{ q.scale.min | num(None, 'count') }} a {{ q.scale.max | num(None, 'count') }}{% endif %}.</caption>
-        <thead>
-          <tr>
-            <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
-            <th class="name" scope="col">Regione</th>
-            <th class="rankcell-bar" scope="col"><span class="sr-only">Distanza dalla media</span>{% if q.scale %}<span class="divbar__axis" aria-hidden="true"><span>{{ q.scale.min | num(None, 'count') }}</span><span>{{ q.scale.mid | num(None, 'count') }}</span><span>{{ q.scale.max | num(None, 'count') }}</span></span>{% endif %}</th>
-            <th class="val" scope="col">Punteggio</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in q.rows %}
-          <tr{% if r.on %} class="is-on"{% endif %}>
-            <td class="rank">{{ r.rank | rank }}</td>
-            <th class="name" scope="row">{% if r.area %}<span class="area-dot area-dot--{{ r.area }}" aria-hidden="true"></span>{% endif %}{% if r.on %}{{ r.name }}{% else %}<a href="{{ '/regione/' ~ r.key }}">{{ r.name }}</a>{% endif %}{% if r.area_label %}<span class="sr-only">, {{ r.area_label }}</span>{% endif %}</th>
-            <td class="rankcell-bar" aria-hidden="true">{% if r.bar %}<span class="divbar"><i style="left: {{ r.bar.left }}%; width: {{ r.bar.width }}%"></i></span>{% endif %}</td>
-            <td class="val">{{ r.score | num(None, 'score') }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </details>
-  {% endif %}
-
-  {#- Le tessere dicono cio' che la frase e il grafico non dicono: i primi e
-      gli ultimi cinque posti, il movimento, le province. Una cifra una volta. -#}
-  {% set tiles = [] %}
-  {% if d.top5 is not none %}
-    {% set _ = tiles.append({"label": "Fra le prime cinque regioni", "value": d.top5, "unit": "indicatori", "role": "count", "sub": "fra quelli confrontabili, con i dati di tutte le regioni"}) %}
-  {% endif %}
-  {% if d.bottom5 is not none %}
-    {% set sub -%}{{ d.bottom5_share | num('%') }} di quelli confrontabili{%- endset %}
-    {% set _ = tiles.append({"label": "Fra le ultime cinque regioni", "value": d.bottom5, "unit": "indicatori", "role": "count", "sub": sub}) %}
-  {% endif %}
-  {% if d.moved_up + d.moved_down + d.moved_same %}
-    {% set sub -%}peggiorate in {{ d.moved_down | num(None, 'count') }}, invariate in {{ d.moved_same | num(None, 'count') }}, rispetto all'anno di confronto{%- endset %}
-    {% set _ = tiles.append({"label": "Posizioni migliorate", "value": d.moved_up, "unit": "indicatori", "role": "count", "sub": sub}) %}
-  {% endif %}
-  {% if d.provinces %}
-    {% set first = d.provinces[0] %}
-    {#- Con una provincia sola (la Valle d'Aosta) "la prima" non dice niente. -#}
-    {% set sub -%}{% if d.provinces | length > 1 %}la prima per qualità della vita è {% endif %}<a href="{{ first.path }}">{{ first.name }}</a>{% if first.rank and d.province_total %}, {{ first.rank | rank(d.province_total) }} in Italia{% if d.provinces | length == 1 %} per qualità della vita{% endif %}{% endif %}{%- endset %}
-    {% set _ = tiles.append({"label": "Provincia" if d.provinces | length == 1 else "Province", "value": d.provinces | length, "unit": None, "role": "count", "sub": sub}) %}
-  {% endif %}
-  {{ ui.tiles(tiles) }}
-
   <div class="layout">
     <aside class="layout__aside" aria-label="In questa pagina">
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
+          {% if q and q.strip.svg %}<li><a href="#qdv">Qualità della vita</a></li>{% endif %}
           {% if ritratto %}<li><a href="#ritratto">Il ritratto</a></li>{% endif %}
           <li><a href="#temi">In quali temi va meglio</a></li>
           {% if d.excels or d.lags %}<li><a href="#stacca">Dove stacca</a></li>{% endif %}
@@ -226,6 +169,65 @@
     </aside>
 
     <div class="layout__main">
+      {#- La figura d'apertura: la qualita' della vita delle regioni sulla stessa
+          scala, con questa in evidenza. Estremi, media e distanza stanno nel
+          grafico, le cifre di ogni regione nella tabella sotto. -#}
+      {% if q and q.strip.svg %}
+      <section class="section" id="qdv" aria-labelledby="h-qdv">
+        {% set lead_note -%}
+          Ogni punto è una regione, nel colore della sua ripartizione. Punteggio{% if q.scale %} da {{ q.scale.min | num(None, 'count') }} a {{ q.scale.max | num(None, 'count') }}{% endif %}{% if q.profile %} del profilo {{ q.profile }}{% endif %}{% if q.dimensions %} su {{ q.dimensions | num(None, 'count') }} dimensioni{% endif %}: la media semplice delle regioni è {{ q.mean | num(None, 'score') }}.{% if q.source %} Fonte: {{ q.source }}.{% endif %} Elaborazione Divario Italia. <a href="{{ q.path }}">Come si calcola</a>
+        {%- endset %}
+        {{ ui.leadfigure('qdv-t', q.claim, q.strip, lead_note) }}
+        <details class="more regione-qdv">
+          <summary>Le {{ q.total | num(None, 'count') }} regioni in tabella</summary>
+          <div class="rankwrap">
+            <table class="table table--rank">
+              <caption>Qualità della vita delle {{ q.total | num(None, 'count') }} regioni{% if q.profile %}, profilo {{ q.profile }}{% endif %}, dalla prima all'ultima. La barra parte dalla media semplice delle regioni{% if q.scale %}, {{ q.scale.mid | num(None, 'count') }} sulla scala da {{ q.scale.min | num(None, 'count') }} a {{ q.scale.max | num(None, 'count') }}{% endif %}.</caption>
+              <thead>
+                <tr>
+                  <th class="rank" scope="col"><span aria-hidden="true">#</span><span class="sr-only">Posizione</span></th>
+                  <th class="name" scope="col">Regione</th>
+                  <th class="rankcell-bar" scope="col"><span class="sr-only">Distanza dalla media</span>{% if q.scale %}<span class="divbar__axis" aria-hidden="true"><span>{{ q.scale.min | num(None, 'count') }}</span><span>{{ q.scale.mid | num(None, 'count') }}</span><span>{{ q.scale.max | num(None, 'count') }}</span></span>{% endif %}</th>
+                  <th class="val" scope="col">Punteggio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in q.rows %}
+                <tr{% if r.on %} class="is-on"{% endif %}>
+                  <td class="rank">{{ r.rank | rank }}</td>
+                  <th class="name" scope="row">{% if r.area %}<span class="area-dot area-dot--{{ r.area }}" aria-hidden="true"></span>{% endif %}{% if r.on %}{{ r.name }}{% else %}<a href="{{ '/regione/' ~ r.key }}">{{ r.name }}</a>{% endif %}{% if r.area_label %}<span class="sr-only">, {{ r.area_label }}</span>{% endif %}</th>
+                  <td class="rankcell-bar" aria-hidden="true">{% if r.bar %}<span class="divbar"><i style="left: {{ r.bar.left }}%; width: {{ r.bar.width }}%"></i></span>{% endif %}</td>
+                  <td class="val">{{ r.score | num(None, 'score') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+      {% endif %}
+
+      {#- Le tessere dicono cio' che la frase e il grafico non dicono: i primi e
+          gli ultimi cinque posti, il movimento, le province. Una cifra una volta. -#}
+      {% set tiles = [] %}
+      {% if d.top5 is not none %}
+        {% set _ = tiles.append({"label": "Fra le prime cinque regioni", "value": d.top5, "unit": "indicatori", "role": "count", "sub": "fra quelli confrontabili, con i dati di tutte le regioni"}) %}
+      {% endif %}
+      {% if d.bottom5 is not none %}
+        {% set sub -%}{{ d.bottom5_share | num('%') }} di quelli confrontabili{%- endset %}
+        {% set _ = tiles.append({"label": "Fra le ultime cinque regioni", "value": d.bottom5, "unit": "indicatori", "role": "count", "sub": sub}) %}
+      {% endif %}
+      {% if d.moved_up + d.moved_down + d.moved_same %}
+        {% set sub -%}peggiorate in {{ d.moved_down | num(None, 'count') }}, invariate in {{ d.moved_same | num(None, 'count') }}, rispetto all'anno di confronto{%- endset %}
+        {% set _ = tiles.append({"label": "Posizioni migliorate", "value": d.moved_up, "unit": "indicatori", "role": "count", "sub": sub}) %}
+      {% endif %}
+      {% if d.provinces %}
+        {% set first = d.provinces[0] %}
+        {#- Con una provincia sola (la Valle d'Aosta) "la prima" non dice niente. -#}
+        {% set sub -%}{% if d.provinces | length > 1 %}la prima per qualità della vita è {% endif %}<a href="{{ first.path }}">{{ first.name }}</a>{% if first.rank and d.province_total %}, {{ first.rank | rank(d.province_total) }} in Italia{% if d.provinces | length == 1 %} per qualità della vita{% endif %}{% endif %}{%- endset %}
+        {% set _ = tiles.append({"label": "Provincia" if d.provinces | length == 1 else "Province", "value": d.provinces | length, "unit": None, "role": "count", "sub": sub}) %}
+      {% endif %}
+      {{ ui.tiles(tiles) }}
       {% if ritratto %}
       <section class="section" id="ritratto" aria-labelledby="h-ritratto">
         <h2 id="h-ritratto">{{ ritratto.titolo }}</h2>

@@ -5,7 +5,8 @@
    link, esteso a tutta la scheda: niente sottolineatura sul corpo.
    ========================================================================== */
 
-.v1-blog .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }
+.v1-blog .pagehead > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 28em; }
+.v1-blog .pagehead .answer { max-width: 74ch; }
 .v1-blog .meta .sep, .v1-blog .card__meta .sep, .story__meta .sep { color: var(--rule-strong); padding-inline: 6px; }
 
 /* Il filtro per tema: ancore verso l'indice, in fila, bersagli da 44 pixel. */

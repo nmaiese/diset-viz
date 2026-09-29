@@ -5,6 +5,9 @@
 /* ---------- testata con il localizzatore nel margine ---------- */
 .regione-head { display: grid; gap: 0 var(--gutter-l); align-items: start; }
 .regione-head > .locator { display: none; padding-top: var(--space-8); }
+.regione-head .h-title { max-width: 32em; }
+.regione-head .answer { max-width: 74ch; }
+.regione-head .lede { max-width: 74ch; }
 @media (min-width: 600px) {
   .regione-head:has(> .locator) { grid-template-columns: minmax(0, 1fr) 9rem; }
   .regione-head > .locator { display: grid; }
@@ -14,7 +17,8 @@
   .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 22rem; }
 }
 @media (min-width: 1200px) {
-  .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; }
+  .regione-head:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; column-gap: var(--space-12); }
+  .v1-regione .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: var(--space-12); }
 }
 
 /* ---------- la tabella della figura d'apertura, larga quanto il grafico ---------- */
@@ -26,7 +30,7 @@
 }
 
 /* ---------- tutti gli indicatori ---------- */
-.regione-intro { max-width: var(--measure); margin-bottom: var(--space-6); color: var(--text-2); }
+.regione-intro { max-width: 74ch; margin-bottom: var(--space-6); color: var(--text-2); }
 .regione-filter { margin-bottom: var(--space-6); }
 .regione-area + .regione-area { margin-top: var(--space-8); }
 .regione-area > summary { cursor: pointer; padding-block: var(--space-2); }
@@ -47,4 +51,4 @@
 }
 
 /* La frase che dice la scala della traccia in "Dove stacca". */
-.regione-stacca__lead { max-width: var(--measure); color: var(--text-2); margin-bottom: var(--space-6); }
+.regione-stacca__lead { max-width: 74ch; color: var(--text-2); margin-bottom: var(--space-6); }

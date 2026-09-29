@@ -3,7 +3,8 @@
    blocchi sono componenti comuni. Legge solo token. */
 
 /* testata: l'H1 resta senza classe, il localizzatore sta nel margine da 1200 */
-.provincia-head > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 24em; }
+.provincia-head > h1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-title); letter-spacing: var(--tr-title); max-width: 28em; }
+.provincia-head .answer { max-width: 74ch; }
 .provincia-top { display: grid; gap: var(--space-4) 0; }
 .provincia-top .locator { grid-template-columns: 4.5rem minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-bottom: var(--space-8); }
 .provincia-top__tiles { margin-top: var(--space-4); }
@@ -21,15 +22,16 @@
 }
 @media (min-width: 1200px) {
   .provincia-top { grid-template-columns: minmax(0, 1fr) 13rem; column-gap: var(--space-16); align-items: start; }
-  .provincia-top:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; grid-template-rows: auto auto; }
+  .provincia-top:has(> .regionmap) { grid-template-columns: minmax(0, 1fr) 26rem; grid-template-rows: auto auto; column-gap: var(--space-12); }
   .provincia-top .locator { grid-template-columns: none; align-items: start; margin: 0; padding-top: var(--space-6); }
+  .v1-provincia .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: var(--space-12); }
 }
 .provincia-lead { margin-top: var(--space-8); }
 /* il nome della provincia sotto la media va a sinistra, lontano dalla linea della media */
 .provincia-lead--left .strip__name--on { text-anchor: end; }
 .provincia-strip-link { margin-top: var(--space-3); }
 
-.provincia-note { max-width: var(--measure); color: var(--text-2); margin-bottom: var(--space-6); }
+.provincia-note { max-width: 74ch; color: var(--text-2); margin-bottom: var(--space-6); }
 .provincia-muted { font-size: var(--fs-small); color: var(--muted); }
 .provincia-colhead { padding-bottom: var(--space-2); border-bottom: 1px solid var(--rule-strong); }
 .provincia-colhead + .subline { margin: var(--space-2) 0 var(--space-3); }
