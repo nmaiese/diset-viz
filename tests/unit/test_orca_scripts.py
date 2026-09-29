@@ -21,80 +21,16 @@ def completed(stdout: str = "", stderr: str = "", returncode: int = 0):
 
 
 class DispatchTest(unittest.TestCase):
-    def test_prompt_e_su_una_sola_riga_e_task_segue_la_create(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            worktree = Path(tmp) / "prova-2"
-            worktree.mkdir()
-            payload = json.dumps(
-                {
-                    "ok": True,
-                    "data": {
-                        "worktree": {
-                            "path": str(worktree),
-                            "branch": "nmaiese/prova-2",
-                        }
-                    },
-                }
-            )
-            with (
-                mock.patch.object(orca_dispatch, "get_orca_cmd", return_value="orca-ide"),
-                mock.patch.object(
-                    orca_dispatch.subprocess,
-                    "run",
-                    return_value=completed(stdout=payload),
-                ) as run,
-            ):
-                code = orca_dispatch.dispatch_task(
-                    "prova", "Titolo\nsu due righe", "Obiettivo\ncompleto"
-                )
-
-            self.assertEqual(code, 0)
-            command = run.call_args.args[0]
-            prompt = command[command.index("--prompt") + 1]
-            self.assertNotIn("\n", prompt)
-            self.assertIn("# Task: Titolo | su due righe", prompt)
-            self.assertIn("R1.", prompt)
-            self.assertIn("Criteri di Accettazione", prompt)
-            task = (worktree / "TASK.md").read_text(encoding="utf-8")
-            self.assertIn("> Branch: nmaiese/prova-2", task)
-            self.assertEqual(run.call_args.kwargs["timeout"], 180)
-
-    def test_help_deriva_dalla_mappa_di_routing(self):
+    def test_help_deriva_dalla_mappa_ruolo_attivita(self):
         output = io.StringIO()
         with self.assertRaises(SystemExit), redirect_stdout(output):
             orca_dispatch.main(["--help"])
         help_text = output.getvalue()
-        for role, agent in orca_dispatch.AGENT_ROUTING.items():
-            self.assertIn(f"{role}={agent}", help_text)
+        for role, attivita in orca_dispatch.ROLE_TO_ATTIVITA.items():
+            self.assertIn(f"{role}={attivita}", help_text)
 
-    def test_ok_false_restituisce_uno(self):
-        with (
-            mock.patch.object(orca_dispatch, "get_orca_cmd", return_value="orca-ide"),
-            mock.patch.object(
-                orca_dispatch.subprocess,
-                "run",
-                return_value=completed(stdout='{"ok": false, "error": "no"}'),
-            ),
-        ):
-            code = orca_dispatch.dispatch_task("prova", "T", "O")
-        self.assertEqual(code, 1)
-
-    def test_runtime_unavailable_verifica_la_lista_e_restituisce_due(self):
-        create = completed(
-            stdout='{"ok": false, "error": {"code": "runtime_unavailable"}}',
-            returncode=1,
-        )
-        listing = completed(stdout='{"ok": true, "worktrees": [{"name": "prova"}]}')
-        with (
-            mock.patch.object(orca_dispatch, "get_orca_cmd", return_value="orca-ide"),
-            mock.patch.object(
-                orca_dispatch.subprocess, "run", side_effect=[create, listing]
-            ) as run,
-        ):
-            code = orca_dispatch.dispatch_task("prova", "T", "O")
-        self.assertEqual(code, 2)
-        self.assertEqual(run.call_count, 2)
-        self.assertEqual(run.call_args_list[1].args[0][1:3], ["worktree", "list"])
+    def test_ruolo_sconosciuto_restituisce_uno(self):
+        self.assertEqual(orca_dispatch.dispatch_task("prova", "T", "O", role="boh"), 1)
 
 
 class WorktreeResolutionTest(unittest.TestCase):
@@ -224,18 +160,15 @@ class DryRunSenzaOrcaTest(unittest.TestCase):
     """In CI e in Cloud Build orca-ide non c'e': il dry-run deve passare lo stesso."""
 
     def test_dry_run_non_richiede_il_binario(self):
-        with mock.patch.object(
-            orca_dispatch, "get_orca_cmd", side_effect=RuntimeError("orca-ide assente")
+        with (
+            mock.patch.object(
+                orca_dispatch, "get_orca_cmd", side_effect=RuntimeError("orca-ide assente")
+            ),
+            redirect_stdout(io.StringIO()),
         ):
             code = orca_dispatch.dispatch_task("prova", "T", "O", dry_run=True)
         self.assertEqual(code, 0)
 
-    def test_senza_binario_la_create_reale_esce_uno(self):
-        with mock.patch.object(
-            orca_dispatch, "get_orca_cmd", side_effect=RuntimeError("orca-ide assente")
-        ):
-            code = orca_dispatch.dispatch_task("prova", "T", "O")
-        self.assertEqual(code, 1)
 
 class ReviewNuoveOpzioniTest(unittest.TestCase):
     def test_base_usata_in_pr_e_count(self):

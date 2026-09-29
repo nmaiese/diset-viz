@@ -148,17 +148,17 @@ macro-area, senza che niente fallisca.
 
 ## Chi lavora, leggi [`docs/WORKFLOW_ORCA.md`](docs/WORKFLOW_ORCA.md)
 
-- Prima di assegnare un lavoro lancia `~/dev/dev-tools/scripts/agent-probe.sh
-  <candidati>` (solo i nomi che servono) e scegli tra chi ha quota. Il ruolo di
-  ciascuno sta in `docs/WORKFLOW_ORCA.md` §1: chi coordina non assegna a sé stesso.
-- Un lavoro con modifiche gira in un terminale di Orca, non in headless:
-  `~/dev/dev-tools/scripts/orca-lancia.sh --agent <a> --worktree <nome> --spec-file
-  <file>` crea il worktree, copia la spec dentro, consegna e controlla per 60 secondi.
-  Stato: `orca-stato.sh`. Codex parte con il prompt come argomento (`worker-start`
-  fallisce su `agent_readiness`, causa non trovata) e non manda `worker_done`;
-  Antigravity vuole il worktree fidato. Dettaglio in `~/dev/dev-tools/docs/orca.md`.
-- L'headless (`claude -p`, `codex exec`, `opencode run`, `agy -p`) è per una
-  domanda o una review senza modifiche, sempre con `< /dev/null` e `timeout`.
+- Scelta: `orca-lancia.sh --attivita <x>` sceglie da
+  `~/dev/dev-tools/agents/ruoli.tsv` il primo agente con quota. Ruoli del
+  progetto: `docs/WORKFLOW_ORCA.md` §1.
+- Lavoro con modifiche in un terminale di Orca, mai headless:
+  `bin/py scripts/orca_dispatch.py <slug> --role worker|architect|researcher`
+  (o `~/dev/dev-tools/scripts/orca-lancia.sh ...`). Stato:
+  `~/dev/dev-tools/scripts/orca-stato.sh`. Limiti per agente:
+  `~/dev/dev-tools/docs/orca.md`.
+- Headless (`claude -p`, `codex exec`, `opencode run`, `agy -p`) vietato, anche
+  per una review: guardia in `~/.claude/settings.json`. Review =
+  `orca-lancia.sh --sola-lettura`. Eccezione: `agent-probe.sh`.
 
 ## Vincoli
 
