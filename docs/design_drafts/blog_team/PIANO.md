@@ -1,6 +1,6 @@
 # Piano: la redazione degli articoli del blog, un team orchestrato con Orca
 
-Stato: **proposta del 29 settembre 2026, con le tre scelte di Nello in fondo (tema a scelta sua, agenti a rotazione, pilota su casa).** Da approvare nel resto. Non c'è ancora codice né skill: l'ordine è quello delle schede indicatore, prima il piano, poi gli strumenti, poi un pilota, poi i documenti normativi.
+Stato: **approvato da Nello il 29 settembre 2026 nelle sue scelte: tema e angolo li sceglie il leader in automatico e Nello rivede solo alla fine nella PR, gli agenti ruotano, il pilota è casa e affitti.** Non c'è ancora codice né skill: l'ordine è quello delle schede indicatore, prima il piano, poi gli strumenti, poi un pilota, poi i documenti normativi.
 
 Sorella di `docs/design_drafts/team/PIANO.md`, che descrive il team per le schede indicatore (approvato il 28 settembre, pilota ter-12 unito). Qui si dice che cosa il blog prende da quel team, e in che cosa deve essere diverso.
 
@@ -49,7 +49,11 @@ Per una scheda indicatore il brief non dà un angolo, perché la pagina spiega u
 
 Il giudizio vive nella cornice e nella posta in gioco. Le **cause** vengono ancora solo dalle fonti, con l'istituzione nominata nella frase, come nelle schede.
 
-**Cancello sull'angolo, economico.** Il leader propone **due** angoli candidati sulla issue, ciascuno con tesi, bersaglio della critica e prova contraria. Nello ne sceglie uno, o li corregge, con una riga. Costa a Nello dieci secondi e evita l'errore più caro della pipeline, un pezzo intero scritto su un'idea mediocre. È l'unico cancello nuovo: gli altri due, revisore e merge, ci sono già.
+**Nessun cancello umano prima del pezzo.** Nello rivede una volta sola, alla fine, nella PR. Poiché non c'è più qualcuno che ferma un'idea mediocre prima che diventi un pezzo, l'angolo si protegge in altri tre modi:
+
+- **Due angoli candidati, scelti con il motivo scritto.** Il leader ne scrive due, diversi nella tesi e non solo nelle parole, ciascuno con tesi, bersaglio, prova contraria e chiusa. Sceglie uno e scrive perché, in tre righe. Il candidato scartato resta scritto.
+- **Un secondo sguardo indipendente sull'angolo**, prima dello scout. Un worker Orca in sola lettura, di famiglia diversa dal leader, riceve i due candidati e i segnali e risponde a tre domande: il bersaglio esiste davvero alla lettera, la tesi è contestabile e non un'etichetta, la prova contraria è la più forte. Ha potere di veto solo sul bersaglio inventato o sull'uomo di paglia; sul gusto no. In caso di veto, il leader sceglie l'altro candidato o ne scrive un terzo.
+- **Tutto è leggibile a fine corsa.** Rosa dei temi, scelta e motivo, i due angoli, il secondo sguardo e le scelte degli agenti stanno nel corpo della PR, in una sezione "Come è stato scelto", così Nello vede da dove viene il pezzo oltre al pezzo.
 
 ### 2. Lo scout porta materiale diverso
 
@@ -144,10 +148,10 @@ Le prove di ruolo che la rotazione produce vanno annotate in `agents/ruoli.tsv` 
 
 ## Il flusso di un pezzo
 
-1. **Il giorno dei trend.** `collect` e `rank`, fasi 1-3, committati. Il leader **non sceglie il tema**: presenta a Nello una **rosa di tre-cinque temi** con, per ciascuno, l'aggancio (il titolo vero della notizia con data), il punteggio e le sue motivazioni, il rischio (un aggancio debole, un tema già scritto nel mese, un dato che non tiene una storia) e se c'è già un pezzo su `content/posts/`. Regola del mese: un tema non torna prima di 30 giorni. Tetto: 8 pagine nuove a settimana, blog e schede insieme. **Il tema lo sceglie Nello.** Nessuna scelta automatica, neanche quando la classifica ha un primo netto.
-2. **Due angoli candidati.** Sul tema scelto il leader apre la issue (`gh issue create --label run:blog`) con **due angoli**, ciascuno con tesi, bersaglio della critica e prova contraria, e la coppia tema-indicatore. **Nello sceglie l'angolo** (o lo corregge in una riga). Senza le due scelte non parte nessun worker.
+1. **Il giorno dei trend.** `collect` e `rank`, fasi 1-3, committati. Il leader legge la classifica e i segnali e **sceglie il tema**, scrivendo la rosa dei tre-cinque migliori con, per ciascuno, l'aggancio (il titolo vero con data), il punteggio e le motivazioni, il rischio (un aggancio debole, un tema già scritto nel mese, un dato che non tiene una storia) e se c'è già un pezzo su `content/posts/`. Sceglie con il motivo scritto. Regola del mese: un tema non torna prima di 30 giorni. Tetto: 8 pagine nuove a settimana, blog e schede insieme. Un aggancio che è una tragedia con una vittima riconoscibile non si usa come appiglio per un tema di dati.
+2. **Due angoli candidati e il secondo sguardo.** Il leader apre la issue (`gh issue create --label run:blog`) con la rosa, il tema scelto, i **due angoli** e la scelta motivata, poi lancia il secondo sguardo (sopra). Se non c'è veto parte lo scout. Nessun worker aspetta una risposta di Nello.
 3. **Worktree e scout.** Worktree senza agente (`--base-branch origin/master`), poi lo scout. Consegna: `dossier.json` (`scripts.trend_articles.dossier`, con le aree ufficiali Istat da `derive_bes_areas`), `fonti.md`, e le eventuali prove di ipotesi in `data/derived/`. Verifica delle citazioni: si scaricano gli URL e si cerca la stringa normalizzata, con lo script del pilota. Una citazione non ritrovata esce dalla tabella.
-4. **Brief.** Lo scrive il leader: la tesi confermata da Nello, il bersaglio, la prova contraria, la cifra centrale in scala umana, la scena umana, il modello di registro, le cifre ammesse (**una per idea**), le figure proposte. Se ne pubblica una copia sulla issue.
+4. **Brief.** Lo scrive il leader: la tesi scelta, il bersaglio, la prova contraria, la cifra centrale in scala umana, la scena umana, il modello di registro, le cifre ammesse (**una per idea**), le figure proposte. Se ne pubblica una copia sulla issue.
 5. **Scrittore**, poi **grafico e foto**, in serie, rilasciando ogni worker.
 6. **Guardia e PR draft.** `verify.py` (riparato) e i test del blog. Il leader controlla a occhio il lessico vietato e il registro, poi apre la PR draft con il trend d'origine, la classifica, le figure, la foto con la licenza.
 7. **Revisore** (worktree nuovo, famiglia diversa), con le nove domande. Verdetto sulla PR.
@@ -187,7 +191,7 @@ Il documento vecchio non si cancella. Va marcato "superata da `blog_team/PIANO.m
 
 | rischio | perché | cosa lo tiene basso |
 | --- | --- | --- |
-| Angolo mediocre o contro un uomo di paglia | il modello scrive quello che gli si dà | due candidati, scelta di Nello, bersaglio citato alla lettera |
+| Angolo mediocre o contro un uomo di paglia | il modello scrive quello che gli si dà, e nessun umano lo ferma prima | due candidati con motivo scritto, secondo sguardo indipendente con veto sul bersaglio inventato, domanda 6 del revisore, sezione "Come è stato scelto" nella PR |
 | Il giudizio scivola in una causa non dimostrata | un'opinione è più facile di un dato | le cause solo da `fonti.md`; il revisore ha la domanda 2 e 6 |
 | Voce ancora sterile | il modello media | modello di registro scelto dal leader, lessico vietato, tetto di parole, "togliere un terzo" |
 | Regressione dopo la riparazione | visto oggi, visto nel pilota | frasi da cercare e da scrivere, lista delle frasi già corrette |
@@ -211,12 +215,10 @@ La seconda prova è il tema di energia, ma solo se la prima passa.
 
 ## Raccomandazione
 
-**Costruire il team, in cinque passi e in quest'ordine: il passo 0 (le riparazioni), la skill dello scrittore del blog, un solo cancello nuovo (l'angolo), il pilota su casa, poi i documenti.** Tutto il resto si prende dal team delle schede senza riscriverlo. Il rischio maggiore non è tecnico, è la tentazione di tenere la vecchia pipeline "solo per i trend veloci": produce numeri corretti e nient'altro, ed è proprio ciò che non vogliamo.
+**Costruire il team, in cinque passi e in quest'ordine: il passo 0 (le riparazioni), le skill dei ruoli, il secondo sguardo sull'angolo al posto di un cancello umano, il pilota su casa, poi i documenti.** Tutto il resto si prende dal team delle schede senza riscriverlo. Il rischio maggiore non è tecnico, è la tentazione di tenere la vecchia pipeline "solo per i trend veloci": produce numeri corretti e nient'altro, ed è proprio ciò che non vogliamo.
 
-## Le decisioni, dopo la risposta di Nello del 29 settembre
+## Le decisioni di Nello, 29 settembre
 
-1. **Il tema non si sceglie in automatico.** Lo sceglie Nello da una rosa. Resta il cancello sull'angolo, con due candidati, sul tema scelto. *(Interpretazione del leader: se il cancello sull'angolo si vuole togliere e lasciare a Nello solo il tema, lo si dice e il piano si accorcia di un passo.)*
+1. **Tema e angolo si scelgono in automatico.** Nello rivede solo alla fine, nella PR. *(Una prima lettura del piano aveva messo due cancelli umani, sul tema e sull'angolo: era un fraintendimento, corretto lo stesso giorno.)* Il rischio che un umano avrebbe fermato è tenuto dal secondo sguardo sull'angolo e dalla sezione "Come è stato scelto".
 2. **Nessuna tabella fissa di agenti.** Ruoli con profilo, agenti a rotazione per quota e necessità, vincoli duri e registro della scelta nella issue.
-3. **Pilota su casa e affitti**, confrontato alla cieca con la versione del 29 settembre, come per ter-12. Approvato.
-
-Restano da fare, prima del pilota: il passo 0, la skill dello scrittore del blog, la rosa dei temi come formato della issue.
+3. **Pilota su casa e affitti**, confrontato alla cieca con la versione del 29 settembre, come per ter-12. Approvato, e parte senza pause per Nello.

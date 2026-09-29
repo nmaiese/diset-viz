@@ -13,15 +13,21 @@ sotto in un file fuori dal worktree, lo compila e apre la issue:
 gh issue create --label run:blog --title "Blog, trend del <AAAA-MM-GG>" --body-file <file>
 ```
 
-La issue fa due domande a Nello, in quest'ordine, e nessun worker parte prima
-delle due risposte.
+Nessuna domanda a Nello e nessun worker aspetta una sua risposta: il leader
+sceglie tema e angolo, scrive il motivo, e Nello rivede alla fine nella PR.
 
-1. **Il tema.** Il leader presenta una rosa di tre-cinque temi presi dalla
-   classifica, senza sceglierne uno, neanche quando c'è un primo netto. Nello
-   scrive il tema nello spazio "Tema scelto da Nello".
-2. **L'angolo.** Sul tema scelto il leader aggiunge al corpo due angoli
-   candidati, diversi fra loro nella tesi e non solo nelle parole. Nello ne
-   sceglie uno, o lo corregge in una riga, nello spazio "Angolo scelto".
+1. **Il tema.** Il leader scrive una rosa di tre-cinque temi presi dalla
+   classifica, ne sceglie uno e scrive perché nello spazio "Tema scelto".
+2. **L'angolo.** Sul tema scelto il leader scrive due angoli candidati, diversi
+   fra loro nella tesi e non solo nelle parole, sceglie uno e scrive perché
+   nello spazio "Angolo scelto". Un worker di famiglia diversa, in sola lettura,
+   dà un secondo sguardo (il bersaglio esiste alla lettera, la tesi si può
+   contestare, la prova contraria è la più forte) e può mettere il veto solo su
+   un bersaglio inventato o su un uomo di paglia. L'esito va sotto "Secondo
+   sguardo".
+
+Il corpo della issue passa, tale e quale, nella sezione "Come è stato scelto"
+del corpo della PR, perché Nello veda da dove viene il pezzo.
 
 Il bersaglio di un angolo è un'affermazione che esiste davvero, copiata alla
 lettera con URL e data: un titolo, la frase di chi fa la politica, il
@@ -38,7 +44,7 @@ ultimi pezzi, il ruolo più difficile prende il migliore) e la quota letta con
 `orca-stato.sh` o `agent-probe.sh` prima del lancio, con l'ora.
 
 La rosa segue l'ordine della classifica e mostra anche i temi che una regola
-tiene fuori, con il motivo scritto nel rischio, perché la scelta resta di Nello.
+tiene fuori, con il motivo scritto nel rischio, perché la scelta si rilegge alla fine.
 Le regole legano la scelta: un tema non torna prima di 30 giorni dall'ultimo
 pezzo sullo stesso tema, e il tetto è di 8 pagine nuove a settimana, blog e
 schede insieme.
@@ -62,9 +68,9 @@ Classifica: `data/trend/<AAAA-MM-GG>/ranking.md`. Segnali: `data/trend/<AAAA-MM-
 
 **2. ...**
 
-### Tema scelto da Nello
+### Tema scelto
 
-<!-- una riga: il numero o il nome del tema, ed eventuali note -->
+<!-- il numero o il nome del tema, e perché in tre righe -->
 
 ### I due angoli candidati
 
@@ -130,9 +136,9 @@ Classifica: `data/trend/2026-09-29/ranking.md`. Segnali: `data/trend/2026-09-29/
 - Rischio: i dati non misurano gli affitti brevi, che sono il centro del dibattito. Il sovraccarico regionale è campionario e nel 2025 manca per sei regioni.
 - Già nel mese: nessun pezzo pubblicato. C'è la bozza non unita del 29 settembre, ramo `nmaiese/art-casa-0929`: il pilota la rifà.
 
-### Tema scelto da Nello
+### Tema scelto
 
-3, casa e affitti.
+3, casa e affitti. Perché: l'aggancio è italiano e recente (Foti, 23 settembre), il dato tiene una storia, è il pilota del piano e permette il confronto con la bozza del 29 settembre.
 
 ### I due angoli candidati
 
@@ -152,13 +158,17 @@ Tema: casa e affitti. Coppia tema-indicatore: `bes:SDG-222`, con `ims:MULTI_ABIT
 
 ### Angolo scelto
 
-<!-- in attesa di Nello -->
+<!-- A o B, e perché in tre righe -->
+
+### Secondo sguardo
+
+<!-- esito del worker di famiglia diversa: bersaglio, tesi, prova contraria; veto sì o no -->
 
 ## Stato
 Fase: angoli proposti
 SHA: nessuno, il ramo `nmaiese/blog-casa-affitti` non esiste ancora
-Prossimo passo: Nello sceglie l'angolo, poi worktree senza agente da origin/master e scout
-Chi lo fa: Nello
+Prossimo passo: scelta dell'angolo e secondo sguardo, poi worktree senza agente da origin/master e scout
+Chi lo fa: leader
 Agenti:
 - scout: non ancora scelto. Vincoli: web con URL aperti. Quota da leggere prima del lancio.
 - scrittore: non ancora scelto. Codex escluso finché la quota non risale (circa 11% fino al 3 ottobre, dato del piano del 29 settembre, da rileggere). OpenCode non primo candidato.

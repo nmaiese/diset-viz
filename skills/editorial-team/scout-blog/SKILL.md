@@ -9,12 +9,12 @@ Questa skill è l'unico contratto del ruolo. Non è quella delle schede
 (`skills/editorial-team/scout/SKILL.md`) e non carichi `italian-product-copywriter`,
 `italian-data-sources` né `seo-content-strategy`. Il piano che la motiva è
 `docs/design_drafts/blog_team/PIANO.md`, "Che cosa cambia" 1 e 2 e "Il flusso di
-un pezzo", passi 3 e 4. L'angolo è già deciso, l'ha scelto Nello: tu non lo inventi e
+un pezzo", passi 3 e 4. L'angolo è già deciso, l'ha scelto il leader: tu non lo inventi e
 non lo discuti, lo documenti con le fonti che lo sostengono.
 
 ## Che cosa ricevi, e come lavori
 
-Ricevi la issue `run:blog`, con il tema scelto da Nello, l'angolo scelto (tesi, bersaglio
+Ricevi la issue `run:blog`, con il tema scelto dal leader, l'angolo scelto (tesi, bersaglio
 con la citazione alla lettera, prova contraria) e la coppia tema-indicatore. Il formato è
 `docs/design_drafts/blog_team/ISSUE.md`. Lo `<slug>` e il ramo `nmaiese/blog-<slug>`
 arrivano con la spec, in un worktree senza agente. Se l'angolo scelto o la coppia

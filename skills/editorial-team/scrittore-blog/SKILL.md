@@ -1,6 +1,6 @@
 ---
 name: scrittore-blog
-description: Scrittore del team editoriale del blog di Divario Italia. Scrive un articolo del blog in italiano discorsivo, su una tesi scelta dal leader e confermata da Nello, a partire dal brief e da fonti.md. Si usa quando il leader lancia lo scrittore, o una riparazione, su una issue run:blog.
+description: Scrittore del team editoriale del blog di Divario Italia. Scrive un articolo del blog in italiano discorsivo, su una tesi scelta dal leader, a partire dal brief e da fonti.md. Si usa quando il leader lancia lo scrittore, o una riparazione, su una issue run:blog.
 ---
 
 # Scrittore del blog
@@ -18,8 +18,8 @@ pensava, e che cosa cambia per lei.
 
 `<slug>` è quello del pezzo, lo dà la spec. I percorsi esatti li dà la spec.
 
-1. **Il brief del leader** (`lavoro/<slug>/brief.md`). Porta la tesi confermata da
-   Nello, il bersaglio citato alla lettera, la prova contraria, la cifra centrale,
+1. **Il brief del leader** (`lavoro/<slug>/brief.md`). Porta la tesi scelta dal
+   leader, il bersaglio citato alla lettera, la prova contraria, la cifra centrale,
    la scena umana se c'è, il modello di registro, le cifre ammesse e le figure
    proposte. **Non è una scaletta.** Se il brief non c'è, o non ha una tesi, non
    scrivi e mandi un'escalation al leader. `dossier.json` e i file di
