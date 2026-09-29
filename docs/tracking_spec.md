@@ -2,9 +2,10 @@
 
 Stato verificato il 2026-09-29.
 
-Versione GTM live pubblicata: `8`, nome `Riallineamento al codice e solo produzione 2026-09-29`.
-La versione `7` (`Disable automatic page_view 2026-06-23`) resta nella cronologia del
-container: ripubblicarla e' il ritorno indietro.
+Versione GTM live pubblicata: `9`, nome `Content group e download JSON 2026-09-29`.
+Le versioni `8` (riallineamento al codice, solo produzione) e `7` (`Disable automatic
+page_view 2026-06-23`) restano nella cronologia del container: ripubblicarne una e'
+il ritorno indietro.
 
 Questa specifica applica a Divario Italia la stessa gerarchia operativa usata su
 Vecchio Conio: consenso inizializzato in pagina, Google Tag Manager come router,
@@ -96,6 +97,17 @@ Tag principali:
 | `GA4 event - filter_year_range` | GA4 event | `CE - filter_year_range` | filtro anni del catalogo |
 | `GA4 event - sort_indicators` | GA4 event | `CE - sort_indicators` | ordinamento catalogo |
 | `GA4 event - toggle_partial_data` | GA4 event | `CE - toggle_partial_data` | inclusione dati parziali |
+| `GA4 event - file_download (json)` | GA4 event | `Click - download json` | clic su un link `/download/...json`, con `file_extension: json` |
+| `GA4 event - file_download (csv qualita)` | GA4 event | `Click - download csv qualita` | clic su `/download/quality-life/<livello>`, CSV senza estensione nell'URL |
+
+La `page_view` porta anche `content_group` uguale a `page_type`: in GA4 e' la
+dimensione "Gruppo di contenuti", che raggruppa pagine e metriche per famiglia
+senza una dimensione personalizzata.
+
+I due tag di download coprono cio' che la misurazione avanzata non vede: riconosce
+`.csv` ma non `.json`, e le classifiche della qualita' della vita si scaricano da un
+URL senza estensione. I CSV delle schede restano alla misurazione avanzata, quindi
+ogni download produce un solo `file_download` (verificato in produzione il 29/09).
 
 Ogni trigger `CE - ...` (tranne quello del consenso Iubenda) e il trigger del Google
 Tag portano la condizione `{{Page Hostname}}` uguale a `divarioitalia.it`: sull'URL
@@ -438,15 +450,28 @@ e le esplorazioni non potevano guardare oltre. I parametri numerici `streak`, `a
 `score`, `total` e `count` vanno valutati come metriche personalizzate, non come
 dimensioni.
 
-Key event creato:
+Key event (gli obiettivi), tutti con counting method `ONCE_PER_EVENT`:
 
-- `select_indicator`, counting method `ONCE_PER_EVENT`. Dal 25 settembre 2026
+- `select_indicator`: apertura di un indicatore dall'atlante. Dal 25 settembre 2026
   parte solo dal clic sul nome di una riga di `/atlante`: il volume basso e'
   quello, non un guasto
+- `file_download`: scarico di un file di dati, CSV o JSON (dal 29 settembre 2026)
+- `game_finish`: partita del gioco quotidiano completata (dal 29 settembre 2026)
+- `game_share`: risultato condiviso (dal 29 settembre 2026)
+- `leaderboard_submit`: punteggio inviato in classifica
 
-Key event aggiunto per i giochi:
+Gruppo di canali personalizzato `Canali Divario` (29 settembre 2026), in quest'ordine
+di precedenza: `Debug e interno` (tagassistant, 127.0.0.1, localhost, `*.run.app`),
+`Assistenti AI` (il canale AI Assistant di Google piu' le sorgenti chatgpt, openai,
+perplexity, gemini, copilot, claude, deepseek, mistral e simili), `Istituzioni e
+ricerca` (istat, `.gov.it`, europa.eu, Dataset Search, universita', Banca d'Italia,
+Wikipedia), poi ricerca organica, diretto, social, a pagamento, email, referral. Vale
+anche sui dati passati, ma GA4 impiega fino a 48 ore a ricalcolarlo: nei rapporti e'
+la dimensione `sessionCustomChannelGroup:15865729028`.
 
-- `leaderboard_submit`, counting method `ONCE_PER_EVENT`
+Segmenti di pubblico (29 settembre 2026), che si riempiono da quel giorno in avanti:
+`Scaricano dati` (365 giorni), `Esploratori atlante` (filtri o confronto), `Giocatori
+quiz`, `Lettori schede indicatore` (una `page_view` con `page_type: indicator`).
 
 Key event rimossi perché non rappresentano una conversione:
 
