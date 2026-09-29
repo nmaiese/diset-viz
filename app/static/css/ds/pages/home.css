@@ -33,7 +33,7 @@
 .home-map .navmap svg { width: 100%; height: auto; max-height: 400px; min-height: 240px; }
 .home-map .legend { max-width: 100%; }
 @media (min-width: 768px) {
-  .home-map { grid-template-columns: minmax(0, 1fr) minmax(0, 11rem); align-items: end; column-gap: var(--space-5); }
+  .home-map { grid-template-columns: minmax(0, 1fr) minmax(0, 14rem); align-items: end; column-gap: var(--space-5); }
   .home-map .navmap { max-width: none; }
   .home-map .navmap svg { max-height: 300px; min-height: 0; }
 }
@@ -301,16 +301,19 @@
 .zone-map__title { font-weight: 700; color: var(--ink); }
 .zone-map__title a { color: inherit; }
 @media (min-width: 960px) {
-  .zone__head:has(.zone-map) { grid-template-columns: minmax(0, 1fr) minmax(21rem, 27rem); align-items: center; }
+  /* La mappa non alza la testata: resta bassa quanto titolo e frase, e il
+     titolo sta in basso come nelle altre fasce. */
+  .zone__head:has(.zone-map) { grid-template-columns: minmax(0, 1fr) minmax(21rem, 27rem); align-items: end; }
   .zone-map { grid-template-columns: 9rem minmax(0, 1fr); align-items: center; max-width: none; }
   .zone-map__graphic { display: grid; gap: var(--space-2); }
   .zone-map .navmap { width: 9rem; }
-  .zone-map .navmap svg { max-height: 170px; }
+  .zone-map .navmap svg { max-height: 120px; }
   .zone-map .legend { width: 9rem; margin-top: 0; }
   .zone-map .legend__caption { display: none; }
+  .qol__main .zone-map--quality { margin-top: var(--space-4); padding-top: var(--space-5); border-top: 1px solid var(--rule); }
   .zone-map--quality { grid-template-columns: 11rem minmax(0, 1fr); }
   .zone-map--quality .navmap, .zone-map--quality .legend { width: 11rem; }
-  .zone-map--quality .navmap svg { max-height: 205px; }
+  .zone-map--quality .navmap svg { max-height: 200px; }
 }
 
 /* ---------- temi: le quattro aree col loro distintivo ----------

@@ -11,20 +11,6 @@
       <h2 class="h-section" id="h-qualita">Qualità della vita: dove si vive meglio</h2>
       <p class="zone__lead">L'indice mette in fila le {{ q.regions | num(None, 'count') }} regioni{% if q.provinces %} e le {{ q.provinces | num(None, 'count') }} province{% endif %} su {{ q.dims_regions | num(None, 'count') }} dimensioni{% if q.institutions %}, con i dati di {{ q.institutions }}{% endif %}. Scegli i pesi, la classifica cambia.</p>
     </div>
-    {% if d.hero_map %}
-    {% set hm = d.hero_map %}
-    <aside class="zone-map zone-map--quality" aria-label="Qualità della vita nelle regioni">
-      <div class="zone-map__graphic">
-        {{ ui.navmap('regione', hm.names, None, '/regione/', steps=hm.steps) }}
-        {{ ui.legend(hm.legend, 'Più intenso, punteggio più alto.', nd=False) }}
-      </div>
-      <div class="zone-map__copy">
-        <p class="zone-map__kicker">Profilo {{ hm.profile or 'predefinito' }}</p>
-        <p>In testa <a href="/regione/{{ hm.top.key }}">{{ hm.top.name }}</a>, in coda <a href="/regione/{{ hm.bottom.key }}">{{ hm.bottom.name }}</a>.</p>
-        <p><a class="linkarrow" href="/qualita-della-vita/classifica/regioni">Apri la classifica</a></p>
-      </div>
-    </aside>
-    {% endif %}
   </header>
   <div class="qol">
     <div class="qol__main">
@@ -33,6 +19,23 @@
         <a class="linkarrow" href="/metodologia#qualita-della-vita">Come si calcola</a>
       </p>
       <p class="status">{{ ui.icon('info') }} Indice sperimentale di Divario Italia, non un dato ufficiale.</p>
+      {#- La mappa sta nella colonna dei bottoni, non nella testata: in testata
+          allungava la fascia e lasciava un vuoto fra frase e bottoni, qui
+          pareggia la colonna dei profili. -#}
+      {% if d.hero_map %}
+      {% set hm = d.hero_map %}
+      <aside class="zone-map zone-map--quality" aria-label="Qualità della vita nelle regioni">
+        <div class="zone-map__graphic">
+          {{ ui.navmap('regione', hm.names, None, '/regione/', steps=hm.steps) }}
+          {{ ui.legend(hm.legend, 'Più intenso, punteggio più alto.', nd=False) }}
+        </div>
+        <div class="zone-map__copy">
+          <p class="zone-map__kicker">Profilo {{ hm.profile or 'predefinito' }}</p>
+          <p>In testa <a href="/regione/{{ hm.top.key }}">{{ hm.top.name }}</a>, in coda <a href="/regione/{{ hm.bottom.key }}">{{ hm.bottom.name }}</a>.</p>
+          <p><a class="linkarrow" href="/qualita-della-vita/classifica/regioni">Apri la classifica</a></p>
+        </div>
+      </aside>
+      {% endif %}
     </div>
     <div class="qol__side">
       {% if q.profiles %}
