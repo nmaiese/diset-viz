@@ -813,7 +813,9 @@ def themes_band(band: dict | None, areas: list[dict]) -> dict | None:
             preview = {
                 "title": area["area"], "href": area.get("area_path"),
                 "names": region_names(),
-                "steps": {area["best_key"]: 6, area["worst_key"]: 1},
+                # Testa e coda con lo stesso gradino: un colore dei dati non
+                # porta un giudizio, e chi e' chi lo dice il testo accanto.
+                "steps": {area["best_key"]: 5, area["worst_key"]: 5},
                 "best": area["best"], "best_key": area["best_key"],
                 "worst": area["worst"], "worst_key": area["worst_key"],
             }
