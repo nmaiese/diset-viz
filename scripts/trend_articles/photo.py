@@ -27,6 +27,9 @@ una foto sbagliata per il pezzo e' peggio di nessuna foto, e nessun filtro lo sa
 - `app/static/img/blog/<slug>.photo.json`, la scheda della foto: titolo del
   file, pagina originale, autore, licenza con URL, data, dimensioni originali,
   modifiche fatte (il ritaglio) e il frontmatter `cover_credit` gia' pronto.
+  L'autore e' quello pulito da `clean_author`: su Commons il campo `Artist`
+  porta il nome e poi la nota di cortesia o l'indirizzo email dell'autore, e
+  nell'attribuzione ci finivano dentro.
 """
 
 from __future__ import annotations
@@ -36,6 +39,7 @@ import html
 import io
 import re
 import sys
+from urllib.parse import unquote, urlsplit
 
 import requests
 from PIL import Image
@@ -53,10 +57,60 @@ NOT_A_PHOTO = re.compile(
 )
 WIDTH, HEIGHT = 1200, 630
 
+# Dove finisce l'autore e comincia altro. Il campo `Artist` di Commons porta
+# spesso il nome e poi tutto il resto che l'autore ha scritto: una richiesta di
+# cortesia, un indirizzo, la formula con cui vuole essere citato. Nell'attribuzione
+# di una pagina tutto quel resto finisce dentro la scheda, quindi si tronca.
+CORTESIA = re.compile(
+    r"i'?d appreciate|i would appreciate|please attribute|please credit|please cite"
+    r"|if you (?:want to |choose to |wish to |need to )?(?:use|publish|reproduce|reprint)"
+    r"|if you (?:use|publish|reproduce)"
+    r"|e-?mail me|contact me|for (?:any|commercial) use|do not use",
+    re.IGNORECASE,
+)
+EMAIL = re.compile(r"\S*@\S+")
+URL = re.compile(r"(?:https?://)?[a-z0-9.-]+\.[a-z]{2,}(?:/\S*)?$", re.IGNORECASE)
+
 
 def _text(value: str | None) -> str:
     """extmetadata porta HTML: 'Artist' e' spesso un link. Serve il testo."""
     return html.unescape(re.sub(r"<[^>]+>", "", value or "")).strip()
+
+
+def _da_url(value: str) -> str:
+    """Un autore che e' solo un URL di profilo diventa l'ultimo pezzo del
+    percorso, con "(Flickr)" se l'host e' Flickr, e l'host altrimenti."""
+    parti = urlsplit(value if "//" in value else f"//{value}")
+    host = parti.netloc.lower().removeprefix("www.")
+    if "flickr" in host:
+        pezzi = [p for p in parti.path.split("/") if p]
+        if pezzi:
+            return f"{unquote(pezzi[-1])} (Flickr)"
+    return host
+
+
+def clean_author(value: str | None) -> str:
+    """Il campo `Artist` di Commons, ridotto al nome che va nell'attribuzione.
+
+    Tiene la prima riga non vuota, toglie l'HTML che resta, tronca alla prima
+    nota di cortesia o al primo indirizzo email, e se quel che resta e' un URL
+    di profilo prende il nome che c'era dentro. Un nome gia' pulito resta
+    com'era: e' il caso normale, e questa funzione non deve rovinarlo.
+    """
+    testo = html.unescape(re.sub(r"<[^>]+>", " ", value or ""))
+    riga = next((r for r in (r.strip() for r in testo.splitlines()) if r), "")
+    riga = html.unescape(re.sub(r"<[^>]+>", "", riga)).strip()
+    if not riga:
+        return ""
+    # Il nome e' quello che c'e' prima della prima nota: se sono due, vince la piu' vicina.
+    tagli = [m.start() for m in CORTESIA.finditer(riga)]
+    tagli += [m.start() for m in EMAIL.finditer(riga)]
+    if tagli:
+        troncata = re.sub(r"[\s.,;:!?]+$|[\(\[]$", "", riga[: min(tagli)])
+        riga = troncata or riga  # un valore fatto solo della nota resta com'era
+    if URL.fullmatch(riga):
+        return _da_url(riga) or riga
+    return riga
 
 
 def _api(**params) -> dict:
@@ -79,7 +133,7 @@ def _record(page: dict) -> dict | None:
         "mime": info.get("mime"),
         "width": info.get("width"),
         "height": info.get("height"),
-        "author": _text(ext.get("Artist", {}).get("value")) or "autore non indicato",
+        "author": clean_author(ext.get("Artist", {}).get("value")) or "autore non indicato",
         "license": _text(ext.get("LicenseShortName", {}).get("value")),
         "license_url": ext.get("LicenseUrl", {}).get("value", ""),
         "attribution_required": ext.get("AttributionRequired", {}).get("value", ""),

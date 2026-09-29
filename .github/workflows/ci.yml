@@ -21,7 +21,10 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install deps
-        run: pip install -r requirements.txt
+        # Anche requirements-trend.txt: la suite contiene i test di
+        # scripts/trend_articles/ (photo.py e verify.py importano requests e
+        # PIL), che senza le due librerie non arriverebbero neppure a importare.
+        run: pip install -r requirements.txt -r requirements-trend.txt
       - name: Run tests
         # Il referto di unittest, non il codice di uscita.
         #

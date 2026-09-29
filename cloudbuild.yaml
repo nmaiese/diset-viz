@@ -22,7 +22,10 @@ steps:
         # fallimento non si vedeva mai in CI perché i runner di GitHub
         # Actions hanno git di serie.
         apt-get update -qq && apt-get install -y -qq --no-install-recommends git
-        pip install --quiet -r requirements.txt
+        # Anche requirements-trend.txt: la suite contiene i test di
+        # scripts/trend_articles/ (photo.py e verify.py importano requests e
+        # PIL). Senza, il gate del deploy diventerebbe rosso su un ModuleNotFoundError.
+        pip install --quiet -r requirements.txt -r requirements-trend.txt
         python -m unittest discover -s tests
 
   - name: 'gcr.io/cloud-builders/docker'

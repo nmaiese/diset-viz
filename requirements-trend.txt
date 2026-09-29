@@ -1,0 +1,16 @@
+# Dipendenze della pipeline dei trend, `scripts/trend_articles/`, non del processo web.
+#
+# `requests` la usano collect, photo, verify e i derive_*; `pillow` la usa photo
+# per ritagliare la copertina, e verify importa photo, quindi serve anche a lui.
+# La pipeline gira solo in sviluppo e in CI, e non entra nell'immagine di
+# produzione. Fino al 29 settembre 2026 le due librerie si aggiravano con
+# PYTHONPATH=$HOME/.cache/divario-req. Sono in un file a parte, e non in
+# requirements-dev.txt, perche' il gate del deploy le installa e non deve
+# portarsi dietro cairosvg, che non gli serve.
+#
+# I pin sono quelli di requirements.txt per la stessa ragione: un aggiornamento
+# deve essere un diff.
+#
+#     bin/py -m pip install -r requirements-trend.txt
+requests==2.34.2
+pillow==12.3.0
