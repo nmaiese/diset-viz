@@ -1,0 +1,52 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Indovina la Provincia", "path": "/quiz/indovina-la-provincia"}] %}
+{% set active_nav = 'gioco' %}
+{% set game_active = 'provincia' %}
+
+{% block title %}Indovina la Provincia: quiz sulle province italiane | {{ site_name }}{% endblock %}
+{% block description %}Quiz sulle province italiane: indovina la provincia misteriosa a partire dai dati Istat. Una sfida al giorno, con la mappa che ti dice quanto sei vicino.{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Indovina la Provincia",
+  "description": "Quiz sulle province italiane: una provincia misteriosa da indovinare a partire dai dati Istat, con la mappa come aiuto.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": { "@type": "Organization", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "isAccessibleForFree": true
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<article class="page game-page wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+
+  {% include "_game_subnav.html" %}
+
+  <header class="page-hero">
+    <h1>Indovina la Provincia</h1>
+    <p class="page-lead">Il quiz sulle province italiane: una provincia misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino.</p>
+  </header>
+
+  <div id="game-root">
+    <noscript>
+      <p>Attiva JavaScript per giocare a "Indovina la Provincia". Nel frattempo puoi esplorare
+      <a href="/province">le province italiane</a> o <a href="/quiz/indovina-la-regione">indovinare la regione misteriosa</a> del giorno.</p>
+    </noscript>
+    <p class="game-loading">Il gioco è in preparazione.</p>
+  </div>
+
+  <section class="prose">
+    <h2>Come si gioca</h2>
+    <p>Ogni giorno tutti affrontano la stessa provincia misteriosa. Scrivi il nome di una provincia e scegli dall'elenco che si completa mentre digiti. La mappa ti mostra dov'è il tuo tentativo rispetto alla provincia da trovare, con la distanza approssimata in chilometri e la direzione da seguire.</p>
+    <p>I dati vengono dalle statistiche territoriali dell'Istat. Vuoi partire dalle regioni? Prova <a href="/quiz/indovina-la-regione">Indovina la Regione</a>.</p>
+  </section>
+</article>
+{% endblock %}

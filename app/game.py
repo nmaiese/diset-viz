@@ -17,14 +17,14 @@ gioco pubblico non competitivo.
 import random
 import re
 import secrets
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 
 from app.cache import cache
 from app.data import REGION_ORDER, get_indicator, indicator_year_average
 from app.taxonomy import MACRO_AREA_ORDER
 from app import profiles
+from app.game_daily import GAME_EPOCH, numero_sfida, oggi_roma, prossima_sfida_roma, regione_del_giorno
 
-GAME_EPOCH = date(2026, 7, 15)  # giorno di lancio, puzzle numero 1
 CLUES_PER_PUZZLE = 6
 MAX_ATTEMPTS = CLUES_PER_PUZZLE
 CANDIDATES_PER_AREA = 3  # varietà tra puzzle diversi a parità di area
@@ -63,7 +63,7 @@ def _daily_date(puzzle_id):
         day = date.fromisoformat(puzzle_id[len(_DAILY_PREFIX):])
     except ValueError:
         return None
-    if day < GAME_EPOCH or day > date.today():
+    if day < GAME_EPOCH or day > oggi_roma():
         return None
     return day
 
@@ -77,7 +77,7 @@ def is_valid_puzzle_id(puzzle_id):
 
 
 def daily_puzzle_id(today=None):
-    today = today or date.today()
+    today = today or oggi_roma()
     return f"{_DAILY_PREFIX}{today.isoformat()}", today
 
 
@@ -86,34 +86,19 @@ def new_practice_puzzle_id():
 
 
 def puzzle_number(today=None):
-    today = today or date.today()
-    return max((today - GAME_EPOCH).days, 0) + 1
+    return numero_sfida(today or oggi_roma())
 
 
 def _next_puzzle_at(today):
-    """ISO 8601 UTC timestamp of the next daily puzzle's release (midnight
-    UTC the following day), so the client can render a countdown without
-    needing to know the server's timezone."""
-    next_day = today + timedelta(days=1)
-    midnight_utc = datetime.combine(next_day, datetime.min.time(), tzinfo=timezone.utc)
-    return midnight_utc.isoformat()
-
-
-def _cycle_shuffle(cycle_index):
-    """Le 20 regioni mescolate deterministicamente per un ciclo di 20 giorni,
-    così nessuna regione si ripete finché il ciclo non è esaurito."""
-    rng = random.Random(f"divario-regioni-cycle-{cycle_index}")
-    regions = list(REGION_ORDER)
-    rng.shuffle(regions)
-    return regions
+    """ISO 8601 UTC della mezzanotte di Roma che apre il giorno dopo, cosi' il
+    client mostra il conto alla rovescia senza conoscere il fuso del server."""
+    return prossima_sfida_roma(today)
 
 
 def region_for_puzzle(puzzle_id):
     if puzzle_id.startswith(_DAILY_PREFIX):
-        iso_date = puzzle_id[len(_DAILY_PREFIX):]
-        day_index = max((date.fromisoformat(iso_date) - GAME_EPOCH).days, 0)
-        cycle_index, pos = divmod(day_index, len(REGION_ORDER))
-        return _cycle_shuffle(cycle_index)[pos]
+        day = date.fromisoformat(puzzle_id[len(_DAILY_PREFIX):])
+        return regione_del_giorno(day, REGION_ORDER)
     rng = random.Random(puzzle_id)
     return rng.choice(REGION_ORDER)
 
@@ -262,7 +247,7 @@ def daily_payload_for_date(iso_date):
         day = date.fromisoformat(iso_date)
     except (ValueError, TypeError):
         return None
-    if day < GAME_EPOCH or day > date.today():
+    if day < GAME_EPOCH or day > oggi_roma():
         return None
     puzzle_id, _ = daily_puzzle_id(day)
     return _puzzle_intro(puzzle_id, number=puzzle_number(day), puzzle_date=day)
@@ -271,7 +256,7 @@ def daily_payload_for_date(iso_date):
 def archive_list(limit=ARCHIVE_LIMIT):
     """Most-recent-first list of past playable daily puzzles (today
     excluded, that's the main "Sfida del giorno" tab already)."""
-    today = date.today()
+    today = oggi_roma()
     past_days = max((today - GAME_EPOCH).days, 0)
     count = min(limit, past_days)
     return [
