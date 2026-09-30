@@ -2,12 +2,42 @@
 
 /* ---------- Chi e' maggiore? (compare.jsx) ---------- */
 
+/* La rivelazione si inserisce SOTTO le scelte: con l'ancoraggio dello scorrimento il browser tiene
+   fermo un elemento piu' in basso (il testo dopo il gioco) e la pagina salta di centinaia di pixel,
+   portando le scelte e i valori appena rivelati fuori dallo schermo. Solo nelle pagine con il gioco. */
+:root:has(#compare-root) { overflow-anchor: none; }
+
 .compare-app {
   display: flex;
   flex-direction: column;
   gap: 18px;
   max-width: 760px;
 }
+
+/* La domanda che prende il focus dopo "Avanti" (lo prende il codice, non chi tocca): niente
+   contorno sul blocco intero. */
+.compare-app .qz-question:focus { outline: none; }
+
+/* Il territorio del giocatore: un testo e un contorno tratteggiato, mai un colore da solo e mai i
+   colori di giusto e sbagliato. */
+.qz-region.is-mio { outline: 2px dotted var(--game-accent); outline-offset: 2px; }
+.qz-region .mio {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--game-accent);
+}
+.qz-fine-mio { margin: 0; padding: 10px 14px; border-left: 3px solid var(--game-accent); background: var(--game-wash); font-weight: 600; }
+.qz-mio-etichetta { margin-left: 8px; font-family: var(--font-ui); font-size: 11px; font-weight: 600; color: var(--game-accent); }
+
+/* Descrizione dell'indicatore dell'allenamento: sta sotto le due scelte, cosi' non le spinge
+   sotto la piega. */
+.compare-app .qz-misura {
+  padding: 10px 14px;
+  border-left: 3px solid var(--rule-strong);
+  background: var(--surface-1);
+}
+.compare-app .qz-misura .desc { margin: 0 0 6px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
 
 /* Descrizione sintetica sotto le card di "Chi è maggiore?": niente titoli
    né pannello, una sola riga di testo per non spingere la scelta fuori
@@ -116,12 +146,32 @@
 
 .compare-lb-cta { align-self: flex-start; }
 
+/* Da telefono (390x844) la domanda, le DUE scelte e il timer stanno insieme sopra la piega: la
+   riga di stato e' una riga sola piu' la barra del tempo, la domanda e' un blocco basso, e le
+   scelte stanno affiancate (A a sinistra, B a destra, come i tasti freccia) invece che impilate
+   con un "VS" in mezzo. Il cronometro sta sulla riga dei badge e la barra sotto, a tutta larghezza. */
 @media (max-width: 640px) {
-  .qz-vs { grid-template-columns: 1fr; }
-  .qz-vs .divider { padding: 2px 0; font-size: 16px; }
-  .qz-timer { margin-left: 0; width: 100%; }
-  .qz-timer-bar { flex: 1; width: auto; }
+  .compare-app { gap: 10px; }
+  .compare-app .qz-status { gap: 2px 12px; min-height: 28px; }
+  .compare-app .qz-badge--level { padding: 1px 7px; }
+  .compare-app .qz-timer { display: contents; }
+  .compare-app .qz-clock { order: 1; margin-left: auto; font-size: 22px; line-height: 1; }
+  .compare-app .qz-timer-bar { order: 2; flex: 1 0 100%; width: auto; height: 4px; }
+
+  .compare-app .qz-question { padding: 10px 14px; }
+  .compare-app .qz-question h2 { margin: 2px 0 0; font-size: 18px; }
+
+  .qz-vs { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .qz-vs .divider { display: none; }
+  .qz-region { min-height: 96px; padding: 12px 8px; gap: 4px; }
+  .qz-region .name { font-size: 20px; line-height: 1.1; overflow-wrap: anywhere; }
+  .qz-region .value { margin-top: 2px; }
+  .qz-region .crown { right: 8px; }
+
+  .compare-notice { padding: 6px 10px; font-size: 12px; }
+  .qz-hud--comando { display: none; }
   .qz-hud-cmd { display: none; }
+  #compare-root .qz-sfida { margin-bottom: 8px; padding: 6px 12px; font-size: 13px; }
 }
 
 .compare-feedback { min-height: 24px; }
@@ -130,7 +180,29 @@
 .compare-verdict.is-correct { color: var(--game-right); }
 .compare-verdict.is-wrong { color: var(--game-wrong); }
 
-.compare-next { align-self: flex-start; }
+/* "Avanti": una barra ferma in fondo all'isola, nella zona del pollice. Sfondo da token, bottone
+   da 48 px, larga quanto lo schermo su telefono. Sta nel flusso (non copre il contenuto): resta
+   attaccata al bordo basso finche' il suo posto naturale non entra nello schermo. */
+.compare-next-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  gap: 6px;
+  padding: 0 0 env(safe-area-inset-bottom, 0px);
+  background: var(--bg);
+  box-shadow: 0 -1px 0 var(--rule);
+}
+.compare-next-bar .compare-next { inline-size: 100%; min-height: 48px; font-size: 16px; }
+.compare-next-errore { margin: 0; font-size: 13px; }
+
+@media (max-width: 720px) {
+  .compare-next-bar { margin-inline: calc(50% - 50vw); }
+  .compare-next-bar .compare-next { border-radius: 0; }
+  .compare-next-errore { padding: 6px 16px 0; }
+}
+
+.compare-rivedi { align-self: flex-start; }
 
 .compare-status { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 
@@ -221,6 +293,20 @@
 }
 
 .qz-scheda p { margin: 0; }
+
+/* Bersagli di almeno 44 px: i link fuori dal testo corrente (la scheda, i territori, la fonte,
+   le azioni della fine) sono controlli, non parole dentro una frase. */
+.compare-app .qz-scheda-link a,
+.compare-app .qz-territori a,
+.compare-app .quiz-source-link,
+.compare-app .qz-fine a,
+.compare-app .qz-fine .btn,
+.compare-app .qz-fine button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.compare-app .qz-territori { gap: 0 14px; }
 .qz-scheda-indicatore { font-size: 13px; }
 .qz-scheda-misura {
   font-family: var(--font-ui); font-weight: 600;
@@ -256,8 +342,46 @@
   .qz-scheda { padding: 10px 12px; }
 }
 
-/* Il movimento, solo a chi non ha chiesto di ridurlo. */
+/* Il movimento, solo a chi non ha chiesto di ridurlo: con `reduce` lo stato finale c'e' gia' e
+   niente si muove. La scala e' quella di game-base.css (--mo-*), i colori sono i token. */
 @media (prefers-reduced-motion: no-preference) {
   .qz-region { transition: border-color 0.14s ease, background 0.14s ease, transform 0.12s ease; }
   .qz-region:not(:disabled):hover { transform: translateY(-2px); }
+
+  /* (a) La rivelazione del valore: sfuma e sale di 6 px. Il perdente entra 80 ms dopo, fermo
+     (solo l'opacita'): il vincitore e' quello che muove l'occhio. */
+  @keyframes qz-valore-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes qz-valore-fermo {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .compare-app .qz-region .value { animation: qz-valore-in var(--mo-base) var(--mo-out) both; }
+  .compare-app .qz-region.is-revealed:not(.is-winner) .value {
+    animation-name: qz-valore-fermo;
+    animation-delay: 80ms;
+  }
+
+  /* (b) Il bordo della scelta fatta: un anello di 3 px che sale e rientra in 160 ms. Nessuna scossa. */
+  @keyframes qz-flash-giusto {
+    0%, 100% { box-shadow: 0 0 0 0 var(--game-right-wash); }
+    50% { box-shadow: 0 0 0 3px var(--game-right-wash); }
+  }
+  @keyframes qz-flash-sbagliato {
+    0%, 100% { box-shadow: 0 0 0 0 var(--game-wrong-wash); }
+    50% { box-shadow: 0 0 0 3px var(--game-wrong-wash); }
+  }
+  .qz-region.is-picked-right { animation: qz-flash-giusto 160ms var(--mo-out); }
+  .qz-region.is-picked-wrong { animation: qz-flash-sbagliato 160ms var(--mo-out); }
+
+  /* (c) Il cambio di coppia: il blocco domanda e' un nodo nuovo (`key` in compare.jsx) e entra
+     da `@starting-style`, senza startViewTransition. */
+  .compare-app .qz-question {
+    transition: opacity var(--mo-base) var(--mo-out), transform var(--mo-base) var(--mo-out);
+  }
+  @starting-style {
+    .compare-app .qz-question { opacity: 0; transform: translateY(8px); }
+  }
 }
