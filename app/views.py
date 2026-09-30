@@ -3194,6 +3194,16 @@ def game_compare_daily_answer_api():
     return jsonify(corpo), stato
 
 
+@app.post("/api/game/compare/daily/next")
+def game_compare_daily_next_api():
+    """"Avanti": lega la domanda dopo quella appena risposta (vedi `game_compare.avanti`)."""
+    dati = request.get_json(silent=True) or {}
+    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+        return jsonify({"error": "rate_limited"}), 429
+    stato, corpo = game_compare.avanti(dati)
+    return jsonify(corpo), stato
+
+
 # fine sfida del giorno di "Chi è maggiore?"
 
 
