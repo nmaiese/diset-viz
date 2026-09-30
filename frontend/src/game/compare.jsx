@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { getAccessToken } from "../shared/supabase.js";
 import { segnaGiocata } from "./oggi.js";
 import {
@@ -11,7 +11,23 @@ import {
   postGame,
   notifyAchievements,
   FinePartita,
+  SfidaCondivisa,
+  useSfidaCondivisa,
+  useTerritorioMio,
+  fraseTerritorioMio,
 } from "./shared.jsx";
+import {
+  ROUND_MS,
+  avviaScadenza,
+  campoFatto,
+  chiediAvanti,
+  coppiaDelTerritorio,
+  primoTerritorioMio,
+  tonoCompare,
+} from "./compare-logica.js";
+
+// Il parametro `game` di ogni evento GA4 (docs/tracking_spec.md).
+const GIOCO = "compare";
 
 const API = {
   round: (difficulty, token, timer) =>
@@ -20,12 +36,13 @@ const API = {
   dailySession: (level, timer) =>
     `/api/game/compare/daily/session?level=${encodeURIComponent(level)}&timer=${timer ? 1 : 0}`,
   dailyAnswer: "/api/game/compare/daily/answer",
+  // La sfida di oggi senza aprire un round: serve solo per il numero, quando il link porta
+  // un frammento `#sfida=`. Il conto alla rovescia di un round parte da `dailySession`.
+  dailyOggi: "/api/game/compare/daily",
 };
 
 const STORAGE_STATS_KEY = "di-compare-stats";
 const STORAGE_ONBOARDED_KEY = "di-compare-onboarded";
-const ROUND_MS = 10000;
-const TICK_MS = 100;
 
 // I tre livelli della sfida del giorno. Il server li accetta tutti e li porta
 // dentro il token firmato: qui si sceglie il livello, non si sceglie la coppia.
@@ -51,6 +68,7 @@ const ERRORI_SFIDA = {
   late: "Il tempo è scaduto: la risposta è troppo tardi.",
   timeout_too_early: "Il tempo non era ancora scaduto.",
   rate_limited: "Troppe risposte in poco tempo. Riprova fra un minuto.",
+  round_already_bound: "La coppia dopo era già stata aperta. Riapri la sfida.",
   training_session: NOTA_ALLENAMENTO,
   bad_request: "Risposta non valida.",
 };
@@ -151,13 +169,12 @@ function SchedaIndicatore({ indicatore }) {
       <p className="qz-scheda-indicatore">
         <strong>{indicatore.name}</strong>
         {indicatore.year ? ` · ${indicatore.year}` : ""}
-        {indicatore.path ? (
-          <>
-            {" "}
-            <a href={indicatore.path}>Apri la scheda dell&apos;indicatore</a>
-          </>
-        ) : null}
       </p>
+      {indicatore.path ? (
+        <p className="qz-scheda-link">
+          <a href={indicatore.path}>Apri la scheda dell&apos;indicatore</a>
+        </p>
+      ) : null}
       {indicatore.description && (
         <>
           <p className="qz-scheda-misura">Che cosa misura</p>
@@ -168,6 +185,7 @@ function SchedaIndicatore({ indicatore }) {
         year={indicatore.year}
         sourceLabel={indicatore.source_label}
         sourceUrl={indicatore.source_url}
+        game={GIOCO}
       />
     </div>
   );
@@ -175,8 +193,10 @@ function SchedaIndicatore({ indicatore }) {
 
 // Il riepilogo delle dieci coppie a fine partita: cosa hai risposto, cosa era
 // giusto e che cosa misura ogni indicatore. È la parte che la partita lascia a
-// chi la finisce, insieme al link alla sfida di domani.
-function Riepilogo({ domande, risposte }) {
+// chi la finisce, insieme al link alla sfida di domani. Il segno di una coppia
+// sbagliata è un cerchio vuoto con la parola, non una croce: il risultato di
+// una partita non è una colpa, e vale anche per chi ne ha sbagliate sei.
+function Riepilogo({ domande, risposte, mio, livello, onRivedi }) {
   return (
     <section className="qz-riepilogo" aria-labelledby="qz-riepilogo-titolo">
       <h3 id="qz-riepilogo-titolo">Le dieci coppie</h3>
@@ -184,193 +204,388 @@ function Riepilogo({ domande, risposte }) {
         {risposte.map((risposta, indice) => {
           const domanda = domande[indice] || {};
           const lato = risposta.winner;
+          const altro = lato === "a" ? "b" : "a";
+          const conMio = coppiaDelTerritorio(mio, domanda, livello) !== null;
           return (
-            <li key={indice} className={risposta.correct ? "is-correct" : "is-wrong"}>
+            <li key={indice} className={`${risposta.correct ? "is-correct" : "is-wrong"}${conMio ? " is-mio" : ""}`}>
               <p className="qz-riepilogo-riga">
-                <span aria-hidden="true">{risposta.correct ? "✓" : "✗"}</span>{" "}
+                <span aria-hidden="true">{risposta.correct ? "✓" : "○"}</span>{" "}
                 <span className="visually-hidden">{risposta.correct ? "Giusta. " : "Sbagliata. "}</span>
                 <span className="qz-riepilogo-indicatore">{domanda.indicator ? domanda.indicator.name : ""}</span>
+                {conMio && <span className="qz-mio-etichetta">Il tuo territorio</span>}
               </p>
               <p className="qz-riepilogo-valori">
                 <strong>{risposta[lato].name}</strong> {formatValue(risposta[lato].value, risposta.indicator.unit)}
                 {" · "}
-                {risposta[lato === "a" ? "b" : "a"].name}{" "}
-                {formatValue(risposta[lato === "a" ? "b" : "a"].value, risposta.indicator.unit)}
+                {risposta[altro].name} {formatValue(risposta[altro].value, risposta.indicator.unit)}
               </p>
               <SchedaIndicatore indicatore={risposta.indicator} />
             </li>
           );
         })}
       </ol>
+      {onRivedi && (
+        <button type="button" className="game-btn game-btn--ghost compare-rivedi" onClick={onRivedi}>
+          Rivedi le stesse coppie
+        </button>
+      )}
     </section>
   );
 }
 
+// Fa scorrere la pagina sull'area di gioco: la testata e il titolo stanno sopra, il gioco
+// conta. Con `prefers-reduced-motion: reduce` lo scorrimento e' immediato. Il margine sotto la
+// testata che resta ferma lo da' `scroll-padding-top` del foglio del sito.
+function scrollaSuIsola() {
+  const isola = document.getElementById("compare-root");
+  if (!isola || typeof isola.scrollIntoView !== "function") return;
+  isola.scrollIntoView({ block: "start", behavior: prefersReducedMotion() ? "auto" : "smooth" });
+}
+
+// Il timer di un round. `attivo` lo accende (solo con il timer scelto e la domanda aperta),
+// `chiave` lo fa ripartire a ogni coppia. Il conto e' di `compare-logica.js`: a scadenza
+// assoluta, e la risposta di timeout parte UNA volta, fuori da qualsiasi updater di stato.
+// Ritorna `[rimasto, azzera]`: `azzera()` riporta il conto a 10 s prima di una coppia nuova. Se
+// il timer si riaccende sulla stessa coppia (un errore riprovabile) riparte da quanto restava.
+function useTimerRound(attivo, chiave, onScadenza) {
+  const [rimasto, setRimasto] = useState(ROUND_MS);
+  const rimastoRef = useRef(ROUND_MS);
+  const scadenzaRef = useRef(onScadenza);
+  scadenzaRef.current = onScadenza;
+
+  const azzera = useCallback(() => {
+    rimastoRef.current = ROUND_MS;
+    setRimasto(ROUND_MS);
+  }, []);
+
+  useEffect(() => {
+    if (!attivo) return undefined;
+    return avviaScadenza({
+      ms: rimastoRef.current,
+      onTick: (ms) => {
+        rimastoRef.current = ms;
+        setRimasto(ms);
+      },
+      onScadenza: () => scadenzaRef.current(),
+    });
+  }, [attivo, chiave]);
+
+  return [rimasto, azzera];
+}
+
+// Cronometro e barra: ci sono solo mentre la domanda e' aperta. Dopo la risposta il tempo e'
+// fermo e mostrarlo direbbe una cosa falsa.
+function Cronometro({ rimasto }) {
+  const pct = Math.max(0, (rimasto / ROUND_MS) * 100);
+  const basso = rimasto <= 3000;
+  return (
+    <div className="qz-timer">
+      <span className={basso ? "qz-clock is-low" : "qz-clock"}>{formatClock(rimasto)}</span>
+      <span className="qz-timer-bar">
+        <i style={{ width: `${pct}%` }} />
+      </span>
+    </div>
+  );
+}
+
+// La barra "Avanti": ferma in fondo all'isola, dove arriva il pollice, larga quanto lo schermo
+// su telefono. Il bottone e' alto 48 px. Il focus ci arriva dopo la risposta (da tastiera si
+// preme Invio), e `aria-busy` dice che sta aspettando il server.
+const BarraAvanti = forwardRef(function BarraAvanti({ etichetta, onClick, occupato, messaggio }, ref) {
+  return (
+    <div className="compare-next-bar">
+      {messaggio && (
+        <p className="game-error compare-next-errore" role="alert">
+          {messaggio}
+        </p>
+      )}
+      <button
+        type="button"
+        ref={ref}
+        className="game-btn compare-next"
+        onClick={onClick}
+        disabled={occupato}
+        aria-busy={occupato ? "true" : undefined}
+      >
+        {etichetta}
+      </button>
+    </div>
+  );
+});
+
+// Il segno "il tuo territorio" nella coppia: un testo, non un colore.
+function EtichettaMio() {
+  return <span className="mio">Il tuo territorio</span>;
+}
+
 // La sfida del giorno: dieci coppie, le stesse per tutti, valutate dal server.
-function SfidaDelGiorno({ livello, timer, onEsci }) {
+function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) {
   const [sessione, setSessione] = useState(null);
-  // caricamento | domanda | invio | rivelata | fine | errore
+  // caricamento | domanda | invio | rivelata | fine | errore | bloccata
   const [stato, setStato] = useState("caricamento");
   const [indice, setIndice] = useState(0);
   const [risposta, setRisposta] = useState(null);
   const [risposte, setRisposte] = useState([]);
   const [messaggio, setMessaggio] = useState("");
   const [scaduta, setScaduta] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(ROUND_MS);
+  // "Avanti": null | invio | riprova | riapri
+  const [avvio, setAvvio] = useState(null);
+  const [messaggioAvvio, setMessaggioAvvio] = useState("");
+  // L'ultima coppia si rivela come le altre; solo dopo la barra "Vedi il risultato" si passa alla fine.
+  const [risultatoVisto, setRisultatoVisto] = useState(false);
+  const mio = useTerritorioMio();
 
   const statoRef = useRef({ stato: "domanda", indice: 0 });
-  const timerRef = useRef(null);
+  const sessioneRef = useRef(null);
   const tokenRef = useRef(null);
+  const ritentoRef = useRef({ id: null, tentativi: 0 });
+  const domandaRef = useRef(null);
+  const avantiRef = useRef(null);
+  const rispondiRef = useRef(null);
 
   useEffect(() => {
     statoRef.current = { stato, indice };
   }, [stato, indice]);
 
   useEffect(() => {
-    return () => {
-      window.clearInterval(timerRef.current);
-    };
+    return () => window.clearTimeout(ritentoRef.current.id);
   }, []);
 
   // Il tempo lo scandisce il client per far avanzare la barra, ma la validita'
   // della risposta la decide il server (vedi `round_timing`): il client puo'
   // sbagliare il conto, non puo' far valere una risposta fuori tempo.
-  useEffect(() => {
-    if (!timer || stato !== "domanda") return undefined;
-    timerRef.current = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        const next = prev - TICK_MS;
-        if (next <= 0) {
-          window.clearInterval(timerRef.current);
-          rispondi("timeout");
-          return 0;
-        }
-        return next;
-      });
-    }, TICK_MS);
-    return () => window.clearInterval(timerRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stato, indice, timer]);
+  const [timeLeft, azzeraTimer] = useTimerRound(timer && stato === "domanda", indice, () =>
+    rispondiRef.current("timeout")
+  );
 
   useEffect(() => {
     apri();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Stesse frecce e stessi tasti del round a serie, per chi gioca da tastiera.
+  // Stesse frecce e stessi tasti del round a serie, per chi gioca da tastiera. La risposta si
+  // legge da un ref: questo effetto si registra una volta sola e vedrebbe la prima `rispondi`,
+  // quella che non ha ancora la sessione e non risponde mai.
   useEffect(() => {
     function onKeyDown(event) {
       if (statoRef.current.stato !== "domanda") return;
       const key = event.key.toLowerCase();
       if (key === "arrowleft" || key === "a") {
         event.preventDefault();
-        rispondi("region_a");
+        rispondiRef.current("region_a");
       } else if (key === "arrowright" || key === "b") {
         event.preventDefault();
-        rispondi("region_b");
+        rispondiRef.current("region_b");
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A ogni coppia nuova (e all'apertura della sfida) la pagina torna sull'area di gioco: la
+  // rivelazione della coppia prima e' piu' lunga, e senza questo la domanda nuova resterebbe
+  // sopra la piega.
+  useEffect(() => {
+    if (!sessione) return;
+    scrollaSuIsola();
+    if (indice > 0 && domandaRef.current) domandaRef.current.focus({ preventScroll: true });
+  }, [sessione, indice]);
+
+  // Dopo la risposta il bottone scelto si disattiva e il focus cadrebbe sul body: va alla barra.
+  useEffect(() => {
+    if ((stato === "rivelata" || stato === "fine") && avantiRef.current) {
+      avantiRef.current.focus({ preventScroll: true });
+    }
+  }, [stato]);
+
+  // Dalla rivelazione dell'ultima coppia alla fine: il blocco cambia del tutto, si riparte dall'alto.
+  useEffect(() => {
+    if (risultatoVisto) scrollaSuIsola();
+  }, [risultatoVisto]);
+
+  useEffect(() => {
+    if (indice > 0 && onAvviata) onAvviata();
+  }, [indice, onAvviata]);
+
   function apri() {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    window.clearTimeout(ritentoRef.current.id);
+    ritentoRef.current = { id: null, tentativi: 0 };
     setStato("caricamento");
+    setSessione(null);
+    sessioneRef.current = null;
     setScaduta(false);
     setMessaggio("");
+    setAvvio(null);
+    setMessaggioAvvio("");
+    setRisultatoVisto(false);
     fetchJson(API.dailySession(livello, timer))
       .then((data) => {
         tokenRef.current = data.token;
+        sessioneRef.current = data;
+        statoRef.current = { stato: "domanda", indice: 0 };
         setSessione(data);
         setIndice(0);
         setRisposta(null);
         setRisposte([]);
-        setTimeLeft(ROUND_MS);
+        azzeraTimer();
         setStato("domanda");
-        trackGameEvent("compare_start", { level: livello, mode: "sfida", total: data.total });
+        trackGameEvent("compare_start", { game: GIOCO, level: livello, mode: "sfida", total: data.total });
       })
       .catch(() => setStato("errore"));
   }
 
+  // Un click o la scadenza: il guardiano e' sincrono (si scrive nel ref prima di rendere),
+  // cosi' un click e la scadenza nello stesso istante mandano UNA richiesta sola.
   function rispondi(scelta) {
-    const { stato: attuale, indice: domanda } = statoRef.current;
-    if (attuale !== "domanda" || !sessione) return;
-    window.clearInterval(timerRef.current);
+    const corrente = statoRef.current;
+    if (corrente.stato !== "domanda" || !sessioneRef.current) return;
+    statoRef.current = { ...corrente, stato: "invio" };
+    window.clearTimeout(ritentoRef.current.id);
+    ritentoRef.current = { id: null, tentativi: 0 };
     setStato("invio");
     setMessaggio("");
+    invia(scelta, corrente.indice);
+  }
+  rispondiRef.current = rispondi;
+
+  function invia(scelta, domandaIndice) {
+    const corrente = sessioneRef.current;
     postSfida(API.dailyAnswer, {
-      puzzle_id: sessione.puzzle_id,
-      q: domanda,
+      puzzle_id: corrente.puzzle_id,
+      q: domandaIndice,
       choice: scelta,
       token: tokenRef.current,
     }).then(({ ok, status, data }) => {
       if (ok) {
         tokenRef.current = data.token;
+        statoRef.current = { stato: data.finished ? "fine" : "rivelata", indice: domandaIndice };
         setRisposta(data);
         setRisposte((precedenti) => [...precedenti, data]);
         setStato(data.finished ? "fine" : "rivelata");
         trackGameEvent("compare_answer", {
+          game: GIOCO,
           result: data.correct ? "correct" : scelta === "timeout" ? "timeout" : "wrong",
           streak: data.score ? data.score.correct : 0,
-          difficulty: sessione.difficulty,
+          difficulty: corrente.difficulty,
           level: livello,
           mode: "sfida",
         });
-        notifyAchievements(data.achievements);
+        notifyAchievements(data.achievements, GIOCO);
         return;
       }
       // Un doppio invio della stessa coppia è un 409 e un token già usato è un
       // 400 `token_invalid`: in entrambi i casi il primo invio ha già fatto
       // testo, quindi si torna alla domanda senza dire nulla a chi gioca.
       if (status === 409 || data.error === "token_invalid") {
+        statoRef.current = { stato: "domanda", indice: domandaIndice };
         setStato("domanda");
         return;
       }
       setMessaggio(ERRORI_SFIDA[data.error] || "Qualcosa non ha funzionato. Riprova.");
       if (ERRORI_RIPROVABILI.has(data.error)) {
-        setStato("domanda");
-        return;
+        if (scelta === "timeout") {
+          // Il tempo e' gia' finito per il client: rimettere la domanda in `domanda` farebbe
+          // scattare la scadenza a ogni tick. Si riprova una volta ogni secondo e mezzo, poche volte.
+          if (ritentoRef.current.tentativi < 3) {
+            ritentoRef.current = {
+              tentativi: ritentoRef.current.tentativi + 1,
+              id: window.setTimeout(() => invia("timeout", domandaIndice), 1500),
+            };
+            return;
+          }
+        } else {
+          statoRef.current = { stato: "domanda", indice: domandaIndice };
+          setStato("domanda");
+          return;
+        }
       }
       setStato("bloccata");
       setScaduta(true);
     });
   }
 
+  // "Avanti": il server lega la coppia dopo solo con `next`, e il tempo della prossima parte
+  // quando arriva la sua risposta, non quando si tocca il bottone.
   function avanti() {
-    setIndice((i) => i + 1);
-    setRisposta(null);
-    setTimeLeft(ROUND_MS);
-    setStato("domanda");
+    if (stato === "fine") {
+      setRisultatoVisto(true);
+      return;
+    }
+    if (stato !== "rivelata" || avvio === "invio") return;
+    setAvvio("invio");
+    setMessaggioAvvio("");
+    chiediAvanti({ post: postSfida, token: tokenRef.current, puzzleId: sessioneRef.current.puzzle_id, q: indice }).then(
+      (esito) => {
+        if (esito.ok) {
+          tokenRef.current = esito.token;
+          statoRef.current = { stato: "domanda", indice: indice + 1 };
+          azzeraTimer();
+          setAvvio(null);
+          setIndice(indice + 1);
+          setRisposta(null);
+          setStato("domanda");
+          return;
+        }
+        if (esito.riprova) {
+          setAvvio("riprova");
+          setMessaggioAvvio("Non sono riuscito a passare alla coppia dopo.");
+          return;
+        }
+        setAvvio("riapri");
+        setMessaggioAvvio(ERRORI_SFIDA[esito.errore] || "La sfida non può proseguire. Riaprila.");
+      }
+    );
   }
 
   const domanda = sessione ? sessione.questions[indice] : null;
-  const punteggio = risposta && risposta.score ? risposta.score : { correct: 0, total: 10 };
+  const giuste = risposte.filter((r) => r.correct).length;
   const allenamento = sessione ? !sessione.leaderboard : false;
-  const timerPct = Math.max(0, (timeLeft / ROUND_MS) * 100);
-  const isLowTime = stato === "domanda" && timer && timeLeft <= 3000;
   const rivelata = stato === "rivelata" || stato === "fine";
+  const fine = stato === "fine" && risultatoVisto && risposta && risposta.summary;
+  const tuoTerritorio = domanda ? coppiaDelTerritorio(mio, domanda, livello) : null;
+  const territorioFine = fine ? primoTerritorioMio(mio, sessione.questions, livello) : null;
 
   function latoClass(lato) {
     let cls = "qz-region";
+    if (tuoTerritorio === lato) cls += " is-mio";
     if (!rivelata || !risposta) return cls;
     if (risposta.winner === lato) cls += " is-revealed is-winner";
     else cls += " is-revealed";
-    if (risposta.choice === lato && !risposta.correct) cls += " is-picked-wrong";
+    // `choice` e' "region_a" o "region_b" (il vocabolario del round a serie), il lato e' "a" o "b".
+    if (risposta.choice === `region_${lato}`) cls += risposta.correct ? " is-picked-right" : " is-picked-wrong";
     return cls;
   }
 
-  const fine = stato === "fine" && risposta && risposta.summary;
-
   // L'hub sa che oggi hai giocato (solo la sfida in classifica, non l'allenamento).
+  const finita = stato === "fine" && risposta && risposta.summary;
   useEffect(() => {
-    if (!fine || allenamento) return;
-    segnaGiocata("compare", fine.date, {
-      ok: fine.score.correct * 2 > fine.score.total,
-      testo: `${fine.score.correct} su ${fine.score.total}`,
+    if (!finita || allenamento) return;
+    // L'hub ha due icone (giusto, sbagliato) e nessuna neutra: un parziale non e' una croce, quindi
+    // solo lo zero pieno e' "sbagliato". Un terzo stato lo deve dare l'hub (`oggi.js`, non di questo file).
+    segnaGiocata("compare", finita.date, {
+      ok: tonoCompare(finita.score.correct, finita.score.total) !== "nullo",
+      testo: `${finita.score.correct} su ${finita.score.total}`,
     });
-  }, [fine, allenamento]);
+  }, [finita, allenamento]);
+
+  function bottoneLato(chiave) {
+    const vista = rivelata && risposta ? risposta[chiave] : domanda[chiave];
+    return (
+      <button
+        type="button"
+        className={latoClass(chiave)}
+        disabled={stato !== "domanda"}
+        onClick={() => rispondi(chiave === "a" ? "region_a" : "region_b")}
+      >
+        <span className="code">{chiave.toUpperCase()}</span>
+        <span className="name">{vista.name}</span>
+        {vista.region && <span className="macro">{vista.region}</span>}
+        {tuoTerritorio === chiave && <EtichettaMio />}
+        {rivelata && risposta && <span className="value">{formatValue(risposta[chiave].value, risposta.indicator.unit)}</span>}
+        {rivelata && risposta && risposta.winner === chiave && <span className="crown">maggiore</span>}
+      </button>
+    );
+  }
 
   return (
     <div className="compare-app">
@@ -379,20 +594,13 @@ function SfidaDelGiorno({ livello, timer, onEsci }) {
           Sfida <strong>{sessione ? sessione.number : "-"}</strong>
         </span>
         <span className="qz-badge">
-          Coppia <strong>{indice + 1}</strong> di <strong>{sessione ? sessione.total : 10}</strong>
+          Coppia <strong>{sessione ? indice + 1 : "-"}</strong> di <strong>{sessione ? sessione.total : "-"}</strong>
         </span>
         <span className="qz-badge">
-          Giuste <strong>{punteggio.correct}</strong>
+          Giuste <strong>{sessione ? giuste : "-"}</strong>
         </span>
         <span className="qz-badge qz-badge--level">{sessione ? sessione.level_label : ""}</span>
-        {timer && (
-          <div className="qz-timer">
-            <span className={isLowTime ? "qz-clock is-low" : "qz-clock"}>{formatClock(timeLeft)}</span>
-            <span className="qz-timer-bar">
-              <i className={stato === "domanda" ? "" : "is-paused"} style={{ width: `${timerPct}%` }} />
-            </span>
-          </div>
-        )}
+        {timer && stato === "domanda" && <Cronometro rimasto={timeLeft} />}
       </div>
 
       {allenamento && <p className="compare-notice">{NOTA_ALLENAMENTO}</p>}
@@ -413,16 +621,16 @@ function SfidaDelGiorno({ livello, timer, onEsci }) {
             <span style={{ height: 22, width: "70%" }} />
           </div>
           <div className="qz-vs" style={{ marginTop: 18 }}>
-            <span className="skel-bar" style={{ height: 140 }} />
+            <span className="skel-bar" style={{ height: 96 }} />
             <div className="divider">VS</div>
-            <span className="skel-bar" style={{ height: 140 }} />
+            <span className="skel-bar" style={{ height: 96 }} />
           </div>
         </div>
       )}
 
       {domanda && !fine && (
         <>
-          <div className="qz-question">
+          <div className="qz-question" key={`domanda-${indice}`} ref={domandaRef} tabIndex={-1}>
             <small>
               {domanda.indicator.family ? `${domanda.indicator.family} · ` : ""}
               {domanda.indicator.year}
@@ -431,43 +639,9 @@ function SfidaDelGiorno({ livello, timer, onEsci }) {
           </div>
 
           <div className="qz-vs">
-            <button
-              type="button"
-              className={latoClass("a")}
-              disabled={stato !== "domanda"}
-              onClick={() => rispondi("region_a")}
-            >
-              <span className="code">A</span>
-              <span className="name">{rivelata && risposta ? risposta.a.name : domanda.a.name}</span>
-              {(rivelata && risposta ? risposta.a.region : domanda.a.region) && (
-                <span className="macro">
-                  {(rivelata && risposta ? risposta.a.region : domanda.a.region)}
-                </span>
-              )}
-              {rivelata && risposta && (
-                <span className="value">{formatValue(risposta.a.value, risposta.indicator.unit)}</span>
-              )}
-              {rivelata && risposta && risposta.winner === "a" && <span className="crown">maggiore</span>}
-            </button>
-            <div className="divider">VS</div>
-            <button
-              type="button"
-              className={latoClass("b")}
-              disabled={stato !== "domanda"}
-              onClick={() => rispondi("region_b")}
-            >
-              <span className="code">B</span>
-              <span className="name">{rivelata && risposta ? risposta.b.name : domanda.b.name}</span>
-              {(rivelata && risposta ? risposta.b.region : domanda.b.region) && (
-                <span className="macro">
-                  {(rivelata && risposta ? risposta.b.region : domanda.b.region)}
-                </span>
-              )}
-              {rivelata && risposta && (
-                <span className="value">{formatValue(risposta.b.value, risposta.indicator.unit)}</span>
-              )}
-              {rivelata && risposta && risposta.winner === "b" && <span className="crown">maggiore</span>}
-            </button>
+            {bottoneLato("a")}
+            <div className="divider" aria-hidden="true">VS</div>
+            {bottoneLato("b")}
           </div>
 
           <div className="compare-feedback" aria-live="polite">
@@ -508,13 +682,20 @@ function SfidaDelGiorno({ livello, timer, onEsci }) {
             )}
           </div>
 
-          {rivelata && (
-            <button type="button" className="game-btn compare-next" onClick={avanti}>
-              Avanti
-            </button>
+          {rivelata && avvio !== "riapri" && (
+            <BarraAvanti
+              ref={avantiRef}
+              etichetta={stato === "fine" ? "Vedi il risultato" : avvio === "riprova" ? "Riprova" : "Avanti"}
+              onClick={avanti}
+              occupato={avvio === "invio"}
+              messaggio={messaggioAvvio}
+            />
+          )}
+          {rivelata && avvio === "riapri" && (
+            <BarraAvanti ref={avantiRef} etichetta="Riapri la sfida di oggi" onClick={apri} messaggio={messaggioAvvio} />
           )}
 
-          <div className="qz-hud">
+          <div className="qz-hud qz-hud--comando">
             <div className="qz-hud-cmd">
               <small>Comando</small>
               <strong>← A · B →</strong>
@@ -526,25 +707,32 @@ function SfidaDelGiorno({ livello, timer, onEsci }) {
       {fine && (
         <>
           <FinePartita
+            game={GIOCO}
             won={fine.score.correct * 2 > fine.score.total}
+            tono={tonoCompare(fine.score.correct, fine.score.total)}
             titolo={`${fine.score.correct} su ${fine.score.total}`}
             dettaglio={`Sfida del giorno numero ${fine.number} · ${dataInItaliano(fine.date)} · ${
               allenamento ? "allenamento, fuori classifica" : sessione.level_label
             }`}
+            fatto={campoFatto(risposta)}
+            sfida={sfida ? { punteggio: sfida.punteggio, tuo: fine.score.correct, game: GIOCO } : undefined}
             nextPuzzleAt={fine.next_puzzle_at}
             condividi={{
               gameName: "Chi è maggiore?",
+              game: GIOCO,
               puzzleNumber: fine.number,
+              punteggio: fine.score.correct,
               esiti: risposte.map((r) => r.esito),
               summary: `${fine.score.correct} su ${fine.score.total}`,
               url: urlDelLivello(livello),
               eventName: "compare_share",
               eventParams: { level: livello },
             }}
-            onPlayAgain={apri}
-            playAgainLabel="Rivedi le stesse coppie"
+            onPlayAgain={onAllena}
+            playAgainLabel="Allenati con coppie nuove"
           />
-          <Riepilogo domande={sessione.questions} risposte={risposte} />
+          {territorioFine && <p className="qz-fine-mio">{fraseTerritorioMio(territorioFine)}</p>}
+          <Riepilogo domande={sessione.questions} risposte={risposte} mio={mio} livello={livello} onRivedi={apri} />
         </>
       )}
 
@@ -564,7 +752,6 @@ function Allenamento({ timer, onEsci }) {
   const [choice, setChoice] = useState(null);
   const [streak, setStreak] = useState(0);
   const [stats, setStats] = useState(loadStats);
-  const [timeLeft, setTimeLeft] = useState(ROUND_MS);
   const [sessionBest, setSessionBest] = useState(0);
   const [showScoreModal, setShowScoreModal] = useState(false);
   // Contatori della sessione corrente, mostrati nella barra di stato in cima
@@ -572,16 +759,24 @@ function Allenamento({ timer, onEsci }) {
   // differenza dei record salvati in localStorage.
   const [roundNumber, setRoundNumber] = useState(0);
   const [sessionPoints, setSessionPoints] = useState(0);
+  const mio = useTerritorioMio();
 
   const stateRef = useRef({ status: "loading", round: null, streak: 0 });
-  const timerRef = useRef(null);
   const tokenRef = useRef(null);
   const promptedBestRef = useRef(0);
+  const domandaRef = useRef(null);
+  const avantiRef = useRef(null);
+  const rispondiRef = useRef(null);
+
+  // Senza timer l'allenamento non scade mai: il conto si accende solo se il timer e' scelto.
+  const [timeLeft, azzeraTimer] = useTimerRound(timer && status === "answering", roundNumber, () =>
+    rispondiRef.current("timeout")
+  );
 
   // Il primo round parte appena il componente è montato: la scelta fra sfida
   // del giorno e allenamento l'ha già fatta chi ha premuto il bottone.
   useEffect(() => {
-    trackGameEvent("compare_start", { level: "regioni", mode: "allenamento" });
+    trackGameEvent("compare_start", { game: GIOCO, level: "regioni", mode: "allenamento" });
     loadRound(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -590,58 +785,47 @@ function Allenamento({ timer, onEsci }) {
     stateRef.current = { status, round, streak };
   }, [status, round, streak]);
 
-  useEffect(() => {
-    return () => {
-      window.clearInterval(timerRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (status !== "answering") return undefined;
-    timerRef.current = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        const next = prev - TICK_MS;
-        if (next <= 0) {
-          window.clearInterval(timerRef.current);
-          submitAnswer("timeout");
-          return 0;
-        }
-        return next;
-      });
-    }, TICK_MS);
-    return () => window.clearInterval(timerRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
-
   // Comando da tastiera mostrato nell'HUD (← A · B →): frecce o i tasti A/B
   // scelgono la regione mentre il round è aperto. Registrato una sola volta,
-  // legge lo stato corrente da stateRef per non re-agganciarsi a ogni render.
+  // legge lo stato corrente da stateRef e la risposta da un ref per non
+  // re-agganciarsi a ogni render.
   useEffect(() => {
     function onKeyDown(event) {
       if (stateRef.current.status !== "answering") return;
       const key = event.key.toLowerCase();
       if (key === "arrowleft" || key === "a") {
         event.preventDefault();
-        submitAnswer("region_a");
+        rispondiRef.current("region_a");
       } else if (key === "arrowright" || key === "b") {
         event.preventDefault();
-        submitAnswer("region_b");
+        rispondiRef.current("region_b");
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Stessa regola della sfida: a ogni round la pagina torna sull'area di gioco, e dopo la
+  // risposta il focus va al bottone "Avanti".
+  useEffect(() => {
+    if (!round) return;
+    scrollaSuIsola();
+    if (roundNumber > 1 && domandaRef.current) domandaRef.current.focus({ preventScroll: true });
+  }, [round, roundNumber]);
+
+  useEffect(() => {
+    if (status === "revealed" && avantiRef.current) avantiRef.current.focus({ preventScroll: true });
+  }, [status]);
+
   function loadRound(difficulty) {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
     setStatus("loading");
     setResult(null);
     setChoice(null);
-    setTimeLeft(ROUND_MS);
+    azzeraTimer();
     fetchJson(API.round(difficulty, tokenRef.current, timer))
       .then((data) => {
         tokenRef.current = data.token;
+        stateRef.current = { ...stateRef.current, status: "answering", round: data };
         setRound(data);
         setRoundNumber((n) => n + 1);
         setStatus("answering");
@@ -652,7 +836,8 @@ function Allenamento({ timer, onEsci }) {
   function submitAnswer(picked) {
     const { status: current, round: currentRound } = stateRef.current;
     if (current !== "answering" || !currentRound) return;
-    window.clearInterval(timerRef.current);
+    // Guardiano sincrono: un click e la scadenza insieme mandano UNA richiesta.
+    stateRef.current = { ...stateRef.current, status: "loading" };
     setStatus("loading");
     setChoice(picked);
     postGame(API.answer, {
@@ -667,7 +852,7 @@ function Allenamento({ timer, onEsci }) {
         setResult(data);
         setStatus("revealed");
         tokenRef.current = data.token;
-        notifyAchievements(data.achievements);
+        notifyAchievements(data.achievements, GIOCO);
         const prevStreak = stateRef.current.streak;
         const nextStreak = data.correct ? prevStreak + 1 : 0;
         setStreak(nextStreak);
@@ -691,6 +876,7 @@ function Allenamento({ timer, onEsci }) {
           }
         }
         trackGameEvent("compare_answer", {
+          game: GIOCO,
           result: data.correct ? "correct" : picked === "timeout" ? "timeout" : "wrong",
           streak: nextStreak,
           difficulty: currentRound.difficulty,
@@ -700,27 +886,54 @@ function Allenamento({ timer, onEsci }) {
       })
       .catch(() => setStatus("error"));
   }
+  rispondiRef.current = submitAnswer;
 
   function nextRound() {
     loadRound(difficultyForStreak(streak));
   }
 
-  const timerPct = Math.max(0, (timeLeft / ROUND_MS) * 100);
   const level = round ? round.difficulty : 0;
-  const isLowTime = status === "answering" && timer && timeLeft <= 3000;
   const accuracy = stats.totalRounds > 0
     ? Math.round((stats.totalCorrect / stats.totalRounds) * 100)
     : 0;
+  const tuoTerritorio = round
+    ? coppiaDelTerritorio(
+        mio,
+        { a: { key: round.region_a.region_key }, b: { key: round.region_b.region_key } },
+        "regioni"
+      )
+    : null;
 
   function regionClass(side) {
-    const base = "qz-region";
-    if (status !== "revealed" || !result) return base;
+    let cls = "qz-region";
+    if (tuoTerritorio === (side === "region_a" ? "a" : "b")) cls += " is-mio";
+    if (status !== "revealed" || !result) return cls;
     const isWinner = result.winner === side;
     const wasPicked = choice === side;
-    let cls = `${base} is-revealed`;
+    cls += " is-revealed";
     if (isWinner) cls += " is-winner";
-    if (wasPicked && !result.correct) cls += " is-picked-wrong";
+    if (wasPicked) cls += result.correct ? " is-picked-right" : " is-picked-wrong";
     return cls;
+  }
+
+  function regione(side, dato, chiave) {
+    return (
+      <button
+        type="button"
+        className={regionClass(side)}
+        disabled={status !== "answering"}
+        onClick={() => submitAnswer(side)}
+      >
+        <span className="code">{side === "region_a" ? "A" : "B"}</span>
+        <span className="name">{dato.region}</span>
+        {dato.geo_area && <span className="macro">{dato.geo_area}</span>}
+        {tuoTerritorio === chiave && <EtichettaMio />}
+        {status === "revealed" && result && (
+          <span className="value">{formatValue(result[side].value, round.indicator.unit)}</span>
+        )}
+        {status === "revealed" && result && result.winner === side && <span className="crown">maggiore</span>}
+      </button>
+    );
   }
 
   return (
@@ -741,71 +954,38 @@ function Allenamento({ timer, onEsci }) {
             <span className="qz-badge">Serie <strong>{streak}</strong></span>
             <span className="qz-badge">Punti <strong>{sessionPoints}</strong></span>
             <span className="qz-badge qz-badge--level">{DIFFICULTY_LABELS[level]}</span>
-            {timer && (
-              <div className="qz-timer">
-                <span className={isLowTime ? "qz-clock is-low" : "qz-clock"}>{formatClock(timeLeft)}</span>
-                <span className="qz-timer-bar">
-                  <i
-                    className={status === "answering" ? "" : "is-paused"}
-                    style={{ width: `${timerPct}%` }}
-                  />
-                </span>
-              </div>
-            )}
+            {timer && status === "answering" && <Cronometro rimasto={timeLeft} />}
           </div>
 
           {!timer && <p className="compare-notice">{NOTA_ALLENAMENTO}</p>}
 
-          <div className="qz-question">
-            <small>Indicatore Istat · {round.indicator.year}</small>
+          <div className="qz-question" key={`round-${roundNumber}`} ref={domandaRef} tabIndex={-1}>
+            <small>
+              {round.indicator.source_label ? `Indicatore ${round.indicator.source_label} · ` : ""}
+              {round.indicator.year}
+            </small>
             <h2>{round.indicator.name}</h2>
-            {(round.indicator.description || round.indicator.value_explanation) && (
-              <p className="desc">
-                {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
-              </p>
-            )}
-            <SourceStrip
-              year={round.indicator.year}
-              sourceLabel={round.indicator.source_label}
-              sourceUrl={round.indicator.source_url}
-            />
           </div>
 
           <div className="qz-vs">
-            <button
-              type="button"
-              className={regionClass("region_a")}
-              disabled={status !== "answering"}
-              onClick={() => submitAnswer("region_a")}
-            >
-              <span className="code">A</span>
-              <span className="name">{round.region_a.region}</span>
-              {round.region_a.geo_area && <span className="macro">{round.region_a.geo_area}</span>}
-              {status === "revealed" && result && (
-                <span className="value">{formatValue(result.region_a.value, round.indicator.unit)}</span>
-              )}
-              {status === "revealed" && result && result.winner === "region_a" && (
-                <span className="crown">maggiore</span>
-              )}
-            </button>
-            <div className="divider">VS</div>
-            <button
-              type="button"
-              className={regionClass("region_b")}
-              disabled={status !== "answering"}
-              onClick={() => submitAnswer("region_b")}
-            >
-              <span className="code">B</span>
-              <span className="name">{round.region_b.region}</span>
-              {round.region_b.geo_area && <span className="macro">{round.region_b.geo_area}</span>}
-              {status === "revealed" && result && (
-                <span className="value">{formatValue(result.region_b.value, round.indicator.unit)}</span>
-              )}
-              {status === "revealed" && result && result.winner === "region_b" && (
-                <span className="crown">maggiore</span>
-              )}
-            </button>
+            {regione("region_a", round.region_a, "a")}
+            <div className="divider" aria-hidden="true">VS</div>
+            {regione("region_b", round.region_b, "b")}
           </div>
+
+          {(round.indicator.description || round.indicator.value_explanation) && (
+            <div className="qz-misura">
+              <p className="desc">
+                {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
+              </p>
+              <SourceStrip
+                year={round.indicator.year}
+                sourceLabel={round.indicator.source_label}
+                sourceUrl={round.indicator.source_url}
+                game={GIOCO}
+              />
+            </div>
+          )}
 
           <div className="compare-feedback" aria-live="polite">
             {status === "revealed" && result && (
@@ -825,9 +1005,11 @@ function Allenamento({ timer, onEsci }) {
           </div>
 
           {status === "revealed" && (
-            <button type="button" className="game-btn compare-next" onClick={nextRound}>
-              {result && result.correct ? "Avanti" : "Ricomincia"}
-            </button>
+            <BarraAvanti
+              ref={avantiRef}
+              etichetta={result && result.correct ? "Avanti" : "Ricomincia"}
+              onClick={nextRound}
+            />
           )}
 
           <div className="qz-hud">
@@ -852,9 +1034,9 @@ function Allenamento({ timer, onEsci }) {
             <span style={{ height: 22, width: "70%" }} />
           </div>
           <div className="qz-vs" style={{ marginTop: 18 }}>
-            <span className="skel-bar" style={{ height: 140 }} />
+            <span className="skel-bar" style={{ height: 96 }} />
             <div className="divider">VS</div>
-            <span className="skel-bar" style={{ height: 140 }} />
+            <span className="skel-bar" style={{ height: 96 }} />
           </div>
         </div>
       )}
@@ -880,6 +1062,10 @@ export default function CompareApp() {
   const [modalita, setModalita] = useState(null); // null | sfida | allenamento
   const [livello, setLivello] = useState(livelloDaUrl);
   const [timer, setTimer] = useState(true);
+  // La sfida condivisa (`#sfida=7-12`): il numero di oggi lo dice il server, mai la data del
+  // browser. Lo si chiede solo se il link porta un frammento, e senza aprire un round.
+  const [numeroOggi, setNumeroOggi] = useState(null);
+  const [avviata, setAvviata] = useState(false);
   const [hasPlayedBefore] = useState(() => {
     try {
       return !!window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
@@ -887,6 +1073,20 @@ export default function CompareApp() {
       return false;
     }
   });
+
+  useEffect(() => {
+    if (!/^#sfida=/.test(window.location.hash)) return;
+    fetchJson(API.dailyOggi)
+      .then((data) => setNumeroOggi(data && Number.isInteger(data.number) ? data.number : null))
+      .catch(() => {
+        // Senza il numero di oggi non c'e' sfida: il gioco parte lo stesso.
+      });
+  }, []);
+
+  // La partita comincia alla seconda coppia, non alla prima risposta: togliere il riquadro
+  // mentre si rivela la prima coppia sposterebbe i bottoni sotto il dito.
+  const sfida = useSfidaCondivisa({ game: GIOCO, numeroOggi, avviata });
+  const segnaAvviata = useCallback(() => setAvviata(true), []);
 
   function segnaGiocato() {
     try {
@@ -896,81 +1096,98 @@ export default function CompareApp() {
     }
   }
 
+  const riquadro = <SfidaCondivisa sfida={sfida} game={GIOCO} avviata={avviata || modalita === "allenamento"} />;
+
   if (modalita === "sfida") {
-    return <SfidaDelGiorno livello={livello} timer={timer} onEsci={() => setModalita(null)} />;
+    return (
+      <>
+        {riquadro}
+        <SfidaDelGiorno
+          livello={livello}
+          timer={timer}
+          sfida={sfida}
+          onAvviata={segnaAvviata}
+          onEsci={() => setModalita(null)}
+          onAllena={() => setModalita("allenamento")}
+        />
+      </>
+    );
   }
   if (modalita === "allenamento") {
     return <Allenamento timer={timer} onEsci={() => setModalita(null)} />;
   }
 
   return (
-    <div className="compare-app">
-      <div className="compare-start">
-        <h2>Chi è maggiore?</h2>
-        <ol className="game-onboarding-steps">
-          <li>
-            <strong>Un indicatore, due territori.</strong> Tocca quello che secondo te ha il valore
-            più alto. Conta il numero, anche quando un valore alto non rappresenta un risultato migliore.
-          </li>
-          <li>
-            <strong>La sfida del giorno è la stessa per tutti.</strong> Dieci coppie, una al giorno,
-            e le stesse coppie per chiunque apra la pagina. Da tastiera usa le frecce o i tasti A e B.
-          </li>
-          <li>
-            <strong>L&apos;allenamento non ha fine.</strong> Un errore azzera la serie e la difficoltà sale
-            di tre risposte giuste di fila. Il tuo record resta salvato su questo dispositivo.
-          </li>
-        </ol>
+    <>
+      {riquadro}
+      <div className="compare-app">
+        <div className="compare-start">
+          <h2>Chi è maggiore?</h2>
+          <ol className="game-onboarding-steps">
+            <li>
+              <strong>Un indicatore, due territori.</strong> Tocca quello che secondo te ha il valore
+              più alto. Conta il numero, anche quando un valore alto non rappresenta un risultato migliore.
+            </li>
+            <li>
+              <strong>La sfida del giorno è la stessa per tutti.</strong> Dieci coppie, una al giorno,
+              e le stesse coppie per chiunque apra la pagina. Da tastiera usa le frecce o i tasti A e B.
+            </li>
+            <li>
+              <strong>L&apos;allenamento non ha fine.</strong> Un errore azzera la serie e la difficoltà sale
+              di tre risposte giuste di fila. Il tuo record resta salvato su questo dispositivo.
+            </li>
+          </ol>
 
-        <fieldset className="compare-scelta-livello">
-          <legend>Livello della sfida</legend>
-          {LIVELLI.map((opzione) => (
-            <label key={opzione.id} className={livello === opzione.id ? "is-active" : ""}>
-              <input
-                type="radio"
-                name="compare-level"
-                value={opzione.id}
-                checked={livello === opzione.id}
-                onChange={() => setLivello(opzione.id)}
-              />
-              <span className="compare-scelta-label">{opzione.label}</span>
-              <span className="compare-scelta-aiuto">{opzione.aiuto}</span>
-            </label>
-          ))}
-        </fieldset>
+          <fieldset className="compare-scelta-livello">
+            <legend>Livello della sfida</legend>
+            {LIVELLI.map((opzione) => (
+              <label key={opzione.id} className={livello === opzione.id ? "is-active" : ""}>
+                <input
+                  type="radio"
+                  name="compare-level"
+                  value={opzione.id}
+                  checked={livello === opzione.id}
+                  onChange={() => setLivello(opzione.id)}
+                />
+                <span className="compare-scelta-label">{opzione.label}</span>
+                <span className="compare-scelta-aiuto">{opzione.aiuto}</span>
+              </label>
+            ))}
+          </fieldset>
 
-        <label className="compare-scelta-timer">
-          <input type="checkbox" checked={timer} onChange={(e) => setTimer(e.target.checked)} />
-          <span>Timer di dieci secondi</span>
-        </label>
-        {!timer && <p className="compare-notice">{NOTA_ALLENAMENTO}</p>}
+          <label className="compare-scelta-timer">
+            <input type="checkbox" checked={timer} onChange={(e) => setTimer(e.target.checked)} />
+            <span>Timer di dieci secondi</span>
+          </label>
+          {!timer && <p className="compare-notice">{NOTA_ALLENAMENTO}</p>}
 
-        <div className="compare-scelta-azioni">
-          <button
-            type="button"
-            className="game-btn"
-            onClick={() => {
-              segnaGiocato();
-              setModalita("sfida");
-            }}
-          >
-            {hasPlayedBefore ? "Sfida del giorno" : "Inizia con la sfida del giorno"}
-          </button>
-          <button
-            type="button"
-            className="game-btn game-btn--ghost"
-            onClick={() => {
-              segnaGiocato();
-              setModalita("allenamento");
-            }}
-          >
-            Allenamento a serie
-          </button>
+          <div className="compare-scelta-azioni">
+            <button
+              type="button"
+              className="game-btn"
+              onClick={() => {
+                segnaGiocato();
+                setModalita("sfida");
+              }}
+            >
+              {hasPlayedBefore ? "Sfida del giorno" : "Inizia con la sfida del giorno"}
+            </button>
+            <button
+              type="button"
+              className="game-btn game-btn--ghost"
+              onClick={() => {
+                segnaGiocato();
+                setModalita("allenamento");
+              }}
+            >
+              Allenamento a serie
+            </button>
+          </div>
+          <p className="compare-scelta-nota">
+            L&apos;allenamento si gioca fra regioni, con la serie che cresce. Il livello vale per la sfida del giorno.
+          </p>
         </div>
-        <p className="compare-scelta-nota">
-          L&apos;allenamento si gioca fra regioni, con la serie che cresce. Il livello vale per la sfida del giorno.
-        </p>
       </div>
-    </div>
+    </>
   );
 }
