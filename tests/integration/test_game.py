@@ -486,8 +486,14 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
             ("order", game_daily.MINIMO_ORDER, game_daily.order_del_giorno),
         ):
             for regione in game_daily.regioni_idonee(minimo):
+                # La sfida e' in cache per (giorno, livello, chiave): con la regione
+                # forzata va ricalcolata, e poi tolta, perche' la cache non la tenga.
+                game_daily._compare.cache_clear()
+                game_daily._order.cache_clear()
                 with mock.patch.object(game_daily, "regioni_idonee", lambda minimo, r=regione: [r]):
                     sfida = funzione(self.giorni[0], "stessa_regione")
+                game_daily._compare.cache_clear()
+                game_daily._order.cache_clear()
                 self.assertEqual(sfida["region"], regione, gioco)
                 elementi = sfida["pairs"] if gioco == "compare" else sfida["territories"]
                 self.assertTrue(elementi, (gioco, regione))

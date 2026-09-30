@@ -20,7 +20,9 @@ vecchio, cosi' l'archivio e il `localStorage` per `puzzleId` restano coerenti.
     giocato oggi vedrebbe un'altra soluzione ricaricando la pagina.
 
 Senza la variabile d'ambiente si usa `CHIAVE_SVILUPPO`, che e' scritta qui e
-quindi NON E' SEGRETA: va bene in locale e nei test, non in produzione.
+quindi NON E' SEGRETA: va bene in locale e nei test, non in produzione. Dove
+`K_SERVICE` e' impostata (Cloud Run) e la chiave manca, `chiave_seed` solleva
+`ChiaveSeedMancante` e le rotte rispondono 503, invece di servire sfide prevedibili.
 `SEED_CUTOVER` e' un segnaposto (2099): la data vera si fissa nell'ultimo commit
 prima del merge, al giorno del deploy piu' uno.
 
@@ -120,10 +122,18 @@ def _avvisa_chiave_di_sviluppo():
     _log.warning("GAME_SEED_KEY non impostata: le sfide usano la chiave di sviluppo, che non e' segreta")
 
 
+class ChiaveSeedMancante(RuntimeError):
+    """In produzione (Cloud Run imposta `K_SERVICE`) senza `GAME_SEED_KEY`: le sfide
+    calcolate con la chiave di sviluppo, che sta nel repo, sarebbero prevedibili da
+    chiunque. Le rotte che usano il seed nuovo rispondono 503."""
+
+
 def chiave_seed():
     chiave = os.environ.get("GAME_SEED_KEY")
     if chiave:
         return chiave
+    if os.environ.get("K_SERVICE"):
+        raise ChiaveSeedMancante("GAME_SEED_KEY non impostata su Cloud Run: le sfide nuove sarebbero prevedibili")
     _avvisa_chiave_di_sviluppo()
     return CHIAVE_SVILUPPO
 
@@ -261,13 +271,22 @@ def id_provinciale(id_):
     return id_[len("bes:"):] if id_.startswith("bes:") else id_
 
 
-def _righe_indicatore(ind, ambito):
-    """(anno, [{key, name, region, value}]) di un indicatore a un livello
-    territoriale, o None se il dato non c'e'. `ambito` e' "regioni" o "province"."""
-    if ambito == "regioni":
-        from app import quiz
+def _indice_quiz():
+    """{id: voce} del pool regionale del quiz. Costruirlo costa circa 0,7 ms: in
+    `_candidati` (96 indicatori) lo si fa una volta per passata e non una volta per
+    indicatore, e non sopravvive alla passata, cosi' non puo' andare fuori sincrono
+    con il pool che `quiz` tiene in cache."""
+    from app import quiz
 
-        voce = {p["id"]: p for p in quiz._quiz_indicators()}.get(ind["id"])
+    return {p["id"]: p for p in quiz._quiz_indicators()}
+
+
+def _righe_indicatore(ind, ambito, indice=None):
+    """(anno, [{key, name, region, value}]) di un indicatore a un livello
+    territoriale, o None se il dato non c'e'. `ambito` e' "regioni" o "province".
+    `indice` e' l'`_indice_quiz()` gia' costruito da chi chiama in un ciclo."""
+    if ambito == "regioni":
+        voce = (indice if indice is not None else _indice_quiz()).get(ind["id"])
         if voce is None:
             return None
         righe = [
@@ -330,8 +349,9 @@ def _candidati(livello, ambito, filtro, minimo_distinti, rng):
     rng.shuffle(elenco)
     minimo = minimo_distinti if livello == "stessa_regione" else max(minimo_distinti, _MIN_DISTINTI_REGIONI)
     utili = []
+    indice = _indice_quiz() if ambito == "regioni" else None
     for ind in elenco:
-        dato = _righe_indicatore(ind, ambito)
+        dato = _righe_indicatore(ind, ambito, indice)
         if dato is None:
             continue
         anno, righe = dato
@@ -347,6 +367,15 @@ def _controlla(livello):
 
 
 def compare_del_giorno(giorno, livello, chiave=None):
+    """Le 10 coppie di "Chi e' maggiore?" per un giorno e un livello (vedi `_compare`).
+    In cache per `(giorno, livello, chiave)`: la chiave e' risolta PRIMA della cache,
+    cosi' una sfida calcolata prima non aggira il controllo di `chiave_seed`."""
+    _controlla(livello)
+    return _compare(giorno, livello, chiave_seed() if chiave is None else chiave)
+
+
+@lru_cache(maxsize=6)
+def _compare(giorno, livello, chiave):
     """Le 10 coppie di "Chi e' maggiore?" per un giorno e un livello: per
     ciascuna un indicatore e due territori, MAI i valori. La difficolta' cresce
     da lunedi' (coppie lontane in classifica) a domenica (quasi adiacenti)."""
@@ -376,6 +405,14 @@ def compare_del_giorno(giorno, livello, chiave=None):
 
 
 def order_del_giorno(giorno, livello, chiave=None):
+    """Il round di "Ordina" per un giorno e un livello (vedi `_order`), in cache come
+    `compare_del_giorno`."""
+    _controlla(livello)
+    return _order(giorno, livello, chiave_seed() if chiave is None else chiave)
+
+
+@lru_cache(maxsize=6)
+def _order(giorno, livello, chiave):
     """Il round di "Ordina" per un giorno e un livello: cinque territori e un
     indicatore, senza valori ne' ordine (i territori sono mescolati). Le
     finestre di difficolta' stringono l'intervallo che i cinque coprono."""
@@ -415,3 +452,66 @@ def sfida_payload(gioco, livello, now=None):
         "next_puzzle_at": prossima_sfida_roma(giorno),
         **corpo,
     }
+
+
+# Le fonti dei giochi, per il JSON-LD delle pagine /quiz/*
+
+def _famiglia_di(id_indicatore):
+    """La famiglia di `app/sources.py` di un id del pool: il prefisso interno
+    (`bes:`, `multiscopo:`, `dem:`, `eur:`), e nessun prefisso e' la territoriale."""
+    from app import sources
+
+    for famiglia, meta in sources.SOURCES.items():
+        prefisso = meta["internal_prefix"]
+        if prefisso and id_indicatore.startswith(prefisso):
+            return famiglia
+    return "territorial"
+
+
+@lru_cache(maxsize=8)
+def famiglie_del_gioco(gioco):
+    """Le famiglie di fonti davvero presenti nel pool di un gioco (`regione`,
+    `compare`, `order`, `provincia`), nell'ordine del registro. Indovina la Regione
+    pesca dal profilo regionale dell'atlante. Chi e' maggiore e Ordina pescano dal
+    pool del quiz e, ai livelli con le province, dal BES provinciale. Indovina la
+    Provincia dal BES."""
+    from app import profiles, quiz, sources
+    from app.data import REGION_ORDER
+
+    if gioco == "regione":
+        profilo = profiles.region_profile(profiles.region_key_for(REGION_ORDER[0]))
+        famiglie = {_famiglia_di(voce["id"]) for voce in profilo["all_indicators"]}
+    elif gioco in ("compare", "order"):
+        famiglie = {_famiglia_di(voce["id"]) for voce in quiz._quiz_indicators()} | {"bes"}
+    elif gioco == "provincia":
+        famiglie = {"bes"}
+    else:
+        raise ValueError(f"gioco sconosciuto: {gioco!r}")
+    return tuple(f for f in sources.SOURCES if f in famiglie)
+
+
+def fonte_del_gioco(gioco):
+    """Chi pubblica i dati di un gioco, per il JSON-LD: `istituzioni` (frase in
+    chiaro, "Istat ed Eurostat"), `creator` (le organizzazioni, una per istituzione) e
+    `licenze` (gli URL delle licenze dichiarate dalle famiglie, senza ripetizioni). Tutto
+    da `app/sources.py`: la stringa "Istat" da sola ha gia' attribuito a Istat una serie
+    Eurostat."""
+    from app import sources
+
+    famiglie = famiglie_del_gioco(gioco)
+    istituzioni = list(dict.fromkeys(sources.SOURCES[f]["institution"] for f in famiglie))
+    licenze = list(dict.fromkeys(u for u in (sources.family_license_url(f) for f in famiglie) if u))
+    return {
+        "istituzioni": sources.institutions_label(famiglie),
+        "creator": [{"@type": "Organization", "name": nome} for nome in istituzioni],
+        "licenze": licenze,
+    }
+
+
+def _registra_nei_template():
+    from app import app
+
+    app.jinja_env.globals["fonte_del_gioco"] = fonte_del_gioco
+
+
+_registra_nei_template()

@@ -1,0 +1,31 @@
+{
+  "descrizione": "Vettori di prova di player_stats.play_streak(dates, today). Una serie e' fatta di giorni giocati (almeno una delle quattro sfide del giorno). Fra due giorni giocati puo' mancare al massimo un giorno (il giorno di riposo automatico), e quel perdono si usa al massimo una volta ogni 7 giorni: due giorni perdonati devono distare almeno 7 giorni fra loro, altrimenti la serie si spezza e ne riparte una nuova dal giorno giocato. La serie conta i giorni GIOCATI, non quelli perdonati. Le date non ISO e quelle dopo `today` si ignorano, i doppioni contano una volta, l'ordine di arrivo non conta. `current` vale solo se l'ultimo giorno giocato e' oggi o ieri, altrimenti e' 0. `max` e' la serie piu' lunga.",
+  "cases": [
+    {"name": "nessun giorno", "today": "2026-10-10", "dates": [], "current": 0, "max": 0},
+    {"name": "solo oggi", "today": "2026-10-10", "dates": ["2026-10-10"], "current": 1, "max": 1},
+    {"name": "solo ieri, la serie e' ancora viva", "today": "2026-10-10", "dates": ["2026-10-09"], "current": 1, "max": 1},
+    {"name": "due giorni fa, la serie e' ferma", "today": "2026-10-10", "dates": ["2026-10-08"], "current": 0, "max": 1},
+    {"name": "cinque giorni di fila fino a oggi", "today": "2026-10-10",
+     "dates": ["2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09", "2026-10-10"], "current": 5, "max": 5},
+    {"name": "un giorno di riposo perdonato", "today": "2026-10-10",
+     "dates": ["2026-10-05", "2026-10-06", "2026-10-08", "2026-10-09", "2026-10-10"], "current": 5, "max": 5},
+    {"name": "due riposi a meno di 7 giorni spezzano la serie", "today": "2026-10-05",
+     "dates": ["2026-10-01", "2026-10-03", "2026-10-05"], "current": 1, "max": 2},
+    {"name": "due riposi a esattamente 7 giorni si perdonano tutti e due", "today": "2026-10-10",
+     "dates": ["2026-10-01", "2026-10-03", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-10"],
+     "current": 8, "max": 8},
+    {"name": "due riposi a 6 giorni spezzano la serie", "today": "2026-10-09",
+     "dates": ["2026-10-01", "2026-10-03", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-09"],
+     "current": 1, "max": 6},
+    {"name": "due giorni vuoti di fila spezzano la serie", "today": "2026-10-06",
+     "dates": ["2026-10-01", "2026-10-02", "2026-10-05", "2026-10-06"], "current": 2, "max": 2},
+    {"name": "le date non ISO si ignorano", "today": "2026-10-10",
+     "dates": ["daily:2026-10-09", "practice-abc", "", "2026-10-10", "2026-10-09"], "current": 2, "max": 2},
+    {"name": "i doppioni contano una volta e l'ordine non conta", "today": "2026-10-10",
+     "dates": ["2026-10-10", "2026-10-09", "2026-10-10", "2026-10-08", "2026-10-09"], "current": 3, "max": 3},
+    {"name": "le date dopo oggi si ignorano", "today": "2026-10-10",
+     "dates": ["2026-10-09", "2026-10-10", "2026-10-11", "2026-10-20"], "current": 2, "max": 2},
+    {"name": "la serie piu' lunga e' una passata", "today": "2026-10-20",
+     "dates": ["2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-19", "2026-10-20"], "current": 2, "max": 4}
+  ]
+}

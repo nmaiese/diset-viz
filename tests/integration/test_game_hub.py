@@ -5,7 +5,6 @@ nickname moderati e niente id, e un anonimo non ci compare. I tre traguardi nuov
 si provano su righe vere di `daily_results` e `daily_scores`, un caso che li
 sblocca e uno che no."""
 
-import json
 import shutil
 import tempfile
 import unittest
@@ -14,7 +13,7 @@ from pathlib import Path
 
 import jwt
 
-from app import accounts, achievements, app, classifica_giorno, config, game, game_daily, game_provincia, player_stats
+from app import accounts, achievements, app, config, game, game_daily, game_provincia, player_stats
 from app.cache import cache
 from app.db import session_scope
 from app.models import DailyResult, DailyScore
@@ -56,55 +55,18 @@ class Base(unittest.TestCase):
                                  punteggio=1 if risolto else 0, created_at=arrivo))
 
 
-class ClassificaDelGiornoTest(Base):
-    def test_ordina_per_tentativi_poi_per_ora_di_arrivo(self):
-        self.risultato("u-lento", "Lento", 3, "2026-09-30T09:00:00Z")
-        self.risultato("u-veloce", "Veloce", 3, "2026-09-30T07:00:00Z")
-        self.risultato("u-bravo", "Bravo", 1, "2026-09-30T20:00:00Z")
-        self.risultato("u-ultimo", "Ultimo", 6, "2026-09-30T06:00:00Z")
-        voci = classifica_giorno.classifica_oggi()
-        self.assertEqual([v["nickname"] for v in voci], ["Bravo", "Veloce", "Lento", "Ultimo"])
-        self.assertEqual([v["rank"] for v in voci], [1, 2, 3, 4])
+class ClassificaDelGiornoRitirataTest(Base):
+    """Con la guess anonima aperta una classifica per tentativi non si puo' rendere
+    onesta (chi gioca sceglie il numero del tentativo): la rotta e il modulo non ci sono."""
 
-    def test_chi_non_ha_l_ora_di_arrivo_viene_dopo_a_parita_di_tentativi(self):
-        self.risultato("u-senza", "Senzaora", 2, None)
-        self.risultato("u-con", "Conora", 2, "2026-09-30T12:00:00Z")
-        voci = classifica_giorno.classifica_oggi()
-        self.assertEqual([v["nickname"] for v in voci], ["Conora", "Senzaora"])
-
-    def test_solo_chi_ha_risolto_oggi(self):
-        self.risultato("u-ok", "Risolto", 4, "2026-09-30T08:00:00Z")
-        self.risultato("u-no", "Perso", 6, "2026-09-30T08:00:00Z", risolto=False)
-        self.risultato("u-ieri", "Ieri", 1, "2026-09-29T08:00:00Z", giorno=self.oggi - timedelta(days=1))
-        self.assertEqual([v["nickname"] for v in classifica_giorno.classifica_oggi()], ["Risolto"])
-
-    def test_un_anonimo_o_senza_nickname_non_compare(self):
-        self.risultato("u-senza-profilo", None, 1, "2026-09-30T08:00:00Z")
-        self.risultato("u-vuoto", "", 1, "2026-09-30T08:00:00Z")
-        self.risultato("u-ok", "Presente", 2, "2026-09-30T08:00:00Z")
-        self.assertEqual([v["nickname"] for v in classifica_giorno.classifica_oggi()], ["Presente"])
-
-    def test_un_nickname_non_moderato_non_esce(self):
-        self.risultato("u-male", "a", 1, "2026-09-30T08:00:00Z")
-        self.risultato("u-ok", "Presente", 2, "2026-09-30T08:00:00Z")
-        self.assertEqual([v["nickname"] for v in classifica_giorno.classifica_oggi()], ["Presente"])
-
-    def test_primi_venti(self):
-        for i in range(25):
-            self.risultato(f"u{i:02d}", f"Giocatore{i:02d}", 1 + i % 6, f"2026-09-30T08:{i:02d}:00Z")
-        self.assertEqual(len(classifica_giorno.classifica_oggi()), 20)
-
-    def test_la_rotta_e_pubblica_e_non_espone_ne_id_ne_email(self):
-        self.risultato("uuid-segreto-123", "Presente", 2, "2026-09-30T08:00:00Z")
+    def test_la_rotta_non_esiste_piu(self):
+        self.risultato("uuid-x", "Presente", 2, "2026-09-30T08:00:00Z")
         risposta = app.test_client().get("/api/game/daily/leaderboard")
-        self.assertEqual(risposta.status_code, 200)
-        corpo = risposta.get_json()
-        self.assertEqual(corpo["date"], self.oggi.isoformat())
-        self.assertEqual([v["nickname"] for v in corpo["entries"]], ["Presente"])
-        testo = json.dumps(corpo)
-        self.assertNotIn("uuid-segreto-123", testo)
-        self.assertNotIn("example.com", testo)
-        self.assertNotIn("auth_id", testo)
+        self.assertEqual(risposta.status_code, 404)
+
+    def test_il_modulo_non_esiste_piu(self):
+        with self.assertRaises(ImportError):
+            __import__("app.classifica_giorno")
 
     def test_la_guess_di_indovina_scrive_la_riga_con_l_ora_e_la_classifica_la_vede(self):
         puzzle_id = f"daily:{self.oggi.isoformat()}"
@@ -117,7 +79,6 @@ class ClassificaDelGiornoTest(Base):
             riga = s.get(DailyScore, {"auth_id": "uuid-guess", "gioco": "indovina", "data": self.oggi.isoformat()})
         self.assertIsNotNone(riga)
         self.assertEqual(riga.punteggio, 1)
-        self.assertEqual([v["nickname"] for v in classifica_giorno.classifica_oggi()], ["Indovino"])
 
     def test_la_guess_anonima_non_scrive_niente(self):
         puzzle_id = f"daily:{self.oggi.isoformat()}"
@@ -125,25 +86,46 @@ class ClassificaDelGiornoTest(Base):
         app.test_client().post("/api/game/guess", json={"puzzle_id": puzzle_id, "region_key": vincente, "attempt": 1})
         with session_scope() as s:
             self.assertEqual(s.query(DailyScore).count(), 0)
-        self.assertEqual(classifica_giorno.classifica_oggi(), [])
 
 
 class GuessProvinciaTest(Base):
-    def _gioca(self, sub, corretta):
+    def _gioca(self, sub, corretta, livello="province"):
         client = app.test_client()
-        payload = client.get("/api/game/provincia/daily?level=province").get_json()
+        payload = client.get(f"/api/game/provincia/daily?level={livello}").get_json()
         mistero = game_provincia.provincia_del_giorno(self.oggi)["key"]
         if corretta:
             chiave = mistero
         else:
-            chiave = next(o["key"] for o in game_provincia.opzioni("province", self.oggi) if o["key"] != mistero)
+            chiave = next(o["key"] for o in game_provincia.opzioni(livello, self.oggi) if o["key"] != mistero)
         cache.delete("rl:prov:ip:127.0.0.1")
         return client.post("/api/game/provincia/guess", json={"token": payload["token"], "province_key": chiave},
                            headers={"Authorization": f"Bearer {_jwt(sub)}"} if sub else {})
 
-    def _riga(self, sub):
+    def _riga(self, sub, gioco="provincia"):
         with session_scope() as s:
-            return s.get(DailyScore, {"auth_id": sub, "gioco": "provincia", "data": self.oggi.isoformat()})
+            return s.get(DailyScore, {"auth_id": sub, "gioco": gioco, "data": self.oggi.isoformat()})
+
+    def test_il_livello_della_regione_scrive_un_punteggio_a_parte_e_non_sblocca_geografo(self):
+        # R1 punto 13: la regione svelata dal livello facile e' quella del livello difficile.
+        r = self._gioca("uuid-prov-reg", True, "stessa_regione").get_json()
+        self.assertTrue(r["correct"])
+        self.assertIsNone(self._riga("uuid-prov-reg", "provincia"))
+        self.assertEqual(self._riga("uuid-prov-reg", "provincia_regione").punteggio, 1)
+        self.assertNotIn("geografo", [a["id"] for a in r["achievements"]])
+        self.assertNotIn("geografo", achievements.unlocked_map("uuid-prov-reg"))
+
+    def test_il_livello_della_regione_non_conta_per_il_giro_d_italia(self):
+        oggi = self.oggi.isoformat()
+        player_stats.record_daily("uuid-giro-liv", oggi, 2, True)
+        player_stats.record_daily_score("uuid-giro-liv", "compare", oggi, 7)
+        player_stats.record_daily_score("uuid-giro-liv", "order", oggi, 5)
+        self._gioca("uuid-giro-liv", True, "stessa_regione")
+        self.assertNotIn("giro_ditalia", achievements.unlocked_map("uuid-giro-liv"))
+
+    def test_il_livello_tutta_italia_scrive_provincia(self):
+        self._gioca("uuid-prov-ita", True, "province")
+        self.assertEqual(self._riga("uuid-prov-ita", "provincia").punteggio, 1)
+        self.assertIsNone(self._riga("uuid-prov-ita", "provincia_regione"))
 
     def test_indovinare_scrive_la_riga_e_sblocca_geografo(self):
         r = self._gioca("uuid-prov", True).get_json()

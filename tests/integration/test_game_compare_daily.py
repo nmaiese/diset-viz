@@ -86,6 +86,12 @@ class Base(unittest.TestCase):
                 "token": token if token is not None else sessione["token"],
             })
 
+    def _avanti(self, sessione, indice, token, now=None):
+        """Il giocatore preme "Avanti" dopo aver risposto alla domanda `indice`."""
+        with mock.patch.object(quiz_tokens, "_now", return_value=T0 if now is None else now):
+            return self.client.post("/api/game/compare/daily/next", json={
+                "puzzle_id": sessione["puzzle_id"], "q": indice, "token": token})
+
     def _gioca(self, sessione, livello, giuste=10):
         """Risponde a tutte e dieci le domande: le prime `giuste` con la risposta
         vera, le altre col tempo scaduto. L'orologio scorre di un secondo a ogni
@@ -105,6 +111,10 @@ class Base(unittest.TestCase):
             risposte.append(risposta)
             self.assertEqual(risposta.status_code, 200, indice)
             token = risposta.get_json()["token"]
+            if indice < len(sessione["questions"]) - 1:
+                avanti = self._avanti(sessione, indice, token, now=orario)
+                self.assertEqual(avanti.status_code, 200, indice)
+                token = avanti.get_json()["token"]
         return risposte
 
 
@@ -259,8 +269,9 @@ class ValutazioneTest(Base):
     def test_token_of_another_question_does_not_judge_this_one(self):
         sessione = self._sessione()
         prima = self._risponde(sessione, 0, "region_a").get_json()
+        token = self._avanti(sessione, 0, prima["token"]).get_json()["token"]
         # Il token ora lega la seconda domanda: la nona non è un round aperto.
-        risposta = self._risponde(sessione, 8, "region_a", token=prima["token"])
+        risposta = self._risponde(sessione, 8, "region_a", token=token)
         self.assertEqual(risposta.status_code, 400)
         self.assertEqual(risposta.get_json()["error"], "token_invalid")
 
@@ -302,10 +313,10 @@ class MonousoTest(Base):
         # né il punteggio né il token.
         replay = self._risponde(sessione, 0, "region_b")
         self.assertEqual(replay.status_code, 409)
-        # Il token tornato dalla prima risposta lega la domanda dopo, e il
-        # punteggio prosegue da dove era: la seconda risposta è sbagliata, quindi
-        # resta a uno.
-        seconda = self._risponde(sessione, 1, "timeout", token=prima["token"], now=T0 + 12)
+        # Il token di "Avanti" lega la domanda dopo, e il punteggio prosegue da
+        # dove era: la seconda risposta è sbagliata, quindi resta a uno.
+        token = self._avanti(sessione, 0, prima["token"]).get_json()["token"]
+        seconda = self._risponde(sessione, 1, "timeout", token=token, now=T0 + 12)
         self.assertEqual(seconda.status_code, 200)
         self.assertEqual(seconda.get_json()["score"]["correct"], 1)
 
@@ -313,7 +324,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         risposte = self._gioca(sessione, "regioni", giuste=10)
         ultima = risposte[-1].get_json()
-        stato = quiz_tokens.load_state(ultima["token"], "compare")
+        stato = quiz_tokens.load_state(ultima["token"], game_compare.MODO)
         self.assertIsNone(stato["fp"])
         # La decima coppia non si può rispondere una seconda volta.
         self.assertEqual(self._risponde(sessione, 9, "region_a", token=ultima["token"]).status_code, 400)
@@ -322,8 +333,9 @@ class MonousoTest(Base):
         sessione = self._sessione()
         coppia = sessione["questions"][0]
         risposta = self._risponde(sessione, 0, _vincitore("regioni", coppia)).get_json()
-        stato = quiz_tokens.load_state(risposta["token"], "compare")
-        self.assertEqual(stato["sfida"], {"d": sessione["date"], "c": 1})
+        stato = quiz_tokens.load_state(risposta["token"], game_compare.MODO)
+        # "l" e' il livello: dopo la risposta `x` si svuota e "Avanti" lo legge da qui.
+        self.assertEqual(stato["sfida"], {"d": sessione["date"], "c": 1, "l": "regioni"})
 
 
 class TempoTest(Base):
@@ -462,6 +474,66 @@ class LimiteFrequenzaTest(Base):
         self.assertEqual(codici[120], 429)
 
 
+class AvantiTest(Base):
+    """R1 punto 9: la domanda successiva si lega quando il giocatore preme "Avanti",
+    non quando risponde: il tempo di lettura della rivelazione non consuma i 12 s.
+    `q` e' l'indice della domanda appena risposta."""
+
+    def test_la_risposta_non_lega_piu_la_domanda_successiva(self):
+        sessione = self._sessione()
+        prima = self._risponde(sessione, 0, _vincitore("regioni", sessione["questions"][0])).get_json()
+        self.assertIsNone(quiz_tokens.load_state(prima["token"], game_compare.MODO)["fp"])
+        seconda = self._risponde(sessione, 1, "region_a", token=prima["token"], now=T0 + 2)
+        self.assertEqual((seconda.status_code, seconda.get_json()["error"]), (400, "token_invalid"))
+
+    def test_cinque_secondi_di_lettura_e_otto_di_risposta_non_sono_late(self):
+        sessione = self._sessione()
+        prima = self._risponde(sessione, 0, _vincitore("regioni", sessione["questions"][0]), now=T0 + 1).get_json()
+        avanti = self._avanti(sessione, 0, prima["token"], now=T0 + 6)
+        self.assertEqual(avanti.status_code, 200)
+        self.assertEqual(list(avanti.get_json()), ["token"])
+        seconda = self._risponde(sessione, 1, "region_a", token=avanti.get_json()["token"], now=T0 + 14)
+        self.assertEqual(seconda.status_code, 200)
+
+    def test_il_tempo_della_domanda_parte_da_avanti_e_non_si_ripete(self):
+        sessione = self._sessione()
+        prima = self._risponde(sessione, 0, "region_a", now=T0 + 1).get_json()
+        avanti = self._avanti(sessione, 0, prima["token"], now=T0 + 6)
+        tardi = self._risponde(sessione, 1, "region_a", token=avanti.get_json()["token"], now=T0 + 6 + 13)
+        self.assertEqual((tardi.status_code, tardi.get_json()["error"]), (400, "late"))
+        # Chiedere di nuovo "Avanti" con lo stesso token per azzerare l'orologio non si puo'.
+        di_nuovo = self._avanti(sessione, 0, prima["token"], now=T0 + 20)
+        self.assertEqual(di_nuovo.status_code, 409)
+
+    def test_non_si_salta_una_domanda_senza_averle_risposto(self):
+        sessione = self._sessione()
+        r = self._avanti(sessione, 0, sessione["token"])
+        self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+    def test_dopo_l_ultima_domanda_non_c_e_altro_da_legare(self):
+        sessione = self._sessione()
+        risposte = self._gioca(sessione, "regioni")
+        ultima = risposte[-1].get_json()
+        r = self._avanti(sessione, 9, ultima["token"])
+        self.assertEqual((r.status_code, r.get_json()["error"]), (400, "bad_request"))
+
+    def test_un_altro_giorno_e_un_altro_token_non_valgono(self):
+        sessione = self._sessione()
+        prima = self._risponde(sessione, 0, "region_a").get_json()
+        with mock.patch.object(quiz_tokens, "_now", return_value=T0):
+            r = self.client.post("/api/game/compare/daily/next", json={
+                "puzzle_id": "daily:2020-01-01", "q": 0, "token": prima["token"]})
+            self.assertEqual(r.get_json()["error"], "puzzle_changed")
+            serie = self.client.get("/api/game/compare/round").get_json()
+            r = self.client.post("/api/game/compare/daily/next", json={
+                "puzzle_id": sessione["puzzle_id"], "q": 0, "token": serie["token"]})
+            self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+    def test_ha_il_limite_di_frequenza(self):
+        codici = [self.client.post("/api/game/compare/daily/next", json={}).status_code for _ in range(121)]
+        self.assertEqual(codici[120], 429)
+
+
 class SerieTest(Base):
     def _corpo_serie(self, round_):
         valori = {
@@ -490,7 +562,7 @@ class SerieTest(Base):
 
     def test_the_two_routes_keep_their_own_sessions(self):
         sessione = self._sessione()
-        stato = quiz_tokens.load_state(sessione["token"], "compare")
+        stato = quiz_tokens.load_state(sessione["token"], game_compare.MODO)
         self.assertEqual(stato["q"], 1)
         self.assertEqual(stato["x"], "regioni")
         # Il round a serie resta un round: due regioni e la sua difficolta'.

@@ -41,9 +41,9 @@ from app import multiscopo_data
 from app import external_atlas
 from app import external_manifest
 from app import game
-from app import classifica_giorno
 from app import game_compare
 from app import game_daily
+from app import game_order
 from app import game_provincia
 from app import quiz
 from app import quiz_tokens
@@ -2672,10 +2672,15 @@ def _timer_requested():
 _SID_ANSWERS_PER_MIN = 45
 
 
+def _ip_answer_limited():
+    """120 richieste al minuto per IP, il secchio condiviso da tutte le rotte di risposta."""
+    return not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60)
+
+
 def _answer_rate_limited(sid):
     """120 risposte al minuto per IP e 45 per sessione firmata: nessun
     giocatore vero ci arriva, uno script si'."""
-    if not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60):
+    if _ip_answer_limited():
         return True
     return not _rate_limit_ok(f"ans:sid:{sid}", limit=_SID_ANSWERS_PER_MIN, window_s=60)
 
@@ -2684,10 +2689,7 @@ def _round_conflict():
     return jsonify({"error": "round_already_answered"}), 409
 
 
-def _session_summary(session):
-    if session is None:
-        return None
-    return {"streak": session["streak"], "best": session["best"], "rounds": session["rounds"]}
+_session_summary = quiz_tokens.session_summary
 
 
 @app.route("/api/game/compare/round")
@@ -2695,7 +2697,8 @@ def game_compare_round_api():
     # Il timer si decide aprendo la sessione (`timer=0` e' allenamento, fuori
     # classifica) e la difficolta' la decide la serie: il parametro `difficulty`
     # del client non si legge.
-    state = quiz_tokens.load_state(request.args.get("token"), "compare", _timer_requested())
+    state = quiz_tokens.close_open_round(
+        quiz_tokens.load_state(request.args.get("token"), "compare", _timer_requested()))
     result = quiz.compare_round(min(state["s"] // 3, quiz.MAX_DIFFICULTY))
     result["timer"] = bool(state["t"])
     keys = [result["region_a"]["region_key"], result["region_b"]["region_key"]]
@@ -2707,6 +2710,11 @@ def game_compare_round_api():
 
 @app.post("/api/game/compare/answer")
 def game_compare_answer_api():
+    """Senza un round legato la risposta si valuta (il dato e' pubblico, e' lo stesso
+    dell'atlante) ma non conta: niente serie, niente token nuovo, niente statistiche
+    dell'account (`_record_quiz`), niente classifica. L'unico freno a chi chiede prima
+    all'oracolo e risponde dopo col token e' la plausibilita' temporale della sessione
+    (`quiz_tokens.is_plausible`)."""
     payload = request.get_json(silent=True) or {}
     state = quiz_tokens.load_state(payload.get("token"), "compare")
     if _answer_rate_limited(state["sid"]):
@@ -2753,7 +2761,8 @@ def game_order_round_api():
     result = quiz.order_round(count)
     if result is None:
         abort(400)
-    state = quiz_tokens.load_state(request.args.get("token"), "order", _timer_requested())
+    state = quiz_tokens.close_open_round(
+        quiz_tokens.load_state(request.args.get("token"), "order", _timer_requested()))
     result["timer"] = bool(state["t"])
     keys = [r["region_key"] for r in result["regions"]]
     result["token"] = quiz_tokens.bind_round(
@@ -2764,6 +2773,7 @@ def game_order_round_api():
 
 @app.post("/api/game/order/answer")
 def game_order_answer_api():
+    """Come `game_compare_answer_api`: senza un round legato si valuta e basta."""
     payload = request.get_json(silent=True) or {}
     state = quiz_tokens.load_state(payload.get("token"), "order")
     if _answer_rate_limited(state["sid"]):
@@ -2791,9 +2801,12 @@ def game_order_answer_api():
 def _record_quiz(req, mode, correct, session_summary):
     """Se la richiesta porta un JWT valido, aggiorna le statistiche account della
     modalità e valuta gli achievement, restituendo gli sblocchi appena ottenuti
-    (per il toast). Anonimo o DB giù -> lista vuota, il gioco non cambia."""
+    (per il toast). Anonimo o DB giù -> lista vuota, il gioco non cambia.
+    Una risposta senza round legato (`session_summary` nullo) si valuta ma non conta:
+    ne' per la serie ne' per l'account, altrimenti chi chiede i valori all'oracolo
+    pubblico gonfierebbe i round giocati."""
     user = auth.current_user(req.headers)
-    if not user:
+    if not user or session_summary is None:
         return []
     try:
         from app import player_stats, achievements
@@ -2818,6 +2831,12 @@ def player_me_api():
         unlocked = achievements.list_for(user["id"])
     except Exception:  # noqa: BLE001
         stats, unlocked = {}, []
+    # Legge `daily_scores`: senza la migrazione 0010 il profilo resta quello di prima.
+    try:
+        stats["play_streak"] = player_stats.play_streak_for(user["id"])
+    except Exception:  # noqa: BLE001
+        app.logger.exception("serie di gioco non calcolata")
+        stats["play_streak"] = {"current": 0, "max": 0}
     return jsonify({"stats": stats, "achievements": unlocked})
 
 
@@ -2980,20 +2999,6 @@ def favorites_remove_api(indicator_id):
     return jsonify({"ok": True})
 
 
-@app.route("/api/game/daily/leaderboard")
-def game_daily_leaderboard_api():
-    """La classifica di oggi di Indovina la Regione: primi 20 con account, per
-    tentativi e poi ora di arrivo. Solo nickname moderati, mai email né id."""
-    oggi = game_daily.oggi_roma()
-    try:
-        entries = classifica_giorno.classifica_oggi(giorno=oggi)
-    except Exception:  # noqa: BLE001
-        app.logger.exception("classifica del giorno non disponibile")
-        return jsonify({"error": "unavailable"}), 503
-    return jsonify({"date": oggi.isoformat(), "number": game_daily.numero_sfida(oggi),
-                    "next_puzzle_at": game_daily.prossima_sfida_roma(oggi), "entries": entries})
-
-
 @app.route("/api/game/leaderboard")
 def leaderboard_get_api():
     mode = request.args.get("mode", "")
@@ -3075,6 +3080,14 @@ def _sfida_del_giorno_api(gioco):
     return jsonify(game_daily.sfida_payload(gioco, livello))
 
 
+@app.errorhandler(game_daily.ChiaveSeedMancante)
+def game_seed_key_missing(errore):
+    """Su Cloud Run senza `GAME_SEED_KEY` le sfide nuove sarebbero prevedibili: 503 e
+    un errore nel log, mai una sfida calcolata con la chiave di sviluppo."""
+    app.logger.error("%s", errore)
+    return jsonify({"error": "seed_unavailable"}), 503
+
+
 @app.route("/api/game/compare/daily")
 def game_compare_daily_api():
     return _sfida_del_giorno_api("compare")
@@ -3116,35 +3129,47 @@ def game_provincia_guess_api():
         return jsonify({"error": errore.code}), errore.status
     utente = auth.current_user(request.headers) if risultato.get("finished") else None
     if utente:
+        from app import achievements, player_stats
+        # Il livello sta nel punteggio: "tutta Italia" e' la sfida difficile ("provincia"), "della
+        # regione" quella facile ("provincia_regione") e non sblocca Geografo ne' Giro d'Italia.
+        gioco = "provincia" if risultato["level"] == "province" else "provincia_regione"
         try:
-            from app import achievements, player_stats
-            player_stats.record_daily_score(utente["id"], "provincia", game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+            player_stats.record_daily_score(utente["id"], gioco, game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+        except Exception:  # noqa: BLE001
+            app.logger.exception("provincia: punteggio del giorno non registrato")
+        try:
             risultato["achievements"] = achievements.evaluate(utente["id"])
         except Exception:  # noqa: BLE001
-            app.logger.exception("sfida della provincia non registrata")
+            app.logger.exception("provincia: traguardi non valutati")
     return jsonify(risultato)
 
 
 # --- fine Indovina la Provincia -----------------------------------------------
 
-# --- INIZIO BLOCCO SFIDA DEL GIORNO ORDINA ---
+# La sfida del giorno di "Ordina le regioni": due rotte, tutta la logica sta in
+# app/game_order.py.
 @app.route("/api/game/order/daily/session")
 def game_order_daily_session_api():
-    level = request.args.get("level", "regioni")
-    token = request.args.get("token")
-    timer = _timer_requested()
-    from app import game_order
-    return jsonify(game_order.daily_order_session(level, token, timer))
+    if _ip_answer_limited():
+        return jsonify({"error": "rate_limited"}), 429
+    try:
+        return jsonify(game_order.daily_order_session(request.args.get("level", "regioni")))
+    except game_order.ErroreOrdina as errore:
+        return jsonify({"error": errore.code}), errore.status
 
 
 @app.post("/api/game/order/daily/answer")
 def game_order_daily_answer_api():
     payload = request.get_json(silent=True) or {}
-    user = auth.current_user(request.headers)
-    from app import game_order
-    res, status_code = game_order.evaluate_daily_order_answer(payload, auth_user=user, request_obj=request)
-    return jsonify(res), status_code
-# --- FINE BLOCCO SFIDA DEL GIORNO ORDINA ---
+    if _answer_rate_limited(game_order.sid_del_token(payload.get("token"))):
+        return jsonify({"error": "rate_limited"}), 429
+    try:
+        res = game_order.evaluate_daily_order_answer(payload, auth_user=auth.current_user(request.headers))
+    except game_order.ErroreOrdina as errore:
+        return jsonify({"error": errore.code}), errore.status
+    # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono.
+    res["achievements"] = _record_quiz(request, "order", res["score"] == res["total"], res["session"])
+    return jsonify(res)
 
 
 # La sfida del giorno di "Chi è maggiore?" con partita valutata dal server: due
@@ -3186,6 +3211,16 @@ def game_compare_daily_answer_api():
         corpo["achievements"] = _record_quiz(
             request, "compare", bool(corpo.get("correct")), corpo["session"]
         )
+    return jsonify(corpo), stato
+
+
+@app.post("/api/game/compare/daily/next")
+def game_compare_daily_next_api():
+    """"Avanti": lega la domanda dopo quella appena risposta (vedi `game_compare.avanti`)."""
+    dati = request.get_json(silent=True) or {}
+    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+        return jsonify({"error": "rate_limited"}), 429
+    stato, corpo = game_compare.avanti(dati)
     return jsonify(corpo), stato
 
 
@@ -3238,13 +3273,21 @@ def game_guess_api():
     if result.get("finished") and puzzle_id == f"daily:{game_daily.oggi_roma().isoformat()}":
         user = auth.current_user(request.headers)
         if user:
+            from app import player_stats, achievements
+            giorno = puzzle_id[len("daily:"):]
+            # Lo storico prima, in un try suo: senza la migrazione 0010 il punteggio del
+            # giorno fallisce ma `daily_results` (storico e serie) non si deve perdere.
             try:
-                from app import player_stats, achievements
-                player_stats.record_daily_score(user["id"], "indovina", puzzle_id[len("daily:"):], 1 if result.get("correct") else 0)
-                if player_stats.record_daily(user["id"], puzzle_id[len("daily:"):], attempt, result.get("correct")):
-                    result["achievements"] = achievements.evaluate(user["id"])
+                nuovo = player_stats.record_daily(user["id"], giorno, attempt, result.get("correct"))
             except Exception:  # noqa: BLE001
                 app.logger.exception("giornaliera non registrata per %s", puzzle_id)
+                nuovo = False
+            try:
+                player_stats.record_daily_score(user["id"], "indovina", giorno, 1 if result.get("correct") else 0)
+            except Exception:  # noqa: BLE001
+                app.logger.exception("indovina: punteggio del giorno non registrato per %s", puzzle_id)
+            if nuovo:
+                result["achievements"] = achievements.evaluate(user["id"])
     return jsonify(result)
 
 

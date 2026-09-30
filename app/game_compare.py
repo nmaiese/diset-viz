@@ -22,6 +22,11 @@ arrivata in tempo, prima del tempo (un `timeout` che scatta troppo presto non
 vale) o troppo tardi (oltre i 10 s più 2 di tolleranza è un errore, e la
 risposta viene rifiutata senza rivelare nulla).
 
+**La domanda dopo la lega "Avanti".** La risposta a una domanda non lega la
+successiva: lo fa `avanti` (`POST /api/game/compare/daily/next`) quando il
+giocatore preme il pulsante, cosi' il tempo di lettura della rivelazione non
+consuma i 12 secondi della domanda dopo.
+
 **Un round, una risposta.** `quiz_tokens.claim_round` mette (sessione, domanda)
 nel DB: la seconda risposta alla stessa coppia è un 409, così un doppio invio
 (un click e la scadenza del timer insieme) non conta due volte. Il secondo
@@ -46,12 +51,13 @@ provinciale, non quello regionale.
 
 from __future__ import annotations
 
-from functools import lru_cache
-
 from app import bes_data, game_daily, quiz, quiz_tokens, sources
 from app.game_daily import LIVELLI, oggi_roma
 
-MODO = "compare"
+# Modalita' di token propria: il token della sfida del giorno non entra nelle serie
+# (`/api/game/compare/round|answer`) ne' nella classifica (`peek_state` la rifiuta), e
+# il token di una serie apre una sessione nuova qui.
+MODO = "compare_daily"
 COPPIE = game_daily.COMPARE_COPPIE
 # Etichetta della fonte per i livelli con le province, che non passano da
 # quiz.evaluate_compare: viene da app/sources.py, l'unica fonte di verita' dei
@@ -79,11 +85,9 @@ def etichetta_livello(livello):
     return ETICHETTE_LIVELLO.get(livello, ETICHETTE_LIVELLO["regioni"])
 
 
-@lru_cache(maxsize=6)
 def _sfida(giorno, livello):
-    """La sfida del giorno a un livello, in cache per po' giorni e livelli: le
-    coppie sono deterministiche sul seed, quindi ricalcolarle non cambia nulla e
-    ogni richiesta rileggerebbe gli elenchi degli indicatori."""
+    """La sfida del giorno a un livello. La cache sta in `game_daily` (per giorno,
+    livello e chiave del seed), cosi' il controllo della chiave si fa a ogni richiesta."""
     return game_daily.compare_del_giorno(giorno, livello)
 
 
@@ -254,6 +258,51 @@ def _punteggio(stato):
     return salvato.get("d"), int(salvato.get("c") or 0)
 
 
+def _lega_domanda(stato, coppia, livello):
+    return quiz_tokens.bind_round(
+        stato, coppia["indicator"]["id"], coppia["indicator"]["year"],
+        [coppia["a"]["key"], coppia["b"]["key"]], livello,
+    )
+
+
+# La domanda successiva
+
+def avanti(dati, now=None):
+    """(status, corpo) di "Avanti": lega al token la domanda dopo quella appena
+    risposta. `q` e' l'INDICE della domanda appena risposta (0-based): il server lega
+    la `q + 1`, e il suo tempo parte da adesso, non da quando il giocatore ha risposto
+    alla precedente. Prima la risposta legava la domanda dopo subito, e chi leggeva la
+    rivelazione piu' di due secondi perdeva la partita per `late`.
+
+    Il corpo e' `{"token": ...}`. Il token deve essere quello tornato dalla risposta a
+    `q` (round non aperto, domanda `q` risposta): un token ancora legato a un round non
+    si rilega, cosi' non si salta una domanda, e "Avanti" vale una volta sola per
+    domanda (`claim_round` con `q` negativo, distinto dai round risposti), cosi' non
+    si azzera l'orologio chiedendolo di nuovo. Errori: `puzzle_changed`,
+    `token_invalid`, `bad_request`, e 409 `round_already_bound` per il secondo invio.
+    La risposta all'ultima domanda non ha un "dopo".
+    """
+    stato = quiz_tokens.load_state(dati.get("token"), MODO)
+    giorno = oggi_roma(now)
+    if dati.get("puzzle_id") != sfida_di_oggi_id(giorno):
+        return 400, {"error": "puzzle_changed"}
+    try:
+        indice = int(dati.get("q"))
+    except (TypeError, ValueError):
+        return 400, {"error": "bad_request"}
+    if not 0 <= indice < COPPIE - 1:
+        return 400, {"error": "bad_request"}
+    salvato = stato.get(CHIAVE_PUNTEGGIO) or {}
+    livello = salvato.get("l")
+    if (livello not in LIVELLI or salvato.get("d") != giorno.isoformat()
+            or stato.get("fp") is not None or stato.get("q") != indice + 1):
+        return 400, {"error": "token_invalid"}
+    if not quiz_tokens.claim_round(stato["sid"], -(indice + 1)):
+        return 409, {"error": "round_already_bound"}
+    coppia = _sfida(giorno, livello)["pairs"][indice + 1]
+    return 200, {"token": _lega_domanda(stato, coppia, livello)}
+
+
 # La risposta
 
 def risposta(dati, now=None):
@@ -306,7 +355,7 @@ def risposta(dati, now=None):
         giuste = 0
     if esito["correct"]:
         giuste += 1
-    stato = {**stato, CHIAVE_PUNTEGGIO: {"d": giorno.isoformat(), "c": giuste}}
+    stato = {**stato, CHIAVE_PUNTEGGIO: {"d": giorno.isoformat(), "c": giuste, "l": livello}}
     sessione, token = quiz_tokens.apply_answer(
         stato, indicatore["id"], indicatore["year"], chiavi, esito["correct"]
     )
@@ -314,15 +363,6 @@ def risposta(dati, now=None):
         "streak": sessione["streak"], "best": sessione["best"], "rounds": sessione["rounds"],
     }
     finita = indice + 1 == COPPIE
-    if not finita:
-        # La risposta lega al token la domanda dopo, come nel round a serie il
-        # token torna legato al round che viene: il client non sceglie la
-        # coppia, la riceve già bindsata.
-        coppia = _sfida(giorno, livello)["pairs"][indice + 1]
-        token = quiz_tokens.bind_round(
-            quiz_tokens.load_state(token, MODO), coppia["indicator"]["id"],
-            coppia["indicator"]["year"], [coppia["a"]["key"], coppia["b"]["key"]], livello,
-        )
     corpo = {
         **esito,
         "index": indice,

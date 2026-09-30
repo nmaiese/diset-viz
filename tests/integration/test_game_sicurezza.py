@@ -7,6 +7,7 @@ C-tecnica §1 e §3)."""
 import os
 import shutil
 import tempfile
+import time
 import unittest
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -191,6 +192,276 @@ class RoundTest(Base):
         response = client.post("/api/game/leaderboard", json={"token": token, "nickname": "Razzo"})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.get_json()["error"], "score_missing")
+
+
+class ModalitaDelGiornoTest(Base):
+    """La sfida del giorno ha modalita' di token proprie (`compare_daily`,
+    `order_daily`): il suo token non entra nelle serie ne' nella classifica, e quello
+    di una serie non si rilega a un altro puzzle (R1 punti 3 e 14)."""
+
+    def _sessioni(self):
+        client = app.test_client()
+        compare = client.get("/api/game/compare/daily/session?level=regioni").get_json()
+        order = client.get("/api/game/order/daily/session?level=regioni").get_json()
+        return client, compare, order
+
+    def test_peek_state_rifiuta_i_token_della_sfida_del_giorno(self):
+        _, compare, order = self._sessioni()
+        self.assertIsNone(quiz_tokens.peek_state(compare["token"]))
+        self.assertIsNone(quiz_tokens.peek_state(order["token"]))
+
+    def test_la_classifica_a_serie_rifiuta_i_token_della_sfida_del_giorno(self):
+        client, compare, order = self._sessioni()
+        for token in (compare["token"], order["token"]):
+            with self.subTest(token=token[:8]):
+                r = client.post("/api/game/leaderboard", json={"token": token, "nickname": "Robot"})
+                self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+    def test_il_round_a_serie_non_rilega_il_token_della_sfida_del_giorno(self):
+        client, compare, order = self._sessioni()
+        sid_compare = quiz_tokens.load_state(compare["token"], "compare_daily")["sid"]
+        sid_order = quiz_tokens.load_state(order["token"], "order_daily")["sid"]
+        r = client.get("/api/game/compare/round?token=" + compare["token"]).get_json()
+        stato = quiz_tokens.load_state(r["token"], "compare")
+        self.assertNotEqual(stato["sid"], sid_compare)
+        self.assertEqual((stato["q"], stato["s"]), (1, 0))
+        r = client.get("/api/game/order/round?count=5&token=" + order["token"]).get_json()
+        self.assertNotEqual(quiz_tokens.load_state(r["token"], "order")["sid"], sid_order)
+
+    def test_le_risposte_a_serie_non_contano_il_token_della_sfida_del_giorno(self):
+        client, compare, order = self._sessioni()
+        r = client.post("/api/game/order/answer", json={
+            "token": order["token"], "indicator_id": order["indicator"]["id"], "year": order["indicator"]["year"],
+            "region_keys": [t["key"] for t in order["territories"]]})
+        corpo = r.get_json()
+        self.assertIsNone(corpo.get("session"))
+        q = compare["questions"][0]
+        r = client.post("/api/game/compare/answer", json={
+            "token": compare["token"], "indicator_id": q["indicator"]["id"], "year": q["indicator"]["year"],
+            "region_a_key": q["a"]["key"], "region_b_key": q["b"]["key"], "choice": "region_a"})
+        self.assertIsNone(r.get_json().get("session"))
+
+    def test_la_sessione_del_giorno_di_ordina_non_riprende_un_token(self):
+        client, _, order = self._sessioni()
+        again = client.get("/api/game/order/daily/session?level=regioni&token=" + order["token"]).get_json()
+        self.assertNotEqual(quiz_tokens.load_state(again["token"], "order_daily")["sid"],
+                            quiz_tokens.load_state(order["token"], "order_daily")["sid"])
+
+    def test_un_token_di_serie_non_vale_nella_sfida_del_giorno_di_chi_e_maggiore(self):
+        client = app.test_client()
+        serie = client.get("/api/game/compare/round").get_json()
+        sessione = client.get("/api/game/compare/daily/session?level=regioni").get_json()
+        r = client.post("/api/game/compare/daily/answer", json={
+            "token": serie["token"], "puzzle_id": sessione["puzzle_id"], "q": 0, "choice": "region_a"})
+        self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+
+class RoundASerieTest(Base):
+    """R1 punti 6 e 7: senza un round legato la risposta si valuta (il dato e'
+    pubblico) ma non conta per la serie ne' per l'account, e un nuovo /round con un
+    round ancora aperto conta quel round come sbagliato."""
+
+    def _corpo(self, round_, scelta=None):
+        return {"token": round_["token"], "indicator_id": round_["indicator"]["id"],
+                "year": round_["indicator"]["year"], "region_a_key": round_["region_a"]["region_key"],
+                "region_b_key": round_["region_b"]["region_key"], "choice": scelta or "region_a"}
+
+    def _giusta(self, client, round_):
+        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
+        return "region_a" if client.post("/api/game/compare/answer", json=senza).get_json()["correct"] else "region_b"
+
+    def test_la_risposta_senza_token_valuta_ma_non_conta_per_la_serie(self):
+        client = app.test_client()
+        round_ = client.get("/api/game/compare/round").get_json()
+        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
+        r = client.post("/api/game/compare/answer", json=senza)
+        self.assertEqual(r.status_code, 200)
+        corpo = r.get_json()
+        self.assertIsNone(corpo["session"])
+        self.assertIsNone(corpo["token"])
+
+    def test_la_risposta_senza_round_legato_non_conta_per_l_account(self):
+        client = app.test_client()
+        round_ = client.get("/api/game/compare/round").get_json()
+        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
+        intest = {"Authorization": "Bearer " + _jwt("oracolo-1")}
+        for _ in range(3):
+            client.post("/api/game/compare/answer", json=senza, headers=intest)
+        self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 0)
+        # e la risposta a un round legato si': un round, e le statistiche lo vedono
+        scelta = self._giusta(client, round_)
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            client.post("/api/game/compare/answer", json=self._corpo(round_, scelta), headers=intest)
+        self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 1)
+
+    def test_ordina_senza_token_non_conta_per_l_account(self):
+        client = app.test_client()
+        round_ = client.get("/api/game/order/round?count=5").get_json()
+        corpo = {"indicator_id": round_["indicator"]["id"], "year": round_["indicator"]["year"],
+                 "region_keys": [r["region_key"] for r in round_["regions"]]}
+        intest = {"Authorization": "Bearer " + _jwt("oracolo-2")}
+        r = client.post("/api/game/order/answer", json=corpo, headers=intest)
+        self.assertEqual(r.status_code, 200)
+        self.assertIsNone(r.get_json()["session"])
+        self.assertEqual(player_stats.stats_map("oracolo-2")["order"]["rounds_played"], 0)
+
+    def test_il_reroll_di_compare_azzera_la_serie_e_chiude_il_round_aperto(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/compare/round").get_json()
+        stato = quiz_tokens.load_state(r0["token"], "compare")
+        stato = {**stato, "s": 5, "b": 5, "r": 5}
+        token = quiz_tokens.sign_state(stato)
+        r1 = client.get("/api/game/compare/round?token=" + token).get_json()
+        nuovo = quiz_tokens.load_state(r1["token"], "compare")
+        self.assertEqual((nuovo["s"], nuovo["b"]), (0, 5))
+        self.assertEqual(nuovo["sid"], stato["sid"])
+        # il round aperto con il token di prima non si puo' piu' rispondere
+        vecchio = {**self._corpo(r0), "token": token}
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            r = client.post("/api/game/compare/answer", json=vecchio)
+        self.assertEqual(r.status_code, 409)
+
+    def test_il_reroll_di_ordina_azzera_la_serie(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/order/round?count=5").get_json()
+        stato = {**quiz_tokens.load_state(r0["token"], "order"), "s": 4, "b": 4}
+        r1 = client.get("/api/game/order/round?count=5&token=" + quiz_tokens.sign_state(stato)).get_json()
+        self.assertEqual(quiz_tokens.load_state(r1["token"], "order")["s"], 0)
+
+    def test_un_round_dopo_una_risposta_non_e_un_reroll(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/compare/round").get_json()
+        scelta = self._giusta(client, r0)
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            risposta = client.post("/api/game/compare/answer", json=self._corpo(r0, scelta)).get_json()
+        self.assertEqual(risposta["session"]["streak"], 1)
+        r1 = client.get("/api/game/compare/round?token=" + risposta["token"]).get_json()
+        self.assertEqual(quiz_tokens.load_state(r1["token"], "compare")["s"], 1)
+
+
+class SenzaMigrazione0010Test(Base):
+    """R1 punto 5: un deploy prima della migrazione 0010 (niente `daily_scores` ne'
+    `quiz_answered`) non deve dare 500 ne' perdere lo storico giornaliero."""
+
+    def setUp(self):
+        super().setUp()
+        from sqlalchemy import text
+        with session_scope() as s:
+            s.execute(text("DROP TABLE daily_scores"))
+            s.execute(text("DROP TABLE quiz_answered"))
+        self.client = app.test_client()
+        self.intest = {"Authorization": "Bearer " + _jwt("uuid-0010")}
+
+    def test_indovina_salva_lo_storico_anche_senza_daily_scores(self):
+        puzzle_id = f"daily:{game_daily.oggi_roma().isoformat()}"
+        r = self.client.post("/api/game/guess", headers=self.intest, json={
+            "puzzle_id": puzzle_id, "region_key": _winning_key(puzzle_id), "attempt": 1})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(_daily_rows("uuid-0010")), 1)
+
+    def test_ordina_del_giorno_loggato_risponde_200(self):
+        sessione = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
+        r = self.client.post("/api/game/order/daily/answer", headers=self.intest, json={
+            "token": sessione["token"], "region_keys": [t["key"] for t in sessione["territories"]]})
+        self.assertEqual(r.status_code, 200)
+
+    def test_provincia_risponde_200_e_i_traguardi_si_valutano_lo_stesso(self):
+        from app import game_provincia
+        payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
+        mistero = game_provincia.provincia_del_giorno(game_daily.oggi_roma())["key"]
+        r = self.client.post("/api/game/provincia/guess", headers=self.intest, json={
+            "token": payload["token"], "province_key": mistero})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("achievements", r.get_json())
+
+    def test_il_profilo_si_legge_anche_senza_daily_scores(self):
+        r = self.client.get("/api/player/me", headers=self.intest)
+        corpo = r.get_json()
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("daily", corpo["stats"])
+        self.assertEqual(corpo["stats"]["play_streak"], {"current": 0, "max": 0})
+        self.assertTrue(corpo["achievements"])
+
+    def test_il_round_risposto_due_volte_senza_quiz_answered_fallisce_aperto_e_lo_dice_nel_log(self):
+        with self.assertLogs("app.quiz_tokens", level="ERROR") as log:
+            self.assertTrue(quiz_tokens.claim_round("sid-x", 1))
+        self.assertIn("quiz_answered", log.output[0])
+
+
+class SeedInProduzioneTest(Base):
+    """R1 punto 4: su Cloud Run (`K_SERVICE`) senza `GAME_SEED_KEY` le rotte che usano il
+    seed nuovo rispondono 503, invece di calcolare sfide prevedibili con la chiave di
+    sviluppo, che sta nel repo. In locale e nei test la chiave di sviluppo resta."""
+
+    ROTTE = ("/api/game/compare/daily?level=regioni", "/api/game/compare/daily/session?level=regioni",
+             "/api/game/order/daily?level=regioni", "/api/game/order/daily/session?level=regioni",
+             "/api/game/provincia/daily?level=province")
+
+    def _ambiente(self, **variabili):
+        base = {k: v for k, v in os.environ.items() if k not in ("K_SERVICE", "GAME_SEED_KEY")}
+        return mock.patch.dict(os.environ, {**base, **variabili}, clear=True)
+
+    def setUp(self):
+        super().setUp()
+        cache.delete("rl:prov:ip:127.0.0.1")
+        self.client = app.test_client()
+
+    def test_su_cloud_run_senza_chiave_rispondono_503_e_lo_dicono_nel_log(self):
+        with self._ambiente(K_SERVICE="divario"):
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    with self.assertLogs("app", level="ERROR") as log:
+                        r = self.client.get(rotta)
+                    self.assertEqual((r.status_code, r.get_json()["error"]), (503, "seed_unavailable"))
+                    self.assertIn("GAME_SEED_KEY", log.output[0])
+
+    def test_una_sfida_in_cache_non_aggira_il_controllo(self):
+        oggi = game_daily.oggi_roma()
+        game_daily.compare_del_giorno(oggi, "regioni")
+        game_daily.order_del_giorno(oggi, "regioni")
+        with self._ambiente(K_SERVICE="divario"):
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    self.assertEqual(self.client.get(rotta).status_code, 503)
+
+    def test_con_la_chiave_su_cloud_run_le_rotte_rispondono(self):
+        with self._ambiente(K_SERVICE="divario", GAME_SEED_KEY="chiave-di-prova"):
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    self.assertEqual(self.client.get(rotta).status_code, 200)
+
+    def test_in_locale_senza_chiave_si_usa_quella_di_sviluppo(self):
+        with self._ambiente():
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    self.assertEqual(self.client.get(rotta).status_code, 200)
+
+    def test_la_chiave_cambia_la_sfida_e_non_si_mescolano_in_cache(self):
+        oggi = game_daily.oggi_roma()
+        a = game_daily.order_del_giorno(oggi, "regioni", "chiave-a")
+        b = game_daily.order_del_giorno(oggi, "regioni", "chiave-b")
+        self.assertIs(a, game_daily.order_del_giorno(oggi, "regioni", "chiave-a"))
+        self.assertNotEqual([t["key"] for t in a["territories"]] + [a["indicator"]["id"]],
+                            [t["key"] for t in b["territories"]] + [b["indicator"]["id"]])
+
+
+class CacheDelleSfideTest(Base):
+    """R1 punto 16: la sfida di un giorno e di un livello si calcola una volta, e nella
+    passata dei candidati l'indice del pool del quiz si costruisce una volta sola."""
+
+    def test_la_sfida_si_calcola_una_volta_per_giorno_livello_e_chiave(self):
+        giorno = date(2031, 3, 4)
+        with mock.patch.object(game_daily, "_candidati", wraps=game_daily._candidati) as candidati:
+            for _ in range(3):
+                game_daily.order_del_giorno(giorno, "regioni", "chiave-cache")
+                game_daily.compare_del_giorno(giorno, "regioni", "chiave-cache")
+        self.assertEqual(candidati.call_count, 2)
+
+    def test_l_indice_del_pool_si_costruisce_una_volta_per_passata(self):
+        giorno = date(2031, 3, 5)
+        with mock.patch.object(game_daily, "_indice_quiz", wraps=game_daily._indice_quiz) as indice:
+            game_daily.order_del_giorno(giorno, "regioni", "chiave-indice")
+        self.assertEqual(indice.call_count, 1)
 
 
 class StoreTest(Base):
