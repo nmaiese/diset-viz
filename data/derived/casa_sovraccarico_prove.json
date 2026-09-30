@@ -1,0 +1,7 @@
+{
+  "name": "Sovraccarico del costo dell'abitazione 2025 e sue possibili compagne, per gruppo di regioni",
+  "unit": "coefficiente (Pearson, Spearman); per la riga quota_varianza_fra_ripartizioni e' una quota fra 0 e 1",
+  "source": "Istat, elaborazione su BES (SDG-222) e Indagine Multiscopo",
+  "method": "Pearson e Spearman fra regioni, Pearson lasciando fuori una regione per volta, sulle sole regioni con il sovraccarico 2025. Nel campo pearson della riga quota_varianza_fra_ripartizioni c'e' la quota di varianza del sovraccarico che sta fra Centro-Nord e Mezzogiorno. Sono associazioni fra territori, non cause, su pochi punti.",
+  "script": "scripts/trend_articles/derive_casa_sovraccarico.py"
+}

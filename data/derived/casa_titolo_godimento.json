@@ -1,0 +1,9 @@
+{
+  "name": "Sovraccarico del costo dell'abitazione per titolo di godimento, Italia",
+  "unit": "Valori percentuali",
+  "source": "Eurostat, EU-SILC",
+  "archive": "ilc_lvho07c, Housing cost overburden rate by tenure status",
+  "source_url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ilc_lvho07c/A.PC..IT?format=SDMX-CSV&startPeriod=2025&endPeriod=2025&labels=name",
+  "method": "Valori Eurostat per l'Italia, 2025, senza rielaborazione: persone in famiglie dove il costo totale dell'abitazione supera il 40% del reddito disponibile. Il dato non esiste per regione. Al posto dei territori ci sono i titoli di godimento.",
+  "script": "scripts/trend_articles/derive_casa_titolo_godimento.py"
+}
