@@ -16,7 +16,12 @@ from sqlalchemy import select
 
 from app import player_stats
 from app.db import session_scope
-from app.models import Achievement
+from app.models import Achievement, DailyResult, DailyScore
+
+# Le quattro sfide del giorno. `indovina` sta in `daily_results`, le altre in
+# `daily_scores` (una riga per account, gioco e data).
+GIOCHI_DEL_GIORNO = ("indovina", "provincia", "compare", "order")
+GIORNI_FEDELE = 30
 
 
 def _now_iso():
@@ -36,6 +41,41 @@ def _played_all(stats):
     return (stats["compare"]["rounds_played"] > 0
             and stats["order"]["rounds_played"] > 0
             and stats["daily"]["games_played"] > 0)
+
+
+def _giorni_del_giro(auth_id):
+    """Le date in cui l'account ha chiuso la sfida del giorno di tutti e quattro
+    i giochi. Indovina conta se risolta, la provincia se indovinata, Chi è
+    maggiore? e Ordina se la partita è stata giocata fino in fondo."""
+    with session_scope() as s:
+        indovina = set(s.execute(select(DailyResult.puzzle_date).where(
+            DailyResult.auth_id == auth_id, DailyResult.solved == 1)).scalars())
+        righe = s.execute(select(DailyScore.gioco, DailyScore.data, DailyScore.punteggio)
+                          .where(DailyScore.auth_id == auth_id)).all()
+    per_gioco = {"indovina": indovina, "provincia": set(), "compare": set(), "order": set()}
+    for gioco, data, punteggio in righe:
+        if gioco == "provincia" and punteggio < 1:
+            continue
+        if gioco in per_gioco:
+            per_gioco[gioco].add(data)
+    return set.intersection(*per_gioco.values())
+
+
+def _provincia_indovinata(auth_id):
+    with session_scope() as s:
+        return s.execute(select(DailyScore.data).where(
+            DailyScore.auth_id == auth_id, DailyScore.gioco == "provincia",
+            DailyScore.punteggio >= 1).limit(1)).first() is not None
+
+
+def _giorni_di_fila(auth_id):
+    """La serie più lunga di giorni con almeno una sfida del giorno."""
+    with session_scope() as s:
+        giorni = set(s.execute(select(DailyResult.puzzle_date)
+                               .where(DailyResult.auth_id == auth_id)).scalars())
+        giorni |= set(s.execute(select(DailyScore.data)
+                                .where(DailyScore.auth_id == auth_id)).scalars())
+    return player_stats._daily_streaks(list(giorni))[1]
 
 
 # id, icona (emoji), titolo, descrizione, criterio(stats_map) -> bool.
@@ -68,11 +108,21 @@ CATALOG = [
     {"id": "veteran_50", "icon": "🏛️", "title": "Veterano",
      "description": "50 round giocati in totale.",
      "criterion": lambda s: _total_rounds(s) >= 50},
+    {"id": "geografo", "icon": "📍", "title": "Geografo",
+     "description": "Prima Provincia del giorno indovinata.",
+     "criterion": lambda s: s["_provincia_indovinata"]},
+    {"id": "giro_ditalia", "icon": "🧭", "title": "Giro d'Italia",
+     "description": "Le sfide del giorno di tutti e quattro i giochi risolte nello stesso giorno.",
+     "criterion": lambda s: s["_giri_completi"] >= 1},
+    {"id": "fedele", "icon": "🛡️", "title": "Fedele",
+     "description": "30 giorni di fila con almeno una sfida del giorno.",
+     "criterion": lambda s: s["_giorni_di_fila"] >= GIORNI_FEDELE},
 ]
 
 
 def _public(item, unlocked=False, unlocked_at=None):
-    return {"id": item["id"], "icon": item["icon"], "title": item["title"],
+    return {"id": item["id"], "icon": item["icon"],
+            "icon_url": f"/static/img/gioco/traguardi/{item['id']}.svg", "title": item["title"],
             "description": item["description"], "unlocked": unlocked, "unlocked_at": unlocked_at}
 
 
@@ -87,6 +137,16 @@ def unlocked_map(auth_id):
     return {aid: at for aid, at in rows}
 
 
+def _stats_per_criteri(auth_id):
+    """`stats_map` più i dati delle sfide del giorno che i nuovi traguardi
+    leggono (chiavi con il trattino basso: non sono una modalità)."""
+    stats = player_stats.stats_map(auth_id)
+    stats["_provincia_indovinata"] = _provincia_indovinata(auth_id)
+    stats["_giri_completi"] = len(_giorni_del_giro(auth_id))
+    stats["_giorni_di_fila"] = _giorni_di_fila(auth_id)
+    return stats
+
+
 def evaluate(auth_id):
     """Registra gli achievement appena raggiunti e li restituisce (voci
     pubbliche). Idempotente: uno già sbloccato non si ripropone. Tollerante:
@@ -94,7 +154,7 @@ def evaluate(auth_id):
     if not auth_id:
         return []
     try:
-        stats = player_stats.stats_map(auth_id)
+        stats = _stats_per_criteri(auth_id)
         already = unlocked_map(auth_id)
         newly = [item for item in CATALOG
                  if item["id"] not in already and item["criterion"](stats)]

@@ -3,6 +3,8 @@
 {% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Chi è maggiore?", "path": "/quiz/chi-e-maggiore"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'compare' %}
+{% set og_image_path = '/static/img/og/gioco-chi-e-maggiore.png' %}
+{% set og_image_alt = 'Quiz Italia: Chi è maggiore?' %}
 
 {% block title %}Chi è maggiore? Quiz sulle regioni italiane | {{ site_name }}{% endblock %}
 {% block description %}Confronta due regioni su un indicatore Istat e scegli il valore più alto. Dieci secondi per round, difficoltà crescente e serie da battere.{% endblock %}

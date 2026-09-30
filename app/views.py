@@ -41,7 +41,7 @@ from app import multiscopo_data
 from app import external_atlas
 from app import external_manifest
 from app import game
-from app import game_daily
+from app import classifica_giorno, game_daily
 from app import game_provincia
 from app import quiz
 from app import quiz_tokens
@@ -2978,6 +2978,20 @@ def favorites_remove_api(indicator_id):
     return jsonify({"ok": True})
 
 
+@app.route("/api/game/daily/leaderboard")
+def game_daily_leaderboard_api():
+    """La classifica di oggi di Indovina la Regione: primi 20 con account, per
+    tentativi e poi ora di arrivo. Solo nickname moderati, mai email né id."""
+    oggi = game_daily.oggi_roma()
+    try:
+        entries = classifica_giorno.classifica_oggi(giorno=oggi)
+    except Exception:  # noqa: BLE001
+        app.logger.exception("classifica del giorno non disponibile")
+        return jsonify({"error": "unavailable"}), 503
+    return jsonify({"date": oggi.isoformat(), "number": game_daily.numero_sfida(oggi),
+                    "next_puzzle_at": game_daily.prossima_sfida_roma(oggi), "entries": entries})
+
+
 @app.route("/api/game/leaderboard")
 def leaderboard_get_api():
     mode = request.args.get("mode", "")
@@ -3095,9 +3109,18 @@ def game_provincia_guess_api():
         return jsonify({"error": "rate_limited"}), 429
     corpo = request.get_json(silent=True) or {}
     try:
-        return jsonify(game_provincia.valuta_tentativo(corpo.get("token"), corpo.get("province_key")))
+        risultato = game_provincia.valuta_tentativo(corpo.get("token"), corpo.get("province_key"))
     except game_provincia.ErroreProvincia as errore:
         return jsonify({"error": errore.code}), errore.status
+    utente = auth.current_user(request.headers) if risultato.get("finished") else None
+    if utente:
+        try:
+            from app import achievements, player_stats
+            player_stats.record_daily_score(utente["id"], "provincia", game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+            risultato["achievements"] = achievements.evaluate(utente["id"])
+        except Exception:  # noqa: BLE001
+            app.logger.exception("sfida della provincia non registrata")
+    return jsonify(risultato)
 
 
 # --- fine Indovina la Provincia -----------------------------------------------
@@ -3171,6 +3194,7 @@ def game_guess_api():
         if user:
             try:
                 from app import player_stats, achievements
+                player_stats.record_daily_score(user["id"], "indovina", puzzle_id[len("daily:"):], 1 if result.get("correct") else 0)
                 if player_stats.record_daily(user["id"], puzzle_id[len("daily:"):], attempt, result.get("correct")):
                     result["achievements"] = achievements.evaluate(user["id"])
             except Exception:  # noqa: BLE001

@@ -4,6 +4,7 @@ import { fetchJson, prefersReducedMotion, trackGameEvent, postGame, notifyAchiev
 import { API, STORAGE_ONBOARDED_KEY } from "./api.js";
 import { dataInChiaro, normalize } from "./helpers.js";
 import { aggiornaSerie, oggiRoma, serieAttuale } from "./serie.js";
+import { segnaGiocata } from "../oggi.js";
 import { leggiSerieServer } from "./giocatore.js";
 import { loadProgress, loadStats, saveProgress, saveStats } from "./storage.js";
 import { useMapInteractions } from "./Mappa.jsx";
@@ -210,6 +211,7 @@ export default function GameApp() {
           setSolution(result.solution);
           setRecap(result.recap);
           recordStats(result.correct, attempt);
+          if (mode === "daily") segnaGiocata("indovina", oggiRoma(), { ok: result.correct, testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta" });
           if (mode === "daily") leggiSerieServer().then((serie) => serie && setServerSerie(serie));
           trackGameEvent("game_finish", { mode, level: "regioni", won: result.correct, attempts: attempt });
         }
