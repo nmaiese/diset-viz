@@ -14,7 +14,7 @@ from unittest import mock
 
 import jwt
 
-from app import app, config, game, game_daily, leaderboard, player_stats, quiz, quiz_tokens
+from app import profiles, app, config, game, game_daily, leaderboard, player_stats, quiz, quiz_tokens
 from app.cache import cache
 from app.db import session_scope
 from app.models import DailyResult
@@ -78,14 +78,21 @@ class DailyRecordTest(Base):
         self.assertEqual(me["stats"]["daily"]["wins"], 1)
         self.assertIn("historic_best_streak", me["stats"]["daily"])
 
-    def test_practice_and_archive_are_not_recorded(self):
+    def test_only_todays_daily_is_recorded_not_practice_nor_archive(self):
         client = app.test_client()
         headers = {"Authorization": "Bearer " + _jwt()}
+        today = game_daily.oggi_roma()
         practice_id = game.new_practice_puzzle_id()
-        self.assertEqual(self._win(client, practice_id, headers).status_code, 200)
-        yesterday = f"daily:{(game_daily.oggi_roma() - timedelta(days=1)).isoformat()}"
+        wrong = next(r["region_key"] for r in profiles.all_regions_index()
+                     if r["region_key"] != _winning_key(practice_id))
+        lost = client.post("/api/game/guess", headers=headers, json={
+            "puzzle_id": practice_id, "region_key": wrong, "attempt": game.MAX_ATTEMPTS})
+        self.assertTrue(lost.get_json()["finished"])
+        yesterday = f"daily:{(today - timedelta(days=1)).isoformat()}"
         self.assertEqual(self._win(client, yesterday, headers).status_code, 200)
         self.assertEqual(_daily_rows("uuid-sic"), [])
+        self.assertEqual(self._win(client, f"daily:{today.isoformat()}", headers).status_code, 200)
+        self.assertEqual([r.puzzle_date for r in _daily_rows("uuid-sic")], [today.isoformat()])
 
     def test_record_daily_refuses_non_iso_date(self):
         self.assertFalse(player_stats.record_daily("u1", "daily:2026-07-20", 1, True))
@@ -224,9 +231,9 @@ class AnswerRateLimitTest(Base):
         client = app.test_client()
         token = quiz_tokens.sign_state(quiz_tokens.new_state("compare"))
         codes = [client.post("/api/game/compare/answer", json={"token": token}).status_code
-                 for _ in range(31)]
-        self.assertEqual(codes[30], 429)
-        self.assertNotIn(429, codes[:30])
+                 for _ in range(46)]
+        self.assertEqual(codes[45], 429)
+        self.assertNotIn(429, codes[:45])
 
 
 class PathTest(Base):

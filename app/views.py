@@ -207,16 +207,19 @@ def _client_ip():
     """IP del client per i limiti di richiesta.
 
     Il primo valore di `X-Forwarded-For` lo scrive il client e non vale niente:
-    chi cambia quel valore cambia secchio. Davanti c'e' il frontend di Google, che
-    aggiunge in coda l'indirizzo da cui gli e' arrivata la connessione, quindi
-    l'unico elemento non falsificabile e' l'ultimo (per un Application Load
-    Balancer Google lo documenta come `[<supplied>,]<client-ip>,<lb-ip>`, cioe' i
-    due finali sono suoi: https://cloud.google.com/load-balancing/docs/https#x-forwarded-for_header).
-    Il numero di hop fidati si regola con `TRUSTED_PROXY_HOPS` (default 1, l'ultimo
-    elemento). NON verificato in produzione: con Cloudflare davanti (DEPLOY.md) l'ultimo
-    elemento puo' essere un indirizzo di edge Cloudflare e non il visitatore, e allora
-    il secchio e' per edge, piu' largo. Fuori da Cloud Run (`K_SERVICE` assente: locale,
-    test) l'header non si legge affatto."""
+    chi cambia quel valore cambia secchio. Quale elemento sia fidato su Cloud Run
+    NON e' verificato dalla documentazione: la pagina delle intestazioni di Cloud
+    Functions (https://docs.cloud.google.com/functions/docs/reference/headers) dice
+    solo che il primo IP e' "generally" il client, e quella dell'Application Load
+    Balancer dice che i due finali sono suoi (`[<supplied>,]<client-ip>,<lb-ip>`,
+    https://cloud.google.com/load-balancing/docs/https). Qui si assume che il
+    frontend di Google aggiunga in coda l'indirizzo della connessione: l'ultimo
+    elemento e' l'unico non falsificabile. `TRUSTED_PROXY_HOPS` (default 1) sceglie
+    quanti elementi dalla fine saltare. Con Cloudflare davanti (DEPLOY.md) l'ultimo
+    e' un edge Cloudflare e il secchio e' condiviso da molti giocatori: con 2 si
+    prende l'IP che Cloudflare ha aggiunto, ma e' sicuro solo se l'ingresso
+    `run.app` e' ristretto a Cloudflare. Fuori da Cloud Run (`K_SERVICE` assente:
+    locale, test) l'header non si legge."""
     if os.environ.get("K_SERVICE"):
         hops = [h.strip() for h in request.headers.get("X-Forwarded-For", "").split(",") if h.strip()]
         try:
@@ -2665,12 +2668,17 @@ def _timer_requested():
     return request.args.get("timer", "1") != "0"
 
 
+# Un giocatore veloce (1,5 s a round, il pavimento di quiz_tokens) fa 40 risposte
+# al minuto: il limite per sessione sta sopra, cosi' non scatta a meta' serie.
+_SID_ANSWERS_PER_MIN = 45
+
+
 def _answer_rate_limited(sid):
-    """120 risposte al minuto per IP e un limite per sessione firmata: nessun
+    """120 risposte al minuto per IP e 45 per sessione firmata: nessun
     giocatore vero ci arriva, uno script si'."""
     if not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60):
         return True
-    return not _rate_limit_ok(f"ans:sid:{sid}", limit=30, window_s=60)
+    return not _rate_limit_ok(f"ans:sid:{sid}", limit=_SID_ANSWERS_PER_MIN, window_s=60)
 
 
 def _round_conflict():
