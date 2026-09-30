@@ -2607,6 +2607,7 @@ def game_order_page_legacy_redirect():
 def game_hub_page():
     return render_template(
         "game_hub.html",
+        province_total=len(game_daily.province_pool()),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/quiz",
@@ -2627,6 +2628,7 @@ def game_page():
 def game_provincia_page():
     return render_template(
         "game_provincia.html",
+        province_total=len(game_daily.province_pool()),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/quiz/indovina-la-provincia",
@@ -3944,7 +3946,7 @@ def _home_quiz_games():
         },
         {
             "name": "Indovina la Provincia",
-            "desc": "Una provincia misteriosa da trovare con gli indizi dei dati Istat, sulla mappa delle 107 province.",
+            "desc": f"Una provincia misteriosa da trovare con gli indizi dei dati Istat, sulla mappa delle {len(game_daily.province_pool())} province.",
             "meta": "una al giorno",
             "href": "/quiz/indovina-la-provincia",
         },

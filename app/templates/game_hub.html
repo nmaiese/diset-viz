@@ -69,7 +69,7 @@
           <li data-gioco="provincia">
             <a class="hub-card hub-oggi__gioco" href="/quiz/indovina-la-provincia">
               <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/provincia.svg') }}')" aria-hidden="true"></span>Indovina la Provincia</span>
-              <span class="hub-card-body">Una provincia su 107, con la mappa che dice quanto sei vicino.</span>
+              <span class="hub-card-body">Una provincia su {{ province_total }}, con la mappa che dice quanto sei vicino.</span>
               <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
             </a>
           </li>

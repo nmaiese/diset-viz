@@ -9,7 +9,7 @@ export const API_PROVINCIA = {
 
 export const LIVELLI = [
   { key: "stessa_regione", label: "Della regione", aiuto: "ti diciamo la regione e scegli fra le sue province" },
-  { key: "province", label: "Di tutta Italia", aiuto: "scegli fra le 107 province" },
+  { key: "province", label: "Di tutta Italia", aiuto: "scegli fra tutte le province" },
 ];
 export const LIVELLO_DEFAULT = "stessa_regione";
 
