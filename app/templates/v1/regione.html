@@ -45,7 +45,7 @@
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }}{% if provinces %}, "containsPlace": [{% for pr in provinces %}{ "@type": "Place", "name": {{ pr.name | tojson }}, "url": {{ (site_url ~ pr.path) | tojson }} }{{ "," if not loop.last }}{% endfor %}]{% endif %} },
   "creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "creator": { "@type": "Organization", "name": "Istat" } },
+  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "description": "Indicatori territoriali regionali pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ data_license_url | tojson }},

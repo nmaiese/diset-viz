@@ -39,7 +39,7 @@
   "spatialCoverage": { "@type": "Place", "name": {{ p.name | tojson }}{% if p.region %}, "containedInPlace": { "@type": "Place", "name": {{ p.region | tojson }}{% if p.region_path %}, "url": {{ (site_url ~ p.region_path) | tojson }}{% endif %} }{% endif %} },
   {% if indicatori %}"temporalCoverage": "{{ indicatori | map(attribute='year_from') | min }}/{{ indicatori | map(attribute='year') | max }}",
   {% endif %}"creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } },
+  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "description": "Indicatori del benessere equo e sostenibile a livello provinciale, pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ data_license_url | tojson }},
