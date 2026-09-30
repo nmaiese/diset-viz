@@ -19,7 +19,7 @@ va nel log.
 
 import logging
 
-from app import bes_data, game_daily, player_stats, profiles, quiz, quiz_tokens, sources
+from app import bes_data, game_daily, player_stats, quiz, quiz_tokens, sources
 
 log = logging.getLogger(__name__)
 
@@ -129,8 +129,7 @@ def evaluate_daily_order_answer(payload, auth_user=None):
         manifest = bes_data.get_bes_manifest("provincia").get(raw_id) or {}
         explain = manifest.get("explain") or {}
         desc = explain.get("plain") or ind["name"]
-        slug = profiles.indicator_slug(ind["name"])
-        canonical_path = sources.indicator_url("bes", raw_id, slug) + "/province"
+        canonical_path = province_path(ind_id)
         val_expl = explain.get("example") or ""
         source_lbl = sources.SOURCES["bes"]["label"]
         source_u = bes_data.BES_SOURCE_URLS["provincia"]
@@ -166,6 +165,12 @@ def evaluate_daily_order_answer(payload, auth_user=None):
         except Exception:  # noqa: BLE001
             log.exception("ordina: punteggio del giorno non registrato")
     return result
+
+
+def province_path(ind_id):
+    """Il link canonico della scheda a livello province, quello di `game_provincia`:
+    uno slug composto dal nome leggibile del gioco porta a un 301."""
+    return bes_data.bes_level_path(game_daily.id_provinciale(ind_id), "provincia")
 
 
 def sid_del_token(token):

@@ -237,6 +237,27 @@ class LimiteFrequenzaOrdinaTest(BaseOrdina):
         self.assertEqual(codici[120], 429)
 
 
+class PercorsoCanonicoOrdinaTest(BaseOrdina):
+    """R1 punto 17: il link dell'indicatore a livello province e' quello canonico
+    (`bes_data.bes_level_path`), non uno slug composto dal nome leggibile."""
+
+    def test_nessun_301_sui_quaranta_indicatori_provinciali(self):
+        provinciali = [i for i in game_daily.indicatori_gioco() if i["provincia"]]
+        self.assertGreaterEqual(len(provinciali), 40)
+        for ind in provinciali:
+            with self.subTest(indicatore=ind["id"]):
+                percorso = game_order.province_path(ind["id"])
+                self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_la_risposta_del_giorno_porta_il_percorso_canonico(self):
+        sessione = self._sessione("province")
+        r = self.client.post("/api/game/order/daily/answer", json={
+            "token": sessione["token"], "region_keys": self._chiavi(sessione)})
+        percorso = r.get_json()["indicator"]["path"]
+        self.assertEqual(percorso, game_order.province_path(sessione["indicator"]["id"]))
+        self.assertEqual(self.client.get(percorso).status_code, 200)
+
+
 class GiroDItaliaTest(unittest.TestCase):
     """R1 + aggiunta A: il punteggio di oggi si registra PRIMA di valutare i
     traguardi, quindi Ordina, giocata per ultima, sblocca "Giro d'Italia"."""
