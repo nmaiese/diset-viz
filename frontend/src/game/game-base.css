@@ -206,6 +206,37 @@
   .hub-layout { display: grid; grid-template-columns: 380px 1fr; gap: 36px; align-items: start; }
   .hub-layout__hero { position: sticky; top: calc(var(--masthead-h) + 20px); display: grid; gap: 20px; }
 }
+.hub-nota { font-size: 14px; line-height: 1.55; color: var(--text-2); margin: 0; }
+
+/* Icone SVG come maschera: prendono il colore del testo e seguono il tema. */
+.ico {
+  display: inline-block; flex: none; inline-size: 24px; block-size: 24px;
+  background-color: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat;
+  mask: var(--ico) center / contain no-repeat;
+}
+
+/* La sfida di oggi: la card in evidenza dell'hub. */
+.hub-oggi { border: 1px solid var(--ink); background: var(--bg); padding: 20px 22px; margin-bottom: 28px; }
+.hub-oggi__testa { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; margin-bottom: 16px; }
+.hub-oggi__testa h2 { font-family: var(--font-display); font-size: 26px; font-weight: 800; line-height: 1.1; margin: 0; }
+.hub-oggi__testa .qz-section-eb { margin-bottom: 6px; }
+.hub-oggi__meta { display: flex; flex-direction: column; gap: 2px; margin: 0; font-size: 13.5px; color: var(--muted); }
+.hub-oggi__conto { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; }
+.hub-oggi__serie:empty { display: none; }
+.hub-oggi__giochi { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 720px) { .hub-oggi__giochi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.hub-oggi__gioco { height: 100%; }
+.hub-oggi__nome { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 18px; line-height: 1.15; }
+.hub-oggi__stato { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--rule); font-weight: 700; font-size: 13.5px; color: var(--game-accent); }
+.is-giocata > .hub-oggi__gioco { background: var(--surface-2); }
+.is-giocata .hub-oggi__stato { color: var(--ink); }
+.hub-oggi__stato strong { font-family: inherit; font-size: inherit; font-weight: 800; }
+.hub-oggi__altre { margin: 14px 0 0; font-size: 13.5px; color: var(--muted); }
+.hub-errore { margin: 8px 0 0; font-size: 13.5px; color: var(--ink); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.hub-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--game-accent); text-decoration: underline; cursor: pointer; }
+@media (max-width: 640px) { .hub-oggi { padding: 16px; } }
+
 .hub-intro h2 { font-size: 17px; margin: 0 0 10px; }
 .hub-intro p { font-size: 14px; line-height: 1.55; color: var(--text-2); margin: 0 0 10px; }
 .hub-intro p:last-child { margin-bottom: 0; }
@@ -674,8 +705,9 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
 /* Vetrina traguardi nel profilo/hub (Fase 5.2). */
 .achv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
 .achv-card { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--rule); border-radius: var(--radius-control); background: var(--bg); }
-.achv-card.is-locked { opacity: .5; }
+.achv-card.is-locked { opacity: .7; }
 .achv-card-ic { font-size: 22px; line-height: 1; }
+.achv-card-s { font-family: var(--font-ui); font-weight: 600; font-size: 11px; color: var(--muted); margin-top: 4px; }
 .achv-card-t { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; }
 .achv-card-d { font-size: 12px; color: var(--text-2); line-height: 1.4; margin-top: 2px; }
 

@@ -327,7 +327,8 @@ class TentativiTest(unittest.TestCase):
             r = self._tenta(payload["token"], self.mistero["key"]).get_json()
         self.assertTrue(r["finished"])
         registra.assert_not_called()
-        self.assertNotIn("achievements", r)
+        # I traguardi della provincia (Geografo) possono esserci, quelli della regione del giorno no.
+        self.assertNotIn("daily_solver", [a["id"] for a in r.get("achievements", [])])
 
 
 class PaginaTest(unittest.TestCase):

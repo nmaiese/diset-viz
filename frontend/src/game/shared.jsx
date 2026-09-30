@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { X } from "lucide-react";
 import {
   getAccessToken,
@@ -10,6 +11,9 @@ import {
 } from "../shared/supabase.js";
 
 const STORAGE_NICKNAME_KEY = "di-nickname";
+const STORAGE_PENDING_KEY = "di-invio-pendente";
+// Il token di sessione vale 12 ore (app/quiz_tokens.py): oltre non serve riprovare.
+const PENDING_MAX_AGE_MS = 12 * 3600 * 1000;
 
 // Header Authorization con il Bearer di Supabase, se c'è una sessione. Vuoto
 // per gli anonimi: il gioco non richiede login, l'account è un extra.
@@ -323,7 +327,7 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
       ) : step === "choice" ? (
         <div className="submit-score-choice">
           <p>Il tuo risultato: <strong>{scoreLabel}</strong>. Come vuoi salvarlo?</p>
-          <button type="button" className="game-btn" onClick={() => signInWithGoogle()}>
+          <button type="button" className="game-btn" onClick={() => { salvaInvioPendente({ mode, token, score, scoreLabel }); signInWithGoogle(); }}>
             Accedi e salvalo sul mio account
           </button>
           <button type="button" className="game-btn game-btn--ghost" onClick={() => setStep("form")}>
@@ -560,3 +564,73 @@ export function FinePartita({
     </section>
   );
 }
+
+// Il punteggio non si perde al redirect di Google. Il token di sessione e il
+// punteggio vivono nello stato React, che il redirect azzera: prima di partire
+// li si mette in sessionStorage (solo questa scheda, si svuota alla chiusura),
+// e al ritorno, con la sessione, si riapre lo stesso modal di invio. Se nel
+// frattempo il token e' scaduto, il server risponde token_invalid e il modal lo
+// dice in chiaro.
+function salvaInvioPendente(invio) {
+  try {
+    window.sessionStorage.setItem(STORAGE_PENDING_KEY, JSON.stringify({ ...invio, savedAt: Date.now() }));
+  } catch {
+    // Senza sessionStorage il punteggio si perde come prima: nessun danno nuovo.
+  }
+}
+
+function leggiInvioPendente() {
+  try {
+    const invio = JSON.parse(window.sessionStorage.getItem(STORAGE_PENDING_KEY) || "null");
+    if (!invio || !invio.token || Date.now() - invio.savedAt > PENDING_MAX_AGE_MS) return null;
+    return invio;
+  } catch {
+    return null;
+  }
+}
+
+function cancellaInvioPendente() {
+  try {
+    window.sessionStorage.removeItem(STORAGE_PENDING_KEY);
+  } catch {
+    // niente da fare
+  }
+}
+
+function PendingSubmit({ invio, onDone }) {
+  return (
+    <SubmitScoreModal
+      mode={invio.mode}
+      token={invio.token}
+      score={invio.score}
+      scoreLabel={invio.scoreLabel}
+      onClose={onDone}
+      onSubmitted={cancellaInvioPendente}
+    />
+  );
+}
+
+// Ogni pagina del gioco importa questo modulo: al ritorno dal login riprende
+// l'invio senza che le pagine debbano saperne niente.
+function riprendiInvioPendente() {
+  if (typeof window === "undefined" || !isAuthConfigured() || !leggiInvioPendente()) return;
+  let aperto = false;
+  function apri(user) {
+    const invio = user && !aperto ? leggiInvioPendente() : null;
+    if (!invio) return;
+    aperto = true;
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    const chiudi = () => {
+      cancellaInvioPendente();
+      root.unmount();
+      host.remove();
+    };
+    root.render(<PendingSubmit invio={invio} onDone={chiudi} />);
+  }
+  getUser().then(apri).catch(() => {});
+  onAuthChange(apri).catch(() => {});
+}
+
+riprendiInvioPendente();

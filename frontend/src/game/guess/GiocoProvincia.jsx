@@ -3,6 +3,7 @@ import { BarChart3 } from "lucide-react";
 import { FinePartita, Modal, fetchJson, formatValue, prefersReducedMotion, trackGameEvent } from "../shared.jsx";
 import { comparisonArrow, comparisonText, dataInChiaro, normalize, ordinal } from "./helpers.js";
 import { oggiRoma } from "./serie.js";
+import { segnaGiocata } from "../oggi.js";
 import {
   API_PROVINCIA,
   LIVELLI,
@@ -231,6 +232,7 @@ export default function GiocoProvincia() {
           setSolution(result.solution);
           setRecap(result.recap);
           registraFine(result.correct, attempt);
+          segnaGiocata("provincia", oggiRoma(), { ok: result.correct, testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta" });
           trackGameEvent("game_finish", { mode: "daily", level, won: result.correct, attempts: attempt });
         }
         salva({

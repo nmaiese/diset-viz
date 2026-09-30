@@ -10,6 +10,7 @@ import {
   notifyAchievements,
   FinePartita,
 } from "./shared.jsx";
+import { oggiRoma, segnaGiocata } from "./oggi.js";
 
 const API = {
   round: (count, token) =>
@@ -267,6 +268,7 @@ export default function OrderApp() {
           }
         }
         trackGameEvent("order_answer", { mode, level, score: data.score, total: data.total });
+        if (isDaily) segnaGiocata("order", oggiRoma(), { ok: data.score === data.total, testo: `${data.score} su ${data.total} al posto giusto` });
       })
       .catch(() => setStatus("error"));
   }
