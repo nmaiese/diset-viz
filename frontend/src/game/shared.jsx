@@ -645,7 +645,9 @@ export function Condividi({
 // Il punteggio del frammento non è firmato, quindi il testo non dice mai "un amico ha fatto":
 // "La sfida condivisa: 7 su 10. Riesci a superarla?". Niente va al server e non c'è un'anteprima
 // social dinamica. Eventi: `challenge_open` quando il riquadro compare, `challenge_finish` a fine
-// partita (da `FinePartita`).
+// partita (da `FinePartita`). Il punteggio della sfida ricevuta NON viaggia negli eventi: ogni evento
+// finisce anche nel log del server (`/api/events`) accanto all'IP, e il frammento esiste apposta per
+// non farlo. Nell'evento c'è il tuo punteggio e il confronto (`outcome`).
 export function useSfidaCondivisa({ game, numeroOggi, avviata }) {
   const [sfida, setSfida] = useState(null);
   const letta = useRef(false);
@@ -656,7 +658,7 @@ export function useSfidaCondivisa({ game, numeroOggi, avviata }) {
     if (!trovata) return;
     letta.current = true;
     setSfida(trovata);
-    trackGameEvent("challenge_open", { game, challenge_score: trovata.punteggio });
+    trackGameEvent("challenge_open", { game });
   }, [game, massimo, numeroOggi, avviata]);
   useEffect(() => {
     if (!avviata || typeof window === "undefined") return;
@@ -807,7 +809,6 @@ export function FinePartita({
     trackGameEvent("challenge_finish", {
       game: (sfida && sfida.game) || gioco,
       score: sfidaTuo,
-      challenge_score: sfidaPunteggio,
       outcome: sfidaTuo > sfidaPunteggio ? "superata" : sfidaTuo === sfidaPunteggio ? "pari" : "sotto",
     });
   }, [sfidaPunteggio, sfidaTuo, sfida, gioco]);

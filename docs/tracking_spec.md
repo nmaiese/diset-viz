@@ -401,8 +401,7 @@ Parametri gioco da registrare in GA4:
 | `won` | true, false |
 | `achievement_id` | identificativo del traguardo sbloccato |
 | `game` | il gioco: `regione`, `provincia`, `compare`, `order`, `mappa` (vedi sotto) |
-| `challenge_score` | punteggio della sfida condivisa (solo `challenge_open` e `challenge_finish`) |
-| `outcome` | `superata`, `pari`, `sotto`: il confronto con la sfida condivisa (solo `challenge_finish`) |
+| `outcome` | `superata`, `pari`, `sotto`: il tuo punteggio messo a confronto con la sfida condivisa (solo `challenge_finish`) |
 
 ### Il parametro `game`
 
@@ -424,15 +423,9 @@ firmato, quindi il testo non dice chi l'ha fatto), e all'avvio della partita il 
 toglie dall'URL, così chi ricondivide non ripropaga il punteggio di un altro. Niente va al
 server. `challenge_open` parte quando il riquadro compare (frammento valido: un solo
 frammento, cifre ASCII, punteggio fra 0 e il massimo del gioco, numero uguale a quello di oggi),
-`challenge_finish` quando la partita finisce, con `score` (il tuo) e `challenge_score`.
-
-### La misura lato server
-
-Gli eventi qui sopra dipendono dal consenso. Le sfide del giorno finite si contano anche
-**senza consenso**, lato server, in `daily_counter` (`app/daily_counter.py`): una riga per
-gioco, giorno e punteggio con quante partite sono finite così, e nient'altro. Nessun account,
-sessione, IP o identificativo. Si legge con `bin/py scripts/partite_giocate.py`. Indovina
-la Regione non entra: i tentativi li dichiara il client.
+`challenge_finish` quando la partita finisce, con `score` (il tuo) e `outcome`. Il punteggio
+della sfida ricevuta non sta in nessuno dei due: anche gli eventi finiscono nel log del server
+(`/api/events`) accanto all'IP, ed è proprio quello che il frammento serve a evitare.
 
 ## GA4
 

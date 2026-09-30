@@ -245,6 +245,32 @@ class RotteTest(CompareBase):
         oggi = game_daily.oggi_roma().isoformat()
         self.assertEqual(self.righe(), {("provincia", oggi, 1): 1, ("provincia_regione", oggi, 1): 1})
 
+    def test_provincia_non_si_conta_due_volte_se_si_rimanda_la_richiesta_finale(self):
+        client = app.test_client()
+        oggi = game_daily.oggi_roma()
+        payload = client.get("/api/game/provincia/daily?level=province").get_json()
+        corpo = {"token": payload["token"], "province_key": game_provincia.provincia_del_giorno(oggi)["key"]}
+        cache.delete("rl:prov:ip:127.0.0.1")
+        prima = client.post("/api/game/provincia/guess", json=corpo)
+        self.assertTrue(prima.get_json()["finished"])
+        for _ in range(3):
+            cache.delete("rl:prov:ip:127.0.0.1")
+            client.post("/api/game/provincia/guess", json=corpo)
+        self.assertEqual(self.righe(), {("provincia", oggi.isoformat(), 1): 1})
+
+    def test_provincia_non_si_conta_due_volte_con_il_token_dopo_la_fine(self):
+        client = app.test_client()
+        oggi = game_daily.oggi_roma()
+        payload = client.get("/api/game/provincia/daily?level=province").get_json()
+        chiave = game_provincia.provincia_del_giorno(oggi)["key"]
+        cache.delete("rl:prov:ip:127.0.0.1")
+        prima = client.post("/api/game/provincia/guess", json={"token": payload["token"], "province_key": chiave}).get_json()
+        self.assertTrue(prima["finished"])
+        for _ in range(3):
+            cache.delete("rl:prov:ip:127.0.0.1")
+            client.post("/api/game/provincia/guess", json={"token": prima["token"], "province_key": chiave})
+        self.assertEqual(self.righe(), {("provincia", oggi.isoformat(), 1): 1})
+
     def test_provincia_non_conta_un_tentativo_sbagliato_che_non_chiude(self):
         r = self._guess_provincia("province", False).get_json()
         self.assertFalse(r["finished"])

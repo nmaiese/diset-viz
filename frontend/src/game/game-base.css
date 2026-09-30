@@ -85,6 +85,10 @@
 .game-btn:hover { background: var(--game-accent-strong); border-color: var(--game-accent-strong); }
 a.game-btn { color: var(--game-on-accent); text-decoration: none; }
 a.game-btn--ghost { color: var(--ink); }
+/* `color: inherit` sui bottoni dell'app (in cima al foglio) batte `.game-btn` per specificita':
+   senza queste due righe il testo del bottone primario prende il colore dell'inchiostro sul viola. */
+.game-app .game-btn, .compare-app .game-btn, .order-app .game-btn { color: var(--game-on-accent); }
+.game-app .game-btn--ghost, .compare-app .game-btn--ghost, .order-app .game-btn--ghost { color: var(--ink); }
 .game-btn--ghost:hover { background: var(--game-wash); border-color: var(--game-accent); }
 .game-btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule); font-weight: 600; }
 
