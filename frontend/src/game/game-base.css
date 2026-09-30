@@ -43,6 +43,7 @@
 .game-toolbar-spacer { flex: 1 1 auto; }
 
 .game-tab {
+  min-height: 44px;
   padding: 8px 16px;
   border-radius: var(--radius-control);
   border: 1px solid var(--rule);
@@ -55,8 +56,8 @@
 .game-tab--ghost { background: transparent; }
 
 .game-icon-btn {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-control);
   border: 1px solid var(--rule);
   background: var(--bg);
@@ -68,6 +69,10 @@
 .game-icon-btn:hover { border-color: var(--game-accent); }
 
 .game-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 9px 16px;
   border-radius: var(--radius-control);
   border: 1px solid var(--ink);
@@ -78,6 +83,8 @@
 }
 
 .game-btn:hover { background: var(--game-accent-strong); border-color: var(--game-accent-strong); }
+a.game-btn { color: var(--game-on-accent); text-decoration: none; }
+a.game-btn--ghost { color: var(--ink); }
 .game-btn--ghost:hover { background: var(--game-wash); border-color: var(--game-accent); }
 .game-btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule); font-weight: 600; }
 
@@ -95,10 +102,6 @@
   border-radius: var(--radius-control);
   background: linear-gradient(90deg, var(--surface-2), var(--bg), var(--surface-2));
   background-size: 200% 100%;
-}
-@keyframes skel {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 /* ---------- Modali (onboarding, statistiche, archivio) ---------- */
@@ -134,8 +137,8 @@
 .game-modal-head h3 { margin: 0; font-size: 18px; }
 
 .game-modal-close {
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-control);
   border: 1px solid var(--rule);
   background: var(--bg);
@@ -386,7 +389,6 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
   font-variant-numeric: tabular-nums;
 }
 .qz-clock.is-low { }
-@keyframes qz-pulse { 50% { opacity: 0.45; } }
 
 .qz-timer-bar {
   width: 180px;
@@ -611,6 +613,7 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
   margin-bottom: 16px;
 }
 .qz-filter {
+  min-height: 44px;
   padding: 7px 14px;
   border: 1px solid var(--rule);
   background: var(--bg);
@@ -621,6 +624,7 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
 .qz-filter:hover { border-color: var(--game-accent); }
 .qz-filter.is-active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .qz-filters-sep { width: 1px; align-self: stretch; background: var(--rule); margin: 2px 4px; }
+@media (max-width: 720px) { .qz-filters-sep { display: none; } }
 
 .qz-podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
 @media (max-width: 640px) { .qz-podium { grid-template-columns: 1fr; } }
@@ -689,7 +693,7 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
    unico, font di sistema del gioco). Compare solo se Supabase e' configurato. */
 .game-auth { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 13px; }
 .game-auth__who { color: var(--text-2); }
-.game-auth__btn { background: none; border: 1px solid var(--rule); color: var(--ink); border-radius: var(--radius-control); padding: 5px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
+.game-auth__btn { background: none; border: 1px solid var(--rule); color: var(--ink); border-radius: var(--radius-control); min-height: 44px; padding: 5px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
 .game-auth__btn:hover { border-color: var(--game-accent); color: var(--game-accent); }
 
 /* Toast di sblocco achievement (Fase 5.2), raccolto dal branch. */
@@ -697,9 +701,11 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
 .achv-toast { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--ink); color: var(--bg); border: 1px solid var(--ink); box-shadow: var(--shadow-pop); border-radius: var(--radius-control); transform: translateX(120%); opacity: 0; }
 .achv-toast.is-in { transform: translateX(0); opacity: 1; }
 .achv-toast-icon { font-size: 24px; line-height: 1; }
+.achv-toast-icon.ico { inline-size: 28px; block-size: 28px; color: var(--game-accent); }
 .achv-toast-text { display: flex; flex-direction: column; gap: 2px; }
 .achv-toast-text strong { font-family: var(--font-ui); font-weight: 600; font-size: 10px; letter-spacing: 0.01em; color: var(--game-accent); }
 .achv-toast-text span { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
+.achv-toast-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 600; color: var(--bg); text-decoration: underline; text-underline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .achv-toast { transform: none; } }
 
 /* Vetrina traguardi nel profilo/hub (Fase 5.2). */
@@ -717,11 +723,45 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
 
 /* Il movimento, solo a chi non ha chiesto di ridurlo. */
 @media (prefers-reduced-motion: no-preference) {
+  @keyframes skel {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @keyframes qz-pulse { 50% { opacity: 0.45; } }
   .skel-bars span, .skel-bar { animation: skel 1.2s ease-in-out infinite; }
   .qz-clock.is-low { animation: qz-pulse 1s ease-in-out infinite; }
   .qz-timer-bar > i { transition: width 0.1s linear; }
+  /* Il toast entra come sempre (0,3 s), esce in 200 ms con --mo-in, e l'icona fa UN pop. */
   .achv-toast { transition: transform .3s ease, opacity .3s ease; }
+  .achv-toast.is-out { transition-duration: 200ms; transition-timing-function: var(--mo-in); }
+  .achv-toast.is-in .achv-toast-icon { animation: achv-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes achv-pop {
+    0% { transform: scale(0.8); }
+    60% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  /* Il segno di un esito pieno si disegna in 350 ms: il tratto parte nascosto solo qui. */
+  .qz-fine-segno--pieno path { stroke-dasharray: 1; animation: qz-segno 350ms var(--mo-out) both; }
+  @keyframes qz-segno {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
 }
+
+/* ---------- Fine partita: segno dell'esito, conteggio, fatto, sfida condivisa ---------- */
+
+.qz-fine-segno { inline-size: 24px; block-size: 24px; vertical-align: -0.2em; flex: none; }
+.qz-fine-segno path { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.qz-fine-segno circle { fill: currentColor; }
+.qz-fine-segno--pieno { color: var(--game-right); }
+.qz-fine-segno--parziale { color: var(--muted); }
+.qz-fine-segno--nullo { color: var(--game-wrong); }
+.qz-fine-cifra { display: inline-block; font-family: var(--font-num); font-variant-numeric: tabular-nums; text-align: end; }
+.qz-fine-sfida { margin: 0 0 12px; font-weight: 600; }
+.qz-fine-fatto { margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--game-accent); background: var(--game-wash); line-height: 1.5; }
+.qz-fine-fatto a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+.qz-sfida { margin: 0 0 12px; padding: 10px 14px; border: 1px solid var(--rule); border-left: 3px solid var(--game-accent); background: var(--game-wash); }
+.qz-sfida p { margin: 0; font-weight: 600; }
 
 /* Il movimento ha una scala sola (durate e curve), cosi' un gioco non inventa i suoi numeri.
    I valori sono una scelta di progetto: 100-500 ms e ease-out in ingresso, come consiglia
