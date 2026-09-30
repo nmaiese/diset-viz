@@ -13,6 +13,7 @@ from app.atlas_catalog import (
     get_atlas_theme_profile,
     search_atlas_indicators,
 )
+from app import client_ip
 from app import design
 from app.design import common as design_common
 from app.design import numfmt
@@ -205,30 +206,15 @@ app.add_template_global(atlas_theme_url)
 
 
 def _client_ip():
-    """IP del client per i limiti di richiesta.
-
-    Il primo valore di `X-Forwarded-For` lo scrive il client e non vale niente:
-    chi cambia quel valore cambia secchio. Quale elemento sia fidato su Cloud Run
-    NON e' verificato dalla documentazione: la pagina delle intestazioni di Cloud
-    Functions (https://docs.cloud.google.com/functions/docs/reference/headers) dice
-    solo che il primo IP e' "generally" il client, e quella dell'Application Load
-    Balancer dice che i due finali sono suoi (`[<supplied>,]<client-ip>,<lb-ip>`,
-    https://cloud.google.com/load-balancing/docs/https). Qui si assume che il
-    frontend di Google aggiunga in coda l'indirizzo della connessione: l'ultimo
-    elemento e' l'unico non falsificabile. `TRUSTED_PROXY_HOPS` (default 1) sceglie
-    quanti elementi dalla fine saltare. Con Cloudflare davanti (DEPLOY.md) l'ultimo
-    e' un edge Cloudflare e il secchio e' condiviso da molti giocatori: con 2 si
-    prende l'IP che Cloudflare ha aggiunto, ma e' sicuro solo se l'ingresso
-    `run.app` e' ristretto a Cloudflare. Fuori da Cloud Run (`K_SERVICE` assente:
-    locale, test) l'header non si legge."""
+    """IP del client per i limiti di richiesta. Su Cloud Run si legge
+    `X-Forwarded-For` (locale e test: `remote_addr`). Come si sceglie l'IP dietro
+    Cloudflare sta in `app/client_ip.py`: l'ultimo hop non si falsifica, il primo
+    lo scrive il client."""
     if os.environ.get("K_SERVICE"):
-        hops = [h.strip() for h in request.headers.get("X-Forwarded-For", "").split(",") if h.strip()]
-        try:
-            trusted = max(1, int(os.environ.get("TRUSTED_PROXY_HOPS", "1")))
-        except ValueError:
-            trusted = 1
-        if len(hops) >= trusted:
-            return hops[-trusted]
+        ip = client_ip.ip_del_client(
+            request.headers.get("X-Forwarded-For"), request.headers.get("CF-Connecting-IP"))
+        if ip:
+            return ip
     return request.remote_addr or "unknown"
 
 
