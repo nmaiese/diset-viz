@@ -722,3 +722,29 @@ a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
   .qz-timer-bar > i { transition: width 0.1s linear; }
   .achv-toast { transition: transform .3s ease, opacity .3s ease; }
 }
+
+/* Il movimento ha una scala sola (durate e curve), cosi' un gioco non inventa i suoi numeri.
+   I valori sono una scelta di progetto: 100-500 ms e ease-out in ingresso, come consiglia
+   https://www.nngroup.com/articles/animation-duration/ . Chi usa questi token sta dentro
+   @media (prefers-reduced-motion: no-preference): fuori da li' lo stato finale e' gia' quello giusto. */
+:root {
+  --mo-fast: 120ms;
+  --mo-base: 220ms;
+  --mo-slow: 360ms;
+  --mo-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --mo-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Su telefono il gioco viene prima del testo. Titolo e lead stanno nella stessa
+   intestazione: con `display: contents` diventano figli diretti dell'articolo e si
+   mettono in ordine (titolo, isola di gioco, lead, "Come si gioca"). Niente testo
+   duplicato e niente nascosto: e' lo stesso DOM, cambia solo dove si vede. Sopra i
+   720 px resta l'ordine di sempre. */
+@media (max-width: 720px) {
+  .game-page--play { display: flex; flex-direction: column; }
+  .game-page--play > .page-hero { display: contents; }
+  .game-page--play > .page-hero > h1 { order: 1; margin-bottom: 12px; }
+  .game-page--play > div { order: 2; }
+  .game-page--play > .page-hero > .page-lead { order: 3; margin-top: 24px; }
+  .game-page--play > .prose { order: 4; }
+}
