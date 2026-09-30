@@ -200,7 +200,11 @@ class StessoPerTuttiTest(Base):
         self.assertEqual(sessione["puzzle_id"], "daily:2026-10-01")
 
     def test_answer_to_yesterdays_challenge_is_refused(self):
-        sessione = self._sessione()
+        # La sessione si apre con l'orologio fissato sul 30 settembre: con la data vera
+        # del computer, da mezzanotte di quel giorno in poi la sfida "di ieri" sarebbe
+        # quella di oggi e il test non potrebbe piu' fallire come deve.
+        with _orologio(GIORNO_PRIMA):
+            sessione = self._sessione()
         with _orologio(MEZZANOTTE_ROMA):
             risposta = self.client.post("/api/game/compare/daily/answer", json={
                 "puzzle_id": sessione["puzzle_id"], "q": 0, "choice": "region_a",
