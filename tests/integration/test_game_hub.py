@@ -89,21 +89,43 @@ class ClassificaDelGiornoRitirataTest(Base):
 
 
 class GuessProvinciaTest(Base):
-    def _gioca(self, sub, corretta):
+    def _gioca(self, sub, corretta, livello="province"):
         client = app.test_client()
-        payload = client.get("/api/game/provincia/daily?level=province").get_json()
+        payload = client.get(f"/api/game/provincia/daily?level={livello}").get_json()
         mistero = game_provincia.provincia_del_giorno(self.oggi)["key"]
         if corretta:
             chiave = mistero
         else:
-            chiave = next(o["key"] for o in game_provincia.opzioni("province", self.oggi) if o["key"] != mistero)
+            chiave = next(o["key"] for o in game_provincia.opzioni(livello, self.oggi) if o["key"] != mistero)
         cache.delete("rl:prov:ip:127.0.0.1")
         return client.post("/api/game/provincia/guess", json={"token": payload["token"], "province_key": chiave},
                            headers={"Authorization": f"Bearer {_jwt(sub)}"} if sub else {})
 
-    def _riga(self, sub):
+    def _riga(self, sub, gioco="provincia"):
         with session_scope() as s:
-            return s.get(DailyScore, {"auth_id": sub, "gioco": "provincia", "data": self.oggi.isoformat()})
+            return s.get(DailyScore, {"auth_id": sub, "gioco": gioco, "data": self.oggi.isoformat()})
+
+    def test_il_livello_della_regione_scrive_un_punteggio_a_parte_e_non_sblocca_geografo(self):
+        # R1 punto 13: la regione svelata dal livello facile e' quella del livello difficile.
+        r = self._gioca("uuid-prov-reg", True, "stessa_regione").get_json()
+        self.assertTrue(r["correct"])
+        self.assertIsNone(self._riga("uuid-prov-reg", "provincia"))
+        self.assertEqual(self._riga("uuid-prov-reg", "provincia_regione").punteggio, 1)
+        self.assertNotIn("geografo", [a["id"] for a in r["achievements"]])
+        self.assertNotIn("geografo", achievements.unlocked_map("uuid-prov-reg"))
+
+    def test_il_livello_della_regione_non_conta_per_il_giro_d_italia(self):
+        oggi = self.oggi.isoformat()
+        player_stats.record_daily("uuid-giro-liv", oggi, 2, True)
+        player_stats.record_daily_score("uuid-giro-liv", "compare", oggi, 7)
+        player_stats.record_daily_score("uuid-giro-liv", "order", oggi, 5)
+        self._gioca("uuid-giro-liv", True, "stessa_regione")
+        self.assertNotIn("giro_ditalia", achievements.unlocked_map("uuid-giro-liv"))
+
+    def test_il_livello_tutta_italia_scrive_provincia(self):
+        self._gioca("uuid-prov-ita", True, "province")
+        self.assertEqual(self._riga("uuid-prov-ita", "provincia").punteggio, 1)
+        self.assertIsNone(self._riga("uuid-prov-ita", "provincia_regione"))
 
     def test_indovinare_scrive_la_riga_e_sblocca_geografo(self):
         r = self._gioca("uuid-prov", True).get_json()

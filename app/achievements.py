@@ -45,8 +45,10 @@ def _played_all(stats):
 
 def _giorni_del_giro(auth_id):
     """Le date in cui l'account ha chiuso la sfida del giorno di tutti e quattro
-    i giochi. Indovina conta se risolta, la provincia se indovinata, Chi è
-    maggiore? e Ordina se la partita è stata giocata fino in fondo."""
+    i giochi. Indovina conta se risolta, la provincia se indovinata al livello
+    "tutta Italia" (`provincia`: il livello "della regione" scrive
+    `provincia_regione` e non conta, perche' svela la regione del livello
+    difficile), Chi è maggiore? e Ordina se la partita è stata giocata fino in fondo."""
     with session_scope() as s:
         indovina = set(s.execute(select(DailyResult.puzzle_date).where(
             DailyResult.auth_id == auth_id, DailyResult.solved == 1)).scalars())
@@ -62,6 +64,7 @@ def _giorni_del_giro(auth_id):
 
 
 def _provincia_indovinata(auth_id):
+    """Solo il livello difficile ("tutta Italia"), gioco `provincia`."""
     with session_scope() as s:
         return s.execute(select(DailyScore.data).where(
             DailyScore.auth_id == auth_id, DailyScore.gioco == "provincia",
@@ -109,7 +112,7 @@ CATALOG = [
      "description": "50 round giocati in totale.",
      "criterion": lambda s: _total_rounds(s) >= 50},
     {"id": "geografo", "icon": "📍", "title": "Geografo",
-     "description": "Prima Provincia del giorno indovinata.",
+     "description": "Prima Provincia del giorno indovinata al livello tutta Italia.",
      "criterion": lambda s: s["_provincia_indovinata"]},
     {"id": "giro_ditalia", "icon": "🧭", "title": "Giro d'Italia",
      "description": "Le sfide del giorno di tutti e quattro i giochi risolte nello stesso giorno.",
