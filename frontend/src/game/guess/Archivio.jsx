@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal } from "../shared.jsx";
+import { dataInChiaro } from "./helpers.js";
 
 export default function ArchiveModal({ list, currentPuzzleId, onPick, onClose }) {
   return (
@@ -21,8 +22,8 @@ export default function ArchiveModal({ list, currentPuzzleId, onPick, onClose })
                 className={currentPuzzleId === `daily:${item.date}` ? "is-active" : ""}
                 onClick={() => onPick(item.date)}
               >
-                <span>Sfida #{item.number}</span>
-                <span>{item.date}</span>
+                <span>Sfida del {dataInChiaro(item.date)}</span>
+                <span>n. {item.number}</span>
               </button>
             </li>
           ))}

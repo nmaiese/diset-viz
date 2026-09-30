@@ -28,6 +28,8 @@ export default function Completamento({
           role="combobox"
           aria-expanded={suggestions.length > 0}
           aria-controls="game-suggestions-list"
+          aria-autocomplete="list"
+          aria-activedescendant={highlighted >= 0 && suggestions[highlighted] ? `game-opzione-${suggestions[highlighted].key}` : undefined}
           placeholder={placeholder}
           value={query}
           disabled={disabled}
@@ -55,7 +57,7 @@ export default function Completamento({
       {suggestions.length > 0 && (
         <ul className="game-suggestions" id="game-suggestions-list" role="listbox">
           {suggestions.map((s, i) => (
-            <li key={s.key} role="option" aria-selected={i === highlighted}>
+            <li key={s.key} id={`game-opzione-${s.key}`} role="option" aria-selected={i === highlighted}>
               <button
                 type="button"
                 className={i === highlighted ? "is-highlighted" : ""}

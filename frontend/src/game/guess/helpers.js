@@ -26,13 +26,15 @@ export function comparisonText(comparison) {
   return "dato non disponibile";
 }
 
-export function countdownParts(targetIso, nowMs) {
-  if (!targetIso) return null;
-  const diff = new Date(targetIso).getTime() - nowMs;
-  if (!Number.isFinite(diff)) return null;
-  const totalSec = Math.max(0, Math.floor(diff / 1000));
-  const h = String(Math.floor(totalSec / 3600)).padStart(2, "0");
-  const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
-  const s = String(totalSec % 60).padStart(2, "0");
-  return `${h}:${m}:${s}`;
+const MESI = [
+  "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+  "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+];
+
+// "2026-09-12" diventa "12 settembre". La data si spezza a mano: con `new Date`
+// la stringa ISO e' mezzanotte UTC e in un fuso a ovest mostrerebbe il giorno prima.
+export function dataInChiaro(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+  if (!m) return "";
+  return `${Number(m[3])} ${MESI[Number(m[2]) - 1]}`;
 }

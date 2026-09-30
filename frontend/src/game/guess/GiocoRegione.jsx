@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3 } from "lucide-react";
 import { fetchJson, prefersReducedMotion, trackGameEvent, postGame, notifyAchievements } from "../shared.jsx";
 import { API, STORAGE_ONBOARDED_KEY } from "./api.js";
-import { countdownParts, normalize } from "./helpers.js";
+import { dataInChiaro, normalize } from "./helpers.js";
+import { aggiornaSerie, oggiRoma, serieAttuale } from "./serie.js";
+import { leggiSerieServer } from "./giocatore.js";
 import { loadProgress, loadStats, saveProgress, saveStats } from "./storage.js";
 import { useMapInteractions } from "./Mappa.jsx";
 import Completamento from "./Completamento.jsx";
@@ -28,11 +30,10 @@ export default function GameApp() {
   const [highlighted, setHighlighted] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [shareCopied, setShareCopied] = useState(false);
   const [shake, setShake] = useState(false);
   const [liveMessage, setLiveMessage] = useState("");
   const [stats, setStats] = useState(loadStats);
-  const [now, setNow] = useState(() => Date.now());
+  const [serverSerie, setServerSerie] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(() => {
     try {
       return !window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
@@ -90,12 +91,10 @@ export default function GameApp() {
     }
   }, [clues.length]);
 
+  // Da loggato la serie a giorni la ricalcola il server dalle giornaliere.
   useEffect(() => {
-    const isResult = status === "won" || status === "lost";
-    if (mode !== "daily" || !isResult || !puzzle?.next_puzzle_at) return undefined;
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [mode, status, puzzle]);
+    leggiSerieServer().then((serie) => serie && setServerSerie(serie));
+  }, []);
 
   useEffect(() => {
     if (showArchive && archiveList === null) {
@@ -110,7 +109,6 @@ export default function GameApp() {
     setStatus("loading");
     setSolution(null);
     setRecap(null);
-    setShareCopied(false);
     setLiveMessage("");
     statsRecordedRef.current = false;
 
@@ -137,7 +135,7 @@ export default function GameApp() {
         setClues(data.clue ? [data.clue] : []);
         setGuesses([]);
         setStatus("playing");
-        trackGameEvent("game_start", { mode: kind });
+        trackGameEvent("game_start", { mode: kind, level: "regioni" });
       })
       .catch(() => {
         setError(
@@ -166,10 +164,9 @@ export default function GameApp() {
     statsRecordedRef.current = true;
     setStats((prev) => {
       const next = {
+        ...aggiornaSerie(prev, { won, giorno: puzzle.date }),
         played: prev.played + 1,
         wins: prev.wins + (won ? 1 : 0),
-        streak: won ? prev.streak + 1 : 0,
-        maxStreak: won ? Math.max(prev.maxStreak, prev.streak + 1) : prev.maxStreak,
         lastWonPuzzleId: won ? puzzle.puzzle_id : prev.lastWonPuzzleId,
         distribution: { ...prev.distribution },
       };
@@ -196,7 +193,7 @@ export default function GameApp() {
         setStatus(nextStatus);
         setQuery("");
         setHighlighted(-1);
-        trackGameEvent("game_guess", { mode, attempt, correct: result.correct });
+        trackGameEvent("game_guess", { mode, level: "regioni", attempt, correct: result.correct });
 
         const guessedName = regionByKey[regionKey] || result.region;
         if (result.correct) {
@@ -213,7 +210,8 @@ export default function GameApp() {
           setSolution(result.solution);
           setRecap(result.recap);
           recordStats(result.correct, attempt);
-          trackGameEvent("game_finish", { mode, won: result.correct, attempts: attempt });
+          if (mode === "daily") leggiSerieServer().then((serie) => serie && setServerSerie(serie));
+          trackGameEvent("game_finish", { mode, level: "regioni", won: result.correct, attempts: attempt });
         }
         persistProgress(nextClues, nextGuesses, nextStatus, result.solution, result.recap);
       })
@@ -226,41 +224,14 @@ export default function GameApp() {
   const attemptsLeft = puzzle ? puzzle.attempts_total - guesses.length : 0;
   const finished = status === "won" || status === "lost";
 
-  function shareText() {
-    if (!puzzle || mode !== "daily") return "";
-    const grid = guesses.map((g) => (g.correct ? "■" : "□")).join("");
-    const outcome = status === "won" ? `${guesses.length}/${puzzle.attempts_total}` : `X/${puzzle.attempts_total}`;
-    return `Indovina la Regione #${puzzle.number} ${outcome}\n${grid}\ndivarioitalia.it/quiz/indovina-la-regione`;
-  }
-
-  async function handleShare() {
-    const text = shareText();
-    if (!text) return;
-    trackGameEvent("game_share", { mode });
-    if (navigator.share) {
-      try {
-        await navigator.share({ text });
-        return;
-      } catch {
-        // L'utente ha annullato la condivisione nativa: proviamo con il clipboard.
-      }
-    }
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
-        setShareCopied(true);
-        window.setTimeout(() => setShareCopied(false), 2500);
-      });
-    }
-  }
-
   function openStats() {
     setShowStats(true);
-    trackGameEvent("game_stats_open", { mode });
+    trackGameEvent("game_stats_open", { mode, level: "regioni" });
   }
 
   function openArchive() {
     setShowArchive(true);
-    trackGameEvent("game_archive_open", {});
+    trackGameEvent("game_archive_open", { level: "regioni" });
   }
 
   function pickArchiveDate(iso) {
@@ -274,6 +245,7 @@ export default function GameApp() {
     setMode("daily");
   }
 
+  const serie = serverSerie || { current: serieAttuale(stats, oggiRoma()), max: stats.maxStreak };
   const highlightBucket = mode === "daily" && finished ? (status === "won" ? String(guesses.length) : "fail") : null;
 
   return (
@@ -343,10 +315,10 @@ export default function GameApp() {
         <>
           <header className="game-head">
             <h2>
-              {mode === "daily" && `Sfida #${puzzle.number}`}
+              {mode === "daily" && `Sfida n. ${puzzle.number}`}
               {mode === "practice" && "Allenamento"}
-              {mode === "archive" && `Sfida #${puzzle.number} · archivio`}
-              {puzzle.date && <span className="game-date"> · {puzzle.date}</span>}
+              {mode === "archive" && `Sfida del ${dataInChiaro(puzzle.date)}`}
+              {mode === "daily" && puzzle.date && <span className="game-date"> · {dataInChiaro(puzzle.date)}</span>}
             </h2>
             <div className="game-attempts-row">
               <span className="game-attempts-label">
@@ -400,9 +372,8 @@ export default function GameApp() {
                 recap={recap}
                 stats={stats}
                 highlightBucket={highlightBucket}
-                shareCopied={shareCopied}
-                onShare={handleShare}
-                countdown={mode === "daily" ? countdownParts(puzzle.next_puzzle_at, now) : null}
+                serie={serie}
+                guesses={guesses}
                 onNewPractice={mode === "practice" ? () => startGame("practice") : null}
               />
             )}
@@ -423,7 +394,7 @@ export default function GameApp() {
         />
       )}
 
-      {showStats && <StatsModal stats={stats} onClose={() => setShowStats(false)} />}
+      {showStats && <StatsModal stats={stats} serie={serie} onClose={() => setShowStats(false)} />}
 
       {showArchive && (
         <ArchiveModal

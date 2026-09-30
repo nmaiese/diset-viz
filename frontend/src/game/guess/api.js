@@ -7,6 +7,7 @@ export const API = {
   archive: "/api/game/archive",
   practice: "/api/game/practice",
   guess: "/api/game/guess",
+  playerMe: "/api/player/me",
 };
 
 export const STORAGE_PROGRESS_PREFIX = "di-game-progress:";
