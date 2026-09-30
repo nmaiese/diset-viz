@@ -1,10 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BarChart3 } from "lucide-react";
-import CompareApp from "./compare.jsx";
-import OrderApp from "./order.jsx";
-import HubApp from "./hub.jsx";
-import LeaderboardApp from "./leaderboard.jsx";
 import { fetchJson, formatValue, prefersReducedMotion, trackGameEvent, SourceStrip, Modal, postGame, notifyAchievements } from "./shared.jsx";
 import "./game.css";
 
@@ -904,30 +900,9 @@ function useMapInteractions({ regions, guesses, status, solution, onGuess, submi
   }, [guesses, status, solution]);
 }
 
-// Un solo bundle per tutte le pagine del gioco: ogni template server ha il
-// suo elemento root e il mount dell'app corrispondente scatta solo dove
-// quell'elemento esiste (sulle altre pagine è un no-op).
+// Entry di Indovina la Regione. Ogni pagina del quiz ha il suo entry in
+// `entries/` (vedi vite.config.js): qui resta solo il mount di questo gioco.
 const root = document.getElementById("game-root");
 if (root) {
   createRoot(root).render(<GameApp />);
-}
-
-const compareRoot = document.getElementById("compare-root");
-if (compareRoot) {
-  createRoot(compareRoot).render(<CompareApp />);
-}
-
-const orderRoot = document.getElementById("order-root");
-if (orderRoot) {
-  createRoot(orderRoot).render(<OrderApp />);
-}
-
-const hubRoot = document.getElementById("hub-root");
-if (hubRoot) {
-  createRoot(hubRoot).render(<HubApp />);
-}
-
-const leaderboardRoot = document.getElementById("leaderboard-root");
-if (leaderboardRoot) {
-  createRoot(leaderboardRoot).render(<LeaderboardApp />);
 }

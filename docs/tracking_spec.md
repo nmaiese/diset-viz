@@ -353,9 +353,11 @@ Parametri applicativi:
 La nuova area giochi usa un tracciamento leggermente diverso finché il
 container GTM non espone tag nativi dedicati ai giochi:
 
-- il codice continua a fare `push` nel `dataLayer`
-- il helper `trackGameEvent` chiama anche `gtag('event', ...)` con
-  `send_to: G-THTPZZ02QH`
+- il helper `trackGameEvent` chiama `gtag('event', ...)` con
+  `send_to: G-THTPZZ02QH`, l'unica strada verso GA4. Non fa più un
+  `dataLayer.push` dell'oggetto a parte: il container GTM versione 8 non ha
+  nessun trigger sui nomi del quiz (li aveva solo letti in sola lettura il 30
+  settembre 2026), quindi il push era un secondo evento che nessuno raccoglieva
 - l'endpoint interno `/api/events` resta solo log operativo, non inoltra a GA4
 
 Eventi gioco oggi previsti:
@@ -376,6 +378,7 @@ Eventi gioco oggi previsti:
 | `leaderboard_view` | apertura classifica | engagement |
 | `hub_mode_click` | click su una modalità dal hub | navigazione |
 | `quiz_source_click` | click sulla fonte del round | fiducia e approfondimento |
+| `achievement_unlocked` | toast di un traguardo sbloccato (solo con login) | motivazione e retention |
 
 Parametri gioco da registrare in GA4:
 
@@ -394,6 +397,7 @@ Parametri gioco da registrare in GA4:
 | `attempts` | numero tentativi della partita |
 | `correct` | true, false |
 | `won` | true, false |
+| `achievement_id` | identificativo del traguardo sbloccato |
 
 ## GA4
 

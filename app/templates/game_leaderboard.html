@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Classifica", "path": "/quiz/classifica"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'classifica' %}
 
@@ -11,12 +13,12 @@
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-leaderboard.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 <article class="page game-page wrap" id="contenuto">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   {% include "_game_subnav.html" %}
 
