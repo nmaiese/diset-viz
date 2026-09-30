@@ -9,6 +9,7 @@
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-provincia.js') }}"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -35,18 +36,47 @@
     <p class="page-lead">Il quiz sulle province italiane: una provincia misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino.</p>
   </header>
 
-  <div id="game-root">
-    <noscript>
-      <p>Attiva JavaScript per giocare a "Indovina la Provincia". Nel frattempo puoi esplorare
-      <a href="/province">le province italiane</a> o <a href="/quiz/indovina-la-regione">indovinare la regione misteriosa</a> del giorno.</p>
-    </noscript>
-    <p class="game-loading">Il gioco è in preparazione.</p>
+  <div class="game-layout">
+    <div class="game-map-frame" id="game-map-frame">
+      {# La mappa e' solo feedback: le sagome richiamano i tracciati dallo sprite
+         (`v1_map_sprite`, in fondo alla pagina) e le marca il gioco. Il
+         riquadro si stringe sulla regione al livello "della regione". #}
+      <svg class="regions-map prov-map" id="prov-map" viewBox="0 0 560 660" role="img"
+           aria-label="Mappa delle province italiane. I tuoi tentativi sono segnati con un numero.">
+        <defs>
+          <pattern id="prov-tratteggio" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" class="prov-tratteggio-fondo"/>
+            <line x1="0" y1="0" x2="0" y2="6" class="prov-tratteggio-riga"/>
+          </pattern>
+        </defs>
+        <g class="prov-tiles">
+          {%- for chiave in v1_province_paths %}
+          <use class="prov-tile" data-key="{{ chiave }}" href="#mp-{{ chiave }}"/>
+          {%- endfor %}
+        </g>
+        <g class="prov-marks" id="prov-marks"></g>
+      </svg>
+      <p class="game-map-legend">
+        <span><i class="sw-available"></i> da tentare</span>
+        <span><i class="sw-wrong"></i> tentata, con il numero del tentativo</span>
+        <span><i class="sw-correct"></i> misteriosa, a partita finita</span>
+      </p>
+    </div>
+    <div id="game-root">
+      <noscript>
+        <p>Attiva JavaScript per giocare a "Indovina la Provincia". Nel frattempo puoi esplorare
+        <a href="/province">le province italiane</a> o <a href="/quiz/indovina-la-regione">indovinare la regione misteriosa</a> del giorno.</p>
+      </noscript>
+      <p class="game-loading">Preparazione della sfida...</p>
+    </div>
   </div>
 
   <section class="prose">
     <h2>Come si gioca</h2>
-    <p>Ogni giorno tutti affrontano la stessa provincia misteriosa. Scrivi il nome di una provincia e scegli dall'elenco che si completa mentre digiti. La mappa ti mostra dov'è il tuo tentativo rispetto alla provincia da trovare, con la distanza approssimata in chilometri e la direzione da seguire.</p>
+    <p>Ogni giorno tutti affrontano la stessa provincia misteriosa, e la sfida cambia a mezzanotte di Roma. Scrivi il nome di una provincia e scegli dall'elenco che si completa mentre digiti. Hai sei tentativi. Ogni errore ti dice a che distanza sei, in chilometri approssimati, e in quale direzione cercare, se la provincia è nella stessa regione e se il dato del tuo tentativo è più alto o più basso di quello nascosto. In più svela un indizio nuovo, preso dalle statistiche territoriali dell'Istat.</p>
+    <p>Puoi giocare su due livelli: "della regione", dove ti diciamo la regione e scegli fra le sue province, oppure "di tutta Italia", fra le 107 province. La provincia è la stessa, cambia il punto di partenza.</p>
     <p>I dati vengono dalle statistiche territoriali dell'Istat. Vuoi partire dalle regioni? Prova <a href="/quiz/indovina-la-regione">Indovina la Regione</a>.</p>
   </section>
 </article>
+{{ v1_map_sprite('provincia') }}
 {% endblock %}

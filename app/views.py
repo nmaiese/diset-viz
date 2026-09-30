@@ -41,6 +41,7 @@ from app import external_atlas
 from app import external_manifest
 from app import game
 from app import game_daily
+from app import game_provincia
 from app import quiz
 from app import quiz_tokens
 from app import leaderboard
@@ -3080,6 +3081,40 @@ def game_compare_daily_api():
 @app.route("/api/game/order/daily")
 def game_order_daily_api():
     return _sfida_del_giorno_api("order")
+
+
+# --- Indovina la Provincia: API (app/game_provincia.py) -----------------------
+# Il livello si sceglie con `?level=` ("province" o "stessa_regione") e la
+# giornaliera e' sempre quella di oggi a Roma. Lo stato dei tentativi sta nel
+# token firmato che il server restituisce a ogni risposta, non nel client.
+
+
+def _provincia_rate_limited():
+    return not _rate_limit_ok(f"prov:ip:{_client_ip()}", limit=60, window_s=60)
+
+
+@app.route("/api/game/provincia/daily")
+def game_provincia_daily_api():
+    if _provincia_rate_limited():
+        return jsonify({"error": "rate_limited"}), 429
+    try:
+        return jsonify(game_provincia.payload(request.args.get("level", "province")))
+    except game_provincia.ErroreProvincia as errore:
+        return jsonify({"error": errore.code}), errore.status
+
+
+@app.post("/api/game/provincia/guess")
+def game_provincia_guess_api():
+    if _provincia_rate_limited():
+        return jsonify({"error": "rate_limited"}), 429
+    corpo = request.get_json(silent=True) or {}
+    try:
+        return jsonify(game_provincia.valuta_tentativo(corpo.get("token"), corpo.get("province_key")))
+    except game_provincia.ErroreProvincia as errore:
+        return jsonify({"error": errore.code}), errore.status
+
+
+# --- fine Indovina la Provincia -----------------------------------------------
 
 
 @app.route("/api/game/regions")
