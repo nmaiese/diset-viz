@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Chi è maggiore?", "path": "/quiz/chi-e-maggiore"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'compare' %}
 
@@ -7,7 +9,7 @@
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-compare.js') }}"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -16,26 +18,17 @@
   "description": "Quiz a raffica sugli indicatori territoriali Istat: scegli quale delle due regioni italiane ha il valore più alto.",
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "description": "Indicatori territoriali regionali pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
   "isAccessibleForFree": true
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Quiz Italia", "item": "{{ site_url }}/quiz" },
-    { "@type": "ListItem", "position": 3, "name": "Chi è maggiore?", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
 <article class="page game-page wrap" id="contenuto">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   {% include "_game_subnav.html" %}
 

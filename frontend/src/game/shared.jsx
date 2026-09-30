@@ -111,8 +111,10 @@ export function trackGameEvent(name, params = {}) {
     page_title: document.title,
     ...params,
   };
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: name, ...eventParams });
+  // Un solo canale verso GA4: `gtag("event")`, che il Google Tag mette lui
+  // stesso nel dataLayer. Il container GTM (versione 8) non ha trigger sui
+  // nomi del quiz, quindi un `dataLayer.push` dell'oggetto si aggiungeva
+  // soltanto come secondo evento duplicato.
   if (typeof window.gtag === "function") {
     try {
       window.gtag("event", name, {
@@ -120,7 +122,7 @@ export function trackGameEvent(name, params = {}) {
         send_to: "G-THTPZZ02QH",
       });
     } catch {
-      // Se il Google Tag non è ancora disponibile, il push nel dataLayer resta.
+      // Le metriche non devono mai bloccare il gioco.
     }
   }
   try {
@@ -355,5 +357,206 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
         </form>
       )}
     </Modal>
+  );
+}
+
+// Forme del risultato condivisibile: il significato non sta mai nel solo
+// colore. Ogni forma ha un glifo per lo schermo e una parola per chi legge
+// con un lettore di schermo o incolla il testo in un posto senza emoji.
+export const FORME_RISULTATO = {
+  exact: { glifo: "●", parola: "esatta" },
+  higher: { glifo: "▲", parola: "più alta" },
+  lower: { glifo: "▼", parola: "più bassa" },
+  miss: { glifo: "○", parola: "sbagliata" },
+};
+
+export function formeRisultato(esiti) {
+  const lista = Array.isArray(esiti) ? esiti : [];
+  const valide = lista.map((esito) => FORME_RISULTATO[esito] || FORME_RISULTATO.miss);
+  return {
+    glifi: valide.map((forma) => forma.glifo).join(" "),
+    parole: valide.map((forma) => forma.parola).join(", "),
+  };
+}
+
+// Testo da condividere, senza spoiler: il numero della sfida, una riga di
+// forme, il link. Mai il nome della regione o il valore da indovinare.
+export function testoCondivisione({ gameName, puzzleNumber, esiti, summary, url }) {
+  const { glifi } = formeRisultato(esiti);
+  const titolo = puzzleNumber ? `${gameName} n. ${puzzleNumber}` : gameName;
+  return [titolo, summary, glifi, url].filter(Boolean).join("\n");
+}
+
+// Condividi: il bottone che condivide il risultato e dice com'è andata.
+//
+// Props
+//   gameName      string, nome del gioco ("Indovina la Regione"). Obbligatoria.
+//   puzzleNumber  number | string, numero della sfida. Opzionale.
+//   esiti         array di "exact" | "higher" | "lower" | "miss", uno per
+//                 tentativo o round, in ordine. Vuoto: nessuna riga di forme.
+//   summary       string, riga di sintesi senza spoiler ("4 su 6"). Opzionale.
+//   url           string, link alla pagina del gioco. Default: pagina corrente.
+//   eventName     string, evento GA4 al successo. Default "game_share".
+//   eventParams   object, parametri aggiuntivi dell'evento.
+//   label         string, testo del bottone. Default "Condividi".
+//
+// Usa `navigator.share` dove c'è, altrimenti gli appunti. L'esito è dichiarato
+// in una regione `aria-live="polite"`, visibile a tutti. Un annullamento del
+// foglio di condivisione non è un errore e non scrive niente.
+export function Condividi({
+  gameName,
+  puzzleNumber,
+  esiti = [],
+  summary = "",
+  url,
+  eventName = "game_share",
+  eventParams = {},
+  label = "Condividi",
+}) {
+  const [esito, setEsito] = useState("");
+  const { parole } = formeRisultato(esiti);
+
+  async function condividi() {
+    const link = url || (typeof window !== "undefined" ? window.location.href : "");
+    const text = testoCondivisione({ gameName, puzzleNumber, esiti, summary, url: link });
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ text });
+        setEsito("Risultato condiviso.");
+        trackGameEvent(eventName, { ...eventParams, method: "share" });
+        return;
+      } catch (error) {
+        if (error && error.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setEsito("Risultato copiato negli appunti.");
+      trackGameEvent(eventName, { ...eventParams, method: "clipboard" });
+    } catch {
+      setEsito("Non sono riuscito a condividere il risultato. Copia il testo a mano.");
+    }
+  }
+
+  return (
+    <div className="qz-condividi">
+      <button type="button" className="btn btn-primary" onClick={condividi}>
+        {label}
+      </button>
+      {parole && <span className="visually-hidden">Forme del risultato: {parole}.</span>}
+      <p className="qz-condividi-esito" role="status" aria-live="polite">
+        {esito}
+      </p>
+    </div>
+  );
+}
+
+// Secondi alla prossima sfida, ricalcolati ogni secondo. `iso` è
+// `next_puzzle_at` (ISO UTC). Con `iso` mancante o illeggibile dà null.
+export function useCountdown(iso) {
+  const target = iso ? Date.parse(iso) : NaN;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!Number.isFinite(target)) return undefined;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [target]);
+  if (!Number.isFinite(target)) return null;
+  return Math.max(0, Math.ceil((target - now) / 1000));
+}
+
+export function formatCountdown(secondi) {
+  const ore = Math.floor(secondi / 3600);
+  const minuti = Math.floor((secondi % 3600) / 60);
+  const sec = secondi % 60;
+  return [ore, minuti, sec].map((n) => String(n).padStart(2, "0")).join(":");
+}
+
+// FinePartita: la schermata che chiude una partita, uguale per i tre giochi.
+//
+// Props
+//   won            boolean, l'esito. Decide icona e parola, mai il colore da solo.
+//   titolo         string, riga di risultato ("Indovinata in 3 tentativi"). Obbligatoria.
+//   dettaglio      string, riga sotto il titolo. Opzionale.
+//   dato           oggetto del dato giusto, tutto insieme:
+//                    name         string, nome dell'indicatore
+//                    value        number, valore
+//                    unit         string, unità (passa da formatValue)
+//                    year         number | string, anno
+//                    sourceLabel  string, fonte in chiaro
+//                    sourceUrl    string, link alla fonte
+//                    description  string, "Che cosa misura" (la `description` del payload)
+//                    path         string, link canonico alla scheda indicatore
+//   territori      array di { name, path }, schede dei territori coinvolti.
+//   nextPuzzleAt   string ISO UTC, `next_puzzle_at`. Senza, niente countdown.
+//   condividi      props di <Condividi>. Senza, niente bottone Condividi.
+//   onPlayAgain    function, "Gioca ancora". Senza, il bottone non compare.
+//   playAgainLabel string, default "Gioca ancora".
+export function FinePartita({
+  won,
+  titolo,
+  dettaglio = "",
+  dato,
+  territori = [],
+  nextPuzzleAt,
+  condividi,
+  onPlayAgain,
+  playAgainLabel = "Gioca ancora",
+}) {
+  const secondi = useCountdown(nextPuzzleAt);
+  return (
+    <section className="qz-fine" aria-labelledby="qz-fine-titolo">
+      <h2 id="qz-fine-titolo" className="qz-fine-titolo">
+        <span aria-hidden="true">{won ? "✓" : "✗"}</span>{" "}
+        <span className="visually-hidden">{won ? "Giusto. " : "Sbagliato. "}</span>
+        {titolo}
+      </h2>
+      {dettaglio && <p className="qz-fine-dettaglio">{dettaglio}</p>}
+
+      {dato && (
+        <div className="qz-fine-dato">
+          <p className="qz-fine-valore">
+            <strong>{dato.name}</strong>: {formatValue(dato.value, dato.unit)}
+          </p>
+          <SourceStrip year={dato.year} sourceLabel={dato.sourceLabel} sourceUrl={dato.sourceUrl} />
+          {dato.description && (
+            <>
+              <h3 className="qz-fine-misura">Che cosa misura</h3>
+              <p>{dato.description}</p>
+            </>
+          )}
+          {dato.path && (
+            <p>
+              <a href={dato.path}>Apri la scheda dell'indicatore</a>
+            </p>
+          )}
+        </div>
+      )}
+
+      {territori.length > 0 && (
+        <ul className="qz-fine-territori" aria-label="Schede dei territori">
+          {territori.map((territorio) => (
+            <li key={territorio.path}>
+              <a href={territorio.path}>{territorio.name}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {secondi !== null && (
+        <p className="qz-fine-countdown" role="timer">
+          {secondi > 0 ? `Prossima sfida tra ${formatCountdown(secondi)}` : "La nuova sfida è pronta."}
+        </p>
+      )}
+
+      <div className="qz-fine-azioni">
+        {condividi && <Condividi {...condividi} />}
+        {onPlayAgain && (
+          <button type="button" className="btn" onClick={onPlayAgain}>
+            {playAgainLabel}
+          </button>
+        )}
+      </div>
+    </section>
   );
 }

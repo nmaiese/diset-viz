@@ -9,7 +9,7 @@
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-order.js') }}"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -18,7 +18,8 @@
   "description": "Quiz sugli indicatori territoriali Istat: metti in ordine le regioni italiane dal valore più alto al più basso.",
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "description": "Indicatori territoriali regionali pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
   "isAccessibleForFree": true
 }
 </script>
@@ -28,7 +29,6 @@
 {% block content %}
 <article class="page game-page wrap" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
 
   {% include "_game_subnav.html" %}
 
