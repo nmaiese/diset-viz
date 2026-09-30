@@ -72,13 +72,9 @@ def _provincia_indovinata(auth_id):
 
 
 def _giorni_di_fila(auth_id):
-    """La serie più lunga di giorni con almeno una sfida del giorno."""
-    with session_scope() as s:
-        giorni = set(s.execute(select(DailyResult.puzzle_date)
-                               .where(DailyResult.auth_id == auth_id)).scalars())
-        giorni |= set(s.execute(select(DailyScore.data)
-                                .where(DailyScore.auth_id == auth_id)).scalars())
-    return player_stats._daily_streaks(list(giorni))[1]
+    """La serie piu' lunga di giorni giocati (almeno una sfida del giorno), con il
+    giorno di riposo automatico: la definizione e' `player_stats.play_streak`."""
+    return player_stats.play_streak_for(auth_id)["max"]
 
 
 # id, icona (emoji), titolo, descrizione, criterio(stats_map) -> bool.
@@ -103,7 +99,7 @@ CATALOG = [
      "description": "Prima Regione del giorno indovinata.",
      "criterion": lambda s: s["daily"]["wins"] >= 1},
     {"id": "daily_streak_7", "icon": "📅", "title": "Costante",
-     "description": "7 sfide del giorno risolte di fila.",
+     "description": "7 giorni di fila con la Regione del giorno risolta",
      "criterion": lambda s: s["daily"]["max_daily_streak"] >= 7},
     {"id": "all_rounder", "icon": "🎖️", "title": "Tuttologo",
      "description": "Giocati tutti e tre i giochi.",
@@ -121,6 +117,18 @@ CATALOG = [
      "description": "30 giorni di fila con almeno una sfida del giorno.",
      "criterion": lambda s: s["_giorni_di_fila"] >= GIORNI_FEDELE},
 ]
+
+
+# I traguardi con una soglia: id -> (valore di chi gioca dalle statistiche, soglia). Ne
+# esce `progress: {value, target}` nella vetrina, col valore fermo alla soglia.
+PROGRESS = {
+    "compare_10": (lambda s: s["compare"]["best_streak"], 10),
+    "compare_25": (lambda s: s["compare"]["best_streak"], 25),
+    "order_10": (lambda s: s["order"]["best_streak"], 10),
+    "daily_streak_7": (lambda s: s["daily"]["max_daily_streak"], 7),
+    "veteran_50": (_total_rounds, 50),
+    "fedele": (lambda s: s["_giorni_di_fila"], GIORNI_FEDELE),
+}
 
 
 def _public(item, unlocked=False, unlocked_at=None):
@@ -177,4 +185,12 @@ def list_for(auth_id):
     """Intero catalogo con lo stato sblocco, per la vetrina (mostra anche quelli
     da conquistare)."""
     unlocked = unlocked_map(auth_id)
-    return [_public(item, item["id"] in unlocked, unlocked.get(item["id"])) for item in CATALOG]
+    stats = _stats_per_criteri(auth_id) if auth_id else None
+    voci = []
+    for item in CATALOG:
+        voce = _public(item, item["id"] in unlocked, unlocked.get(item["id"]))
+        if item["id"] in PROGRESS:
+            leggi, soglia = PROGRESS[item["id"]]
+            voce["progress"] = {"value": min(leggi(stats), soglia) if stats else 0, "target": soglia}
+        voci.append(voce)
+    return voci

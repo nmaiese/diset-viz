@@ -61,15 +61,28 @@ def record_quiz_answer(auth_id, mode, correct, best_streak):
         row.last_played_at = _now_iso()
 
 
+def _iso_days(dates):
+    """Le date ISO distinte, in ordine. Le righe storiche di `daily_results` con il
+    `puzzle_id` intero (`daily:2026-...`, `practice-...`) e ogni altra stringa non ISO
+    si ignorano: una sola riga cosi' non deve far cadere le statistiche dell'account."""
+    giorni = set()
+    for d in dates:
+        try:
+            giorni.add(date.fromisoformat(d))
+        except (TypeError, ValueError):
+            continue
+    return sorted(giorni)
+
+
 def _daily_streaks(solved_dates, today=None):
     """(current, max) run di giorni consecutivi risolti. `current` risale dalla
     data risolta piu' recente, cosi' l'ordine di arrivo non falsa il conteggio, e
     vale solo se quella data e' oggi o ieri (giorno di Roma): una serie ferma da due
-    giorni e' spezzata."""
-    if not solved_dates:
+    giorni e' spezzata. Le date non ISO si ignorano."""
+    days = _iso_days(solved_dates)
+    if not days:
         return 0, 0
     today = today or game_daily.oggi_roma()
-    days = sorted({date.fromisoformat(d) for d in solved_dates})
     longest = run = 1
     for prev, cur in zip(days, days[1:]):
         run = run + 1 if cur - prev == timedelta(days=1) else 1
@@ -83,6 +96,58 @@ def _daily_streaks(solved_dates, today=None):
         else:
             break
     return current, longest
+
+
+# Un giorno di riposo perdonato si puo' usare una volta ogni tanti giorni.
+RIPOSO_OGNI_GIORNI = 7
+
+
+def play_streak(dates, today=None):
+    """{"current", "max"}: la serie dei giorni giocati di fila. E' la definizione unica
+    di "serie" del gioco: un giorno conta se l'account ha giocato almeno una delle
+    quattro sfide del giorno (`daily_results` piu' `daily_scores`).
+
+    Un giorno di riposo e' automatico: la serie continua se fra due giorni giocati
+    manca al massimo UN giorno, e quel perdono si usa al massimo una volta ogni 7
+    giorni (due giorni perdonati devono distare almeno 7 giorni, altrimenti la serie si
+    spezza e ne riparte una nuova dal giorno giocato). La serie conta i giorni GIOCATI,
+    non quelli perdonati. Le date non ISO e quelle dopo `today` si ignorano, i doppioni
+    contano una volta. `current` vale solo se l'ultimo giorno giocato e' oggi o ieri.
+
+    Funzione pura: i vettori di prova stanno in `tests/fixtures/play_streak_cases.json`
+    e il frontend li legge con la stessa funzione in JS.
+    """
+    today = today or game_daily.oggi_roma()
+    days = [d for d in _iso_days(dates) if d <= today]
+    if not days:
+        return {"current": 0, "max": 0}
+    longest = run = 1
+    perdonato = None  # il giorno vuoto perdonato piu' di recente nella serie
+    for prev, cur in zip(days, days[1:]):
+        gap = (cur - prev).days
+        riposo = prev + timedelta(days=1)
+        if gap == 1:
+            run += 1
+        elif gap == 2 and (perdonato is None or (riposo - perdonato).days >= RIPOSO_OGNI_GIORNI):
+            run += 1
+            perdonato = riposo
+        else:
+            run, perdonato = 1, None
+        longest = max(longest, run)
+    current = run if today - days[-1] <= timedelta(days=1) else 0
+    return {"current": current, "max": longest}
+
+
+def play_streak_for(auth_id, today=None):
+    """`play_streak` dell'account: i giorni di `daily_results` e di `daily_scores`."""
+    if not auth_id:
+        return {"current": 0, "max": 0}
+    with session_scope() as s:
+        giorni = set(s.execute(select(DailyResult.puzzle_date)
+                               .where(DailyResult.auth_id == auth_id)).scalars())
+        giorni |= set(s.execute(select(DailyScore.data)
+                                .where(DailyScore.auth_id == auth_id)).scalars())
+    return play_streak(giorni, today)
 
 
 def record_daily(auth_id, puzzle_date, attempts, solved):

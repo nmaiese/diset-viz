@@ -2828,6 +2828,7 @@ def player_me_api():
     from app import player_stats, achievements
     try:
         stats = player_stats.stats_map(user["id"])
+        stats["play_streak"] = player_stats.play_streak_for(user["id"])
         unlocked = achievements.list_for(user["id"])
     except Exception:  # noqa: BLE001
         stats, unlocked = {}, []
