@@ -3,6 +3,9 @@ import csv
 import json
 import os
 import re
+import shutil
+import subprocess
+from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
 from unittest import mock
 
@@ -100,7 +103,7 @@ class GameTest(unittest.TestCase):
         for field in (
             "id", "name", "theme", "macro_area", "unit", "description",
             "value_explanation", "reading", "year", "value", "rank",
-            "region_count", "source_label", "source_url",
+            "region_count", "source_label", "source_url", "path",
         ):
             self.assertIn(field, first["clue"])
         self.assertGreaterEqual(first["clue"]["rank"], 1)
@@ -826,6 +829,52 @@ class QuizOrderTest(unittest.TestCase):
         sitemap = client.get("/sitemap.xml").data
         self.assertIn(b"/quiz/chi-e-maggiore", sitemap)
         self.assertIn(b"/quiz/ordina", sitemap)
+
+
+class IndizioCollegatoTest(unittest.TestCase):
+    """Il nome dell'indizio porta alla scheda dell'indicatore anche durante la
+    partita, non solo nel recap di fine partita."""
+
+    def test_clue_fields_espone_il_link_canonico(self):
+        from app import profiles
+
+        puzzle = game.build_puzzle("daily:2026-08-01")
+        self.assertEqual(len(puzzle["clues"]), 6)
+        for clue in puzzle["clues"]:
+            self.assertEqual(clue["path"], profiles.indicator_path(clue["id"], clue["name"]))
+            self.assertTrue(clue["path"].startswith("/indicatore/"), clue["path"])
+
+    def test_il_primo_indizio_e_il_successivo_portano_path(self):
+        client = app.test_client()
+        daily = client.get("/api/game/daily").get_json()
+        self.assertTrue(daily["clue"]["path"].startswith("/indicatore/"))
+        sbagliata = next(k for k in game_region_keys() if k != game.build_puzzle(daily["puzzle_id"])["region_key"])
+        risposta = client.post("/api/game/guess", json={
+            "puzzle_id": daily["puzzle_id"], "region_key": sbagliata, "attempt": 1,
+        }).get_json()
+        self.assertTrue(risposta["next_clue"]["path"].startswith("/indicatore/"))
+        self.assertEqual(risposta["recap"], None)
+
+    def test_il_recap_passa_i_testi_di_che_cosa_misura(self):
+        puzzle = game.build_puzzle("daily:2026-08-01")
+        for clue in puzzle["clues"]:
+            riga = game._recap_entry(clue)
+            for campo in ("description", "value_explanation", "reading"):
+                self.assertIn(campo, riga)
+            self.assertTrue(riga["description"], clue["id"])
+
+
+@unittest.skipUnless(shutil.which("node"), "serve node per provare la logica della serie")
+class SerieAGiorniTest(unittest.TestCase):
+    """La serie locale di Indovina conta giorni di fila con `lastWonDate` come il
+    server: la logica e' pura in `guess/serie.js` e la prova e' `serie.test.mjs`."""
+
+    def test_serie_js(self):
+        prova = Path(__file__).resolve().parents[2] / "frontend" / "src" / "game" / "guess" / "serie.test.mjs"
+        esito = subprocess.run(
+            ["node", "--test", str(prova)], capture_output=True, text=True, timeout=60, check=False
+        )
+        self.assertEqual(esito.returncode, 0, esito.stdout + esito.stderr)
 
 
 def game_region_keys():

@@ -187,6 +187,7 @@
 
 .game-input-row input {
   width: 100%;
+  min-height: 44px;
   padding: 12px 14px;
   border-radius: var(--radius-control);
   border: 1px solid var(--rule);
@@ -214,7 +215,7 @@
 
 .game-suggestions li + li { border-top: 1px solid var(--rule); }
 
-.game-suggestions button { width: 100%; text-align: left; padding: 10px 14px; border: 0; background: var(--bg); }
+.game-suggestions button { width: 100%; min-height: 44px; text-align: left; padding: 10px 14px; border: 0; background: var(--bg); }
 .game-suggestions button:hover,
 .game-suggestions button.is-highlighted { background: var(--game-wash); }
 
@@ -263,24 +264,27 @@
 
 /* ---------- Risultato finale ---------- */
 
-.game-result { border: 1px solid var(--rule); border-radius: var(--radius-control); padding: 20px; background: var(--bg); }
-.game-result h3 { margin-top: 0; }
+.game-result { display: flex; flex-direction: column; gap: 4px; }
 
-.game-result-region a { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--ink); }
 
-.game-result-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.game-recap { margin-top: 18px; }
+.game-recap h3 { margin: 0 0 8px; font-size: 16px; }
 
-.game-countdown {
+.game-recap-list { list-style: none; margin: 0; padding: 0; }
+.game-recap-list li { padding: 12px 0; border-top: 1px solid var(--rule); }
+.game-recap-list p { margin: 0; }
+.game-recap-nome { font-weight: 700; font-size: 14.5px; }
+.game-recap-valori {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin-top: 4px;
   font-family: var(--font-num); font-variant-numeric: tabular-nums;
   font-size: 13px;
-  color: var(--muted);
-  margin: 4px 0 14px;
+  color: var(--text-2);
 }
-
-.game-countdown span { color: var(--ink); font-weight: 700; }
-
-.game-recap { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-.game-recap th, .game-recap td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+.game-recap-misura { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+.game-recap-misura strong { color: var(--ink); }
 
 .game-stats-inline { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
 
@@ -374,6 +378,100 @@
   .qz-clues td { padding: 12px 10px; }
   .qz-clues .n { width: 26px; }
 }
+
+/* ---------- Onboarding in una schermata ---------- */
+
+.game-onboarding-aree { margin: 0 0 14px; padding-left: 20px; font-weight: 600; }
+
+/* ---------- Fine partita uniforme (FinePartita e Condividi, shared.jsx) ---------- */
+
+.qz-fine {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 20px;
+  background: var(--bg);
+}
+.qz-fine-titolo { margin: 0 0 6px; font-size: 22px; }
+.qz-fine-dettaglio { margin: 0 0 12px; color: var(--text-2); }
+.qz-fine-dato { margin: 0 0 12px; }
+.qz-fine-dato p { margin: 0 0 6px; }
+.qz-fine-misura { margin: 10px 0 4px; font-size: 14px; }
+.qz-fine-territori { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.qz-fine-territori a,
+.qz-fine-azioni .btn,
+.qz-condividi .btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.qz-fine-azioni .btn:hover,
+.qz-fine-territori a:hover { border-color: var(--game-accent); background: var(--game-wash); }
+.qz-condividi .btn,
+.qz-condividi .btn-primary { background: var(--game-accent); border-color: var(--game-accent); color: var(--game-on-accent); }
+.qz-condividi .btn:hover { background: var(--game-accent-strong); border-color: var(--game-accent-strong); }
+.qz-fine-countdown {
+  margin: 0 0 12px;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--muted);
+}
+.qz-fine-azioni { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+.qz-condividi { display: flex; flex-direction: column; gap: 6px; }
+.qz-condividi-esito { margin: 0; min-height: 1.3em; font-size: 12.5px; color: var(--muted); }
+
+.qz-clues a, .qz-clue-desc a { text-decoration: underline; text-underline-offset: 2px; }
+
+
+/* ---------- Bersagli da 44 px (WCAG 2.5.8) ---------- */
+
+.guess-app .game-tab,
+.guess-app .game-btn { min-height: 44px; }
+.guess-app .game-icon-btn { width: 44px; height: 44px; }
+.game-tab:disabled { opacity: 0.55; cursor: default; }
+
+/* ---------- Indovina la Provincia ---------- */
+
+.game-livello-nota,
+.game-regione-nota { margin: 0; font-size: 13px; color: var(--text-2); }
+.game-regione-nota { font-size: 15px; color: var(--ink); }
+
+.prov-map .prov-tile {
+  fill: var(--data-null);
+  stroke: var(--bg);
+  stroke-width: var(--prov-tratto, 0.8);
+}
+.prov-map .prov-tile.is-context { fill: var(--surface-2); opacity: 0.55; }
+.prov-map .prov-tile.is-guessed-wrong { fill: url(#prov-tratteggio); }
+.prov-map .prov-tile.is-guessed-correct,
+.prov-map .prov-tile.is-mystery { fill: var(--game-right); stroke: var(--ink); }
+.prov-tratteggio-fondo { fill: var(--game-wrong-wash); }
+.prov-tratteggio-riga { stroke: var(--game-wrong); stroke-width: 2; }
+
+/* Il numero del tentativo e la forma: un rombo per chi ha sbagliato, un cerchio
+   per la provincia giusta. */
+.prov-segno rect,
+.prov-segno circle { stroke: var(--ink); stroke-width: 1; }
+.prov-segno.is-sbagliato rect { fill: var(--bg); }
+.prov-segno.is-giusto circle { fill: var(--game-right-wash); }
+.prov-segno text { fill: var(--ink); font-family: var(--font-num); font-weight: 700; pointer-events: none; }
+.prov-freccia line,
+.prov-freccia polyline { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+.guess-titolo { display: flex; align-items: center; gap: 8px; margin: 0; }
+.guess-icona { flex: 0 0 auto; }
+.guess-esito { margin-left: auto; font-size: 12px; color: var(--muted); }
+.guess-distanza { margin: 6px 0 0; font-size: 13.5px; color: var(--text-2); }
+.guess-freccia { display: inline-block; width: 1.3em; font-weight: 700; color: var(--ink); }
+.guess-confronto { margin-top: 8px; }
+.guess-confronto summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 13px; color: var(--text-2); }
+.game-stats-numbers--due { grid-template-columns: repeat(2, 1fr); }
 
 /* Il movimento, solo a chi non ha chiesto di ridurlo. */
 @media (prefers-reduced-motion: no-preference) {

@@ -125,6 +125,9 @@ def _clue_fields(item):
         "region_count": item["region_count"],
         "source_label": item["source_label"],
         "source_url": item["source_url"],
+        # Il link canonico alla scheda, cosi' il nome dell'indizio e' una
+        # porta verso il dato anche durante la partita, non solo a fine gioco.
+        "path": profiles.indicator_path(item["id"], item["name"]),
     }
 
 
