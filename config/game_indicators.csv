@@ -3,25 +3,22 @@ id;famiglia;nome_leggibile;unita;livello_regione;livello_provincia;note
 902;reddito;Reddito disponibile delle famiglie per abitante;euro;1;0;
 multiscopo:MULTI_REDD_MEDIANO;reddito;Reddito netto mediano di una famiglia in un anno;euro;1;0;
 multiscopo:MULTI_ABIT_SPESA_EURO;abitazione;Spesa media mensile per la casa;euro al mese;1;0;
-631;reddito;Persone in povertà relativa;percentuale;1;0;dubbio: il termine povertà relativa va spiegato nel testo di fine partita
+631;reddito;Persone in povertà relativa;percentuale;1;0;da spiegare a fine partita: povertà relativa
 multiscopo:MULTI_DISAGIO_IMPREVISTI;reddito;Famiglie che non reggono una spesa imprevista;percentuale;1;0;
 multiscopo:MULTI_DISAGIO_RISPARMIO;reddito;Famiglie che non riescono a risparmiare;percentuale;1;0;
 12;lavoro;Tasso di disoccupazione;percentuale;1;0;
 15;lavoro;Tasso di disoccupazione giovanile;percentuale;1;0;
-345;lavoro;Occupati tra i 20 e i 64 anni;percentuale;1;0;
-407;lavoro;Tasso di occupazione giovanile;percentuale;1;0;dubbio: fascia d'età non dichiarata nel nome della fonte
-408;lavoro;Giovani che non studiano e non lavorano;percentuale;1;0;
 57;lavoro;Distanza tra occupazione maschile e femminile;punti percentuali;1;0;
 402;imprese;Imprese guidate da donne;percentuale;1;0;
-bes:03LAV001-N22;lavoro;Occupati tra i 20 e i 64 anni (indagine BES);percentuale;1;1;doppione di 345 con altra fonte, tenerne uno
-bes:03LAV002-N22;lavoro;Persone che vorrebbero lavorare e non lavorano;percentuale;1;1;dubbio: nome tecnico della fonte è tasso di mancata partecipazione al lavoro
+bes:03LAV001-N22;lavoro;Occupati tra i 20 e i 64 anni;percentuale;1;1;
+bes:03LAV002-N22;lavoro;Persone che vorrebbero lavorare e non lavorano;percentuale;1;1;da spiegare a fine partita: nome della fonte, tasso di mancata partecipazione al lavoro
 339;istruzione;Laureati tra i 30 e i 34 anni;percentuale;1;0;
 bes:02IST002-N22;istruzione;Adulti con almeno il diploma;percentuale;1;1;
 bes:02IST005-N22;istruzione;Giovani che lasciano presto la scuola;percentuale;1;0;
-bes:02IST006-N22;istruzione;Giovani che non studiano e non lavorano (indagine BES);percentuale;1;1;doppione di 408, tenerne uno
+bes:02IST006-N22;istruzione;Giovani che non studiano e non lavorano;percentuale;1;1;
 bes:02IST007-N22;istruzione;Adulti che seguono corsi di formazione;percentuale;1;1;
 bes:02IST023;cultura;Persone che leggono libri e quotidiani;percentuale;1;0;
-bes:SDG-310;istruzione;Studenti di terza media deboli in matematica;percentuale;1;0;dubbio: la fonte dice competenza numerica non adeguata
+bes:SDG-310;istruzione;Studenti di terza media deboli in matematica;percentuale;1;0;da spiegare a fine partita: la fonte dice competenza numerica non adeguata
 910;salute;Speranza di vita alla nascita;anni;1;0;
 bes:01SAL002;salute;Anni di vita in buona salute alla nascita;anni;1;0;
 bes:01SAL009;salute;Persone in eccesso di peso;per 100 persone;1;0;
@@ -30,11 +27,11 @@ bes:01SAL012;salute;Persone sedentarie;per 100 persone;1;0;
 multiscopo:MULTI_BMI_OBESI;salute;Adulti obesi;percentuale;1;0;
 590;salute;Pazienti che si curano in un'altra regione;percentuale;1;0;
 920;demografia;Età media della popolazione;anni;1;0;
-921;demografia;Anziani ogni 100 giovani;per 100 giovani;1;0;dubbio: è l'indice di vecchiaia, il rapporto tra over 65 e under 15
+921;demografia;Anziani ogni 100 giovani;per 100 giovani;1;0;da spiegare a fine partita: indice di vecchiaia, rapporto tra over 65 e under 15
 922;demografia;Figli per donna;numero medio;1;0;
 dem:POP65OVER;demografia;Popolazione con più di 65 anni;percentuale;1;0;
 dem:POP014;demografia;Bambini e ragazzi fino a 14 anni;percentuale;1;0;
-923;demografia;Chi arriva meno chi parte ogni 1.000 abitanti;per 1.000 abitanti;1;0;dubbio: saldo migratorio totale, nome da rendere più chiaro
+923;demografia;Saldo migratorio: chi arriva meno chi parte, ogni 1.000 abitanti;per 1.000 abitanti;1;0;da spiegare a fine partita: saldo migratorio totale
 dem:MEANAGECH;demografia;Età media della madre al parto;anni;1;0;
 dem:BIRTHRATE;demografia;Nascite ogni 1.000 abitanti;per 1.000 abitanti;1;0;
 dem:MARRATE;demografia;Matrimoni ogni 1.000 abitanti;per 1.000 abitanti;1;0;
@@ -51,7 +48,6 @@ dem:MARRATE;demografia;Matrimoni ogni 1.000 abitanti;per 1.000 abitanti;1;0;
 multiscopo:MULTI_ICT_BANDA_LARGA;digitale;Famiglie con connessione a banda larga;percentuale;1;0;
 279;sicurezza;Furti denunciati ogni 1.000 abitanti;per 1.000 abitanti;1;0;
 280;sicurezza;Rapine denunciate ogni 1.000 abitanti;per 1.000 abitanti;1;0;
-281;sicurezza;Omicidi ogni 100.000 abitanti;per 100.000 abitanti;1;0;dubbio: valori piccoli e molti pareggi a zero, il filtro sui valori distinti lo gestisce ma la sfida resta poco leggibile
 542;giustizia;Durata dei processi nei tribunali;giorni;1;0;
 multiscopo:MULTI_ABIT_PROPRIETA;abitazione;Famiglie proprietarie della casa;percentuale;1;0;
 multiscopo:MULTI_ABIT_AFFITTO;abitazione;Famiglie in affitto;percentuale;1;0;
@@ -61,7 +57,6 @@ multiscopo:MULTI_ZONA_INQUINAMENTO;ambiente;Famiglie che lamentano inquinamento 
 bes:08BSO001;benessere;Persone molto soddisfatte della propria vita;percentuale;1;0;
 bes:05REL006;benessere;Persone che fanno volontariato;percentuale;1;0;
 bes:06POL007;istituzioni;Donne tra gli amministratori locali;percentuale;1;0;
-bes:11RIC003-N22;lavoro;Lavoratori della conoscenza ogni 100 occupati;per 100 occupati;1;0;dubbio: il nome lavoratori della conoscenza è astratto
 54;imprese;Nuove imprese ogni 100 esistenti;percentuale;1;0;
 123;imprese;Valore prodotto per occupato nell'industria;migliaia di euro;1;0;
 01SAL001;salute;Speranza di vita alla nascita;anni;0;1;
