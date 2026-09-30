@@ -5,7 +5,11 @@ nickname moderati e niente id, e un anonimo non ci compare. I tre traguardi nuov
 si provano su righe vere di `daily_results` e `daily_scores`, un caso che li
 sblocca e uno che no."""
 
+import html
+import json
+import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from datetime import date, datetime, timedelta, timezone
@@ -13,7 +17,7 @@ from pathlib import Path
 
 import jwt
 
-from app import accounts, achievements, app, config, game, game_daily, game_provincia, player_stats
+from app import accounts, achievements, app, config, game, game_daily, game_provincia, player_stats, profiles, province_profile
 from app.cache import cache
 from app.db import session_scope
 from app.models import DailyResult, DailyScore
@@ -241,6 +245,98 @@ class HubPaginaTest(unittest.TestCase):
             self.assertIn(f'data-gioco="{gioco}"', html)
         self.assertIn("data-oggi-countdown", html)
         self.assertNotIn("Come funziona il quiz", html)
+
+
+class NotaDellHubTest(unittest.TestCase):
+    def test_la_nota_non_dice_che_le_classifiche_vogliono_un_account(self):
+        """Le classifiche accettano un nickname anche senza account (SubmitScoreModal): la frase
+        "solo chi ha un account compare nelle classifiche" era un residuo della scheda Oggi."""
+        html = app.test_client().get("/quiz").get_data(as_text=True)
+        self.assertNotIn("solo chi ha un account compare", html)
+        self.assertIn("anche senza account, con un nickname", html)
+
+
+class TerritorioMioRealeTest(unittest.TestCase):
+    """`parseTerritorioMio` su ogni chiave e ogni nome veri: i bottoni "E' la mia" delle 20
+    regioni e delle 107 province, resi dal server, scritti come li scrive `v1.js` e riletti dal
+    parser. Un valore vero rifiutato vorrebbe dire una funzione che non parte mai per quel
+    territorio, senza che niente fallisca."""
+
+    _ATTRIBUTO = re.compile(r'data-([\w-]+)="([^"]*)"')
+
+    def _payload(self, client, livello, chiave):
+        html_pagina = client.get(f"/{livello}/{chiave}").get_data(as_text=True)
+        bottone = re.search(r"<button[^>]*data-mine-set[^>]*>", html_pagina)
+        self.assertIsNotNone(bottone, f"{livello}/{chiave}: nessun bottone \"E' la mia\"")
+        a = {k: html.unescape(v) for k, v in self._ATTRIBUTO.findall(bottone.group(0))}
+        v = {"level": a["level"], "key": a["key"], "name": a["name"]}
+        if "region" in a:
+            v["region"], v["regionName"] = a["region"], a["region-name"]
+        return v
+
+    @unittest.skipUnless(shutil.which("node"), "serve node per eseguire puri.js")
+    def test_tutti_i_territori_veri_passano_il_parser(self):
+        client = app.test_client()
+        payload = [self._payload(client, "regione", r["region_key"]) for r in profiles.all_regions_index()]
+        payload += [self._payload(client, "provincia", p["key"])
+                    for lista in province_profile.by_region().values() for p in lista]
+        script = (
+            "import { parseTerritorioMio } from %s;"
+            "const letti = JSON.parse(await new Promise((ok) => { let s = ''; process.stdin.on('data', (d) => s += d);"
+            " process.stdin.on('end', () => ok(s)); }));"
+            "console.log(JSON.stringify(letti.filter((v) => JSON.stringify(parseTerritorioMio(JSON.stringify(v))) !== JSON.stringify(v))));"
+        ) % json.dumps((_ROOT / "frontend" / "src" / "game" / "puri.js").as_uri())
+        r = subprocess.run(["node", "--input-type=module", "-e", script], input=json.dumps(payload),
+                           capture_output=True, text=True, timeout=60)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(json.loads(r.stdout), [], "territori veri che il parser rifiuta o altera")
+        self.assertEqual(len([v for v in payload if v["level"] == "regione"]), len(profiles.all_regions_index()))
+        self.assertEqual(len([v for v in payload if v["level"] == "provincia"]), len(game_daily.province_pool()))
+
+
+class ClassificaSenzaSchedaOggiTest(unittest.TestCase):
+    """La scheda "Oggi" della classifica se n'e' andata con la sua rotta: niente testo che la
+    promette, niente codice che la chiama."""
+
+    def test_la_pagina_non_promette_piu_la_scheda_oggi(self):
+        html = app.test_client().get("/quiz/classifica").get_data(as_text=True)
+        self.assertNotIn('La scheda "Oggi"', html)
+        self.assertNotIn("La scheda &#34;Oggi&#34;", html)
+        self.assertNotIn("ora di arrivo", html)
+        self.assertIn("Come funziona", html)
+
+    def test_il_frontend_non_chiama_la_rotta_che_non_c_e(self):
+        sorgente = (_ROOT / "frontend" / "src" / "game" / "leaderboard.jsx").read_text(encoding="utf-8")
+        for traccia in ("daily/leaderboard", "ClassificaOggi", "statoOggi", '"oggi"', "oraArrivo"):
+            self.assertNotIn(traccia, sorgente)
+
+    def test_le_due_classifiche_che_restano_rispondono(self):
+        client = app.test_client()
+        for modo in ("compare", "order"):
+            r = client.get(f"/api/game/leaderboard?mode={modo}&period=week&limit=4")
+            self.assertEqual(r.status_code, 200, modo)
+
+
+class SerieDellHubTest(Base):
+    """L'hub mostra la serie del profilo (`stats.play_streak`) con il login e quella locale senza."""
+
+    def test_il_profilo_porta_play_streak_con_il_riposo(self):
+        oggi = self.oggi
+        for giorni_fa in (4, 3, 1, 0):  # un giorno vuoto in mezzo, perdonato
+            player_stats.record_daily("uuid-serie", (oggi - timedelta(days=giorni_fa)).isoformat(), 2, True)
+        r = app.test_client().get("/api/player/me", headers={"Authorization": f"Bearer {_jwt('uuid-serie')}"})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["stats"]["play_streak"], {"current": 4, "max": 4})
+
+    def test_l_hub_legge_play_streak_e_non_la_serie_di_indovina(self):
+        sorgente = (_ROOT / "frontend" / "src" / "game" / "hub.jsx").read_text(encoding="utf-8")
+        self.assertIn("play_streak", sorgente)
+        self.assertNotIn("current_daily_streak", sorgente)
+
+    def test_il_testo_del_traguardo_della_serie_dice_il_vero(self):
+        descrizioni = {v["id"]: v["description"] for v in achievements.list_for("nessuno")}
+        self.assertIn("7 giorni di fila con la Regione del giorno risolta", descrizioni["daily_streak_7"])
+        self.assertIn("almeno una sfida del giorno", descrizioni["fedele"])
 
 
 if __name__ == "__main__":

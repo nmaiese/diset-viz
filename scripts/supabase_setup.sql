@@ -76,6 +76,10 @@ DROP POLICY IF EXISTS own_daily_scores ON public.daily_scores;
 -- come scores: RLS attiva e nessuna policy, il browser non la legge ne' la scrive.
 ALTER TABLE public.quiz_answered ENABLE ROW LEVEL SECURITY;
 
+-- daily_counter (migrazione 0011): i contatori aggregati delle sfide finite, solo backend.
+-- DENY-ALL come scores: RLS attiva e nessuna policy, il browser non la legge ne' la scrive.
+ALTER TABLE public.daily_counter ENABLE ROW LEVEL SECURITY;
+
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si
 -- connette come `postgres`, che ha BYPASSRLS: la RLS non lo tocca. NON aggiungere

@@ -1,7 +1,9 @@
 """RLS di `scripts/supabase_setup.sql` (R1 punto 8): il server scrive i punteggi con il suo
 ruolo (BYPASSRLS), quindi il browser, con la chiave anon e il suo JWT, non deve poter
-scrivere `daily_scores`, `daily_results`, `player_stats` e `achievements`. Un controllo sul
-testo: Postgres vero non c'e' in questa suite."""
+scrivere `daily_scores`, `daily_results`, `player_stats` e `achievements`. `daily_counter`
+(migrazione 0011, i contatori aggregati delle sfide finite) e' DENY-ALL come `scores`: il
+browser non la legge ne' la scrive. Un controllo sul testo: Postgres vero non c'e' in questa
+suite."""
 
 import re
 import unittest
@@ -15,6 +17,20 @@ class RlsScrittureTest(unittest.TestCase):
         self.assertIn("ALTER TABLE public.daily_scores ENABLE ROW LEVEL SECURITY;", SQL)
         self.assertEqual(re.findall(r"CREATE POLICY \w+\s+ON public\.daily_scores\b", SQL), [])
         self.assertIn("DROP POLICY IF EXISTS own_daily_scores ON public.daily_scores;", SQL)
+
+    def test_daily_counter_e_deny_all(self):
+        """I contatori li scrive solo il server: RLS attiva e nessuna policy, per nessun ruolo."""
+        self.assertIn("ALTER TABLE public.daily_counter ENABLE ROW LEVEL SECURITY;", SQL)
+        self.assertEqual(re.findall(r"CREATE POLICY \w+\s+ON public\.daily_counter\b", SQL), [])
+
+    def test_ogni_tabella_dell_app_ha_la_rls_attiva(self):
+        """Una tabella nuova senza la sua riga resterebbe aperta all'anon key: il controllo
+        parte dai modelli, non da un elenco scritto qui."""
+        from app.models import Base
+
+        for tabella in sorted(Base.metadata.tables):
+            with self.subTest(tabella=tabella):
+                self.assertRegex(SQL, rf"ALTER TABLE public\.{tabella}\s+ENABLE ROW LEVEL SECURITY;")
 
     def test_le_tabelle_scritte_dal_server_si_leggono_soltanto(self):
         for tabella in ("daily_results", "player_stats", "achievements"):

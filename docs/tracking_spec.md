@@ -379,6 +379,8 @@ Eventi gioco oggi previsti:
 | `hub_mode_click` | click su una modalità dal hub | navigazione |
 | `quiz_source_click` | click sulla fonte del round | fiducia e approfondimento |
 | `achievement_unlocked` | toast di un traguardo sbloccato (solo con login) | motivazione e retention |
+| `challenge_open` | il riquadro "La sfida condivisa" compare in cima al gioco (dal 1 ottobre 2026) | quante sfide condivise vengono aperte |
+| `challenge_finish` | fine di una partita aperta da una sfida condivisa (dal 1 ottobre 2026) | quante vengono giocate fino in fondo, e come vanno |
 
 Parametri gioco da registrare in GA4:
 
@@ -398,6 +400,32 @@ Parametri gioco da registrare in GA4:
 | `correct` | true, false |
 | `won` | true, false |
 | `achievement_id` | identificativo del traguardo sbloccato |
+| `game` | il gioco: `regione`, `provincia`, `compare`, `order`, `mappa` (vedi sotto) |
+| `outcome` | `superata`, `pari`, `sotto`: il tuo punteggio messo a confronto con la sfida condivisa (solo `challenge_finish`) |
+
+### Il parametro `game`
+
+Dal 1 ottobre 2026 ogni evento del gioco porta `game`, e `trackGameEvent`
+(`frontend/src/game/shared.jsx`) lo chiede: senza, o con un valore fuori dai cinque, l'evento
+parte lo stesso ma senza il parametro, e in sviluppo la console lo segnala. Così un rapporto
+per gioco non dipende dal prefisso del nome dell'evento (`compare_answer`, `order_answer`,
+`game_finish` di Indovina). Un evento che non appartiene a un gioco solo (`achievement_unlocked`
+sbloccato dall'hub al login) non lo porta. Registrare `game` come dimensione personalizzata
+a livello di evento in GA4.
+
+### La sfida condivisa
+
+`Condividi` aggiunge al link un **frammento**, `#sfida=<punteggio>-<numero>`, con il punteggio di
+chi condivide e il numero della sfida del giorno, mai un nome. Un frammento e non una query:
+la query finisce nei log del server insieme all'IP, il frammento non lascia il browser. Chi
+apre il link vede "La sfida condivisa: 7 su 10. Riesci a superarla?" (il punteggio non è
+firmato, quindi il testo non dice chi l'ha fatto), e all'avvio della partita il frammento si
+toglie dall'URL, così chi ricondivide non ripropaga il punteggio di un altro. Niente va al
+server. `challenge_open` parte quando il riquadro compare (frammento valido: un solo
+frammento, cifre ASCII, punteggio fra 0 e il massimo del gioco, numero uguale a quello di oggi),
+`challenge_finish` quando la partita finisce, con `score` (il tuo) e `outcome`. Il punteggio
+della sfida ricevuta non sta in nessuno dei due: anche gli eventi finiscono nel log del server
+(`/api/events`) accanto all'IP, ed è proprio quello che il frammento serve a evitare.
 
 ## GA4
 

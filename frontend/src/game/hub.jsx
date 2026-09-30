@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AuthControl, fetchJson, formatCountdown, trackGameEvent, notifyAchievements } from "./shared.jsx";
 import { GIOCHI, serieLocale, statoOggi } from "./oggi.js";
+import { giorniDiFila } from "./puri.js";
 import { getAccessToken, getUser, isAuthConfigured, mergeLocalStatsOnce, onAuthChange } from "../shared/supabase.js";
 
 // Un'icona SVG che prende il colore del testo: il file e' una maschera, cosi'
@@ -80,7 +81,7 @@ function AchievementsPanel({ account }) {
   if (account.fase === "anonimo") return null;
   if (account.fase === "caricamento") {
     return (
-      <div className="qz-stats" aria-busy="true">
+      <div className="qz-stats" id="traguardi" aria-busy="true">
         <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi</p>
         <div className="skel-bars" style={{ marginTop: 14 }} aria-hidden="true"><span style={{ height: 14, width: "60%" }} /></div>
       </div>
@@ -88,7 +89,7 @@ function AchievementsPanel({ account }) {
   }
   if (account.fase === "errore") {
     return (
-      <div className="qz-stats">
+      <div className="qz-stats" id="traguardi">
         <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi</p>
         <Errore testo="Non riesco a caricare i tuoi traguardi." onRiprova={account.riprova} />
       </div>
@@ -98,7 +99,7 @@ function AchievementsPanel({ account }) {
   if (lista.length === 0) return null;
   const sbloccati = lista.filter((a) => a.unlocked).length;
   return (
-    <div className="qz-stats">
+    <div className="qz-stats" id="traguardi">
       <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi · {sbloccati}/{lista.length}</p>
       <div className="achv-grid">
         {lista.map((a) => (
@@ -139,6 +140,10 @@ function useHubStats() {
   return stats;
 }
 
+// Il `game` degli eventi, dal `data-gioco` della card (Indovina la Regione e' "indovina" nel
+// markup e "regione" negli eventi).
+const GIOCO_EVENTO = { indovina: "regione", provincia: "provincia", compare: "compare", order: "order" };
+
 // Le card modalità sono server-rendered (indicizzabili): qui aggiungiamo solo
 // il tracciamento evento, senza duplicarne il markup in React.
 function useHubCardTracking() {
@@ -146,7 +151,8 @@ function useHubCardTracking() {
     const cards = document.querySelectorAll(".hub-card");
     function onClick(event) {
       const mode = event.currentTarget.getAttribute("href");
-      trackGameEvent("hub_mode_click", { mode });
+      const scheda = event.currentTarget.closest("[data-gioco]");
+      trackGameEvent("hub_mode_click", { mode, game: GIOCO_EVENTO[scheda && scheda.dataset.gioco] });
     }
     cards.forEach((card) => card.addEventListener("click", onClick));
     return () => cards.forEach((card) => card.removeEventListener("click", onClick));
@@ -214,13 +220,20 @@ function SfidaDiOggi({ account }) {
     setSerie(serieLocale());
   }, []);
 
-  // Chi ha il login ha la serie dal profilo (ricalcolata dal server), gli altri
-  // quella di questo dispositivo.
-  const serieProfilo = account.dati && account.dati.stats && account.dati.stats.daily
-    ? account.dati.stats.daily.current_daily_streak : null;
-  const giorni = serieProfilo !== null && serieProfilo !== undefined ? serieProfilo : serie;
+  // Chi ha il login ha la serie dal profilo (`stats.play_streak`, ricalcolata dal server con il
+  // riposo di un giorno), gli altri quella di questo dispositivo (`playStreak`, stessa regola).
+  const giorni = giorniDiFila(account.dati && account.dati.stats ? account.dati.stats.play_streak : null, serie);
 
   const b = useBersagli();
+  // La classe sulla card e' un effetto, non un gesto del render: React puo' rifare un render.
+  useEffect(() => {
+    if (!b || !esiti) return;
+    GIOCHI.forEach((gioco) => {
+      const el = b.giochi[gioco];
+      const card = el && el.closest("[data-gioco]");
+      if (card) card.classList.toggle("is-giocata", Boolean(esiti[gioco]));
+    });
+  }, [b, esiti]);
   if (!b) return null;
   return (
     <>
@@ -242,7 +255,6 @@ function SfidaDiOggi({ account }) {
       {esiti && GIOCHI.map((gioco) => {
         const el = b.giochi[gioco];
         if (!el) return null;
-        el.closest("[data-gioco]").classList.toggle("is-giocata", Boolean(esiti[gioco]));
         return createPortal(<StatoGioco esito={esiti[gioco]} />, el, gioco);
       })}
     </>
