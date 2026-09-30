@@ -99,18 +99,30 @@ class TestDatiStrutturati(unittest.TestCase):
                 self.assertTrue(places and places[0])
                 self.assertIn(places[0], h1)
 
-    def test_ogni_dataset_annidato_ha_descrizione_e_licenza(self):
-        """Search Console segnala come errore un Dataset senza `description` e
-        come avviso uno senza `license`, anche quando e' solo la fonte in
-        `isBasedOn` di un altro Dataset."""
-        for path, (_, page) in self.pages.items():
-            for node in (n for b in _blocks(page) for n in _nodes(b) if n.get("@type") == "Dataset"):
-                sources = node.get("isBasedOn") or []
-                for source in sources if isinstance(sources, list) else [sources]:
-                    if isinstance(source, dict) and source.get("@type") == "Dataset":
-                        with self.subTest(path=path, source=source.get("name")):
-                            self.assertTrue(source.get("description"))
-                            self.assertTrue(source.get("license"))
+    def test_ogni_dataset_a_ogni_livello_ha_i_campi_che_search_console_chiede(self):
+        """Search Console segnala un Dataset senza `description` (errore),
+        `license` o `creator` (avvisi), anche annidato in `isBasedOn` o in
+        `DataCatalog.dataset`, e una `license` che non e' un URL."""
+        pages = dict(self.pages)
+        pages["/catalogo-dati"] = (200, app.test_client().get("/catalogo-dati").get_data(as_text=True))
+
+        def datasets(node):
+            if isinstance(node, dict):
+                if node.get("@type") == "Dataset":
+                    yield node
+                for value in node.values():
+                    yield from datasets(value)
+            elif isinstance(node, list):
+                for item in node:
+                    yield from datasets(item)
+
+        for path, (_, page) in pages.items():
+            for block in _blocks(page):
+                for node in datasets(block):
+                    with self.subTest(path=path, dataset=node.get("name")):
+                        self.assertTrue(node.get("description"))
+                        self.assertTrue(node.get("creator"))
+                        self.assertRegex(str(node.get("license")), r"^https://")
 
 
 if __name__ == "__main__":

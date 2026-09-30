@@ -673,7 +673,18 @@ def data_catalog():
         # Organization anonima: un solo publisher, collegato, in tutto il grafo.
         "publisher": publisher.ORGANIZATION,
         "dataset": [
-            {"@type": "Dataset", "name": item["name"], "url": item["url"]}
+            {
+                "@type": "Dataset",
+                "name": item["name"],
+                "url": item["url"],
+                "description": (
+                    f"Scheda dell'indicatore {item['name']}"
+                    + (f", fonte {item['source']}" if item["source"] else "")
+                    + ": valori per territorio, con anno e confronto."
+                ),
+                "license": sources.LICENSE_URL,
+                "creator": {"@type": "Organization", "name": item["source"] or SITE_NAME},
+            }
             for item in datasets
         ],
     }
