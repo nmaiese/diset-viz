@@ -48,15 +48,15 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from app import bes_data, game_daily, quiz, quiz_tokens
+from app import bes_data, game_daily, quiz, quiz_tokens, sources
 from app.game_daily import LIVELLI, oggi_roma
 
 MODO = "compare"
 COPPIE = game_daily.COMPARE_COPPIE
-# Etichetta e link della fonte per i livelli con le province, che non passano da
-# quiz.evaluate_compare. Stessa fonte di bes_data.BES_SOURCE_URLS: nome
-# dell'istituzione prima del nome della serie.
-FONTE_PROVINCE = "Istat, BES dei territori"
+# Etichetta della fonte per i livelli con le province, che non passano da
+# quiz.evaluate_compare: viene da app/sources.py, l'unica fonte di verita' dei
+# nomi (un'etichetta scritta qui ha gia' pubblicato una serie sotto un altro nome).
+FONTE_PROVINCE = sources.SOURCES["bes"]["label"]
 # La scheda del territorio: la stessa forma degli altri giochi (`/regione/<key>`
 # e `/provincia/<key>`).
 PERCORSI = {"regioni": "/regione/", "stessa_regione": "/provincia/", "province": "/provincia/"}

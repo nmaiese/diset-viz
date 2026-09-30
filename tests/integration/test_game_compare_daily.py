@@ -13,7 +13,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
-from app import app, config, game_compare, game_daily, quiz, quiz_tokens
+from app import app, config, game_compare, game_daily, quiz, quiz_tokens, sources
 from app.cache import cache
 
 T0 = 1_800_000_000.0
@@ -248,6 +248,13 @@ class ValutazioneTest(Base):
             self.assertEqual(corpo["level"], livello)
             self.assertTrue(corpo["indicator"]["path"].startswith("/indicatore/"))
             self.assertTrue(corpo["indicator"]["description"])
+
+    def test_a_livello_province_la_fonte_viene_da_sources(self):
+        # L'etichetta di una fonte sta in un posto solo (app/sources.py).
+        sessione = self._sessione("province")
+        coppia = sessione["questions"][0]
+        corpo = self._risponde(sessione, 0, _vincitore("province", coppia)).get_json()
+        self.assertEqual(corpo["indicator"]["source_label"], sources.SOURCES["bes"]["label"])
 
     def test_token_of_another_question_does_not_judge_this_one(self):
         sessione = self._sessione()
