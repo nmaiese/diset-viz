@@ -133,3 +133,31 @@ class Score(Base):
     detail: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
     user_id: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class QuizAnswered(Base):
+    """Un round del quiz a cui si e' gia' risposto: la coppia (sid, q) e' il round
+    monouso. Sta nel DB e non in `app.cache` perche' Cloud Run ha piu' istanze e la
+    cache e' per processo. Le righe piu' vecchie di 12 ore (la vita del token) si
+    cancellano alla scrittura."""
+
+    __tablename__ = "quiz_answered"
+    __table_args__ = (Index("idx_quiz_answered_at", "answered_at"),)
+
+    sid: Mapped[str] = mapped_column(Text, primary_key=True)
+    q: Mapped[int] = mapped_column(Integer, primary_key=True)
+    answered_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class DailyScore(Base):
+    """Il punteggio di un giocatore in una sfida del giorno (ondata 3): una riga per
+    (account, gioco, data), il secondo tentativo della stessa giornata si rifiuta.
+    Invariante: auth_id dal JWT verificato."""
+
+    __tablename__ = "daily_scores"
+
+    auth_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    gioco: Mapped[str] = mapped_column(Text, primary_key=True)
+    data: Mapped[str] = mapped_column(Text, primary_key=True)
+    punteggio: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)

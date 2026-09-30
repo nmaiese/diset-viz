@@ -15,9 +15,11 @@ ON CONFLICT con espressioni SQL, così la semantica è identica sui due dialetti
 from datetime import date, datetime, timedelta, timezone
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
+from app import game_daily
 from app.db import session_scope
-from app.models import DailyResult, PlayerStat
+from app.models import DailyResult, DailyScore, PlayerStat
 
 QUIZ_MODES = ("compare", "order")
 _ALL_MODES = (*QUIZ_MODES, "daily")
@@ -32,6 +34,7 @@ def _empty_mode_stats():
         "best_streak": 0, "rounds_played": 0, "correct": 0,
         "games_played": 0, "wins": 0,
         "current_daily_streak": 0, "max_daily_streak": 0,
+        "historic_best_streak": 0,
         "last_played_at": None,
     }
 
@@ -58,16 +61,21 @@ def record_quiz_answer(auth_id, mode, correct, best_streak):
         row.last_played_at = _now_iso()
 
 
-def _daily_streaks(solved_dates):
+def _daily_streaks(solved_dates, today=None):
     """(current, max) run di giorni consecutivi risolti. `current` risale dalla
-    data risolta più recente, così l'ordine di arrivo non falsa il conteggio."""
+    data risolta piu' recente, cosi' l'ordine di arrivo non falsa il conteggio, e
+    vale solo se quella data e' oggi o ieri (giorno di Roma): una serie ferma da due
+    giorni e' spezzata."""
     if not solved_dates:
         return 0, 0
+    today = today or game_daily.oggi_roma()
     days = sorted({date.fromisoformat(d) for d in solved_dates})
     longest = run = 1
     for prev, cur in zip(days, days[1:]):
         run = run + 1 if cur - prev == timedelta(days=1) else 1
         longest = max(longest, run)
+    if today - days[-1] > timedelta(days=1):
+        return 0, longest
     current = 1
     for prev, cur in zip(reversed(days[:-1]), reversed(days[1:])):
         if cur - prev == timedelta(days=1):
@@ -78,10 +86,16 @@ def _daily_streaks(solved_dates):
 
 
 def record_daily(auth_id, puzzle_date, attempts, solved):
-    """Registra il risultato di una giornaliera. Non sovrascrive un risultato
-    già presente per quella data (niente replay che gonfia i numeri). Ricalcola
-    le streak dallo storico. Ritorna True se il risultato era nuovo."""
-    if not auth_id or not puzzle_date:
+    """Registra il risultato di una giornaliera. `puzzle_date` e' una data ISO
+    (YYYY-MM-DD), il resto si rifiuta. Non sovrascrive un risultato gia' presente
+    per quella data (niente replay che gonfia i numeri). La serie a giorni non si
+    salva: si ricalcola da `daily_results` a ogni lettura (`stats_map`). Ritorna
+    True se il risultato era nuovo."""
+    if not auth_id or not isinstance(puzzle_date, str):
+        return False
+    try:
+        date.fromisoformat(puzzle_date)
+    except ValueError:
         return False
     with session_scope() as s:
         exists = s.get(DailyResult, {"auth_id": auth_id, "puzzle_date": puzzle_date})
@@ -89,18 +103,29 @@ def record_daily(auth_id, puzzle_date, attempts, solved):
             return False
         s.add(DailyResult(auth_id=auth_id, puzzle_date=puzzle_date,
                           attempts=int(attempts or 0), solved=1 if solved else 0))
-        s.flush()
-        solved_dates = s.execute(
-            select(DailyResult.puzzle_date)
-            .where(DailyResult.auth_id == auth_id, DailyResult.solved == 1)).scalars().all()
-        current, longest = _daily_streaks(list(solved_dates))
         row = _get_or_new(s, auth_id, "daily")
         row.games_played = (row.games_played or 0) + 1
         row.wins = (row.wins or 0) + (1 if solved else 0)
-        row.current_daily_streak = current
-        row.max_daily_streak = max(row.max_daily_streak or 0, longest)
         row.last_played_at = _now_iso()
         return True
+
+
+def record_daily_score(auth_id, gioco, data, punteggio):
+    """Registra il punteggio di una sfida del giorno. Un solo tentativo per
+    (account, gioco, data): il secondo si rifiuta (False) e non sovrascrive."""
+    if not auth_id or not gioco or not isinstance(data, str):
+        return False
+    try:
+        date.fromisoformat(data)
+    except ValueError:
+        return False
+    try:
+        with session_scope() as s:
+            s.add(DailyScore(auth_id=auth_id, gioco=gioco, data=data,
+                             punteggio=int(punteggio), created_at=_now_iso()))
+        return True
+    except IntegrityError:
+        return False
 
 
 def stats_map(auth_id):
@@ -112,13 +137,23 @@ def stats_map(auth_id):
     with session_scope() as s:
         rows = s.execute(
             select(PlayerStat).where(PlayerStat.auth_id == auth_id)).scalars().all()
+        solved_dates = s.execute(
+            select(DailyResult.puzzle_date)
+            .where(DailyResult.auth_id == auth_id, DailyResult.solved == 1)).scalars().all()
     for r in rows:
         result[r.mode] = {
             "best_streak": r.best_streak, "rounds_played": r.rounds_played,
             "correct": r.correct, "games_played": r.games_played, "wins": r.wins,
             "current_daily_streak": r.current_daily_streak,
-            "max_daily_streak": r.max_daily_streak, "last_played_at": r.last_played_at,
+            "max_daily_streak": 0, "historic_best_streak": 0,
+            "last_played_at": r.last_played_at,
         }
+    # La serie a giorni viene sempre da `daily_results`. Il `max_daily_streak`
+    # salvato e' il dato storico del merge locale (vittorie di fila, non giorni)
+    # e si espone a parte, senza toccarlo e senza mescolarlo.
+    daily = result["daily"]
+    daily["historic_best_streak"] = max((r.max_daily_streak or 0 for r in rows if r.mode == "daily"), default=0)
+    daily["current_daily_streak"], daily["max_daily_streak"] = _daily_streaks(list(solved_dates))
     return result
 
 
