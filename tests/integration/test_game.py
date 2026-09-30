@@ -376,7 +376,9 @@ class SoluzioniPrimaDelCutoverTest(unittest.TestCase):
         import random
 
         giorno = game.GAME_EPOCH
-        while giorno <= oggi_roma():
+        # Dal cutover in poi le soluzioni escono dall'HMAC, e la formula di prima non vale.
+        ultimo = min(oggi_roma(), game_daily.SEED_CUTOVER - timedelta(days=1))
+        while giorno <= ultimo:
             ciclo, pos = divmod((giorno - game.GAME_EPOCH).days, len(REGION_ORDER))
             regioni = list(REGION_ORDER)
             random.Random(f"divario-regioni-cycle-{ciclo}").shuffle(regioni)
@@ -451,6 +453,36 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
                 if livello == "stessa_regione":
                     self.assertIn(sfida["region"], game_daily.regioni_idonee(5))
                     self.assertTrue(all(t["region"] == sfida["region"] for t in sfida["territories"]))
+
+    def test_ogni_regione_idonea_e_ogni_livello_hanno_indicatori_a_sufficienza(self):
+        """La chiave di produzione decide quale regione esce ogni giorno: nessuna
+        regione idonea puo' restare senza indicatori, o quel giorno sarebbe un 500."""
+        rng = game_daily.random.Random(0)
+        giorno = self.giorni[0]
+        for gioco, minimo, distinti in (("compare", game_daily.MINIMO_COMPARE, 2), ("order", game_daily.MINIMO_ORDER, 5)):
+            for regione in game_daily.regioni_idonee(minimo):
+                utili = game_daily._candidati(
+                    "stessa_regione", "province", lambda r, regione=regione: r["region"] == regione, distinti, rng
+                )
+                soglia = game_daily.COMPARE_COPPIE if gioco == "compare" else 1
+                self.assertGreaterEqual(len(utili), soglia, (gioco, regione))
+            for livello, ambito in (("regioni", "regioni"), ("province", "province")):
+                utili = game_daily._candidati(livello, ambito, lambda r: True, distinti, rng)
+                self.assertGreaterEqual(len(utili), 10, (gioco, livello))
+        self.assertTrue(giorno)
+
+    def test_ogni_regione_idonea_esce_davvero_come_sfida(self):
+        """Forza ogni regione idonea come regione del giorno e costruisce il payload."""
+        for gioco, minimo, funzione in (
+            ("compare", game_daily.MINIMO_COMPARE, game_daily.compare_del_giorno),
+            ("order", game_daily.MINIMO_ORDER, game_daily.order_del_giorno),
+        ):
+            for regione in game_daily.regioni_idonee(minimo):
+                with mock.patch.object(game_daily, "regioni_idonee", lambda minimo, r=regione: [r]):
+                    sfida = funzione(self.giorni[0], "stessa_regione")
+                self.assertEqual(sfida["region"], regione, gioco)
+                elementi = sfida["pairs"] if gioco == "compare" else sfida["territories"]
+                self.assertTrue(elementi, (gioco, regione))
 
     def test_compare_stessa_regione_usa_regioni_con_almeno_tre_province(self):
         for giorno in self.giorni:

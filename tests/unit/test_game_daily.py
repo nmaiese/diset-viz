@@ -83,8 +83,9 @@ class TestSeedOnesto(unittest.TestCase):
         with mock.patch.dict(os.environ, {"GAME_SEED_KEY": "da-ambiente"}):
             self.assertEqual(game_daily.chiave_seed(), "da-ambiente")
 
-    def test_il_cutover_segnaposto_e_lontano(self):
-        self.assertEqual(game_daily.SEED_CUTOVER, date(2099, 1, 1))
+    def test_il_cutover_e_dopo_il_lancio(self):
+        # Il valore cambia: il segnaposto (2099) lo sostituisce il coordinatore.
+        self.assertGreater(game_daily.SEED_CUTOVER, GAME_EPOCH)
 
     def test_prima_del_cutover_le_soluzioni_sono_quelle_di_oggi(self):
         cutover = GAME_EPOCH + timedelta(days=len(SOLUZIONI_VECCHIE))
