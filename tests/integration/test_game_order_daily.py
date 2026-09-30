@@ -130,10 +130,7 @@ def _punteggi(auth_id):
         return [(r.gioco, r.punteggio) for r in s.query(DailyScore).filter_by(auth_id=auth_id)]
 
 
-class OrdinaDelGiornoSicuroTest(unittest.TestCase):
-    """R1 punti 2 e 10: il livello viene dal token, senza round legato niente valori
-    ne' punteggio, e Ordina non ha un timer nel client."""
-
+class BaseOrdina(unittest.TestCase):
     def setUp(self):
         self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
         config.SUPABASE_JWT_SECRET = "test-jwt-secret"
@@ -154,6 +151,11 @@ class OrdinaDelGiornoSicuroTest(unittest.TestCase):
 
     def _chiavi(self, sessione):
         return [t["key"] for t in sessione["territories"]]
+
+
+class OrdinaDelGiornoSicuroTest(BaseOrdina):
+    """R1 punti 2 e 10: il livello viene dal token, senza round legato niente valori
+    ne' punteggio, e Ordina non ha un timer nel client."""
 
     def test_senza_token_si_risponde_400_senza_valori_ne_ordine_giusto(self):
         sessione = self._sessione()
@@ -219,6 +221,20 @@ class OrdinaDelGiornoSicuroTest(unittest.TestCase):
     def test_il_modulo_di_dominio_non_dipende_da_flask_ne_dalle_viste(self):
         self.assertFalse(hasattr(game_order, "abort"))
         self.assertNotIn("app.views", open(game_order.__file__, encoding="utf-8").read())
+
+
+class LimiteFrequenzaOrdinaTest(BaseOrdina):
+    """R1 punto 15: sessione e risposta del giorno hanno il limite delle altre rotte."""
+
+    def test_la_sessione_ha_il_limite_per_ip(self):
+        codici = [self.client.get("/api/game/order/daily/session?level=regioni").status_code for _ in range(121)]
+        self.assertEqual(codici[:120], [200] * 120)
+        self.assertEqual(codici[120], 429)
+
+    def test_la_risposta_ha_il_limite_per_ip(self):
+        codici = [self.client.post("/api/game/order/daily/answer", json={}).status_code for _ in range(121)]
+        self.assertEqual(codici[:120], [400] * 120)
+        self.assertEqual(codici[120], 429)
 
 
 class GiroDItaliaTest(unittest.TestCase):
