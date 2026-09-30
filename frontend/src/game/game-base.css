@@ -228,6 +228,9 @@
   color: var(--ink);
   text-decoration: none;
 }
+/* a.hub-card pareggia .ds a di system.css e, venendo dopo, lo vince: senza,
+   ogni riga della scheda eredita la sottolineatura del link. */
+a.hub-card, a.hub-card:hover { text-decoration: none; color: var(--ink); }
 .hub-card:hover { border-color: var(--game-accent); }
 .hub-card-kicker {
   font-family: var(--font-ui); font-weight: 600;

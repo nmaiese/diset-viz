@@ -214,7 +214,7 @@
 
 .game-suggestions li + li { border-top: 1px solid var(--rule); }
 
-.game-suggestions button { width: 100%; text-align: left; padding: 10px 14px; background: var(--bg); }
+.game-suggestions button { width: 100%; text-align: left; padding: 10px 14px; border: 0; background: var(--bg); }
 .game-suggestions button:hover,
 .game-suggestions button.is-highlighted { background: var(--game-wash); }
 
@@ -223,7 +223,10 @@
 .game-history { display: flex; flex-direction: column; gap: 10px; }
 
 .guess-row { border-radius: var(--radius-control); padding: 12px 14px; border: 1px solid var(--rule); background: var(--bg); }
-.guess-row.is-correct { border-color: var(--game-right); background: var(--game-right-wash); }
+/* Giusto e sbagliato non stanno solo nel colore: il filo a sinistra e' la
+   forma, il testo del tentativo dice l'esito. */
+.guess-row.is-correct { border-color: var(--game-right); border-left: 4px solid var(--game-right); background: var(--game-right-wash); }
+.guess-row.is-wrong { border-left: 4px solid var(--game-wrong); }
 
 .guess-feedback {
   list-style: none;
