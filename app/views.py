@@ -40,6 +40,7 @@ from app import multiscopo_data
 from app import external_atlas
 from app import external_manifest
 from app import game
+from app import game_daily
 from app import quiz
 from app import quiz_tokens
 from app import leaderboard
@@ -203,10 +204,30 @@ app.add_template_global(atlas_theme_url)
 
 
 def _client_ip():
-    """IP del client, rispettando X-Forwarded-For dietro il proxy Cloud Run."""
-    fwd = request.headers.get("X-Forwarded-For", "")
-    if fwd:
-        return fwd.split(",")[0].strip()
+    """IP del client per i limiti di richiesta.
+
+    Il primo valore di `X-Forwarded-For` lo scrive il client e non vale niente:
+    chi cambia quel valore cambia secchio. Quale elemento sia fidato su Cloud Run
+    NON e' verificato dalla documentazione: la pagina delle intestazioni di Cloud
+    Functions (https://docs.cloud.google.com/functions/docs/reference/headers) dice
+    solo che il primo IP e' "generally" il client, e quella dell'Application Load
+    Balancer dice che i due finali sono suoi (`[<supplied>,]<client-ip>,<lb-ip>`,
+    https://cloud.google.com/load-balancing/docs/https). Qui si assume che il
+    frontend di Google aggiunga in coda l'indirizzo della connessione: l'ultimo
+    elemento e' l'unico non falsificabile. `TRUSTED_PROXY_HOPS` (default 1) sceglie
+    quanti elementi dalla fine saltare. Con Cloudflare davanti (DEPLOY.md) l'ultimo
+    e' un edge Cloudflare e il secchio e' condiviso da molti giocatori: con 2 si
+    prende l'IP che Cloudflare ha aggiunto, ma e' sicuro solo se l'ingresso
+    `run.app` e' ristretto a Cloudflare. Fuori da Cloud Run (`K_SERVICE` assente:
+    locale, test) l'header non si legge."""
+    if os.environ.get("K_SERVICE"):
+        hops = [h.strip() for h in request.headers.get("X-Forwarded-For", "").split(",") if h.strip()]
+        try:
+            trusted = max(1, int(os.environ.get("TRUSTED_PROXY_HOPS", "1")))
+        except ValueError:
+            trusted = 1
+        if len(hops) >= trusted:
+            return hops[-trusted]
     return request.remote_addr or "unknown"
 
 
@@ -2643,6 +2664,27 @@ def game_leaderboard_page():
     )
 
 
+def _timer_requested():
+    return request.args.get("timer", "1") != "0"
+
+
+# Un giocatore veloce (1,5 s a round, il pavimento di quiz_tokens) fa 40 risposte
+# al minuto: il limite per sessione sta sopra, cosi' non scatta a meta' serie.
+_SID_ANSWERS_PER_MIN = 45
+
+
+def _answer_rate_limited(sid):
+    """120 risposte al minuto per IP e 45 per sessione firmata: nessun
+    giocatore vero ci arriva, uno script si'."""
+    if not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60):
+        return True
+    return not _rate_limit_ok(f"ans:sid:{sid}", limit=_SID_ANSWERS_PER_MIN, window_s=60)
+
+
+def _round_conflict():
+    return jsonify({"error": "round_already_answered"}), 409
+
+
 def _session_summary(session):
     if session is None:
         return None
@@ -2651,9 +2693,12 @@ def _session_summary(session):
 
 @app.route("/api/game/compare/round")
 def game_compare_round_api():
-    difficulty = request.args.get("difficulty", "0")
-    result = quiz.compare_round(difficulty)
-    state = quiz_tokens.load_state(request.args.get("token"), "compare")
+    # Il timer si decide aprendo la sessione (`timer=0` e' allenamento, fuori
+    # classifica) e la difficolta' la decide la serie: il parametro `difficulty`
+    # del client non si legge.
+    state = quiz_tokens.load_state(request.args.get("token"), "compare", _timer_requested())
+    result = quiz.compare_round(min(state["s"] // 3, quiz.MAX_DIFFICULTY))
+    result["timer"] = bool(state["t"])
     keys = [result["region_a"]["region_key"], result["region_b"]["region_key"]]
     result["token"] = quiz_tokens.bind_round(
         state, result["indicator"]["id"], result["indicator"]["year"], keys, result["difficulty"]
@@ -2664,6 +2709,9 @@ def game_compare_round_api():
 @app.post("/api/game/compare/answer")
 def game_compare_answer_api():
     payload = request.get_json(silent=True) or {}
+    state = quiz_tokens.load_state(payload.get("token"), "compare")
+    if _answer_rate_limited(state["sid"]):
+        return jsonify({"error": "rate_limited"}), 429
     result = quiz.evaluate_compare(
         payload.get("indicator_id"),
         payload.get("year"),
@@ -2673,14 +2721,27 @@ def game_compare_answer_api():
     )
     if result is None:
         abort(400)
-    state = quiz_tokens.load_state(payload.get("token"), "compare")
     keys = [payload.get("region_a_key"), payload.get("region_b_key")]
-    session, token = quiz_tokens.apply_answer(
+    bound = quiz_tokens.apply_answer(
         state, payload.get("indicator_id"), payload.get("year"), keys, result["correct"]
+    )[0] is not None
+    late = False
+    if bound:
+        timing = quiz_tokens.round_timing(state, payload.get("choice"))
+        if timing == "early_timeout":
+            return jsonify({"error": "timeout_too_early"}), 400
+        if not quiz_tokens.claim_round(state["sid"], state["q"]):
+            return _round_conflict()
+        late = timing == "late"
+    correct = result["correct"] and not late
+    session, token = quiz_tokens.apply_answer(
+        state, payload.get("indicator_id"), payload.get("year"), keys, correct
     )
+    if late:
+        result["correct"], result["late"] = False, True
     result["session"] = _session_summary(session)
     result["token"] = token
-    result["achievements"] = _record_quiz(request, "compare", result["correct"], result["session"])
+    result["achievements"] = _record_quiz(request, "compare", correct, result["session"])
     return jsonify(result)
 
 
@@ -2693,7 +2754,8 @@ def game_order_round_api():
     result = quiz.order_round(count)
     if result is None:
         abort(400)
-    state = quiz_tokens.load_state(request.args.get("token"), "order")
+    state = quiz_tokens.load_state(request.args.get("token"), "order", _timer_requested())
+    result["timer"] = bool(state["t"])
     keys = [r["region_key"] for r in result["regions"]]
     result["token"] = quiz_tokens.bind_round(
         state, result["indicator"]["id"], result["indicator"]["year"], keys, count, count=count
@@ -2704,6 +2766,9 @@ def game_order_round_api():
 @app.post("/api/game/order/answer")
 def game_order_answer_api():
     payload = request.get_json(silent=True) or {}
+    state = quiz_tokens.load_state(payload.get("token"), "order")
+    if _answer_rate_limited(state["sid"]):
+        return jsonify({"error": "rate_limited"}), 429
     region_keys = payload.get("region_keys")
     result = quiz.evaluate_order(
         payload.get("indicator_id"),
@@ -2712,11 +2777,12 @@ def game_order_answer_api():
     )
     if result is None:
         abort(400)
-    state = quiz_tokens.load_state(payload.get("token"), "order")
     is_perfect = result["score"] == result["total"]
     session, token = quiz_tokens.apply_answer(
         state, payload.get("indicator_id"), payload.get("year"), region_keys or [], is_perfect
     )
+    if session is not None and not quiz_tokens.claim_round(state["sid"], state["q"]):
+        return _round_conflict()
     result["session"] = _session_summary(session)
     result["token"] = token
     result["achievements"] = _record_quiz(request, "order", is_perfect, result["session"])
@@ -2950,6 +3016,12 @@ def leaderboard_post_api():
     score = state.get("b", 0)
     if not score:
         return jsonify({"error": "score_missing"}), 400
+    # Una sessione senza timer e' allenamento, e una che ha giocato i round piu'
+    # in fretta di 1,5 s l'uno dalla prima apertura non l'ha giocata una persona.
+    if not state.get("t"):
+        return jsonify({"error": "training_session"}), 400
+    if not quiz_tokens.is_plausible(state):
+        return jsonify({"error": "score_missing"}), 400
 
     nickname, error = moderation.validate_nickname(payload.get("nickname"))
     if error:
@@ -3024,15 +3096,17 @@ def game_guess_api():
         abort(400)
     # A partita finita, se loggato, registra la giornaliera e valuta i traguardi.
     result["achievements"] = []
-    if result.get("finished"):
+    # Solo la giornaliera di oggi (giorno di Roma): allenamento e archivio si
+    # giocano ma non entrano nello storico, e non contano per la serie.
+    if result.get("finished") and puzzle_id == f"daily:{game_daily.oggi_roma().isoformat()}":
         user = auth.current_user(request.headers)
         if user:
             try:
                 from app import player_stats, achievements
-                if player_stats.record_daily(user["id"], puzzle_id, attempt, result.get("correct")):
+                if player_stats.record_daily(user["id"], puzzle_id[len("daily:"):], attempt, result.get("correct")):
                     result["achievements"] = achievements.evaluate(user["id"])
             except Exception:  # noqa: BLE001
-                pass
+                app.logger.exception("giornaliera non registrata per %s", puzzle_id)
     return jsonify(result)
 
 

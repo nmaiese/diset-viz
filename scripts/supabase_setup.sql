@@ -60,6 +60,18 @@ CREATE POLICY own_saved_comparisons ON public.saved_comparisons
   FOR ALL TO authenticated
   USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
 
+-- Punteggi delle sfide del giorno (migrazione 0010): own-rows, come le altre tabelle
+-- account. La classifica del giorno, quando ci sara', si servira dal backend.
+ALTER TABLE public.daily_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_daily_scores ON public.daily_scores;
+CREATE POLICY own_daily_scores ON public.daily_scores
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
+-- quiz_answered (migrazione 0010): i round gia' risposti, solo backend. DENY-ALL
+-- come scores: RLS attiva e nessuna policy, il browser non la legge ne' la scrive.
+ALTER TABLE public.quiz_answered ENABLE ROW LEVEL SECURITY;
+
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si
 -- connette come `postgres`, che ha BYPASSRLS: la RLS non lo tocca. NON aggiungere

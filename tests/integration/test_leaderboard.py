@@ -7,6 +7,14 @@ from app import app, config, leaderboard, quiz, quiz_tokens
 from app.cache import cache
 
 
+def aged(token, seconds=3600):
+    """Il token come se la sessione fosse iniziata `seconds` fa: la classifica
+    rifiuta le sessioni piu' veloci di 1,5 s a round, e un test non aspetta."""
+    data = quiz_tokens._serializer().loads(token)
+    data["st"] -= seconds
+    return quiz_tokens.sign_state(data)
+
+
 class LeaderboardTestBase(unittest.TestCase):
     def setUp(self):
         self._tmp_dir = tempfile.mkdtemp()
@@ -18,6 +26,7 @@ class LeaderboardTestBase(unittest.TestCase):
         # lento. Il test client usa sempre lo stesso IP fittizio, quindi
         # basta invalidare la sua chiave di rate limit.
         cache.delete("rl:lb:127.0.0.1")
+        cache.delete("rl:ans:ip:127.0.0.1")
 
     def tearDown(self):
         config.LEADERBOARD_DB = self._original_db
@@ -107,7 +116,7 @@ class TokenChainTest(LeaderboardTestBase):
         }).get_json()
         self.assertIsNone(answer["session"])
 
-    def test_replaying_the_same_answer_is_idempotent(self):
+    def test_replaying_the_same_answer_is_rejected(self):
         client = app.test_client()
         round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
         values = {
@@ -122,10 +131,10 @@ class TokenChainTest(LeaderboardTestBase):
             "indicator_id": round_["indicator"]["id"], "year": round_["indicator"]["year"],
             "region_a_key": key_a, "region_b_key": key_b, "choice": winner, "token": round_["token"],
         }
-        first = client.post("/api/game/compare/answer", json=body).get_json()
-        second = client.post("/api/game/compare/answer", json=body).get_json()
-        self.assertEqual(first["session"], second["session"])
-        self.assertEqual(first["token"], second["token"])
+        first = client.post("/api/game/compare/answer", json=body)
+        second = client.post("/api/game/compare/answer", json=body)
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 409)
 
 
 class LeaderboardStoreTest(LeaderboardTestBase):
@@ -200,7 +209,7 @@ class LeaderboardApiTest(LeaderboardTestBase):
 
     def test_submit_flow_returns_rank_and_get_lists_entry(self):
         client = app.test_client()
-        token = self._stream_to_best(client, 2)
+        token = aged(self._stream_to_best(client, 2))
         response = client.post("/api/game/leaderboard", json={"token": token, "nickname": "Giulia"})
         self.assertEqual(response.status_code, 200)
         body = response.get_json()
@@ -230,7 +239,7 @@ class LeaderboardApiTest(LeaderboardTestBase):
 
     def test_submit_rejects_invalid_and_blocked_nicknames(self):
         client = app.test_client()
-        token = self._stream_to_best(client, 1)
+        token = aged(self._stream_to_best(client, 1))
         for bad_nick, expected_error in (
             ("a", "nickname_invalid"),
             ("x" * 20, "nickname_invalid"),

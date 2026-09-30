@@ -3,7 +3,12 @@ from datetime import date, datetime, timedelta
 
 from app import app
 from app.data import REGION_ORDER
-from app import game
+from app import game, quiz_tokens
+from app.cache import cache
+
+
+def setUpModule():
+    cache.delete("rl:ans:ip:127.0.0.1")
 
 
 class CompareHelperTest(unittest.TestCase):
@@ -317,12 +322,15 @@ class QuizCompareTest(unittest.TestCase):
         import json
 
         client = app.test_client()
-        response = client.get("/api/game/compare/round?difficulty=2")
+        # La difficolta' la decide la serie del token, non la query.
+        state = quiz_tokens.new_state("compare")
+        state["s"] = 6
+        response = client.get("/api/game/compare/round?token=" + quiz_tokens.sign_state(state))
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
         for field in (
             "id", "name", "theme", "macro_area", "unit", "year",
-            "source_label", "source_url", "description", "value_explanation",
+            "source_label", "source_url", "description", "value_explanation", "path",
         ):
             self.assertIn(field, payload["indicator"])
         self.assertTrue(payload["indicator"]["source_url"].startswith("http"))
