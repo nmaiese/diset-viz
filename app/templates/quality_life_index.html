@@ -16,7 +16,7 @@
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } },
+  "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "description": "Indicatori del benessere equo e sostenibile a livello provinciale, pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
   "isAccessibleForFree": true
 }
 </script>

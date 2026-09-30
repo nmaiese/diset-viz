@@ -28,10 +28,10 @@
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": [{ "@type": "Dataset", "name": "BES dei Territori", "creator": { "@type": "Organization", "name": "Istat" } }{% if has_eurostat %}, { "@type": "Dataset", "name": "Eurostat, statistiche regionali", "creator": { "@type": "Organization", "name": "Eurostat" } }{% endif %}],
+  "isBasedOn": [{ "@type": "Dataset", "name": "BES dei Territori", "description": "Indicatori del benessere equo e sostenibile a livello provinciale, pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } }{% if has_eurostat %}, { "@type": "Dataset", "name": "Eurostat, statistiche regionali", "description": "Statistiche regionali pubblicate da Eurostat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Eurostat" } }{% endif %}],
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
-  "license": {{ (data_licenses_label(('territorial', 'eurostat')) if has_eurostat else data_license_url) | tojson }},
+  "license": {{ data_license_url | tojson }},
   "distribution": [
     {
       "@type": "DataDownload",
