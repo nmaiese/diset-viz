@@ -51,8 +51,6 @@ provinciale, non quello regionale.
 
 from __future__ import annotations
 
-from functools import lru_cache
-
 from app import bes_data, game_daily, quiz, quiz_tokens, sources
 from app.game_daily import LIVELLI, oggi_roma
 
@@ -87,11 +85,9 @@ def etichetta_livello(livello):
     return ETICHETTE_LIVELLO.get(livello, ETICHETTE_LIVELLO["regioni"])
 
 
-@lru_cache(maxsize=6)
 def _sfida(giorno, livello):
-    """La sfida del giorno a un livello, in cache per po' giorni e livelli: le
-    coppie sono deterministiche sul seed, quindi ricalcolarle non cambia nulla e
-    ogni richiesta rileggerebbe gli elenchi degli indicatori."""
+    """La sfida del giorno a un livello. La cache sta in `game_daily` (per giorno,
+    livello e chiave del seed), cosi' il controllo della chiave si fa a ogni richiesta."""
     return game_daily.compare_del_giorno(giorno, livello)
 
 

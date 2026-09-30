@@ -380,6 +380,95 @@ class SenzaMigrazione0010Test(Base):
         self.assertIn("quiz_answered", log.output[0])
 
 
+class SeedInProduzioneTest(Base):
+    """R1 punto 4: su Cloud Run (`K_SERVICE`) senza `GAME_SEED_KEY` le rotte che usano il
+    seed nuovo rispondono 503, invece di calcolare sfide prevedibili con la chiave di
+    sviluppo, che sta nel repo. In locale e nei test la chiave di sviluppo resta."""
+
+    ROTTE = ("/api/game/compare/daily?level=regioni", "/api/game/compare/daily/session?level=regioni",
+             "/api/game/order/daily?level=regioni", "/api/game/order/daily/session?level=regioni",
+             "/api/game/provincia/daily?level=province")
+
+    def _ambiente(self, **variabili):
+        base = {k: v for k, v in os.environ.items() if k not in ("K_SERVICE", "GAME_SEED_KEY")}
+        return mock.patch.dict(os.environ, {**base, **variabili}, clear=True)
+
+    def setUp(self):
+        super().setUp()
+        cache.delete("rl:prov:ip:127.0.0.1")
+        self.client = app.test_client()
+
+    def test_su_cloud_run_senza_chiave_rispondono_503_e_lo_dicono_nel_log(self):
+        with self._ambiente(K_SERVICE="divario"):
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    with self.assertLogs("app", level="ERROR") as log:
+                        r = self.client.get(rotta)
+                    self.assertEqual((r.status_code, r.get_json()["error"]), (503, "seed_unavailable"))
+                    self.assertIn("GAME_SEED_KEY", log.output[0])
+
+    def test_una_sfida_in_cache_non_aggira_il_controllo(self):
+        oggi = game_daily.oggi_roma()
+        game_daily.compare_del_giorno(oggi, "regioni")
+        game_daily.order_del_giorno(oggi, "regioni")
+        with self._ambiente(K_SERVICE="divario"):
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    self.assertEqual(self.client.get(rotta).status_code, 503)
+
+    def test_con_la_chiave_su_cloud_run_le_rotte_rispondono(self):
+        with self._ambiente(K_SERVICE="divario", GAME_SEED_KEY="chiave-di-prova"):
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    self.assertEqual(self.client.get(rotta).status_code, 200)
+
+    def test_in_locale_senza_chiave_si_usa_quella_di_sviluppo(self):
+        with self._ambiente():
+            for rotta in self.ROTTE:
+                with self.subTest(rotta=rotta):
+                    self.assertEqual(self.client.get(rotta).status_code, 200)
+
+    def test_la_chiave_cambia_la_sfida_e_non_si_mescolano_in_cache(self):
+        oggi = game_daily.oggi_roma()
+        a = game_daily.order_del_giorno(oggi, "regioni", "chiave-a")
+        b = game_daily.order_del_giorno(oggi, "regioni", "chiave-b")
+        self.assertIs(a, game_daily.order_del_giorno(oggi, "regioni", "chiave-a"))
+        self.assertNotEqual([t["key"] for t in a["territories"]] + [a["indicator"]["id"]],
+                            [t["key"] for t in b["territories"]] + [b["indicator"]["id"]])
+
+
+class CacheDelleSfideTest(Base):
+    """R1 punto 16: la sfida di un giorno e di un livello si calcola una volta, e nella
+    passata dei candidati l'indice del pool del quiz si costruisce una volta sola."""
+
+    def test_la_sfida_si_calcola_una_volta_per_giorno_livello_e_chiave(self):
+        giorno = date(2031, 3, 4)
+        with mock.patch.object(game_daily, "_candidati", wraps=game_daily._candidati) as candidati:
+            for _ in range(3):
+                game_daily.order_del_giorno(giorno, "regioni", "chiave-cache")
+                game_daily.compare_del_giorno(giorno, "regioni", "chiave-cache")
+        self.assertEqual(candidati.call_count, 2)
+
+    def test_l_indice_del_pool_si_costruisce_una_volta_per_passata(self):
+        giorno = date(2031, 3, 5)
+        with mock.patch.object(game_daily, "_indice_quiz", wraps=game_daily._indice_quiz) as indice:
+            game_daily.order_del_giorno(giorno, "regioni", "chiave-indice")
+        self.assertEqual(indice.call_count, 1)
+
+    def test_le_rotte_della_sfida_del_giorno_sono_veloci_a_caldo(self):
+        rotte = ("/api/game/order/daily/session?level=province", "/api/game/order/daily?level=province",
+                 "/api/game/compare/daily?level=province", "/api/game/order/daily/session?level=regioni")
+        client = app.test_client()
+        for rotta in rotte:
+            client.get(rotta)
+            inizio = time.perf_counter()
+            for _ in range(5):
+                client.get(rotta)
+            medio_ms = (time.perf_counter() - inizio) / 5 * 1000
+            # prima: 50 ms (regioni) e 100 ms (province) a richiesta, dalla cache: pochi ms.
+            self.assertLess(medio_ms, 25, f"{rotta}: {medio_ms:.0f} ms")
+
+
 class StoreTest(Base):
     def test_daily_score_refuses_second_attempt(self):
         self.assertTrue(player_stats.record_daily_score("u1", "compare", "2026-09-30", 7))

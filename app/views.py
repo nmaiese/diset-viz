@@ -3075,6 +3075,14 @@ def _sfida_del_giorno_api(gioco):
     return jsonify(game_daily.sfida_payload(gioco, livello))
 
 
+@app.errorhandler(game_daily.ChiaveSeedMancante)
+def game_seed_key_missing(errore):
+    """Su Cloud Run senza `GAME_SEED_KEY` le sfide nuove sarebbero prevedibili: 503 e
+    un errore nel log, mai una sfida calcolata con la chiave di sviluppo."""
+    app.logger.error("%s", errore)
+    return jsonify({"error": "seed_unavailable"}), 503
+
+
 @app.route("/api/game/compare/daily")
 def game_compare_daily_api():
     return _sfida_del_giorno_api("compare")
