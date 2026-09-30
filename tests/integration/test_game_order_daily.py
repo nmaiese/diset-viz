@@ -259,8 +259,9 @@ class PercorsoCanonicoOrdinaTest(BaseOrdina):
 
 
 class GiroDItaliaTest(unittest.TestCase):
-    """R1 + aggiunta A: il punteggio di oggi si registra PRIMA di valutare i
-    traguardi, quindi Ordina, giocata per ultima, sblocca "Giro d'Italia"."""
+    """Aggiunta A: il punteggio di oggi si registra PRIMA di valutare i traguardi,
+    quindi la sfida giocata per ultima, qualunque sia, sblocca "Giro d'Italia" sulla
+    sua risposta. Le altre tre si scrivono nel DB, l'ultima passa dalla rotta vera."""
 
     def setUp(self):
         self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
@@ -273,6 +274,54 @@ class GiroDItaliaTest(unittest.TestCase):
     def tearDown(self):
         config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB = self._saved
         shutil.rmtree(self._tmp, ignore_errors=True)
+
+    def _auth(self, sub):
+        return {"Authorization": "Bearer " + _jwt(sub)}
+
+    def _prepara(self, sub, tranne):
+        from app import player_stats
+        oggi = game_daily.oggi_roma().isoformat()
+        if tranne != "indovina":
+            player_stats.record_daily(sub, oggi, 2, True)
+        for gioco, punteggio in (("provincia", 1), ("compare", 7), ("order", 5)):
+            if gioco != tranne:
+                player_stats.record_daily_score(sub, gioco, oggi, punteggio)
+
+    def test_indovina_per_ultima_sblocca_il_giro_d_italia(self):
+        from app import game
+        self._prepara("giro-indovina", "indovina")
+        puzzle_id = f"daily:{game_daily.oggi_roma().isoformat()}"
+        r = self.client.post("/api/game/guess", headers=self._auth("giro-indovina"), json={
+            "puzzle_id": puzzle_id, "region_key": game.build_puzzle(puzzle_id)["region_key"], "attempt": 1})
+        self.assertIn("giro_ditalia", [a["id"] for a in r.get_json()["achievements"]])
+
+    def test_provincia_per_ultima_sblocca_il_giro_d_italia(self):
+        from app import game_provincia
+        from app.cache import cache
+        self._prepara("giro-provincia", "provincia")
+        cache.delete("rl:prov:ip:127.0.0.1")
+        payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
+        mistero = game_provincia.provincia_del_giorno(game_daily.oggi_roma())["key"]
+        r = self.client.post("/api/game/provincia/guess", headers=self._auth("giro-provincia"), json={
+            "token": payload["token"], "province_key": mistero})
+        self.assertIn("giro_ditalia", [a["id"] for a in r.get_json()["achievements"]])
+
+    def test_chi_e_maggiore_per_ultima_sblocca_il_giro_d_italia(self):
+        from app.cache import cache
+        self._prepara("giro-compare", "compare")
+        cache.delete("rl:ans:ip:127.0.0.1")
+        sessione = self.client.get("/api/game/compare/daily/session?level=regioni").get_json()
+        token = sessione["token"]
+        ultima = None
+        for indice in range(len(sessione["questions"])):
+            ultima = self.client.post("/api/game/compare/daily/answer", headers=self._auth("giro-compare"), json={
+                "token": token, "puzzle_id": sessione["puzzle_id"], "q": indice, "choice": "region_a"}).get_json()
+            token = ultima["token"]
+            if indice < len(sessione["questions"]) - 1:
+                token = self.client.post("/api/game/compare/daily/next", json={
+                    "token": token, "puzzle_id": sessione["puzzle_id"], "q": indice}).get_json()["token"]
+        self.assertTrue(ultima["finished"])
+        self.assertIn("giro_ditalia", [a["id"] for a in ultima["achievements"]])
 
     def test_ordina_per_ultima_sblocca_il_giro_d_italia_sull_ultima_risposta(self):
         from app import player_stats
