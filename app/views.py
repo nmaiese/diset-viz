@@ -41,6 +41,7 @@ from app import multiscopo_data
 from app import external_atlas
 from app import external_manifest
 from app import game
+from app import game_compare
 from app import game_daily
 from app import game_provincia
 from app import quiz
@@ -3121,6 +3122,38 @@ def game_order_daily_answer_api():
     return jsonify(res), status_code
 # --- FINE BLOCCO SFIDA DEL GIORNO ORDINA ---
 
+
+# La sfida del giorno di "Chi è maggiore?" con partita valutata dal server: due
+# rotte e nient'altro, tutta la logica sta in app/game_compare.py. Il round a
+# serie (/api/game/compare/round e /answer) resta com'è.
+
+
+@app.route("/api/game/compare/daily/session")
+def game_compare_daily_session_api():
+    # Livello e timer si dichiarano qui e da qui in poi viaggiano nel token
+    # firmato: il client non li sceglie più.
+    sessione = game_compare.apri_sessione(
+        request.args.get("level", "regioni"), _timer_requested()
+    )
+    if sessione is None:
+        abort(400)
+    return jsonify(sessione)
+
+
+@app.post("/api/game/compare/daily/answer")
+def game_compare_daily_answer_api():
+    dati = request.get_json(silent=True) or {}
+    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+        return jsonify({"error": "rate_limited"}), 429
+    stato, corpo = game_compare.risposta(dati)
+    if isinstance(corpo.get("session"), dict):
+        corpo["achievements"] = _record_quiz(
+            request, "compare", bool(corpo.get("correct")), corpo["session"]
+        )
+    return jsonify(corpo), stato
+
+
+# fine sfida del giorno di "Chi è maggiore?"
 
 
 @app.route("/api/game/regions")

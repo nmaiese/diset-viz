@@ -134,6 +134,128 @@
 
 .compare-status { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 
+/* ---------- Scelta iniziale (compare.jsx) ----------
+   Il bottone principale è la sfida del giorno, l'allenamento sta accanto e non
+   ha il riempimento pieno: due ingressi con la stessa importanza, non un
+   secondario che si perde. Il campo dei livelli è un fieldset con i radio
+   nativi, quindi i tasti freccia lo muovono e l'etichetta è il bersaglio. */
+
+.compare-scelta-livello {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.compare-scelta-livello legend {
+  padding: 0 6px;
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.compare-scelta-livello label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "radio label" ". aiuto";
+  gap: 2px 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.compare-scelta-livello label.is-active {
+  border-color: var(--game-accent);
+  background: var(--game-wash);
+}
+
+.compare-scelta-livello input { grid-area: radio; width: 18px; height: 18px; margin: 0; accent-color: var(--game-accent); }
+.compare-scelta-label { grid-area: label; font-weight: 700; font-size: 14px; }
+.compare-scelta-aiuto { grid-area: aiuto; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+
+/* L'interruttore del timer: un'intera etichetta cliccabile da 44px, non la
+   casella da 18px, e il testo che spiega cosa succede senza timer. */
+.compare-scelta-timer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.compare-scelta-timer input { width: 18px; height: 18px; margin: 0; accent-color: var(--game-accent); }
+.compare-scelta-timer span { font-weight: 600; font-size: 14px; }
+
+.compare-scelta-azioni { display: flex; flex-wrap: wrap; gap: 10px; }
+.compare-scelta-nota { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+
+/* Avviso della partita senza timer: dentro il flusso, sopra la domanda, non in
+   un messaggio d'errore. */
+.compare-notice {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface-1);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.compare-esci { align-self: flex-start; }
+
+/* ---------- Dopo la risposta: che cosa misura, schede, riepilogo ----------
+   Il glossario ("Che cosa misura") e i link alle schede arrivano solo dopo la
+   risposta: prima il valore è nascosto e aprire la scheda del territorio
+   spoilererebbe la coppia. */
+
+.qz-scheda {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--rule-strong);
+  background: var(--surface-1);
+}
+
+.qz-scheda p { margin: 0; }
+.qz-scheda-indicatore { font-size: 13px; }
+.qz-scheda-misura {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.qz-scheda .desc { font-size: 13px; line-height: 1.5; color: var(--text-2); }
+
+.qz-territori {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+/* Riepilogo di fine partita: le dieci coppie con la risposta data, il valore
+   vero accanto al nome e la spiegazione dell'indicatore. */
+.qz-riepilogo { display: grid; gap: 12px; }
+.qz-riepilogo h3 { margin: 0; font-family: var(--font-display); font-size: 18px; }
+.qz-riepilogo-lista { display: grid; gap: 14px; margin: 0; padding-left: 22px; }
+.qz-riepilogo-lista > li { display: grid; gap: 4px; }
+.qz-riepilogo-riga { margin: 0; font-weight: 700; font-size: 13.5px; }
+.qz-riepilogo-lista > li.is-correct .qz-riepilogo-riga { color: var(--game-right); }
+.qz-riepilogo-lista > li.is-wrong .qz-riepilogo-riga { color: var(--game-wrong); }
+.qz-riepilogo-indicatore { font-family: var(--font-display); }
+.qz-riepilogo-valori { margin: 0; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+
+@media (max-width: 640px) {
+  .qz-scheda { padding: 10px 12px; }
+}
+
 /* Il movimento, solo a chi non ha chiesto di ridurlo. */
 @media (prefers-reduced-motion: no-preference) {
   .qz-region { transition: border-color 0.14s ease, background 0.14s ease, transform 0.12s ease; }
