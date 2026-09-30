@@ -903,13 +903,14 @@ class IndizioCollegatoTest(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("node"), "serve node per provare la logica della serie")
 class SerieAGiorniTest(unittest.TestCase):
-    """La serie locale di Indovina conta giorni di fila con `lastWonDate` come il
-    server: la logica e' pura in `guess/serie.js` e la prova e' `serie.test.mjs`."""
+    """La logica pura di Indovina (serie a giorni, messaggi di Provincia, rete) sta in `guess/*.js`
+    e la provano i `guess/*.test.mjs` con `node --test`."""
 
     def test_serie_js(self):
-        prova = Path(__file__).resolve().parents[2] / "frontend" / "src" / "game" / "guess" / "serie.test.mjs"
+        prove = sorted((Path(__file__).resolve().parents[2] / "frontend" / "src" / "game" / "guess").glob("*.test.mjs"))
+        self.assertIn("provincia.test.mjs", {p.name for p in prove})
         esito = subprocess.run(
-            ["node", "--test", str(prova)], capture_output=True, text=True, timeout=60, check=False
+            ["node", "--test", *map(str, prove)], capture_output=True, text=True, timeout=60, check=False
         )
         self.assertEqual(esito.returncode, 0, esito.stdout + esito.stderr)
 

@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3 } from "lucide-react";
-import { FinePartita, Modal, fetchJson, formatValue, prefersReducedMotion, trackGameEvent } from "../shared.jsx";
-import { comparisonArrow, comparisonText, dataInChiaro, normalize, ordinal } from "./helpers.js";
+import {
+  FinePartita, Modal, fetchJson, formatValue, notifyAchievements, prefersReducedMotion, trackGameEvent, useTerritorioMio,
+} from "../shared.jsx";
+import { getAccessToken } from "../../shared/supabase.js";
+import {
+  comparisonArrow, comparisonText, dataInChiaro, normalize, ordinal, titoloEsito, titoloIndizi, titoloTentativi,
+} from "./helpers.js";
 import { oggiRoma } from "./serie.js";
 import { segnaGiocata } from "../oggi.js";
 import {
@@ -10,22 +15,32 @@ import {
   caricaProgresso,
   caricaStatistiche,
   direzione,
+  inviaTentativo,
   livelloSalvato,
+  messaggioFuoriElenco,
   nomeLivello,
   onboardingFatto,
   registraPartita,
+  regioneConArticolo,
+  rigaTerritorio,
+  riassuntoProvincia,
   salvaLivello,
   salvaProgresso,
   segnaOnboarding,
   testoDistanza,
+  testoDistanzaCompatta,
 } from "./provincia.js";
 import { useMappaProvince } from "./MappaProvince.jsx";
 import Completamento from "./Completamento.jsx";
-import TabellaIndizi from "./TabellaIndizi.jsx";
+import Dettagli from "./Dettagli.jsx";
+import Scheletro from "./Scheletro.jsx";
+import { CheCosaMisura, TabellaIndizi } from "./TabellaIndizi.jsx";
+import { SegnoTentativo, TentativiCompatti } from "./Tentativi.jsx";
 import Riepilogo from "./Riepilogo.jsx";
 import { DistributionChart } from "./Statistiche.jsx";
 
 const GAME_NAME = "Indovina la Provincia";
+const GAME = "provincia";
 const MAX_SUGGERIMENTI = 6;
 
 const MESSAGGI_ERRORE = {
@@ -37,30 +52,13 @@ const MESSAGGI_ERRORE = {
   rate_limited: "Troppi tentativi in poco tempo. Riprova fra un minuto.",
 };
 
+// Gli errori che si risolvono solo ricaricando la pagina: la sfida e' cambiata, o il tentativo e' gia' registrato.
+const ERRORI_DA_RICARICA = new Set(["sfida_scaduta", "token_superato"]);
+
 // Un tentativo: niente token, che resta nel salvataggio a parte.
 function senzaToken(risultato) {
   const { token, ...resto } = risultato;
   return resto;
-}
-
-async function inviaTentativo(token, provinceKey) {
-  const res = await fetch(API_PROVINCIA.guess, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, province_key: provinceKey }),
-  });
-  let dati = null;
-  try {
-    dati = await res.json();
-  } catch {
-    dati = null;
-  }
-  if (!res.ok) {
-    const errore = new Error(dati?.error || "errore");
-    errore.code = dati?.error;
-    throw errore;
-  }
-  return dati;
 }
 
 function etichettaSuggerimento(provincia, livello) {
@@ -80,13 +78,16 @@ export default function GiocoProvincia() {
   const [highlighted, setHighlighted] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [ricarica, setRicarica] = useState(false); // l'errore si risolve ricaricando la pagina
+  const [fatto, setFatto] = useState(null); // il "fatto da portarti via", se il server lo manda
   const [liveMessage, setLiveMessage] = useState("");
   const [shake, setShake] = useState(false);
   const [stats, setStats] = useState(caricaStatistiche);
   const [showOnboarding, setShowOnboarding] = useState(() => !onboardingFatto());
   const [showStats, setShowStats] = useState(false);
 
-  const cluesListRef = useRef(null);
+  const esitoRef = useRef(null);
+  const [scorri, setScorri] = useState(0); // sale a ogni tentativo appena giocato
   const statsRecordedRef = useRef(false);
   const latestRef = useRef({ status: "loading", submitting: false });
 
@@ -112,6 +113,8 @@ export default function GiocoProvincia() {
     let attivo = true;
     setStatus("loading");
     setError(null);
+    setRicarica(false);
+    setFatto(null);
     setLiveMessage("");
     fetchJson(API_PROVINCIA.daily(level))
       .then((data) => {
@@ -124,6 +127,7 @@ export default function GiocoProvincia() {
           setGuesses(progresso.guesses);
           setSolution(progresso.solution || null);
           setRecap(progresso.recap || null);
+          setFatto(progresso.fatto || null);
           statsRecordedRef.current = Boolean(progresso.statsRecorded);
           setStatus(progresso.status);
           return;
@@ -135,7 +139,7 @@ export default function GiocoProvincia() {
         setSolution(null);
         setRecap(null);
         setStatus("playing");
-        trackGameEvent("game_start", { mode: "daily", level });
+        trackGameEvent("game_start", { game: GAME, mode: "daily", level });
       })
       .catch(() => {
         if (!attivo) return;
@@ -147,14 +151,16 @@ export default function GiocoProvincia() {
     };
   }, [level]);
 
-  // Scrolla solo il pannello indizi: un indizio nuovo non trascina la pagina
-  // oltre il campo di risposta.
+  // Dopo ogni tentativo la pagina porta in vista l'esito: la riga del tentativo sotto il campo o, a fine
+  // partita, la schermata finale. `nearest` muove la pagina il minimo, e liscio solo se non si e' chiesto
+  // di ridurre il movimento. Non parte al caricamento: `scorri` sale solo quando si gioca.
   useEffect(() => {
-    const lista = cluesListRef.current;
-    if (clues.length > 1 && lista) {
-      lista.scrollTo({ top: lista.scrollHeight, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    if (scorri === 0) return;
+    const esito = esitoRef.current;
+    if (esito && esito.scrollIntoView) {
+      esito.scrollIntoView({ block: "nearest", behavior: prefersReducedMotion() ? "auto" : "smooth" });
     }
-  }, [clues.length]);
+  }, [scorri]);
 
   const opzioni = puzzle?.provinces;
 
@@ -167,6 +173,18 @@ export default function GiocoProvincia() {
     trovate.sort((a, b) => Number(!normalize(a.name).startsWith(q)) - Number(!normalize(b.name).startsWith(q)));
     return trovate.slice(0, MAX_SUGGERIMENTI).map((p) => ({ key: p.key, label: etichettaSuggerimento(p, level) }));
   }, [query, opzioni, guesses, level]);
+
+  // Sotto il campo, quando il testo non porta a nessun suggerimento: perche' (una provincia di un'altra
+  // regione, una gia' provata, nessuna). Vuoto finche' non si scrive, o se ci sono suggerimenti.
+  const nota = useMemo(() => {
+    if (!opzioni || suggestions.length > 0) return "";
+    return messaggioFuoriElenco(query, {
+      regione: level === "stessa_regione" ? puzzle?.region : null,
+      opzioni,
+      altre: puzzle?.other_provinces || [],
+      tentate: guesses.map((g) => g.province_key),
+    }) || "";
+  }, [query, opzioni, suggestions, level, puzzle, guesses]);
 
   useMappaProvince({ options: opzioni, region: puzzle?.region, guesses, status, solution });
 
@@ -192,6 +210,7 @@ export default function GiocoProvincia() {
       status: next.status,
       solution: next.solution,
       recap: next.recap,
+      fatto: next.fatto || null,
       statsRecorded: statsRecordedRef.current,
     });
   }
@@ -201,7 +220,10 @@ export default function GiocoProvincia() {
     const attempt = guesses.length + 1;
     setSubmitting(true);
     setError(null);
-    inviaTentativo(token, provinceKey)
+    setRicarica(false);
+    // Col Bearer di chi ha fatto l'accesso, cosi' il server registra il punteggio e i traguardi; a fine
+    // partita i traguardi sbloccati vanno al toast.
+    inviaTentativo(token, provinceKey, { getToken: getAccessToken, notify: notifyAchievements })
       .then((result) => {
         const tentativo = senzaToken(result);
         const nextGuesses = [...guesses, tentativo];
@@ -213,7 +235,7 @@ export default function GiocoProvincia() {
         setStatus(nextStatus);
         setQuery("");
         setHighlighted(-1);
-        trackGameEvent("game_guess", { mode: "daily", level, attempt, correct: result.correct });
+        trackGameEvent("game_guess", { game: GAME, mode: "daily", level, attempt, correct: result.correct });
 
         if (result.correct) {
           setLiveMessage(`Hai indovinato! La provincia era ${result.province}.`);
@@ -228,19 +250,30 @@ export default function GiocoProvincia() {
           window.setTimeout(() => setShake(false), 420);
         }
 
+        // Il fatto viene dal server (`fatto`, o `fact`): senza il campo, niente riga.
+        const nextFatto = result.finished ? (result.fatto || result.fact || null) : null;
         if (result.finished) {
           setSolution(result.solution);
           setRecap(result.recap);
+          setFatto(nextFatto);
           registraFine(result.correct, attempt);
-          segnaGiocata("provincia", oggiRoma(), { ok: result.correct, testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta" });
-          trackGameEvent("game_finish", { mode: "daily", level, won: result.correct, attempts: attempt });
+          segnaGiocata("provincia", oggiRoma(), {
+            ok: result.correct,
+            testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta",
+            tentativi: attempt,
+          });
+          trackGameEvent("game_finish", { game: GAME, mode: "daily", level, won: result.correct, attempts: attempt });
         }
         salva({
           token: result.token, clues: nextClues, guesses: nextGuesses, status: nextStatus,
-          solution: result.solution, recap: result.recap,
+          solution: result.solution, recap: result.recap, fatto: nextFatto,
         });
+        setScorri((n) => n + 1);
       })
-      .catch((e) => setError(MESSAGGI_ERRORE[e.code] || "Il tentativo non è andato a buon fine. Riprova."))
+      .catch((e) => {
+        setError(MESSAGGI_ERRORE[e.code] || "Il tentativo non è andato a buon fine. Riprova.");
+        setRicarica(ERRORI_DA_RICARICA.has(e.code));
+      })
       .finally(() => setSubmitting(false));
   }
 
@@ -266,7 +299,7 @@ export default function GiocoProvincia() {
         <button
           type="button"
           className="game-icon-btn"
-          onClick={() => { setShowStats(true); trackGameEvent("game_stats_open", { mode: "daily", level }); }}
+          onClick={() => { setShowStats(true); trackGameEvent("game_stats_open", { game: GAME, mode: "daily", level }); }}
           aria-label="Statistiche"
         >
           <BarChart3 size={16} strokeWidth={2} />
@@ -284,22 +317,7 @@ export default function GiocoProvincia() {
 
       <div className="visually-hidden" aria-live="polite">{liveMessage}</div>
 
-      {status === "loading" && (
-        <div aria-hidden="true">
-          <div className="game-head">
-            <span className="skel-bar" style={{ height: 22, width: "40%" }} />
-            <div className="game-attempts">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i} className="seg" />
-              ))}
-            </div>
-          </div>
-          <div className="skel-bars" style={{ marginTop: 18 }}>
-            <span style={{ height: 96 }} />
-            <span style={{ height: 96 }} />
-          </div>
-        </div>
-      )}
+      {status === "loading" && <Scheletro />}
       {status === "error" && (
         <>
           <p className="game-error">{error}</p>
@@ -316,7 +334,7 @@ export default function GiocoProvincia() {
             </h2>
             {puzzle.region && (
               <p className="game-regione-nota">
-                La provincia misteriosa è in <strong>{puzzle.region.name}</strong>.
+                La provincia misteriosa è <strong>{regioneConArticolo(puzzle.region.name).in}</strong>.
               </p>
             )}
             <div className="game-attempts-row">
@@ -337,8 +355,14 @@ export default function GiocoProvincia() {
               #game-root, come in Indovina la Regione: useMappaProvince la
               rende viva dall'esterno. */}
           <div className="game-panel">
-            <p className="qz-section-label">Indizi svelati</p>
-            <TabellaIndizi clues={clues} total={puzzle.attempts_total} playing={status === "playing"} bodyRef={cluesListRef} />
+            {/* A partita finita la tabella sparisce: gli indizi tutti e sei stanno nel riquadro chiuso della
+                schermata finale, con le loro definizioni. */}
+            {!(finished && solution) && (
+              <>
+                <p className="qz-section-label">Indizi svelati</p>
+                <TabellaIndizi clues={clues} total={puzzle.attempts_total} playing={status === "playing"} />
+              </>
+            )}
 
             {status === "playing" && (
               <Completamento
@@ -354,10 +378,14 @@ export default function GiocoProvincia() {
                 disabled={submitting}
                 shake={shake}
                 error={error}
+                ricarica={ricarica}
+                nota={nota}
               />
             )}
 
-            {guesses.length > 0 && <TentativiProvincia guesses={guesses} />}
+            {!(finished && solution) && guesses.length > 0 && <TentativiProvincia guesses={guesses} esitoRef={esitoRef} />}
+
+            {!(finished && solution) && <CheCosaMisura clues={clues} game={GAME} />}
 
             {finished && solution && (
               <FineProvincia
@@ -369,6 +397,8 @@ export default function GiocoProvincia() {
                 guesses={guesses}
                 stats={stats}
                 highlightBucket={highlightBucket}
+                fatto={fatto}
+                esitoRef={esitoRef}
               />
             )}
           </div>
@@ -411,27 +441,26 @@ export default function GiocoProvincia() {
   );
 }
 
-// Lo storico dei tentativi: per ognuno la distanza e la direzione, se e' nella
-// stessa regione, e il confronto indizio per indizio. L'esito si legge dal testo
-// e dall'icona, non dal solo colore.
-function TentativiProvincia({ guesses }) {
+// Lo storico dei tentativi durante la partita, dal piu' recente: l'esito dell'ultimo sta subito sotto il
+// campo di risposta (`esitoRef` e' la sua riga, dove scorre la pagina) e il confronto indizio per indizio
+// e' aperto solo li'. Per ognuno la distanza e la direzione, se e' nella stessa regione. L'esito si legge
+// dal testo e dall'icona, non dal solo colore.
+function TentativiProvincia({ guesses, esitoRef }) {
+  const righe = guesses.map((g, i) => ({ g, i })).reverse();
   return (
     <section className="game-history" aria-label="Tentativi">
-      {guesses.map((g, i) => {
+      {righe.map(({ g, i }, posizione) => {
         const punto = direzione(g.direction);
-        const ultimo = i === guesses.length - 1;
         return (
-          <div key={g.province_key} className={g.correct ? "guess-row is-correct" : "guess-row is-wrong"}>
+          <div
+            key={g.province_key}
+            ref={posizione === 0 ? esitoRef : undefined}
+            className={g.correct ? "guess-row is-correct" : "guess-row is-wrong"}
+          >
             <p className="guess-titolo">
-              <img
-                className="guess-icona"
-                src={g.correct ? "/static/img/gioco/stato-giusto.svg" : "/static/img/gioco/stato-sbagliato.svg"}
-                alt=""
-                width="18"
-                height="18"
-              />
-              <strong>{i + 1}. {g.province}</strong>
-              <span className="guess-esito">{g.correct ? "Giusto" : "Non è questa"}</span>
+              <SegnoTentativo correct={g.correct}>
+                <strong>{i + 1}. {g.province}</strong>
+              </SegnoTentativo>
             </p>
             {!g.correct && (
               <p className="guess-distanza">
@@ -441,7 +470,7 @@ function TentativiProvincia({ guesses }) {
               </p>
             )}
             {!g.correct && (
-              <details className="guess-confronto" open={ultimo}>
+              <details className="guess-confronto" open={posizione === 0}>
                 <summary>Confronto degli indizi</summary>
                 <ul className="guess-feedback">
                   {g.feedback.map((f) => (
@@ -468,26 +497,30 @@ function TentativiProvincia({ guesses }) {
   );
 }
 
-function titoloEsito(won, tentativi) {
-  if (!won) return "Provincia non indovinata";
-  return tentativi === 1 ? "Indovinata al primo tentativo" : `Indovinata in ${tentativi} tentativi`;
-}
-
-function FineProvincia({ won, puzzle, level, solution, recap, guesses, stats, highlightBucket }) {
+// La fine di una partita a livelli: prima l'esito (il tono, la provincia e la regione coi loro link, in
+// quanti tentativi, il conto alla rovescia, "Condividi"), poi, in riquadri chiusi, gli indizi con le
+// definizioni intere, i tentativi e le statistiche. `fatto` viene dal server, se c'e'.
+function FineProvincia({ won, puzzle, level, solution, recap, guesses, stats, highlightBucket, fatto, esitoRef }) {
+  const mio = useTerritorioMio();
+  const tuo = rigaTerritorio(mio, solution);
   const condividi = {
     gameName: GAME_NAME,
+    game: GAME,
     puzzleNumber: puzzle.number,
     esiti: guesses.map((g) => (g.correct ? "exact" : "miss")),
-    summary: `${won ? guesses.length : "X"} su ${puzzle.attempts_total}, livello ${nomeLivello(level)}`,
+    summary: riassuntoProvincia({ won, tentativi: guesses.length, totale: puzzle.attempts_total, level }),
     url: `${window.location.origin}/quiz/indovina-la-provincia`,
-    eventParams: { mode: "daily", level },
+    eventParams: { mode: "daily", level, game: GAME },
   };
   return (
-    <div className="game-result">
+    <div className="game-result" ref={esitoRef}>
       <FinePartita
         won={won}
-        titolo={titoloEsito(won, guesses.length)}
-        dettaglio={`La provincia era ${solution.province}, in ${solution.region}.`}
+        tono={won ? "pieno" : "nullo"}
+        game={GAME}
+        titolo={titoloEsito("provincia", won, guesses.length)}
+        dettaglio={`La provincia era ${solution.province}, in ${solution.region}.${tuo ? ` ${tuo}` : ""}`}
+        fatto={fatto || undefined}
         territori={[
           { name: `Scheda di ${solution.province}`, path: solution.path },
           { name: `Scheda di ${solution.region}`, path: solution.region_path },
@@ -497,20 +530,27 @@ function FineProvincia({ won, puzzle, level, solution, recap, guesses, stats, hi
       />
 
       {recap && (
-        <Riepilogo
-          soggetto={solution.province}
-          mediaLabel="Media delle province"
-          rows={recap.map((row) => ({ ...row, media: row.province_avg }))}
-        />
+        <Dettagli titolo={titoloIndizi(recap.length)}>
+          <Riepilogo
+            titolo={null}
+            soggetto={solution.province}
+            mediaLabel="Media delle province"
+            rows={recap.map((row) => ({ ...row, media: row.province_avg }))}
+          />
+        </Dettagli>
       )}
 
-      <div className="game-stats-inline">
+      <Dettagli titolo={titoloTentativi(guesses.length)}>
+        <TentativiCompatti guesses={guesses} nome={(g) => g.province} distanza={testoDistanzaCompatta} />
+      </Dettagli>
+
+      <Dettagli titolo="Le tue statistiche">
         <div className="game-stats-numbers game-stats-numbers--due">
           <div><strong>{stats.played}</strong><span>Partite</span></div>
           <div><strong>{stats.played ? Math.round((stats.wins / stats.played) * 100) : 0}%</strong><span>Vittorie</span></div>
         </div>
         <DistributionChart distribution={stats.distribution} highlightBucket={highlightBucket} />
-      </div>
+      </Dettagli>
     </div>
   );
 }

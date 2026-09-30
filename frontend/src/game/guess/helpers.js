@@ -38,3 +38,28 @@ export function dataInChiaro(iso) {
   if (!m) return "";
   return `${Number(m[3])} ${MESI[Number(m[2]) - 1]}`;
 }
+
+// -- I testi dell'esito, uguali per Regione e Provincia -------------------------------
+
+// La riga di sintesi del testo condiviso: i tentativi ("3 su 6"), mai il nome.
+export function riassuntoRegione({ won, tentativi, totale }) {
+  return `${won ? tentativi : "X"} su ${totale}`;
+}
+
+// "Indovinata in 3 tentativi": niente "N su M" nel titolo, che FinePartita farebbe contare da 0.
+export function titoloEsito(gioco, won, tentativi) {
+  if (!won) return gioco === "provincia" ? "Provincia non indovinata" : "Regione non indovinata";
+  return tentativi === 1 ? "Indovinata al primo tentativo" : `Indovinata in ${tentativi} tentativi`;
+}
+
+const NUMERI_IN_LETTERE = ["zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"];
+
+// Il titolo del riquadro chiuso con le definizioni intere: il numero viene dai dati, mai scritto a mano.
+export function titoloIndizi(quanti) {
+  const parola = NUMERI_IN_LETTERE[quanti];
+  return quanti >= 2 && parola ? `Gli indizi, tutti e ${parola}` : `Gli indizi (${quanti})`;
+}
+
+export function titoloTentativi(quanti) {
+  return `I tuoi tentativi (${quanti})`;
+}

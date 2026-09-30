@@ -15,50 +15,76 @@ function NomeIndizio({ clue }) {
   );
 }
 
-// La tabella dei sei indizi (quelli non ancora svelati restano bloccati) e la
-// descrizione dell'ultimo svelato.
-export default function TabellaIndizi({ clues, total, playing, bodyRef }) {
-  const latest = clues[clues.length - 1];
-  const latestIndex = clues.length - 1;
+// Il valore: il numero in evidenza e l'unita' sotto, piccola, cosi' la colonna dei nomi non si stringe.
+// Letto da un lettore di schermo e' "13,8 numero per mille abitanti", come `formatValue`.
+function Valore({ clue }) {
+  const intero = formatValue(clue.value, clue.unit);
+  const numero = formatValue(clue.value, "");
+  const unita = intero.startsWith(numero) ? intero.slice(numero.length).trim() : "";
+  // Un'unita' breve ("%") resta accanto al numero: sotto, da sola, si leggerebbe come una riga persa.
+  if (!unita || unita.length <= 3) return intero;
   return (
     <>
-      <table className="qz-clues" aria-label="Indizi">
-        <tbody ref={bodyRef}>
-          {Array.from({ length: total }).map((_, i) => {
-            const clue = clues[i];
-            if (!clue) {
-              return (
-                <tr key={`locked-${i}`} className="locked">
-                  <td className="n">{i + 1}</td>
-                  <td className="theme">Indizio da svelare</td>
-                  <td className="v"><span aria-hidden="true">?</span></td>
-                </tr>
-              );
-            }
-            const isLatest = i === latestIndex && playing;
-            return (
-              <tr key={clue.id} className={isLatest ? "latest" : ""}>
-                <td className="n">{i + 1}</td>
-                <td>
-                  <strong>{clue.theme}</strong> · <NomeIndizio clue={clue} />
-                </td>
-                <td className="v">{formatValue(clue.value, clue.unit)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {latest && (
-        <div className="qz-clue-desc">
-          <p>
-            <strong>Indizio {clues.length}</strong> · <NomeIndizio clue={latest} />
-            {latest.description ? `: ${latest.description}` : "."}
-            {latest.reading ? ` ${latest.reading}` : ""}{" "}
-            <span className="qz-clue-rank">{ordinal(latest.rank)} su {latest.region_count ?? latest.province_count}</span>
-          </p>
-          <SourceStrip year={latest.year} sourceLabel={latest.source_label} sourceUrl={latest.source_url} />
-        </div>
-      )}
+      <span className="v-num">{numero}</span>{" "}
+      <span className="v-unita">{unita}</span>
     </>
   );
 }
+
+// La tabella dei sei indizi, compatta: il nome e il valore, una riga ciascuno (quelli non ancora
+// svelati restano bloccati). Il tema si vede solo dove c'e' posto (guess.css lo toglie da telefono).
+// L'indizio appena svelato entra con un'evidenza che svanisce, e solo se si e' in partita.
+export function TabellaIndizi({ clues, total, playing }) {
+  const latestIndex = clues.length - 1;
+  return (
+    <table className="qz-clues" aria-label="Indizi">
+      <tbody>
+        {Array.from({ length: total }).map((_, i) => {
+          const clue = clues[i];
+          if (!clue) {
+            return (
+              <tr key={`locked-${i}`} className="locked">
+                <td className="n">{i + 1}</td>
+                <td className="theme">Indizio da svelare</td>
+                <td className="v"><span aria-hidden="true">?</span></td>
+              </tr>
+            );
+          }
+          const isLatest = i === latestIndex && playing;
+          return (
+            <tr key={clue.id} className={isLatest ? "latest" : ""}>
+              <td className="n">{i + 1}</td>
+              <td>
+                <span className="qz-tema"><strong>{clue.theme}</strong> · </span>
+                <NomeIndizio clue={clue} />
+              </td>
+              <td className="v"><Valore clue={clue} /></td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+// "Che cosa misura" dell'ultimo indizio svelato, in un riquadro chiuso: la spiegazione e' lunga e
+// da telefono non deve stare fra la tabella e il campo di risposta. La `key` (l'id dell'indizio)
+// lo richiude a ogni indizio nuovo. Senza testi, resta la posizione e la fonte: mai un punto da solo.
+export function CheCosaMisura({ clues, game }) {
+  const latest = clues[clues.length - 1];
+  if (!latest) return null;
+  const testo = [latest.description, latest.reading].filter(Boolean).join(" ");
+  return (
+    <details className="qz-clue-desc" key={latest.id}>
+      <summary>Che cosa misura</summary>
+      <p>
+        <strong>Indizio {clues.length}</strong> · <NomeIndizio clue={latest} />
+        {testo ? `: ${testo}` : ""}{" "}
+        <span className="qz-clue-rank">{ordinal(latest.rank)} su {latest.region_count ?? latest.province_count}</span>
+      </p>
+      <SourceStrip year={latest.year} sourceLabel={latest.source_label} sourceUrl={latest.source_url} game={game} />
+    </details>
+  );
+}
+
+export default TabellaIndizi;

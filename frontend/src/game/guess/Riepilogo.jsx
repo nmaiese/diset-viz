@@ -18,10 +18,11 @@ function CheCosaMisura({ row }) {
 //   rows       [{ id, name, path, value, unit, year, media, description, value_explanation, reading }]
 //   soggetto   nome del territorio misterioso ("Toscana")
 //   mediaLabel "Media delle regioni" o "Media delle province"
-export default function Riepilogo({ rows, soggetto, mediaLabel }) {
+//   titolo     il titolo del riepilogo; `null` quando sta dentro un riquadro che ha gia' il suo
+export default function Riepilogo({ rows, soggetto, mediaLabel, titolo = "Gli indicatori, uno per uno" }) {
   return (
     <section className="game-recap" aria-label="Gli indicatori della sfida">
-      <h3>Gli indicatori, uno per uno</h3>
+      {titolo && <h3>{titolo}</h3>}
       <ol className="game-recap-list">
         {rows.map((row) => (
           <li key={row.id}>
