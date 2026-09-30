@@ -502,7 +502,7 @@ function TentativiProvincia({ guesses, esitoRef }) {
 // definizioni intere, i tentativi e le statistiche. `fatto` viene dal server, se c'e'.
 function FineProvincia({ won, puzzle, level, solution, recap, guesses, stats, highlightBucket, fatto, esitoRef }) {
   const mio = useTerritorioMio();
-  const tuo = rigaTerritorio(mio, solution);
+  const tuo = rigaTerritorio(mio, solution, puzzle.provinces);
   const condividi = {
     gameName: GAME_NAME,
     game: GAME,
@@ -519,11 +519,11 @@ function FineProvincia({ won, puzzle, level, solution, recap, guesses, stats, hi
         tono={won ? "pieno" : "nullo"}
         game={GAME}
         titolo={titoloEsito("provincia", won, guesses.length)}
-        dettaglio={`La provincia era ${solution.province}, in ${solution.region}.${tuo ? ` ${tuo}` : ""}`}
+        dettaglio={`La provincia era ${solution.province}, ${regioneConArticolo(solution.region).in}.${tuo ? ` ${tuo}` : ""}`}
         fatto={fatto || undefined}
         territori={[
           { name: `Scheda di ${solution.province}`, path: solution.path },
-          { name: `Scheda di ${solution.region}`, path: solution.region_path },
+          { name: `Scheda ${regioneConArticolo(solution.region).di}`, path: solution.region_path },
         ]}
         nextPuzzleAt={puzzle.next_puzzle_at}
         condividi={condividi}

@@ -4,6 +4,7 @@ import Dettagli from "./Dettagli.jsx";
 import Riepilogo from "./Riepilogo.jsx";
 import { DistributionChart } from "./Statistiche.jsx";
 import { TentativiCompatti } from "./Tentativi.jsx";
+import { regioneConArticolo } from "./provincia.js";
 import { riassuntoRegione, titoloEsito, titoloIndizi, titoloTentativi } from "./helpers.js";
 
 const GAME_NAME = "Indovina la Regione";
@@ -38,7 +39,7 @@ export default function ResultPanel({
         titolo={titoloEsito("regione", won, guesses.length)}
         dettaglio={`La regione era ${solution.region}.`}
         fatto={fatto || undefined}
-        territori={[{ name: `Scheda di ${solution.region}`, path: solution.path }]}
+        territori={[{ name: `Scheda ${regioneConArticolo(solution.region).di}`, path: solution.path }]}
         nextPuzzleAt={daily ? puzzle.next_puzzle_at : undefined}
         condividi={condividi}
         onPlayAgain={onNewPractice || undefined}

@@ -200,5 +200,15 @@ test("la riga del territorio non esce se non c'entra o se manca il dato", () => 
   assert.equal(rigaTerritorio({ level: "regione", key: "lazio", name: "Lazio" }, SOLUZIONE), null);
   assert.equal(rigaTerritorio(null, SOLUZIONE), null);
   assert.equal(rigaTerritorio({ level: "provincia", key: "lecce", name: "Lecce" }, SOLUZIONE), null);
+  assert.equal(rigaTerritorio({ level: "provincia", key: "lecce", name: "Lecce" }, SOLUZIONE, [{ key: "lecce", region: "Lombardia" }]), null);
   assert.equal(rigaTerritorio(altrove, null), null);
+});
+
+test("la provincia scelta senza la sua regione la trova fra le province del payload", () => {
+  const soluzione = { province_key: "bari", region_key: "puglia", region: "Puglia" };
+  const senzaRegione = { level: "provincia", key: "lecce", name: "Lecce" };
+  assert.equal(
+    rigaTerritorio(senzaRegione, soluzione, [{ key: "lecce", region: "Puglia" }]),
+    "La provincia di oggi è della tua regione.",
+  );
 });

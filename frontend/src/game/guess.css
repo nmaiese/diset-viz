@@ -282,7 +282,6 @@
 /* Il numero in evidenza, l'unita' sotto e piccola: la colonna dei nomi non si stringe. */
 .qz-clues .v-num { white-space: nowrap; }
 .qz-clues .v-unita { display: block; font-weight: 400; font-size: 11.5px; line-height: 1.25; color: var(--muted); }
-.qz-clues tr.latest { background: var(--game-wash); }
 .qz-clues tr.latest .n { color: var(--game-accent); border-left-color: var(--game-accent); }
 .qz-clues tr.locked td { color: var(--muted); }
 

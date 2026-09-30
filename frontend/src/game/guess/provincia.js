@@ -123,9 +123,15 @@ export function messaggioFuoriElenco(testo, { regione, opzioni = [], altre = [],
 
 // A fine partita, se il territorio scelto dal giocatore (`useTerritorioMio`, `di:mio`) c'entra con la
 // provincia di oggi: una riga sola, o `null`. `soluzione` e' quella del payload di fine partita.
-export function rigaTerritorio(mio, soluzione) {
+// `province` ([{ key, region }], quelle del payload) serve quando il territorio salvato e' una provincia
+// senza la sua regione (`region` e' facoltativa in `di:mio`): la regione si ricava dal nome.
+export function rigaTerritorio(mio, soluzione, province = []) {
   if (!mio || !soluzione) return null;
   if (mio.level === "provincia" && mio.key === soluzione.province_key) return "La provincia di oggi è la tua.";
+  if (mio.level === "provincia" && !mio.region) {
+    const sua = province.find((p) => p.key === mio.key);
+    return sua && sua.region === soluzione.region ? "La provincia di oggi è della tua regione." : null;
+  }
   const sua = mio.level === "provincia" ? mio.region : mio.key;
   return sua && sua === soluzione.region_key ? "La provincia di oggi è della tua regione." : null;
 }
