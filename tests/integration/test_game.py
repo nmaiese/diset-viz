@@ -359,6 +359,37 @@ class GiornoDiRomaTest(unittest.TestCase):
         })
         self.assertEqual(futuro.status_code, 400)
 
+    def test_la_sfida_di_ieri_a_pagina_aperta_a_mezzanotte_e_410(self):
+        """La pagina e' rimasta aperta oltre la mezzanotte di Roma: il client della sfida del
+        giorno manda ancora `daily:ieri`. Il server lo dice (`puzzle_changed`) invece di
+        valutare in silenzio un tentativo che non conta per nessuno."""
+        ieri = {"puzzle_id": "daily:2026-09-30", "region_key": "lombardia", "attempt": 1}
+        risposta = self.client.post("/api/game/guess", json={**ieri, "mode": "daily"})
+        self.assertEqual(risposta.status_code, 410)
+        self.assertEqual(risposta.get_json(), {"error": "puzzle_changed"})
+        oggi = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-01", "region_key": "lombardia", "attempt": 1, "mode": "daily",
+        })
+        self.assertEqual(oggi.status_code, 200)
+
+    def test_l_archivio_e_i_client_di_prima_continuano_a_giocare_le_sfide_passate(self):
+        """Il contratto non si restringe: senza `mode` (un bundle vecchio) o con `mode:
+        "archive"` una daily passata si valuta come prima."""
+        ieri = {"puzzle_id": "daily:2026-09-30", "region_key": "lombardia", "attempt": 1}
+        for corpo in (ieri, {**ieri, "mode": "archive"}, {**ieri, "mode": "practice"}):
+            with self.subTest(corpo=corpo):
+                self.assertEqual(self.client.post("/api/game/guess", json=corpo).status_code, 200)
+
+    def test_il_410_non_apre_una_porta_sul_futuro_ne_sull_input_rotto(self):
+        futuro = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-02", "region_key": "lombardia", "attempt": 1, "mode": "daily",
+        })
+        self.assertEqual(futuro.status_code, 400)
+        rotto = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-09-30", "region_key": "atlantide", "attempt": 1, "mode": "daily",
+        })
+        self.assertEqual(rotto.status_code, 400)
+
     def test_la_lista_dell_archivio_parte_da_ieri_di_roma(self):
         giorni = [p["date"] for p in self.client.get("/api/game/archive").get_json()["puzzles"]]
         self.assertEqual(giorni[0], "2026-09-30")
@@ -872,13 +903,14 @@ class IndizioCollegatoTest(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("node"), "serve node per provare la logica della serie")
 class SerieAGiorniTest(unittest.TestCase):
-    """La serie locale di Indovina conta giorni di fila con `lastWonDate` come il
-    server: la logica e' pura in `guess/serie.js` e la prova e' `serie.test.mjs`."""
+    """La logica pura di Indovina (serie a giorni, messaggi di Provincia, rete) sta in `guess/*.js`
+    e la provano i `guess/*.test.mjs` con `node --test`."""
 
     def test_serie_js(self):
-        prova = Path(__file__).resolve().parents[2] / "frontend" / "src" / "game" / "guess" / "serie.test.mjs"
+        prove = sorted((Path(__file__).resolve().parents[2] / "frontend" / "src" / "game" / "guess").glob("*.test.mjs"))
+        self.assertIn("provincia.test.mjs", {p.name for p in prove})
         esito = subprocess.run(
-            ["node", "--test", str(prova)], capture_output=True, text=True, timeout=60, check=False
+            ["node", "--test", *map(str, prove)], capture_output=True, text=True, timeout=60, check=False
         )
         self.assertEqual(esito.returncode, 0, esito.stdout + esito.stderr)
 

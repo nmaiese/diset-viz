@@ -50,12 +50,6 @@
 
 .game-map-frame .rmap-region.is-mystery-reveal { }
 
-@keyframes map-pulse {
-  0% { stroke-width: 1.5; filter: drop-shadow(0 0 0 var(--game-right)); }
-  50% { stroke-width: 3; filter: drop-shadow(0 0 6px var(--game-right)); }
-  100% { stroke-width: 1.5; filter: drop-shadow(0 0 0 transparent); }
-}
-
 .game-map-legend {
   display: flex;
   flex-wrap: wrap;
@@ -73,6 +67,10 @@
   border-radius: var(--radius-control);
   display: inline-block;
 }
+
+/* L'attribuzione dei confini (la stessa riga del resto del sito): piccola e in secondo piano. */
+.game-map-frame .source { margin: 8px 2px 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.game-map-frame .source a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
 
 .game-map-legend .sw-available { background: var(--data-null); }
 .game-map-legend .sw-wrong { background: var(--game-wrong); }
@@ -121,70 +119,13 @@
 
 .game-panel { display: flex; flex-direction: column; gap: 18px; }
 
-.game-clues {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 420px;
-  overflow-y: auto;
-  padding-right: 2px;
-}
-
-.clue-card {
-  position: relative;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-control);
-  padding: 14px 16px;
-}
-
-.clue-card.is-latest { border-color: var(--game-accent); box-shadow: 0 0 0 3px var(--game-wash); }
-
-@keyframes clue-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.clue-badge {
-  position: absolute;
-  top: -9px;
-  right: 12px;
-  background: var(--game-accent);
-  color: var(--game-on-accent);
-  font-family: var(--font-ui); font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 0.01em;
-  padding: 3px 8px;
-  border-radius: var(--radius-control);
-}
-
-.clue-index {
-  font-family: var(--font-ui); font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.01em;
-  color: var(--muted);
-}
-
-.clue-card h3 { margin: 4px 0 6px; font-size: 15px; line-height: 1.3; }
-.clue-meta { margin: 0 0 8px; font-size: 12px; color: var(--muted); }
-.clue-description,
-.clue-value-hint,
-.clue-reading { margin: 0 0 8px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
-.clue-value-hint,
-.clue-reading { padding-top: 8px; border-top: 1px solid var(--rule); }
-.clue-description strong,
-.clue-value-hint strong,
-.clue-reading strong { color: var(--ink); }
-
-.clue-stats { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-
-.clue-value { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 700; color: var(--game-accent); }
-.clue-rank { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 12px; color: var(--text-2); }
-
 /* ---------- Input e suggerimenti ---------- */
 
 .game-input label { display: block; font-weight: 600; margin-bottom: 6px; }
 
+.game-input-campo { position: relative; }
+
+/* 16 px: sotto, iOS ingrandisce la pagina quando il campo prende il focus. */
 .game-input-row input {
   width: 100%;
   min-height: 44px;
@@ -192,17 +133,10 @@
   border-radius: var(--radius-control);
   border: 1px solid var(--rule);
   background: var(--bg);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .game-input-row.is-shake { }
-
-@keyframes input-shake {
-  10%, 90% { transform: translateX(-1px); }
-  20%, 80% { transform: translateX(2px); }
-  30%, 50%, 70% { transform: translateX(-4px); }
-  40%, 60% { transform: translateX(4px); }
-}
 
 .game-suggestions {
   list-style: none;
@@ -210,7 +144,8 @@
   padding: 0;
   border: 1px solid var(--rule);
   border-radius: var(--radius-control);
-  overflow: hidden;
+  background: var(--bg);
+  overflow-y: auto;
 }
 
 .game-suggestions li + li { border-top: 1px solid var(--rule); }
@@ -218,6 +153,11 @@
 .game-suggestions button { width: 100%; min-height: 44px; text-align: left; padding: 10px 14px; border: 0; background: var(--bg); }
 .game-suggestions button:hover,
 .game-suggestions button.is-highlighted { background: var(--game-wash); }
+
+/* Il perche' di un testo che non porta a nessun suggerimento: sotto il campo, letto da `aria-live`. */
+.game-nota { margin: 8px 0 0; min-height: 1.4em; font-size: 14px; line-height: 1.4; color: var(--text-2); }
+.game-input .game-error { margin: 8px 0 0; }
+.game-input .game-btn { margin-top: 8px; }
 
 /* ---------- Cronologia tentativi ---------- */
 
@@ -322,7 +262,6 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  margin-bottom: 18px;
   border: 1px solid var(--rule);
   background: var(--bg);
 }
@@ -338,26 +277,35 @@
 .qz-clues .v {
   text-align: right;
   font-family: var(--font-num); font-variant-numeric: tabular-nums;
-  white-space: nowrap;
   font-weight: 600;
 }
-.qz-clues tr.latest { background: var(--game-wash); }
+/* Il numero in evidenza, l'unita' sotto e piccola: la colonna dei nomi non si stringe. */
+.qz-clues .v-num { white-space: nowrap; }
+.qz-clues .v-unita { display: block; font-weight: 400; font-size: 11.5px; line-height: 1.25; color: var(--muted); }
 .qz-clues tr.latest .n { color: var(--game-accent); border-left-color: var(--game-accent); }
 .qz-clues tr.locked td { color: var(--muted); }
-.qz-clues tr.locked .theme { opacity: 0.6; }
 
+/* "Che cosa misura": un riquadro chiuso, la spiegazione lunga si apre a richiesta. */
 .qz-clue-desc {
-  margin: -8px 0 18px;
-  padding: 12px 14px;
+  padding: 0 14px;
   border: 1px solid var(--rule);
-  border-top: 0;
   border-left: 3px solid var(--game-accent);
   background: var(--bg);
   font-size: 13px;
   color: var(--text-2);
   line-height: 1.45;
 }
+.qz-clue-desc summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+.qz-clue-desc[open] summary { border-bottom: 1px solid var(--rule); margin-bottom: 10px; }
 .qz-clue-desc p { margin: 0; }
+.qz-clue-desc[open] { padding-bottom: 12px; }
 .qz-clue-desc strong {
   font-family: var(--font-ui);
   font-size: 11px;
@@ -473,11 +421,104 @@
 .guess-confronto summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 13px; color: var(--text-2); }
 .game-stats-numbers--due { grid-template-columns: repeat(2, 1fr); }
 
+/* ---------- Fine partita a livelli: i riquadri chiusi e i tentativi compatti ---------- */
+
+.qz-fine + .game-dettagli { margin-top: 12px; }
+.game-dettagli { border: 1px solid var(--rule); border-radius: var(--radius-control); background: var(--bg); }
+.game-dettagli + .game-dettagli { margin-top: 8px; }
+.game-dettagli > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.game-dettagli[open] > summary { border-bottom: 1px solid var(--rule); }
+.game-dettagli-corpo { padding: 4px 14px 14px; }
+.game-dettagli-corpo .game-recap { margin-top: 0; }
+
+.guess-compatti { list-style: none; margin: 0; padding: 0; }
+.guess-compatto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+}
+.guess-compatto:first-child { border-top: 0; }
+.guess-compatto .guess-esito { margin-left: 0; }
+.guess-compatto-distanza { flex-basis: 100%; padding-left: 26px; font-size: 13px; color: var(--text-2); }
+
+/* ---------- Da telefono (<= 720 px) ---------- */
+
+@media (max-width: 720px) {
+  /* L'ordine e' lo stato, la tabella compatta, il campo subito sotto, poi la mappa (il fratello dopo
+     #game-root). Qui si stringe lo spazio perche' tutto questo stia in una schermata. */
+  .guess-app .game-toolbar { gap: 8px; }
+  .guess-app .game-tab { padding-inline: 12px; }
+  .guess-app .game-head { gap: 6px; }
+  .guess-app .game-head h2 { font-size: 18px; }
+  .guess-app .game-panel { gap: 10px; }
+  .guess-app .qz-section-label { display: none; }
+  .qz-tema { display: none; }
+  .qz-clues td { padding: 7px 10px; }
+  .qz-clues .n { width: 24px; }
+  .qz-clues { table-layout: fixed; }
+  .qz-clues .v { width: 38%; }
+  .qz-clues td:nth-child(2) { overflow-wrap: anywhere; }
+
+  /* I suggerimenti si aprono SOPRA il campo: la tastiera virtuale non li copre. Non piu' del 40% di
+     quello che si vede (`--vv-h` e' la `visualViewport`, la imposta Completamento). */
+  .game-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    z-index: 5;
+    margin: 0 0 4px;
+    max-height: calc(var(--vv-h, 100dvh) * 0.4);
+  }
+}
+
 /* Il movimento, solo a chi non ha chiesto di ridurlo. */
 @media (prefers-reduced-motion: no-preference) {
-  .game-map-frame .rmap-region { transition: fill 0.12s ease; }
+  .game-map-frame .rmap-region { transition: fill var(--mo-fast) ease; }
   .game-map-frame .rmap-region.is-mystery-reveal { animation: map-pulse 1.1s ease-out 1; }
-  .clue-card { animation: clue-in 0.32s ease; }
   .game-input-row.is-shake { animation: input-shake 0.4s ease; }
   .dist-bar { transition: width 0.3s ease; }
+
+  @keyframes map-pulse {
+    0% { stroke-width: 1.5; filter: drop-shadow(0 0 0 var(--game-right)); }
+    50% { stroke-width: 3; filter: drop-shadow(0 0 6px var(--game-right)); }
+    100% { stroke-width: 1.5; filter: drop-shadow(0 0 0 transparent); }
+  }
+
+  @keyframes input-shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+
+  /* L'indizio appena svelato: l'evidenza (il lavaggio `--game-wash`) svanisce in 600 ms, e la riga entra
+     salendo di 6 px. `@starting-style` parte solo quando la riga nasce, non quando perde `latest`. */
+  .qz-clues tr.latest { animation: indizio-evidenza 600ms var(--mo-out) both; }
+  .qz-clues tr.latest { transition: opacity var(--mo-base) var(--mo-out), transform var(--mo-base) var(--mo-out); }
+  @starting-style {
+    .qz-clues tr.latest { opacity: 0; transform: translateY(6px); }
+  }
+  @keyframes indizio-evidenza {
+    from { background: var(--game-wash); }
+    to { background: transparent; }
+  }
+
+  /* Lo scheletro compare dopo 150 ms: una sfida che arriva subito non lampeggia. */
+  .qz-scheletro { animation: scheletro-appare var(--mo-fast) var(--mo-out) 150ms both; }
+  @keyframes scheletro-appare {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 }

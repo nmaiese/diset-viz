@@ -76,6 +76,13 @@ def is_valid_puzzle_id(puzzle_id):
     return bool(_PRACTICE_ID_RE.match(puzzle_id))
 
 
+def is_past_daily(puzzle_id):
+    """True se `puzzle_id` e' una giornaliera valida di un giorno gia' passato (a Roma):
+    serve a dire `puzzle_changed` a chi ha la pagina aperta oltre la mezzanotte."""
+    day = _daily_date(puzzle_id) if isinstance(puzzle_id, str) else None
+    return day is not None and day < oggi_roma()
+
+
 def daily_puzzle_id(today=None):
     today = today or oggi_roma()
     return f"{_DAILY_PREFIX}{today.isoformat()}", today

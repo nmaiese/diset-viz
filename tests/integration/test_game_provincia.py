@@ -167,6 +167,22 @@ class PayloadTest(unittest.TestCase):
             self.assertIn(mistero["key"], {p["key"] for p in payload["provinces"]})
             self.assertRegex(payload["region"]["viewbox"], r"^[\d.\-]+( [\d.\-]+){3}$")
 
+    def test_al_livello_della_regione_il_payload_porta_le_province_delle_altre(self):
+        """Serve al client per dire "Milano non e' in Puglia" invece di tacere: nome e regione,
+        niente coordinate, e mai una provincia della regione indicata (ne' la misteriosa)."""
+        payload = game_provincia.payload("stessa_regione", chiave=CHIAVE)
+        altre = payload["other_provinces"]
+        regione = payload["region"]["name"]
+        nomi_regione = {p["name"] for p in payload["provinces"]}
+        self.assertEqual(len(altre) + len(payload["provinces"]), 107)
+        for voce in altre:
+            self.assertEqual(set(voce), {"name", "region"})
+            self.assertNotEqual(voce["region"], regione)
+            self.assertNotIn(voce["name"], nomi_regione)
+
+    def test_al_livello_di_tutta_italia_non_serve_il_campo(self):
+        self.assertNotIn("other_provinces", game_provincia.payload("province", chiave=CHIAVE))
+
     def test_livello_di_tutta_italia_offre_tutte_e_107(self):
         payload = game_provincia.payload("province", chiave=CHIAVE)
         self.assertIsNone(payload["region"])
@@ -338,6 +354,29 @@ class PaginaTest(unittest.TestCase):
         self.assertIn('id="game-map-frame"', html)
         self.assertEqual(len(set(re.findall(r'class="prov-tile"[^>]*data-key="([a-z\-]+)"', html))), 107)
         self.assertIn("quiz-provincia.js", html)
+
+    def test_titolo_e_descrizione_non_cannibalizzano_la_pagina_a_mappa_che_arriva_dopo(self):
+        """"Quiz sulle province" e' la ricerca della pagina a mappa che verra': qui il titolo e la
+        descrizione dicono "Indovina la Provincia" e i dati Istat, dentro il budget dei risultati."""
+        from html import unescape
+        html = app.test_client().get("/quiz/indovina-la-provincia").get_data(as_text=True)
+        titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.S).group(1)).strip()
+        descrizione = unescape(re.search(r'<meta name="description" content="([^"]*)"', html).group(1)).strip()
+        lead = unescape(re.search(r'<p class="page-lead">(.*?)</p>', html, re.S).group(1))
+        self.assertIn("Indovina la Provincia dai dati Istat", titolo)
+        self.assertLessEqual(len(titolo), 60, titolo)
+        self.assertLessEqual(len(descrizione), 155, descrizione)
+        for testo in (titolo, descrizione, lead):
+            self.assertNotIn("quiz sulle province", testo.lower())
+
+    def test_la_mappa_dichiara_l_attribuzione_dei_confini(self):
+        """La stessa riga che il sito usa alla classifica e in home: l'attribuzione e' un obbligo
+        della licenza dei confini, e la mappa del gioco li mostra."""
+        html = app.test_client().get("/quiz/indovina-la-provincia").get_data(as_text=True)
+        riga = "Confini delle province: Istat, via openpolis, "
+        self.assertIn(riga, html)
+        self.assertIn("https://creativecommons.org/licenses/by/4.0/deed.it", html)
+        self.assertLess(html.index('id="prov-map"'), html.index(riga))
 
     def test_le_rotte_hanno_x_robots_tag_noindex(self):
         cache.delete("rl:prov:ip:127.0.0.1")

@@ -26,17 +26,7 @@ REDUCE = "@media (prefers-reduced-motion: reduce)"
 
 # (foglio, contesto, proprieta) -> perche' sta fuori da no-preference. Il contesto e' il
 # selettore (con gli spazi normalizzati) o `@keyframes nome`.
-_KEYFRAMES_DI_GUESS = (
-    "Dichiarato fuori dal blocco ma usato solo da un `animation` dentro no-preference: senza "
-    "`animation` un @keyframes non muove niente. Preesistente, di guess.css (Indovina): si sposta "
-    "dentro il blocco quando quel foglio si tocca."
-)
-
-ECCEZIONI = {
-    ("guess.css", "@keyframes clue-in", "@keyframes"): _KEYFRAMES_DI_GUESS,
-    ("guess.css", "@keyframes input-shake", "@keyframes"): _KEYFRAMES_DI_GUESS,
-    ("guess.css", "@keyframes map-pulse", "@keyframes"): _KEYFRAMES_DI_GUESS,
-}
+ECCEZIONI = {}
 
 
 def _normalizza(testo):

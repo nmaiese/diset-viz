@@ -1,20 +1,25 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3 } from "lucide-react";
-import { fetchJson, prefersReducedMotion, trackGameEvent, postGame, notifyAchievements } from "../shared.jsx";
+import { fetchJson, prefersReducedMotion, trackGameEvent, notifyAchievements } from "../shared.jsx";
+import { getAccessToken } from "../../shared/supabase.js";
 import { API, STORAGE_ONBOARDED_KEY } from "./api.js";
 import { dataInChiaro, normalize } from "./helpers.js";
+import { inviaJson } from "./rete.js";
 import { aggiornaSerie, oggiRoma, serieAttuale } from "./serie.js";
 import { segnaGiocata } from "../oggi.js";
 import { leggiSerieServer } from "./giocatore.js";
 import { loadProgress, loadStats, saveProgress, saveStats } from "./storage.js";
 import { useMapInteractions } from "./Mappa.jsx";
 import Completamento from "./Completamento.jsx";
-import TabellaIndizi from "./TabellaIndizi.jsx";
+import Scheletro from "./Scheletro.jsx";
+import { CheCosaMisura, TabellaIndizi } from "./TabellaIndizi.jsx";
 import Tentativi from "./Tentativi.jsx";
 import ResultPanel from "./Risultato.jsx";
 import OnboardingModal from "./Onboarding.jsx";
 import ArchiveModal from "./Archivio.jsx";
 import { StatsModal } from "./Statistiche.jsx";
+
+const GAME = "regione";
 
 export default function GameApp() {
   const [regions, setRegions] = useState([]);
@@ -31,6 +36,8 @@ export default function GameApp() {
   const [highlighted, setHighlighted] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [ricarica, setRicarica] = useState(false); // l'errore si risolve ricaricando la pagina
+  const [fatto, setFatto] = useState(null); // il "fatto da portarti via", se il server lo manda
   const [shake, setShake] = useState(false);
   const [liveMessage, setLiveMessage] = useState("");
   const [stats, setStats] = useState(loadStats);
@@ -47,7 +54,8 @@ export default function GameApp() {
 
   const statsRecordedRef = useRef(false);
   const stateRef = useRef({ status: "loading", submitting: false });
-  const cluesListRef = useRef(null);
+  const esitoRef = useRef(null);
+  const [scorri, setScorri] = useState(0); // sale a ogni tentativo appena giocato
 
   const regionByKey = useMemo(() => {
     const map = {};
@@ -82,15 +90,16 @@ export default function GameApp() {
     setHighlighted(-1);
   }, [query]);
 
-  // Scrolla solo il pannello indizi (non la pagina): un nuovo indizio non deve
-  // trascinare la finestra oltre il campo di risposta, che resta sempre
-  // visibile subito sotto (vedi .game-clues in game.css, max-height + overflow).
+  // Dopo ogni tentativo la pagina porta in vista l'esito: la riga del tentativo sotto il campo o, a fine
+  // partita, la schermata finale. `nearest` muove la pagina il minimo, e liscio solo se non si e' chiesto
+  // di ridurre il movimento. Non parte al caricamento: `scorri` sale solo quando si gioca.
   useEffect(() => {
-    const list = cluesListRef.current;
-    if (clues.length > 1 && list) {
-      list.scrollTo({ top: list.scrollHeight, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    if (scorri === 0) return;
+    const esito = esitoRef.current;
+    if (esito && esito.scrollIntoView) {
+      esito.scrollIntoView({ block: "nearest", behavior: prefersReducedMotion() ? "auto" : "smooth" });
     }
-  }, [clues.length]);
+  }, [scorri]);
 
   // Da loggato la serie a giorni la ricalcola il server dalle giornaliere.
   useEffect(() => {
@@ -105,11 +114,18 @@ export default function GameApp() {
     }
   }, [showArchive, archiveList]);
 
+  function mostraErrore(testo, conRicarica = false) {
+    setError(testo);
+    setRicarica(conRicarica);
+  }
+
   function startGame(kind, opts = {}) {
     setError(null);
+    setRicarica(false);
     setStatus("loading");
     setSolution(null);
     setRecap(null);
+    setFatto(null);
     setLiveMessage("");
     statsRecordedRef.current = false;
 
@@ -128,6 +144,7 @@ export default function GameApp() {
             setGuesses(saved.guesses);
             setSolution(saved.solution || null);
             setRecap(saved.recap || null);
+            setFatto(saved.fatto || null);
             statsRecordedRef.current = Boolean(saved.statsRecorded);
             setStatus(saved.status);
             return;
@@ -136,7 +153,7 @@ export default function GameApp() {
         setClues(data.clue ? [data.clue] : []);
         setGuesses([]);
         setStatus("playing");
-        trackGameEvent("game_start", { mode: kind, level: "regioni" });
+        trackGameEvent("game_start", { game: GAME, mode: kind, level: "regioni" });
       })
       .catch(() => {
         setError(
@@ -148,7 +165,7 @@ export default function GameApp() {
       });
   }
 
-  function persistProgress(nextClues, nextGuesses, nextStatus, nextSolution, nextRecap) {
+  function persistProgress(nextClues, nextGuesses, nextStatus, nextSolution, nextRecap, nextFatto) {
     if (mode === "practice" || !puzzle) return;
     saveProgress(puzzle.puzzle_id, {
       clues: nextClues,
@@ -156,6 +173,7 @@ export default function GameApp() {
       status: nextStatus,
       solution: nextSolution,
       recap: nextRecap,
+      fatto: nextFatto || null,
       statsRecorded: statsRecordedRef.current,
     });
   }
@@ -183,9 +201,11 @@ export default function GameApp() {
     const attempt = guesses.length + 1;
     setSubmitting(true);
     setError(null);
-    postGame(API.guess, { puzzle_id: puzzle.puzzle_id, region_key: regionKey, attempt })
+    // `mode` dice al server che cosa stiamo giocando: a una "daily" rimasta aperta oltre la mezzanotte
+    // risponde 410 `puzzle_changed` invece di valutare la sfida di ieri.
+    inviaJson(API.guess, { puzzle_id: puzzle.puzzle_id, region_key: regionKey, attempt, mode }, { getToken: getAccessToken })
       .then((result) => {
-        notifyAchievements(result.achievements);
+        notifyAchievements(result.achievements, GAME);
         const nextGuesses = [...guesses, result];
         const nextClues = result.next_clue ? [...clues, result.next_clue] : clues;
         const nextStatus = result.finished ? (result.correct ? "won" : "lost") : "playing";
@@ -194,7 +214,7 @@ export default function GameApp() {
         setStatus(nextStatus);
         setQuery("");
         setHighlighted(-1);
-        trackGameEvent("game_guess", { mode, level: "regioni", attempt, correct: result.correct });
+        trackGameEvent("game_guess", { game: GAME, mode, level: "regioni", attempt, correct: result.correct });
 
         const guessedName = regionByKey[regionKey] || result.region;
         if (result.correct) {
@@ -207,17 +227,24 @@ export default function GameApp() {
           window.setTimeout(() => setShake(false), 420);
         }
 
+        // Il fatto viene dal server (`fatto`, o `fact`): senza il campo, niente riga.
+        const nextFatto = result.finished ? (result.fatto || result.fact || null) : null;
         if (result.finished) {
           setSolution(result.solution);
           setRecap(result.recap);
+          setFatto(nextFatto);
           recordStats(result.correct, attempt);
           if (mode === "daily") segnaGiocata("indovina", oggiRoma(), { ok: result.correct, testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta" });
           if (mode === "daily") leggiSerieServer().then((serie) => serie && setServerSerie(serie));
-          trackGameEvent("game_finish", { mode, level: "regioni", won: result.correct, attempts: attempt });
+          trackGameEvent("game_finish", { game: GAME, mode, level: "regioni", won: result.correct, attempts: attempt });
         }
-        persistProgress(nextClues, nextGuesses, nextStatus, result.solution, result.recap);
+        persistProgress(nextClues, nextGuesses, nextStatus, result.solution, result.recap, nextFatto);
+        setScorri((n) => n + 1);
       })
-      .catch(() => setError("Il tentativo non è andato a buon fine. Riprova."))
+      .catch((e) => {
+        if (e && e.code === "puzzle_changed") mostraErrore("La sfida è cambiata. Ricarica la pagina.", true);
+        else mostraErrore("Il tentativo non è andato a buon fine. Riprova.");
+      })
       .finally(() => setSubmitting(false));
   }
 
@@ -228,12 +255,12 @@ export default function GameApp() {
 
   function openStats() {
     setShowStats(true);
-    trackGameEvent("game_stats_open", { mode, level: "regioni" });
+    trackGameEvent("game_stats_open", { game: GAME, mode, level: "regioni" });
   }
 
   function openArchive() {
     setShowArchive(true);
-    trackGameEvent("game_archive_open", { level: "regioni" });
+    trackGameEvent("game_archive_open", { game: GAME, level: "regioni" });
   }
 
   function pickArchiveDate(iso) {
@@ -252,11 +279,10 @@ export default function GameApp() {
 
   return (
     <div className="game-app guess-app">
-      <div className="game-toolbar" role="tablist" aria-label="Modalità di gioco">
+      <div className="game-toolbar" role="group" aria-label="Modalità di gioco">
         <button
           type="button"
-          role="tab"
-          aria-selected={mode === "daily"}
+          aria-pressed={mode === "daily"}
           className={mode === "daily" ? "game-tab is-active" : "game-tab"}
           onClick={backToToday}
         >
@@ -264,8 +290,7 @@ export default function GameApp() {
         </button>
         <button
           type="button"
-          role="tab"
-          aria-selected={mode === "practice"}
+          aria-pressed={mode === "practice"}
           className={mode === "practice" ? "game-tab is-active" : "game-tab"}
           onClick={() => setMode("practice")}
         >
@@ -295,23 +320,13 @@ export default function GameApp() {
 
       <div className="visually-hidden" aria-live="polite">{liveMessage}</div>
 
-      {status === "loading" && (
-        <div aria-hidden="true">
-          <div className="game-head">
-            <span className="skel-bar" style={{ height: 22, width: "40%" }} />
-            <div className="game-attempts">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i} className="seg" />
-              ))}
-            </div>
-          </div>
-          <div className="skel-bars" style={{ marginTop: 18 }}>
-            <span style={{ height: 96 }} />
-            <span style={{ height: 96 }} />
-          </div>
-        </div>
+      {status === "loading" && <Scheletro />}
+      {status === "error" && (
+        <>
+          <p className="game-error">{error}</p>
+          <button type="button" className="game-btn" onClick={() => window.location.reload()}>Riprova</button>
+        </>
       )}
-      {status === "error" && <p className="game-error">{error}</p>}
 
       {(status === "playing" || finished) && puzzle && (
         <>
@@ -343,8 +358,14 @@ export default function GameApp() {
               bundle del gioco non avrebbe senso; useMapInteractions() la rende
               interattiva dall'esterno con querySelector/addEventListener. */}
           <div className="game-panel">
-            <p className="qz-section-label">Indizi svelati</p>
-            <TabellaIndizi clues={clues} total={puzzle.attempts_total} playing={status === "playing"} bodyRef={cluesListRef} />
+            {/* A partita finita la tabella sparisce: gli indizi tutti e sei stanno nel riquadro chiuso della
+                schermata finale, con le loro definizioni. */}
+            {!(finished && solution) && (
+              <>
+                <p className="qz-section-label">Indizi svelati</p>
+                <TabellaIndizi clues={clues} total={puzzle.attempts_total} playing={status === "playing"} />
+              </>
+            )}
 
             {status === "playing" && (
               <Completamento
@@ -360,10 +381,15 @@ export default function GameApp() {
                 disabled={submitting}
                 shake={shake}
                 error={error}
+                ricarica={ricarica}
               />
             )}
 
-            {guesses.length > 0 && <Tentativi guesses={guesses} regionByKey={regionByKey} />}
+            {!(finished && solution) && guesses.length > 0 && (
+              <Tentativi guesses={guesses} regionByKey={regionByKey} esitoRef={esitoRef} />
+            )}
+
+            {!(finished && solution) && <CheCosaMisura clues={clues} game={GAME} />}
 
             {finished && solution && (
               <ResultPanel
@@ -376,6 +402,9 @@ export default function GameApp() {
                 highlightBucket={highlightBucket}
                 serie={serie}
                 guesses={guesses}
+                regionByKey={regionByKey}
+                fatto={fatto}
+                esitoRef={esitoRef}
                 onNewPractice={mode === "practice" ? () => startGame("practice") : null}
               />
             )}
