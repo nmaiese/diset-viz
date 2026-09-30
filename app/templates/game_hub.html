@@ -1,11 +1,11 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}] %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'hub' %}
 
-{% block title %}Il quiz sui dati delle regioni italiane | {{ site_name }}{% endblock %}
-{% block description %}Quattro giochi sugli indicatori Istat di regioni e province: indovina la regione o la provincia, sfida chi è maggiore, ordina la classifica. Fonte e anno in evidenza.{% endblock %}
+{% block title %}Sfida Italia: il quiz sui dati Istat | {{ site_name }}{% endblock %}
+{% block description %}Quattro giochi sui dati Istat di regioni e province: indovina la regione o la provincia, chi è maggiore, ordina la classifica. Fonte e anno in evidenza.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
@@ -15,7 +15,7 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "I giochi del Quiz Italia",
+  "name": "I giochi di Sfida Italia",
   "url": {{ canonical | tojson }},
   "numberOfItems": 4,
   "itemListElement": [

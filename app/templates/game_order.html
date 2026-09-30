@@ -1,10 +1,10 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Ordina le regioni", "path": "/quiz/ordina"}] %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Ordina le regioni", "path": "/quiz/ordina"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'order' %}
 {% set og_image_path = '/static/img/og/gioco-ordina.png' %}
-{% set og_image_alt = 'Quiz Italia: Ordina le regioni' %}
+{% set og_image_alt = 'Sfida Italia: Ordina le regioni' %}
 
 {% block title %}Ordina le regioni per indicatore Istat | {{ site_name }}{% endblock %}
 {% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore Istat, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}

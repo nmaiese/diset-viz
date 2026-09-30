@@ -387,7 +387,7 @@ export function formeRisultato(esiti) {
 // forme, il link. Mai il nome della regione o il valore da indovinare.
 export function testoCondivisione({ gameName, puzzleNumber, esiti, summary, url }) {
   const { glifi } = formeRisultato(esiti);
-  const titolo = puzzleNumber ? `${gameName} n. ${puzzleNumber}` : gameName;
+  const titolo = puzzleNumber ? `Sfida Italia: ${gameName} n. ${puzzleNumber}` : `Sfida Italia: ${gameName}`;
   return [titolo, summary, glifi, url].filter(Boolean).join("\n");
 }
 

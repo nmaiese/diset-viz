@@ -3899,6 +3899,12 @@ def _home_quiz_games():
             "meta": "credito parziale",
             "href": "/quiz/ordina",
         },
+        {
+            "name": "Indovina la Provincia",
+            "desc": "Una provincia misteriosa da trovare con gli indizi dei dati Istat, sulla mappa delle 107 province.",
+            "meta": "una al giorno",
+            "href": "/quiz/indovina-la-provincia",
+        },
     ]
 
 

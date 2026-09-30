@@ -1,12 +1,12 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Indovina la Provincia", "path": "/quiz/indovina-la-provincia"}] %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Indovina la Provincia", "path": "/quiz/indovina-la-provincia"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'provincia' %}
 {% set og_image_path = '/static/img/og/gioco-indovina-provincia.png' %}
-{% set og_image_alt = 'Quiz Italia: Indovina la Provincia' %}
+{% set og_image_alt = 'Sfida Italia: Indovina la Provincia' %}
 
-{% block title %}Indovina la Provincia: quiz sulle province italiane | {{ site_name }}{% endblock %}
+{% block title %}Indovina la Provincia, quiz sulle province | {{ site_name }}{% endblock %}
 {% block description %}Quiz sulle province italiane: indovina la provincia misteriosa a partire dai dati Istat. Una sfida al giorno, con la mappa che ti dice quanto sei vicino.{% endblock %}
 
 {% block head_extra %}
