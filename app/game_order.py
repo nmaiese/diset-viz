@@ -6,13 +6,18 @@ from flask import abort
 from app import bes_data, game_daily, player_stats, profiles, quiz, quiz_tokens, sources
 
 
-def daily_order_session(level="regioni", token=None, timer=True):
-    """Payload per l'avvio o il ripristino di una sessione della sfida del giorno."""
+MODO = "order_daily"
+
+
+def daily_order_session(level="regioni"):
+    """Payload per l'apertura di una sessione della sfida del giorno. La sessione e'
+    sempre nuova: riprendere un token precedente rilegherebbe lo stesso puzzle e farebbe
+    crescere una serie che non esiste."""
     if level not in game_daily.LIVELLI:
         abort(400)
     payload = game_daily.sfida_payload("order", level)
-    state = quiz_tokens.load_state(token, "order", timer)
-    payload["timer"] = bool(state["t"])
+    state = quiz_tokens.load_state(None, MODO, timer=False)
+    payload["timer"] = False
     keys = [t["key"] for t in payload["territories"]]
     payload["token"] = quiz_tokens.bind_round(
         state, payload["indicator"]["id"], payload["indicator"]["year"], keys, len(keys), count=len(keys)
@@ -26,7 +31,7 @@ def evaluate_daily_order_answer(payload, auth_user=None, request_obj=None):
         return {"error": "bad_request"}, 400
 
     token = payload.get("token")
-    state = quiz_tokens.load_state(token, "order")
+    state = quiz_tokens.load_state(token, MODO)
 
     level = payload.get("level") or "regioni"
     if level not in game_daily.LIVELLI:

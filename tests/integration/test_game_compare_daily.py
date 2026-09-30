@@ -313,7 +313,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         risposte = self._gioca(sessione, "regioni", giuste=10)
         ultima = risposte[-1].get_json()
-        stato = quiz_tokens.load_state(ultima["token"], "compare")
+        stato = quiz_tokens.load_state(ultima["token"], game_compare.MODO)
         self.assertIsNone(stato["fp"])
         # La decima coppia non si può rispondere una seconda volta.
         self.assertEqual(self._risponde(sessione, 9, "region_a", token=ultima["token"]).status_code, 400)
@@ -322,7 +322,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         coppia = sessione["questions"][0]
         risposta = self._risponde(sessione, 0, _vincitore("regioni", coppia)).get_json()
-        stato = quiz_tokens.load_state(risposta["token"], "compare")
+        stato = quiz_tokens.load_state(risposta["token"], game_compare.MODO)
         self.assertEqual(stato["sfida"], {"d": sessione["date"], "c": 1})
 
 
@@ -490,7 +490,7 @@ class SerieTest(Base):
 
     def test_the_two_routes_keep_their_own_sessions(self):
         sessione = self._sessione()
-        stato = quiz_tokens.load_state(sessione["token"], "compare")
+        stato = quiz_tokens.load_state(sessione["token"], game_compare.MODO)
         self.assertEqual(stato["q"], 1)
         self.assertEqual(stato["x"], "regioni")
         # Il round a serie resta un round: due regioni e la sua difficolta'.

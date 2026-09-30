@@ -51,7 +51,10 @@ from functools import lru_cache
 from app import bes_data, game_daily, quiz, quiz_tokens, sources
 from app.game_daily import LIVELLI, oggi_roma
 
-MODO = "compare"
+# Modalita' di token propria: il token della sfida del giorno non entra nelle serie
+# (`/api/game/compare/round|answer`) ne' nella classifica (`peek_state` la rifiuta), e
+# il token di una serie apre una sessione nuova qui.
+MODO = "compare_daily"
 COPPIE = game_daily.COMPARE_COPPIE
 # Etichetta della fonte per i livelli con le province, che non passano da
 # quiz.evaluate_compare: viene da app/sources.py, l'unica fonte di verita' dei

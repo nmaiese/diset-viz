@@ -193,6 +193,68 @@ class RoundTest(Base):
         self.assertEqual(response.get_json()["error"], "score_missing")
 
 
+class ModalitaDelGiornoTest(Base):
+    """La sfida del giorno ha modalita' di token proprie (`compare_daily`,
+    `order_daily`): il suo token non entra nelle serie ne' nella classifica, e quello
+    di una serie non si rilega a un altro puzzle (R1 punti 3 e 14)."""
+
+    def _sessioni(self):
+        client = app.test_client()
+        compare = client.get("/api/game/compare/daily/session?level=regioni").get_json()
+        order = client.get("/api/game/order/daily/session?level=regioni").get_json()
+        return client, compare, order
+
+    def test_peek_state_rifiuta_i_token_della_sfida_del_giorno(self):
+        _, compare, order = self._sessioni()
+        self.assertIsNone(quiz_tokens.peek_state(compare["token"]))
+        self.assertIsNone(quiz_tokens.peek_state(order["token"]))
+
+    def test_la_classifica_a_serie_rifiuta_i_token_della_sfida_del_giorno(self):
+        client, compare, order = self._sessioni()
+        for token in (compare["token"], order["token"]):
+            with self.subTest(token=token[:8]):
+                r = client.post("/api/game/leaderboard", json={"token": token, "nickname": "Robot"})
+                self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+    def test_il_round_a_serie_non_rilega_il_token_della_sfida_del_giorno(self):
+        client, compare, order = self._sessioni()
+        sid_compare = quiz_tokens.load_state(compare["token"], "compare_daily")["sid"]
+        sid_order = quiz_tokens.load_state(order["token"], "order_daily")["sid"]
+        r = client.get("/api/game/compare/round?token=" + compare["token"]).get_json()
+        stato = quiz_tokens.load_state(r["token"], "compare")
+        self.assertNotEqual(stato["sid"], sid_compare)
+        self.assertEqual((stato["q"], stato["s"]), (1, 0))
+        r = client.get("/api/game/order/round?count=5&token=" + order["token"]).get_json()
+        self.assertNotEqual(quiz_tokens.load_state(r["token"], "order")["sid"], sid_order)
+
+    def test_le_risposte_a_serie_non_contano_il_token_della_sfida_del_giorno(self):
+        client, compare, order = self._sessioni()
+        r = client.post("/api/game/order/answer", json={
+            "token": order["token"], "indicator_id": order["indicator"]["id"], "year": order["indicator"]["year"],
+            "region_keys": [t["key"] for t in order["territories"]]})
+        corpo = r.get_json()
+        self.assertIsNone(corpo.get("session"))
+        q = compare["questions"][0]
+        r = client.post("/api/game/compare/answer", json={
+            "token": compare["token"], "indicator_id": q["indicator"]["id"], "year": q["indicator"]["year"],
+            "region_a_key": q["a"]["key"], "region_b_key": q["b"]["key"], "choice": "region_a"})
+        self.assertIsNone(r.get_json().get("session"))
+
+    def test_la_sessione_del_giorno_di_ordina_non_riprende_un_token(self):
+        client, _, order = self._sessioni()
+        again = client.get("/api/game/order/daily/session?level=regioni&token=" + order["token"]).get_json()
+        self.assertNotEqual(quiz_tokens.load_state(again["token"], "order_daily")["sid"],
+                            quiz_tokens.load_state(order["token"], "order_daily")["sid"])
+
+    def test_un_token_di_serie_non_vale_nella_sfida_del_giorno_di_chi_e_maggiore(self):
+        client = app.test_client()
+        serie = client.get("/api/game/compare/round").get_json()
+        sessione = client.get("/api/game/compare/daily/session?level=regioni").get_json()
+        r = client.post("/api/game/compare/daily/answer", json={
+            "token": serie["token"], "puzzle_id": sessione["puzzle_id"], "q": 0, "choice": "region_a"})
+        self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+
 class StoreTest(Base):
     def test_daily_score_refuses_second_attempt(self):
         self.assertTrue(player_stats.record_daily_score("u1", "compare", "2026-09-30", 7))

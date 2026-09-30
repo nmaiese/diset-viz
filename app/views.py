@@ -3116,10 +3116,8 @@ def game_provincia_guess_api():
 @app.route("/api/game/order/daily/session")
 def game_order_daily_session_api():
     level = request.args.get("level", "regioni")
-    token = request.args.get("token")
-    timer = _timer_requested()
     from app import game_order
-    return jsonify(game_order.daily_order_session(level, token, timer))
+    return jsonify(game_order.daily_order_session(level))
 
 
 @app.post("/api/game/order/daily/answer")
