@@ -4,8 +4,8 @@
 {% set active_nav = 'gioco' %}
 {% set game_active = 'compare' %}
 
-{% block title %}Chi è maggiore? Quiz sulle regioni italiane | {{ site_name }}{% endblock %}
-{% block description %}Confronta due regioni su un indicatore Istat e scegli il valore più alto. Dieci secondi per round, difficoltà crescente e serie da battere.{% endblock %}
+{% block title %}Chi è maggiore? Confronto fra regioni e province | {{ site_name }}{% endblock %}
+{% block description %}La sfida del giorno di dieci coppie, le stesse per tutti, fra regioni o province. Scegli il valore più alto prima che scada il tempo, poi l'allenamento a serie.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
@@ -15,11 +15,11 @@
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Chi è maggiore?",
-  "description": "Quiz a raffica sugli indicatori territoriali Istat: scegli quale delle due regioni italiane ha il valore più alto.",
+  "description": "Sfida del giorno e allenamento a serie sugli indicatori territoriali Istat: scegli quale fra due regioni o province italiane ha il valore più alto.",
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "description": "Indicatori territoriali regionali pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
+  "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "description": "Indicatori territoriali regionali e provinciali pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
   "isAccessibleForFree": true
 }
 </script>
@@ -34,7 +34,7 @@
 
   <header class="page-hero">
     <h1>Chi è maggiore?</h1>
-    <p class="page-lead">Un indicatore Istat, due regioni: scegli quale ha il valore più alto prima che scada il tempo. Più risposte giuste di fila dai, più le sfide diventano serrate.</p>
+    <p class="page-lead">Un indicatore Istat, due regioni o province: scegli quale ha il valore più alto prima che scada il tempo. Ogni giorno c'è una sfida di dieci coppie, le stesse per tutti, e chi vuole può allenarsi a serie.</p>
   </header>
 
   <div id="compare-root">
@@ -42,12 +42,15 @@
       <p>Attiva JavaScript per giocare a "Chi è maggiore?". Nel frattempo puoi esplorare
       <a href="/regioni">le regioni italiane</a> o provare <a href="/quiz/indovina-la-regione">Indovina la Regione</a>.</p>
     </noscript>
-    <p class="game-loading">Preparazione del primo round...</p>
+    <p class="game-loading">Preparazione della sfida del giorno...</p>
   </div>
 
   <section class="prose">
     <h2>Come si gioca</h2>
-    <p>Ogni round mostra il nome di un indicatore Istat e due regioni italiane. Hai dieci secondi per toccare la regione che secondo te ha il valore più alto. Dopo la risposta vedi entrambi i valori reali. Ogni risposta corretta allunga la tua serie e alza la difficoltà: le coppie diventano sempre più vicine in classifica. Un errore o il tempo scaduto azzerano la serie. Il tuo record resta salvato sul dispositivo, e le migliori serie possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
+    <p>La <strong>sfida del giorno</strong> è una partita di dieci coppie, una al giorno, con le stesse dieci coppie per chiunque apra la pagina. La cambia alla mezzanotte di Roma e la difficoltà cresce da lunedi a domenica, dalle coppie lontane in classifica a quelle quasi adiacenti. Prima di iniziare scegli il livello: fra regioni, fra le province di una stessa regione o fra province d'Italia.</p>
+    <p>Hai dieci secondi per coppia e scegli il territorio che secondo te ha il numero più alto. Conta il numero, anche quando un valore alto non è un risultato migliore: un tasso di occupazione più basso o un indice di povertà più basso indicano una situazione migliore. Dopo la risposta vedi i due valori veri, la spiegazione di che cosa misura l'indicatore e i link alla scheda del territorio e dell'indicatore. A fine partita trovi il riepilogo delle dieci coppie e puoi condividere il risultato, che non contiene la soluzione.</p>
+    <p>Il <strong>interruttore del timer</strong> è una scelta tua: con i dieci secondi la partita va in classifica, senza timer è allenamento e non entra in nessuna classifica né in nessun record del giorno.</p>
+    <p>L'<strong>allenamento a serie</strong> non ha fine: ogni risposta giusta allunga la serie e alza la difficoltà, un errore o il tempo scaduto la azzerano. Il tuo record resta salvato sul dispositivo e le migliori serie possono entrare nella <a href="/quiz/classifica">classifica</a>. Da tastiera usa le frecce o i tasti A e B.</p>
     <p>Vuoi una sfida più ragionata? Prova a <a href="/quiz/ordina">ordinare le regioni</a> o a <a href="/quiz/indovina-la-regione">indovinare la regione misteriosa</a> del giorno.</p>
   </section>
 </article>
