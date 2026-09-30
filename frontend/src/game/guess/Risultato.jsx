@@ -1,5 +1,6 @@
 import React from "react";
-import { formatValue, FinePartita } from "../shared.jsx";
+import { FinePartita } from "../shared.jsx";
+import Riepilogo from "./Riepilogo.jsx";
 import { DistributionChart } from "./Statistiche.jsx";
 
 const GAME_NAME = "Indovina la Regione";
@@ -7,18 +8,6 @@ const GAME_NAME = "Indovina la Regione";
 function titoloEsito(won, tentativi) {
   if (!won) return "Regione non indovinata";
   return tentativi === 1 ? "Indovinata al primo tentativo" : `Indovinata in ${tentativi} tentativi`;
-}
-
-// "Che cosa misura" di un indicatore: la descrizione, come si legge il valore e
-// la lettura, i tre testi che il backend passa a ogni riga del recap.
-function CheCosaMisura({ row }) {
-  const testi = [row.description, row.value_explanation, row.reading].filter(Boolean);
-  if (!testi.length) return null;
-  return (
-    <p className="game-recap-misura">
-      <strong>Che cosa misura.</strong> {testi.join(" ")}
-    </p>
-  );
 }
 
 export default function ResultPanel({
@@ -51,23 +40,11 @@ export default function ResultPanel({
       />
 
       {recap && (
-        <section className="game-recap" aria-label="Gli indicatori della sfida">
-          <h3>Gli indicatori, uno per uno</h3>
-          <ol className="game-recap-list">
-            {recap.map((row) => (
-              <li key={row.id}>
-                <p className="game-recap-nome">
-                  <a href={row.path}>{row.name}</a>
-                </p>
-                <p className="game-recap-valori">
-                  <span>{solution.region}: <strong>{formatValue(row.value, row.unit)}</strong></span>
-                  <span>Media delle regioni: {formatValue(row.national_avg, row.unit)}</span>
-                </p>
-                <CheCosaMisura row={row} />
-              </li>
-            ))}
-          </ol>
-        </section>
+        <Riepilogo
+          soggetto={solution.region}
+          mediaLabel="Media delle regioni"
+          rows={recap.map((row) => ({ ...row, media: row.national_avg }))}
+        />
       )}
 
       {daily && (

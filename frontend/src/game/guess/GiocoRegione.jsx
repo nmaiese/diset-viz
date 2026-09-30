@@ -249,7 +249,7 @@ export default function GameApp() {
   const highlightBucket = mode === "daily" && finished ? (status === "won" ? String(guesses.length) : "fail") : null;
 
   return (
-    <div className="game-app">
+    <div className="game-app guess-app">
       <div className="game-toolbar" role="tablist" aria-label="Modalità di gioco">
         <button
           type="button"

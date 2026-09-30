@@ -20,6 +20,7 @@ export default defineConfig({
       input: {
         "quiz-hub": resolve(__dirname, "src/game/entries/hub.jsx"),
         "quiz-indovina": resolve(__dirname, "src/game/main.jsx"),
+        "quiz-provincia": resolve(__dirname, "src/game/entries/provincia.jsx"),
         "quiz-compare": resolve(__dirname, "src/game/entries/compare.jsx"),
         "quiz-order": resolve(__dirname, "src/game/entries/order.jsx"),
         "quiz-leaderboard": resolve(__dirname, "src/game/entries/leaderboard.jsx"),

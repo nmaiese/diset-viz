@@ -54,7 +54,7 @@ export default function TabellaIndizi({ clues, total, playing, bodyRef }) {
             <strong>Indizio {clues.length}</strong> · <NomeIndizio clue={latest} />
             {latest.description ? `: ${latest.description}` : "."}
             {latest.reading ? ` ${latest.reading}` : ""}{" "}
-            <span className="qz-clue-rank">{ordinal(latest.rank)} su {latest.region_count}</span>
+            <span className="qz-clue-rank">{ordinal(latest.rank)} su {latest.region_count ?? latest.province_count}</span>
           </p>
           <SourceStrip year={latest.year} sourceLabel={latest.source_label} sourceUrl={latest.source_url} />
         </div>
