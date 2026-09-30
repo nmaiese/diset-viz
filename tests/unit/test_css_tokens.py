@@ -17,6 +17,9 @@ ognuna e' del tipo che non si vede in una PR e non rompe nessun test:
    adesso guarda i fogli di pagina, dove stanno l'atlante e il confronto, e
    dal 26 settembre anche i componenti comuni e la testata (`components.css`,
    `chrome.css`). Il solo foglio che scrive colori e' `system.css`.
+   Dal 30 settembre 2026 anche i fogli del gioco (`frontend/src/game/*.css`),
+   che leggono i token del sotto-marchio `--game-*`: e ogni `--game-*` che
+   usano deve esistere in chiaro e in scuro.
 """
 import re
 import unittest
@@ -25,7 +28,8 @@ from pathlib import Path
 RADICE = Path(__file__).resolve().parents[2]
 SITE = RADICE / "app" / "static" / "css" / "site.css"
 PAGINE = RADICE / "app" / "static" / "css" / "ds" / "pages"
-GIOCO = RADICE / "frontend" / "src" / "game" / "game.css"
+GIOCO_DIR = RADICE / "frontend" / "src" / "game"
+GIOCO = tuple(sorted(GIOCO_DIR.glob("*.css")))
 SISTEMA = RADICE / "app" / "static" / "css" / "ds" / "system.css"
 CHROME = RADICE / "app" / "static" / "css" / "ds" / "chrome.css"
 COMPONENTS = RADICE / "app" / "static" / "css" / "ds" / "components.css"
@@ -33,7 +37,7 @@ INDICATOR = RADICE / "app" / "static" / "css" / "ds" / "indicator.css"
 REGION_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "regione.css"
 PROVINCE_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "provincia.css"
 
-FOGLI = (SITE, GIOCO, SISTEMA, CHROME, COMPONENTS, *sorted(PAGINE.glob("*.css")))
+FOGLI = (SITE, *GIOCO, SISTEMA, CHROME, COMPONENTS, *sorted(PAGINE.glob("*.css")))
 
 # I token che le view transition leggono dalla radice del documento.
 MOVIMENTO_IN_RADICE = ("--dur", "--ease-out")
@@ -135,11 +139,51 @@ class FogliDiStileTest(unittest.TestCase):
         """
         fogli = sorted(PAGINE.glob("*.css"))
         self.assertIn("confronto.css", [f.name for f in fogli])
-        fogli += [COMPONENTS, CHROME]
+        fogli += [COMPONENTS, CHROME, *GIOCO]
         for foglio in fogli:
             with self.subTest(foglio=foglio.name):
                 testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
                 self.assertEqual(re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", testo), [])
+
+    def test_il_gioco_ha_i_suoi_fogli(self):
+        """`game.css` raccoglie i quattro fogli e non scrive regole sue.
+
+        main.jsx importa solo `game.css`: un foglio del gioco che non passa di
+        li' non arriva nel bundle, e una regola rimasta in `game.css` sfugge
+        alla divisione per gioco."""
+        nomi = {f.name for f in GIOCO}
+        self.assertEqual(nomi, {"game.css", "game-base.css", "guess.css", "compare.css", "order.css"})
+        raccolta = re.sub(r"/\*.*?\*/", "", (GIOCO_DIR / "game.css").read_text(encoding="utf-8"), flags=re.DOTALL)
+        importati = re.findall(r'^@import "\./([a-z-]+\.css)";$', raccolta, re.M)
+        self.assertEqual(sorted(importati), sorted(nomi - {"game.css"}))
+        self.assertNotIn("{", raccolta)
+
+    def test_i_token_del_gioco_esistono_nei_due_temi(self):
+        """Un `var(--game-x)` senza dichiarazione non fallisce: cade a vuoto.
+
+        Il bottone di gioco resterebbe senza fondo in chiaro, o sulla palette
+        chiara nel tema scuro."""
+        sistema = SISTEMA.read_text(encoding="utf-8")
+        chiaro = {n for n in _nomi(_corpi(sistema, r"^:root\s*\{")) if n.startswith("--game-")}
+        scuro = {n for n in _nomi(_corpi(sistema, r'^\[data-theme="dark"\]\s*\{')) if n.startswith("--game-")}
+        self.assertTrue(chiaro, "nessun --game-* in system.css")
+        self.assertEqual(chiaro, scuro)
+        usati = set()
+        for foglio in GIOCO:
+            usati |= set(re.findall(r"var\((--game-[a-z-]+)", foglio.read_text(encoding="utf-8")))
+        self.assertTrue(usati, "i fogli del gioco non leggono nessun --game-*")
+        self.assertEqual(usati - chiaro, set())
+
+    def test_il_movimento_del_gioco_chiede_il_permesso(self):
+        """Nei fogli del gioco `animation` e `transition` stanno solo dentro
+        `@media (prefers-reduced-motion: no-preference)`."""
+        for foglio in GIOCO:
+            testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
+            fuori = testo
+            for corpo in _corpi(testo, r"^@media \(prefers-reduced-motion: no-preference\)\s*\{"):
+                fuori = fuori.replace(corpo, "")
+            with self.subTest(foglio=foglio.name):
+                self.assertEqual(re.findall(r"(?<![-\w])(?:animation|transition)\s*:", fuori), [])
 
     def test_il_telaio_vecchio_non_ha_piu_regole(self):
         """Nessuna pagina rende piu' `.masthead`, `.mobmenu` o `.nav-underline`.
