@@ -1,0 +1,90 @@
+/* Il prototipo del sotto-marchio del gioco: solo cio' che il sito da' gia' con
+   la testata e i template (margini, testata, eroe dell'hub) e cio' che il
+   prototipo propone di nuovo (sfida del giorno in evidenza, icone, stati).
+   Nessun colore scritto: legge i token di system.css, --game-* compresi. */
+
+.gi-wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--margin-s); }
+@media (min-width: 720px) { .gi-wrap { padding: 0 var(--margin-l); } }
+
+/* ---------- Testata: il marchio madre e il sotto-marchio ---------- */
+.gi-top { border-bottom: 1px solid var(--rule); background: var(--bg); }
+.gi-top__row { display: flex; align-items: center; gap: var(--space-4); min-height: var(--masthead-s); flex-wrap: wrap; }
+.gi-parent { margin: 0; font-family: var(--font-display); font-weight: 760; font-size: var(--fs-subsection); color: var(--ink); }
+.gi-lockup {
+  display: inline-flex; align-items: center; gap: var(--space-2); margin: 0;
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--game-wash); color: var(--game-accent);
+  font-family: var(--font-display); font-weight: 700; font-size: var(--fs-label);
+}
+.gi-theme { margin-left: auto; display: flex; gap: var(--space-1); }
+.gi-theme button {
+  min-height: var(--target-min); padding: 0 var(--space-3);
+  border: 1px solid var(--control-border); border-radius: var(--radius-control);
+  background: var(--bg); color: var(--ink); font: inherit; font-size: var(--fs-small); cursor: pointer;
+}
+.gi-theme button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.gi-proto-note {
+  margin: var(--space-4) 0 0; padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--rule-strong); border-radius: var(--radius-control);
+  color: var(--muted); font-size: var(--fs-small);
+}
+.gi-ph {
+  display: inline-block; padding: 0 var(--space-1);
+  border: 1px dashed var(--control-border); border-radius: var(--radius-control);
+  color: var(--muted); font-weight: 400; font-family: var(--font-ui);
+}
+
+.gi-title { font-size: var(--fs-title); line-height: var(--lh-title); margin: var(--space-8) 0 var(--space-2); }
+.gi-title--s { font-size: var(--fs-section); line-height: var(--lh-section); margin-top: var(--space-12); }
+.gi-lede { margin: 0 0 var(--space-6); max-width: var(--measure); font-size: var(--fs-lede); line-height: var(--lh-lede); color: var(--text-2); }
+
+/* ---------- Icone ---------- */
+.gi { display: block; flex: 0 0 auto; }
+.gi-24 { width: 24px; height: 24px; }
+.gi-34 { width: 34px; height: 34px; }
+.qz-game > .gi { color: var(--ink); margin-bottom: var(--space-3); }
+.qz-badge--level { display: inline-flex; align-items: center; gap: var(--space-1); }
+.qz-badge--level .gi { width: 18px; height: 18px; }
+.achv-card-ic { color: var(--ink); }
+.achv-card.is-locked .achv-card-ic { color: var(--muted); }
+.gi-achv-state { margin-top: var(--space-1); font-size: var(--fs-small); color: var(--muted); }
+
+/* ---------- La sfida del giorno, in evidenza sull'hub ---------- */
+.gi-daily {
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-4); align-items: center;
+  padding: var(--space-6);
+  border: 1px solid var(--game-accent); border-left-width: 6px; border-radius: var(--radius-control);
+  background: var(--game-wash); color: var(--ink); text-decoration: none;
+}
+a.gi-daily, a.gi-daily:hover { color: var(--ink); text-decoration: none; }
+.gi-daily__icon { color: var(--game-accent); align-self: start; }
+.gi-daily__body { display: grid; gap: var(--space-1); min-width: 0; }
+.gi-daily__kicker { font-size: var(--fs-label); font-weight: 600; color: var(--game-accent); }
+.gi-daily__title { font-family: var(--font-display); font-size: var(--fs-section); line-height: var(--lh-section); font-weight: 760; }
+.gi-daily__text { color: var(--text-2); }
+.gi-daily__meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); align-items: center; margin-top: var(--space-1); font-size: var(--fs-small); color: var(--muted); }
+.gi-daily__cta { display: inline-flex; align-items: center; min-height: var(--target); padding: 0 var(--space-6); font-size: var(--fs-ui); }
+@media (max-width: 720px) {
+  .gi-daily { grid-template-columns: auto 1fr; padding: var(--space-4); }
+  .gi-daily__cta { grid-column: 1 / -1; justify-content: center; }
+}
+
+/* ---------- La partita ---------- */
+.gi-game .game-layout { margin-top: var(--space-4); }
+.gi-region-edge { fill: none; stroke: var(--ink); stroke-width: 0.9; pointer-events: none; }
+.game-map-frame .rmap-region.is-guessed-wrong { fill: url(#gi-hatch); stroke: var(--game-wrong); stroke-width: 1.2; }
+.game-map-legend i.gi-sw-wrong {
+  background: repeating-linear-gradient(45deg, var(--game-wrong) 0 2px, var(--game-wrong-wash) 2px 4px);
+  outline: 1px solid var(--game-wrong);
+}
+.game-map-legend i.gi-sw-right { background: var(--game-right); border-radius: 50%; }
+
+.gi-verdict { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-2); font-weight: 600; }
+.gi-verdict--wrong { color: var(--game-wrong); }
+.gi-verdict--right { color: var(--game-right); }
+.gi-states { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--rule); }
+.gi-states .gi-verdict { margin: 0; }
+
+main { padding-bottom: var(--space-16); }
