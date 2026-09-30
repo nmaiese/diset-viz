@@ -162,7 +162,7 @@ def main() -> None:
     )
 
     attempts = "".join(f'<span class="seg{" is-wrong" if i < len(GUESSES) else ""}"></span>' for i in range(ATTEMPTS))
-    page = TEMPLATE
+    page = (HERE / "index.template.html").read_text(encoding="utf-8")
     for k, v in {
         "SUB_BRAND": html.escape(SUB_BRAND),
         "ICON_GUESS_34": icon("indovina", 34),
@@ -189,8 +189,6 @@ def main() -> None:
     (HERE / "index.html").write_text(page, encoding="utf-8")
     print(f"design/gioco/index.html: {len(page) // 1024} KB")
 
-
-TEMPLATE = (HERE / "index.template.html").read_text(encoding="utf-8") if (HERE / "index.template.html").exists() else ""
 
 if __name__ == "__main__":
     main()

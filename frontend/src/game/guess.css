@@ -292,7 +292,7 @@
   margin-bottom: 16px;
 }
 
-.game-stats-numbers strong { display: block; font-family: var(--font-display); font-size: 22px; }
+.game-stats-numbers strong { display: block; font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 22px; }
 .game-stats-numbers span { display: block; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
 
 .game-stats-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
