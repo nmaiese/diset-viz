@@ -4,7 +4,7 @@ import unittest
 from datetime import date
 from unittest import mock
 
-from app import app, game_daily
+from app import app, game_daily, sources
 
 
 class TestGameOrderDaily(unittest.TestCase):
@@ -87,6 +87,33 @@ class TestGameOrderDaily(unittest.TestCase):
         self.assertEqual(len(session["territories"]), 5)
         for t in session["territories"]:
             self.assertEqual(t["region"], session["region"])
+
+    def test_si_ordina_solo_la_sfida_di_oggi(self):
+        session = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
+        token = session["token"]
+        del_giorno = [t["key"] for t in session["territories"]]
+        altri = [k for k in game_daily_regioni() if k not in del_giorno][:5]
+        for chiavi in (altri, del_giorno[:4] + [del_giorno[0]], del_giorno[:4]):
+            with self.subTest(chiavi=chiavi):
+                r = self.client.post("/api/game/order/daily/answer", json={
+                    "token": token, "level": "regioni", "region_keys": chiavi})
+                self.assertEqual(r.status_code, 400)
+
+    def test_a_livello_province_la_fonte_viene_da_sources(self):
+        session = self.client.get("/api/game/order/daily/session?level=province").get_json()
+        keys = [t["key"] for t in session["territories"]]
+        r = self.client.post("/api/game/order/daily/answer", json={
+            "token": session["token"], "level": "province", "region_keys": keys})
+        self.assertEqual(r.status_code, 200)
+        ind = r.get_json()["indicator"]
+        self.assertEqual(ind["source_label"], sources.SOURCES["bes"]["label"])
+        self.assertTrue(ind["path"].startswith("/indicatore/") and ind["path"].endswith("/province"))
+        self.assertNotEqual(ind["source_url"], "https://www.istat.it")
+
+
+def game_daily_regioni():
+    from app.data import REGION_ORDER
+    return list(REGION_ORDER)
 
 
 if __name__ == "__main__":

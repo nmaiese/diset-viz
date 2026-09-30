@@ -42,12 +42,18 @@ def evaluate_daily_order_answer(payload, auth_user=None, request_obj=None):
     ind_id = ind["id"]
     year = ind["year"]
 
+    # Si ordina proprio la sfida di oggi: i cinque territori, ciascuno una volta.
+    if sorted(region_keys) != sorted(t["key"] for t in daily_puzzle["territories"]):
+        return {"error": "bad_request"}, 400
+
     result = None
     if level == "regioni":
         result = quiz.evaluate_order(ind_id, year, region_keys)
+        if result is None:
+            return {"error": "bad_request"}, 400
 
     if result is None:
-        ambito = "regioni" if level == "regioni" else "province"
+        ambito = "province"
         righe_data = game_daily._righe_indicatore(ind, ambito)
         if not righe_data:
             return {"error": "bad_request"}, 400
@@ -83,25 +89,15 @@ def evaluate_daily_order_answer(payload, auth_user=None, request_obj=None):
             for k in correct_keys
         ]
 
-        if level != "regioni":
-            raw_id = game_daily.id_provinciale(ind_id)
-            manifest = bes_data.get_bes_manifest("provincia").get(raw_id) or {}
-            explain = manifest.get("explain") or {}
-            desc = explain.get("plain") or ind["name"]
-            slug = profiles.indicator_slug(ind["name"])
-            try:
-                canonical_path = sources.indicator_url("bes", raw_id, slug) + "/province"
-            except Exception:
-                canonical_path = f"/indicatore/{slug}/{raw_id}/province"
-            val_expl = explain.get("example") or ""
-            source_lbl = "Istat, BES le province"
-            source_u = "https://www.istat.it"
-        else:
-            desc = ind["name"]
-            canonical_path = f"/indicatore/{profiles.indicator_slug(ind['name'])}/{ind_id}"
-            val_expl = ""
-            source_lbl = "Istat"
-            source_u = "https://www.istat.it"
+        raw_id = game_daily.id_provinciale(ind_id)
+        manifest = bes_data.get_bes_manifest("provincia").get(raw_id) or {}
+        explain = manifest.get("explain") or {}
+        desc = explain.get("plain") or ind["name"]
+        slug = profiles.indicator_slug(ind["name"])
+        canonical_path = sources.indicator_url("bes", raw_id, slug) + "/province"
+        val_expl = explain.get("example") or ""
+        source_lbl = sources.SOURCES["bes"]["label"]
+        source_u = bes_data.BES_SOURCE_URLS["provincia"]
 
         result = {
             "score": score,
@@ -149,6 +145,5 @@ def evaluate_daily_order_answer(payload, auth_user=None, request_obj=None):
     if auth_user:
         date_str = today.isoformat()
         player_stats.record_daily_score(auth_user["id"], "order", date_str, result["score"])
-        player_stats.record_daily(auth_user["id"], f"daily:{date_str}", 1, is_perfect)
 
     return result, 200
