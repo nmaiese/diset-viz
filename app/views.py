@@ -41,7 +41,6 @@ from app import multiscopo_data
 from app import external_atlas
 from app import external_manifest
 from app import game
-from app import classifica_giorno
 from app import game_compare
 from app import game_daily
 from app import game_provincia
@@ -2978,20 +2977,6 @@ def favorites_remove_api(indicator_id):
     from app import favorites
     favorites.remove(user["id"], indicator_id)
     return jsonify({"ok": True})
-
-
-@app.route("/api/game/daily/leaderboard")
-def game_daily_leaderboard_api():
-    """La classifica di oggi di Indovina la Regione: primi 20 con account, per
-    tentativi e poi ora di arrivo. Solo nickname moderati, mai email né id."""
-    oggi = game_daily.oggi_roma()
-    try:
-        entries = classifica_giorno.classifica_oggi(giorno=oggi)
-    except Exception:  # noqa: BLE001
-        app.logger.exception("classifica del giorno non disponibile")
-        return jsonify({"error": "unavailable"}), 503
-    return jsonify({"date": oggi.isoformat(), "number": game_daily.numero_sfida(oggi),
-                    "next_puzzle_at": game_daily.prossima_sfida_roma(oggi), "entries": entries})
 
 
 @app.route("/api/game/leaderboard")
