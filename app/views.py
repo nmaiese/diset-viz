@@ -3116,6 +3116,26 @@ def game_provincia_guess_api():
 
 # --- fine Indovina la Provincia -----------------------------------------------
 
+# --- INIZIO BLOCCO SFIDA DEL GIORNO ORDINA ---
+@app.route("/api/game/order/daily/session")
+def game_order_daily_session_api():
+    level = request.args.get("level", "regioni")
+    token = request.args.get("token")
+    timer = _timer_requested()
+    from app import game_order
+    return jsonify(game_order.daily_order_session(level, token, timer))
+
+
+@app.post("/api/game/order/daily/answer")
+def game_order_daily_answer_api():
+    payload = request.get_json(silent=True) or {}
+    user = auth.current_user(request.headers)
+    from app import game_order
+    res, status_code = game_order.evaluate_daily_order_answer(payload, auth_user=user, request_obj=request)
+    return jsonify(res), status_code
+# --- FINE BLOCCO SFIDA DEL GIORNO ORDINA ---
+
+
 
 @app.route("/api/game/regions")
 def game_regions_api():
