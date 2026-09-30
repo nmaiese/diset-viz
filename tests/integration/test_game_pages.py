@@ -7,7 +7,7 @@ import json
 import re
 import unittest
 
-from app import app, publisher
+from app import app, publisher, quiz, sources
 
 PAGINE = {
     "/quiz": "quiz-hub.js",
@@ -22,6 +22,10 @@ GIOCHI = ("/quiz/indovina-la-regione", "/quiz/chi-e-maggiore", "/quiz/ordina")
 def _jsonld(html):
     blocchi = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
     return [json.loads(b) for b in blocchi]
+
+
+def _lista(valore):
+    return valore if isinstance(valore, list) else [valore]
 
 
 class GamePagesTest(unittest.TestCase):
@@ -62,8 +66,43 @@ class GamePagesTest(unittest.TestCase):
                 self.assertEqual(gioco["creator"], {"@id": publisher.ORGANIZATION_ID})
                 base = gioco["isBasedOn"]
                 self.assertEqual(base["@type"], "Dataset")
-                self.assertEqual(base["creator"]["name"], "Istat")
-                self.assertTrue(base["license"].startswith("http"))
+                self.assertTrue(all(url.startswith("http") for url in _lista(base["license"])))
+
+    def _famiglie_nel_pool(self, path):
+        """Le famiglie realmente presenti nel pool del gioco, dai prefissi degli id
+        (un calcolo indipendente da quello dell'app)."""
+        if path == "/quiz/indovina-la-regione":
+            return {"territorial"}
+        prefissi = {meta["internal_prefix"]: famiglia for famiglia, meta in sources.SOURCES.items()}
+        famiglie = set()
+        for voce in quiz._quiz_indicators():
+            prefisso = voce["id"].split(":")[0] + ":" if ":" in voce["id"] else ""
+            famiglie.add(prefissi[prefisso])
+        return famiglie | {"bes"}
+
+    def test_fonte_e_licenza_del_json_ld_vengono_da_sources(self):
+        """R1 punto 12: nome e licenza dell'istituzione si compongono da app/sources.py
+        sulle famiglie che il pool del gioco ha davvero, mai la stringa "Istat" da sola."""
+        for path in GIOCHI:
+            with self.subTest(path=path):
+                famiglie = self._famiglie_nel_pool(path)
+                base = [b for b in _jsonld(self._html(path)) if b.get("@type") == "Game"][0]["isBasedOn"]
+                attesi = sources.institutions_label(famiglie)
+                nomi = [c["name"] for c in _lista(base["creator"])]
+                self.assertEqual(len(nomi), len(set(nomi)))
+                self.assertIn(attesi, base["description"])
+                self.assertEqual(
+                    sorted(_lista(base["license"])),
+                    sorted({sources.family_license_url(f) for f in famiglie if sources.family_license_url(f)}))
+                self.assertEqual(set(nomi), {sources.SOURCES[f]["institution"] for f in famiglie})
+
+    def test_chi_e_maggiore_e_ordina_dicono_anche_eurostat(self):
+        for path in ("/quiz/chi-e-maggiore", "/quiz/ordina"):
+            with self.subTest(path=path):
+                base = [b for b in _jsonld(self._html(path)) if b.get("@type") == "Game"][0]["isBasedOn"]
+                self.assertIn("Eurostat", [c["name"] for c in _lista(base["creator"])])
+                self.assertIn("Eurostat", base["description"])
+                self.assertNotIn("pubblicati da Istat.", base["description"])
 
     def test_hub_ha_itemlist_dei_quattro_giochi(self):
         liste = [b for b in _jsonld(self._html("/quiz")) if b.get("@type") == "ItemList"]

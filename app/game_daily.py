@@ -452,3 +452,66 @@ def sfida_payload(gioco, livello, now=None):
         "next_puzzle_at": prossima_sfida_roma(giorno),
         **corpo,
     }
+
+
+# Le fonti dei giochi, per il JSON-LD delle pagine /quiz/*
+
+def _famiglia_di(id_indicatore):
+    """La famiglia di `app/sources.py` di un id del pool: il prefisso interno
+    (`bes:`, `multiscopo:`, `dem:`, `eur:`), e nessun prefisso e' la territoriale."""
+    from app import sources
+
+    for famiglia, meta in sources.SOURCES.items():
+        prefisso = meta["internal_prefix"]
+        if prefisso and id_indicatore.startswith(prefisso):
+            return famiglia
+    return "territorial"
+
+
+@lru_cache(maxsize=8)
+def famiglie_del_gioco(gioco):
+    """Le famiglie di fonti davvero presenti nel pool di un gioco (`regione`,
+    `compare`, `order`, `provincia`), nell'ordine del registro. Indovina la Regione
+    pesca dal profilo regionale dell'atlante. Chi e' maggiore e Ordina pescano dal
+    pool del quiz e, ai livelli con le province, dal BES provinciale. Indovina la
+    Provincia dal BES."""
+    from app import profiles, quiz, sources
+    from app.data import REGION_ORDER
+
+    if gioco == "regione":
+        profilo = profiles.region_profile(profiles.region_key_for(REGION_ORDER[0]))
+        famiglie = {_famiglia_di(voce["id"]) for voce in profilo["all_indicators"]}
+    elif gioco in ("compare", "order"):
+        famiglie = {_famiglia_di(voce["id"]) for voce in quiz._quiz_indicators()} | {"bes"}
+    elif gioco == "provincia":
+        famiglie = {"bes"}
+    else:
+        raise ValueError(f"gioco sconosciuto: {gioco!r}")
+    return tuple(f for f in sources.SOURCES if f in famiglie)
+
+
+def fonte_del_gioco(gioco):
+    """Chi pubblica i dati di un gioco, per il JSON-LD: `istituzioni` (frase in
+    chiaro, "Istat ed Eurostat"), `creator` (le organizzazioni, una per istituzione) e
+    `licenze` (gli URL delle licenze dichiarate dalle famiglie, senza ripetizioni). Tutto
+    da `app/sources.py`: la stringa "Istat" da sola ha gia' attribuito a Istat una serie
+    Eurostat."""
+    from app import sources
+
+    famiglie = famiglie_del_gioco(gioco)
+    istituzioni = list(dict.fromkeys(sources.SOURCES[f]["institution"] for f in famiglie))
+    licenze = list(dict.fromkeys(u for u in (sources.family_license_url(f) for f in famiglie) if u))
+    return {
+        "istituzioni": sources.institutions_label(famiglie),
+        "creator": [{"@type": "Organization", "name": nome} for nome in istituzioni],
+        "licenze": licenze,
+    }
+
+
+def _registra_nei_template():
+    from app import app
+
+    app.jinja_env.globals["fonte_del_gioco"] = fonte_del_gioco
+
+
+_registra_nei_template()
