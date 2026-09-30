@@ -3283,9 +3283,15 @@ def game_guess_api():
     attempt = payload.get("attempt")
     if not isinstance(region_key, str) or not isinstance(attempt, int) or isinstance(attempt, bool):
         abort(400)
+    # `mode` lo manda il client della sfida del giorno. Un client che non lo manda (un bundle di
+    # prima) e l'archivio (`mode: "archive"`) giocano le sfide passate come sempre: il contratto
+    # si allarga, non si restringe. Solo chi dice "e' la sfida di oggi" e ha una pagina rimasta
+    # aperta oltre la mezzanotte di Roma riceve 410, invece di un tentativo che non conta.
     result = game.evaluate_guess(puzzle_id, region_key, attempt)
     if result is None:
         abort(400)
+    if payload.get("mode") == "daily" and game.is_past_daily(puzzle_id):
+        return jsonify({"error": "puzzle_changed"}), 410
     # A partita finita, se loggato, registra la giornaliera e valuta i traguardi.
     result["achievements"] = []
     # Solo la giornaliera di oggi (giorno di Roma): allenamento e archivio si

@@ -236,7 +236,7 @@ def payload(livello, now=None, chiave=None):
         chiave_regione = mistero["region_key"]
         regione = {"name": mistero["region"], "key": chiave_regione, "viewbox": maps.zoom(chiave_regione)["viewbox"]}
     token = _firma({"p": puzzle_id(giorno), "l": livello, "g": [], "sid": _nuova_sessione()})
-    return {
+    risposta = {
         "puzzle_id": puzzle_id(giorno),
         "number": game_daily.numero_sfida(giorno),
         "date": giorno.isoformat(),
@@ -249,6 +249,16 @@ def payload(livello, now=None, chiave=None):
         "clue": dict(indizi[0]),
         "token": token,
     }
+    if livello == "stessa_regione":
+        # Le province delle altre regioni, solo nome e regione: il client le usa per dire
+        # "Milano non e' in Puglia" a chi scrive una provincia che non e' fra le opzioni. La regione
+        # e' gia' nel payload e la misteriosa e' fra le opzioni, quindi niente si svela.
+        risposta["other_provinces"] = [
+            {"name": p["name"], "region": p["region"]}
+            for p in sorted(game_daily.province_pool(), key=lambda p: p["name"])
+            if p["region"] != mistero["region"]
+        ]
+    return risposta
 
 
 @lru_cache(maxsize=1)

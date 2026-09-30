@@ -6,8 +6,8 @@
 {% set og_image_path = '/static/img/og/gioco-indovina-provincia.png' %}
 {% set og_image_alt = 'Sfida Italia: Indovina la Provincia' %}
 
-{% block title %}Indovina la Provincia, quiz sulle province | {{ site_name }}{% endblock %}
-{% block description %}Quiz sulle province italiane: indovina la provincia misteriosa a partire dai dati Istat. Una sfida al giorno, con la mappa che ti dice quanto sei vicino.{% endblock %}
+{% block title %}Indovina la Provincia dai dati Istat | {{ site_name }}{% endblock %}
+{% block description %}Indovina la provincia italiana misteriosa a partire dai dati Istat. Una sfida al giorno, con la mappa che ti dice quanto sei vicino.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
@@ -36,7 +36,9 @@
 
   <header class="page-hero">
     <h1>Indovina la Provincia</h1>
-    <p class="page-lead">Il quiz sulle province italiane: una provincia misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino.</p>
+    {# Quando esistera' la pagina a mappa per imparare dove stanno le province, il lead rimanda li'
+       per chi vuole imparare e non giocare. Fino ad allora niente link a una pagina che non c'e'. #}
+    <p class="page-lead">Una provincia italiana misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino.</p>
   </header>
 
   <div class="game-layout">
@@ -64,6 +66,9 @@
         <span><i class="sw-wrong"></i> tentata, con il numero del tentativo</span>
         <span><i class="sw-correct"></i> misteriosa, a partita finita</span>
       </p>
+      {# La stessa riga di attribuzione dei confini che il sito usa alla classifica (v1/_ui.html) e
+         in home: la mappa del gioco disegna gli stessi confini e la licenza la chiede. #}
+      <p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>
     </div>
     <div id="game-root">
       <noscript>
