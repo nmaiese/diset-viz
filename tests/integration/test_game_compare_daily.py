@@ -414,6 +414,44 @@ class FinePartitaTest(Base):
             self.assertEqual(corpo["b"]["name"], domanda["b"]["name"])
 
 
+class PunteggioDelGiornoTest(Base):
+    """La sfida finita con il timer conta per l'account (`daily_scores`)."""
+
+    def _punteggi(self):
+        from sqlalchemy import select
+        from app.db import session_scope
+        from app.models import DailyScore
+        with session_scope() as s:
+            return [(r.auth_id, r.gioco, r.data, r.punteggio)
+                    for r in s.execute(select(DailyScore)).scalars().all()]
+
+    def _accedi(self, sub):
+        import jwt
+        credenziale = jwt.encode(
+            {"sub": sub, "email": "c@example.com", "aud": "authenticated",
+             "exp": datetime.now(timezone.utc) + timedelta(hours=1)},
+            "test-jwt-secret", algorithm="HS256")
+        self.client.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + credenziale
+
+    def test_da_loggato_la_sfida_con_timer_registra_il_punteggio_una_volta(self):
+        self._accedi("uuid-compare-1")
+        sessione = self._sessione("regioni")
+        self._gioca(sessione, "regioni", giuste=7)
+        giorno = sessione["date"]
+        self.assertEqual(self._punteggi(), [("uuid-compare-1", "compare", giorno, 7)])
+
+    def test_l_allenamento_senza_timer_non_registra_niente(self):
+        self._accedi("uuid-compare-2")
+        sessione = self._sessione("regioni", timer=0)
+        self._gioca(sessione, "regioni")
+        self.assertEqual(self._punteggi(), [])
+
+    def test_da_anonimo_non_si_registra_niente(self):
+        sessione = self._sessione("regioni")
+        self._gioca(sessione, "regioni")
+        self.assertEqual(self._punteggi(), [])
+
+
 class LimiteFrequenzaTest(Base):
     def test_ip_limit_on_daily_answers(self):
         codici = [

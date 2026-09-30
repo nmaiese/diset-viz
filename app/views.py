@@ -3170,6 +3170,18 @@ def game_compare_daily_answer_api():
     if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
     stato, corpo = game_compare.risposta(dati)
+    if stato == 200 and corpo.get("finished") and corpo.get("leaderboard"):
+        # La sfida del giorno finita con il timer conta per l'account: un solo
+        # punteggio per (account, gioco, giorno). Serve ai traguardi ("Giro d'Italia").
+        from app import player_stats
+
+        utente = auth.current_user(request.headers)
+        if utente:
+            try:
+                player_stats.record_daily_score(
+                    utente["id"], "compare", corpo["summary"]["date"], corpo["summary"]["score"]["correct"])
+            except Exception:
+                app.logger.exception("compare: punteggio del giorno non registrato")
     if isinstance(corpo.get("session"), dict):
         corpo["achievements"] = _record_quiz(
             request, "compare", bool(corpo.get("correct")), corpo["session"]

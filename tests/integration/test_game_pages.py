@@ -65,13 +65,13 @@ class GamePagesTest(unittest.TestCase):
                 self.assertEqual(base["creator"]["name"], "Istat")
                 self.assertTrue(base["license"].startswith("http"))
 
-    def test_hub_ha_itemlist_dei_tre_giochi(self):
+    def test_hub_ha_itemlist_dei_quattro_giochi(self):
         liste = [b for b in _jsonld(self._html("/quiz")) if b.get("@type") == "ItemList"]
         self.assertEqual(len(liste), 1)
         elementi = liste[0]["itemListElement"]
-        self.assertEqual(len(elementi), 3)
+        self.assertEqual(len(elementi), 4)
         percorsi = [e["url"][e["url"].index("/quiz"):] for e in elementi]
-        self.assertEqual(percorsi, list(GIOCHI))
+        self.assertEqual(percorsi, list(GIOCHI) + ["/quiz/indovina-la-provincia"])
 
     def test_ogni_pagina_carica_il_suo_entry_e_non_game_js(self):
         for path, entry in PAGINE.items():

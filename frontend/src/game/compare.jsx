@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getAccessToken } from "../shared/supabase.js";
+import { segnaGiocata } from "./oggi.js";
 import {
   fetchJson,
   formatValue,
@@ -361,6 +362,15 @@ function SfidaDelGiorno({ livello, timer, onEsci }) {
   }
 
   const fine = stato === "fine" && risposta && risposta.summary;
+
+  // L'hub sa che oggi hai giocato (solo la sfida in classifica, non l'allenamento).
+  useEffect(() => {
+    if (!fine || allenamento) return;
+    segnaGiocata("compare", fine.date, {
+      ok: fine.score.correct * 2 > fine.score.total,
+      testo: `${fine.score.correct} su ${fine.score.total}`,
+    });
+  }, [fine, allenamento]);
 
   return (
     <div className="compare-app">
