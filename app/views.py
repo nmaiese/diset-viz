@@ -2697,7 +2697,8 @@ def game_compare_round_api():
     # Il timer si decide aprendo la sessione (`timer=0` e' allenamento, fuori
     # classifica) e la difficolta' la decide la serie: il parametro `difficulty`
     # del client non si legge.
-    state = quiz_tokens.load_state(request.args.get("token"), "compare", _timer_requested())
+    state = quiz_tokens.close_open_round(
+        quiz_tokens.load_state(request.args.get("token"), "compare", _timer_requested()))
     result = quiz.compare_round(min(state["s"] // 3, quiz.MAX_DIFFICULTY))
     result["timer"] = bool(state["t"])
     keys = [result["region_a"]["region_key"], result["region_b"]["region_key"]]
@@ -2709,6 +2710,11 @@ def game_compare_round_api():
 
 @app.post("/api/game/compare/answer")
 def game_compare_answer_api():
+    """Senza un round legato la risposta si valuta (il dato e' pubblico, e' lo stesso
+    dell'atlante) ma non conta: niente serie, niente token nuovo, niente statistiche
+    dell'account (`_record_quiz`), niente classifica. L'unico freno a chi chiede prima
+    all'oracolo e risponde dopo col token e' la plausibilita' temporale della sessione
+    (`quiz_tokens.is_plausible`)."""
     payload = request.get_json(silent=True) or {}
     state = quiz_tokens.load_state(payload.get("token"), "compare")
     if _answer_rate_limited(state["sid"]):
@@ -2755,7 +2761,8 @@ def game_order_round_api():
     result = quiz.order_round(count)
     if result is None:
         abort(400)
-    state = quiz_tokens.load_state(request.args.get("token"), "order", _timer_requested())
+    state = quiz_tokens.close_open_round(
+        quiz_tokens.load_state(request.args.get("token"), "order", _timer_requested()))
     result["timer"] = bool(state["t"])
     keys = [r["region_key"] for r in result["regions"]]
     result["token"] = quiz_tokens.bind_round(
@@ -2766,6 +2773,7 @@ def game_order_round_api():
 
 @app.post("/api/game/order/answer")
 def game_order_answer_api():
+    """Come `game_compare_answer_api`: senza un round legato si valuta e basta."""
     payload = request.get_json(silent=True) or {}
     state = quiz_tokens.load_state(payload.get("token"), "order")
     if _answer_rate_limited(state["sid"]):
@@ -2793,9 +2801,12 @@ def game_order_answer_api():
 def _record_quiz(req, mode, correct, session_summary):
     """Se la richiesta porta un JWT valido, aggiorna le statistiche account della
     modalità e valuta gli achievement, restituendo gli sblocchi appena ottenuti
-    (per il toast). Anonimo o DB giù -> lista vuota, il gioco non cambia."""
+    (per il toast). Anonimo o DB giù -> lista vuota, il gioco non cambia.
+    Una risposta senza round legato (`session_summary` nullo) si valuta ma non conta:
+    ne' per la serie ne' per l'account, altrimenti chi chiede i valori all'oracolo
+    pubblico gonfierebbe i round giocati."""
     user = auth.current_user(req.headers)
-    if not user:
+    if not user or session_summary is None:
         return []
     try:
         from app import player_stats, achievements

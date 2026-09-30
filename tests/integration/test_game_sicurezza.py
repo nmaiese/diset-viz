@@ -7,6 +7,7 @@ C-tecnica §1 e §3)."""
 import os
 import shutil
 import tempfile
+import time
 import unittest
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -253,6 +254,89 @@ class ModalitaDelGiornoTest(Base):
         r = client.post("/api/game/compare/daily/answer", json={
             "token": serie["token"], "puzzle_id": sessione["puzzle_id"], "q": 0, "choice": "region_a"})
         self.assertEqual((r.status_code, r.get_json()["error"]), (400, "token_invalid"))
+
+
+class RoundASerieTest(Base):
+    """R1 punti 6 e 7: senza un round legato la risposta si valuta (il dato e'
+    pubblico) ma non conta per la serie ne' per l'account, e un nuovo /round con un
+    round ancora aperto conta quel round come sbagliato."""
+
+    def _corpo(self, round_, scelta=None):
+        return {"token": round_["token"], "indicator_id": round_["indicator"]["id"],
+                "year": round_["indicator"]["year"], "region_a_key": round_["region_a"]["region_key"],
+                "region_b_key": round_["region_b"]["region_key"], "choice": scelta or "region_a"}
+
+    def _giusta(self, client, round_):
+        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
+        return "region_a" if client.post("/api/game/compare/answer", json=senza).get_json()["correct"] else "region_b"
+
+    def test_la_risposta_senza_token_valuta_ma_non_conta_per_la_serie(self):
+        client = app.test_client()
+        round_ = client.get("/api/game/compare/round").get_json()
+        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
+        r = client.post("/api/game/compare/answer", json=senza)
+        self.assertEqual(r.status_code, 200)
+        corpo = r.get_json()
+        self.assertIsNone(corpo["session"])
+        self.assertIsNone(corpo["token"])
+
+    def test_la_risposta_senza_round_legato_non_conta_per_l_account(self):
+        client = app.test_client()
+        round_ = client.get("/api/game/compare/round").get_json()
+        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
+        intest = {"Authorization": "Bearer " + _jwt("oracolo-1")}
+        for _ in range(3):
+            client.post("/api/game/compare/answer", json=senza, headers=intest)
+        self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 0)
+        # e la risposta a un round legato si': un round, e le statistiche lo vedono
+        scelta = self._giusta(client, round_)
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            client.post("/api/game/compare/answer", json=self._corpo(round_, scelta), headers=intest)
+        self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 1)
+
+    def test_ordina_senza_token_non_conta_per_l_account(self):
+        client = app.test_client()
+        round_ = client.get("/api/game/order/round?count=5").get_json()
+        corpo = {"indicator_id": round_["indicator"]["id"], "year": round_["indicator"]["year"],
+                 "region_keys": [r["region_key"] for r in round_["regions"]]}
+        intest = {"Authorization": "Bearer " + _jwt("oracolo-2")}
+        r = client.post("/api/game/order/answer", json=corpo, headers=intest)
+        self.assertEqual(r.status_code, 200)
+        self.assertIsNone(r.get_json()["session"])
+        self.assertEqual(player_stats.stats_map("oracolo-2")["order"]["rounds_played"], 0)
+
+    def test_il_reroll_di_compare_azzera_la_serie_e_chiude_il_round_aperto(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/compare/round").get_json()
+        stato = quiz_tokens.load_state(r0["token"], "compare")
+        stato = {**stato, "s": 5, "b": 5, "r": 5}
+        token = quiz_tokens.sign_state(stato)
+        r1 = client.get("/api/game/compare/round?token=" + token).get_json()
+        nuovo = quiz_tokens.load_state(r1["token"], "compare")
+        self.assertEqual((nuovo["s"], nuovo["b"]), (0, 5))
+        self.assertEqual(nuovo["sid"], stato["sid"])
+        # il round aperto con il token di prima non si puo' piu' rispondere
+        vecchio = {**self._corpo(r0), "token": token}
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            r = client.post("/api/game/compare/answer", json=vecchio)
+        self.assertEqual(r.status_code, 409)
+
+    def test_il_reroll_di_ordina_azzera_la_serie(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/order/round?count=5").get_json()
+        stato = {**quiz_tokens.load_state(r0["token"], "order"), "s": 4, "b": 4}
+        r1 = client.get("/api/game/order/round?count=5&token=" + quiz_tokens.sign_state(stato)).get_json()
+        self.assertEqual(quiz_tokens.load_state(r1["token"], "order")["s"], 0)
+
+    def test_un_round_dopo_una_risposta_non_e_un_reroll(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/compare/round").get_json()
+        scelta = self._giusta(client, r0)
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            risposta = client.post("/api/game/compare/answer", json=self._corpo(r0, scelta)).get_json()
+        self.assertEqual(risposta["session"]["streak"], 1)
+        r1 = client.get("/api/game/compare/round?token=" + risposta["token"]).get_json()
+        self.assertEqual(quiz_tokens.load_state(r1["token"], "compare")["s"], 1)
 
 
 class StoreTest(Base):

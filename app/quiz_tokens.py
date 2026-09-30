@@ -138,6 +138,18 @@ def bind_round(state, indicator_id, year, region_keys, extra, count=None):
     return sign_state(next_state)
 
 
+def close_open_round(state):
+    """Un nuovo round chiesto mentre ce n'e' uno ancora aperto conta quello aperto
+    come sbagliato: la serie riparte da zero e il round `(sid, q)` si segna come
+    risposto, cosi' non si puo' rispondere dopo. Senza, chi non gradisce una domanda
+    ne chiederebbe un'altra a costo zero (reroll). Con un round non aperto (`fp` nullo:
+    sessione nuova o risposta gia' data) non cambia niente."""
+    if state.get("fp") is None:
+        return state
+    claim_round(state["sid"], state["q"])
+    return {**state, "s": 0, "r": state["r"] + 1, "fp": None, "x": None, "iat": None, "n": None}
+
+
 def apply_answer(state, indicator_id, year, region_keys, correct):
     """Valida che la risposta corrisponda al round legato dal fingerprint,
     poi aggiorna streak/record/round giocati. Ritorna (session, token) o
