@@ -355,6 +355,22 @@
   --z-toast: 500;
   --target-min: 40px;
   --target-comfortable: 44px;
+
+  /* === IL SOTTO-MARCHIO DEL GIOCO (/quiz) =============================== */
+  /* Colori d'interfaccia del gioco: l'azione, il badge, il pannello. Mai un
+     colore dei dati, e giusto e sbagliato non stanno mai solo nel colore
+     (icona, forma, testo). Tinta lontana dall'arancio e dalla rampa blu,
+     giusto e sbagliato separati anche in luminosita'. accent-strong e' solo
+     il fondo del bottone sotto il puntatore o premuto. Li verifica
+     design/v1/tools/check_tokens.py (sezione gioco, tokens.json "game"). */
+  --game-accent: #9c29d0;
+  --game-accent-strong: #7b15a6;
+  --game-wash: #f7eefd;
+  --game-on-accent: #ffffff;
+  --game-right: #1d7635;
+  --game-right-wash: #e7f9e8;
+  --game-wrong: #6c1614;
+  --game-wrong-wash: #fdebe9;
 }
 
 /* ===========================================================================
@@ -516,6 +532,14 @@ body.ds {
   --blue-600: #c8e1fe;
   --blue-wash: #1a2f46;
   --scrim: #000000a0;
+  --game-accent: #d48af8;
+  --game-accent-strong: #bd52eb;
+  --game-wash: #301d3b;
+  --game-on-accent: #121417;
+  --game-right: #7fe998;
+  --game-right-wash: #122d19;
+  --game-wrong: #e47c75;
+  --game-wrong-wash: #371b19;
 }
 
 /* ===========================================================================

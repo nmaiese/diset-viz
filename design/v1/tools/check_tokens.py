@@ -6,12 +6,19 @@
 Le soglie: testo 4,5:1, controlli e oggetti grafici 3:1 (WCAG 2.2, 1.4.3 e
 1.4.11). Per le tinte dei dati la distanza minima in OKLab sotto le quattro
 visioni (normale, protanopia, deuteranopia, tritanopia).
+
+Il sotto-marchio del gioco (`tokens.json`, chiave "game", e il blocco `--game-*`
+di `app/static/css/ds/system.css`) ha le sue soglie: contrasti, tinta lontana
+dall'arancio e dalla rampa blu, niente verde e niente rosso, lontano dai colori
+dei dati, e giusto e sbagliato distinguibili anche in acromatopsia.
 """
 
 from __future__ import annotations
 
 import itertools
 import json
+import math
+import re
 import sys
 from pathlib import Path
 
@@ -27,6 +34,7 @@ from colors import (
 )
 
 TOKENS = Path(__file__).resolve().parents[1] / "tokens" / "tokens.json"
+SYSTEM_CSS = Path(__file__).resolve().parents[3] / "app" / "static" / "css" / "ds" / "system.css"
 
 TEXT = ("ink", "text-2", "muted", "link", "accent", "error", "warning", "success")
 SURFACES = ("bg", "surface-1", "surface-2")
@@ -36,6 +44,36 @@ CAT_MIN = 0.10  # distanza minima fra due tinte categoriali, in ogni visione
 # etichette dirette e la tabella.
 CAT_CMP_MIN = 0.08  # distanza minima dal grigio di contesto
 SEQ_STEP_MIN = 0.07  # distanza minima fra due passi vicini della rampa
+
+# Il gioco. Le sue tinte sono d'interfaccia, mai dei dati.
+# accent-strong e' solo un fondo (il bottone sotto il puntatore o premuto): si
+# prova col testo che ci sta sopra e come controllo, non come testo.
+GAME_TEXT = ("accent", "right", "wrong")
+GAME_HUE_MIN = 40  # gradi di tinta dall'arancio e da ogni passo della rampa blu
+GAME_SEMAPHORE_HUE_MIN = 35  # gradi dal verde e dal rosso: sono gia' giusto e sbagliato
+GAME_DATA_MIN = 0.1  # distanza dai colori dei dati (rampa, categoriale, ripartizioni)
+GAME_RW_MIN = 0.12  # giusto contro sbagliato, in ogni visione e in scala di grigi
+GAME_ACTION_MIN = 0.1  # l'azione del gioco contro giusto e sbagliato
+# Le quattro visioni della prova del gioco: le tre carenze e l'acromatopsia.
+# L'acromatopsia qui e non in colors.VISIONS: le prove dei dati non la chiedono.
+GAME_VISIONS = ("protan", "deutan", "tritan", "acroma")
+
+
+def game_distance(a: str, b: str, vision: str) -> float:
+    """Distanza OKLab; in acromatopsia conta solo la luminosita' (grigio a pari Y)."""
+    if vision == "acroma":
+        return abs(luminance(a) ** (1 / 3) - luminance(b) ** (1 / 3))
+    return distance(a, b, vision)
+
+
+def css_game_tokens(css: str) -> dict[str, dict[str, str]]:
+    """I `--game-*` di system.css, del chiaro (`:root`) e dello scuro."""
+    found: dict[str, dict[str, str]] = {}
+    for theme, head in (("light", r"^:root\s*\{"), ("dark", r'^\[data-theme="dark"\]\s*\{')):
+        m = re.search(head, css, re.M)
+        body = css[m.end() : css.index("\n}", m.end())] if m else ""
+        found[theme] = dict(re.findall(r"--game-([a-z-]+):\s*(#[0-9a-fA-F]{3,8})\s*;", body))
+    return found
 
 
 def check(tokens: dict) -> list[str]:
@@ -125,6 +163,85 @@ def check(tokens: dict) -> list[str]:
         for i in range(1, 5):
             hc = oklch(tokens["light"][f"cat-{i}"])[2]
             need(hue_gap(h, hc) >= 20, f"cat-{i} non richiama il {mark} del simbolo: {hue_gap(h, hc):.0f} gradi di tinta")
+
+    failures += check_game(tokens)
+    return failures
+
+
+def check_game(tokens: dict, css: str | None = None) -> list[str]:
+    """Il sotto-marchio del gioco: contrasti, tinta, distanza dai dati, giusto e sbagliato."""
+    failures: list[str] = []
+    logo = tokens["logo"]
+
+    def need(ok: bool, message: str) -> None:
+        print(("  ok   " if ok else "  NO   ") + message)
+        if not ok:
+            failures.append(message)
+
+    for theme in ("light", "dark"):
+        t, g = tokens[theme], tokens["game"][theme]
+        print(f"\n== gioco, {theme} ==")
+        print("testo, 4,5:1")
+        for name in GAME_TEXT:
+            for surface in SURFACES:
+                r = contrast(g[name], t[surface])
+                need(r >= 4.5, f"{theme} game-{name} su {surface}: {r:.2f}")
+        for name, wash in (("accent", "wash"), ("right", "right-wash"), ("wrong", "wrong-wash")):
+            r = contrast(g[name], g[wash])
+            need(r >= 4.5, f"{theme} game-{name} su game-{wash}: {r:.2f}")
+        for wash in ("wash", "right-wash", "wrong-wash"):
+            r = contrast(t["ink"], g[wash])
+            need(r >= 4.5, f"{theme} ink su game-{wash}: {r:.2f}")
+        for fill in ("accent", "accent-strong"):
+            r = contrast(g["on-accent"], g[fill])
+            need(r >= 4.5, f"{theme} game-on-accent su game-{fill} (bottone di gioco): {r:.2f}")
+        print("controlli, 3:1")
+        for name in ("accent", "accent-strong", "right", "wrong"):
+            r = min(contrast(g[name], t[s]) for s in SURFACES)
+            need(r >= 3, f"{theme} game-{name} come bordo o icona, sul fondo peggiore: {r:.2f}")
+
+        print("tinta: lontana dall'arancio e dalla rampa, ne' verde ne' rosso")
+        semaphore = {"success": t["success"], "error": t["error"], "game-right": g["right"],
+                     "game-wrong": g["wrong"], "verde del simbolo": logo["green"], "rosso del simbolo": logo["red"]}
+        for name in ("accent", "accent-strong"):
+            h = oklch(g[name])[2]
+            gap = hue_gap(h, oklch(t["accent"])[2])
+            need(gap >= GAME_HUE_MIN, f"{theme} game-{name} (tinta {h:.0f}) dall'arancio: {gap:.0f} gradi")
+            gap = min(hue_gap(h, oklch(t[f"seq-{i}"])[2]) for i in range(1, 7))
+            need(gap >= GAME_HUE_MIN, f"{theme} game-{name} dalla rampa blu: {gap:.0f} gradi")
+            near, gap = min(((k, hue_gap(h, oklch(v)[2])) for k, v in semaphore.items()), key=lambda x: x[1])
+            need(gap >= GAME_SEMAPHORE_HUE_MIN, f"{theme} game-{name} dal verde e dal rosso: {gap:.0f} gradi ({near})")
+
+        print("un colore d'interfaccia, non dei dati")
+        data = {k: v for k, v in t.items() if k.startswith(("seq-", "cat-", "area-", "div-")) and "label" not in k}
+        data["accent"] = t["accent"]
+        for name in ("accent", "accent-strong"):
+            near = min(data, key=lambda k: distance(g[name], data[k]))
+            d = distance(g[name], data[near])
+            need(d >= GAME_DATA_MIN, f"{theme} game-{name} dal colore dei dati piu' vicino ({near}): {d:.3f}")
+            cvd = min(min_distance(g[name], t[f"seq-{i}"]) for i in range(1, 7))
+            print(f"  info {theme} game-{name} dalla rampa blu, visione peggiore: {cvd:.3f} (mai sulla mappa dei dati)")
+
+        print("giusto e sbagliato, nelle quattro visioni")
+        for vision in ("normale", *GAME_VISIONS):
+            d = game_distance(g["right"], g["wrong"], vision)
+            need(d >= GAME_RW_MIN, f"{theme} game-right contro game-wrong, {vision}: {d:.3f}")
+        for vision in ("normale", *GAME_VISIONS):
+            d = game_distance(t["success"], t["error"], vision)
+            print(f"  info {theme} success contro error del sito, {vision}: {d:.3f}")
+        for mark in ("right", "wrong"):
+            d = min(distance(g["accent"], g[mark], v) for v in VISIONS)
+            need(d >= GAME_ACTION_MIN, f"{theme} game-accent contro game-{mark}, visione peggiore: {d:.3f}")
+
+    print("\n== gioco, system.css allineato a tokens.json ==")
+    if css is None:
+        css = SYSTEM_CSS.read_text(encoding="utf-8")
+    found = css_game_tokens(css)
+    for theme in ("light", "dark"):
+        want = {k: v.lower() for k, v in tokens["game"][theme].items()}
+        got = {k: v.lower() for k, v in found[theme].items()}
+        need(got == want, f"{theme} --game-* di system.css uguali a tokens.json"
+             + ("" if got == want else f": diversi {sorted(set(want.items()) ^ set(got.items()))}"))
     return failures
 
 

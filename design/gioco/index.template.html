@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="it" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{SUB_BRAND}}, prototipo del sotto-marchio</title>
+<script>
+  // Il tema come nel sito: quello del sistema, salvo scelta esplicita.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("gi-theme"); } catch (e) {}
+    if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<link rel="stylesheet" href="../../app/static/css/fonts.css">
+<link rel="stylesheet" href="../../app/static/css/ds/system.css">
+<link rel="stylesheet" href="../../frontend/src/game/game.css">
+<link rel="stylesheet" href="proto.css">
+</head>
+<body class="ds">
+<header class="gi-top">
+  <div class="gi-wrap gi-top__row">
+    <p class="gi-parent">Divario Italia</p>
+    <p class="gi-lockup">{{ICON_GUESS_24}}<span>{{SUB_BRAND}}</span></p>
+    <div class="gi-theme" role="group" aria-label="Tema">
+      <button type="button" data-set-theme="light">Chiaro</button>
+      <button type="button" data-set-theme="dark">Scuro</button>
+    </div>
+  </div>
+</header>
+
+<main class="gi-wrap">
+  <p class="gi-proto-note">Prototipo statico. Il nome del sotto-marchio è un segnaposto, i riquadri tratteggiati sono dati che arrivano dall'API del gioco.</p>
+
+  <!-- ============================== HUB ============================== -->
+  <section class="gi-hub" aria-labelledby="gi-hub-title">
+    <h1 id="gi-hub-title" class="gi-title">Quanto conosci l'Italia?</h1>
+    <p class="gi-lede">Tre giochi sui dati Istat di regioni e province. Una sfida nuova ogni giorno, e partite veloci quando vuoi.</p>
+
+    <a class="gi-daily" href="#gi-partita">
+      <span class="gi-daily__icon">{{ICON_GUESS_34}}</span>
+      <span class="gi-daily__body">
+        <span class="gi-daily__kicker">Sfida del giorno <span class="gi-ph">numero</span></span>
+        <strong class="gi-daily__title">Indovina la Provincia</strong>
+        <span class="gi-daily__text">Una provincia misteriosa fra {{N_PROV}}, sei indicatori come indizi, sei tentativi.</span>
+        <span class="gi-daily__meta"><span class="qz-badge qz-badge--level">{{ICON_PROV_24}} Livello Provincia</span><span class="gi-daily__clock">Nuova sfida fra <span class="gi-ph">ore e minuti</span></span></span>
+      </span>
+      <span class="game-btn gi-daily__cta">Gioca la sfida</span>
+    </a>
+
+    <section class="hub-cards qz-games" aria-label="I giochi">
+      <a class="hub-card qz-game" href="#gi-partita">
+        {{ICON_GUESS_34}}
+        <small>Sfida quotidiana</small>
+        <h3>Indovina la Regione</h3>
+        <p>Una regione misteriosa, sei indicatori come indizi, sei tentativi. Anche a livello Provincia.</p>
+        <span class="qz-meta"><em>6 tentativi</em><span>Gioca ora</span></span>
+      </a>
+      <a class="hub-card qz-game" href="#gi-partita">
+        {{ICON_COMPARE_34}}
+        <small>Round da 10 secondi</small>
+        <h3>Chi è maggiore?</h3>
+        <p>Due regioni, un indicatore: scegli quella col valore più alto prima che scada il tempo.</p>
+        <span class="qz-meta"><em>10 secondi per round</em><span>Gioca ora</span></span>
+      </a>
+      <a class="hub-card qz-game" href="#gi-partita">
+        {{ICON_ORDER_34}}
+        <small>Credito parziale</small>
+        <h3>Ordina le regioni</h3>
+        <p>Tre o cinque regioni, dal valore più alto al più basso. Un punto per ogni posizione giusta.</p>
+        <span class="qz-meta"><em>3 o 5 regioni</em><span>Gioca ora</span></span>
+      </a>
+    </section>
+
+    <div class="qz-stats">
+      <p class="qz-section-eb">Traguardi · {{ACHV_COUNT}} <span class="gi-ph">del giocatore</span></p>
+      <div class="achv-grid">{{ACHV}}</div>
+    </div>
+  </section>
+
+  <!-- ======================= PARTITA, LIVELLO PROVINCIA ======================= -->
+  <section id="gi-partita" class="gi-game" aria-labelledby="gi-game-title">
+    <h2 id="gi-game-title" class="gi-title gi-title--s">Indovina la Regione, livello Provincia</h2>
+    <div class="game-layout">
+      <div class="game-map-frame">
+        {{MAP}}
+        <div class="game-map-legend">
+          <span><i class="sw-available"></i>Da provare</span>
+          <span><i class="gi-sw-wrong"></i>Tentativo sbagliato</span>
+          <span><i class="gi-sw-right"></i>Provincia misteriosa, a fine partita</span>
+        </div>
+      </div>
+      <div class="game-app">
+        <header class="game-head">
+          <div class="qz-status">
+            <span class="qz-badge">Sfida <strong><span class="gi-ph">numero</span></strong></span>
+            <span class="qz-badge qz-badge--level">{{ICON_PROV_24}} Provincia</span>
+          </div>
+          <div class="game-attempts-row">
+            <span class="game-attempts-label">Tentativo {{ATTEMPT_N}} di {{ATTEMPT_TOT}}</span>
+            <div class="game-attempts" aria-hidden="true">{{ATTEMPTS}}</div>
+          </div>
+        </header>
+        <div class="game-panel">
+          <p class="qz-section-label">Indizi svelati</p>
+          <table class="qz-clues" aria-label="Indizi">
+            <tbody>{{CLUE_ROWS}}</tbody>
+          </table>
+          {{CLUE_DESC}}
+          <section class="game-input" aria-label="Indovina la provincia">
+            <label for="gi-guess">La tua ipotesi</label>
+            <div class="game-input-row">
+              <input id="gi-guess" type="text" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="gi-suggestions" value="Mat" placeholder="Scrivi il nome di una provincia">
+            </div>
+            <ul class="game-suggestions" id="gi-suggestions" role="listbox">
+              <li role="option" aria-selected="true"><button type="button" class="is-highlighted">Matera</button></li>
+              <li role="option" aria-selected="false"><button type="button">Massa-Carrara</button></li>
+            </ul>
+          </section>
+          <section class="game-history" aria-label="Tentativi">{{HISTORY}}</section>
+          <div class="gi-states" aria-label="Come si mostrano giusto e sbagliato">
+            <p class="gi-verdict gi-verdict--right">{{ICON_RIGHT}}<span>Giusto: cerchio con la spunta</span></p>
+            <p class="gi-verdict gi-verdict--wrong">{{ICON_WRONG}}<span>Sbagliato: quadrato con la croce</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+  document.querySelectorAll("[data-set-theme]").forEach(function (b) {
+    b.setAttribute("aria-pressed", String(b.dataset.setTheme === document.documentElement.dataset.theme));
+    b.addEventListener("click", function () {
+      document.documentElement.dataset.theme = b.dataset.setTheme;
+      try { localStorage.setItem("gi-theme", b.dataset.setTheme); } catch (e) {}
+      document.querySelectorAll("[data-set-theme]").forEach(function (o) {
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+    });
+  });
+</script>
+</body>
+</html>

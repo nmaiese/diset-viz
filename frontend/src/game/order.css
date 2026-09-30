@@ -1,0 +1,222 @@
+/* Gioco, Ordina le regioni (order.jsx): la lista ordinabile e il pannello. */
+
+/* ---------- Ordina le regioni (order.jsx) ---------- */
+
+.order-app {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.order-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-counts { display: flex; gap: 8px; }
+
+.order-question h2 { margin: 4px 0 6px; font-size: 20px; line-height: 1.3; }
+.order-kicker {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--game-accent);
+}
+.order-meta { margin: 0; font-size: 13px; color: var(--muted); }
+
+/* ----- layout a due colonne: lista + pannello punteggio/regole ----- */
+
+.order-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .order-layout { grid-template-columns: 1fr; }
+}
+
+.order-main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.order-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: var(--masthead-h, 84px);
+}
+
+.order-side .card {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 14px 16px;
+}
+
+.order-side-eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.order-score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.order-score-grid small {
+  display: block;
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.order-score-grid strong {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--game-accent);
+}
+
+.order-rules-card { border-left: 3px solid var(--game-accent); }
+.order-rules-card .order-side-eyebrow { color: var(--game-accent); }
+.order-rules-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+/* ----- lista ordinabile (righe con trascinamento e frecce) ----- */
+
+.order-list { display: flex; flex-direction: column; gap: 8px; }
+
+.order-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(110px, 160px) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.order-row.is-draggable { cursor: grab; }
+.order-row.is-draggable:hover { border-color: var(--game-accent); }
+.order-row.is-dragging { opacity: 0.5; }
+.order-row.is-correct { border-left-color: var(--game-right); background: var(--game-right-wash); }
+.order-row.is-wrong { border-left-color: var(--game-wrong); background: var(--game-wrong-wash); }
+
+.order-rank {
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+}
+.order-row.is-correct .order-rank { color: var(--game-right); }
+.order-row.is-wrong .order-rank { color: var(--game-wrong); }
+
+.order-row-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+
+.order-row-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.order-row-status {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.order-row.is-correct .order-row-status { color: var(--game-right); }
+.order-row.is-wrong .order-row-status { color: var(--game-wrong); }
+
+.order-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+}
+
+.order-move-btn {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.order-move-btn:disabled { opacity: 0.35; cursor: default; }
+.order-move-btn:not(:disabled):hover { border-color: var(--game-accent); color: var(--game-accent); }
+
+.order-handle {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .order-row { grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; padding: 12px 14px; }
+  .order-handle { display: none; }
+  .order-row-name { font-size: 15px; }
+  .order-row-value { font-size: 12px; }
+}
+
+.order-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.order-feedback { min-height: 24px; }
+.order-verdict { margin: 0; font-weight: 600; color: var(--ink); }
+.order-verdict.is-perfect { color: var(--game-right); }
+
+.order-solution {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 14px 18px;
+  background: var(--bg);
+}
+
+.order-solution h3 { margin: 0 0 10px; font-size: 15px; }
+
+.order-solution ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.order-solution li { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.order-solution li strong { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+.order-next { align-self: flex-start; }
+
+.order-status { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+
+/* Il movimento, solo a chi non ha chiesto di ridurlo. */
+@media (prefers-reduced-motion: no-preference) {
+  .order-row { transition: border-color 0.12s ease; }
+}

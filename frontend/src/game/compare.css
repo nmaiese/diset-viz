@@ -1,0 +1,141 @@
+/* Gioco, Chi e' maggiore? (compare.jsx): il faccia a faccia e il cruscotto. */
+
+/* ---------- Chi e' maggiore? (compare.jsx) ---------- */
+
+.compare-app {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+}
+
+/* Descrizione sintetica sotto le card di "Chi è maggiore?": niente titoli
+   né pannello, una sola riga di testo per non spingere la scelta fuori
+   dallo schermo su mobile (vedi compare.jsx). */
+.quiz-description-compact {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Faccia a faccia: regione A | divisore "VS" | regione B. Su schermi stretti
+   il divisore resta in mezzo mentre le due schede si impilano. */
+.qz-vs {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.qz-vs .divider {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--muted);
+  padding: 0 6px;
+}
+
+.qz-region {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 140px;
+  padding: 28px 20px;
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  text-align: center;
+}
+.qz-region:not(:disabled):hover { border-color: var(--game-accent); background: var(--game-wash); }
+.qz-region:disabled { cursor: default; }
+
+.qz-region .code {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.qz-region .name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(23px, 3vw, 30px);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.qz-region .macro {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.qz-region .value { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 18px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+
+.qz-region.is-winner { border-color: var(--game-right); background: var(--game-right-wash); }
+.qz-region.is-picked-wrong { border-color: var(--game-wrong); background: var(--game-wrong-wash); }
+
+.qz-region .crown {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  background: var(--game-right);
+  color: var(--game-on-accent);
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.01em;
+  padding: 3px 9px;
+}
+
+/* Cruscotto sotto la sfida: serie corrente, record, accuratezza e il comando
+   da tastiera. Su mobile il comando si nasconde per lasciare spazio ai numeri. */
+.qz-hud {
+  display: flex;
+  gap: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  flex-wrap: wrap;
+}
+.qz-hud div { display: grid; gap: 2px; }
+.qz-hud small {
+  font-family: var(--font-ui); font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.qz-hud strong { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; }
+.qz-hud strong.streak { color: var(--game-accent); }
+.qz-hud strong.best { color: var(--ink); }
+.qz-hud-cmd { margin-left: auto; }
+.qz-hud-cmd strong { font-size: 13px; color: var(--muted); }
+
+.compare-lb-cta { align-self: flex-start; }
+
+@media (max-width: 640px) {
+  .qz-vs { grid-template-columns: 1fr; }
+  .qz-vs .divider { padding: 2px 0; font-size: 16px; }
+  .qz-timer { margin-left: 0; width: 100%; }
+  .qz-timer-bar { flex: 1; width: auto; }
+  .qz-hud-cmd { display: none; }
+}
+
+.compare-feedback { min-height: 24px; }
+
+.compare-verdict { margin: 0; font-weight: 600; }
+.compare-verdict.is-correct { color: var(--game-right); }
+.compare-verdict.is-wrong { color: var(--game-wrong); }
+
+.compare-next { align-self: flex-start; }
+
+.compare-status { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+
+/* Il movimento, solo a chi non ha chiesto di ridurlo. */
+@media (prefers-reduced-motion: no-preference) {
+  .qz-region { transition: border-color 0.14s ease, background 0.14s ease, transform 0.12s ease; }
+  .qz-region:not(:disabled):hover { transform: translateY(-2px); }
+}
