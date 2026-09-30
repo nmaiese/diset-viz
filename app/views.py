@@ -3129,6 +3129,13 @@ def game_provincia_guess_api():
         risultato = game_provincia.valuta_tentativo(corpo.get("token"), corpo.get("province_key"))
     except game_provincia.ErroreProvincia as errore:
         return jsonify({"error": errore.code}), errore.status
+    if risultato.get("finished"):
+        try:
+            from app import daily_counter
+            daily_counter.record("provincia" if risultato["level"] == "province" else "provincia_regione",
+                                 game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+        except Exception:  # noqa: BLE001
+            app.logger.exception("provincia: partita finita non contata")
     utente = auth.current_user(request.headers) if risultato.get("finished") else None
     if utente:
         from app import achievements, player_stats
@@ -3169,6 +3176,11 @@ def game_order_daily_answer_api():
         res = game_order.evaluate_daily_order_answer(payload, auth_user=auth.current_user(request.headers))
     except game_order.ErroreOrdina as errore:
         return jsonify({"error": errore.code}), errore.status
+    try:
+        from app import daily_counter
+        daily_counter.record("order", game_daily.oggi_roma().isoformat(), res["score"])
+    except Exception:  # noqa: BLE001
+        app.logger.exception("order: partita finita non contata")
     # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono.
     res["achievements"] = _record_quiz(request, "order", res["score"] == res["total"], res["session"])
     return jsonify(res)
@@ -3197,6 +3209,12 @@ def game_compare_daily_answer_api():
     if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
     stato, corpo = game_compare.risposta(dati)
+    if stato == 200 and corpo.get("finished") and isinstance(corpo.get("summary"), dict):
+        try:
+            from app import daily_counter
+            daily_counter.record("compare", corpo["summary"]["date"], corpo["summary"]["score"]["correct"])
+        except Exception:  # noqa: BLE001
+            app.logger.exception("compare: partita finita non contata")
     if stato == 200 and corpo.get("finished") and corpo.get("leaderboard"):
         # La sfida del giorno finita con il timer conta per l'account: un solo
         # punteggio per (account, gioco, giorno). Serve ai traguardi ("Giro d'Italia").

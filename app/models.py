@@ -161,3 +161,18 @@ class DailyScore(Base):
     data: Mapped[str] = mapped_column(Text, primary_key=True)
     punteggio: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class DailyCounter(Base):
+    """Quante sfide del giorno sono finite, per gioco, giorno e punteggio: un contatore
+    aggregato e niente altro. Nessun account, nessuna sessione, nessun IP, nessun
+    identificativo: la riga dice "il 1 ottobre 7 partite di Chi e' maggiore? sono finite
+    con 8 su 10" e non chi le ha giocate. Conta anche per chi ha rifiutato il consenso
+    alle analitiche, perche' non tocca il browser. Si scrive con `app.daily_counter`."""
+
+    __tablename__ = "daily_counter"
+
+    gioco: Mapped[str] = mapped_column(Text, primary_key=True)
+    data: Mapped[str] = mapped_column(Text, primary_key=True)
+    punteggio: Mapped[int] = mapped_column(Integer, primary_key=True)
+    conteggio: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
