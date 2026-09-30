@@ -17,7 +17,7 @@
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Ordina le regioni",
-  "description": "Quiz sugli indicatori territoriali Istat: metti in ordine le regioni italiane dal valore più alto al più basso.",
+  "description": {{ ("Quiz sugli indicatori territoriali di " ~ fonte_del_gioco("order").istituzioni ~ ": metti in ordine le regioni italiane dal valore più alto al più basso.") | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},

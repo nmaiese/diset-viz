@@ -17,7 +17,7 @@
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Chi è maggiore?",
-  "description": "Sfida del giorno e allenamento a serie sugli indicatori territoriali Istat: scegli quale fra due regioni o province italiane ha il valore più alto.",
+  "description": {{ ("Sfida del giorno e allenamento a serie sugli indicatori territoriali di " ~ fonte_del_gioco("compare").istituzioni ~ ": scegli quale fra due regioni o province italiane ha il valore più alto.") | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},

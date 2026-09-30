@@ -185,7 +185,12 @@ def list_for(auth_id):
     """Intero catalogo con lo stato sblocco, per la vetrina (mostra anche quelli
     da conquistare)."""
     unlocked = unlocked_map(auth_id)
-    stats = _stats_per_criteri(auth_id) if auth_id else None
+    try:
+        stats = _stats_per_criteri(auth_id) if auth_id else None
+    except Exception:  # noqa: BLE001
+        # `_stats_per_criteri` legge `daily_scores`: senza la migrazione 0010 la vetrina
+        # resta quella di prima, con il progresso a zero.
+        stats = None
     voci = []
     for item in CATALOG:
         voce = _public(item, item["id"] in unlocked, unlocked.get(item["id"]))

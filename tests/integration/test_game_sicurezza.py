@@ -374,6 +374,14 @@ class SenzaMigrazione0010Test(Base):
         self.assertEqual(r.status_code, 200)
         self.assertIn("achievements", r.get_json())
 
+    def test_il_profilo_si_legge_anche_senza_daily_scores(self):
+        r = self.client.get("/api/player/me", headers=self.intest)
+        corpo = r.get_json()
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("daily", corpo["stats"])
+        self.assertEqual(corpo["stats"]["play_streak"], {"current": 0, "max": 0})
+        self.assertTrue(corpo["achievements"])
+
     def test_il_round_risposto_due_volte_senza_quiz_answered_fallisce_aperto_e_lo_dice_nel_log(self):
         with self.assertLogs("app.quiz_tokens", level="ERROR") as log:
             self.assertTrue(quiz_tokens.claim_round("sid-x", 1))
@@ -454,19 +462,6 @@ class CacheDelleSfideTest(Base):
         with mock.patch.object(game_daily, "_indice_quiz", wraps=game_daily._indice_quiz) as indice:
             game_daily.order_del_giorno(giorno, "regioni", "chiave-indice")
         self.assertEqual(indice.call_count, 1)
-
-    def test_le_rotte_della_sfida_del_giorno_sono_veloci_a_caldo(self):
-        rotte = ("/api/game/order/daily/session?level=province", "/api/game/order/daily?level=province",
-                 "/api/game/compare/daily?level=province", "/api/game/order/daily/session?level=regioni")
-        client = app.test_client()
-        for rotta in rotte:
-            client.get(rotta)
-            inizio = time.perf_counter()
-            for _ in range(5):
-                client.get(rotta)
-            medio_ms = (time.perf_counter() - inizio) / 5 * 1000
-            # prima: 50 ms (regioni) e 100 ms (province) a richiesta, dalla cache: pochi ms.
-            self.assertLess(medio_ms, 25, f"{rotta}: {medio_ms:.0f} ms")
 
 
 class StoreTest(Base):

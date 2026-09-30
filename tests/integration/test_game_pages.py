@@ -73,6 +73,8 @@ class GamePagesTest(unittest.TestCase):
         (un calcolo indipendente da quello dell'app)."""
         if path == "/quiz/indovina-la-regione":
             return {"territorial"}
+        if path == "/quiz/indovina-la-provincia":
+            return {"bes"}
         prefissi = {meta["internal_prefix"]: famiglia for famiglia, meta in sources.SOURCES.items()}
         famiglie = set()
         for voce in quiz._quiz_indicators():
@@ -83,7 +85,7 @@ class GamePagesTest(unittest.TestCase):
     def test_fonte_e_licenza_del_json_ld_vengono_da_sources(self):
         """R1 punto 12: nome e licenza dell'istituzione si compongono da app/sources.py
         sulle famiglie che il pool del gioco ha davvero, mai la stringa "Istat" da sola."""
-        for path in GIOCHI:
+        for path in GIOCHI + ("/quiz/indovina-la-provincia",):
             with self.subTest(path=path):
                 famiglie = self._famiglie_nel_pool(path)
                 base = [b for b in _jsonld(self._html(path)) if b.get("@type") == "Game"][0]["isBasedOn"]
@@ -91,6 +93,9 @@ class GamePagesTest(unittest.TestCase):
                 nomi = [c["name"] for c in _lista(base["creator"])]
                 self.assertEqual(len(nomi), len(set(nomi)))
                 self.assertIn(attesi, base["description"])
+                gioco = [b for b in _jsonld(self._html(path)) if b.get("@type") == "Game"][0]
+                if path in ("/quiz/chi-e-maggiore", "/quiz/ordina"):
+                    self.assertIn(attesi, gioco["description"])
                 self.assertEqual(
                     sorted(_lista(base["license"])),
                     sorted({sources.family_license_url(f) for f in famiglie if sources.family_license_url(f)}))
