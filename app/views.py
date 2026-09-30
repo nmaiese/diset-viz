@@ -3115,12 +3115,18 @@ def game_provincia_guess_api():
         return jsonify({"error": errore.code}), errore.status
     utente = auth.current_user(request.headers) if risultato.get("finished") else None
     if utente:
+        from app import achievements, player_stats
+        # Il livello sta nel punteggio: "tutta Italia" e' la sfida difficile ("provincia"), "della
+        # regione" quella facile ("provincia_regione") e non sblocca Geografo ne' Giro d'Italia.
+        gioco = "provincia" if risultato["level"] == "province" else "provincia_regione"
         try:
-            from app import achievements, player_stats
-            player_stats.record_daily_score(utente["id"], "provincia", game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+            player_stats.record_daily_score(utente["id"], gioco, game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+        except Exception:  # noqa: BLE001
+            app.logger.exception("provincia: punteggio del giorno non registrato")
+        try:
             risultato["achievements"] = achievements.evaluate(utente["id"])
         except Exception:  # noqa: BLE001
-            app.logger.exception("sfida della provincia non registrata")
+            app.logger.exception("provincia: traguardi non valutati")
     return jsonify(risultato)
 
 
@@ -3253,13 +3259,21 @@ def game_guess_api():
     if result.get("finished") and puzzle_id == f"daily:{game_daily.oggi_roma().isoformat()}":
         user = auth.current_user(request.headers)
         if user:
+            from app import player_stats, achievements
+            giorno = puzzle_id[len("daily:"):]
+            # Lo storico prima, in un try suo: senza la migrazione 0010 il punteggio del
+            # giorno fallisce ma `daily_results` (storico e serie) non si deve perdere.
             try:
-                from app import player_stats, achievements
-                player_stats.record_daily_score(user["id"], "indovina", puzzle_id[len("daily:"):], 1 if result.get("correct") else 0)
-                if player_stats.record_daily(user["id"], puzzle_id[len("daily:"):], attempt, result.get("correct")):
-                    result["achievements"] = achievements.evaluate(user["id"])
+                nuovo = player_stats.record_daily(user["id"], giorno, attempt, result.get("correct"))
             except Exception:  # noqa: BLE001
                 app.logger.exception("giornaliera non registrata per %s", puzzle_id)
+                nuovo = False
+            try:
+                player_stats.record_daily_score(user["id"], "indovina", giorno, 1 if result.get("correct") else 0)
+            except Exception:  # noqa: BLE001
+                app.logger.exception("indovina: punteggio del giorno non registrato per %s", puzzle_id)
+            if nuovo:
+                result["achievements"] = achievements.evaluate(user["id"])
     return jsonify(result)
 
 

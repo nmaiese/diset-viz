@@ -338,6 +338,7 @@ def valuta_tentativo(token, chiave_provincia, now=None, chiave=None):
     nuovo = _firma({**stato, "g": [*tentate, chiave_provincia]})
     return {
         "correct": corretta,
+        "level": livello,
         "attempt": attempt,
         "province": tentata["name"],
         "province_key": chiave_provincia,

@@ -339,6 +339,47 @@ class RoundASerieTest(Base):
         self.assertEqual(quiz_tokens.load_state(r1["token"], "compare")["s"], 1)
 
 
+class SenzaMigrazione0010Test(Base):
+    """R1 punto 5: un deploy prima della migrazione 0010 (niente `daily_scores` ne'
+    `quiz_answered`) non deve dare 500 ne' perdere lo storico giornaliero."""
+
+    def setUp(self):
+        super().setUp()
+        from sqlalchemy import text
+        with session_scope() as s:
+            s.execute(text("DROP TABLE daily_scores"))
+            s.execute(text("DROP TABLE quiz_answered"))
+        self.client = app.test_client()
+        self.intest = {"Authorization": "Bearer " + _jwt("uuid-0010")}
+
+    def test_indovina_salva_lo_storico_anche_senza_daily_scores(self):
+        puzzle_id = f"daily:{game_daily.oggi_roma().isoformat()}"
+        r = self.client.post("/api/game/guess", headers=self.intest, json={
+            "puzzle_id": puzzle_id, "region_key": _winning_key(puzzle_id), "attempt": 1})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(_daily_rows("uuid-0010")), 1)
+
+    def test_ordina_del_giorno_loggato_risponde_200(self):
+        sessione = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
+        r = self.client.post("/api/game/order/daily/answer", headers=self.intest, json={
+            "token": sessione["token"], "region_keys": [t["key"] for t in sessione["territories"]]})
+        self.assertEqual(r.status_code, 200)
+
+    def test_provincia_risponde_200_e_i_traguardi_si_valutano_lo_stesso(self):
+        from app import game_provincia
+        payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
+        mistero = game_provincia.provincia_del_giorno(game_daily.oggi_roma())["key"]
+        r = self.client.post("/api/game/provincia/guess", headers=self.intest, json={
+            "token": payload["token"], "province_key": mistero})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("achievements", r.get_json())
+
+    def test_il_round_risposto_due_volte_senza_quiz_answered_fallisce_aperto_e_lo_dice_nel_log(self):
+        with self.assertLogs("app.quiz_tokens", level="ERROR") as log:
+            self.assertTrue(quiz_tokens.claim_round("sid-x", 1))
+        self.assertIn("quiz_answered", log.output[0])
+
+
 class StoreTest(Base):
     def test_daily_score_refuses_second_attempt(self):
         self.assertTrue(player_stats.record_daily_score("u1", "compare", "2026-09-30", 7))
