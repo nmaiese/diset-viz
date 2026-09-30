@@ -164,6 +164,14 @@ def apply_answer(state, indicator_id, year, region_keys, correct):
     return session, token
 
 
+def session_summary(session):
+    """La parte della sessione che il client vede (mai `sid` ne' `count`), o None
+    se il round non era legato."""
+    if session is None:
+        return None
+    return {"streak": session["streak"], "best": session["best"], "rounds": session["rounds"]}
+
+
 def round_timing(state, choice, now=None):
     """Com'e' andata la risposta rispetto al tempo del round, misurato dal server:
     "ok", "late" (oltre 10 s piu' 2 di tolleranza: e' un errore) o "early_timeout"

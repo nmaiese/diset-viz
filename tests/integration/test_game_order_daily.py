@@ -1,10 +1,18 @@
 """Test per la sfida del giorno di "Ordina le regioni" (app/game_order.py e rotte /api/game/order/daily/*)."""
 
+import shutil
+import tempfile
+import time
 import unittest
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from unittest import mock
 
-from app import app, game_daily, sources
+import jwt
+
+from app import app, config, game_daily, game_order, quiz_tokens, sources
+from app.db import session_scope
+from app.models import DailyScore
 
 
 class TestGameOrderDaily(unittest.TestCase):
@@ -109,6 +117,138 @@ class TestGameOrderDaily(unittest.TestCase):
         self.assertEqual(ind["source_label"], sources.SOURCES["bes"]["label"])
         self.assertTrue(ind["path"].startswith("/indicatore/") and ind["path"].endswith("/province"))
         self.assertNotEqual(ind["source_url"], "https://www.istat.it")
+
+
+def _jwt(sub):
+    return jwt.encode({"sub": sub, "email": f"{sub}@example.com", "aud": "authenticated",
+                       "exp": datetime.now(timezone.utc) + timedelta(hours=1)},
+                      "test-jwt-secret", algorithm="HS256")
+
+
+def _punteggi(auth_id):
+    with session_scope() as s:
+        return [(r.gioco, r.punteggio) for r in s.query(DailyScore).filter_by(auth_id=auth_id)]
+
+
+class OrdinaDelGiornoSicuroTest(unittest.TestCase):
+    """R1 punti 2 e 10: il livello viene dal token, senza round legato niente valori
+    ne' punteggio, e Ordina non ha un timer nel client."""
+
+    def setUp(self):
+        self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
+        config.SUPABASE_JWT_SECRET = "test-jwt-secret"
+        config.SUPABASE_URL = ""
+        self._tmp = tempfile.mkdtemp()
+        config.LEADERBOARD_DB = str(Path(self._tmp) / "o.sqlite3")
+        from app.cache import cache
+        for k in ("rl:ans:ip:127.0.0.1",):
+            cache.delete(k)
+        self.client = app.test_client()
+
+    def tearDown(self):
+        config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB = self._saved
+        shutil.rmtree(self._tmp, ignore_errors=True)
+
+    def _sessione(self, level="regioni"):
+        return self.client.get(f"/api/game/order/daily/session?level={level}").get_json()
+
+    def _chiavi(self, sessione):
+        return [t["key"] for t in sessione["territories"]]
+
+    def test_senza_token_si_risponde_400_senza_valori_ne_ordine_giusto(self):
+        sessione = self._sessione()
+        r = self.client.post("/api/game/order/daily/answer", json={"region_keys": self._chiavi(sessione)})
+        self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
+
+    def test_senza_token_ma_loggato_non_registra_il_punteggio(self):
+        sessione = self._sessione()
+        r = self.client.post("/api/game/order/daily/answer", headers={"Authorization": "Bearer " + _jwt("o-1")},
+                             json={"region_keys": self._chiavi(sessione)})
+        self.assertEqual(r.status_code, 400)
+        self.assertEqual(_punteggi("o-1"), [])
+
+    def test_un_token_di_un_altro_round_non_lega(self):
+        sessione = self._sessione()
+        serie = self.client.get("/api/game/order/round?count=5").get_json()
+        for token in (serie["token"], "rotto"):
+            with self.subTest(token=token[:6]):
+                r = self.client.post("/api/game/order/daily/answer", json={
+                    "token": token, "region_keys": self._chiavi(sessione)})
+                self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
+
+    def test_il_livello_viene_dal_token_e_non_dal_corpo(self):
+        sessione = self._sessione("province")
+        r = self.client.post("/api/game/order/daily/answer", json={
+            "token": sessione["token"], "level": "regioni", "region_keys": self._chiavi(sessione)})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["indicator"]["source_label"], sources.SOURCES["bes"]["label"])
+
+    def test_la_sessione_del_giorno_non_ha_timer_e_una_risposta_tarda_conta(self):
+        sessione = self._sessione()
+        self.assertIs(sessione["timer"], False)
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 600):
+            r = self.client.post("/api/game/order/daily/answer", headers={"Authorization": "Bearer " + _jwt("o-2")},
+                                 json={"token": sessione["token"], "region_keys": self._chiavi(sessione)})
+        corpo = r.get_json()
+        self.assertEqual(r.status_code, 200)
+        self.assertNotIn("late", corpo)
+        ordine = [x["region_key"] for x in corpo["correct_order"]]
+        self.assertEqual(len(ordine), 5)
+        self.assertEqual(_punteggi("o-2"), [("order", corpo["score"])])
+
+    def test_da_loggato_con_il_round_legato_registra_il_punteggio_una_volta(self):
+        sessione = self._sessione()
+        corpo = {"token": sessione["token"], "region_keys": self._chiavi(sessione)}
+        intest = {"Authorization": "Bearer " + _jwt("o-3")}
+        r = self.client.post("/api/game/order/daily/answer", headers=intest, json=corpo)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(_punteggi("o-3")), 1)
+        self.assertEqual(self.client.post("/api/game/order/daily/answer", headers=intest, json=corpo).status_code, 409)
+
+    def test_le_chiavi_alternative_non_si_accettano(self):
+        sessione = self._sessione()
+        for nome in ("territory_keys", "keys"):
+            with self.subTest(nome=nome):
+                r = self.client.post("/api/game/order/daily/answer", json={
+                    "token": sessione["token"], nome: self._chiavi(sessione)})
+                self.assertEqual(r.status_code, 400)
+
+    def test_un_livello_sconosciuto_e_400(self):
+        self.assertEqual(self.client.get("/api/game/order/daily/session?level=boh").status_code, 400)
+
+    def test_il_modulo_di_dominio_non_dipende_da_flask_ne_dalle_viste(self):
+        self.assertFalse(hasattr(game_order, "abort"))
+        self.assertNotIn("app.views", open(game_order.__file__, encoding="utf-8").read())
+
+
+class GiroDItaliaTest(unittest.TestCase):
+    """R1 + aggiunta A: il punteggio di oggi si registra PRIMA di valutare i
+    traguardi, quindi Ordina, giocata per ultima, sblocca "Giro d'Italia"."""
+
+    def setUp(self):
+        self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
+        config.SUPABASE_JWT_SECRET = "test-jwt-secret"
+        config.SUPABASE_URL = ""
+        self._tmp = tempfile.mkdtemp()
+        config.LEADERBOARD_DB = str(Path(self._tmp) / "g.sqlite3")
+        self.client = app.test_client()
+
+    def tearDown(self):
+        config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB = self._saved
+        shutil.rmtree(self._tmp, ignore_errors=True)
+
+    def test_ordina_per_ultima_sblocca_il_giro_d_italia_sull_ultima_risposta(self):
+        from app import player_stats
+        oggi = game_daily.oggi_roma().isoformat()
+        for gioco, punteggio in (("provincia", 1), ("compare", 7)):
+            player_stats.record_daily_score("giro-1", gioco, oggi, punteggio)
+        player_stats.record_daily("giro-1", oggi, 2, True)
+        sessione = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
+        r = self.client.post("/api/game/order/daily/answer", headers={"Authorization": "Bearer " + _jwt("giro-1")},
+                             json={"token": sessione["token"], "region_keys": [t["key"] for t in sessione["territories"]]})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("giro_ditalia", [a["id"] for a in r.get_json()["achievements"]])
+
 
 
 def game_daily_regioni():

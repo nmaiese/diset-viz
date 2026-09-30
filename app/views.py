@@ -43,6 +43,7 @@ from app import external_manifest
 from app import game
 from app import game_compare
 from app import game_daily
+from app import game_order
 from app import game_provincia
 from app import quiz
 from app import quiz_tokens
@@ -2671,10 +2672,15 @@ def _timer_requested():
 _SID_ANSWERS_PER_MIN = 45
 
 
+def _ip_answer_limited():
+    """120 richieste al minuto per IP, il secchio condiviso da tutte le rotte di risposta."""
+    return not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60)
+
+
 def _answer_rate_limited(sid):
     """120 risposte al minuto per IP e 45 per sessione firmata: nessun
     giocatore vero ci arriva, uno script si'."""
-    if not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60):
+    if _ip_answer_limited():
         return True
     return not _rate_limit_ok(f"ans:sid:{sid}", limit=_SID_ANSWERS_PER_MIN, window_s=60)
 
@@ -2683,10 +2689,7 @@ def _round_conflict():
     return jsonify({"error": "round_already_answered"}), 409
 
 
-def _session_summary(session):
-    if session is None:
-        return None
-    return {"streak": session["streak"], "best": session["best"], "rounds": session["rounds"]}
+_session_summary = quiz_tokens.session_summary
 
 
 @app.route("/api/game/compare/round")
@@ -3112,22 +3115,30 @@ def game_provincia_guess_api():
 
 # --- fine Indovina la Provincia -----------------------------------------------
 
-# --- INIZIO BLOCCO SFIDA DEL GIORNO ORDINA ---
+# La sfida del giorno di "Ordina le regioni": due rotte, tutta la logica sta in
+# app/game_order.py.
 @app.route("/api/game/order/daily/session")
 def game_order_daily_session_api():
-    level = request.args.get("level", "regioni")
-    from app import game_order
-    return jsonify(game_order.daily_order_session(level))
+    if _ip_answer_limited():
+        return jsonify({"error": "rate_limited"}), 429
+    try:
+        return jsonify(game_order.daily_order_session(request.args.get("level", "regioni")))
+    except game_order.ErroreOrdina as errore:
+        return jsonify({"error": errore.code}), errore.status
 
 
 @app.post("/api/game/order/daily/answer")
 def game_order_daily_answer_api():
     payload = request.get_json(silent=True) or {}
-    user = auth.current_user(request.headers)
-    from app import game_order
-    res, status_code = game_order.evaluate_daily_order_answer(payload, auth_user=user, request_obj=request)
-    return jsonify(res), status_code
-# --- FINE BLOCCO SFIDA DEL GIORNO ORDINA ---
+    if _answer_rate_limited(game_order.sid_del_token(payload.get("token"))):
+        return jsonify({"error": "rate_limited"}), 429
+    try:
+        res = game_order.evaluate_daily_order_answer(payload, auth_user=auth.current_user(request.headers))
+    except game_order.ErroreOrdina as errore:
+        return jsonify({"error": errore.code}), errore.status
+    # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono.
+    res["achievements"] = _record_quiz(request, "order", res["score"] == res["total"], res["session"])
+    return jsonify(res)
 
 
 # La sfida del giorno di "Chi è maggiore?" con partita valutata dal server: due
