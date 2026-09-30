@@ -75,8 +75,8 @@ grafico ha dichiarato due ritagli...", e `docs/design_drafts/team/09_valutazione
    modifica (gli articoli restano in cache) e lo fermi alla fine. L'articolo è a
    `http://127.0.0.1:5050/blog/<slug>`.
 2. Copi `docs/design_drafts/team/ripresa/shot_figura.py` in `.lavoro/` e lo adatti: cerca
-   `figure.scatter-figure`, delle schede. Nel blog il selettore è **`figure.article-figure`**,
-   e lo fai girare su **ogni** figura, non sulla prima:
+   `figure.scatter-figure`, delle schede. Nel blog, servito dalla 1.0, il selettore è **`figure.art-fig`**
+   (`figure.article-figure` è solo del template di ripiego), e lo fai girare su **ogni** figura, non sulla prima:
 
    ```bash
    uv run --with playwright python .lavoro/shot_figura.py http://127.0.0.1:5050/blog/<slug> .lavoro/shot
