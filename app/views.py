@@ -2634,6 +2634,16 @@ def game_page():
     )
 
 
+@app.route("/quiz/indovina-la-provincia")
+def game_provincia_page():
+    return render_template(
+        "game_provincia.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/quiz/indovina-la-provincia",
+    )
+
+
 @app.route("/quiz/chi-e-maggiore")
 def game_compare_page():
     return render_template(
@@ -3055,6 +3065,23 @@ def leaderboard_admin_delete_api():
     return jsonify({"ok": True, "deleted": deleted})
 
 
+def _sfida_del_giorno_api(gioco):
+    livello = request.args.get("level", "regioni")
+    if livello not in game_daily.LIVELLI:
+        abort(400)
+    return jsonify(game_daily.sfida_payload(gioco, livello))
+
+
+@app.route("/api/game/compare/daily")
+def game_compare_daily_api():
+    return _sfida_del_giorno_api("compare")
+
+
+@app.route("/api/game/order/daily")
+def game_order_daily_api():
+    return _sfida_del_giorno_api("order")
+
+
 @app.route("/api/game/regions")
 def game_regions_api():
     return jsonify({"regions": profiles.all_regions_index()})
@@ -3187,6 +3214,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/indovina-la-regione", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/quiz/indovina-la-provincia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},

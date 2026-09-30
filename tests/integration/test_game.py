@@ -1,10 +1,16 @@
 import unittest
-from datetime import date, datetime, timedelta
+import csv
+import json
+import os
+import re
+from datetime import date, datetime, timedelta, timezone
+from unittest import mock
 
 from app import app
 from app.data import REGION_ORDER
-from app import game, quiz_tokens
+from app import config, game, game_daily, quiz_tokens
 from app.cache import cache
+from app.game_daily import oggi_roma
 
 
 def setUpModule():
@@ -255,7 +261,7 @@ class GameTest(unittest.TestCase):
 
     def test_archive_day_route(self):
         client = app.test_client()
-        today = date.today()
+        today = oggi_roma()
 
         # A past (or launch-day) date is playable and carries the right puzzle number.
         past = max(today - timedelta(days=1), game.GAME_EPOCH)
@@ -289,7 +295,7 @@ class GameTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         puzzles = response.get_json()["puzzles"]
 
-        today = date.today()
+        today = oggi_roma()
         for item in puzzles:
             day = date.fromisoformat(item["date"])
             self.assertLess(day, today)  # today is excluded, it's the main daily tab
@@ -303,11 +309,276 @@ class GameTest(unittest.TestCase):
         """Anti-spoiler: a client must not be able to fetch tomorrow's solution
         by fabricating a future daily puzzle_id and racing to attempt 6."""
         client = app.test_client()
-        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        tomorrow = (oggi_roma() + timedelta(days=1)).isoformat()
         response = client.post("/api/game/guess", json={
             "puzzle_id": f"daily:{tomorrow}", "region_key": "lombardia", "attempt": 1,
         })
         self.assertEqual(response.status_code, 400)
+
+
+class _OrologioFisso(datetime):
+    """`datetime` con `now()` fissato alle 23:30 UTC del 30 settembre 2026,
+    quando a Roma (CEST) e' gia' l'1 ottobre."""
+
+    @classmethod
+    def now(cls, tz=None):
+        fisso = datetime(2026, 9, 30, 23, 30, tzinfo=timezone.utc)
+        return fisso.astimezone(tz) if tz else fisso.replace(tzinfo=None)
+
+
+class GiornoDiRomaTest(unittest.TestCase):
+    """Fra le 22:00 e la mezzanotte UTC server e client concordano sul giorno:
+    il server gira in UTC, il giocatore vive a Roma."""
+
+    def setUp(self):
+        patcher = mock.patch("app.game_daily.datetime", _OrologioFisso)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.client = app.test_client()
+
+    def test_daily_e_il_giorno_di_roma(self):
+        payload = self.client.get("/api/game/daily").get_json()
+        self.assertEqual(payload["date"], "2026-10-01")
+        self.assertEqual(payload["puzzle_id"], "daily:2026-10-01")
+        self.assertEqual(payload["number"], game.puzzle_number(date(2026, 10, 1)))
+        # La prossima sfida e' la mezzanotte di Roma del 2 ottobre: 22:00 UTC dell'1.
+        self.assertEqual(payload["next_puzzle_at"], "2026-10-01T22:00:00+00:00")
+
+    def test_archivio_e_guess_accettano_il_giorno_di_roma(self):
+        self.assertEqual(self.client.get("/api/game/daily/2026-10-01").status_code, 200)
+        self.assertEqual(self.client.get("/api/game/daily/2026-10-02").status_code, 404)
+        giusto = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-01", "region_key": "lombardia", "attempt": 1,
+        })
+        self.assertEqual(giusto.status_code, 200)
+        futuro = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-02", "region_key": "lombardia", "attempt": 1,
+        })
+        self.assertEqual(futuro.status_code, 400)
+
+    def test_la_lista_dell_archivio_parte_da_ieri_di_roma(self):
+        giorni = [p["date"] for p in self.client.get("/api/game/archive").get_json()["puzzles"]]
+        self.assertEqual(giorni[0], "2026-09-30")
+        self.assertNotIn("2026-10-01", giorni)
+
+    def test_le_sfide_a_livelli_sono_quelle_di_roma(self):
+        for gioco in ("compare", "order"):
+            payload = self.client.get(f"/api/game/{gioco}/daily").get_json()
+            self.assertEqual(payload["date"], "2026-10-01", gioco)
+            self.assertEqual(payload["puzzle_id"], "daily:2026-10-01", gioco)
+            self.assertEqual(payload["next_puzzle_at"], "2026-10-01T22:00:00+00:00", gioco)
+
+    def test_le_vecchie_soluzioni_non_cambiano_col_passaggio_al_giorno_di_roma(self):
+        # Il numero della sfida e la regione dipendono solo dalla data.
+        self.assertEqual(game.puzzle_number(game.GAME_EPOCH), 1)
+        self.assertEqual(game.region_for_puzzle("daily:2026-07-15"), "Lazio")
+
+
+class SoluzioniPrimaDelCutoverTest(unittest.TestCase):
+    def test_le_regioni_servite_dal_codice_di_prima_non_cambiano(self):
+        """Le soluzioni da GAME_EPOCH a oggi, calcolate con la formula
+        originale, coincidono con quelle del codice nuovo."""
+        import random
+
+        giorno = game.GAME_EPOCH
+        # Dal cutover in poi le soluzioni escono dall'HMAC, e la formula di prima non vale.
+        ultimo = min(oggi_roma(), game_daily.SEED_CUTOVER - timedelta(days=1))
+        while giorno <= ultimo:
+            ciclo, pos = divmod((giorno - game.GAME_EPOCH).days, len(REGION_ORDER))
+            regioni = list(REGION_ORDER)
+            random.Random(f"divario-regioni-cycle-{ciclo}").shuffle(regioni)
+            puzzle_id, _ = game.daily_puzzle_id(giorno)
+            self.assertEqual(game.region_for_puzzle(puzzle_id), regioni[pos], giorno)
+            giorno += timedelta(days=1)
+
+
+class ElencoGiocoTest(unittest.TestCase):
+    def test_integrita_del_csv(self):
+        righe = game_daily.indicatori_gioco()
+        self.assertGreaterEqual(len(righe), 60)
+        self.assertLessEqual(len(righe), 100)
+        ids = [r["id"] for r in righe]
+        self.assertEqual(len(ids), len(set(ids)))
+        from app import bes_data, quiz
+
+        pool = {p["id"] for p in quiz._quiz_indicators()}
+        manifesto = bes_data.get_bes_manifest("provincia")
+        for r in righe:
+            self.assertTrue(r["unit"].strip(), r["id"])
+            self.assertTrue(r["name"].strip(), r["id"])
+            self.assertTrue(r["regione"] or r["provincia"], r["id"])
+            self.assertFalse(set(r["name"] + r["unit"] + r["note"]) & set(";\u2014\u2013\u2026"), r["id"])
+            if r["regione"]:
+                self.assertIn(r["id"], pool, r["id"])
+            if r["provincia"]:
+                info = manifesto.get(game_daily.id_provinciale(r["id"]))
+                self.assertIsNotNone(info, r["id"])
+                self.assertEqual(info["coverage_latest"], 1.0, r["id"])
+                self.assertGreaterEqual(info["year_max"], 2022, r["id"])
+
+    def test_il_flag_provincia_segue_il_manifesto(self):
+        """`n_province_latest == 107` e `year_max >= 2022`, come dice la regola
+        di prodotto, guardando il manifesto grezzo."""
+        with open("app/static/data/province_manifest.csv", encoding="utf-8", newline="") as handle:
+            manifesto = {r["id"]: r for r in csv.DictReader(handle, delimiter=";")}
+        for r in game_daily.indicatori_gioco():
+            if r["provincia"]:
+                riga = manifesto[game_daily.id_provinciale(r["id"])]
+                self.assertEqual(int(riga["n_province_latest"]), 107, r["id"])
+                self.assertGreaterEqual(int(riga["year_max"]), 2022, r["id"])
+
+
+class SfidaDelGiornoLivelliTest(unittest.TestCase):
+    CHIAVE = "chiave-di-prova-per-i-test"
+
+    def setUp(self):
+        patcher = mock.patch.dict(os.environ, {"GAME_SEED_KEY": self.CHIAVE})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.giorni = [date(2026, 10, 1) + timedelta(days=i) for i in range(7)]  # giovedi' + una settimana
+
+    def test_compare_ha_dieci_coppie_valide_a_ogni_livello_e_giorno(self):
+        for giorno in self.giorni:
+            for livello in game_daily.LIVELLI:
+                sfida = game_daily.compare_del_giorno(giorno, livello)
+                self.assertEqual(len(sfida["pairs"]), 10, (giorno, livello))
+                for coppia in sfida["pairs"]:
+                    self.assertNotEqual(coppia["a"]["key"], coppia["b"]["key"])
+                    self.assertTrue(coppia["indicator"]["unit"])
+                    if livello == "stessa_regione":
+                        self.assertEqual(coppia["a"]["region"], sfida["region"])
+                        self.assertEqual(coppia["b"]["region"], sfida["region"])
+
+    def test_order_ha_cinque_territori_distinti_a_ogni_livello_e_giorno(self):
+        for giorno in self.giorni:
+            for livello in game_daily.LIVELLI:
+                sfida = game_daily.order_del_giorno(giorno, livello)
+                chiavi = [t["key"] for t in sfida["territories"]]
+                self.assertEqual(len(set(chiavi)), 5, (giorno, livello))
+                if livello == "stessa_regione":
+                    self.assertIn(sfida["region"], game_daily.regioni_idonee(5))
+                    self.assertTrue(all(t["region"] == sfida["region"] for t in sfida["territories"]))
+
+    def test_ogni_regione_idonea_e_ogni_livello_hanno_indicatori_a_sufficienza(self):
+        """La chiave di produzione decide quale regione esce ogni giorno: nessuna
+        regione idonea puo' restare senza indicatori, o quel giorno sarebbe un 500."""
+        rng = game_daily.random.Random(0)
+        giorno = self.giorni[0]
+        for gioco, minimo, distinti in (("compare", game_daily.MINIMO_COMPARE, 2), ("order", game_daily.MINIMO_ORDER, 5)):
+            for regione in game_daily.regioni_idonee(minimo):
+                utili = game_daily._candidati(
+                    "stessa_regione", "province", lambda r, regione=regione: r["region"] == regione, distinti, rng
+                )
+                soglia = game_daily.COMPARE_COPPIE if gioco == "compare" else 1
+                self.assertGreaterEqual(len(utili), soglia, (gioco, regione))
+            for livello, ambito in (("regioni", "regioni"), ("province", "province")):
+                utili = game_daily._candidati(livello, ambito, lambda r: True, distinti, rng)
+                self.assertGreaterEqual(len(utili), 10, (gioco, livello))
+        self.assertTrue(giorno)
+
+    def test_ogni_regione_idonea_esce_davvero_come_sfida(self):
+        """Forza ogni regione idonea come regione del giorno e costruisce il payload."""
+        for gioco, minimo, funzione in (
+            ("compare", game_daily.MINIMO_COMPARE, game_daily.compare_del_giorno),
+            ("order", game_daily.MINIMO_ORDER, game_daily.order_del_giorno),
+        ):
+            for regione in game_daily.regioni_idonee(minimo):
+                with mock.patch.object(game_daily, "regioni_idonee", lambda minimo, r=regione: [r]):
+                    sfida = funzione(self.giorni[0], "stessa_regione")
+                self.assertEqual(sfida["region"], regione, gioco)
+                elementi = sfida["pairs"] if gioco == "compare" else sfida["territories"]
+                self.assertTrue(elementi, (gioco, regione))
+
+    def test_compare_stessa_regione_usa_regioni_con_almeno_tre_province(self):
+        for giorno in self.giorni:
+            self.assertIn(game_daily.compare_del_giorno(giorno, "stessa_regione")["region"], game_daily.regioni_idonee(3))
+
+    def test_le_sfide_sono_deterministiche_e_dipendono_dalla_chiave(self):
+        giorno = self.giorni[0]
+        for funzione in (game_daily.compare_del_giorno, game_daily.order_del_giorno):
+            self.assertEqual(funzione(giorno, "province"), funzione(giorno, "province"))
+            self.assertNotEqual(funzione(giorno, "province"), funzione(giorno, "province", chiave="altra-chiave"))
+            self.assertNotEqual(funzione(giorno, "regioni"), funzione(giorno + timedelta(days=1), "regioni"))
+
+    def test_i_payload_non_rivelano_valori(self):
+        for livello in game_daily.LIVELLI:
+            for sfida in (
+                game_daily.compare_del_giorno(self.giorni[0], livello),
+                game_daily.order_del_giorno(self.giorni[0], livello),
+            ):
+                testo = json.dumps(sfida)
+                self.assertNotIn('"value"', testo)
+                self.assertNotIn('"rank"', testo)
+                self.assertNotIn('"solution"', testo)
+
+    def test_la_difficolta_cresce_da_lunedi_a_domenica(self):
+        lunedi, domenica = date(2026, 10, 5), date(2026, 10, 11)
+        self.assertEqual((lunedi.weekday(), domenica.weekday()), (0, 6))
+        self.assertEqual(game_daily.compare_del_giorno(lunedi, "regioni")["difficulty"], 0)
+        self.assertEqual(game_daily.compare_del_giorno(domenica, "regioni")["difficulty"], 4)
+        self.assertEqual(list(game_daily.DIFFICOLTA_SETTIMANA), sorted(game_daily.DIFFICOLTA_SETTIMANA))
+
+        def rapporti(giorno, livello):
+            ritorno = []
+            for coppia in game_daily.compare_del_giorno(giorno, livello)["pairs"]:
+                ind = next(i for i in game_daily.indicatori_gioco() if i["id"] == coppia["indicator"]["id"])
+                ambito = "regioni" if livello == "regioni" else "province"
+                _, righe = game_daily._righe_indicatore(ind, ambito)
+                distinti = sorted({r["value"] for r in righe}, reverse=True)
+                valori = {r["key"]: r["value"] for r in righe}
+                gap = abs(distinti.index(valori[coppia["a"]["key"]]) - distinti.index(valori[coppia["b"]["key"]]))
+                ritorno.append(gap / (len(distinti) - 1))
+            return ritorno
+
+        for livello in ("regioni", "province"):
+            for r in rapporti(lunedi, livello):
+                self.assertGreaterEqual(r, 0.5, livello)
+            for r in rapporti(domenica, livello):
+                self.assertLessEqual(r, 0.25, livello)
+
+    def test_rotte_giornaliere(self):
+        client = app.test_client()
+        for gioco, chiave in (("compare", "pairs"), ("order", "territories")):
+            risposta = client.get(f"/api/game/{gioco}/daily?level=province")
+            self.assertEqual(risposta.status_code, 200)
+            payload = risposta.get_json()
+            self.assertEqual(payload["puzzle_id"], f"daily:{oggi_roma().isoformat()}")
+            self.assertEqual(payload["level"], "province")
+            self.assertTrue(payload["next_puzzle_at"].endswith("+00:00"))
+            self.assertIn(chiave, payload)
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily").get_json()["level"], "regioni")
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily?level=pianeti").status_code, 400)
+            # Nessuna data a scelta del client: il parametro non esiste.
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily?date=2030-01-01").get_json()["date"], oggi_roma().isoformat())
+
+
+class PaginaProvinciaTest(unittest.TestCase):
+    def test_pagina_risponde_con_un_solo_h1_e_canonical(self):
+        client = app.test_client()
+        pagina = client.get("/quiz/indovina-la-provincia")
+        self.assertEqual(pagina.status_code, 200)
+        html = pagina.get_data(as_text=True)
+        self.assertEqual(len(re.findall(r"<h1[\s>]", html)), 1)
+        self.assertIn(f'<link rel="canonical" href="{config.SITE_URL}/quiz/indovina-la-provincia"', html)
+        self.assertIn('id="game-root"', html)
+        self.assertIn("province italiane", html)
+        giochi = [
+            json.loads(m) for m in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
+        ]
+        gioco = next(d for d in giochi if d.get("@type") == "Game")
+        self.assertEqual(gioco["creator"]["name"], "Divario Italia")
+
+    def test_pagina_e_in_sitemap_con_priorita(self):
+        sitemap = app.test_client().get("/sitemap.xml").get_data(as_text=True)
+        self.assertRegex(
+            sitemap,
+            re.escape(f"<loc>{config.SITE_URL}/quiz/indovina-la-provincia</loc>") + r"\s*(?:<lastmod>[^<]*</lastmod>\s*)?<priority>0.7</priority>",
+        )
+
+    def test_page_type_game(self):
+        from app import page_types
+
+        self.assertEqual(page_types.page_type("/quiz/indovina-la-provincia"), "game")
 
 
 class QuizCompareTest(unittest.TestCase):
