@@ -213,6 +213,17 @@ def _bes_quiz_indicators():
     return pool
 
 
+# Serie dell'indagine campionaria con un campione troppo piccolo per una regione
+# (conteggi rari, rumore da un anno all'altro) o con differenze fra regioni minime:
+# restano nell'atlante, non diventano una domanda del quiz. Stessa scelta, per le
+# sfide del giorno, di `config/game_indicators.csv`.
+_MULTI_QUIZ_EXCLUDED = {
+    "MULTI_PRONTO_SOCCORSO", "MULTI_GUARDIA_MEDICA", "MULTI_RICOVERO_ASSISTENZA_MEDICA",
+    "MULTI_INCIDENTI_DOMESTICI", "MULTI_CINQUE_PORZIONI", "MULTI_LAVORO_BICICLETTA",
+    "MULTI_LAVORO_A_PIEDI", "MULTI_AMICI_OGNI_GIORNO", "MULTI_COLAZIONE_ADEGUATA",
+}
+
+
 @cache.memoize(timeout=3600)
 def _multiscopo_quiz_indicators():
     if not has_multiscopo_data():
@@ -220,6 +231,8 @@ def _multiscopo_quiz_indicators():
     pool = []
     manifest = get_multiscopo_manifest()
     for raw_id, info in manifest.items():
+        if raw_id in _MULTI_QUIZ_EXCLUDED:
+            continue
         if info["year_max"] < _MULTI_MIN_YEAR or info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
             continue
         payload = _multi_region_payload(f"{_MULTI_PREFIX}{raw_id}", info["year_max"])
