@@ -286,7 +286,8 @@ def question(day, level, mode, index):
     province = _provinces()[daily_provinces(day, level)[index]]
     name = display_name(province)
     if mode == "list":
-        label = f"In quale regione si trova {name}?"
+        # "Aosta (Valle d'Aosta)" nella domanda sulla regione darebbe la risposta: qui il nome nudo.
+        label = f"In quale regione si trova {province['name']}?"
     elif level == "regione":
         label = f"Dov'è {name}? Si trova in {province['region']}."
     else:

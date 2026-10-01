@@ -62,6 +62,14 @@ class NamesTest(unittest.TestCase):
     def test_aosta_is_shown_with_its_region(self):
         self.assertEqual(display_name(_province("aosta")), "Aosta (Valle d'Aosta)")
 
+    def test_without_map_the_question_on_the_region_does_not_contain_the_answer(self):
+        with mock.patch.object(game_mappa, "daily_provinces", return_value=("aosta",) * QUESTIONS):
+            label = game_mappa.question(MONDAY, "italia", "list", 0)["label"]
+            on_map = game_mappa.question(MONDAY, "italia", "map", 0)["label"]
+        self.assertEqual(label, "In quale regione si trova Aosta?")
+        self.assertNotIn("Valle d'Aosta", label)
+        self.assertIn("Valle d'Aosta", on_map)
+
     def test_other_names_are_those_of_the_codes_file(self):
         self.assertEqual(display_name(_province("lecce")), "Lecce")
         self.assertEqual(display_name(_province("monza-e-della-brianza")), "Monza e della Brianza")
