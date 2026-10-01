@@ -70,6 +70,15 @@ class TestGameOrderDaily(unittest.TestCase):
         vals = [r["value"] for r in data["correct_order"]]
         self.assertEqual(vals, sorted(vals, reverse=True))
 
+        # Ogni riga porta il valore e la sua unita': e' quello che il client
+        # scrive accanto al nome, e senza unita' non puo' farlo.
+        for riga in data["positions"]:
+            self.assertIsInstance(riga["value"], (int, float))
+            self.assertEqual(riga["unit"], data["indicator"]["unit"])
+        for riga in data["correct_order"]:
+            self.assertIsInstance(riga["value"], (int, float))
+            self.assertEqual(riga["unit"], data["indicator"]["unit"])
+
     def test_same_session_submitted_twice_returns_409(self):
         session = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
         token = session["token"]
