@@ -11,13 +11,8 @@ Le regole del sotto-marchio stanno in `design/v1/SISTEMA.md`, "Il gioco: un
 sotto-marchio, di proposito". I token si verificano con
 `bin/py design/v1/tools/check_tokens.py`.
 
-## Il nome, da decidere
+## Il nome
 
-L'URL resta `/quiz`. Tre proposte, il prototipo usa la prima come segnaposto.
-
-1. **Divario in gioco**: il divario e' la posta in gioco. Tiene il nome della
-   testata e dice che si gioca con i suoi dati, con un filo di ironia.
-2. **Sfida Italia**: diretto, quotidiano, parla alla sfida del giorno. Piu'
-   facile da ricordare, meno legato al marchio madre.
-3. **Il Quiz del Divario**: descrittivo e coerente con l'URL, il tono piu'
-   semplice dei tre. Rischia di sembrare una rubrica piu' che un luogo.
+Deciso il 30 settembre 2026: **Sfida Italia**. L'URL resta `/quiz`. Le altre due proposte
+(Divario in gioco, Il Quiz del Divario) sono state scartate: Sfida Italia parla alla sfida del giorno
+e si ricorda meglio. Il prototipo qui sotto porta ancora il segnaposto della prima.

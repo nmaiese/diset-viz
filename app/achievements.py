@@ -102,7 +102,7 @@ CATALOG = [
      "description": "7 giorni di fila con la Regione del giorno risolta",
      "criterion": lambda s: s["daily"]["max_daily_streak"] >= 7},
     {"id": "all_rounder", "icon": "🎖️", "title": "Tuttologo",
-     "description": "Giocati tutti e tre i giochi.",
+     "description": "Giocati Indovina la Regione, Chi è maggiore? e Ordina le regioni.",
      "criterion": _played_all},
     {"id": "veteran_50", "icon": "🏛️", "title": "Veterano",
      "description": "50 round giocati in totale.",
