@@ -19,6 +19,7 @@ import {
   syncProfile,
   mergeLocalStatsOnce,
 } from "../shared/supabase.js";
+import { ELIMINA_FALLITO, ESPORTA_FALLITO, messaggioErrore } from "./account-errori.js";
 
 const root = document.getElementById("site-auth");
 
@@ -217,7 +218,7 @@ async function wireAccountPage() {
   if (!el || !isAuthConfigured()) return;
   if (!hasStoredSession()) {
     el.innerHTML =
-      '<p>Accedi per gestire il tuo account.</p>' +
+      '<p>Accedi per gestire il tuo account. Con l\'account salvi i preferiti e i confronti, e conservi statistiche e traguardi dei giochi. Il sito e i giochi funzionano anche senza.</p>' +
       '<button type="button" class="account-btn" id="account-login">Accedi con Google</button>';
     const b = document.getElementById("account-login");
     if (b) b.onclick = () => signInWithGoogle();
@@ -259,6 +260,7 @@ async function wireAccountPage() {
     '<div class="account-data-cta">' +
     '<button type="button" class="account-btn account-btn--ghost" id="account-export">Esporta i miei dati</button>' +
     '<button type="button" class="account-danger" id="account-delete">Elimina account</button></div>' +
+    '<p class="account-data-msg" id="account-data-msg" role="alert"></p>' +
     '<p class="account-note">La cancellazione elimina definitivamente profilo, preferiti, statistiche, traguardi e punteggi, e il tuo accesso Google al sito.</p></section>';
 
   document.getElementById("account-nick-save").onclick = async () => {
@@ -267,9 +269,19 @@ async function wireAccountPage() {
     const res = await authFetch("/api/player/nickname", { method: "PATCH", body: JSON.stringify({ nickname: val }) });
     msg.textContent = res && res.ok ? "Nickname salvato." : "Nickname non valido o non ammesso.";
   };
+  const dataMsg = document.getElementById("account-data-msg");
+  const fallisce = (res, generico) => {
+    dataMsg.textContent = messaggioErrore(res, generico);
+  };
   document.getElementById("account-export").onclick = async () => {
-    const res = await authFetch("/api/account/export");
-    if (!res || !res.ok) return;
+    dataMsg.textContent = "";
+    let res = null;
+    try {
+      res = await authFetch("/api/account/export");
+    } catch {
+      res = { ok: false, status: 0 }; // la rete ha ceduto: non e' colpa dell'accesso
+    }
+    if (!res || !res.ok) return fallisce(res, ESPORTA_FALLITO);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -280,11 +292,19 @@ async function wireAccountPage() {
   };
   document.getElementById("account-delete").onclick = async () => {
     if (!window.confirm("Eliminare l'account e tutti i dati? L'operazione non è reversibile.")) return;
-    const res = await authFetch("/api/account", { method: "DELETE" });
+    dataMsg.textContent = "";
+    let res = null;
+    try {
+      res = await authFetch("/api/account", { method: "DELETE" });
+    } catch {
+      res = { ok: false, status: 0 }; // la rete ha ceduto: non e' colpa dell'accesso
+    }
     if (res && res.ok) {
       await signOut();
       window.location.href = "/";
+      return;
     }
+    fallisce(res, ELIMINA_FALLITO);
   };
 }
 
