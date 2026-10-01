@@ -12,6 +12,7 @@ import {
   useSfidaCondivisa,
   useTerritorioMio,
 } from "./shared.jsx";
+import { campoFatto } from "./compare-logica.js";
 import { fraseTerritorioMio, trovaTerritorioMio } from "./puri.js";
 import { oggiRoma, segnaGiocata } from "./oggi.js";
 import {
@@ -515,7 +516,8 @@ export default function OrderApp() {
                       ? (round.number ? `Sfida del giorno n. ${round.number}` : "")
                       : `Allenamento · ${righe.length} territori`
                   }
-                  fatto={esito.fatto}
+                  fatto={campoFatto(esito)}
+                  fattoPath={esito.fact && esito.indicator && esito.indicator.path ? esito.indicator.path : undefined}
                   sfida={sfida ? { punteggio: sfida.punteggio, tuo: esito.score, game: "order" } : null}
                   nextPuzzleAt={mode === "daily" ? round.next_puzzle_at : undefined}
                   condividi={

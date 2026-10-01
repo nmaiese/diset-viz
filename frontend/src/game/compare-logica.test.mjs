@@ -233,3 +233,12 @@ test("fra le dieci coppie si trova il nome del territorio, quello del server", (
   assert.equal(primoTerritorioMio(null, DOMANDE, "regioni"), null);
   assert.equal(primoTerritorioMio(mio, [], "regioni"), null);
 });
+
+test("il link del fatto e' solo un percorso interno di scheda indicatore", async () => {
+  const { campoFattoPath } = await import("./compare-logica.js");
+  assert.equal(campoFattoPath({ summary: { fact_path: "/indicatore/tasso-di-occupazione/ter-105" } }), "/indicatore/tasso-di-occupazione/ter-105");
+  assert.equal(campoFattoPath({ summary: { fact_path: "https://esempio.it/x" } }), undefined);
+  assert.equal(campoFattoPath({ summary: { fact_path: "//esempio.it" } }), undefined);
+  assert.equal(campoFattoPath({}), undefined);
+  assert.equal(campoFattoPath(null), undefined);
+});

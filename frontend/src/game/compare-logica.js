@@ -80,10 +80,9 @@ export function tonoCompare(giuste, totale) {
 
 // -- Il fatto da portarti via ------------------------------------------------------------------
 
-// Il "fatto" lo scrive il server (`app/game_facts.py`, un worker dedicato) e questo client non
-// lo calcola. Il contratto del payload non e' ancora deciso (la spec dice `fatto`, le regole
-// `fact`; ne' dicono se sta nel `summary` o in cima alla risposta): si legge in UN punto solo,
-// qui, cosi' quando si decide si cambia una riga.
+// Il "fatto" lo scrive il server (`app/game_facts.py`) e questo client non lo calcola. Il
+// contratto: `summary.fact` in Chi e' maggiore? (con `summary.fact_path`), `fact` in cima al
+// risultato in Ordina. Si legge in UN punto solo, qui.
 export function campoFatto(risposta) {
   if (!risposta || typeof risposta !== "object") return undefined;
   const fonti = [risposta.summary, risposta];
@@ -94,6 +93,12 @@ export function campoFatto(risposta) {
     }
   }
   return undefined;
+}
+
+// Il link alla scheda dell'indicatore del fatto: `summary.fact_path`, solo un percorso interno.
+export function campoFattoPath(risposta) {
+  const percorso = risposta && risposta.summary && risposta.summary.fact_path;
+  return typeof percorso === "string" && /^\/indicatore\/[\w\-/]+$/.test(percorso) ? percorso : undefined;
 }
 
 // -- Il territorio del giocatore ---------------------------------------------------------------

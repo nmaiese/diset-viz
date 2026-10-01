@@ -757,6 +757,8 @@ function SegnoEsito({ tono }) {
 //   fatto          string, il "fatto da portarti via": una frase sola, dopo l'esito, col link alla
 //                  scheda (`dato.path`). SOLO se presente e presentabile: senza, o con un "n.d."
 //                  o un carattere vietato dallo stile, la riga non esce. Viene dal server.
+//   fattoPath      string, il link alla scheda dell'indicatore DEL FATTO, se diverso da `dato.path`
+//                  (Chi è maggiore?: ogni coppia ha il suo indicatore). Vince su `dato.path`.
 //   sfida          `{ punteggio, tuo, game? }`: la sfida condivisa ricevuta (da
 //                  `useSfidaCondivisa`) e il punteggio di chi ha giocato. Mostra "Tu 8, la
 //                  sfida condivisa 7" e manda `challenge_finish`. Senza, niente.
@@ -783,6 +785,7 @@ export function FinePartita({
   conta = true,
   dettaglio = "",
   fatto,
+  fattoPath,
   sfida,
   game,
   dato,
@@ -839,10 +842,10 @@ export function FinePartita({
       {frase && (
         <p className="qz-fine-fatto">
           {frase}
-          {dato && dato.path && (
+          {(fattoPath || (dato && dato.path)) && (
             <>
               {" "}
-              <a href={dato.path}>Vai alla scheda</a>
+              <a href={fattoPath || dato.path}>Vai alla scheda</a>
             </>
           )}
         </p>

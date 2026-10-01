@@ -20,6 +20,7 @@ import {
   ROUND_MS,
   avviaScadenza,
   campoFatto,
+  campoFattoPath,
   chiediAvanti,
   coppiaDelTerritorio,
   primoTerritorioMio,
@@ -716,6 +717,7 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
               allenamento ? "allenamento, fuori classifica" : sessione.level_label
             }`}
             fatto={campoFatto(risposta)}
+            fattoPath={campoFattoPath(risposta)}
             sfida={sfida ? { punteggio: sfida.punteggio, tuo: fine.score.correct, game: GIOCO } : undefined}
             nextPuzzleAt={fine.next_puzzle_at}
             condividi={{
