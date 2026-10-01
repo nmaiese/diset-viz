@@ -44,6 +44,8 @@ FAMILY_PREFIX = {
     "salute": "salute:",
     "aci": "aci:",
     "unioncamere": "unioncamere:",
+    "agcom": "agcom:",
+    "istat_provinciale": "ipr:",
 }
 
 # Which catalog family a hunter adapter promotes into. A second mirror of
@@ -60,6 +62,8 @@ FEED_FAMILY = {
     "salute_dati": "salute",
     "aci_statistiche": "aci",
     "unioncamere_movimprese": "unioncamere",
+    "agcom_bbmap": "agcom",
+    "istat_provinciale": "istat_provinciale",
 }
 
 # The 20 regional keys the whole app joins on (`territory_code` in the external

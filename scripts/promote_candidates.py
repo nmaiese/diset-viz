@@ -45,7 +45,7 @@ def _unimplemented_source(source_id, *_args, **_kwargs):
 
 for _feed in (
     "mef_irpef", "ispra_suolo", "mim_scuola", "salute_dati",
-    "aci_statistiche", "unioncamere_movimprese",
+    "aci_statistiche", "unioncamere_movimprese", "agcom_bbmap", "istat_provinciale",
 ):
     PROMOTION_PARSERS[_feed] = lambda *args, _feed=_feed, **kwargs: _unimplemented_source(_feed, *args, **kwargs)
 

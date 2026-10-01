@@ -184,6 +184,16 @@ class LaVistaProvincialeHaIlSuoUrl(unittest.TestCase):
         self.assertEqual(bes_level_path("12SER002P", "provincia"), self.SOLO_PROVINCIALE)
 
 
+def province_views_expected():
+    """Le `/province` indicizzabili: le 17 della BES piu' una per ogni scheda
+    esterna a due livelli il cui livello provinciale passa la regola."""
+    from app import provincial_families
+
+    external = sum(1 for item in provincial_families.all_indicators()
+                   if "regione" in item["levels"] and item["levels"]["provincia"]["indexable"])
+    return 17 + external
+
+
 class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
     """17 `/province` in piu' nella sitemap, nessuna URL con una query, e
     l'interruttore che le spegne senza togliere link e 301."""
@@ -210,11 +220,11 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
     def test_diciassette_province_e_nessuna_query(self):
         locs = self._locs()
         province = [loc for loc in locs if loc.endswith("/province") and "/indicatore/" in loc]
-        self.assertEqual(len(province), 17)
+        self.assertEqual(len(province), province_views_expected())
         self.assertFalse([loc for loc in locs if "/indicatore/" in loc and "?" in loc])
         schede = [loc for loc in locs if "/indicatore/" in loc]
         self.assertEqual(len(self._bases_elsewhere()), 1)
-        self.assertEqual(len(schede), len(self.universe.indexable_catalog()) - 1 + 17)
+        self.assertEqual(len(schede), len(self.universe.indexable_catalog()) - 1 + province_views_expected())
         self.assertEqual(len(schede), len(set(schede)))
 
     def test_l_interruttore_spento(self):
@@ -243,7 +253,7 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
             self.assertEqual(vecchio.headers["Location"], base + "/province")
             self.assertIn(f'href="{base}/province"',
                           self.client.get("/ricerca?q=speranza").get_data(as_text=True))
-        self.assertEqual(len([loc for loc in self._locs() if "/indicatore/" in loc and loc.endswith("/province")]), 17)
+        self.assertEqual(len([loc for loc in self._locs() if "/indicatore/" in loc and loc.endswith("/province")]), province_views_expected())
 
 
 class EditorialLinksAreCanonicalTest(unittest.TestCase):

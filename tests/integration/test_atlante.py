@@ -35,7 +35,9 @@ from app.design.pages import atlante as atlas_page
 from app.taxonomy import CATEGORY_NAME_TO_SLUG, MACRO_AREAS, PROVINCE_TWINS
 
 # Il peso massimo della pagina, compressa come la serve il sito.
-MAX_GZIP_BYTES = 90 * 1024
+# Era 90 KB con le sole righe BES e regionali: le schede esterne con le province
+# (Istat provinciale, ACI, AGCOM) aggiungono righe alla pagina, circa 4 KB compressi.
+MAX_GZIP_BYTES = 100 * 1024
 ROW = re.compile(r'<tr data-id="([^"]+)"[^>]*>(.*?)</tr>', re.DOTALL)
 SPARK = re.compile(r'<svg\b[^>]*\bclass="spark\b[^"]*"[^>]*>.*?</svg>', re.DOTALL)
 
@@ -118,7 +120,7 @@ class LAtlanteNellaV1(unittest.TestCase):
                 self.assertNotIn(forbidden, text)
         self.assertIsNone(re.search(r"\bNone\b|\bnan\b|\bundefined\b", text))
 
-    def test_il_peso_resta_sotto_i_90_kb_compressi(self):
+    def test_il_peso_resta_sotto_il_tetto_compresso(self):
         response = self.client.get("/atlante", headers={"Accept-Encoding": "gzip"})
         body = response.get_data()
         if response.headers.get("Content-Encoding") != "gzip":
@@ -376,6 +378,11 @@ class LeProvinceNellAtlante(unittest.TestCase):
         # Dalla funzione sorgente, non dal filtro della pagina: se il filtro
         # cambiasse, la prova non deve cambiare con lui.
         cls.items = [item for item in all_bes_indicators() if "provincia" in item["levels"]]
+        from app import provincial_families
+
+        # Le schede esterne con le province (ipr, aci, agcom): righe come le BES.
+        cls.external = [item["metadata"] for item in provincial_families.all_indicators()]
+        cls.total = len(cls.items) + len(cls.external)
         cls.records = {(r["family"], r["raw_id"]): r for r in indicator_universe.projection()}
 
     def test_e_la_pagina_della_1_0_sulle_province(self):
@@ -388,8 +395,9 @@ class LeProvinceNellAtlante(unittest.TestCase):
         """Il numero viene dalla funzione sorgente, mai scritto qui."""
         rows = ROW.findall(self.html)
         expected = {sources.internal_id("bes", item["id"]) for item in self.items}
+        expected |= {meta["id"] for meta in self.external}
         self.assertTrue(expected)
-        self.assertEqual(len(rows), len(self.items))
+        self.assertEqual(len(rows), self.total)
         self.assertEqual({row_id for row_id, _ in rows}, expected)
         self.assertEqual(len(rows), atlas_page.rows("provincia")["total"])
 
@@ -399,7 +407,12 @@ class LeProvinceNellAtlante(unittest.TestCase):
         for row_id, body in ROW.findall(self.html):
             with self.subTest(row=row_id):
                 href = re.search(r'<a href="([^"]+)"', body).group(1)
-                self.assertEqual(href, bes_level_path(row_id, "provincia"))
+                external = next((m for m in self.external if m["id"] == row_id), None)
+                if external is None:
+                    self.assertEqual(href, bes_level_path(row_id, "provincia"))
+                else:
+                    suffix = "/province" if external["base_level"] == "regione" else ""
+                    self.assertEqual(href, external["path"] + suffix)
                 self.assertNotIn("livello=", href)
 
     def test_nessuna_riga_senza_area(self):
@@ -407,7 +420,7 @@ class LeProvinceNellAtlante(unittest.TestCase):
         tema. Una riga senza area sparirebbe da ogni filtro."""
         blocks = re.findall(r'<div class="atlante-area" data-area="([^"]*)">(.*?)(?=<div class="atlante-area"|<p class="empty" data-atlas-empty)',
                             self.html, re.DOTALL)
-        self.assertEqual(sum(len(ROW.findall(body)) for _, body in blocks), len(self.items))
+        self.assertEqual(sum(len(ROW.findall(body)) for _, body in blocks), self.total)
         only = {sources.internal_id("bes", i["id"]) for i in self.items if "regione" not in i["levels"]}
         seen = set()
         for area, body in blocks:
@@ -467,7 +480,7 @@ class LeProvinceNellAtlante(unittest.TestCase):
             self.assertEqual([href.replace("&amp;", "&") for href, _ in links], ["/atlante", PROVINCE])
             self.assertEqual([href.replace("&amp;", "&") for href, cur in links if cur], [current])
         n = re.search(r'href="/atlante\?livello=provincia">Province <span[^>]*>(\d+)</span>', regional).group(1)
-        self.assertEqual(int(n), len(self.items))
+        self.assertEqual(int(n), self.total)
 
     def test_la_mappa_porta_alle_province(self):
         section = self.html[self.html.index('id="mappa"'):self.html.index('id="indicatori"')]
@@ -487,7 +500,7 @@ class LeProvinceNellAtlante(unittest.TestCase):
                 self.assertNotIn(forbidden, text)
         self.assertIsNone(re.search(r"\bNone\b|\bnan\b|\bundefined\b", text))
 
-    def test_il_peso_resta_sotto_i_90_kb_compressi(self):
+    def test_il_peso_resta_sotto_il_tetto_compresso(self):
         body = self.html.encode()
         self.assertLess(len(gzip.compress(body, 6)), MAX_GZIP_BYTES, f"{len(gzip.compress(body, 6))} byte compressi")
 

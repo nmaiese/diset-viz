@@ -119,8 +119,12 @@ class LaFascia(unittest.TestCase):
         for area in self.data["levels"][1]["areas"]:
             mover = area["mover"]
             family, raw_id = sources.parse_indicator_code(mover["code"])
-            self.assertEqual(family, "bes")
-            self.assertEqual(mover["path"], bes_level_path(raw_id, "provincia"))
+            if family == "bes":
+                self.assertEqual(mover["path"], bes_level_path(raw_id, "provincia"))
+            else:
+                # Una famiglia esterna: la vista provinciale e' `/province`, o la
+                # base stessa se la scheda e' solo provinciale.
+                self.assertTrue(mover["path"].startswith("/indicatore/"), mover["path"])
 
     def test_nessun_id_ripetuto_nella_pagina(self):
         ids = re.findall(r'\sid="([^"]+)"', self.page)

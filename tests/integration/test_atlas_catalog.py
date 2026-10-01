@@ -66,7 +66,10 @@ class CatalogSummaryTest(unittest.TestCase):
             self.assertIn(institution, summary["institutions_label"])
 
         for path in ("/", "/qualita-della-vita/classifica/regioni"):
-            html = app.test_client().get(path).data.decode("utf-8")
+            import html as html_lib
+
+            # I nomi con l'apostrofo (Automobile Club d'Italia) escono escapati.
+            html = html_lib.unescape(app.test_client().get(path).data.decode("utf-8"))
             for institution in expected:
                 self.assertIn(institution, html, f"{institution} missing from {path}")
 

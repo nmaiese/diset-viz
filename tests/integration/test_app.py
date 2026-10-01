@@ -293,7 +293,8 @@ class AppSmokeTest(unittest.TestCase):
         self.assertTrue(sitemap_indicators)
         self.assertEqual(sitemap_indicators, llms_indicators)
         views = {url for url in llms_indicators if url.endswith("/province")}
-        self.assertEqual(len(views), 17)
+        from tests.integration.test_url_migration import province_views_expected
+        self.assertEqual(len(views), province_views_expected())
         self.assertLessEqual(views, sitemap_indicators)
         self.assertNotIn("?livello=", llms_full)
         self.assertEqual(len(sitemap_indicators), sitemap.count("<loc>https://divarioitalia.it/indicatore/"))
