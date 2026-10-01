@@ -486,6 +486,15 @@ class PunteggioDelGiornoTest(Base):
         sessione = self._sessione("regioni", timer=0)
         self._gioca(sessione, "regioni")
         self.assertEqual(self._punteggi(), [])
+        # neanche i round per le serie dell'account (basso c della revisione finale)
+        from app import player_stats
+        self.assertEqual(player_stats.stats_map("uuid-compare-2")["compare"]["rounds_played"], 0)
+
+    def test_con_il_timer_i_round_contano_per_l_account(self):
+        from app import player_stats
+        self._accedi("uuid-compare-4")
+        self._gioca(self._sessione("regioni"), "regioni")
+        self.assertEqual(player_stats.stats_map("uuid-compare-4")["compare"]["rounds_played"], 10)
 
     def test_da_anonimo_non_si_registra_niente(self):
         sessione = self._sessione("regioni")

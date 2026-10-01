@@ -15,8 +15,11 @@ in avanti le soluzioni escono da `HMAC(GAME_SEED_KEY, "<gioco>|<data>")`, con un
 chiave che non sta nel repo. Le date PRECEDENTI al passaggio tengono il seed
 vecchio, cosi' l'archivio e il `localStorage` per `puzzleId` restano coerenti.
 
-    RUOTARE `GAME_SEED_KEY` CAMBIA LE SFIDE FUTURE (dal cutover in poi) e mai le
-    passate. Va fatto solo di proposito, e mai a meta' giornata: chi ha gia'
+    RUOTARE `GAME_SEED_KEY` CAMBIA TUTTE LE SFIDE DAL CUTOVER IN POI, ANCHE QUELLE
+    GIA' GIOCATE: ogni giorno dal cutover si ricalcola con la chiave corrente, quindi
+    l'archivio cambia insieme alle sfide future, e i risultati salvati per data non
+    corrispondono piu' alla sfida che si rivede. Restano uguali solo i giorni prima
+    del cutover. Va fatto solo di proposito, e mai a meta' giornata: chi ha gia'
     giocato oggi vedrebbe un'altra soluzione ricaricando la pagina.
 
 Senza la variabile d'ambiente si usa `DEV_SEED_KEY`, che e' scritta qui e

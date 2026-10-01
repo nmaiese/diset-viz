@@ -453,13 +453,14 @@ class FinishTest(Base):
         self._play(self._open(), step=0.1)
         self.assertEqual(self._scores(), [])
 
-    def test_the_counter_counts_every_finished_game(self):
+    def test_the_counter_counts_every_plausible_finished_game(self):
         self._play(self._open())
         self._login("uuid-mappa-4")
+        # dieci risposte in un secondo non sono di una persona: non si contano
         self._play(self._open(), step=0.1)
         self._play(self._open("regione"), pick=lambda i, right: _other_region(right))
         self.assertEqual(self._counter(), {
-            ("mappa", "2026-10-11", 20): 2,
+            ("mappa", "2026-10-11", 20): 1,
             ("mappa_regione", "2026-10-11", 0): 1,
         })
 

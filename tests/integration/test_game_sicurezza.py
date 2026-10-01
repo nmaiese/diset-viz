@@ -297,6 +297,29 @@ class RoundASerieTest(Base):
             client.post("/api/game/compare/answer", json=self._corpo(round_, scelta), headers=intest)
         self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 1)
 
+    def test_l_allenamento_senza_timer_non_conta_per_le_serie_dell_account(self):
+        """Basso (c): senza timer la serie si allunga senza limite di tempo, quindi un
+        round di allenamento non entra nelle statistiche che sbloccano "In serie"."""
+        client = app.test_client()
+        intest = {"Authorization": "Bearer " + _jwt("allenamento-1")}
+        round_ = client.get("/api/game/compare/round?timer=0").get_json()
+        r = client.post("/api/game/compare/answer", json=self._corpo(round_, _winner(round_)), headers=intest)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.get_json()["correct"])
+        self.assertIn("achievements", r.get_json())
+        self.assertEqual(player_stats.stats_map("allenamento-1")["compare"]["rounds_played"], 0)
+        round_ = client.get("/api/game/order/round?count=3&timer=0").get_json()
+        r = client.post("/api/game/order/answer", headers=intest, json={
+            "token": round_["token"], "indicator_id": round_["indicator"]["id"],
+            "year": round_["indicator"]["year"], "region_keys": [x["region_key"] for x in round_["regions"]]})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(player_stats.stats_map("allenamento-1")["order"]["rounds_played"], 0)
+        # con il timer si conta, come prima
+        round_ = client.get("/api/game/compare/round").get_json()
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            client.post("/api/game/compare/answer", json=self._corpo(round_, _winner(round_)), headers=intest)
+        self.assertEqual(player_stats.stats_map("allenamento-1")["compare"]["rounds_played"], 1)
+
     def test_ordina_senza_token_non_conta_per_l_account(self):
         client = app.test_client()
         round_ = client.get("/api/game/order/round?count=5").get_json()

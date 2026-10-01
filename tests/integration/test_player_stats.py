@@ -104,7 +104,18 @@ class RigheStoricheNonIsoTest(StatsBase):
         self.assertEqual(
             player_stats._daily_streaks(["daily:2026-10-09", "practice-1", "2026-10-09", "2026-10-10"], today=oggi),
             (2, 2))
-        self.assertEqual(player_stats._daily_streaks(["daily:2026-10-09"], today=oggi), (0, 0))
+        self.assertEqual(player_stats._daily_streaks(["practice-1", "daily:boh"], today=oggi), (0, 0))
+
+    def test_le_righe_storiche_daily_contano_come_giorni_giocati(self):
+        """Su master `record_daily` riceveva `daily:YYYY-MM-DD`: le sconfitte sono rimaste
+        salvate cosi', e quei giorni giocati non devono sparire dalla serie di gioco."""
+        oggi = game_daily.today_rome()
+        self._riga_storica("u-storico3", f"daily:{(oggi - timedelta(days=1)).isoformat()}")
+        with session_scope() as s:
+            s.add(DailyResult(auth_id="u-storico3", puzzle_date=oggi.isoformat(), attempts=2, solved=1))
+        self.assertEqual(player_stats.play_streak_for("u-storico3"), {"current": 2, "max": 2})
+        self.assertEqual(player_stats._iso_days(["daily:2026-10-09", "2026-10-09", "practice-1"]),
+                         [date(2026, 10, 9)])
 
     def test_stats_map_non_solleva_con_una_vittoria_non_iso(self):
         self._riga_storica("u-storico2", "practice-7", solved=1)

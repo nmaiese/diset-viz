@@ -2783,7 +2783,7 @@ def game_compare_answer_api():
         result["correct"], result["late"] = False, True
     result["session"] = _session_summary(session)
     result["token"] = token
-    result["achievements"] = _record_quiz(request, "compare", correct, result["session"])
+    result["achievements"] = _record_quiz(request, "compare", correct, result["session"], state["t"])
     return jsonify(result)
 
 
@@ -2834,24 +2834,27 @@ def game_order_answer_api():
         return _round_conflict()
     result["session"] = _session_summary(session)
     result["token"] = token
-    result["achievements"] = _record_quiz(request, "order", is_perfect, result["session"])
+    result["achievements"] = _record_quiz(request, "order", is_perfect, result["session"], state["t"])
     return jsonify(result)
 
 
-def _record_quiz(req, mode, correct, session_summary):
+def _record_quiz(req, mode, correct, session_summary, timed=True):
     """Se la richiesta porta un JWT valido, aggiorna le statistiche account della
     modalità e valuta gli achievement, restituendo gli sblocchi appena ottenuti
     (per il toast). Anonimo o DB giù -> lista vuota, il gioco non cambia.
-    Una risposta senza round legato (`session_summary` nullo) si valuta ma non conta:
-    ne' per la serie ne' per l'account, altrimenti chi chiede i valori all'oracolo
-    pubblico gonfierebbe i round giocati."""
+    Una risposta senza round legato (`session_summary` nullo) non conta. Una sessione
+    senza timer (`timed` falso, l'allenamento) non aggiorna le statistiche: la serie si
+    allungherebbe senza limite di tempo e "In serie" si guadagnerebbe cosi'. I
+    traguardi si valutano lo stesso, perche' altri punteggi (quello del giorno) li
+    possono aver appena sbloccati."""
     user = auth.current_user(req.headers)
     if not user or session_summary is None:
         return []
     try:
         from app import player_stats, achievements
-        best = (session_summary or {}).get("best", 0)
-        player_stats.record_quiz_answer(user["id"], mode, correct, best)
+        if timed:
+            best = (session_summary or {}).get("best", 0)
+            player_stats.record_quiz_answer(user["id"], mode, correct, best)
         return achievements.evaluate(user["id"])
     except Exception:  # noqa: BLE001
         return []
@@ -3214,13 +3217,18 @@ def game_order_daily_answer_api():
         res = game_order.evaluate_daily_order_answer(payload, auth_user=auth.current_user(request.headers))
     except game_order.OrderError as errore:
         return jsonify({"error": errore.code}), errore.status
-    try:
-        from app import daily_counter
-        daily_counter.record("order", game_daily.today_rome().isoformat(), res["score"])
-    except Exception:  # noqa: BLE001
-        app.logger.exception("order: partita finita non contata")
-    # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono.
-    res["achievements"] = _record_quiz(request, "order", res["score"] == res["total"], res["session"])
+    # Si conta solo una partita plausibile (`quiz_tokens.is_plausible` sul token
+    # restituito): cinque territori ordinati nell'istante dell'apertura sono uno script.
+    if quiz_tokens.is_plausible(quiz_tokens.load_state(res.get("token"), game_order.MODE)):
+        try:
+            from app import daily_counter
+            daily_counter.record("order", game_daily.today_rome().isoformat(), res["score"])
+        except Exception:  # noqa: BLE001
+            app.logger.exception("order: partita finita non contata")
+    # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono. Ordina del
+    # giorno apre sempre senza timer per costruzione (un solo round, nessun tempo per
+    # round), non per scelta di chi gioca: non e' allenamento, e conta (`timed`).
+    res["achievements"] = _record_quiz(request, "order", res["score"] == res["total"], res["session"], True)
     return jsonify(res)
 
 
@@ -3249,7 +3257,11 @@ def game_compare_daily_answer_api():
     if _answer_rate_limited(game_compare.sid_from_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
     stato, corpo = game_compare.answer(dati)
-    if stato == 200 and corpo.get("finished") and isinstance(corpo.get("summary"), dict):
+    # Il contatore conta le sfide vere: con il timer (la modalita' che va in
+    # classifica) e plausibili, cioe' non piu' veloci di 1,5 s a round dall'apertura.
+    if (stato == 200 and corpo.get("finished") and isinstance(corpo.get("summary"), dict)
+            and corpo.get("leaderboard")
+            and quiz_tokens.is_plausible(quiz_tokens.load_state(corpo.get("token"), game_compare.MODE))):
         try:
             from app import daily_counter
             daily_counter.record("compare", corpo["summary"]["date"], corpo["summary"]["score"]["correct"])
@@ -3269,7 +3281,7 @@ def game_compare_daily_answer_api():
                 app.logger.exception("compare: punteggio del giorno non registrato")
     if isinstance(corpo.get("session"), dict):
         corpo["achievements"] = _record_quiz(
-            request, "compare", bool(corpo.get("correct")), corpo["session"]
+            request, "compare", bool(corpo.get("correct")), corpo["session"], bool(corpo.get("leaderboard"))
         )
     return jsonify(corpo), stato
 
@@ -3316,11 +3328,12 @@ def game_map_daily_answer_api():
     status, body, finished_game = game_mappa.answer(data)
     if finished_game is None:
         return jsonify(body), status
-    try:
-        from app import daily_counter
-        daily_counter.record(finished_game["game"], finished_game["date"], finished_game["points"])
-    except Exception:  # noqa: BLE001
-        app.logger.exception("mappa: partita finita non contata")
+    if finished_game["plausible"]:
+        try:
+            from app import daily_counter
+            daily_counter.record(finished_game["game"], finished_game["date"], finished_game["points"])
+        except Exception:  # noqa: BLE001
+            app.logger.exception("mappa: partita finita non contata")
     user = auth.current_user(request.headers)
     if user and finished_game["plausible"]:
         from app import achievements, player_stats
@@ -4051,7 +4064,7 @@ def _home_quiz_games():
         },
         {
             "name": "Chi è maggiore?",
-            "desc": "Due regioni, un indicatore. Scegli quale ha il valore più alto.",
+            "desc": "Due territori, regioni o province, e un indicatore. Scegli quale ha il valore più alto.",
             "meta": "testa a testa",
             "href": "/quiz/chi-e-maggiore",
         },
