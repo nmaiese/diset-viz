@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { playStreak, serieDaGiorni, segnaGiocata, statoOggi } from "./oggi.js";
+import { GIOCHI, playStreak, serieDaGiorni, segnaGiocata, statoOggi } from "./oggi.js";
 
 test("giorni di fila fino a oggi", () => {
   assert.equal(serieDaGiorni(["2026-09-28", "2026-09-29", "2026-09-30"], "2026-09-30"), 3);
@@ -67,4 +67,8 @@ test("un risultato a meta ha il tono neutro, non quello sbagliato", () => {
   } finally {
     delete globalThis.window;
   }
+});
+
+test("la mappa e' un gioco del giorno come gli altri e conta nella serie", () => {
+  assert.ok(GIOCHI.includes("mappa"));
 });

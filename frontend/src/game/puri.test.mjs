@@ -152,14 +152,15 @@ test("leggiSfida senza un massimo del gioco non da' mai una sfida", () => {
   assert.equal(leggiSfida("#sfida=7-12", { numeroOggi: 12 }), null);
   assert.equal(leggiSfida("#sfida=0-12", { massimo: 0, numeroOggi: 12 }), null);
   assert.equal(leggiSfida("#sfida=7-12", { massimo: null, numeroOggi: 12 }), null);
-  assert.equal(leggiSfida("#sfida=7-12", { massimo: MASSIMI_SFIDA.mappa, numeroOggi: 12 }), null);
   assert.equal(leggiSfida("#sfida=7-12"), null);
 });
 
 test("i massimi per gioco sono quelli delle sfide del giorno", () => {
   assert.equal(MASSIMI_SFIDA.compare, 10);
   assert.equal(MASSIMI_SFIDA.order, 5);
-  assert.ok("mappa" in MASSIMI_SFIDA);
+  assert.equal(MASSIMI_SFIDA.mappa, 20);
+  assert.deepEqual(leggiSfida("#sfida=14-12", { massimo: MASSIMI_SFIDA.mappa, numeroOggi: 12 }), { punteggio: 14, numero: 12 });
+  assert.equal(leggiSfida("#sfida=21-12", { massimo: MASSIMI_SFIDA.mappa, numeroOggi: 12 }), null);
 });
 
 test("linkConSfida mette il frammento, non una query, e toglie quello di prima", () => {

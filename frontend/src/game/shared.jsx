@@ -528,6 +528,7 @@ export const FORME_RISULTATO = {
   exact: { glifo: "●", parola: "esatta" },
   higher: { glifo: "▲", parola: "più alta" },
   lower: { glifo: "▼", parola: "più bassa" },
+  region: { glifo: "◐", parola: "regione giusta" },
   miss: { glifo: "○", parola: "sbagliata" },
 };
 

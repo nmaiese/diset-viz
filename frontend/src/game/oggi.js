@@ -9,7 +9,7 @@ import { oggiRoma } from "./guess/serie.js";
 
 export { oggiRoma };
 
-export const GIOCHI = ["indovina", "provincia", "compare", "order"];
+export const GIOCHI = ["indovina", "provincia", "compare", "order", "mappa"];
 
 const PREFISSO = "di-oggi:";
 
