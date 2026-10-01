@@ -162,19 +162,46 @@ export function chiavePartita(livello, modalita, iso) {
   return `di-mappa-partita:${livello}:${modalita}:${iso}`;
 }
 
-// Errori del server con un nome, e che cosa dire. Quelli di un doppio invio non si dicono: il
-// primo invio e' gia' arrivato.
+// Errori del server con un nome, e che cosa dire. `token_invalid` ha la stessa frase di
+// `session_expired` (si sceglie in `decisioneErroreRisposta`), mai un messaggio vuoto.
+export const AVVISO_RIPRESA = "La partita si è interrotta, non per colpa tua. La riapriamo da capo.";
+
 export const ERRORI = {
   puzzle_changed: "La sfida del giorno è cambiata mentre giocavi. Riapri la partita.",
   session_expired: "La partita è scaduta. Riaprila per giocare la sfida di oggi.",
-  token_invalid: "",
-  round_already_answered: "",
+  partita_interrotta: "La partita si è interrotta. Riaprila per giocare la sfida di oggi.",
+  token_invalid: "La partita è scaduta. Riaprila per giocare la sfida di oggi.",
+  round_already_answered: AVVISO_RIPRESA,
   rate_limited: "Troppe richieste in poco tempo. Riprova fra un minuto.",
   seed_unavailable: "La sfida del giorno non è disponibile in questo momento. Riprova più tardi.",
   bad_request: "Risposta non valida. Riprova.",
 };
 
 export const ERRORI_DA_RIAPRIRE = new Set(["puzzle_changed", "session_expired", "token_invalid"]);
+
+// Con questi la risposta e' gia' arrivata al server ma al client no (la rete e' caduta), oppure il
+// token e' stato superato: il token salvato non serve piu', e ogni "Conferma" darebbe lo stesso 409.
+export const ERRORI_DA_RIPRENDERE = new Set(["round_already_answered", "token_superato"]);
+
+// Che cosa fare di una risposta rifiutata, in un punto solo (funzione pura). Ritorna
+//   "riprendi"  si dimentica la partita salvata e se ne apre una nuova, da sola, dicendolo;
+//   "riapri"    la sfida non puo' proseguire: messaggio e bottone "Riapri la sfida di oggi";
+//   "messaggio" un errore che passa: si resta sulla domanda e si puo' riprovare.
+// La ripresa automatica e' una sola: se la partita era gia' stata ripresa e non ha avuto
+// nemmeno una risposta buona (`giaRiaperta`), un secondo 409 non la rilancia (sarebbe un ciclo) e
+// lascia il bottone.
+export function decisioneErroreRisposta({ status, error } = {}, { giaRiaperta = false } = {}) {
+  if (status === 409 || ERRORI_DA_RIPRENDERE.has(error)) return giaRiaperta ? "riapri" : "riprendi";
+  if (ERRORI_DA_RIAPRIRE.has(error)) return "riapri";
+  return "messaggio";
+}
+
+// Il testo di un errore che si riapre con il bottone: quello della ripresa fallita non e' quello
+// di un token scaduto.
+export function messaggioRiapertura(error, { status } = {}) {
+  if (status === 409 || ERRORI_DA_RIPRENDERE.has(error)) return messaggioErrore("partita_interrotta");
+  return messaggioErrore(error === "token_invalid" ? "session_expired" : error);
+}
 
 export function messaggioErrore(codice) {
   return Object.prototype.hasOwnProperty.call(ERRORI, codice) ? ERRORI[codice] : "Qualcosa non ha funzionato. Riprova.";

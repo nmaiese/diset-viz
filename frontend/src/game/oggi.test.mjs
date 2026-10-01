@@ -72,3 +72,45 @@ test("un risultato a meta ha il tono neutro, non quello sbagliato", () => {
 test("la mappa e' un gioco del giorno come gli altri e conta nella serie", () => {
   assert.ok(GIOCHI.includes("mappa"));
 });
+
+function conDeposito(prova) {
+  const deposito = new Map();
+  globalThis.window = {
+    localStorage: { getItem: (k) => deposito.get(k) ?? null, setItem: (k, v) => deposito.set(k, v) },
+  };
+  try {
+    prova(deposito);
+  } finally {
+    delete globalThis.window;
+  }
+}
+
+test("segnaGiocata: la prima partita del giorno resta, un rigioco non la sovrascrive", () => {
+  conDeposito(() => {
+    assert.equal(segnaGiocata("compare", "2026-10-01", { ok: true, tono: "parziale", testo: "6 su 10" }), true);
+    // "Rivedi le stesse coppie" finito con 10 su 10: l'hub tiene il 6 su 10.
+    assert.equal(segnaGiocata("compare", "2026-10-01", { ok: true, tono: "giusto", testo: "10 su 10" }), false);
+    const stato = statoOggi("compare", "2026-10-01");
+    assert.equal(stato.tono, "parziale");
+    assert.equal(stato.testo, "6 su 10");
+  });
+});
+
+test("segnaGiocata: un altro esercizio della mappa non cambia l'esito gia' segnato", () => {
+  conDeposito(() => {
+    segnaGiocata("mappa", "2026-10-01", { ok: true, tono: "giusto", testo: "17 su 20" });
+    segnaGiocata("mappa", "2026-10-01", { ok: true, tono: "sbagliato", testo: "0 su 10, senza mappa" });
+    assert.equal(statoOggi("mappa", "2026-10-01").testo, "17 su 20");
+  });
+});
+
+test("segnaGiocata: giorni e giochi diversi non si toccano, e una data che non e' ISO non scrive", () => {
+  conDeposito((deposito) => {
+    assert.equal(segnaGiocata("order", "2026-10-01", { ok: true, testo: "a" }), true);
+    assert.equal(segnaGiocata("order", "2026-10-02", { ok: true, testo: "b" }), true);
+    assert.equal(segnaGiocata("compare", "2026-10-01", { ok: true, testo: "c" }), true);
+    assert.equal(segnaGiocata("order", undefined, { ok: true, testo: "d" }), false);
+    assert.equal(segnaGiocata("order", "oggi", { ok: true, testo: "d" }), false);
+    assert.equal(deposito.size, 3);
+  });
+});

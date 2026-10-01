@@ -11,9 +11,11 @@ import { oggiRoma } from "./serie.js";
 import { segnaGiocata } from "../oggi.js";
 import {
   API_PROVINCIA,
+  AVVISO_RIPRESA,
   LIVELLI,
   caricaProgresso,
   caricaStatistiche,
+  decisioneErroreTentativo,
   direzione,
   inviaTentativo,
   livelloSalvato,
@@ -23,6 +25,7 @@ import {
   registraPartita,
   regioneConArticolo,
   rigaTerritorio,
+  rimuoviProgresso,
   riassuntoProvincia,
   salvaLivello,
   salvaProgresso,
@@ -45,15 +48,12 @@ const MAX_SUGGERIMENTI = 6;
 
 const MESSAGGI_ERRORE = {
   sfida_scaduta: "La sfida è cambiata. Ricarica la pagina per giocare quella di oggi.",
-  token_superato: "Questo tentativo risulta già registrato. Ricarica la pagina per riprendere.",
+  token_superato: "La partita si è interrotta. Ricarica la pagina per ripartire.",
   provincia_gia_tentata: "Hai già provato questa provincia.",
   provincia_non_valida: "Questa provincia non è fra quelle del livello scelto.",
   partita_conclusa: "La partita di oggi è già conclusa.",
   rate_limited: "Troppi tentativi in poco tempo. Riprova fra un minuto.",
 };
-
-// Gli errori che si risolvono solo ricaricando la pagina: la sfida e' cambiata, o il tentativo e' gia' registrato.
-const ERRORI_DA_RICARICA = new Set(["sfida_scaduta", "token_superato"]);
 
 // Un tentativo: niente token, che resta nel salvataggio a parte.
 function senzaToken(risultato) {
@@ -90,6 +90,11 @@ export default function GiocoProvincia() {
   const [scorri, setScorri] = useState(0); // sale a ogni tentativo appena giocato
   const statsRecordedRef = useRef(false);
   const latestRef = useRef({ status: "loading", submitting: false });
+  // La ripresa da sola dopo un tentativo perso: il contatore rilancia il caricamento, il testo si
+  // mostra alla fine, e `ripresaRef` e' vero finche' la partita ripresa non ha un tentativo buono.
+  const [riprese, setRiprese] = useState(0);
+  const avvisoRef = useRef("");
+  const ripresaRef = useRef(false);
 
   const finished = status === "won" || status === "lost";
   const locked = guesses.length > 0 || finished;
@@ -139,6 +144,10 @@ export default function GiocoProvincia() {
         setSolution(null);
         setRecap(null);
         setStatus("playing");
+        if (avvisoRef.current) {
+          setError(avvisoRef.current);
+          avvisoRef.current = "";
+        }
         trackGameEvent("game_start", { game: GAME, mode: "daily", level });
       })
       .catch(() => {
@@ -149,7 +158,7 @@ export default function GiocoProvincia() {
     return () => {
       attivo = false;
     };
-  }, [level]);
+  }, [level, riprese]);
 
   // Dopo ogni tentativo la pagina porta in vista l'esito: la riga del tentativo sotto il campo o, a fine
   // partita, la schermata finale. `nearest` muove la pagina il minimo, e liscio solo se non si e' chiesto
@@ -229,6 +238,7 @@ export default function GiocoProvincia() {
         const nextGuesses = [...guesses, tentativo];
         const nextClues = result.next_clue ? [...clues, result.next_clue] : clues;
         const nextStatus = result.finished ? (result.correct ? "won" : "lost") : "playing";
+        ripresaRef.current = false;
         setGuesses(nextGuesses);
         setClues(nextClues);
         setToken(result.token);
@@ -257,7 +267,7 @@ export default function GiocoProvincia() {
           setRecap(result.recap);
           setFatto(nextFatto);
           registraFine(result.correct, attempt);
-          segnaGiocata("provincia", oggiRoma(), {
+          segnaGiocata("provincia", puzzle.date, {
             ok: result.correct,
             testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta",
             tentativi: attempt,
@@ -271,8 +281,17 @@ export default function GiocoProvincia() {
         setScorri((n) => n + 1);
       })
       .catch((e) => {
+        const decisione = decisioneErroreTentativo({ status: e.status, code: e.code }, { giaRipresa: ripresaRef.current });
+        if (decisione === "riprendi") {
+          // Il token salvato e' superato: si dimentica il progresso e si ricarica la sfida.
+          rimuoviProgresso(puzzle.puzzle_id);
+          avvisoRef.current = AVVISO_RIPRESA;
+          ripresaRef.current = true;
+          setRiprese((n) => n + 1);
+          return;
+        }
         setError(MESSAGGI_ERRORE[e.code] || "Il tentativo non è andato a buon fine. Riprova.");
-        setRicarica(ERRORI_DA_RICARICA.has(e.code));
+        setRicarica(decisione === "ricarica");
       })
       .finally(() => setSubmitting(false));
   }

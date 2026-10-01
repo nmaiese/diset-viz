@@ -15,12 +15,13 @@ import { Avanti, Conferma, InAzioni } from "./Azioni.jsx";
 import { Domanda } from "./Domanda.jsx";
 import { creaMappa } from "./mappaMuta.js";
 import {
-  ERRORI_DA_RIAPRIRE,
   GIOCO,
   OPZIONI,
   applicaRisposta,
+  decisioneErroreRisposta,
   esitiPerCondivisione,
   messaggioErrore,
+  messaggioRiapertura,
   nuovaPartita,
   opzione,
   parametriRisposta,
@@ -99,7 +100,7 @@ function Scelta({ scelta, onScegli, onInizia, occupato, errore, sfida, avviata }
   );
 }
 
-function Partita({ partita, sfida, onPartita, onCambiaOpzione, onRiapri, mappa, vistaMappa }) {
+function Partita({ partita, sfida, avviso, onPartita, onCambiaOpzione, onRiapri, onRiprendi, mappa, vistaMappa }) {
   const iso = partita.date;
   // La domanda mostrata resta quella appena risposta finche' non si preme "Avanti": la partita
   // ha gia' la domanda dopo, ma la rivelazione parla di quella di prima.
@@ -107,7 +108,7 @@ function Partita({ partita, sfida, onPartita, onCambiaOpzione, onRiapri, mappa, 
   const [stato, setStato] = useState(partita.fine ? "fine" : "domanda"); // domanda | invio | rivelata | fine
   const [risposta, setRisposta] = useState(null);
   const [scelta, setScelta] = useState(null); // la regione scelta senza mappa
-  const [messaggio, setMessaggio] = useState("");
+  const [messaggio, setMessaggio] = useState(avviso || "");
   const [riaprire, setRiaprire] = useState(false);
   const [vista, setVista] = useState({ vista: "italia", selezionata: null });
   const mio = useTerritorioMio();
@@ -183,18 +184,21 @@ function Partita({ partita, sfida, onPartita, onCambiaOpzione, onRiapri, mappa, 
       q: domanda.index,
       ...(conMappa ? { province_key: selezionata } : { region_key: selezionata }),
     };
-    const { ok, data } = await rispondi(corpo);
+    const { ok, status, data } = await rispondi(corpo);
     if (!ok) {
-      // Un doppio invio (409, o un token gia' usato) non e' un errore di chi gioca: il primo invio e'
-      // gia' arrivato, si torna alla domanda senza dire niente.
-      if (data.error === "round_already_answered" || data.error === "token_invalid") {
-        statoRef.current = "domanda";
-        setStato("domanda");
-        if (data.error === "token_invalid") riapri(messaggioErrore("session_expired"));
+      // La partita ripresa da sola e ancora senza una risposta buona non si riprende una seconda volta.
+      const decisione = decisioneErroreRisposta(
+        { status, error: data.error },
+        { giaRiaperta: Boolean(avviso) && corrente.risposte.length === 0 },
+      );
+      if (decisione === "riprendi") {
+        // La risposta e' arrivata al server ma non a noi (o il token e' superato): quello salvato non
+        // serve piu'. Si apre una sessione nuova, dicendolo.
+        onRiprendi(messaggioErrore("round_already_answered"));
         return;
       }
-      if (ERRORI_DA_RIAPRIRE.has(data.error)) {
-        riapri(messaggioErrore(data.error));
+      if (decisione === "riapri") {
+        riapri(messaggioRiapertura(data.error, { status }));
         return;
       }
       statoRef.current = "domanda";
@@ -341,6 +345,8 @@ export default function GiocoMappa() {
   const [partita, setPartita] = useState(null);
   const [generazione, setGenerazione] = useState(0);
   const [errore, setErrore] = useState("");
+  // Il testo della partita ripresa da sola: sta qui perche' `Partita` si rimonta (`key`).
+  const [avviso, setAvviso] = useState("");
   const [numeroOggi, setNumeroOggi] = useState(null);
   const preaperta = useRef(null);
   const vistaMappa = useRef(null);
@@ -364,10 +370,11 @@ export default function GiocoMappa() {
   const avviata = fase !== "scelta";
   const sfida = useSfidaCondivisa({ game: GIOCO, numeroOggi, avviata });
 
-  const inizia = useCallback(async (id) => {
+  const inizia = useCallback(async (id, avvisoIniziale = "") => {
     const o = OPZIONI.find((x) => x.id === id) || OPZIONI[0];
     const iso = oggiRoma();
     setErrore("");
+    setAvviso(avvisoIniziale);
     setFase("caricamento");
     const salvata = leggiSalvata(o.livello, o.modalita, iso);
     if (salvata) {
@@ -397,10 +404,13 @@ export default function GiocoMappa() {
     trackGameEvent("map_start", { game: GIOCO, mode: "daily", level: o.livello, answer_mode: o.modalita, total: nuova.total });
   }, []);
 
-  const riapri = useCallback(() => {
+  // Dimentica la partita salvata e ne apre una nuova. Con `testo` la partita nuova parte dicendolo.
+  const riprendi = useCallback((testo = "") => {
     if (partita) dimenticaPartita(partita.level, partita.mode, partita.date);
-    inizia(opzione(partita ? partita.level : "italia", partita ? partita.mode : "map").id);
+    inizia(opzione(partita ? partita.level : "italia", partita ? partita.mode : "map").id, testo);
   }, [inizia, partita]);
+
+  const riapri = useCallback(() => riprendi(""), [riprendi]);
 
   const cambiaOpzione = useCallback(() => {
     mostraMappa(true);
@@ -421,9 +431,11 @@ export default function GiocoMappa() {
         key={generazione}
         partita={partita}
         sfida={sfida}
+        avviso={avviso}
         onPartita={setPartita}
         onCambiaOpzione={cambiaOpzione}
         onRiapri={riapri}
+        onRiprendi={riprendi}
         mappa={mappa}
         vistaMappa={vistaMappa}
       />

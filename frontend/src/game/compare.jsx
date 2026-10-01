@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { getAccessToken } from "../shared/supabase.js";
 import { segnaGiocata } from "./oggi.js";
+import { analizza, statsCompare } from "./salvati.js";
 import {
   fetchJson,
   formatValue,
@@ -23,6 +24,7 @@ import {
   campoFattoPath,
   chiediAvanti,
   coppiaDelTerritorio,
+  decisioneInvio,
   primoTerritorioMio,
   tonoCompare,
 } from "./compare-logica.js";
@@ -59,14 +61,14 @@ const LIVELLI = [
 const NOTA_ALLENAMENTO =
   "Senza timer è allenamento: la partita non va in classifica.";
 
-// Gli errori della sfida del giorno hanno tutti un nome. Quelli che capitano per
-// un doppio invio (click e scadenza insieme) si ignorano in silenzio: non sono un
-// errore di chi gioca e non devono interrompere la partita.
+// Gli errori della sfida del giorno hanno tutti un nome, e nessuno e' muto: un doppio invio o un
+// token superato bloccano la partita, e chi gioca deve leggere perche' e trovare il bottone.
+// Una risposta tardiva non e' un errore: il server risponde 200 con `late: true`.
 const ERRORI_SFIDA = {
-  round_already_answered: "",
-  token_invalid: "",
+  round_already_answered: "La partita si è interrotta, non per colpa tua. Riaprila per giocare la sfida di oggi.",
+  token_invalid: "La partita è scaduta, non per colpa tua. Riaprila per giocare la sfida di oggi.",
   puzzle_changed: "La sfida del giorno è cambiata mentre giocavi. Riapri la partita.",
-  late: "Il tempo è scaduto: la risposta è troppo tardi.",
+  rete: "Non riesco a raggiungere il server. Riapri la sfida di oggi.",
   timeout_too_early: "Il tempo non era ancora scaduto.",
   rate_limited: "Troppe risposte in poco tempo. Riprova fra un minuto.",
   round_already_bound: "La coppia dopo era già stata aperta. Riapri la sfida.",
@@ -74,19 +76,11 @@ const ERRORI_SFIDA = {
   bad_request: "Risposta non valida.",
 };
 
-// Errori che si possono riprovare subito sulla stessa coppia: il server non ha
-// consumato il round. Tutti gli altri lo bloccano, e l'unica strada è riaprire
-// la sfida, quindi non ripartono neanche il cronometro (un timeout a cronometro
-// fermo ripeterebbe la stessa richiesta per sempre).
-const ERRORI_RIPROVABILI = new Set(["timeout_too_early", "rate_limited"]);
-
 function loadStats() {
   try {
-    const raw = window.localStorage.getItem(STORAGE_STATS_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    return { bestStreak: 0, totalRounds: 0, totalCorrect: 0, ...parsed };
+    return statsCompare(analizza(window.localStorage.getItem(STORAGE_STATS_KEY)));
   } catch {
-    return { bestStreak: 0, totalRounds: 0, totalCorrect: 0 };
+    return statsCompare(null);
   }
 }
 
@@ -246,7 +240,8 @@ function scrollaSuIsola() {
 // Il timer di un round. `attivo` lo accende (solo con il timer scelto e la domanda aperta),
 // `chiave` lo fa ripartire a ogni coppia. Il conto e' di `compare-logica.js`: a scadenza
 // assoluta, e la risposta di timeout parte UNA volta, fuori da qualsiasi updater di stato.
-// Ritorna `[rimasto, azzera]`: `azzera()` riporta il conto a 10 s prima di una coppia nuova. Se
+// Ritorna `[rimasto, azzera, rimastoRef]`: `azzera()` riporta il conto a 10 s prima di una coppia nuova,
+// `rimastoRef.current` e' il tempo che restava (si legge fuori dal render, da una risposta). Se
 // il timer si riaccende sulla stessa coppia (un errore riprovabile) riparte da quanto restava.
 function useTimerRound(attivo, chiave, onScadenza) {
   const [rimasto, setRimasto] = useState(ROUND_MS);
@@ -271,7 +266,7 @@ function useTimerRound(attivo, chiave, onScadenza) {
     });
   }, [attivo, chiave]);
 
-  return [rimasto, azzera];
+  return [rimasto, azzera, rimastoRef];
 }
 
 // Cronometro e barra: ci sono solo mentre la domanda e' aperta. Dopo la risposta il tempo e'
@@ -343,6 +338,9 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
   const domandaRef = useRef(null);
   const avantiRef = useRef(null);
   const rispondiRef = useRef(null);
+  // Chi riapre la sfida da una partita finita ("Rivedi le stesse coppie") la rigioca: l'hub tiene l'esito
+  // della prima, quella del giorno.
+  const rigiocoRef = useRef(false);
 
   useEffect(() => {
     statoRef.current = { stato, indice };
@@ -355,7 +353,7 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
   // Il tempo lo scandisce il client per far avanzare la barra, ma la validita'
   // della risposta la decide il server (vedi `round_timing`): il client puo'
   // sbagliare il conto, non puo' far valere una risposta fuori tempo.
-  const [timeLeft, azzeraTimer] = useTimerRound(timer && stato === "domanda", indice, () =>
+  const [timeLeft, azzeraTimer, rimastoRef] = useTimerRound(timer && stato === "domanda", indice, () =>
     rispondiRef.current("timeout")
   );
 
@@ -409,6 +407,7 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
   }, [indice, onAvviata]);
 
   function apri() {
+    if (statoRef.current.stato === "fine") rigiocoRef.current = true;
     window.clearTimeout(ritentoRef.current.id);
     ritentoRef.current = { id: null, tentativi: 0 };
     setStato("caricamento");
@@ -456,8 +455,16 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
       q: domandaIndice,
       choice: scelta,
       token: tokenRef.current,
-    }).then(({ ok, status, data }) => {
-      if (ok) {
+    }).then((esito) => {
+      // Una risposta che arriva dopo una nuova apertura della sfida non e' piu' di questa partita.
+      if (sessioneRef.current !== corrente) return;
+      const decisione = decisioneInvio(esito, {
+        scelta,
+        tentativi: ritentoRef.current.tentativi,
+        rimastoMs: timer ? rimastoRef.current : Infinity,
+      });
+      const { data } = esito;
+      if (decisione.azione === "rivelata") {
         tokenRef.current = data.token;
         statoRef.current = { stato: data.finished ? "fine" : "rivelata", indice: domandaIndice };
         setRisposta(data);
@@ -474,31 +481,21 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
         notifyAchievements(data.achievements, GIOCO);
         return;
       }
-      // Un doppio invio della stessa coppia è un 409 e un token già usato è un
-      // 400 `token_invalid`: in entrambi i casi il primo invio ha già fatto
-      // testo, quindi si torna alla domanda senza dire nulla a chi gioca.
-      if (status === 409 || data.error === "token_invalid") {
+      if (decisione.azione === "riprova") {
+        // Lo stesso invio, poche volte: la rete che non risponde o un timeout arrivato presto. Il
+        // tempo e' gia' finito per il client, quindi non si rimette la domanda in `domanda`.
+        setMessaggio("");
+        ritentoRef.current = {
+          tentativi: ritentoRef.current.tentativi + 1,
+          id: window.setTimeout(() => invia(decisione.scelta, domandaIndice), decisione.attesaMs),
+        };
+        return;
+      }
+      setMessaggio(ERRORI_SFIDA[decisione.errore] || "Qualcosa non ha funzionato. Riprova.");
+      if (decisione.azione === "domanda") {
         statoRef.current = { stato: "domanda", indice: domandaIndice };
         setStato("domanda");
         return;
-      }
-      setMessaggio(ERRORI_SFIDA[data.error] || "Qualcosa non ha funzionato. Riprova.");
-      if (ERRORI_RIPROVABILI.has(data.error)) {
-        if (scelta === "timeout") {
-          // Il tempo e' gia' finito per il client: rimettere la domanda in `domanda` farebbe
-          // scattare la scadenza a ogni tick. Si riprova una volta ogni secondo e mezzo, poche volte.
-          if (ritentoRef.current.tentativi < 3) {
-            ritentoRef.current = {
-              tentativi: ritentoRef.current.tentativi + 1,
-              id: window.setTimeout(() => invia("timeout", domandaIndice), 1500),
-            };
-            return;
-          }
-        } else {
-          statoRef.current = { stato: "domanda", indice: domandaIndice };
-          setStato("domanda");
-          return;
-        }
       }
       setStato("bloccata");
       setScaduta(true);
@@ -553,14 +550,16 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
     if (risposta.winner === lato) cls += " is-revealed is-winner";
     else cls += " is-revealed";
     // `choice` e' "region_a" o "region_b" (il vocabolario del round a serie), il lato e' "a" o "b".
-    if (risposta.choice === `region_${lato}`) cls += risposta.correct ? " is-picked-right" : " is-picked-wrong";
+    // Una risposta tardiva (`late`) e' sbagliata anche se il lato era quello giusto: il marcatore
+    // "scelta sbagliata" sul lato vincente sarebbe ambiguo, la riga sotto dice come e' andata.
+    if (risposta.choice === `region_${lato}` && !risposta.late) cls += risposta.correct ? " is-picked-right" : " is-picked-wrong";
     return cls;
   }
 
   // L'hub sa che oggi hai giocato (solo la sfida in classifica, non l'allenamento).
   const finita = stato === "fine" && risposta && risposta.summary;
   useEffect(() => {
-    if (!finita || allenamento) return;
+    if (!finita || allenamento || rigiocoRef.current) return;
     // Un parziale non e' una croce: l'hub ha una terza icona, neutra, per il risultato a meta.
     const tono = tonoCompare(finita.score.correct, finita.score.total);
     segnaGiocata("compare", finita.date, {
@@ -660,6 +659,8 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
                   <span className="visually-hidden">{risposta.correct ? "Giusto. " : "Sbagliato. "}</span>
                   {risposta.correct
                     ? "Giusto."
+                    : risposta.late
+                    ? "Risposta arrivata dopo il tempo, conta come sbagliata."
                     : risposta.choice === "timeout"
                     ? "Tempo scaduto."
                     : "Sbagliato."}{" "}
