@@ -65,7 +65,13 @@ from app.multiscopo_data import (
 )
 from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
-from app.quality_life_selection import BES_PREFIX, EUR_PREFIX, MULTI_PREFIX, regional_quality_life_selection
+from app.quality_life_selection import (
+    BES_PREFIX,
+    EUR_PREFIX,
+    MULTI_PREFIX,
+    REGIONAL_EUR_MIN_YEAR,
+    regional_quality_life_selection,
+)
 
 # Compact source labels for the visible methodology breakdown.
 def _source_score_label(family):
@@ -252,7 +258,14 @@ def _matrix_and_meta(level):
 
         if has_external_data():
             scoreables = external_regional_scoreables()
-            for public_id in (i for i in selection if i.startswith(EUR_PREFIX)):
+            # Every external family, resolved from the registry: the family is
+            # what the methodology prints as the source of each indicator, and
+            # a hardcoded "eurostat" here published Istat demographic series
+            # under Eurostat's name.
+            for public_id in selection:
+                family = sources.split_internal_id(public_id)[0]
+                if family not in sources.EXTERNAL_FAMILIES:
+                    continue
                 info = scoreables.get(public_id)
                 payload = get_external_atlas_indicator(public_id)
                 if info is None or payload is None:
@@ -282,7 +295,7 @@ def _matrix_and_meta(level):
                     "year_max": year_max,
                     "unit": meta_src["unit"],
                     "path": meta_src["path"],
-                    "source_family": "eurostat",
+                    "source_family": family,
                 }
     return matrix, meta
 
@@ -433,7 +446,10 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
                 else "Istat, BES dei Territori (Bes at local level)"
             ),
             "minimum_reference_year": (
-                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023, "eurostat": 2021}
+                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023,
+                 **{family: REGIONAL_EUR_MIN_YEAR
+                    for family in sorted({i["source_family"] for i in meta.values()})
+                    if family in sources.EXTERNAL_FAMILIES}}
                 if level == "regione" else None
             ),
             "territorial_level": "regioni" if level == "regione" else "province e città metropolitane",

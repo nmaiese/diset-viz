@@ -2,7 +2,7 @@ import unittest
 import re
 from html import unescape
 
-from app import app
+from app import app, sources
 from app import quality_life_bes as qb
 from app.atlas_catalog import get_atlas_indicator
 from app.bes_data import (
@@ -127,10 +127,15 @@ class QualityLifeStaticTest(unittest.TestCase):
     def test_regional_score_uses_the_federated_indicator_selection(self):
         matrix, meta = qb._matrix_and_meta("regione")
         self.assertGreaterEqual(len(matrix), 200)
-        self.assertEqual(
-            set(item["source_family"] for item in meta.values()),
-            {"bes", "territorial", "multiscopo", "eurostat"},
-        )
+        families = set(item["source_family"] for item in meta.values())
+        self.assertLessEqual({"bes", "territorial", "multiscopo"}, families)
+        self.assertLessEqual(families, {"bes", "territorial", "multiscopo", *sources.EXTERNAL_FAMILIES})
+        # Each external indicator is attributed to the family its id belongs
+        # to, never to Eurostat by default.
+        for indicator_id, item in meta.items():
+            family = sources.split_internal_id(indicator_id)[0]
+            if family in sources.EXTERNAL_FAMILIES:
+                self.assertEqual(item["source_family"], family, indicator_id)
         self.assertTrue(all(
             item["year_max"] >= (2025 if item["source_family"] == "bes" else 2023)
             for item in meta.values()
@@ -194,6 +199,38 @@ class QualityLifeStaticTest(unittest.TestCase):
             self.assertNotIn("eur:clone_of_an_existing_name", selection)
         finally:
             qls.regional_quality_life_selection.cache_clear()
+
+    def test_every_external_family_enters_the_regional_score_under_its_own_name(self):
+        """The engine used to load only ids it took for Eurostat and to write
+        "eurostat" as the source of every external indicator. Any registered
+        external family must enter the matrix and keep its own attribution."""
+        from unittest import mock
+
+        regions = list(qb.get_bes_territories("regione"))
+        for family in ("eurostat", "mef", "istat_demografia", "aci"):
+            with self.subTest(family=family):
+                public_id = sources.internal_id(family, "prova-famiglia")
+                payload = {
+                    "metadata": {
+                        "raw_id": "prova-famiglia", "name": f"Serie di prova {family}",
+                        "theme": "Reddito e ricchezza", "source_theme": "Reddito",
+                        "year_max": 2024, "unit": "%", "path": f"/indicatore/prova/{family}",
+                    },
+                    "series": [
+                        {"region_key": key, "year": 2024, "value": float(index)}
+                        for index, key in enumerate(regions)
+                    ],
+                }
+                info = {"name": payload["metadata"]["name"], "category": "reddito_accessibilita",
+                        "direction": "higher_better", "coverage": 1.0, "year_max": 2024}
+                with mock.patch.object(qb, "regional_quality_life_selection",
+                                       return_value={public_id: "reddito_accessibilita"}), \
+                     mock.patch.object(qb, "has_external_data", return_value=True), \
+                     mock.patch.object(qb, "external_regional_scoreables", return_value={public_id: info}), \
+                     mock.patch.object(qb, "get_external_atlas_indicator", return_value=payload):
+                    matrix, meta = qb._matrix_and_meta.uncached("regione")
+                self.assertIn(public_id, matrix)
+                self.assertEqual(meta[public_id]["source_family"], family)
 
     def test_invalid_level_is_404(self):
         client = app.test_client()
