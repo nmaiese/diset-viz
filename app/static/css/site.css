@@ -1129,7 +1129,7 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .account-btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
 .account-data-cta { display: flex; gap: 10px; flex-wrap: wrap; }
 .account-danger { background: none; border: 1px solid var(--negative-soft); color: var(--error-text); border-radius: 999px; padding: 9px 18px; font: 600 14px/1 var(--font-body); cursor: pointer; }
-.account-danger:hover { background: var(--error); color: var(--text-on-accent); }
+.account-danger:hover { background: var(--error-soft); color: var(--error-text); }
 .account-data-msg { font-size: 14px; color: var(--error-text); margin: 12px 0 0; }
 .account-data-msg:empty { display: none; }
 .account-note { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; line-height: 1.5; }
