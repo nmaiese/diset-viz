@@ -53,12 +53,15 @@
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": {{ ('Qualità della vita ' ~ (p.name | at_place)) | tojson }},
-  "description": {{ ((p.name ~ ' è ' ~ p.rank ~ 'ª su ' ~ p.total ~ ' province per qualità della vita, con ' ~ (p.score | it_num) ~ ' su 100. ') ~ ('I valori di ' ~ (indicatori | length) ~ ' indicatori del BES dei Territori di Istat, con anno, posizione fra le province e confronto con le province della sua regione.' if indicatori else 'Punteggio e profilo per dimensione dal BES dei Territori di Istat.')) | tojson }},
+  "description": {{ ((p.name ~ ' è ' ~ p.rank ~ 'ª su ' ~ p.total ~ ' province per qualità della vita, con ' ~ (p.score | it_num) ~ ' su 100. ') ~ ('I valori di ' ~ (indicatori | length) ~ ' indicatori del BES dei Territori di Istat, con anno, posizione fra le province e confronto con le province della sua regione.' ~ ((' Più ' ~ d.external_count ~ ' indicatori descrittivi di ' ~ d.external_label ~ ', fuori dal punteggio.') if d.external_count else '') if indicatori else 'Punteggio e profilo per dimensione dal BES dei Territori di Istat.')) | tojson }},
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": {{ p.name | tojson }}{% if p.region %}, "containedInPlace": { "@type": "Place", "name": {{ p.region | tojson }}{% if p.region_path %}, "url": {{ (site_url ~ p.region_path) | tojson }}{% endif %} }{% endif %} },
-  {% if indicatori %}"temporalCoverage": "{{ indicatori | map(attribute='year_from') | min }}/{{ indicatori | map(attribute='year') | max }}",
+  {% if d.rows %}"temporalCoverage": "{{ d.rows | map(attribute='year_from') | min }}/{{ d.rows | map(attribute='year') | max }}",
   {% endif %}"creator": {{ organization_ref_jsonld | safe }},
   "isBasedOn": { "@type": "Dataset", "name": "BES dei Territori", "description": "Indicatori del benessere equo e sostenibile a livello provinciale, pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
+  {%- if d.external %}
+  "hasPart": [{% for e in d.external %}{ "@type": "Dataset", "name": {{ e.label | tojson }}, "description": {{ (e.count ~ ' indicatori di ' ~ e.institution ~ ' per la ' ~ ('città metropolitana' if p.metro_city else 'provincia') ~ ' ' ~ d.of_name ~ ', descrittivi e fuori dal punteggio.') | tojson }}, "creator": { "@type": "Organization", "name": {{ e.institution | tojson }} }{% if e.license_url %}, "license": {{ e.license_url | tojson }}{% endif %}{% if e.url %}, "url": {{ e.url | tojson }}{% endif %} }{{ "," if not loop.last }}{% endfor %}],
+  {%- endif %}
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ data_license_url | tojson }},
@@ -70,7 +73,7 @@
       "minValue": 0,
       "maxValue": 100,
       "measurementTechnique": {{ (p.methodology.source or 'Istat, BES dei Territori') | tojson }}
-    }{% for i in indicatori %},
+    }{% for i in d.rows %},
     { "@type": "PropertyValue", "name": {{ i.name | tojson }}, "value": {{ i.value }}{% if i.unit %}, "unitText": {{ i.unit | tojson }}{% endif %} }{% endfor %}
   ],
   "keywords": [{{ p.name | tojson }}, "qualità della vita", "province italiane", "Istat"]
@@ -248,13 +251,13 @@
       {% endif %}
 
 
-  {% if indicatori %}
+  {% if d.rows %}
   <section class="section" id="indicatori" aria-labelledby="h-indicatori">
     {#- "I dati della provincia di Lecce": la sezione con i valori veri e' cio'
         che chi cerca "dati provincia di Lecce" vuole, e prima il titolo non
         diceva ne' "provincia" ne' "dati". -#}
     <h2 id="h-indicatori">I dati {{ 'della città metropolitana' if p.metro_city else 'della provincia' }} {{ d.of_name }}, indicatore per indicatore</h2>
-    <p class="provincia-note">{{ indicatori | length | num(None, 'count') }} indicatori, per area. Il valore è quello pubblicato dalla fonte, arrotondato secondo la sua grandezza, nell'anno più recente per {{ p.name }}, e la variazione è dal primo anno della serie. La linea accanto è la serie della provincia anno per anno, e resta quasi piatta quando la provincia si è mossa poco rispetto alla distanza fra le province. La posizione in Italia si conta fra le province che quell'anno hanno un dato, quindi il denominatore cambia da riga a riga, e la prima è la migliore secondo il verso dell'indicatore. {% if p.region %}In {{ p.region }} il confronto è con le altre province della regione, e la media è la loro, non il valore regionale.{% endif %}</p>
+    <p class="provincia-note">{{ d.rows | length | num(None, 'count') }} indicatori, per area. Il valore è quello pubblicato dalla fonte, arrotondato secondo la sua grandezza, nell'anno più recente per {{ p.name }}, e la variazione è dal primo anno della serie. La linea accanto è la serie della provincia anno per anno, e resta quasi piatta quando la provincia si è mossa poco rispetto alla distanza fra le province. La posizione in Italia si conta fra le province che quell'anno hanno un dato, quindi il denominatore cambia da riga a riga, e la prima è la migliore secondo il verso dell'indicatore. {% if p.region %}In {{ p.region }} il confronto è con le altre province della regione, e la media è la loro, non il valore regionale.{% endif %}{% if d.external_count %} {{ d.external_count | num(None, 'count') }} {{ d.external_count | it_plural('indicatore porta', 'indicatori portano') }} sotto il nome la fonte, {{ d.external_label }}: {{ d.external_count | it_plural('descrive', 'descrivono') }} il territorio e non {{ d.external_count | it_plural('entra', 'entrano') }} nel punteggio. Dove un indicatore non ha un verso, come i figli per donna o l'età media al parto, la posizione ordina dal valore più alto e non dice che sia un bene o un male.{% endif %}</p>
     {% if d.groups | length > 1 %}
     <nav class="provincia-jump" aria-label="Aree della tabella">
       {%- for g in d.groups %}<a href="#{{ g.anchor }}">{{ g.name }} {{ g.rows | length | num(None, 'count') }}</a>{% endfor -%}
@@ -279,12 +282,12 @@
           <tbody role="rowgroup">
             {%- for i in g.rows %}
             <tr role="row">
-              <th scope="row" role="rowheader"><a href="{{ i.path }}">{{ i.name }}</a></th>
+              <th scope="row" role="rowheader"><a href="{{ i.path }}">{{ i.name }}</a>{% if i.source %}<span class="provincia-src">Fonte: {% if i.source_url %}<a href="{{ i.source_url }}">{{ i.source }}</a>{% else %}{{ i.source }}{% endif %}</span>{% endif %}</th>
               <td role="cell" class="val" data-label="Valore">{{ i.value | num(None, 'cell') }}</td>
               <td role="cell" class="provincia-unit" data-label="Unità">{{ i.unit }}</td>
               <td role="cell" class="val" data-label="Anno">{{ i.year }}</td>
               <td role="cell" class="trendcell" data-label="Variazione">{% if i.variazione is not none %}<span class="trend">{{ i.spark | sparkline("s", i.spark_floor) }}<span class="trend__txt"><span class="trend__from">dal {{ i.year_from }}</span> {{ i.variazione | delta }}</span></span>{% else %}{{ none | num }}{% endif %}</td>
-              <td role="cell" class="val" data-label="In Italia">{{ i.rank | rank(i.province_count) }}</td>
+              <td role="cell" class="val" data-label="In Italia">{{ i.rank | rank(i.province_count) }}{% if i.contextual %}<span class="provincia-src"> per valore</span>{% endif %}</td>
               {%- if i.in_regione %}
               <td role="cell" class="val" data-label="In {{ region_label }}">{{ i.in_regione.posizione | rank(i.in_regione.quante) }}</td>
               <td role="cell" class="val" data-label="Media delle altre">{{ i.in_regione.media | num(None, 'cell') }}</td>
@@ -299,7 +302,7 @@
       </div>
     </details>
     {%- endfor %}
-    <p class="source">Fonte: {{ d.source }}. Elaborazione Divario Italia.</p>
+    <p class="source">Fonte: {{ d.table_source }}. Elaborazione Divario Italia.</p>
   </section>
   {% endif %}
 
@@ -337,6 +340,7 @@
     <h2 id="h-fonti">Fonti e metodo</h2>
     <dl class="specs">
       <div><dt>Fonte</dt><dd>{{ d.source | replace('BES dei Territori', 'Benessere equo e sostenibile (BES) dei Territori') }}, {{ indicatori | length | num(None, 'count') }} indicatori con un dato per {{ p.name }}{% if d.year_from %}, dal {{ d.year_from }} al {{ d.year_to }}{% endif %}.{% if d.dataset %} Il dataset di origine è «{{ d.dataset }}».{% endif %}</dd></div>
+      {% if d.external %}<div><dt>Altre fonti</dt><dd>{{ d.external_count | num(None, 'count') }} {{ d.external_count | it_plural('indicatore della tabella non viene', 'indicatori della tabella non vengono') }} dal BES e {{ d.external_count | it_plural('è descrittivo', 'sono descrittivi') }}, fuori dal punteggio. Ogni riga dice da quale fonte viene.<ul class="reflist">{% for e in d.external %}<li>{% if e.url %}<a href="{{ e.url }}">{{ e.label }}</a>{% else %}{{ e.label }}{% endif %}<small>{{ e.count | num(None, 'count') }} {{ e.count | it_plural('indicatore', 'indicatori') }}{% if e.license %}, licenza {{ e.license }}{% endif %}</small></li>{% endfor %}</ul></dd></div>{% endif %}
       <div><dt>Come è calcolato</dt><dd>Ogni indicatore diventa uno scarto standardizzato dalla media delle province, con il segno girato quando il valore basso è il migliore, e le distanze restano quelle vere. I punteggi si mostrano da 0 a 100, dove 50 è la media. {% if d.equal_weights %}Il profilo {{ d.profile_name }} dà lo stesso peso a ogni dimensione.{% elif p.profile.description %}Il profilo {{ d.profile_name }}: {{ p.profile.description | lower }}{% endif %} Non è una classifica ufficiale. <a href="/metodologia#qualita-della-vita">Il metodo per esteso</a></dd></div>
       {#- `covered` si conta sulla matrice del punteggio (provincia.py,
           `_score_coverage`), che guarda solo l'anno piu' recente di ogni

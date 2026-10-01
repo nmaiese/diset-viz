@@ -26,7 +26,7 @@ from __future__ import annotations
 import statistics
 from collections import defaultdict
 
-from app import bes_data, profiles
+from app import bes_data, profiles, sources
 from app import quality_life_bes as qb
 from app.cache import cache
 from app.cache_util import synchronized_cache
@@ -440,3 +440,117 @@ def dentro_la_regione(righe, quanti=4):
     ultime = [r for r in confrontabili
               if r["in_regione"]["posizione"] == r["in_regione"]["quante"]]
     return prime[:quanti], ultime[:quanti]
+
+
+# ---------------------------------------------------------------------------
+# Gli indicatori delle altre fonti.
+#
+# Le famiglie esterne con un livello provinciale (Istat indicatori provinciali,
+# ACI, AGCOM) hanno il loro loader, `provincial_families`. Qui se ne legge la
+# serie e se ne fanno righe della stessa forma di quelle del BES, perche' la
+# tabella della pagina e' una sola. Restano righe **descrittive**: non entrano
+# nel punteggio, ne' nei forti e deboli, ne' nel movimento, e `indicatori()`
+# non le contiene. Chi le vuole le chiede a `external_indicators()`.
+# ---------------------------------------------------------------------------
+
+
+@synchronized_cache(maxsize=1)
+def _external_series():
+    """`[(metadati, {anno: {chiave di provincia: valore}})]`, una volta per processo.
+
+    Sono undici serie da un migliaio di righe: la passata e' di pochi
+    millesimi, ma e' la stessa per tutte le province e non si rifa a ogni
+    pagina. Le graduatorie non stanno qui, si fanno sulla riga: costano una
+    ordinatura di centosette valori.
+    """
+    from app import provincial_families
+
+    series = []
+    for item in provincial_families.all_indicators():
+        by_year = defaultdict(dict)
+        for row in item["series"]:
+            if row.get("value") is not None:
+                by_year[row["year"]][row["region_key"]] = row["value"]
+        series.append((item["metadata"], dict(by_year)))
+    return series
+
+
+def external_indicators(key):
+    """Gli indicatori delle famiglie esterne con un valore per una provincia.
+
+    Stessa forma delle righe di `indicatori()`, piu' la fonte di ogni riga:
+    `source` e' l'istituzione e `source_label` l'etichetta della famiglia, tutte
+    e due dal registro (`app/sources.py`), mai scritte a mano. `descriptive`
+    dice che la riga non pesa sul punteggio.
+
+    **Il verso `contextual` non da' un giudizio.** Una posizione c'e' sempre,
+    perche' la tabella e' una, ma per un indicatore senza verso (i figli per
+    donna, l'eta' media al parto) ordina dal valore piu' alto e non dice che
+    sia meglio o peggio: la riga porta `contextual` e il template lo scrive
+    ("per valore"). Per lo stesso motivo non ha un movimento di posizione.
+    """
+    rows = []
+    region_of = _regione_di()
+    sisters = {k for k, r in region_of.items() if r and r == (region_of.get(key) or "")}
+    for meta, by_year in _external_series():
+        years = sorted(y for y, values in by_year.items() if key in values)
+        if not years:
+            continue
+        last = years[-1]
+        values = by_year[last]
+        value = values[key]
+        direction = meta["direction"]
+        contextual = direction not in profiles.SCOREABLE_DIRECTIONS
+        position = _graduatoria(values, direction)[key]
+
+        movement = None
+        if len(years) > 1 and not contextual:
+            before = _graduatoria(by_year[years[-2]], direction).get(key)
+            if before is not None:
+                movement = before - position
+
+        in_region = None
+        near = {k: v for k, v in values.items() if k in sisters}
+        if len(sisters) > 1 and len(near) > 1:
+            others = [v for k, v in near.items() if k != key]
+            in_region = {
+                "posizione": _graduatoria(near, direction)[key],
+                "quante": len(near),
+                "media": round(statistics.fmean(others), 2),
+            }
+
+        spark = [{"year": year, "value": by_year[year][key]} for year in years]
+        family = meta["family"]
+        # Da una provincia si atterra sulle province, e sulla sua riga se ha
+        # il dato dell'ultimo anno della serie: la stessa regola del BES.
+        path = sources.level_path(meta["path"], LIVELLO, meta["base_level"])
+        if last == max(by_year):
+            path += f"#p-{key}"
+        rows.append({
+            "id": meta["id"],
+            "name": meta["name"],
+            "theme": meta["theme"],
+            "macro_area": meta["macro_area"],
+            "path": path,
+            "unit": meta["unit"] or "",
+            "direction": direction,
+            "value": value,
+            "year": last,
+            "year_from": years[0],
+            "freshness_status": freshness_status(last),
+            "freshness_label": freshness_label(freshness_status(last)),
+            "rank": position,
+            "province_count": len(values),
+            "movement": movement,
+            "variazione": round(value - by_year[years[0]][key], 2) if len(years) > 1 else None,
+            "spark": spark,
+            "spark_floor": spark_floor(values.values()) if len(spark) > 1 else None,
+            "in_regione": in_region,
+            "family": family,
+            "source": sources.family_institution(family),
+            "source_label": sources.family_label(family),
+            "source_url": meta["source_url"],
+            "descriptive": not meta["scoreable"],
+            "contextual": contextual,
+        })
+    return rows

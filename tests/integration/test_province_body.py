@@ -263,7 +263,8 @@ class ProvincePageLandsOnTheRow(unittest.TestCase):
         page = client.get("/provincia/pavia").get_data(as_text=True)
         anchored = sorted(set(re.findall(r'href="(/indicatore/[^"#]+#p-pavia)"', page)))
         with app.app_context():
-            rows = province_profile.indicatori("pavia")
+            # Le righe del BES e quelle delle altre fonti: la tabella e' una.
+            rows = province_profile.indicatori("pavia") + province_profile.external_indicators("pavia")
         self.assertEqual(len(anchored), sum(r["path"].endswith("#p-pavia") for r in rows))
         self.assertGreater(len(anchored), 50)
         for link in anchored:

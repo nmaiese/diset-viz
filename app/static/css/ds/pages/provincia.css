@@ -78,5 +78,7 @@
 .provincia-group > summary > svg { align-self: center; transform: rotate(-90deg); transition: transform var(--motion-base) var(--motion-ease); }
 .provincia-group[open] > summary > svg { transform: none; }
 .provincia-table tbody th[scope="row"] { min-width: 12rem; }
+.provincia-src { font-size: var(--fs-small); font-weight: 400; color: var(--muted); }
+.provincia-table th > .provincia-src { display: block; }
 .provincia-table .provincia-unit { font-size: var(--fs-small); color: var(--text-2); }
 @container stackwide (max-width: 719px) { .provincia-table tbody th[scope="row"] { min-width: 0; } }
