@@ -266,6 +266,45 @@ def not_found(error):
     )
 
 
+ERROR_500_FALLBACK_TEXT = (
+    "Qualcosa non ha funzionato da parte nostra. "
+    "Riprova tra qualche istante, oppure torna alla home: https://divarioitalia.it/\n"
+)
+
+
+@app.errorhandler(500)
+def server_error(error):
+    # Un handler 500 non deve mai sollevare a sua volta: se lo fa, Werkzeug
+    # torna alla sua pagina inglese, che e' proprio cio' che qui si evita.
+    # Ogni passo che puo' cedere (resa del template, JSON) ripiega su un testo
+    # minimo in italiano. Il codice di stato resta 500 anche per atlante e
+    # confronto quando la regia cede: la pagina li veste, non li promuove.
+    try:
+        if request.path == "/data" or request.path.startswith("/api/"):
+            response = jsonify({"error": "internal_error"})
+            response.status_code = 500
+            response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+            return response
+        return (
+            render_template(
+                "500.html",
+                site_url=config.SITE_URL,
+                site_name=config.SITE_NAME,
+                canonical=None,
+            ),
+            500,
+            {"X-Robots-Tag": "noindex, follow"},
+        )
+    except Exception:
+        app.logger.exception("handler 500: resa fallita, risposta testuale")
+        return Response(
+            ERROR_500_FALLBACK_TEXT,
+            status=500,
+            mimetype="text/plain",
+            headers={"X-Robots-Tag": "noindex, follow"},
+        )
+
+
 # Le pagine su cui lo script degli annunci non si carica: quelle senza
 # contenuto editoriale (ricerca, account, classifica del quiz) e ogni errore,
 # dove `request.endpoint` e' None. AdSense rifiuta un sito anche per annunci

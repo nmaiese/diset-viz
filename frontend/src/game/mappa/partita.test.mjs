@@ -172,9 +172,14 @@ test("chiavePartita e opzione", () => {
 test("messaggioErrore: nessun errore noto e' muto, gli sconosciuti hanno una frase", () => {
   for (const codice of Object.keys(ERRORI)) assert.notEqual(messaggioErrore(codice), "", codice);
   assert.equal(messaggioErrore("round_already_answered"), AVVISO_RIPRESA);
-  assert.match(messaggioErrore("puzzle_changed"), /Riapri/);
-  assert.match(messaggioErrore("session_expired"), /scaduta/);
+  assert.match(messaggioErrore("puzzle_changed"), /Riaprila/);
+  assert.match(messaggioErrore("session_expired"), /interrotta/);
+  assert.doesNotMatch(messaggioErrore("session_expired"), /scadut/);
   assert.match(messaggioErrore(undefined), /Riprova/);
+  // Senza un nome decide lo stato: rete e 503 dicono che il server non risponde, il 429 il limite.
+  assert.match(messaggioErrore(undefined, 503), /non risponde/);
+  assert.equal(messaggioErrore(undefined, 0), messaggioErrore(undefined, 503));
+  assert.match(messaggioErrore(undefined, 429), /Troppe richieste/);
 });
 
 test("decisioneErroreRisposta: 409 e token superato riprendono da soli, una volta", () => {
@@ -195,8 +200,8 @@ test("decisioneErroreRisposta: token scaduto e sfida cambiata col bottone, il re
   }
 });
 
-test("messaggioRiapertura: dice sempre qualcosa, e la ripresa fallita non parla di scadenza", () => {
-  assert.match(messaggioRiapertura("token_invalid", { status: 400 }), /scaduta/);
+test("messaggioRiapertura: dice sempre qualcosa, e la partita non e' mai scaduta", () => {
+  assert.match(messaggioRiapertura("token_invalid", { status: 400 }), /interrotta/);
   assert.match(messaggioRiapertura("round_already_answered", { status: 409 }), /interrotta/);
   assert.match(messaggioRiapertura("puzzle_changed", { status: 400 }), /cambiata/);
 });

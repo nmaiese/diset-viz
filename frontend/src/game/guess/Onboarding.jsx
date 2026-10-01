@@ -17,7 +17,7 @@ export default function OnboardingModal({ onClose }) {
       <ol className="game-onboarding-steps">
         <li>Hai sei tentativi. Ogni errore svela un indizio in più.</li>
         <li>Per ogni indizio vedi se il dato della tua regione è più alto o più basso di quello nascosto.</li>
-        <li>Dal terzo errore scopri anche se la regione nascosta è nella tua stessa ripartizione.</li>
+        <li>Dal terzo errore scopri anche se la regione nascosta è nella tua stessa ripartizione, cioè Nord, Centro o Mezzogiorno.</li>
       </ol>
       <button type="button" className="game-btn" onClick={onClose}>Ho capito, gioco</button>
     </Modal>

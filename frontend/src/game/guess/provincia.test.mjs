@@ -126,9 +126,9 @@ test("il testo condiviso porta i tentativi e il livello, senza spoiler", () => {
 });
 
 test("la riga compatta di un tentativo: a circa N km verso il punto cardinale", () => {
-  assert.equal(testoDistanzaCompatta({ correct: false, distance_km: 120, direction: "NE" }), "a circa 120 km verso nord-est");
-  assert.equal(testoDistanzaCompatta({ correct: false, distance_km: 1200, direction: "S" }), "a circa 1200 km verso sud");
-  assert.equal(testoDistanzaCompatta({ correct: false, distance_km: 40 }), "a circa 40 km");
+  assert.equal(testoDistanzaCompatta({ correct: false, distance_km: 120, direction: "NE" }), "a circa 120 km verso nord-est, stima");
+  assert.equal(testoDistanzaCompatta({ correct: false, distance_km: 1200, direction: "S" }), "a circa 1200 km verso sud, stima");
+  assert.equal(testoDistanzaCompatta({ correct: false, distance_km: 40 }), "a circa 40 km, stima");
   assert.equal(testoDistanzaCompatta({ correct: true, distance_km: 0, direction: "N" }), "");
 });
 

@@ -187,7 +187,11 @@ test("un link condiviso si legge di nuovo con leggiSfida", () => {
 });
 
 test("il testo della sfida non attribuisce il punteggio a nessuno", () => {
-  assert.equal(testoSfida(7, 10), "La sfida condivisa: 7 su 10. Riesci a superarla?");
+  assert.equal(
+    testoSfida(7, 10, "Chi è maggiore?"),
+    "La sfida condivisa in Chi è maggiore?: 7 su 10. Livello e timer possono essere diversi dai tuoi. Riesci a superarla?"
+  );
+  assert.ok(testoSfida(7, 10).startsWith("La sfida condivisa: 7 su 10."));
   assert.ok(!/amic|ha fatto|giocatore|utente/i.test(testoSfida(7, 10)));
   assert.equal(testoConfrontoSfida(8, 7), "Tu 8, la sfida condivisa 7");
 });
