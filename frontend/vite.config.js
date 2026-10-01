@@ -23,6 +23,7 @@ export default defineConfig({
         "quiz-provincia": resolve(__dirname, "src/game/entries/provincia.jsx"),
         "quiz-compare": resolve(__dirname, "src/game/entries/compare.jsx"),
         "quiz-order": resolve(__dirname, "src/game/entries/order.jsx"),
+        "quiz-mappa": resolve(__dirname, "src/game/entries/mappa.jsx"),
         "quiz-leaderboard": resolve(__dirname, "src/game/entries/leaderboard.jsx"),
         // Controllo login/account nel masthead (Fase 5), su ogni pagina SSR.
         // Vanilla, supabase caricato solo se serve. blog_base.html carica
