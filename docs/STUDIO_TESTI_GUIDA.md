@@ -1,0 +1,139 @@
+# Studio dei testi di guida e spiegazione, giochi compresi
+
+Redatto il 1 ottobre 2026. È uno **studio**: nessun testo del sito è stato modificato. Completa `docs/STUDIO_TESTI.md`, che riguarda i tag title e le meta description e non va ripetuto. Qui si parla dei testi che dicono che cos'è il sito, come si legge un dato o una classifica, che cosa vuol dire un termine, che cosa fare dopo, e dei testi dei cinque giochi di Sfida Italia (regole, errori, esiti, condivisione).
+
+## 1. Come è stato fatto, e quanto fidarsi
+
+Tre worker Orca (nessun Codex) più i dati di prima mano di chi coordina: corpus del testo visibile di 24 pagine di produzione del 1/10/2026, indice di leggibilità Gulpease per pagina, Search Console a 90 giorni, Semrush Italia.
+
+| Fonte | Esito della verifica |
+| --- | --- |
+| **Audit interno** (claude sonnet, circa 22.000 parole, letto dal sorgente di template, `app/design`, `frontend/src/game`, `docs/GIOCO.md` e un campione di `content/`) | **È la base di questo studio.** Ho ricontrollato nel codice quattro affermazioni pesanti: la locuzione "media semplice" non compare in `v1/metodologia.html`; "DISET" sta nel testo pubblico a `metodologia.html:162`; non esiste un `errorhandler(500)`; l'esportazione e l'eliminazione dell'account in `auth.js` non mostrano nessun errore se falliscono. Tutte esatte. Dichiara di non aver eseguito l'app né provato i giochi in un browser |
+| **Evidenza e SEO** (claude sonnet) | Buona sulle fonti ufficiali: ricontrollato Google, FAQ rich result spenti dal 7 maggio 2026. **Sbaglia in un punto**: dice che la ricerca senza risultati non mostra il messaggio, ma il messaggio c'è (`ricerca.html:61`), il corpus tagliava la testata. Le fonti accademiche (PNAS, ACM, SAGE) erano bloccate: segnate non verificate |
+| **Competitor** (antigravity) | **Poco affidabile, usato solo in parte.** Verificate a mano: la frase di OWID ("a free, non-profit website. Our mission...") e la sostanza di Lab24 sul punteggio (1.000 punti al migliore, 0 al peggiore, verso deciso dalla redazione), ma la sua citazione di Lab24 non è letterale. Le percentuali ("8 siti su 10") non sono credibili, alcune citazioni non sono verificabili (Wordle, bloccato) o sono sospette (un quiz de Il Post). Il rapporto al momento della sintesi conteneva ancora lo script che lo scrive, non il testo. Non uso i suoi conteggi |
+
+Conseguenza: sui competitor lo studio dice poco di verificato. Dove mancano evidenza e confronto lo dichiaro.
+
+## 2. Che cosa è emerso
+
+Il sito ha un buon istinto: dice i limiti, non chiama "media nazionale" la media delle regioni, ha un blocco "Come leggere il dato" su ogni scheda e un piccolo glossario a popover. **Il problema non è la voce, è dove sta la spiegazione**: ogni pagina spiega da sé con parole sue, e la pagina a cui tutte rimandano non spiega quasi niente di ciò che le si chiede.
+
+### I problemi che spostano di più (da audit, ordinati)
+
+1. **`/metodologia` è la meta di una ventina di link "Come si calcola" ma non definisce "media semplice", "n.d.", "copertura variabile", "posizione media", "percentile medio", "Cambiato di più".** I popover di `app/design/terms.py` puntano lì e quattro su cinque non ci trovano la propria definizione. La risposta migliore alla domanda "la media mostrata è la media italiana?" sta in `divari-regionali.html:216`, che nessuno cita. *(Verificato per "media semplice".)*
+2. **"Punteggio" ha tre metodi con lo stesso nome**: z-score orientato (qualità della vita), media dei percentili (pagina tema), posizione media (pagina regione). Il popover dice "50 è la media semplice dei territori", vero per il primo e non per il secondo.
+3. **Nel gioco Chi è maggiore? "va in classifica" è ambiguo.** Il testo promette che la partita a tempo "va in classifica", ma la sola classifica pubblica è quella delle serie a round: la sfida del giorno conta come record personale. Chi gioca a tempo cerca una classifica che non c'è. Si risolve cambiando una parola nei due punti in cui compare.
+4. **Il lead di Indovina la Regione promette "più vicino o più lontano"**, ma il gioco dà solo "più alto o più basso" e "stessa ripartizione". "Ripartizione" non è mai definita.
+5. **Indovina la Provincia dà distanze senza la parola "stima".** `docs/GIOCO.md` chiede che il testo lo dica ed è coperto a metà (la mappa lo dice, la provincia no).
+6. **Mancano del tutto**: la pagina 500 (si vede quella inglese di Werkzeug, inferenza, non l'ho vista), un messaggio quando "Esporta" o "Elimina account" falliscono (la persona conferma e non succede niente), una frase su che cosa dà un account al punto in cui si decide di accedere. *(500 e account verificati nel codice.)*
+7. **Conteggi senza una riga che li riconcili**: 597, 372, 223 e 64, 142, 158, 241. E "indicatore", "serie", "dataset" e "scheda" si alternano come sinonimi. (Il primo giro aveva già visto 597, 372 e 67.)
+8. **Acronimi non spiegati o interni**: "DISET" nel testo pubblico (il `CLAUDE.md` del progetto vieta l'acronimo interno nudo); "BES" mai sciolto in "Benessere equo e sostenibile" nel testo visibile.
+9. **Fatti scritti a mano che possono uscire di sincronia**: "dodici dimensioni" (imprecisa per le province, due non hanno dati), "sei tentativi", "dieci coppie", "dieci secondi", e ogni cifra nei ritratti delle regioni, che il modulo stesso dice "non si ricalcola da sola".
+10. **Una promessa di fiducia non vale ovunque**: `/metodologia` dice che ogni scheda con spiegazione causale "porta accanto una citazione verificata di un'istituzione"; nel campione di 10 schede, tre hanno una spiegazione causale con `fonti: []`. È un minimo, non una stima.
+
+### Errori di messaggio nei giochi (da audit)
+
+- **Gli stessi eventi hanno parole diverse**: "La riapriamo da capo" contro "La riprendiamo da capo" (riprendere è continuare); "scaduta" ha due sensi (sessione di 12 ore e timer di dieci secondi); "Troppe risposte/tentativi/richieste" tre sostantivi per lo stesso blocco.
+- **Prima persona maschile**: "Non sono riuscito ad aprire la sfida", mentre il resto del sottomarchio parla alla seconda persona.
+- **Messaggio generico che nasconde un costo**: "Qualcosa non ha funzionato. Riprova." In serie, `docs/GIOCO.md` avverte che "Riprova" dopo una risposta persa azzera la serie.
+- **Gergo e falsità**: "La sessione di gioco non è più valida" (gergo), e `score_missing` ("Rispondi almeno a un round...") che per il codice vale anche "sessione non plausibile": chi ha risposto a dieci round legge un messaggio falso.
+- **"Risposta non valida"**: contiene una parola che NN/g indica come accusatoria.
+- **Stonature di tono**: "Hai indovinato!" in un sottomarchio dichiarato senza coriandoli; "Lazio è sbagliata" dove è la scelta a essere sbagliata ("Non è il Lazio").
+- **Condivisione**: "La sfida condivisa: 7 su 10. Riesci a superarla?" non dice di che gioco né che livello e timer possono differire; il testo copiato ha una riga di simboli senza legenda.
+- **La pagina di Ordina** descrive livello e quantità in modo diverso dal client.
+
+### Che cosa va bene e non si tocca
+
+Il blocco "Che cosa questo controllo non garantisce" in metodologia; le note sul limite specifiche del dato (per esempio "Chi dorme in una seconda casa, da parenti... non lascia traccia"); l'onboarding di Ordina ("Ordina dal valore più alto al più basso. Non dal risultato migliore al peggiore"); "La partita si è interrotta, non per colpa tua"; la nota onesta di Dov'è la provincia? ("Non è equivalente alla partita sulla mappa e non facciamo finta che lo sia"); il "tu" del quiz. Le definizioni a una riga con "che cosa è, che cosa non è".
+
+## 3. Che cosa dice l'evidenza (verificata dove indicato)
+
+- **Non esistono soglie ufficiali** su lunghezza dei testi (Google dichiara di non avere un word count preferito) né una soglia Gulpease universale. Come obiettivo di lavoro, 60 o più per i testi per tutti e 40 o più per quelli di metodo (scelta dichiarata, non una regola). L'indice si ricalcola con cautela: dove le liste non hanno punto finale il numero è falso (per `/metodologia` la cifra grezza era 40, il ricalcolo dell'audit sulla sola prosa dà circa 55).
+- **Il limite del dato va in testa quando cambia le conclusioni, e dice che cosa si può fare con il numero.** Le avvertenze generiche non aiutano (guida del Government Analysis Function britannico: "Phrases like 'care must be taken'... are not sufficient").
+- **Una pagina di metodo non crea fiducia da sola** (Reuters Institute: l'effetto della trasparenza è misto e più forte in chi già si fida). Serve soprattutto a chi cita: dichiarare chi risponde, da dove arrivano i numeri, che cosa il metodo non garantisce, come si segnala un errore.
+- **Divulgazione progressiva, non oltre due livelli** (NN/g); **piramide rovesciata**; le persone scorrono più che leggere (dati NN/g datati: usarli come ordine di grandezza).
+- **Tutorial iniziali**: aiutano poco, costano attenzione (NN/g). Tre righe al punto d'uso battono un tutorial a schede.
+- **Errori**: non accusare, offrire un rimedio (NN/g). **Tooltip**: mai la sola sede di una definizione essenziale (NN/g).
+- **Un esempio di metodo trasparente di un concorrente** (verificato): Lab24 dichiara che 1.000 punti vanno alla provincia con il valore migliore e 0 alla peggiore, per ciascuno dei 90 indicatori, con il "senso di lettura" definito dalla redazione. È una frase corta che dice che la scala è una scelta editoriale: il nostro z-score orientato dice lo stesso in modo più rigoroso ma in un posto meno raggiungibile.
+- **Non provato**: l'effetto delle serie e della perdita sulla permanenza nei giochi (le cifre in giro vengono da blog), l'effetto del titolo-tesi sulla comprensione (fonti accademiche non lette).
+
+## 4. SEO: i testi di guida contano poco, e conviene dirlo
+
+| Intervento | Impatto SEO atteso | Motivo |
+| --- | --- | --- |
+| Riassunto in testa a `/metodologia` | basso sul traffico, medio sulla citabilità | nessuna query con volume; serve a chi cita |
+| Definizione più asciutta nelle schede ad alto volume (PIL pro capite, livello di istruzione) | medio | è la pagina che già si posiziona a 14-18 per 2.400-3.600 ricerche; il testo di guida aiuta solo se coincide con la domanda di una pagina che ha dati propri |
+| Pagine di glossario separate | basso | nessun termine tecnico del sito ha volume noto, e il confronto è con Wikipedia e Istat |
+| FAQPage o HowTo | nullo | Google ha spento i rich result FAQ il 7 maggio 2026 (verificato) |
+| Messaggi di errore, giochi | nullo sul traffico | usabilità e fiducia |
+
+Rischi SEO reali: il blocco di spiegazione ripetuto uguale su centinaia di schede (non è dimostrato che Google lo penalizzi, ma ogni scheda deve restare distinta dai suoi numeri: la spiegazione lunga vive una volta in `/metodologia`, la scheda porta una frase e un link); un testo che regala la risposta nel gioco; una metodologia troppo lunga senza riassunto.
+
+**"Come si calcola il tasso di disoccupazione"** ha 70 ricerche al mese, il sito è in posizione 39: anche in prima pagina varrebbe poche visite. Non è una ragione per scrivere un glossario.
+
+## 5. Come dovrebbero essere scritti: i criteri
+
+Cinque criteri per tutti, poi uno per tipo di testo. Ogni criterio ha esempio buono e cattivo, presi dal sito, nell'audit (`studio-guida-audit/lavoro/RAPPORTO.md`, sezione 8).
+
+**Per tutti:**
+1. **Una parola, un significato.** Se "profilo", "serie", "classifica", "scaduta" ne hanno due, uno cambia nome.
+2. **Una cifra che il codice conosce non si scrive a mano.**
+3. **Nessun gergo di sistema** nel testo per il lettore: sitemap, token, sessione, seed, acronimi interni.
+4. **La promessa e il limite nello stesso blocco**, non in due pagine.
+5. **Voce**: impersonale o "noi" nelle pagine dell'atlante, "tu" nei giochi, mai la prima persona singolare.
+
+**Per tipo:**
+- **Intro di pagina**: che cosa c'è, per chi, che cosa si può fare. Prima il significato, poi la cifra. Una idea per frase.
+- **Come leggere**: un esempio con l'unità vera e il verso, un solo limite specifico del dato. Non una frase che vale per ogni percentuale.
+- **Definizione** (popover): al massimo trenta parole, che cos'è e che cosa non è, senza cifre. Stessa parola, stessa definizione ovunque, il link porta a un'ancora che la contiene.
+- **Nota sul limite**: specifica del dato, nella frase sua. Niente "va letto insieme ad altri indicatori".
+- **Metodologia**: ordine per bisogno del lettore (riassunto di cinque righe, fonti, calcolo, che cosa non garantisce, errori e correzioni, come citare), non per storia del progetto. Elenchi lunghi chiusi.
+- **Onboarding del gioco**: al massimo tre regole, nell'ordine in cui servono, numeri da costante.
+- **Errore**: che cosa è successo, di chi non è la colpa, che cosa fare. La stessa formula per lo stesso evento in tutti i giochi.
+- **Esito**: un fatto, non un giudizio. **Condivisione**: chi riceve capisce in una riga che cosa è e come si fa, senza spoiler e senza simboli senza legenda.
+
+## 6. Priorità, costo, rischio
+
+Costo in file toccati, non in ore. Ogni testo di v1 ha un **gemello di ripiego** (`methodology.html`, `indicator_page.html`, `region_page.html`...) e una **variante Markdown** per agenti (`app/agent_discovery.py`): cambiare un testo vuol dire cambiarlo in due o tre posti. Ogni modifica a `frontend/src/` richiede `npm run build` e i test `node --test`.
+
+**Prima una decisione di Nello**, perché tutto il resto ne dipende: la **regola di nome** per indicatore, serie, scheda e dataset, con una riga che riconcili 597 e 372, e se la sezione "Come leggere un numero" in `/metodologia` diventa la casa unica delle definizioni. Se si scrive prima, va riscritto dopo.
+
+**PR 1, testo, nessuna build frontend (circa 6 file, 2 test da rileggere):**
+- Definizioni in `/metodologia` (media semplice, verso, n.d., copertura, posizione media, percentile, punteggio, ripartizione, profilo) con ancore; i popover e i link "Come si calcola" puntano alle ancore. Le ancore esistenti non si spostano.
+- Riassunto di cinque righe in testa alla metodologia.
+- Togliere "DISET" dal testo pubblico, sciogliere BES alla prima occorrenza.
+- Correggere "dodici dimensioni" per le province (una riga di `quality_life_config.py`).
+- Riscrivere il blocco "Come è calcolato" della scheda, e la frase "classifica del BES" in `regioni.html:90`. È il blocco più bloccato dai test (`test_quality_life.py:94`, `test_transparency.py`): rischio medio-alto.
+
+**PR 2, giochi, solo testo, con `npm run build` (circa 7 file frontend e 4 template):** "va in classifica" in Chi è maggiore? (il testo del client è quello che il server manda come avviso: i due restano uguali); lead di Indovina la Regione; la parola "stima" nelle distanze di Indovina la Provincia; un solo lessico per gli errori, al femminile o impersonale; "scaduta" e "riapriamo/riprendiamo"; il 503 anche negli altri giochi; "Hai indovinato!" e "è sbagliata"; testo di condivisione con legenda; pagina di Ordina allineata al client. Va provato in un browser, anche su telefono: nessun worker l'ha fatto.
+
+**PR 3, codice (circa 4 file e un test nuovo):** pagina 500, errori su "Esporta" ed "Elimina account", frase su che cosa dà un account. Un handler 500 non deve mai sollevare a sua volta, e il template nuovo è `noindex` come la 404.
+
+**P1 e P2, uno alla volta:** definizioni nelle didascalie della pagina regione ("In media la Puglia è 14ª su 20 regioni" spiegata in una riga); stati vuoti senza uscita (tema, province); una guardia di test che leghi i testi dei giochi alle costanti; la 404 con ricerca; la promessa causale di `/metodologia`, da misurare su tutte le schede e poi correggere o la frase o le schede (**decisione di Nello**); i dieci passaggi più pesanti per leggibilità.
+
+**Da non fare ancora:**
+- Riscrivere in blocco i 388 "Come leggere il dato". `docs/AUDIT_VOCE.md` conclude che l'uniformità è consistenza voluta. Interventi mirati dopo aver contato quante schede usano la frase vuota "nel gruppo di riferimento definito dalla fonte".
+- Un glossario in pagina separata prima che le definizioni abbiano una casa in `/metodologia`: sarebbe la settima formulazione di "media semplice".
+- Cambiare ancore, URL o il nome `/quiz`.
+- Cambiare le etichette di `app/sources.py` per sciogliere BES: compaiono su decine di pagine.
+- Unificare i tre sensi di "serie" cambiando i contatori: solo le etichette.
+- Aggiungere il livello al frammento della sfida condivisa come "correzione di testo": cambia che cosa viaggia nell'URL.
+- Descrivere nei testi le difese anti-barare: il repository è pubblico.
+- Riscrivere i ritratti delle regioni: prima una guardia di vintage.
+- Pubblicare di nuovo la riga sull'articolo 50 del regolamento europeo sull'IA in una forma nuova senza verificarla su fonte primaria: è già nel sito e nessuno l'ha verificata.
+- Aggiungere markup FAQPage o HowTo: i rich result non esistono più.
+
+## 7. Raccomandazione
+
+Una decisione di Nello, poi tre PR nell'ordine 1, 2, 3. Non cominciare dai dieci passaggi di leggibilità né dalla home: sono i più visibili e i meno urgenti, e se si fanno prima della regola di nome vanno rifatti. L'impatto SEO atteso dai testi di guida è basso: lo scopo è fiducia, comprensione e un gioco i cui messaggi non dicono cose false.
+
+## 8. Che cosa non sappiamo
+
+- **Nessuno ha visto il sito o i giochi girare.** L'audit lavora dal sorgente e dal corpus. I percorsi delle quattro persone sono inferenze dal testo, non osservazioni di utenti. Nessun dato di scorrimento o permanenza.
+- **Il testo dei giochi è stato letto dal sorgente**, non nel browser: anche gli stati e gli errori vanno provati.
+- **Il campione di `content/`** è di 10 schede e 5 articoli su circa 383: quello che dice vale per il campione.
+- **Competitor**: poco verificato. Mancano un confronto serio dei testi di guida degli altri siti e di come altri giochi scrivono regole ed errori (Wordle e NYT bloccano la lettura). Se serve, va rifatto con una ricerca mirata e citazioni controllate.
+- **Fonti accademiche** sui titoli-tesi, sulla comunicazione dell'incertezza e sulle serie nei giochi non sono state lette.
+- **Articolo 50 del regolamento IA e rapporto della Banca d'Italia sulla Calabria**: citati dal sito, non verificati.
+- **La suite di test non è stata eseguita**: le asserzioni che bloccano i testi sono cercate per stringa.
+- Il rapporto dell'audit non è stato riletto da una seconda persona.
