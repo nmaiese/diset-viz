@@ -20,6 +20,7 @@
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": {{ mappa.boundaries | tojson }},
   "isAccessibleForFree": true
 }
 </script>

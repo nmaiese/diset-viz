@@ -13,7 +13,7 @@ import unittest
 from html.parser import HTMLParser
 from unittest import mock
 
-from app import app, game_daily, game_mappa, game_mappa_page, publisher
+from app import app, game_daily, game_mappa, game_mappa_page, publisher, sources
 
 PATH = "/quiz/province-italiane"
 VIETATI = "—–;…"
@@ -99,7 +99,13 @@ class PaginaMappaTest(unittest.TestCase):
         gioco = giochi[0]
         self.assertEqual(gioco["creator"], {"@id": publisher.ORGANIZATION_ID})
         self.assertTrue(gioco["isAccessibleForFree"])
-        self.assertNotIn("isBasedOn", gioco)
+        # i confini vengono da `sources.PROVINCE_BOUNDARIES`, mai da una stringa del template
+        base = gioco["isBasedOn"]
+        self.assertEqual(base["@type"], "Dataset")
+        self.assertEqual(base["creator"], {"@type": "Organization", "name": sources.PROVINCE_BOUNDARIES["institution"]})
+        self.assertEqual(base["license"], sources.LICENSE_URL)
+        self.assertTrue(base["url"].startswith("http"))
+        self.assertIn(sources.PROVINCE_BOUNDARIES["redistributor"], base["description"])
 
     def test_nessun_carattere_vietato_nel_testo_visibile(self):
         testo = _testo_visibile(self.html)

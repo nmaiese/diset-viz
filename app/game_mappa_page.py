@@ -68,6 +68,25 @@ def attribution(site_name: str) -> Markup:
     )
 
 
+def boundaries_dataset() -> dict:
+    """Il `isBasedOn` del JSON-LD `Game`: i confini, composti da `sources.PROVINCE_BOUNDARIES` e
+    mai scritti nel template. La licenza e' quella del registro (`LICENSE_URL`), non il `deed.it`
+    che serve al link per le persone."""
+    b = sources.PROVINCE_BOUNDARIES
+    return {
+        "@type": "Dataset",
+        "name": "Confini delle province",
+        "description": (
+            f"Confini delle province in vigore nel {b['vintage']}, pubblicati da {b['institution']} "
+            f"e ridistribuiti da {b['redistributor']}."
+        ),
+        "url": b["institution_url"],
+        "license": sources.LICENSE_URL,
+        "creator": {"@type": "Organization", "name": b["institution"]},
+        "temporalCoverage": str(b["vintage"]),
+    }
+
+
 @lru_cache(maxsize=1)
 def region_groups() -> tuple[dict, ...]:
     """Per ogni regione, nell'ordine di `REGION_ORDER`: `{key, viewbox, provinces}`, con le
@@ -94,5 +113,6 @@ def page(site_name: str) -> dict:
         "groups": region_groups(),
         "list": game_mappa.static_list(),
         "attribution": attribution(site_name),
+        "boundaries": boundaries_dataset(),
         "sardinia_note": sardinia_note(total),
     }
