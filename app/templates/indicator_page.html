@@ -359,7 +359,7 @@
          "limiti" section can never drop it. #}
       <div class="apparatus-specs__row">
         <dt>Come è calcolato</dt>
-        <dd>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</dd>
+        <dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Il divario è la distanza fra il valore più alto e il più basso, e la classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni.</dd>
       </div>
       {# Come nasce la scheda. Era un paragrafo in coda all'articolo, dove
          diceva la stessa frase su trecento pagine dentro il racconto. Qui sta

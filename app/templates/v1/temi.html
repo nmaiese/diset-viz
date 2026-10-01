@@ -112,7 +112,7 @@
   </section>
   {% endfor %}
   <p class="empty" data-temi-empty hidden>Nessun tema corrisponde alla ricerca. <a href="/atlante">Cerca fra tutti gli indicatori nell'atlante</a></p>
-  <p class="source temi-source">In testa e in coda: la regione con la posizione media migliore e quella con la peggiore sugli indicatori del tema che hanno un verso, cioè per cui si può dire quale valore è migliore. Su {{ theme_total - d.ranked }} {{ 'tema' if theme_total - d.ranked == 1 else 'temi' }} i dati completi non bastano per una classifica. <a href="/metodologia">Come sono calcolati confronti e medie</a></p>
+  <p class="source temi-source">In testa e in coda: la regione con la posizione media migliore e quella con la peggiore sugli indicatori del tema che hanno un verso, cioè per cui si può dire quale valore è migliore. Su {{ theme_total - d.ranked }} {{ 'tema' if theme_total - d.ranked == 1 else 'temi' }} i dati completi non bastano per una classifica. <a href="/metodologia#posizione-media">Come si calcola la posizione media</a></p>
 </div>
 
 <section class="band" id="continua" aria-labelledby="h-continua">

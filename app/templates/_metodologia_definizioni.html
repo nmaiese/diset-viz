@@ -1,0 +1,45 @@
+{#- Le definizioni delle parole che il sito usa senza spiegarle ogni volta:
+    la casa unica, a cui puntano i popover di app/design/terms.py, i link
+    "Come si calcola" e il markdown per agenti (agent_discovery.py). Le
+    includono v1/metodologia.html e il ripiego methodology.html. Ogni ancora e'
+    un id nuovo: non sposta quelle che c'erano. Una parola, un significato: se
+    ne cambia uno qui, si cambia anche dove la parola e' scritta a mano.
+    Chiede `catalog_total` (le pagine del catalogo dati) e, se ci sono,
+    `methodology_regioni`. -#}
+<h3>Le parole che usiamo</h3>
+<p>Ogni parola ha un solo significato. Quando una pagina la usa e rimanda qui, vale quello che segue.</p>
+
+<h4 id="indicatore">Indicatore</h4>
+<p>Una misura con la sua unità, la sua fonte e il suo anno, riferita ai territori: per esempio il tasso di occupazione. Ogni indicatore ha una pagina. Quanti sono dipende da che cosa si conta:{% if methodology_regioni %} l'atlante ne elenca <strong>{{ methodology_regioni.manifest_indicators_total | num(None, 'count') }}</strong> con dati regionali,{% endif %}{% if catalog_total %} il catalogo dati ne elenca <strong>{{ catalog_total | num(None, 'count') }}</strong>, quelli con una pagina che i motori di ricerca possono indicizzare, compresi alcuni con dati solo provinciali,{% endif %}{% if methodology_regioni %} e <strong>{{ methodology_regioni.score_indicators_total | num(None, 'count') }}</strong> entrano nel punteggio regionale della qualità della vita.{% else %} e solo una parte entra nel punteggio della qualità della vita.{% endif %}</p>
+
+<h4 id="media-semplice">Media semplice</h4>
+<p>La media dei valori dei territori, con lo stesso peso per ognuno, qualunque sia la sua popolazione. Non è il valore nazionale calcolato sulle persone, che la fonte pubblica a parte. Dove una pagina scrive «la media delle regioni» intende questa, calcolata sulle regioni che hanno il dato.</p>
+
+<h4 id="verso">Verso</h4>
+<p>Dice se per un indicatore è meglio un valore alto, uno basso, o se nessuno dei due: in quel caso l'indicatore dà solo contesto. Il verso decide l'ordine di classifiche e punteggi. Sulla mappa il colore segue solo la grandezza del valore, non il giudizio.</p>
+
+<h4 id="nd">n.d.</h4>
+<p>Dato non disponibile: la fonte non pubblica il valore per quel territorio in quell'anno. Non è uno zero. Sulla mappa il territorio è tratteggiato, e nelle medie non entra.</p>
+
+<h4 id="copertura">Copertura</h4>
+<p>Quanti territori hanno il dato in un anno. Se cambia troppo da un anno all'altro, una media su gruppi diversi salirebbe o scenderebbe per chi entra e chi esce, non per un cambiamento vero. Per questo la linea nel tempo si disegna solo sugli anni in cui quasi tutti i territori hanno il dato, e solo sui territori presenti in tutti quegli anni. Se non bastano, la pagina scrive «copertura variabile» e la linea non c'è.</p>
+
+<h4 id="percentile">Percentile</h4>
+<p>La posizione di un territorio fra tutti gli altri sullo stesso indicatore, nell'ultimo anno disponibile, da 0 (il valore più basso) a 100 (il più alto). «Orientato» vuol dire che si applica il verso: 100 è sempre il caso migliore.</p>
+
+<h4 id="posizione-media">Posizione media</h4>
+<p>Su ogni indicatore con un verso e il dato per tutte le regioni, le regioni si mettono in fila dalla migliore alla peggiore: il posto di una regione è il suo piazzamento. La posizione media è la media di quei piazzamenti. Non è una classifica: più regioni possono avere la stessa, e uno scarto piccolo non vuol dire molto. Nella pagina di un tema è la stessa media, sugli indicatori di quel tema.</p>
+
+<h4 id="punteggio">Punteggio</h4>
+<p>Da 0 a 100, con due calcoli diversi che non si confondono:</p>
+<ul>
+  <li><strong>Punteggio della qualità della vita</strong>: lo <a href="#qualita-della-vita">z-score orientato</a> degli indicatori, riportato su una scala dove 50 è la media semplice dei territori.</li>
+  <li><strong>Punteggio di un tema</strong>: la media semplice dei percentili orientati degli indicatori del tema che hanno un verso. Qui 50 non è, per costruzione, la media dei territori.</li>
+</ul>
+<p>Il punteggio ordina i territori, non misura il benessere. La posizione media non è un punteggio: è un piazzamento.</p>
+
+<h4 id="ripartizione">Ripartizione</h4>
+<p>Il gruppo di regioni a cui ne appartiene ognuna: Nord, Centro, Mezzogiorno (Sud e Isole insieme). Nei grafici ogni regione ha il colore della sua ripartizione. Il colore serve a raggrupparle, non a giudicarle.</p>
+
+<h4 id="profilo">Profilo</h4>
+<p>Un insieme di pesi che dice quanto conta ogni categoria nel punteggio della qualità della vita. Equilibrato dà lo stesso peso a tutte, gli altri spostano l'attenzione, per esempio sul lavoro o sull'istruzione. Si sceglie nella <a href="/qualita-della-vita/classifica/regioni">classifica</a>. Non è la pagina di una regione.</p>

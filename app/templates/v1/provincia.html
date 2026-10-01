@@ -336,7 +336,7 @@
   <section class="section" id="fonti-verifica" aria-labelledby="h-fonti">
     <h2 id="h-fonti">Fonti e metodo</h2>
     <dl class="specs">
-      <div><dt>Fonte</dt><dd>{{ d.source }}, {{ indicatori | length | num(None, 'count') }} indicatori con un dato per {{ p.name }}{% if d.year_from %}, dal {{ d.year_from }} al {{ d.year_to }}{% endif %}.{% if d.dataset %} Il dataset di origine è «{{ d.dataset }}».{% endif %}</dd></div>
+      <div><dt>Fonte</dt><dd>{{ d.source | replace('BES dei Territori', 'Benessere equo e sostenibile (BES) dei Territori') }}, {{ indicatori | length | num(None, 'count') }} indicatori con un dato per {{ p.name }}{% if d.year_from %}, dal {{ d.year_from }} al {{ d.year_to }}{% endif %}.{% if d.dataset %} Il dataset di origine è «{{ d.dataset }}».{% endif %}</dd></div>
       <div><dt>Come è calcolato</dt><dd>Ogni indicatore diventa uno scarto standardizzato dalla media delle province, con il segno girato quando il valore basso è il migliore, e le distanze restano quelle vere. I punteggi si mostrano da 0 a 100, dove 50 è la media. {% if d.equal_weights %}Il profilo {{ d.profile_name }} dà lo stesso peso a ogni dimensione.{% elif p.profile.description %}Il profilo {{ d.profile_name }}: {{ p.profile.description | lower }}{% endif %} Non è una classifica ufficiale. <a href="/metodologia#qualita-della-vita">Il metodo per esteso</a></dd></div>
       {#- `covered` si conta sulla matrice del punteggio (provincia.py,
           `_score_coverage`), che guarda solo l'anno piu' recente di ogni
