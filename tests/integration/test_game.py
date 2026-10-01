@@ -56,7 +56,7 @@ class GameTest(unittest.TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertIn(b'id="hub-root"', page.data)
         self.assertIn("Quanto conosci l'Italia?".encode(), page.data)
-        for href in (b"/quiz/indovina-la-regione", b"/quiz/chi-e-maggiore", b"/quiz/ordina"):
+        for href in (b"/quiz/indovina-la-regione", b"/quiz/chi-e-maggiore", b"/quiz/ordina", b"/quiz/province-italiane"):
             self.assertIn(href, page.data)
 
     def test_legacy_gioco_paths_redirect_permanently(self):
@@ -866,6 +866,7 @@ class QuizOrderTest(unittest.TestCase):
         sitemap = client.get("/sitemap.xml").data
         self.assertIn(b"/quiz/chi-e-maggiore", sitemap)
         self.assertIn(b"/quiz/ordina", sitemap)
+        self.assertIn(b"/quiz/province-italiane", sitemap)
 
 
 class IndizioCollegatoTest(unittest.TestCase):

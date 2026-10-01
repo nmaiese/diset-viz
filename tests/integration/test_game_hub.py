@@ -232,7 +232,8 @@ class ImmaginiOgDeiGiochiTest(unittest.TestCase):
         for percorso, nome in (("/quiz/indovina-la-regione", "indovina-regione"),
                                ("/quiz/indovina-la-provincia", "indovina-provincia"),
                                ("/quiz/chi-e-maggiore", "chi-e-maggiore"),
-                               ("/quiz/ordina", "ordina")):
+                               ("/quiz/ordina", "ordina"),
+                               ("/quiz/province-italiane", "province-italiane")):
             html = client.get(percorso).get_data(as_text=True)
             self.assertIn(f"/static/img/og/gioco-{nome}.png", html, percorso)
             self.assertTrue((_ROOT / "app" / "static" / "img" / "og" / f"gioco-{nome}.png").is_file())

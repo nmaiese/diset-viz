@@ -3,6 +3,8 @@
 {% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Dov'è la provincia?", "path": "/quiz/province-italiane"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'mappa' %}
+{% set og_image_path = '/static/img/og/gioco-province-italiane.png' %}
+{% set og_image_alt = 'Sfida Italia: Dov\'è la provincia?' %}
 
 {% block title %}Dov'è la provincia? Quiz province italiane | {{ site_name }}{% endblock %}
 {% block description %}Quiz sulle province italiane: leggi un nome e trova la provincia sulla mappa muta. Dieci al giorno, uguali per tutti, e ogni errore ti dice di quanto.{% endblock %}
