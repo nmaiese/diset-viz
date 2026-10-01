@@ -217,3 +217,12 @@ Secondo giro, con un worker Claude (sonnet) in sola lettura. Le citazioni segnat
 - **Articolo 50 del regolamento IA e rapporto della Banca d'Italia sulla Calabria**: citati dal sito, non verificati.
 - **La suite di test non dà un verdetto pulito** (sezione 8): le asserzioni che bloccano i testi sono cercate per stringa.
 - Il rapporto dell'audit non è stato riletto da una seconda persona.
+
+## 12. Che cosa è stato fatto (1 ottobre 2026)
+
+Decisione di Nello: la parola pubblica è "indicatore". Tre PR aperte, non ancora in master:
+- **#308**, testi di `/metodologia` e della scheda: riassunto, dieci definizioni con ancora, "DISET" tolto, "dodici" corretto, blocco "Come è calcolato" riscritto.
+- **#310**, giochi: lessico unico degli errori, Riprova dove mancava, tastiera di Ordina, "va in classifica" tolto. In allenamento "Riprova" azzera il contatore a schermo come fa il server.
+- **#309**, pagina 500 in italiano e messaggi su Esporta ed Elimina account.
+
+Restano fuori, da decidere: il blocco "Come nasce questa scheda" (tre test lo fissano), il catalogo dati che dice ancora "dataset", la promessa "citazione verificata" contraddetta da 292 schede senza fonti, `.account-danger:hover` con `var(--error)` non definita, i bersagli tattili della mappa a 375 px, la 404 di `/quiz/*`.
