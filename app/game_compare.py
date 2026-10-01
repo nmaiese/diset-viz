@@ -51,7 +51,7 @@ provinciale, non quello regionale.
 
 from __future__ import annotations
 
-from app import bes_data, game_daily, quiz, quiz_tokens, sources
+from app import bes_data, game_daily, game_facts, quiz, quiz_tokens, sources
 from app.game_daily import LIVELLI, oggi_roma
 
 # Modalita' di token propria: il token della sfida del giorno non entra nelle serie
@@ -355,7 +355,11 @@ def risposta(dati, now=None):
         giuste = 0
     if esito["correct"]:
         giuste += 1
-    stato = {**stato, CHIAVE_PUNTEGGIO: {"d": giorno.isoformat(), "c": giuste, "l": livello}}
+    # La prima coppia sbagliata resta nel token, per il fatto di fine partita.
+    errore = game_facts.errore_firmato(
+        stato.get(CHIAVE_PUNTEGGIO) or {}, giorno.isoformat(), indice, esito, dati.get("choice")
+    )
+    stato = {**stato, CHIAVE_PUNTEGGIO: {"d": giorno.isoformat(), "c": giuste, "l": livello, **errore}}
     sessione, token = quiz_tokens.apply_answer(
         stato, indicatore["id"], indicatore["year"], chiavi, esito["correct"]
     )
@@ -386,4 +390,12 @@ def risposta(dati, now=None):
             "next_puzzle_at": game_daily.prossima_sfida_roma(giorno),
             "score": {"correct": giuste, "total": COPPIE},
         }
+        fatto = game_facts.fatto_compare(
+            livello, _sfida(giorno, livello)["pairs"], stato[CHIAVE_PUNTEGGIO].get("e"),
+            lambda coppia, scelta: _valuta(coppia, livello, scelta),
+        )
+        if fatto:
+            corpo["summary"]["fact"] = fatto["fact"]
+            if fatto["path"]:
+                corpo["summary"]["fact_path"] = fatto["path"]
     return 200, corpo
