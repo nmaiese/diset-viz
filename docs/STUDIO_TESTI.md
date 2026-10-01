@@ -99,10 +99,13 @@ Fare i quattro P0 in **una PR sola per il codice** (template e un dato) e **una 
 
 Il guadagno SEO atteso dai soli testi è **basso o medio**. Il guadagno vero è di chiarezza e fiducia: un lettore che trova 597, 372 e 67 nello stesso sito si chiede quale sia giusto. Questo è il motivo per cui l'uniformità batte la creatività.
 
-## 8. Che cosa non sappiamo
+## 8. Misure aggiunte dopo le verifiche (1 ottobre 2026)
+
+Sul sito locale, 576 URL del sitemap: title sopra 60 caratteri **1** (l'atlante), meta sopra 155 **19**, meta sotto 110 **170** (164 schede su 388, il 42%), nessun duplicato. Questo risponde a "quanti title e meta di scheda sono fuori budget": il problema delle schede è la meta troppo corta, non il title. `Eta media` non è un errore del solo copy: viene dal CSV legacy e la pipeline lo rigenererebbe. La scheda `ter-901`, la più vista, ha apostrofi al posto degli accenti nel testo. `/account` ha due meta robots in conflitto. Dettagli in `docs/STUDIO_TESTI_GUIDA.md`, sezione 8.
+
+## 9. Che cosa non sappiamo
 
 - **Query per pagina.** Le query che portano a ogni scheda non sono state estratte da Search Console. Il passo successivo, prima di decidere sui title delle schede, è questo. Con 614 clic resterà comunque un campione piccolo.
-- **Quanti** title e meta di scheda sono sotto 110 o sopra 155 su 388: l'audit ha misurato un campione.
 - **Quiz**: l'HTML è un guscio, ne abbiamo letto solo title, meta e H1 server-side. Il testo visibile, gli stati vuoti e gli errori non sono stati inventariati. Serve un inventario dopo un'interazione.
 - **Studi su CTR**: tutti in inglese e quasi tutti USA, nessuno su siti di dati italiani.
 - **La suite di test non è stata eseguita** da nessun worker: il costo dei test è stimato per ricerca di stringa.

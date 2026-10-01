@@ -25,7 +25,7 @@ Il sito ha un buon istinto: dice i limiti, non chiama "media nazionale" la media
 3. **Nel gioco Chi è maggiore? "va in classifica" è ambiguo.** Il testo promette che la partita a tempo "va in classifica", ma la sola classifica pubblica è quella delle serie a round: la sfida del giorno conta come record personale. Chi gioca a tempo cerca una classifica che non c'è. Si risolve cambiando una parola nei due punti in cui compare.
 4. **Il lead di Indovina la Regione promette "più vicino o più lontano"**, ma il gioco dà solo "più alto o più basso" e "stessa ripartizione". "Ripartizione" non è mai definita.
 5. **Indovina la Provincia dà distanze senza la parola "stima".** `docs/GIOCO.md` chiede che il testo lo dica ed è coperto a metà (la mappa lo dice, la provincia no).
-6. **Mancano del tutto**: la pagina 500 (si vede quella inglese di Werkzeug, inferenza, non l'ho vista), un messaggio quando "Esporta" o "Elimina account" falliscono (la persona conferma e non succede niente), una frase su che cosa dà un account al punto in cui si decide di accedere. *(500 e account verificati nel codice.)*
+6. **Mancano del tutto**: la pagina 500 (si vede quella inglese di Werkzeug, verificato), un messaggio quando "Esporta" o "Elimina account" falliscono (la persona conferma e non succede niente), una frase su che cosa dà un account al punto in cui si decide di accedere. *(500 e account verificati nel codice.)*
 7. **Conteggi senza una riga che li riconcili**: 597, 372, 223 e 64, 142, 158, 241. E "indicatore", "serie", "dataset" e "scheda" si alternano come sinonimi. (Il primo giro aveva già visto 597, 372 e 67.)
 8. **Acronimi non spiegati o interni**: "DISET" nel testo pubblico (il `CLAUDE.md` del progetto vieta l'acronimo interno nudo); "BES" mai sciolto in "Benessere equo e sostenibile" nel testo visibile.
 9. **Fatti scritti a mano che possono uscire di sincronia**: "dodici dimensioni" (imprecisa per le province, due non hanno dati), "sei tentativi", "dieci coppie", "dieci secondi", e ogni cifra nei ritratti delle regioni, che il modulo stesso dice "non si ricalcola da sola".
@@ -127,13 +127,45 @@ Costo in file toccati, non in ore. Ogni testo di v1 ha un **gemello di ripiego**
 
 Una decisione di Nello, poi tre PR nell'ordine 1, 2, 3. Non cominciare dai dieci passaggi di leggibilità né dalla home: sono i più visibili e i meno urgenti, e se si fanno prima della regola di nome vanno rifatti. L'impatto SEO atteso dai testi di guida è basso: lo scopo è fiducia, comprensione e un gioco i cui messaggi non dicono cose false.
 
-## 8. Che cosa non sappiamo
+## 8. Verifiche eseguite sul sito (1 ottobre 2026)
 
-- **Nessuno ha visto il sito o i giochi girare.** L'audit lavora dal sorgente e dal corpus. I percorsi delle quattro persone sono inferenze dal testo, non osservazioni di utenti. Nessun dato di scorrimento o permanenza.
+Un worker ha eseguito le affermazioni degli studi sul render reale (client di test Flask, 576 URL del sitemap, dati locali, nessun segreto). Ho ricontrollato di persona: nessuna "media semplice" in `/metodologia`, il title senza accento di `ter-920`, le due meta robots di `/account`, gli apostrofi in `content/indicators/901.md`.
+
+**Confermato:**
+- La ricerca senza risultati mostra il messaggio, con i link a temi, regioni e province (smentisce il worker evidenza).
+- **Pagina 500**: risposta di Werkzeug, 265 byte, `lang=en`, senza navigazione né link di uscita, anche per `/atlante` quando la regia cede. Il ripiego delle altre pagine è invece un 200 silenzioso con il vecchio template e il vecchio title.
+- **H2 di menu**: 4 nell'header e 4 nel footer, e il documento apre con un `h2` prima dell'unico `h1` (su 15 pagine, un solo `h1` ciascuna).
+- **Popover**: quattro su cinque portano a `/metodologia` senza ancora, e "media semplice", "verso", "n.d.", "copertura variabile" non trovano la loro definizione. La metodologia non contiene "media semplice", "n.d.", "posizione media", "percentile".
+- **`Eta media`**: vale solo per l'id 920. Viene dal CSV legacy `Assoluti_Regione.csv`: `scripts/build_external_dataset.py` lo rigenera, quindi correggere solo il manifest o il normalizzato non basta, l'errore tornerebbe. Anche "Definizione della fonte" e "in eta feconda" restano senza accento.
+- **Conteggi**: 597, 372, 223, 64, 142, 158, 241, 67, 107, 20, 12 sono tutti calcolati e coerenti col dato, salvo `app/nav.py:33-34` e `divari_regionali.py:119` scritti a mano e un docstring in `app/divari.py` che dice 221 invece di 241. Il 142 di metodologia e quello di regione sono due calcoli diversi con lo stesso valore, senza un test che li tenga allineati.
+- **"Dodici dimensioni"**: vero per le regioni, falso per le 107 province (dieci). La classifica province lo dice, ma `/metodologia` dice "dodici categorie... per entrambi i livelli" (righe 172 e 208).
+- **Promessa causale**: 292 schede su 383 hanno `fonti: []`, 29 contengono espressioni causali (euristica); su 12 lette a mano, 8 sono spiegazioni vere. La promessa di `/metodologia` è smentita almeno per 25-29 schede.
+- **Frasi vuote**: "nel gruppo di riferimento definito dalla fonte" compare in 128 schede su 388 e "Il dato va letto insieme a unità di misura, anno e copertura" in 57. Insieme 185 su 388, il 47%.
+- **Link interni**: 28 pagine, 4.122 link, 1.569 URL distinti, tutti 200, nessuna ancora mancante.
+- **Etichette**: ogni destinazione ha da 2 a 5 etichette diverse nella stessa pagina (la home ha 5 modi di dire `/qualita-della-vita`, 5 per `/blog`, 7 per `/atlante`).
+
+**Smentito:**
+- Lo spazio in "7 ª" non esiste nel DOM: `<data>7</data><span class="n__o">ª</span>`, è un artefatto dell'estrazione del testo.
+- La didascalia "Punteggio da 0 a 100" non è doppia: l'etichetta è il bottone e la frase lunga è il popover adiacente.
+
+**Misure nuove (rispondono a ciò che lo studio dei title non sapeva):**
+- Su 576 URL: **1** title sopra 60 (l'atlante), **19** meta sopra 155 (home, atlante, province, privacy, 8 province su 107, 7 articoli su 17), **170** meta sotto 110 (164 schede su 388, il 42%, 5 regioni, il catalogo), nessun title o meta duplicato. Le meta più corte sono di 33, 36 e 39 caratteri, e 65 schede stanno sotto 80.
+
+**Altri difetti trovati dal worker, non citati prima:**
+- `/account` ha due meta robots in conflitto: `index, follow` dal template base e `noindex, nofollow` da `account.html:6`.
+- La scheda `ter-901` (PIL pro capite, la più vista) ha apostrofi al posto degli accenti nel testo (`e'`, `piu'`, `Il Lazio e' quinto`), nel file `content/indicators/901.md`. È l'unica pagina su 577 con questo schema.
+
+**Suite di test.** Non si può eseguire in un solo processo: l'interprete (Python 3.13.12 nel venv locale, il Dockerfile usa 3.12) va in segfault in almeno 7 test e moduli. Eseguita modulo per modulo: 127 moduli, 1.906 test eseguiti, 6 moduli in segfault (non contati), fallimenti per `requests` mancante nel venv (`test_foto_autore`, `test_verify_pezzi_trend`, il gruppo trend articoli), e quattro moduli (`test_app`, `test_atlante`, `test_editoriale_guardia`, `test_indicator_view`) che hanno fallito nel ciclo ma passano rieseguiti da soli, tranne `test_app` che resta instabile. Nessun verdetto pulito è possibile senza Python 3.12 e `requests` nell'ambiente.
+
+**Non ancora verificato:** i giochi nel browser (messaggi d'errore, esiti, "stima", condivisione, a 375 px), perché il worker che li prova non è ancora partito.
+
+## 9. Che cosa non sappiamo
+
+- **I giochi non sono stati provati nel browser.** Il sito è stato eseguito in locale (sezione 8), ma i giochi no. I percorsi delle quattro persone sono inferenze dal testo, non osservazioni di utenti. Nessun dato di scorrimento o permanenza.
 - **Il testo dei giochi è stato letto dal sorgente**, non nel browser: anche gli stati e gli errori vanno provati.
 - **Il campione di `content/`** è di 10 schede e 5 articoli su circa 383: quello che dice vale per il campione.
 - **Competitor**: poco verificato. Mancano un confronto serio dei testi di guida degli altri siti e di come altri giochi scrivono regole ed errori (Wordle e NYT bloccano la lettura). Se serve, va rifatto con una ricerca mirata e citazioni controllate.
 - **Fonti accademiche** sui titoli-tesi, sulla comunicazione dell'incertezza e sulle serie nei giochi non sono state lette.
 - **Articolo 50 del regolamento IA e rapporto della Banca d'Italia sulla Calabria**: citati dal sito, non verificati.
-- **La suite di test non è stata eseguita**: le asserzioni che bloccano i testi sono cercate per stringa.
+- **La suite di test non dà un verdetto pulito** (sezione 8): le asserzioni che bloccano i testi sono cercate per stringa.
 - Il rapporto dell'audit non è stato riletto da una seconda persona.
