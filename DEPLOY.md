@@ -131,10 +131,11 @@ si dovesse rifare da un nuovo progetto Supabase):
 
 Le migrazioni successive alla Fase 4 vogliono gli stessi passi 3
 (`DIRECT_URL=... alembic upgrade head`) e 4 (`scripts/supabase_setup.sql`,
-idempotente). L'ultima e' `0009_via_cruscotto` (2026-09-05): droppa `pipeline_run`
-e `pipeline_agente`, le due tabelle del cruscotto tolto con la catena editoriale.
-**Il drop e' irreversibile per le righe che c'erano dentro**: il `downgrade()`
-ricrea le tabelle vuote.
+idempotente). Le ultime sono `0009_via_cruscotto` (2026-09-05), `0010_quiz_monouso_punteggi`
+e `0011_daily_counter`: le ultime due sono del gioco e hanno la loro sezione sotto.
+La `0009` droppa `pipeline_run` e `pipeline_agente`, le due tabelle del cruscotto tolto
+con la catena editoriale: **il drop e' irreversibile per le righe che c'erano dentro**, il
+`downgrade()` ricrea le tabelle vuote.
 
 | Variabile | Dove | A cosa serve |
 |---|---|---|
@@ -142,6 +143,7 @@ ricrea le tabelle vuote.
 | `DIRECT_URL` | Secret Manager | Postgres diretto (5432), solo Alembic. |
 | `SUPABASE_JWT_SECRET` | Secret Manager | Verifica HS256 dei JWT (vuoto -> JWKS, caso attuale). |
 | `SUPABASE_SECRET_KEY` | Secret Manager | Solo per la cancellazione account (admin API Supabase). |
+| `GAME_SEED_KEY` | Secret Manager | Seme delle sfide del giorno di Sfida Italia. Senza, le API seminate rispondono 503: vedi "Il rilascio di Sfida Italia". |
 | `SUPABASE_URL` | env Cloud Run | Progetto Supabase (browser: auth + Realtime). |
 | `SUPABASE_ANON_KEY` | env Cloud Run | Chiave anon pubblica (protetta da RLS). |
 
@@ -182,6 +184,55 @@ locale o tag Funding Choices nel codice del sito.
 
 La strategia completa, inclusi eventi e configurazione GTM/GA4, è in
 [`docs/tracking_spec.md`](docs/tracking_spec.md).
+
+### Il rilascio di Sfida Italia (il gioco sotto `/quiz`)
+
+Il gioco (`docs/GIOCO.md`) ha tre passi di rilascio che il codice richiede, e vanno **prima del merge**, perche' il merge su `master` e' anche il deploy. Nessuno di questi passi lo fa un agente: sono di Nello. Niente valore di un segreto va mai stampato, copiato in un messaggio o scritto in un file.
+
+**Prima del merge, in quest'ordine:**
+
+1. **`SEED_CUTOVER`.** Nell'ultimo commit prima del merge, `SEED_CUTOVER` in `app/game_daily.py` passa dal segnaposto del 2099 al **giorno del deploy piu' uno**. Non prima, non dopo: il perche' e le cose da non fare stanno in `docs/GIOCO.md` ("`SEED_CUTOVER`: perche' esiste"). Una volta fissato non si tocca piu'.
+2. **Il segreto `GAME_SEED_KEY`.** Una chiave nuova in Secret Manager, con la service account di runtime che la puo' leggere, agganciata al servizio. Senza l'aggancio la revisione parte ma le sfide non si aprono:
+
+   ```bash
+   # il valore passa nella pipe e non si vede mai
+   python3 -c "import secrets; print(secrets.token_hex(32))" | \
+     gcloud secrets create diset-viz-game-seed-key --data-file=- --replication-policy=automatic
+   gcloud secrets add-iam-policy-binding diset-viz-game-seed-key \
+     --member="serviceAccount:RUNTIME_SA" --role="roles/secretmanager.secretAccessor"
+   gcloud run services update diset-viz --region europe-west1 \
+     --update-secrets GAME_SEED_KEY=diset-viz-game-seed-key:latest
+   ```
+
+   Cloud Build non tocca le variabili del servizio (`cloudbuild.yaml`), quindi l'aggancio sopravvive ai deploy. **Senza la chiave** le API che compongono una sfida seminata rispondono **503** `seed_unavailable` e l'errore va nel log, mentre le **pagine rispondono sempre 200** (nessuna pagina chiama il seed) e Indovina la Regione resta giocabile finche' non passa il cutover. E' voluto: meglio una sfida che non si apre di una sfida calcolabile da chi legge il repository.
+   **Ruotare la chiave** cambia le sfide seminate da quel momento, anche quella di oggi, e per Indovina la Regione anche i giorni d'archivio dal cutover in poi: si fa solo di proposito e mai a meta' giornata. Con `:latest` l'istanza legge il valore quando parte, quindi dopo aver aggiunto la versione serve una revisione nuova perche' le istanze prendano tutte la stessa chiave.
+3. **Le migrazioni `0010` e `0011` e la RLS.** `0010_quiz_monouso_punteggi` crea `quiz_answered` (i round monouso) e `daily_scores`, `0011_daily_counter` crea `daily_counter` (la misura lato server):
+
+   ```bash
+   DIRECT_URL=<diretta 5432, dal segreto> alembic upgrade head
+   ```
+
+   poi si incolla `scripts/supabase_setup.sql` nel SQL editor di Supabase (idempotente: attiva la RLS delle tre tabelle nuove, solo backend, e riduce a sola lettura per il browser `player_stats`, `daily_results` e `achievements`). **Senza le migrazioni non c'e' un 500**: le scritture falliscono, l'errore va nel log e il gioco continua. Il costo e' silenzioso: il monouso dei round non blocca niente e i punteggi del giorno e il contatore non si salvano. Per questo si applicano prima, e si verifica con `alembic current` e guardando le tabelle.
+
+**Il merge** e' di Nello, e fa partire il deploy automatico.
+
+**Dopo il deploy**, le verifiche che contano. Le pagine del gioco **non passano da `design.render`**, quindi `data-v1` non c'e' e non serve: si guarda che rispondano e che le API seminate non siano in 503.
+
+```bash
+for p in /quiz /quiz/indovina-la-regione /quiz/indovina-la-provincia /quiz/chi-e-maggiore \
+         /quiz/ordina /quiz/province-italiane /quiz/classifica; do
+  curl -s -o /dev/null -w "%{http_code} $p\n" "https://divarioitalia.it$p"
+done
+# un'API seminata: 200 vuol dire che la chiave c'e', 503 che manca o non e' agganciata
+curl -s -o /dev/null -w "%{http_code}\n" "https://divarioitalia.it/api/game/compare/daily/session?level=regioni"
+curl -s -o /dev/null -w "%{http_code}\n" "https://divarioitalia.it/api/game/map/daily/session?level=italia&mode=map"
+```
+
+La sitemap deve elencare `/quiz` e le cinque pagine dei giochi e **non** `/quiz/classifica`, che e' `noindex`. Il dettaglio degli eventi si guarda in GA4 DebugView (`compare_answer` un solo invio). Se qualcosa risponde 503, il log di Cloud Run dice `GAME_SEED_KEY non impostata`.
+
+**La pulizia della classifica** viene dopo, con la conferma esplicita di Nello. La classifica (`scores`) puo' contenere righe nate prima del round monouso e del timer lato server, con punteggi che a mano non si raggiungono. Non c'e' un criterio automatico, e non lo si inventa: si guardano le prime righe (`GET /api/game/leaderboard?mode=compare&period=all&limit=50`, e `mode=order`) e si decide riga per riga con Nello. Si tolgono con `POST /api/game/leaderboard/admin/delete` (corpo JSON `mode` e `nickname`, header `X-Admin-Key` uguale a `SECRET_KEY`, letto dal segreto e mai stampato). Attenzione: cancella **tutte** le righe di quel soprannome in quella modalita'.
+
+**Lo stage** non eredita niente dalla produzione, quindi nemmeno `GAME_SEED_KEY`: li' le pagine rispondono 200 e le API seminate 503. Per provare le sfide su stage serve una chiave propria, diversa da quella di produzione, perche' la chiave vera darebbe in anticipo le sfide future a chiunque abbia la password dello stage.
 
 ## Primo deploy
 

@@ -30,6 +30,7 @@ possono scrivere direttamente su `master`.
 | se stai lavorando su... | leggi |
 | --- | --- |
 | account utente, login Google, preferiti, statistiche/achievements, confronti salvati, GDPR | [`docs/ACCOUNT.md`](docs/ACCOUNT.md) |
+| **il gioco, Sfida Italia** (`/quiz`): i cinque giochi, la sfida del giorno e il suo seed, l'anti-barare, punteggi e serie, traguardi, la sfida condivisa, la Sardegna e i confini | [`docs/GIOCO.md`](docs/GIOCO.md); la parte visiva del sottomarchio in [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | che cosa si può citare in un articolo | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | **scrivere un articolo indicatore**: formato e controlli | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md), [`content/STYLE.md`](content/STYLE.md); la pipeline automatica non è attiva |
@@ -57,8 +58,8 @@ qualità della vita per regioni e province. A `/` c'è la **home
 server-rendered**, non l'atlante: l'atlante sta a `/atlante`, anche lui una
 pagina della 1.0 resa dal server, come il confronto a `/confronto`. React
 (sorgente in `frontend/`, build in `app/static/dist/`) serve ormai solo il
-gioco sotto `/quiz`, accanto al controllo di accesso della testata (`site.js`,
-senza framework). Ogni indicatore di ogni famiglia a
+gioco sotto `/quiz` (Sfida Italia, `docs/GIOCO.md`), accanto al controllo di
+accesso della testata (`site.js`, senza framework). Ogni indicatore di ogni famiglia a
 `/indicatore/<slug>/<acronimo>-<id>`, e la vista provinciale di una scheda a
 due livelli a `/indicatore/<slug>/<acronimo>-<id>/province`, servite da **un
 template su un view model**; i temi a `/temi` e `/tema/<slug>`; le regioni a `/regioni` e
@@ -171,8 +172,13 @@ macro-area, senza che niente fallisca.
   cifre, servite da noi), e' l'identita' di tutto il sito. I token stanno in
   `app/static/css/ds/system.css`, l'unico posto dove si cambia un colore, un
   font o un'ombra; nascono da `design/v1/tokens/tokens.json`, dove si verificano
-  contrasti e daltonismo. `/legacy` e' l'unica pagina rimasta sul suo stile, di
-  proposito.
+  contrasti e daltonismo. `/legacy` e' la pagina rimasta sul suo stile, di
+  proposito, e **il gioco sotto `/quiz` e' l'altra eccezione, dichiarata**: un
+  sottomarchio che richiama la 1.0 senza esserne uguale, con un accento suo
+  (`--game-accent` e gli altri `--game-*`, giusto e sbagliato compresi) e una
+  scala di movimento propria (`--mo-*`). Non esce da `app/templates/v1/` e non
+  passa da `design.render`. Le regole stanno in `design/v1/SISTEMA.md` e il
+  resto in `docs/GIOCO.md`.
   Le pagine chiave (scheda indicatore, home, regione, provincia, articolo,
   indice e classifica della qualita' della vita, atlante, confronto, e dal 26
   settembre 2026 anche regioni, province, temi, tema, divari regionali,

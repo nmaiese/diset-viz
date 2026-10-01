@@ -547,19 +547,33 @@ gioco.
   Sofia Sans Semi Condensed a larghezza fissa, etichette mai in maiuscolo
   spaziato. Il movimento sta solo dietro `prefers-reduced-motion:
   no-preference`.
-- **Icone** in `app/static/img/gioco/`: una per gioco, una per il livello
-  Provincia, una per traguardo (`traguardi/<id>.svg`, gli id di
-  `app/achievements.py`) e le due dell'esito. Tratto su `currentColor` e i
-  `--game-*` letti con `var()` e un ripiego, nessun esadecimale, disegnate su
-  24 e leggibili a 34. Prendono i token solo se sono in linea nella pagina.
+- **Movimento**: una scala sola, `--mo-fast`, `--mo-base`, `--mo-slow` e le due
+  curve `--mo-out` (ingresso) e `--mo-in` (uscita), dichiarata in
+  `frontend/src/game/game-base.css`. Chi la usa sta dentro `@media
+  (prefers-reduced-motion: no-preference)`: fuori da li' lo stato finale e' gia'
+  quello giusto. Niente suono, vibrazione o coriandoli, e' il tono della Cronaca.
+  `tests/unit/test_game_motion.py` guarda la regola sui fogli di
+  `frontend/src/game/*.css`, **ma non scende in `mappa/mappa.css`**: li' la
+  regola si rispetta a mano.
+- **Icone** in `app/static/img/gioco/`: una per gioco (`indovina`, `maggiore`,
+  `ordina`, `mappa`), una per il livello Provincia, una per traguardo
+  (`traguardi/<id>.svg`, gli id di `app/achievements.py`) e le tre dell'esito
+  (giusto, parziale, sbagliato: un risultato a meta' non e' una croce). Tratto
+  su `currentColor` e i `--game-*` letti con `var()` e un ripiego, nessun
+  esadecimale, disegnate su 24 e leggibili a 34. Prendono i token solo se sono
+  in linea nella pagina.
 - **Dove sta**: i valori in `tokens/tokens.json` sotto `game` e nel blocco
   `--game-*` di `system.css`, che `tools/check_tokens.py` prova insieme
   (contrasti, tinte, distanza dai dati, le quattro visioni, e che i due file
   dicano gli stessi valori). I fogli sono `frontend/src/game/` (`game-base.css`,
-  `guess.css`, `compare.css`, `order.css`, raccolti da `game.css`), il
-  prototipo e' `design/gioco/` (`bin/py design/gioco/build.py`). Il nome del
-  sotto-marchio non e' ancora deciso: il prototipo porta il primo dei nomi
-  proposti come segnaposto.
+  `guess.css`, `compare.css`, `order.css`, raccolti da `game.css`, e
+  `mappa/mappa.css` per la mappa), il prototipo e' `design/gioco/`
+  (`bin/py design/gioco/build.py`). Il nome del sotto-marchio e' **Sfida
+  Italia**, scelto il 30 settembre 2026: il prototipo statico e' di prima e porta
+  ancora un nome segnaposto, e non si aggiorna.
+- **Il resto del gioco** (i giochi, la sfida del giorno, l'anti-barare, le
+  regole di contenuto) sta in [`docs/GIOCO.md`](../../docs/GIOCO.md): qui c'e'
+  solo la parte visiva.
 
 ## Regole di contenuto
 
