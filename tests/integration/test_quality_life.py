@@ -343,6 +343,66 @@ class QualityLifeBesEngineTest(unittest.TestCase):
             self.assertEqual(alias_response.status_code, 200)
             self.assertTrue(alias_response.headers["X-Robots-Tag"].startswith("noindex"))
 
+    def _provincial_matrix_with_fixture(self, **level_overrides):
+        """Provincial matrix and ranking with the synthetic MEF series loaded,
+        its levels manifest overridden (e.g. scoreable, direction)."""
+        from unittest import mock
+
+        from app import external_data, provincial_families
+        from tests.fixtures import external_mef
+
+        levels = [{**row, **level_overrides} for row in external_mef.levels()]
+        # Il loader vuole lo stesso verso nelle righe e nel manifesto dei livelli.
+        rows = [{**row, "direction": levels[0]["direction"]} for row in external_mef.rows()]
+        memoized = (qb._matrix_and_meta, qb._indicators_by_category, qb._ranking_keys, qb.build_bes_ranking)
+
+        def reset():
+            provincial_families.cache_clear()
+            for function in memoized:
+                qb.cache.delete_memoized(function)
+
+        reset()
+        try:
+            with mock.patch.object(external_data, "get_external_rows", return_value=rows), \
+                 mock.patch.object(external_data, "get_external_levels", return_value=levels):
+                matrix, meta = qb._matrix_and_meta("provincia")
+                ranking = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
+        finally:
+            reset()
+        return external_mef.TARGET, matrix, meta, ranking
+
+    def test_non_scoreable_external_series_stay_out_of_the_provincial_score(self):
+        target, matrix, meta, ranking = self._provincial_matrix_with_fixture(
+            scoreable="false", direction="higher_better")
+        self.assertNotIn(target, matrix)
+        self.assertNotIn(target, meta)
+        self.assertEqual(set(ranking["methodology"]["source_counts"]), {"bes"})
+        ids = {e["id"] for row in ranking["ranking"]
+               for e in row["top_positive_indicators"] + row["top_negative_indicators"]}
+        self.assertNotIn(target, ids)
+
+    def test_a_contextual_series_stays_out_even_if_marked_scoreable(self):
+        target, matrix, _, _ = self._provincial_matrix_with_fixture(
+            scoreable="true", direction="contextual")
+        self.assertNotIn(target, matrix)
+
+    def test_a_scoreable_external_series_enters_after_bes_under_its_family(self):
+        target, matrix, meta, ranking = self._provincial_matrix_with_fixture(
+            scoreable="true", direction="higher_better")
+        self.assertIn(target, matrix)
+        provinces = set(qb.get_bes_territories("provincia"))
+        self.assertLessEqual(set(matrix[target]), provinces)
+        self.assertGreaterEqual(len(matrix[target]), 100)
+        self.assertEqual(meta[target]["source_family"], "mef")
+        self.assertEqual(meta[target]["category"], "reddito_accessibilita")
+        # Il MEF ha anche il livello regionale: dalla classifica si atterra sulle province.
+        self.assertTrue(meta[target]["path"].endswith("/province"), meta[target]["path"])
+        method = ranking["methodology"]
+        self.assertEqual(method["source_counts"]["mef"], 1)
+        self.assertIn(sources.family_label("mef"), method["source"])
+        self.assertEqual(method["catalog_institutions"], sources.institutions_label({"bes", "mef"}))
+        self.assertEqual(method["score_indicators_total"], len(matrix))
+
     def test_legacy_regional_api_alias(self):
         client = app.test_client()
         self.assertEqual(client.get("/api/quality-life/rankings").status_code, 200)

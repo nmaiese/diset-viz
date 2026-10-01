@@ -9,12 +9,13 @@ import re
 import unicodedata
 from functools import lru_cache
 
-from app import sources
+from app import provincial_families, sources
 from app.bes_data import MIN_PUBLIC_COVERAGE, get_bes_manifest
 from app.external_atlas import external_regional_scoreables, has_external_data
 from app.multiscopo_data import get_multiscopo_manifest, has_multiscopo_data
 from app.profiles import SCOREABLE_DIRECTIONS
 from app.quality_life import quality_life_indicator_set
+from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 
 
 BES_PREFIX = "bes:"
@@ -28,6 +29,7 @@ EUR_PREFIX = tuple(
     sources.SOURCES[family]["internal_prefix"] for family in sources.EXTERNAL_FAMILIES
 )
 REGIONAL_EUR_MIN_YEAR = 2021
+PROVINCIAL_EXTERNAL_MIN_YEAR = 2023
 
 
 def _normalise_name(value):
@@ -101,4 +103,39 @@ def regional_quality_life_selection():
                 continue
             selected[public_id] = info["category"]
             used_names.add(name)
+    return selected
+
+
+def provincial_external_selection(bes_names):
+    """External provincial series admitted to the provincial score, in order.
+
+    The provincial score is BES dei Territori first. An external series joins
+    only if the curator marked it `scoreable` in the levels manifest
+    (`provincial_families.scoreables()` already demands that, a scoreable
+    direction and an indexable provincial level) and it passes the gates
+    restated here, so the score never depends on a loader default: scoreable
+    direction, latest year >= 2023, coverage >= 0.80, a canonical category.
+    `bes_names` are the normalised names of the BES series already scored:
+    an identical phenomenon stays BES. Names accumulate, so two external
+    families cannot add the same phenomenon twice either. No fuzzy matching:
+    similar names with different definitions are a curator's call.
+    """
+    used_names = set(bes_names)
+    selected = []
+    for item in provincial_families.scoreables():
+        meta = item["metadata"]
+        level = item["levels"][provincial_families.PROVINCE_LEVEL]
+        if meta["direction"] not in SCOREABLE_DIRECTIONS:
+            continue
+        if level["year_max"] < PROVINCIAL_EXTERNAL_MIN_YEAR:
+            continue
+        if level["coverage_latest"] < MIN_PUBLIC_COVERAGE:
+            continue
+        if meta["quality_life_category"] not in QUALITY_LIFE_CATEGORIES:
+            continue
+        name = _normalise_name(meta["name"])
+        if name in used_names:
+            continue
+        used_names.add(name)
+        selected.append(item)
     return selected
