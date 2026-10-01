@@ -99,7 +99,7 @@ SOURCES = {
         "label": "Istituto Superiore per la Protezione e la Ricerca Ambientale, consumo di suolo",
         "short_label": "Consumo di suolo",
         "internal_prefix": "ispra:",
-        "license": "CC BY 4.0 IT (licenza indicata dalla fonte)",
+        "license": "CC BY 4.0 (licenza indicata dalla fonte)",
         "license_url": "https://creativecommons.org/licenses/by/4.0/deed.it",
         "source_url": "https://www.isprambiente.gov.it/it/attivita/suolo-e-territorio/suolo/il-consumo-di-suolo/i-dati-sul-consumo-di-suolo",
         "feeds": ("ispra_suolo",),

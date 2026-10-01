@@ -112,8 +112,8 @@ eur:ilc_mdes01_r;abitazione;Persone in case riscaldate in modo inadeguato;percen
 eur:hrst_st_rcat;lavoro;Scienziati e ingegneri sulla popolazione attiva;percentuale;1;0;;1;2026-10-04
 eur:tour_occ_nin2;turismo;Pernottamenti dei turisti residenti all'estero;percentuale;1;0;da spiegare a fine partita: quota sul totale dei pernottamenti;0;2026-10-04
 eur:tour_occ_anor2;turismo;Posti letto degli alberghi occupati;percentuale;1;0;da spiegare a fine partita: tasso netto di occupazione dei posti letto;0;2026-10-04
-aci:autovetture-alimentazione-alternativa;servizi;Autovetture con alimentazione alternativa a benzina e gasolio;percentuale;1;1;;0;2026-10-04
-aci:autovetture-ante-2009;servizi;Autovetture immatricolate fino al 2009;percentuale;1;1;;0;2026-10-04
+aci:autovetture-alimentazione-alternativa;servizi;Autovetture con alimentazione alternativa a benzina e gasolio;percentuale;1;1;le auto contano dove sono immatricolate: il noleggio e le flotte aziendali alzano la quota in alcune province;0;2026-10-04
+aci:autovetture-ante-2009;servizi;Autovetture immatricolate fino al 2009;percentuale;1;1;le auto contano dove sono immatricolate: il noleggio e le flotte aziendali pesano in alcune province;0;2026-10-04
 agcom:copertura-ftth;digitale;Famiglie raggiunte dalla fibra fino a casa;percentuale;1;1;da spiegare a fine partita: rete in fibra FTTH;0;2026-10-04
 ipr:figli-per-donna;demografia;Figli per donna;figli per donna;0;1;;0;2026-10-04
 ipr:indice-di-vecchiaia;demografia;Anziani ogni 100 giovani;per 100 giovani;0;1;da spiegare a fine partita: indice di vecchiaia, rapporto tra over 65 e under 15;0;2026-10-04

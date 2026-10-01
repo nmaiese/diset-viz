@@ -8,9 +8,9 @@ territory-neutral che usa ``indicator_view``.
 from __future__ import annotations
 
 from collections import defaultdict
-from functools import lru_cache
 
 from app import bes_data, external_data, profiles, sources
+from app.cache_util import synchronized_cache
 from app.data import REGION_ORDER, _parse_number
 from app.profiles import SCOREABLE_DIRECTIONS
 from app.indicator_notes import build_bes_indicator_explain
@@ -19,6 +19,7 @@ from app.taxonomy import CANONICAL_CATEGORIES, category_metadata, category_path
 
 PROVINCE_LEVEL = "provincia"
 REGION_LEVEL = "regione"
+LIMIT_PREFIX = "LIMITE: "
 PUBLIC_LEVELS = (REGION_LEVEL, PROVINCE_LEVEL)
 MIN_PUBLIC_YEAR = 2023
 MIN_PUBLIC_COVERAGE = 0.8
@@ -147,7 +148,7 @@ def _validate(rows, levels):
     return level_by_key, accepted, dict(regional_years)
 
 
-@lru_cache(maxsize=1)
+@synchronized_cache(maxsize=1)
 def _index():
     manifests = external_data.get_external_levels()
     rows = external_data.get_external_rows()
@@ -182,7 +183,7 @@ def _level_info(manifest, observations, years=None):
     }
 
 
-@lru_cache(maxsize=1)
+@synchronized_cache(maxsize=1)
 def all_indicators():
     """Catalogo cross-family delle serie esterne con livello provinciale."""
     level_by_key, rows_by_target, regional_years = _index()
@@ -229,6 +230,11 @@ def all_indicators():
              "theme": metadata["source_theme"], "direction": metadata["direction"]},
             "province",
         )
+        # Una nota del manifesto che comincia con "LIMITE: " e il limite
+        # principale della serie, e la scheda lo mostra al lettore.
+        note = (province_manifest.get("notes") or "").strip()
+        if note.startswith(LIMIT_PREFIX):
+            metadata["explain"]["caveat"] = note[len(LIMIT_PREFIX):].strip()
         levels = {}
         for level, manifest in manifests.items():
             if level == PROVINCE_LEVEL:
@@ -294,8 +300,10 @@ def indicators_for_province(province_key):
         year = years[-1]
         values = by_year[year]
         reverse = meta["direction"] not in ("lower_better", "higher_worse")
-        ordered = sorted(values.items(), key=lambda pair: (-pair[1] if reverse else pair[1], pair[0]))
-        rank = next(index for index, pair in enumerate(ordered, start=1) if pair[0] == province_key)
+        # A pari valore, pari posizione (1, 2, 2, 4): la regola di
+        # `province_profile._graduatoria`, quella che le pagine mostrano.
+        mine = values[province_key]
+        rank = 1 + sum(1 for other in values.values() if (other > mine if reverse else other < mine))
         previous = by_year[years[-2]].get(province_key) if len(years) > 1 else None
         output.append({
             "id": meta["id"], "name": meta["name"], "theme": meta["theme"],

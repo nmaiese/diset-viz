@@ -180,6 +180,9 @@ def _inject_license():
     return {
         "data_license_url": sources.LICENSE_URL,
         "data_license_label": sources.LICENSE_LABEL,
+        # Chi pubblica i dati lo dice il catalogo: il piè di pagina non scrive un
+        # elenco a mano (diceva "Istat ed Eurostat" anche sulle pagine ACI e AGCOM).
+        "data_institutions_label": lambda: catalog_summary()["institutions_label"],
         "data_licenses_label": sources.licenses_label,
         "publisher": publisher.ORGANIZATION,
         "publisher_jsonld": publisher.organization_json(),

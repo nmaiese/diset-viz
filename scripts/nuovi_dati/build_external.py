@@ -53,6 +53,21 @@ LEVEL_COLUMNS = [
 # file di estrazione -> (feed del registro `app/sources.py`)
 # id di estrazione -> (id pubblico, feed, tema, categoria, livelli ammessi)
 # Le categorie sono quelle di `app/taxonomy.py:CANONICAL_CATEGORIES`.
+CAMPIONE_PROVINCIALE = "Indagine campionaria sulle forze di lavoro: nelle province piccole il campione e esiguo e il valore oscilla da un anno all'altro."
+TAA_PESO_ATTIVI = "Il Trentino Alto Adige e la media di Bolzano e Trento pesata per la popolazione, non per gli attivi: un'approssimazione."
+TAA_PESO_OCCUPATI = "Il Trentino Alto Adige e la media di Bolzano e Trento pesata per la popolazione, non per gli occupati: un'approssimazione."
+TAA_PESO_POSTI_LETTO = "Il Trentino Alto Adige e la media di Bolzano e Trento pesata per la popolazione, non per i posti letto: un'approssimazione."
+ACI_NOLEGGIO = (
+    "Le auto sono contate dove sono immatricolate: le flotte di noleggio e aziendali "
+    "con sede in una provincia (Firenze, Bolzano e poche altre) ne alzano la quota "
+    "senza che riguardi i residenti. Va letta come descrizione, non come merito."
+)
+AGCOM_LACUNA = (
+    "Per Bolzano e Trento i dati della fonte hanno una lacuna dichiarata (mancata o "
+    "incompleta trasmissione dei dati degli operatori locali): le due province e il "
+    "Trentino Alto Adige non hanno valore."
+)
+
 PUBBLICATI = {
     "istat_prov": {
         "feed": "istat_provinciale",
@@ -63,31 +78,31 @@ PUBBLICATI = {
             "ISTATP_SALDO_MIGRATORIO_INTERNO": ("ipr:saldo-migratorio-interno", "Demografia e popolazione", "salute_cura", ("provincia",)),
             "ISTATP_ETA_MEDIA_MADRE": ("ipr:eta-media-madre-al-parto", "Demografia e popolazione", "salute_cura", ("provincia",)),
             "ISTATP_NATALITA": ("ipr:tasso-di-natalita", "Demografia e popolazione", "salute_cura", ("provincia",)),
-            "ISTATP_DISOCCUPAZIONE": ("ipr:tasso-di-disoccupazione", "Lavoro", "lavoro_opportunita", ("provincia",)),
-            "ISTATP_ATTIVITA": ("ipr:tasso-di-attivita", "Lavoro", "lavoro_opportunita", ("provincia",)),
+            "ISTATP_DISOCCUPAZIONE": ("ipr:tasso-di-disoccupazione", "Lavoro", "lavoro_opportunita", ("provincia",), {"campionario": True, "nota": CAMPIONE_PROVINCIALE}),
+            "ISTATP_ATTIVITA": ("ipr:tasso-di-attivita", "Lavoro", "lavoro_opportunita", ("provincia",), {"campionario": True, "nota": CAMPIONE_PROVINCIALE}),
         },
     },
     "eurostat_nuovi": {
         "feed": "eurostat_regional",
         "serie": {
-            "EUROSTAT_CASA_NON_RISCALDATA": ("eur:ilc_mdes01_r", "Abitazione", "reddito_accessibilita", ("regione",)),
-            "EUROSTAT_SCIENZIATI_INGEGNERI": ("eur:hrst_st_rcat", "Ricerca e sviluppo (Eurostat)", "ricerca_innovazione_digitale", ("regione",)),
-            "EUROSTAT_ORE_LAVORATE": ("eur:lfst_r_lfe2ehour", "Lavoro e conciliazione dei tempi di vita", "lavoro_opportunita", ("regione",)),
+            "EUROSTAT_CASA_NON_RISCALDATA": ("eur:ilc_mdes01_r", "Abitazione", "reddito_accessibilita", ("regione",), {"campionario": True}),
+            "EUROSTAT_SCIENZIATI_INGEGNERI": ("eur:hrst_st_rcat", "Ricerca e sviluppo (Eurostat)", "ricerca_innovazione_digitale", ("regione",), {"campionario": True, "nota": TAA_PESO_ATTIVI}),
+            "EUROSTAT_ORE_LAVORATE": ("eur:lfst_r_lfe2ehour", "Lavoro e conciliazione dei tempi di vita", "lavoro_opportunita", ("regione",), {"campionario": True, "nota": TAA_PESO_OCCUPATI}),
             "EUROSTAT_NOTTI_ESTERO": ("eur:tour_occ_nin2", "Turismo", "cultura_patrimonio_turismo", ("regione",)),
-            "EUROSTAT_OCCUPAZIONE_POSTI_LETTO": ("eur:tour_occ_anor2", "Turismo", "cultura_patrimonio_turismo", ("regione",)),
+            "EUROSTAT_OCCUPAZIONE_POSTI_LETTO": ("eur:tour_occ_anor2", "Turismo", "cultura_patrimonio_turismo", ("regione",), {"nota": TAA_PESO_POSTI_LETTO}),
         },
     },
     "aci": {
         "feed": "aci_statistiche",
         "serie": {
-            "ACI_AUTO_ANTE_2009": ("aci:autovetture-ante-2009", "Trasporti e mobilità", "mobilita_servizi_territoriali", ("provincia", "regione")),
-            "ACI_AUTO_ALIMENTAZIONE_ALTERNATIVA": ("aci:autovetture-alimentazione-alternativa", "Trasporti e mobilità", "mobilita_servizi_territoriali", ("provincia", "regione")),
+            "ACI_AUTO_ANTE_2009": ("aci:autovetture-ante-2009", "Trasporti e mobilità", "mobilita_servizi_territoriali", ("provincia", "regione"), {"direction": "contextual", "nota": ACI_NOLEGGIO}),
+            "ACI_AUTO_ALIMENTAZIONE_ALTERNATIVA": ("aci:autovetture-alimentazione-alternativa", "Trasporti e mobilità", "mobilita_servizi_territoriali", ("provincia", "regione"), {"direction": "contextual", "nota": ACI_NOLEGGIO}),
         },
     },
     "agcom": {
         "feed": "agcom_bbmap",
         "serie": {
-            "AGCOM_FTTH": ("agcom:copertura-ftth", "Società dell'informazione", "ricerca_innovazione_digitale", ("provincia", "regione")),
+            "AGCOM_FTTH": ("agcom:copertura-ftth", "Società dell'informazione", "ricerca_innovazione_digitale", ("provincia", "regione"), {"escludi": {("regione", "trentino-alto-adige")}, "nota": AGCOM_LACUNA}),
         },
     },
 }
@@ -129,11 +144,18 @@ def build(only=None):
         for r in _read(NUOVI / f"{fonte}.csv"):
             values[(r["indicator_id"], r["level"])][(r["territory_key"], int(r["year"]))] = r["value"]
 
-        for ext_id, (public_id, theme, category, levels) in cfg["serie"].items():
-            m = manifest[ext_id]
+        for ext_id, spec in cfg["serie"].items():
+            public_id, theme, category, levels = spec[:4]
+            opts = spec[4] if len(spec) > 4 else {}
+            m = dict(manifest[ext_id])
+            m["direction"] = opts.get("direction", m["direction"])
+            limite = "LIMITE: " + opts["nota"] if opts.get("nota") else m["note"]
+            m["note"] = (m["note"] + " " + opts["nota"]).strip() if opts.get("nota") else m["note"]
+            skip = opts.get("escludi", set())
             owned.add(public_id)
             for level in levels:
-                cells = values.get((ext_id, level))
+                cells = {k: v for k, v in (values.get((ext_id, level)) or {}).items()
+                         if (level, k[0]) not in skip}
                 if not cells:
                     raise SystemExit(f"{ext_id}: nessun valore al livello {level}")
                 names = provinces if level == "provincia" else regions
@@ -159,12 +181,13 @@ def build(only=None):
                 new_levels.append({
                     "target_indicator_id": public_id, "territory_level": level, "name": m["name"],
                     "theme": theme, "quality_life_category": category, "direction": m["direction"],
-                    "scoreable": "false", "sample_survey": "false", "year_min": years[0],
+                    "scoreable": "false",
+                    "sample_survey": "true" if opts.get("campionario") else "false", "year_min": years[0],
                     "year_max": last, "territory_count_latest": n_last,
                     "coverage_latest": f"{n_last / universe:.4f}".rstrip("0").rstrip("."),
                     "source_dataset": fonte, "source_indicator_id": ext_id,
                     "source_url": m["source_url"], "license": m["license"],
-                    "definition_match": "new", "reviewed_at": reviewed, "notes": m["note"],
+                    "definition_match": "new", "reviewed_at": reviewed, "notes": limite,
                 })
 
     keep_obs = [r for r in _read(OBS_PATH) if r["target_indicator_id"] not in owned]

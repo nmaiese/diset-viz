@@ -178,6 +178,17 @@ def _explain_with_curation(public_id, explain):
     return result
 
 
+def _with_declared_limit(public_id, explain):
+    """Il limite principale che il manifesto dei livelli dichiara per la serie
+    (una nota che comincia con "LIMITE: ") sostituisce quello generico."""
+    from app.external_data import get_external_levels
+
+    for row in get_external_levels():
+        if row.get("target_indicator_id") == str(public_id) and (row.get("notes") or "").startswith("LIMITE: "):
+            return {**explain, "caveat": row["notes"][len("LIMITE: "):].strip()}
+    return explain
+
+
 def get_external_atlas_indicator(public_id):
     """One Eurostat regional indicator in the atlas API shape, or None."""
     family = _family_of(public_id)
@@ -233,14 +244,14 @@ def get_external_atlas_indicator(public_id):
         "license": first.get("license") or default_license,
         "license_url": license_url,
         "archive": first.get("source_dataset") or source_label,
-        "explain": _explain_with_curation(
+        "explain": _with_declared_limit(str(public_id), _explain_with_curation(
             str(public_id),
             build_bes_indicator_explain(
                 {"name": first["name"], "unit": unit, "theme": source_theme,
                  "id": str(public_id), "direction": direction},
                 level="territori regionali",
             ),
-        ),
+        )),
         "years": years,
         "year_min": years[0],
         "year_max": latest_year,
