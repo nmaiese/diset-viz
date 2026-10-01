@@ -187,7 +187,7 @@ La strategia completa, inclusi eventi e configurazione GTM/GA4, è in
 
 ### Il rilascio di Sfida Italia (il gioco sotto `/quiz`)
 
-Il gioco (`docs/GIOCO.md`) ha tre passi di rilascio che il codice richiede, e vanno **prima del merge**, perche' il merge su `master` e' anche il deploy. Nessuno di questi passi lo fa un agente: sono di Nello. Niente valore di un segreto va mai stampato, copiato in un messaggio o scritto in un file.
+Il gioco (`docs/GIOCO.md`) ha tre passi di rilascio che il codice richiede, e vanno **prima del merge**, perche' il merge su `master` e' anche il deploy. Sono passi di produzione che chiedono l'OK esplicito di Nello, e la RLS la incolla lui a mano nel SQL editor. Niente valore di un segreto va mai stampato, copiato in un messaggio o scritto in un file.
 
 **Prima del merge, in quest'ordine:**
 
@@ -212,7 +212,7 @@ Il gioco (`docs/GIOCO.md`) ha tre passi di rilascio che il codice richiede, e va
    DIRECT_URL=<diretta 5432, dal segreto> alembic upgrade head
    ```
 
-   poi si incolla `scripts/supabase_setup.sql` nel SQL editor di Supabase (idempotente: attiva la RLS delle tre tabelle nuove, solo backend, e riduce a sola lettura per il browser `player_stats`, `daily_results` e `achievements`). **Senza le migrazioni non c'e' un 500**: le scritture falliscono, l'errore va nel log e il gioco continua. Il costo e' silenzioso: il monouso dei round non blocca niente e i punteggi del giorno e il contatore non si salvano. Per questo si applicano prima, e si verifica con `alembic current` e guardando le tabelle.
+   poi si incolla `scripts/supabase_setup.sql` nel SQL editor di Supabase (idempotente: attiva la RLS delle tre tabelle nuove, solo backend, e riduce a sola lettura per il browser `player_stats`, `daily_results` e `achievements`). **Senza le migrazioni non c'e' un 500 sulle rotte del gioco**: le scritture falliscono, l'errore va nel log e il gioco continua. Il costo e' silenzioso: il monouso dei round non blocca niente (e la classifica delle serie torna esposta al difetto che il monouso chiude), e i punteggi del giorno e il contatore non si salvano. Per questo si applicano prima, e si verifica con `alembic current` e guardando le tabelle.
 
 **Il merge** e' di Nello, e fa partire il deploy automatico.
 

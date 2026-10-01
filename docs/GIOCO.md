@@ -4,7 +4,7 @@ Il sottomarchio dei giochi di Divario Italia si chiama **Sfida Italia**. Cinque 
 
 Questo documento è il contratto della sezione e **possiede l'argomento**. Chi tocca `app/game*.py`, `app/quiz*.py`, `frontend/src/game/` o `config/game_indicators.csv` lo legge prima e lo aggiorna quando cambia un fatto. Dove il documento e il codice non tornano, ha ragione il codice: si corregge il documento. Le regole visive stanno in `design/v1/SISTEMA.md`, gli eventi in `docs/tracking_spec.md`, l'account in `docs/ACCOUNT.md`, i passi di rilascio in `DEPLOY.md`.
 
-Ogni numero che qui compare o viene dal codice (e si legge lì, non si ricopia) o è datato e attribuito. I conteggi di province, indicatori, traguardi e test **non si scrivono a mano**: un numero scritto invecchia in silenzio, e si legge dal codice (`len(province_pool())`, `game_indicators()`, `achievements.CATALOG`).
+Ogni numero che qui compare o viene dal codice (dove c'è una costante si nomina quella, e il valore si scrive solo per dare l'ordine di grandezza) o è datato e attribuito. I conteggi di province, indicatori, traguardi e test **non si scrivono a mano**: un numero scritto invecchia in silenzio, e si legge dal codice (`len(province_pool())`, `game_indicators()`, `achievements.CATALOG`).
 
 ## I giochi
 
@@ -46,7 +46,7 @@ Per **Indovina la Provincia** l'indicatore è anche filtrato per copertura: entr
 
 **Il giorno è quello di Roma.** Il server gira in UTC (Cloud Run): senza una funzione unica, la sfida nuova uscirebbe all'una o alle due di notte e ogni punto che usasse la data di sistema darebbe un giorno diverso da quello del giocatore. Per questo c'è solo `game_daily.today_rome()`, il numero della sfida viene da `challenge_number()` (con `GAME_EPOCH`, il giorno di lancio, come numero 1) e il conto alla rovescia da `next_challenge_rome()`, la mezzanotte di Roma in UTC. I test fissano l'orologio alle 23:30 UTC (a Roma, d'estate, è già il giorno dopo) e a 21:59 UTC (è ancora lo stesso): `tests/unit/test_game_daily.py`.
 
-**Il `puzzle_id` è `daily:<ISO>` e deve essere quello di oggi.** Nessuna rotta accetta una data scelta dal client per una sfida seminata: chi risponde a una sfida di ieri riceve un errore (`puzzle_changed`, 400 nei giochi a punteggio e 410 su Regione, o `sfida_scaduta`, 410, su Provincia), e il payload non rivela mai soluzioni di domani. Fa eccezione solo l'archivio di Indovina la Regione, che per costruzione mostra giorni già passati.
+**Il `puzzle_id` è `daily:<ISO>` e deve essere quello di oggi.** Nessuna rotta accetta una data scelta dal client per una sfida seminata: chi risponde a una sfida di ieri riceve un errore: `puzzle_changed` (400) in Chi è maggiore e nella mappa, 410 su Regione (se la partita si dichiara del giorno), `sfida_scaduta` (410) su Provincia, e in Ordina una risposta che non combacia con la sfida di oggi (`bad_request` o `token_invalid`). Il payload non rivela mai soluzioni di domani. Fa eccezione solo l'archivio di Indovina la Regione, che per costruzione mostra giorni già passati.
 
 ### Il seed
 
@@ -101,11 +101,11 @@ Vale 12 ore (`_MAX_AGE_S`). Un token scaduto, manomesso o di un'altra modalità 
 
 Un round si risponde una volta sola. `quiz_tokens.claim_round(sid, q)` scrive la coppia in `quiz_answered` (chiave primaria `(sid, q)`) e la seconda risposta alla stessa coppia riceve **409** `round_already_answered`. Sta nel database e non in `app.cache` perché Cloud Run scala su più istanze: una cache per processo non vedrebbe le risposte date altrove. Ogni scrittura cancella anche le righe più vecchie della durata del token. `close_open_round` completa il disegno: chiedere un round nuovo mentre ce n'è uno aperto conta quello aperto come sbagliato, altrimenti scartare una domanda costerebbe zero.
 
-**Il fallimento è aperto, di proposito.** Se il database non risponde `claim_round` dice che la risposta è nuova, e l'errore va nel log. Il compromesso: un guasto di Supabase non deve spegnere il gioco, e il danno possibile (qualche risposta contata due volte nello stesso minuto) è molto più piccolo di un gioco rotto. Conseguenza operativa da ricordare: **senza la migrazione 0010 il monouso e i punteggi del giorno non funzionano, in silenzio**: niente 500, solo righe nel log. Per questo la migrazione va applicata prima del merge (`DEPLOY.md`).
+**Il fallimento è aperto, di proposito.** Se il database non risponde `claim_round` dice che la risposta è nuova, e l'errore va nel log. Il compromesso: un guasto di Supabase non deve spegnere il gioco, e con il database fermo non si scrive comunque niente di persistente (punteggi e classifica stanno nello stesso database), quindi si gonfia al più quello che il giocatore vede. Il caso che conta è un altro: **con il database vivo ma senza la migrazione `0010` la tabella non c'è**, il monouso non fa niente senza segnalarlo, e la classifica delle serie torna esposta al difetto che il monouso era nato per chiudere (un round che conta più volte). Sulle rotte del gioco non c'è un 500 a dirlo, solo righe nel log, e i punteggi del giorno non si salvano. Per questo la migrazione va applicata prima del merge (`DEPLOY.md`).
 
 ### Il tempo, deciso dal server
 
-Un round **con il timer** dura `ROUND_TIME_S` (10 secondi) più `ROUND_TOLERANCE_S` (2, per la rete), e lo applica `round_timing()` guardando `iat`. Una risposta oltre il limite è un errore (`late`), e un `timeout` che arriva prima dei 10 secondi non vale (`timeout_too_early`). Il controllo del tempo c'è solo in Chi è maggiore (serie e sfida), e `t` nel token lo rende disattivabile: **senza timer è allenamento, non va in classifica e il punteggio della sfida non entra in `daily_scores`** (la risposta porta `training_session`). Ordina, la mappa e i due giochi indovina non hanno timer.
+Un round **con il timer** dura `ROUND_TIME_S` (10 secondi) più `ROUND_TOLERANCE_S` (2, per la rete), e lo applica `round_timing()` guardando `iat`. Una risposta oltre il limite è un errore (`late`), e un `timeout` che arriva prima dei 10 secondi non vale (`timeout_too_early`). Il controllo del tempo c'è solo in Chi è maggiore (serie e sfida), e `t` nel token lo rende disattivabile: **senza timer è allenamento, non va in classifica e il punteggio della sfida non entra in `daily_scores`** (la risposta porta `training_session`). Ordina, la mappa e i due giochi indovina non hanno un controllo del tempo (il token di una serie di Ordina porta comunque `t`, e il cancello della classifica lo legge).
 
 La **plausibilità** (`is_plausible`) è un controllo sulla sessione intera: `r` round non possono essere durati meno di `r * MIN_ROUND_TIME_S` (1,5 secondi) dalla prima apertura. Si applica a chi invia il punteggio in classifica e al punteggio della mappa che finisce nell'account: una sessione troppo veloce resta giocabile ma non conta. Nella classifica il rifiuto si chiama `score_missing`, un nome che non dice cosa è successo: chi legge i log lo interpreta come "non plausibile".
 
@@ -125,8 +125,7 @@ Il limite è a finestra fissa, per processo (`views._rate_limit_ok`, appoggiato 
 
 | Dove | Limite |
 | --- | --- |
-| risposte di Chi è maggiore (serie e sfida), Ordina, mappa | 120 al minuto per IP (`_ip_answer_limited`) e `_SID_ANSWERS_PER_MIN` (45) al minuto per sessione firmata (`_answer_rate_limited`) |
-| apertura di sessione di Ordina e della mappa | 120 al minuto per IP |
+| le risposte di Chi è maggiore (serie e sfida, `next` compreso), di Ordina e della mappa, più l'apertura di sessione di Ordina e della mappa | **un solo secchio** da 120 al minuto per IP (`_ip_answer_limited`), condiviso da tutte queste rotte. Per le risposte c'è in più `_SID_ANSWERS_PER_MIN` (45) al minuto per sessione firmata (`_answer_rate_limited`) |
 | Indovina la Provincia (`daily` e `guess`) | 60 al minuto per IP (`_provincia_rate_limited`) |
 | invio alla classifica | 5 al minuto per IP |
 | `POST /api/events` (log) | 30 al minuto per IP |
@@ -239,7 +238,8 @@ Idee valutate e **non** fatte, con il motivo, perché qualcuno le riproporrà:
 Cose vere oggi che non sono state corrette. Non sono un elenco di impegni.
 
 - **Il limite di frequenza e `token_superato` sono per processo.** Con più istanze Cloud Run il limite è più lasco di quanto sembri. È un freno, non un muro.
-- **Il fallimento aperto di `claim_round`** (sopra): chi guasta il database, o ha dimenticato la migrazione, spegne il monouso senza un 500.
+- **Il fallimento aperto di `claim_round`** (sopra): con la migrazione `0010` mancante il monouso è spento senza un 500 a dirlo, e la classifica delle serie perde la sua difesa.
+- **L'esportazione e la cancellazione dell'account non conoscono `daily_scores`.** `app/account.py` (`export_data`, `delete_account`) tratta `daily_results`, `player_stats`, `achievements`, `scores` e il resto, ma non la tabella dei punteggi delle sfide del giorno, che porta `auth_id`. Chi cancella l'account lascia lì le sue righe e l'esportazione non le include. È un buco di tutela dei dati che va chiuso nel codice dell'account, e `docs/ACCOUNT.md` è da aggiornare insieme.
 - **Indovina la Regione non ha stato di sessione** (sopra): non farci poggiare nessuna classifica.
 - **Il testo del traguardo `all_rounder`** in `app/achievements.py` dice ancora "tutti e tre i giochi" mentre i giochi sono cinque, e il suo criterio guarda solo tre aggregati (`compare`, `order`, `daily`). È un difetto di testo, non di logica.
 - **`app/templates/game_provincia.html`** ha la riga di attribuzione dei confini scritta a mano (senza "semplificati e riproiettati") e non ha la frase sulla Sardegna: le due cose vivono composte solo nella pagina della mappa. Andrebbero allineate.
