@@ -241,7 +241,7 @@ class CicloSulPoolTest(unittest.TestCase):
                 esatto = [{**r, "guessed_position": i + 1} for i, r in enumerate(giusto)]
                 for caso, mosse in (("errore", rovesciato), ("perfetto", esatto)):
                     totali += 1
-                    fatto = game_facts.fatto_ordina(livello, indicatore, mosse, giusto)
+                    fatto = game_facts.order_fact(livello, indicatore, mosse, giusto)
                     if fatto is not None:
                         prodotte += 1
                         _controlla_frase(self, fatto, f"ordina {ind['id']} {livello} {caso}")
@@ -273,7 +273,7 @@ class CicloSulPoolTest(unittest.TestCase):
 
                 for errore in (None, 0, 2):
                     totali += 1
-                    fatto = game_facts.fatto_compare(livello, coppie, errore, valuta)
+                    fatto = game_facts.compare_fact(livello, coppie, errore, valuta)
                     if fatto is not None:
                         prodotte += 1
                         _controlla_frase(self, fatto["fact"], f"compare {ind['id']} {livello} {errore}")
@@ -288,7 +288,7 @@ class CicloSulPoolTest(unittest.TestCase):
             for livello in LIVELLI:
                 contesto = f"{giorno} {livello}"
                 coppie = game_daily.daily_compare(giorno, livello)["pairs"]
-                fatto = game_facts.fatto_compare(
+                fatto = game_facts.compare_fact(
                     livello, coppie, 0, lambda c, s, livello=livello: game_compare._evaluate(c, livello, s))
                 if fatto is not None:
                     _controlla_frase(self, fatto["fact"], f"compare {contesto}")
@@ -299,7 +299,7 @@ class CicloSulPoolTest(unittest.TestCase):
                 mosse = [{"region": t["name"], "region_key": t["key"], "value": valori[t["key"]],
                           "guessed_position": i + 1} for i, t in enumerate(puzzle["territories"])]
                 giusto = sorted(mosse, key=lambda r: -r["value"])
-                fatto = game_facts.fatto_ordina(livello, puzzle["indicator"], mosse, giusto)
+                fatto = game_facts.order_fact(livello, puzzle["indicator"], mosse, giusto)
                 if fatto is not None:
                     _controlla_frase(self, fatto, f"ordina {contesto}")
 

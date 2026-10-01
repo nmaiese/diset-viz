@@ -356,7 +356,7 @@ def answer(data, now=None):
     if outcome["correct"]:
         correct_count += 1
     # La prima coppia sbagliata resta nel token, per il fatto di fine partita.
-    first_error = game_facts.errore_firmato(
+    first_error = game_facts.signed_error(
         state.get(SCORE_KEY) or {}, day.isoformat(), index, outcome, data.get("choice")
     )
     state = {**state, SCORE_KEY: {"d": day.isoformat(), "c": correct_count, "l": level, **first_error}}
@@ -390,7 +390,7 @@ def answer(data, now=None):
             "next_puzzle_at": game_daily.next_challenge_rome(day),
             "score": {"correct": correct_count, "total": PAIRS},
         }
-        fact = game_facts.fatto_compare(
+        fact = game_facts.compare_fact(
             level, _challenge(day, level)["pairs"], state[SCORE_KEY].get("e"),
             lambda pair, choice: _evaluate(pair, level, choice),
         )

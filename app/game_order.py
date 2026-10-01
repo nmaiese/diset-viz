@@ -162,7 +162,7 @@ def evaluate_daily_order_answer(payload, auth_user=None):
     result["session"] = quiz_tokens.session_summary(session)
     result["token"] = token_out
     # Il fatto da portarsi via (app/game_facts.py): manca se una regola non regge.
-    fact = game_facts.fatto_ordina(level, ind, result["positions"], result["correct_order"])
+    fact = game_facts.order_fact(level, ind, result["positions"], result["correct_order"])
     if fact:
         result["fact"] = fact
     if auth_user:

@@ -13,7 +13,7 @@ a fine partita:
 
 Se una regola qui sotto non e' soddisfatta il campo **manca**: meglio nessuna
 frase che una falsa. Una frase sola, al massimo 260 caratteri, un solo punto
-finale, mai `;`, trattini lunghi, puntini o "n.d." (`valida`: se la guardia
+finale, mai `;`, trattini lunghi, puntini o "n.d." (`validate`: se la guardia
 finale fallisce si torna a None, mai si tronca).
 
 **Da dove parte la frase.** Dall'errore del giocatore se ne ha fatto uno
@@ -74,281 +74,281 @@ from app.seo_titles import ARTICLED_PROVINCES, of_region
 MAX_LEN = 260
 # Il rapporto "volte" si dice solo da qui in su, e solo se il valore piu' piccolo
 # non e' trascurabile rispetto ai valori in gioco.
-SOGLIA_VOLTE = 1.5
-SOGLIA_PICCOLO = 0.05
-ULTIME = 5
-VIETATI = ("—", "–", ";", "…", "n.d.")
-_PUNTO_NON_FINALE = re.compile(r"\.(?!\d)(?!$)")
+TIMES_THRESHOLD = 1.5
+SMALL_THRESHOLD = 0.05
+LAST_N = 5
+FORBIDDEN = ("—", "–", ";", "…", "n.d.")
+_NON_FINAL_DOT = re.compile(r"\.(?!\d)(?!$)")
 
 
-def valida(testo):
+def validate(text):
     """La frase se rispetta la guardia finale, altrimenti None. Mai troncare: una
     frase tagliata e' una frase falsa. "Un solo punto finale" non vuol dire un solo
     carattere `.`: "1.234" e "ogni 1.000 abitanti" ne contengono, e restano buoni."""
-    if not isinstance(testo, str) or not testo or len(testo) > MAX_LEN:
+    if not isinstance(text, str) or not text or len(text) > MAX_LEN:
         return None
-    if not testo.endswith(".") or _PUNTO_NON_FINALE.search(testo):
+    if not text.endswith(".") or _NON_FINAL_DOT.search(text):
         return None
-    if any(v in testo for v in VIETATI) or re.search(r"\bnan\b", testo, re.IGNORECASE):
+    if any(v in text for v in FORBIDDEN) or re.search(r"\bnan\b", text, re.IGNORECASE):
         return None
-    return testo
+    return text
 
 
 # I nomi dei territori
 
-def nome_con_articolo(nome, livello):
+def name_with_article(name, level):
     """"la Lombardia", "il Lazio", "l'Umbria", "le Marche" per le regioni, "il Sud
     Sardegna" per le due province che lo vogliono, il nome nudo per tutte le altre
     ("Trieste", "La Spezia"). Il genere delle regioni sta in `seo_titles.of_region`
     (il Piemonte, il Molise): si deriva da la', e un nome che non e' una delle venti
     regioni resta nudo, perche' l'articolo non si indovina."""
-    if livello == "regioni":
-        if nome not in REGION_ORDER:
-            return nome
-        di = of_region(nome)
-        for forma, articolo in (("della ", "la "), ("del ", "il "), ("delle ", "le "), ("dell'", "l'")):
-            if di.startswith(forma):
-                return articolo + di[len(forma):]
-        return nome
-    return f"il {nome}" if nome in ARTICLED_PROVINCES else nome
+    if level == "regioni":
+        if name not in REGION_ORDER:
+            return name
+        of_name = of_region(name)
+        for form, article in (("della ", "la "), ("del ", "il "), ("delle ", "le "), ("dell'", "l'")):
+            if of_name.startswith(form):
+                return article + of_name[len(form):]
+        return name
+    return f"il {name}" if name in ARTICLED_PROVINCES else name
 
 
 # Cifre e unita'
 
-def _testo_cifra(valore, extra=0):
-    return numfmt.text(valore, numfmt.magnitude_decimals(valore) + extra)
+def _figure_text(value, extra=0):
+    return numfmt.text(value, numfmt.magnitude_decimals(value) + extra)
 
 
-def unita_scritta(unita):
+def written_unit(unit):
     """L'unita' da scrivere dopo la cifra, o None se non ce n'e' una onesta. La regola
     del sito (`numfmt.phrase_unit`) e' la prima; se rinuncia solo perche' l'etichetta
     e' lunga ("metri quadrati per abitante") la frase la scrive per intero. Una coda
     dopo la virgola ("ogni 10.000 abitanti, tasso standardizzato") si lascia cadere:
     la base resta vera. Un'etichetta generica non e' un'unita': senza, la frase non
     esce."""
-    scritta = numfmt.phrase_unit(unita)
-    if scritta:
-        return scritta
-    grezza = numfmt.lower_first((unita or "").strip())
-    testa, _, coda = grezza.partition(",")
-    if coda and testa.startswith(("ogni ", "per ")):
-        grezza = testa
-    if not grezza or grezza in numfmt.GENERIC_UNITS or "," in grezza or len(grezza) > 40:
+    written = numfmt.phrase_unit(unit)
+    if written:
+        return written
+    raw = numfmt.lower_first((unit or "").strip())
+    head, _, tail = raw.partition(",")
+    if tail and head.startswith(("ogni ", "per ")):
+        raw = head
+    if not raw or raw in numfmt.GENERIC_UNITS or "," in raw or len(raw) > 40:
         return None
-    return grezza
+    return raw
 
 
-def _con_unita(testo, unita):
-    return testo + ("%" if unita == "%" else numfmt.THIN + unita)
+def _with_unit(text, unit):
+    return text + ("%" if unit == "%" else numfmt.THIN + unit)
 
 
-def _cifre_distinte(va, vb):
+def _distinct_figures(va, vb):
     """I testi di due valori diversi, con un decimale in piu' (fino a due) se
     arrotondati sarebbero uguali: "12,3 e 12,3" non dice niente. None se non si
     distinguono."""
     for extra in (0, 1, 2):
-        ta, tb = _testo_cifra(va, extra), _testo_cifra(vb, extra)
+        ta, tb = _figure_text(va, extra), _figure_text(vb, extra)
         if ta != tb:
             return ta, tb
     return None
 
 
-def relazione(unita, nome, valori, va, vb):
+def relation(unit, name, values, va, vb):
     """La relazione fra i due valori, o "" se non ce n'e' una dicibile.
 
     Percentuale (e punti percentuali): lo scarto in punti, mai "volte". Altrimenti
     il rapporto, solo con valori in gioco tutti positivi, rapporto grezzo almeno
     1,5, il piu' piccolo almeno il 5% della mediana dei valori in gioco, e mai su un
     saldo. Il rapporto si decide sul valore grezzo: 1,49 non diventa "1,5 volte"."""
-    alto, basso = max(va, vb), min(va, vb)
-    scritta = numfmt.phrase_unit(unita)
-    if scritta in ("%", numfmt.POINTS):
-        scarto = numfmt.text(alto - basso)
-        return f", uno scarto di {scarto} punti percentuali" if re.search(r"[1-9]", scarto) else ""
-    if "saldo" in (nome or "").lower():
+    high, low = max(va, vb), min(va, vb)
+    written = numfmt.phrase_unit(unit)
+    if written in ("%", numfmt.POINTS):
+        gap = numfmt.text(high - low)
+        return f", uno scarto di {gap} punti percentuali" if re.search(r"[1-9]", gap) else ""
+    if "saldo" in (name or "").lower():
         return ""
-    if not valori or min(valori) <= 0 or basso <= 0:
+    if not values or min(values) <= 0 or low <= 0:
         return ""
-    if basso < SOGLIA_PICCOLO * statistics.median(valori):
+    if low < SMALL_THRESHOLD * statistics.median(values):
         return ""
-    rapporto = alto / basso
-    if rapporto < SOGLIA_VOLTE:
+    ratio = high / low
+    if ratio < TIMES_THRESHOLD:
         return ""
-    return f", un rapporto di {numfmt.text(rapporto, 1)} volte"
+    return f", un rapporto di {numfmt.text(ratio, 1)} volte"
 
 
 # Il piazzamento
 
-def direzione(ind_id, ambito):
+def direction(ind_id, scope):
     """"higher_better", "lower_better" o None (non si giudica). `higher_worse`
     ordina come `lower_better`. Mai l'euristica sul nome (`direction_for`): una
     direzione indovinata darebbe un piazzamento falso."""
-    if ambito == "province":
+    if scope == "province":
         info = bes_data.get_bes_manifest("provincia").get(game_daily.provincial_id(ind_id))
-        grezza = (info or {}).get("direction")
+        raw = (info or {}).get("direction")
     elif ind_id.startswith("bes:"):
         info = bes_data.get_bes_manifest("regione").get(ind_id[len("bes:"):])
-        grezza = (info or {}).get("direction")
+        raw = (info or {}).get("direction")
     else:
-        grezza = CURATED_DIRECTION.get(ind_id.split(":", 1)[-1])
-    if grezza == "higher_better":
+        raw = CURATED_DIRECTION.get(ind_id.split(":", 1)[-1])
+    if raw == "higher_better":
         return "higher_better"
-    if grezza in ("lower_better", "higher_worse"):
+    if raw in ("lower_better", "higher_worse"):
         return "lower_better"
     return None
 
 
-def campionario(ind_id, ambito):
+def is_sample_survey(ind_id, scope):
     """BES e Multiscopo sono indagini campionarie, e il livello provinciale e' tutto
     BES: il numero esatto della posizione non regge, la fascia si'."""
-    return ambito == "province" or ind_id.startswith(("bes:", "multiscopo:"))
+    return scope == "province" or ind_id.startswith(("bes:", "multiscopo:"))
 
 
-def piazzamento_da_valori(valori, chiave, direz, e_campionario, ambito, attesi):
+def placement_from_values(values, key, rank_direction, is_sample, scope, expected):
     """"18ª su 20", "fra le ultime cinque" o None, sui valori di TUTTI i territori
     dello stesso anno. None senza direzione, senza copertura completa (`attesi`
     territori, tutti con un valore) o per un territorio che non c'e'. A pari merito,
     come `profiles._ranks` e `province_profile._graduatoria`: due valori uguali
     hanno la stessa posizione."""
-    if direz is None or chiave not in valori or len(valori) != attesi:
+    if rank_direction is None or key not in values or len(values) != expected:
         return None
-    if any(v is None for v in valori.values()):
+    if any(v is None for v in values.values()):
         return None
-    if ambito == "regioni":
-        graduatoria = profiles._ranks(valori, direz)
+    if scope == "regioni":
+        ranking = profiles._ranks(values, rank_direction)
     else:
-        graduatoria = province_profile._graduatoria(valori, direz)
-    posto, totale = graduatoria[chiave], len(valori)
-    if e_campionario:
-        return "fra le ultime cinque" if posto >= totale - ULTIME + 1 else None
-    return f"{posto}ª su {totale}"
+        ranking = province_profile._graduatoria(values, rank_direction)
+    place, total = ranking[key], len(values)
+    if is_sample:
+        return "fra le ultime cinque" if place >= total - LAST_N + 1 else None
+    return f"{place}ª su {total}"
 
 
-def piazzamento(livello, indicatore, chiave):
+def placement(level, indicator, key):
     """Il piazzamento di un territorio per l'indicatore del gioco, dai dati veri.
     Si legge dalla stessa funzione che ha composto la sfida e solo se l'anno e'
     quello del gioco."""
-    ambito = "regioni" if livello == "regioni" else "province"
-    ind_id = indicatore["id"]
-    dato = game_daily._indicator_rows({"id": ind_id}, ambito)
-    if dato is None or dato[0] != indicatore["year"]:
+    scope = "regioni" if level == "regioni" else "province"
+    ind_id = indicator["id"]
+    found = game_daily._indicator_rows({"id": ind_id}, scope)
+    if found is None or found[0] != indicator["year"]:
         return None
-    attesi = len(REGION_ORDER) if ambito == "regioni" else len(game_daily.province_pool())
-    valori = {r["key"]: r["value"] for r in dato[1]}
-    return piazzamento_da_valori(
-        valori, chiave, direzione(ind_id, ambito), campionario(ind_id, ambito), ambito, attesi,
+    expected = len(REGION_ORDER) if scope == "regioni" else len(game_daily.province_pool())
+    values = {r["key"]: r["value"] for r in found[1]}
+    return placement_from_values(
+        values, key, direction(ind_id, scope), is_sample_survey(ind_id, scope), scope, expected,
     )
 
 
 # La frase
 
-TESTE = {
+LEAD_INS = {
     "errore": "Hai messo {a} sopra {b}: ",
     "distante": "La coppia più distante: ",
     "perfetto": "Tutto al posto giusto, con la distanza maggiore fra il primo e l'ultimo: ",
 }
 
 
-def frase(livello, indicatore, caso, a, b, valori):
+def sentence(level, indicator, case, a, b, values):
     """La frase di un caso ("errore", "distante" o "perfetto") o None. `a` e `b` sono
     `{"name", "key", "value"}`, `valori` tutti i valori in gioco (per il rapporto).
     La relazione e' la prima cosa che salta se la frase sfora la lunghezza."""
-    unita = unita_scritta(indicatore.get("unit"))
-    if not unita or a.get("value") is None or b.get("value") is None:
+    unit = written_unit(indicator.get("unit"))
+    if not unit or a.get("value") is None or b.get("value") is None:
         return None
     if a["value"] == b["value"]:
         return None
-    testi = _cifre_distinte(a["value"], b["value"])
-    if testi is None:
+    texts = _distinct_figures(a["value"], b["value"])
+    if texts is None:
         return None
-    nome_a = nome_con_articolo(a["name"], livello)
-    nome_b = nome_con_articolo(b["name"], livello)
-    nome = numfmt.lower_first(indicatore["name"])
-    luogo = piazzamento(livello, indicatore, a["key"])
-    posto = f" ({luogo})" if luogo else ""
-    testa = TESTE[caso].format(a=nome_a, b=nome_b)
-    for con_relazione in (True, False):
-        rel = relazione(indicatore["unit"], indicatore["name"], valori, a["value"], b["value"]) if con_relazione else ""
-        testo = (f"{testa}per «{nome}» ({indicatore['year']}) {nome_a} ha {_con_unita(testi[0], unita)}{posto}, "
-                 f"{nome_b} ha {_con_unita(testi[1], unita)}{rel}.")
-        if valida(testo):
-            return testo
+    name_a = name_with_article(a["name"], level)
+    name_b = name_with_article(b["name"], level)
+    name = numfmt.lower_first(indicator["name"])
+    placement_text = placement(level, indicator, a["key"])
+    place = f" ({placement_text})" if placement_text else ""
+    head = LEAD_INS[case].format(a=name_a, b=name_b)
+    for with_relation in (True, False):
+        relation_text = relation(indicator["unit"], indicator["name"], values, a["value"], b["value"]) if with_relation else ""
+        text = (f"{head}per «{name}» ({indicator['year']}) {name_a} ha {_with_unit(texts[0], unit)}{place}, "
+                f"{name_b} ha {_with_unit(texts[1], unit)}{relation_text}.")
+        if validate(text):
+            return text
     return None
 
 
-def _riga(r):
+def _row(r):
     return {"name": r["region"], "key": r["region_key"], "value": r["value"]}
 
 
 # Ordina le regioni
 
-def fatto_ordina(livello, indicatore, positions, correct_order):
+def order_fact(level, indicator, positions, correct_order):
     """Il fatto di fine partita di Ordina, o None. `indicatore` e' quello del gioco
     (`id`, `name`, `unit`, `year`), `positions` le righe nell'ordine del giocatore
     (con `value`) e `correct_order` quelle nell'ordine giusto."""
     if not isinstance(positions, list) or not isinstance(correct_order, list) or len(positions) < 2:
         return None
-    mosse = sorted(positions, key=lambda r: r.get("guessed_position", 0))
-    valori = [r["value"] for r in mosse]
-    if any(v is None for v in valori):
+    moves = sorted(positions, key=lambda r: r.get("guessed_position", 0))
+    values = [r["value"] for r in moves]
+    if any(v is None for v in values):
         return None
-    for sopra, sotto in zip(mosse, mosse[1:]):
-        if sopra["value"] < sotto["value"]:
-            return frase(livello, indicatore, "errore", _riga(sopra), _riga(sotto), valori)
+    for above, below in zip(moves, moves[1:]):
+        if above["value"] < below["value"]:
+            return sentence(level, indicator, "errore", _row(above), _row(below), values)
     if len(correct_order) < 2:
         return None
-    return frase(livello, indicatore, "perfetto", _riga(correct_order[0]), _riga(correct_order[-1]), valori)
+    return sentence(level, indicator, "perfetto", _row(correct_order[0]), _row(correct_order[-1]), values)
 
 
 # Chi e' maggiore?
 
-def errore_firmato(precedente, giorno, indice, esito, scelta):
+def signed_error(previous, day, index, outcome, choice):
     """Il pezzo di `sfida` che il token firma per ricordare la PRIMA coppia sbagliata:
     `{"e": indice}`, o niente. `precedente` e' il `sfida` del token prima di questa
     risposta. Vale solo per il giorno di oggi, e solo con una scelta vera: un tempo
     scaduto non dice quale lato il giocatore aveva in mente."""
-    if precedente.get("d") == giorno and isinstance(precedente.get("e"), int):
-        return {"e": precedente["e"]}
-    if not esito["correct"] and scelta in ("region_a", "region_b"):
-        return {"e": indice}
+    if previous.get("d") == day and isinstance(previous.get("e"), int):
+        return {"e": previous["e"]}
+    if not outcome["correct"] and choice in ("region_a", "region_b"):
+        return {"e": index}
     return {}
 
 
-def _riga_compare(t):
+def _compare_row(t):
     return {"name": t["name"], "key": t["key"], "value": t["value"]}
 
 
-def fatto_compare(livello, coppie, indice_errore, valuta):
+def compare_fact(level, pairs, error_index, evaluate):
     """`{"fact", "path"}` di fine partita di Chi e' maggiore, o None. `coppie` sono le
     dieci della sfida, `indice_errore` il `sfida.e` del token e `valuta(coppia,
     "region_a")` i valori veri della coppia (gli stessi `_evaluate` della risposta). Con
     un errore la frase parte da li' ("Hai messo A sopra B": A e' il piu' basso, e'
     quello che il giocatore ha scelto), senza la coppia piu' distante per scarto
     relativo."""
-    if isinstance(indice_errore, int) and 0 <= indice_errore < len(coppie):
-        esito = valuta(coppie[indice_errore], "region_a")
-        if esito is not None:
-            alto, basso = sorted((esito["a"], esito["b"]), key=lambda t: t["value"], reverse=True)
-            testo = frase(livello, coppie[indice_errore]["indicator"], "errore",
-                          _riga_compare(basso), _riga_compare(alto), [alto["value"], basso["value"]])
-            if testo:
-                return {"fact": testo, "path": esito["indicator"].get("path")}
-    migliore = None
-    for coppia in coppie:
-        esito = valuta(coppia, "region_a")
-        if esito is None:
+    if isinstance(error_index, int) and 0 <= error_index < len(pairs):
+        outcome = evaluate(pairs[error_index], "region_a")
+        if outcome is not None:
+            high, low = sorted((outcome["a"], outcome["b"]), key=lambda t: t["value"], reverse=True)
+            text = sentence(level, pairs[error_index]["indicator"], "errore",
+                            _compare_row(low), _compare_row(high), [high["value"], low["value"]])
+            if text:
+                return {"fact": text, "path": outcome["indicator"].get("path")}
+    best = None
+    for pair in pairs:
+        outcome = evaluate(pair, "region_a")
+        if outcome is None:
             continue
-        alto, basso = sorted((esito["a"], esito["b"]), key=lambda t: t["value"], reverse=True)
-        massimo = max(abs(alto["value"]), abs(basso["value"]))
-        if massimo == 0:
+        high, low = sorted((outcome["a"], outcome["b"]), key=lambda t: t["value"], reverse=True)
+        maximum = max(abs(high["value"]), abs(low["value"]))
+        if maximum == 0:
             continue
-        scarto = (alto["value"] - basso["value"]) / massimo
-        if migliore is not None and scarto <= migliore[0]:
+        gap = (high["value"] - low["value"]) / maximum
+        if best is not None and gap <= best[0]:
             continue
-        testo = frase(livello, coppia["indicator"], "distante", _riga_compare(alto), _riga_compare(basso),
-                      [alto["value"], basso["value"]])
-        if testo:
-            migliore = (scarto, testo, esito["indicator"].get("path"))
-    if migliore is None:
+        text = sentence(level, pair["indicator"], "distante", _compare_row(high), _compare_row(low),
+                        [high["value"], low["value"]])
+        if text:
+            best = (gap, text, outcome["indicator"].get("path"))
+    if best is None:
         return None
-    return {"fact": migliore[1], "path": migliore[2]}
+    return {"fact": best[1], "path": best[2]}
