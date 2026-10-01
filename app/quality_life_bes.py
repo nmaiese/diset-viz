@@ -52,11 +52,7 @@ from app.bes_data import (
     get_bes_territories,
     has_bes_data,
 )
-from app.external_atlas import (
-    external_regional_scoreables,
-    get_external_atlas_indicator,
-    has_external_data,
-)
+from app.external_atlas import get_external_atlas_indicator, has_external_data
 from app.multiscopo_data import (
     get_multiscopo_manifest,
     get_multiscopo_rows,
@@ -71,6 +67,7 @@ from app.quality_life_selection import (
     MULTI_PREFIX,
     REGIONAL_EUR_MIN_YEAR,
     _normalise_name,
+    external_regional_score_gate,
     provincial_external_selection,
     regional_quality_life_selection,
 )
@@ -296,7 +293,7 @@ def _matrix_and_meta(level):
                 }
 
         if has_external_data():
-            scoreables = external_regional_scoreables()
+            scoreables = external_regional_score_gate()
             # Every external family, resolved from the registry: the family is
             # what the methodology prints as the source of each indicator, and
             # a hardcoded "eurostat" here published Istat demographic series

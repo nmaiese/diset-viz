@@ -50,5 +50,52 @@ class ProvincialExternalSelection(unittest.TestCase):
         self.assertEqual(self._select(items), ["agcom:Copertura FTTH"])
 
 
+
+def _level_row(public_id, scoreable, *, direction="lower_better", category="reddito_accessibilita"):
+    return {
+        "target_indicator_id": public_id, "territory_level": "regione", "name": f"Serie {public_id}",
+        "quality_life_category": category, "direction": direction, "scoreable": scoreable,
+        "year_max": "2025", "coverage_latest": "1",
+    }
+
+
+class ExternalRegionalScoreGate(unittest.TestCase):
+    """Il manifesto dei livelli decide dove ha una riga regionale; senza riga
+    vale ancora score_eligible delle righe normalizzate."""
+
+    NORMALIZED = {"eur:da_normalizzato": {"name": "Da normalizzato", "category": "salute_cura",
+                                          "direction": "higher_better", "coverage": 1.0,
+                                          "year_max": 2024}}
+
+    def _gate(self, levels):
+        with patch.object(qls, "external_regional_scoreables", return_value=dict(self.NORMALIZED)), \
+             patch.object(qls.external_data, "get_external_levels", return_value=levels):
+            return qls.external_regional_score_gate()
+
+    def test_riga_dei_livelli_scoreable_entra(self):
+        gate = self._gate([_level_row("eur:acceso", "true")])
+        self.assertEqual(gate["eur:acceso"]["direction"], "lower_better")
+        self.assertEqual(gate["eur:acceso"]["year_max"], 2025)
+
+    def test_riga_dei_livelli_spenta_vince_sul_normalizzato(self):
+        gate = self._gate([_level_row("eur:da_normalizzato", "false")])
+        self.assertNotIn("eur:da_normalizzato", gate)
+
+    def test_senza_riga_dei_livelli_vale_il_normalizzato(self):
+        gate = self._gate([])
+        self.assertIn("eur:da_normalizzato", gate)
+
+    def test_verso_descrittivo_o_categoria_vuota_restano_fuori(self):
+        gate = self._gate([_level_row("eur:a", "true", direction="contextual"),
+                           _level_row("eur:b", "true", category="")])
+        self.assertNotIn("eur:a", gate)
+        self.assertNotIn("eur:b", gate)
+
+    def test_le_righe_provinciali_e_le_famiglie_non_esterne_non_contano(self):
+        provincial = {**_level_row("ipr:x", "true"), "territory_level": "provincia"}
+        gate = self._gate([provincial, _level_row("bes:01SAL001", "true")])
+        self.assertNotIn("ipr:x", gate)
+        self.assertNotIn("bes:01SAL001", gate)
+
 if __name__ == "__main__":
     unittest.main()

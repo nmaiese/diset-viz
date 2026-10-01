@@ -148,6 +148,27 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertGreater(ranking["methodology"]["source_counts"]["bes"], 0)
         self.assertGreater(ranking["methodology"]["source_counts"]["territorial"], 0)
 
+    def test_reviewed_eurostat_candidates_are_in_the_regional_score(self):
+        """Decisione del 2/10/2026 (passo 7): casa non riscaldata e scienziati e
+        ingegneri entrano nel punteggio regionale, accesi da `scoreable` nel
+        manifesto dei livelli. Le serie Istat di demografia restano tre."""
+        matrix, meta = qb._matrix_and_meta("regione")
+        for public_id in ("eur:ilc_mdes01_r", "eur:hrst_st_rcat"):
+            self.assertIn(public_id, matrix)
+            self.assertEqual(len(matrix[public_id]), 20)
+            self.assertEqual(meta[public_id]["source_family"], "eurostat")
+        counts = qb.build_bes_ranking("regione", "standard")["methodology"]["source_counts"]
+        self.assertEqual(counts["eurostat"], 4)
+        self.assertEqual(counts["istat_demografia"], 3)
+
+    def test_rejected_candidates_stay_descriptive(self):
+        """La disoccupazione provinciale resta fuori (ridondante con la mancata
+        partecipazione al lavoro del BES), e cosi' i Multiscopo del bus."""
+        matrix, _ = qb._matrix_and_meta("provincia")
+        self.assertNotIn("ipr:tasso-di-disoccupazione", matrix)
+        regional, _ = qb._matrix_and_meta("regione")
+        self.assertFalse([i for i in regional if i.startswith("multiscopo:MULTI_BUS_")])
+
     def test_no_phenomenon_enters_the_score_twice_under_two_families(self):
         """The methodology promises exact name duplicates are counted once. The
         universe is federated, so the guarantee has to hold across every family,
@@ -226,7 +247,7 @@ class QualityLifeStaticTest(unittest.TestCase):
                 with mock.patch.object(qb, "regional_quality_life_selection",
                                        return_value={public_id: "reddito_accessibilita"}), \
                      mock.patch.object(qb, "has_external_data", return_value=True), \
-                     mock.patch.object(qb, "external_regional_scoreables", return_value={public_id: info}), \
+                     mock.patch.object(qb, "external_regional_score_gate", return_value={public_id: info}), \
                      mock.patch.object(qb, "get_external_atlas_indicator", return_value=payload):
                     matrix, meta = qb._matrix_and_meta.uncached("regione")
                 self.assertIn(public_id, matrix)
