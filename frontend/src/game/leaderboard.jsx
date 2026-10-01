@@ -72,7 +72,7 @@ export default function LeaderboardApp() {
       .catch(() => setError(true));
   }, [mode, period]);
 
-  const periodLabel = period === "week" ? "ultimi 7 giorni" : "tutti i tempi";
+  const periodLabel = period === "week" ? "degli ultimi 7 giorni" : "di tutti i tempi";
 
   return (
     <div className="qz-page qz-page--lb">
@@ -104,7 +104,7 @@ export default function LeaderboardApp() {
         </div>
 
         <div aria-live="polite">
-          {error && <p className="game-error">Impossibile caricare la classifica. Riprova.</p>}
+          {error && <p className="game-error">Non è stato possibile caricare la classifica. Riprova.</p>}
 
           {!error && entries === null && (
             <div className="skel-bars" aria-hidden="true" style={{ marginTop: 16 }}>
@@ -160,7 +160,7 @@ export default function LeaderboardApp() {
         <div className="qz-side-card">
           <p className="eb">Periodo</p>
           <p className="qz-side-body">
-            Stai vedendo i punteggi dei <strong>{periodLabel}</strong>. La finestra settimanale scorre sugli
+            Stai vedendo i punteggi <strong>{periodLabel}</strong>. La finestra settimanale scorre sugli
             ultimi sette giorni. I record personali restano salvati sul tuo dispositivo.
           </p>
         </div>

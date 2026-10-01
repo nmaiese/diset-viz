@@ -87,9 +87,15 @@ export function linkConSfida(url, punteggio, numero) {
 }
 
 // Il riquadro in cima all'isola. Non attributivo: il punteggio non e' firmato.
-export function testoSfida(punteggio, massimo) {
-  return `La sfida condivisa: ${punteggio} su ${massimo}. Riesci a superarla?`;
+// Dice di che gioco e' e che livello e timer possono essere diversi: il link non porta ne' l'uno
+// ne' l'altro (nel frammento viaggiano solo punteggio e numero, e non si cambia).
+export function testoSfida(punteggio, massimo, gioco) {
+  const dove = gioco ? ` in ${gioco}` : "";
+  return `La sfida condivisa${dove}: ${punteggio} su ${massimo}. Livello e timer possono essere diversi dai tuoi. Riesci a superarla?`;
 }
+
+// Il nome con cui un gioco a punteggio si dice dentro una frase.
+export const NOMI_GIOCO = { compare: "Chi è maggiore?", order: "Ordina le regioni", mappa: "Dov'è la provincia?" };
 
 // La riga di fine partita che mette a confronto il tuo punteggio con quello della sfida.
 export function testoConfrontoSfida(tuo, sfida) {

@@ -9,10 +9,12 @@ import {
   signInWithGoogle,
   signOut,
 } from "../shared/supabase.js";
+import { ERRORE_LIMITE, PARTITA_INTERROTTA } from "./testi.js";
 import {
   CHIAVE_TERRITORIO_MIO,
   DURATA_CONTEGGIO_MS,
   MASSIMI_SFIDA,
+  NOMI_GIOCO,
   countUpValue,
   fattoPresentabile,
   leggiSfida,
@@ -66,8 +68,22 @@ export async function postGame(url, body) {
     headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Request failed: ${url}`);
+  if (!res.ok) throw await erroreDiRichiesta(res, url);
   return res.json();
+}
+
+// L'errore di una risposta non riuscita, con lo stato HTTP e il nome dell'errore del server (`error`
+// nel corpo): e' cosi' che i giochi distinguono il 429 e il 503 dal resto. Mai un corpo che non e' JSON.
+async function erroreDiRichiesta(res, url) {
+  const errore = new Error(`Request failed: ${url}`);
+  errore.status = res.status;
+  try {
+    const dati = await res.json();
+    errore.code = dati && typeof dati.error === "string" ? dati.error : undefined;
+  } catch {
+    errore.code = undefined;
+  }
+  return errore;
 }
 
 // Controllo login/logout Google, minimale. Non compare affatto se Supabase non
@@ -119,7 +135,7 @@ export function AuthControl() {
 
 export async function fetchJson(url, options) {
   const response = await fetch(url, options);
-  if (!response.ok) throw new Error(`Request failed: ${url}`);
+  if (!response.ok) throw await erroreDiRichiesta(response, url);
   return response.json();
 }
 
@@ -415,9 +431,9 @@ function saveNickname(nickname) {
 const LEADERBOARD_ERROR_MESSAGES = {
   nickname_invalid: "Usa un nickname di 2-16 caratteri (lettere, numeri, spazi).",
   nickname_blocked: "Questo nickname non è ammesso, provane un altro.",
-  token_invalid: "La sessione di gioco non è più valida: gioca un nuovo round per aggiornarla.",
-  score_missing: "Rispondi almeno a un round prima di entrare in classifica.",
-  rate_limited: "Troppi invii in poco tempo, riprova tra un minuto.",
+  token_invalid: `${PARTITA_INTERROTTA} Gioca un nuovo round e riprova.`,
+  score_missing: "Questo punteggio non può entrare in classifica. Gioca una nuova serie e riprova.",
+  rate_limited: ERRORE_LIMITE,
 };
 
 // Modal di invio punteggio condiviso da "Chi è maggiore?" e "Ordina le
@@ -454,7 +470,7 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
       });
       const data = await response.json();
       if (!response.ok) {
-        setError(LEADERBOARD_ERROR_MESSAGES[data.error] || "Invio non riuscito, riprova.");
+        setError(LEADERBOARD_ERROR_MESSAGES[data.error] || "Non è andata a buon fine. Riprova.");
         setStatus("error");
         return;
       }
@@ -464,7 +480,7 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
       trackGameEvent("leaderboard_submit", { mode, score, game: mode });
       if (onSubmitted) onSubmitted(data);
     } catch {
-      setError("Invio non riuscito, riprova.");
+      setError("Non è andata a buon fine. Riprova.");
       setStatus("error");
     }
   }
@@ -535,18 +551,21 @@ export const FORME_RISULTATO = {
 export function formeRisultato(esiti) {
   const lista = Array.isArray(esiti) ? esiti : [];
   const valide = lista.map((esito) => FORME_RISULTATO[esito] || FORME_RISULTATO.miss);
+  // La legenda dice solo le forme che ci sono, una volta ciascuna: "● esatta, ○ sbagliata".
+  const presenti = [...new Set(valide)];
   return {
     glifi: valide.map((forma) => forma.glifo).join(" "),
     parole: valide.map((forma) => forma.parola).join(", "),
+    legenda: presenti.map((forma) => `${forma.glifo} ${forma.parola}`).join(", "),
   };
 }
 
 // Testo da condividere, senza spoiler: il numero della sfida, una riga di
 // forme, il link. Mai il nome della regione o il valore da indovinare.
 export function testoCondivisione({ gameName, puzzleNumber, esiti, summary, url }) {
-  const { glifi } = formeRisultato(esiti);
+  const { glifi, legenda } = formeRisultato(esiti);
   const titolo = puzzleNumber ? `Sfida Italia: ${gameName} n. ${puzzleNumber}` : `Sfida Italia: ${gameName}`;
-  return [titolo, summary, glifi, url].filter(Boolean).join("\n");
+  return [titolo, summary, glifi, legenda, url].filter(Boolean).join("\n");
 }
 
 // Condividi: il bottone che condivide il risultato e dice com'è andata.
@@ -608,7 +627,7 @@ export function Condividi({
       setEsito("Risultato copiato negli appunti.");
       trackGameEvent(eventName, { ...parametri, method: "clipboard" });
     } catch {
-      setEsito("Non sono riuscito a condividere il risultato. Copia il testo a mano.");
+      setEsito("Non è stato possibile condividere il risultato. Copia il testo a mano.");
     }
   }
 
@@ -675,7 +694,7 @@ export function SfidaCondivisa({ sfida, game, avviata }) {
   if (!sfida || avviata || !Number.isInteger(massimo)) return null;
   return (
     <aside className="qz-sfida" role="note" aria-label="Sfida condivisa">
-      <p>{testoSfida(sfida.punteggio, massimo)}</p>
+      <p>{testoSfida(sfida.punteggio, massimo, NOMI_GIOCO[game])}</p>
     </aside>
   );
 }
@@ -727,7 +746,7 @@ export function useCountUp(finale, durata = DURATA_CONTEGGIO_MS) {
   return valido ? valore : finale;
 }
 
-const PAROLA_TONO = { pieno: "Giusto. ", parziale: "Risultato parziale. ", nullo: "Sbagliato. " };
+const PAROLA_TONO = { pieno: "Giusto. ", parziale: "Parziale. ", nullo: "Sbagliato. " };
 
 // Il segno dell'esito: forma diversa per tono, mai il solo colore. ✓ per il pieno (si disegna),
 // ● neutro per il parziale, ✗ per il nullo. Il tratto si anima nel CSS, solo con `no-preference`.
