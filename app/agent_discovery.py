@@ -351,7 +351,7 @@ def atlas_markdown(featured, site_url):
     lines = [
         "# Atlante degli indicatori territoriali italiani",
         "",
-        "Cerca un indicatore, confronta le regioni e apri la scheda canonica per leggere definizione, fonte, andamento e download.",
+        "Cerca un indicatore, confronta le regioni e apri la pagina canonica dell'indicatore per leggere definizione, fonte, andamento e download.",
         "",
         f"- [Catalogo dati]({site_url}/catalogo-dati)",
         f"- [Metodologia]({site_url}/metodologia)",
@@ -376,7 +376,7 @@ def data_catalog_markdown(datasets, description, site_url):
         "",
         f"Metodologia: {site_url}/metodologia",
         "",
-        f"## Dataset disponibili ({len(datasets)})",
+        f"## Indicatori disponibili ({len(datasets)})",
         "",
     ]
     for item in datasets:
@@ -423,35 +423,67 @@ def blog_post_markdown(post, site_url):
             "",
             "## Dati collegati",
             "",
-            f"- [Apri la scheda indicatore]({_absolute(site_url, post['indicator_path'])})",
+            f"- [Apri l'indicatore]({_absolute(site_url, post['indicator_path'])})",
         ]
     return "\n".join(lines)
 
 
-def methodology_markdown(site_url, license_label, license_url):
+def methodology_markdown(site_url, license_label, license_url, counts=None):
+    """La metodologia in Markdown: lo stesso riassunto e le stesse definizioni
+    di `_metodologia_riassunto.html` e `_metodologia_definizioni.html`, con le
+    stesse ancore. `counts` (atlante, catalogo, punteggio) e' facoltativo: se
+    manca la riga dei conteggi non porta cifre."""
+    doc = f"{site_url}/metodologia"
+    if counts:
+        quanti = (f"L'atlante ne elenca {counts['atlante']} con dati regionali, il catalogo dati ne elenca "
+                  f"{counts['catalogo']} (quelli con una pagina indicizzabile, compresi alcuni con dati solo "
+                  f"provinciali) e {counts['punteggio']} entrano nel punteggio regionale della qualità della vita.")
+    else:
+        quanti = "L'atlante, il catalogo dati e il punteggio della qualità della vita ne contano numeri diversi."
     return "\n".join(
         [
             "# Metodologia e fonti",
             "",
-            "Divario Italia ripubblica e organizza indicatori territoriali provenienti da Istat, Eurostat e dalle altre istituzioni dichiarate nella singola scheda.",
+            "Divario Italia ripubblica e organizza indicatori territoriali provenienti da Istat, Eurostat e dalle altre istituzioni dichiarate nella pagina di ogni indicatore.",
+            "",
+            "## In breve",
+            "",
+            "- Il sito mette in fila indicatori territoriali di Istat e di altre istituzioni, per regioni e province.",
+            "- I dati arrivano dalla fonte e non si correggono. Medie, divari e classifiche si ricalcolano dal codice a ogni caricamento.",
+            f"- La media delle regioni è una [media semplice]({doc}#media-semplice): ogni regione pesa uguale, e non è la media nazionale.",
+            "- Punteggi e posizioni mettono in ordine i territori, non misurano il benessere.",
+            "- Un confronto mostra una differenza osservata, non la sua causa. Il racconto degli indicatori è scritto con strumenti automatici e approvato da una persona.",
             "",
             "## Come leggere i valori",
             "",
-            "- Ogni scheda dichiara popolazione di riferimento, unità, periodo e copertura.",
+            "- Ogni indicatore dichiara popolazione di riferimento, unità, periodo e copertura.",
             "- Le variazioni annuali di una percentuale sono espresse in punti percentuali.",
             "- La media delle regioni è una media semplice non ponderata e non è la media nazionale italiana.",
             "- Una differenza osservata tra territori non dimostra da sola un rapporto di causa.",
             "- Un valore alto non è sempre migliore. La direzione è dichiarata per ogni indicatore.",
             "",
+            "## Definizioni",
+            "",
+            f"- [Indicatore]({doc}#indicatore): una misura con la sua unità, la sua fonte e il suo anno, riferita ai territori. {quanti}",
+            f"- [Media semplice]({doc}#media-semplice): la media dei valori dei territori, con lo stesso peso per ognuno, qualunque sia la popolazione. Non è il valore nazionale calcolato sulle persone.",
+            f"- [Verso]({doc}#verso): dice se per un indicatore è meglio un valore alto, uno basso, o se nessuno dei due. Decide l'ordine di classifiche e punteggi, non il colore della mappa.",
+            f"- [n.d.]({doc}#nd): dato non disponibile, la fonte non pubblica il valore per quel territorio in quell'anno. Non è uno zero e nelle medie non entra.",
+            f"- [Copertura]({doc}#copertura): quanti territori hanno il dato in un anno. Se cambia troppo da un anno all'altro, la linea nel tempo non si disegna e la pagina scrive «copertura variabile».",
+            f"- [Percentile]({doc}#percentile): la posizione di un territorio fra tutti gli altri sullo stesso indicatore, da 0 (valore più basso) a 100 (più alto). «Orientato» vuol dire che si applica il verso: 100 è il caso migliore.",
+            f"- [Posizione media]({doc}#posizione-media): la media dei piazzamenti di una regione sugli indicatori con un verso e il dato per tutte le regioni. Non è una classifica.",
+            f"- [Punteggio]({doc}#punteggio): da 0 a 100, in due calcoli distinti. Per la qualità della vita è lo z-score orientato, con 50 media dei territori. Per un tema è la media semplice dei percentili orientati, e 50 non è per costruzione la media dei territori.",
+            f"- [Ripartizione]({doc}#ripartizione): Nord, Centro, Mezzogiorno (Sud e Isole insieme). Nei grafici ogni regione ha il colore della sua ripartizione.",
+            f"- [Profilo]({doc}#profilo): un insieme di pesi che dice quanto conta ogni categoria nel punteggio della qualità della vita. Equilibrato dà lo stesso peso a tutte.",
+            "",
             "## Fonti e riuso",
             "",
-            "La fonte primaria e il relativo collegamento sono riportati in ogni scheda indicatore.",
+            "La fonte primaria e il relativo collegamento sono riportati nella pagina di ogni indicatore.",
             f"Licenza di riferimento per i dati Istat: [{license_label}]({license_url}). Le altre famiglie mantengono la licenza dichiarata dalla propria fonte.",
             "",
             "## Regioni e province",
             "",
-            ("Le regioni usano il BES nazionale e gli indicatori territoriali Istat, le province il BES dei Territori. "
-             "Le schede indicatore con una serie regionale offrono il download in CSV e JSON, i valori provinciali "
+            ("Le regioni usano il Benessere equo e sostenibile (BES) nazionale e gli indicatori territoriali Istat, le province il BES dei Territori. "
+             "Gli indicatori con dati regionali offrono il download in CSV e JSON, i valori provinciali "
              "si leggono nelle pagine delle province."),
             "",
             f"- [Catalogo dati]({site_url}/catalogo-dati)",
@@ -566,7 +598,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         "",
         f"URL canonica: {canonical}",
         "",
-        "## Scheda",
+        "## Indicatore",
         "",
         # Il nome ufficiale della serie, sempre. Con un H1 autorato il titolo in
         # lingua comune sostituisce quello amministrativo, e nella proiezione
@@ -581,7 +613,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         # le province di una scheda a due livelli (`sources.level_path`).
         *(f"- Gli stessi dati per {other['plural']}: {site_url}{other.get('preferred_path') or other['canonical_path']}"
           for other in others),
-        *([f"- La stessa misura per {twin['plural']}, in un'altra scheda: {site_url}{twin['path']}"]
+        *([f"- La stessa misura per {twin['plural']}, in un'altra pagina: {site_url}{twin['path']}"]
           if twin else []),
         f"- Unità di misura: {unit}",
         f"- Copertura: dal {level['year_min']} al {level['year_max']}",
@@ -924,7 +956,7 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         # sono il catalogo dell'atlante, regionale, e le schede con i valori
         # delle province si contano a parte, dalla sezione "Per provincia".
         f"Indicatori per regione: {profile['indicator_count']}",
-        *([f"Schede per provincia: {len(province_indicators)}"] if province_indicators else []),
+        *([f"Indicatori per provincia: {len(province_indicators)}"] if province_indicators else []),
         f"URL canonica: {_absolute(site_url, profile['theme_path'])}",
         "",
     ]
@@ -937,8 +969,9 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
             f"## Le regioni su questo tema, {standings['year_max']}",
             "",
             "Media semplice dei percentili orientati dei "
-            f"{standings['indicator_count']} indicatori direzionali del tema, "
-            "da 0 a 1. Non è una classifica ufficiale.",
+            f"{standings['indicator_count']} indicatori del tema che hanno un verso, "
+            "da 0 a 100. Non è una classifica ufficiale. "
+            f"Definizione: [punteggio]({site_url}/metodologia#punteggio).",
             "",
             "| # | regione | punteggio |",
             "| ---: | --- | ---: |",
@@ -946,7 +979,7 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         for row in standings["rows"]:
             lines.append(
                 f"| {row['rank']} | [{row['region']}]({_absolute(site_url, row['path'])}) "
-                f"| {row['score']:.2f} |"
+                f"| {row['score'] * 100:.1f} |"
             )
         lines.append("")
     lines += [
@@ -960,7 +993,7 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         )
     if province_indicators:
         lines += ["", "## Per provincia", "",
-                  "Le schede del tema con i valori delle province, aperte sulle province.", ""]
+                  "Gli indicatori del tema con i valori delle province, aperte sulle province.", ""]
         for item in province_indicators:
             only = ", solo per provincia" if item["only_province"] else ""
             years = (f"nel {item['year_max']}" if item["year_min"] == item["year_max"]

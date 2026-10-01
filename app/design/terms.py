@@ -5,8 +5,8 @@ Sono le parole che fermano chi legge una scheda o una classifica e che la
 pagina usa senza spiegarle ogni volta: "media semplice", il verso, n.d.,
 "copertura variabile", il punteggio da 0 a 100. Il testo sta qui una volta
 sola, cosi' la stessa parola si spiega allo stesso modo su ogni pagina, e
-rimanda alla metodologia per il resto. Niente cifre: le cifre stanno nella
-pagina, la definizione dice come leggerle.
+rimanda all'ancora della metodologia che la definisce per esteso. Niente
+cifre: le cifre stanno nella pagina, la definizione dice come leggerle.
 """
 
 from __future__ import annotations
@@ -19,33 +19,34 @@ TERMS: dict[str, dict[str, str]] = {
         "text": ("La media dei valori dei territori, ognuno con lo stesso peso qualunque sia la sua "
                  "popolazione. Non è il valore nazionale calcolato sulle persone, che la fonte "
                  "pubblica a parte."),
-        "href": "/metodologia",
+        "href": "/metodologia#media-semplice",
     },
     "verso": {
         "label": "verso",
         "text": ("Dice se un valore più alto è meglio, peggio o nessuno dei due. Decide l'ordine delle "
                  "classifiche, non il colore: sulla mappa il colore segue solo la grandezza."),
-        "href": "/metodologia",
+        "href": "/metodologia#verso",
     },
     "nd": {
         "label": "n.d.",
         "text": ("Dato non disponibile: la fonte non pubblica il valore per quel territorio in "
                  "quell'anno. Sulla mappa il territorio è tratteggiato."),
-        "href": "/metodologia",
+        "href": "/metodologia#nd",
     },
     "copertura-variabile": {
         "label": "Copertura variabile",
         "text": ("Da un anno all'altro cambiano troppo i territori con il dato. Una media su gruppi "
                  "diversi salirebbe o scenderebbe per chi entra e chi esce, quindi la linea non si "
                  "disegna."),
-        "href": "/metodologia",
+        "href": "/metodologia#copertura",
     },
     "punteggio": {
         "label": "punteggio",
         "text": ("Un numero da 0 a 100 che mette insieme gli indicatori di una dimensione, ognuno col "
-                 "suo verso. 50 è la media semplice dei territori: sopra si sta meglio della media, "
-                 "sotto peggio. Ordina i territori, non misura il benessere."),
-        "href": "/metodologia#qualita-della-vita",
+                 "suo verso. Nella classifica della qualità della vita 50 è la media semplice dei "
+                 "territori: sopra si sta meglio, sotto peggio. Ordina i territori, non misura "
+                 "il benessere."),
+        "href": "/metodologia#punteggio",
     },
 }
 

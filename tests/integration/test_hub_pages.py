@@ -770,14 +770,14 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
                 sezione = markdown.split("## Indicatori del tema", 1)[1].split("\n## ", 1)[0]
                 self.assertEqual(sezione.count("\n- ["), elencati)
                 if provinciali:
-                    self.assertIn(f"Schede per provincia: {provinciali}\n", markdown)
-                    self.assertIn(f"{provinciali} schede di questo tema" if provinciali > 1
-                                  else "1 scheda di questo tema", html)
+                    self.assertIn(f"Indicatori per provincia: {provinciali}\n", markdown)
+                    self.assertIn(f"{provinciali} indicatori di questo tema" if provinciali > 1
+                                  else "1 indicatore di questo tema", html)
                 else:
-                    self.assertNotIn("Schede per provincia", markdown)
+                    self.assertNotIn("Indicatori per provincia", markdown)
         testo = visible_text(self.html)
         self.assertGreater(per_provincia, 0)
-        self.assertIn(f"le {per_provincia} schede con i valori delle province, {solo_provincia} solo per provincia",
+        self.assertIn(f"le {per_provincia} indicatori con i valori delle province, {solo_provincia} solo per provincia",
                       " ".join(testo.split()))
 
 

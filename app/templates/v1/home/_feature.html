@@ -18,7 +18,7 @@
     <div class="zone__title">
       <h2 class="h-section" id="h-dato">Indicatore in evidenza</h2>
       {%- set where = 'per regione e per provincia' if two else ('per regione' if f.level == 'regione' else 'per provincia') %}
-      <p class="zone__lead">{% if f.requested %}L'indicatore che hai scelto, qui {{ where }}. Per uno a caso fra le schede di Divario Italia c'è «Un altro indicatore».{% else %}Uno a caso fra le schede di Divario Italia, qui {{ where }}. A ogni visita la home lo estrae di nuovo.{% endif %}</p>
+      <p class="zone__lead">{% if f.requested %}L'indicatore che hai scelto, qui {{ where }}. Per uno a caso fra gli indicatori di Divario Italia c'è «Un altro indicatore».{% else %}Uno a caso fra gli indicatori di Divario Italia, qui {{ where }}. A ogni visita la home lo estrae di nuovo.{% endif %}</p>
     </div>
     <p class="zone__actions"><a class="btn" href="/">{{ ui.icon('shuffle') }} Un altro indicatore</a></p>
   </header>
@@ -31,7 +31,7 @@
       </div>
       {#- Il rimando all'altro livello resta: e' l'unico link dalla home alla
           scheda gemella (le regioni di una serie BES hanno la loro su ter-*). -#}
-      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> {% if f.elsewhere_twin %}hanno una scheda loro{% else %}sono nella scheda{% endif %}.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
+      {% if not two %}<p class="feat__only">{% if f.elsewhere %}Qui solo per {{ f.levels[0].singular }}: <a href="{{ f.elsewhere_href }}">i valori per {{ f.elsewhere }}</a> {% if f.elsewhere_twin %}hanno una pagina loro{% else %}sono nella pagina{% endif %}.{% else %}Questo indicatore c'è solo per {{ f.levels[0].singular }}.{% endif %}</p>{% endif %}
       {% if two %}
       {#- Senza JavaScript sono due link, tutti e due nell'ordine di
           tabulazione: ruoli, aria-selected e tabindex mobile li aggiunge
@@ -71,7 +71,7 @@
           <div class="feat__cap">
             <p class="feat__kicker">Sulla mappa e in classifica</p>
             {% if lv.table_claim %}<span class="feat__claim">{{ lv.table_claim }}</span>{% endif %}
-            <p class="subline">{{ f.name }}{% if lv.unit_note %}, {{ lv.unit_note }}{% endif %}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %} {% if lv.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.{% if lv.middle %} Le altre {{ lv.middle | num(None, 'count') }} sono nella scheda.{% endif %}</p>
+            <p class="subline">{{ f.name }}{% if lv.unit_note %}, {{ lv.unit_note }}{% endif %}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %} {% if lv.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.{% if lv.middle %} Le altre {{ lv.middle | num(None, 'count') }} sono nella pagina.{% endif %}</p>
           </div>
           <label class="field feat__find" for="territorio-{{ lv.key }}">Trova la tua {{ lv.singular }}
             <select id="territorio-{{ lv.key }}" data-territory>
@@ -115,7 +115,7 @@
       </div>
       <div class="feat__end">
         <p class="source feat__source">Fonte: {% if f.source_url %}<a href="{{ f.source_url }}">{{ f.source_label }}</a>{% else %}{{ f.source_label }}{% endif %} ({{ lv.year }}). Elaborazione Divario Italia. Le barre partono da zero.{% if lv.key == 'provincia' %} Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.{% endif %}</p>
-        <a class="btn btn--primary" href="{{ lv.scheda }}">Tutta la scheda dell'indicatore</a>
+        <a class="btn btn--primary" href="{{ lv.scheda }}">Tutto l'indicatore</a>
       </div>
     </div>
     {% endfor %}

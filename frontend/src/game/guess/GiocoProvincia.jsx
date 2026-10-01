@@ -33,6 +33,7 @@ import {
   testoDistanza,
   testoDistanzaCompatta,
 } from "./provincia.js";
+import { ERRORE_LIMITE, PARTITA_INTERROTTA, SFIDA_CAMBIATA, messaggioTentativo } from "../testi.js";
 import { useMappaProvince } from "./MappaProvince.jsx";
 import Completamento from "./Completamento.jsx";
 import Dettagli from "./Dettagli.jsx";
@@ -47,12 +48,12 @@ const GAME = "provincia";
 const MAX_SUGGERIMENTI = 6;
 
 const MESSAGGI_ERRORE = {
-  sfida_scaduta: "La sfida è cambiata. Ricarica la pagina per giocare quella di oggi.",
-  token_superato: "La partita si è interrotta. Ricarica la pagina per ripartire.",
+  sfida_scaduta: `${SFIDA_CAMBIATA} Ricarica la pagina per giocare quella di oggi.`,
+  token_superato: `${PARTITA_INTERROTTA} Ricarica la pagina per ripartire.`,
   provincia_gia_tentata: "Hai già provato questa provincia.",
   provincia_non_valida: "Questa provincia non è fra quelle del livello scelto.",
   partita_conclusa: "La partita di oggi è già conclusa.",
-  rate_limited: "Troppi tentativi in poco tempo. Riprova fra un minuto.",
+  rate_limited: ERRORE_LIMITE,
 };
 
 // Un tentativo: niente token, che resta nel salvataggio a parte.
@@ -79,6 +80,7 @@ export default function GiocoProvincia() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [ricarica, setRicarica] = useState(false); // l'errore si risolve ricaricando la pagina
+  const [daRiprovare, setDaRiprovare] = useState(null); // la provincia del tentativo da rimandare
   const [fatto, setFatto] = useState(null); // il "fatto da portarti via", se il server lo manda
   const [liveMessage, setLiveMessage] = useState("");
   const [shake, setShake] = useState(false);
@@ -230,6 +232,7 @@ export default function GiocoProvincia() {
     setSubmitting(true);
     setError(null);
     setRicarica(false);
+    setDaRiprovare(null);
     // Col Bearer di chi ha fatto l'accesso, cosi' il server registra il punteggio e i traguardi; a fine
     // partita i traguardi sbloccati vanno al toast.
     inviaTentativo(token, provinceKey, { getToken: getAccessToken, notify: notifyAchievements })
@@ -248,7 +251,7 @@ export default function GiocoProvincia() {
         trackGameEvent("game_guess", { game: GAME, mode: "daily", level, attempt, correct: result.correct });
 
         if (result.correct) {
-          setLiveMessage(`Hai indovinato! La provincia era ${result.province}.`);
+          setLiveMessage(`Giusto. La provincia era ${result.province}.`);
         } else if (result.finished) {
           setLiveMessage(`Tentativi esauriti. La provincia era ${result.solution?.province || ""}.`);
         } else {
@@ -290,8 +293,10 @@ export default function GiocoProvincia() {
           setRiprese((n) => n + 1);
           return;
         }
-        setError(MESSAGGI_ERRORE[e.code] || "Il tentativo non è andato a buon fine. Riprova.");
+        setError(MESSAGGI_ERRORE[e.code] || messaggioTentativo(e.status));
         setRicarica(decisione === "ricarica");
+        // Rete, 5xx (503 compreso), limite e generico: il tentativo non e' stato contato, si rimanda.
+        setDaRiprovare(!MESSAGGI_ERRORE[e.code] || e.code === "rate_limited" ? provinceKey : null);
       })
       .finally(() => setSubmitting(false));
   }
@@ -398,6 +403,7 @@ export default function GiocoProvincia() {
                 shake={shake}
                 error={error}
                 ricarica={ricarica}
+                onRiprova={daRiprovare ? () => submitGuess(daRiprovare) : undefined}
                 nota={nota}
               />
             )}
@@ -434,7 +440,7 @@ export default function GiocoProvincia() {
             <li>Una provincia italiana è nascosta, e cambia ogni giorno a mezzanotte di Roma. Hai sei tentativi.</li>
             <li>Scrivi il nome di una provincia e scegline una dall'elenco. La mappa segna il tentativo con un numero.</li>
             <li>
-              Ogni errore ti dice a che distanza sei, in chilometri approssimati, e in quale direzione cercare.
+              Ogni errore ti dice a che distanza sei, in chilometri (una stima) e in quale direzione cercare.
               Svela anche un indizio nuovo, un dato Istat.
             </li>
           </ol>

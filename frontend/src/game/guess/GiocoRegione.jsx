@@ -10,6 +10,7 @@ import { segnaGiocata } from "../oggi.js";
 import { leggiSerieServer } from "./giocatore.js";
 import { loadProgress, loadStats, saveProgress, saveStats } from "./storage.js";
 import { useMapInteractions } from "./Mappa.jsx";
+import { ERRORE_LIMITE, SFIDA_CAMBIATA, messaggioTentativo } from "../testi.js";
 import Completamento from "./Completamento.jsx";
 import Scheletro from "./Scheletro.jsx";
 import { CheCosaMisura, TabellaIndizi } from "./TabellaIndizi.jsx";
@@ -36,6 +37,7 @@ export default function GameApp() {
   const [highlighted, setHighlighted] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [daRiprovare, setDaRiprovare] = useState(null); // la regione del tentativo da rimandare
   const [ricarica, setRicarica] = useState(false); // l'errore si risolve ricaricando la pagina
   const [fatto, setFatto] = useState(null); // il "fatto da portarti via", se il server lo manda
   const [shake, setShake] = useState(false);
@@ -159,7 +161,7 @@ export default function GameApp() {
         setError(
           kind === "archive"
             ? "Questa sfida non è disponibile."
-            : "Non è stato possibile caricare la sfida. Riprova tra poco."
+            : "Non è stato possibile caricare la sfida. Riprova fra poco."
         );
         setStatus("error");
       });
@@ -201,6 +203,7 @@ export default function GameApp() {
     const attempt = guesses.length + 1;
     setSubmitting(true);
     setError(null);
+    setDaRiprovare(null);
     // `mode` dice al server che cosa stiamo giocando: a una "daily" rimasta aperta oltre la mezzanotte
     // risponde 410 `puzzle_changed` invece di valutare la sfida di ieri.
     inviaJson(API.guess, { puzzle_id: puzzle.puzzle_id, region_key: regionKey, attempt, mode }, { getToken: getAccessToken })
@@ -218,11 +221,11 @@ export default function GameApp() {
 
         const guessedName = regionByKey[regionKey] || result.region;
         if (result.correct) {
-          setLiveMessage(`Hai indovinato! La regione era ${guessedName}.`);
+          setLiveMessage(`Giusto. La regione era ${guessedName}.`);
         } else if (result.finished) {
           setLiveMessage(`Tentativi esauriti. La regione era ${result.solution?.region || ""}.`);
         } else {
-          setLiveMessage(`Tentativo ${attempt}: ${guessedName} è sbagliata. Nuovo indizio rivelato.`);
+          setLiveMessage(`Tentativo ${attempt}: ${guessedName} non è la regione misteriosa. Nuovo indizio rivelato.`);
           setShake(true);
           window.setTimeout(() => setShake(false), 420);
         }
@@ -242,8 +245,11 @@ export default function GameApp() {
         setScorri((n) => n + 1);
       })
       .catch((e) => {
-        if (e && e.code === "puzzle_changed") mostraErrore("La sfida è cambiata. Ricarica la pagina.", true);
-        else mostraErrore("Il tentativo non è andato a buon fine. Riprova.");
+        if (e && e.code === "puzzle_changed") mostraErrore(`${SFIDA_CAMBIATA} Ricarica la pagina per giocare quella di oggi.`, true);
+        else {
+          mostraErrore(e && e.code === "rate_limited" ? ERRORE_LIMITE : messaggioTentativo(e && e.status));
+          setDaRiprovare(regionKey);
+        }
       })
       .finally(() => setSubmitting(false));
   }
@@ -382,6 +388,7 @@ export default function GameApp() {
                 shake={shake}
                 error={error}
                 ricarica={ricarica}
+                onRiprova={daRiprovare ? () => submitGuess(daRiprovare) : undefined}
               />
             )}
 

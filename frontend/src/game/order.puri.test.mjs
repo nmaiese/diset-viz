@@ -7,6 +7,7 @@ import {
   percorsoTerritorio,
   righeEsito,
   segnoPosizione,
+  tastoPerLaRiga,
   tonoDaPunteggio,
   valoreConUnita,
 } from "./order.puri.js";
@@ -190,4 +191,18 @@ test("metaUnita tiene la riga dei metadati su una riga e senza spaziatori vuoti"
   assert.equal(metaUnita([undefined, "anni"]), "anni");
   assert.equal(metaUnita([]), "");
   assert.equal(metaUnita(null), "");
+});
+
+test("tastoPerLaRiga: Invio e Spazio sulla riga la attivano", () => {
+  const riga = {};
+  assert.equal(tastoPerLaRiga("Enter", riga, riga), true);
+  assert.equal(tastoPerLaRiga(" ", riga, riga), true);
+  assert.equal(tastoPerLaRiga("ArrowDown", riga, riga), false);
+});
+
+test("tastoPerLaRiga: sui bottoni freccia della riga Invio e Spazio restano del bottone", () => {
+  const riga = {};
+  const bottone = {};
+  assert.equal(tastoPerLaRiga("Enter", bottone, riga), false);
+  assert.equal(tastoPerLaRiga(" ", bottone, riga), false);
 });

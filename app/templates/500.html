@@ -1,0 +1,23 @@
+{% extends "blog_base.html" %}
+{#- Come la 404: il page_view dice "error" su qualunque percorso (`app/page_types.py`). -#}
+{% set PAGE_TYPE = "error" %}
+
+{% block title %}Qualcosa non ha funzionato | {{ site_name }}{% endblock %}
+{% block description %}La pagina non si è caricata per un problema nostro. Riprova tra qualche istante, oppure riparti dalla home o dalla ricerca.{% endblock %}
+{% block robots_meta %}
+<meta name="robots" content="noindex, follow">
+{% endblock %}
+
+{% block content %}
+<main class="page wrap" id="contenuto">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+  <h1>Qualcosa non ha funzionato</h1>
+  <p class="page-lead">La pagina non si è caricata per un problema nostro, non per qualcosa che hai fatto tu. Riprova tra qualche istante. Se l'errore resta, torna alla home o cerca quello che ti serve.</p>
+  <div class="quality-cta">
+    <a class="quality-btn quality-btn--primary" href="/">Torna alla home</a>
+    <a class="quality-btn" href="/ricerca">Cerca nel sito</a>
+    <a class="quality-btn" href="/atlante">Atlante</a>
+    <a class="quality-btn" href="/blog">Blog</a>
+  </div>
+</main>
+{% endblock %}

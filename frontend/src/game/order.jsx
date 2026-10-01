@@ -13,6 +13,7 @@ import {
   useTerritorioMio,
 } from "./shared.jsx";
 import { campoFatto } from "./compare-logica.js";
+import { PARTITA_INTERROTTA, messaggioTentativo } from "./testi.js";
 import { fraseTerritorioMio, trovaTerritorioMio } from "./puri.js";
 import { segnaGiocata } from "./oggi.js";
 import { analizza, statsOrder } from "./salvati.js";
@@ -22,6 +23,7 @@ import {
   percorsoTerritorio,
   righeEsito,
   segnoPosizione,
+  tastoPerLaRiga,
   tonoDaPunteggio,
   valoreConUnita,
 } from "./order.puri.js";
@@ -83,6 +85,7 @@ export default function OrderApp() {
   const [count, setCount] = useState(3); // 3 | 5 per allenamento
   const [round, setRound] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | loading | ordering | revealed | error
+  const [messaggioErrore, setMessaggioErrore] = useState("");
   const [orderKeys, setOrderKeys] = useState([]);
   const [dragIndex, setDragIndex] = useState(null);
   const [selectedIdx, setSelectedIdx] = useState(null);
@@ -201,6 +204,18 @@ export default function OrderApp() {
     setStarted(true);
   }
 
+  // Un errore di rete o del server dice che il server non risponde (503 compreso), il 429 il limite, un
+  // token rifiutato che la partita si e' interrotta: lo stesso testo degli altri giochi.
+  function erroreOrdina(e) {
+    const codice = e && e.code;
+    setMessaggioErrore(
+      codice === "token_invalid" || codice === "round_already_answered"
+        ? `${PARTITA_INTERROTTA} Riprova per aprire una sfida nuova.`
+        : messaggioTentativo(e && e.status)
+    );
+    setStatus("error");
+  }
+
   function loadDailySession(lvl) {
     scrolledToGameArea();
     setStatus("loading");
@@ -215,7 +230,7 @@ export default function OrderApp() {
         setOrderKeys((data.territories || []).map((t) => t.key));
         setStatus("ordering");
       })
-      .catch(() => setStatus("error"));
+      .catch((e) => erroreOrdina(e));
   }
 
   function loadPracticeRound(n) {
@@ -232,7 +247,7 @@ export default function OrderApp() {
         setOrderKeys((data.regions || []).map((r) => r.region_key));
         setStatus("ordering");
       })
-      .catch(() => setStatus("error"));
+      .catch((e) => erroreOrdina(e));
   }
 
   function reloadCurrent() {
@@ -362,9 +377,9 @@ export default function OrderApp() {
         trackGameEvent("order_answer", { game: "order", mode, level, score: data.score, total: data.total });
         if (isDaily) segnaGiocata("order", round.date, { ok: data.score > 0, tono: data.score === data.total ? "giusto" : data.score === 0 ? "sbagliato" : "parziale", testo: `${data.score} su ${data.total} al posto giusto` });
       })
-      .catch(() => {
+      .catch((e) => {
         submittingRef.current = false;
-        setStatus("error");
+        erroreOrdina(e);
       });
   }
 
@@ -493,7 +508,7 @@ export default function OrderApp() {
 
       {status === "error" && (
         <div className="order-status">
-          <p className="game-error">Qualcosa non ha funzionato. Riprova.</p>
+          <p className="game-error">{messaggioErrore}</p>
           <button type="button" className="game-btn" onClick={reloadCurrent}>
             Riprova
           </button>
@@ -669,7 +684,7 @@ export default function OrderApp() {
                         draggable={status === "ordering"}
                         onClick={() => handleRowClick(idx)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
+                          if (tastoPerLaRiga(e.key, e.target, e.currentTarget)) {
                             e.preventDefault();
                             handleRowClick(idx);
                           }

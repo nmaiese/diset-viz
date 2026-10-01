@@ -90,7 +90,7 @@ class IlCatalogoDati(unittest.TestCase):
         self.assertIsNotNone(answer)
         self.assertIn(f'<data class="n n--count" value="{total}">', answer.group(1))
         text = " ".join(re.sub(r"<[^>]+>", "", answer.group(1)).split())
-        self.assertIn(f"collega {total} dataset indicizzabili, {downloadable} con la serie", text)
+        self.assertIn(f"collega {total} indicatori indicizzabili, {downloadable} con la serie", text)
 
     def test_ogni_voce_del_grafo_sta_in_un_gruppo(self):
         catalog = jsonld(self.html, "DataCatalog")

@@ -3,6 +3,14 @@ import { getAccessToken } from "../shared/supabase.js";
 import { segnaGiocata } from "./oggi.js";
 import { analizza, statsCompare } from "./salvati.js";
 import {
+  ERRORE_GENERICO,
+  ERRORE_LIMITE,
+  ERRORE_RETE,
+  NUOVO_TENTATIVO,
+  PARTITA_INTERROTTA,
+  SFIDA_CAMBIATA,
+} from "./testi.js";
+import {
   fetchJson,
   formatValue,
   trackGameEvent,
@@ -59,21 +67,21 @@ const LIVELLI = [
 // classifica e non finisce fra i record del giorno. Il testo è quello che il
 // server rimanda come avviso (`notice`), detto anche qui prima di iniziare.
 const NOTA_ALLENAMENTO =
-  "Senza timer è allenamento: la partita non va in classifica.";
+  "Senza timer è allenamento: la partita non conta come sfida del giorno e non entra in nessuna classifica.";
 
 // Gli errori della sfida del giorno hanno tutti un nome, e nessuno e' muto: un doppio invio o un
 // token superato bloccano la partita, e chi gioca deve leggere perche' e trovare il bottone.
 // Una risposta tardiva non e' un errore: il server risponde 200 con `late: true`.
 const ERRORI_SFIDA = {
-  round_already_answered: "La partita si è interrotta, non per colpa tua. Riaprila per giocare la sfida di oggi.",
-  token_invalid: "La partita è scaduta, non per colpa tua. Riaprila per giocare la sfida di oggi.",
-  puzzle_changed: "La sfida del giorno è cambiata mentre giocavi. Riapri la partita.",
-  rete: "Non riesco a raggiungere il server. Riapri la sfida di oggi.",
+  round_already_answered: `${PARTITA_INTERROTTA} Riaprila per giocare la sfida di oggi.`,
+  token_invalid: `${PARTITA_INTERROTTA} Riaprila per giocare la sfida di oggi.`,
+  puzzle_changed: `${SFIDA_CAMBIATA} Riaprila per giocare quella di oggi.`,
+  rete: `${ERRORE_RETE} Riprova, o riapri la sfida di oggi.`,
   timeout_too_early: "Il tempo non era ancora scaduto.",
-  rate_limited: "Troppe risposte in poco tempo. Riprova fra un minuto.",
-  round_already_bound: "La coppia dopo era già stata aperta. Riapri la sfida.",
+  rate_limited: ERRORE_LIMITE,
+  round_already_bound: "La coppia dopo era già stata aperta. Riaprila per giocare la sfida di oggi.",
   training_session: NOTA_ALLENAMENTO,
-  bad_request: "Risposta non valida.",
+  bad_request: "Non è stato possibile inviare la risposta. Riaprila per giocare la sfida di oggi.",
 };
 
 function loadStats() {
@@ -324,6 +332,8 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
   const [risposte, setRisposte] = useState([]);
   const [messaggio, setMessaggio] = useState("");
   const [scaduta, setScaduta] = useState(false);
+  // La risposta che la rete non ha portato: da rimandare con "Riprova" (null: non c'e' niente da rimandare).
+  const [daRimandare, setDaRimandare] = useState(null);
   // "Avanti": null | invio | riprova | riapri
   const [avvio, setAvvio] = useState(null);
   const [messaggioAvvio, setMessaggioAvvio] = useState("");
@@ -414,6 +424,7 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
     setSessione(null);
     sessioneRef.current = null;
     setScaduta(false);
+    setDaRimandare(null);
     setMessaggio("");
     setAvvio(null);
     setMessaggioAvvio("");
@@ -484,22 +495,37 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
       if (decisione.azione === "riprova") {
         // Lo stesso invio, poche volte: la rete che non risponde o un timeout arrivato presto. Il
         // tempo e' gia' finito per il client, quindi non si rimette la domanda in `domanda`.
-        setMessaggio("");
+        setMessaggio(NUOVO_TENTATIVO);
         ritentoRef.current = {
           tentativi: ritentoRef.current.tentativi + 1,
           id: window.setTimeout(() => invia(decisione.scelta, domandaIndice), decisione.attesaMs),
         };
         return;
       }
-      setMessaggio(ERRORI_SFIDA[decisione.errore] || "Qualcosa non ha funzionato. Riprova.");
+      setMessaggio(ERRORI_SFIDA[decisione.errore] || ERRORE_GENERICO);
       if (decisione.azione === "domanda") {
         statoRef.current = { stato: "domanda", indice: domandaIndice };
         setStato("domanda");
         return;
       }
       setStato("bloccata");
-      setScaduta(true);
+      // Con la rete assente il round non e' stato consumato: la stessa risposta si puo' rimandare.
+      if (decisione.errore === "rete") setDaRimandare({ scelta: decisione.scelta || scelta, indice: domandaIndice });
+      else setScaduta(true);
     });
+  }
+
+  // "Riprova" dopo la rete assente: stessa risposta, stesso round. Se il server l'aveva ricevuta
+  // (si e' perso solo il ritorno) risponde `round_already_answered` e resta il bottone "Riapri".
+  function rimanda() {
+    if (!daRimandare || statoRef.current.stato !== "bloccata") return;
+    const { scelta, indice: domandaIndice } = daRimandare;
+    setDaRimandare(null);
+    setMessaggio(NUOVO_TENTATIVO);
+    ritentoRef.current = { id: null, tentativi: 0 };
+    statoRef.current = { stato: "invio", indice: domandaIndice };
+    setStato("invio");
+    invia(scelta, domandaIndice);
   }
 
   // "Avanti": il server lega la coppia dopo solo con `next`, e il tempo della prossima parte
@@ -526,11 +552,11 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
         }
         if (esito.riprova) {
           setAvvio("riprova");
-          setMessaggioAvvio("Non sono riuscito a passare alla coppia dopo.");
+          setMessaggioAvvio("Non è stato possibile passare alla coppia dopo. Riprova.");
           return;
         }
         setAvvio("riapri");
-        setMessaggioAvvio(ERRORI_SFIDA[esito.errore] || "La sfida non può proseguire. Riaprila.");
+        setMessaggioAvvio(ERRORI_SFIDA[esito.errore] || "La sfida non può proseguire. Riaprila per giocare quella di oggi.");
       }
     );
   }
@@ -608,7 +634,7 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
 
       {stato === "errore" && (
         <div className="compare-status">
-          <p className="game-error">Non sono riuscito ad aprire la sfida del giorno. Riprova.</p>
+          <p className="game-error">Non è stato possibile aprire la sfida del giorno. Riprova.</p>
           <button type="button" className="game-btn" onClick={apri}>
             Riprova
           </button>
@@ -647,6 +673,16 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
 
           <div className="compare-feedback" aria-live="polite">
             {messaggio && <p className="game-error">{messaggio}</p>}
+            {daRimandare && (
+              <>
+                <button type="button" className="game-btn" onClick={rimanda}>
+                  Riprova
+                </button>{" "}
+                <button type="button" className="game-btn game-btn--ghost" onClick={apri}>
+                  Riapri la sfida di oggi
+                </button>
+              </>
+            )}
             {scaduta && (
               <button type="button" className="game-btn" onClick={apri}>
                 Riapri la sfida di oggi
@@ -758,6 +794,9 @@ function Allenamento({ timer, onEsci }) {
   const [stats, setStats] = useState(loadStats);
   const [sessionBest, setSessionBest] = useState(0);
   const [showScoreModal, setShowScoreModal] = useState(false);
+  // L'errore e' di una risposta persa (true) o dell'apertura di un round (false): con una risposta persa il
+  // server, a "Riprova", apre un round nuovo senza chiudere quello vecchio e azzera la serie (e lo diciamo).
+  const [erroreRisposta, setErroreRisposta] = useState(false);
   // Contatori della sessione corrente, mostrati nella barra di stato in cima
   // (Round / Serie / Punti): ripartono a ogni caricamento della pagina, a
   // differenza dei record salvati in localStorage.
@@ -822,6 +861,7 @@ function Allenamento({ timer, onEsci }) {
   }, [status]);
 
   function loadRound(difficulty) {
+    setErroreRisposta(false);
     setStatus("loading");
     setResult(null);
     setChoice(null);
@@ -834,7 +874,9 @@ function Allenamento({ timer, onEsci }) {
         setRoundNumber((n) => n + 1);
         setStatus("answering");
       })
-      .catch(() => setStatus("error"));
+      .catch(() => {
+        setStatus("error");
+      });
   }
 
   function submitAnswer(picked) {
@@ -888,7 +930,10 @@ function Allenamento({ timer, onEsci }) {
           mode: "allenamento",
         });
       })
-      .catch(() => setStatus("error"));
+      .catch(() => {
+        setErroreRisposta(true);
+        setStatus("error");
+      });
   }
   rispondiRef.current = submitAnswer;
 
@@ -944,8 +989,24 @@ function Allenamento({ timer, onEsci }) {
     <div className="compare-app">
       {status === "error" && (
         <div className="compare-status">
-          <p className="game-error">Qualcosa non ha funzionato. Riprova.</p>
-          <button type="button" className="game-btn" onClick={() => loadRound(difficultyForStreak(streak))}>
+          <p className="game-error">
+            {erroreRisposta
+              ? "La risposta non è arrivata al server. Se riprovi, la serie riparte da zero."
+              : "Non è stato possibile aprire il round. Riprova."}
+          </p>
+          <button
+            type="button"
+            className="game-btn"
+            onClick={() => {
+              if (erroreRisposta) {
+                stateRef.current = { ...stateRef.current, streak: 0 };
+                setStreak(0);
+                loadRound(difficultyForStreak(0));
+              } else {
+                loadRound(difficultyForStreak(streak));
+              }
+            }}
+          >
             Riprova
           </button>
         </div>
@@ -1050,7 +1111,7 @@ function Allenamento({ timer, onEsci }) {
           mode="compare"
           token={tokenRef.current}
           score={sessionBest}
-          scoreLabel={`${sessionBest} risposte di fila`}
+          scoreLabel={`${sessionBest} ${sessionBest === 1 ? "risposta" : "risposte"} di fila`}
           onClose={() => setShowScoreModal(false)}
         />
       )}
