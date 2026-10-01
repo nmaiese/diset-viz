@@ -10,7 +10,7 @@ from unittest import mock
 
 import jwt
 
-from app import app, config, game_daily, game_order, quiz_tokens, sources
+from app import app, bes_data, config, game_daily, game_order, quiz_tokens, sources
 from app.db import session_scope
 from app.models import DailyScore
 
@@ -124,7 +124,10 @@ class TestGameOrderDaily(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         ind = r.get_json()["indicator"]
         self.assertEqual(ind["source_label"], sources.SOURCES["bes"]["label"])
-        self.assertTrue(ind["path"].startswith("/indicatore/") and ind["path"].endswith("/province"))
+        # Il link e' quello di `bes_level_path`: una scheda a due livelli si apre
+        # sulle `/province`, una solo provinciale resta sul suo canonico.
+        self.assertTrue(ind["path"].startswith("/indicatore/"))
+        self.assertEqual(ind["path"], bes_data.bes_level_path(game_daily.provincial_id(ind["id"]), "provincia"))
         self.assertNotEqual(ind["source_url"], "https://www.istat.it")
 
 
