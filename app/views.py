@@ -4070,7 +4070,7 @@ def _home_quiz_games():
         },
         {
             "name": "Ordina le regioni",
-            "desc": "Cinque regioni da ordinare dal valore più alto al più basso, con credito parziale.",
+            "desc": "Cinque territori da ordinare dal valore più alto al più basso, con credito parziale.",
             "meta": "credito parziale",
             "href": "/quiz/ordina",
         },
