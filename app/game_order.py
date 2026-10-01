@@ -19,7 +19,7 @@ va nel log.
 
 import logging
 
-from app import bes_data, game_daily, player_stats, quiz, quiz_tokens, sources
+from app import bes_data, game_daily, game_facts, player_stats, quiz, quiz_tokens, sources
 
 log = logging.getLogger(__name__)
 
@@ -161,6 +161,10 @@ def evaluate_daily_order_answer(payload, auth_user=None):
 
     result["session"] = quiz_tokens.session_summary(session)
     result["token"] = token_out
+    # Il fatto da portarsi via (app/game_facts.py): manca se una regola non regge.
+    fatto = game_facts.fatto_ordina(level, ind, result["positions"], result["correct_order"])
+    if fatto:
+        result["fact"] = fatto
     if auth_user:
         try:
             player_stats.record_daily_score(auth_user["id"], "order", today.isoformat(), result["score"])
