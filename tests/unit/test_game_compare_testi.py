@@ -32,14 +32,14 @@ class FontiTest(unittest.TestCase):
             self.assertNotIn(istituto, codice, f"`{istituto}` scritto a mano in compare.jsx")
 
     def test_la_pagina_non_scrive_un_istituto_a_mano(self):
-        """Il lead dice chi pubblica i dati con `fonte_del_gioco`, che legge `sources.py`."""
+        """Il lead dice chi pubblica i dati con `game_source`, che legge `sources.py`."""
         corpo = _senza_json_ld(TEMPLATE.read_text(encoding="utf-8"))
         corpo = re.sub(r"\{\{.*?\}\}", "", corpo, flags=re.S)
         for istituto in ("Istat", "Eurostat"):
             self.assertNotIn(istituto, corpo, f"`{istituto}` scritto a mano in game_compare.html")
 
     def test_il_lead_legge_la_fonte_dal_server(self):
-        self.assertIn('fonte_del_gioco("compare").istituzioni', TEMPLATE.read_text(encoding="utf-8"))
+        self.assertIn('game_source("compare").istituzioni', TEMPLATE.read_text(encoding="utf-8"))
 
 
 class TotaleCoppieTest(unittest.TestCase):

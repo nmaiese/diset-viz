@@ -5,7 +5,7 @@ sceglie le coppie di oggi) e in `app/quiz.py` (che sa giudicare un confronto fra
 regioni). Il modulo non tocca nessuno dei due e non li duplica.
 
 **Il giorno lo sceglie il server.** Ogni richiesta ricostruisce la sfida di
-oggi a Roma con `game_daily.compare_del_giorno`: il client manda solo
+oggi a Roma con `game_daily.daily_compare`: il client manda solo
 `puzzle_id`, indice di domanda e scelta, e il `puzzle_id` deve essere quello di
 oggi. Nessuna data scelta dal client, quindi nessuna soluzione di un giorno
 futuro può uscire. Se la mezzanotte di Roma passa fra l'apertura e la risposta,
@@ -41,7 +41,7 @@ non cambia la conta, e il round singolo tiene gli invii duplicati fuori.
 
 **I valori veri, e da dove vengono.** Al livello "regioni" la valutazione è
 `quiz.evaluate_compare`, la stessa del round a serie. Ai livelli con le province
-i dati sono quelli provinciali (`game_daily._righe_indicatore`, la stessa
+i dati sono quelli provinciali (`game_daily._indicator_rows`, la stessa
 funzione privata da cui la sfida è stata composta: rileggere i dati con un
 secondo percorso li farebbe divergere) e il vincitore si calcola qui, perché
 `quiz.evaluate_compare` confronta regioni. Lo stesso indicatore può esistere a
@@ -52,13 +52,13 @@ provinciale, non quello regionale.
 from __future__ import annotations
 
 from app import bes_data, game_daily, game_facts, quiz, quiz_tokens, sources
-from app.game_daily import LIVELLI, oggi_roma
+from app.game_daily import LEVELS, today_rome
 
 # Modalita' di token propria: il token della sfida del giorno non entra nelle serie
 # (`/api/game/compare/round|answer`) ne' nella classifica (`peek_state` la rifiuta), e
 # il token di una serie apre una sessione nuova qui.
 MODO = "compare_daily"
-COPPIE = game_daily.COMPARE_COPPIE
+COPPIE = game_daily.COMPARE_PAIRS
 # Etichetta della fonte per i livelli con le province, che non passano da
 # quiz.evaluate_compare: viene da app/sources.py, l'unica fonte di verita' dei
 # nomi (un'etichetta scritta qui ha gia' pubblicato una serie sotto un altro nome).
@@ -88,7 +88,7 @@ def etichetta_livello(livello):
 def _sfida(giorno, livello):
     """La sfida del giorno a un livello. La cache sta in `game_daily` (per giorno,
     livello e chiave del seed), cosi' il controllo della chiave si fa a ogni richiesta."""
-    return game_daily.compare_del_giorno(giorno, livello)
+    return game_daily.daily_compare(giorno, livello)
 
 
 def _percorso_territorio(livello, chiave):
@@ -111,7 +111,7 @@ def _indicatore_provinciale(ind_id, anno, nome, unita):
     leggibile e unità sono quelli scelti per il gioco in
     `config/game_indicators.csv`, la spiegazione e il link canonico vengono dal
     catalogo BES, l'unica fonte che li ha per gli indicatori solo provinciali."""
-    raw = game_daily.id_provinciale(ind_id)
+    raw = game_daily.provincial_id(ind_id)
     info = bes_data.get_bes_manifest("provincia").get(raw)
     if info is None:
         return None
@@ -135,7 +135,7 @@ def _indicatore_provinciale(ind_id, anno, nome, unita):
 def _valori_provinciali(ind_id, chiavi):
     """(anno, {chiave: valore}) per un indicatore provinciale, letti dalla stessa
     funzione che ha composto la sfida."""
-    dato = game_daily._righe_indicatore({"id": ind_id}, "province")
+    dato = game_daily._indicator_rows({"id": ind_id}, "province")
     if dato is None:
         return None, None
     anno, righe = dato
@@ -215,9 +215,9 @@ def apri_sessione(livello, timer, now=None):
     registra. Il livello e il timer viaggiano dentro il token firmato, quindi da
     qui in poi il client non li sceglie più.
     """
-    if livello not in LIVELLI:
+    if livello not in LEVELS:
         return None
-    giorno = oggi_roma(now)
+    giorno = today_rome(now)
     sfida = _sfida(giorno, livello)
     stato = quiz_tokens.load_state(None, MODO, timer)
     coppia = sfida["pairs"][0]
@@ -228,9 +228,9 @@ def apri_sessione(livello, timer, now=None):
     )
     return {
         "puzzle_id": sfida_di_oggi_id(giorno),
-        "number": game_daily.numero_sfida(giorno),
+        "number": game_daily.challenge_number(giorno),
         "date": giorno.isoformat(),
-        "next_puzzle_at": game_daily.prossima_sfida_roma(giorno),
+        "next_puzzle_at": game_daily.next_challenge_rome(giorno),
         "level": livello,
         "level_label": etichetta_livello(livello),
         "difficulty": sfida["difficulty"],
@@ -283,7 +283,7 @@ def avanti(dati, now=None):
     La risposta all'ultima domanda non ha un "dopo".
     """
     stato = quiz_tokens.load_state(dati.get("token"), MODO)
-    giorno = oggi_roma(now)
+    giorno = today_rome(now)
     if dati.get("puzzle_id") != sfida_di_oggi_id(giorno):
         return 400, {"error": "puzzle_changed"}
     try:
@@ -294,7 +294,7 @@ def avanti(dati, now=None):
         return 400, {"error": "bad_request"}
     salvato = stato.get(CHIAVE_PUNTEGGIO) or {}
     livello = salvato.get("l")
-    if (livello not in LIVELLI or salvato.get("d") != giorno.isoformat()
+    if (livello not in LEVELS or salvato.get("d") != giorno.isoformat()
             or stato.get("fp") is not None or stato.get("q") != indice + 1):
         return 400, {"error": "token_invalid"}
     if not quiz_tokens.claim_round(stato["sid"], -(indice + 1)):
@@ -316,11 +316,11 @@ def risposta(dati, now=None):
     che senza timer la partita non va in classifica.
     """
     stato = quiz_tokens.load_state(dati.get("token"), MODO)
-    giorno = oggi_roma(now)
+    giorno = today_rome(now)
     if dati.get("puzzle_id") != sfida_di_oggi_id(giorno):
         return 400, {"error": "puzzle_changed"}
     livello = stato.get("x")
-    if livello not in LIVELLI:
+    if livello not in LEVELS:
         return 400, {"error": "token_invalid"}
     try:
         indice = int(dati.get("q"))
@@ -385,9 +385,9 @@ def risposta(dati, now=None):
     if finita:
         corpo["summary"] = {
             "puzzle_id": sfida_di_oggi_id(giorno),
-            "number": game_daily.numero_sfida(giorno),
+            "number": game_daily.challenge_number(giorno),
             "date": giorno.isoformat(),
-            "next_puzzle_at": game_daily.prossima_sfida_roma(giorno),
+            "next_puzzle_at": game_daily.next_challenge_rome(giorno),
             "score": {"correct": giuste, "total": COPPIE},
         }
         fatto = game_facts.fatto_compare(

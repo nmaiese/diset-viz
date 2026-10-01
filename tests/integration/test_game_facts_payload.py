@@ -43,7 +43,7 @@ class OrdinaPayloadTest(unittest.TestCase):
         self._tmp = tempfile.mkdtemp()
         config.LEADERBOARD_DB = str(Path(self._tmp) / "s.sqlite3")
         self.client = app.test_client()
-        self._giorno = mock.patch.object(game_daily, "oggi_roma", return_value=GIORNO)
+        self._giorno = mock.patch.object(game_daily, "today_rome", return_value=GIORNO)
         self._giorno.start()
         self.addCleanup(self._giorno.stop)
 
@@ -128,7 +128,7 @@ class OrdinaPayloadTest(unittest.TestCase):
 class CompareFattoTest(Base):
     def setUp(self):
         super().setUp()
-        self._giorno = mock.patch.object(game_compare, "oggi_roma", return_value=GIORNO)
+        self._giorno = mock.patch.object(game_compare, "today_rome", return_value=GIORNO)
         self._giorno.start()
         self.addCleanup(self._giorno.stop)
 
@@ -226,16 +226,16 @@ class CicloSulPoolTest(unittest.TestCase):
 
     def test_order_sentences_over_the_whole_pool(self):
         prodotte = totali = 0
-        for ind in game_daily.indicatori_gioco():
+        for ind in game_daily.game_indicators():
             for flag, ambito, livello in (("regione", "regioni", "regioni"), ("provincia", "province", "province")):
                 if not ind[flag]:
                     continue
-                dato = game_daily._righe_indicatore(ind, ambito)
+                dato = game_daily._indicator_rows(ind, ambito)
                 if dato is None:
                     continue
                 anno, righe = dato
                 scelti = self._cinque(righe)
-                indicatore = game_daily._campi_indicatore(ind, anno)
+                indicatore = game_daily._indicator_fields(ind, anno)
                 giusto = [{"region": r["name"], "region_key": r["key"], "value": r["value"]} for r in scelti]
                 rovesciato = [{**r, "guessed_position": i + 1} for i, r in enumerate(reversed(giusto))]
                 esatto = [{**r, "guessed_position": i + 1} for i, r in enumerate(giusto)]
@@ -250,16 +250,16 @@ class CicloSulPoolTest(unittest.TestCase):
 
     def test_compare_sentences_over_the_whole_pool(self):
         prodotte = totali = 0
-        for ind in game_daily.indicatori_gioco():
+        for ind in game_daily.game_indicators():
             for flag, ambito, livello in (("regione", "regioni", "regioni"), ("provincia", "province", "province")):
                 if not ind[flag]:
                     continue
-                dato = game_daily._righe_indicatore(ind, ambito)
+                dato = game_daily._indicator_rows(ind, ambito)
                 if dato is None:
                     continue
                 anno, righe = dato
                 scelti = self._cinque(righe)
-                indicatore = game_daily._campi_indicatore(ind, anno)
+                indicatore = game_daily._indicator_fields(ind, anno)
                 coppie = [{"indicator": indicatore,
                            "a": {"key": a["key"], "name": a["name"], "region": a["region"]},
                            "b": {"key": b["key"], "name": b["name"], "region": b["region"]}}
@@ -287,14 +287,14 @@ class CicloSulPoolTest(unittest.TestCase):
             giorno = date.fromordinal(GIORNO.toordinal() + giorno_n)
             for livello in LIVELLI:
                 contesto = f"{giorno} {livello}"
-                coppie = game_daily.compare_del_giorno(giorno, livello)["pairs"]
+                coppie = game_daily.daily_compare(giorno, livello)["pairs"]
                 fatto = game_facts.fatto_compare(
                     livello, coppie, 0, lambda c, s, livello=livello: game_compare._valuta(c, livello, s))
                 if fatto is not None:
                     _controlla_frase(self, fatto["fact"], f"compare {contesto}")
-                puzzle = game_daily.order_del_giorno(giorno, livello)
+                puzzle = game_daily.daily_order(giorno, livello)
                 ambito = "regioni" if livello == "regioni" else "province"
-                anno, righe = game_daily._righe_indicatore(puzzle["indicator"], ambito)
+                anno, righe = game_daily._indicator_rows(puzzle["indicator"], ambito)
                 valori = {r["key"]: r["value"] for r in righe}
                 mosse = [{"region": t["name"], "region_key": t["key"], "value": valori[t["key"]],
                           "guessed_position": i + 1} for i, t in enumerate(puzzle["territories"])]

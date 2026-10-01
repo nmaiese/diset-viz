@@ -2,7 +2,7 @@
 
 Tre cose stanno qui, perche' devono restare d'accordo fra loro.
 
-**Il giorno e' quello di Roma.** Un'unica funzione, `oggi_roma()`, dice che
+**Il giorno e' quello di Roma.** Un'unica funzione, `today_rome()`, dice che
 giorno e' per il gioco. Il server gira in UTC (Cloud Run): senza questa funzione
 la sfida nuova uscirebbe all'una o alle due di notte in Italia, e un punto che
 usa `date.today()` darebbe un giorno diverso da quello che il giocatore vede. I
@@ -19,10 +19,10 @@ vecchio, cosi' l'archivio e il `localStorage` per `puzzleId` restano coerenti.
     passate. Va fatto solo di proposito, e mai a meta' giornata: chi ha gia'
     giocato oggi vedrebbe un'altra soluzione ricaricando la pagina.
 
-Senza la variabile d'ambiente si usa `CHIAVE_SVILUPPO`, che e' scritta qui e
+Senza la variabile d'ambiente si usa `DEV_SEED_KEY`, che e' scritta qui e
 quindi NON E' SEGRETA: va bene in locale e nei test, non in produzione. Dove
-`K_SERVICE` e' impostata (Cloud Run) e la chiave manca, `chiave_seed` solleva
-`ChiaveSeedMancante` e le rotte rispondono 503, invece di servire sfide prevedibili.
+`K_SERVICE` e' impostata (Cloud Run) e la chiave manca, `seed_key` solleva
+`SeedKeyMissing` e le rotte rispondono 503, invece di servire sfide prevedibili.
 `SEED_CUTOVER` e' un segnaposto (2099): la data vera si fissa nell'ultimo commit
 prima del merge, al giorno del deploy piu' uno.
 
@@ -54,150 +54,150 @@ from functools import lru_cache
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-ROMA = ZoneInfo("Europe/Rome")
+ROME_TZ = ZoneInfo("Europe/Rome")
 GAME_EPOCH = date(2026, 7, 15)  # giorno di lancio, puzzle numero 1
 
 # Segnaposto: la data vera si fissa prima del merge (vedi sopra).
 SEED_CUTOVER = date(2099, 1, 1)
 # NON SEGRETA: vale solo finche' `GAME_SEED_KEY` non e' impostata.
-CHIAVE_SVILUPPO = "divario-chiave-di-sviluppo-non-segreta"
+DEV_SEED_KEY = "divario-chiave-di-sviluppo-non-segreta"
 
-LIVELLI = ("regioni", "stessa_regione", "province")
-COMPARE_COPPIE = 10
-ORDER_TERRITORI = 5
+LEVELS = ("regioni", "stessa_regione", "province")
+COMPARE_PAIRS = 10
+ORDER_TERRITORIES = 5
 # Province minime in una regione perche' "stessa regione" abbia senso.
-MINIMO_COMPARE = 3
-MINIMO_ORDER = 5
+MIN_PROVINCES_COMPARE = 3
+MIN_PROVINCES_ORDER = 5
 
 ROOT = Path(__file__).resolve().parents[1]
-GIOCHI_CSV = ROOT / "config" / "game_indicators.csv"
-CENTROIDI_JSON = ROOT / "app" / "static" / "data" / "province_centroidi.json"
+GAMES_CSV = ROOT / "config" / "game_indicators.csv"
+CENTROIDS_JSON = ROOT / "app" / "static" / "data" / "province_centroidi.json"
 
 # Lato minore (unita' del viewBox 560x660) del poligono principale di una
 # provincia, sotto il quale la sagoma e' illeggibile sulla mappa a 390 px. Fra
 # Trieste (12,7) e Gorizia (16,3) non cade nessuna provincia: la soglia sta nel
 # vuoto, non taglia a caso.
-SOGLIA_GIOCABILE = 14.0
+PLAYABLE_THRESHOLD = 14.0
 # Chilometri per unita' del viewBox: media di tre distanze note (Milano-Roma,
 # Torino-Trieste, Palermo-Bolzano) fra centroidi. Il viewBox e' un Mercatore,
 # quindi la scala varia con la latitudine: i km sono approssimati.
-KM_PER_UNITA = 1.90
+KM_PER_UNIT = 1.90
 
 # Livello di difficolta' (0 facile, 4 duro) per giorno della settimana, lunedi' = 0.
-DIFFICOLTA_SETTIMANA = (0, 1, 1, 2, 3, 3, 4)
+WEEKDAY_DIFFICULTY = (0, 1, 1, 2, 3, 3, 4)
 # Finestra (min, max) della distanza fra i due valori in gara, come frazione
 # degli indici distinti disponibili: a livello 0 la coppia e' lontana in
 # classifica, ai livelli alti quasi adiacente.
-_FINESTRA_COMPARE = {0: (0.63, 1.0), 1: (0.42, 0.58), 2: (0.26, 0.37), 3: (0.16, 0.21), 4: (0.05, 0.11)}
+_COMPARE_WINDOW = {0: (0.63, 1.0), 1: (0.42, 0.58), 2: (0.26, 0.37), 3: (0.16, 0.21), 4: (0.05, 0.11)}
 # Per Ordina: quanta parte della classifica puo' coprire l'insieme dei cinque.
-_FINESTRA_ORDER = {0: 1.0, 1: 0.7, 2: 0.5, 3: 0.35, 4: 0.22}
-_MIN_DISTINTI_REGIONI = 6
+_ORDER_WINDOW = {0: 1.0, 1: 0.7, 2: 0.5, 3: 0.35, 4: 0.22}
+_MIN_DISTINCT_REGIONS = 6
 
 _log = logging.getLogger(__name__)
 
 
 # Il giorno di Roma
 
-def oggi_roma(now=None):
+def today_rome(now=None):
     """Il giorno corrente a Roma. `now` (datetime con fuso) serve ai test."""
     now = now or datetime.now(timezone.utc)
-    return now.astimezone(ROMA).date()
+    return now.astimezone(ROME_TZ).date()
 
 
-def prossima_sfida_roma(oggi=None):
+def next_challenge_rome(today=None):
     """ISO 8601 UTC della mezzanotte di Roma che apre il giorno dopo `oggi`."""
-    oggi = oggi or oggi_roma()
-    mezzanotte = datetime.combine(oggi + timedelta(days=1), datetime.min.time(), tzinfo=ROMA)
-    return mezzanotte.astimezone(timezone.utc).isoformat()
+    today = today or today_rome()
+    midnight = datetime.combine(today + timedelta(days=1), datetime.min.time(), tzinfo=ROME_TZ)
+    return midnight.astimezone(timezone.utc).isoformat()
 
 
-def numero_sfida(giorno):
-    return max((giorno - GAME_EPOCH).days, 0) + 1
+def challenge_number(day):
+    return max((day - GAME_EPOCH).days, 0) + 1
 
 
 # Il seed
 
 @lru_cache(maxsize=1)
-def _avvisa_chiave_di_sviluppo():
+def _warn_dev_seed_key():
     _log.warning("GAME_SEED_KEY non impostata: le sfide usano la chiave di sviluppo, che non e' segreta")
 
 
-class ChiaveSeedMancante(RuntimeError):
+class SeedKeyMissing(RuntimeError):
     """In produzione (Cloud Run imposta `K_SERVICE`) senza `GAME_SEED_KEY`: le sfide
     calcolate con la chiave di sviluppo, che sta nel repo, sarebbero prevedibili da
     chiunque. Le rotte che usano il seed nuovo rispondono 503."""
 
 
-def chiave_seed():
-    chiave = os.environ.get("GAME_SEED_KEY")
-    if chiave:
-        return chiave
+def seed_key():
+    key = os.environ.get("GAME_SEED_KEY")
+    if key:
+        return key
     if os.environ.get("K_SERVICE"):
-        raise ChiaveSeedMancante("GAME_SEED_KEY non impostata su Cloud Run: le sfide nuove sarebbero prevedibili")
-    _avvisa_chiave_di_sviluppo()
-    return CHIAVE_SVILUPPO
+        raise SeedKeyMissing("GAME_SEED_KEY non impostata su Cloud Run: le sfide nuove sarebbero prevedibili")
+    _warn_dev_seed_key()
+    return DEV_SEED_KEY
 
 
-def seed_giorno(gioco, giorno, chiave=None):
+def day_seed(game, day, key=None):
     """Il seed intero di `gioco` nel `giorno`: HMAC-SHA256 di "<gioco>|<data>"."""
-    chiave = chiave_seed() if chiave is None else chiave
-    messaggio = f"{gioco}|{giorno.isoformat()}".encode()
-    digest = hmac.new(chiave.encode(), messaggio, hashlib.sha256).digest()
+    key = seed_key() if key is None else key
+    message = f"{game}|{day.isoformat()}".encode()
+    digest = hmac.new(key.encode(), message, hashlib.sha256).digest()
     return int.from_bytes(digest, "big")
 
 
-def _rng(gioco, giorno, chiave=None):
-    return random.Random(seed_giorno(gioco, giorno, chiave))
+def _rng(game, day, key=None):
+    return random.Random(day_seed(game, day, key))
 
 
-def _ciclo_vecchio(indice_ciclo, ordine):
+def _legacy_cycle(cycle_index, ordering):
     """Il seed di prima del cutover: calcolabile da chiunque, conservato
     perche' le sfide gia' servite restano le stesse."""
-    rng = random.Random(f"divario-regioni-cycle-{indice_ciclo}")
-    regioni = list(ordine)
-    rng.shuffle(regioni)
-    return regioni
+    rng = random.Random(f"divario-regioni-cycle-{cycle_index}")
+    regions = list(ordering)
+    rng.shuffle(regions)
+    return regions
 
 
-def regione_del_giorno(giorno, ordine, cutover=None, chiave=None):
+def daily_region(day, ordering, cutover=None, key=None):
     """La regione di Indovina per un giorno. Prima del cutover il ciclo vecchio
     di 20 giorni, dopo lo stesso schema (nessuna ripetizione nel ciclo) con un
     mescolamento che esce dall'HMAC. `ordine` e' l'elenco delle regioni."""
     cutover = SEED_CUTOVER if cutover is None else cutover
-    if giorno < cutover:
-        indice = max((giorno - GAME_EPOCH).days, 0)
-        ciclo, pos = divmod(indice, len(ordine))
-        return _ciclo_vecchio(ciclo, ordine)[pos]
-    ciclo, pos = divmod((giorno - cutover).days, len(ordine))
-    inizio = cutover + timedelta(days=ciclo * len(ordine))
-    regioni = list(ordine)
-    _rng("regioni", inizio, chiave).shuffle(regioni)
-    return regioni[pos]
+    if day < cutover:
+        index = max((day - GAME_EPOCH).days, 0)
+        cycle, pos = divmod(index, len(ordering))
+        return _legacy_cycle(cycle, ordering)[pos]
+    cycle, pos = divmod((day - cutover).days, len(ordering))
+    start = cutover + timedelta(days=cycle * len(ordering))
+    regions = list(ordering)
+    _rng("regioni", start, key).shuffle(regions)
+    return regions[pos]
 
 
 # I territori
 
 @lru_cache(maxsize=1)
-def _province():
+def _provinces():
     from app import bes_data, profiles
 
     with bes_data.PROVINCE_CODES.open(encoding="utf-8", newline="") as handle:
-        codici = list(csv.DictReader(handle, delimiter=";"))
-    centroidi = json.loads(CENTROIDI_JSON.read_text(encoding="utf-8"))["province"]
+        codes = list(csv.DictReader(handle, delimiter=";"))
+    centroids = json.loads(CENTROIDS_JSON.read_text(encoding="utf-8"))["province"]
     pool = []
-    for riga in codici:
-        chiave = riga["province_key"]
-        c = centroidi[chiave]
+    for row in codes:
+        key = row["province_key"]
+        c = centroids[key]
         pool.append({
-            "key": chiave,
-            "name": riga["name"],
-            "region": riga["region"],
-            "region_key": profiles.region_key_for(riga["region"]),
+            "key": key,
+            "name": row["name"],
+            "region": row["region"],
+            "region_key": profiles.region_key_for(row["region"]),
             "x": c["x"],
             "y": c["y"],
             "w": c["w"],
             "h": c["h"],
-            "giocabile": min(c["w"], c["h"]) >= SOGLIA_GIOCABILE,
+            "giocabile": min(c["w"], c["h"]) >= PLAYABLE_THRESHOLD,
         })
     return tuple(pool)
 
@@ -206,53 +206,53 @@ def province_pool(solo_giocabili=False):
     """Le 107 province con chiave, nome, regione e centroide (`x`, `y` nel
     viewBox 560x660). `giocabile` dice se la sagoma e' leggibile sulla mappa;
     `solo_giocabili` restituisce solo quelle. Non modificare le voci."""
-    return [p for p in _province() if p["giocabile"] or not solo_giocabili]
+    return [p for p in _provinces() if p["giocabile"] or not solo_giocabili]
 
 
-def province_escluse():
-    return [p["key"] for p in _province() if not p["giocabile"]]
+def excluded_provinces():
+    return [p["key"] for p in _provinces() if not p["giocabile"]]
 
 
-def regioni_idonee(minimo):
+def eligible_regions(minimum):
     """Le regioni con almeno `minimo` province (5 per Ordina, 3 per gli altri
     giochi), nell'ordine di `REGION_ORDER`."""
     from app.data import REGION_ORDER
 
-    conteggi = {}
-    for p in _province():
-        conteggi[p["region"]] = conteggi.get(p["region"], 0) + 1
-    return [r for r in REGION_ORDER if conteggi.get(r, 0) >= minimo]
+    counts = {}
+    for p in _provinces():
+        counts[p["region"]] = counts.get(p["region"], 0) + 1
+    return [r for r in REGION_ORDER if counts.get(r, 0) >= minimum]
 
 
-def _provincia(chiave):
-    for p in _province():
-        if p["key"] == chiave:
+def _province_by_key(key):
+    for p in _provinces():
+        if p["key"] == key:
             return p
-    raise KeyError(chiave)
+    raise KeyError(key)
 
 
-_PUNTI = ("N", "NE", "E", "SE", "S", "SO", "O", "NO")
+_COMPASS_POINTS = ("N", "NE", "E", "SE", "S", "SO", "O", "NO")
 
 
-def distanza_km_direzione(a, b):
+def distance_km_direction(a, b):
     """(km approssimati, direzione in otto punti) per andare dalla provincia `a`
     alla `b`, fra i centroidi. I km sono una stima: vanno dichiarati tali."""
-    pa, pb = _provincia(a), _provincia(b)
+    pa, pb = _province_by_key(a), _province_by_key(b)
     dx, dy = pb["x"] - pa["x"], pb["y"] - pa["y"]
-    km = round(math.hypot(dx, dy) * KM_PER_UNITA)
+    km = round(math.hypot(dx, dy) * KM_PER_UNIT)
     if km == 0:
         return 0, None
-    gradi = math.degrees(math.atan2(dx, -dy)) % 360  # l'asse y dell'SVG scende
-    return km, _PUNTI[int((gradi + 22.5) // 45) % 8]
+    bearing = math.degrees(math.atan2(dx, -dy)) % 360  # l'asse y dell'SVG scende
+    return km, _COMPASS_POINTS[int((bearing + 22.5) // 45) % 8]
 
 
 # L'elenco curato
 
 @lru_cache(maxsize=1)
-def indicatori_gioco():
+def game_indicators():
     """Le righe di `config/game_indicators.csv`, con i due flag come bool."""
-    with GIOCHI_CSV.open(encoding="utf-8", newline="") as handle:
-        righe = list(csv.DictReader(handle, delimiter=";"))
+    with GAMES_CSV.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle, delimiter=";"))
     return tuple(
         {
             "id": r["id"],
@@ -263,17 +263,17 @@ def indicatori_gioco():
             "provincia": r["livello_provincia"] == "1",
             "note": r["note"],
         }
-        for r in righe
+        for r in rows
     )
 
 
-def id_provinciale(id_):
+def provincial_id(id_):
     return id_[len("bes:"):] if id_.startswith("bes:") else id_
 
 
-def _indice_quiz():
+def _quiz_index():
     """{id: voce} del pool regionale del quiz. Costruirlo costa circa 0,7 ms: in
-    `_candidati` (96 indicatori) lo si fa una volta per passata e non una volta per
+    `_candidates` (96 indicatori) lo si fa una volta per passata e non una volta per
     indicatore, e non sopravvive alla passata, cosi' non puo' andare fuori sincrono
     con il pool che `quiz` tiene in cache."""
     from app import quiz
@@ -281,195 +281,195 @@ def _indice_quiz():
     return {p["id"]: p for p in quiz._quiz_indicators()}
 
 
-def _righe_indicatore(ind, ambito, indice=None):
+def _indicator_rows(ind, scope, index=None):
     """(anno, [{key, name, region, value}]) di un indicatore a un livello
     territoriale, o None se il dato non c'e'. `ambito` e' "regioni" o "province".
-    `indice` e' l'`_indice_quiz()` gia' costruito da chi chiama in un ciclo."""
-    if ambito == "regioni":
-        voce = (indice if indice is not None else _indice_quiz()).get(ind["id"])
-        if voce is None:
+    `indice` e' l'`_quiz_index()` gia' costruito da chi chiama in un ciclo."""
+    if scope == "regioni":
+        entry = (index if index is not None else _quiz_index()).get(ind["id"])
+        if entry is None:
             return None
-        righe = [
+        rows = [
             {"key": r["region_key"], "name": r["region"], "region": r["region"], "value": r["value"]}
-            for r in voce["ranking"]
+            for r in entry["ranking"]
         ]
-        return voce["year"], righe
+        return entry["year"], rows
     from app import bes_data, province_profile
 
-    raw = id_provinciale(ind["id"])
+    raw = provincial_id(ind["id"])
     info = bes_data.get_bes_manifest("provincia").get(raw)
     if info is None:
         return None
-    valori = (province_profile._serie().get(raw) or {}).get(info["year_max"])
-    if not valori:
+    values = (province_profile._serie().get(raw) or {}).get(info["year_max"])
+    if not values:
         return None
-    anagrafe = {p["key"]: p for p in _province()}
-    righe = [
-        {"key": k, "name": anagrafe[k]["name"], "region": anagrafe[k]["region"], "value": v}
-        for k, v in sorted(valori["valori"].items()) if k in anagrafe
+    registry = {p["key"]: p for p in _provinces()}
+    rows = [
+        {"key": k, "name": registry[k]["name"], "region": registry[k]["region"], "value": v}
+        for k, v in sorted(values["valori"].items()) if k in registry
     ]
-    return info["year_max"], righe
+    return info["year_max"], rows
 
 
-def _campi_indicatore(ind, anno):
-    return {"id": ind["id"], "name": ind["name"], "unit": ind["unit"], "year": anno, "family": ind["family"]}
+def _indicator_fields(ind, year):
+    return {"id": ind["id"], "name": ind["name"], "unit": ind["unit"], "year": year, "family": ind["family"]}
 
 
-def _campi_territorio(riga):
-    return {"key": riga["key"], "name": riga["name"], "region": riga["region"]}
+def _territory_fields(row):
+    return {"key": row["key"], "name": row["name"], "region": row["region"]}
 
 
-def _distinti(righe):
+def _distinct(rows):
     """Valori distinti dal piu' alto al piu' basso, e le righe di ciascuno."""
-    per_valore = {}
-    for r in righe:
-        per_valore.setdefault(r["value"], []).append(r)
-    ordine = sorted(per_valore, reverse=True)
-    return ordine, per_valore
+    by_value = {}
+    for r in rows:
+        by_value.setdefault(r["value"], []).append(r)
+    ordering = sorted(by_value, reverse=True)
+    return ordering, by_value
 
 
-def _ambito(livello, gioco, giorno, chiave):
+def _scope(level, game, day, key):
     """(ambito dei dati, filtro sulle righe, regione) per un livello. Per
     "stessa regione" la regione del giorno esce dal seed."""
-    if livello == "regioni":
+    if level == "regioni":
         return "regioni", (lambda r: True), None
-    if livello == "province":
+    if level == "province":
         return "province", (lambda r: True), None
-    minimo = MINIMO_ORDER if gioco == "order" else MINIMO_COMPARE
-    idonee = regioni_idonee(minimo)
-    regione = _rng(f"{gioco}-regione", giorno, chiave).choice(idonee)
-    return "province", (lambda r: r["region"] == regione), regione
+    minimum = MIN_PROVINCES_ORDER if game == "order" else MIN_PROVINCES_COMPARE
+    eligible = eligible_regions(minimum)
+    region = _rng(f"{game}-regione", day, key).choice(eligible)
+    return "province", (lambda r: r["region"] == region), region
 
 
-def _candidati(livello, ambito, filtro, minimo_distinti, rng):
+def _candidates(level, scope, row_filter, min_distinct, rng):
     """Gli indicatori utilizzabili in quell'ambito, in ordine mescolato dal
     seed: una lista di (indicatore, anno, righe filtrate)."""
-    flag = "regione" if ambito == "regioni" else "provincia"
-    elenco = sorted((i for i in indicatori_gioco() if i[flag]), key=lambda i: i["id"])
-    rng.shuffle(elenco)
-    minimo = minimo_distinti if livello == "stessa_regione" else max(minimo_distinti, _MIN_DISTINTI_REGIONI)
-    utili = []
-    indice = _indice_quiz() if ambito == "regioni" else None
-    for ind in elenco:
-        dato = _righe_indicatore(ind, ambito, indice)
-        if dato is None:
+    flag = "regione" if scope == "regioni" else "provincia"
+    listing = sorted((i for i in game_indicators() if i[flag]), key=lambda i: i["id"])
+    rng.shuffle(listing)
+    minimum = min_distinct if level == "stessa_regione" else max(min_distinct, _MIN_DISTINCT_REGIONS)
+    usable = []
+    index = _quiz_index() if scope == "regioni" else None
+    for ind in listing:
+        found = _indicator_rows(ind, scope, index)
+        if found is None:
             continue
-        anno, righe = dato
-        righe = [r for r in righe if r["value"] is not None and filtro(r)]
-        if len({r["value"] for r in righe}) >= minimo:
-            utili.append((ind, anno, righe))
-    return utili
+        year, rows = found
+        rows = [r for r in rows if r["value"] is not None and row_filter(r)]
+        if len({r["value"] for r in rows}) >= minimum:
+            usable.append((ind, year, rows))
+    return usable
 
 
-def _controlla(livello):
-    if livello not in LIVELLI:
-        raise ValueError(f"livello sconosciuto: {livello!r}")
+def _check_level(level):
+    if level not in LEVELS:
+        raise ValueError(f"livello sconosciuto: {level!r}")
 
 
-def compare_del_giorno(giorno, livello, chiave=None):
+def daily_compare(day, level, key=None):
     """Le 10 coppie di "Chi e' maggiore?" per un giorno e un livello (vedi `_compare`).
     In cache per `(giorno, livello, chiave)`: la chiave e' risolta PRIMA della cache,
-    cosi' una sfida calcolata prima non aggira il controllo di `chiave_seed`."""
-    _controlla(livello)
-    return _compare(giorno, livello, chiave_seed() if chiave is None else chiave)
+    cosi' una sfida calcolata prima non aggira il controllo di `seed_key`."""
+    _check_level(level)
+    return _compare(day, level, seed_key() if key is None else key)
 
 
 @lru_cache(maxsize=6)
-def _compare(giorno, livello, chiave):
+def _compare(day, level, key):
     """Le 10 coppie di "Chi e' maggiore?" per un giorno e un livello: per
     ciascuna un indicatore e due territori, MAI i valori. La difficolta' cresce
     da lunedi' (coppie lontane in classifica) a domenica (quasi adiacenti)."""
-    _controlla(livello)
-    difficolta = DIFFICOLTA_SETTIMANA[giorno.weekday()]
-    rng = _rng(f"compare-{livello}", giorno, chiave)
-    ambito, filtro, regione = _ambito(livello, "compare", giorno, chiave)
-    utili = _candidati(livello, ambito, filtro, 2, rng)
-    lo, hi = _FINESTRA_COMPARE[difficolta]
-    coppie = []
-    for i in range(COMPARE_COPPIE):
-        ind, anno, righe = utili[i % len(utili)]
-        distinti, per_valore = _distinti(righe)
-        massimo = len(distinti) - 1
-        gap_min = max(1, math.ceil(lo * massimo))
-        gap_max = min(max(gap_min, math.floor(hi * massimo)), massimo)
+    _check_level(level)
+    difficulty = WEEKDAY_DIFFICULTY[day.weekday()]
+    rng = _rng(f"compare-{level}", day, key)
+    scope, row_filter, region = _scope(level, "compare", day, key)
+    usable = _candidates(level, scope, row_filter, 2, rng)
+    lo, hi = _COMPARE_WINDOW[difficulty]
+    pairs = []
+    for i in range(COMPARE_PAIRS):
+        ind, year, rows = usable[i % len(usable)]
+        distinct, by_value = _distinct(rows)
+        maximum = len(distinct) - 1
+        gap_min = max(1, math.ceil(lo * maximum))
+        gap_max = min(max(gap_min, math.floor(hi * maximum)), maximum)
         gap = rng.randint(gap_min, gap_max)
-        j = rng.randint(0, massimo - gap)
-        coppia = [rng.choice(per_valore[distinti[j]]), rng.choice(per_valore[distinti[j + gap]])]
-        rng.shuffle(coppia)
-        coppie.append({
-            "indicator": _campi_indicatore(ind, anno),
-            "a": _campi_territorio(coppia[0]),
-            "b": _campi_territorio(coppia[1]),
+        j = rng.randint(0, maximum - gap)
+        pair = [rng.choice(by_value[distinct[j]]), rng.choice(by_value[distinct[j + gap]])]
+        rng.shuffle(pair)
+        pairs.append({
+            "indicator": _indicator_fields(ind, year),
+            "a": _territory_fields(pair[0]),
+            "b": _territory_fields(pair[1]),
         })
-    return {"level": livello, "difficulty": difficolta, "region": regione, "pairs": coppie}
+    return {"level": level, "difficulty": difficulty, "region": region, "pairs": pairs}
 
 
-def order_del_giorno(giorno, livello, chiave=None):
+def daily_order(day, level, key=None):
     """Il round di "Ordina" per un giorno e un livello (vedi `_order`), in cache come
-    `compare_del_giorno`."""
-    _controlla(livello)
-    return _order(giorno, livello, chiave_seed() if chiave is None else chiave)
+    `daily_compare`."""
+    _check_level(level)
+    return _order(day, level, seed_key() if key is None else key)
 
 
 @lru_cache(maxsize=6)
-def _order(giorno, livello, chiave):
+def _order(day, level, key):
     """Il round di "Ordina" per un giorno e un livello: cinque territori e un
     indicatore, senza valori ne' ordine (i territori sono mescolati). Le
     finestre di difficolta' stringono l'intervallo che i cinque coprono."""
-    _controlla(livello)
-    difficolta = DIFFICOLTA_SETTIMANA[giorno.weekday()]
-    rng = _rng(f"order-{livello}", giorno, chiave)
-    ambito, filtro, regione = _ambito(livello, "order", giorno, chiave)
-    utili = _candidati(livello, ambito, filtro, ORDER_TERRITORI, rng)
-    ind, anno, righe = utili[0]
-    distinti, per_valore = _distinti(righe)
-    n = len(distinti)
-    finestra = min(n, max(ORDER_TERRITORI, math.ceil(_FINESTRA_ORDER[difficolta] * n)))
-    inizio = rng.randint(0, n - finestra)
-    indici = sorted(rng.sample(range(inizio, inizio + finestra), ORDER_TERRITORI))
-    scelti = [rng.choice(per_valore[distinti[i]]) for i in indici]
-    rng.shuffle(scelti)
+    _check_level(level)
+    difficulty = WEEKDAY_DIFFICULTY[day.weekday()]
+    rng = _rng(f"order-{level}", day, key)
+    scope, row_filter, region = _scope(level, "order", day, key)
+    usable = _candidates(level, scope, row_filter, ORDER_TERRITORIES, rng)
+    ind, year, rows = usable[0]
+    distinct, by_value = _distinct(rows)
+    n = len(distinct)
+    window = min(n, max(ORDER_TERRITORIES, math.ceil(_ORDER_WINDOW[difficulty] * n)))
+    start = rng.randint(0, n - window)
+    indices = sorted(rng.sample(range(start, start + window), ORDER_TERRITORIES))
+    picked = [rng.choice(by_value[distinct[i]]) for i in indices]
+    rng.shuffle(picked)
     return {
-        "level": livello,
-        "difficulty": difficolta,
-        "region": regione,
-        "indicator": _campi_indicatore(ind, anno),
-        "territories": [_campi_territorio(r) for r in scelti],
+        "level": level,
+        "difficulty": difficulty,
+        "region": region,
+        "indicator": _indicator_fields(ind, year),
+        "territories": [_territory_fields(r) for r in picked],
     }
 
 
 # I payload delle rotte
 
-def sfida_payload(gioco, livello, now=None):
+def challenge_payload(game, level, now=None):
     """Il payload della sfida di OGGI (a Roma): mai una data a scelta del
     client, cosi' una soluzione futura non puo' uscire."""
-    giorno = oggi_roma(now)
-    corpo = (compare_del_giorno if gioco == "compare" else order_del_giorno)(giorno, livello)
+    day = today_rome(now)
+    body = (daily_compare if game == "compare" else daily_order)(day, level)
     return {
-        "puzzle_id": f"daily:{giorno.isoformat()}",
-        "number": numero_sfida(giorno),
-        "date": giorno.isoformat(),
-        "next_puzzle_at": prossima_sfida_roma(giorno),
-        **corpo,
+        "puzzle_id": f"daily:{day.isoformat()}",
+        "number": challenge_number(day),
+        "date": day.isoformat(),
+        "next_puzzle_at": next_challenge_rome(day),
+        **body,
     }
 
 
 # Le fonti dei giochi, per il JSON-LD delle pagine /quiz/*
 
-def _famiglia_di(id_indicatore):
+def _family_of(id_indicatore):
     """La famiglia di `app/sources.py` di un id del pool: il prefisso interno
     (`bes:`, `multiscopo:`, `dem:`, `eur:`), e nessun prefisso e' la territoriale."""
     from app import sources
 
-    for famiglia, meta in sources.SOURCES.items():
-        prefisso = meta["internal_prefix"]
-        if prefisso and id_indicatore.startswith(prefisso):
-            return famiglia
+    for family, meta in sources.SOURCES.items():
+        prefix = meta["internal_prefix"]
+        if prefix and id_indicatore.startswith(prefix):
+            return family
     return "territorial"
 
 
 @lru_cache(maxsize=8)
-def famiglie_del_gioco(gioco):
+def game_families(game):
     """Le famiglie di fonti davvero presenti nel pool di un gioco (`regione`,
     `compare`, `order`, `provincia`), nell'ordine del registro. Indovina la Regione
     pesca dal profilo regionale dell'atlante. Chi e' maggiore e Ordina pescano dal
@@ -478,19 +478,19 @@ def famiglie_del_gioco(gioco):
     from app import profiles, quiz, sources
     from app.data import REGION_ORDER
 
-    if gioco == "regione":
-        profilo = profiles.region_profile(profiles.region_key_for(REGION_ORDER[0]))
-        famiglie = {_famiglia_di(voce["id"]) for voce in profilo["all_indicators"]}
-    elif gioco in ("compare", "order"):
-        famiglie = {_famiglia_di(voce["id"]) for voce in quiz._quiz_indicators()} | {"bes"}
-    elif gioco == "provincia":
-        famiglie = {"bes"}
+    if game == "regione":
+        profile = profiles.region_profile(profiles.region_key_for(REGION_ORDER[0]))
+        families = {_family_of(entry["id"]) for entry in profile["all_indicators"]}
+    elif game in ("compare", "order"):
+        families = {_family_of(entry["id"]) for entry in quiz._quiz_indicators()} | {"bes"}
+    elif game == "provincia":
+        families = {"bes"}
     else:
-        raise ValueError(f"gioco sconosciuto: {gioco!r}")
-    return tuple(f for f in sources.SOURCES if f in famiglie)
+        raise ValueError(f"gioco sconosciuto: {game!r}")
+    return tuple(f for f in sources.SOURCES if f in families)
 
 
-def fonte_del_gioco(gioco):
+def game_source(game):
     """Chi pubblica i dati di un gioco, per il JSON-LD: `istituzioni` (frase in
     chiaro, "Istat ed Eurostat"), `creator` (le organizzazioni, una per istituzione) e
     `licenze` (gli URL delle licenze dichiarate dalle famiglie, senza ripetizioni). Tutto
@@ -498,20 +498,20 @@ def fonte_del_gioco(gioco):
     Eurostat."""
     from app import sources
 
-    famiglie = famiglie_del_gioco(gioco)
-    istituzioni = list(dict.fromkeys(sources.SOURCES[f]["institution"] for f in famiglie))
-    licenze = list(dict.fromkeys(u for u in (sources.family_license_url(f) for f in famiglie) if u))
+    families = game_families(game)
+    institutions = list(dict.fromkeys(sources.SOURCES[f]["institution"] for f in families))
+    licenses = list(dict.fromkeys(u for u in (sources.family_license_url(f) for f in families) if u))
     return {
-        "istituzioni": sources.institutions_label(famiglie),
-        "creator": [{"@type": "Organization", "name": nome} for nome in istituzioni],
-        "licenze": licenze,
+        "istituzioni": sources.institutions_label(families),
+        "creator": [{"@type": "Organization", "name": name} for name in institutions],
+        "licenze": licenses,
     }
 
 
-def _registra_nei_template():
+def _register_in_templates():
     from app import app
 
-    app.jinja_env.globals["fonte_del_gioco"] = fonte_del_gioco
+    app.jinja_env.globals["game_source"] = game_source
 
 
-_registra_nei_template()
+_register_in_templates()

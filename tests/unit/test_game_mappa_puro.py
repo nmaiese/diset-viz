@@ -22,7 +22,7 @@ from app.game_mappa import (
     size_bands,
 )
 
-KEY = game_daily.CHIAVE_SVILUPPO
+KEY = game_daily.DEV_SEED_KEY
 MONDAY = date(2026, 10, 5)
 SUNDAY = date(2026, 10, 11)
 
@@ -105,7 +105,7 @@ class PoolAndBandsTest(unittest.TestCase):
         self.assertEqual(len(pool("regione")), 93)
 
     def test_region_level_only_regions_with_three_provinces(self):
-        eligible = set(game_daily.regioni_idonee(3))
+        eligible = set(game_daily.eligible_regions(3))
         for key in pool("regione"):
             self.assertIn(_province(key)["region"], eligible)
         self.assertNotIn("aosta", pool("regione"))
@@ -132,15 +132,15 @@ class DailyTest(unittest.TestCase):
 
     def test_mix_follows_the_day_of_the_week(self):
         for day in (MONDAY, SUNDAY, MONDAY + timedelta(days=3)):
-            counts = MIX[game_daily.DIFFICOLTA_SETTIMANA[day.weekday()]]
+            counts = MIX[game_daily.WEEKDAY_DIFFICULTY[day.weekday()]]
             for level in LEVELS:
                 keys = daily_provinces(day, level, KEY)
                 bands = size_bands(level)
                 expected = [i for i, n in enumerate(counts) for _ in range(n)]
                 found = [next(i for i, band in enumerate(bands) if k in band) for k in keys]
                 self.assertEqual(found, expected, (day, level))
-        self.assertEqual(MIX[game_daily.DIFFICOLTA_SETTIMANA[MONDAY.weekday()]], (6, 4, 0))
-        self.assertEqual(MIX[game_daily.DIFFICOLTA_SETTIMANA[SUNDAY.weekday()]], (1, 3, 6))
+        self.assertEqual(MIX[game_daily.WEEKDAY_DIFFICULTY[MONDAY.weekday()]], (6, 4, 0))
+        self.assertEqual(MIX[game_daily.WEEKDAY_DIFFICULTY[SUNDAY.weekday()]], (1, 3, 6))
 
     def test_deterministic_and_the_same_after_clearing_the_cache(self):
         before = daily_provinces(SUNDAY, "italia", KEY)
@@ -172,12 +172,12 @@ class DailyTest(unittest.TestCase):
 
     def test_the_seed_key_is_resolved_before_the_cache(self):
         daily_provinces(SUNDAY, "italia", KEY)
-        game_daily.chiave_seed()  # in locale non solleva
+        game_daily.seed_key()  # in locale non solleva
         env = {k: v for k, v in os.environ.items() if k != "GAME_SEED_KEY"}
         env["K_SERVICE"] = "divarioitalia"
         with mock.patch.dict(os.environ, env, clear=True):
-            game_mappa._history(SUNDAY, "italia", game_daily.CHIAVE_SVILUPPO)
-            with self.assertRaises(game_daily.ChiaveSeedMancante):
+            game_mappa._history(SUNDAY, "italia", game_daily.DEV_SEED_KEY)
+            with self.assertRaises(game_daily.SeedKeyMissing):
                 daily_provinces(SUNDAY, "italia")
 
     def test_unknown_level_raises(self):
@@ -227,7 +227,7 @@ class OutcomeTest(unittest.TestCase):
 
 class QuestionTest(unittest.TestCase):
     def test_question_shapes(self):
-        with mock.patch.object(game_daily, "chiave_seed", return_value=KEY):
+        with mock.patch.object(game_daily, "seed_key", return_value=KEY):
             italia = game_mappa.question(SUNDAY, "italia", "map", 0)
             regione = game_mappa.question(SUNDAY, "regione", "map", 0)
             elenco = game_mappa.question(SUNDAY, "italia", "list", 0)
@@ -243,10 +243,10 @@ class QuestionTest(unittest.TestCase):
 
 class DistanceTest(unittest.TestCase):
     def test_distance_is_an_estimate_from_the_chosen_to_the_right_one(self):
-        km, direction = game_daily.distanza_km_direzione("brindisi", "lecce")
+        km, direction = game_daily.distance_km_direction("brindisi", "lecce")
         self.assertTrue(20 <= km <= 60, km)
         self.assertIn(direction, ("S", "SE"))
-        self.assertEqual(game_daily.distanza_km_direzione("lecce", "lecce"), (0, None))
+        self.assertEqual(game_daily.distance_km_direction("lecce", "lecce"), (0, None))
 
 
 if __name__ == "__main__":

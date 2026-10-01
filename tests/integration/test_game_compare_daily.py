@@ -29,8 +29,8 @@ GIORNO_30 = date(2026, 9, 30)
 
 def _orologio(now):
     """Fissa l'orologio del server su un istante, per le rotte."""
-    giorno = game_daily.oggi_roma(now)
-    return mock.patch.object(game_compare, "oggi_roma", return_value=giorno)
+    giorno = game_daily.today_rome(now)
+    return mock.patch.object(game_compare, "today_rome", return_value=giorno)
 
 
 def _valori_veri(livello, coppia):
@@ -42,7 +42,7 @@ def _valori_veri(livello, coppia):
             for riga in quiz._quiz_indicator_payload(indicatore["id"], indicatore["year"])["values"]
         }
     else:
-        _, righe = game_daily._righe_indicatore({"id": indicatore["id"]}, "province")
+        _, righe = game_daily._indicator_rows({"id": indicatore["id"]}, "province")
         valori = {riga["key"]: riga["value"] for riga in righe}
     return valori[coppia["a"]["key"]], valori[coppia["b"]["key"]]
 
@@ -120,9 +120,9 @@ class Base(unittest.TestCase):
 
 class SessioneTest(Base):
     def test_questions_carry_no_values_and_no_solution(self):
-        for livello in game_daily.LIVELLI:
+        for livello in game_daily.LEVELS:
             sessione = self._sessione(livello)
-            self.assertEqual(len(sessione["questions"]), game_daily.COMPARE_COPPIE)
+            self.assertEqual(len(sessione["questions"]), game_daily.COMPARE_PAIRS)
             testo = json.dumps(sessione)
             for rubrica in ("value", "winner", "correct", "description"):
                 self.assertNotIn(rubrica, testo, f"{livello}: {rubrica} nelle domande")
@@ -156,9 +156,9 @@ class SessioneTest(Base):
                     self.assertEqual(domanda[lato]["region"], regioni[domanda[lato]["key"]])
 
     def test_same_region_level_only_uses_eligible_regions(self):
-        idonee = set(game_daily.regioni_idonee(game_daily.MINIMO_COMPARE))
+        idonee = set(game_daily.eligible_regions(game_daily.MIN_PROVINCES_COMPARE))
         for giorno in range(10):
-            sfida = game_daily.compare_del_giorno(GIORNO_30 + timedelta(days=giorno), "stessa_regione")
+            sfida = game_daily.daily_compare(GIORNO_30 + timedelta(days=giorno), "stessa_regione")
             self.assertIn(sfida["region"], idonee)
             for coppia in sfida["pairs"]:
                 for lato in ("a", "b"):

@@ -40,9 +40,9 @@ def daily_order_session(level="regioni"):
     """Payload per l'apertura di una sessione della sfida del giorno. La sessione e'
     sempre nuova: riprendere un token precedente rilegherebbe lo stesso puzzle e farebbe
     crescere una serie che non esiste."""
-    if level not in game_daily.LIVELLI:
+    if level not in game_daily.LEVELS:
         raise ErroreOrdina("bad_request")
-    payload = game_daily.sfida_payload("order", level)
+    payload = game_daily.challenge_payload("order", level)
     state = quiz_tokens.load_state(None, MODO, timer=False)
     payload["timer"] = False
     keys = [t["key"] for t in payload["territories"]]
@@ -60,15 +60,15 @@ def evaluate_daily_order_answer(payload, auth_user=None):
 
     state = quiz_tokens.load_state(payload.get("token"), MODO)
     level = state.get("x")
-    if state.get("fp") is None or level not in game_daily.LIVELLI:
+    if state.get("fp") is None or level not in game_daily.LEVELS:
         raise ErroreOrdina("token_invalid")
 
     region_keys = payload.get("region_keys")
-    if not isinstance(region_keys, list) or len(region_keys) != game_daily.ORDER_TERRITORI:
+    if not isinstance(region_keys, list) or len(region_keys) != game_daily.ORDER_TERRITORIES:
         raise ErroreOrdina("bad_request")
 
-    today = game_daily.oggi_roma()
-    daily_puzzle = game_daily.order_del_giorno(today, level)
+    today = game_daily.today_rome()
+    daily_puzzle = game_daily.daily_order(today, level)
     ind = daily_puzzle["indicator"]
     ind_id = ind["id"]
     year = ind["year"]
@@ -90,7 +90,7 @@ def evaluate_daily_order_answer(payload, auth_user=None):
 
     if result is None:
         ambito = "province"
-        righe_data = game_daily._righe_indicatore(ind, ambito)
+        righe_data = game_daily._indicator_rows(ind, ambito)
         if not righe_data:
             raise ErroreOrdina("bad_request")
         _, all_rows = righe_data
@@ -125,7 +125,7 @@ def evaluate_daily_order_answer(payload, auth_user=None):
             for k in correct_keys
         ]
 
-        raw_id = game_daily.id_provinciale(ind_id)
+        raw_id = game_daily.provincial_id(ind_id)
         manifest = bes_data.get_bes_manifest("provincia").get(raw_id) or {}
         explain = manifest.get("explain") or {}
         desc = explain.get("plain") or ind["name"]
@@ -194,7 +194,7 @@ def _righe_con_unita(result):
 def province_path(ind_id):
     """Il link canonico della scheda a livello province, quello di `game_provincia`:
     uno slug composto dal nome leggibile del gioco porta a un 301."""
-    return bes_data.bes_level_path(game_daily.id_provinciale(ind_id), "provincia")
+    return bes_data.bes_level_path(game_daily.provincial_id(ind_id), "provincia")
 
 
 def sid_del_token(token):

@@ -67,12 +67,12 @@ class DailyRecordTest(Base):
 
     def test_daily_win_with_jwt_is_saved_and_streak_is_one(self):
         client = app.test_client()
-        puzzle_id = f"daily:{game_daily.oggi_roma().isoformat()}"
+        puzzle_id = f"daily:{game_daily.today_rome().isoformat()}"
         response = self._win(client, puzzle_id, {"Authorization": "Bearer " + _jwt()})
         self.assertEqual(response.status_code, 200)
         rows = _daily_rows("uuid-sic")
         self.assertEqual([(r.puzzle_date, r.solved) for r in rows],
-                         [(game_daily.oggi_roma().isoformat(), 1)])
+                         [(game_daily.today_rome().isoformat(), 1)])
         daily = player_stats.stats_map("uuid-sic")["daily"]
         self.assertEqual(daily["current_daily_streak"], 1)
         me = client.get("/api/player/me", headers={"Authorization": "Bearer " + _jwt()}).get_json()
@@ -82,7 +82,7 @@ class DailyRecordTest(Base):
     def test_only_todays_daily_is_recorded_not_practice_nor_archive(self):
         client = app.test_client()
         headers = {"Authorization": "Bearer " + _jwt()}
-        today = game_daily.oggi_roma()
+        today = game_daily.today_rome()
         practice_id = game.new_practice_puzzle_id()
         wrong = next(r["region_key"] for r in profiles.all_regions_index()
                      if r["region_key"] != _winning_key(practice_id))
@@ -102,11 +102,11 @@ class DailyRecordTest(Base):
     def test_current_streak_is_zero_when_last_win_is_two_days_old(self):
         player_stats.record_daily("u1", "2026-07-19", 1, True)
         player_stats.record_daily("u1", "2026-07-20", 1, True)
-        with mock.patch.object(game_daily, "oggi_roma", return_value=date(2026, 7, 22)):
+        with mock.patch.object(game_daily, "today_rome", return_value=date(2026, 7, 22)):
             daily = player_stats.stats_map("u1")["daily"]
         self.assertEqual(daily["current_daily_streak"], 0)
         self.assertEqual(daily["max_daily_streak"], 2)
-        with mock.patch.object(game_daily, "oggi_roma", return_value=date(2026, 7, 21)):
+        with mock.patch.object(game_daily, "today_rome", return_value=date(2026, 7, 21)):
             self.assertEqual(player_stats.stats_map("u1")["daily"]["current_daily_streak"], 2)
 
     def test_historic_streak_stays_apart_from_daily_streak(self):
@@ -353,7 +353,7 @@ class SenzaMigrazione0010Test(Base):
         self.intest = {"Authorization": "Bearer " + _jwt("uuid-0010")}
 
     def test_indovina_salva_lo_storico_anche_senza_daily_scores(self):
-        puzzle_id = f"daily:{game_daily.oggi_roma().isoformat()}"
+        puzzle_id = f"daily:{game_daily.today_rome().isoformat()}"
         r = self.client.post("/api/game/guess", headers=self.intest, json={
             "puzzle_id": puzzle_id, "region_key": _winning_key(puzzle_id), "attempt": 1})
         self.assertEqual(r.status_code, 200)
@@ -368,7 +368,7 @@ class SenzaMigrazione0010Test(Base):
     def test_provincia_risponde_200_e_i_traguardi_si_valutano_lo_stesso(self):
         from app import game_provincia
         payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
-        mistero = game_provincia.provincia_del_giorno(game_daily.oggi_roma())["key"]
+        mistero = game_provincia.provincia_del_giorno(game_daily.today_rome())["key"]
         r = self.client.post("/api/game/provincia/guess", headers=self.intest, json={
             "token": payload["token"], "province_key": mistero})
         self.assertEqual(r.status_code, 200)
@@ -416,9 +416,9 @@ class SeedInProduzioneTest(Base):
                     self.assertIn("GAME_SEED_KEY", log.output[0])
 
     def test_una_sfida_in_cache_non_aggira_il_controllo(self):
-        oggi = game_daily.oggi_roma()
-        game_daily.compare_del_giorno(oggi, "regioni")
-        game_daily.order_del_giorno(oggi, "regioni")
+        oggi = game_daily.today_rome()
+        game_daily.daily_compare(oggi, "regioni")
+        game_daily.daily_order(oggi, "regioni")
         with self._ambiente(K_SERVICE="divario"):
             for rotta in self.ROTTE:
                 with self.subTest(rotta=rotta):
@@ -437,10 +437,10 @@ class SeedInProduzioneTest(Base):
                     self.assertEqual(self.client.get(rotta).status_code, 200)
 
     def test_la_chiave_cambia_la_sfida_e_non_si_mescolano_in_cache(self):
-        oggi = game_daily.oggi_roma()
-        a = game_daily.order_del_giorno(oggi, "regioni", "chiave-a")
-        b = game_daily.order_del_giorno(oggi, "regioni", "chiave-b")
-        self.assertIs(a, game_daily.order_del_giorno(oggi, "regioni", "chiave-a"))
+        oggi = game_daily.today_rome()
+        a = game_daily.daily_order(oggi, "regioni", "chiave-a")
+        b = game_daily.daily_order(oggi, "regioni", "chiave-b")
+        self.assertIs(a, game_daily.daily_order(oggi, "regioni", "chiave-a"))
         self.assertNotEqual([t["key"] for t in a["territories"]] + [a["indicator"]["id"]],
                             [t["key"] for t in b["territories"]] + [b["indicator"]["id"]])
 
@@ -451,16 +451,16 @@ class CacheDelleSfideTest(Base):
 
     def test_la_sfida_si_calcola_una_volta_per_giorno_livello_e_chiave(self):
         giorno = date(2031, 3, 4)
-        with mock.patch.object(game_daily, "_candidati", wraps=game_daily._candidati) as candidati:
+        with mock.patch.object(game_daily, "_candidates", wraps=game_daily._candidates) as candidati:
             for _ in range(3):
-                game_daily.order_del_giorno(giorno, "regioni", "chiave-cache")
-                game_daily.compare_del_giorno(giorno, "regioni", "chiave-cache")
+                game_daily.daily_order(giorno, "regioni", "chiave-cache")
+                game_daily.daily_compare(giorno, "regioni", "chiave-cache")
         self.assertEqual(candidati.call_count, 2)
 
     def test_l_indice_del_pool_si_costruisce_una_volta_per_passata(self):
         giorno = date(2031, 3, 5)
-        with mock.patch.object(game_daily, "_indice_quiz", wraps=game_daily._indice_quiz) as indice:
-            game_daily.order_del_giorno(giorno, "regioni", "chiave-indice")
+        with mock.patch.object(game_daily, "_quiz_index", wraps=game_daily._quiz_index) as indice:
+            game_daily.daily_order(giorno, "regioni", "chiave-indice")
         self.assertEqual(indice.call_count, 1)
 
 

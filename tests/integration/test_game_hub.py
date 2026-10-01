@@ -41,7 +41,7 @@ class Base(unittest.TestCase):
         config.LEADERBOARD_DB = str(Path(self._tmp) / "h.sqlite3")
         for chiave in ("rl:prov:ip:127.0.0.1", "rl:ans:ip:127.0.0.1"):
             cache.delete(chiave)
-        self.oggi = game_daily.oggi_roma()
+        self.oggi = game_daily.today_rome()
 
     def tearDown(self):
         config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB = self._saved

@@ -9,10 +9,10 @@ La provincia del giorno e' una sola, uguale per tutti e per i due livelli:
 Il livello e' la sola cosa che cambia: la provincia, gli indizi e la soluzione
 sono gli stessi. Per questo la provincia si sceglie fra le giocabili
 (`game_daily.province_pool(solo_giocabili=True)`) **di una regione idonea**
-(`regioni_idonee(3)`): altrimenti il livello facile non avrebbe fra chi scegliere.
+(`eligible_regions(3)`): altrimenti il livello facile non avrebbe fra chi scegliere.
 
-Il giorno e' quello di Roma (`game_daily.oggi_roma`) e il seed esce da
-`game_daily.seed_giorno("provincia", giorno)`, cioe' da un HMAC con una chiave
+Il giorno e' quello di Roma (`game_daily.today_rome`) e il seed esce da
+`game_daily.day_seed("provincia", giorno)`, cioe' da un HMAC con una chiave
 che non sta nel repo: la soluzione di domani non si calcola leggendo il codice.
 
 **Anti-spoiler.** Lo stato dei tentativi sta nel server, non nel solo client: il
@@ -87,10 +87,10 @@ def indizi_ammessi():
     configurazione: (id BES, nome leggibile, unita', famiglia, tema, anno)."""
     manifesto = _manifesto()
     ammessi = []
-    for voce in game_daily.indicatori_gioco():
+    for voce in game_daily.game_indicators():
         if not voce["provincia"]:
             continue
-        raw = game_daily.id_provinciale(voce["id"])
+        raw = game_daily.provincial_id(voce["id"])
         riga = manifesto.get(raw)
         if riga is None:
             continue
@@ -121,12 +121,12 @@ def puzzle_id(giorno):
 def provincia_del_giorno(giorno, chiave=None):
     """La provincia misteriosa di un giorno: una giocabile di una regione
     idonea, dal seed. `chiave` serve ai test."""
-    idonee = set(game_daily.regioni_idonee(game_daily.MINIMO_COMPARE))
+    idonee = set(game_daily.eligible_regions(game_daily.MIN_PROVINCES_COMPARE))
     candidate = sorted(
         (p for p in game_daily.province_pool(solo_giocabili=True) if p["region"] in idonee),
         key=lambda p: p["key"],
     )
-    rng = random.Random(game_daily.seed_giorno("provincia", giorno, chiave))
+    rng = random.Random(game_daily.day_seed("provincia", giorno, chiave))
     return rng.choice(candidate)
 
 
@@ -157,7 +157,7 @@ def _campi_indizio(ind, chiave_provincia):
 def indizi_del_giorno(giorno, chiave=None):
     """I sei indizi della provincia del giorno, dal meno al piu' distintivo."""
     mistero = provincia_del_giorno(giorno, chiave)["key"]
-    rng = random.Random(game_daily.seed_giorno("provincia-indizi", giorno, chiave))
+    rng = random.Random(game_daily.day_seed("provincia-indizi", giorno, chiave))
     candidati = sorted(indizi_ammessi(), key=lambda i: i["id"])
     rng.shuffle(candidati)
     scelti, famiglie = [], set()
@@ -228,7 +228,7 @@ def payload(livello, now=None, chiave=None):
     """La sfida di OGGI (a Roma) a un livello: mai una data a scelta del client.
     Porta il primo indizio e le opzioni, mai la provincia ne' gli altri indizi."""
     _controlla_livello(livello)
-    giorno = game_daily.oggi_roma(now)
+    giorno = game_daily.today_rome(now)
     mistero = provincia_del_giorno(giorno, chiave)
     indizi = indizi_del_giorno(giorno, chiave)
     regione = None
@@ -238,9 +238,9 @@ def payload(livello, now=None, chiave=None):
     token = _firma({"p": puzzle_id(giorno), "l": livello, "g": [], "sid": _nuova_sessione()})
     risposta = {
         "puzzle_id": puzzle_id(giorno),
-        "number": game_daily.numero_sfida(giorno),
+        "number": game_daily.challenge_number(giorno),
         "date": giorno.isoformat(),
-        "next_puzzle_at": game_daily.prossima_sfida_roma(giorno),
+        "next_puzzle_at": game_daily.next_challenge_rome(giorno),
         "level": livello,
         "attempts_total": TENTATIVI,
         "clues_total": len(indizi),
@@ -291,7 +291,7 @@ def valuta_tentativo(token, chiave_provincia, now=None, chiave=None):
     """Valuta un tentativo e ritorna il risultato, o solleva `ErroreProvincia`.
     Il numero del tentativo lo decide il token, mai il client."""
     stato = _leggi(token)
-    giorno = game_daily.oggi_roma(now)
+    giorno = game_daily.today_rome(now)
     if stato["p"] != puzzle_id(giorno):
         raise ErroreProvincia("sfida_scaduta", 410)
     livello, tentate = stato["l"], stato["g"]
@@ -316,7 +316,7 @@ def valuta_tentativo(token, chiave_provincia, now=None, chiave=None):
     corretta = chiave_provincia == mistero["key"]
     finita = corretta or attempt >= TENTATIVI
     tentata = _anagrafe()[chiave_provincia]
-    km, direzione = game_daily.distanza_km_direzione(chiave_provincia, mistero["key"])
+    km, direzione = game_daily.distance_km_direction(chiave_provincia, mistero["key"])
 
     confronti = []
     for indizio in indizi[:attempt]:

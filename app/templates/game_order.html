@@ -17,11 +17,11 @@
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Ordina le regioni",
-  "description": {{ ("Quiz sugli indicatori territoriali di " ~ fonte_del_gioco("order").istituzioni ~ ": metti in ordine le regioni italiane dal valore più alto al più basso.") | tojson }},
+  "description": {{ ("Quiz sugli indicatori territoriali di " ~ game_source("order").istituzioni ~ ": metti in ordine le regioni italiane dal valore più alto al più basso.") | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": {% set fonte = fonte_del_gioco("order") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali regionali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
+  "isBasedOn": {% set fonte = game_source("order") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali regionali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
   "isAccessibleForFree": true
 }
 </script>

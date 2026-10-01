@@ -82,7 +82,7 @@ def _daily_streaks(solved_dates, today=None):
     days = _iso_days(solved_dates)
     if not days:
         return 0, 0
-    today = today or game_daily.oggi_roma()
+    today = today or game_daily.today_rome()
     longest = run = 1
     for prev, cur in zip(days, days[1:]):
         run = run + 1 if cur - prev == timedelta(days=1) else 1
@@ -117,7 +117,7 @@ def play_streak(dates, today=None):
     Funzione pura: i vettori di prova stanno in `tests/fixtures/play_streak_cases.json`
     e il frontend li legge con la stessa funzione in JS.
     """
-    today = today or game_daily.oggi_roma()
+    today = today or game_daily.today_rome()
     days = [d for d in _iso_days(dates) if d <= today]
     if not days:
         return {"current": 0, "max": 0}

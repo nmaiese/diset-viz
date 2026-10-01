@@ -25,7 +25,7 @@ le coppie sbagliate, e non lo fa con una tabella: la prima coppia sbagliata (con
 una scelta vera, un tempo scaduto non e' un errore di giudizio) va **nel token
 firmato** come INDICE, `sfida.e`, dentro lo stesso dizionario del punteggio, che
 si azzera quando il giorno cambia. Le chiavi non servono: la coppia si
-ricostruisce da `compare_del_giorno(giorno, livello)["pairs"][e]`, deterministica
+ricostruisce da `daily_compare(giorno, livello)["pairs"][e]`, deterministica
 su giorno e livello, e il token e' gia' firmato. Un fatto per ogni risposta
 sbagliata avrebbe dato il campo prima della fine. Senza errori (o con solo tempi
 scaduti) la frase parte dalla coppia piu' distante delle dieci, per scarto
@@ -184,7 +184,7 @@ def direzione(ind_id, ambito):
     ordina come `lower_better`. Mai l'euristica sul nome (`direction_for`): una
     direzione indovinata darebbe un piazzamento falso."""
     if ambito == "province":
-        info = bes_data.get_bes_manifest("provincia").get(game_daily.id_provinciale(ind_id))
+        info = bes_data.get_bes_manifest("provincia").get(game_daily.provincial_id(ind_id))
         grezza = (info or {}).get("direction")
     elif ind_id.startswith("bes:"):
         info = bes_data.get_bes_manifest("regione").get(ind_id[len("bes:"):])
@@ -230,7 +230,7 @@ def piazzamento(livello, indicatore, chiave):
     quello del gioco."""
     ambito = "regioni" if livello == "regioni" else "province"
     ind_id = indicatore["id"]
-    dato = game_daily._righe_indicatore({"id": ind_id}, ambito)
+    dato = game_daily._indicator_rows({"id": ind_id}, ambito)
     if dato is None or dato[0] != indicatore["year"]:
         return None
     attesi = len(REGION_ORDER) if ambito == "regioni" else len(game_daily.province_pool())

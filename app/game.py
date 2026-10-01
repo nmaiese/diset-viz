@@ -23,7 +23,7 @@ from app.cache import cache
 from app.data import REGION_ORDER, get_indicator, indicator_year_average
 from app.taxonomy import MACRO_AREA_ORDER
 from app import profiles
-from app.game_daily import GAME_EPOCH, numero_sfida, oggi_roma, prossima_sfida_roma, regione_del_giorno
+from app.game_daily import GAME_EPOCH, challenge_number, today_rome, next_challenge_rome, daily_region
 
 CLUES_PER_PUZZLE = 6
 MAX_ATTEMPTS = CLUES_PER_PUZZLE
@@ -63,7 +63,7 @@ def _daily_date(puzzle_id):
         day = date.fromisoformat(puzzle_id[len(_DAILY_PREFIX):])
     except ValueError:
         return None
-    if day < GAME_EPOCH or day > oggi_roma():
+    if day < GAME_EPOCH or day > today_rome():
         return None
     return day
 
@@ -80,11 +80,11 @@ def is_past_daily(puzzle_id):
     """True se `puzzle_id` e' una giornaliera valida di un giorno gia' passato (a Roma):
     serve a dire `puzzle_changed` a chi ha la pagina aperta oltre la mezzanotte."""
     day = _daily_date(puzzle_id) if isinstance(puzzle_id, str) else None
-    return day is not None and day < oggi_roma()
+    return day is not None and day < today_rome()
 
 
 def daily_puzzle_id(today=None):
-    today = today or oggi_roma()
+    today = today or today_rome()
     return f"{_DAILY_PREFIX}{today.isoformat()}", today
 
 
@@ -93,19 +93,19 @@ def new_practice_puzzle_id():
 
 
 def puzzle_number(today=None):
-    return numero_sfida(today or oggi_roma())
+    return challenge_number(today or today_rome())
 
 
 def _next_puzzle_at(today):
     """ISO 8601 UTC della mezzanotte di Roma che apre il giorno dopo, cosi' il
     client mostra il conto alla rovescia senza conoscere il fuso del server."""
-    return prossima_sfida_roma(today)
+    return next_challenge_rome(today)
 
 
 def region_for_puzzle(puzzle_id):
     if puzzle_id.startswith(_DAILY_PREFIX):
         day = date.fromisoformat(puzzle_id[len(_DAILY_PREFIX):])
-        return regione_del_giorno(day, REGION_ORDER)
+        return daily_region(day, REGION_ORDER)
     rng = random.Random(puzzle_id)
     return rng.choice(REGION_ORDER)
 
@@ -257,7 +257,7 @@ def daily_payload_for_date(iso_date):
         day = date.fromisoformat(iso_date)
     except (ValueError, TypeError):
         return None
-    if day < GAME_EPOCH or day > oggi_roma():
+    if day < GAME_EPOCH or day > today_rome():
         return None
     puzzle_id, _ = daily_puzzle_id(day)
     return _puzzle_intro(puzzle_id, number=puzzle_number(day), puzzle_date=day)
@@ -266,7 +266,7 @@ def daily_payload_for_date(iso_date):
 def archive_list(limit=ARCHIVE_LIMIT):
     """Most-recent-first list of past playable daily puzzles (today
     excluded, that's the main "Sfida del giorno" tab already)."""
-    today = oggi_roma()
+    today = today_rome()
     past_days = max((today - GAME_EPOCH).days, 0)
     count = min(limit, past_days)
     return [

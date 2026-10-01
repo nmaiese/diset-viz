@@ -3099,12 +3099,12 @@ def leaderboard_admin_delete_api():
 
 def _sfida_del_giorno_api(gioco):
     livello = request.args.get("level", "regioni")
-    if livello not in game_daily.LIVELLI:
+    if livello not in game_daily.LEVELS:
         abort(400)
-    return jsonify(game_daily.sfida_payload(gioco, livello))
+    return jsonify(game_daily.challenge_payload(gioco, livello))
 
 
-@app.errorhandler(game_daily.ChiaveSeedMancante)
+@app.errorhandler(game_daily.SeedKeyMissing)
 def game_seed_key_missing(errore):
     """Su Cloud Run senza `GAME_SEED_KEY` le sfide nuove sarebbero prevedibili: 503 e
     un errore nel log, mai una sfida calcolata con la chiave di sviluppo."""
@@ -3155,7 +3155,7 @@ def game_provincia_guess_api():
         try:
             from app import daily_counter
             daily_counter.record("provincia" if risultato["level"] == "province" else "provincia_regione",
-                                 game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+                                 game_daily.today_rome().isoformat(), 1 if risultato["correct"] else 0)
         except Exception:  # noqa: BLE001
             app.logger.exception("provincia: partita finita non contata")
     utente = auth.current_user(request.headers) if risultato.get("finished") else None
@@ -3165,7 +3165,7 @@ def game_provincia_guess_api():
         # regione" quella facile ("provincia_regione") e non sblocca Geografo ne' Giro d'Italia.
         gioco = "provincia" if risultato["level"] == "province" else "provincia_regione"
         try:
-            player_stats.record_daily_score(utente["id"], gioco, game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+            player_stats.record_daily_score(utente["id"], gioco, game_daily.today_rome().isoformat(), 1 if risultato["correct"] else 0)
         except Exception:  # noqa: BLE001
             app.logger.exception("provincia: punteggio del giorno non registrato")
         try:
@@ -3200,7 +3200,7 @@ def game_order_daily_answer_api():
         return jsonify({"error": errore.code}), errore.status
     try:
         from app import daily_counter
-        daily_counter.record("order", game_daily.oggi_roma().isoformat(), res["score"])
+        daily_counter.record("order", game_daily.today_rome().isoformat(), res["score"])
     except Exception:  # noqa: BLE001
         app.logger.exception("order: partita finita non contata")
     # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono.
@@ -3370,7 +3370,7 @@ def game_guess_api():
     result["achievements"] = []
     # Solo la giornaliera di oggi (giorno di Roma): allenamento e archivio si
     # giocano ma non entrano nello storico, e non contano per la serie.
-    if result.get("finished") and puzzle_id == f"daily:{game_daily.oggi_roma().isoformat()}":
+    if result.get("finished") and puzzle_id == f"daily:{game_daily.today_rome().isoformat()}":
         user = auth.current_user(request.headers)
         if user:
             from app import player_stats, achievements

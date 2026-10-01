@@ -7,13 +7,13 @@ from pathlib import Path
 from app import game_daily
 from app.game_daily import (
     GAME_EPOCH,
-    distanza_km_direzione,
-    oggi_roma,
-    prossima_sfida_roma,
+    distance_km_direction,
+    today_rome,
+    next_challenge_rome,
     province_pool,
-    regione_del_giorno,
-    regioni_idonee,
-    seed_giorno,
+    daily_region,
+    eligible_regions,
+    day_seed,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -44,22 +44,22 @@ class TestOggiRoma(unittest.TestCase):
     def test_dopo_le_23_utc_a_roma_e_gia_il_giorno_dopo(self):
         # 23:30 UTC del 30 settembre: a Roma (CEST, UTC+2) sono le 01:30 del 1 ottobre.
         now = datetime(2026, 9, 30, 23, 30, tzinfo=timezone.utc)
-        self.assertEqual(oggi_roma(now), date(2026, 10, 1))
+        self.assertEqual(today_rome(now), date(2026, 10, 1))
 
     def test_prima_delle_22_utc_il_giorno_e_lo_stesso(self):
         now = datetime(2026, 9, 30, 21, 59, tzinfo=timezone.utc)
-        self.assertEqual(oggi_roma(now), date(2026, 9, 30))
+        self.assertEqual(today_rome(now), date(2026, 9, 30))
 
     def test_ora_solare_cambia_la_soglia(self):
         # In inverno (CET, UTC+1) il giorno cambia alle 23:00 UTC, non alle 22:00.
-        self.assertEqual(oggi_roma(datetime(2026, 12, 15, 22, 30, tzinfo=timezone.utc)), date(2026, 12, 15))
-        self.assertEqual(oggi_roma(datetime(2026, 12, 15, 23, 30, tzinfo=timezone.utc)), date(2026, 12, 16))
+        self.assertEqual(today_rome(datetime(2026, 12, 15, 22, 30, tzinfo=timezone.utc)), date(2026, 12, 15))
+        self.assertEqual(today_rome(datetime(2026, 12, 15, 23, 30, tzinfo=timezone.utc)), date(2026, 12, 16))
 
     def test_prossima_sfida_e_la_mezzanotte_di_roma(self):
         # Mezzanotte del 1 ottobre a Roma (CEST) = 22:00 UTC del 30 settembre.
-        self.assertEqual(prossima_sfida_roma(date(2026, 9, 30)), "2026-09-30T22:00:00+00:00")
+        self.assertEqual(next_challenge_rome(date(2026, 9, 30)), "2026-09-30T22:00:00+00:00")
         # In inverno (CET) = 23:00 UTC.
-        self.assertEqual(prossima_sfida_roma(date(2026, 12, 15)), "2026-12-15T23:00:00+00:00")
+        self.assertEqual(next_challenge_rome(date(2026, 12, 15)), "2026-12-15T23:00:00+00:00")
 
 
 class TestSeedOnesto(unittest.TestCase):
@@ -67,11 +67,11 @@ class TestSeedOnesto(unittest.TestCase):
 
     def test_il_seed_e_deterministico_e_dipende_da_gioco_data_e_chiave(self):
         giorno = date(2026, 10, 1)
-        base = seed_giorno("regioni", giorno, self.CHIAVE)
-        self.assertEqual(base, seed_giorno("regioni", giorno, self.CHIAVE))
-        self.assertNotEqual(base, seed_giorno("compare", giorno, self.CHIAVE))
-        self.assertNotEqual(base, seed_giorno("regioni", giorno + timedelta(days=1), self.CHIAVE))
-        self.assertNotEqual(base, seed_giorno("regioni", giorno, "altra-chiave"))
+        base = day_seed("regioni", giorno, self.CHIAVE)
+        self.assertEqual(base, day_seed("regioni", giorno, self.CHIAVE))
+        self.assertNotEqual(base, day_seed("compare", giorno, self.CHIAVE))
+        self.assertNotEqual(base, day_seed("regioni", giorno + timedelta(days=1), self.CHIAVE))
+        self.assertNotEqual(base, day_seed("regioni", giorno, "altra-chiave"))
 
     def test_senza_variabile_si_usa_la_chiave_di_sviluppo(self):
         import os
@@ -79,9 +79,9 @@ class TestSeedOnesto(unittest.TestCase):
 
         with mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("GAME_SEED_KEY", None)
-            self.assertEqual(game_daily.chiave_seed(), game_daily.CHIAVE_SVILUPPO)
+            self.assertEqual(game_daily.seed_key(), game_daily.DEV_SEED_KEY)
         with mock.patch.dict(os.environ, {"GAME_SEED_KEY": "da-ambiente"}):
-            self.assertEqual(game_daily.chiave_seed(), "da-ambiente")
+            self.assertEqual(game_daily.seed_key(), "da-ambiente")
 
     def test_il_cutover_e_dopo_il_lancio(self):
         # Il valore cambia: il segnaposto (2099) lo sostituisce il coordinatore.
@@ -91,30 +91,30 @@ class TestSeedOnesto(unittest.TestCase):
         cutover = GAME_EPOCH + timedelta(days=len(SOLUZIONI_VECCHIE))
         for offset, attesa in enumerate(SOLUZIONI_VECCHIE):
             giorno = GAME_EPOCH + timedelta(days=offset)
-            self.assertEqual(regione_del_giorno(giorno, ORDINE, cutover, self.CHIAVE), attesa, giorno)
+            self.assertEqual(daily_region(giorno, ORDINE, cutover, self.CHIAVE), attesa, giorno)
             # Con il segnaposto di default: stesso risultato.
-            self.assertEqual(regione_del_giorno(giorno, ORDINE), attesa, giorno)
+            self.assertEqual(daily_region(giorno, ORDINE), attesa, giorno)
 
     def test_dal_cutover_cambiano_e_non_ripetono_nel_ciclo(self):
         cutover = GAME_EPOCH + timedelta(days=30)
-        dopo = [regione_del_giorno(cutover + timedelta(days=i), ORDINE, cutover, self.CHIAVE) for i in range(40)]
+        dopo = [daily_region(cutover + timedelta(days=i), ORDINE, cutover, self.CHIAVE) for i in range(40)]
         self.assertEqual(len(set(dopo[:20])), 20)
         self.assertEqual(len(set(dopo[20:40])), 20)
-        vecchie = [regione_del_giorno(cutover + timedelta(days=i), ORDINE, cutover + timedelta(days=99)) for i in range(20)]
+        vecchie = [daily_region(cutover + timedelta(days=i), ORDINE, cutover + timedelta(days=99)) for i in range(20)]
         self.assertNotEqual(dopo[:20], vecchie)
 
     def test_ruotare_la_chiave_cambia_le_soluzioni_dal_cutover_in_poi(self):
         cutover = GAME_EPOCH + timedelta(days=30)
         giorni = [cutover + timedelta(days=i) for i in range(20)]
-        a = [regione_del_giorno(g, ORDINE, cutover, "chiave-a") for g in giorni]
-        b = [regione_del_giorno(g, ORDINE, cutover, "chiave-b") for g in giorni]
+        a = [daily_region(g, ORDINE, cutover, "chiave-a") for g in giorni]
+        b = [daily_region(g, ORDINE, cutover, "chiave-b") for g in giorni]
         self.assertNotEqual(a, b)
         self.assertGreaterEqual(sum(x != y for x, y in zip(a, b)), 10)
         # Prima del cutover la chiave non conta.
         prima = [GAME_EPOCH + timedelta(days=i) for i in range(30)]
         self.assertEqual(
-            [regione_del_giorno(g, ORDINE, cutover, "chiave-a") for g in prima],
-            [regione_del_giorno(g, ORDINE, cutover, "chiave-b") for g in prima],
+            [daily_region(g, ORDINE, cutover, "chiave-a") for g in prima],
+            [daily_region(g, ORDINE, cutover, "chiave-b") for g in prima],
         )
 
 
@@ -133,11 +133,11 @@ class TestTerritori(unittest.TestCase):
             self.assertTrue(p["region_key"], p["key"])
 
     def test_province_giocabili_escludono_le_sagome_illeggibili(self):
-        self.assertEqual(game_daily.province_escluse(), ["lecco", "monza-e-della-brianza", "prato", "trieste"])
+        self.assertEqual(game_daily.excluded_provinces(), ["lecco", "monza-e-della-brianza", "prato", "trieste"])
         giocabili = province_pool(solo_giocabili=True)
         self.assertEqual(len(giocabili), 103)
         for p in giocabili:
-            self.assertGreaterEqual(min(p["w"], p["h"]), game_daily.SOGLIA_GIOCABILE, p["key"])
+            self.assertGreaterEqual(min(p["w"], p["h"]), game_daily.PLAYABLE_THRESHOLD, p["key"])
 
     def test_regioni_idonee(self):
         conteggi = {}
@@ -146,8 +146,8 @@ class TestTerritori(unittest.TestCase):
         self.assertEqual(conteggi["Valle d'Aosta"], 1)
         for regione in ("Molise", "Basilicata", "Umbria", "Trentino Alto Adige"):
             self.assertEqual(conteggi[regione], 2, regione)
-        tre = regioni_idonee(3)
-        cinque = regioni_idonee(5)
+        tre = eligible_regions(3)
+        cinque = eligible_regions(5)
         self.assertEqual(len(tre), 15)
         for fuori in ("Valle d'Aosta", "Molise", "Basilicata", "Umbria", "Trentino Alto Adige"):
             self.assertNotIn(fuori, tre)
@@ -165,18 +165,18 @@ class TestTerritori(unittest.TestCase):
         # delle province non coincidono con le citta', da qui la tolleranza.
         riferimenti = (("milano", "roma", 477), ("torino", "trieste", 480), ("palermo", "bolzano", 947))
         for a, b, vero in riferimenti:
-            km, _ = distanza_km_direzione(a, b)
+            km, _ = distance_km_direction(a, b)
             self.assertAlmostEqual(km / vero, 1.0, delta=0.05, msg=f"{a}-{b}: {km} km contro {vero}")
-            self.assertEqual(distanza_km_direzione(a, b)[0], distanza_km_direzione(b, a)[0])
+            self.assertEqual(distance_km_direction(a, b)[0], distance_km_direction(b, a)[0])
 
     def test_direzione_in_otto_punti(self):
-        self.assertEqual(distanza_km_direzione("palermo", "bolzano")[1], "N")
-        self.assertEqual(distanza_km_direzione("bolzano", "palermo")[1], "S")
-        self.assertEqual(distanza_km_direzione("torino", "trieste")[1], "E")
-        self.assertEqual(distanza_km_direzione("trieste", "torino")[1], "O")
-        self.assertEqual(distanza_km_direzione("milano", "roma")[1], "SE")
-        self.assertEqual(distanza_km_direzione("roma", "milano")[1], "NO")
-        self.assertEqual(distanza_km_direzione("roma", "roma"), (0, None))
+        self.assertEqual(distance_km_direction("palermo", "bolzano")[1], "N")
+        self.assertEqual(distance_km_direction("bolzano", "palermo")[1], "S")
+        self.assertEqual(distance_km_direction("torino", "trieste")[1], "E")
+        self.assertEqual(distance_km_direction("trieste", "torino")[1], "O")
+        self.assertEqual(distance_km_direction("milano", "roma")[1], "SE")
+        self.assertEqual(distance_km_direction("roma", "milano")[1], "NO")
+        self.assertEqual(distance_km_direction("roma", "roma"), (0, None))
 
 
 class TestScriptCentroidi(unittest.TestCase):

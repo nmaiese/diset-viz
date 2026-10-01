@@ -12,7 +12,7 @@ from unittest import mock
 
 from app import app, game_daily, game_provincia
 from app.cache import cache
-from app.game_daily import oggi_roma
+from app.game_daily import today_rome
 
 CHIAVE = "chiave-di-prova"
 
@@ -29,7 +29,7 @@ class _OrologioFisso(datetime):
 
 def _sbagliata(mistero, livello="province", giorno=None, escluse=()):
     """Una provincia tentabile a quel livello che non e' la misteriosa."""
-    giorno = giorno or oggi_roma()
+    giorno = giorno or today_rome()
     for voce in game_provincia.opzioni(livello, giorno):
         if voce["key"] != mistero["key"] and voce["key"] not in escluse:
             return voce["key"]
@@ -53,8 +53,8 @@ class ProvinciaDelGiornoTest(unittest.TestCase):
         self.assertGreater(len(scelte), 1)
 
     def test_e_sempre_giocabile_e_di_una_regione_idonea(self):
-        idonee = set(game_daily.regioni_idonee(3))
-        escluse = set(game_daily.province_escluse())
+        idonee = set(game_daily.eligible_regions(3))
+        escluse = set(game_daily.excluded_provinces())
         inizio = date(2026, 7, 15)
         for offset in range(400):
             provincia = game_provincia.provincia_del_giorno(inizio + timedelta(days=offset), CHIAVE)
@@ -92,7 +92,7 @@ class IndiziTest(unittest.TestCase):
             manifesto = {r["id"]: r for r in csv.DictReader(handle, delimiter=";")}
         ammessi = game_provincia.indizi_ammessi()
         self.assertGreaterEqual(len(ammessi), 6)
-        in_config = {game_daily.id_provinciale(v["id"]) for v in game_daily.indicatori_gioco() if v["provincia"]}
+        in_config = {game_daily.provincial_id(v["id"]) for v in game_daily.game_indicators() if v["provincia"]}
         for ind in ammessi:
             riga = manifesto[ind["id"]]
             self.assertEqual(int(riga["n_province_latest"]), 107, ind["id"])
@@ -129,7 +129,7 @@ class PayloadTest(unittest.TestCase):
         payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
         for campo in ("solution", "recap", "province", "province_key", "distance_km"):
             self.assertNotIn(campo, payload)
-        giorno = oggi_roma()
+        giorno = today_rome()
         indizi = game_provincia.indizi_del_giorno(giorno)
         self.assertEqual(payload["clue"]["id"], indizi[0]["id"])
         testo = json.dumps(payload, ensure_ascii=False)
@@ -152,7 +152,7 @@ class PayloadTest(unittest.TestCase):
                 self.assertEqual(risposta.status_code, 400)
 
     def test_livello_della_regione_offre_solo_le_province_di_quella_regione(self):
-        idonee = set(game_daily.regioni_idonee(3))
+        idonee = set(game_daily.eligible_regions(3))
         inizio = date(2026, 7, 15)
         for offset in range(120):
             giorno = inizio + timedelta(days=offset)
@@ -193,7 +193,7 @@ class TentativiTest(unittest.TestCase):
     def setUp(self):
         cache.delete("rl:prov:ip:127.0.0.1")
         self.client = app.test_client()
-        self.giorno = oggi_roma()
+        self.giorno = today_rome()
         self.mistero = game_provincia.provincia_del_giorno(self.giorno)
 
     def _apri(self, livello="province"):
@@ -209,12 +209,12 @@ class TentativiTest(unittest.TestCase):
         risposta = self._tenta(payload["token"], chiave)
         self.assertEqual(risposta.status_code, 200)
         r = risposta.get_json()
-        km, direzione = game_daily.distanza_km_direzione(chiave, self.mistero["key"])
+        km, direzione = game_daily.distance_km_direction(chiave, self.mistero["key"])
         self.assertAlmostEqual(r["distance_km"], km, delta=1)
         self.assertEqual(r["direction"], direzione)
-        self.assertIn(r["direction"], game_daily._PUNTI)
+        self.assertIn(r["direction"], game_daily._COMPASS_POINTS)
         self.assertGreater(r["distance_km"], 0)
-        self.assertEqual(r["same_region"], game_daily._provincia(chiave)["region"] == self.mistero["region"])
+        self.assertEqual(r["same_region"], game_daily._province_by_key(chiave)["region"] == self.mistero["region"])
         self.assertFalse(r["correct"])
         self.assertEqual(r["attempt"], 1)
         self.assertEqual(len(r["feedback"]), 1)
@@ -224,10 +224,10 @@ class TentativiTest(unittest.TestCase):
     def test_la_misura_dei_km_e_plausibile(self):
         # Milano-Roma in linea d'aria sono circa 480 km, Torino-Trieste circa 410:
         # la stima del gioco e' approssimata, non di qualche metro.
-        km, direzione = game_daily.distanza_km_direzione("milano", "roma")
+        km, direzione = game_daily.distance_km_direction("milano", "roma")
         self.assertTrue(400 <= km <= 560, km)
         self.assertEqual(direzione, "SE")
-        self.assertEqual(game_daily.distanza_km_direzione("roma", "roma"), (0, None))
+        self.assertEqual(game_daily.distance_km_direction("roma", "roma"), (0, None))
 
     def test_il_confronto_dell_indizio_ha_il_verso_del_valore_tentato(self):
         payload = self._apri()
