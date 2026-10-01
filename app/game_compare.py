@@ -19,8 +19,11 @@ ha chiesto. Stessa regola del tempo (`timer`) e della difficoltà.
 **Il tempo lo misura il server.** Il token v2 porta `t` (timer sì o no) e `iat`
 (quando è uscito il round): `quiz_tokens.round_timing` dice se la risposta è
 arrivata in tempo, prima del tempo (un `timeout` che scatta troppo presto non
-vale) o troppo tardi (oltre i 10 s più 2 di tolleranza è un errore, e la
-risposta viene rifiutata senza rivelare nulla).
+vale) o troppo tardi. Oltre i 10 s più 2 di tolleranza la risposta conta come un
+tempo scaduto: il round si chiude, la risposta è sbagliata e il corpo è quello di
+un `timeout` più `late: true`, così "Avanti" funziona. Rifiutarla con un 400 senza
+chiudere il round rendeva la partita impossibile da finire (ogni nuovo invio era
+di nuovo tardi).
 
 **La domanda dopo la lega "Avanti".** La risposta a una domanda non lega la
 successiva: lo fa `next_question` (`POST /api/game/compare/daily/next`) quando il
@@ -310,9 +313,10 @@ def answer(data, now=None):
 
     Gli errori hanno tutti un nome che il client conosce: `puzzle_changed` (fra
     l'apertura e la risposta è cambiato il giorno), `token_invalid` (il token non
-    lega questa domanda di questa sfida), `late` e `timeout_too_early` (il tempo
-    lo misura il server), `round_already_answered` con 409 (un doppio invio, che
-    il client ignora in silenzio). `training_session` non è un errore: è l'avviso
+    lega questa domanda di questa sfida), `timeout_too_early` (il tempo lo misura
+    il server), `round_already_answered` con 409 (un doppio invio, che il client
+    ignora in silenzio). Una risposta tardiva non è un errore: vale come un tempo
+    scaduto e porta `late: true`. `training_session` non è un errore: è l'avviso
     che senza timer la partita non va in classifica.
     """
     state = quiz_tokens.load_state(data.get("token"), MODE)
@@ -329,7 +333,8 @@ def answer(data, now=None):
     if not 0 <= index < PAIRS:
         return 400, {"error": "bad_request"}
     pair = _challenge(day, level)["pairs"][index]
-    outcome = _evaluate(pair, level, data.get("choice"))
+    choice = data.get("choice")
+    outcome = _evaluate(pair, level, choice)
     if outcome is None:
         return 400, {"error": "bad_request"}
     keys = [pair["a"]["key"], pair["b"]["key"]]
@@ -341,13 +346,14 @@ def answer(data, now=None):
     )
     if bound is None or state.get("q") != index + 1:
         return 400, {"error": "token_invalid"}
-    timing = quiz_tokens.round_timing(state, data.get("choice"), now)
+    timing = quiz_tokens.round_timing(state, choice, now)
     if timing == "early_timeout":
         return 400, {"error": "timeout_too_early"}
     if timing == "late":
-        # oltre i 10 s più la tolleranza non è una risposta: si rifiuta senza
-        # rivelare i valori, e il round resta aperto solo per il tempo che manca.
-        return 400, {"error": "late"}
+        # Oltre i 10 s più la tolleranza la scelta non vale: la risposta è un tempo
+        # scaduto, con la stessa rivelazione e niente di più, e il round si chiude.
+        choice = "timeout"
+        outcome = _evaluate(pair, level, choice)
     if not quiz_tokens.claim_round(state["sid"], state["q"]):
         return 409, {"error": "round_already_answered"}
     token_day, correct_count = _score(state)
@@ -357,7 +363,7 @@ def answer(data, now=None):
         correct_count += 1
     # La prima coppia sbagliata resta nel token, per il fatto di fine partita.
     first_error = game_facts.signed_error(
-        state.get(SCORE_KEY) or {}, day.isoformat(), index, outcome, data.get("choice")
+        state.get(SCORE_KEY) or {}, day.isoformat(), index, outcome, choice
     )
     state = {**state, SCORE_KEY: {"d": day.isoformat(), "c": correct_count, "l": level, **first_error}}
     session, token = quiz_tokens.apply_answer(
@@ -380,6 +386,8 @@ def answer(data, now=None):
         "finished": finished,
         "token": token,
     }
+    if timing == "late":
+        body["late"] = True
     if not state["t"]:
         body["notice"] = "training_session"
     if finished:
