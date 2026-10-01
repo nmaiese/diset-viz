@@ -1828,6 +1828,7 @@ def region_page(region_key):
         seo_title=_region_title(profile),
         seo_description=_region_description(profile, ritratto, quality),
         provinces=provinces,
+        external_indicators=profiles.region_external_indicators(region_key),
         portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
         ritratto=ritratto,
         site_url=SITE_URL,

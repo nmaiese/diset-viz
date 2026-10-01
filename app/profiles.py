@@ -23,6 +23,7 @@ from collections import defaultdict
 
 from app import sources
 from app.cache import cache
+from app.cache_util import synchronized_cache
 from app.data import REGION_GEO_AREA, REGION_ORDER, get_catalog, get_rows
 from app.external_data import count_freshness, freshness_status
 from app.taxonomy import (
@@ -544,6 +545,108 @@ def _region_indicators(region_key):
         })
     rows.sort(key=lambda r: (r["score"] is None, -(r["score"] or 0), r["name"]))
     return rows
+
+
+def _external_profile_ids():
+    """Gli id esterni che il CSV ammette ai profili (`profile_eligible`).
+
+    Solo le righe regionali che sono anche voci dell'atlante: una serie
+    ammessa al punteggio e non ai profili (`profile_eligible=false`) resta
+    dov'era, e una riga che arricchisce un indicatore esistente non e' mai
+    una voce a se'. La colonna e' del CSV e la decide chi cura il dato: qui
+    non si ricostruisce con una regola."""
+    from app.external_data import get_external_rows
+
+    ids = set()
+    for row in get_external_rows():
+        if (row.get("profile_eligible") == "true" and row.get("atlas_eligible") == "true"
+                and row.get("territory_level") == "regione"):
+            ids.add(row.get("target_indicator_id"))
+    return ids
+
+
+@synchronized_cache(maxsize=1)
+def _external_region_rows():
+    """`{chiave di regione: [riga, ...]}` per gli indicatori delle altre fonti.
+
+    Una voce di cache sola per tutte e venti le regioni, come
+    `_region_series` nella pagina: un `cache.memoize` per regione
+    aggiungerebbe venti voci a una `SimpleCache` che pota oltre le cinquecento.
+
+    Sono righe **descrittive**, della stessa forma di `_region_indicators` ma
+    in un elenco a parte: non entrano in `all_indicators`, quindi non toccano
+    posizione media, temi forti e deboli, punteggi, movimenti ne' i giochi che
+    pescano dal profilo. Con un verso (`higher_better`, `lower_better`) la
+    riga ha la sua posizione fra le regioni e il movimento, calcolati come per
+    i core; senza verso (`contextual`) ha il valore e la serie e nessuna
+    posizione, come le righe senza verso della tabella principale.
+    """
+    # In funzione e non in testa: `external_atlas` importa questo modulo.
+    from app.design.charts import spark_floor
+    from app.external_atlas import get_external_atlas_indicator
+
+    out = defaultdict(list)
+    for public_id in sorted(_external_profile_ids()):
+        payload = get_external_atlas_indicator(public_id)
+        if payload is None:
+            continue
+        meta, series = payload["metadata"], payload["series"]
+        direction = (meta.get("explain") or {}).get("direction") or "contextual"
+        family = meta["catalog_family"]
+        by_year = defaultdict(dict)
+        for point in series:
+            if point["value"] is not None and point["region_key"]:
+                by_year[point["year"]][point["region_key"]] = point["value"]
+        year = meta["year_max"]
+        latest = by_year.get(year, {})
+        if len(latest) < 2:
+            continue
+        directional = direction in SCOREABLE_DIRECTIONS
+        ranks = _ranks(latest, direction) if directional else {}
+        year_from, move = None, {}
+        if directional:
+            for earlier in sorted((y for y in by_year if y < year), reverse=True):
+                if len(by_year[earlier]) >= len(REGION_ORDER):
+                    year_from = earlier
+                    before = _ranks(by_year[earlier], direction)
+                    move = {r: before[r] - ranks[r] for r in ranks if r in before}
+                    break
+        floor = spark_floor(latest.values())
+        for region_key, value in latest.items():
+            points = [{"year": y, "value": by_year[y][region_key]}
+                      for y in sorted(by_year) if y <= year and region_key in by_year[y]]
+            out[region_key].append({
+                "id": meta["id"],
+                "name": meta["name"],
+                "theme": meta["theme"],
+                "macro_area": meta["macro_area"],
+                "path": meta["path"],
+                "unit": meta["unit"],
+                "direction": direction,
+                "value": value,
+                "year": year,
+                "year_from": year_from,
+                "freshness_status": freshness_status(year),
+                "rank": ranks.get(region_key),
+                "region_count": len(latest),
+                "movement": move.get(region_key),
+                "family": family,
+                "source": sources.family_institution(family),
+                "source_label": sources.family_label(family),
+                "source_url": meta.get("source_url") or "",
+                "contextual": not directional,
+                "spark": points,
+                "spark_floor": floor if len(points) > 1 else None,
+            })
+    return dict(out)
+
+
+def region_external_indicators(region_key):
+    """Gli indicatori delle altre fonti (Eurostat, ACI, AGCOM) di una regione.
+
+    Copie: l'elenco viene da una cache condivisa. Vuoto se la regione non ne
+    ha o se lo strato esterno non c'e'."""
+    return [dict(row) for row in _external_region_rows().get(region_key, [])]
 
 
 @cache.memoize(timeout=3600)

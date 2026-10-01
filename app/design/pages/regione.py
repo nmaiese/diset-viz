@@ -30,6 +30,7 @@ from collections import defaultdict
 from functools import lru_cache
 
 from app import profiles
+from app import sources as source_registry
 from app import quality_life_bes as qb
 from app.cache_util import synchronized_cache
 from app.data import REGION_GEO_AREA, get_rows
@@ -315,6 +316,34 @@ def _indicator_row(ind: dict, region_total: int | None) -> dict:
     }
 
 
+def _external_row(ind: dict, total: int | None) -> dict:
+    """Una riga di un'altra fonte: quella della tabella, piu' la fonte, presa
+    dalla riga stessa (che l'ha dal registro), e la serie gia' pronta.
+    `contextual` dice che non ha un verso e che la posizione non c'e'."""
+    return {**_indicator_row(ind, total),
+            "source": ind.get("source"), "source_label": ind.get("source_label"),
+            "source_url": ind.get("source_url"), "family": ind.get("family"),
+            "contextual": bool(ind.get("contextual")),
+            "spark": ind.get("spark") or [], "spark_floor": ind.get("spark_floor")}
+
+
+def _external_groups(rows: list[dict]) -> list[dict]:
+    """Le righe delle altre fonti per famiglia, nell'ordine del registro, e dentro
+    per tema e nome. Etichetta, istituzione e licenza vengono da `app/sources.py`."""
+    groups = []
+    for family in source_registry.SOURCES:
+        items = sorted((r for r in rows if r.get("family") == family),
+                       key=lambda r: (r.get("theme") or "", r["name"]))
+        if not items:
+            continue
+        licence, licence_url = source_registry.family_license(family)
+        groups.append({"family": family, "label": source_registry.family_label(family),
+                       "institution": source_registry.family_institution(family),
+                       "url": items[0].get("source_url"), "license": licence, "license_url": licence_url,
+                       "rows": items})
+    return groups
+
+
 def _answer(profile: dict) -> dict:
     """La frase-risposta: il tema dove sta piu' in alto e quello dove sta piu'
     in basso fra le regioni, con la posizione.
@@ -371,6 +400,10 @@ def derive(ctx: dict) -> dict:
     p = ctx["profile"]
     key, name = p["region_key"], p["region"]
     total = p.get("region_total")
+    # Gli indicatori delle altre fonti stanno in una sezione a parte: non
+    # entrano in `all_indicators`, quindi non nei conteggi, nelle fonti
+    # dell'apertura ne' nel filtro per area della tabella principale.
+    external_groups = _external_groups([_external_row(i, total) for i in ctx.get("external_indicators") or []])
     indicators = list(p.get("all_indicators") or [])
     by_id = {i["id"]: i for i in indicators if i.get("id")}
     the_name = _article(name)
@@ -468,6 +501,9 @@ def derive(ctx: dict) -> dict:
         "province_profile": pq["profile"],
         "province_scale": pscale,
         "areas": areas, "similar": similar,
+        "external_groups": external_groups,
+        "external_count": sum(len(g["rows"]) for g in external_groups),
+        "external_label": source_registry.institutions_label([g["family"] for g in external_groups]),
         "min_theme": MIN_THEME_INDICATORS, "citation": citation,
         "count_word": common.count_word,
     }
