@@ -84,6 +84,22 @@ SOURCES = {
     },
 }
 
+# The province outlines of the "Dov'e' la provincia?" map are not a data family:
+# they carry no indicator, so they do NOT go in SOURCES (that registry feeds
+# FAMILY_BY_ACRONYM and the regex of the indicator URLs). They are Istat
+# boundaries (CC BY 4.0), redistributed by openpolis at tag 2023.1, simplified
+# and reprojected by design/v1/tools/province_map.py. The visible credit line is
+# composed from these fields, never typed in a template.
+PROVINCE_BOUNDARIES = {
+    "institution": "Istat",
+    "institution_url": "https://www.istat.it/classificazione/confini-delle-unita-amministrative-a-fini-statistici/",
+    "redistributor": "openpolis",
+    "redistributor_url": "https://github.com/openpolis/geojson-italy",
+    "license_label": "CC BY 4.0",
+    "license_url": LICENSE_URL + "deed.it",
+    "vintage": 2023,
+}
+
 # Indicator-specific landing pages belong to provenance just as much as the
 # family names and licences above.  Keeping this routing here prevents the
 # structured data, visible source link and downloads from disagreeing about
