@@ -183,23 +183,23 @@ class CompareFattoTest(Base):
     def test_the_mistake_lives_in_the_signed_token_not_in_the_body(self):
         _, risposte = self._partita("regioni", sbagliate=(3,))
         self.assertNotIn("fact", risposte[3])
-        stato = quiz_tokens.load_state(risposte[3]["token"], game_compare.MODO)
-        self.assertEqual(stato[game_compare.CHIAVE_PUNTEGGIO]["e"], 3)
+        stato = quiz_tokens.load_state(risposte[3]["token"], game_compare.MODE)
+        self.assertEqual(stato[game_compare.SCORE_KEY]["e"], 3)
         # le risposte dopo, anche giuste, tengono la prima
-        stato = quiz_tokens.load_state(risposte[8]["token"], game_compare.MODO)
-        self.assertEqual(stato[game_compare.CHIAVE_PUNTEGGIO]["e"], 3)
+        stato = quiz_tokens.load_state(risposte[8]["token"], game_compare.MODE)
+        self.assertEqual(stato[game_compare.SCORE_KEY]["e"], 3)
 
     def test_a_perfect_game_never_writes_a_mistake_into_the_token(self):
         _, risposte = self._partita("regioni")
-        stato = quiz_tokens.load_state(risposte[5]["token"], game_compare.MODO)
-        self.assertNotIn("e", stato[game_compare.CHIAVE_PUNTEGGIO])
+        stato = quiz_tokens.load_state(risposte[5]["token"], game_compare.MODE)
+        self.assertNotIn("e", stato[game_compare.SCORE_KEY])
 
     def test_only_timeouts_fall_back_to_the_widest_pair(self):
         _, risposte = self._partita("regioni", scadute=(1, 4))
         fatto = risposte[-1]["summary"]["fact"]
         self.assertTrue(fatto.startswith("La coppia più distante:"), fatto)
-        stato = quiz_tokens.load_state(risposte[4]["token"], game_compare.MODO)
-        self.assertNotIn("e", stato[game_compare.CHIAVE_PUNTEGGIO])
+        stato = quiz_tokens.load_state(risposte[4]["token"], game_compare.MODE)
+        self.assertNotIn("e", stato[game_compare.SCORE_KEY])
 
     def test_the_score_travels_as_before(self):
         _, risposte = self._partita("regioni", sbagliate=(3,))
@@ -282,14 +282,14 @@ class CicloSulPoolTest(unittest.TestCase):
 
     def test_the_real_daily_puzzles_of_two_weeks(self):
         """Le sfide vere dei prossimi quattordici giorni, con i valori che la risposta
-        porterebbe: Ordina come la vista, Chi e' maggiore con `_valuta` vero."""
+        porterebbe: Ordina come la vista, Chi e' maggiore con `_evaluate` vero."""
         for giorno_n in range(14):
             giorno = date.fromordinal(GIORNO.toordinal() + giorno_n)
             for livello in LIVELLI:
                 contesto = f"{giorno} {livello}"
                 coppie = game_daily.daily_compare(giorno, livello)["pairs"]
                 fatto = game_facts.fatto_compare(
-                    livello, coppie, 0, lambda c, s, livello=livello: game_compare._valuta(c, livello, s))
+                    livello, coppie, 0, lambda c, s, livello=livello: game_compare._evaluate(c, livello, s))
                 if fatto is not None:
                     _controlla_frase(self, fatto["fact"], f"compare {contesto}")
                 puzzle = game_daily.daily_order(giorno, livello)

@@ -3185,18 +3185,18 @@ def game_order_daily_session_api():
         return jsonify({"error": "rate_limited"}), 429
     try:
         return jsonify(game_order.daily_order_session(request.args.get("level", "regioni")))
-    except game_order.ErroreOrdina as errore:
+    except game_order.OrderError as errore:
         return jsonify({"error": errore.code}), errore.status
 
 
 @app.post("/api/game/order/daily/answer")
 def game_order_daily_answer_api():
     payload = request.get_json(silent=True) or {}
-    if _answer_rate_limited(game_order.sid_del_token(payload.get("token"))):
+    if _answer_rate_limited(game_order.sid_from_token(payload.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
     try:
         res = game_order.evaluate_daily_order_answer(payload, auth_user=auth.current_user(request.headers))
-    except game_order.ErroreOrdina as errore:
+    except game_order.OrderError as errore:
         return jsonify({"error": errore.code}), errore.status
     try:
         from app import daily_counter
@@ -3217,7 +3217,7 @@ def game_order_daily_answer_api():
 def game_compare_daily_session_api():
     # Livello e timer si dichiarano qui e da qui in poi viaggiano nel token
     # firmato: il client non li sceglie più.
-    sessione = game_compare.apri_sessione(
+    sessione = game_compare.open_session(
         request.args.get("level", "regioni"), _timer_requested()
     )
     if sessione is None:
@@ -3228,9 +3228,9 @@ def game_compare_daily_session_api():
 @app.post("/api/game/compare/daily/answer")
 def game_compare_daily_answer_api():
     dati = request.get_json(silent=True) or {}
-    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+    if _answer_rate_limited(game_compare.sid_from_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
-    stato, corpo = game_compare.risposta(dati)
+    stato, corpo = game_compare.answer(dati)
     if stato == 200 and corpo.get("finished") and isinstance(corpo.get("summary"), dict):
         try:
             from app import daily_counter
@@ -3258,11 +3258,11 @@ def game_compare_daily_answer_api():
 
 @app.post("/api/game/compare/daily/next")
 def game_compare_daily_next_api():
-    """"Avanti": lega la domanda dopo quella appena risposta (vedi `game_compare.avanti`)."""
+    """"Avanti": lega la domanda dopo quella appena risposta (vedi `game_compare.next_question`)."""
     dati = request.get_json(silent=True) or {}
-    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+    if _answer_rate_limited(game_compare.sid_from_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
-    stato, corpo = game_compare.avanti(dati)
+    stato, corpo = game_compare.next_question(dati)
     return jsonify(corpo), stato
 
 

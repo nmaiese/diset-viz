@@ -23,7 +23,7 @@ vale) o troppo tardi (oltre i 10 s più 2 di tolleranza è un errore, e la
 risposta viene rifiutata senza rivelare nulla).
 
 **La domanda dopo la lega "Avanti".** La risposta a una domanda non lega la
-successiva: lo fa `avanti` (`POST /api/game/compare/daily/next`) quando il
+successiva: lo fa `next_question` (`POST /api/game/compare/daily/next`) quando il
 giocatore preme il pulsante, cosi' il tempo di lettura della rivelazione non
 consuma i 12 secondi della domanda dopo.
 
@@ -57,56 +57,56 @@ from app.game_daily import LEVELS, today_rome
 # Modalita' di token propria: il token della sfida del giorno non entra nelle serie
 # (`/api/game/compare/round|answer`) ne' nella classifica (`peek_state` la rifiuta), e
 # il token di una serie apre una sessione nuova qui.
-MODO = "compare_daily"
-COPPIE = game_daily.COMPARE_PAIRS
+MODE = "compare_daily"
+PAIRS = game_daily.COMPARE_PAIRS
 # Etichetta della fonte per i livelli con le province, che non passano da
 # quiz.evaluate_compare: viene da app/sources.py, l'unica fonte di verita' dei
 # nomi (un'etichetta scritta qui ha gia' pubblicato una serie sotto un altro nome).
-FONTE_PROVINCE = sources.SOURCES["bes"]["label"]
+PROVINCE_SOURCE = sources.SOURCES["bes"]["label"]
 # La scheda del territorio: la stessa forma degli altri giochi (`/regione/<key>`
 # e `/provincia/<key>`).
-PERCORSI = {"regioni": "/regione/", "stessa_regione": "/provincia/", "province": "/provincia/"}
+TERRITORY_PATHS = {"regioni": "/regione/", "stessa_regione": "/provincia/", "province": "/provincia/"}
 # Campo del token con la data della sfida e le risposte giuste. Firmato come
 # tutto il resto del token.
-CHIAVE_PUNTEGGIO = "sfida"
+SCORE_KEY = "sfida"
 
-ETICHETTE_LIVELLO = {
+LEVEL_LABELS = {
     "regioni": "Regioni",
     "stessa_regione": "Province della stessa regione",
     "province": "Province",
 }
 
 
-def sfida_di_oggi_id(giorno):
-    return f"daily:{giorno.isoformat()}"
+def today_challenge_id(day):
+    return f"daily:{day.isoformat()}"
 
 
-def etichetta_livello(livello):
-    return ETICHETTE_LIVELLO.get(livello, ETICHETTE_LIVELLO["regioni"])
+def level_label(level):
+    return LEVEL_LABELS.get(level, LEVEL_LABELS["regioni"])
 
 
-def _sfida(giorno, livello):
+def _challenge(day, level):
     """La sfida del giorno a un livello. La cache sta in `game_daily` (per giorno,
     livello e chiave del seed), cosi' il controllo della chiave si fa a ogni richiesta."""
-    return game_daily.daily_compare(giorno, livello)
+    return game_daily.daily_compare(day, level)
 
 
-def _percorso_territorio(livello, chiave):
-    return PERCORSI.get(livello, PERCORSI["regioni"]) + chiave
+def _territory_path(level, key):
+    return TERRITORY_PATHS.get(level, TERRITORY_PATHS["regioni"]) + key
 
 
-def _domanda(coppia, indice, livello):
+def _question(pair, index, level):
     """La domanda `indice` senza valori e senza soluzione: quello che il client
     vede prima di rispondere."""
     return {
-        "index": indice,
-        "indicator": dict(coppia["indicator"]),
-        "a": {**coppia["a"], "path": _percorso_territorio(livello, coppia["a"]["key"])},
-        "b": {**coppia["b"], "path": _percorso_territorio(livello, coppia["b"]["key"])},
+        "index": index,
+        "indicator": dict(pair["indicator"]),
+        "a": {**pair["a"], "path": _territory_path(level, pair["a"]["key"])},
+        "b": {**pair["b"], "path": _territory_path(level, pair["b"]["key"])},
     }
 
 
-def _indicatore_provinciale(ind_id, anno, nome, unita):
+def _province_indicator(ind_id, year, name, unit):
     """I campi dell'indicatore per una risposta ai livelli con le province: nome
     leggibile e unità sono quelli scelti per il gioco in
     `config/game_indicators.csv`, la spiegazione e il link canonico vengono dal
@@ -116,58 +116,58 @@ def _indicatore_provinciale(ind_id, anno, nome, unita):
     if info is None:
         return None
     try:
-        percorso = bes_data.bes_path(raw)
+        path = bes_data.bes_path(raw)
     except LookupError:
-        percorso = None
+        path = None
     return {
         "id": ind_id,
-        "name": nome,
-        "unit": unita,
-        "year": anno,
+        "name": name,
+        "unit": unit,
+        "year": year,
         "description": info["explain"]["plain"],
         "value_explanation": info["explain"]["example"],
-        "path": percorso,
-        "source_label": FONTE_PROVINCE,
+        "path": path,
+        "source_label": PROVINCE_SOURCE,
         "source_url": bes_data.BES_SOURCE_URLS["provincia"],
     }
 
 
-def _valori_provinciali(ind_id, chiavi):
+def _province_values(ind_id, keys):
     """(anno, {chiave: valore}) per un indicatore provinciale, letti dalla stessa
     funzione che ha composto la sfida."""
-    dato = game_daily._indicator_rows({"id": ind_id}, "province")
-    if dato is None:
+    found = game_daily._indicator_rows({"id": ind_id}, "province")
+    if found is None:
         return None, None
-    anno, righe = dato
-    valori = {riga["key"]: riga["value"] for riga in righe}
-    if any(valori.get(chiave) is None for chiave in chiavi):
+    year, rows = found
+    values = {row["key"]: row["value"] for row in rows}
+    if any(values.get(key) is None for key in keys):
         return None, None
-    return anno, valori
+    return year, values
 
 
-def _lato(scelta):
+def _side(choice):
     """Il lato della coppia da una scelta del client ("region_a", "region_b" o
     "timeout"), None per il tempo scaduto. I nomi sono quelli del round a serie,
     così il client non deve imparare due vocabulari."""
-    if scelta == "region_a":
+    if choice == "region_a":
         return "a"
-    if scelta == "region_b":
+    if choice == "region_b":
         return "b"
     return None
 
 
-def _valuta(coppia, livello, scelta):
+def _evaluate(pair, level, choice):
     """Il risultato di una risposta, o None se l'input non è valido (chi chiama
     risponde 400). I valori sono quelli veri, la risposta porta l'indicatore con
     `path` e `description` e i due territori con la loro scheda: è tutto quello
     che la fine partita deve mostrare. `winner` è "a" o "b"."""
-    if scelta not in quiz.COMPARE_CHOICES:
+    if choice not in quiz.COMPARE_CHOICES:
         return None
-    lato = _lato(scelta)
-    ind = coppia["indicator"]
-    a, b = coppia["a"], coppia["b"]
-    if livello == "regioni":
-        base = quiz.evaluate_compare(ind["id"], ind["year"], a["key"], b["key"], scelta)
+    side = _side(choice)
+    ind = pair["indicator"]
+    a, b = pair["a"], pair["b"]
+    if level == "regioni":
+        base = quiz.evaluate_compare(ind["id"], ind["year"], a["key"], b["key"], choice)
         if base is None:
             return None
         # `winner` torna sempre come "a" o "b": `quiz` lo chiama region_a e
@@ -180,32 +180,32 @@ def _valuta(coppia, livello, scelta):
             # non quella abbreviata della scheda: la stessa che sta accanto al
             # valore nella stessa partita.
             "indicator": {**base["indicator"], "unit": ind["unit"], "year": ind["year"]},
-            "a": {**a, "value": base["region_a"]["value"], "path": _percorso_territorio(livello, a["key"])},
-            "b": {**b, "value": base["region_b"]["value"], "path": _percorso_territorio(livello, b["key"])},
+            "a": {**a, "value": base["region_a"]["value"], "path": _territory_path(level, a["key"])},
+            "b": {**b, "value": base["region_b"]["value"], "path": _territory_path(level, b["key"])},
         }
-    anno, valori = _valori_provinciali(ind["id"], [a["key"], b["key"]])
-    if anno is None or anno != ind["year"]:
+    year, values = _province_values(ind["id"], [a["key"], b["key"]])
+    if year is None or year != ind["year"]:
         return None
-    valore_a, valore_b = valori[a["key"]], valori[b["key"]]
-    if valore_a == valore_b:
+    value_a, value_b = values[a["key"]], values[b["key"]]
+    if value_a == value_b:
         return None
-    indicatore = _indicatore_provinciale(ind["id"], anno, ind["name"], ind["unit"])
-    if indicatore is None:
+    indicator = _province_indicator(ind["id"], year, ind["name"], ind["unit"])
+    if indicator is None:
         return None
-    vincitore = "a" if valore_a > valore_b else "b"
+    winner = "a" if value_a > value_b else "b"
     return {
-        "correct": lato == vincitore,
-        "choice": scelta,
-        "winner": vincitore,
-        "indicator": indicatore,
-        "a": {**a, "value": valore_a, "path": _percorso_territorio(livello, a["key"])},
-        "b": {**b, "value": valore_b, "path": _percorso_territorio(livello, b["key"])},
+        "correct": side == winner,
+        "choice": choice,
+        "winner": winner,
+        "indicator": indicator,
+        "a": {**a, "value": value_a, "path": _territory_path(level, a["key"])},
+        "b": {**b, "value": value_b, "path": _territory_path(level, b["key"])},
     }
 
 
 # L'apertura della sessione
 
-def apri_sessione(livello, timer, now=None):
+def open_session(level, timer, now=None):
     """Il token, il livello e le dieci domande SENZA valori. None se il livello
     non esiste (chi chiama risponde 400).
 
@@ -215,59 +215,59 @@ def apri_sessione(livello, timer, now=None):
     registra. Il livello e il timer viaggiano dentro il token firmato, quindi da
     qui in poi il client non li sceglie più.
     """
-    if livello not in LEVELS:
+    if level not in LEVELS:
         return None
-    giorno = today_rome(now)
-    sfida = _sfida(giorno, livello)
-    stato = quiz_tokens.load_state(None, MODO, timer)
-    coppia = sfida["pairs"][0]
-    domande = [_domanda(c, i, livello) for i, c in enumerate(sfida["pairs"])]
+    day = today_rome(now)
+    challenge = _challenge(day, level)
+    state = quiz_tokens.load_state(None, MODE, timer)
+    pair = challenge["pairs"][0]
+    questions = [_question(c, i, level) for i, c in enumerate(challenge["pairs"])]
     token = quiz_tokens.bind_round(
-        stato, coppia["indicator"]["id"], coppia["indicator"]["year"],
-        [coppia["a"]["key"], coppia["b"]["key"]], livello,
+        state, pair["indicator"]["id"], pair["indicator"]["year"],
+        [pair["a"]["key"], pair["b"]["key"]], level,
     )
     return {
-        "puzzle_id": sfida_di_oggi_id(giorno),
-        "number": game_daily.challenge_number(giorno),
-        "date": giorno.isoformat(),
-        "next_puzzle_at": game_daily.next_challenge_rome(giorno),
-        "level": livello,
-        "level_label": etichetta_livello(livello),
-        "difficulty": sfida["difficulty"],
-        "region": sfida["region"],
-        "timer": bool(stato["t"]),
+        "puzzle_id": today_challenge_id(day),
+        "number": game_daily.challenge_number(day),
+        "date": day.isoformat(),
+        "next_puzzle_at": game_daily.next_challenge_rome(day),
+        "level": level,
+        "level_label": level_label(level),
+        "difficulty": challenge["difficulty"],
+        "region": challenge["region"],
+        "timer": bool(state["t"]),
         # Senza timer è allenamento e non va in classifica: il client lo dice e
         # non offre l'invio.
-        "leaderboard": bool(stato["t"]),
-        "total": COPPIE,
-        "questions": domande,
+        "leaderboard": bool(state["t"]),
+        "total": PAIRS,
+        "questions": questions,
         "token": token,
     }
 
 
-def sid_del_token(token):
+def sid_from_token(token):
     """Il `sid` della sessione, per il limite di frequenza: un token assente o
     rotto apre una sessione nuova, come fa `load_state` nell'altra rotta."""
-    return quiz_tokens.load_state(token, MODO)["sid"]
+    return quiz_tokens.load_state(token, MODE)["sid"]
 
 
-def _punteggio(stato):
+def _score(state):
     """(giorno, risposte giuste) letti dal token firmato. Un token di un altro
     giorno riparte da zero."""
-    salvato = stato.get(CHIAVE_PUNTEGGIO) or {}
-    return salvato.get("d"), int(salvato.get("c") or 0)
+    saved = state.get(SCORE_KEY) or {}
+    return saved.get("d"), int(saved.get("c") or 0)
 
 
-def _lega_domanda(stato, coppia, livello):
+def _bind_question(state, pair, level):
     return quiz_tokens.bind_round(
-        stato, coppia["indicator"]["id"], coppia["indicator"]["year"],
-        [coppia["a"]["key"], coppia["b"]["key"]], livello,
+        state, pair["indicator"]["id"], pair["indicator"]["year"],
+        [pair["a"]["key"], pair["b"]["key"]], level,
     )
 
 
 # La domanda successiva
 
-def avanti(dati, now=None):
+def next_question(data, now=None):
     """(status, corpo) di "Avanti": lega al token la domanda dopo quella appena
     risposta. `q` e' l'INDICE della domanda appena risposta (0-based): il server lega
     la `q + 1`, e il suo tempo parte da adesso, non da quando il giocatore ha risposto
@@ -282,30 +282,30 @@ def avanti(dati, now=None):
     `token_invalid`, `bad_request`, e 409 `round_already_bound` per il secondo invio.
     La risposta all'ultima domanda non ha un "dopo".
     """
-    stato = quiz_tokens.load_state(dati.get("token"), MODO)
-    giorno = today_rome(now)
-    if dati.get("puzzle_id") != sfida_di_oggi_id(giorno):
+    state = quiz_tokens.load_state(data.get("token"), MODE)
+    day = today_rome(now)
+    if data.get("puzzle_id") != today_challenge_id(day):
         return 400, {"error": "puzzle_changed"}
     try:
-        indice = int(dati.get("q"))
+        index = int(data.get("q"))
     except (TypeError, ValueError):
         return 400, {"error": "bad_request"}
-    if not 0 <= indice < COPPIE - 1:
+    if not 0 <= index < PAIRS - 1:
         return 400, {"error": "bad_request"}
-    salvato = stato.get(CHIAVE_PUNTEGGIO) or {}
-    livello = salvato.get("l")
-    if (livello not in LEVELS or salvato.get("d") != giorno.isoformat()
-            or stato.get("fp") is not None or stato.get("q") != indice + 1):
+    saved = state.get(SCORE_KEY) or {}
+    level = saved.get("l")
+    if (level not in LEVELS or saved.get("d") != day.isoformat()
+            or state.get("fp") is not None or state.get("q") != index + 1):
         return 400, {"error": "token_invalid"}
-    if not quiz_tokens.claim_round(stato["sid"], -(indice + 1)):
+    if not quiz_tokens.claim_round(state["sid"], -(index + 1)):
         return 409, {"error": "round_already_bound"}
-    coppia = _sfida(giorno, livello)["pairs"][indice + 1]
-    return 200, {"token": _lega_domanda(stato, coppia, livello)}
+    pair = _challenge(day, level)["pairs"][index + 1]
+    return 200, {"token": _bind_question(state, pair, level)}
 
 
 # La risposta
 
-def risposta(dati, now=None):
+def answer(data, now=None):
     """(status, corpo) della risposta a una domanda della sfida del giorno.
 
     Gli errori hanno tutti un nome che il client conosce: `puzzle_changed` (fra
@@ -315,87 +315,87 @@ def risposta(dati, now=None):
     il client ignora in silenzio). `training_session` non è un errore: è l'avviso
     che senza timer la partita non va in classifica.
     """
-    stato = quiz_tokens.load_state(dati.get("token"), MODO)
-    giorno = today_rome(now)
-    if dati.get("puzzle_id") != sfida_di_oggi_id(giorno):
+    state = quiz_tokens.load_state(data.get("token"), MODE)
+    day = today_rome(now)
+    if data.get("puzzle_id") != today_challenge_id(day):
         return 400, {"error": "puzzle_changed"}
-    livello = stato.get("x")
-    if livello not in LEVELS:
+    level = state.get("x")
+    if level not in LEVELS:
         return 400, {"error": "token_invalid"}
     try:
-        indice = int(dati.get("q"))
+        index = int(data.get("q"))
     except (TypeError, ValueError):
         return 400, {"error": "bad_request"}
-    if not 0 <= indice < COPPIE:
+    if not 0 <= index < PAIRS:
         return 400, {"error": "bad_request"}
-    coppia = _sfida(giorno, livello)["pairs"][indice]
-    esito = _valuta(coppia, livello, dati.get("choice"))
-    if esito is None:
+    pair = _challenge(day, level)["pairs"][index]
+    outcome = _evaluate(pair, level, data.get("choice"))
+    if outcome is None:
         return 400, {"error": "bad_request"}
-    chiavi = [coppia["a"]["key"], coppia["b"]["key"]]
-    indicatore = coppia["indicator"]
+    keys = [pair["a"]["key"], pair["b"]["key"]]
+    indicator = pair["indicator"]
     # Il token deve legare proprio questa domanda: senza questo controllo un
     # token buono potrebbe essere usato per far valutare una coppia diversa.
-    legato, _ = quiz_tokens.apply_answer(
-        stato, indicatore["id"], indicatore["year"], chiavi, esito["correct"]
+    bound, _ = quiz_tokens.apply_answer(
+        state, indicator["id"], indicator["year"], keys, outcome["correct"]
     )
-    if legato is None or stato.get("q") != indice + 1:
+    if bound is None or state.get("q") != index + 1:
         return 400, {"error": "token_invalid"}
-    tempo = quiz_tokens.round_timing(stato, dati.get("choice"), now)
-    if tempo == "early_timeout":
+    timing = quiz_tokens.round_timing(state, data.get("choice"), now)
+    if timing == "early_timeout":
         return 400, {"error": "timeout_too_early"}
-    if tempo == "late":
+    if timing == "late":
         # oltre i 10 s più la tolleranza non è una risposta: si rifiuta senza
         # rivelare i valori, e il round resta aperto solo per il tempo che manca.
         return 400, {"error": "late"}
-    if not quiz_tokens.claim_round(stato["sid"], stato["q"]):
+    if not quiz_tokens.claim_round(state["sid"], state["q"]):
         return 409, {"error": "round_already_answered"}
-    giorno_token, giuste = _punteggio(stato)
-    if giorno_token != giorno.isoformat():
-        giuste = 0
-    if esito["correct"]:
-        giuste += 1
+    token_day, correct_count = _score(state)
+    if token_day != day.isoformat():
+        correct_count = 0
+    if outcome["correct"]:
+        correct_count += 1
     # La prima coppia sbagliata resta nel token, per il fatto di fine partita.
-    errore = game_facts.errore_firmato(
-        stato.get(CHIAVE_PUNTEGGIO) or {}, giorno.isoformat(), indice, esito, dati.get("choice")
+    first_error = game_facts.errore_firmato(
+        state.get(SCORE_KEY) or {}, day.isoformat(), index, outcome, data.get("choice")
     )
-    stato = {**stato, CHIAVE_PUNTEGGIO: {"d": giorno.isoformat(), "c": giuste, "l": livello, **errore}}
-    sessione, token = quiz_tokens.apply_answer(
-        stato, indicatore["id"], indicatore["year"], chiavi, esito["correct"]
+    state = {**state, SCORE_KEY: {"d": day.isoformat(), "c": correct_count, "l": level, **first_error}}
+    session, token = quiz_tokens.apply_answer(
+        state, indicator["id"], indicator["year"], keys, outcome["correct"]
     )
-    riassunto = None if sessione is None else {
-        "streak": sessione["streak"], "best": sessione["best"], "rounds": sessione["rounds"],
+    summary = None if session is None else {
+        "streak": session["streak"], "best": session["best"], "rounds": session["rounds"],
     }
-    finita = indice + 1 == COPPIE
-    corpo = {
-        **esito,
-        "index": indice,
-        "level": livello,
+    finished = index + 1 == PAIRS
+    body = {
+        **outcome,
+        "index": index,
+        "level": level,
         # La forma del risultato per la riga da condividere: mai il nome del
         # territorio né il valore.
-        "esito": "exact" if esito["correct"] else "miss",
-        "score": {"correct": giuste, "total": COPPIE},
-        "session": riassunto,
-        "leaderboard": bool(stato["t"]),
-        "finished": finita,
+        "esito": "exact" if outcome["correct"] else "miss",
+        "score": {"correct": correct_count, "total": PAIRS},
+        "session": summary,
+        "leaderboard": bool(state["t"]),
+        "finished": finished,
         "token": token,
     }
-    if not stato["t"]:
-        corpo["notice"] = "training_session"
-    if finita:
-        corpo["summary"] = {
-            "puzzle_id": sfida_di_oggi_id(giorno),
-            "number": game_daily.challenge_number(giorno),
-            "date": giorno.isoformat(),
-            "next_puzzle_at": game_daily.next_challenge_rome(giorno),
-            "score": {"correct": giuste, "total": COPPIE},
+    if not state["t"]:
+        body["notice"] = "training_session"
+    if finished:
+        body["summary"] = {
+            "puzzle_id": today_challenge_id(day),
+            "number": game_daily.challenge_number(day),
+            "date": day.isoformat(),
+            "next_puzzle_at": game_daily.next_challenge_rome(day),
+            "score": {"correct": correct_count, "total": PAIRS},
         }
-        fatto = game_facts.fatto_compare(
-            livello, _sfida(giorno, livello)["pairs"], stato[CHIAVE_PUNTEGGIO].get("e"),
-            lambda coppia, scelta: _valuta(coppia, livello, scelta),
+        fact = game_facts.fatto_compare(
+            level, _challenge(day, level)["pairs"], state[SCORE_KEY].get("e"),
+            lambda pair, choice: _evaluate(pair, level, choice),
         )
-        if fatto:
-            corpo["summary"]["fact"] = fatto["fact"]
-            if fatto["path"]:
-                corpo["summary"]["fact_path"] = fatto["path"]
-    return 200, corpo
+        if fact:
+            body["summary"]["fact"] = fact["fact"]
+            if fact["path"]:
+                body["summary"]["fact_path"] = fact["path"]
+    return 200, body

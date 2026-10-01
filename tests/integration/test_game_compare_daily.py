@@ -328,7 +328,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         risposte = self._gioca(sessione, "regioni", giuste=10)
         ultima = risposte[-1].get_json()
-        stato = quiz_tokens.load_state(ultima["token"], game_compare.MODO)
+        stato = quiz_tokens.load_state(ultima["token"], game_compare.MODE)
         self.assertIsNone(stato["fp"])
         # La decima coppia non si può rispondere una seconda volta.
         self.assertEqual(self._risponde(sessione, 9, "region_a", token=ultima["token"]).status_code, 400)
@@ -337,7 +337,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         coppia = sessione["questions"][0]
         risposta = self._risponde(sessione, 0, _vincitore("regioni", coppia)).get_json()
-        stato = quiz_tokens.load_state(risposta["token"], game_compare.MODO)
+        stato = quiz_tokens.load_state(risposta["token"], game_compare.MODE)
         # "l" e' il livello: dopo la risposta `x` si svuota e "Avanti" lo legge da qui.
         self.assertEqual(stato["sfida"], {"d": sessione["date"], "c": 1, "l": "regioni"})
 
@@ -486,7 +486,7 @@ class AvantiTest(Base):
     def test_la_risposta_non_lega_piu_la_domanda_successiva(self):
         sessione = self._sessione()
         prima = self._risponde(sessione, 0, _vincitore("regioni", sessione["questions"][0])).get_json()
-        self.assertIsNone(quiz_tokens.load_state(prima["token"], game_compare.MODO)["fp"])
+        self.assertIsNone(quiz_tokens.load_state(prima["token"], game_compare.MODE)["fp"])
         seconda = self._risponde(sessione, 1, "region_a", token=prima["token"], now=T0 + 2)
         self.assertEqual((seconda.status_code, seconda.get_json()["error"]), (400, "token_invalid"))
 
@@ -566,7 +566,7 @@ class SerieTest(Base):
 
     def test_the_two_routes_keep_their_own_sessions(self):
         sessione = self._sessione()
-        stato = quiz_tokens.load_state(sessione["token"], game_compare.MODO)
+        stato = quiz_tokens.load_state(sessione["token"], game_compare.MODE)
         self.assertEqual(stato["q"], 1)
         self.assertEqual(stato["x"], "regioni")
         # Il round a serie resta un round: due regioni e la sua difficolta'.

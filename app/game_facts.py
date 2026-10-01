@@ -33,7 +33,7 @@ relativo `|a-b| / max(|a|, |b|)`: le unita' cambiano da una coppia all'altra,
 quindi la distanza assoluta non si confronta.
 
 **I numeri.** Vengono dai valori che la risposta gia' porta (Ordina) o dagli
-stessi `_valuta` di Chi e' maggiore: mai un numero esterno. Si scrivono come le
+stessi `_evaluate` di Chi e' maggiore: mai un numero esterno. Si scrivono come le
 scrive il sito, `app/design/numfmt` (virgola decimale, migliaia con il punto,
 `%` attaccato e le altre unita' dopo uno spazio fine). Il nome dell'indicatore e'
 il `nome_leggibile` di `config/game_indicators.csv`, non quello Istat da 180
@@ -321,7 +321,7 @@ def _riga_compare(t):
 def fatto_compare(livello, coppie, indice_errore, valuta):
     """`{"fact", "path"}` di fine partita di Chi e' maggiore, o None. `coppie` sono le
     dieci della sfida, `indice_errore` il `sfida.e` del token e `valuta(coppia,
-    "region_a")` i valori veri della coppia (gli stessi `_valuta` della risposta). Con
+    "region_a")` i valori veri della coppia (gli stessi `_evaluate` della risposta). Con
     un errore la frase parte da li' ("Hai messo A sopra B": A e' il piu' basso, e'
     quello che il giocatore ha scelto), senza la coppia piu' distante per scarto
     relativo."""
