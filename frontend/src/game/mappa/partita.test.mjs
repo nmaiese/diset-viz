@@ -1,16 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  AVVISO_RIPRESA,
   DIREZIONI,
   ERRORI,
   OPZIONI,
   applicaRisposta,
   chiavePartita,
+  decisioneErroreRisposta,
   esitiPerCondivisione,
   fraseDistanza,
   frasePunti,
   leggiPartita,
   messaggioErrore,
+  messaggioRiapertura,
   nuovaPartita,
   opzione,
   parametriRisposta,
@@ -166,12 +169,36 @@ test("chiavePartita e opzione", () => {
   assert.equal(opzione("boh", "boh").id, "italia-map");
 });
 
-test("messaggioErrore: i doppi invii tacciono, gli sconosciuti hanno una frase", () => {
-  assert.equal(messaggioErrore("round_already_answered"), "");
-  assert.equal(messaggioErrore("token_invalid"), "");
+test("messaggioErrore: nessun errore noto e' muto, gli sconosciuti hanno una frase", () => {
+  for (const codice of Object.keys(ERRORI)) assert.notEqual(messaggioErrore(codice), "", codice);
+  assert.equal(messaggioErrore("round_already_answered"), AVVISO_RIPRESA);
   assert.match(messaggioErrore("puzzle_changed"), /Riapri/);
   assert.match(messaggioErrore("session_expired"), /scaduta/);
   assert.match(messaggioErrore(undefined), /Riprova/);
+});
+
+test("decisioneErroreRisposta: 409 e token superato riprendono da soli, una volta", () => {
+  assert.equal(decisioneErroreRisposta({ status: 409, error: "round_already_answered" }), "riprendi");
+  assert.equal(decisioneErroreRisposta({ status: 409 }), "riprendi");
+  assert.equal(decisioneErroreRisposta({ status: 400, error: "token_superato" }), "riprendi");
+  // Gia' ripresa e senza una risposta buona: niente ciclo, il bottone.
+  assert.equal(decisioneErroreRisposta({ status: 409, error: "round_already_answered" }, { giaRiaperta: true }), "riapri");
+  assert.equal(decisioneErroreRisposta({ status: 400, error: "token_superato" }, { giaRiaperta: true }), "riapri");
+});
+
+test("decisioneErroreRisposta: token scaduto e sfida cambiata col bottone, il resto riprova", () => {
+  for (const error of ["token_invalid", "puzzle_changed", "session_expired"]) {
+    assert.equal(decisioneErroreRisposta({ status: 400, error }), "riapri", error);
+  }
+  for (const input of [{ status: 0, error: undefined }, { status: 429, error: "rate_limited" }, { status: 500 }, undefined]) {
+    assert.equal(decisioneErroreRisposta(input), "messaggio");
+  }
+});
+
+test("messaggioRiapertura: dice sempre qualcosa, e la ripresa fallita non parla di scadenza", () => {
+  assert.match(messaggioRiapertura("token_invalid", { status: 400 }), /scaduta/);
+  assert.match(messaggioRiapertura("round_already_answered", { status: 409 }), /interrotta/);
+  assert.match(messaggioRiapertura("puzzle_changed", { status: 400 }), /cambiata/);
 });
 
 test("applicaRisposta non muta e tiene solo il necessario", () => {

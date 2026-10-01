@@ -46,6 +46,44 @@ export function avviaScadenza({
   return ferma;
 }
 
+// -- L'invio di una risposta -----------------------------------------------------------------
+
+export const MAX_TENTATIVI_INVIO = 3;
+export const ATTESA_RITENTO_MS = 1500;
+
+// Gli errori che il server da' senza aver consumato il round: si possono rimandare.
+const ERRORI_SENZA_CONSUMO = new Set(["timeout_too_early", "rate_limited"]);
+
+// Che cosa fare dell'esito di `POST /api/game/compare/daily/answer`, in un punto solo (funzione
+// pura). `esito` e' `{ ok, status, data }`. `scelta` e' quello che si e' mandato ("region_a",
+// "region_b", "timeout"), `tentativi` quanti rinvii di questo invio ci sono gia' stati e
+// `rimastoMs` il tempo che il conto alla rovescia aveva ancora (`Infinity` senza timer).
+// Ritorna `{ azione, ... }`:
+//   rivelata   il server ha risposto 200: giusta, sbagliata o in ritardo (`data.late`, una risposta
+//              sbagliata come le altre, non un errore);
+//   riprova    si rimanda lo STESSO invio fra `attesaMs`, con `scelta` (puo' diventare "timeout");
+//   domanda    si torna alla domanda, con `errore`: il server non ha consumato il round e c'e' tempo;
+//   bloccata   la partita non puo' proseguire: `errore` dice perche', il bottone e' "Riapri".
+// Un 409 o un `token_invalid` sono "bloccata": il primo invio e' gia' arrivato, ed ignorarli
+// lascerebbe la partita senza messaggio e senza bottone. Mai "domanda" a tempo scaduto: il timer
+// ripartirebbe da zero e scatterebbe a ogni tick, quindi la risposta e' un timeout.
+export function decisioneInvio({ ok, status, data }, { scelta, tentativi = 0, rimastoMs = Infinity }) {
+  if (ok) return { azione: "rivelata" };
+  const errore = data && typeof data.error === "string" ? data.error : "";
+  if (status === 409 || errore === "token_invalid") {
+    return { azione: "bloccata", errore: errore || "round_already_answered" };
+  }
+  const rete = status === 0 || status >= 500;
+  if (rete || ERRORI_SENZA_CONSUMO.has(errore)) {
+    if (tentativi >= MAX_TENTATIVI_INVIO) return { azione: "bloccata", errore: rete ? "rete" : errore };
+    if (rete || scelta === "timeout") return { azione: "riprova", scelta, attesaMs: ATTESA_RITENTO_MS };
+    // Una scelta fatta con tempo ancora a disposizione: si torna alla domanda. A tempo finito no.
+    if (rimastoMs <= 0) return { azione: "riprova", scelta: "timeout", attesaMs: ATTESA_RITENTO_MS };
+    return { azione: "domanda", errore };
+  }
+  return { azione: "bloccata", errore };
+}
+
 // -- "Avanti" ----------------------------------------------------------------------------
 
 // Lega al token la domanda dopo quella appena risposta (`POST /api/game/compare/daily/next`).

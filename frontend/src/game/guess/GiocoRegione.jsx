@@ -234,7 +234,7 @@ export default function GameApp() {
           setRecap(result.recap);
           setFatto(nextFatto);
           recordStats(result.correct, attempt);
-          if (mode === "daily") segnaGiocata("indovina", oggiRoma(), { ok: result.correct, testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta" });
+          if (mode === "daily") segnaGiocata("indovina", puzzle.date, { ok: result.correct, testo: result.correct ? `Risolta in ${attempt} su ${puzzle.attempts_total}` : "Non risolta" });
           if (mode === "daily") leggiSerieServer().then((serie) => serie && setServerSerie(serie));
           trackGameEvent("game_finish", { game: GAME, mode, level: "regioni", won: result.correct, attempts: attempt });
         }

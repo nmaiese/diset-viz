@@ -180,7 +180,10 @@
 .mappa-regione-voce.is-scelta { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
 .mappa-regione-voce input { inline-size: 18px; block-size: 18px; margin: 0; accent-color: var(--accent); }
 
-.mappa-rivelazione:empty { display: none; }
+/* La regione `aria-live` resta sempre nell'albero (con `display: none` i lettori di schermo non
+   annunciano l'esito, perche' regione e contenuto comparirebbero insieme): vuota non ha ne'
+   altezza ne' spazio attorno. */
+.mappa-rivelazione:empty { padding: 0; }
 .mappa-rivelazione { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 0; }
 .mappa-rivelazione p { margin: 0; }
 .mappa-verdetto { display: flex; align-items: center; gap: 8px; font-size: 16px; }
@@ -275,7 +278,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .mappa-muta .prov-tile { transition: fill var(--mo-fast) ease, stroke var(--mo-fast) ease; }
   .mappa-segno { animation: mappa-segno-in var(--mo-base) var(--mo-out) both; }
-  .mappa-rivelazione { animation: mappa-rivelazione-in var(--mo-base) var(--mo-out) both; }
+  .mappa-rivelazione > * { animation: mappa-rivelazione-in var(--mo-base) var(--mo-out) both; }
   @keyframes mappa-segno-in {
     from { opacity: 0; }
     to { opacity: 1; }

@@ -5,6 +5,7 @@
 
 import { normalize } from "./helpers.js";
 import { inviaJson } from "./rete.js";
+import { analizza, extraProvincia, progressoValido, statsProvincia } from "../salvati.js";
 
 export const API_PROVINCIA = {
   daily: (level) => `/api/game/provincia/daily?level=${encodeURIComponent(level)}`,
@@ -149,6 +150,24 @@ function trovaFuori(altre, q) {
   return trovata ? trovata[0] : null;
 }
 
+// Il tentativo che il server ha registrato ma di cui il client non ha avuto la risposta (la rete e'
+// caduta) lascia il token salvato superato: ogni nuovo tentativo darebbe `token_superato` (409), e
+// ricaricare la pagina rimetterebbe lo stesso token. Si dimentica il progresso e si riparte, una
+// volta, dicendolo.
+export const AVVISO_RIPRESA = "La partita si è interrotta, non per colpa tua. La riprendiamo da capo.";
+
+// Che cosa fare di un tentativo rifiutato (funzione pura). Ritorna
+//   "riprendi"  si dimentica il progresso salvato e si ricarica la sfida da soli, una volta sola;
+//   "ricarica"  messaggio e "Ricarica la pagina" (la sfida e' cambiata, o la ripresa non e' bastata);
+//   "messaggio" un errore che passa: si resta sul campo e si puo' riprovare.
+// `giaRipresa` e' vero se la partita e' gia' ripartita da sola e non ha avuto un tentativo buono:
+// un secondo `token_superato` non la rilancia (sarebbe un ciclo).
+export function decisioneErroreTentativo({ status, code } = {}, { giaRipresa = false } = {}) {
+  if (status === 409 || code === "token_superato") return giaRipresa ? "ricarica" : "riprendi";
+  if (code === "sfida_scaduta") return "ricarica";
+  return "messaggio";
+}
+
 // Un tentativo: manda il Bearer (il server attribuisce punteggio e traguardi all'account) e, a fine
 // partita, passa i traguardi sbloccati a `notify` (il toast di `shared.jsx`).
 export async function inviaTentativo(token, provinceKey, { getToken, fetchImpl, notify } = {}) {
@@ -173,12 +192,18 @@ function scrivi(chiave, valore) {
   }
 }
 
+// Il progresso salvato di una partita, o `null` se manca o non ha la forma giusta (si riparte da zero).
 export function caricaProgresso(puzzleId) {
+  return progressoValido(analizza(leggi(STORAGE_PROGRESS + puzzleId)), { extra: extraProvincia(LIVELLI.map((l) => l.key)) });
+}
+
+// Dimentica il progresso di una partita: dopo un tentativo perso in rete il token salvato e'
+// superato, e rileggerlo darebbe lo stesso errore a ogni tentativo.
+export function rimuoviProgresso(puzzleId) {
   try {
-    const raw = leggi(STORAGE_PROGRESS + puzzleId);
-    return raw ? JSON.parse(raw) : null;
+    window.localStorage.removeItem(STORAGE_PROGRESS + puzzleId);
   } catch {
-    return null;
+    // niente da fare
   }
 }
 
@@ -186,15 +211,8 @@ export function salvaProgresso(puzzleId, progresso) {
   scrivi(STORAGE_PROGRESS + puzzleId, JSON.stringify(progresso));
 }
 
-const STATISTICHE_VUOTE = { played: 0, wins: 0, distribution: {} };
-
 export function caricaStatistiche() {
-  try {
-    const raw = leggi(STORAGE_STATS);
-    return raw ? { ...STATISTICHE_VUOTE, ...JSON.parse(raw) } : { ...STATISTICHE_VUOTE, distribution: {} };
-  } catch {
-    return { ...STATISTICHE_VUOTE, distribution: {} };
-  }
+  return statsProvincia(analizza(leggi(STORAGE_STATS)));
 }
 
 // Registra una partita finita: una partita, una vittoria o no, in quale tentativo.

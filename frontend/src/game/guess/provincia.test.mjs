@@ -2,6 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   API_PROVINCIA,
+  AVVISO_RIPRESA,
+  decisioneErroreTentativo,
+  rimuoviProgresso,
+  caricaProgresso,
+  salvaProgresso,
   inviaTentativo,
   messaggioFuoriElenco,
   nomeLivello,
@@ -211,4 +216,46 @@ test("la provincia scelta senza la sua regione la trova fra le province del payl
     rigaTerritorio(senzaRegione, soluzione, [{ key: "lecce", region: "Puglia" }]),
     "La provincia di oggi è della tua regione.",
   );
+});
+
+test("decisioneErroreTentativo: 409 e token superato riprendono da soli, una volta", () => {
+  assert.equal(decisioneErroreTentativo({ status: 409, code: "token_superato" }), "riprendi");
+  assert.equal(decisioneErroreTentativo({ status: 409 }), "riprendi");
+  assert.equal(decisioneErroreTentativo({ code: "token_superato" }), "riprendi");
+  assert.equal(decisioneErroreTentativo({ status: 409, code: "token_superato" }, { giaRipresa: true }), "ricarica");
+});
+
+test("decisioneErroreTentativo: la sfida cambiata si ricarica, il resto riprova", () => {
+  assert.equal(decisioneErroreTentativo({ status: 410, code: "sfida_scaduta" }), "ricarica");
+  assert.equal(decisioneErroreTentativo({ status: 410, code: "sfida_scaduta" }, { giaRipresa: true }), "ricarica");
+  for (const input of [{ status: 429, code: "rate_limited" }, { status: 400, code: "provincia_gia_tentata" }, { status: 0 }, {}, undefined]) {
+    assert.equal(decisioneErroreTentativo(input), "messaggio");
+  }
+});
+
+test("l'avviso della ripresa non ha colpa, ne' punteggiatura vietata", () => {
+  assert.match(AVVISO_RIPRESA, /non per colpa tua/);
+  assert.doesNotMatch(AVVISO_RIPRESA, /[;—–…]/);
+});
+
+test("rimuoviProgresso dimentica il progresso salvato e solo quello", () => {
+  const deposito = new Map();
+  globalThis.window = {
+    localStorage: {
+      getItem: (k) => deposito.get(k) ?? null,
+      setItem: (k, v) => deposito.set(k, v),
+      removeItem: (k) => deposito.delete(k),
+    },
+  };
+  try {
+    const progresso = { level: "province", token: "t", clues: [], guesses: [], status: "playing", solution: null, recap: null };
+    salvaProgresso("daily:2026-10-01", progresso);
+    salvaProgresso("daily:2026-09-30", progresso);
+    assert.deepEqual(caricaProgresso("daily:2026-10-01"), progresso);
+    rimuoviProgresso("daily:2026-10-01");
+    assert.equal(caricaProgresso("daily:2026-10-01"), null);
+    assert.deepEqual(caricaProgresso("daily:2026-09-30"), progresso);
+  } finally {
+    delete globalThis.window;
+  }
 });

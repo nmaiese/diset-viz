@@ -14,7 +14,8 @@ import {
 } from "./shared.jsx";
 import { campoFatto } from "./compare-logica.js";
 import { fraseTerritorioMio, trovaTerritorioMio } from "./puri.js";
-import { oggiRoma, segnaGiocata } from "./oggi.js";
+import { segnaGiocata } from "./oggi.js";
+import { analizza, statsOrder } from "./salvati.js";
 import {
   metaUnita,
   nomeTerritorio,
@@ -46,11 +47,9 @@ const LIVELLI = [
 
 function loadStats() {
   try {
-    const raw = window.localStorage.getItem(STORAGE_STATS_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    return { bestScore3: 0, bestScore5: 0, totalRounds: 0, totalPositionsCorrect: 0, ...parsed };
+    return statsOrder(analizza(window.localStorage.getItem(STORAGE_STATS_KEY)));
   } catch {
-    return { bestScore3: 0, bestScore5: 0, totalRounds: 0, totalPositionsCorrect: 0 };
+    return statsOrder(null);
   }
 }
 
@@ -361,7 +360,7 @@ export default function OrderApp() {
           }
         }
         trackGameEvent("order_answer", { game: "order", mode, level, score: data.score, total: data.total });
-        if (isDaily) segnaGiocata("order", oggiRoma(), { ok: data.score > 0, tono: data.score === data.total ? "giusto" : data.score === 0 ? "sbagliato" : "parziale", testo: `${data.score} su ${data.total} al posto giusto` });
+        if (isDaily) segnaGiocata("order", round.date, { ok: data.score > 0, tono: data.score === data.total ? "giusto" : data.score === 0 ? "sbagliato" : "parziale", testo: `${data.score} su ${data.total} al posto giusto` });
       })
       .catch(() => {
         submittingRef.current = false;

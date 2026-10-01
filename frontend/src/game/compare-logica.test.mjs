@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  ATTESA_RITENTO_MS,
+  MAX_TENTATIVI_INVIO,
+  decisioneInvio,
   API_AVANTI,
   ROUND_MS,
   TICK_MS,
@@ -241,4 +244,61 @@ test("il link del fatto e' solo un percorso interno di scheda indicatore", async
   assert.equal(campoFattoPath({ summary: { fact_path: "//esempio.it" } }), undefined);
   assert.equal(campoFattoPath({}), undefined);
   assert.equal(campoFattoPath(null), undefined);
+});
+
+// -- L'invio di una risposta ------------------------------------------------------------------
+
+const RISPOSTA_200 = { ok: true, status: 200, data: { correct: false, late: true, token: "t" } };
+const RETE = { ok: false, status: 0, data: {} };
+
+test("decisioneInvio: un 200 e' una rivelazione, anche con late: true (una risposta sbagliata)", () => {
+  assert.deepEqual(decisioneInvio(RISPOSTA_200, { scelta: "region_a" }), { azione: "rivelata" });
+  assert.deepEqual(decisioneInvio({ ok: true, status: 200, data: { correct: true } }, { scelta: "region_b" }), { azione: "rivelata" });
+});
+
+test("decisioneInvio: un 409 o un token_invalid bloccano la partita, mai in silenzio", () => {
+  const dopo409 = decisioneInvio({ ok: false, status: 409, data: { error: "round_already_answered" } }, { scelta: "region_a" });
+  assert.deepEqual(dopo409, { azione: "bloccata", errore: "round_already_answered" });
+  const senzaNome = decisioneInvio({ ok: false, status: 409, data: {} }, { scelta: "region_a" });
+  assert.equal(senzaNome.azione, "bloccata");
+  assert.notEqual(senzaNome.errore, "");
+  const token = decisioneInvio({ ok: false, status: 400, data: { error: "token_invalid" } }, { scelta: "timeout", rimastoMs: 0 });
+  assert.deepEqual(token, { azione: "bloccata", errore: "token_invalid" });
+});
+
+test("decisioneInvio: un errore di rete rimanda lo stesso invio, poi blocca", () => {
+  for (const scelta of ["region_a", "timeout"]) {
+    for (let tentativi = 0; tentativi < MAX_TENTATIVI_INVIO; tentativi += 1) {
+      assert.deepEqual(
+        decisioneInvio(RETE, { scelta, tentativi, rimastoMs: 4000 }),
+        { azione: "riprova", scelta, attesaMs: ATTESA_RITENTO_MS },
+      );
+    }
+    assert.deepEqual(decisioneInvio(RETE, { scelta, tentativi: MAX_TENTATIVI_INVIO }), { azione: "bloccata", errore: "rete" });
+  }
+  // Un errore del server e' come la rete.
+  assert.equal(decisioneInvio({ ok: false, status: 503, data: {} }, { scelta: "region_b" }).azione, "riprova");
+});
+
+test("decisioneInvio: mai tornare alla domanda a tempo scaduto, la risposta e' un timeout", () => {
+  const limite = { ok: false, status: 429, data: { error: "rate_limited" } };
+  assert.deepEqual(decisioneInvio(limite, { scelta: "region_a", rimastoMs: 2500 }), { azione: "domanda", errore: "rate_limited" });
+  assert.deepEqual(
+    decisioneInvio(limite, { scelta: "region_a", rimastoMs: 0 }),
+    { azione: "riprova", scelta: "timeout", attesaMs: ATTESA_RITENTO_MS },
+  );
+  // Senza timer il tempo non scade.
+  assert.equal(decisioneInvio(limite, { scelta: "region_a" }).azione, "domanda");
+  // Un timeout rimandato resta un timeout, e dopo i tentativi blocca (non gira all'infinito).
+  const presto = { ok: false, status: 400, data: { error: "timeout_too_early" } };
+  assert.equal(decisioneInvio(presto, { scelta: "timeout", tentativi: 0, rimastoMs: 0 }).azione, "riprova");
+  assert.equal(decisioneInvio(presto, { scelta: "timeout", tentativi: MAX_TENTATIVI_INVIO, rimastoMs: 0 }).azione, "bloccata");
+});
+
+test("decisioneInvio: ogni altro errore del server blocca, con il suo nome", () => {
+  assert.deepEqual(
+    decisioneInvio({ ok: false, status: 400, data: { error: "puzzle_changed" } }, { scelta: "region_a" }),
+    { azione: "bloccata", errore: "puzzle_changed" },
+  );
+  assert.equal(decisioneInvio({ ok: false, status: 400, data: null }, { scelta: "region_a" }).azione, "bloccata");
 });

@@ -22,14 +22,22 @@ export const TONI_STATO = ["giusto", "parziale", "sbagliato"];
 // `esito` e' `{ ok: boolean, testo: string, tono?: "giusto"|"parziale"|"sbagliato" }`: `tono`
 // decide l'icona (la terza, neutra, e' per un risultato a meta: un parziale non e' una croce).
 // Senza `tono` vale `ok` (giusto o sbagliato). `testo` e' la riga che la accompagna.
+//
+// Vale la PRIMA partita del giorno: se per quel gioco e quel giorno c'e' gia' un esito non lo
+// sovrascrive (chi rigioca le stesse coppie, o prova un altro esercizio, non cambia cio' che l'hub
+// ha gia' segnato). Ritorna `true` se ha scritto. Si chiama solo per la sfida del giorno finita,
+// mai per un allenamento: la data e' quella che il server da' alla sfida.
 export function segnaGiocata(gioco, iso, esito) {
-  if (!GIOCHI.includes(gioco) || !/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return;
+  if (!GIOCHI.includes(gioco) || !/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return false;
   try {
+    if (window.localStorage.getItem(chiave(gioco, iso))) return false;
     const ok = Boolean(esito && esito.ok);
     const tono = esito && TONI_STATO.includes(esito.tono) ? esito.tono : ok ? "giusto" : "sbagliato";
     window.localStorage.setItem(chiave(gioco, iso), JSON.stringify({ ok, tono, testo: String((esito && esito.testo) || "") }));
+    return true;
   } catch {
     // Senza localStorage l'hub non sa che hai giocato: nessun danno per la partita.
+    return false;
   }
 }
 
