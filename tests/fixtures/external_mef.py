@@ -14,7 +14,7 @@ TARGET = "mef:reddito-irpef-medio"
 SOURCE_ID = "MEF_REDDITO_IRPEF_MEDIO"
 NAME = "Reddito imponibile medio per contribuente"
 THEME = "Reddito e ricchezza"
-CATEGORY = "reddito_ricchezza"
+CATEGORY = "reddito_accessibilita"
 
 
 def levels():

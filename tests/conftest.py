@@ -27,6 +27,7 @@ def _clear_lru_caches():
     import app.atlas_catalog
     import app.indicator_view
     import app.external_atlas
+    import app.provincial_families
     import app.blog
 
     modules = [
@@ -34,6 +35,7 @@ def _clear_lru_caches():
         app.atlas_catalog,
         app.indicator_view,
         app.external_atlas,
+        app.provincial_families,
         app.blog,
     ]
     for module in modules:
