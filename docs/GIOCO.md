@@ -240,6 +240,7 @@ Idee valutate e **non** fatte, con il motivo, perché qualcuno le riproporrà:
 Cose vere oggi che non sono state corrette. Non sono un elenco di impegni.
 
 - **Il limite di frequenza e `token_superato` sono per processo.** Con più istanze Cloud Run il limite è più lasco di quanto sembri. È un freno, non un muro.
+- **La sessione di Chi è maggiore? porta tutte e dieci le coppie** (indicatore e territori, mai i valori) già all'apertura. Si può quindi guardare la coppia dopo mentre scorre il timer della precedente, e il timer non misura più la sola conoscenza. Per ora conta poco (il punteggio della sfida non ha una classifica pubblica, e la sessione porta già `Avanti` senza richiamare il server), ma se la sfida del giorno avrà una classifica la sessione dovrà mandare solo la domanda 0 e far arrivare le altre con `next`. Decisione della revisione finale del 1 ottobre 2026: non si fa ora.
 - **Il fallimento aperto di `claim_round`** (sopra): con la migrazione `0010` mancante il monouso è spento senza un 500 a dirlo, e la classifica delle serie perde la sua difesa.
 - **I punteggi del giorno stanno nell'esportazione e nella cancellazione dell'account** (`app/account.py`, tabella `daily_scores`, dal 1 ottobre 2026). Una tabella nuova che porta `auth_id` va aggiunta lì: lo prova `tests/integration/test_account.py`.
 - **Indovina la Regione non ha stato di sessione** (sopra): non farci poggiare nessuna classifica.
