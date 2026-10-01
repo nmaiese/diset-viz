@@ -51,6 +51,13 @@ COPY packs/ packs/
 # Build. `test_app.py` sorveglia che questa COPY resti, perche' e' un buco che si
 # vede solo in produzione.
 COPY data/ data/
+# `config/game_indicators.csv` e' l'elenco curato che compone le sfide del giorno di
+# Chi e' maggiore? e Ordina (`app/game_daily.py`). Senza questa riga le due API
+# `/api/game/{compare,order}/daily/session` rispondono 500 in produzione (e' successo
+# il 1 ottobre 2026), mentre la suite qui, che gira col repo intero, non se ne
+# accorge. Si copia il solo file e non `config/`: il resto della cartella non e'
+# mai stato nell'immagine e una COPY larga cambierebbe cio' che le altre pagine leggono.
+COPY config/game_indicators.csv config/game_indicators.csv
 COPY run.py .
 COPY --from=frontend-build /build/app/static/dist app/static/dist
 
