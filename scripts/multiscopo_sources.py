@@ -268,6 +268,123 @@ MULTISCOPO_INDICATORS = [
         "id": "MULTI_SPESA_INTERQUINTILE", "name": "Rapporto interquintilico della spesa per consumi",
         "tema": "Reddito e ricchezza", "unit": "rapporto", "direction": "lower_better",
     },
+
+    # -- Aspetti della vita quotidiana 2025 (nuovi dettagli: salute, sportelli, trasporto, cultura, dotazioni)
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_216", "filters": {'DATA_TYPE': '0_FA', 'MEASURE': 'TSC', 'SEX': '9'},
+        "id": "MULTI_PRONTO_SOCCORSO", "name": 'Persone che hanno usato il pronto soccorso negli ultimi 3 mesi',
+        "tema": 'Salute', "unit": 'per 1000 persone', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_216", "filters": {'DATA_TYPE': '0_MG', 'MEASURE': 'TSC', 'SEX': '9'},
+        "id": "MULTI_GUARDIA_MEDICA", "name": 'Persone che hanno usato la guardia medica negli ultimi 3 mesi',
+        "tema": 'Salute', "unit": 'per 1000 persone', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_104", "filters": {'DATA_TYPE': '18_ASL_DUR_GE20', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_ASL_FILA_OLTRE_20_MIN", "name": 'Utenti della ASL con una fila di oltre 20 minuti',
+        "tema": 'Salute', "unit": '%', "direction": "lower_better",
+    },
+    {
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_109", "filters": {'DATA_TYPE': '18_BA_DUR_GE20', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_BANCA_FILA_OLTRE_20_MIN", "name": 'Utenti della banca con una fila di oltre 20 minuti',
+        "tema": 'Benessere economico', "unit": '%', "direction": "lower_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_256", "filters": {'DATA_TYPE': '0_MED_CAREQ', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_RICOVERO_ASSISTENZA_MEDICA", "name": "Ricoverati soddisfatti dell'assistenza medica",
+        "tema": 'Salute', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_235", "filters": {'DATA_TYPE': '0_DOM_ACC', 'MEASURE': 'TSC', 'SEX': '9'},
+        "id": "MULTI_INCIDENTI_DOMESTICI", "name": 'Persone che hanno subito incidenti domestici negli ultimi 3 mesi',
+        "tema": 'Salute', "unit": 'per 1000 persone', "direction": "lower_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_160", "filters": {'DATA_TYPE': '14_BUS_SAT_FC', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_BUS_FREQUENZA_CORSE", "name": 'Utenti del bus soddisfatti della frequenza delle corse',
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_160", "filters": {'DATA_TYPE': '14_BUS_SAT_WAIT', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_BUS_ATTESA_FERMATA", "name": "Utenti del bus soddisfatti della comodita dell'attesa alla fermata",
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_160", "filters": {'DATA_TYPE': '14_BUS_SAT_COMF', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_BUS_COMODITA_ORARI", "name": 'Utenti del bus soddisfatti della comodita degli orari',
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_170", "filters": {'DATA_TYPE': '15_EMPMOV_PCAR', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_LAVORO_AUTO_PRIVATA", "name": 'Occupati che vanno al lavoro in auto privata come conducente',
+        "tema": 'Ambiente', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_170", "filters": {'DATA_TYPE': '15_EMPMOV_FOOT', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_LAVORO_A_PIEDI", "name": 'Occupati che vanno al lavoro a piedi',
+        "tema": 'Ambiente', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_170", "filters": {'DATA_TYPE': '15_EMPMOV_BICYC', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_LAVORO_BICICLETTA", "name": 'Occupati che vanno al lavoro in bicicletta',
+        "tema": 'Ambiente', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_121", "filters": {'DATA_TYPE': '18_YOUNG', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_GIOVANI_CON_GENITORI", "name": 'Giovani di 18-34 anni, celibi e nubili, che vivono con almeno un genitore',
+        "tema": 'Abitazione', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_227", "filters": {'DATA_TYPE': '6_THEATR', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_TEATRO", "name": "Persone di 6 anni e piu che sono andate a teatro nell'ultimo anno",
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_227", "filters": {'DATA_TYPE': '6_CINEMA', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_CINEMA", "name": "Persone di 6 anni e piu che sono andate al cinema nell'ultimo anno",
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_227", "filters": {'DATA_TYPE': '6_ARCHEO_MUSEUM', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_SITI_ARCHEOLOGICI", "name": "Persone di 6 anni e piu che hanno visitato siti archeologici e monumenti nell'ultimo anno",
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_107", "filters": {'DATA_TYPE': '6_EVERYD', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_AMICI_OGNI_GIORNO", "name": 'Persone di 6 anni e piu che incontrano gli amici ogni giorno',
+        "tema": 'Benessere soggettivo', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_15", "filters": {'DATA_TYPE': 'HOUS_AIRCON', 'MEASURE': 'HSC_F', 'NUMBER_HOUSEHOLD_COMP': 'TOT'},
+        "id": "MULTI_CONDIZIONATORI", "name": 'Famiglie con condizionatore o climatizzatore',
+        "tema": 'Energia', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_15", "filters": {'DATA_TYPE': 'HOUS_CARS', 'MEASURE': 'HSC_F', 'NUMBER_HOUSEHOLD_COMP': 'TOT'},
+        "id": "MULTI_PIU_DI_UN_AUTO", "name": "Famiglie con piu di un'automobile",
+        "tema": 'Benessere economico', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_15", "filters": {'DATA_TYPE': 'HOUS_BICY', 'MEASURE': 'HSC_F', 'NUMBER_HOUSEHOLD_COMP': 'TOT'},
+        "id": "MULTI_BICICLETTE", "name": 'Famiglie con almeno una bicicletta',
+        "tema": 'Ambiente', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_15", "filters": {'DATA_TYPE': 'HOUS_DISH', 'MEASURE': 'HSC_F', 'NUMBER_HOUSEHOLD_COMP': 'TOT'},
+        "id": "MULTI_LAVASTOVIGLIE", "name": 'Famiglie con lavastoviglie',
+        "tema": 'Benessere economico', "unit": '%', "direction": "contextual",
+    },
+    {
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_239", "filters": {'DATA_TYPE': '3_ADEQ_BREAK', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_COLAZIONE_ADEGUATA", "name": 'Persone di 3 anni e piu che fanno una colazione adeguata',
+        "tema": 'Salute', "unit": '%', "direction": "higher_better",
+    },
+    {
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_251", "filters": {'DATA_TYPE': '3_GE5_PORTION', 'MEASURE': 'HSC', 'SEX': '9'},
+        "id": "MULTI_CINQUE_PORZIONI", "name": 'Persone di 3 anni e piu che mangiano 5 o piu porzioni di frutta e verdura al giorno',
+        "tema": 'Salute', "unit": '%', "direction": "higher_better",
+    },
 ]
 
 # La direzione spiega come leggere la serie, ma non basta a renderla adatta a
