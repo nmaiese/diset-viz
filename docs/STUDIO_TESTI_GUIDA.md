@@ -157,12 +157,39 @@ Un worker ha eseguito le affermazioni degli studi sul render reale (client di te
 
 **Suite di test.** Non si può eseguire in un solo processo: l'interprete (Python 3.13.12 nel venv locale, il Dockerfile usa 3.12) va in segfault in almeno 7 test e moduli. Eseguita modulo per modulo: 127 moduli, 1.906 test eseguiti, 6 moduli in segfault (non contati), fallimenti per `requests` mancante nel venv (`test_foto_autore`, `test_verify_pezzi_trend`, il gruppo trend articoli), e quattro moduli (`test_app`, `test_atlante`, `test_editoriale_guardia`, `test_indicator_view`) che hanno fallito nel ciclo ma passano rieseguiti da soli, tranne `test_app` che resta instabile. Nessun verdetto pulito è possibile senza Python 3.12 e `requests` nell'ambiente.
 
-**Non ancora verificato:** i giochi nel browser (messaggi d'errore, esiti, "stima", condivisione, a 375 px), perché il worker che li prova non è ancora partito.
+## 9. Verifiche nei giochi, nel browser (1 ottobre 2026)
 
-## 9. Che cosa non sappiamo
+Un worker ha giocato i cinque giochi con Chromium a 375 e 1280 px, sulla sfida n. 79, con localStorage pulito e con rete simulata assente, abortita e in 503. Ho ricontrollato uno screenshot e due difetti nel codice (`order.jsx:671-673`, `leaderboard.jsx:163`). Gli screenshot (65) stanno nel worktree `verifica-giochi`, fuori dal ramo. **Nessun overflow orizzontale a 375 px**, nessun testo in inglese, nessun bottone senza etichetta.
 
-- **I giochi non sono stati provati nel browser.** Il sito è stato eseguito in locale (sezione 8), ma i giochi no. I percorsi delle quattro persone sono inferenze dal testo, non osservazioni di utenti. Nessun dato di scorrimento o permanenza.
-- **Il testo dei giochi è stato letto dal sorgente**, non nel browser: anche gli stati e gli errori vanno provati.
+**Affermazioni dell'audit: 12 confermate, 1 smentita, 1 smentita in parte.**
+- **Smentita nei fatti:** "con i dieci secondi la partita va in classifica". La sfida del giorno a tempo non ha nessuna classifica (a fine partita non compare né un invito né un nickname, nessuna chiamata alla classifica). La classifica è delle "migliori serie", cioè dell'allenamento a serie. Il testo promette una cosa che non esiste: il difetto resta, ed è quello che l'audit chiamava ambiguità.
+- **Ordina, in parte:** la frase "tre regioni per iniziare, cinque per la sfida completa" è vera nel client. Non coincidono invece l'onboarding del client ("Trascina la maniglia o tocca due volte. Le frecce spostano una riga alla volta") e quello della pagina ("toccando una regione e poi la posizione"), e "livello" vale cose diverse (Regioni / Stessa regione / Province nel client, 3 o 5 nel testo).
+- **Confermati con testo letterale:**
+  - Il lead di Indovina la Regione promette "più vicino o più lontano", ma a schermo ci sono solo "più alta/più bassa della misteriosa", la posizione in graduatoria e, dal terzo errore, la ripartizione, mai spiegata (Nord, Centro, Mezzogiorno non compaiono).
+  - Indovina la Provincia dice "Circa 77 km verso sud-est" senza la parola "stima", né in partita né in pagina, solo "approssimati". Dov'è la provincia? la dice, ma con una virgola davanti ("a circa 298 km a sud-ovest, stima").
+  - Esiti: "Tentativo 1: Lazio è sbagliata" (in Provincia: "Teramo non è la provincia"), "Hai indovinato!". Al termine, tre frasi per lo stesso esito: "Hai indovinato!", "Giusto.", "Indovinata al primo tentativo".
+  - Condivisione: solo `●` e `○`, nessun triangolo, senza legenda. In Dov'è la provincia? i cerchi sono su 10 domande ma il punteggio su 20. Il link di sfida condivisa nasce solo da Chi è maggiore e da Dov'è la provincia?; in Regione, Provincia e Ordina l'hash non fa nulla. Il box "La sfida condivisa: 7 su 10. Riesci a superarla?" non nomina il gioco né il livello, e con un numero di sfida vecchio sparisce senza avviso.
+  - Onboarding: solo Regione e Provincia hanno un modale "Come si gioca" (3-5 righe); gli altri mostrano un blocco di regole fisso. Nessun tutorial interattivo. La sfida del giorno è chiaramente quella principale, ma "le statistiche contano solo la sfida del giorno" sta solo nel modale delle statistiche.
+  - Quattro nomi per la stessa sezione: "Sfida Italia", "Quiz", "Quanto conosci l'Italia?", "Classifica". "Serie" vale almeno quattro cose, e "giorni di fila" ha due definizioni che si contraddicono (hub: "con almeno una sfida"; statistiche: "in cui hai vinto la sfida del giorno").
+  - Senza JavaScript: Regione, Provincia, Chi è maggiore, Ordina e Mappa mostrano il lead e un fallback; l'hub e la classifica no, restano "Caricamento delle statistiche...". **Con il bundle bloccato** (JS attivo) il fallback non copre: resta "Preparazione della sfida del giorno..." per sempre, senza errore e senza link.
+  - La 404 di un gioco è la pagina generica, senza rimando a `/quiz`.
+
+**Errori di rete, il risultato più utile.** In **Chi è maggiore?** con rete assente il giocatore resta per 3-8 secondi con A e B disabilitati, senza messaggio e con il timer sparito, poi compare "Non riesco a raggiungere il server. Riapri la sfida di oggi.". In **Indovina la Provincia e Regione** l'errore è un generico "Il tentativo non è andato a buon fine. Riprova." **senza bottone**. In **Mappa e Ordina** è "Qualcosa non ha funzionato. Riprova." e la Mappa non ha un bottone "Riprova". Ordina ha un solo messaggio per tutto, anche per il token non valido. Dopo "Riprova" in allenamento la serie **non** si azzera: l'avviso di `docs/GIOCO.md` va riletto contro il comportamento reale. Il 429 si legge in tre modi ("Troppe risposte/tentativi/richieste") e in Regione non c'è (il generico).
+
+**Difetti nuovi, non citati dall'audit:**
+1. **Ordina, tastiera: i bottoni ▲ ▼ non rispondono a Invio o Spazio.** La riga cattura Invio e Spazio e il tasto del bottone risale fino a lei. Con il mouse funzionano, con la tastiera no, e "le frecce spostano una riga alla volta" non è vero. Da testo promesso, un problema di accessibilità, non solo di copy. È codice, non testo.
+2. **Grammatica**: "Stai vedendo i punteggi dei ultimi 7 giorni" e "dei tutti i tempi" in classifica (`leaderboard.jsx:163`, la stringa composta con il periodo); "Il tuo risultato: 1 risposte di fila" (singolare sbagliato in Chi è maggiore); "Risultato parziale." come titolo di una partita finita; "tra" in Regione e "fra" in Provincia.
+3. **Mappa**: i venti gruppi delle regioni hanno `aria-label="Regione"` e le province `aria-label="Provincia"` (da verificare con un lettore di schermo vero); il riepilogo "1 provincia esatta, 0 nella regione giusta" con "2 su 20" non si legge senza conoscere la regola (esatta 2, regione giusta 1).
+4. **Bersagli tattili a 375 px**: Valle d'Aosta misura 26x17 px nella mappa di Regione, Molise 28x22; link inline di fine partita da 15 a 21 px. I bottoni di gioco veri sono tutti da 44 px o più.
+
+**Cosa va aggiunto alla proposta (PR 2, giochi):** il messaggio durante il silenzio di rete di Chi è maggiore; i bottoni "Riprova" mancanti in Regione, Provincia e Mappa; il 429 anche in Regione; un'uscita per il bundle non caricato; la frase del box di sfida condivisa con nome del gioco; la legenda dei simboli e il perché dei cerchi su 10 con punteggio su 20 nella condivisione; l'allineamento del testo server di Ordina al client; il rimando ai giochi nella 404 di `/quiz/*`. **Da decidere con Nello:** la tastiera di Ordina (una correzione di codice che merita una PR e un test a sé).
+
+**Non verificato:** "La riapriamo da capo" della Mappa e di Chi è maggiore a schermo (serve un token superato dopo una ripresa vera; provato solo per Provincia con una risposta finta); sfide passate e archivio; lettore di schermo vero; contrasto misurato (solo a occhio); `navigator.share` nativo.
+
+## 10. Che cosa non sappiamo
+
+- **I giochi sono stati provati nel browser** (sezione 9), ma da un worker automatico, non da giocatori. I percorsi delle quattro persone sono inferenze dal testo, non osservazioni di utenti. Nessun dato di scorrimento o permanenza.
+- **Gli errori dei giochi sono stati simulati** (rete assente, 503, 429, token non valido), non osservati in uso reale.
 - **Il campione di `content/`** è di 10 schede e 5 articoli su circa 383: quello che dice vale per il campione.
 - **Competitor**: poco verificato. Mancano un confronto serio dei testi di guida degli altri siti e di come altri giochi scrivono regole ed errori (Wordle e NYT bloccano la lettura). Se serve, va rifatto con una ricerca mirata e citazioni controllate.
 - **Fonti accademiche** sui titoli-tesi, sulla comunicazione dell'incertezza e sulle serie nei giochi non sono state lette.
