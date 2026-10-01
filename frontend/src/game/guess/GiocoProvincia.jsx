@@ -440,7 +440,7 @@ export default function GiocoProvincia() {
             <li>Una provincia italiana è nascosta, e cambia ogni giorno a mezzanotte di Roma. Hai sei tentativi.</li>
             <li>Scrivi il nome di una provincia e scegline una dall'elenco. La mappa segna il tentativo con un numero.</li>
             <li>
-              Ogni errore ti dice a che distanza sei, in chilometri, una stima, e in quale direzione cercare.
+              Ogni errore ti dice a che distanza sei, in chilometri (una stima) e in quale direzione cercare.
               Svela anche un indizio nuovo, un dato Istat.
             </li>
           </ol>
