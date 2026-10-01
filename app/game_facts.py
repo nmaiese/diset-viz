@@ -54,12 +54,13 @@ che arrotondati sono uguali la frase non esce.
   mediana dei valori in gioco, e mai su un saldo.
 
 **Il piazzamento ("18ª su 20")** solo con: direzione dell'indicatore nota
-(`CURATED_DIRECTION` sull'id senza prefisso, o la direzione del manifesto BES),
+(`CURATED_DIRECTION` sull'id senza prefisso, o la direzione del manifesto BES o
+della famiglia esterna provinciale, dove `contextual` vale "non si giudica"),
 tutti i territori previsti presenti (20 regioni, o le province del pool), stesso
 anno per tutti e graduatoria a pari merito (`profiles._ranks` per le regioni,
 `province_profile._graduatoria` per le province). Per gli indicatori campionari
 (la colonna `campionario` di `config/game_indicators.csv`, i prefissi BES e
-Multiscopo, e tutto il livello provinciale che e' BES) il numero esatto non si da:
+Multiscopo, e il livello provinciale BES) il numero esatto non si da:
 si scrive "fra le ultime cinque" se il territorio vi sta davvero, altrimenti
 niente. Al livello "stessa regione" il piazzamento non si scrive: la graduatoria e'
 sulle province d'Italia, e chi gioca la leggerebbe come della regione.
@@ -192,8 +193,7 @@ def direction(ind_id, scope):
     ordina come `lower_better`. Mai l'euristica sul nome (`direction_for`): una
     direzione indovinata darebbe un piazzamento falso."""
     if scope == "province":
-        info = bes_data.get_bes_manifest("provincia").get(game_daily.provincial_id(ind_id))
-        raw = (info or {}).get("direction")
+        raw = (game_daily.province_info(ind_id) or {}).get("direction")
     elif ind_id.startswith("bes:"):
         info = bes_data.get_bes_manifest("regione").get(ind_id[len("bes:"):])
         raw = (info or {}).get("direction")
@@ -211,8 +211,12 @@ def is_sample_survey(ind_id, scope):
     fascia si'. Lo dice la colonna `campionario` di `config/game_indicators.csv`,
     perche' un prefisso non basta (`426` e' Multiscopo, `57` Forze di lavoro, `72` ICT
     nelle imprese). BES e Multiscopo restano campionari per prefisso, il livello
-    provinciale e' tutto BES, e un id che non sta nel CSV, nel dubbio, e' campionario."""
-    if scope == "province" or ind_id.startswith(("bes:", "multiscopo:")):
+    provinciale BES pure, e un id che non sta nel CSV, nel dubbio, e' campionario. Le
+    famiglie esterne provinciali (`ipr:`, `aci:`, `agcom:`) non hanno un prefisso che lo
+    dica: per loro vale la colonna."""
+    if ind_id.startswith(("bes:", "multiscopo:")):
+        return True
+    if scope == "province" and game_daily.province_source(ind_id)[0] == "bes":
         return True
     flags = {i["id"]: i["sample_survey"] for i in game_daily.game_indicators()}
     return flags.get(ind_id, True)

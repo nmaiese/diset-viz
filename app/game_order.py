@@ -19,7 +19,7 @@ va nel log.
 
 import logging
 
-from app import bes_data, game_daily, game_facts, player_stats, quiz, quiz_tokens, sources
+from app import game_daily, game_facts, player_stats, quiz, quiz_tokens
 
 log = logging.getLogger(__name__)
 
@@ -126,14 +126,14 @@ def evaluate_daily_order_answer(payload, auth_user=None):
             for k in correct_keys
         ]
 
-        raw_id = game_daily.provincial_id(ind_id)
-        manifest = bes_data.get_bes_manifest("provincia").get(raw_id) or {}
-        explain = manifest.get("explain") or {}
-        desc = explain.get("plain") or ind["name"]
-        canonical_path = province_path(ind_id)
-        val_expl = explain.get("example") or ""
-        source_lbl = sources.SOURCES["bes"]["label"]
-        source_u = bes_data.BES_SOURCE_URLS["provincia"]
+        # Spiegazione, link e fonte della famiglia dell'indicatore, da
+        # `app/sources.py` e dal suo manifesto (`game_daily.province_info`).
+        info = game_daily.province_info(ind_id) or {}
+        desc = info.get("description") or ind["name"]
+        canonical_path = info.get("province_path")
+        val_expl = info.get("value_explanation") or ""
+        source_lbl = info.get("source_label")
+        source_u = info.get("source_url")
 
         result = {
             "score": score,
@@ -192,13 +192,14 @@ def _rows_with_unit(result):
     return result
 
 
-def province_path(ind_id):
-    """Il link canonico della scheda a livello province, quello di `game_provincia`:
-    uno slug composto dal nome leggibile del gioco porta a un 301."""
-    return bes_data.bes_level_path(game_daily.provincial_id(ind_id), "provincia")
-
-
 def sid_from_token(token):
     """Il `sid` della sessione per il limite di frequenza, o None per un token
     assente o rotto: allora vale solo il secchio per IP."""
     return quiz_tokens.signed_sid(token, MODE)
+
+
+def province_path(ind_id):
+    """Il link canonico della scheda a livello province, quello di `game_provincia`:
+    uno slug composto dal nome leggibile del gioco porta a un 301. Per una scheda a due
+    livelli e' la `/province`, per una solo provinciale il suo canonico."""
+    return (game_daily.province_info(ind_id) or {}).get("province_path")
