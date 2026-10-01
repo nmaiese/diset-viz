@@ -33,7 +33,7 @@ Questo documento è l'unica sorgente di verità per lo stato di questo progetto 
   * React (`frontend/`, compilato via Vite in `app/static/dist/`) è limitato al modulo interattivo `/quiz`.
   * Header, tema e login gestiti in Vanilla JS (`site.js`).
 * **Dati**:
-  * 634 indicatori territoriali ufficiali Istat/BES (107 province, 20 regioni).
+  * Indicatori territoriali ufficiali (Istat, BES, Multiscopo, Eurostat, ACI, AGCOM; 107 province, 20 regioni): il numero si legge da `indicator_universe.projection()`, non si scrive qui (dal 2 ottobre 2026 sono 39 piu dei 634 di prima).
   * Dataset in `app/static/data/Assoluti_Regione.csv`, caricato e cachato in memoria (`lru_cache`).
 * **Pipeline Editoriale**:
   * I contenuti attuali risiedono in `content/indicators/*.md` e `content/posts/*.md`.
