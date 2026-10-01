@@ -57,8 +57,8 @@ def attribution(site_name: str) -> Markup:
     proietta nel viewBox delle regioni."""
     b = sources.PROVINCE_BOUNDARIES
 
-    def link(testo: str, url: str) -> str:
-        return f'<a href="{escape(url)}">{escape(testo)}</a>'
+    def link(label: str, url: str) -> str:
+        return f'<a href="{escape(url)}">{escape(label)}</a>'
 
     return Markup(
         "Confini delle province: "

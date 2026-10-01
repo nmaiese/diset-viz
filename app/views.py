@@ -213,7 +213,7 @@ def _client_ip():
     Cloudflare sta in `app/client_ip.py`: l'ultimo hop non si falsifica, il primo
     lo scrive il client."""
     if os.environ.get("K_SERVICE"):
-        ip = client_ip.ip_del_client(
+        ip = client_ip.resolve_client_ip(
             request.headers.get("X-Forwarded-For"), request.headers.get("CF-Connecting-IP"))
         if ip:
             return ip

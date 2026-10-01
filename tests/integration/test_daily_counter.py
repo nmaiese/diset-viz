@@ -143,9 +143,9 @@ class TotalsTest(ConDatabase):
 
     def test_filtra_per_gioco_e_per_finestra_inclusa(self):
         self.assertEqual([v["partite"] for v in daily_counter.totals("order")], [4])
-        self.assertEqual([v["data"] for v in daily_counter.totals(da="2026-10-02")], ["2026-10-03"])
-        self.assertEqual([v["data"] for v in daily_counter.totals(a="2026-10-01")], ["2026-10-01"] * 2)
-        self.assertEqual(daily_counter.totals(da="2026-10-03", a="2026-10-03")[0]["partite"], 1)
+        self.assertEqual([v["data"] for v in daily_counter.totals(since="2026-10-02")], ["2026-10-03"])
+        self.assertEqual([v["data"] for v in daily_counter.totals(until="2026-10-01")], ["2026-10-01"] * 2)
+        self.assertEqual(daily_counter.totals(since="2026-10-03", until="2026-10-03")[0]["partite"], 1)
 
     def test_senza_partite_e_vuoto(self):
         self.assertEqual(daily_counter.totals("provincia"), [])

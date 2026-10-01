@@ -564,23 +564,23 @@ class DietroCloudflareTest(unittest.TestCase):
     EDGE = "172.69.9.50"  # un edge Cloudflare visto nei log di produzione
 
     def test_ultimo_hop_cloudflare_si_usa_cf_connecting_ip(self):
-        self.assertEqual(client_ip.ip_del_client(f"1.2.3.4, 198.51.100.9, {self.EDGE}", "198.51.100.9"), "198.51.100.9")
+        self.assertEqual(client_ip.resolve_client_ip(f"1.2.3.4, 198.51.100.9, {self.EDGE}", "198.51.100.9"), "198.51.100.9")
 
     def test_senza_cf_connecting_ip_o_con_valore_non_valido_si_resta_sull_edge(self):
-        self.assertEqual(client_ip.ip_del_client(self.EDGE, None), self.EDGE)
-        self.assertEqual(client_ip.ip_del_client(self.EDGE, "non-un-ip"), self.EDGE)
+        self.assertEqual(client_ip.resolve_client_ip(self.EDGE, None), self.EDGE)
+        self.assertEqual(client_ip.resolve_client_ip(self.EDGE, "non-un-ip"), self.EDGE)
 
     def test_chiamata_diretta_a_run_app_non_legge_cf_connecting_ip(self):
         # L'ultimo hop non e' Cloudflare: chiunque puo' aver scritto l'header.
-        self.assertEqual(client_ip.ip_del_client("10.1.1.1, 203.0.113.7", "8.8.8.8"), "203.0.113.7")
+        self.assertEqual(client_ip.resolve_client_ip("10.1.1.1, 203.0.113.7", "8.8.8.8"), "203.0.113.7")
 
     def test_senza_forwarded_for_non_c_e_un_hop(self):
-        self.assertIsNone(client_ip.ip_del_client("", "8.8.8.8"))
+        self.assertIsNone(client_ip.resolve_client_ip("", "8.8.8.8"))
 
     def test_gli_intervalli_contengono_i_cloudflare_dei_log_di_produzione(self):
         for ip in ("172.71.120.17", "104.22.148.71", "108.162.241.215", "162.158.217.74", "2606:4700::1"):
-            self.assertTrue(client_ip.e_cloudflare(ip), ip)
-        self.assertFalse(client_ip.e_cloudflare("203.0.113.7"))
+            self.assertTrue(client_ip.is_cloudflare(ip), ip)
+        self.assertFalse(client_ip.is_cloudflare("203.0.113.7"))
 
     def test_due_giocatori_dietro_lo_stesso_edge_hanno_secchi_diversi(self):
         client = app.test_client()

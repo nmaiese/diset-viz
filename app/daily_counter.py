@@ -24,72 +24,72 @@ from app.models import DailyCounter
 
 log = logging.getLogger(__name__)
 
-_GIOCO = re.compile(r"^[a-z][a-z_]{0,31}$")
+_GAME_NAME = re.compile(r"^[a-z][a-z_]{0,31}$")
 # Un tetto di buon senso: la sfida piu' lunga ha dieci round, oltre mille e' un errore.
-PUNTEGGIO_MASSIMO = 1000
+MAX_SCORE = 1000
 
 
-def _valido(gioco, data, punteggio):
-    if not isinstance(gioco, str) or not _GIOCO.match(gioco):
+def _is_valid(game, day, score):
+    if not isinstance(game, str) or not _GAME_NAME.match(game):
         return False
-    if not isinstance(data, str):
+    if not isinstance(day, str):
         return False
     try:
-        date.fromisoformat(data)
+        date.fromisoformat(day)
     except ValueError:
         return False
-    if isinstance(punteggio, bool) or not isinstance(punteggio, int):
+    if isinstance(score, bool) or not isinstance(score, int):
         return False
-    return 0 <= punteggio <= PUNTEGGIO_MASSIMO
+    return 0 <= score <= MAX_SCORE
 
 
-def _upsert(session, gioco, data, punteggio):
+def _upsert(session, game, day, score):
     """`INSERT ... ON CONFLICT DO UPDATE conteggio + 1`: atomico, due richieste insieme
     non si perdono un incremento. Un solo punto distingue il dialetto."""
     if session.bind.dialect.name == "postgresql":
         from sqlalchemy.dialects.postgresql import insert as _insert
     else:
         from sqlalchemy.dialects.sqlite import insert as _insert
-    stmt = _insert(DailyCounter).values(gioco=gioco, data=data, punteggio=punteggio, conteggio=1)
+    stmt = _insert(DailyCounter).values(gioco=game, data=day, punteggio=score, conteggio=1)
     session.execute(stmt.on_conflict_do_update(
         index_elements=["gioco", "data", "punteggio"],
         set_={"conteggio": DailyCounter.conteggio + 1},
     ))
 
 
-def record(gioco, data, punteggio):
+def record(game, day, score):
     """Conta una sfida finita. `data` e' il giorno della sfida (ISO), `punteggio` un
     intero. Ritorna True se ha scritto, False se l'input non era valido o il DB ha
     fallito (e in quel caso lo dice nel log). Non solleva mai."""
     try:
-        if not _valido(gioco, data, punteggio):
-            log.warning("daily_counter: input non valido, niente da contare (%r, %r, %r)", gioco, data, punteggio)
+        if not _is_valid(game, day, score):
+            log.warning("daily_counter: input non valido, niente da contare (%r, %r, %r)", game, day, score)
             return False
         with session_scope() as s:
-            _upsert(s, gioco, data, punteggio)
+            _upsert(s, game, day, score)
         return True
     except Exception:  # noqa: BLE001 - una misura non rompe mai la partita
         log.exception("daily_counter: conteggio non scritto")
         return False
 
 
-def totals(gioco=None, da=None, a=None):
+def totals(game=None, since=None, until=None):
     """Le partite finite, una voce per `(data, gioco)`: `{"gioco", "data", "partite",
     "punteggi": {punteggio: conteggio}}`, in ordine di data e poi di gioco. `gioco`
     filtra un solo gioco; `da` e `a` sono date ISO incluse (o None per nessun limite)."""
     stmt = select(DailyCounter)
-    if gioco:
-        stmt = stmt.where(DailyCounter.gioco == gioco)
-    if da:
-        stmt = stmt.where(DailyCounter.data >= da)
-    if a:
-        stmt = stmt.where(DailyCounter.data <= a)
+    if game:
+        stmt = stmt.where(DailyCounter.gioco == game)
+    if since:
+        stmt = stmt.where(DailyCounter.data >= since)
+    if until:
+        stmt = stmt.where(DailyCounter.data <= until)
     with session_scope() as s:
-        righe = s.execute(stmt).scalars().all()
-    voci = {}
-    for riga in righe:
-        voce = voci.setdefault((riga.data, riga.gioco), {
-            "gioco": riga.gioco, "data": riga.data, "partite": 0, "punteggi": {}})
-        voce["partite"] += riga.conteggio
-        voce["punteggi"][riga.punteggio] = riga.conteggio
-    return [voci[k] for k in sorted(voci)]
+        rows = s.execute(stmt).scalars().all()
+    entries = {}
+    for row in rows:
+        entry = entries.setdefault((row.data, row.gioco), {
+            "gioco": row.gioco, "data": row.data, "partite": 0, "punteggi": {}})
+        entry["partite"] += row.conteggio
+        entry["punteggi"][row.punteggio] = row.conteggio
+    return [entries[k] for k in sorted(entries)]

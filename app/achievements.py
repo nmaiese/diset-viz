@@ -20,8 +20,8 @@ from app.models import Achievement, DailyResult, DailyScore
 
 # Le quattro sfide del giorno. `indovina` sta in `daily_results`, le altre in
 # `daily_scores` (una riga per account, gioco e data).
-GIOCHI_DEL_GIORNO = ("indovina", "provincia", "compare", "order")
-GIORNI_FEDELE = 30
+DAILY_GAMES = ("indovina", "provincia", "compare", "order")
+LOYAL_DAYS = 30
 
 
 def _now_iso():
@@ -43,27 +43,27 @@ def _played_all(stats):
             and stats["daily"]["games_played"] > 0)
 
 
-def _giorni_del_giro(auth_id):
+def _tour_days(auth_id):
     """Le date in cui l'account ha chiuso la sfida del giorno di tutti e quattro
     i giochi. Indovina conta se risolta, la provincia se indovinata al livello
     "tutta Italia" (`provincia`: il livello "della regione" scrive
     `provincia_regione` e non conta, perche' svela la regione del livello
     difficile), Chi è maggiore? e Ordina se la partita è stata giocata fino in fondo."""
     with session_scope() as s:
-        indovina = set(s.execute(select(DailyResult.puzzle_date).where(
+        guess_days = set(s.execute(select(DailyResult.puzzle_date).where(
             DailyResult.auth_id == auth_id, DailyResult.solved == 1)).scalars())
-        righe = s.execute(select(DailyScore.gioco, DailyScore.data, DailyScore.punteggio)
-                          .where(DailyScore.auth_id == auth_id)).all()
-    per_gioco = {"indovina": indovina, "provincia": set(), "compare": set(), "order": set()}
-    for gioco, data, punteggio in righe:
-        if gioco == "provincia" and punteggio < 1:
+        rows = s.execute(select(DailyScore.gioco, DailyScore.data, DailyScore.punteggio)
+                         .where(DailyScore.auth_id == auth_id)).all()
+    per_game = {"indovina": guess_days, "provincia": set(), "compare": set(), "order": set()}
+    for game, day, score in rows:
+        if game == "provincia" and score < 1:
             continue
-        if gioco in per_gioco:
-            per_gioco[gioco].add(data)
-    return set.intersection(*per_gioco.values())
+        if game in per_game:
+            per_game[game].add(day)
+    return set.intersection(*per_game.values())
 
 
-def _provincia_indovinata(auth_id):
+def _province_guessed(auth_id):
     """Solo il livello difficile ("tutta Italia"), gioco `provincia`."""
     with session_scope() as s:
         return s.execute(select(DailyScore.data).where(
@@ -71,7 +71,7 @@ def _provincia_indovinata(auth_id):
             DailyScore.punteggio >= 1).limit(1)).first() is not None
 
 
-def _giorni_di_fila(auth_id):
+def _days_in_a_row(auth_id):
     """La serie piu' lunga di giorni giocati (almeno una sfida del giorno), con il
     giorno di riposo automatico: la definizione e' `player_stats.play_streak`."""
     return player_stats.play_streak_for(auth_id)["max"]
@@ -115,7 +115,7 @@ CATALOG = [
      "criterion": lambda s: s["_giri_completi"] >= 1},
     {"id": "fedele", "icon": "🛡️", "title": "Fedele",
      "description": "30 giorni di fila con almeno una sfida del giorno.",
-     "criterion": lambda s: s["_giorni_di_fila"] >= GIORNI_FEDELE},
+     "criterion": lambda s: s["_giorni_di_fila"] >= LOYAL_DAYS},
 ]
 
 
@@ -127,7 +127,7 @@ PROGRESS = {
     "order_10": (lambda s: s["order"]["best_streak"], 10),
     "daily_streak_7": (lambda s: s["daily"]["max_daily_streak"], 7),
     "veteran_50": (_total_rounds, 50),
-    "fedele": (lambda s: s["_giorni_di_fila"], GIORNI_FEDELE),
+    "fedele": (lambda s: s["_giorni_di_fila"], LOYAL_DAYS),
 }
 
 
@@ -148,13 +148,13 @@ def unlocked_map(auth_id):
     return {aid: at for aid, at in rows}
 
 
-def _stats_per_criteri(auth_id):
+def _stats_for_criteria(auth_id):
     """`stats_map` più i dati delle sfide del giorno che i nuovi traguardi
     leggono (chiavi con il trattino basso: non sono una modalità)."""
     stats = player_stats.stats_map(auth_id)
-    stats["_provincia_indovinata"] = _provincia_indovinata(auth_id)
-    stats["_giri_completi"] = len(_giorni_del_giro(auth_id))
-    stats["_giorni_di_fila"] = _giorni_di_fila(auth_id)
+    stats["_provincia_indovinata"] = _province_guessed(auth_id)
+    stats["_giri_completi"] = len(_tour_days(auth_id))
+    stats["_giorni_di_fila"] = _days_in_a_row(auth_id)
     return stats
 
 
@@ -165,7 +165,7 @@ def evaluate(auth_id):
     if not auth_id:
         return []
     try:
-        stats = _stats_per_criteri(auth_id)
+        stats = _stats_for_criteria(auth_id)
         already = unlocked_map(auth_id)
         newly = [item for item in CATALOG
                  if item["id"] not in already and item["criterion"](stats)]
@@ -186,16 +186,16 @@ def list_for(auth_id):
     da conquistare)."""
     unlocked = unlocked_map(auth_id)
     try:
-        stats = _stats_per_criteri(auth_id) if auth_id else None
+        stats = _stats_for_criteria(auth_id) if auth_id else None
     except Exception:  # noqa: BLE001
-        # `_stats_per_criteri` legge `daily_scores`: senza la migrazione 0010 la vetrina
+        # `_stats_for_criteria` legge `daily_scores`: senza la migrazione 0010 la vetrina
         # resta quella di prima, con il progresso a zero.
         stats = None
-    voci = []
+    entries = []
     for item in CATALOG:
-        voce = _public(item, item["id"] in unlocked, unlocked.get(item["id"]))
+        entry = _public(item, item["id"] in unlocked, unlocked.get(item["id"]))
         if item["id"] in PROGRESS:
-            leggi, soglia = PROGRESS[item["id"]]
-            voce["progress"] = {"value": min(leggi(stats), soglia) if stats else 0, "target": soglia}
-        voci.append(voce)
-    return voci
+            read_value, threshold = PROGRESS[item["id"]]
+            entry["progress"] = {"value": min(read_value(stats), threshold) if stats else 0, "target": threshold}
+        entries.append(entry)
+    return entries
