@@ -310,7 +310,7 @@ class GiroDItaliaTest(unittest.TestCase):
         self._prepara("giro-provincia", "provincia")
         cache.delete("rl:prov:ip:127.0.0.1")
         payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
-        mistero = game_provincia.provincia_del_giorno(game_daily.today_rome())["key"]
+        mistero = game_provincia.daily_province(game_daily.today_rome())["key"]
         r = self.client.post("/api/game/provincia/guess", headers=self._auth("giro-provincia"), json={
             "token": payload["token"], "province_key": mistero})
         self.assertIn("giro_ditalia", [a["id"] for a in r.get_json()["achievements"]])

@@ -368,7 +368,7 @@ class SenzaMigrazione0010Test(Base):
     def test_provincia_risponde_200_e_i_traguardi_si_valutano_lo_stesso(self):
         from app import game_provincia
         payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
-        mistero = game_provincia.provincia_del_giorno(game_daily.today_rome())["key"]
+        mistero = game_provincia.daily_province(game_daily.today_rome())["key"]
         r = self.client.post("/api/game/provincia/guess", headers=self.intest, json={
             "token": payload["token"], "province_key": mistero})
         self.assertEqual(r.status_code, 200)

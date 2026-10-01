@@ -233,9 +233,9 @@ class RotteTest(CompareBase):
         client = app.test_client()
         oggi = game_daily.today_rome()
         payload = client.get(f"/api/game/provincia/daily?level={livello}").get_json()
-        mistero = game_provincia.provincia_del_giorno(oggi)["key"]
+        mistero = game_provincia.daily_province(oggi)["key"]
         chiave = mistero if corretta else next(
-            o["key"] for o in game_provincia.opzioni(livello, oggi) if o["key"] != mistero)
+            o["key"] for o in game_provincia.options(livello, oggi) if o["key"] != mistero)
         cache.delete("rl:prov:ip:127.0.0.1")
         return client.post("/api/game/provincia/guess", json={"token": payload["token"], "province_key": chiave})
 
@@ -249,7 +249,7 @@ class RotteTest(CompareBase):
         client = app.test_client()
         oggi = game_daily.today_rome()
         payload = client.get("/api/game/provincia/daily?level=province").get_json()
-        corpo = {"token": payload["token"], "province_key": game_provincia.provincia_del_giorno(oggi)["key"]}
+        corpo = {"token": payload["token"], "province_key": game_provincia.daily_province(oggi)["key"]}
         cache.delete("rl:prov:ip:127.0.0.1")
         prima = client.post("/api/game/provincia/guess", json=corpo)
         self.assertTrue(prima.get_json()["finished"])
@@ -262,7 +262,7 @@ class RotteTest(CompareBase):
         client = app.test_client()
         oggi = game_daily.today_rome()
         payload = client.get("/api/game/provincia/daily?level=province").get_json()
-        chiave = game_provincia.provincia_del_giorno(oggi)["key"]
+        chiave = game_provincia.daily_province(oggi)["key"]
         cache.delete("rl:prov:ip:127.0.0.1")
         prima = client.post("/api/game/provincia/guess", json={"token": payload["token"], "province_key": chiave}).get_json()
         self.assertTrue(prima["finished"])

@@ -3138,7 +3138,7 @@ def game_provincia_daily_api():
         return jsonify({"error": "rate_limited"}), 429
     try:
         return jsonify(game_provincia.payload(request.args.get("level", "province")))
-    except game_provincia.ErroreProvincia as errore:
+    except game_provincia.ProvinceError as errore:
         return jsonify({"error": errore.code}), errore.status
 
 
@@ -3148,8 +3148,8 @@ def game_provincia_guess_api():
         return jsonify({"error": "rate_limited"}), 429
     corpo = request.get_json(silent=True) or {}
     try:
-        risultato = game_provincia.valuta_tentativo(corpo.get("token"), corpo.get("province_key"))
-    except game_provincia.ErroreProvincia as errore:
+        risultato = game_provincia.evaluate_attempt(corpo.get("token"), corpo.get("province_key"))
+    except game_provincia.ProvinceError as errore:
         return jsonify({"error": errore.code}), errore.status
     if risultato.get("finished"):
         try:

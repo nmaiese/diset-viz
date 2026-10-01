@@ -30,7 +30,7 @@ class _OrologioFisso(datetime):
 def _sbagliata(mistero, livello="province", giorno=None, escluse=()):
     """Una provincia tentabile a quel livello che non e' la misteriosa."""
     giorno = giorno or today_rome()
-    for voce in game_provincia.opzioni(livello, giorno):
+    for voce in game_provincia.options(livello, giorno):
         if voce["key"] != mistero["key"] and voce["key"] not in escluse:
             return voce["key"]
     raise AssertionError("nessuna provincia sbagliata disponibile")
@@ -39,17 +39,17 @@ def _sbagliata(mistero, livello="province", giorno=None, escluse=()):
 class ProvinciaDelGiornoTest(unittest.TestCase):
     def test_e_la_stessa_per_tutti(self):
         giorno = date(2026, 10, 1)
-        a = game_provincia.provincia_del_giorno(giorno, CHIAVE)
-        b = game_provincia.provincia_del_giorno(giorno, CHIAVE)
+        a = game_provincia.daily_province(giorno, CHIAVE)
+        b = game_provincia.daily_province(giorno, CHIAVE)
         self.assertEqual(a, b)
-        primo, secondo = (game_provincia.payload("province", chiave=CHIAVE) for _ in range(2))
+        primo, secondo = (game_provincia.payload("province", key=CHIAVE) for _ in range(2))
         for payload in (primo, secondo):
             payload.pop("token")
         self.assertEqual(primo, secondo)
 
     def test_dipende_dalla_chiave_non_dal_solo_calendario(self):
         giorno = date(2026, 10, 1)
-        scelte = {game_provincia.provincia_del_giorno(giorno, f"k{i}")["key"] for i in range(12)}
+        scelte = {game_provincia.daily_province(giorno, f"k{i}")["key"] for i in range(12)}
         self.assertGreater(len(scelte), 1)
 
     def test_e_sempre_giocabile_e_di_una_regione_idonea(self):
@@ -57,13 +57,13 @@ class ProvinciaDelGiornoTest(unittest.TestCase):
         escluse = set(game_daily.excluded_provinces())
         inizio = date(2026, 7, 15)
         for offset in range(400):
-            provincia = game_provincia.provincia_del_giorno(inizio + timedelta(days=offset), CHIAVE)
+            provincia = game_provincia.daily_province(inizio + timedelta(days=offset), CHIAVE)
             self.assertNotIn(provincia["key"], escluse)
             self.assertIn(provincia["region"], idonee)
 
     def test_cambia_a_mezzanotte_di_roma_e_non_a_quella_utc(self):
-        prima = game_provincia.payload("province", now=datetime(2026, 9, 30, 21, 30, tzinfo=timezone.utc), chiave=CHIAVE)
-        dopo = game_provincia.payload("province", now=datetime(2026, 9, 30, 23, 30, tzinfo=timezone.utc), chiave=CHIAVE)
+        prima = game_provincia.payload("province", now=datetime(2026, 9, 30, 21, 30, tzinfo=timezone.utc), key=CHIAVE)
+        dopo = game_provincia.payload("province", now=datetime(2026, 9, 30, 23, 30, tzinfo=timezone.utc), key=CHIAVE)
         self.assertEqual(prima["date"], "2026-09-30")
         self.assertEqual(dopo["date"], "2026-10-01")
         self.assertEqual(dopo["puzzle_id"], "daily:2026-10-01")
@@ -71,7 +71,7 @@ class ProvinciaDelGiornoTest(unittest.TestCase):
         self.assertEqual(dopo["number"], prima["number"] + 1)
         # Le due giornate hanno il loro seed: nell'arco di un mese non sono tutte uguali.
         chiavi = {
-            game_provincia.provincia_del_giorno(date(2026, 9, 1) + timedelta(days=i), CHIAVE)["key"]
+            game_provincia.daily_province(date(2026, 9, 1) + timedelta(days=i), CHIAVE)["key"]
             for i in range(30)
         }
         self.assertGreater(len(chiavi), 20)
@@ -90,7 +90,7 @@ class IndiziTest(unittest.TestCase):
 
         with (game_daily.ROOT / "app/static/data/province_manifest.csv").open(encoding="utf-8") as handle:
             manifesto = {r["id"]: r for r in csv.DictReader(handle, delimiter=";")}
-        ammessi = game_provincia.indizi_ammessi()
+        ammessi = game_provincia.allowed_clues()
         self.assertGreaterEqual(len(ammessi), 6)
         in_config = {game_daily.provincial_id(v["id"]) for v in game_daily.game_indicators() if v["provincia"]}
         for ind in ammessi:
@@ -102,7 +102,7 @@ class IndiziTest(unittest.TestCase):
     def test_sei_indizi_distinti_con_anno_fonte_e_link(self):
         inizio = date(2026, 7, 15)
         for offset in range(60):
-            indizi = game_provincia.indizi_del_giorno(inizio + timedelta(days=offset), CHIAVE)
+            indizi = game_provincia.daily_clues(inizio + timedelta(days=offset), CHIAVE)
             self.assertEqual(len(indizi), 6)
             self.assertEqual(len({i["id"] for i in indizi}), 6)
             for i in indizi:
@@ -115,7 +115,7 @@ class IndiziTest(unittest.TestCase):
 
     def test_gli_indizi_salgono_di_distintivita(self):
         for offset in range(20):
-            indizi = game_provincia.indizi_del_giorno(date(2026, 8, 1) + timedelta(days=offset), CHIAVE)
+            indizi = game_provincia.daily_clues(date(2026, 8, 1) + timedelta(days=offset), CHIAVE)
             distanze = [abs(i["rank"] - 54) for i in indizi]
             self.assertEqual(distanze, sorted(distanze))
 
@@ -130,7 +130,7 @@ class PayloadTest(unittest.TestCase):
         for campo in ("solution", "recap", "province", "province_key", "distance_km"):
             self.assertNotIn(campo, payload)
         giorno = today_rome()
-        indizi = game_provincia.indizi_del_giorno(giorno)
+        indizi = game_provincia.daily_clues(giorno)
         self.assertEqual(payload["clue"]["id"], indizi[0]["id"])
         testo = json.dumps(payload, ensure_ascii=False)
         # Gli altri cinque indizi non escono prima di un tentativo.
@@ -157,12 +157,12 @@ class PayloadTest(unittest.TestCase):
         for offset in range(120):
             giorno = inizio + timedelta(days=offset)
             now = datetime.combine(giorno, datetime.min.time(), tzinfo=timezone.utc) + timedelta(hours=12)
-            payload = game_provincia.payload("stessa_regione", now=now, chiave=CHIAVE)
+            payload = game_provincia.payload("stessa_regione", now=now, key=CHIAVE)
             regione = payload["region"]["name"]
             self.assertIn(regione, idonee)
             self.assertGreaterEqual(len(payload["provinces"]), 3)
             self.assertEqual({p["region"] for p in payload["provinces"]}, {regione})
-            mistero = game_provincia.provincia_del_giorno(giorno, CHIAVE)
+            mistero = game_provincia.daily_province(giorno, CHIAVE)
             self.assertEqual(mistero["region"], regione)
             self.assertIn(mistero["key"], {p["key"] for p in payload["provinces"]})
             self.assertRegex(payload["region"]["viewbox"], r"^[\d.\-]+( [\d.\-]+){3}$")
@@ -170,7 +170,7 @@ class PayloadTest(unittest.TestCase):
     def test_al_livello_della_regione_il_payload_porta_le_province_delle_altre(self):
         """Serve al client per dire "Milano non e' in Puglia" invece di tacere: nome e regione,
         niente coordinate, e mai una provincia della regione indicata (ne' la misteriosa)."""
-        payload = game_provincia.payload("stessa_regione", chiave=CHIAVE)
+        payload = game_provincia.payload("stessa_regione", key=CHIAVE)
         altre = payload["other_provinces"]
         regione = payload["region"]["name"]
         nomi_regione = {p["name"] for p in payload["provinces"]}
@@ -181,10 +181,10 @@ class PayloadTest(unittest.TestCase):
             self.assertNotIn(voce["name"], nomi_regione)
 
     def test_al_livello_di_tutta_italia_non_serve_il_campo(self):
-        self.assertNotIn("other_provinces", game_provincia.payload("province", chiave=CHIAVE))
+        self.assertNotIn("other_provinces", game_provincia.payload("province", key=CHIAVE))
 
     def test_livello_di_tutta_italia_offre_tutte_e_107(self):
-        payload = game_provincia.payload("province", chiave=CHIAVE)
+        payload = game_provincia.payload("province", key=CHIAVE)
         self.assertIsNone(payload["region"])
         self.assertEqual(len(payload["provinces"]), 107)
 
@@ -194,7 +194,7 @@ class TentativiTest(unittest.TestCase):
         cache.delete("rl:prov:ip:127.0.0.1")
         self.client = app.test_client()
         self.giorno = today_rome()
-        self.mistero = game_provincia.provincia_del_giorno(self.giorno)
+        self.mistero = game_provincia.daily_province(self.giorno)
 
     def _apri(self, livello="province"):
         return self.client.get(f"/api/game/provincia/daily?level={livello}").get_json()
@@ -233,7 +233,7 @@ class TentativiTest(unittest.TestCase):
         payload = self._apri()
         chiave = _sbagliata(self.mistero)
         r = self._tenta(payload["token"], chiave).get_json()
-        indizio = game_provincia.indizi_del_giorno(self.giorno)[0]
+        indizio = game_provincia.daily_clues(self.giorno)[0]
         f = r["feedback"][0]
         if f["comparison"] == "higher":
             self.assertGreater(f["guess_value"], indizio["value"])
@@ -324,8 +324,8 @@ class TentativiTest(unittest.TestCase):
         oggi = datetime(2026, 9, 30, 23, 30, tzinfo=timezone.utc)
         payload = game_provincia.payload("province", now=ieri)
         chiave = next(v["key"] for v in payload["provinces"])
-        with self.assertRaises(game_provincia.ErroreProvincia) as contesto:
-            game_provincia.valuta_tentativo(payload["token"], chiave, now=oggi)
+        with self.assertRaises(game_provincia.ProvinceError) as contesto:
+            game_provincia.evaluate_attempt(payload["token"], chiave, now=oggi)
         self.assertEqual(contesto.exception.status, 410)
 
     def test_un_token_di_un_altro_sale_non_si_accetta(self):

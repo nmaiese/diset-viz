@@ -52,17 +52,17 @@ from app import app, bes_data, game_daily, province_profile, sources
 from app.cache import cache
 from app.design import maps
 
-TENTATIVI = 6
-LIVELLI = ("province", "stessa_regione")
-ANNO_MINIMO = 2022
-PROVINCE_ATTESE = 107
+ATTEMPTS = 6
+LEVELS = ("province", "stessa_regione")
+MIN_YEAR = 2022
+EXPECTED_PROVINCES = 107
 
 _SALT = "game-provincia"
 _TOKEN_MAX_AGE_S = 2 * 24 * 3600
 _MANIFEST_CSV = game_daily.ROOT / "app" / "static" / "data" / "province_manifest.csv"
 
 
-class ErroreProvincia(Exception):
+class ProvinceError(Exception):
     """Un tentativo che non si valuta. `code` e' una parola per il client,
     `status` il codice HTTP."""
 
@@ -76,111 +76,111 @@ class ErroreProvincia(Exception):
 
 
 @lru_cache(maxsize=1)
-def _manifesto():
+def _manifest():
     with _MANIFEST_CSV.open(encoding="utf-8", newline="") as handle:
-        return {riga["id"]: riga for riga in csv.DictReader(handle, delimiter=";")}
+        return {row["id"]: row for row in csv.DictReader(handle, delimiter=";")}
 
 
 @lru_cache(maxsize=1)
-def indizi_ammessi():
+def allowed_clues():
     """Gli indicatori che possono fare da indizio, nell'ordine del file di
     configurazione: (id BES, nome leggibile, unita', famiglia, tema, anno)."""
-    manifesto = _manifesto()
-    ammessi = []
-    for voce in game_daily.game_indicators():
-        if not voce["provincia"]:
+    manifest = _manifest()
+    allowed = []
+    for entry in game_daily.game_indicators():
+        if not entry["provincia"]:
             continue
-        raw = game_daily.provincial_id(voce["id"])
-        riga = manifesto.get(raw)
-        if riga is None:
+        raw = game_daily.provincial_id(entry["id"])
+        row = manifest.get(raw)
+        if row is None:
             continue
-        anno = int(riga["year_max"])
-        if int(riga["n_province_latest"]) != PROVINCE_ATTESE or anno < ANNO_MINIMO:
+        year = int(row["year_max"])
+        if int(row["n_province_latest"]) != EXPECTED_PROVINCES or year < MIN_YEAR:
             continue
-        valori = (province_profile._serie().get(raw) or {}).get(anno)
-        if not valori or len(valori["valori"]) != PROVINCE_ATTESE:
+        values = (province_profile._serie().get(raw) or {}).get(year)
+        if not values or len(values["valori"]) != EXPECTED_PROVINCES:
             continue
-        ammessi.append({
+        allowed.append({
             "id": raw,
-            "name": voce["name"],
-            "unit": voce["unit"],
-            "family": voce["family"],
-            "theme": riga["domain_name"],
-            "year": anno,
+            "name": entry["name"],
+            "unit": entry["unit"],
+            "family": entry["family"],
+            "theme": row["domain_name"],
+            "year": year,
         })
-    return tuple(ammessi)
+    return tuple(allowed)
 
 
 # La sfida del giorno
 
 
-def puzzle_id(giorno):
-    return f"daily:{giorno.isoformat()}"
+def puzzle_id(day):
+    return f"daily:{day.isoformat()}"
 
 
-def provincia_del_giorno(giorno, chiave=None):
+def daily_province(day, key=None):
     """La provincia misteriosa di un giorno: una giocabile di una regione
     idonea, dal seed. `chiave` serve ai test."""
-    idonee = set(game_daily.eligible_regions(game_daily.MIN_PROVINCES_COMPARE))
+    eligible = set(game_daily.eligible_regions(game_daily.MIN_PROVINCES_COMPARE))
     candidate = sorted(
-        (p for p in game_daily.province_pool(solo_giocabili=True) if p["region"] in idonee),
+        (p for p in game_daily.province_pool(solo_giocabili=True) if p["region"] in eligible),
         key=lambda p: p["key"],
     )
-    rng = random.Random(game_daily.day_seed("provincia", giorno, chiave))
+    rng = random.Random(game_daily.day_seed("provincia", day, key))
     return rng.choice(candidate)
 
 
-def _campi_indizio(ind, chiave_provincia):
+def _clue_fields(ind, province_key):
     """L'indizio di un indicatore per una provincia: valore, posizione fra le
     107, anno e fonte. Le spiegazioni e il link alla scheda seguono il recap."""
-    anno = ind["year"]
-    dati = province_profile._serie()[ind["id"]][anno]
-    spiegazione = bes_data.get_bes_manifest("provincia")[ind["id"]]["explain"]
+    year = ind["year"]
+    series = province_profile._serie()[ind["id"]][year]
+    explanation = bes_data.get_bes_manifest("provincia")[ind["id"]]["explain"]
     return {
         "id": ind["id"],
         "name": ind["name"],
         "theme": ind["theme"],
         "unit": ind["unit"],
-        "year": anno,
-        "value": dati["valori"][chiave_provincia],
-        "rank": dati["posizioni"][chiave_provincia],
-        "province_count": PROVINCE_ATTESE,
+        "year": year,
+        "value": series["valori"][province_key],
+        "rank": series["posizioni"][province_key],
+        "province_count": EXPECTED_PROVINCES,
         "source_label": sources.SOURCES["bes"]["label"],
         "source_url": bes_data.BES_SOURCE_URLS["provincia"],
         "path": bes_data.bes_level_path(ind["id"], "provincia"),
-        "description": spiegazione["plain"],
-        "value_explanation": spiegazione["example"],
-        "reading": spiegazione["reading"],
+        "description": explanation["plain"],
+        "value_explanation": explanation["example"],
+        "reading": explanation["reading"],
     }
 
 
-def indizi_del_giorno(giorno, chiave=None):
+def daily_clues(day, key=None):
     """I sei indizi della provincia del giorno, dal meno al piu' distintivo."""
-    mistero = provincia_del_giorno(giorno, chiave)["key"]
-    rng = random.Random(game_daily.day_seed("provincia-indizi", giorno, chiave))
-    candidati = sorted(indizi_ammessi(), key=lambda i: i["id"])
-    rng.shuffle(candidati)
-    scelti, famiglie = [], set()
-    for ind in candidati:  # un indizio per famiglia finche' ce ne sono
-        if ind["family"] not in famiglie and len(scelti) < TENTATIVI:
-            scelti.append(ind)
-            famiglie.add(ind["family"])
-    for ind in candidati:
-        if ind not in scelti and len(scelti) < TENTATIVI:
-            scelti.append(ind)
-    indizi = [_campi_indizio(ind, mistero) for ind in scelti]
-    meta = (PROVINCE_ATTESE + 1) / 2
-    indizi.sort(key=lambda c: (abs(c["rank"] - meta), c["id"]))
-    return indizi
+    mystery = daily_province(day, key)["key"]
+    rng = random.Random(game_daily.day_seed("provincia-indizi", day, key))
+    candidates = sorted(allowed_clues(), key=lambda i: i["id"])
+    rng.shuffle(candidates)
+    picked, families = [], set()
+    for ind in candidates:  # un indizio per famiglia finche' ce ne sono
+        if ind["family"] not in families and len(picked) < ATTEMPTS:
+            picked.append(ind)
+            families.add(ind["family"])
+    for ind in candidates:
+        if ind not in picked and len(picked) < ATTEMPTS:
+            picked.append(ind)
+    clues = [_clue_fields(ind, mystery) for ind in picked]
+    midpoint = (EXPECTED_PROVINCES + 1) / 2
+    clues.sort(key=lambda c: (abs(c["rank"] - midpoint), c["id"]))
+    return clues
 
 
-def opzioni(livello, giorno, chiave=None):
+def options(level, day, key=None):
     """Le province fra cui si indovina a un livello, con il centroide per la
     mappa. Non dicono quali sono giocabili e non dicono qual e' la misteriosa."""
-    mistero = provincia_del_giorno(giorno, chiave)
+    mystery = daily_province(day, key)
     pool = game_daily.province_pool()
-    if livello == "stessa_regione":
-        pool = [p for p in pool if p["region"] == mistero["region"]]
+    if level == "stessa_regione":
+        pool = [p for p in pool if p["region"] == mystery["region"]]
     return [
         {"key": p["key"], "name": p["name"], "region": p["region"], "x": p["x"], "y": p["y"]}
         for p in sorted(pool, key=lambda p: p["name"])
@@ -190,175 +190,175 @@ def opzioni(livello, giorno, chiave=None):
 # Il token
 
 
-def _serializzatore():
+def _serializer():
     return URLSafeTimedSerializer(app.secret_key, salt=_SALT)
 
 
-def _firma(stato):
-    return _serializzatore().dumps(stato)
+def _sign(state):
+    return _serializer().dumps(state)
 
 
-def _leggi(token):
+def _read(token):
     if not token or not isinstance(token, str):
-        raise ErroreProvincia("token_non_valido")
+        raise ProvinceError("token_non_valido")
     try:
-        stato = _serializzatore().loads(token, max_age=_TOKEN_MAX_AGE_S)
+        state = _serializer().loads(token, max_age=_TOKEN_MAX_AGE_S)
     except BadData:
-        raise ErroreProvincia("token_non_valido") from None
+        raise ProvinceError("token_non_valido") from None
     if (
-        not isinstance(stato, dict)
-        or stato.get("l") not in LIVELLI
-        or not isinstance(stato.get("p"), str)
-        or not isinstance(stato.get("g"), list)
-        or not isinstance(stato.get("sid"), str)
+        not isinstance(state, dict)
+        or state.get("l") not in LEVELS
+        or not isinstance(state.get("p"), str)
+        or not isinstance(state.get("g"), list)
+        or not isinstance(state.get("sid"), str)
     ):
-        raise ErroreProvincia("token_non_valido")
-    return stato
+        raise ProvinceError("token_non_valido")
+    return state
 
 
-def _controlla_livello(livello):
-    if livello not in LIVELLI:
-        raise ErroreProvincia("livello_sconosciuto")
+def _check_level(level):
+    if level not in LEVELS:
+        raise ProvinceError("livello_sconosciuto")
 
 
 # Le risposte
 
 
-def payload(livello, now=None, chiave=None):
+def payload(level, now=None, key=None):
     """La sfida di OGGI (a Roma) a un livello: mai una data a scelta del client.
     Porta il primo indizio e le opzioni, mai la provincia ne' gli altri indizi."""
-    _controlla_livello(livello)
-    giorno = game_daily.today_rome(now)
-    mistero = provincia_del_giorno(giorno, chiave)
-    indizi = indizi_del_giorno(giorno, chiave)
-    regione = None
-    if livello == "stessa_regione":
-        chiave_regione = mistero["region_key"]
-        regione = {"name": mistero["region"], "key": chiave_regione, "viewbox": maps.zoom(chiave_regione)["viewbox"]}
-    token = _firma({"p": puzzle_id(giorno), "l": livello, "g": [], "sid": _nuova_sessione()})
-    risposta = {
-        "puzzle_id": puzzle_id(giorno),
-        "number": game_daily.challenge_number(giorno),
-        "date": giorno.isoformat(),
-        "next_puzzle_at": game_daily.next_challenge_rome(giorno),
-        "level": livello,
-        "attempts_total": TENTATIVI,
-        "clues_total": len(indizi),
-        "region": regione,
-        "provinces": opzioni(livello, giorno, chiave),
-        "clue": dict(indizi[0]),
+    _check_level(level)
+    day = game_daily.today_rome(now)
+    mystery = daily_province(day, key)
+    clues = daily_clues(day, key)
+    region = None
+    if level == "stessa_regione":
+        region_key = mystery["region_key"]
+        region = {"name": mystery["region"], "key": region_key, "viewbox": maps.zoom(region_key)["viewbox"]}
+    token = _sign({"p": puzzle_id(day), "l": level, "g": [], "sid": _new_session()})
+    response = {
+        "puzzle_id": puzzle_id(day),
+        "number": game_daily.challenge_number(day),
+        "date": day.isoformat(),
+        "next_puzzle_at": game_daily.next_challenge_rome(day),
+        "level": level,
+        "attempts_total": ATTEMPTS,
+        "clues_total": len(clues),
+        "region": region,
+        "provinces": options(level, day, key),
+        "clue": dict(clues[0]),
         "token": token,
     }
-    if livello == "stessa_regione":
+    if level == "stessa_regione":
         # Le province delle altre regioni, solo nome e regione: il client le usa per dire
         # "Milano non e' in Puglia" a chi scrive una provincia che non e' fra le opzioni. La regione
         # e' gia' nel payload e la misteriosa e' fra le opzioni, quindi niente si svela.
-        risposta["other_provinces"] = [
+        response["other_provinces"] = [
             {"name": p["name"], "region": p["region"]}
             for p in sorted(game_daily.province_pool(), key=lambda p: p["name"])
-            if p["region"] != mistero["region"]
+            if p["region"] != mystery["region"]
         ]
-    return risposta
+    return response
 
 
 @lru_cache(maxsize=1)
-def _anagrafe():
+def _registry():
     return {p["key"]: p for p in game_daily.province_pool()}
 
 
-def _nuova_sessione():
+def _new_session():
     return random.SystemRandom().randbytes(8).hex()
 
 
-def _confronto(valore_misterioso, valore_tentativo):
+def _comparison(mystery_value, attempt_value):
     """Come in `game._compare`: descrive il valore TENTATO rispetto al mistero."""
-    if valore_tentativo is None or valore_misterioso is None:
+    if attempt_value is None or mystery_value is None:
         return "unknown"
-    if abs(valore_tentativo - valore_misterioso) < 1e-9:
+    if abs(attempt_value - mystery_value) < 1e-9:
         return "equal"
-    return "higher" if valore_tentativo > valore_misterioso else "lower"
+    return "higher" if attempt_value > mystery_value else "lower"
 
 
-def _riepilogo(indizi):
-    righe = []
-    for indizio in indizi:
-        valori = province_profile._serie()[indizio["id"]][indizio["year"]]["valori"]
-        righe.append({**indizio, "province_avg": round(fmean(valori.values()), 3)})
-    return righe
+def _recap(clues):
+    rows = []
+    for clue in clues:
+        values = province_profile._serie()[clue["id"]][clue["year"]]["valori"]
+        rows.append({**clue, "province_avg": round(fmean(values.values()), 3)})
+    return rows
 
 
-def valuta_tentativo(token, chiave_provincia, now=None, chiave=None):
-    """Valuta un tentativo e ritorna il risultato, o solleva `ErroreProvincia`.
+def evaluate_attempt(token, province_key, now=None, key=None):
+    """Valuta un tentativo e ritorna il risultato, o solleva `ProvinceError`.
     Il numero del tentativo lo decide il token, mai il client."""
-    stato = _leggi(token)
-    giorno = game_daily.today_rome(now)
-    if stato["p"] != puzzle_id(giorno):
-        raise ErroreProvincia("sfida_scaduta", 410)
-    livello, tentate = stato["l"], stato["g"]
-    attempt = len(tentate) + 1
-    if attempt > TENTATIVI:
-        raise ErroreProvincia("partita_conclusa", 409)
-    mistero = provincia_del_giorno(giorno, chiave)
-    if tentate and tentate[-1] == mistero["key"]:
-        raise ErroreProvincia("partita_conclusa", 409)
-    if not isinstance(chiave_provincia, str) or chiave_provincia not in {
-        o["key"] for o in opzioni(livello, giorno, chiave)
+    state = _read(token)
+    day = game_daily.today_rome(now)
+    if state["p"] != puzzle_id(day):
+        raise ProvinceError("sfida_scaduta", 410)
+    level, attempted = state["l"], state["g"]
+    attempt = len(attempted) + 1
+    if attempt > ATTEMPTS:
+        raise ProvinceError("partita_conclusa", 409)
+    mystery = daily_province(day, key)
+    if attempted and attempted[-1] == mystery["key"]:
+        raise ProvinceError("partita_conclusa", 409)
+    if not isinstance(province_key, str) or province_key not in {
+        o["key"] for o in options(level, day, key)
     }:
-        raise ErroreProvincia("provincia_non_valida")
-    if chiave_provincia in tentate:
-        raise ErroreProvincia("provincia_gia_tentata")
-    visti = cache.get(f"provincia:{stato['sid']}") or 0
-    if len(tentate) < visti:
-        raise ErroreProvincia("token_superato", 409)
-    cache.set(f"provincia:{stato['sid']}", attempt, timeout=_TOKEN_MAX_AGE_S)
+        raise ProvinceError("provincia_non_valida")
+    if province_key in attempted:
+        raise ProvinceError("provincia_gia_tentata")
+    seen = cache.get(f"provincia:{state['sid']}") or 0
+    if len(attempted) < seen:
+        raise ProvinceError("token_superato", 409)
+    cache.set(f"provincia:{state['sid']}", attempt, timeout=_TOKEN_MAX_AGE_S)
 
-    indizi = indizi_del_giorno(giorno, chiave)
-    corretta = chiave_provincia == mistero["key"]
-    finita = corretta or attempt >= TENTATIVI
-    tentata = _anagrafe()[chiave_provincia]
-    km, direzione = game_daily.distance_km_direction(chiave_provincia, mistero["key"])
+    clues = daily_clues(day, key)
+    correct = province_key == mystery["key"]
+    finished = correct or attempt >= ATTEMPTS
+    guessed_province = _registry()[province_key]
+    km, direction = game_daily.distance_km_direction(province_key, mystery["key"])
 
-    confronti = []
-    for indizio in indizi[:attempt]:
-        dati = province_profile._serie()[indizio["id"]][indizio["year"]]
-        valore = dati["valori"].get(chiave_provincia)
-        confronti.append({
-            "id": indizio["id"],
-            "name": indizio["name"],
-            "unit": indizio["unit"],
-            "comparison": "equal" if corretta else _confronto(indizio["value"], valore),
-            "guess_value": valore,
-            "guess_rank": dati["posizioni"].get(chiave_provincia),
-            "mystery_rank": indizio["rank"],
-            "province_count": PROVINCE_ATTESE,
+    comparisons = []
+    for clue in clues[:attempt]:
+        series = province_profile._serie()[clue["id"]][clue["year"]]
+        value = series["valori"].get(province_key)
+        comparisons.append({
+            "id": clue["id"],
+            "name": clue["name"],
+            "unit": clue["unit"],
+            "comparison": "equal" if correct else _comparison(clue["value"], value),
+            "guess_value": value,
+            "guess_rank": series["posizioni"].get(province_key),
+            "mystery_rank": clue["rank"],
+            "province_count": EXPECTED_PROVINCES,
         })
 
-    soluzione = riepilogo = None
-    if finita:
-        soluzione = {
-            "province": mistero["name"],
-            "province_key": mistero["key"],
-            "path": f"/provincia/{mistero['key']}",
-            "region": mistero["region"],
-            "region_key": mistero["region_key"],
-            "region_path": f"/regione/{mistero['region_key']}",
+    solution = recap = None
+    if finished:
+        solution = {
+            "province": mystery["name"],
+            "province_key": mystery["key"],
+            "path": f"/provincia/{mystery['key']}",
+            "region": mystery["region"],
+            "region_key": mystery["region_key"],
+            "region_path": f"/regione/{mystery['region_key']}",
         }
-        riepilogo = _riepilogo(indizi)
+        recap = _recap(clues)
 
-    nuovo = _firma({**stato, "g": [*tentate, chiave_provincia]})
+    new_token = _sign({**state, "g": [*attempted, province_key]})
     return {
-        "correct": corretta,
-        "level": livello,
+        "correct": correct,
+        "level": level,
         "attempt": attempt,
-        "province": tentata["name"],
-        "province_key": chiave_provincia,
+        "province": guessed_province["name"],
+        "province_key": province_key,
         "distance_km": km,
-        "direction": direzione,
-        "same_region": tentata["region"] == mistero["region"],
-        "feedback": confronti,
-        "next_clue": None if finita else dict(indizi[attempt]),
-        "finished": finita,
-        "solution": soluzione,
-        "recap": riepilogo,
-        "token": nuovo,
+        "direction": direction,
+        "same_region": guessed_province["region"] == mystery["region"],
+        "feedback": comparisons,
+        "next_clue": None if finished else dict(clues[attempt]),
+        "finished": finished,
+        "solution": solution,
+        "recap": recap,
+        "token": new_token,
     }
