@@ -14,6 +14,7 @@ PAGINE = {
     "/quiz/indovina-la-regione": "quiz-indovina.js",
     "/quiz/chi-e-maggiore": "quiz-compare.js",
     "/quiz/ordina": "quiz-order.js",
+    "/quiz/province-italiane": "quiz-mappa.js",
     "/quiz/classifica": "quiz-leaderboard.js",
 }
 GIOCHI = ("/quiz/indovina-la-regione", "/quiz/chi-e-maggiore", "/quiz/ordina")
@@ -109,13 +110,13 @@ class GamePagesTest(unittest.TestCase):
                 self.assertIn("Eurostat", base["description"])
                 self.assertNotIn("pubblicati da Istat.", base["description"])
 
-    def test_hub_ha_itemlist_dei_quattro_giochi(self):
+    def test_hub_ha_itemlist_dei_cinque_giochi(self):
         liste = [b for b in _jsonld(self._html("/quiz")) if b.get("@type") == "ItemList"]
         self.assertEqual(len(liste), 1)
         elementi = liste[0]["itemListElement"]
-        self.assertEqual(len(elementi), 4)
+        self.assertEqual(len(elementi), 5)
         percorsi = [e["url"][e["url"].index("/quiz"):] for e in elementi]
-        self.assertEqual(percorsi, list(GIOCHI) + ["/quiz/indovina-la-provincia"])
+        self.assertEqual(percorsi, list(GIOCHI) + ["/quiz/indovina-la-provincia", "/quiz/province-italiane"])
 
     def test_ogni_pagina_carica_il_suo_entry_e_non_game_js(self):
         for path, entry in PAGINE.items():

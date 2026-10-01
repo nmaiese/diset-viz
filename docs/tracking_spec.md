@@ -374,6 +374,11 @@ Eventi gioco oggi previsti:
 | `compare_answer` | risposta a un round di confronto | risposta corretta / errata |
 | `order_start` | inizio di "Ordina le regioni" | avvio sfida |
 | `order_answer` | invio dell'ordine | completamento sfida |
+| `map_start` | inizio di "Dov'è la provincia?" (con `level` e `answer_mode`) | avvio sfida |
+| `map_answer` | conferma di una risposta sulla mappa (con `reselects`, `in_view`, `answer_mode`) | quanto si esita, e se la provincia stava nel riquadro |
+| `map_back` | "Indietro" dal riquadro di una regione all'Italia intera | difficoltà della mappa |
+| `map_finish` | fine della partita sulla mappa | completamento sfida |
+| `map_share` | condivisione del risultato sulla mappa | viralità |
 | `leaderboard_submit` | invio punteggio in classifica | conversione gioco |
 | `leaderboard_view` | apertura classifica | engagement |
 | `hub_mode_click` | click su una modalità dal hub | navigazione |
