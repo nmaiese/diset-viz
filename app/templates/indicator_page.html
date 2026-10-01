@@ -349,11 +349,11 @@
     <dl class="apparatus-specs">
       <div class="apparatus-specs__row">
         <dt>Dato più recente</dt>
-        <dd>{{ level.year_max }}{% if level.year_min != level.year_max %}, serie {{ level.year_min }}-{{ level.year_max }}{% endif %}</dd>
+        <dd>{{ level.year_max }}{% if level.year_min != level.year_max %}, dati {{ level.year_min }}-{{ level.year_max }}{% endif %}</dd>
       </div>
       <div class="apparatus-specs__row">
         <dt>Fonte</dt>
-        <dd><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>{% if meta.source_dataflow %} · serie SDMX <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>{% endif %}</dd>
+        <dd><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>{% if meta.source_dataflow %} · dataflow SDMX <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>{% endif %}</dd>
       </div>
       {# How we compute, not what the source measures. It stays here so an authored
          "limiti" section can never drop it. #}

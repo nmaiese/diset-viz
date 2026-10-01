@@ -376,7 +376,7 @@ def data_catalog_markdown(datasets, description, site_url):
         "",
         f"Metodologia: {site_url}/metodologia",
         "",
-        f"## Dataset disponibili ({len(datasets)})",
+        f"## Indicatori disponibili ({len(datasets)})",
         "",
     ]
     for item in datasets:

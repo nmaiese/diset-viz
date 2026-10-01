@@ -348,8 +348,8 @@ addEventListener("pagereveal", function (e) {
       <section class="section indicator-apparatus" id="fonti-verifica" aria-labelledby="h-fonti">
         <h2 id="h-fonti">Fonti, dati e citazione</h2>
         <dl class="specs apparatus-specs">
-          <div><dt>Dato più recente</dt><dd>{{ year }}{% if level.year_min != year %}, serie dal {{ level.year_min }}{% endif %}</dd></div>
-          <div><dt>Fonte</dt><dd><a href="{{ meta.source_url }}">{{ meta.source_label }}</a>{% if meta.source_dataflow %}, serie <code>{{ meta.source_dataflow }}</code>{% endif %}</dd></div>
+          <div><dt>Dato più recente</dt><dd>{{ year }}{% if level.year_min != year %}, dati dal {{ level.year_min }}{% endif %}</dd></div>
+          <div><dt>Fonte</dt><dd><a href="{{ meta.source_url }}">{{ meta.source_label }}</a>{% if meta.source_dataflow %}, dataflow <code>{{ meta.source_dataflow }}</code>{% endif %}</dd></div>
           {#- Le righe che dicono come e' fatta la pagina sono quelle di
               indicator_page.html, parola per parola (qui "Come e' calcolato"
               in piu' porta il link alla metodologia): le prove di trasparenza
