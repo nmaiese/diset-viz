@@ -1828,6 +1828,7 @@ def region_page(region_key):
         seo_title=_region_title(profile),
         seo_description=_region_description(profile, ritratto, quality),
         provinces=provinces,
+        external_indicators=profiles.region_external_indicators(region_key),
         portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
         ritratto=ritratto,
         site_url=SITE_URL,
@@ -1977,6 +1978,10 @@ def province_page(province_key):
     if profilo is None:
         abort(404)
     righe = province_profile.indicatori(province_key)
+    # Le righe delle altre fonti (ACI, AGCOM, Istat provinciale) stanno a parte:
+    # sono descrittive, e `righe` resta il solo elenco su cui si contano
+    # movimenti, forti e deboli e il confronto dentro la regione.
+    external = province_profile.external_indicators(province_key)
     su, giu = province_profile.movimenti(righe)
     prime, ultime = province_profile.dentro_la_regione(righe)
     sisters = [
@@ -1998,10 +2003,11 @@ def province_page(province_key):
         sister_provinces=sisters,
         vicine=province_profile.vicine(province_key),
         indicatori=righe,
+        external_indicators=external,
         # Le quattro macro-aree nell'ordine del sito, lo stesso filtro della
         # pagina regione.
         macro_aree=[area for area in MACRO_AREA_ORDER
-                    if any(riga["macro_area"] == area for riga in righe)],
+                    if any(riga["macro_area"] == area for riga in righe + external)],
         movimenti_su=su,
         movimenti_giu=giu,
         prime_in_regione=prime,

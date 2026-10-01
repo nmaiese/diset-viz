@@ -46,6 +46,9 @@
   "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }}{% if provinces %}, "containsPlace": [{% for pr in provinces %}{ "@type": "Place", "name": {{ pr.name | tojson }}, "url": {{ (site_url ~ pr.path) | tojson }} }{{ "," if not loop.last }}{% endfor %}]{% endif %} },
   "creator": {{ organization_ref_jsonld | safe }},
   "isBasedOn": { "@type": "Dataset", "name": "Indicatori territoriali", "description": "Indicatori territoriali regionali pubblicati da Istat.", "license": {{ data_license_url | tojson }}, "creator": { "@type": "Organization", "name": "Istat" } },
+  {%- if d.external_groups %}
+  "hasPart": [{% for g in d.external_groups %}{ "@type": "Dataset", "name": {{ g.label | tojson }}, "description": {{ (g.rows | length ~ ' indicatori di ' ~ g.institution ~ ' per la regione ' ~ d.of_name ~ ', descrittivi e fuori dalla posizione media e dal punteggio.') | tojson }}, "creator": { "@type": "Organization", "name": {{ g.institution | tojson }} }{% if g.license_url %}, "license": {{ g.license_url | tojson }}{% endif %}{% if g.url %}, "url": {{ g.url | tojson }}{% endif %} }{{ "," if not loop.last }}{% endfor %}],
+  {%- endif %}
   "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ data_license_url | tojson }},
@@ -433,6 +436,49 @@
     {% endfor %}
   </section>
 
+  {% if d.external_groups %}
+  <section class="section" id="altre-fonti" aria-labelledby="h-altre-fonti">
+    <h2 id="h-altre-fonti">Altri indicatori {{ d.of_name }}, da altre fonti</h2>
+    <p class="regione-intro">{{ d.external_count | num(None, 'count') }} {{ d.external_count | it_plural('indicatore', 'indicatori') }} di {{ d.external_label }}, in una tabella a parte perché {{ d.external_count | it_plural('descrive', 'descrivono') }} la regione e non {{ d.external_count | it_plural('entra', 'entrano') }} nella posizione media, nei temi o nel punteggio della qualità della vita. Dove un indicatore ha un verso la tabella dà la posizione fra le regioni, altrimenti scrive che non si classifica: un valore alto o basso, lì, non è di per sé un bene o un male.</p>
+    {% for g in d.external_groups %}
+    <div class="tablewrap stackwrap stackwrap--wide" tabindex="0" role="region" aria-labelledby="{{ 'h-fonte-' ~ g.family }}">
+      <table class="table table--compact table--stack" role="table">
+        <caption class="sr-only">{{ g.label }}: gli indicatori {{ d.of_name }} con valore, unità, anno, andamento e posizione fra le regioni</caption>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader">Indicatore</th>
+            <th class="r" scope="col" role="columnheader">Valore</th>
+            <th scope="col" role="columnheader">Unità</th>
+            <th class="r" scope="col" role="columnheader">Anno</th>
+            <th scope="col" role="columnheader">Andamento</th>
+            <th class="r" scope="col" role="columnheader">Posizione</th>
+            <th class="r" scope="col" role="columnheader">Nell'anno di confronto</th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          <tr class="group" role="row"><th scope="rowgroup" colspan="7" role="rowheader" id="{{ 'h-fonte-' ~ g.family }}">Fonte: {% if g.url %}<a href="{{ g.url }}">{{ g.label }}</a>{% else %}{{ g.label }}{% endif %}{% if g.license %}, licenza {{ g.license }}{% endif %}</th></tr>
+          {% for r in g.rows %}
+          <tr role="row">
+            <th scope="row" role="rowheader"><a href="{{ r.path }}">{{ r.name }}</a><span class="where">{{ r.source }}, {{ r.theme }}{% if r.unit_apart %}, in {{ r.unit_apart }}{% endif %}</span></th>
+            <td class="val" data-label="Valore" role="cell">{{ r.value | num(None, 'cell') }}</td>
+            <td data-label="Unità" role="cell">{{ r.unit }}</td>
+            <td class="val" data-label="Anno" role="cell">{{ r.year }}</td>
+            <td class="trendcell" data-label="Andamento" role="cell">{% if r.spark | length > 1 %}<span class="trend">{{ r.spark | sparkline("s", r.spark_floor) }}<span class="trend__txt"><span class="trend__from">dal {{ r.spark[0].year }} era</span> {{ r.spark[0].value | num(None, 'cell') }}</span></span>{% else %}{{ none | num }}{% endif %}</td>
+            {% if r.rank %}
+            <td class="val" data-label="Posizione" role="cell">{{ r.rank | rank(r.count) }}</td>
+            <td class="val" data-label="Nell'anno di confronto" role="cell">{% if r.before %}{% if r.before.same and not r.partial %}stessa nel {{ r.before.year }}{% else %}{{ r.before.rank | rank(r.before.total) }} nel {{ r.before.year }}{% endif %}{% else %}<span class="n n--nd">n.d.</span>{% endif %}</td>
+            {% else %}
+            <td class="val" colspan="2" data-label="Posizione" role="cell"><span class="status">Senza verso, non si classifica</span></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
   {% if d.similar %}
   <section class="section" id="simili" aria-labelledby="h-simili">
     <h2 id="h-simili">Le regioni con un profilo simile</h2>
@@ -471,6 +517,7 @@
       </div>
     </div>
     <dl class="specs">
+      {% if d.external_groups %}<div><dt>Altre fonti</dt><dd><ul class="reflist">{% for g in d.external_groups %}<li>{% if g.url %}<a href="{{ g.url }}">{{ g.label }}</a>{% else %}{{ g.label }}{% endif %}<small>{{ g.rows | length | num(None, 'count') }} {{ g.rows | length | it_plural('indicatore', 'indicatori') }}{% if g.license %}, licenza {{ g.license }}{% endif %}, fuori dalla posizione media e dal punteggio</small></li>{% endfor %}</ul></dd></div>{% endif %}
       {% if d.sources %}<div><dt>Fonti</dt><dd><ul class="reflist">{% for s in d.sources %}<li>{% if s.url %}<a href="{{ s.url }}">{{ s.label }}</a>{% else %}{{ s.label }}{% endif %}<small>{{ s.count | num(None, 'count') }} {{ s.count | it_plural('indicatore', 'indicatori') }}</small></li>{% endfor %}</ul></dd></div>{% endif %}
       <div><dt>Anni dei dati</dt><dd>L'ultimo anno di ogni indicatore{% if d.year_min and d.year_min != d.year_max %}, dal {{ d.year_min }} al {{ d.year_max }}{% endif %}</dd></div>
       <div><dt>Indicatori</dt><dd>{{ d.indicator_count | num(None, 'count') }} nella tabella, di cui {{ d.scored | num(None, 'count') }} con un verso e {{ d.comparable | num(None, 'count') }} con i dati di tutte le regioni</dd></div>
