@@ -2655,6 +2655,28 @@ def game_order_page():
     )
 
 
+# --- Dov'è la provincia? (mappa muta): la pagina (app/game_mappa_page.py) ------
+# Solo la rotta di pagina: le API stanno nel blocco "Dov'è la provincia?" piu' sotto.
+# Risponde 200 anche senza GAME_SEED_KEY (non chiama niente di seminato): un errore di
+# deploy non deve togliere dall'indice la pagina che porta traffico. L'import sta qui
+# perche' il blocco resta delimitato.
+from app import game_mappa_page  # noqa: E402
+
+
+@app.route(game_mappa_page.PATH)
+def game_mappa_page_view():
+    return render_template(
+        "game_mappa.html",
+        mappa=game_mappa_page.page(SITE_NAME),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}{game_mappa_page.PATH}",
+    )
+
+
+# --- fine Dov'è la provincia? (pagina) -----------------------------------------
+
+
 @app.route("/quiz/classifica")
 def game_leaderboard_page():
     return render_template(

@@ -1,0 +1,291 @@
+/* "Dov'e' la provincia?" (/quiz/province-italiane): la mappa muta, la domanda, la rivelazione e i
+   tasti in basso. Nessun colore scritto qui: tutto viene dai token (`--ink`, `--bg`, `--rule`,
+   `--accent` per cio' che si clicca, `--game-*` per giusto e sbagliato, `--focus` per l'anello). Il
+   foglio sta in `mappa/` e non in `game/`, quindi `test_css_tokens` e `test_game_motion` non lo
+   leggono: le stesse regole le applica `tests/unit/test_game_mappa_pagina_puro.py`.
+
+   Il tratto, i segni e l'anello di focus si misurano in pixel di schermo: il client scrive su
+   `#mappa-svg` la variabile `--mappa-u`, le unita' del viewBox per pixel, e a ogni cambio di
+   riquadro i tratti restano della stessa misura. Giusto e sbagliato hanno una FORMA (cerchio con
+   spunta, quadrato con croce, tratteggio) oltre al colore, e il testo della rivelazione. Il
+   movimento sta solo dentro `prefers-reduced-motion: no-preference`. */
+
+/* ---------- La cornice e la mappa ---------- */
+
+.mappa-cornice {
+  inline-size: min(100%, calc(62vh * 560 / 660));
+  margin-inline: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.mappa-cornice[hidden] { display: none; }
+
+.mappa-muta {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 560 / 660;
+  /* il pinch e lo scorrimento restano del browser: niente gesti nostri */
+  touch-action: manipulation;
+  --mappa-u: 1;
+}
+
+.mappa-muta .prov-tile {
+  fill: var(--data-null);
+  stroke: var(--bg);
+  stroke-width: calc(0.8px * var(--mappa-u));
+  cursor: pointer;
+}
+
+.mappa-muta .mappa-confini use {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: calc(1px * var(--mappa-u));
+  stroke-opacity: 0.45;
+}
+
+/* Sull'Italia si sceglie la regione: e' tutta la regione ad accendersi. Nel riquadro, la provincia. */
+.mappa-muta[data-vista="italia"] .mappa-regione:hover .prov-tile { fill: var(--accent-soft); }
+.mappa-muta[data-vista="regione"] .prov-tile:hover { fill: var(--accent-soft); }
+
+/* La scelta: motivo a puntini e bordo spesso, mai il solo colore, e mai il nome. */
+.mappa-muta .prov-tile.is-selected {
+  fill: url(#mappa-selezione);
+  stroke: var(--accent);
+  stroke-width: calc(3px * var(--mappa-u));
+}
+.mappa-selezione-fondo { fill: var(--bg); }
+.mappa-selezione-punto { fill: var(--accent); }
+
+/* L'esito: la giusta piena e col bordo d'inchiostro, la scelta sbagliata a tratteggio. */
+.mappa-muta .prov-tile.is-right {
+  fill: var(--game-right);
+  stroke: var(--ink);
+  stroke-width: calc(2px * var(--mappa-u));
+}
+.mappa-muta .prov-tile.is-chosen-wrong {
+  fill: url(#mappa-tratteggio);
+  stroke: var(--game-wrong);
+  stroke-width: calc(2px * var(--mappa-u));
+}
+.mappa-tratteggio-fondo { fill: var(--game-wrong-wash); }
+.mappa-tratteggio-riga { stroke: var(--game-wrong); stroke-width: 2; }
+
+/* I segni sopra le sagome: cerchio con spunta (la giusta), quadrato con croce (la tua scelta). */
+.mappa-segno circle { fill: var(--game-right); stroke: var(--bg); stroke-width: calc(2px * var(--mappa-u)); }
+.mappa-segno--giusta path {
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: calc(2.5px * var(--mappa-u));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mappa-segno rect { fill: var(--bg); stroke: var(--ink); stroke-width: calc(2px * var(--mappa-u)); }
+.mappa-segno--scelta path {
+  fill: none;
+  stroke: var(--game-wrong);
+  stroke-width: calc(2.5px * var(--mappa-u));
+  stroke-linecap: round;
+}
+
+/* L'anello di focus da tastiera (3:1 sulla pagina): sul gruppo della regione e sulla provincia. */
+.mappa-muta [tabindex]:focus { outline: none; }
+.mappa-muta [tabindex]:focus-visible {
+  outline: calc(3px * var(--mappa-u)) solid var(--focus);
+  outline-offset: calc(2px * var(--mappa-u));
+}
+.mappa-muta[data-vista="italia"] .mappa-regione:focus-visible .prov-tile {
+  stroke: var(--focus);
+  stroke-width: calc(2px * var(--mappa-u));
+}
+.mappa-muta .prov-tile:focus-visible {
+  stroke: var(--focus);
+  stroke-width: calc(3px * var(--mappa-u));
+}
+
+.mappa-suggerimento {
+  margin: 0;
+  min-block-size: 1.5em;
+  padding: 4px 12px;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+/* ---------- La scelta, la domanda, la rivelazione ---------- */
+
+.mappa-scelta, .mappa-app { display: flex; flex-direction: column; gap: 12px; }
+.mappa-scelta-titolo { margin: 0; font-size: 20px; }
+
+.mappa-scelta-livello {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+}
+.mappa-scelta-livello legend {
+  padding: 0 6px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.mappa-scelta-livello label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "radio label" ". aiuto";
+  gap: 2px 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.mappa-scelta-livello label.is-active { border-color: var(--game-accent); background: var(--game-wash); }
+.mappa-scelta-livello input { grid-area: radio; width: 18px; height: 18px; margin: 0; accent-color: var(--game-accent); }
+.mappa-scelta-label { grid-area: label; font-weight: 700; font-size: 14px; }
+.mappa-scelta-aiuto { grid-area: aiuto; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+.mappa-inizia { align-self: flex-start; min-block-size: 48px; }
+
+.mappa-domanda-blocco { display: flex; flex-direction: column; gap: 4px; }
+.mappa-stato { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; margin: 0; }
+.mappa-app .mappa-domanda { margin: 0; font-size: 22px; line-height: 1.2; }
+.mappa-domanda:focus { outline: none; }
+.mappa-domanda:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.mappa-istruzione { margin: 0; min-block-size: 1.4em; font-size: 14px; color: var(--text-2); }
+
+.mappa-regioni {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.mappa-regione-voce {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  cursor: pointer;
+}
+.mappa-regione-voce.is-scelta { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.mappa-regione-voce input { inline-size: 18px; block-size: 18px; margin: 0; accent-color: var(--accent); }
+
+.mappa-rivelazione:empty { display: none; }
+.mappa-rivelazione { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 0; }
+.mappa-rivelazione p { margin: 0; }
+.mappa-verdetto { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+.mappa-esito-segno { flex: none; inline-size: 24px; block-size: 24px; }
+.mappa-esito-segno path { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.mappa-esito-segno--esatto { color: var(--game-right); }
+.mappa-esito-segno--esatto circle { fill: var(--game-right); stroke: none; }
+.mappa-esito-segno--esatto path { stroke: var(--bg); }
+.mappa-esito-segno--vicino { color: var(--ink); }
+.mappa-esito-segno--vicino .mappa-esito-contorno { fill: none; stroke: currentColor; stroke-width: 2; }
+.mappa-esito-segno--vicino path { fill: currentColor; stroke: none; }
+.mappa-esito-segno--errore { color: var(--game-wrong); }
+.mappa-esito-segno--errore rect { fill: var(--bg); stroke: currentColor; stroke-width: 2; }
+.mappa-dettaglio { font-size: 15px; line-height: 1.45; }
+.mappa-legenda { font-size: 13px; line-height: 1.4; color: var(--text-2); }
+.mappa-scheda a { display: inline-flex; align-items: center; min-block-size: 44px; font-weight: 600; }
+
+/* ---------- I tasti in basso, nella zona del pollice ---------- */
+
+/* i bottoni del gioco non portano `font: inherit` fuori da `.compare-app` e simili */
+.mappa-scelta button, .mappa-app button, #mappa-azioni button { font: inherit; }
+#mappa-azioni .game-btn { color: var(--game-on-accent); }
+#mappa-azioni .game-btn--ghost { color: var(--ink); }
+
+.mappa-barra {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0 env(safe-area-inset-bottom, 0px);
+}
+.mappa-barra .game-btn { min-block-size: 48px; font-size: 16px; }
+.mappa-inizia { font-size: 16px; }
+.mappa-conferma, .mappa-avanti { flex: 1 1 auto; }
+.mappa-indietro { flex: 0 0 auto; }
+/* senza una scelta Conferma non e' disabilitata (un bottone disabilitato non prende il focus): lo dice
+   `aria-disabled`, e qui si vede */
+#mappa-azioni .mappa-conferma[aria-disabled="true"] {
+  background: var(--surface-2);
+  border-color: var(--rule);
+  color: var(--muted);
+  cursor: default;
+}
+
+#mappa-azioni { background: var(--bg); }
+
+.mappa-fonte .source { margin: 8px 2px 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.mappa-fonte .source a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
+.mappa-altro-esercizio { margin: 12px 0 0; }
+
+/* ---------- L'elenco indicizzabile ---------- */
+
+.mappa-elenco {
+  columns: 3 14rem;
+  column-gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mappa-elenco li { break-inside: avoid; margin: 0; }
+.mappa-elenco a { display: inline-flex; align-items: center; min-block-size: 32px; }
+@media (pointer: coarse) {
+  .mappa-elenco a { min-block-size: 44px; }
+}
+.mappa-ufficiale { display: block; font-size: 13px; color: var(--muted); }
+
+/* ---------- Telefono ---------- */
+
+@media (max-width: 720px) {
+  /* Su telefono il gioco viene prima (game-base.css), e il sottomenu degli altri giochi dopo la
+     mappa e i tasti: la domanda, la mappa e Conferma stanno insieme sopra la piega. `guess.css`
+     mette `#game-root` all'ordine 1 sotto gli 860 px, per la sua pagina: qui torna con gli altri. */
+  .game-page--play > #game-root { order: 2; }
+  .game-page--play > .game-subnav-wrap { order: 3; margin-block-start: 16px; }
+  .mappa-cornice { inline-size: 100%; }
+  .mappa-domanda { font-size: 20px; }
+  .mappa-app, .mappa-scelta { gap: 8px; }
+  /* la barra resta attaccata al bordo basso finche' il suo posto naturale non entra nello schermo,
+     larga quanto lo schermo, col tasto da 48 px */
+  #mappa-azioni {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: 16px;
+    box-shadow: 0 -1px 0 var(--rule);
+  }
+  #mappa-azioni:empty { display: none; }
+  .mappa-rivelazione { padding-inline: 0; }
+}
+
+/* ---------- Il movimento, solo a chi non ha chiesto di ridurlo ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .mappa-muta .prov-tile { transition: fill var(--mo-fast) ease, stroke var(--mo-fast) ease; }
+  .mappa-segno { animation: mappa-segno-in var(--mo-base) var(--mo-out) both; }
+  .mappa-rivelazione { animation: mappa-rivelazione-in var(--mo-base) var(--mo-out) both; }
+  @keyframes mappa-segno-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes mappa-rivelazione-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* I bottoni dentro l'isola (Condividi, "Gioca un altro esercizio", Inizia) non portano `font: inherit`
+   fuori dalle app dei giochi vicini */
+#game-root button { font: inherit; }
