@@ -1705,6 +1705,17 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
             "data/source_state.json e la data delle fonti sparisce.",
         )
 
+    def test_the_games_indicator_list_is_shipped(self):
+        """Senza `config/game_indicators.csv` nell'immagine le sfide del giorno di Chi e'
+        maggiore? e Ordina danno 500 (successo il 1 ottobre 2026): il file e' letto a
+        runtime da `app/game_daily.py` e la suite gira col repo intero."""
+        text = (self.ROOT / "Dockerfile").read_text(encoding="utf-8")
+        self.assertRegex(
+            text, r"(?m)^COPY\s+config/game_indicators\.csv\s+config/game_indicators\.csv\s*$",
+            "il Dockerfile non copia config/game_indicators.csv: in produzione le sfide "
+            "del giorno di Chi e' maggiore? e Ordina rispondono 500.",
+        )
+
     def test_dockerignore_keeps_runtime_state_out_of_the_image(self):
         """`COPY data/` spedisce la storia committata, ma `.gitignore` NON protegge
         il build context: solo `.dockerignore` lo fa. Un `docker build .` da un
