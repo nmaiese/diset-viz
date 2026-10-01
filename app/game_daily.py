@@ -26,8 +26,10 @@ Senza la variabile d'ambiente si usa `DEV_SEED_KEY`, che e' scritta qui e
 quindi NON E' SEGRETA: va bene in locale e nei test, non in produzione. Dove
 `K_SERVICE` e' impostata (Cloud Run) e la chiave manca, `seed_key` solleva
 `SeedKeyMissing` e le rotte rispondono 503, invece di servire sfide prevedibili.
-`SEED_CUTOVER` e' un segnaposto (2099): la data vera si fissa nell'ultimo commit
-prima del merge, al giorno del deploy piu' uno.
+`SEED_CUTOVER` e' il primo giorno con il seed segreto (2 ottobre 2026: il giorno
+del deploy piu' uno). Se il deploy slitta oltre quel giorno, la data va spostata
+PRIMA del merge: i giorni fra il cutover e il deploy sarebbero gia' stati serviti
+col seed vecchio e cambierebbero nell'archivio.
 
 **I giochi con le province.** Il pool dei territori (107 province, centroidi,
 province "giocabili"), l'elenco curato degli indicatori da gioco
@@ -65,8 +67,8 @@ from zoneinfo import ZoneInfo
 ROME_TZ = ZoneInfo("Europe/Rome")
 GAME_EPOCH = date(2026, 7, 15)  # giorno di lancio, puzzle numero 1
 
-# Segnaposto: la data vera si fissa prima del merge (vedi sopra).
-SEED_CUTOVER = date(2099, 1, 1)
+# Il primo giorno con il seed segreto: il giorno del deploy piu' uno (vedi sopra).
+SEED_CUTOVER = date(2026, 10, 2)
 # NON SEGRETA: vale solo finche' `GAME_SEED_KEY` non e' impostata.
 DEV_SEED_KEY = "divario-chiave-di-sviluppo-non-segreta"
 
