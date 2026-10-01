@@ -186,12 +186,33 @@ Un worker ha giocato i cinque giochi con Chromium a 375 e 1280 px, sulla sfida n
 
 **Non verificato:** "La riapriamo da capo" della Mappa e di Chi è maggiore a schermo (serve un token superato dopo una ripresa vera; provato solo per Provincia con una risposta finta); sfide passate e archivio; lettore di schermo vero; contrasto misurato (solo a occhio); `navigator.share` nativo.
 
-## 10. Che cosa non sappiamo
+## 10. Competitor, rifatti con citazioni controllate (1 ottobre 2026)
+
+Secondo giro, con un worker Claude (sonnet) in sola lettura. Le citazioni segnate **letterale** sono estratte con `curl` dall'HTML; quelle segnate **WebFetch** passano da un modello piccolo e vanno ricontrollate prima di citarle altrove. Non ho riverificato di persona ogni frase.
+
+**Che cosa si può dire.**
+- **Lab24** dichiara verso e peso: "mille punti vengono dati alla provincia con il valore migliore e zero punti a quella con il peggiore, in base ad un 'senso di lettura' del parametro ... definito dalla redazione", e la classifica è "la media aritmetica semplice delle sei graduatorie di settore". Bene: un metodo solo, scala chiara, fonti nominate per istituzione. Male: "senso di lettura" è gergo e la spiegazione sta in una nota in fondo, non accanto al dato.
+- **Noi Italia (Istat)** apre con una promessa al lettore, "100 statistiche per capire il Paese in cui viviamo", e elenca che cosa contiene (sei aree, diciannove settori, glossario, download). Male: una frase d'apertura di circa 40 parole e un testo segnaposto "Donec id elit..." rimasto in pagina.
+- **IstatData** mostra errori generici in inglese ("An error occurred while contacting the server."). Il 404 di Istat è un menù senza una frase che dica dove andare.
+- **Our World in Data** dice subito chi scrive e chi finanzia, e le FAQ sono domande vere in ordine di dubbio (fiducia prima, riuso dopo). Male: "more on our mission below" rimanda a una risposta che non c'è.
+- **Openpolis** e **Tuttitalia** nella parte letta non hanno metodologia in homepage: lo slogan o la promessa ("Guida ai Comuni...") prende il posto della spiegazione. Giudizio provvisorio.
+- **Truenumbers**: titoli con cifra e conclusione ("Tetto del 30% agli studenti stranieri: il divario non c'è"), da copiare per gli articoli, non per le schede. Una pagina inesistente dà un 403 muto.
+
+**Che cosa non si può dire.** Truenumbers solo in homepage, Eurostat Regional Yearbook non raggiungibile (login), nessun altro atlante regionale. Non esiste evidenza competitor su regole, errori o condivisione dei giochi: nessun concorrente letto ha giochi, e le correzioni sui giochi poggiano solo sul nostro codice.
+
+**Cinque indicazioni di scrittura che ne escono.**
+1. Dichiara la scelta editoriale dove sta il numero, non in una nota in fondo. Divario ha tre metodi con lo stesso nome "punteggio": un nome per metodo.
+2. Scrivi una promessa al lettore, non una descrizione di ciò che fa il sito.
+3. Ordina le FAQ come domande vere, dalla fiducia all'uso. Ogni termine che un popover manda a `/metodologia` ha la sua definizione lì.
+4. Una parola sola, "indicatore" (decisione di Nello del 1 ottobre): nessun competitor ne usa una in modo coerente, quindi non c'è uno standard da seguire, solo da fissare.
+5. Gli errori dicono che cosa è successo e che cosa fare, nella lingua del sito, e dicono il costo ("Riprova" azzera la serie).
+
+## 11. Che cosa non sappiamo
 
 - **I giochi sono stati provati nel browser** (sezione 9), ma da un worker automatico, non da giocatori. I percorsi delle quattro persone sono inferenze dal testo, non osservazioni di utenti. Nessun dato di scorrimento o permanenza.
 - **Gli errori dei giochi sono stati simulati** (rete assente, 503, 429, token non valido), non osservati in uso reale.
 - **Il campione di `content/`** è di 10 schede e 5 articoli su circa 383: quello che dice vale per il campione.
-- **Competitor**: poco verificato. Mancano un confronto serio dei testi di guida degli altri siti e di come altri giochi scrivono regole ed errori (Wordle e NYT bloccano la lettura). Se serve, va rifatto con una ricerca mirata e citazioni controllate.
+- **Competitor**: rifatti nella sezione 10, ma sui giochi degli altri non c'è evidenza (Wordle e NYT bloccano la lettura) e alcune citazioni restano da WebFetch, non letterali.
 - **Fonti accademiche** sui titoli-tesi, sulla comunicazione dell'incertezza e sulle serie nei giochi non sono state lette.
 - **Articolo 50 del regolamento IA e rapporto della Banca d'Italia sulla Calabria**: citati dal sito, non verificati.
 - **La suite di test non dà un verdetto pulito** (sezione 8): le asserzioni che bloccano i testi sono cercate per stringa.
