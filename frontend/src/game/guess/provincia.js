@@ -5,6 +5,7 @@
 
 import { normalize } from "./helpers.js";
 import { inviaJson } from "./rete.js";
+import { PARTITA_INTERROTTA } from "../testi.js";
 import { analizza, extraProvincia, progressoValido, statsProvincia } from "../salvati.js";
 
 export const API_PROVINCIA = {
@@ -38,12 +39,12 @@ export function direzione(sigla) {
   return PUNTI[sigla] || null;
 }
 
-// "Circa 120 km verso nord-est". I km sono stimati fra i centri delle province.
+// "Circa 120 km verso nord-est, stima". I km sono stimati fra i centri delle province, e lo dice la parola.
 export function testoDistanza(guess) {
   if (guess.correct) return "";
   const punto = direzione(guess.direction);
   const km = Number(guess.distance_km).toLocaleString("it-IT");
-  return punto ? `Circa ${km} km verso ${punto.parola}` : `Circa ${km} km`;
+  return punto ? `Circa ${km} km verso ${punto.parola}, stima` : `Circa ${km} km, stima`;
 }
 
 // "della regione", "di tutta Italia": si abbassa solo la prima lettera, "Italia" resta maiuscola.
@@ -154,7 +155,7 @@ function trovaFuori(altre, q) {
 // caduta) lascia il token salvato superato: ogni nuovo tentativo darebbe `token_superato` (409), e
 // ricaricare la pagina rimetterebbe lo stesso token. Si dimentica il progresso e si riparte, una
 // volta, dicendolo.
-export const AVVISO_RIPRESA = "La partita si è interrotta, non per colpa tua. La riprendiamo da capo.";
+export const AVVISO_RIPRESA = `${PARTITA_INTERROTTA} La riapriamo da capo.`;
 
 // Che cosa fare di un tentativo rifiutato (funzione pura). Ritorna
 //   "riprendi"  si dimentica il progresso salvato e si ricarica la sfida da soli, una volta sola;

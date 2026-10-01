@@ -24,6 +24,8 @@ function useAltezzaVisibile() {
 //             non porta a nessun suggerimento. `undefined` = nessuna regione live, come prima.
 //   error     il messaggio di un tentativo andato male.
 //   ricarica  true: sotto l'errore c'e' "Ricarica la pagina" (la sfida e' cambiata, il token e' vecchio).
+//   onRiprova funzione | undefined: sotto l'errore c'e' "Riprova", che rimanda lo stesso tentativo (la
+//             rete non ha risposto, il tentativo non e' stato contato).
 //
 // Da telefono (<= 720 px, guess.css) l'elenco si apre SOPRA il campo, cosi' la tastiera virtuale non lo
 // copre, e il campo e' a 16 px perche' iOS non zoomi. Le frecce e `aria-activedescendant` seguono
@@ -43,6 +45,7 @@ export default function Completamento({
   error,
   nota,
   ricarica,
+  onRiprova,
 }) {
   const altezza = useAltezzaVisibile();
   const elencoRef = useRef(null);
@@ -122,6 +125,9 @@ export default function Completamento({
       </div>
       {nota !== undefined && <p className="game-nota" role="status" aria-live="polite">{nota}</p>}
       {error && <p className="game-error">{error}</p>}
+      {error && !ricarica && onRiprova && (
+        <button type="button" className="game-btn" onClick={onRiprova}>Riprova</button>
+      )}
       {error && ricarica && (
         <button type="button" className="game-btn" onClick={() => window.location.reload()}>Ricarica la pagina</button>
       )}

@@ -19,6 +19,7 @@ import {
   OPZIONI,
   applicaRisposta,
   decisioneErroreRisposta,
+  erroreRiprovabile,
   esitiPerCondivisione,
   messaggioErrore,
   messaggioRiapertura,
@@ -94,7 +95,7 @@ function Scelta({ scelta, onScegli, onInizia, occupato, errore, sfida, avviata }
       </fieldset>
       {errore && <p className="game-error" role="alert">{errore}</p>}
       <button type="button" className="game-btn mappa-inizia" onClick={onInizia} aria-busy={occupato ? "true" : undefined} disabled={occupato}>
-        Inizia la sfida del giorno
+        {errore ? "Riprova" : "Inizia la sfida del giorno"}
       </button>
     </div>
   );
@@ -110,6 +111,8 @@ function Partita({ partita, sfida, avviso, onPartita, onCambiaOpzione, onRiapri,
   const [scelta, setScelta] = useState(null); // la regione scelta senza mappa
   const [messaggio, setMessaggio] = useState(avviso || "");
   const [riaprire, setRiaprire] = useState(false);
+  // L'ultima risposta non e' arrivata e si puo' rimandare: sotto il messaggio c'e' "Riprova".
+  const [riprovabile, setRiprovabile] = useState(false);
   const [vista, setVista] = useState({ vista: "italia", selezionata: null });
   const mio = useTerritorioMio();
 
@@ -175,6 +178,7 @@ function Partita({ partita, sfida, avviso, onPartita, onCambiaOpzione, onRiapri,
       return;
     }
     setMessaggio("");
+    setRiprovabile(false);
     statoRef.current = "invio";
     setStato("invio");
     const corrente = partitaRef.current;
@@ -203,7 +207,8 @@ function Partita({ partita, sfida, avviso, onPartita, onCambiaOpzione, onRiapri,
       }
       statoRef.current = "domanda";
       setStato("domanda");
-      setMessaggio(messaggioErrore(data.error));
+      setMessaggio(messaggioErrore(data.error, status));
+      setRiprovabile(erroreRiprovabile(data.error));
       return;
     }
     let inVista = null;
@@ -275,6 +280,9 @@ function Partita({ partita, sfida, avviso, onPartita, onCambiaOpzione, onRiapri,
         <SenzaMappa regioni={partita.regions || []} scelta={scelta} onScegli={setScelta} disabilitato={stato !== "domanda"} />
       )}
       {messaggio && <p className="game-error" role="alert">{messaggio}</p>}
+      {riprovabile && !riaprire && stato === "domanda" && (
+        <button type="button" className="game-btn" onClick={conferma}>Riprova</button>
+      )}
       {riaprire && (
         <button type="button" className="game-btn" onClick={onRiapri}>Riapri la sfida di oggi</button>
       )}
@@ -326,7 +334,7 @@ function Fine({ partita, sfida, mio, onCambiaOpzione }) {
           puzzleNumber: number,
           ...(piena ? { punteggio: score.points } : {}),
           esiti: esitiPerCondivisione(esiti, partita.mode),
-          summary: testoHub(score.points, score.max, partita.mode),
+          summary: `${testoHub(score.points, score.max, partita.mode)}. Un simbolo per domanda.`,
           eventName: "map_share",
           eventParams: { level: partita.level, answer_mode: partita.mode },
         }}
@@ -388,9 +396,9 @@ export default function GiocoMappa() {
       sessione = preaperta.current;
       preaperta.current = null;
     } else {
-      const { ok, data } = await apriSessione(o.livello, o.modalita);
+      const { ok, status, data } = await apriSessione(o.livello, o.modalita);
       if (!ok) {
-        setErrore(messaggioErrore(data.error) || "Non sono riuscito ad aprire la sfida del giorno. Riprova.");
+        setErrore(messaggioErrore(data.error, status));
         setFase("scelta");
         return;
       }

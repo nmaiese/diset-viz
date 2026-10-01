@@ -181,3 +181,10 @@ export function metaUnita(parts) {
     .filter(Boolean)
     .join(" · ");
 }
+
+// Invio e Spazio attivano la RIGA solo se il tasto nasce sulla riga. Sui bottoni
+// freccia (figli della riga) il keydown risale fino a lei: se la riga lo
+// intercettasse con preventDefault, il bottone non scatterebbe mai da tastiera.
+export function tastoPerLaRiga(key, target, currentTarget) {
+  return target === currentTarget && (key === "Enter" || key === " ");
+}

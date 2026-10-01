@@ -7,6 +7,7 @@
 // il nome della provincia prima della rivelazione.
 
 import { trovaTerritorioMio } from "../puri.js";
+import { ERRORE_LIMITE, PARTITA_INTERROTTA, SFIDA_CAMBIATA, messaggioTentativo } from "../testi.js";
 
 export const GIOCO = "mappa";
 
@@ -164,17 +165,17 @@ export function chiavePartita(livello, modalita, iso) {
 
 // Errori del server con un nome, e che cosa dire. `token_invalid` ha la stessa frase di
 // `session_expired` (si sceglie in `decisioneErroreRisposta`), mai un messaggio vuoto.
-export const AVVISO_RIPRESA = "La partita si è interrotta, non per colpa tua. La riapriamo da capo.";
+export const AVVISO_RIPRESA = `${PARTITA_INTERROTTA} La riapriamo da capo.`;
 
 export const ERRORI = {
-  puzzle_changed: "La sfida del giorno è cambiata mentre giocavi. Riapri la partita.",
-  session_expired: "La partita è scaduta. Riaprila per giocare la sfida di oggi.",
-  partita_interrotta: "La partita si è interrotta. Riaprila per giocare la sfida di oggi.",
-  token_invalid: "La partita è scaduta. Riaprila per giocare la sfida di oggi.",
+  puzzle_changed: `${SFIDA_CAMBIATA} Riaprila per giocare quella di oggi.`,
+  session_expired: `${PARTITA_INTERROTTA} Riaprila per giocare la sfida di oggi.`,
+  partita_interrotta: `${PARTITA_INTERROTTA} Riaprila per giocare la sfida di oggi.`,
+  token_invalid: `${PARTITA_INTERROTTA} Riaprila per giocare la sfida di oggi.`,
   round_already_answered: AVVISO_RIPRESA,
-  rate_limited: "Troppe richieste in poco tempo. Riprova fra un minuto.",
+  rate_limited: ERRORE_LIMITE,
   seed_unavailable: "La sfida del giorno non è disponibile in questo momento. Riprova più tardi.",
-  bad_request: "Risposta non valida. Riprova.",
+  bad_request: "Non è stato possibile inviare la risposta. Riprova.",
 };
 
 export const ERRORI_DA_RIAPRIRE = new Set(["puzzle_changed", "session_expired", "token_invalid"]);
@@ -203,8 +204,17 @@ export function messaggioRiapertura(error, { status } = {}) {
   return messaggioErrore(error === "token_invalid" ? "session_expired" : error);
 }
 
-export function messaggioErrore(codice) {
-  return Object.prototype.hasOwnProperty.call(ERRORI, codice) ? ERRORI[codice] : "Qualcosa non ha funzionato. Riprova.";
+// Senza un nome di errore decide lo stato HTTP: la rete assente (0) e il 5xx, 503 compreso, dicono
+// che il server non risponde, il resto e' il generico.
+export function messaggioErrore(codice, status) {
+  if (Object.prototype.hasOwnProperty.call(ERRORI, codice)) return ERRORI[codice];
+  return messaggioTentativo(status);
+}
+
+// Un errore dopo cui ha senso "Riprova": la rete, il 5xx, il limite di frequenza e il generico. Gli
+// altri hanno un loro bottone (riapri) o niente da ritentare.
+export function erroreRiprovabile(codice) {
+  return !Object.prototype.hasOwnProperty.call(ERRORI, codice) || codice === "rate_limited" || codice === "seed_unavailable";
 }
 
 // -- La partita in corso -----------------------------------------------------------------
