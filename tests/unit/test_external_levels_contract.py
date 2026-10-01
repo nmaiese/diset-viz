@@ -10,12 +10,18 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ExternalLevelsContract(unittest.TestCase):
-    def test_production_manifest_has_only_declared_header(self):
+    def test_production_manifest_has_declared_header_and_unique_levels(self):
         path = ROOT / "app/static/data/external/external_indicator_levels.csv"
         with path.open(encoding="utf-8", newline="") as handle:
-            reader = csv.reader(handle, delimiter=";")
-            self.assertEqual(next(reader), LEVEL_COLUMNS)
-            self.assertEqual(list(reader), [])
+            reader = csv.DictReader(handle, delimiter=";")
+            self.assertEqual(reader.fieldnames, LEVEL_COLUMNS)
+            rows = list(reader)
+        keys = [(row["target_indicator_id"], row["territory_level"]) for row in rows]
+        self.assertEqual(len(keys), len(set(keys)))
+        for row in rows:
+            self.assertIn(row["territory_level"], {"regione", "provincia"})
+            self.assertIn(row["direction"], {"higher_better", "lower_better", "contextual"})
+            self.assertGreaterEqual(int(row["year_max"]), 2025)
 
     def test_fixture_exercises_both_levels_without_production_rows(self):
         self.assertEqual(len(external_mef.levels()), 2)

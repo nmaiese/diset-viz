@@ -26,7 +26,8 @@ class ExternalSourceRegistry(unittest.TestCase):
     def test_mef_ispra_and_aci_keep_declared_non_istat_deeds(self):
         self.assertIn("3.0", sources.SOURCES["mef"]["license"])
         self.assertIn("4.0", sources.SOURCES["ispra"]["license"])
-        self.assertIn("3.0", sources.SOURCES["aci"]["license"])
+        self.assertIn("4.0", sources.SOURCES["aci"]["license"])
+        self.assertNotEqual(sources.SOURCES["aci"]["license_url"], sources.LICENSE_URL)
         self.assertNotEqual(sources.SOURCES["mef"]["license_url"], sources.LICENSE_URL)
 
 
