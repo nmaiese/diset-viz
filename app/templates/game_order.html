@@ -6,8 +6,8 @@
 {% set og_image_path = '/static/img/og/gioco-ordina.png' %}
 {% set og_image_alt = 'Sfida Italia: Ordina le regioni' %}
 
-{% block title %}Ordina le regioni per indicatore Istat | {{ site_name }}{% endblock %}
-{% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore Istat, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}
+{% block title %}Ordina le regioni per indicatore | {{ site_name }}{% endblock %}
+{% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore territoriale, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
@@ -36,7 +36,7 @@
 
   <header class="page-hero">
     <h1>Ordina le regioni</h1>
-    <p class="page-lead">Un indicatore Istat e alcune regioni in ordine sparso: trascinale o usa le frecce per rimetterle in ordine, dal valore più alto al più basso. Un punto per ogni posizione corretta.</p>
+    <p class="page-lead">Un indicatore territoriale e alcune regioni in ordine sparso: mettile in fila dal valore più alto al più basso, toccando una regione e poi la posizione dove metterla. Un punto per ogni posizione corretta.</p>
   </header>
 
   <div id="order-root">
@@ -49,7 +49,7 @@
 
   <section class="prose">
     <h2>Come si gioca</h2>
-    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Le regioni partono in ordine casuale: trascinale con l'icona ⋮⋮ oppure spostale su o giù con le frecce, finché non sono in ordine dalla più alta alla più bassa sull'indicatore proposto. Quando l'ordine ti convince, verifica: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo, e le serie perfette possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
+    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Le regioni partono in ordine casuale: tocca una regione e poi tocca la posizione dove metterla, oppure spostala su o giù con le frecce, finché non sono in ordine dalla più alta alla più bassa sull'indicatore proposto. Quando l'ordine ti convince, verifica: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo, e le serie perfette possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
     <p>Preferisci round più rapidi? Prova <a href="/quiz/chi-e-maggiore">Chi è maggiore?</a> o la <a href="/quiz/indovina-la-regione">regione misteriosa</a> del giorno.</p>
   </section>
 </article>

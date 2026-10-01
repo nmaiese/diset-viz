@@ -152,6 +152,8 @@ def evaluate_daily_order_answer(payload, auth_user=None):
             },
         }
 
+    result = _righe_con_unita(result)
+
     is_perfect = result["score"] == result["total"]
     session, token_out = quiz_tokens.apply_answer(state, ind_id, year, session_keys, is_perfect)
     if not quiz_tokens.claim_round(state["sid"], state["q"]):
@@ -164,6 +166,24 @@ def evaluate_daily_order_answer(payload, auth_user=None):
             player_stats.record_daily_score(auth_user["id"], "order", today.isoformat(), result["score"])
         except Exception:  # noqa: BLE001
             log.exception("ordina: punteggio del giorno non registrato")
+    return result
+
+
+def _righe_con_unita(result):
+    """L'unita' accanto a ogni valore, dentro `positions` e `correct_order`.
+
+    Il client scrive "74,3%" e non "74,3 Valori percentuali": senza l'unita' per
+    riga doveva indovinarla, e per un indicatore senza valore (o con l'etichetta
+    della fonte al posto dell'unita') finiva per stampare un numero nudo o un
+    "n.d.". Si aggiunge un campo, non se ne toglie nessuno. Vale per entrambe le
+    diramazioni (regioni e province), perche' la prova guarda il payload."""
+    unit = (result.get("indicator") or {}).get("unit") or ""
+    if not unit:
+        return result
+    for chiave in ("positions", "correct_order"):
+        righe = result.get(chiave)
+        if isinstance(righe, list):
+            result[chiave] = [{**riga, "unit": unit} for riga in righe]
     return result
 
 
