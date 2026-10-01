@@ -34,7 +34,13 @@ Quello che i giochi hanno in comune sta in pochi posti: `app/game_daily.py` (gio
 
 I tre livelli di Chi è maggiore e Ordina (`game_daily.LEVELS`) sono `regioni`, `stessa_regione` (due territori provinciali della stessa regione) e `province` (province d'Italia). "Stessa regione" esiste solo per le regioni con abbastanza province: `MIN_PROVINCES_COMPARE` per Chi è maggiore e `MIN_PROVINCES_ORDER` per Ordina, e `game_daily.eligible_regions(minimo)` dice quali sono. La stessa soglia (`MIN_PROVINCES_COMPARE`) vale per la regione di Indovina la Provincia, e `game_mappa.REGION_LEVEL_MIN` per il livello `regione` della mappa: con una provincia sola la domanda si risponderebbe da sola.
 
-**L'elenco curato** è `config/game_indicators.csv`, letto da `game_daily.game_indicators()`. Separatore `;`, colonne `id`, `famiglia`, `nome_leggibile`, `unita`, `livello_regione`, `livello_provincia`, `note`. È il solo posto dove si decide quali indicatori entrano nei giochi, con il nome leggibile e l'unità che il giocatore vede (non quelli lunghi della fonte). I due `livello_*` sono flag `1` e `0`: l'`id` è quello del pool regionale del quiz quando `livello_regione` è 1, e l'id BES delle province quando l'indicatore esiste solo lì. L'anno non si sceglie: è sempre l'ultimo disponibile. Un indicatore nuovo si aggiunge al CSV e passa dai test del gioco, che ne guardano fonte, anno e giocabilità. Il nome della fonte viene sempre da `app/sources.py` e mai scritto a mano nel codice del gioco: una scrittura a mano ha già pubblicato una serie sotto il nome sbagliato.
+**L'elenco curato** è `config/game_indicators.csv`, letto da `game_daily.game_indicators()`. Separatore `;`, colonne `id`, `famiglia`, `nome_leggibile`, `unita`, `livello_regione`, `livello_provincia`, `note`, `campionario`, `dal`. È il solo posto dove si decide quali indicatori entrano nei giochi, con il nome leggibile e l'unità che il giocatore vede (non quelli lunghi della fonte). I due `livello_*` sono flag `1` e `0`: l'`id` è quello del pool regionale del quiz quando `livello_regione` è 1, e l'id BES delle province quando l'indicatore esiste solo lì. L'anno non si sceglie: è sempre l'ultimo disponibile. Un indicatore nuovo si aggiunge al CSV e passa dai test del gioco, che ne guardano fonte, anno e giocabilità. Il nome della fonte viene sempre da `app/sources.py` e mai scritto a mano nel codice del gioco: una scrittura a mano ha già pubblicato una serie sotto il nome sbagliato.
+
+`campionario` è `1` per le serie che vengono da un'indagine campionaria e `game_facts` allora non scrive la posizione esatta (`game_facts.is_sample_survey`); nel dubbio vale `1`. `dal` è il primo giorno in cui la riga entra nelle sfide del giorno: vuoto per le righe che c'erano al lancio, una data ISO per quelle aggiunte dopo (vedi sotto, "Il pool delle sfide del giorno e il suo passaggio").
+
+**Le famiglie esterne.** Una riga con prefisso `eur:` o `multiscopo:` è regionale e i suoi dati vengono dal pool del quiz. Una riga con `ipr:` (Istat, indicatori provinciali), `aci:` (ACI) o `agcom:` (AGCOM) ha i dati provinciali in `app/provincial_families.py`: `game_daily.province_source` smista per famiglia (un id nudo o `bes:` è BES) e `game_daily.province_info` dà spiegazione, link e fonte, dal registro `app/sources.py` e dal manifesto della famiglia. Chi è maggiore e Ordina passano da lì, e nessuno dei due scrive più il BES a mano. Il verso `contextual` di una famiglia esterna vale come ignoto: nessun piazzamento. I flag dicono dove la riga è giocabile: `ipr` solo province, `aci` e `agcom` tutte e due, `eur` e Multiscopo solo regioni. Indovina la Provincia legge solo le righe BES (il suo indizio vuole il manifesto BES), quindi le righe esterne non gli arrivano.
+
+**Che cosa non entra.** Non sono nell'elenco, di proposito, le serie a campione piccolo (pronto soccorso, guardia medica, ricoveri, incidenti domestici, cinque porzioni, bicicletta per andare al lavoro) e quelle in cui i territori differiscono troppo poco per una domanda giusta: lo scarto fra il valore più alto e il più basso sotto il 15% della media, o per le percentuali sotto i dieci punti (andare al lavoro a piedi, incontrare gli amici ogni giorno, colazione adeguata, ore lavorate, speranza di vita a 65 anni, età della madre al parto). `tests/integration/test_game_pool_esteso.py` tiene l'elenco delle escluse e la soglia.
 
 Per **Indovina la Provincia** l'indicatore è anche filtrato per copertura: entra solo se ha un valore per tutte le province nell'ultimo anno (`EXPECTED_PROVINCES`) e l'ultimo anno non è prima di `MIN_YEAR` (`game_provincia.allowed_clues`). Chi è maggiore e Ordina chiedono solo abbastanza valori distinti fra i territori in gioco (`game_daily._candidates`).
 
@@ -65,6 +71,19 @@ Cose da non fare:
 - **Non spostare `SEED_CUTOVER` indietro** a un giorno già servito: cambierebbe la soluzione di un giorno che qualcuno ha già giocato o salvato.
 - **Non fissarlo prima del rilascio.** Si fissa nell'ultimo commit prima del merge, al **giorno del deploy più uno**: fra la data scritta e il merge la produzione serve ancora il codice vecchio, e un cutover anticipato darebbe a quei giorni soluzioni diverse da quelle servite. Finché nel codice c'è il segnaposto del 2099 il rilascio non è fatto.
 - **Non cambiarlo dopo il rilascio.** Una volta fissato resta lì per sempre. `tests/unit/test_game_daily.py` guarda che sia dopo il lancio e che i giorni prima producano le soluzioni di prima.
+
+### Il pool delle sfide del giorno e il suo passaggio
+
+`game_daily._candidates` ordina le righe dell'elenco curato per `id` e le **mescola con il seed del giorno**: l'indicatore di una sfida dipende dall'ordine e dalla dimensione del pool, non solo dal seed. Aggiungere anche una sola riga cambia l'indicatore di ogni giorno, compresi quelli già serviti, giocati e condivisi. Per questo le righe aggiunte dopo il lancio portano `dal` e `_candidates` le include solo dal giorno `POOL_CUTOVER`, il 4 ottobre 2026 (il giorno del deploy più uno, come `SEED_CUTOVER`). **I giorni fino al 3 ottobre 2026 usano il pool di prima, riga per riga**, e dal 4 ottobre il pool esteso.
+
+La prova è `tests/integration/test_game_pool_esteso.py`: tiene l'elenco delle righe di prima (con i loro flag) e l'impronta della sfida di ogni giorno dal lancio al 3 ottobre 2026, calcolate sul commit `b7dd6d98` con una chiave di prova, e le confronta con quello che il codice produce oggi. Prova anche che il merge dei dati nuovi non ha spostato i giorni passati: le impronte coincidono con quelle del commit prima dei dati.
+
+Cose da non fare:
+
+- **Non aggiungere una riga senza `dal`**, e non dare a una riga un `dal` anteriore a `POOL_CUTOVER`: il test lo rifiuta, perché entrerebbe nei giorni passati.
+- **Non spostare `POOL_CUTOVER` indietro** a un giorno già servito. Se il deploy slitta al 4 ottobre o dopo, la data va spostata PRIMA del merge (al giorno del deploy più uno), insieme al `dal` delle righe: fra la data scritta e il merge la produzione serve ancora il pool vecchio, e il giorno del deploy cambierebbe indicatore a metà giornata.
+- **Un'aggiunta successiva** usa una data nuova (il giorno del suo deploy più uno) nella colonna `dal`, e le impronte dei giorni serviti vanno estese a quella data: le costanti del test non si rigenerano per far passare un giorno che non torna.
+- Indovina la Provincia, la mappa e Indovina la Regione non leggono il pool della sfida: non hanno una data di passaggio.
 
 ### La storia della mappa e il test d'oro
 
@@ -296,7 +315,7 @@ Nota d'ambiente: sulla macchina di sviluppo la suite intera è caduta in segfaul
 | `app/views.py` | rotte delle pagine e delle API, limiti di frequenza, 503 senza chiave |
 | `app/__init__.py` | `noindex` della classifica (`_NOINDEX_EXACT_PATHS`) |
 | `app/page_types.py` | `/quiz` e `/gioco` hanno `page_type = "game"` |
-| `config/game_indicators.csv` | gli indicatori giocabili |
+| `config/game_indicators.csv` | gli indicatori giocabili (colonne `campionario` e `dal`) |
 | `frontend/src/game/` | l'interfaccia: `shared.jsx`, `oggi.js`, `puri.js`, `guess/`, `mappa/`, `compare.jsx`, `order.jsx`, `hub.jsx`, `leaderboard.jsx` |
 | `design/v1/tools/centroidi_province.py` | genera `app/static/data/province_centroidi.json` |
 | `design/gioco/` | il prototipo statico del sottomarchio |
