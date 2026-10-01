@@ -218,6 +218,21 @@ class PiazzamentoTest(unittest.TestCase):
         self.assertFalse(g.is_sample_survey("910", "regioni"))
         self.assertFalse(g.is_sample_survey("dem:BIRTHRATE", "regioni"))
 
+    def test_sample_surveys_without_a_prefix_come_from_the_csv(self):
+        """M8: Multiscopo (426), Forze di lavoro (57, 12, 15, 339), ICT nelle imprese
+        (72) e la poverta' relativa (631) non hanno un prefisso che lo dica: lo dice la
+        colonna `campionario` di config/game_indicators.csv."""
+        for ind_id in ("426", "57", "72", "12", "15", "339", "631"):
+            with self.subTest(id=ind_id):
+                self.assertTrue(g.is_sample_survey(ind_id, "regioni"))
+        for ind_id in ("901", "542", "279"):
+            with self.subTest(id=ind_id):
+                self.assertFalse(g.is_sample_survey(ind_id, "regioni"))
+
+    def test_an_id_outside_the_csv_is_treated_as_a_sample(self):
+        # nel dubbio la fascia, mai il numero esatto
+        self.assertTrue(g.is_sample_survey("99999", "regioni"))
+
 
 class FraseTest(SenzaDati):
     def test_error_sentence_has_names_values_unit_and_year(self):
@@ -403,6 +418,34 @@ class CompareTest(SenzaDati):
     def test_no_pair_with_a_sentence_gives_none(self):
         coppie = [self._coppia(0, _ind(unit="numero", name="Senza unita"))]
         self.assertIsNone(g.compare_fact("regioni", coppie, None, self._valuta({"Senza unita": (1.0, 9.0)})))
+
+    def test_the_widest_pair_without_a_sentence_does_not_crown_another(self):
+        """M9: la coppia con lo scarto piu' ampio non ha una frase scrivibile (unita'
+        generica): un'altra coppia non puo' dirsi "la piu' distante"."""
+        coppie = [self._coppia(0, _ind(unit="numero", name="Senza unita")), self._coppia(1), self._coppia(2)]
+        valori = {"Senza unita": (1.0, 9.0), "Indicatore 1": (10.0, 30.0), "Indicatore 2": (10.0, 11.0)}
+        fatto = g.compare_fact("regioni", coppie, None, self._valuta(valori))
+        self.assertTrue(fatto["fact"].startswith("Una coppia lontana:"), fatto)
+        self.assertIn("«indicatore 1»", fatto["fact"])
+
+    def test_the_neutral_head_never_goes_to_a_close_pair(self):
+        """La testa neutra e' per una coppia davvero lontana: fra le piu' distanti
+        della partita, non l'ultima rimasta."""
+        coppie = [self._coppia(0, _ind(unit="numero", name="Senza unita")), self._coppia(1)]
+        valori = {"Senza unita": (1.0, 9.0), "Indicatore 1": (100.0, 101.0)}
+        self.assertIsNone(g.compare_fact("regioni", coppie, None, self._valuta(valori)))
+
+    def test_opposite_signs_do_not_win_by_a_gap_above_one(self):
+        """Il saldo (923) con un valore negativo e uno positivo ha uno scarto relativo
+        sopra 1: vinceva quasi sempre. Non entra nella gara della distanza."""
+        saldo = _ind(unit="per 1.000 abitanti", name="Saldo migratorio")
+        coppie = [self._coppia(0, saldo), self._coppia(1)]
+        valori = {"Saldo migratorio": (-3.0, 4.0), "Indicatore 1": (2.0, 9.0)}
+        fatto = g.compare_fact("regioni", coppie, None, self._valuta(valori))
+        self.assertIn("«indicatore 1»", fatto["fact"])
+        self.assertNotIn("saldo", fatto["fact"])
+        # e senza la gara vinta per intero la frase non dice "la piu' distante"
+        self.assertTrue(fatto["fact"].startswith("Una coppia lontana:"), fatto)
 
     def test_a_pair_the_evaluator_refuses_is_skipped(self):
         coppie = [self._coppia(0), self._coppia(1)]

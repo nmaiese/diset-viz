@@ -343,16 +343,41 @@ class MonousoTest(Base):
 
 
 class TempoTest(Base):
-    def test_answer_after_fifteen_seconds_with_timer_is_refused(self):
+    def test_a_late_answer_is_a_miss_and_the_game_goes_on(self):
+        """A1: oltre i 12 s la risposta conta come sbagliata (come un tempo scaduto) e
+        il round si chiude, cosi' "Avanti" funziona. Prima era un 400 `late` senza
+        claim: ogni nuovo invio era di nuovo `late` e la partita non finiva piu'."""
         sessione = self._sessione()
-        coppia = sessione["questions"][0]
-        risposta = self._risponde(
-            sessione, 0, _vincitore("regioni", coppia), now=T0 + 15
-        )
-        self.assertEqual(risposta.status_code, 400)
-        self.assertEqual(risposta.get_json()["error"], "late")
-        # Rifiutata vuol dire anche senza rivelare i valori.
-        self.assertNotIn("value", json.dumps(risposta.get_json()))
+        giusta = _vincitore("regioni", sessione["questions"][0])
+        risposta = self._risponde(sessione, 0, giusta, now=T0 + 13)
+        self.assertEqual(risposta.status_code, 200)
+        corpo = risposta.get_json()
+        self.assertTrue(corpo["late"])
+        self.assertFalse(corpo["correct"])
+        self.assertEqual(corpo["choice"], "timeout")
+        self.assertEqual(corpo["score"], {"correct": 0, "total": 10})
+        self.assertEqual(corpo["session"]["streak"], 0)
+        # un secondo invio della stessa domanda e' il doppio invio di sempre
+        self.assertEqual(self._risponde(sessione, 0, giusta, now=T0 + 14).status_code, 409)
+        # e la partita prosegue: "Avanti" lega la domanda dopo, che si risponde
+        avanti = self._avanti(sessione, 0, corpo["token"], now=T0 + 14)
+        self.assertEqual(avanti.status_code, 200)
+        seconda = self._risponde(sessione, 1, _vincitore("regioni", sessione["questions"][1]),
+                                 token=avanti.get_json()["token"], now=T0 + 16)
+        self.assertEqual(seconda.status_code, 200)
+        self.assertEqual(seconda.get_json()["score"], {"correct": 1, "total": 10})
+
+    def test_a_late_answer_says_no_more_than_a_timeout(self):
+        sessione = self._sessione()
+        tardi = self._risponde(sessione, 0, "region_a", now=T0 + 13).get_json()
+        altra = self._sessione()
+        scaduta = self._risponde(altra, 0, "timeout", now=T0 + 11).get_json()
+        self.assertEqual(set(tardi) - set(scaduta), {"late"})
+        for campo in ("correct", "choice", "winner", "a", "b", "indicator", "esito", "score"):
+            self.assertEqual(tardi[campo], scaduta[campo], campo)
+        # una risposta giusta arrivata tardi non diventa l'errore del fatto di fine partita
+        stato = quiz_tokens.load_state(tardi["token"], game_compare.MODE)
+        self.assertNotIn("e", stato[game_compare.SCORE_KEY])
 
     def test_timeout_before_the_ten_seconds_does_not_count(self):
         sessione = self._sessione()
@@ -461,6 +486,15 @@ class PunteggioDelGiornoTest(Base):
         sessione = self._sessione("regioni", timer=0)
         self._gioca(sessione, "regioni")
         self.assertEqual(self._punteggi(), [])
+        # neanche i round per le serie dell'account (basso c della revisione finale)
+        from app import player_stats
+        self.assertEqual(player_stats.stats_map("uuid-compare-2")["compare"]["rounds_played"], 0)
+
+    def test_con_il_timer_i_round_contano_per_l_account(self):
+        from app import player_stats
+        self._accedi("uuid-compare-4")
+        self._gioca(self._sessione("regioni"), "regioni")
+        self.assertEqual(player_stats.stats_map("uuid-compare-4")["compare"]["rounds_played"], 10)
 
     def test_da_anonimo_non_si_registra_niente(self):
         sessione = self._sessione("regioni")
@@ -504,7 +538,8 @@ class AvantiTest(Base):
         prima = self._risponde(sessione, 0, "region_a", now=T0 + 1).get_json()
         avanti = self._avanti(sessione, 0, prima["token"], now=T0 + 6)
         tardi = self._risponde(sessione, 1, "region_a", token=avanti.get_json()["token"], now=T0 + 6 + 13)
-        self.assertEqual((tardi.status_code, tardi.get_json()["error"]), (400, "late"))
+        self.assertEqual(tardi.status_code, 200)
+        self.assertTrue(tardi.get_json()["late"])
         # Chiedere di nuovo "Avanti" con lo stesso token per azzerare l'orologio non si puo'.
         di_nuovo = self._avanti(sessione, 0, prima["token"], now=T0 + 20)
         self.assertEqual(di_nuovo.status_code, 409)

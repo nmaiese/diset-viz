@@ -84,7 +84,7 @@ class TokenChainTest(LeaderboardTestBase):
         }).get_json()
         self.assertEqual(answer["session"], {"streak": 1, "best": 1, "rounds": 1})
 
-    def test_tampered_token_yields_no_session_but_game_still_works(self):
+    def test_tampered_token_is_refused_without_values(self):
         client = app.test_client()
         round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
         values = {
@@ -99,10 +99,9 @@ class TokenChainTest(LeaderboardTestBase):
         answer = client.post("/api/game/compare/answer", json={
             "indicator_id": round_["indicator"]["id"], "year": round_["indicator"]["year"],
             "region_a_key": key_a, "region_b_key": key_b, "choice": winner, "token": tampered,
-        }).get_json()
-        self.assertTrue(answer["correct"])
-        self.assertIsNone(answer["session"])
-        self.assertIsNone(answer["token"])
+        })
+        # Senza un round legato non c'e' valutazione: il server non e' un oracolo.
+        self.assertEqual((answer.status_code, answer.get_json()), (400, {"error": "token_invalid"}))
 
     def test_fp_mismatch_across_rounds_yields_no_session(self):
         client = app.test_client()
@@ -113,8 +112,8 @@ class TokenChainTest(LeaderboardTestBase):
             "indicator_id": round_b["indicator"]["id"], "year": round_b["indicator"]["year"],
             "region_a_key": round_b["region_a"]["region_key"], "region_b_key": round_b["region_b"]["region_key"],
             "choice": "region_a", "token": round_a["token"],
-        }).get_json()
-        self.assertIsNone(answer["session"])
+        })
+        self.assertEqual((answer.status_code, answer.get_json()), (400, {"error": "token_invalid"}))
 
     def test_replaying_the_same_answer_is_rejected(self):
         client = app.test_client()

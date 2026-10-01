@@ -30,7 +30,13 @@ su giorno e livello, e il token e' gia' firmato. Un fatto per ogni risposta
 sbagliata avrebbe dato il campo prima della fine. Senza errori (o con solo tempi
 scaduti) la frase parte dalla coppia piu' distante delle dieci, per scarto
 relativo `|a-b| / max(|a|, |b|)`: le unita' cambiano da una coppia all'altra,
-quindi la distanza assoluta non si confronta.
+quindi la distanza assoluta non si confronta. "La coppia piu' distante" si scrive
+solo se e' vero: per la coppia con lo scarto piu' ampio, quando quella ha una frase
+scrivibile e tutte le dieci sono entrate nella gara. Una coppia con valori di segno
+opposto (un saldo) non entra, perche' il suo scarto relativo supera 1 e vincerebbe
+sempre, e una coppia che non si valuta non si confronta. Altrimenti la frase usa la
+testa neutra "Una coppia lontana", e solo per una coppia nella meta' piu' distante
+della partita, o non esce.
 
 **I numeri.** Vengono dai valori che la risposta gia' porta (Ordina) o dagli
 stessi `_evaluate` di Chi e' maggiore: mai un numero esterno. Si scrivono come le
@@ -52,9 +58,11 @@ che arrotondati sono uguali la frase non esce.
 tutti i territori previsti presenti (20 regioni, o le province del pool), stesso
 anno per tutti e graduatoria a pari merito (`profiles._ranks` per le regioni,
 `province_profile._graduatoria` per le province). Per gli indicatori campionari
-(BES, Multiscopo, e tutto il livello provinciale che e' BES) il numero esatto non
-si da: si scrive "fra le ultime cinque" se il territorio vi sta davvero, altrimenti
-niente.
+(la colonna `campionario` di `config/game_indicators.csv`, i prefissi BES e
+Multiscopo, e tutto il livello provinciale che e' BES) il numero esatto non si da:
+si scrive "fra le ultime cinque" se il territorio vi sta davvero, altrimenti
+niente. Al livello "stessa regione" il piazzamento non si scrive: la graduatoria e'
+sulle province d'Italia, e chi gioca la leggerebbe come della regione.
 
 **Giudizio.** Nessun verbo di causa e nessun "migliore" o "peggiore" dedotto
 dall'ordine dei numeri. La direzione serve solo al piazzamento.
@@ -199,9 +207,15 @@ def direction(ind_id, scope):
 
 
 def is_sample_survey(ind_id, scope):
-    """BES e Multiscopo sono indagini campionarie, e il livello provinciale e' tutto
-    BES: il numero esatto della posizione non regge, la fascia si'."""
-    return scope == "province" or ind_id.startswith(("bes:", "multiscopo:"))
+    """Il numero esatto della posizione non regge su un'indagine campionaria, la
+    fascia si'. Lo dice la colonna `campionario` di `config/game_indicators.csv`,
+    perche' un prefisso non basta (`426` e' Multiscopo, `57` Forze di lavoro, `72` ICT
+    nelle imprese). BES e Multiscopo restano campionari per prefisso, il livello
+    provinciale e' tutto BES, e un id che non sta nel CSV, nel dubbio, e' campionario."""
+    if scope == "province" or ind_id.startswith(("bes:", "multiscopo:")):
+        return True
+    flags = {i["id"]: i["sample_survey"] for i in game_daily.game_indicators()}
+    return flags.get(ind_id, True)
 
 
 def placement_from_values(values, key, rank_direction, is_sample, scope, expected):
@@ -227,7 +241,10 @@ def placement_from_values(values, key, rank_direction, is_sample, scope, expecte
 def placement(level, indicator, key):
     """Il piazzamento di un territorio per l'indicatore del gioco, dai dati veri.
     Si legge dalla stessa funzione che ha composto la sfida e solo se l'anno e'
-    quello del gioco."""
+    quello del gioco. Al livello "stessa regione" niente: la graduatoria e' sulle
+    province d'Italia e si leggerebbe come della regione."""
+    if level == "stessa_regione":
+        return None
     scope = "regioni" if level == "regioni" else "province"
     ind_id = indicator["id"]
     found = game_daily._indicator_rows({"id": ind_id}, scope)
@@ -245,12 +262,13 @@ def placement(level, indicator, key):
 LEAD_INS = {
     "errore": "Hai messo {a} sopra {b}: ",
     "distante": "La coppia più distante: ",
+    "lontana": "Una coppia lontana: ",
     "perfetto": "Tutto al posto giusto, con la distanza maggiore fra il primo e l'ultimo: ",
 }
 
 
 def sentence(level, indicator, case, a, b, values):
-    """La frase di un caso ("errore", "distante" o "perfetto") o None. `a` e `b` sono
+    """La frase di un caso ("errore", "distante", "lontana" o "perfetto") o None. `a` e `b` sono
     `{"name", "key", "value"}`, `valori` tutti i valori in gioco (per il rapporto).
     La relazione e' la prima cosa che salta se la frase sfora la lunghezza."""
     unit = written_unit(indicator.get("unit"))
@@ -323,8 +341,8 @@ def compare_fact(level, pairs, error_index, evaluate):
     dieci della sfida, `indice_errore` il `sfida.e` del token e `valuta(coppia,
     "region_a")` i valori veri della coppia (gli stessi `_evaluate` della risposta). Con
     un errore la frase parte da li' ("Hai messo A sopra B": A e' il piu' basso, e'
-    quello che il giocatore ha scelto), senza la coppia piu' distante per scarto
-    relativo."""
+    quello che il giocatore ha scelto), altrimenti dalla coppia piu' distante per
+    scarto relativo (`_widest_fact`)."""
     if isinstance(error_index, int) and 0 <= error_index < len(pairs):
         outcome = evaluate(pairs[error_index], "region_a")
         if outcome is not None:
@@ -333,22 +351,42 @@ def compare_fact(level, pairs, error_index, evaluate):
                             _compare_row(low), _compare_row(high), [high["value"], low["value"]])
             if text:
                 return {"fact": text, "path": outcome["indicator"].get("path")}
-    best = None
+    return _widest_fact(level, pairs, evaluate)
+
+
+def _widest_fact(level, pairs, evaluate):
+    """La frase sulla coppia piu' distante, o None. Prima la gara, poi la frase: la
+    coppia con lo scarto relativo piu' ampio e' "la piu' distante" solo se ha una frase
+    scrivibile e se tutte le coppie sono entrate nella gara. Escono dalla gara una
+    coppia che non si valuta (non si sa quanto e' distante) e una con valori di segno
+    opposto (lo scarto relativo supera 1: il saldo vincerebbe sempre). Altrimenti
+    "Una coppia lontana", per la prima scrivibile nella meta' piu' distante delle
+    coppie in gara: mai l'ultima rimasta, che lontana puo' non esserlo."""
+    ranked, complete = [], True
     for pair in pairs:
         outcome = evaluate(pair, "region_a")
         if outcome is None:
+            complete = False
             continue
         high, low = sorted((outcome["a"], outcome["b"]), key=lambda t: t["value"], reverse=True)
+        if high["value"] > 0 > low["value"]:
+            complete = False
+            continue
         maximum = max(abs(high["value"]), abs(low["value"]))
-        if maximum == 0:
-            continue
-        gap = (high["value"] - low["value"]) / maximum
-        if best is not None and gap <= best[0]:
-            continue
-        text = sentence(level, pair["indicator"], "distante", _compare_row(high), _compare_row(low),
+        gap = 0.0 if maximum == 0 else (high["value"] - low["value"]) / maximum
+        ranked.append((gap, pair, outcome, high, low))
+    if not ranked:
+        return None
+    # A pari scarto vince la prima coppia della partita (l'ordinamento e' stabile). La
+    # meta' piu' distante comprende chi e' a pari merito con l'ultima che ci sta.
+    ranked.sort(key=lambda r: -r[0])
+    cutoff = ranked[(len(ranked) + 1) // 2 - 1][0]
+    for position, (gap, pair, outcome, high, low) in enumerate(r for r in ranked if r[0] >= cutoff):
+        if gap == 0:
+            break
+        case = "distante" if position == 0 and complete else "lontana"
+        text = sentence(level, pair["indicator"], case, _compare_row(high), _compare_row(low),
                         [high["value"], low["value"]])
         if text:
-            best = (gap, text, outcome["indicator"].get("path"))
-    if best is None:
-        return None
-    return {"fact": best[1], "path": best[2]}
+            return {"fact": text, "path": outcome["indicator"].get("path")}
+    return None

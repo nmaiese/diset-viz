@@ -228,18 +228,19 @@ class ModalitaDelGiornoTest(Base):
         r = client.get("/api/game/order/round?count=5&token=" + order["token"]).get_json()
         self.assertNotEqual(quiz_tokens.load_state(r["token"], "order")["sid"], sid_order)
 
-    def test_le_risposte_a_serie_non_contano_il_token_della_sfida_del_giorno(self):
+    def test_le_risposte_a_serie_non_valutano_la_sfida_del_giorno(self):
+        """M2: il round a serie non e' un oracolo per le coppie e le cinquine della
+        sfida del giorno, che la sessione mostra tutte in chiaro."""
         client, compare, order = self._sessioni()
         r = client.post("/api/game/order/answer", json={
             "token": order["token"], "indicator_id": order["indicator"]["id"], "year": order["indicator"]["year"],
             "region_keys": [t["key"] for t in order["territories"]]})
-        corpo = r.get_json()
-        self.assertIsNone(corpo.get("session"))
+        self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
         q = compare["questions"][0]
         r = client.post("/api/game/compare/answer", json={
             "token": compare["token"], "indicator_id": q["indicator"]["id"], "year": q["indicator"]["year"],
             "region_a_key": q["a"]["key"], "region_b_key": q["b"]["key"], "choice": "region_a"})
-        self.assertIsNone(r.get_json().get("session"))
+        self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
 
     def test_la_sessione_del_giorno_di_ordina_non_riprende_un_token(self):
         client, _, order = self._sessioni()
@@ -257,9 +258,10 @@ class ModalitaDelGiornoTest(Base):
 
 
 class RoundASerieTest(Base):
-    """R1 punti 6 e 7: senza un round legato la risposta si valuta (il dato e'
-    pubblico) ma non conta per la serie ne' per l'account, e un nuovo /round con un
-    round ancora aperto conta quel round come sbagliato."""
+    """R1 punti 6 e 7, e M2 della revisione finale: senza un round legato la risposta
+    e' un 400 senza valori (prima si valutava e basta, ed era un oracolo), e un nuovo
+    /round con un round ancora aperto, o un secondo /round con lo stesso token gia'
+    risposto, azzera la serie."""
 
     def _corpo(self, round_, scelta=None):
         return {"token": round_["token"], "indicator_id": round_["indicator"]["id"],
@@ -267,18 +269,19 @@ class RoundASerieTest(Base):
                 "region_b_key": round_["region_b"]["region_key"], "choice": scelta or "region_a"}
 
     def _giusta(self, client, round_):
-        senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
-        return "region_a" if client.post("/api/game/compare/answer", json=senza).get_json()["correct"] else "region_b"
+        return _winner(round_)
 
-    def test_la_risposta_senza_token_valuta_ma_non_conta_per_la_serie(self):
+    def test_la_risposta_senza_token_e_un_400_senza_valori(self):
         client = app.test_client()
         round_ = client.get("/api/game/compare/round").get_json()
         senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
         r = client.post("/api/game/compare/answer", json=senza)
-        self.assertEqual(r.status_code, 200)
-        corpo = r.get_json()
-        self.assertIsNone(corpo["session"])
-        self.assertIsNone(corpo["token"])
+        self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
+        # un token gia' risposto non lega piu' niente: neanche lui e' un oracolo
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            risposta = client.post("/api/game/compare/answer", json=self._corpo(round_, _winner(round_)))
+        r = client.post("/api/game/compare/answer", json={**senza, "token": risposta.get_json()["token"]})
+        self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
 
     def test_la_risposta_senza_round_legato_non_conta_per_l_account(self):
         client = app.test_client()
@@ -286,13 +289,36 @@ class RoundASerieTest(Base):
         senza = {k: v for k, v in self._corpo(round_).items() if k != "token"}
         intest = {"Authorization": "Bearer " + _jwt("oracolo-1")}
         for _ in range(3):
-            client.post("/api/game/compare/answer", json=senza, headers=intest)
+            self.assertEqual(client.post("/api/game/compare/answer", json=senza, headers=intest).status_code, 400)
         self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 0)
         # e la risposta a un round legato si': un round, e le statistiche lo vedono
         scelta = self._giusta(client, round_)
         with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
             client.post("/api/game/compare/answer", json=self._corpo(round_, scelta), headers=intest)
         self.assertEqual(player_stats.stats_map("oracolo-1")["compare"]["rounds_played"], 1)
+
+    def test_l_allenamento_senza_timer_non_conta_per_le_serie_dell_account(self):
+        """Basso (c): senza timer la serie si allunga senza limite di tempo, quindi un
+        round di allenamento non entra nelle statistiche che sbloccano "In serie"."""
+        client = app.test_client()
+        intest = {"Authorization": "Bearer " + _jwt("allenamento-1")}
+        round_ = client.get("/api/game/compare/round?timer=0").get_json()
+        r = client.post("/api/game/compare/answer", json=self._corpo(round_, _winner(round_)), headers=intest)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.get_json()["correct"])
+        self.assertIn("achievements", r.get_json())
+        self.assertEqual(player_stats.stats_map("allenamento-1")["compare"]["rounds_played"], 0)
+        round_ = client.get("/api/game/order/round?count=3&timer=0").get_json()
+        r = client.post("/api/game/order/answer", headers=intest, json={
+            "token": round_["token"], "indicator_id": round_["indicator"]["id"],
+            "year": round_["indicator"]["year"], "region_keys": [x["region_key"] for x in round_["regions"]]})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(player_stats.stats_map("allenamento-1")["order"]["rounds_played"], 0)
+        # con il timer si conta, come prima
+        round_ = client.get("/api/game/compare/round").get_json()
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            client.post("/api/game/compare/answer", json=self._corpo(round_, _winner(round_)), headers=intest)
+        self.assertEqual(player_stats.stats_map("allenamento-1")["compare"]["rounds_played"], 1)
 
     def test_ordina_senza_token_non_conta_per_l_account(self):
         client = app.test_client()
@@ -301,8 +327,7 @@ class RoundASerieTest(Base):
                  "region_keys": [r["region_key"] for r in round_["regions"]]}
         intest = {"Authorization": "Bearer " + _jwt("oracolo-2")}
         r = client.post("/api/game/order/answer", json=corpo, headers=intest)
-        self.assertEqual(r.status_code, 200)
-        self.assertIsNone(r.get_json()["session"])
+        self.assertEqual((r.status_code, r.get_json()), (400, {"error": "token_invalid"}))
         self.assertEqual(player_stats.stats_map("oracolo-2")["order"]["rounds_played"], 0)
 
     def test_il_reroll_di_compare_azzera_la_serie_e_chiude_il_round_aperto(self):
@@ -337,6 +362,45 @@ class RoundASerieTest(Base):
         self.assertEqual(risposta["session"]["streak"], 1)
         r1 = client.get("/api/game/compare/round?token=" + risposta["token"]).get_json()
         self.assertEqual(quiz_tokens.load_state(r1["token"], "compare")["s"], 1)
+
+    def test_chiavi_che_non_sono_stringhe_con_un_token_legato_sono_un_400(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/compare/round").get_json()
+        r = client.post("/api/game/compare/answer", json={**self._corpo(r0), "region_b_key": None})
+        self.assertEqual(r.status_code, 400)
+        o = client.get("/api/game/order/round?count=3").get_json()
+        r = client.post("/api/game/order/answer", json={
+            "token": o["token"], "indicator_id": o["indicator"]["id"], "year": o["indicator"]["year"],
+            "region_keys": [1, "a", None]})
+        self.assertEqual(r.status_code, 400)
+
+    def test_rimandare_il_token_risposto_e_un_reroll(self):
+        """M1: il token tornato da una risposta, mandato a /round piu' volte, dava ogni
+        volta una domanda nuova con la serie intatta. Ora solo il primo round la tiene."""
+        client = app.test_client()
+        r0 = client.get("/api/game/compare/round").get_json()
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            risposta = client.post("/api/game/compare/answer", json=self._corpo(r0, _winner(r0))).get_json()
+        self.assertEqual(risposta["session"]["streak"], 1)
+        serie = [quiz_tokens.load_state(
+            client.get("/api/game/compare/round?token=" + risposta["token"]).get_json()["token"], "compare")["s"]
+            for _ in range(5)]
+        self.assertEqual(serie, [1, 0, 0, 0, 0])
+        # la domanda di un'emissione ripetuta non vale piu' di una nuova serie
+        ripetuto = client.get("/api/game/compare/round?token=" + risposta["token"]).get_json()
+        with mock.patch.object(quiz_tokens, "_now", return_value=time.time() + 3):
+            fine = client.post("/api/game/compare/answer", json=self._corpo(ripetuto, _winner(ripetuto))).get_json()
+        self.assertEqual((fine["session"]["streak"], fine["session"]["best"]), (1, 1))
+
+    def test_rimandare_il_token_risposto_e_un_reroll_anche_in_ordina(self):
+        client = app.test_client()
+        r0 = client.get("/api/game/order/round?count=3").get_json()
+        stato = {**quiz_tokens.load_state(r0["token"], "order"), "s": 4, "b": 4, "fp": None}
+        risposto = quiz_tokens.sign_state(stato)
+        serie = [quiz_tokens.load_state(
+            client.get("/api/game/order/round?count=3&token=" + risposto).get_json()["token"], "order")["s"]
+            for _ in range(3)]
+        self.assertEqual(serie, [4, 0, 0])
 
 
 class SenzaMigrazione0010Test(Base):
@@ -492,6 +556,52 @@ class StoreTest(Base):
 
 
 class AnswerRateLimitTest(Base):
+    def test_ip_limit_on_rounds_and_on_the_daily_compare_session(self):
+        """M3: /round scrive nel DB (`claim_round`) e non aveva limite, come l'apertura
+        della sfida del giorno di Chi e' maggiore."""
+        for rotta in ("/api/game/compare/round", "/api/game/order/round?count=3",
+                      "/api/game/compare/daily/session?level=regioni"):
+            with self.subTest(rotta=rotta):
+                _clear_buckets()
+                client = app.test_client()
+                codes = [client.get(rotta).status_code for _ in range(121)]
+                self.assertEqual(codes[:120], [200] * 120)
+                self.assertEqual(codes[120], 429)
+
+    def test_ipv6_clients_share_the_bucket_of_their_64(self):
+        """Un client IPv6 ruota gli indirizzi dentro il suo /64: il secchio e' il /64."""
+        client = app.test_client()
+        codes = [client.post("/api/game/order/answer", json={},
+                             environ_base={"REMOTE_ADDR": f"2001:db8:1:2::{i:x}"}).status_code
+                 for i in range(1, 122)]
+        self.assertEqual(codes[120], 429)
+        altro = client.post("/api/game/order/answer", json={},
+                            environ_base={"REMOTE_ADDR": "2001:db8:1:3::1"})
+        self.assertEqual(altro.status_code, 400)
+        cache.delete("rl:ans:ip:2001:db8:1:2::/64")
+        cache.delete("rl:ans:ip:2001:db8:1:3::/64")
+
+    def test_the_sid_bucket_exists_only_for_a_valid_token(self):
+        """Un token non valido non crea una chiave `rl:ans:sid:<casuale>`: in cache
+        quelle chiavi spingevano fuori i secchi per IP."""
+        from app import views
+        client = app.test_client()
+        rotte = (("/api/game/compare/answer", "compare"), ("/api/game/order/answer", "order"),
+                 ("/api/game/compare/daily/answer", "compare_daily"),
+                 ("/api/game/compare/daily/next", "compare_daily"),
+                 ("/api/game/order/daily/answer", "order_daily"),
+                 ("/api/game/map/daily/answer", "mappa_daily"))
+        for rotta, modo in rotte:
+            with self.subTest(rotta=rotta):
+                with mock.patch.object(views, "_rate_limit_ok", wraps=views._rate_limit_ok) as limite:
+                    client.post(rotta, json={"token": "rotto"})
+                    client.post(rotta, json={})
+                self.assertFalse([c for c in limite.call_args_list if c.args[0].startswith("ans:sid:")])
+                stato = quiz_tokens.new_state(modo)
+                with mock.patch.object(views, "_rate_limit_ok", wraps=views._rate_limit_ok) as limite:
+                    client.post(rotta, json={"token": quiz_tokens.sign_state(stato)})
+                self.assertIn(f"ans:sid:{stato['sid']}", [c.args[0] for c in limite.call_args_list])
+
     def test_ip_limit_on_answers(self):
         client = app.test_client()
         codes = [client.post("/api/game/order/answer", json={}).status_code for _ in range(121)]

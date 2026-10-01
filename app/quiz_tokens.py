@@ -81,21 +81,36 @@ def new_state(mode, timer=True):
     }
 
 
+def _decode(token, mode):
+    """Lo stato firmato di un token di questa modalità, o None se manca, è
+    scaduto, manomesso, di un'altra versione o di un'altra modalità."""
+    if not token or not isinstance(token, str):
+        return None
+    try:
+        data = _serializer().loads(token, max_age=_MAX_AGE_S)
+    except BadData:
+        return None
+    if not isinstance(data, dict) or not _REQUIRED_KEYS.issubset(data.keys()):
+        return None
+    if data.get("v") != _VERSION or data.get("m") != mode:
+        return None
+    return data
+
+
 def load_state(token, mode, timer=True):
     """Decodifica un token del client, o apre una sessione nuova se manca,
     è scaduto, manomesso, di un'altra versione o di un'altra modalità. `timer`
     conta solo quando la sessione si apre: un token valido porta il suo."""
-    if not token or not isinstance(token, str):
-        return new_state(mode, timer)
-    try:
-        data = _serializer().loads(token, max_age=_MAX_AGE_S)
-    except BadData:
-        return new_state(mode, timer)
-    if not isinstance(data, dict) or not _REQUIRED_KEYS.issubset(data.keys()):
-        return new_state(mode, timer)
-    if data.get("v") != _VERSION or data.get("m") != mode:
-        return new_state(mode, timer)
-    return data
+    data = _decode(token, mode)
+    return data if data is not None else new_state(mode, timer)
+
+
+def signed_sid(token, mode):
+    """Il `sid` di un token valido di questa modalità, o None. Serve al limite di
+    frequenza per sessione: un token non valido non deve creare un secchio con un
+    `sid` casuale (ogni richiesta una chiave nuova in cache)."""
+    data = _decode(token, mode)
+    return None if data is None else data["sid"]
 
 
 def peek_state(token):
@@ -150,12 +165,32 @@ def close_open_round(state):
     return {**state, "s": 0, "r": state["r"] + 1, "fp": None, "x": None, "iat": None, "n": None}
 
 
+def open_round(state):
+    """Lo stato da cui emettere il prossimo round a serie (`/round`). Due casi sono un
+    reroll e azzerano la serie: un round ancora aperto (`close_open_round`) e un
+    secondo round chiesto con lo stesso token gia' risposto. Il secondo caso prima
+    passava: il token tornato da una risposta (`fp` nullo), mandato a `/round` piu'
+    volte, dava ogni volta una domanda nuova con la serie intatta. Ora l'emissione del
+    round `q + 1` si segna come `(sid, -(q + 1))`, la stessa forma di "Avanti" nella
+    sfida del giorno, e dalla seconda in poi la serie riparte da zero. Il primo round
+    emesso resta rispondibile: chi cambia domanda non tiene la serie, e basta. Senza
+    il DB `claim_round` fallisce aperto e il controllo non c'e'."""
+    state = close_open_round(state)
+    if not claim_round(state["sid"], -(state["q"] + 1)):
+        state = {**state, "s": 0}
+    return state
+
+
 def apply_answer(state, indicator_id, year, region_keys, correct):
     """Valida che la risposta corrisponda al round legato dal fingerprint,
     poi aggiorna streak/record/round giocati. Ritorna (session, token) o
     (None, None) se il token è assente, manomesso o non lega a questa
     risposta (il gioco resta comunque giocabile, solo senza classifica)."""
     if state.get("fp") is None:
+        return None, None
+    # Le chiavi arrivano dal corpo della richiesta: una che non e' una stringa non
+    # lega niente (e non deve far cadere l'ordinamento dell'impronta).
+    if not all(isinstance(k, str) for k in region_keys):
         return None, None
     expected = _fingerprint(state["m"], state["sid"], state["q"], indicator_id, year, region_keys,
                             state.get("x"), state.get("n"))

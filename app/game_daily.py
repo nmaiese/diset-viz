@@ -15,8 +15,11 @@ in avanti le soluzioni escono da `HMAC(GAME_SEED_KEY, "<gioco>|<data>")`, con un
 chiave che non sta nel repo. Le date PRECEDENTI al passaggio tengono il seed
 vecchio, cosi' l'archivio e il `localStorage` per `puzzleId` restano coerenti.
 
-    RUOTARE `GAME_SEED_KEY` CAMBIA LE SFIDE FUTURE (dal cutover in poi) e mai le
-    passate. Va fatto solo di proposito, e mai a meta' giornata: chi ha gia'
+    RUOTARE `GAME_SEED_KEY` CAMBIA TUTTE LE SFIDE DAL CUTOVER IN POI, ANCHE QUELLE
+    GIA' GIOCATE: ogni giorno dal cutover si ricalcola con la chiave corrente, quindi
+    l'archivio cambia insieme alle sfide future, e i risultati salvati per data non
+    corrispondono piu' alla sfida che si rivede. Restano uguali solo i giorni prima
+    del cutover. Va fatto solo di proposito, e mai a meta' giornata: chi ha gia'
     giocato oggi vedrebbe un'altra soluzione ricaricando la pagina.
 
 Senza la variabile d'ambiente si usa `DEV_SEED_KEY`, che e' scritta qui e
@@ -36,7 +39,12 @@ rivelano mai un valore. Come si valutano le risposte non e' qui.
 regionale del quiz (`105`, `bes:10AMB009`, `multiscopo:...`) quando
 `livello_regione` e' 1, oppure l'id BES delle province (`04BEC001P`) quando
 l'indicatore esiste solo a livello provinciale. Con `livello_provincia` 1 i dati
-provinciali si leggono sotto l'id senza il prefisso `bes:`.
+provinciali si leggono sotto l'id senza il prefisso `bes:`. `campionario` e' 1 per
+le serie che vengono da un'indagine campionaria, e nel dubbio: il fatto di fine
+partita (`game_facts.is_sample_survey`) allora non scrive la posizione esatta. Il
+prefisso non basta a dirlo: `426` e' Multiscopo, `57` Forze di lavoro, `72` ICT
+nelle imprese, e nessuno dei tre ha un prefisso. Le righe `bes:`, `multiscopo:` e
+quelle solo provinciali (BES) sono tutte 1. Una riga senza il valore conta come 1.
 """
 
 from __future__ import annotations
@@ -250,7 +258,7 @@ def distance_km_direction(a, b):
 
 @lru_cache(maxsize=1)
 def game_indicators():
-    """Le righe di `config/game_indicators.csv`, con i due flag come bool."""
+    """Le righe di `config/game_indicators.csv`, con i flag come bool."""
     with GAMES_CSV.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle, delimiter=";"))
     return tuple(
@@ -262,6 +270,8 @@ def game_indicators():
             "regione": r["livello_regione"] == "1",
             "provincia": r["livello_provincia"] == "1",
             "note": r["note"],
+            # Nel dubbio campionario: una riga senza il valore non da' la posizione esatta.
+            "sample_survey": (r.get("campionario") or "").strip() != "0",
         }
         for r in rows
     )

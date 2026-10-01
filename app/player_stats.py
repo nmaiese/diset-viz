@@ -63,10 +63,14 @@ def record_quiz_answer(auth_id, mode, correct, best_streak):
 
 def _iso_days(dates):
     """Le date ISO distinte, in ordine. Le righe storiche di `daily_results` con il
-    `puzzle_id` intero (`daily:2026-...`, `practice-...`) e ogni altra stringa non ISO
-    si ignorano: una sola riga cosi' non deve far cadere le statistiche dell'account."""
+    `puzzle_id` intero della sfida del giorno (`daily:2026-...`: su master le sconfitte
+    sono rimaste salvate cosi') valgono per il loro giorno. Ogni altra stringa non ISO
+    (`practice-...`) si ignora: una sola riga cosi' non deve far cadere le statistiche
+    dell'account."""
     unique_days = set()
     for d in dates:
+        if isinstance(d, str) and d.startswith("daily:"):
+            d = d[len("daily:"):]
         try:
             unique_days.add(date.fromisoformat(d))
         except (TypeError, ValueError):

@@ -35,6 +35,41 @@ def _controlla_frase(test, testo, contesto=""):
     test.assertEqual(len(re.findall(r"\.(?!\d)", testo)), 1, f"{contesto}: {testo}")
 
 
+def _cifre(testo):
+    """Le due cifre della frase ("... A ha 74,3%, B ha 1.234 euro"), come
+    (valore, decimali scritti)."""
+    cifre = []
+    for scritta in re.findall(r" ha (-?[\d.]+(?:,\d+)?)", testo):
+        intera, _, decimali = scritta.partition(",")
+        cifre.append((float(intera.replace(".", "") + ("." + decimali if decimali else "")), len(decimali)))
+    return cifre
+
+
+def _controlla_cifre(test, testo, valori, contesto=""):
+    """Le due cifre della frase sono due dei valori veri, arrotondati come scritti."""
+    cifre = _cifre(testo)
+    test.assertEqual(len(cifre), 2, f"{contesto}: {testo}")
+    usati = []
+    for cifra, decimali in cifre:
+        tolleranza = 0.5 * 10 ** -decimali + 1e-9
+        vicini = [v for v in valori if abs(v - cifra) <= tolleranza and v not in usati]
+        test.assertTrue(vicini, f"{contesto}: {cifra} non e' fra {valori}: {testo}")
+        usati.append(vicini[0])
+
+
+def _coppia_del_fatto(coppie, testo):
+    """La coppia di cui parla la frase: quella con il nome dell'indicatore fra le
+    virgolette basse e il suo anno."""
+    trovate = [c for c in coppie if f"«{numfmt.lower_first(c['indicator']['name'])}» ({c['indicator']['year']})" in testo]
+    return trovate[0] if len(trovate) == 1 else None
+
+
+def _scarto(coppia, valuta):
+    esito = valuta(coppia, "region_a")
+    a, b = esito["a"]["value"], esito["b"]["value"]
+    return abs(a - b) / max(abs(a), abs(b)), (a, b)
+
+
 class OrdinaPayloadTest(unittest.TestCase):
     def setUp(self):
         self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
@@ -78,6 +113,8 @@ class OrdinaPayloadTest(unittest.TestCase):
         # il fatto parla dell'indicatore e dell'anno della sfida
         self.assertIn(str(sessione["indicator"]["year"]), corpo["fact"])
         self.assertIn(numfmt.lower_first(sessione["indicator"]["name"]), corpo["fact"])
+        # le cifre della frase sono i `value` dello stesso payload
+        _controlla_cifre(self, corpo["fact"], [p["value"] for p in corpo["positions"]], "regioni")
 
     def test_the_fact_on_a_mistake_starts_from_the_players_error(self):
         _, risposta = self._gioca("regioni", ordine=lambda chiavi, s: chiavi)
@@ -163,12 +200,29 @@ class CompareFattoTest(Base):
                     self.assertNotIn("fact", corpo)
                     self.assertNotIn("fatto", corpo)
 
+    def _vera(self, sessione, risposte, testo, livello="regioni"):
+        """La frase di una partita senza errori dice il vero: le cifre sono i valori
+        della coppia di cui parla (letti dalle risposte della stessa partita), e "la
+        coppia piu' distante" e' davvero quella con lo scarto relativo piu' ampio."""
+        coppia = _coppia_del_fatto(sessione["questions"], testo)
+        self.assertIsNotNone(coppia, testo)
+        risposta = risposte[coppia["index"]]
+        _controlla_cifre(self, testo, [risposta["a"]["value"], risposta["b"]["value"]], livello)
+        if testo.startswith("La coppia più distante:"):
+            scarti = [abs(r["a"]["value"] - r["b"]["value"]) / max(abs(r["a"]["value"]), abs(r["b"]["value"]))
+                      for r in risposte]
+            a, b = risposta["a"]["value"], risposta["b"]["value"]
+            self.assertEqual(abs(a - b) / max(abs(a), abs(b)), max(scarti), testo)
+            self.assertFalse(any(r["a"]["value"] * r["b"]["value"] < 0 for r in risposte), testo)
+        else:
+            self.assertTrue(testo.startswith("Una coppia lontana:"), testo)
+
     def test_the_last_answer_has_the_fact_in_the_summary(self):
         sessione, risposte = self._partita("regioni")
         riassunto = risposte[-1]["summary"]
         self.assertIn("fact", riassunto)
         _controlla_frase(self, riassunto["fact"], "regioni")
-        self.assertTrue(riassunto["fact"].startswith("La coppia più distante:"), riassunto["fact"])
+        self._vera(sessione, risposte, riassunto["fact"])
         self.assertTrue(riassunto["fact_path"].startswith("/"), riassunto["fact_path"])
 
     def test_the_first_mistake_is_the_one_the_fact_talks_about(self):
@@ -179,6 +233,7 @@ class CompareFattoTest(Base):
         self.assertTrue(fatto.startswith("Hai messo "), fatto)
         self.assertIn(numfmt.lower_first(coppia["indicator"]["name"]), fatto)
         self.assertIn(str(coppia["indicator"]["year"]), fatto)
+        _controlla_cifre(self, fatto, [risposte[3]["a"]["value"], risposte[3]["b"]["value"]], "regioni")
 
     def test_the_mistake_lives_in_the_signed_token_not_in_the_body(self):
         _, risposte = self._partita("regioni", sbagliate=(3,))
@@ -195,9 +250,10 @@ class CompareFattoTest(Base):
         self.assertNotIn("e", stato[game_compare.SCORE_KEY])
 
     def test_only_timeouts_fall_back_to_the_widest_pair(self):
-        _, risposte = self._partita("regioni", scadute=(1, 4))
+        sessione, risposte = self._partita("regioni", scadute=(1, 4))
         fatto = risposte[-1]["summary"]["fact"]
-        self.assertTrue(fatto.startswith("La coppia più distante:"), fatto)
+        self.assertFalse(fatto.startswith("Hai messo "), fatto)
+        self._vera(sessione, risposte, fatto)
         stato = quiz_tokens.load_state(risposte[4]["token"], game_compare.MODE)
         self.assertNotIn("e", stato[game_compare.SCORE_KEY])
 
@@ -282,16 +338,39 @@ class CicloSulPoolTest(unittest.TestCase):
 
     def test_the_real_daily_puzzles_of_two_weeks(self):
         """Le sfide vere dei prossimi quattordici giorni, con i valori che la risposta
-        porterebbe: Ordina come la vista, Chi e' maggiore con `_evaluate` vero."""
+        porterebbe: Ordina come la vista, Chi e' maggiore con `_evaluate` vero. La
+        frase c'e' per la maggioranza delle partite e le sue cifre sono i valori veri
+        della coppia (o della cinquina) di cui parla."""
+        partite = {"compare_errore": 0, "compare_perfetta": 0, "ordina": 0}
+        trovate = dict.fromkeys(partite, 0)
         for giorno_n in range(14):
             giorno = date.fromordinal(GIORNO.toordinal() + giorno_n)
             for livello in LIVELLI:
                 contesto = f"{giorno} {livello}"
                 coppie = game_daily.daily_compare(giorno, livello)["pairs"]
-                fatto = game_facts.compare_fact(
-                    livello, coppie, 0, lambda c, s, livello=livello: game_compare._evaluate(c, livello, s))
-                if fatto is not None:
-                    _controlla_frase(self, fatto["fact"], f"compare {contesto}")
+
+                def valuta(c, s, livello=livello):
+                    return game_compare._evaluate(c, livello, s)
+
+                for caso, errore in (("compare_errore", 0), ("compare_perfetta", None)):
+                    partite[caso] += 1
+                    fatto = game_facts.compare_fact(livello, coppie, errore, valuta)
+                    if fatto is None:
+                        continue
+                    trovate[caso] += 1
+                    testo = fatto["fact"]
+                    _controlla_frase(self, testo, f"compare {contesto}")
+                    coppia = _coppia_del_fatto(coppie, testo)
+                    self.assertIsNotNone(coppia, testo)
+                    scarto, valori = _scarto(coppia, valuta)
+                    _controlla_cifre(self, testo, list(valori), f"compare {contesto}")
+                    if testo.startswith("Hai messo "):
+                        self.assertIs(coppia, coppie[0], testo)
+                    if testo.startswith("La coppia più distante:"):
+                        scarti = [_scarto(c, valuta) for c in coppie]
+                        self.assertFalse(any(a * b < 0 for _, (a, b) in scarti), testo)
+                        self.assertEqual(scarto, max(s for s, _ in scarti), testo)
+                partite["ordina"] += 1
                 puzzle = game_daily.daily_order(giorno, livello)
                 ambito = "regioni" if livello == "regioni" else "province"
                 anno, righe = game_daily._indicator_rows(puzzle["indicator"], ambito)
@@ -301,7 +380,93 @@ class CicloSulPoolTest(unittest.TestCase):
                 giusto = sorted(mosse, key=lambda r: -r["value"])
                 fatto = game_facts.order_fact(livello, puzzle["indicator"], mosse, giusto)
                 if fatto is not None:
+                    trovate["ordina"] += 1
                     _controlla_frase(self, fatto, f"ordina {contesto}")
+                    _controlla_cifre(self, fatto, [m["value"] for m in mosse], f"ordina {contesto}")
+        for caso in partite:
+            with self.subTest(caso=caso):
+                self.assertGreater(trovate[caso], partite[caso] / 2, trovate)
+
+
+class FattiVeriTest(unittest.TestCase):
+    """M8 della revisione finale, sui dati veri e senza mock del piazzamento."""
+
+    @staticmethod
+    def _indicatore(ind_id, ambito="regioni"):
+        anno, righe = game_daily._indicator_rows({"id": ind_id}, ambito)
+        return {"id": ind_id, "year": anno}, {r["key"]: r["value"] for r in righe}
+
+    def test_the_exact_place_is_the_real_ranking(self):
+        """Speranza di vita (910): non campionaria, direzione curata (piu' alto e'
+        meglio). Il piazzamento di ogni regione e' quello di un ordinamento dei valori
+        fatto qui, a pari merito come la graduatoria del sito."""
+        self.assertFalse(game_facts.is_sample_survey("910", "regioni"))
+        indicatore, valori = self._indicatore("910")
+        self.assertEqual(len(valori), 20)
+        for chiave, valore in valori.items():
+            posto = 1 + sum(1 for v in valori.values() if v > valore)
+            with self.subTest(regione=chiave):
+                self.assertEqual(game_facts.placement("regioni", indicatore, chiave), f"{posto}ª su 20")
+
+    def test_sample_surveys_never_give_the_exact_place(self):
+        """Multiscopo (426), Forze di lavoro (57) e ICT nelle imprese (72): solo la
+        fascia, e solo per chi sta davvero fra le ultime cinque."""
+        for ind_id in ("426", "57", "72"):
+            indicatore, valori = self._indicatore(ind_id)
+            direzione = game_facts.direction(ind_id, "regioni")
+            self.assertIsNotNone(direzione, ind_id)
+            fascia = 0
+            for chiave, valore in valori.items():
+                meglio = (lambda v: v > valore) if direzione == "higher_better" else (lambda v: v < valore)
+                posto = 1 + sum(1 for v in valori.values() if meglio(v))
+                testo = game_facts.placement("regioni", indicatore, chiave)
+                with self.subTest(id=ind_id, regione=chiave):
+                    self.assertEqual(testo, "fra le ultime cinque" if posto >= 16 else None)
+                fascia += testo is not None
+            self.assertGreaterEqual(fascia, 5, ind_id)
+
+    def test_same_region_level_writes_no_place(self):
+        """Al livello `stessa_regione` il piazzamento si calcolava sulle 107 province
+        e si leggeva "della regione": non si scrive."""
+        provinciali = [i for i in game_daily.game_indicators()
+                       if i["provincia"] and game_facts.direction(i["id"], "province")]
+        self.assertTrue(provinciali)
+        provato = 0
+        for ind in provinciali:
+            indicatore, valori = self._indicatore(ind["id"], "province")
+            for chiave in valori:
+                if game_facts.placement("province", indicatore, chiave) is None:
+                    continue
+                provato += 1
+                with self.subTest(id=ind["id"], provincia=chiave):
+                    self.assertIsNone(game_facts.placement("stessa_regione", indicatore, chiave))
+        self.assertGreater(provato, 0)
+
+    def test_the_two_names_say_what_the_series_counts(self):
+        """`72` conta gli addetti delle imprese, `426` le persone di 6 anni e piu':
+        il nome del gioco dice lo stesso soggetto della definizione Istat."""
+        nomi = {i["id"]: i["name"] for i in game_daily.game_indicators()}
+        definizioni = {}
+        with open("app/static/data/Assoluti_Regione.csv", encoding="utf-8") as righe:
+            for riga in righe:
+                campi = riga.split(";")
+                if campi[0] in ("72", "426") and campi[0] not in definizioni:
+                    definizioni[campi[0]] = campi[6]
+        self.assertIn("Addetti", definizioni["72"])
+        self.assertTrue(nomi["72"].startswith("Addetti"), nomi["72"])
+        self.assertIn("Persone di 6 anni e più", definizioni["426"])
+        self.assertTrue(nomi["426"].startswith("Persone di 6 anni e più"), nomi["426"])
+
+    def test_the_csv_sample_column_is_read(self):
+        righe = game_daily.game_indicators()
+        self.assertTrue(all(isinstance(r["sample_survey"], bool) for r in righe))
+        per_id = {r["id"]: r["sample_survey"] for r in righe}
+        for ind_id in ("426", "57", "72"):
+            self.assertTrue(per_id[ind_id], ind_id)
+        # i prefissi campionari e le righe solo provinciali (BES) sono tutte 1
+        for r in righe:
+            if r["id"].startswith(("bes:", "multiscopo:")) or not r["regione"]:
+                self.assertTrue(r["sample_survey"], r["id"])
 
 
 if __name__ == "__main__":

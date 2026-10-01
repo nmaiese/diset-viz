@@ -18,12 +18,12 @@ from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from sqlalchemy import create_engine, inspect
 
-from app import app, config, daily_counter, game, game_daily, game_provincia
+from app import app, config, daily_counter, game, game_daily, game_provincia, quiz_tokens
 from app.cache import cache
 from app.db import get_engine, session_scope
 from app.models import DailyCounter
 from scripts import partite_giocate
-from tests.integration.test_game_compare_daily import Base as CompareBase
+from tests.integration.test_game_compare_daily import T0, Base as CompareBase, _vincitore
 
 
 class ConDatabase(unittest.TestCase):
@@ -178,48 +178,93 @@ class RotteTest(CompareBase):
         with session_scope() as s:
             return {(r.gioco, r.data, r.punteggio): r.conteggio for r in s.query(DailyCounter).all()}
 
+    def _gioca_con_calma(self, sessione, livello, giuste=10, passo=2):
+        """Come `_gioca`, ma con `passo` secondi per risposta: dieci risposte in venti
+        secondi sono una partita plausibile (`quiz_tokens.is_plausible`, 1,5 s a round),
+        dieci in dieci no."""
+        token, orario, risposte = sessione["token"], T0, []
+        for indice, coppia in enumerate(sessione["questions"]):
+            if indice < giuste:
+                scelta, orario = _vincitore(livello, coppia), orario + passo
+            else:
+                scelta, orario = "timeout", orario + 11
+            risposta = self._risponde(sessione, indice, scelta, token=token, now=orario)
+            self.assertEqual(risposta.status_code, 200, indice)
+            risposte.append(risposta)
+            token = risposta.get_json()["token"]
+            if indice < len(sessione["questions"]) - 1:
+                token = self._avanti(sessione, indice, token, now=orario).get_json()["token"]
+        return risposte
+
     def test_chi_e_maggiore_conta_una_volta_all_ultima_risposta(self):
-        sessione = self._sessione("regioni", timer=0)
-        risposte = self._gioca(sessione, "regioni", giuste=10)
+        sessione = self._sessione("regioni")
+        risposte = self._gioca_con_calma(sessione, "regioni", giuste=10)
         ultimo = risposte[-1].get_json()
         self.assertTrue(ultimo["finished"])
         data = ultimo["summary"]["date"]
         self.assertEqual(self.righe(), {("compare", data, 10): 1})
 
     def test_chi_e_maggiore_non_conta_prima_della_fine(self):
-        sessione = self._sessione("regioni", timer=0)
-        self._gioca(sessione, "regioni", giuste=10)
+        sessione = self._sessione("regioni")
+        self._gioca_con_calma(sessione, "regioni", giuste=10)
         with session_scope() as s:
             s.query(DailyCounter).delete()
-        sessione = self._sessione("regioni", timer=0)
-        self._risponde(sessione, 0, "region_a")
+        sessione = self._sessione("regioni")
+        self._risponde(sessione, 0, "region_a", now=T0 + 2)
         self.assertEqual(self.righe(), {})
 
     def test_il_punteggio_e_quello_della_risposta_finale(self):
-        sessione = self._sessione("regioni", timer=0)
-        risposte = self._gioca(sessione, "regioni", giuste=7)
+        sessione = self._sessione("regioni")
+        risposte = self._gioca_con_calma(sessione, "regioni", giuste=7)
         summary = risposte[-1].get_json()["summary"]
         self.assertEqual(summary["score"]["correct"], 7)
         self.assertEqual(self.righe(), {("compare", summary["date"], 7): 1})
 
-    def test_un_guasto_del_contatore_non_rompe_la_risposta(self):
+    def test_chi_e_maggiore_senza_timer_non_conta(self):
+        """Basso (d): l'allenamento non e' una sfida finita."""
         sessione = self._sessione("regioni", timer=0)
+        risposte = self._gioca_con_calma(sessione, "regioni", giuste=10)
+        self.assertTrue(risposte[-1].get_json()["finished"])
+        self.assertEqual(self.righe(), {})
+
+    def test_chi_e_maggiore_non_plausibile_non_conta(self):
+        """Dieci risposte in dieci secondi non sono di una persona."""
+        sessione = self._sessione("regioni")
+        risposte = self._gioca_con_calma(sessione, "regioni", giuste=10, passo=1)
+        self.assertTrue(risposte[-1].get_json()["finished"])
+        self.assertEqual(self.righe(), {})
+
+    def test_un_guasto_del_contatore_non_rompe_la_risposta(self):
+        sessione = self._sessione("regioni")
         with mock.patch.object(daily_counter, "record", side_effect=RuntimeError("giu'")):
             with self.assertLogs(app.logger, level="ERROR"):
-                risposte = self._gioca(sessione, "regioni", giuste=10)
+                risposte = self._gioca_con_calma(sessione, "regioni", giuste=10)
         self.assertEqual(risposte[-1].status_code, 200)
         self.assertTrue(risposte[-1].get_json()["finished"])
 
     def test_ordina_conta_la_risposta_finale_e_non_il_rifiuto_di_un_doppione(self):
         client = app.test_client()
-        sessione = client.get("/api/game/order/daily/session?level=regioni").get_json()
+        with mock.patch.object(quiz_tokens, "_now", return_value=T0):
+            sessione = client.get("/api/game/order/daily/session?level=regioni").get_json()
         corpo = {"token": sessione["token"], "level": "regioni", "region_keys": [t["key"] for t in sessione["territories"]]}
-        prima = client.post("/api/game/order/daily/answer", json=corpo)
-        self.assertEqual(prima.status_code, 200)
-        oggi = game_daily.today_rome().isoformat()
-        self.assertEqual(self.righe(), {("order", oggi, prima.get_json()["score"]): 1})
-        self.assertEqual(client.post("/api/game/order/daily/answer", json=corpo).status_code, 409)
+        with mock.patch.object(quiz_tokens, "_now", return_value=T0 + 10):
+            prima = client.post("/api/game/order/daily/answer", json=corpo)
+            self.assertEqual(prima.status_code, 200)
+            oggi = game_daily.today_rome().isoformat()
+            self.assertEqual(self.righe(), {("order", oggi, prima.get_json()["score"]): 1})
+            self.assertEqual(client.post("/api/game/order/daily/answer", json=corpo).status_code, 409)
         self.assertEqual(sum(self.righe().values()), 1)
+
+    def test_ordina_non_plausibile_non_conta(self):
+        """Cinque territori ordinati nello stesso istante dell'apertura: uno script."""
+        client = app.test_client()
+        with mock.patch.object(quiz_tokens, "_now", return_value=T0):
+            sessione = client.get("/api/game/order/daily/session?level=regioni").get_json()
+            r = client.post("/api/game/order/daily/answer", json={
+                "token": sessione["token"], "level": "regioni",
+                "region_keys": [t["key"] for t in sessione["territories"]]})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(self.righe(), {})
 
     def test_ordina_non_conta_una_risposta_rifiutata(self):
         client = app.test_client()

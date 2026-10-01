@@ -248,6 +248,19 @@ class HubPaginaTest(unittest.TestCase):
         self.assertNotIn("Come funziona il quiz", html)
 
 
+class DescrizioniDellaHomeTest(unittest.TestCase):
+    def test_chi_e_maggiore_si_descrive_come_si_gioca_adesso(self):
+        """La sfida del giorno gioca anche fra province: "Due regioni, un indicatore"
+        non e' piu' vero. Nessun numero nella frase, e niente punto e virgola."""
+        from app import views
+        giochi = {g["name"]: g for g in views._home_quiz_games()}
+        testo = giochi["Chi è maggiore?"]["desc"]
+        self.assertNotIn("Due regioni", testo)
+        self.assertIn("province", testo)
+        self.assertIsNone(re.search(r"\d", testo))
+        self.assertFalse(set(testo) & set(";\u2014\u2013\u2026"))
+
+
 class NotaDellHubTest(unittest.TestCase):
     def test_la_nota_non_dice_che_le_classifiche_vogliono_un_account(self):
         """Le classifiche accettano un nickname anche senza account (SubmitScoreModal): la frase
