@@ -1,0 +1,82 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Dov'è la provincia?", "path": "/quiz/province-italiane"}] %}
+{% set active_nav = 'gioco' %}
+{% set game_active = 'mappa' %}
+{% set og_image_path = '/static/img/og/gioco-province-italiane.png' %}
+{% set og_image_alt = 'Sfida Italia: Dov\'è la provincia?' %}
+
+{% block title %}Dov'è la provincia? Quiz province italiane | {{ site_name }}{% endblock %}
+{% block description %}Quiz sulle province italiane: leggi un nome e trova la provincia sulla mappa muta. Dieci al giorno, uguali per tutti, e ogni errore ti dice di quanto.{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
+<link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/quiz-mappa.css') }}">
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-mappa.js') }}"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Dov'è la provincia?",
+  "description": "Quiz sulle province italiane: dieci province al giorno da trovare su una mappa muta, uguali per tutti.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": {{ mappa.boundaries | tojson }},
+  "isAccessibleForFree": true
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<article class="page game-page game-page--play wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+
+  {% include "_game_subnav.html" %}
+
+  <header class="page-hero">
+    <h1>Quiz sulle province italiane</h1>
+    <p class="page-lead">Dov'è la provincia? Ti diciamo un nome e tu lo trovi sulla mappa muta. Dieci al giorno, uguali per tutti, senza timer, e ogni errore ti dice di quanto hai sbagliato.</p>
+  </header>
+
+  <div id="game-root">
+    <noscript>
+      <p>Attiva JavaScript per giocare a "Dov'è la provincia?". Nel frattempo puoi esplorare
+      <a href="/province">le province italiane</a> o provare <a href="/quiz/indovina-la-provincia">Indovina la Provincia</a>.</p>
+    </noscript>
+    <p class="game-loading">Preparazione della sfida del giorno...</p>
+  </div>
+
+  {% include "_mappa_muta.html" %}
+
+  <div id="mappa-azioni"></div>
+
+  {# Il credito dei confini sta sotto la mappa e resta in pagina anche a partita finita, quando
+     la mappa si nasconde. La riga la compone `game_mappa_page.attribution` da `sources.py`. #}
+  <div class="mappa-fonte">
+    <p class="source">{{ mappa.attribution }}</p>
+  </div>
+
+  <section class="prose">
+    <h2>Come si gioca</h2>
+    <p>Ogni giorno ti chiediamo il nome di dieci province, le stesse per tutti, e la sfida cambia a mezzanotte, ora italiana. Non c'è il timer. Sull'Italia intera tocchi la regione dove pensi che sia la provincia: la mappa si stringe su quella regione e tocchi la provincia, poi confermi. Con "Indietro" torni all'Italia intera. Da tastiera usa le frecce per spostarti, Invio per scegliere, Esc per tornare indietro e Tab per arrivare a "Conferma".</p>
+    <p>La provincia esatta vale 2 punti, una provincia sbagliata ma della stessa regione ne vale 1, le altre 0: il massimo è 20. Dopo ogni risposta vedi la distanza in chilometri e la direzione, come stima, e il link alla scheda della provincia. Al livello della regione ti diciamo in quale regione si trova e la mappa parte già stretta su di essa.</p>
+    <p><strong>Senza mappa: conta la regione.</strong> È un altro esercizio, per chi non può usare la mappa: stesse dieci province, ma dici soltanto in quale delle venti regioni si trovano. Vale 1 punto a risposta, massimo 10. Non è equivalente alla partita sulla mappa e non facciamo finta che lo sia.</p>
+    <p>{{ mappa.sardinia_note }} Le province sarde compaiono sulla mappa ma non vengono mai chieste.</p>
+    <p>Chi vuole una sfida sui dati, e non sulla geografia, può provare <a href="/quiz/indovina-la-provincia">Indovina la Provincia</a>.</p>
+  </section>
+
+  <section class="prose" id="elenco-province">
+    <h2>Le {{ mappa.province_total }} province della mappa</h2>
+    <p>In ordine alfabetico, ciascuna con il link alla sua scheda. Per l'elenco regione per regione vai alle <a href="/province">province italiane</a>.</p>
+    <ul class="mappa-elenco">
+      {%- for p in mappa.list %}
+      <li><a href="{{ p.path }}">{{ p.name }}</a>{% if p.official_name != p.name %} <span class="mappa-ufficiale">(nome ufficiale: {{ p.official_name }})</span>{% endif %}</li>
+      {%- endfor %}
+    </ul>
+  </section>
+</article>
+{{ v1_map_sprite('provincia') }}
+{{ v1_map_sprite('regione') }}
+{% endblock %}

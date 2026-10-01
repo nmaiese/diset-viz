@@ -1,8 +1,10 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Classifica", "path": "/quiz/classifica"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'classifica' %}
 
-{% block title %}Classifica del Quiz Italia | {{ site_name }}{% endblock %}
+{% block title %}Classifica di Sfida Italia | {{ site_name }}{% endblock %}
 {% block description %}La classifica di "Chi è maggiore?" e "Ordina le regioni": le migliori serie verificate sugli indicatori Istat delle regioni italiane.{% endblock %}
 
 {% block robots_meta %}
@@ -11,17 +13,17 @@
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-leaderboard.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 <article class="page game-page wrap" id="contenuto">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   {% include "_game_subnav.html" %}
 
   <header class="qz-hero">
-    <p class="qz-hero-eb">Classifica · Quiz Italia</p>
+    <p class="qz-hero-eb">Classifica · Sfida Italia</p>
     <h1>Chi conosce l'Italia<br>meglio di tutti?</h1>
     <p class="qz-hero-lead">Le migliori serie di "Chi è maggiore?" e "Ordina le regioni", calcolate dal server round per round. Il punteggio è la serie di risposte corrette o di round perfetti ottenuta in una sessione.</p>
   </header>

@@ -1,0 +1,623 @@
+/* Gioco, Ordina le regioni (order.jsx): la lista ordinabile, il pannello e
+   l'esito. Tutto sotto le classi di questo gioco, e i numeri del movimento
+   vengono dai token di `game-base.css`. */
+
+.order-app {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.order-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-modes,
+.order-counts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order-classifica-btn {
+  margin-left: auto;
+}
+
+/* ---------- la domanda: quattro righe, non un blocco di testo ---------- */
+
+.order-question h2 {
+  margin: 3px 0 4px;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.order-kicker {
+  display: block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--game-accent);
+}
+
+.order-meta {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* La regola del gioco sta sempre in vista: senza, si ordina dal risultato
+   migliore al peggiore e la partita è sbagliata per un motivo che nessuno ha
+   scritto. */
+.order-regola {
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--surface-1);
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.order-altro {
+  margin: 0;
+}
+
+.order-altro > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.order-altro[open] > summary {
+  border-radius: var(--radius-control) var(--radius-control) 0 0;
+  border-bottom-color: transparent;
+}
+
+.order-altro .quiz-explanation {
+  padding: 10px 12px 2px;
+  border: 1px solid var(--rule);
+  border-top: 0;
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+}
+
+/* La riga di istruzioni: sul telefono e' il gesto, sul desktop anche le frecce.
+   Quando una riga e' selezionata dice dove metterla. */
+.order-suggerimento {
+  margin: -4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- layout a due colonne: lista + pannello punteggio/regole ---------- */
+
+.order-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .order-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.order-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.order-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: var(--masthead-h, 84px);
+}
+
+@media (max-width: 900px) {
+  .order-side {
+    position: static;
+  }
+}
+
+.order-side .card {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 14px 16px;
+}
+
+.order-side-eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.order-score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.order-score-grid small {
+  display: block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.order-score-grid strong {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--game-accent);
+}
+
+.order-rules-card {
+  border-left: 3px solid var(--game-accent);
+}
+
+.order-rules-card .order-side-eyebrow {
+  color: var(--game-accent);
+}
+
+.order-rules-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* ---------- lista ordinabile (righe con trascinamento, due tocchi e frecce) ----------
+   Tre colonne e tre figli: il numero, il nome, la coda. La coda e' un blocco
+   solo perche' il desktop vuole la scritta "nascosto" accanto ai comandi e il
+   telefono no: se i figli fossero quattro in una griglia di tre, il quarto
+   andrebbe a capo e la riga passava da 56 a 107 pixel, con le prime tre righe
+   sotto la piega di un telefono. */
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  min-height: 56px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  user-select: none;
+}
+
+.order-row.is-draggable {
+  cursor: pointer;
+}
+
+.order-row.is-draggable:hover {
+  border-color: var(--game-accent);
+}
+
+.order-row.is-selected {
+  border-color: var(--game-accent);
+  border-left-color: var(--game-accent);
+  background: var(--game-wash);
+  box-shadow: inset 0 0 0 1px var(--game-accent);
+}
+
+.order-row.is-dragging {
+  opacity: 0.5;
+}
+
+.order-row:focus-visible,
+.order-move-btn:focus-visible,
+.order-altro > summary:focus-visible,
+.order-classifica-nome a:focus-visible,
+.game-tab:focus-visible,
+.game-btn:focus-visible {
+  outline: 2px solid var(--game-accent);
+  outline-offset: 2px;
+}
+
+.order-rank {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+}
+
+.order-row-testo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.order-row-name-riga {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.order-row-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Il territorio del giocatore: lo dice il colore, la parola e il bordo, mai il
+   colore da solo. Durante l'ordinamento deve stare dentro la riga da 56 px, per
+   questo l'etichetta sta sulla stessa riga del nome. */
+.order-row-mio {
+  flex: none;
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--game-accent);
+  white-space: nowrap;
+}
+
+.order-row.is-mio {
+  border-left-color: var(--game-accent);
+}
+
+.order-row-region {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.order-row-coda {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  min-width: 190px;
+}
+
+.order-row-nascosto {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.order-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+}
+
+.order-move-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.order-move-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.order-move-btn:not(:disabled):hover {
+  border-color: var(--game-accent);
+  color: var(--game-accent);
+}
+
+/* La maniglia e' per chi ha un puntatore fine. Sul touch non c'e' niente da
+   prendere: il riquadro della regola e la riga di istruzioni dicono il resto, e
+   il trascinamento con le frecce resta comunque possibile per chi lo puo' fare
+   (WCAG 2.5.7, alternativa al trascinamento). */
+.order-handle {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  padding: 8px 4px;
+}
+
+@media (pointer: coarse) {
+  .order-handle {
+    display: none;
+  }
+}
+
+/* Telefono: la riga sta in 56 pixel con i bersagli da 44 dentro, e la scritta
+   "nascosto" sparisce perche' lo dice la riga di istruzioni. */
+@media (max-width: 640px) {
+  .order-app {
+    gap: 14px;
+  }
+  .order-main {
+    gap: 14px;
+  }
+  .order-row {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 6px 10px;
+    min-height: 56px;
+  }
+  .order-row-coda {
+    min-width: 0;
+  }
+  .order-row-nascosto {
+    display: none;
+  }
+  .order-row-name {
+    font-size: 15px;
+  }
+  .order-question h2 {
+    font-size: 18px;
+  }
+}
+
+.order-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* ---------- l'esito: il conto, l'indicatore, l'ordine vero ---------- */
+
+.order-esito {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* I bottoni che vengono da `shared.jsx` sono `.btn`, una classe del design system
+   che le pagine del gioco non caricano: senza queste righe resterebbero testo
+   nudo, e senza il minimo da 44 non sarebbero un bersaglio al dito. */
+.order-esito .qz-fine-azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.order-esito .qz-fine-azioni .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target, 44px);
+  padding: 0 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.order-esito .qz-fine-azioni .btn:hover {
+  border-color: var(--game-accent);
+  color: var(--game-accent);
+}
+
+.order-quadro {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 14px 16px;
+}
+
+.order-quadro-titolo {
+  margin: 0 0 8px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.order-quadro-riga {
+  margin: 0;
+  font-size: 15px;
+}
+
+.order-quadro .quiz-source {
+  margin: 6px 0 0;
+}
+
+.order-quadro-descrizione {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.order-quadro-scheda {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.order-classifica {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-classifica-riga {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-control);
+}
+
+.order-classifica-riga.is-correct {
+  border-left-color: var(--game-right);
+  background: var(--game-right-wash);
+}
+
+.order-classifica-riga.is-wrong {
+  border-left-color: var(--game-wrong);
+}
+
+.order-classifica-riga.is-mio {
+  box-shadow: inset 0 0 0 1px var(--game-accent);
+}
+
+.order-classifica-riga .order-rank {
+  grid-row: 1;
+  grid-column: 1;
+  font-size: 15px;
+}
+
+.order-classifica-riga.is-correct .order-rank {
+  color: var(--game-right);
+}
+
+.order-classifica-riga.is-wrong .order-rank {
+  color: var(--game-wrong);
+}
+
+.order-classifica-nome {
+  grid-row: 1;
+  grid-column: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.order-classifica-nome a {
+  color: inherit;
+}
+
+.order-mio-tag {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--game-accent);
+  white-space: nowrap;
+}
+
+.order-classifica-valore {
+  grid-row: 1;
+  grid-column: 3;
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.order-segno {
+  grid-row: 2;
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.order-classifica-riga.is-correct .order-segno {
+  color: var(--game-right);
+}
+
+.order-classifica-riga.is-wrong .order-segno {
+  color: var(--game-wrong);
+}
+
+.order-territorio-mio {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Il movimento ha una scala sola, quella dei token di `game-base.css`, e chiede
+   il permesso: fuori da `no-preference` la riga e' gia' al suo posto. */
+@media (prefers-reduced-motion: no-preference) {
+  .order-row {
+    transition: transform var(--mo-base) var(--mo-out),
+      border-color var(--mo-fast) ease,
+      background-color var(--mo-fast) ease,
+      box-shadow var(--mo-fast) ease;
+  }
+  /* L'esito entra riga per riga, con un ritardo piccolo e costante: la lista
+     si legge dall'alto, e il segno di ogni riga resta fermo. */
+  .order-classifica-riga {
+    animation: order-riga-entro var(--mo-base) var(--mo-out) backwards;
+    animation-delay: calc(var(--order-riga, 0) * 60ms);
+  }
+  @keyframes order-riga-entro {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @starting-style {
+    .order-classifica-riga {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+}

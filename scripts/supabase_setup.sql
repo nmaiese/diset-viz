@@ -34,24 +34,28 @@ CREATE POLICY own_favorites ON public.favorites
   USING ( (auth.jwt() ->> 'sub') = auth_id )
   WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
 
--- Stats, storico giornaliero, achievements (Fase 5.2): stessa forma own-rows.
+-- Stats, storico giornaliero, achievements (Fase 5.2): le scrive solo il server (BYPASSRLS),
+-- il giocatore puo' solo leggere le proprie righe. Erano `FOR ALL ... WITH CHECK`: con la
+-- chiave anon e il proprio JWT il browser poteva scrivere `daily_results` (tentativi,
+-- vinto) e `player_stats`, e da li' i traguardi. Il file si rilancia su una base che ha
+-- gia' le vecchie policy: ogni CREATE e' preceduto dal DROP IF EXISTS dello stesso nome.
 ALTER TABLE public.player_stats  ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS own_player_stats ON public.player_stats;
 CREATE POLICY own_player_stats ON public.player_stats
-  FOR ALL TO authenticated
-  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+  FOR SELECT TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id );
 
 ALTER TABLE public.daily_results ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS own_daily_results ON public.daily_results;
 CREATE POLICY own_daily_results ON public.daily_results
-  FOR ALL TO authenticated
-  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+  FOR SELECT TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id );
 
 ALTER TABLE public.achievements  ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS own_achievements ON public.achievements;
 CREATE POLICY own_achievements ON public.achievements
-  FOR ALL TO authenticated
-  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+  FOR SELECT TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id );
 
 -- Confronti salvati (Fase 5.3): own-rows. Niente public_slug, nessuna condivisione.
 ALTER TABLE public.saved_comparisons ENABLE ROW LEVEL SECURITY;
@@ -59,6 +63,22 @@ DROP POLICY IF EXISTS own_saved_comparisons ON public.saved_comparisons;
 CREATE POLICY own_saved_comparisons ON public.saved_comparisons
   FOR ALL TO authenticated
   USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
+-- Punteggi delle sfide del giorno (migrazione 0010): DENY-ALL come `scores`. Il server li
+-- scrive con il suo ruolo (BYPASSRLS) e contano per i traguardi: con `FOR ALL` il browser,
+-- con la chiave anon e il proprio JWT, poteva scrivere il punteggio che voleva. Si toglie la
+-- vecchia policy e non se ne crea nessuna: RLS attiva e nessuna policy, il browser non la
+-- legge ne' la scrive.
+ALTER TABLE public.daily_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_daily_scores ON public.daily_scores;
+
+-- quiz_answered (migrazione 0010): i round gia' risposti, solo backend. DENY-ALL
+-- come scores: RLS attiva e nessuna policy, il browser non la legge ne' la scrive.
+ALTER TABLE public.quiz_answered ENABLE ROW LEVEL SECURITY;
+
+-- daily_counter (migrazione 0011): i contatori aggregati delle sfide finite, solo backend.
+-- DENY-ALL come scores: RLS attiva e nessuna policy, il browser non la legge ne' la scrive.
+ALTER TABLE public.daily_counter ENABLE ROW LEVEL SECURITY;
 
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si

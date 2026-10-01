@@ -1255,6 +1255,8 @@ class AppSmokeTest(unittest.TestCase):
             "/quiz/ordina",
             "/quiz",
             "/quiz/indovina-la-regione",
+            "/quiz/indovina-la-provincia",
+            "/quiz/province-italiane",
             "/qualita-della-vita/classifica/regioni",
             "/qualita-della-vita/classifica/province?profilo=accessibilita",
             "/qualita-della-vita/classifica/regioni?profilo=accessibilita",

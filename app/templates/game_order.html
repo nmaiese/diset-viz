@@ -1,24 +1,27 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Ordina le regioni", "path": "/quiz/ordina"}] %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Ordina le regioni", "path": "/quiz/ordina"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'order' %}
+{% set og_image_path = '/static/img/og/gioco-ordina.png' %}
+{% set og_image_alt = 'Sfida Italia: Ordina le regioni' %}
 
-{% block title %}Ordina le regioni per indicatore Istat | {{ site_name }}{% endblock %}
-{% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore Istat, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}
+{% block title %}Ordina le regioni per indicatore | {{ site_name }}{% endblock %}
+{% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore territoriale, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-order.js') }}"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Ordina le regioni",
-  "description": "Quiz sugli indicatori territoriali Istat: metti in ordine le regioni italiane dal valore più alto al più basso.",
+  "description": {{ ("Quiz sugli indicatori territoriali di " ~ game_source("order").istituzioni ~ ": metti in ordine le regioni italiane dal valore più alto al più basso.") | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": {% set fonte = game_source("order") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali regionali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
   "isAccessibleForFree": true
 }
 </script>
@@ -26,15 +29,14 @@
 {% endblock %}
 
 {% block content %}
-<article class="page game-page wrap" id="contenuto">
+<article class="page game-page game-page--play wrap" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
 
   {% include "_game_subnav.html" %}
 
   <header class="page-hero">
     <h1>Ordina le regioni</h1>
-    <p class="page-lead">Un indicatore Istat e alcune regioni in ordine sparso: trascinale o usa le frecce per rimetterle in ordine, dal valore più alto al più basso. Un punto per ogni posizione corretta.</p>
+    <p class="page-lead">Un indicatore territoriale e alcune regioni in ordine sparso: mettile in fila dal valore più alto al più basso, toccando una regione e poi la posizione dove metterla. Un punto per ogni posizione corretta.</p>
   </header>
 
   <div id="order-root">
@@ -47,7 +49,7 @@
 
   <section class="prose">
     <h2>Come si gioca</h2>
-    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Le regioni partono in ordine casuale: trascinale con l'icona ⋮⋮ oppure spostale su o giù con le frecce, finché non sono in ordine dalla più alta alla più bassa sull'indicatore proposto. Quando l'ordine ti convince, verifica: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo, e le serie perfette possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
+    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Le regioni partono in ordine casuale: tocca una regione e poi tocca la posizione dove metterla, oppure spostala su o giù con le frecce, finché non sono in ordine dalla più alta alla più bassa sull'indicatore proposto. Quando l'ordine ti convince, verifica: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo, e le serie perfette possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
     <p>Preferisci round più rapidi? Prova <a href="/quiz/chi-e-maggiore">Chi è maggiore?</a> o la <a href="/quiz/indovina-la-regione">regione misteriosa</a> del giorno.</p>
   </section>
 </article>

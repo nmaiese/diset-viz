@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { fetchJson, trackGameEvent } from "./shared.jsx";
 
+// Le classifiche sono due: la sfida di Indovina la Regione non ha una classifica (con la guess
+// aperta a chiunque una classifica per tentativi non si puo' rendere onesta) e la rotta non
+// esiste piu'. `value` e' anche il `game` degli eventi.
 const MODES = [
   { value: "compare", label: "Chi è maggiore?" },
   { value: "order", label: "Ordina le regioni" },
@@ -63,7 +66,7 @@ export default function LeaderboardApp() {
   useEffect(() => {
     setEntries(null);
     setError(false);
-    trackGameEvent("leaderboard_view", { mode, period });
+    trackGameEvent("leaderboard_view", { mode, period, game: mode });
     fetchJson(`/api/game/leaderboard?mode=${mode}&period=${period}&limit=40`)
       .then((data) => setEntries(data.entries))
       .catch(() => setError(true));

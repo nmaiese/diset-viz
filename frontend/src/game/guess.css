@@ -1,0 +1,524 @@
+/* Gioco, Indovina la Regione (main.jsx): mappa, indizi, tentativi, esito. */
+
+/* ---------- Layout a due colonne (mappa server-renderizzata + #game-root) ---------- */
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 440px) 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 8px;
+}
+
+@media (max-width: 860px) {
+  .game-layout { grid-template-columns: 1fr; }
+  .game-map-frame { order: 2; }
+  #game-root { order: 1; }
+}
+
+.game-map-frame {
+  position: sticky;
+  top: var(--masthead-h, 84px);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 12px;
+}
+
+.game-map-frame .regions-map { width: 100%; height: auto; }
+
+.game-map-frame .rmap-region {
+  fill: var(--data-null);
+  stroke: var(--bg);
+  stroke-width: 1;
+}
+
+.game-map-frame .rmap-region.is-clickable { cursor: pointer; }
+.game-map-frame .rmap-region.is-clickable:hover,
+.game-map-frame .rmap-region.is-clickable:focus {
+  fill: var(--game-accent);
+  outline: none;
+}
+
+.game-map-frame .rmap-region.is-guessed-correct { fill: var(--game-right); }
+.game-map-frame .rmap-region.is-guessed-wrong { fill: var(--game-wrong); }
+.game-map-frame .rmap-region.is-mystery {
+  fill: var(--game-right);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.game-map-frame .rmap-region.is-mystery-reveal { }
+
+.game-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 12px 2px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.game-map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.game-map-legend i {
+  width: 11px;
+  height: 11px;
+  border-radius: var(--radius-control);
+  display: inline-block;
+}
+
+/* L'attribuzione dei confini (la stessa riga del resto del sito): piccola e in secondo piano. */
+.game-map-frame .source { margin: 8px 2px 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.game-map-frame .source a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
+
+.game-map-legend .sw-available { background: var(--data-null); }
+.game-map-legend .sw-wrong { background: var(--game-wrong); }
+.game-map-legend .sw-correct { background: var(--game-right); }
+
+@media (max-width: 860px) {
+  .game-map-frame { position: static; }
+}
+
+/* ---------- Header di partita ---------- */
+
+.game-head { display: flex; flex-direction: column; gap: 10px; }
+
+.game-head h2 { margin: 0; font-size: 22px; }
+
+.game-date { color: var(--muted); font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 400; }
+
+.game-attempts-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.game-attempts-label {
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.game-attempts { display: flex; gap: 5px; flex: 1 1 auto; min-width: 120px; }
+
+.game-attempts .seg {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+}
+
+.game-attempts .seg.is-correct { background: var(--game-right); border-color: var(--game-right); }
+.game-attempts .seg.is-wrong { background: var(--game-wrong); border-color: var(--game-wrong); }
+
+/* ---------- Pannello di gioco ---------- */
+
+.game-panel { display: flex; flex-direction: column; gap: 18px; }
+
+/* ---------- Input e suggerimenti ---------- */
+
+.game-input label { display: block; font-weight: 600; margin-bottom: 6px; }
+
+.game-input-campo { position: relative; }
+
+/* 16 px: sotto, iOS ingrandisce la pagina quando il campo prende il focus. */
+.game-input-row input {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  font-size: 16px;
+}
+
+.game-input-row.is-shake { }
+
+.game-suggestions {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  overflow-y: auto;
+}
+
+.game-suggestions li + li { border-top: 1px solid var(--rule); }
+
+.game-suggestions button { width: 100%; min-height: 44px; text-align: left; padding: 10px 14px; border: 0; background: var(--bg); }
+.game-suggestions button:hover,
+.game-suggestions button.is-highlighted { background: var(--game-wash); }
+
+/* Il perche' di un testo che non porta a nessun suggerimento: sotto il campo, letto da `aria-live`. */
+.game-nota { margin: 8px 0 0; min-height: 1.4em; font-size: 14px; line-height: 1.4; color: var(--text-2); }
+.game-input .game-error { margin: 8px 0 0; }
+.game-input .game-btn { margin-top: 8px; }
+
+/* ---------- Cronologia tentativi ---------- */
+
+.game-history { display: flex; flex-direction: column; gap: 10px; }
+
+.guess-row { border-radius: var(--radius-control); padding: 12px 14px; border: 1px solid var(--rule); background: var(--bg); }
+/* Giusto e sbagliato non stanno solo nel colore: il filo a sinistra e' la
+   forma, il testo del tentativo dice l'esito. */
+.guess-row.is-correct { border-color: var(--game-right); border-left: 4px solid var(--game-right); background: var(--game-right-wash); }
+.guess-row.is-wrong { border-left: 4px solid var(--game-wrong); }
+
+.guess-feedback {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guess-feedback li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
+
+.guess-symbol {
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--game-accent);
+  flex: 0 0 auto;
+  width: 16px;
+  text-align: center;
+}
+
+.guess-feedback-body { display: flex; flex-direction: column; gap: 2px; color: var(--text-2); }
+.guess-feedback-detail { color: var(--muted); font-size: 12.5px; }
+
+.guess-ripartizione {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  background: var(--game-wash);
+  border: 1px solid var(--game-accent);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+/* ---------- Risultato finale ---------- */
+
+.game-result { display: flex; flex-direction: column; gap: 4px; }
+
+
+.game-recap { margin-top: 18px; }
+.game-recap h3 { margin: 0 0 8px; font-size: 16px; }
+
+.game-recap-list { list-style: none; margin: 0; padding: 0; }
+.game-recap-list li { padding: 12px 0; border-top: 1px solid var(--rule); }
+.game-recap-list p { margin: 0; }
+.game-recap-nome { font-weight: 700; font-size: 14.5px; }
+.game-recap-valori {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin-top: 4px;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.game-recap-misura { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+.game-recap-misura strong { color: var(--ink); }
+
+.game-stats-inline { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+
+.game-stats-numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.game-stats-numbers strong { display: block; font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 22px; }
+.game-stats-numbers span { display: block; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+.game-stats-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+/* ---------- Grafico distribuzione ---------- */
+
+.dist-chart { display: flex; flex-direction: column; gap: 6px; }
+
+.dist-row { display: grid; grid-template-columns: 18px 1fr 24px; align-items: center; gap: 8px; }
+
+.dist-label { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 12px; text-align: right; }
+
+.dist-bar-track { background: var(--surface-2); border-radius: var(--radius-control); overflow: hidden; height: 16px; }
+
+.dist-bar { height: 100%; background: var(--text-2); border-radius: var(--radius-control); }
+.dist-bar.is-current { background: var(--game-accent); }
+
+.dist-count { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 12px; color: var(--muted); }
+
+/* ---------- Indovina: tabella indizi compatta (design QuizIndovina) ---------- */
+
+.qz-clues {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+}
+.qz-clues td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.qz-clues tr:last-child td { border-bottom: 0; }
+.qz-clues td strong { font-weight: 700; }
+.qz-clues .n {
+  color: var(--muted);
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  width: 32px;
+  border-left: 3px solid transparent;
+}
+.qz-clues .v {
+  text-align: right;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+/* Il numero in evidenza, l'unita' sotto e piccola: la colonna dei nomi non si stringe. */
+.qz-clues .v-num { white-space: nowrap; }
+.qz-clues .v-unita { display: block; font-weight: 400; font-size: 11.5px; line-height: 1.25; color: var(--muted); }
+.qz-clues tr.latest .n { color: var(--game-accent); border-left-color: var(--game-accent); }
+.qz-clues tr.locked td { color: var(--muted); }
+
+/* "Che cosa misura": un riquadro chiuso, la spiegazione lunga si apre a richiesta. */
+.qz-clue-desc {
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--game-accent);
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+.qz-clue-desc summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+.qz-clue-desc[open] summary { border-bottom: 1px solid var(--rule); margin-bottom: 10px; }
+.qz-clue-desc p { margin: 0; }
+.qz-clue-desc[open] { padding-bottom: 12px; }
+.qz-clue-desc strong {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--game-accent);
+  font-weight: 700;
+}
+.qz-clue-rank {
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.qz-clue-desc .quiz-source { margin-top: 8px; }
+
+@media (max-width: 640px) {
+  .qz-clues { font-size: 13.5px; }
+  .qz-clues td { padding: 12px 10px; }
+  .qz-clues .n { width: 26px; }
+}
+
+/* ---------- Onboarding in una schermata ---------- */
+
+.game-onboarding-aree { margin: 0 0 14px; padding-left: 20px; font-weight: 600; }
+
+/* ---------- Fine partita uniforme (FinePartita e Condividi, shared.jsx) ---------- */
+
+.qz-fine {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  padding: 20px;
+  background: var(--bg);
+}
+.qz-fine-titolo { margin: 0 0 6px; font-size: 22px; }
+.qz-fine-dettaglio { margin: 0 0 12px; color: var(--text-2); }
+.qz-fine-dato { margin: 0 0 12px; }
+.qz-fine-dato p { margin: 0 0 6px; }
+.qz-fine-misura { margin: 10px 0 4px; font-size: 14px; }
+.qz-fine-territori { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.qz-fine-territori a,
+.qz-fine-azioni .btn,
+.qz-condividi .btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.qz-fine-azioni .btn:hover,
+.qz-fine-territori a:hover { border-color: var(--game-accent); background: var(--game-wash); }
+.qz-condividi .btn,
+.qz-condividi .btn-primary { background: var(--game-accent); border-color: var(--game-accent); color: var(--game-on-accent); }
+.qz-condividi .btn:hover { background: var(--game-accent-strong); border-color: var(--game-accent-strong); }
+.qz-fine-countdown {
+  margin: 0 0 12px;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--muted);
+}
+.qz-fine-azioni { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+.qz-condividi { display: flex; flex-direction: column; gap: 6px; }
+.qz-condividi-esito { margin: 0; min-height: 1.3em; font-size: 12.5px; color: var(--muted); }
+
+.qz-clues a, .qz-clue-desc a { text-decoration: underline; text-underline-offset: 2px; }
+
+
+/* ---------- Bersagli da 44 px (WCAG 2.5.8) ---------- */
+
+.guess-app .game-tab,
+.guess-app .game-btn { min-height: 44px; }
+.guess-app .game-icon-btn { width: 44px; height: 44px; }
+.game-tab:disabled { opacity: 0.55; cursor: default; }
+
+/* ---------- Indovina la Provincia ---------- */
+
+.game-livello-nota,
+.game-regione-nota { margin: 0; font-size: 13px; color: var(--text-2); }
+.game-regione-nota { font-size: 15px; color: var(--ink); }
+
+.prov-map .prov-tile {
+  fill: var(--data-null);
+  stroke: var(--bg);
+  stroke-width: var(--prov-tratto, 0.8);
+}
+.prov-map .prov-tile.is-context { fill: var(--surface-2); opacity: 0.55; }
+.prov-map .prov-tile.is-guessed-wrong { fill: url(#prov-tratteggio); }
+.prov-map .prov-tile.is-guessed-correct,
+.prov-map .prov-tile.is-mystery { fill: var(--game-right); stroke: var(--ink); }
+.prov-tratteggio-fondo { fill: var(--game-wrong-wash); }
+.prov-tratteggio-riga { stroke: var(--game-wrong); stroke-width: 2; }
+
+/* Il numero del tentativo e la forma: un rombo per chi ha sbagliato, un cerchio
+   per la provincia giusta. */
+.prov-segno rect,
+.prov-segno circle { stroke: var(--ink); stroke-width: 1; }
+.prov-segno.is-sbagliato rect { fill: var(--bg); }
+.prov-segno.is-giusto circle { fill: var(--game-right-wash); }
+.prov-segno text { fill: var(--ink); font-family: var(--font-num); font-weight: 700; pointer-events: none; }
+.prov-freccia line,
+.prov-freccia polyline { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+.guess-titolo { display: flex; align-items: center; gap: 8px; margin: 0; }
+.guess-icona { flex: 0 0 auto; }
+.guess-esito { margin-left: auto; font-size: 12px; color: var(--muted); }
+.guess-distanza { margin: 6px 0 0; font-size: 13.5px; color: var(--text-2); }
+.guess-freccia { display: inline-block; width: 1.3em; font-weight: 700; color: var(--ink); }
+.guess-confronto { margin-top: 8px; }
+.guess-confronto summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 13px; color: var(--text-2); }
+.game-stats-numbers--due { grid-template-columns: repeat(2, 1fr); }
+
+/* ---------- Fine partita a livelli: i riquadri chiusi e i tentativi compatti ---------- */
+
+.qz-fine + .game-dettagli { margin-top: 12px; }
+.game-dettagli { border: 1px solid var(--rule); border-radius: var(--radius-control); background: var(--bg); }
+.game-dettagli + .game-dettagli { margin-top: 8px; }
+.game-dettagli > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.game-dettagli[open] > summary { border-bottom: 1px solid var(--rule); }
+.game-dettagli-corpo { padding: 4px 14px 14px; }
+.game-dettagli-corpo .game-recap { margin-top: 0; }
+
+.guess-compatti { list-style: none; margin: 0; padding: 0; }
+.guess-compatto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+}
+.guess-compatto:first-child { border-top: 0; }
+.guess-compatto .guess-esito { margin-left: 0; }
+.guess-compatto-distanza { flex-basis: 100%; padding-left: 26px; font-size: 13px; color: var(--text-2); }
+
+/* ---------- Da telefono (<= 720 px) ---------- */
+
+@media (max-width: 720px) {
+  /* L'ordine e' lo stato, la tabella compatta, il campo subito sotto, poi la mappa (il fratello dopo
+     #game-root). Qui si stringe lo spazio perche' tutto questo stia in una schermata. */
+  .guess-app .game-toolbar { gap: 8px; }
+  .guess-app .game-tab { padding-inline: 12px; }
+  .guess-app .game-head { gap: 6px; }
+  .guess-app .game-head h2 { font-size: 18px; }
+  .guess-app .game-panel { gap: 10px; }
+  .guess-app .qz-section-label { display: none; }
+  .qz-tema { display: none; }
+  .qz-clues td { padding: 7px 10px; }
+  .qz-clues .n { width: 24px; }
+  .qz-clues { table-layout: fixed; }
+  .qz-clues .v { width: 38%; }
+  .qz-clues td:nth-child(2) { overflow-wrap: anywhere; }
+
+  /* I suggerimenti si aprono SOPRA il campo: la tastiera virtuale non li copre. Non piu' del 40% di
+     quello che si vede (`--vv-h` e' la `visualViewport`, la imposta Completamento). */
+  .game-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    z-index: 5;
+    margin: 0 0 4px;
+    max-height: calc(var(--vv-h, 100dvh) * 0.4);
+  }
+}
+
+/* Il movimento, solo a chi non ha chiesto di ridurlo. */
+@media (prefers-reduced-motion: no-preference) {
+  .game-map-frame .rmap-region { transition: fill var(--mo-fast) ease; }
+  .game-map-frame .rmap-region.is-mystery-reveal { animation: map-pulse 1.1s ease-out 1; }
+  .game-input-row.is-shake { animation: input-shake 0.4s ease; }
+  .dist-bar { transition: width 0.3s ease; }
+
+  @keyframes map-pulse {
+    0% { stroke-width: 1.5; filter: drop-shadow(0 0 0 var(--game-right)); }
+    50% { stroke-width: 3; filter: drop-shadow(0 0 6px var(--game-right)); }
+    100% { stroke-width: 1.5; filter: drop-shadow(0 0 0 transparent); }
+  }
+
+  @keyframes input-shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+
+  /* L'indizio appena svelato: l'evidenza (il lavaggio `--game-wash`) svanisce in 600 ms, e la riga entra
+     salendo di 6 px. `@starting-style` parte solo quando la riga nasce, non quando perde `latest`. */
+  .qz-clues tr.latest { animation: indizio-evidenza 600ms var(--mo-out) both; }
+  .qz-clues tr.latest { transition: opacity var(--mo-base) var(--mo-out), transform var(--mo-base) var(--mo-out); }
+  @starting-style {
+    .qz-clues tr.latest { opacity: 0; transform: translateY(6px); }
+  }
+  @keyframes indizio-evidenza {
+    from { background: var(--game-wash); }
+    to { background: transparent; }
+  }
+
+  /* Lo scheletro compare dopo 150 ms: una sfida che arriva subito non lampeggia. */
+  .qz-scheletro { animation: scheletro-appare var(--mo-fast) var(--mo-out) 150ms both; }
+  @keyframes scheletro-appare {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}

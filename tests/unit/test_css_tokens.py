@@ -17,6 +17,9 @@ ognuna e' del tipo che non si vede in una PR e non rompe nessun test:
    adesso guarda i fogli di pagina, dove stanno l'atlante e il confronto, e
    dal 26 settembre anche i componenti comuni e la testata (`components.css`,
    `chrome.css`). Il solo foglio che scrive colori e' `system.css`.
+   Dal 30 settembre 2026 anche i fogli del gioco (`frontend/src/game/*.css`),
+   che leggono i token del sotto-marchio `--game-*`: e ogni `--game-*` che
+   usano deve esistere in chiaro e in scuro.
 """
 import re
 import unittest
@@ -25,7 +28,10 @@ from pathlib import Path
 RADICE = Path(__file__).resolve().parents[2]
 SITE = RADICE / "app" / "static" / "css" / "site.css"
 PAGINE = RADICE / "app" / "static" / "css" / "ds" / "pages"
-GIOCO = RADICE / "frontend" / "src" / "game" / "game.css"
+GIOCO_DIR = RADICE / "frontend" / "src" / "game"
+GIOCO = tuple(sorted(GIOCO_DIR.glob("*.css")))
+# Tutti i fogli del gioco, anche quelli dei giochi in una cartella loro (la mappa).
+GIOCO_TUTTI = tuple(sorted(GIOCO_DIR.rglob("*.css")))
 SISTEMA = RADICE / "app" / "static" / "css" / "ds" / "system.css"
 CHROME = RADICE / "app" / "static" / "css" / "ds" / "chrome.css"
 COMPONENTS = RADICE / "app" / "static" / "css" / "ds" / "components.css"
@@ -33,7 +39,46 @@ INDICATOR = RADICE / "app" / "static" / "css" / "ds" / "indicator.css"
 REGION_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "regione.css"
 PROVINCE_SHEET = RADICE / "app" / "static" / "css" / "ds" / "pages" / "provincia.css"
 
-FOGLI = (SITE, GIOCO, SISTEMA, CHROME, COMPONENTS, *sorted(PAGINE.glob("*.css")))
+FOGLI = (SITE, *GIOCO, SISTEMA, CHROME, COMPONENTS, *sorted(PAGINE.glob("*.css")))
+
+# Un colore si scrive anche con una funzione che non e' `rgb()`: tutte stanno solo
+# nei token. `\b` davanti: `lab(` non deve scattare dentro `oklab(`, e il nome
+# intero prima della parentesi: `color(` non e' `color-mix(`, che mescola due token.
+FUNZIONI_COLORE = re.compile(r"(?<![-\w])(?:rgba?|hsla?|hwb|oklch|oklab|lab|lch|color)\(")
+# I nomi di colore CSS. `transparent`, `currentColor` e `inherit` non sono colori
+# della palette e restano permessi.
+NOMI_COLORE = frozenset("""
+aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown
+burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan
+darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred
+darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue
+dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray
+green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen
+lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink
+lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen
+linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue
+mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy
+oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip
+peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown
+seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal
+thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen
+""".split())
+# Fogli del gioco con un colore scritto a mano oggi: nessuno. Se ne serve uno, va
+# qui con il perche', e il CSS lo corregge chi lo possiede, non questa prova.
+ECCEZIONI_COLORE_GIOCO = {}
+
+
+def _nomi_di_colore(testo):
+    """I nomi di colore nei VALORI delle dichiarazioni, mai nei nomi delle custom
+    property (`--game-red: ...` e' un nome, non un colore) ne' dentro `var()` o
+    dentro una stringa."""
+    trovati = []
+    for m in re.finditer(r"(?<![-\w])([a-z][a-z-]*)\s*:\s*([^;{}]+)", testo):
+        valore = re.sub(r"var\([^)]*\)|\"[^\"]*\"|'[^']*'", "", m.group(2))
+        for parola in re.findall(r"(?<![-\w$@.#])[A-Za-z]+(?![-\w(])", valore):
+            if parola.lower() in NOMI_COLORE:
+                trovati.append(f"{m.group(1)}: {m.group(2).strip()}")
+    return trovati
 
 # I token che le view transition leggono dalla radice del documento.
 MOVIMENTO_IN_RADICE = ("--dur", "--ease-out")
@@ -135,11 +180,80 @@ class FogliDiStileTest(unittest.TestCase):
         """
         fogli = sorted(PAGINE.glob("*.css"))
         self.assertIn("confronto.css", [f.name for f in fogli])
-        fogli += [COMPONENTS, CHROME]
+        fogli += [COMPONENTS, CHROME, *GIOCO]
         for foglio in fogli:
             with self.subTest(foglio=foglio.name):
                 testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
                 self.assertEqual(re.findall(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(", testo), [])
+
+    def test_i_fogli_del_gioco_non_scrivono_colori_in_nessuna_forma(self):
+        """Non solo `#hex` e `rgb()`: anche `hsl()`, `hwb()`, `oklch()`, `oklab()`,
+        `lab()`, `lch()`, `color()` e i nomi (`red`, `white`). Un colore scritto cosi'
+        non segue il tema scuro come uno esadecimale."""
+        self.assertIn("mappa.css", [f.name for f in GIOCO_TUTTI])
+        for foglio in GIOCO_TUTTI:
+            with self.subTest(foglio=str(foglio.relative_to(GIOCO_DIR))):
+                testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
+                trovati = re.findall(r"#[0-9a-fA-F]{3,8}\b", testo)
+                trovati += FUNZIONI_COLORE.findall(testo)
+                trovati += _nomi_di_colore(testo)
+                self.assertEqual(trovati, ECCEZIONI_COLORE_GIOCO.get(foglio.name, []))
+
+    def test_la_guardia_dei_colori_riconosce_ogni_forma(self):
+        """La prova sopra non deve passare perche' non guarda: ogni forma si trova, e
+        i casi che non sono colori restano fuori."""
+        for colore in ("hsl(10 50% 50%)", "hsla(1,2%,3%,.4)", "hwb(1 2% 3%)", "oklch(0.7 0.1 30)",
+                       "oklab(0.5 0.1 0.1)", "lab(50 20 30)", "lch(50 20 30)", "color(srgb 1 0 0)", "rgb(1 2 3)"):
+            with self.subTest(colore=colore):
+                self.assertTrue(FUNZIONI_COLORE.findall(f"a {{ color: {colore}; }}"))
+        self.assertEqual(FUNZIONI_COLORE.findall("a { color: color-mix(in srgb, var(--ink), transparent); }"), [])
+        self.assertEqual(_nomi_di_colore(".x { border: 1px solid red; }"), ["border: 1px solid red"])
+        self.assertEqual(_nomi_di_colore(".x { color: White }"), ["color: White"])
+        for pulito in (".x { color: transparent; }", ".x { fill: currentColor; }", ".x { color: inherit; }",
+                       ":root { --game-red: var(--x); }", ".x { animation: red-pulse 1s; }",
+                       ".x { color: var(--red); }", '.x::after { content: "red"; }'):
+            with self.subTest(pulito=pulito):
+                self.assertEqual(_nomi_di_colore(pulito), [])
+
+    def test_il_gioco_ha_i_suoi_fogli(self):
+        """`game.css` raccoglie i quattro fogli e non scrive regole sue.
+
+        main.jsx importa solo `game.css`: un foglio del gioco che non passa di
+        li' non arriva nel bundle, e una regola rimasta in `game.css` sfugge
+        alla divisione per gioco."""
+        nomi = {f.name for f in GIOCO}
+        self.assertEqual(nomi, {"game.css", "game-base.css", "guess.css", "compare.css", "order.css"})
+        raccolta = re.sub(r"/\*.*?\*/", "", (GIOCO_DIR / "game.css").read_text(encoding="utf-8"), flags=re.DOTALL)
+        importati = re.findall(r'^@import "\./([a-z-]+\.css)";$', raccolta, re.M)
+        self.assertEqual(sorted(importati), sorted(nomi - {"game.css"}))
+        self.assertNotIn("{", raccolta)
+
+    def test_i_token_del_gioco_esistono_nei_due_temi(self):
+        """Un `var(--game-x)` senza dichiarazione non fallisce: cade a vuoto.
+
+        Il bottone di gioco resterebbe senza fondo in chiaro, o sulla palette
+        chiara nel tema scuro."""
+        sistema = SISTEMA.read_text(encoding="utf-8")
+        chiaro = {n for n in _nomi(_corpi(sistema, r"^:root\s*\{")) if n.startswith("--game-")}
+        scuro = {n for n in _nomi(_corpi(sistema, r'^\[data-theme="dark"\]\s*\{')) if n.startswith("--game-")}
+        self.assertTrue(chiaro, "nessun --game-* in system.css")
+        self.assertEqual(chiaro, scuro)
+        usati = set()
+        for foglio in GIOCO:
+            usati |= set(re.findall(r"var\((--game-[a-z-]+)", foglio.read_text(encoding="utf-8")))
+        self.assertTrue(usati, "i fogli del gioco non leggono nessun --game-*")
+        self.assertEqual(usati - chiaro, set())
+
+    def test_il_movimento_del_gioco_chiede_il_permesso(self):
+        """Nei fogli del gioco `animation` e `transition` stanno solo dentro
+        `@media (prefers-reduced-motion: no-preference)`."""
+        for foglio in GIOCO:
+            testo = re.sub(r"/\*.*?\*/", "", foglio.read_text(encoding="utf-8"), flags=re.DOTALL)
+            fuori = testo
+            for corpo in _corpi(testo, r"^@media \(prefers-reduced-motion: no-preference\)\s*\{"):
+                fuori = fuori.replace(corpo, "")
+            with self.subTest(foglio=foglio.name):
+                self.assertEqual(re.findall(r"(?<![-\w])(?:animation|transition)\s*:", fuori), [])
 
     def test_il_telaio_vecchio_non_ha_piu_regole(self):
         """Nessuna pagina rende piu' `.masthead`, `.mobmenu` o `.nav-underline`.

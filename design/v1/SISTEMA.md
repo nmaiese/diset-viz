@@ -520,6 +520,61 @@ punteggio e tacca a 50, mappa accanto (non sticky), dove eccelle ogni
 territorio, metodo fonti e download. L'indice `/qualita-della-vita` usa gli
 stessi pezzi con il doppio podio regioni e province.
 
+### Il gioco: un sotto-marchio, di proposito
+
+`/legacy` e' l'unica pagina rimasta sul suo stile. Il gioco sotto `/quiz` e'
+l'altra eccezione, ma di segno opposto: non resta indietro, **richiama la 1.0
+senza esserne uguale**. Stessi caratteri, stessa pagina bianca, stessi token
+per inchiostro, filetti, spazi e forme. Cambia solo l'accento, e solo dentro il
+gioco.
+
+- **Un accento suo**, un viola magenta (`--game-accent`, con il fondo del
+  bottone premuto `--game-accent-strong`, lo sfondo tenue `--game-wash` e il
+  testo sopra `--game-on-accent`). Cento gradi di tinta dall'arancio, sessanta
+  dalla rampa blu, lontano dal verde e dal rosso. E' un colore d'interfaccia
+  (l'azione di gioco, il badge, la sfida del giorno), **mai un colore dei
+  dati**: non va su una mappa coi valori, non colora un punto o una barra. Sotto
+  deuteranopia e protanopia si avvicina alla rampa blu, ed e' il motivo per cui
+  la regola non ha eccezioni.
+- **Giusto e sbagliato hanno token propri**, `--game-right` e `--game-wrong`
+  con i loro sfondi tenui. Il verde e il rosso del sito (`success`, `error`) in
+  deuteranopia e in scala di grigi quasi coincidono: quelli del gioco sono
+  separati anche in luminosita' e reggono sotto protanopia, deuteranopia,
+  tritanopia e acromatopsia. Non bastano da soli: l'esito ha sempre un'icona,
+  una forma (cerchio con la spunta, quadrato con la croce, il tratteggio sulla
+  mappa, il filo a sinistra) e una parola.
+- **Forme e cifre**: tessere quasi squadrate (`--radius-control`), cifre in
+  Sofia Sans Semi Condensed a larghezza fissa, etichette mai in maiuscolo
+  spaziato. Il movimento sta solo dietro `prefers-reduced-motion:
+  no-preference`.
+- **Movimento**: una scala sola, `--mo-fast`, `--mo-base`, `--mo-slow` e le due
+  curve `--mo-out` (ingresso) e `--mo-in` (uscita), dichiarata in
+  `frontend/src/game/game-base.css`. Chi la usa sta dentro `@media
+  (prefers-reduced-motion: no-preference)`: fuori da li' lo stato finale e' gia'
+  quello giusto. Niente suono, vibrazione o coriandoli, e' il tono della Cronaca.
+  `tests/unit/test_game_motion.py` guarda la regola sui fogli di
+  `frontend/src/game/*.css`, **ma non scende in `mappa/mappa.css`**: li' la
+  regola si rispetta a mano.
+- **Icone** in `app/static/img/gioco/`: una per gioco (`indovina`, `maggiore`,
+  `ordina`, `mappa`), una per il livello Provincia, una per traguardo
+  (`traguardi/<id>.svg`, gli id di `app/achievements.py`) e le tre dell'esito
+  (giusto, parziale, sbagliato: un risultato a meta' non e' una croce). Tratto
+  su `currentColor` e i `--game-*` letti con `var()` e un ripiego, nessun
+  esadecimale, disegnate su 24 e leggibili a 34. Prendono i token solo se sono
+  in linea nella pagina.
+- **Dove sta**: i valori in `tokens/tokens.json` sotto `game` e nel blocco
+  `--game-*` di `system.css`, che `tools/check_tokens.py` prova insieme
+  (contrasti, tinte, distanza dai dati, le quattro visioni, e che i due file
+  dicano gli stessi valori). I fogli sono `frontend/src/game/` (`game-base.css`,
+  `guess.css`, `compare.css`, `order.css`, raccolti da `game.css`, e
+  `mappa/mappa.css` per la mappa), il prototipo e' `design/gioco/`
+  (`bin/py design/gioco/build.py`). Il nome del sotto-marchio e' **Sfida
+  Italia**, scelto il 30 settembre 2026: il prototipo statico e' di prima e porta
+  ancora un nome segnaposto, e non si aggiorna.
+- **Il resto del gioco** (i giochi, la sfida del giorno, l'anti-barare, le
+  regole di contenuto) sta in [`docs/GIOCO.md`](../../docs/GIOCO.md): qui c'e'
+  solo la parte visiva.
+
 ## Regole di contenuto
 
 - **Percentuali**: ogni forma percentuale della fonte ("valori percentuali",

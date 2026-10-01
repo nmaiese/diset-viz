@@ -16,7 +16,12 @@ from sqlalchemy import select
 
 from app import player_stats
 from app.db import session_scope
-from app.models import Achievement
+from app.models import Achievement, DailyResult, DailyScore
+
+# Le quattro sfide del giorno. `indovina` sta in `daily_results`, le altre in
+# `daily_scores` (una riga per account, gioco e data).
+DAILY_GAMES = ("indovina", "provincia", "compare", "order")
+LOYAL_DAYS = 30
 
 
 def _now_iso():
@@ -36,6 +41,40 @@ def _played_all(stats):
     return (stats["compare"]["rounds_played"] > 0
             and stats["order"]["rounds_played"] > 0
             and stats["daily"]["games_played"] > 0)
+
+
+def _tour_days(auth_id):
+    """Le date in cui l'account ha chiuso la sfida del giorno di tutti e quattro
+    i giochi. Indovina conta se risolta, la provincia se indovinata al livello
+    "tutta Italia" (`provincia`: il livello "della regione" scrive
+    `provincia_regione` e non conta, perche' svela la regione del livello
+    difficile), Chi è maggiore? e Ordina se la partita è stata giocata fino in fondo."""
+    with session_scope() as s:
+        guess_days = set(s.execute(select(DailyResult.puzzle_date).where(
+            DailyResult.auth_id == auth_id, DailyResult.solved == 1)).scalars())
+        rows = s.execute(select(DailyScore.gioco, DailyScore.data, DailyScore.punteggio)
+                         .where(DailyScore.auth_id == auth_id)).all()
+    per_game = {"indovina": guess_days, "provincia": set(), "compare": set(), "order": set()}
+    for game, day, score in rows:
+        if game == "provincia" and score < 1:
+            continue
+        if game in per_game:
+            per_game[game].add(day)
+    return set.intersection(*per_game.values())
+
+
+def _province_guessed(auth_id):
+    """Solo il livello difficile ("tutta Italia"), gioco `provincia`."""
+    with session_scope() as s:
+        return s.execute(select(DailyScore.data).where(
+            DailyScore.auth_id == auth_id, DailyScore.gioco == "provincia",
+            DailyScore.punteggio >= 1).limit(1)).first() is not None
+
+
+def _days_in_a_row(auth_id):
+    """La serie piu' lunga di giorni giocati (almeno una sfida del giorno), con il
+    giorno di riposo automatico: la definizione e' `player_stats.play_streak`."""
+    return player_stats.play_streak_for(auth_id)["max"]
 
 
 # id, icona (emoji), titolo, descrizione, criterio(stats_map) -> bool.
@@ -60,19 +99,41 @@ CATALOG = [
      "description": "Prima Regione del giorno indovinata.",
      "criterion": lambda s: s["daily"]["wins"] >= 1},
     {"id": "daily_streak_7", "icon": "📅", "title": "Costante",
-     "description": "7 sfide del giorno risolte di fila.",
+     "description": "7 giorni di fila con la Regione del giorno risolta",
      "criterion": lambda s: s["daily"]["max_daily_streak"] >= 7},
     {"id": "all_rounder", "icon": "🎖️", "title": "Tuttologo",
-     "description": "Giocati tutti e tre i giochi.",
+     "description": "Giocati Indovina la Regione, Chi è maggiore? e Ordina le regioni.",
      "criterion": _played_all},
     {"id": "veteran_50", "icon": "🏛️", "title": "Veterano",
      "description": "50 round giocati in totale.",
      "criterion": lambda s: _total_rounds(s) >= 50},
+    {"id": "geografo", "icon": "📍", "title": "Geografo",
+     "description": "Prima Provincia del giorno indovinata al livello tutta Italia.",
+     "criterion": lambda s: s["_provincia_indovinata"]},
+    {"id": "giro_ditalia", "icon": "🧭", "title": "Giro d'Italia",
+     "description": "Le sfide del giorno di tutti e quattro i giochi risolte nello stesso giorno.",
+     "criterion": lambda s: s["_giri_completi"] >= 1},
+    {"id": "fedele", "icon": "🛡️", "title": "Fedele",
+     "description": "30 giorni di fila con almeno una sfida del giorno.",
+     "criterion": lambda s: s["_giorni_di_fila"] >= LOYAL_DAYS},
 ]
 
 
+# I traguardi con una soglia: id -> (valore di chi gioca dalle statistiche, soglia). Ne
+# esce `progress: {value, target}` nella vetrina, col valore fermo alla soglia.
+PROGRESS = {
+    "compare_10": (lambda s: s["compare"]["best_streak"], 10),
+    "compare_25": (lambda s: s["compare"]["best_streak"], 25),
+    "order_10": (lambda s: s["order"]["best_streak"], 10),
+    "daily_streak_7": (lambda s: s["daily"]["max_daily_streak"], 7),
+    "veteran_50": (_total_rounds, 50),
+    "fedele": (lambda s: s["_giorni_di_fila"], LOYAL_DAYS),
+}
+
+
 def _public(item, unlocked=False, unlocked_at=None):
-    return {"id": item["id"], "icon": item["icon"], "title": item["title"],
+    return {"id": item["id"], "icon": item["icon"],
+            "icon_url": f"/static/img/gioco/traguardi/{item['id']}.svg", "title": item["title"],
             "description": item["description"], "unlocked": unlocked, "unlocked_at": unlocked_at}
 
 
@@ -87,6 +148,16 @@ def unlocked_map(auth_id):
     return {aid: at for aid, at in rows}
 
 
+def _stats_for_criteria(auth_id):
+    """`stats_map` più i dati delle sfide del giorno che i nuovi traguardi
+    leggono (chiavi con il trattino basso: non sono una modalità)."""
+    stats = player_stats.stats_map(auth_id)
+    stats["_provincia_indovinata"] = _province_guessed(auth_id)
+    stats["_giri_completi"] = len(_tour_days(auth_id))
+    stats["_giorni_di_fila"] = _days_in_a_row(auth_id)
+    return stats
+
+
 def evaluate(auth_id):
     """Registra gli achievement appena raggiunti e li restituisce (voci
     pubbliche). Idempotente: uno già sbloccato non si ripropone. Tollerante:
@@ -94,7 +165,7 @@ def evaluate(auth_id):
     if not auth_id:
         return []
     try:
-        stats = player_stats.stats_map(auth_id)
+        stats = _stats_for_criteria(auth_id)
         already = unlocked_map(auth_id)
         newly = [item for item in CATALOG
                  if item["id"] not in already and item["criterion"](stats)]
@@ -114,4 +185,17 @@ def list_for(auth_id):
     """Intero catalogo con lo stato sblocco, per la vetrina (mostra anche quelli
     da conquistare)."""
     unlocked = unlocked_map(auth_id)
-    return [_public(item, item["id"] in unlocked, unlocked.get(item["id"])) for item in CATALOG]
+    try:
+        stats = _stats_for_criteria(auth_id) if auth_id else None
+    except Exception:  # noqa: BLE001
+        # `_stats_for_criteria` legge `daily_scores`: senza la migrazione 0010 la vetrina
+        # resta quella di prima, con il progresso a zero.
+        stats = None
+    entries = []
+    for item in CATALOG:
+        entry = _public(item, item["id"] in unlocked, unlocked.get(item["id"]))
+        if item["id"] in PROGRESS:
+            read_value, threshold = PROGRESS[item["id"]]
+            entry["progress"] = {"value": min(read_value(stats), threshold) if stats else 0, "target": threshold}
+        entries.append(entry)
+    return entries

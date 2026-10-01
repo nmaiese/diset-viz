@@ -1,9 +1,23 @@
 import unittest
-from datetime import date, datetime, timedelta
+import csv
+import json
+import os
+import re
+import shutil
+import subprocess
+from pathlib import Path
+from datetime import date, datetime, timedelta, timezone
+from unittest import mock
 
 from app import app
 from app.data import REGION_ORDER
-from app import game
+from app import config, game, game_daily, quiz_tokens
+from app.cache import cache
+from app.game_daily import today_rome
+
+
+def setUpModule():
+    cache.delete("rl:ans:ip:127.0.0.1")
 
 
 class CompareHelperTest(unittest.TestCase):
@@ -42,7 +56,7 @@ class GameTest(unittest.TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertIn(b'id="hub-root"', page.data)
         self.assertIn("Quanto conosci l'Italia?".encode(), page.data)
-        for href in (b"/quiz/indovina-la-regione", b"/quiz/chi-e-maggiore", b"/quiz/ordina"):
+        for href in (b"/quiz/indovina-la-regione", b"/quiz/chi-e-maggiore", b"/quiz/ordina", b"/quiz/province-italiane"):
             self.assertIn(href, page.data)
 
     def test_legacy_gioco_paths_redirect_permanently(self):
@@ -89,7 +103,7 @@ class GameTest(unittest.TestCase):
         for field in (
             "id", "name", "theme", "macro_area", "unit", "description",
             "value_explanation", "reading", "year", "value", "rank",
-            "region_count", "source_label", "source_url",
+            "region_count", "source_label", "source_url", "path",
         ):
             self.assertIn(field, first["clue"])
         self.assertGreaterEqual(first["clue"]["rank"], 1)
@@ -250,7 +264,7 @@ class GameTest(unittest.TestCase):
 
     def test_archive_day_route(self):
         client = app.test_client()
-        today = date.today()
+        today = today_rome()
 
         # A past (or launch-day) date is playable and carries the right puzzle number.
         past = max(today - timedelta(days=1), game.GAME_EPOCH)
@@ -284,7 +298,7 @@ class GameTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         puzzles = response.get_json()["puzzles"]
 
-        today = date.today()
+        today = today_rome()
         for item in puzzles:
             day = date.fromisoformat(item["date"])
             self.assertLess(day, today)  # today is excluded, it's the main daily tab
@@ -298,11 +312,313 @@ class GameTest(unittest.TestCase):
         """Anti-spoiler: a client must not be able to fetch tomorrow's solution
         by fabricating a future daily puzzle_id and racing to attempt 6."""
         client = app.test_client()
-        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        tomorrow = (today_rome() + timedelta(days=1)).isoformat()
         response = client.post("/api/game/guess", json={
             "puzzle_id": f"daily:{tomorrow}", "region_key": "lombardia", "attempt": 1,
         })
         self.assertEqual(response.status_code, 400)
+
+
+class _OrologioFisso(datetime):
+    """`datetime` con `now()` fissato alle 23:30 UTC del 30 settembre 2026,
+    quando a Roma (CEST) e' gia' l'1 ottobre."""
+
+    @classmethod
+    def now(cls, tz=None):
+        fisso = datetime(2026, 9, 30, 23, 30, tzinfo=timezone.utc)
+        return fisso.astimezone(tz) if tz else fisso.replace(tzinfo=None)
+
+
+class GiornoDiRomaTest(unittest.TestCase):
+    """Fra le 22:00 e la mezzanotte UTC server e client concordano sul giorno:
+    il server gira in UTC, il giocatore vive a Roma."""
+
+    def setUp(self):
+        patcher = mock.patch("app.game_daily.datetime", _OrologioFisso)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.client = app.test_client()
+
+    def test_daily_e_il_giorno_di_roma(self):
+        payload = self.client.get("/api/game/daily").get_json()
+        self.assertEqual(payload["date"], "2026-10-01")
+        self.assertEqual(payload["puzzle_id"], "daily:2026-10-01")
+        self.assertEqual(payload["number"], game.puzzle_number(date(2026, 10, 1)))
+        # La prossima sfida e' la mezzanotte di Roma del 2 ottobre: 22:00 UTC dell'1.
+        self.assertEqual(payload["next_puzzle_at"], "2026-10-01T22:00:00+00:00")
+
+    def test_archivio_e_guess_accettano_il_giorno_di_roma(self):
+        self.assertEqual(self.client.get("/api/game/daily/2026-10-01").status_code, 200)
+        self.assertEqual(self.client.get("/api/game/daily/2026-10-02").status_code, 404)
+        giusto = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-01", "region_key": "lombardia", "attempt": 1,
+        })
+        self.assertEqual(giusto.status_code, 200)
+        futuro = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-02", "region_key": "lombardia", "attempt": 1,
+        })
+        self.assertEqual(futuro.status_code, 400)
+
+    def test_la_sfida_di_ieri_a_pagina_aperta_a_mezzanotte_e_410(self):
+        """La pagina e' rimasta aperta oltre la mezzanotte di Roma: il client della sfida del
+        giorno manda ancora `daily:ieri`. Il server lo dice (`puzzle_changed`) invece di
+        valutare in silenzio un tentativo che non conta per nessuno."""
+        ieri = {"puzzle_id": "daily:2026-09-30", "region_key": "lombardia", "attempt": 1}
+        risposta = self.client.post("/api/game/guess", json={**ieri, "mode": "daily"})
+        self.assertEqual(risposta.status_code, 410)
+        self.assertEqual(risposta.get_json(), {"error": "puzzle_changed"})
+        oggi = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-01", "region_key": "lombardia", "attempt": 1, "mode": "daily",
+        })
+        self.assertEqual(oggi.status_code, 200)
+
+    def test_l_archivio_e_i_client_di_prima_continuano_a_giocare_le_sfide_passate(self):
+        """Il contratto non si restringe: senza `mode` (un bundle vecchio) o con `mode:
+        "archive"` una daily passata si valuta come prima."""
+        ieri = {"puzzle_id": "daily:2026-09-30", "region_key": "lombardia", "attempt": 1}
+        for corpo in (ieri, {**ieri, "mode": "archive"}, {**ieri, "mode": "practice"}):
+            with self.subTest(corpo=corpo):
+                self.assertEqual(self.client.post("/api/game/guess", json=corpo).status_code, 200)
+
+    def test_il_410_non_apre_una_porta_sul_futuro_ne_sull_input_rotto(self):
+        futuro = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-10-02", "region_key": "lombardia", "attempt": 1, "mode": "daily",
+        })
+        self.assertEqual(futuro.status_code, 400)
+        rotto = self.client.post("/api/game/guess", json={
+            "puzzle_id": "daily:2026-09-30", "region_key": "atlantide", "attempt": 1, "mode": "daily",
+        })
+        self.assertEqual(rotto.status_code, 400)
+
+    def test_la_lista_dell_archivio_parte_da_ieri_di_roma(self):
+        giorni = [p["date"] for p in self.client.get("/api/game/archive").get_json()["puzzles"]]
+        self.assertEqual(giorni[0], "2026-09-30")
+        self.assertNotIn("2026-10-01", giorni)
+
+    def test_le_sfide_a_livelli_sono_quelle_di_roma(self):
+        for gioco in ("compare", "order"):
+            payload = self.client.get(f"/api/game/{gioco}/daily").get_json()
+            self.assertEqual(payload["date"], "2026-10-01", gioco)
+            self.assertEqual(payload["puzzle_id"], "daily:2026-10-01", gioco)
+            self.assertEqual(payload["next_puzzle_at"], "2026-10-01T22:00:00+00:00", gioco)
+
+    def test_le_vecchie_soluzioni_non_cambiano_col_passaggio_al_giorno_di_roma(self):
+        # Il numero della sfida e la regione dipendono solo dalla data.
+        self.assertEqual(game.puzzle_number(game.GAME_EPOCH), 1)
+        self.assertEqual(game.region_for_puzzle("daily:2026-07-15"), "Lazio")
+
+
+class SoluzioniPrimaDelCutoverTest(unittest.TestCase):
+    def test_le_regioni_servite_dal_codice_di_prima_non_cambiano(self):
+        """Le soluzioni da GAME_EPOCH a oggi, calcolate con la formula
+        originale, coincidono con quelle del codice nuovo."""
+        import random
+
+        giorno = game.GAME_EPOCH
+        # Dal cutover in poi le soluzioni escono dall'HMAC, e la formula di prima non vale.
+        ultimo = min(today_rome(), game_daily.SEED_CUTOVER - timedelta(days=1))
+        while giorno <= ultimo:
+            ciclo, pos = divmod((giorno - game.GAME_EPOCH).days, len(REGION_ORDER))
+            regioni = list(REGION_ORDER)
+            random.Random(f"divario-regioni-cycle-{ciclo}").shuffle(regioni)
+            puzzle_id, _ = game.daily_puzzle_id(giorno)
+            self.assertEqual(game.region_for_puzzle(puzzle_id), regioni[pos], giorno)
+            giorno += timedelta(days=1)
+
+
+class ElencoGiocoTest(unittest.TestCase):
+    def test_integrita_del_csv(self):
+        righe = game_daily.game_indicators()
+        self.assertGreaterEqual(len(righe), 60)
+        self.assertLessEqual(len(righe), 100)
+        ids = [r["id"] for r in righe]
+        self.assertEqual(len(ids), len(set(ids)))
+        from app import bes_data, quiz
+
+        pool = {p["id"] for p in quiz._quiz_indicators()}
+        manifesto = bes_data.get_bes_manifest("provincia")
+        for r in righe:
+            self.assertTrue(r["unit"].strip(), r["id"])
+            self.assertTrue(r["name"].strip(), r["id"])
+            self.assertTrue(r["regione"] or r["provincia"], r["id"])
+            self.assertFalse(set(r["name"] + r["unit"] + r["note"]) & set(";\u2014\u2013\u2026"), r["id"])
+            if r["regione"]:
+                self.assertIn(r["id"], pool, r["id"])
+            if r["provincia"]:
+                info = manifesto.get(game_daily.provincial_id(r["id"]))
+                self.assertIsNotNone(info, r["id"])
+                self.assertEqual(info["coverage_latest"], 1.0, r["id"])
+                self.assertGreaterEqual(info["year_max"], 2022, r["id"])
+
+    def test_il_flag_provincia_segue_il_manifesto(self):
+        """`n_province_latest == 107` e `year_max >= 2022`, come dice la regola
+        di prodotto, guardando il manifesto grezzo."""
+        with open("app/static/data/province_manifest.csv", encoding="utf-8", newline="") as handle:
+            manifesto = {r["id"]: r for r in csv.DictReader(handle, delimiter=";")}
+        for r in game_daily.game_indicators():
+            if r["provincia"]:
+                riga = manifesto[game_daily.provincial_id(r["id"])]
+                self.assertEqual(int(riga["n_province_latest"]), 107, r["id"])
+                self.assertGreaterEqual(int(riga["year_max"]), 2022, r["id"])
+
+
+class SfidaDelGiornoLivelliTest(unittest.TestCase):
+    CHIAVE = "chiave-di-prova-per-i-test"
+
+    def setUp(self):
+        patcher = mock.patch.dict(os.environ, {"GAME_SEED_KEY": self.CHIAVE})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.giorni = [date(2026, 10, 1) + timedelta(days=i) for i in range(7)]  # giovedi' + una settimana
+
+    def test_compare_ha_dieci_coppie_valide_a_ogni_livello_e_giorno(self):
+        for giorno in self.giorni:
+            for livello in game_daily.LEVELS:
+                sfida = game_daily.daily_compare(giorno, livello)
+                self.assertEqual(len(sfida["pairs"]), 10, (giorno, livello))
+                for coppia in sfida["pairs"]:
+                    self.assertNotEqual(coppia["a"]["key"], coppia["b"]["key"])
+                    self.assertTrue(coppia["indicator"]["unit"])
+                    if livello == "stessa_regione":
+                        self.assertEqual(coppia["a"]["region"], sfida["region"])
+                        self.assertEqual(coppia["b"]["region"], sfida["region"])
+
+    def test_order_ha_cinque_territori_distinti_a_ogni_livello_e_giorno(self):
+        for giorno in self.giorni:
+            for livello in game_daily.LEVELS:
+                sfida = game_daily.daily_order(giorno, livello)
+                chiavi = [t["key"] for t in sfida["territories"]]
+                self.assertEqual(len(set(chiavi)), 5, (giorno, livello))
+                if livello == "stessa_regione":
+                    self.assertIn(sfida["region"], game_daily.eligible_regions(5))
+                    self.assertTrue(all(t["region"] == sfida["region"] for t in sfida["territories"]))
+
+    def test_ogni_regione_idonea_e_ogni_livello_hanno_indicatori_a_sufficienza(self):
+        """La chiave di produzione decide quale regione esce ogni giorno: nessuna
+        regione idonea puo' restare senza indicatori, o quel giorno sarebbe un 500."""
+        rng = game_daily.random.Random(0)
+        giorno = self.giorni[0]
+        for gioco, minimo, distinti in (("compare", game_daily.MIN_PROVINCES_COMPARE, 2), ("order", game_daily.MIN_PROVINCES_ORDER, 5)):
+            for regione in game_daily.eligible_regions(minimo):
+                utili = game_daily._candidates(
+                    "stessa_regione", "province", lambda r, regione=regione: r["region"] == regione, distinti, rng
+                )
+                soglia = game_daily.COMPARE_PAIRS if gioco == "compare" else 1
+                self.assertGreaterEqual(len(utili), soglia, (gioco, regione))
+            for livello, ambito in (("regioni", "regioni"), ("province", "province")):
+                utili = game_daily._candidates(livello, ambito, lambda r: True, distinti, rng)
+                self.assertGreaterEqual(len(utili), 10, (gioco, livello))
+        self.assertTrue(giorno)
+
+    def test_ogni_regione_idonea_esce_davvero_come_sfida(self):
+        """Forza ogni regione idonea come regione del giorno e costruisce il payload."""
+        for gioco, minimo, funzione in (
+            ("compare", game_daily.MIN_PROVINCES_COMPARE, game_daily.daily_compare),
+            ("order", game_daily.MIN_PROVINCES_ORDER, game_daily.daily_order),
+        ):
+            for regione in game_daily.eligible_regions(minimo):
+                # La sfida e' in cache per (giorno, livello, chiave): con la regione
+                # forzata va ricalcolata, e poi tolta, perche' la cache non la tenga.
+                game_daily._compare.cache_clear()
+                game_daily._order.cache_clear()
+                with mock.patch.object(game_daily, "eligible_regions", lambda minimo, r=regione: [r]):
+                    sfida = funzione(self.giorni[0], "stessa_regione")
+                game_daily._compare.cache_clear()
+                game_daily._order.cache_clear()
+                self.assertEqual(sfida["region"], regione, gioco)
+                elementi = sfida["pairs"] if gioco == "compare" else sfida["territories"]
+                self.assertTrue(elementi, (gioco, regione))
+
+    def test_compare_stessa_regione_usa_regioni_con_almeno_tre_province(self):
+        for giorno in self.giorni:
+            self.assertIn(game_daily.daily_compare(giorno, "stessa_regione")["region"], game_daily.eligible_regions(3))
+
+    def test_le_sfide_sono_deterministiche_e_dipendono_dalla_chiave(self):
+        giorno = self.giorni[0]
+        for funzione in (game_daily.daily_compare, game_daily.daily_order):
+            self.assertEqual(funzione(giorno, "province"), funzione(giorno, "province"))
+            self.assertNotEqual(funzione(giorno, "province"), funzione(giorno, "province", key="altra-chiave"))
+            self.assertNotEqual(funzione(giorno, "regioni"), funzione(giorno + timedelta(days=1), "regioni"))
+
+    def test_i_payload_non_rivelano_valori(self):
+        for livello in game_daily.LEVELS:
+            for sfida in (
+                game_daily.daily_compare(self.giorni[0], livello),
+                game_daily.daily_order(self.giorni[0], livello),
+            ):
+                testo = json.dumps(sfida)
+                self.assertNotIn('"value"', testo)
+                self.assertNotIn('"rank"', testo)
+                self.assertNotIn('"solution"', testo)
+
+    def test_la_difficolta_cresce_da_lunedi_a_domenica(self):
+        lunedi, domenica = date(2026, 10, 5), date(2026, 10, 11)
+        self.assertEqual((lunedi.weekday(), domenica.weekday()), (0, 6))
+        self.assertEqual(game_daily.daily_compare(lunedi, "regioni")["difficulty"], 0)
+        self.assertEqual(game_daily.daily_compare(domenica, "regioni")["difficulty"], 4)
+        self.assertEqual(list(game_daily.WEEKDAY_DIFFICULTY), sorted(game_daily.WEEKDAY_DIFFICULTY))
+
+        def rapporti(giorno, livello):
+            ritorno = []
+            for coppia in game_daily.daily_compare(giorno, livello)["pairs"]:
+                ind = next(i for i in game_daily.game_indicators() if i["id"] == coppia["indicator"]["id"])
+                ambito = "regioni" if livello == "regioni" else "province"
+                _, righe = game_daily._indicator_rows(ind, ambito)
+                distinti = sorted({r["value"] for r in righe}, reverse=True)
+                valori = {r["key"]: r["value"] for r in righe}
+                gap = abs(distinti.index(valori[coppia["a"]["key"]]) - distinti.index(valori[coppia["b"]["key"]]))
+                ritorno.append(gap / (len(distinti) - 1))
+            return ritorno
+
+        for livello in ("regioni", "province"):
+            for r in rapporti(lunedi, livello):
+                self.assertGreaterEqual(r, 0.5, livello)
+            for r in rapporti(domenica, livello):
+                self.assertLessEqual(r, 0.25, livello)
+
+    def test_rotte_giornaliere(self):
+        client = app.test_client()
+        for gioco, chiave in (("compare", "pairs"), ("order", "territories")):
+            risposta = client.get(f"/api/game/{gioco}/daily?level=province")
+            self.assertEqual(risposta.status_code, 200)
+            payload = risposta.get_json()
+            self.assertEqual(payload["puzzle_id"], f"daily:{today_rome().isoformat()}")
+            self.assertEqual(payload["level"], "province")
+            self.assertTrue(payload["next_puzzle_at"].endswith("+00:00"))
+            self.assertIn(chiave, payload)
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily").get_json()["level"], "regioni")
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily?level=pianeti").status_code, 400)
+            # Nessuna data a scelta del client: il parametro non esiste.
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily?date=2030-01-01").get_json()["date"], today_rome().isoformat())
+
+
+class PaginaProvinciaTest(unittest.TestCase):
+    def test_pagina_risponde_con_un_solo_h1_e_canonical(self):
+        client = app.test_client()
+        pagina = client.get("/quiz/indovina-la-provincia")
+        self.assertEqual(pagina.status_code, 200)
+        html = pagina.get_data(as_text=True)
+        self.assertEqual(len(re.findall(r"<h1[\s>]", html)), 1)
+        self.assertIn(f'<link rel="canonical" href="{config.SITE_URL}/quiz/indovina-la-provincia"', html)
+        self.assertIn('id="game-root"', html)
+        self.assertIn("province italiane", html)
+        giochi = [
+            json.loads(m) for m in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
+        ]
+        gioco = next(d for d in giochi if d.get("@type") == "Game")
+        self.assertEqual(gioco["creator"]["name"], "Divario Italia")
+
+    def test_pagina_e_in_sitemap_con_priorita(self):
+        sitemap = app.test_client().get("/sitemap.xml").get_data(as_text=True)
+        self.assertRegex(
+            sitemap,
+            re.escape(f"<loc>{config.SITE_URL}/quiz/indovina-la-provincia</loc>") + r"\s*(?:<lastmod>[^<]*</lastmod>\s*)?<priority>0.7</priority>",
+        )
+
+    def test_page_type_game(self):
+        from app import page_types
+
+        self.assertEqual(page_types.page_type("/quiz/indovina-la-provincia"), "game")
 
 
 class QuizCompareTest(unittest.TestCase):
@@ -317,12 +633,15 @@ class QuizCompareTest(unittest.TestCase):
         import json
 
         client = app.test_client()
-        response = client.get("/api/game/compare/round?difficulty=2")
+        # La difficolta' la decide la serie del token, non la query.
+        state = quiz_tokens.new_state("compare")
+        state["s"] = 6
+        response = client.get("/api/game/compare/round?token=" + quiz_tokens.sign_state(state))
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
         for field in (
             "id", "name", "theme", "macro_area", "unit", "year",
-            "source_label", "source_url", "description", "value_explanation",
+            "source_label", "source_url", "description", "value_explanation", "path",
         ):
             self.assertIn(field, payload["indicator"])
         self.assertTrue(payload["indicator"]["source_url"].startswith("http"))
@@ -395,37 +714,39 @@ class QuizCompareTest(unittest.TestCase):
         from app import quiz
 
         client = app.test_client()
-        round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
-        indicator_id = round_["indicator"]["id"]
-        year = round_["indicator"]["year"]
-        key_a = round_["region_a"]["region_key"]
-        key_b = round_["region_b"]["region_key"]
-        values = {
-            row["region_key"]: row["value"]
-            for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
-        }
-        winner = "region_a" if values[key_a] > values[key_b] else "region_b"
-        loser = "region_b" if winner == "region_a" else "region_a"
 
-        def answer(choice):
-            return client.post("/api/game/compare/answer", json={
-                "indicator_id": indicator_id, "year": year,
+        def answer(pick):
+            """Un round nuovo senza timer (un `timeout` subito vale) e la risposta col
+            suo token: senza un round legato la risposta e' un 400."""
+            round_ = client.get("/api/game/compare/round?difficulty=0&timer=0").get_json()
+            indicator_id, year = round_["indicator"]["id"], round_["indicator"]["year"]
+            key_a, key_b = round_["region_a"]["region_key"], round_["region_b"]["region_key"]
+            values = {
+                row["region_key"]: row["value"]
+                for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
+            }
+            winner = "region_a" if values[key_a] > values[key_b] else "region_b"
+            loser = "region_b" if winner == "region_a" else "region_a"
+            choice = {"winner": winner, "loser": loser, "timeout": "timeout"}[pick]
+            body = client.post("/api/game/compare/answer", json={
+                "indicator_id": indicator_id, "year": year, "token": round_["token"],
                 "region_a_key": key_a, "region_b_key": key_b, "choice": choice,
             }).get_json()
+            return body, winner, values[key_a]
 
-        right = answer(winner)
+        right, winner, value_a = answer("winner")
         self.assertTrue(right["correct"])
         self.assertEqual(right["winner"], winner)
-        self.assertEqual(right["region_a"]["value"], values[key_a])
+        self.assertEqual(right["region_a"]["value"], value_a)
         self.assertTrue(right["indicator"]["description"])
         self.assertTrue(right["indicator"]["value_explanation"])
         self.assertTrue(right["indicator"]["source_url"].startswith("http"))
         self.assertTrue(right["indicator"]["source_label"])
 
-        wrong = answer(loser)
+        wrong, _, _ = answer("loser")
         self.assertFalse(wrong["correct"])
 
-        timeout = answer("timeout")
+        timeout, winner, _ = answer("timeout")
         self.assertFalse(timeout["correct"])
         self.assertEqual(timeout["winner"], winner)
         self.assertIsNotNone(timeout["region_b"]["value"])
@@ -438,6 +759,7 @@ class QuizCompareTest(unittest.TestCase):
             "year": round_["indicator"]["year"],
             "region_a_key": round_["region_a"]["region_key"],
             "region_b_key": round_["region_b"]["region_key"],
+            "token": round_["token"],
         }
 
         for overrides in (
@@ -487,22 +809,26 @@ class QuizOrderTest(unittest.TestCase):
         from app import quiz
 
         client = app.test_client()
-        round_ = client.get("/api/game/order/round?count=3").get_json()
-        indicator_id = round_["indicator"]["id"]
-        year = round_["indicator"]["year"]
-        keys = [r["region_key"] for r in round_["regions"]]
-        values = {
-            row["region_key"]: row["value"]
-            for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
-        }
-        perfect = sorted(keys, key=lambda key: values[key], reverse=True)
 
-        def answer(order):
-            return client.post("/api/game/order/answer", json={
-                "indicator_id": indicator_id, "year": year, "region_keys": order,
-            })
+        def answer(arrange):
+            """Un round nuovo e la risposta col suo token, nell'ordine che `arrange`
+            ricava da quello giusto: un round si risponde una volta sola."""
+            round_ = client.get("/api/game/order/round?count=3").get_json()
+            indicator_id = round_["indicator"]["id"]
+            year = round_["indicator"]["year"]
+            keys = [r["region_key"] for r in round_["regions"]]
+            values = {
+                row["region_key"]: row["value"]
+                for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
+            }
+            perfect = sorted(keys, key=lambda key: values[key], reverse=True)
+            body = client.post("/api/game/order/answer", json={
+                "indicator_id": indicator_id, "year": year, "region_keys": arrange(perfect),
+                "token": round_["token"],
+            }).get_json()
+            return body, perfect, indicator_id
 
-        full = answer(perfect).get_json()
+        full, perfect, indicator_id = answer(lambda perfect: perfect)
         self.assertEqual(full["score"], 3)
         self.assertEqual(full["total"], 3)
         self.assertTrue(all(p["correct"] for p in full["positions"]))
@@ -512,7 +838,7 @@ class QuizOrderTest(unittest.TestCase):
         self.assertTrue(full["indicator"]["source_url"].startswith("http"))
         self.assertEqual(full["indicator"]["id"], indicator_id)
 
-        reversed_resp = answer(list(reversed(perfect))).get_json()
+        reversed_resp, _, _ = answer(lambda perfect: list(reversed(perfect)))
         self.assertLess(reversed_resp["score"], 3)
         for pos in reversed_resp["positions"]:
             self.assertIsNotNone(pos["value"])
@@ -520,8 +846,7 @@ class QuizOrderTest(unittest.TestCase):
             self.assertLessEqual(pos["correct_position"], 3)
 
         # Credito parziale: scambiando solo le ultime due resta giusta la prima.
-        swapped = [perfect[0], perfect[2], perfect[1]]
-        partial = answer(swapped).get_json()
+        partial, _, _ = answer(lambda perfect: [perfect[0], perfect[2], perfect[1]])
         self.assertEqual(partial["score"], 1)
         self.assertTrue(partial["positions"][0]["correct"])
 
@@ -535,7 +860,7 @@ class QuizOrderTest(unittest.TestCase):
         def answer(payload):
             return client.post("/api/game/order/answer", json=payload)
 
-        base = {"indicator_id": indicator_id, "year": year}
+        base = {"indicator_id": indicator_id, "year": year, "token": round_["token"]}
         self.assertEqual(answer({**base, "region_keys": [keys[0], keys[0], keys[1]]}).status_code, 400)
         self.assertEqual(answer({**base, "region_keys": ["atlantide", keys[0], keys[1]]}).status_code, 400)
         self.assertEqual(answer({**base, "region_keys": keys[:2]}).status_code, 400)
@@ -547,6 +872,54 @@ class QuizOrderTest(unittest.TestCase):
         sitemap = client.get("/sitemap.xml").data
         self.assertIn(b"/quiz/chi-e-maggiore", sitemap)
         self.assertIn(b"/quiz/ordina", sitemap)
+        self.assertIn(b"/quiz/province-italiane", sitemap)
+
+
+class IndizioCollegatoTest(unittest.TestCase):
+    """Il nome dell'indizio porta alla scheda dell'indicatore anche durante la
+    partita, non solo nel recap di fine partita."""
+
+    def test_clue_fields_espone_il_link_canonico(self):
+        from app import profiles
+
+        puzzle = game.build_puzzle("daily:2026-08-01")
+        self.assertEqual(len(puzzle["clues"]), 6)
+        for clue in puzzle["clues"]:
+            self.assertEqual(clue["path"], profiles.indicator_path(clue["id"], clue["name"]))
+            self.assertTrue(clue["path"].startswith("/indicatore/"), clue["path"])
+
+    def test_il_primo_indizio_e_il_successivo_portano_path(self):
+        client = app.test_client()
+        daily = client.get("/api/game/daily").get_json()
+        self.assertTrue(daily["clue"]["path"].startswith("/indicatore/"))
+        sbagliata = next(k for k in game_region_keys() if k != game.build_puzzle(daily["puzzle_id"])["region_key"])
+        risposta = client.post("/api/game/guess", json={
+            "puzzle_id": daily["puzzle_id"], "region_key": sbagliata, "attempt": 1,
+        }).get_json()
+        self.assertTrue(risposta["next_clue"]["path"].startswith("/indicatore/"))
+        self.assertEqual(risposta["recap"], None)
+
+    def test_il_recap_passa_i_testi_di_che_cosa_misura(self):
+        puzzle = game.build_puzzle("daily:2026-08-01")
+        for clue in puzzle["clues"]:
+            riga = game._recap_entry(clue)
+            for campo in ("description", "value_explanation", "reading"):
+                self.assertIn(campo, riga)
+            self.assertTrue(riga["description"], clue["id"])
+
+
+@unittest.skipUnless(shutil.which("node"), "serve node per provare la logica della serie")
+class SerieAGiorniTest(unittest.TestCase):
+    """La logica pura di Indovina (serie a giorni, messaggi di Provincia, rete) sta in `guess/*.js`
+    e la provano i `guess/*.test.mjs` con `node --test`."""
+
+    def test_serie_js(self):
+        prove = sorted((Path(__file__).resolve().parents[2] / "frontend" / "src" / "game" / "guess").glob("*.test.mjs"))
+        self.assertIn("provincia.test.mjs", {p.name for p in prove})
+        esito = subprocess.run(
+            ["node", "--test", *map(str, prove)], capture_output=True, text=True, timeout=60, check=False
+        )
+        self.assertEqual(esito.returncode, 0, esito.stdout + esito.stderr)
 
 
 def game_region_keys():

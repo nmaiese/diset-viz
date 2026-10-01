@@ -118,14 +118,54 @@ paths:
   L'header sta nella view perché `add_security_headers` timbra `index, follow`
   su ciò che non dichiara altro. Fuori dalla sitemap e deliberatamente NON nel
   disallow di robots.txt: una pagina disallow non si fa mai leggere il noindex.
+- `/quiz` — l'hub di **Sfida Italia** (`game_hub.html`), indicizzabile, `page_type`
+  `game`. **Il gioco non e' una pagina della 1.0**: non passa da `design.render` e
+  non va spostato in `app/templates/v1/`. La sfida di oggi e' **prerenderizzata**
+  con `data-oggi-*`, quindi la pagina indicizzabile non deve dipendere da React.
+  Il JSON-LD `ItemList` ha `numberOfItems` scritto: un gioco in piu' lo cambia,
+  e `docs/GIOCO.md` ("Gli eventi") elenca tutti i punti da aggiornare. Tutto il
+  resto del gioco sta in quel documento: leggerlo prima di toccare una di queste.
+- `/quiz/indovina-la-regione` — pagina del server con l'isola React, canonical su se' stessa,
+  in sitemap. La soluzione non sta mai nel template. Dopo `SEED_CUTOVER` le API
+  del giorno rispondono 503 senza `GAME_SEED_KEY`, la pagina sempre 200.
+- `/quiz/indovina-la-provincia` — `province_total` viene da `province_pool()` al
+  render, mai scritto. La riga di attribuzione dei confini e' scritta a mano nel
+  template (vedi i rischi noti di `docs/GIOCO.md`).
+- `/quiz/chi-e-maggiore`, `/quiz/ordina` — pagine del server con l'isola React, canonical su
+  se' stesse, in sitemap. Niente di seminato al render.
+- `/quiz/province-italiane` — "Dov'e' la provincia?". Il contesto lo compone
+  `game_mappa_page.page()` al render (sagome per regione, elenco indicizzabile
+  delle province, attribuzione CC BY dei confini da `sources.PROVINCE_BOUNDARIES`,
+  frase sulla Sardegna col numero dal pool). **Risponde 200 anche senza
+  `GAME_SEED_KEY`**: non chiama niente di seminato, perche' un errore di deploy
+  non deve togliere dall'indice la pagina che porta traffico.
+- `/quiz/classifica` — **`noindex`** (`_NOINDEX_EXACT_PATHS` in `app/__init__.py`)
+  e fuori dalla sitemap. Mostra solo le serie di Chi e' maggiore e Ordina.
+- `/gioco`, `/gioco/chi-e-maggiore`, `/gioco/ordina` — 301 in un salto verso `/quiz`
+  e le sue pagine.
 - `/legacy` — la dashboard D3 originale: non romperla (`tests/integration/test_app.py`).
 - `/account` — pagina account (noindex), si popola lato client col Bearer.
-- `/api/*` — catalogo, ricerca, indicatori, qualità della vita, **e l'account**:
-  `/api/auth/me`, `/api/favorites`, `/api/player/{me,merge,nickname}`,
+- `/api/*` — catalogo, ricerca, indicatori, qualità della vita, **il gioco e
+  l'account**: `/api/auth/me`, `/api/favorites`, `/api/player/{me,merge,nickname}`,
   `/api/comparisons`, `/api/account/{export,delete}`. Tutti gli endpoint account
   sono authed (401 anonimo) e ricavano l'`auth_id` **solo dal JWT verificato**,
   mai dal body: la RLS è difesa in profondità (il backend gira BYPASSRLS), il
   confine è il `WHERE auth_id`. Leggere `docs/ACCOUNT.md` prima di toccarli.
+- `/api/game/*` — le API del gioco, tutte `noindex` dal prefisso `/api/`. Per
+  gioco: Indovina la Regione (`daily`, `daily/<iso_date>`, `practice`, `archive`,
+  `regions`, `guess`), Indovina la Provincia (`provincia/daily`, `provincia/guess`),
+  Chi e' maggiore (le serie `compare/round` e `compare/answer`, la sfida
+  `compare/daily`, `compare/daily/{session,answer,next}`), Ordina (le serie
+  `order/round` e `order/answer`, la sfida `order/daily`,
+  `order/daily/{session,answer}`), la mappa (`map/daily/{session,answer}`) e la
+  classifica (`leaderboard` in GET e POST, `leaderboard/admin/delete`). Le
+  rotte che compongono una sfida seminata rispondono **503** `seed_unavailable`
+  senza `GAME_SEED_KEY` su Cloud Run (gestore `game_seed_key_missing`), le serie a
+  round e le pagine mai. Le risposte sono sempre valutate dal server e un punteggio
+  di account si scrive solo con un JWT valido. `leaderboard/admin/delete` e'
+  l'unica senza account: chiede `X-Admin-Key` uguale a `SECRET_KEY` e risponde 404
+  se non torna. Il dettaglio di ciascuna (token, monouso, limiti di frequenza) e'
+  in `docs/GIOCO.md`.
 
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
 Strato blog: `app/blog.py` (legge `content/posts/*.md`).

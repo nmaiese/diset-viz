@@ -1,0 +1,42 @@
+{# La mappa muta di "Dov'è la provincia?": markup del server, non React. Il client la rende
+   viva dall'esterno con UN ascoltatore `click` sull'<svg> (`closest('[data-region]')`,
+   `closest('[data-key]')`), come Indovina la Provincia, e legge i centri per la tastiera dal
+   DOM con `getBBox()`: nessun payload serve a disegnarla.
+
+   Id e classi sono il punto d'incontro con `frontend/src/game/mappa/` e non si cambiano
+   senza guardare il client. Ogni sagoma ha un'etichetta neutra, mai il nome: la domanda sta
+   nel gioco, la mappa e' muta. Le sagome vengono dallo sprite (`v1_map_sprite`, a fondo
+   pagina). Ogni gruppo e' una regione e porta il suo riquadro (`maps.zoom`) in
+   `data-viewbox`: e' il riquadro su cui il primo tocco stringe la mappa. #}
+<div class="mappa-cornice" id="mappa-cornice">
+  <svg id="mappa-svg" class="mappa-muta" viewBox="0 0 560 660" role="group"
+       aria-label="Mappa muta delle province italiane: tocca quella indicata" aria-describedby="mappa-istruzioni">
+    <defs>
+      <pattern id="mappa-selezione" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" class="mappa-selezione-fondo"/>
+        <circle cx="3" cy="3" r="1.2" class="mappa-selezione-punto"/>
+      </pattern>
+      <pattern id="mappa-tratteggio" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="6" height="6" class="mappa-tratteggio-fondo"/>
+        <line x1="0" y1="0" x2="0" y2="6" class="mappa-tratteggio-riga"/>
+      </pattern>
+    </defs>
+    <g class="mappa-sagome">
+      {%- for gruppo in mappa.groups %}
+      <g class="mappa-regione" data-region="{{ gruppo.key }}" data-viewbox="{{ gruppo.viewbox }}">
+        {%- for chiave in gruppo.provinces %}
+        <use class="prov-tile" data-key="{{ chiave }}" href="#mp-{{ chiave }}" aria-label="Provincia"/>
+        {%- endfor %}
+      </g>
+      {%- endfor %}
+    </g>
+    <g class="mappa-confini" pointer-events="none" aria-hidden="true">
+      {%- for gruppo in mappa.groups %}
+      <use href="#mr-{{ gruppo.key }}"/>
+      {%- endfor %}
+    </g>
+    <g class="mappa-segni" id="mappa-segni" pointer-events="none" aria-hidden="true"></g>
+  </svg>
+  <p id="mappa-istruzioni" class="visually-hidden">Tocca la regione dove pensi che sia la provincia, poi tocca la provincia e conferma. Con la tastiera: frecce per spostarti, Invio per scegliere, Esc per tornare indietro, Tab per arrivare a Conferma.</p>
+  <p class="mappa-suggerimento" id="mappa-suggerimento" role="status" aria-live="polite"></p>
+</div>

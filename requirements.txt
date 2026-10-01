@@ -19,3 +19,7 @@ alembic==1.14.0
 # (il JWT asimmetrico di Supabase), quindi ogni richiesta autenticata cadeva a
 # 401 in produzione mentre in locale passava (cryptography già nel venv).
 PyJWT[crypto]==2.10.1
+
+# Il giorno del gioco e' quello di Roma (app/game_daily.py): serve il database dei fusi anche
+# nelle immagini senza /usr/share/zoneinfo.
+tzdata==2025.2

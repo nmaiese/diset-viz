@@ -1,55 +1,116 @@
-import React, { useEffect, useState } from "react";
-import { AuthControl, fetchJson, trackGameEvent, notifyAchievements } from "./shared.jsx";
+import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { AuthControl, fetchJson, formatCountdown, trackGameEvent, notifyAchievements } from "./shared.jsx";
+import { GIOCHI, serieLocale, statoOggi } from "./oggi.js";
+import { giorniDiFila } from "./puri.js";
 import { getAccessToken, getUser, isAuthConfigured, mergeLocalStatsOnce, onAuthChange } from "../shared/supabase.js";
+
+// Un'icona SVG che prende il colore del testo: il file e' una maschera, cosi'
+// segue il tema chiaro e scuro (un <img> non legge le variabili del sito).
+function Icona({ nome, cartella = "gioco" }) {
+  return <span className="ico" style={{ "--ico": `url(/static/img/${cartella}/${nome}.svg)` }} aria-hidden="true" />;
+}
+
+// Caricamento, vuoto ed errore sono tre cose diverse: un errore di rete non
+// deve passare per "nessun dato". `carica` ritorna una promise del dato.
+function useCaricamento(carica, dipendenze) {
+  const [stato, setStato] = useState({ fase: "caricamento", dati: null });
+  const [tentativo, setTentativo] = useState(0);
+  useEffect(() => {
+    let attivo = true;
+    setStato({ fase: "caricamento", dati: null });
+    carica()
+      .then((dati) => attivo && setStato({ fase: "pronto", dati }))
+      .catch(() => attivo && setStato({ fase: "errore", dati: null }));
+    return () => {
+      attivo = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...dipendenze, tentativo]);
+  const riprova = useCallback(() => setTentativo((n) => n + 1), []);
+  return [stato, riprova];
+}
+
+function Errore({ testo, onRiprova }) {
+  return (
+    <p className="hub-errore" role="alert">
+      {testo}{" "}
+      <button type="button" className="game-btn game-btn--ghost" onClick={onRiprova}>Riprova</button>
+    </p>
+  );
+}
 
 // Statistiche e traguardi dell'account (quando loggato). Alla prima connessione
 // fonde i progressi locali nell'account (una volta), poi carica la vetrina.
-function useAccountAchievements() {
-  const [data, setData] = useState(null);
+// `fase` dice se sta caricando, e' pronta o e' fallita; `dati` e' null anche
+// per chi non ha il login (fase "anonimo").
+function useAccount() {
+  const [utente, setUtente] = useState(undefined);
   useEffect(() => {
-    if (!isAuthConfigured()) return undefined;
-    let active = true;
-    let unsub = () => {};
-    async function load(user) {
-      if (!user) {
-        if (active) setData(null);
-        return;
-      }
-      const unlocked = await mergeLocalStatsOnce(user.id);
-      if (unlocked && unlocked.length) notifyAchievements(unlocked);
-      const token = await getAccessToken();
-      if (!token || !active) return;
-      try {
-        const r = await fetch("/api/player/me", { headers: { Authorization: `Bearer ${token}` } });
-        if (r.ok && active) setData(await r.json());
-      } catch {
-        /* la vetrina non deve rompere l'hub */
-      }
+    if (!isAuthConfigured()) {
+      setUtente(null);
+      return undefined;
     }
-    getUser().then(load);
-    onAuthChange(load).then((fn) => (active ? (unsub = fn) : fn()));
+    let attivo = true;
+    let unsub = () => {};
+    getUser().then((u) => attivo && setUtente(u || null)).catch(() => attivo && setUtente(null));
+    onAuthChange((u) => attivo && setUtente(u || null)).then((fn) => (attivo ? (unsub = fn) : fn()));
     return () => {
-      active = false;
+      attivo = false;
       unsub();
     };
   }, []);
-  return data;
+
+  const [stato, riprova] = useCaricamento(async () => {
+    if (!utente) return null;
+    const sbloccati = await mergeLocalStatsOnce(utente.id);
+    if (sbloccati && sbloccati.length) notifyAchievements(sbloccati);
+    const token = await getAccessToken();
+    if (!token) throw new Error("senza sessione");
+    const r = await fetch("/api/player/me", { headers: { Authorization: `Bearer ${token}` } });
+    if (!r.ok) throw new Error(`player/me ${r.status}`);
+    return r.json();
+  }, [utente]);
+
+  if (utente === undefined) return { fase: "caricamento", dati: null, riprova };
+  if (utente === null) return { fase: "anonimo", dati: null, riprova };
+  return { ...stato, riprova };
 }
 
-function AchievementsPanel({ data }) {
-  if (!data || !Array.isArray(data.achievements) || data.achievements.length === 0) return null;
-  const list = data.achievements;
-  const unlocked = list.filter((a) => a.unlocked).length;
+function AchievementsPanel({ account }) {
+  if (account.fase === "anonimo") return null;
+  if (account.fase === "caricamento") {
+    return (
+      <div className="qz-stats" id="traguardi" aria-busy="true">
+        <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi</p>
+        <div className="skel-bars" style={{ marginTop: 14 }} aria-hidden="true"><span style={{ height: 14, width: "60%" }} /></div>
+      </div>
+    );
+  }
+  if (account.fase === "errore") {
+    return (
+      <div className="qz-stats" id="traguardi">
+        <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi</p>
+        <Errore testo="Non riesco a caricare i tuoi traguardi." onRiprova={account.riprova} />
+      </div>
+    );
+  }
+  const lista = account.dati && Array.isArray(account.dati.achievements) ? account.dati.achievements : [];
+  if (lista.length === 0) return null;
+  const sbloccati = lista.filter((a) => a.unlocked).length;
   return (
-    <div className="qz-stats">
-      <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi · {unlocked}/{list.length}</p>
+    <div className="qz-stats" id="traguardi">
+      <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi · {sbloccati}/{lista.length}</p>
       <div className="achv-grid">
-        {list.map((a) => (
+        {lista.map((a) => (
           <div key={a.id} className={a.unlocked ? "achv-card" : "achv-card is-locked"}>
-            <span className="achv-card-ic" aria-hidden="true">{a.icon}</span>
+            {a.icon_url
+              ? <span className="ico achv-card-ic" style={{ "--ico": `url(${a.icon_url})` }} aria-hidden="true" />
+              : <span className="achv-card-ic" aria-hidden="true">{a.icon}</span>}
             <div>
               <div className="achv-card-t">{a.title}</div>
               <div className="achv-card-d">{a.description}</div>
+              <div className="achv-card-s">{a.unlocked ? "Sbloccato" : "Da sbloccare"}</div>
             </div>
           </div>
         ))}
@@ -79,6 +140,10 @@ function useHubStats() {
   return stats;
 }
 
+// Il `game` degli eventi, dal `data-gioco` della card (Indovina la Regione e' "indovina" nel
+// markup e "regione" negli eventi).
+const GIOCO_EVENTO = { indovina: "regione", provincia: "provincia", compare: "compare", order: "order" };
+
 // Le card modalità sono server-rendered (indicizzabili): qui aggiungiamo solo
 // il tracciamento evento, senza duplicarne il markup in React.
 function useHubCardTracking() {
@@ -86,21 +151,114 @@ function useHubCardTracking() {
     const cards = document.querySelectorAll(".hub-card");
     function onClick(event) {
       const mode = event.currentTarget.getAttribute("href");
-      trackGameEvent("hub_mode_click", { mode });
+      const scheda = event.currentTarget.closest("[data-gioco]");
+      trackGameEvent("hub_mode_click", { mode, game: GIOCO_EVENTO[scheda && scheda.dataset.gioco] });
     }
     cards.forEach((card) => card.addEventListener("click", onClick));
     return () => cards.forEach((card) => card.removeEventListener("click", onClick));
   }, []);
 }
 
-function useTop5() {
-  const [entries, setEntries] = useState(null);
+// -- La sfida di oggi ---------------------------------------------------------
+// Il markup e' del server (game_hub.html): qui si riempiono gli elementi
+// `data-oggi-*` con portali, cosi' la pagina indicizzabile non dipende dal JS.
+
+// Gli elementi del server da riempire, svuotati una volta sola: un portale
+// aggiunge i suoi figli a quelli che trova, e il testo del server vale solo
+// finche' il JS non e' partito.
+function useBersagli() {
+  const [bersagli, setBersagli] = useState(null);
   useEffect(() => {
-    fetchJson("/api/game/leaderboard?mode=compare&period=week&limit=4")
-      .then((data) => setEntries(data.entries))
-      .catch(() => setEntries([]));
+    const uno = (selettore) => {
+      const el = document.querySelector(selettore);
+      if (el) el.replaceChildren();
+      return el;
+    };
+    setBersagli({
+      numero: uno("[data-oggi-numero]"),
+      conto: uno("[data-oggi-countdown]"),
+      serie: uno("[data-oggi-serie]"),
+      giochi: Object.fromEntries(GIOCHI.map((g) => [g, uno(`[data-gioco="${g}"] [data-oggi-stato]`)])),
+    });
   }, []);
-  return entries;
+  return bersagli;
+}
+
+function useSecondiAlCambio(prossimaIso) {
+  const [secondi, setSecondi] = useState(null);
+  useEffect(() => {
+    const fine = Date.parse(prossimaIso || "");
+    if (!Number.isFinite(fine)) return undefined;
+    const tick = () => setSecondi(Math.max(0, Math.round((fine - Date.now()) / 1000)));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [prossimaIso]);
+  return secondi;
+}
+
+function StatoGioco({ esito }) {
+  if (!esito) return <>Gioca <span aria-hidden="true">→</span></>;
+  return (
+    <>
+      <Icona nome={`stato-${esito.tono || (esito.ok ? "giusto" : "sbagliato")}`} />
+      <span>
+        <strong>Giocata oggi</strong>
+        {esito.testo && <> · {esito.testo}</>}
+      </span>
+    </>
+  );
+}
+
+function SfidaDiOggi({ account }) {
+  const [daily, riprovaDaily] = useCaricamento(() => fetchJson("/api/game/daily"), []);
+  const secondi = useSecondiAlCambio(daily.dati && daily.dati.next_puzzle_at);
+  const [esiti, setEsiti] = useState(null);
+  const [serie, setSerie] = useState(0);
+  useEffect(() => {
+    setEsiti(Object.fromEntries(GIOCHI.map((g) => [g, statoOggi(g)])));
+    setSerie(serieLocale());
+  }, []);
+
+  // Chi ha il login ha la serie dal profilo (`stats.play_streak`, ricalcolata dal server con il
+  // riposo di un giorno), gli altri quella di questo dispositivo (`playStreak`, stessa regola).
+  const giorni = giorniDiFila(account.dati && account.dati.stats ? account.dati.stats.play_streak : null, serie);
+
+  const b = useBersagli();
+  // La classe sulla card e' un effetto, non un gesto del render: React puo' rifare un render.
+  useEffect(() => {
+    if (!b || !esiti) return;
+    GIOCHI.forEach((gioco) => {
+      const el = b.giochi[gioco];
+      const card = el && el.closest("[data-gioco]");
+      if (card) card.classList.toggle("is-giocata", Boolean(esiti[gioco]));
+    });
+  }, [b, esiti]);
+  if (!b) return null;
+  return (
+    <>
+      {b.numero && daily.dati && daily.dati.number ? createPortal(`n. ${daily.dati.number}`, b.numero) : null}
+      {b.conto && createPortal(
+        daily.fase === "errore"
+          ? <>Non riesco a leggere l'orario della prossima sfida. <button type="button" className="hub-link" onClick={riprovaDaily}>Riprova</button></>
+          : secondi === null
+            ? "Una nuova sfida ogni giorno, a mezzanotte"
+            : secondi > 0
+              ? <>Prossima sfida tra <span role="timer" className="hub-oggi__conto">{formatCountdown(secondi)}</span></>
+              : "La nuova sfida è pronta: ricarica la pagina.",
+        b.conto,
+      )}
+      {b.serie && giorni > 0 && createPortal(
+        <>{giorni === 1 ? "1 giorno di fila" : `${giorni} giorni di fila`} con almeno una sfida</>,
+        b.serie,
+      )}
+      {esiti && GIOCHI.map((gioco) => {
+        const el = b.giochi[gioco];
+        if (!el) return null;
+        return createPortal(<StatoGioco esito={esiti[gioco]} />, el, gioco);
+      })}
+    </>
+  );
 }
 
 // Statistiche locali del giocatore (salvate su questo dispositivo, mai sul
@@ -140,7 +298,11 @@ function StatsPanel({ stats }) {
 }
 
 function LeaderboardPanel() {
-  const entries = useTop5();
+  const [top, riprova] = useCaricamento(
+    () => fetchJson("/api/game/leaderboard?mode=compare&period=week&limit=4").then((d) => d.entries || []),
+    [],
+  );
+  const entries = top.dati;
   const max = entries && entries.length > 0 ? entries[0].score : 1;
   return (
     <div className="qz-lb">
@@ -148,16 +310,17 @@ function LeaderboardPanel() {
         <p className="qz-section-eb" style={{ margin: 0 }}>Classifica · settimana</p>
         <a href="/quiz/classifica">Vedi tutta →</a>
       </div>
-      {entries === null && (
+      {top.fase === "caricamento" && (
         <div className="skel-bars" aria-hidden="true">
           <span style={{ height: 14, width: "70%" }} />
           <span style={{ height: 14, width: "60%" }} />
         </div>
       )}
-      {entries && entries.length === 0 && (
+      {top.fase === "errore" && <Errore testo="Non riesco a caricare la classifica." onRiprova={riprova} />}
+      {top.fase === "pronto" && entries.length === 0 && (
         <p className="hub-stats-empty">Ancora nessun punteggio questa settimana: gioca a "Chi è maggiore?" e sii il primo.</p>
       )}
-      {entries && entries.length > 0 && (
+      {top.fase === "pronto" && entries.length > 0 && (
         <ol className="qz-lb-list">
           {entries.map((entry) => (
             <li key={entry.rank}>
@@ -178,16 +341,17 @@ function LeaderboardPanel() {
 export default function HubApp() {
   const stats = useHubStats();
   useHubCardTracking();
-  const account = useAccountAchievements();
+  const account = useAccount();
 
   return (
     <>
+      <SfidaDiOggi account={account} />
       <AuthControl />
       <section className="qz-two">
         <StatsPanel stats={stats} />
         <LeaderboardPanel />
       </section>
-      <AchievementsPanel data={account} />
+      <AchievementsPanel account={account} />
     </>
   );
 }

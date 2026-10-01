@@ -207,6 +207,7 @@ def _bes_quiz_indicators():
             "source_url": meta["source_url"],
             "description": meta["description"],
             "value_explanation": meta["value_explanation"],
+            "path": meta["path"],
             "ranking": values,
         })
     return pool
@@ -240,6 +241,7 @@ def _multiscopo_quiz_indicators():
             "source_url": meta["source_url"],
             "description": meta["description"],
             "value_explanation": meta["value_explanation"],
+            "path": meta["path"],
             "ranking": values,
         })
     return pool
@@ -271,6 +273,7 @@ def _eurostat_quiz_indicators():
             "source_url": meta["source_url"],
             "description": meta["description"],
             "value_explanation": meta["value_explanation"],
+            "path": meta["path"],
             "ranking": values,
         })
     return pool
@@ -313,6 +316,7 @@ def _quiz_indicators():
             "source_url": item["source_url"],
             "description": item["explain"]["plain"],
             "value_explanation": item["explain"]["example"],
+            "path": profiles.indicator_path(item["id"], item["name"]),
             "ranking": [
                 {"region": row["region"], "region_key": row["region_key"], "value": row["value"]}
                 for row in rows
@@ -342,7 +346,14 @@ def _indicator_fields(entry):
         "source_url": entry["source_url"],
         "description": entry["description"],
         "value_explanation": entry["value_explanation"],
+        "path": entry["path"],
     }
+
+
+def _canonical_path(meta):
+    """Il path canonico della scheda: le famiglie esterne lo portano nel payload,
+    le territoriali lo compongono da id e nome."""
+    return meta.get("path") or profiles.indicator_path(meta["id"], meta["name"])
 
 
 def _region_fields(row):
@@ -461,6 +472,7 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
             "source_url": meta["source_url"],
             "description": meta.get("description") or meta["explain"]["plain"],
             "value_explanation": meta.get("value_explanation") or meta["explain"]["example"],
+            "path": _canonical_path(meta),
         },
         "region_a": {"region": name_a, "region_key": region_a_key, "value": value_a},
         "region_b": {"region": name_b, "region_key": region_b_key, "value": value_b},
@@ -558,5 +570,6 @@ def evaluate_order(indicator_id, year, region_keys):
             "source_url": meta["source_url"],
             "description": meta.get("description") or meta["explain"]["plain"],
             "value_explanation": meta.get("value_explanation") or meta["explain"]["example"],
+            "path": _canonical_path(meta),
         },
     }

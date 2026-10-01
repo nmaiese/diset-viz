@@ -1,0 +1,88 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Indovina la Provincia", "path": "/quiz/indovina-la-provincia"}] %}
+{% set active_nav = 'gioco' %}
+{% set game_active = 'provincia' %}
+{% set og_image_path = '/static/img/og/gioco-indovina-provincia.png' %}
+{% set og_image_alt = 'Sfida Italia: Indovina la Provincia' %}
+
+{% block title %}Indovina la Provincia dai dati Istat | {{ site_name }}{% endblock %}
+{% block description %}Indovina la provincia italiana misteriosa a partire dai dati Istat. Una sfida al giorno, con la mappa che ti dice quanto sei vicino.{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-provincia.js') }}"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Indovina la Provincia",
+  "description": "Una provincia italiana misteriosa da indovinare a partire dai dati Istat, con la mappa come aiuto.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": { "@type": "Organization", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "isBasedOn": {% set fonte = game_source("provincia") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali provinciali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
+  "isAccessibleForFree": true
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<article class="page game-page game-page--play wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+
+  {% include "_game_subnav.html" %}
+
+  <header class="page-hero">
+    <h1>Indovina la Provincia</h1>
+    <p class="page-lead">Una provincia italiana misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino. Per imparare dove stanno le province, prova <a href="/quiz/province-italiane">Dov'è la provincia?</a></p>
+  </header>
+
+  <div class="game-layout">
+    <div class="game-map-frame" id="game-map-frame">
+      {# La mappa e' solo feedback: le sagome richiamano i tracciati dallo sprite
+         (`v1_map_sprite`, in fondo alla pagina) e le marca il gioco. Il
+         riquadro si stringe sulla regione al livello "della regione". #}
+      <svg class="regions-map prov-map" id="prov-map" viewBox="0 0 560 660" role="img"
+           aria-label="Mappa delle province italiane. I tuoi tentativi sono segnati con un numero.">
+        <defs>
+          <pattern id="prov-tratteggio" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" class="prov-tratteggio-fondo"/>
+            <line x1="0" y1="0" x2="0" y2="6" class="prov-tratteggio-riga"/>
+          </pattern>
+        </defs>
+        <g class="prov-tiles">
+          {%- for chiave in v1_province_paths %}
+          <use class="prov-tile" data-key="{{ chiave }}" href="#mp-{{ chiave }}"/>
+          {%- endfor %}
+        </g>
+        <g class="prov-marks" id="prov-marks"></g>
+      </svg>
+      <p class="game-map-legend">
+        <span><i class="sw-available"></i> da tentare</span>
+        <span><i class="sw-wrong"></i> tentata, con il numero del tentativo</span>
+        <span><i class="sw-correct"></i> misteriosa, a partita finita</span>
+      </p>
+      {# La stessa riga di attribuzione dei confini che il sito usa alla classifica (v1/_ui.html) e
+         in home: la mappa del gioco disegna gli stessi confini e la licenza la chiede. #}
+      <p class="source">Confini delle province: Istat, via openpolis, <a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>.</p>
+    </div>
+    <div id="game-root">
+      <noscript>
+        <p>Attiva JavaScript per giocare a "Indovina la Provincia". Nel frattempo puoi esplorare
+        <a href="/province">le province italiane</a> o <a href="/quiz/indovina-la-regione">indovinare la regione misteriosa</a> del giorno.</p>
+      </noscript>
+      <p class="game-loading">Preparazione della sfida...</p>
+    </div>
+  </div>
+
+  <section class="prose">
+    <h2>Come si gioca</h2>
+    <p>Ogni giorno tutti affrontano la stessa provincia misteriosa, e la sfida cambia a mezzanotte di Roma. Scrivi il nome di una provincia e scegli dall'elenco che si completa mentre digiti. Hai sei tentativi. Ogni errore ti dice a che distanza sei, in chilometri approssimati, e in quale direzione cercare, se la provincia è nella stessa regione e se il dato del tuo tentativo è più alto o più basso di quello nascosto. In più svela un indizio nuovo, preso dalle statistiche territoriali dell'Istat.</p>
+    <p>Puoi giocare su due livelli: "della regione", dove ti diciamo la regione e scegli fra le sue province, oppure "di tutta Italia", fra le {{ province_total }} province. La provincia è la stessa, cambia il punto di partenza.</p>
+    <p>I dati vengono dalle statistiche territoriali dell'Istat. Vuoi partire dalle regioni? Prova <a href="/quiz/indovina-la-regione">Indovina la Regione</a>.</p>
+  </section>
+</article>
+{{ v1_map_sprite('provincia') }}
+{% endblock %}

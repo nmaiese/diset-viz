@@ -1,22 +1,40 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}] %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'hub' %}
 
-{% block title %}Il quiz sui dati delle regioni italiane | {{ site_name }}{% endblock %}
-{% block description %}Tre giochi sugli indicatori Istat delle regioni italiane: indovina la regione, sfida chi è maggiore, ordina la classifica. Fonte e anno in evidenza.{% endblock %}
+{% block title %}Sfida Italia: quiz sui dati dei territori | {{ site_name }}{% endblock %}
+{% block description %}Cinque giochi sui dati dei territori e sulla geografia: indovina regione e provincia, chi è maggiore, ordina la classifica, trova la provincia sulla mappa.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-hub.js') }}"></script>
 {{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "I giochi di Sfida Italia",
+  "url": {{ canonical | tojson }},
+  "numberOfItems": 5,
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Indovina la Regione", "url": "{{ site_url }}/quiz/indovina-la-regione" },
+    { "@type": "ListItem", "position": 2, "name": "Chi è maggiore?", "url": "{{ site_url }}/quiz/chi-e-maggiore" },
+    { "@type": "ListItem", "position": 3, "name": "Ordina le regioni", "url": "{{ site_url }}/quiz/ordina" },
+    { "@type": "ListItem", "position": 4, "name": "Indovina la Provincia", "url": "{{ site_url }}/quiz/indovina-la-provincia" },
+    { "@type": "ListItem", "position": 5, "name": "Dov'è la provincia?", "url": "{{ site_url }}/quiz/province-italiane" }
+  ]
+}
+</script>
 {% endblock %}
 
 {% block content %}
+{#- Le card sono markup del server, indicizzabile: hub.jsx aggiunge solo lo
+    stato (numero, countdown, "Giocata oggi", serie) negli elementi con
+    `data-oggi-*`, e il server li lascia con un testo che vale da solo. -#}
 <article class="page game-page wrap-wide" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
-  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
 
   {% include "_game_subnav.html" %}
 
@@ -24,36 +42,66 @@
     <div class="hub-layout__hero">
       <header class="page-hero">
         <h1>Quanto conosci l'Italia?</h1>
-        <p class="page-lead">Tre giochi rapidi sugli indicatori territoriali Istat: una regione misteriosa da scoprire, sfide a due e classifiche da ricostruire. Ogni domanda mostra l'anno e la fonte, ogni risposta svela cosa misura davvero il dato.</p>
+        <p class="page-lead">Cinque giochi rapidi: quattro sugli indicatori territoriali, con anno e fonte a ogni domanda, e uno per imparare dove stanno le province sulla mappa.</p>
       </header>
-      <div class="panel-card hub-intro">
-        <h2>Come funziona il quiz</h2>
-        <p>Tutti i giochi usano gli indicatori territoriali Istat pubblicati nell'<a href="/atlante">atlante</a>, con anno e fonte indicati prima di ogni domanda. Alla risposta trovi anche una breve spiegazione di cosa misura l'indicatore, per imparare qualcosa in più sull'Italia a ogni round.</p>
-        <p>Le partite si giocano anche senza registrazione: i record personali restano sul dispositivo e le serie migliori possono entrare nella <a href="/quiz/classifica">classifica</a> condivisa. Se accedi con un account, statistiche e traguardi ti seguono su ogni dispositivo.</p>
-      </div>
+      <p class="hub-nota">Si gioca senza registrazione: i record restano su questo dispositivo. Con un account statistiche e traguardi ti seguono. Nelle <a href="/quiz/classifica">classifiche</a> si entra anche senza account, con un nickname.</p>
     </div>
 
     <div class="hub-layout__main">
-      <p class="qz-section-eb">I tre giochi</p>
-      <section class="hub-cards qz-games" aria-label="Modalità di gioco">
-        <a class="hub-card qz-game" href="/quiz/indovina-la-regione">
-          <small>Sfida quotidiana</small>
-          <h3>Indovina la Regione</h3>
-          <p>Una regione italiana misteriosa, sei indicatori Istat come indizi, sei tentativi. Una nuova sfida ogni giorno.</p>
-          <span class="qz-meta"><em>~3 min · 6 tentativi</em><span>Gioca ora →</span></span>
-        </a>
-        <a class="hub-card qz-game" href="/quiz/chi-e-maggiore">
-          <small>Round da 10 secondi</small>
-          <h3>Chi è maggiore?</h3>
-          <p>Due regioni, un indicatore: scegli quella con il valore più alto prima che scada il tempo. Difficoltà crescente.</p>
-          <span class="qz-meta"><em>~2 min · 10s per round</em><span>Gioca ora →</span></span>
-        </a>
-        <a class="hub-card qz-game" href="/quiz/ordina">
-          <small>Credito parziale</small>
-          <h3>Ordina le regioni</h3>
-          <p>Metti tre o cinque regioni in ordine, dal valore più alto al più basso. Un punto per ogni posizione corretta.</p>
-          <span class="qz-meta"><em>~4 min · 3 o 5 regioni</em><span>Gioca ora →</span></span>
-        </a>
+      <section class="hub-oggi" aria-labelledby="hub-oggi-titolo">
+        <header class="hub-oggi__testa">
+          <div>
+            <p class="qz-section-eb">Sfida di oggi</p>
+            <h2 id="hub-oggi-titolo">Sfida <span data-oggi-numero>del giorno</span></h2>
+          </div>
+          <p class="hub-oggi__meta">
+            <span data-oggi-countdown>Una nuova sfida ogni giorno, a mezzanotte</span>
+            <span class="hub-oggi__serie" data-oggi-serie></span>
+          </p>
+        </header>
+        <ul class="hub-oggi__giochi" aria-label="Le sfide di oggi">
+          <li data-gioco="indovina">
+            <a class="hub-card hub-oggi__gioco" href="/quiz/indovina-la-regione">
+              <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/indovina.svg') }}')" aria-hidden="true"></span>Indovina la Regione</span>
+              <span class="hub-card-body">Una regione misteriosa, sei indizi Istat, sei tentativi.</span>
+              <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
+            </a>
+          </li>
+          <li data-gioco="provincia">
+            <a class="hub-card hub-oggi__gioco" href="/quiz/indovina-la-provincia">
+              <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/provincia.svg') }}')" aria-hidden="true"></span>Indovina la Provincia</span>
+              <span class="hub-card-body">Una provincia su {{ province_total }}, con la mappa che dice quanto sei vicino.</span>
+              <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
+            </a>
+          </li>
+          <li data-gioco="compare">
+            <a class="hub-card hub-oggi__gioco" href="/quiz/chi-e-maggiore">
+              <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/maggiore.svg') }}')" aria-hidden="true"></span>Chi è maggiore?</span>
+              <span class="hub-card-body">Due territori, un indicatore: scegli quello con il valore più alto.</span>
+              <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
+            </a>
+          </li>
+          <li data-gioco="order">
+            <a class="hub-card hub-oggi__gioco" href="/quiz/ordina">
+              <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/ordina.svg') }}')" aria-hidden="true"></span>Ordina le regioni</span>
+              <span class="hub-card-body">Dal valore più alto al più basso, un punto per ogni posizione giusta.</span>
+              <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
+            </a>
+          </li>
+          <li data-gioco="mappa">
+            <a class="hub-card hub-oggi__gioco" href="/quiz/province-italiane">
+              <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/mappa.svg') }}')" aria-hidden="true"></span>Dov'è la provincia?</span>
+              <span class="hub-card-body">Dieci nomi da trovare sulla mappa muta: ogni errore dice di quanto.</span>
+              <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
+            </a>
+          </li>
+        </ul>
+        <p class="hub-oggi__altre">
+          Altre modalità:
+          <a href="/quiz/indovina-la-regione">allenamento senza fine</a>,
+          <a href="/quiz/indovina-la-regione">archivio delle sfide passate</a>,
+          <a href="/quiz/classifica">classifica</a>.
+        </p>
       </section>
 
       <div id="hub-root">

@@ -752,8 +752,8 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
         "/divari-regionali": {"title": "Divari regionali", "text": "Nord, Centro e Mezzogiorno messi a confronto"},
         "/blog": {"title": "Storie", "text": f"{ctx['post_total']} articoli costruiti sui dati" if ctx.get("post_total")
                   else "Gli articoli costruiti sui dati"},
-        "/quiz": {"title": "Quiz", "text": f"{count_word(len(ctx.get('quiz_games') or []), feminine=False).capitalize()} giochi sugli stessi indicatori"
-                  if ctx.get("quiz_games") else "Giochi sugli stessi indicatori"},
+        "/quiz": {"title": "Sfida Italia", "text": f"Il quiz di ogni giorno: {count_word(len(ctx.get('quiz_games') or []), feminine=False)} giochi sugli stessi indicatori"
+                  if ctx.get("quiz_games") else "Il quiz di ogni giorno sugli stessi indicatori"},
         "/catalogo-dati": {"title": "Catalogo dati", "text": "Le schede principali in un elenco, con la loro fonte"},
     }
     return {

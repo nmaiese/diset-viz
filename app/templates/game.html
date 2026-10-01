@@ -1,15 +1,17 @@
 {% extends "blog_base.html" %}
 {% import "_breadcrumb.html" as breadcrumb %}
-{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Indovina la Regione", "path": "/quiz/indovina-la-regione"}] %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Sfida Italia", "path": "/quiz"}, {"name": "Indovina la Regione", "path": "/quiz/indovina-la-regione"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'daily' %}
+{% set og_image_path = '/static/img/og/gioco-indovina-regione.png' %}
+{% set og_image_alt = 'Sfida Italia: Indovina la Regione' %}
 
 {% block title %}Indovina la Regione: gioco sui dati Istat | {{ site_name }}{% endblock %}
 {% block description %}Indovina la regione italiana misteriosa a partire da sei indicatori Istat. Una sfida al giorno, indizi progressivi e un profilo completo a fine partita.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
+<script type="module" crossorigin src="{{ asset_url('dist/assets/quiz-indovina.js') }}"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -18,7 +20,8 @@
   "description": "Gioco quotidiano che fa indovinare una regione italiana a partire da sei indicatori Istat, con indizi progressivi.",
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {{ organization_ref_jsonld | safe }},
+  "isBasedOn": {% set fonte = game_source("regione") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali regionali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
   "isAccessibleForFree": true
 }
 </script>
@@ -26,9 +29,8 @@
 {% endblock %}
 
 {% block content %}
-<article class="page game-page wrap" id="contenuto">
+<article class="page game-page game-page--play wrap" id="contenuto">
   {{ breadcrumb.trail(percorso) }}
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
 
   {% include "_game_subnav.html" %}
 

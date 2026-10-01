@@ -179,10 +179,19 @@ def _oriented(percentile, direction):
 
 
 def _ranks(by_region, direction):
-    """region_key -> rank in 1..n where 1 is the best region for this direction."""
+    """region_key -> rank in 1..n where 1 is the best region for this direction.
+
+    Ranking "a pari merito" (competition ranking, come `province_profile`): due regioni
+    con lo stesso valore hanno lo stesso piazzamento e la successiva salta i posti
+    occupati (1, 2, 2, 4). Prima i pari merito si ordinavano per chiave alfabetica e
+    prendevano posizioni consecutive, quindi una regione sembrava davanti a un'altra
+    che aveva esattamente lo stesso valore."""
     reverse = direction == HIGHER_IS_BETTER  # best = highest value
-    ordered = sorted(by_region.items(), key=lambda kv: (kv[1], kv[0]), reverse=reverse)
-    return {region: index + 1 for index, (region, _) in enumerate(ordered)}
+    values = list(by_region.values())
+    return {
+        region: 1 + sum(1 for other in values if (other > value if reverse else other < value))
+        for region, value in by_region.items()
+    }
 
 
 @cache.memoize(timeout=3600)
