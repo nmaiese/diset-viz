@@ -134,7 +134,7 @@ class TestTerritori(unittest.TestCase):
 
     def test_province_giocabili_escludono_le_sagome_illeggibili(self):
         self.assertEqual(game_daily.excluded_provinces(), ["lecco", "monza-e-della-brianza", "prato", "trieste"])
-        giocabili = province_pool(solo_giocabili=True)
+        giocabili = province_pool(playable_only=True)
         self.assertEqual(len(giocabili), 103)
         for p in giocabili:
             self.assertGreaterEqual(min(p["w"], p["h"]), game_daily.PLAYABLE_THRESHOLD, p["key"])

@@ -202,11 +202,11 @@ def _provinces():
     return tuple(pool)
 
 
-def province_pool(solo_giocabili=False):
+def province_pool(playable_only=False):
     """Le 107 province con chiave, nome, regione e centroide (`x`, `y` nel
     viewBox 560x660). `giocabile` dice se la sagoma e' leggibile sulla mappa;
-    `solo_giocabili` restituisce solo quelle. Non modificare le voci."""
-    return [p for p in _provinces() if p["giocabile"] or not solo_giocabili]
+    `playable_only` restituisce solo quelle. Non modificare le voci."""
+    return [p for p in _provinces() if p["giocabile"] or not playable_only]
 
 
 def excluded_provinces():
@@ -456,14 +456,14 @@ def challenge_payload(game, level, now=None):
 
 # Le fonti dei giochi, per il JSON-LD delle pagine /quiz/*
 
-def _family_of(id_indicatore):
+def _family_of(indicator_id):
     """La famiglia di `app/sources.py` di un id del pool: il prefisso interno
     (`bes:`, `multiscopo:`, `dem:`, `eur:`), e nessun prefisso e' la territoriale."""
     from app import sources
 
     for family, meta in sources.SOURCES.items():
         prefix = meta["internal_prefix"]
-        if prefix and id_indicatore.startswith(prefix):
+        if prefix and indicator_id.startswith(prefix):
             return family
     return "territorial"
 

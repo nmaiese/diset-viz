@@ -8,7 +8,7 @@ La provincia del giorno e' una sola, uguale per tutti e per i due livelli:
 
 Il livello e' la sola cosa che cambia: la provincia, gli indizi e la soluzione
 sono gli stessi. Per questo la provincia si sceglie fra le giocabili
-(`game_daily.province_pool(solo_giocabili=True)`) **di una regione idonea**
+(`game_daily.province_pool(playable_only=True)`) **di una regione idonea**
 (`eligible_regions(3)`): altrimenti il livello facile non avrebbe fra chi scegliere.
 
 Il giorno e' quello di Roma (`game_daily.today_rome`) e il seed esce da
@@ -123,7 +123,7 @@ def daily_province(day, key=None):
     idonea, dal seed. `chiave` serve ai test."""
     eligible = set(game_daily.eligible_regions(game_daily.MIN_PROVINCES_COMPARE))
     candidate = sorted(
-        (p for p in game_daily.province_pool(solo_giocabili=True) if p["region"] in eligible),
+        (p for p in game_daily.province_pool(playable_only=True) if p["region"] in eligible),
         key=lambda p: p["key"],
     )
     rng = random.Random(game_daily.day_seed("provincia", day, key))
