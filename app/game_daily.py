@@ -47,6 +47,8 @@ partita (`game_facts.is_sample_survey`) allora non scrive la posizione esatta. I
 prefisso non basta a dirlo: `426` e' Multiscopo, `57` Forze di lavoro, `72` ICT
 nelle imprese, e nessuno dei tre ha un prefisso. Le righe `bes:`, `multiscopo:` e
 quelle solo provinciali (BES) sono tutte 1. Una riga senza il valore conta come 1.
+`dal` e' il primo giorno (ISO) in cui la riga entra nel pool delle sfide del
+giorno, vuoto per le righe che c'erano dal lancio: vedi `POOL_CUTOVER`.
 """
 
 from __future__ import annotations
@@ -69,6 +71,12 @@ GAME_EPOCH = date(2026, 7, 15)  # giorno di lancio, puzzle numero 1
 
 # Il primo giorno con il seed segreto: il giorno del deploy piu' uno (vedi sopra).
 SEED_CUTOVER = date(2026, 10, 2)
+# Il primo giorno in cui le righe aggiunte all'elenco curato dopo il lancio (colonna
+# `dal` di `config/game_indicators.csv`) entrano nel pool delle sfide del giorno.
+# `_candidates` mescola l'elenco col seed: aggiungere una riga cambia l'indicatore
+# di OGNI giorno, anche gia' servito e condiviso. Prima di questa data il pool e'
+# quello di prima, riga per riga. Il giorno del deploy piu' uno, mai indietro.
+POOL_CUTOVER = date(2026, 10, 4)
 # NON SEGRETA: vale solo finche' `GAME_SEED_KEY` non e' impostata.
 DEV_SEED_KEY = "divario-chiave-di-sviluppo-non-segreta"
 
@@ -272,6 +280,7 @@ def game_indicators():
             "regione": r["livello_regione"] == "1",
             "provincia": r["livello_provincia"] == "1",
             "note": r["note"],
+            "since": date.fromisoformat(r["dal"]) if (r.get("dal") or "").strip() else None,
             # Nel dubbio campionario: una riga senza il valore non da' la posizione esatta.
             "sample_survey": (r.get("campionario") or "").strip() != "0",
         }
@@ -281,6 +290,18 @@ def game_indicators():
 
 def provincial_id(id_):
     return id_[len("bes:"):] if id_.startswith("bes:") else id_
+
+
+def province_source(id_):
+    """(famiglia, id grezzo) di un indicatore provinciale dell'elenco curato. Un id
+    senza prefisso, o con `bes:`, e' BES; con il prefisso di una famiglia esterna
+    (`ipr:`, `aci:`, `agcom:`) i dati stanno in `provincial_families`."""
+    from app import sources
+
+    family, raw = sources.split_internal_id(id_)
+    if family in sources.EXTERNAL_FAMILIES:
+        return family, raw
+    return "bes", provincial_id(id_)
 
 
 def _quiz_index():
@@ -306,21 +327,77 @@ def _indicator_rows(ind, scope, index=None):
             for r in entry["ranking"]
         ]
         return entry["year"], rows
-    from app import bes_data, province_profile
+    from app import bes_data, province_profile, provincial_families
 
-    raw = provincial_id(ind["id"])
+    family, raw = province_source(ind["id"])
+    registry = {p["key"]: p for p in _provinces()}
+    if family != "bes":
+        entry = provincial_families.indicator_page(family, raw)
+        if entry is None or "provincia" not in entry["levels"]:
+            return None
+        year = entry["levels"]["provincia"]["year_max"]
+        rows = [
+            {"key": r["region_key"], "name": registry[r["region_key"]]["name"],
+             "region": registry[r["region_key"]]["region"], "value": r["value"]}
+            for r in sorted(entry["series"], key=lambda r: r["region_key"])
+            if r["year"] == year and r["region_key"] in registry and r["value"] is not None
+        ]
+        return (year, rows) if rows else None
     info = bes_data.get_bes_manifest("provincia").get(raw)
     if info is None:
         return None
     values = (province_profile._serie().get(raw) or {}).get(info["year_max"])
     if not values:
         return None
-    registry = {p["key"]: p for p in _provinces()}
     rows = [
         {"key": k, "name": registry[k]["name"], "region": registry[k]["region"], "value": v}
         for k, v in sorted(values["valori"].items()) if k in registry
     ]
     return info["year_max"], rows
+
+
+def province_info(ind_id):
+    """Spiegazione, link e fonte di un indicatore provinciale dell'elenco curato, o
+    None se la fonte non lo ha. `path` e' il canonico della scheda, `province_path`
+    quello da cui atterra chi parte da una provincia (le `/province` di una scheda a
+    due livelli). Etichetta e URL della fonte vengono da `app/sources.py` e dal
+    manifesto della famiglia, mai scritti a mano. `direction` e' quella della
+    fonte: chi la usa per un piazzamento tratta `contextual` come ignota."""
+    from app import bes_data, provincial_families, sources
+
+    family, raw = province_source(ind_id)
+    if family == "bes":
+        info = bes_data.get_bes_manifest("provincia").get(raw)
+        if info is None:
+            return None
+        try:
+            path, province_path = bes_data.bes_path(raw), bes_data.bes_level_path(raw, "provincia")
+        except LookupError:
+            path = province_path = None
+        return {
+            "family": "bes",
+            "description": info["explain"]["plain"],
+            "value_explanation": info["explain"]["example"],
+            "path": path,
+            "province_path": province_path,
+            "source_label": sources.SOURCES["bes"]["label"],
+            "source_url": bes_data.BES_SOURCE_URLS["provincia"],
+            "direction": info.get("direction"),
+        }
+    entry = provincial_families.indicator_page(family, raw)
+    if entry is None:
+        return None
+    meta = entry["metadata"]
+    return {
+        "family": family,
+        "description": meta["explain"]["plain"],
+        "value_explanation": meta["explain"]["example"],
+        "path": meta["path"],
+        "province_path": sources.level_path(meta["path"], "provincia", meta["base_level"]),
+        "source_label": meta["source_label"],
+        "source_url": meta["source_url"],
+        "direction": meta["direction"],
+    }
 
 
 def _indicator_fields(ind, year):
@@ -353,11 +430,16 @@ def _scope(level, game, day, key):
     return "province", (lambda r: r["region"] == region), region
 
 
-def _candidates(level, scope, row_filter, min_distinct, rng):
+def _candidates(level, scope, row_filter, min_distinct, rng, day=None):
     """Gli indicatori utilizzabili in quell'ambito, in ordine mescolato dal
-    seed: una lista di (indicatore, anno, righe filtrate)."""
+    seed: una lista di (indicatore, anno, righe filtrate). Le righe con `dal`
+    entrano solo da quel giorno (`POOL_CUTOVER`): senza `day` entrano tutte."""
     flag = "regione" if scope == "regioni" else "provincia"
-    listing = sorted((i for i in game_indicators() if i[flag]), key=lambda i: i["id"])
+    listing = sorted(
+        (i for i in game_indicators()
+         if i[flag] and (day is None or i["since"] is None or i["since"] <= day)),
+        key=lambda i: i["id"],
+    )
     rng.shuffle(listing)
     minimum = min_distinct if level == "stessa_regione" else max(min_distinct, _MIN_DISTINCT_REGIONS)
     usable = []
@@ -395,7 +477,7 @@ def _compare(day, level, key):
     difficulty = WEEKDAY_DIFFICULTY[day.weekday()]
     rng = _rng(f"compare-{level}", day, key)
     scope, row_filter, region = _scope(level, "compare", day, key)
-    usable = _candidates(level, scope, row_filter, 2, rng)
+    usable = _candidates(level, scope, row_filter, 2, rng, day)
     lo, hi = _COMPARE_WINDOW[difficulty]
     pairs = []
     for i in range(COMPARE_PAIRS):
@@ -432,7 +514,7 @@ def _order(day, level, key):
     difficulty = WEEKDAY_DIFFICULTY[day.weekday()]
     rng = _rng(f"order-{level}", day, key)
     scope, row_filter, region = _scope(level, "order", day, key)
-    usable = _candidates(level, scope, row_filter, ORDER_TERRITORIES, rng)
+    usable = _candidates(level, scope, row_filter, ORDER_TERRITORIES, rng, day)
     ind, year, rows = usable[0]
     distinct, by_value = _distinct(rows)
     n = len(distinct)
@@ -485,7 +567,8 @@ def game_families(game):
     """Le famiglie di fonti davvero presenti nel pool di un gioco (`regione`,
     `compare`, `order`, `provincia`), nell'ordine del registro. Indovina la Regione
     pesca dal profilo regionale dell'atlante. Chi e' maggiore e Ordina pescano dal
-    pool del quiz e, ai livelli con le province, dal BES provinciale. Indovina la
+    pool del quiz e, ai livelli con le province, dalle famiglie delle righe
+    provinciali dell'elenco curato (BES e le esterne). Indovina la
     Provincia dal BES."""
     from app import profiles, quiz, sources
     from app.data import REGION_ORDER
@@ -494,7 +577,8 @@ def game_families(game):
         profile = profiles.region_profile(profiles.region_key_for(REGION_ORDER[0]))
         families = {_family_of(entry["id"]) for entry in profile["all_indicators"]}
     elif game in ("compare", "order"):
-        families = {_family_of(entry["id"]) for entry in quiz._quiz_indicators()} | {"bes"}
+        families = {_family_of(entry["id"]) for entry in quiz._quiz_indicators()}
+        families |= {province_source(i["id"])[0] for i in game_indicators() if i["provincia"]}
     elif game == "provincia":
         families = {"bes"}
     else:

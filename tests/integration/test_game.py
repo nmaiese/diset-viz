@@ -430,7 +430,7 @@ class ElencoGiocoTest(unittest.TestCase):
     def test_integrita_del_csv(self):
         righe = game_daily.game_indicators()
         self.assertGreaterEqual(len(righe), 60)
-        self.assertLessEqual(len(righe), 100)
+        self.assertLessEqual(len(righe), 150)
         ids = [r["id"] for r in righe]
         self.assertEqual(len(ids), len(set(ids)))
         from app import bes_data, quiz
@@ -444,7 +444,7 @@ class ElencoGiocoTest(unittest.TestCase):
             self.assertFalse(set(r["name"] + r["unit"] + r["note"]) & set(";\u2014\u2013\u2026"), r["id"])
             if r["regione"]:
                 self.assertIn(r["id"], pool, r["id"])
-            if r["provincia"]:
+            if r["provincia"] and game_daily.province_source(r["id"])[0] == "bes":
                 info = manifesto.get(game_daily.provincial_id(r["id"]))
                 self.assertIsNotNone(info, r["id"])
                 self.assertEqual(info["coverage_latest"], 1.0, r["id"])
@@ -456,7 +456,9 @@ class ElencoGiocoTest(unittest.TestCase):
         with open("app/static/data/province_manifest.csv", encoding="utf-8", newline="") as handle:
             manifesto = {r["id"]: r for r in csv.DictReader(handle, delimiter=";")}
         for r in game_daily.game_indicators():
-            if r["provincia"]:
+            # Le famiglie esterne provinciali hanno il loro manifesto: lo guarda
+            # `tests/integration/test_game_pool_esteso.py`.
+            if r["provincia"] and game_daily.province_source(r["id"])[0] == "bes":
                 riga = manifesto[game_daily.provincial_id(r["id"])]
                 self.assertEqual(int(riga["n_province_latest"]), 107, r["id"])
                 self.assertGreaterEqual(int(riga["year_max"]), 2022, r["id"])
