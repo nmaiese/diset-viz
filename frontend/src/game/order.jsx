@@ -22,6 +22,7 @@ import {
   percorsoTerritorio,
   righeEsito,
   segnoPosizione,
+  tastoPerLaRiga,
   tonoDaPunteggio,
   valoreConUnita,
 } from "./order.puri.js";
@@ -669,7 +670,7 @@ export default function OrderApp() {
                         draggable={status === "ordering"}
                         onClick={() => handleRowClick(idx)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
+                          if (tastoPerLaRiga(e.key, e.target, e.currentTarget)) {
                             e.preventDefault();
                             handleRowClick(idx);
                           }
