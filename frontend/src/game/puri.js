@@ -51,10 +51,10 @@ export function tonoFinale(won, tono) {
 // -- La sfida condivisa -----------------------------------------------------------
 
 // Il punteggio massimo di ogni gioco a punteggio: serve a `leggiSfida` per scartare un
-// frammento fuori scala. Il valore e' il numero di round della sfida del giorno
-// (`game_daily.COMPARE_COPPIE` e `ORDER_TERRITORI`). `mappa` e' la modalita' a mappa che
-// arriva dopo: fino a che il suo gioco non dichiara il massimo e' `null`, e senza un
-// massimo nessun frammento e' valido (meglio nessuna sfida che una sfida fuori scala).
+// frammento fuori scala. Il valore e' il massimo della sfida del giorno (le dieci coppie di
+// Chi e' maggiore?, i cinque territori di Ordina, i venti punti della mappa a due punti per
+// domanda). Senza un massimo nessun frammento e' valido (meglio nessuna sfida che una sfida
+// fuori scala).
 export const MASSIMI_SFIDA = { compare: 10, order: 5, mappa: 20 };
 
 const FRAMMENTO_SFIDA = /^#sfida=(0|[1-9]\d{0,2})-([1-9]\d{0,5})$/;
