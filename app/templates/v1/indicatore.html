@@ -129,7 +129,7 @@ addEventListener("pagereveal", function (e) {
       {% endif %}
     </p>
     {% if not meta.indexable %}
-    <p class="meta">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
+    <p class="meta">Questa pagina resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
     {% endif %}
   </header>
   {% if d.tiles %}{{ ui.tiles(d.tiles) }}{% endif %}
@@ -203,13 +203,13 @@ addEventListener("pagereveal", function (e) {
           (`level.query_map`, filtrato da `_query_map_for_article`). -#}
       {% if query_map %}
       <div class="aside-block">
-        <p class="aside-block__label">Le domande di questa scheda</p>
+        <p class="aside-block__label">Le domande di questo indicatore</p>
         <ul class="qlist">{% for item in query_map %}<li><a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a></li>{% endfor %}</ul>
       </div>
       {% endif %}
       <div class="aside-block">
         <p>Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
-        <p><a class="linkarrow" href="#fonti-verifica">Cita questa scheda</a></p>
+        <p><a class="linkarrow" href="#fonti-verifica">Cita questo indicatore</a></p>
       </div>
       <div class="aside-block">{{ ui.ad('side') }}</div>
     </aside>
@@ -348,14 +348,14 @@ addEventListener("pagereveal", function (e) {
       <section class="section indicator-apparatus" id="fonti-verifica" aria-labelledby="h-fonti">
         <h2 id="h-fonti">Fonti, dati e citazione</h2>
         <dl class="specs apparatus-specs">
-          <div><dt>Dato più recente</dt><dd>{{ year }}{% if level.year_min != year %}, serie dal {{ level.year_min }}{% endif %}</dd></div>
-          <div><dt>Fonte</dt><dd><a href="{{ meta.source_url }}">{{ meta.source_label }}</a>{% if meta.source_dataflow %}, serie <code>{{ meta.source_dataflow }}</code>{% endif %}</dd></div>
-          {#- Le righe che dicono come e' fatta la scheda sono quelle di
-              indicator_page.html, parola per parola: le prove di trasparenza e
-              della qualita' della vita le leggono, e sono dichiarazioni, non
-              testo da ridisegnare. -#}
-          <div><dt>Come è calcolato</dt><dd>La media mostrata nella scheda è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
-          <div><dt>Come nasce questa scheda</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della scheda sono ricalcolate dal codice a ogni caricamento.
+          <div><dt>Dato più recente</dt><dd>{{ year }}{% if level.year_min != year %}, dati dal {{ level.year_min }}{% endif %}</dd></div>
+          <div><dt>Fonte</dt><dd><a href="{{ meta.source_url }}">{{ meta.source_label }}</a>{% if meta.source_dataflow %}, dataflow <code>{{ meta.source_dataflow }}</code>{% endif %}</dd></div>
+          {#- Le righe che dicono come e' fatta la pagina sono quelle di
+              indicator_page.html, parola per parola (qui "Come e' calcolato"
+              in piu' porta il link alla metodologia): le prove di trasparenza
+              le leggono, e sono dichiarazioni, non testo da ridisegnare. -#}
+          <div><dt>Come è calcolato</dt><dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Il divario è la distanza fra il valore più alto e il più basso, e la classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
+          <div><dt>Come nasce questa pagina</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della pagina sono ricalcolate dal codice a ogni caricamento.
             {%- if page_article.authored_count or page_article.lead %} Il racconto lo legge e lo approva una persona prima che vada online.
             {%- else %} Il commento ai numeri è costruito sui dati della fonte e si aggiorna con loro, quindi non può invecchiare rispetto ai dati.{% endif %}
             <a href="/metodologia#come-nasce-il-testo">Come lavoriamo</a>.</dd></div>

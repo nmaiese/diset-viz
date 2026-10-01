@@ -133,7 +133,7 @@
       </div>
     </div>
 
-    <p class="page-note">Il punteggio è la media semplice dei percentili orientati dei {{ s.indicator_count }} indicatori direzionali del tema, da 0 a 100, dove il verso di ogni indicatore è quello dichiarato nella sua scheda. Non è una classifica ufficiale e non pesa gli indicatori per importanza: dice dove una regione sta, rispetto alle altre, sulle serie che questo tema raccoglie. <a href="/metodologia">Come sono calcolati confronti e medie</a>.</p>
+    <p class="page-note">Il punteggio è la media semplice dei percentili orientati dei {{ s.indicator_count }} indicatori direzionali del tema, da 0 a 100, dove il verso di ogni indicatore è quello dichiarato nella pagina dell'indicatore. Non è una classifica ufficiale e non pesa gli indicatori per importanza: dice dove una regione sta, rispetto alle altre, sulle serie che questo tema raccoglie. <a href="/metodologia#punteggio">Come si calcola il punteggio</a>.</p>
   </section>
   {% endif %}
 
@@ -151,7 +151,7 @@
         {% if ind.plain %}<p class="ind-card__plain">{{ ind.plain }}</p>{% endif %}
         <div class="ind-card__foot">
           <span class="ind-card__coverage">{{ ind.region_count }} regioni{% if ind.path in province_paths %} · anche per provincia{% endif %}{% if ind.complete %} · completa{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</span>
-          <span class="ind-card__go">Apri la scheda →</span>
+          <span class="ind-card__go">Apri l'indicatore →</span>
         </div>
       </a>
       {% endfor %}
@@ -187,7 +187,7 @@
       dell'atlante, e senza questo blocco non erano in nessun tema. -#}
   <section class="theme-all" id="province">
     <h2>Per provincia</h2>
-    <p class="page-intro">{{ province_indicators | length }} {{ 'scheda di questo tema ha' if province_indicators | length == 1 else 'schede di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
+    <p class="page-intro">{{ province_indicators | length }} {{ 'indicatore di questo tema ha' if province_indicators | length == 1 else 'indicatori di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
     <ol class="indicator-list theme-list">
       {% for ind in province_indicators %}
       <li>

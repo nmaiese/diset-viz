@@ -101,7 +101,7 @@ class LaSchedaDiceComeENata(unittest.TestCase):
 
     def test_una_scheda_con_prosa_dice_che_una_persona_la_approva(self):
         pagina = self._pagina("ter-176")
-        self.assertIn("Come nasce questa scheda", pagina)
+        self.assertIn("Come nasce questa pagina", pagina)
         self.assertIn("lo approva una persona", pagina)
 
     def test_una_scheda_composta_dal_codice_non_si_dichiara_generata(self):
@@ -149,6 +149,14 @@ class LaPaginaDiMetodo(unittest.TestCase):
     def test_dice_che_cosa_viene_verificato(self):
         self.assertIn("riverificata contro il valore vero", self.page)
 
+    def test_non_promette_una_citazione_per_ogni_spiegazione(self):
+        """Misurato il 1 ottobre 2026: 41 articoli su 383 avanzano una lettura
+        causale senza nessuna fonte, e solo 3 portano una citazione del corpus.
+        La promessa "ogni scheda che da' una spiegazione porta accanto una
+        citazione verificata" era falsa, e la pagina non la fa piu'."""
+        self.assertNotIn("porta accanto una citazione verificata", self.page)
+        self.assertIn("una lettura di chi scrive e non una causa accertata", self.page)
+
     def test_dice_che_niente_va_online_senza_una_persona(self):
         """E' la frase che regge l'esenzione del comma 4, quindi o e' vera e
         sta scritta, o la dichiarazione di generazione deve tornare."""
@@ -167,7 +175,7 @@ class LaPaginaDiMetodo(unittest.TestCase):
         "even if the page assigns credit for the content to another source".
         """
         self.assertIn("responsabilità editoriale", self.page)
-        self.assertIn("non firmiamo le schede con nomi di redattori che non esistono",
+        self.assertIn("non firmiamo i testi degli indicatori con nomi di redattori che non esistono",
                       self.page.lower())
 
     def test_manda_a_chi_siamo_e_non_alla_pagina_che_non_esiste(self):
@@ -182,7 +190,7 @@ class IlBloccoStaNelGuscioNonNegliArticoli(unittest.TestCase):
         from pathlib import Path
         guscio = (Path(__file__).resolve().parents[2]
                   / "app" / "templates" / "indicator_page.html").read_text(encoding="utf-8")
-        self.assertIn("Come nasce questa scheda", guscio)
+        self.assertIn("Come nasce questa pagina", guscio)
 
     def test_nessun_articolo_committato_porta_la_dichiarazione_nella_prosa(self):
         """Questa prova girava a vuoto.
@@ -200,7 +208,7 @@ class IlBloccoStaNelGuscioNonNegliArticoli(unittest.TestCase):
                 [voce.get("lead") or ""]
                 + [(s.get("body") or "") + " " + (s.get("h") or "") for s in voce.get("sections") or []]
             )
-            for frase in VECCHIE + ("Come nasce questa scheda",):
+            for frase in VECCHIE + ("Come nasce questa scheda", "Come nasce questa pagina"):
                 with self.subTest(articolo=chiave, frase=frase):
                     self.assertNotIn(
                         frase, testo,

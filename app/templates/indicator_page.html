@@ -102,12 +102,12 @@
     {% endif %}
   </h1>
   <p class="page-lead">{{ page_lead | analyst_html }}</p>
-  <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa scheda</a>.</p>
+  <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa pagina</a>.</p>
   {% if not meta.indexable %}
-  <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
+  <p class="page-note">Questa pagina resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
   {% endif %}
 
-  <nav class="page-note" aria-label="Domande a cui risponde questa scheda">
+  <nav class="page-note" aria-label="Domande a cui risponde questo indicatore">
     <strong>Domande sui dati:</strong>
     {% for item in query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{{ " · " if not loop.last }}{% endfor %}
   </nav>
@@ -241,7 +241,7 @@
       {% if level.has_map and level.map_colors %}
       <article class="data-card viz-card--map" data-tabpanel="map">
         <header><small>Anno <span data-explore="year-label">{{ level.year_max }}</span></small><h3>Mappa</h3></header>
-        <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore, selezionala per metterla in evidenza nella scheda e nella serie storica.</p>
+        <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore, selezionala per metterla in evidenza nella pagina e nella serie storica.</p>
         <style>
           {% for key, color in level.map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
           {% endfor %}
@@ -349,17 +349,17 @@
     <dl class="apparatus-specs">
       <div class="apparatus-specs__row">
         <dt>Dato più recente</dt>
-        <dd>{{ level.year_max }}{% if level.year_min != level.year_max %}, serie {{ level.year_min }}-{{ level.year_max }}{% endif %}</dd>
+        <dd>{{ level.year_max }}{% if level.year_min != level.year_max %}, dati {{ level.year_min }}-{{ level.year_max }}{% endif %}</dd>
       </div>
       <div class="apparatus-specs__row">
         <dt>Fonte</dt>
-        <dd><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>{% if meta.source_dataflow %} · serie SDMX <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>{% endif %}</dd>
+        <dd><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>{% if meta.source_dataflow %} · dataflow SDMX <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>{% endif %}</dd>
       </div>
       {# How we compute, not what the source measures. It stays here so an authored
          "limiti" section can never drop it. #}
       <div class="apparatus-specs__row">
         <dt>Come è calcolato</dt>
-        <dd>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</dd>
+        <dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Il divario è la distanza fra il valore più alto e il più basso, e la classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni.</dd>
       </div>
       {# Come nasce la scheda. Era un paragrafo in coda all'articolo, dove
          diceva la stessa frase su trecento pagine dentro il racconto. Qui sta
@@ -369,7 +369,7 @@
          una persona, oppure frasi composte dal codice sui dati della fonte.
          Chiamare generata la seconda sarebbe impreciso in eccesso. #}
       <div class="apparatus-specs__row">
-        <dt>Come nasce questa scheda</dt>
+        <dt>Come nasce questa pagina</dt>
         <dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi del cruscotto sono ricalcolate dal codice a ogni caricamento.
           {%- if page_article.authored_count or page_article.lead %} Il racconto lo legge e lo approva una persona prima che vada online.
           {%- else %} Il commento ai numeri è costruito sui dati della fonte e si aggiorna con loro, quindi non può invecchiare rispetto ai dati.{% endif %}

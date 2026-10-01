@@ -9,7 +9,10 @@ ordine del `groupby` del template di prima.
 Le ancore restano quelle di prima (`#come-nasce-il-testo`,
 `#qualita-della-vita`, `#indicatori-usati`), perche' le schede, la classifica e
 l'indice della qualita' della vita ci linkano. Le sezioni che non avevano un
-id ne prendono uno nuovo, per l'indice.
+id ne prendono uno nuovo, per l'indice, e le definizioni di "Come leggere gli
+indicatori" ne hanno uno ciascuna (`#media-semplice`, `#verso`, `#nd`,
+`#copertura`, `#percentile`, `#posizione-media`, `#punteggio`, `#ripartizione`,
+`#profilo`, `#indicatore`): i popover di `app/design/terms.py` puntano a quelle.
 """
 
 from __future__ import annotations
@@ -31,6 +34,7 @@ def derive(ctx: dict) -> dict:
     indicators = ctx.get("quality_life_indicators") or []
     groups = _indicator_groups(indicators)
     toc = [
+        ("in-breve", "In breve"),
         ("fonte", "Fonte principale"),
         ("leggere", "Come leggere gli indicatori"),
         ("come-nasce-il-testo", "Come nasce il testo"),

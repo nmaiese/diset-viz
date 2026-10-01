@@ -69,7 +69,7 @@
     {#- Il totale e' quello del catalogo dell'atlante, che e' regionale: i
         valori delle province non ci stanno, e le schede che li hanno le conta
         la sezione "Per provincia" dei temi (`indicator_view.province_indicators_by_theme`). #}
-    <p class="answer">{{ total | num(None, 'count') }} indicatori per regione, di {{ institutions }}, divisi in {{ theme_total | num(None, 'count') }} temi e {{ d.area_count | num(None, 'count') }} aree.{% if province_count %} Nella sezione Per provincia dei temi ci {{ 'è' if province_count == 1 else 'sono' }} anche {{ 'la' if province_count == 1 else 'le' }} {{ province_count }} {{ province_count | it_plural('scheda', 'schede') }} con i valori delle province{% if province_only %}, {{ province_only }} solo per provincia{% endif %}.{% endif %}</p>
+    <p class="answer">{{ total | num(None, 'count') }} indicatori per regione, di {{ institutions }}, divisi in {{ theme_total | num(None, 'count') }} temi e {{ d.area_count | num(None, 'count') }} aree.{% if province_count %} Nella sezione Per provincia dei temi ci {{ 'è' if province_count == 1 else 'sono' }} anche {{ 'la' if province_count == 1 else 'le' }} {{ province_count }} {{ province_count | it_plural('indicatore', 'indicatori') }} con i valori delle province{% if province_only %}, {{ province_only }} solo per provincia{% endif %}.{% endif %}</p>
     <p class="lede">Ogni tema apre con la classifica delle regioni, la mappa e le serie da cui partire, e sotto ha tutte le sue serie con fonte e andamento negli anni.</p>
     <p class="meta">
       {% for a in d.areas %}<a href="#area-{{ a.slug }}">{{ a.area }}</a>{% endfor %}
@@ -112,7 +112,7 @@
   </section>
   {% endfor %}
   <p class="empty" data-temi-empty hidden>Nessun tema corrisponde alla ricerca. <a href="/atlante">Cerca fra tutti gli indicatori nell'atlante</a></p>
-  <p class="source temi-source">In testa e in coda: la regione con la posizione media migliore e quella con la peggiore sugli indicatori del tema che hanno un verso, cioè per cui si può dire quale valore è migliore. Su {{ theme_total - d.ranked }} {{ 'tema' if theme_total - d.ranked == 1 else 'temi' }} i dati completi non bastano per una classifica. <a href="/metodologia">Come sono calcolati confronti e medie</a></p>
+  <p class="source temi-source">In testa e in coda: la regione con la posizione media migliore e quella con la peggiore sugli indicatori del tema che hanno un verso, cioè per cui si può dire quale valore è migliore. Su {{ theme_total - d.ranked }} {{ 'tema' if theme_total - d.ranked == 1 else 'temi' }} i dati completi non bastano per una classifica. <a href="/metodologia#posizione-media">Come si calcola la posizione media</a></p>
 </div>
 
 <section class="band" id="continua" aria-labelledby="h-continua">

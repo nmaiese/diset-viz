@@ -51,7 +51,7 @@ QUALITY_LIFE_CATEGORIES = {
 QUALITY_LIFE_PROFILES = {
     "standard": {
         "name": "Equilibrato",
-        "description": "Assegna lo stesso peso alle dodici dimensioni della qualità della vita.",
+        "description": "Assegna lo stesso peso a tutte le dimensioni della qualità della vita.",
         "weights": {slug: 1.0 for slug in QUALITY_LIFE_CATEGORIES},
     },
     "opportunita": {

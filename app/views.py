@@ -1375,15 +1375,23 @@ def termini():
 
 @app.route("/metodologia")
 def methodology():
+    regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
+    catalog_total = len(_listed_indicator_entries())
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.methodology_markdown(
                 SITE_URL, sources.LICENSE_LABEL, sources.LICENSE_URL,
+                counts={
+                    "atlante": regioni["methodology"]["manifest_indicators_total"],
+                    "catalogo": catalog_total,
+                    "punteggio": regioni["methodology"]["score_indicators_total"],
+                } if regioni else None,
             ),
             f"{SITE_URL}/metodologia",
         )
-    regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
     province = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
+    categories = qb.get_quality_life_categories()
+    conteggi_province = province["methodology"]["indicator_counts"] if province else {}
     return design.render(
         "metodologia", "v1/metodologia.html", "methodology.html",
         site_url=SITE_URL,
@@ -1393,7 +1401,13 @@ def methodology():
         methodology_province=province["methodology"] if province else None,
         measured_provinces=len(province["ranking"]) if province else 0,
         unmeasured_provinces=province_profile.unmeasured_provinces(),
-        categories=qb.get_quality_life_categories(),
+        categories=categories,
+        # Le categorie senza un indicatore provinciale: "dodici" vale per le
+        # regioni, non per le province, e il testo lo dice con questi conti.
+        categorie_senza_province=[c for c in categories if not conteggi_province.get(c["slug"])],
+        # Le pagine del catalogo dati, per la riga che riconcilia i conteggi
+        # degli indicatori (atlante, catalogo, punteggio).
+        catalog_total=catalog_total,
         profiles=qb.get_quality_life_profiles(),
         quality_life_indicators=_quality_life_indicators(),
     )
@@ -3684,7 +3698,7 @@ def llms_txt():
     lines += [
         "",
         "## Note per i modelli linguistici",
-        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori. Alcuni indicatori provengono da altre istituzioni, indicate sulla singola scheda.",
+        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori. Alcuni indicatori provengono da altre istituzioni, indicate su ogni indicatore.",
         f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte indicata per ciascun indicatore.",
         "- Per gli indicatori territoriali, i download seguono il pattern "
         f"`/download/indicator/ID.csv` e `/download/indicator/ID.json`. Esempio reale: "
@@ -3753,7 +3767,7 @@ def llms_full_txt():
         "pubblicati su divarioitalia.it. I numeri coincidono "
         "con le pagine indicatore del sito. La fonte primaria e Istat, ma "
         "alcuni indicatori provengono da altre istituzioni indicate su ogni "
-        "scheda. Cita \"Divario Italia\" e la fonte indicata per ciascun "
+        "indicatore. Cita \"Divario Italia\" e la fonte indicata per ciascun "
         "indicatore.",
         "",
         "## Metodologia in breve",

@@ -91,7 +91,8 @@ class QualityLifeStaticTest(unittest.TestCase):
         # the wording of the old quality-of-life page.
         self.assertIn(b'id="sezione-dinamica"', page.data)
         self.assertIn(b'class="indicator-cockpit"', page.data)
-        self.assertIn("sintesi non ponderata".encode("utf-8"), page.data)
+        self.assertIn("media semplice".encode("utf-8"), page.data)
+        self.assertIn(b"/metodologia#media-semplice", page.data)
 
         sparse = next(item for item in indicators if item["id"] == "06POL001P")
         sparse_page = client.get(sparse["path"])

@@ -165,8 +165,8 @@
         </div>
 
         <div class="heromap__actions">
-          <span class="label heromap__readout" data-ds-readout aria-live="polite">Passa sulle regioni per leggerne il valore. Clicca per aprire la scheda.</span>
-          <a class="heromap__open" href="{{ hero_map.indicator_path }}">Apri la scheda dell'indicatore &rarr;</a>
+          <span class="label heromap__readout" data-ds-readout aria-live="polite">Passa sulle regioni per leggerne il valore. Clicca per aprire l'indicatore.</span>
+          <a class="heromap__open" href="{{ hero_map.indicator_path }}">Apri l'indicatore &rarr;</a>
         </div>
       </div>
     </div>
@@ -235,7 +235,7 @@
         {% if featured_story.summary %}<p class="body">{{ featured_story.summary }}</p>{% endif %}
         <p class="body body--secondary">Nel {{ featured_story.year }} {{ featured_story.lead_region }} segna {{ featured_story.lead_value }} {{ featured_story.unit }}, {{ featured_story.lag_region }} si ferma a {{ featured_story.lag_value }}. {{ featured_story.direction_note }}</p>
         <div class="ctarow storyfeat__cta">
-          <a class="linkcta" href="{{ featured_story.path }}">Apri la scheda dell'indicatore &rarr;</a>
+          <a class="linkcta" href="{{ featured_story.path }}">Apri l'indicatore &rarr;</a>
           <a class="linkcta linkcta--quiet" href="/divari-regionali">Leggi i divari territoriali</a>
         </div>
       </div>
@@ -248,7 +248,7 @@
         <span class="meta">{{ card.theme }} · {{ card.year }}</span>
         <p class="h4 insight__title">{{ card.lead_region }} guida, {{ card.lag_region }} chiude</p>
         <p class="body insight__body">{{ card.name }}: da {{ card.lead_value }} a {{ card.lag_value }} {{ card.unit }}.{% if card.summary %} {{ card.summary }}{% endif %}</p>
-        <a class="meta insight__meta" href="{{ card.path }}">Apri la scheda &rarr;</a>
+        <a class="meta insight__meta" href="{{ card.path }}">Apri l'indicatore &rarr;</a>
       </div>
       {% endfor %}
     </div>
