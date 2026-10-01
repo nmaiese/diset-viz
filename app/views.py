@@ -220,6 +220,12 @@ def _client_ip():
     return request.remote_addr or "unknown"
 
 
+def _client_bucket():
+    """L'IP del client come chiave dei secchi del gioco: un IPv6 vale per il suo /64
+    (`client_ip.bucket_key`), un IPv4 resta se stesso."""
+    return client_ip.bucket_key(_client_ip())
+
+
 def _rate_limit_ok(bucket, limit, window_s):
     """Rate limit a finestra fissa, in-process, appoggiato alla cache dell'app.
     Per-worker (leggermente lasco con più worker), senza dipendenze esterne né Redis:
@@ -2698,14 +2704,18 @@ _SID_ANSWERS_PER_MIN = 45
 
 def _ip_answer_limited():
     """120 richieste al minuto per IP, il secchio condiviso da tutte le rotte di risposta."""
-    return not _rate_limit_ok(f"ans:ip:{_client_ip()}", limit=120, window_s=60)
+    return not _rate_limit_ok(f"ans:ip:{_client_bucket()}", limit=120, window_s=60)
 
 
 def _answer_rate_limited(sid):
     """120 risposte al minuto per IP e 45 per sessione firmata: nessun
-    giocatore vero ci arriva, uno script si'."""
+    giocatore vero ci arriva, uno script si'. `sid` e' None per un token non valido
+    (`quiz_tokens.signed_sid`): allora vale solo il secchio per IP, e la cache non
+    si riempie di secchi con un `sid` casuale."""
     if _ip_answer_limited():
         return True
+    if sid is None:
+        return False
     return not _rate_limit_ok(f"ans:sid:{sid}", limit=_SID_ANSWERS_PER_MIN, window_s=60)
 
 
@@ -2720,8 +2730,11 @@ _session_summary = quiz_tokens.session_summary
 def game_compare_round_api():
     # Il timer si decide aprendo la sessione (`timer=0` e' allenamento, fuori
     # classifica) e la difficolta' la decide la serie: il parametro `difficulty`
-    # del client non si legge.
-    state = quiz_tokens.close_open_round(
+    # del client non si legge. Il limite per IP c'e' perche' l'emissione scrive nel
+    # DB (`quiz_tokens.open_round`).
+    if _ip_answer_limited():
+        return jsonify({"error": "rate_limited"}), 429
+    state = quiz_tokens.open_round(
         quiz_tokens.load_state(request.args.get("token"), "compare", _timer_requested()))
     result = quiz.compare_round(min(state["s"] // 3, quiz.MAX_DIFFICULTY))
     result["timer"] = bool(state["t"])
@@ -2734,15 +2747,19 @@ def game_compare_round_api():
 
 @app.post("/api/game/compare/answer")
 def game_compare_answer_api():
-    """Senza un round legato la risposta si valuta (il dato e' pubblico, e' lo stesso
-    dell'atlante) ma non conta: niente serie, niente token nuovo, niente statistiche
-    dell'account (`_record_quiz`), niente classifica. L'unico freno a chi chiede prima
-    all'oracolo e risponde dopo col token e' la plausibilita' temporale della sessione
-    (`quiz_tokens.is_plausible`)."""
+    """Si valuta solo la coppia del round legato al token: senza (token assente, rotto,
+    di un'altra modalita', gia' risposto, o una coppia diversa da quella emessa) la
+    risposta e' un 400 `token_invalid` senza valori. Prima si valutava lo stesso, senza
+    contare: era un oracolo che rispondeva su qualsiasi coppia, comprese quelle della
+    sfida del giorno, e con uno script portava la classifica dove voleva. Il client
+    manda sempre il token che `/round` gli ha dato."""
     payload = request.get_json(silent=True) or {}
-    state = quiz_tokens.load_state(payload.get("token"), "compare")
-    if _answer_rate_limited(state["sid"]):
+    if _answer_rate_limited(quiz_tokens.signed_sid(payload.get("token"), "compare")):
         return jsonify({"error": "rate_limited"}), 429
+    state = quiz_tokens.load_state(payload.get("token"), "compare")
+    keys = [payload.get("region_a_key"), payload.get("region_b_key")]
+    if quiz_tokens.apply_answer(state, payload.get("indicator_id"), payload.get("year"), keys, False)[0] is None:
+        return jsonify({"error": "token_invalid"}), 400
     result = quiz.evaluate_compare(
         payload.get("indicator_id"),
         payload.get("year"),
@@ -2752,18 +2769,12 @@ def game_compare_answer_api():
     )
     if result is None:
         abort(400)
-    keys = [payload.get("region_a_key"), payload.get("region_b_key")]
-    bound = quiz_tokens.apply_answer(
-        state, payload.get("indicator_id"), payload.get("year"), keys, result["correct"]
-    )[0] is not None
-    late = False
-    if bound:
-        timing = quiz_tokens.round_timing(state, payload.get("choice"))
-        if timing == "early_timeout":
-            return jsonify({"error": "timeout_too_early"}), 400
-        if not quiz_tokens.claim_round(state["sid"], state["q"]):
-            return _round_conflict()
-        late = timing == "late"
+    timing = quiz_tokens.round_timing(state, payload.get("choice"))
+    if timing == "early_timeout":
+        return jsonify({"error": "timeout_too_early"}), 400
+    if not quiz_tokens.claim_round(state["sid"], state["q"]):
+        return _round_conflict()
+    late = timing == "late"
     correct = result["correct"] and not late
     session, token = quiz_tokens.apply_answer(
         state, payload.get("indicator_id"), payload.get("year"), keys, correct
@@ -2778,6 +2789,8 @@ def game_compare_answer_api():
 
 @app.route("/api/game/order/round")
 def game_order_round_api():
+    if _ip_answer_limited():
+        return jsonify({"error": "rate_limited"}), 429
     try:
         count = int(request.args.get("count", ""))
     except ValueError:
@@ -2785,7 +2798,7 @@ def game_order_round_api():
     result = quiz.order_round(count)
     if result is None:
         abort(400)
-    state = quiz_tokens.close_open_round(
+    state = quiz_tokens.open_round(
         quiz_tokens.load_state(request.args.get("token"), "order", _timer_requested()))
     result["timer"] = bool(state["t"])
     keys = [r["region_key"] for r in result["regions"]]
@@ -2797,12 +2810,15 @@ def game_order_round_api():
 
 @app.post("/api/game/order/answer")
 def game_order_answer_api():
-    """Come `game_compare_answer_api`: senza un round legato si valuta e basta."""
+    """Come `game_compare_answer_api`: senza un round legato e' un 400 senza valori."""
     payload = request.get_json(silent=True) or {}
-    state = quiz_tokens.load_state(payload.get("token"), "order")
-    if _answer_rate_limited(state["sid"]):
+    if _answer_rate_limited(quiz_tokens.signed_sid(payload.get("token"), "order")):
         return jsonify({"error": "rate_limited"}), 429
+    state = quiz_tokens.load_state(payload.get("token"), "order")
     region_keys = payload.get("region_keys")
+    if not isinstance(region_keys, list) or quiz_tokens.apply_answer(
+            state, payload.get("indicator_id"), payload.get("year"), region_keys, False)[0] is None:
+        return jsonify({"error": "token_invalid"}), 400
     result = quiz.evaluate_order(
         payload.get("indicator_id"),
         payload.get("year"),
@@ -2812,9 +2828,9 @@ def game_order_answer_api():
         abort(400)
     is_perfect = result["score"] == result["total"]
     session, token = quiz_tokens.apply_answer(
-        state, payload.get("indicator_id"), payload.get("year"), region_keys or [], is_perfect
+        state, payload.get("indicator_id"), payload.get("year"), region_keys, is_perfect
     )
-    if session is not None and not quiz_tokens.claim_round(state["sid"], state["q"]):
+    if not quiz_tokens.claim_round(state["sid"], state["q"]):
         return _round_conflict()
     result["session"] = _session_summary(session)
     result["token"] = token
@@ -3046,7 +3062,7 @@ def leaderboard_get_api():
 
 @app.post("/api/game/leaderboard")
 def leaderboard_post_api():
-    if not _rate_limit_ok(f"lb:{_client_ip()}", limit=5, window_s=60):
+    if not _rate_limit_ok(f"lb:{_client_bucket()}", limit=5, window_s=60):
         return jsonify({"error": "rate_limited"}), 429
 
     payload = request.get_json(silent=True) or {}
@@ -3129,7 +3145,7 @@ def game_order_daily_api():
 
 
 def _provincia_rate_limited():
-    return not _rate_limit_ok(f"prov:ip:{_client_ip()}", limit=60, window_s=60)
+    return not _rate_limit_ok(f"prov:ip:{_client_bucket()}", limit=60, window_s=60)
 
 
 @app.route("/api/game/provincia/daily")
@@ -3217,6 +3233,8 @@ def game_order_daily_answer_api():
 def game_compare_daily_session_api():
     # Livello e timer si dichiarano qui e da qui in poi viaggiano nel token
     # firmato: il client non li sceglie più.
+    if _ip_answer_limited():
+        return jsonify({"error": "rate_limited"}), 429
     sessione = game_compare.open_session(
         request.args.get("level", "regioni"), _timer_requested()
     )
@@ -3293,7 +3311,7 @@ def game_map_daily_answer_api():
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
         data = {}
-    if _answer_rate_limited(game_mappa.sid_of_token(data.get("token"))):
+    if _answer_rate_limited(quiz_tokens.signed_sid(data.get("token"), game_mappa.MODE)):
         return jsonify({"error": "rate_limited"}), 429
     status, body, finished_game = game_mappa.answer(data)
     if finished_game is None:

@@ -51,3 +51,19 @@ def resolve_client_ip(forwarded_for, cf_connecting_ip):
         if client is not None:
             return str(client)
     return last_hop
+
+
+def bucket_key(value):
+    """La chiave del secchio di un limite di frequenza per un IP. Un IPv6 vale per il
+    suo /64: un client ruota gli indirizzi dentro il prefisso che gli assegna il
+    provider, e un secchio per indirizzo si aggirerebbe cambiando indirizzo. Un IPv4
+    resta se stesso (anche quando arriva come IPv6 mappato), e un valore che non e'
+    un IP resta com'e'."""
+    ip = _ip(value)
+    if ip is None:
+        return value
+    if ip.version == 6:
+        if ip.ipv4_mapped is not None:
+            return str(ip.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{ip}/64", strict=False))
+    return str(ip)

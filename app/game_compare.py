@@ -249,9 +249,9 @@ def open_session(level, timer, now=None):
 
 
 def sid_from_token(token):
-    """Il `sid` della sessione, per il limite di frequenza: un token assente o
-    rotto apre una sessione nuova, come fa `load_state` nell'altra rotta."""
-    return quiz_tokens.load_state(token, MODE)["sid"]
+    """Il `sid` della sessione per il limite di frequenza, o None per un token
+    assente o rotto: allora vale solo il secchio per IP."""
+    return quiz_tokens.signed_sid(token, MODE)
 
 
 def _score(state):

@@ -64,7 +64,8 @@ def evaluate_daily_order_answer(payload, auth_user=None):
         raise OrderError("token_invalid")
 
     region_keys = payload.get("region_keys")
-    if not isinstance(region_keys, list) or len(region_keys) != game_daily.ORDER_TERRITORIES:
+    if (not isinstance(region_keys, list) or len(region_keys) != game_daily.ORDER_TERRITORIES
+            or not all(isinstance(k, str) for k in region_keys)):
         raise OrderError("bad_request")
 
     today = game_daily.today_rome()
@@ -198,6 +199,6 @@ def province_path(ind_id):
 
 
 def sid_from_token(token):
-    """Il `sid` della sessione, per il limite di frequenza: un token assente o rotto
-    apre una sessione nuova, come fa `load_state` nelle altre rotte."""
-    return quiz_tokens.load_state(token, MODE)["sid"]
+    """Il `sid` della sessione per il limite di frequenza, o None per un token
+    assente o rotto: allora vale solo il secchio per IP."""
+    return quiz_tokens.signed_sid(token, MODE)

@@ -714,37 +714,39 @@ class QuizCompareTest(unittest.TestCase):
         from app import quiz
 
         client = app.test_client()
-        round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
-        indicator_id = round_["indicator"]["id"]
-        year = round_["indicator"]["year"]
-        key_a = round_["region_a"]["region_key"]
-        key_b = round_["region_b"]["region_key"]
-        values = {
-            row["region_key"]: row["value"]
-            for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
-        }
-        winner = "region_a" if values[key_a] > values[key_b] else "region_b"
-        loser = "region_b" if winner == "region_a" else "region_a"
 
-        def answer(choice):
-            return client.post("/api/game/compare/answer", json={
-                "indicator_id": indicator_id, "year": year,
+        def answer(pick):
+            """Un round nuovo senza timer (un `timeout` subito vale) e la risposta col
+            suo token: senza un round legato la risposta e' un 400."""
+            round_ = client.get("/api/game/compare/round?difficulty=0&timer=0").get_json()
+            indicator_id, year = round_["indicator"]["id"], round_["indicator"]["year"]
+            key_a, key_b = round_["region_a"]["region_key"], round_["region_b"]["region_key"]
+            values = {
+                row["region_key"]: row["value"]
+                for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
+            }
+            winner = "region_a" if values[key_a] > values[key_b] else "region_b"
+            loser = "region_b" if winner == "region_a" else "region_a"
+            choice = {"winner": winner, "loser": loser, "timeout": "timeout"}[pick]
+            body = client.post("/api/game/compare/answer", json={
+                "indicator_id": indicator_id, "year": year, "token": round_["token"],
                 "region_a_key": key_a, "region_b_key": key_b, "choice": choice,
             }).get_json()
+            return body, winner, values[key_a]
 
-        right = answer(winner)
+        right, winner, value_a = answer("winner")
         self.assertTrue(right["correct"])
         self.assertEqual(right["winner"], winner)
-        self.assertEqual(right["region_a"]["value"], values[key_a])
+        self.assertEqual(right["region_a"]["value"], value_a)
         self.assertTrue(right["indicator"]["description"])
         self.assertTrue(right["indicator"]["value_explanation"])
         self.assertTrue(right["indicator"]["source_url"].startswith("http"))
         self.assertTrue(right["indicator"]["source_label"])
 
-        wrong = answer(loser)
+        wrong, _, _ = answer("loser")
         self.assertFalse(wrong["correct"])
 
-        timeout = answer("timeout")
+        timeout, winner, _ = answer("timeout")
         self.assertFalse(timeout["correct"])
         self.assertEqual(timeout["winner"], winner)
         self.assertIsNotNone(timeout["region_b"]["value"])
@@ -757,6 +759,7 @@ class QuizCompareTest(unittest.TestCase):
             "year": round_["indicator"]["year"],
             "region_a_key": round_["region_a"]["region_key"],
             "region_b_key": round_["region_b"]["region_key"],
+            "token": round_["token"],
         }
 
         for overrides in (
@@ -806,22 +809,26 @@ class QuizOrderTest(unittest.TestCase):
         from app import quiz
 
         client = app.test_client()
-        round_ = client.get("/api/game/order/round?count=3").get_json()
-        indicator_id = round_["indicator"]["id"]
-        year = round_["indicator"]["year"]
-        keys = [r["region_key"] for r in round_["regions"]]
-        values = {
-            row["region_key"]: row["value"]
-            for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
-        }
-        perfect = sorted(keys, key=lambda key: values[key], reverse=True)
 
-        def answer(order):
-            return client.post("/api/game/order/answer", json={
-                "indicator_id": indicator_id, "year": year, "region_keys": order,
-            })
+        def answer(arrange):
+            """Un round nuovo e la risposta col suo token, nell'ordine che `arrange`
+            ricava da quello giusto: un round si risponde una volta sola."""
+            round_ = client.get("/api/game/order/round?count=3").get_json()
+            indicator_id = round_["indicator"]["id"]
+            year = round_["indicator"]["year"]
+            keys = [r["region_key"] for r in round_["regions"]]
+            values = {
+                row["region_key"]: row["value"]
+                for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
+            }
+            perfect = sorted(keys, key=lambda key: values[key], reverse=True)
+            body = client.post("/api/game/order/answer", json={
+                "indicator_id": indicator_id, "year": year, "region_keys": arrange(perfect),
+                "token": round_["token"],
+            }).get_json()
+            return body, perfect, indicator_id
 
-        full = answer(perfect).get_json()
+        full, perfect, indicator_id = answer(lambda perfect: perfect)
         self.assertEqual(full["score"], 3)
         self.assertEqual(full["total"], 3)
         self.assertTrue(all(p["correct"] for p in full["positions"]))
@@ -831,7 +838,7 @@ class QuizOrderTest(unittest.TestCase):
         self.assertTrue(full["indicator"]["source_url"].startswith("http"))
         self.assertEqual(full["indicator"]["id"], indicator_id)
 
-        reversed_resp = answer(list(reversed(perfect))).get_json()
+        reversed_resp, _, _ = answer(lambda perfect: list(reversed(perfect)))
         self.assertLess(reversed_resp["score"], 3)
         for pos in reversed_resp["positions"]:
             self.assertIsNotNone(pos["value"])
@@ -839,8 +846,7 @@ class QuizOrderTest(unittest.TestCase):
             self.assertLessEqual(pos["correct_position"], 3)
 
         # Credito parziale: scambiando solo le ultime due resta giusta la prima.
-        swapped = [perfect[0], perfect[2], perfect[1]]
-        partial = answer(swapped).get_json()
+        partial, _, _ = answer(lambda perfect: [perfect[0], perfect[2], perfect[1]])
         self.assertEqual(partial["score"], 1)
         self.assertTrue(partial["positions"][0]["correct"])
 
@@ -854,7 +860,7 @@ class QuizOrderTest(unittest.TestCase):
         def answer(payload):
             return client.post("/api/game/order/answer", json=payload)
 
-        base = {"indicator_id": indicator_id, "year": year}
+        base = {"indicator_id": indicator_id, "year": year, "token": round_["token"]}
         self.assertEqual(answer({**base, "region_keys": [keys[0], keys[0], keys[1]]}).status_code, 400)
         self.assertEqual(answer({**base, "region_keys": ["atlantide", keys[0], keys[1]]}).status_code, 400)
         self.assertEqual(answer({**base, "region_keys": keys[:2]}).status_code, 400)
