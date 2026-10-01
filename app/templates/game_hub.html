@@ -5,7 +5,7 @@
 {% set game_active = 'hub' %}
 
 {% block title %}Sfida Italia: il quiz sui dati Istat | {{ site_name }}{% endblock %}
-{% block description %}Quattro giochi sui dati Istat di regioni e province: indovina la regione o la provincia, chi è maggiore, ordina la classifica. Fonte e anno in evidenza.{% endblock %}
+{% block description %}Cinque giochi sui dati Istat e sulla geografia: indovina regione e provincia, chi è maggiore, ordina la classifica, trova la provincia sulla mappa.{% endblock %}
 
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
@@ -17,12 +17,13 @@
   "@type": "ItemList",
   "name": "I giochi di Sfida Italia",
   "url": {{ canonical | tojson }},
-  "numberOfItems": 4,
+  "numberOfItems": 5,
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Indovina la Regione", "url": "{{ site_url }}/quiz/indovina-la-regione" },
     { "@type": "ListItem", "position": 2, "name": "Chi è maggiore?", "url": "{{ site_url }}/quiz/chi-e-maggiore" },
     { "@type": "ListItem", "position": 3, "name": "Ordina le regioni", "url": "{{ site_url }}/quiz/ordina" },
-    { "@type": "ListItem", "position": 4, "name": "Indovina la Provincia", "url": "{{ site_url }}/quiz/indovina-la-provincia" }
+    { "@type": "ListItem", "position": 4, "name": "Indovina la Provincia", "url": "{{ site_url }}/quiz/indovina-la-provincia" },
+    { "@type": "ListItem", "position": 5, "name": "Dov'è la provincia?", "url": "{{ site_url }}/quiz/province-italiane" }
   ]
 }
 </script>
@@ -41,7 +42,7 @@
     <div class="hub-layout__hero">
       <header class="page-hero">
         <h1>Quanto conosci l'Italia?</h1>
-        <p class="page-lead">Quattro giochi rapidi sugli indicatori territoriali Istat, con anno e fonte a ogni domanda e, a ogni risposta, che cosa misura davvero il dato.</p>
+        <p class="page-lead">Cinque giochi rapidi: quattro sugli indicatori territoriali Istat, con anno e fonte a ogni domanda, e uno per imparare dove stanno le province sulla mappa.</p>
       </header>
       <p class="hub-nota">Si gioca senza registrazione: i record restano su questo dispositivo. Con un account statistiche e traguardi ti seguono. Nelle <a href="/quiz/classifica">classifiche</a> si entra anche senza account, con un nickname.</p>
     </div>
@@ -84,6 +85,13 @@
             <a class="hub-card hub-oggi__gioco" href="/quiz/ordina">
               <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/ordina.svg') }}')" aria-hidden="true"></span>Ordina le regioni</span>
               <span class="hub-card-body">Dal valore più alto al più basso, un punto per ogni posizione giusta.</span>
+              <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
+            </a>
+          </li>
+          <li data-gioco="mappa">
+            <a class="hub-card hub-oggi__gioco" href="/quiz/province-italiane">
+              <span class="hub-oggi__nome"><span class="ico" style="--ico: url('{{ url_for('static', filename='img/gioco/mappa.svg') }}')" aria-hidden="true"></span>Dov'è la provincia?</span>
+              <span class="hub-card-body">Dieci nomi da trovare sulla mappa muta: ogni errore dice di quanto.</span>
               <span class="hub-oggi__stato" data-oggi-stato>Gioca</span>
             </a>
           </li>

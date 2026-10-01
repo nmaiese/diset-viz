@@ -239,9 +239,9 @@ class ImmaginiOgDeiGiochiTest(unittest.TestCase):
 
 
 class HubPaginaTest(unittest.TestCase):
-    def test_le_quattro_card_sono_nel_markup_del_server(self):
+    def test_le_cinque_card_sono_nel_markup_del_server(self):
         html = app.test_client().get("/quiz").get_data(as_text=True)
-        for gioco in ("indovina", "provincia", "compare", "order"):
+        for gioco in ("indovina", "provincia", "compare", "order", "mappa"):
             self.assertIn(f'data-gioco="{gioco}"', html)
         self.assertIn("data-oggi-countdown", html)
         self.assertNotIn("Come funziona il quiz", html)

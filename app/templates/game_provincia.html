@@ -17,7 +17,7 @@
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Indovina la Provincia",
-  "description": "Quiz sulle province italiane: una provincia misteriosa da indovinare a partire dai dati Istat, con la mappa come aiuto.",
+  "description": "Una provincia italiana misteriosa da indovinare a partire dai dati Istat, con la mappa come aiuto.",
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": { "@type": "Organization", "name": "Divario Italia", "url": "{{ site_url }}/" },
@@ -36,9 +36,7 @@
 
   <header class="page-hero">
     <h1>Indovina la Provincia</h1>
-    {# Quando esistera' la pagina a mappa per imparare dove stanno le province, il lead rimanda li'
-       per chi vuole imparare e non giocare. Fino ad allora niente link a una pagina che non c'e'. #}
-    <p class="page-lead">Una provincia italiana misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino.</p>
+    <p class="page-lead">Una provincia italiana misteriosa, i dati Istat come indizi, la mappa che ti dice quanto sei vicino. Per imparare dove stanno le province, prova <a href="/quiz/province-italiane">Dov'è la provincia?</a></p>
   </header>
 
   <div class="game-layout">

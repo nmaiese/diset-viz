@@ -3397,6 +3397,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/quiz/indovina-la-provincia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/quiz/province-italiane", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
@@ -3973,6 +3974,12 @@ def _home_quiz_games():
             "desc": f"Una provincia misteriosa da trovare con gli indizi dei dati Istat, sulla mappa delle {len(game_daily.province_pool())} province.",
             "meta": "una al giorno",
             "href": "/quiz/indovina-la-provincia",
+        },
+        {
+            "name": "Dov'è la provincia?",
+            "desc": "Dieci province da trovare sulla mappa muta d'Italia, uguali per tutti. Ogni errore dice di quanto.",
+            "meta": "dieci al giorno",
+            "href": "/quiz/province-italiane",
         },
     ]
 
