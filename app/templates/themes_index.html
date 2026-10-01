@@ -50,7 +50,7 @@
     {#- Il totale e' quello del catalogo dell'atlante, che e' regionale: i
         valori delle province non ci stanno, e le schede che li hanno le conta
         la sezione "Per provincia" dei temi (`indicator_view.province_indicators_by_theme`). #}
-    <p class="region-hero__sum">{{ total }} indicatori per regione, di {{ institutions }}, per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.{% if province_count %} Nella sezione Per provincia dei temi ci {{ 'è' if province_count == 1 else 'sono' }} anche {{ 'la' if province_count == 1 else 'le' }} {{ province_count }} {{ province_count | it_plural('scheda', 'schede') }} con i valori delle province{% if province_only %}, {{ province_only }} solo per provincia{% endif %}.{% endif %}</p>
+    <p class="region-hero__sum">{{ total }} indicatori per regione, di {{ institutions }}, per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.{% if province_count %} Nella sezione Per provincia dei temi ci {{ 'è' if province_count == 1 else 'sono' }} anche {{ 'la' if province_count == 1 else 'le' }} {{ province_count }} {{ province_count | it_plural('indicatore', 'indicatori') }} con i valori delle province{% if province_only %}, {{ province_only }} solo per provincia{% endif %}.{% endif %}</p>
   </section>
 
   <div class="facts">

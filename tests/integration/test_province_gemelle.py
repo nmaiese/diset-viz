@@ -72,7 +72,7 @@ class LeGemelle(unittest.TestCase):
     def test_il_markdown_dice_la_gemella(self):
         markdown = self.client.get("/indicatore/speranza-di-vita-alla-nascita/ter-910",
                                    headers={"Accept": "text/markdown"}).get_data(as_text=True)
-        self.assertIn("- La stessa misura per province, in un'altra scheda: ", markdown)
+        self.assertIn("- La stessa misura per province, in un'altra pagina: ", markdown)
         self.assertIn("/bes-01SAL001/province", markdown)
 
 

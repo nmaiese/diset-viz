@@ -157,7 +157,7 @@
 
   <section class="section" id="tutti" aria-labelledby="h-tutti">
     <h2 id="h-tutti">Tutti gli indicatori del tema</h2>
-    <p class="intro">Le {{ d.total }} serie del tema, ognuna con la sua scheda. La linea è la media semplice delle regioni, anno per anno, sugli anni in cui quasi tutte hanno il dato{% if d.with_spark < d.total %}: dove la copertura cambia troppo da un anno all'altro resta l'etichetta al suo posto{% endif %}.</p>
+    <p class="intro">Le {{ d.total }} serie del tema, ognuna con la sua pagina. La linea è la media semplice delle regioni, anno per anno, sugli anni in cui quasi tutte hanno il dato{% if d.with_spark < d.total %}: dove la copertura cambia troppo da un anno all'altro resta l'etichetta al suo posto{% endif %}.</p>
     <p class="intro"><a class="linkarrow" href="{{ atlas_theme_url(p.theme) }}">Le stesse serie nell'atlante, con i filtri per fonte e anni</a></p>
     <form class="toolbar filter tema-filter" data-tema-filter hidden role="search" aria-label="Filtra gli indicatori del tema" onsubmit="return false">
       <label class="field filter__q" for="tema-q">Cerca fra gli indicatori del tema
@@ -190,7 +190,7 @@
       dell'atlante, e senza questo blocco non erano in nessun tema. -#}
   <section class="section" id="province" aria-labelledby="h-province">
     <h2 id="h-province">Per provincia</h2>
-    <p class="intro">{{ province_indicators | length }} {{ 'scheda di questo tema ha' if province_indicators | length == 1 else 'schede di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
+    <p class="intro">{{ province_indicators | length }} {{ 'indicatore di questo tema ha' if province_indicators | length == 1 else 'indicatori di questo tema hanno' }} i valori delle province: la classifica, la serie e il confronto con le altre province della stessa regione. Il profilo di ognuna delle {{ province_total }} province è nell'<a href="/province">indice delle province</a>.</p>
     <ul class="tema-list">
       {%- for ind in province_indicators %}
       <li data-tema-province><a href="{{ ind.path }}">{{ ind.name }}</a><span class="tema-list__meta">{{ ind.year_min }}{% if ind.year_max != ind.year_min %}-{{ ind.year_max }}{% endif %}, {{ ind.count }} province{% if ind.only_province %}, solo per provincia{% endif %}</span></li>

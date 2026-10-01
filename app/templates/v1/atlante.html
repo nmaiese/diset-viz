@@ -53,14 +53,14 @@
   <header class="pagehead">
     <p class="eyebrow">{{ d.institutions }}<span class="sep" aria-hidden="true">·</span>dal {{ d.year_min }} al {{ d.year_max }}</p>
     <h1 class="h-title">Atlante degli indicatori territoriali italiani</h1>
-    <div class="answer"><p>{{ d.total | num(None, 'count') }} serie {{ adj }} in un elenco solo, tema per tema, ognuna con la sua scheda. {{ d.complete | num(None, 'count') }} hanno il dato di tutte le {{ d.panel_total }} {{ d.plural }} nell'ultimo anno{% if not prov %} e quasi tutti gli anni{% endif %}, le altre {{ d.partial | num(None, 'count') }} sono segnate come serie parziali.</p></div>
+    <div class="answer"><p>{{ d.total | num(None, 'count') }} serie {{ adj }} in un elenco solo, tema per tema, ognuna con la sua pagina. {{ d.complete | num(None, 'count') }} hanno il dato di tutte le {{ d.panel_total }} {{ d.plural }} nell'ultimo anno{% if not prov %} e quasi tutti gli anni{% endif %}, le altre {{ d.partial | num(None, 'count') }} sono segnate come serie parziali.</p></div>
     <nav class="seg atlante-level" aria-label="Livello dei territori">{% for t in d.tabs %}<a href="{{ t.href }}"{% if t.current %} aria-current="page"{% endif %}>{{ t.label }} <span class="atlante-level__n">{{ t.n }}</span></a>{% endfor %}</nav>
     <p class="meta"><a href="#mappa">Sulla mappa</a><a href="#indicatori">Tutti gli indicatori</a><a href="/metodologia">Metodologia e fonti</a></p>
   </header>
 
   <section class="section" id="mappa" aria-labelledby="h-mappa">
     <h2 id="h-mappa">Sulla mappa</h2>
-    <p class="intro">Un indicatore sulle {{ d.plural }}, con la mappa accanto alla classifica: scegli l'anno e trova la tua {{ 'provincia' if prov else 'regione' }}. <a href="{{ m.href }}" data-atlas-map-href>La scheda completa</a> ha la serie, l'analisi e i dati da scaricare.</p>
+    <p class="intro">Un indicatore sulle {{ d.plural }}, con la mappa accanto alla classifica: scegli l'anno e trova la tua {{ 'provincia' if prov else 'regione' }}. <a href="{{ m.href }}" data-atlas-map-href>La pagina dell'indicatore</a> ha la serie, l'analisi e i dati da scaricare.</p>
     {% include "v1/_atlante_mappa.html" %}
     {#- Il modulo dei bottoni "Sulla mappa" delle righe: GET su /atlante, con
         il solo codice dell'indicatore. atlante.js lo intercetta e cambia il

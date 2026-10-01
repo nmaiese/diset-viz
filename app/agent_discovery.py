@@ -351,7 +351,7 @@ def atlas_markdown(featured, site_url):
     lines = [
         "# Atlante degli indicatori territoriali italiani",
         "",
-        "Cerca un indicatore, confronta le regioni e apri la scheda canonica per leggere definizione, fonte, andamento e download.",
+        "Cerca un indicatore, confronta le regioni e apri la pagina canonica dell'indicatore per leggere definizione, fonte, andamento e download.",
         "",
         f"- [Catalogo dati]({site_url}/catalogo-dati)",
         f"- [Metodologia]({site_url}/metodologia)",
@@ -423,7 +423,7 @@ def blog_post_markdown(post, site_url):
             "",
             "## Dati collegati",
             "",
-            f"- [Apri la scheda indicatore]({_absolute(site_url, post['indicator_path'])})",
+            f"- [Apri l'indicatore]({_absolute(site_url, post['indicator_path'])})",
         ]
     return "\n".join(lines)
 
@@ -598,7 +598,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         "",
         f"URL canonica: {canonical}",
         "",
-        "## Scheda",
+        "## Indicatore",
         "",
         # Il nome ufficiale della serie, sempre. Con un H1 autorato il titolo in
         # lingua comune sostituisce quello amministrativo, e nella proiezione
@@ -613,7 +613,7 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         # le province di una scheda a due livelli (`sources.level_path`).
         *(f"- Gli stessi dati per {other['plural']}: {site_url}{other.get('preferred_path') or other['canonical_path']}"
           for other in others),
-        *([f"- La stessa misura per {twin['plural']}, in un'altra scheda: {site_url}{twin['path']}"]
+        *([f"- La stessa misura per {twin['plural']}, in un'altra pagina: {site_url}{twin['path']}"]
           if twin else []),
         f"- Unità di misura: {unit}",
         f"- Copertura: dal {level['year_min']} al {level['year_max']}",
@@ -956,7 +956,7 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         # sono il catalogo dell'atlante, regionale, e le schede con i valori
         # delle province si contano a parte, dalla sezione "Per provincia".
         f"Indicatori per regione: {profile['indicator_count']}",
-        *([f"Schede per provincia: {len(province_indicators)}"] if province_indicators else []),
+        *([f"Indicatori per provincia: {len(province_indicators)}"] if province_indicators else []),
         f"URL canonica: {_absolute(site_url, profile['theme_path'])}",
         "",
     ]
@@ -993,7 +993,7 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         )
     if province_indicators:
         lines += ["", "## Per provincia", "",
-                  "Le schede del tema con i valori delle province, aperte sulle province.", ""]
+                  "Gli indicatori del tema con i valori delle province, aperte sulle province.", ""]
         for item in province_indicators:
             only = ", solo per provincia" if item["only_province"] else ""
             years = (f"nel {item['year_max']}" if item["year_min"] == item["year_max"]

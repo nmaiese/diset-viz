@@ -754,7 +754,7 @@ def doors(ctx: dict, qol: dict | None = None) -> dict:
                   else "Gli articoli costruiti sui dati"},
         "/quiz": {"title": "Sfida Italia", "text": f"Il quiz di ogni giorno: {count_word(len(ctx.get('quiz_games') or []), feminine=False)} giochi sugli stessi indicatori"
                   if ctx.get("quiz_games") else "Il quiz di ogni giorno sugli stessi indicatori"},
-        "/catalogo-dati": {"title": "Catalogo dati", "text": "Le schede principali in un elenco, con la loro fonte"},
+        "/catalogo-dati": {"title": "Catalogo dati", "text": "Gli indicatori principali in un elenco, con la loro fonte"},
     }
     return {
         "main": [{"path": path, **main[path]} for path in MAIN_DOORS],

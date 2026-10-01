@@ -60,7 +60,7 @@
     {% if d.count %}
     {#- "Analisi brevi e basate sui dati" e' il marcatore della pagina nel
         contratto pubblico (PUBLIC_DISCOVERABILITY_EXPECTATIONS in views.py). #}
-    <p class="answer">Analisi brevi e basate sui dati ufficiali: {{ d.count | num(None, 'count') }} articoli, l'ultimo uscito il <time datetime="{{ d.latest }}">{{ d.latest_label }}</time>. Ogni storia parte da un indicatore dell'<a href="/atlante">atlante</a>, con la sua fonte e il suo anno, e porta alla sua scheda.</p>
+    <p class="answer">Analisi brevi e basate sui dati ufficiali: {{ d.count | num(None, 'count') }} articoli, l'ultimo uscito il <time datetime="{{ d.latest }}">{{ d.latest_label }}</time>. Ogni storia parte da un indicatore dell'<a href="/atlante">atlante</a>, con la sua fonte e il suo anno, e porta al suo indicatore.</p>
     {% endif %}
     {% if d.top_tags %}
     <nav class="blog-tags" aria-label="Storie per tema">

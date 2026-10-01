@@ -168,7 +168,7 @@ class LaSchedaSulSuoLivello(unittest.TestCase):
     def test_titolo_e_bottone_del_pannello_province(self):
         html = app.test_client().get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
         self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001/province"')
-        self.assertIn("/bes-01SAL001/province\">Tutta la scheda", html)
+        self.assertIn("/bes-01SAL001/province\">Tutto l'indicatore", html)
 
 
 class LeFrasi(unittest.TestCase):

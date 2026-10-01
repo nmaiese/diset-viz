@@ -102,12 +102,12 @@
     {% endif %}
   </h1>
   <p class="page-lead">{{ page_lead | analyst_html }}</p>
-  <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa scheda</a>.</p>
+  <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa pagina</a>.</p>
   {% if not meta.indexable %}
-  <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
+  <p class="page-note">Questa pagina resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
   {% endif %}
 
-  <nav class="page-note" aria-label="Domande a cui risponde questa scheda">
+  <nav class="page-note" aria-label="Domande a cui risponde questo indicatore">
     <strong>Domande sui dati:</strong>
     {% for item in query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{{ " · " if not loop.last }}{% endfor %}
   </nav>
@@ -241,7 +241,7 @@
       {% if level.has_map and level.map_colors %}
       <article class="data-card viz-card--map" data-tabpanel="map">
         <header><small>Anno <span data-explore="year-label">{{ level.year_max }}</span></small><h3>Mappa</h3></header>
-        <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore, selezionala per metterla in evidenza nella scheda e nella serie storica.</p>
+        <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore, selezionala per metterla in evidenza nella pagina e nella serie storica.</p>
         <style>
           {% for key, color in level.map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
           {% endfor %}

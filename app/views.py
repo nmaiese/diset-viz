@@ -3698,7 +3698,7 @@ def llms_txt():
     lines += [
         "",
         "## Note per i modelli linguistici",
-        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori. Alcuni indicatori provengono da altre istituzioni, indicate sulla singola scheda.",
+        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori. Alcuni indicatori provengono da altre istituzioni, indicate su ogni indicatore.",
         f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte indicata per ciascun indicatore.",
         "- Per gli indicatori territoriali, i download seguono il pattern "
         f"`/download/indicator/ID.csv` e `/download/indicator/ID.json`. Esempio reale: "
@@ -3767,7 +3767,7 @@ def llms_full_txt():
         "pubblicati su divarioitalia.it. I numeri coincidono "
         "con le pagine indicatore del sito. La fonte primaria e Istat, ma "
         "alcuni indicatori provengono da altre istituzioni indicate su ogni "
-        "scheda. Cita \"Divario Italia\" e la fonte indicata per ciascun "
+        "indicatore. Cita \"Divario Italia\" e la fonte indicata per ciascun "
         "indicatore.",
         "",
         "## Metodologia in breve",
