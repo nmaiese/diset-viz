@@ -2,7 +2,7 @@ import unittest
 import re
 from html import unescape
 
-from app import app
+from app import app, sources
 from app import quality_life_bes as qb
 from app.atlas_catalog import get_atlas_indicator
 from app.bes_data import (
@@ -127,10 +127,15 @@ class QualityLifeStaticTest(unittest.TestCase):
     def test_regional_score_uses_the_federated_indicator_selection(self):
         matrix, meta = qb._matrix_and_meta("regione")
         self.assertGreaterEqual(len(matrix), 200)
-        self.assertEqual(
-            set(item["source_family"] for item in meta.values()),
-            {"bes", "territorial", "multiscopo", "eurostat"},
-        )
+        families = set(item["source_family"] for item in meta.values())
+        self.assertLessEqual({"bes", "territorial", "multiscopo"}, families)
+        self.assertLessEqual(families, {"bes", "territorial", "multiscopo", *sources.EXTERNAL_FAMILIES})
+        # Each external indicator is attributed to the family its id belongs
+        # to, never to Eurostat by default.
+        for indicator_id, item in meta.items():
+            family = sources.split_internal_id(indicator_id)[0]
+            if family in sources.EXTERNAL_FAMILIES:
+                self.assertEqual(item["source_family"], family, indicator_id)
         self.assertTrue(all(
             item["year_max"] >= (2025 if item["source_family"] == "bes" else 2023)
             for item in meta.values()
@@ -142,6 +147,27 @@ class QualityLifeStaticTest(unittest.TestCase):
         )
         self.assertGreater(ranking["methodology"]["source_counts"]["bes"], 0)
         self.assertGreater(ranking["methodology"]["source_counts"]["territorial"], 0)
+
+    def test_reviewed_eurostat_candidates_are_in_the_regional_score(self):
+        """Decisione del 2/10/2026 (passo 7): casa non riscaldata e scienziati e
+        ingegneri entrano nel punteggio regionale, accesi da `scoreable` nel
+        manifesto dei livelli. Le serie Istat di demografia restano tre."""
+        matrix, meta = qb._matrix_and_meta("regione")
+        for public_id in ("eur:ilc_mdes01_r", "eur:hrst_st_rcat"):
+            self.assertIn(public_id, matrix)
+            self.assertEqual(len(matrix[public_id]), 20)
+            self.assertEqual(meta[public_id]["source_family"], "eurostat")
+        counts = qb.build_bes_ranking("regione", "standard")["methodology"]["source_counts"]
+        self.assertEqual(counts["eurostat"], 4)
+        self.assertEqual(counts["istat_demografia"], 3)
+
+    def test_rejected_candidates_stay_descriptive(self):
+        """La disoccupazione provinciale resta fuori (ridondante con la mancata
+        partecipazione al lavoro del BES), e cosi' i Multiscopo del bus."""
+        matrix, _ = qb._matrix_and_meta("provincia")
+        self.assertNotIn("ipr:tasso-di-disoccupazione", matrix)
+        regional, _ = qb._matrix_and_meta("regione")
+        self.assertFalse([i for i in regional if i.startswith("multiscopo:MULTI_BUS_")])
 
     def test_no_phenomenon_enters_the_score_twice_under_two_families(self):
         """The methodology promises exact name duplicates are counted once. The
@@ -194,6 +220,38 @@ class QualityLifeStaticTest(unittest.TestCase):
             self.assertNotIn("eur:clone_of_an_existing_name", selection)
         finally:
             qls.regional_quality_life_selection.cache_clear()
+
+    def test_every_external_family_enters_the_regional_score_under_its_own_name(self):
+        """The engine used to load only ids it took for Eurostat and to write
+        "eurostat" as the source of every external indicator. Any registered
+        external family must enter the matrix and keep its own attribution."""
+        from unittest import mock
+
+        regions = list(qb.get_bes_territories("regione"))
+        for family in ("eurostat", "mef", "istat_demografia", "aci"):
+            with self.subTest(family=family):
+                public_id = sources.internal_id(family, "prova-famiglia")
+                payload = {
+                    "metadata": {
+                        "raw_id": "prova-famiglia", "name": f"Serie di prova {family}",
+                        "theme": "Reddito e ricchezza", "source_theme": "Reddito",
+                        "year_max": 2024, "unit": "%", "path": f"/indicatore/prova/{family}",
+                    },
+                    "series": [
+                        {"region_key": key, "year": 2024, "value": float(index)}
+                        for index, key in enumerate(regions)
+                    ],
+                }
+                info = {"name": payload["metadata"]["name"], "category": "reddito_accessibilita",
+                        "direction": "higher_better", "coverage": 1.0, "year_max": 2024}
+                with mock.patch.object(qb, "regional_quality_life_selection",
+                                       return_value={public_id: "reddito_accessibilita"}), \
+                     mock.patch.object(qb, "has_external_data", return_value=True), \
+                     mock.patch.object(qb, "external_regional_score_gate", return_value={public_id: info}), \
+                     mock.patch.object(qb, "get_external_atlas_indicator", return_value=payload):
+                    matrix, meta = qb._matrix_and_meta.uncached("regione")
+                self.assertIn(public_id, matrix)
+                self.assertEqual(meta[public_id]["source_family"], family)
 
     def test_invalid_level_is_404(self):
         client = app.test_client()
@@ -305,6 +363,66 @@ class QualityLifeBesEngineTest(unittest.TestCase):
             alias_response = client.get(alias)
             self.assertEqual(alias_response.status_code, 200)
             self.assertTrue(alias_response.headers["X-Robots-Tag"].startswith("noindex"))
+
+    def _provincial_matrix_with_fixture(self, **level_overrides):
+        """Provincial matrix and ranking with the synthetic MEF series loaded,
+        its levels manifest overridden (e.g. scoreable, direction)."""
+        from unittest import mock
+
+        from app import external_data, provincial_families
+        from tests.fixtures import external_mef
+
+        levels = [{**row, **level_overrides} for row in external_mef.levels()]
+        # Il loader vuole lo stesso verso nelle righe e nel manifesto dei livelli.
+        rows = [{**row, "direction": levels[0]["direction"]} for row in external_mef.rows()]
+        memoized = (qb._matrix_and_meta, qb._indicators_by_category, qb._ranking_keys, qb.build_bes_ranking)
+
+        def reset():
+            provincial_families.cache_clear()
+            for function in memoized:
+                qb.cache.delete_memoized(function)
+
+        reset()
+        try:
+            with mock.patch.object(external_data, "get_external_rows", return_value=rows), \
+                 mock.patch.object(external_data, "get_external_levels", return_value=levels):
+                matrix, meta = qb._matrix_and_meta("provincia")
+                ranking = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
+        finally:
+            reset()
+        return external_mef.TARGET, matrix, meta, ranking
+
+    def test_non_scoreable_external_series_stay_out_of_the_provincial_score(self):
+        target, matrix, meta, ranking = self._provincial_matrix_with_fixture(
+            scoreable="false", direction="higher_better")
+        self.assertNotIn(target, matrix)
+        self.assertNotIn(target, meta)
+        self.assertEqual(set(ranking["methodology"]["source_counts"]), {"bes"})
+        ids = {e["id"] for row in ranking["ranking"]
+               for e in row["top_positive_indicators"] + row["top_negative_indicators"]}
+        self.assertNotIn(target, ids)
+
+    def test_a_contextual_series_stays_out_even_if_marked_scoreable(self):
+        target, matrix, _, _ = self._provincial_matrix_with_fixture(
+            scoreable="true", direction="contextual")
+        self.assertNotIn(target, matrix)
+
+    def test_a_scoreable_external_series_enters_after_bes_under_its_family(self):
+        target, matrix, meta, ranking = self._provincial_matrix_with_fixture(
+            scoreable="true", direction="higher_better")
+        self.assertIn(target, matrix)
+        provinces = set(qb.get_bes_territories("provincia"))
+        self.assertLessEqual(set(matrix[target]), provinces)
+        self.assertGreaterEqual(len(matrix[target]), 100)
+        self.assertEqual(meta[target]["source_family"], "mef")
+        self.assertEqual(meta[target]["category"], "reddito_accessibilita")
+        # Il MEF ha anche il livello regionale: dalla classifica si atterra sulle province.
+        self.assertTrue(meta[target]["path"].endswith("/province"), meta[target]["path"])
+        method = ranking["methodology"]
+        self.assertEqual(method["source_counts"]["mef"], 1)
+        self.assertIn(sources.family_label("mef"), method["source"])
+        self.assertEqual(method["catalog_institutions"], sources.institutions_label({"bes", "mef"}))
+        self.assertEqual(method["score_indicators_total"], len(matrix))
 
     def test_legacy_regional_api_alias(self):
         client = app.test_client()

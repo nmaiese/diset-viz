@@ -38,7 +38,7 @@ def _score_color(score, lo, hi):
     t = 0.5 if span <= 0 else max(0.0, min(1.0, (score - lo) / span))
     return _ds_ramp_color(t)
 
-from app import sources
+from app import provincial_families, sources
 from app.cache import cache
 from app.data import get_catalog, get_rows
 from app.atlas_catalog import catalog_summary as _regional_catalog_summary
@@ -52,11 +52,7 @@ from app.bes_data import (
     get_bes_territories,
     has_bes_data,
 )
-from app.external_atlas import (
-    external_regional_scoreables,
-    get_external_atlas_indicator,
-    has_external_data,
-)
+from app.external_atlas import get_external_atlas_indicator, has_external_data
 from app.multiscopo_data import (
     get_multiscopo_manifest,
     get_multiscopo_rows,
@@ -65,7 +61,16 @@ from app.multiscopo_data import (
 )
 from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
-from app.quality_life_selection import BES_PREFIX, EUR_PREFIX, MULTI_PREFIX, regional_quality_life_selection
+from app.quality_life_selection import (
+    BES_PREFIX,
+    EUR_PREFIX,
+    MULTI_PREFIX,
+    REGIONAL_EUR_MIN_YEAR,
+    _normalise_name,
+    external_regional_score_gate,
+    provincial_external_selection,
+    regional_quality_life_selection,
+)
 
 # Compact source labels for the visible methodology breakdown.
 def _source_score_label(family):
@@ -171,6 +176,43 @@ def _matrix_and_meta(level):
             "source_family": "bes",
         }
 
+    if level == "provincia":
+        territories = get_bes_territories(level)
+        bes_names = {_normalise_name(item["name"]) for item in meta.values()}
+        for item in provincial_external_selection(bes_names):
+            meta_src = item["metadata"]
+            year_max = item["levels"][provincial_families.PROVINCE_LEVEL]["year_max"]
+            latest = {
+                row["territory_key"]: row["value"]
+                for row in item["series"]
+                if row["year"] == year_max and row["value"] is not None
+                and row["territory_key"] in territories
+            }
+            if len(latest) < 3:
+                continue
+            z = _standardise(latest)
+            if not any(z.values()):
+                continue
+            public_id = meta_src["id"]
+            sign = 1.0 if meta_src["direction"] == "higher_better" else -1.0
+            matrix[public_id] = {k: sign * v for k, v in z.items()}
+            meta[public_id] = {
+                "id": public_id,
+                "raw_id": meta_src["raw_id"],
+                "name": meta_src["name"],
+                "theme": meta_src["theme"],
+                "source_theme": meta_src["source_theme"],
+                "category": meta_src["quality_life_category"],
+                "direction": meta_src["direction"],
+                "year_max": year_max,
+                "unit": meta_src["unit"],
+                # From a province ranking the link lands on the provinces.
+                "path": sources.level_path(
+                    meta_src["path"], provincial_families.PROVINCE_LEVEL, meta_src["base_level"]
+                ),
+                "source_family": meta_src["family"],
+            }
+
     if level == "regione":
         catalog = {item["id"]: item for item in get_catalog()["indicators"]}
         selected_ids = {
@@ -251,8 +293,15 @@ def _matrix_and_meta(level):
                 }
 
         if has_external_data():
-            scoreables = external_regional_scoreables()
-            for public_id in (i for i in selection if i.startswith(EUR_PREFIX)):
+            scoreables = external_regional_score_gate()
+            # Every external family, resolved from the registry: the family is
+            # what the methodology prints as the source of each indicator, and
+            # a hardcoded "eurostat" here published Istat demographic series
+            # under Eurostat's name.
+            for public_id in selection:
+                family = sources.split_internal_id(public_id)[0]
+                if family not in sources.EXTERNAL_FAMILIES:
+                    continue
                 info = scoreables.get(public_id)
                 payload = get_external_atlas_indicator(public_id)
                 if info is None or payload is None:
@@ -282,7 +331,7 @@ def _matrix_and_meta(level):
                     "year_max": year_max,
                     "unit": meta_src["unit"],
                     "path": meta_src["path"],
-                    "source_family": "eurostat",
+                    "source_family": family,
                 }
     return matrix, meta
 
@@ -430,10 +479,13 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
                 _regional_catalog_summary()["institutions_label"]
                 + ", catalogo federato degli indicatori regionali"
                 if level == "regione"
-                else "Istat, BES dei Territori (Bes at local level)"
+                else _provincial_source(meta)
             ),
             "minimum_reference_year": (
-                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023, "eurostat": 2021}
+                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023,
+                 **{family: REGIONAL_EUR_MIN_YEAR
+                    for family in sorted({i["source_family"] for i in meta.values()})
+                    if family in sources.EXTERNAL_FAMILIES}}
                 if level == "regione" else None
             ),
             "territorial_level": "regioni" if level == "regione" else "province e città metropolitane",
@@ -447,7 +499,8 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
             # catalog that no longer matched the one behind the atlas.
             "manifest_indicators_total": (
                 _regional_catalog_summary()["total"]
-                if level == "regione" else len(manifest)
+                if level == "regione"
+                else len(manifest) + len(provincial_families.all_indicators())
             ),
             "catalog_families": (
                 _regional_catalog_summary()["families"] if level == "regione" else []
@@ -457,7 +510,8 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
             # Eurostat in it.
             "catalog_institutions": (
                 _regional_catalog_summary()["institutions_label"]
-                if level == "regione" else "Istat"
+                if level == "regione"
+                else sources.institutions_label({i["source_family"] for i in meta.values()}) or "Istat"
             ),
             "source_counts": {
                 source: sum(item["source_family"] == source for item in meta.values())
@@ -477,6 +531,15 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
                                "unrated": [u["name"] for u in unrated]},
         },
     }
+
+
+def _provincial_source(meta):
+    """Who the provincial score comes from: BES dei Territori, plus the label of
+    every external family that actually entered it (from the registry)."""
+    label = "Istat, BES dei Territori (Bes at local level)"
+    external = sorted({i["source_family"] for i in meta.values()} - {"bes"},
+                      key=list(sources.SOURCES).index)
+    return ", ".join([label, *(sources.family_label(f) for f in external)])
 
 
 def _category_entry(slug, score):
