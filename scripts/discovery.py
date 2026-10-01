@@ -38,6 +38,12 @@ FAMILY_PREFIX = {
     "multiscopo": "multiscopo:",
     "eurostat": "eur:",
     "istat_demografia": "dem:",
+    "mef": "mef:",
+    "ispra": "ispra:",
+    "mim": "mim:",
+    "salute": "salute:",
+    "aci": "aci:",
+    "unioncamere": "unioncamere:",
 }
 
 # Which catalog family a hunter adapter promotes into. A second mirror of
@@ -48,6 +54,12 @@ FAMILY_PREFIX = {
 FEED_FAMILY = {
     "eurostat_regional": "eurostat",
     "istat_demografia": "istat_demografia",
+    "mef_irpef": "mef",
+    "ispra_suolo": "ispra",
+    "mim_scuola": "mim",
+    "salute_dati": "salute",
+    "aci_statistiche": "aci",
+    "unioncamere_movimprese": "unioncamere",
 }
 
 # The 20 regional keys the whole app joins on (`territory_code` in the external

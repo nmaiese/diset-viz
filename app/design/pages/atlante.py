@@ -13,8 +13,9 @@ parziali. All'apertura si vedono tutte: filtri, ricerca e ordine li fa
 prima.
 
 Le righe delle regioni sono le serie del catalogo regionale
-(`get_atlas_catalog`). Quelle delle province sono le schede BES con il livello
-provinciale (`bes_data.all_bes_indicators`), lette dalla stessa proiezione: il
+(`get_atlas_catalog`). Quelle delle province sono le schede con il livello
+provinciale, BES (`bes_data.all_bes_indicators`) e delle famiglie esterne
+(`provincial_families.all_indicators`), lette dalla stessa proiezione: il
 catalogo e `/api/catalog` restano regionali.
 
 Le righe si compongono una volta per processo e per livello (`rows`,
@@ -25,7 +26,7 @@ Flask per cinque minuti.
 
 from __future__ import annotations
 
-from app import indicator_universe, indicator_view, seo_policy, sources
+from app import indicator_universe, indicator_view, provincial_families, seo_policy, sources
 from app.atlas_catalog import catalog_summary, get_atlas_catalog
 from app.bes_data import all_bes_indicators, bes_level_path
 from app.cache_util import synchronized_cache
@@ -114,10 +115,19 @@ def province_path(record: dict) -> str | None:
     (`taxonomy.PROVINCE_TWINS`, come ter-910 e bes-01SAL001), la gemella aperta
     sulle province (`indicator_view.twin_level`)."""
     keys = {level["key"] for level in record["levels"]}
-    if "provincia" in keys and record["family"] == "bes":
-        return bes_level_path(record["raw_id"], "provincia")
+    if "provincia" in keys:
+        return _province_level_path(record)
     twin = indicator_view.twin_level(record["meta"], record["levels"])
     return twin["path"] if twin and twin["key"] == "provincia" else None
+
+
+def _province_level_path(record: dict) -> str:
+    """La pagina delle province di una scheda, di qualunque famiglia: la
+    `/province` quando la scheda si apre sulle regioni, il canonico quando e'
+    solo provinciale. Per il BES resta `bes_level_path`, che e' la sua regola."""
+    if record["family"] == "bes":
+        return bes_level_path(record["raw_id"], "provincia")
+    return sources.level_path(record["meta"]["canonical_path"], "provincia", record["levels"][0]["key"])
 
 
 def _row(item: dict, record: dict) -> dict:
@@ -138,22 +148,23 @@ def _row(item: dict, record: dict) -> dict:
 
 
 def _province_row(item: dict, record: dict) -> dict:
-    """Una riga delle province: una scheda BES letta sul suo livello provinciale.
+    """Una riga delle province: una scheda, BES o di una famiglia esterna,
+    letta sul suo livello provinciale.
 
     Cio' che la riga dice viene dal livello, mai da `meta`: anni, province col
     dato, indicizzabilita' della pagina a cui porta, pannello. Una serie e'
     completa, come nel catalogo delle regioni, quando ha tutte le 107 province
     nell'ultimo anno e una copertura di almeno 0,98."""
-    meta, raw_id = record["meta"], record["raw_id"]
+    meta, family, raw_id = record["meta"], record["family"], record["raw_id"]
     level = next(lv for lv in record["levels"] if lv["key"] == "provincia")
     coverage = item["levels"]["provincia"].get("coverage_latest") or 0
     count = level["territory_count"]
     spark, change = _trend(meta, level, "province")
     theme = meta.get("theme")
     return {
-        "id": sources.internal_id("bes", raw_id), "code": sources.indicator_code("bes", raw_id),
-        "name": meta["name"], "path": bes_level_path(raw_id, "provincia"),
-        "family": "bes", "y0": level["year_min"], "y1": level["year_max"],
+        "id": sources.internal_id(family, raw_id), "code": sources.indicator_code(family, raw_id),
+        "name": meta["name"], "path": _province_level_path(record),
+        "family": family, "y0": level["year_min"], "y1": level["year_max"],
         "complete": count == indicator_view.PANEL_TOTALS["provincia"] and coverage >= seo_policy.MIN_COMPLETENESS,
         "completeness": round(100 * coverage), "n": count,
         "indexable": indicator_view.level_indexable(meta, "provincia", record["levels"][0]["key"]),
@@ -188,9 +199,15 @@ def _regional_rows() -> tuple[dict[str, list[dict]], list[dict]]:
 
 
 def province_items() -> list[dict]:
-    """Le schede BES con il livello provinciale, dalla loro fonte: una riga
-    delle province per ognuna, solo provinciali comprese."""
-    return [item for item in all_bes_indicators() if "provincia" in item["levels"]]
+    """Le schede con il livello provinciale, dalla loro fonte: una riga delle
+    province per ognuna, solo provinciali comprese. Prima le BES, poi le
+    famiglie esterne (`provincial_families`). Ogni voce porta `family`, `id`
+    (l'id grezzo) e `levels["provincia"]["coverage_latest"]`."""
+    items = [{**item, "family": "bes"} for item in all_bes_indicators() if "provincia" in item["levels"]]
+    items.extend({"family": entry["metadata"]["family"], "id": entry["metadata"]["raw_id"],
+                  "levels": entry["levels"]}
+                 for entry in provincial_families.all_indicators())
+    return items
 
 
 def _province_rows() -> tuple[dict[str, list[dict]], list[dict]]:
@@ -203,12 +220,13 @@ def _province_rows() -> tuple[dict[str, list[dict]], list[dict]]:
     records = {(record["family"], record["raw_id"]): record for record in indicator_universe.projection()}
     by_theme: dict[str, list[dict]] = {}
     for item in province_items():
-        record = records.get(("bes", item["id"]))
+        record = records.get((item["family"], item["id"]))
+        code = sources.indicator_code(item["family"], item["id"])
         if record is None or not any(lv["key"] == "provincia" for lv in record["levels"]):
-            raise LookupError(f"atlante: bes-{item['id']} ha le province ma non nella proiezione")
+            raise LookupError(f"atlante: {code} ha le province ma non nella proiezione")
         theme = record["meta"].get("theme")
         if CATEGORY_NAME_TO_SLUG.get(theme) is None:
-            raise LookupError(f"atlante: bes-{item['id']} ha il tema {theme!r}, fuori dalle categorie")
+            raise LookupError(f"atlante: {code} ha il tema {theme!r}, fuori dalle categorie")
         by_theme.setdefault(theme, []).append(_province_row(item, record))
     areas = []
     for area, slugs in MACRO_AREAS.items():
@@ -320,7 +338,7 @@ def derive(ctx: dict) -> dict:
     data = rows(level_key)
     shown = map_payload(tuple(ctx.get("map_indicator") or MAP_INDICATORS[level_key]), level_key)
     year_min, year_max = data["years"]
-    # Le istituzioni del livello, non del catalogo: le province sono solo BES.
+    # Le istituzioni del livello, non del catalogo: quelle delle sole righe provinciali.
     institutions = (catalog_summary()["institutions_label"] if level_key == "regione"
                     else sources.institutions_label([source["id"] for source in data["sources"]]))
     return {

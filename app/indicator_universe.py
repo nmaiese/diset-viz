@@ -1,9 +1,10 @@
 """L'universo degli indicatori con una pagina pubblica, in una passata sola.
 
-Sono 634, e non coincidono con i 594 del catalogo dell'atlante: 40 serie BES
-hanno solo osservazioni provinciali, quindi non entrano nel catalogo regionale
-ma la loro pagina esiste. Chi conta gli indicatori partendo dal catalogo ne
-perde quaranta senza che niente diventi rosso.
+Non coincidono con il catalogo dell'atlante: le serie BES e delle famiglie
+esterne (`app/provincial_families.py`) che hanno solo osservazioni provinciali
+non entrano nel catalogo regionale, ma la loro pagina esiste. Chi conta gli
+indicatori partendo dal catalogo le perde senza che niente diventi rosso. Il
+totale non si scrive da nessuna parte: e' `len(all_indicator_refs())`.
 
 Questa passata la faceva gia' la sitemap, che pero' scartava i non
 indicizzabili subito e non lasciava niente per chi deve guardare **tutto**
@@ -19,7 +20,7 @@ vista pesante si butta appena preso il riassunto. Chi legge non deve mutare il
 risultato.
 """
 
-from app import external_atlas, indicator_view, multiscopo_data, seo_policy, sources
+from app import external_atlas, indicator_view, multiscopo_data, provincial_families, seo_policy, sources
 from app.atlas_catalog import _downsample
 from app.bes_data import all_bes_indicators
 from app.cache_util import synchronized_cache
@@ -30,7 +31,9 @@ def all_indicator_refs():
     """`(famiglia, raw_id)` per ogni indicatore che ha una pagina pubblica.
 
     Si parte dai registri di famiglia e non dal catalogo dell'atlante, che e' la
-    ragione per cui le 40 serie BES solo provinciali restano dentro.
+    ragione per cui le serie solo provinciali, BES ed esterne, restano dentro.
+    Una serie esterna a due livelli compare una volta sola: il dedup tiene
+    l'ordine e scarta la seconda ref uguale.
     """
     refs = [("territorial", str(item["id"])) for item in get_catalog()["indicators"]]
     refs.extend(("bes", str(item["id"])) for item in all_bes_indicators())
@@ -40,12 +43,14 @@ def all_indicator_refs():
     if external_atlas.has_external_data():
         refs.extend(sources.split_internal_id(item["id"])
                     for item in external_atlas.all_external_indicators())
-    return refs
+    refs.extend((item["metadata"]["family"], item["metadata"]["raw_id"])
+                for item in provincial_families.all_indicators())
+    return list(dict.fromkeys(refs))
 
 
 @synchronized_cache(maxsize=1)
 def projection():
-    """Un record compatto per ognuno dei 634, indicizzabili e non.
+    """Un record compatto per ogni indicatore con una pagina, indicizzabili e non.
 
     `synchronized_cache` e non `lru_cache`: `lru_cache` non coalizza i miss
     concorrenti, e il worker gunicorn di produzione ha otto thread. Due crawler
@@ -96,7 +101,7 @@ def indexable_catalog():
     E' quello che leggono `sitemap.xml` e `llms-full.txt`, con la stessa forma di
     prima (`meta` piu' il riassunto per livello). Il dedup su `canonical_path`
     resta **dentro il sottoinsieme indicizzabile**: allargando la passata a tutti
-    e 634 sarebbe stato naturale deduplicare prima di filtrare, e un non
+    sarebbe stato naturale deduplicare prima di filtrare, e un non
     indicizzabile che occupa il path avrebbe buttato fuori dalla sitemap il suo
     gemello indicizzabile. Oggi non ci sono collisioni, ma `TERRITORIAL_NAME_TWINS` e
     `PROVINCE_ONLY_TITLE_COLLISIONS` esistono perche' sono reali.
@@ -190,9 +195,9 @@ def province_payload(indicator_id):
     if record is None:
         return None
     keys = [level["key"] for level in record["levels"]]
-    if "provincia" not in keys or record["family"] != "bes":
+    if "provincia" not in keys:
         return None
-    rows = indicator_view.provincial_series(record["raw_id"])
+    rows = indicator_view.provincial_series(record["raw_id"], record["family"])
     if not rows:
         return None
     meta = record["meta"]

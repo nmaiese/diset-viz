@@ -3443,7 +3443,7 @@ def _indexable_indicator_catalog():
     passata** anche per il cruscotto editoriale: prima la sitemap la faceva sui
     soli indicizzabili e chi doveva guardare tutto l'atlante ne avrebbe fatta una
     seconda, cioe' una seconda traversata e un secondo picco di memoria per gli
-    stessi 634 indicatori. Allargarla e' costato 0,2 s.
+    stessi indicatori. Allargarla e' costato 0,2 s.
 
     Il lock single-flight che stava qui e' dentro `synchronized_cache`: `lru_cache`
     non coalizza i miss concorrenti, e il worker gunicorn ha otto thread mentre
