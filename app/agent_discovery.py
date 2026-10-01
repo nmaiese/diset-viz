@@ -452,7 +452,7 @@ def methodology_markdown(site_url, license_label, license_url, counts=None):
             "- I dati arrivano dalla fonte e non si correggono. Medie, divari e classifiche si ricalcolano dal codice a ogni caricamento.",
             f"- La media delle regioni è una [media semplice]({doc}#media-semplice): ogni regione pesa uguale, e non è la media nazionale.",
             "- Punteggi e posizioni mettono in ordine i territori, non misurano il benessere.",
-            "- Un confronto mostra una differenza osservata, non la sua causa. Il racconto delle pagine è scritto con strumenti automatici e approvato da una persona.",
+            "- Un confronto mostra una differenza osservata, non la sua causa. Il racconto degli indicatori è scritto con strumenti automatici e approvato da una persona.",
             "",
             "## Come leggere i valori",
             "",

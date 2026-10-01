@@ -355,7 +355,7 @@ addEventListener("pagereveal", function (e) {
               in piu' porta il link alla metodologia): le prove di trasparenza
               le leggono, e sono dichiarazioni, non testo da ridisegnare. -#}
           <div><dt>Come è calcolato</dt><dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Il divario è la distanza fra il valore più alto e il più basso, e la classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
-          <div><dt>Come nasce questa scheda</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della scheda sono ricalcolate dal codice a ogni caricamento.
+          <div><dt>Come nasce questa pagina</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della scheda sono ricalcolate dal codice a ogni caricamento.
             {%- if page_article.authored_count or page_article.lead %} Il racconto lo legge e lo approva una persona prima che vada online.
             {%- else %} Il commento ai numeri è costruito sui dati della fonte e si aggiorna con loro, quindi non può invecchiare rispetto ai dati.{% endif %}
             <a href="/metodologia#come-nasce-il-testo">Come lavoriamo</a>.</dd></div>
