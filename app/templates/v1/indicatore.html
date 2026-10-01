@@ -371,7 +371,7 @@ addEventListener("pagereveal", function (e) {
           <div><dt>Qualità della vita</dt><dd>Questa serie resta descrittiva e non entra nel punteggio della qualità della vita, per evitare sovrapposizioni con altri indicatori o interpretazioni arbitrarie.</dd></div>
           {% endif %}
           {% if page_article.fonti %}<div><dt>Fonti dell'analisi</dt><dd><ul class="reflist">{% for f in page_article.fonti %}{% set parts = f.testo.split(' «', 1) %}<li>{% if f.url %}<a href="{{ f.url }}">{{ parts[0] }}</a>{% else %}{{ parts[0] }}{% endif %}{% if parts | length > 1 %}<small>«{{ parts[1] | truncate(180, true, '') }}{{ '»' if parts[1] | length <= 180 else '' }}</small>{% endif %}</li>{% endfor %}</ul></dd></div>{% endif %}
-          <div><dt>Licenza</dt><dd><a href="{{ data_license_url }}">{{ data_license_label }}</a></dd></div>
+          {% if meta.license_url %}<div><dt>Licenza</dt><dd><a href="{{ meta.license_url }}">{{ meta.license or meta.license_url }}</a></dd></div>{% endif %}
         </dl>
         {% if meta.downloads and level.key == 'regione' %}
         <div class="actions" id="download-dati">

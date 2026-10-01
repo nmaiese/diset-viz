@@ -37,6 +37,26 @@ class ProvincialFamilies(unittest.TestCase):
             self.assertGreaterEqual(rows[0]["rank"], 1)
             self.assertLessEqual(rows[0]["rank"], 107)
             self.assertEqual(rows[0]["source"], "Ministero dell'Economia e delle Finanze, dichiarazioni fiscali")
+            self.assertTrue(rows[0]["path"].endswith("/mef-reddito-irpef-medio/province"))
+
+    def test_base_level_is_regional_and_its_rule_is_its_own(self):
+        with patch("app.external_data.get_external_rows", return_value=external_mef.rows()), \
+                patch("app.external_data.get_external_levels", return_value=external_mef.levels()):
+            meta = provincial_families.all_indicators()[0]["metadata"]
+            levels = provincial_families.all_indicators()[0]["levels"]
+            self.assertEqual(meta["base_level"], "regione")
+            self.assertEqual(levels["regione"]["count_latest"], 20)
+            self.assertTrue(levels["regione"]["indexable"])
+            self.assertTrue(meta["indexable"])
+
+    def test_province_only_series_has_province_base(self):
+        rows = [row for row in external_mef.rows() if row["territory_level"] == "provincia"]
+        levels = [level for level in external_mef.levels() if level["territory_level"] == "provincia"]
+        with patch("app.external_data.get_external_rows", return_value=rows), \
+                patch("app.external_data.get_external_levels", return_value=levels):
+            meta = provincial_families.all_indicators()[0]["metadata"]
+            self.assertEqual(meta["base_level"], "provincia")
+            self.assertTrue(meta["indexable"])
 
     def test_unknown_province_fails_with_context(self):
         broken = external_mef.rows()

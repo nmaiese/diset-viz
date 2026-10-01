@@ -13,6 +13,7 @@ from functools import lru_cache
 from app import bes_data, external_data, profiles, sources
 from app.data import REGION_ORDER, _parse_number
 from app.profiles import SCOREABLE_DIRECTIONS
+from app.indicator_notes import build_bes_indicator_explain
 from app.taxonomy import CANONICAL_CATEGORIES, category_metadata, category_path
 
 
@@ -87,10 +88,20 @@ def _validate(rows, levels):
 
     seen = {}
     accepted = []
+    regional_years = defaultdict(list)
     for row in rows:
+        target = row.get("target_indicator_id", "")
+        if row.get("territory_level") == REGION_LEVEL:
+            # Il regionale lo valida e lo serve `external_atlas`: qui basta
+            # l'anno di ogni valore, per dire se il livello passa la regola.
+            if (target, REGION_LEVEL) in level_by_key and _parse_number(row.get("value")) is not None:
+                try:
+                    regional_years[target].append(int(row["year"]))
+                except (KeyError, TypeError, ValueError):
+                    _fail(f"anno illeggibile per {target} / {REGION_LEVEL}")
+            continue
         if row.get("territory_level") != PROVINCE_LEVEL:
             continue
-        target = row.get("target_indicator_id", "")
         key = (target, PROVINCE_LEVEL)
         manifest = level_by_key.get(key)
         if manifest is None:
@@ -133,26 +144,27 @@ def _validate(rows, levels):
             "territory_key": territory_key,
             "unit": row.get("unit", ""),
         })
-    return level_by_key, accepted
+    return level_by_key, accepted, dict(regional_years)
 
 
 @lru_cache(maxsize=1)
 def _index():
     manifests = external_data.get_external_levels()
     rows = external_data.get_external_rows()
-    level_by_key, province_rows = _validate(rows, manifests)
+    level_by_key, province_rows, regional_years = _validate(rows, manifests)
     rows_by_target = defaultdict(list)
     for row in province_rows:
         rows_by_target[(row["family"], row["raw_id"])].append(row)
-    return level_by_key, dict(rows_by_target)
+    return level_by_key, dict(rows_by_target), regional_years
 
 
-def _level_info(manifest, observations):
-    years = sorted({row["year"] for row in observations})
-    if not years:
-        years = [int(manifest["year_min"]), int(manifest["year_max"])]
+def _level_info(manifest, observations, years=None):
+    """Riassunto di un livello. `years` e' l'anno di ogni valore: le righe
+    regionali non passano di qui, ne basta l'anno."""
+    if years is None:
+        years = [row["year"] for row in observations]
     latest = int(manifest["year_max"])
-    count = sum(row["year"] == latest for row in observations)
+    count = sum(year == latest for year in years)
     return {
         "key": manifest["territory_level"],
         "label": "Province" if manifest["territory_level"] == PROVINCE_LEVEL else "Regioni",
@@ -173,7 +185,7 @@ def _level_info(manifest, observations):
 @lru_cache(maxsize=1)
 def all_indicators():
     """Catalogo cross-family delle serie esterne con livello provinciale."""
-    level_by_key, rows_by_target = _index()
+    level_by_key, rows_by_target, regional_years = _index()
     keys = sorted(set((family, raw_id) for family, raw_id in rows_by_target))
     output = []
     for family, raw_id in keys:
@@ -211,13 +223,23 @@ def all_indicators():
             "catalog_family": family,
             "catalog_family_label": sources.family_label(family),
             "path": sources.indicator_url(family, raw_id, profiles.indicator_slug(province_manifest["name"])),
-            "indexable": any(_level_info(manifest, province if level == PROVINCE_LEVEL else [])['indexable']
-                              for level, manifest in manifests.items()),
         }
+        metadata["explain"] = build_bes_indicator_explain(
+            {"name": metadata["name"], "unit": metadata["unit"],
+             "theme": metadata["source_theme"], "direction": metadata["direction"]},
+            "province",
+        )
         levels = {}
         for level, manifest in manifests.items():
-            observations = province if level == PROVINCE_LEVEL else []
-            levels[level] = _level_info(manifest, observations)
+            if level == PROVINCE_LEVEL:
+                levels[level] = _level_info(manifest, province)
+            else:
+                levels[level] = _level_info(manifest, [], regional_years.get(target, []))
+        # La pagina base e' la regionale quando il livello regionale ha valori,
+        # e la sua indicizzabilita' e' quella del livello base, non di un altro.
+        base = REGION_LEVEL if levels.get(REGION_LEVEL, {}).get("count_latest") else PROVINCE_LEVEL
+        metadata["base_level"] = base
+        metadata["indexable"] = levels[base]["indexable"]
         metadata["year_min"] = min(info["year_min"] for info in levels.values())
         metadata["year_max"] = max(info["year_max"] for info in levels.values())
         output.append({"metadata": metadata, "levels": levels, "series": province})
@@ -281,7 +303,9 @@ def indicators_for_province(province_key):
             "year": year, "year_from": years[0], "rank": rank,
             "province_count": len(values), "movement": None if previous is None else values[province_key] - previous,
             "source": meta["source_label"], "source_url": meta["source_url"],
-            "path": sources.level_path(meta["path"], PROVINCE_LEVEL, PROVINCE_LEVEL),
+            # Da una provincia si atterra sulle province: la `/province` quando
+            # la scheda si apre sulle regioni.
+            "path": sources.level_path(meta["path"], PROVINCE_LEVEL, meta["base_level"]),
         })
     return sorted(output, key=lambda row: (row["rank"], row["name"]))
 

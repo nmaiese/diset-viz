@@ -51,6 +51,7 @@ from app.data import REGION_ORDER, indicator_trend_stats, indicator_year_over_ye
 from app.design.charts import spark_floor
 from app.design.maps import PROVINCE_PATHS
 from app.external_data import freshness_label, freshness_status
+from app import provincial_families
 from app.multiscopo_data import all_multiscopo_indicators
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_CANONICALS, REGIONAL_TWINS
 from app.indicator_notes import (
@@ -116,21 +117,20 @@ def build_indicator_view(family, raw_id):
     payload = get_atlas_indicator(indicator_id)
 
     if payload is None:
-        # Province-only BES series: they never enter the atlas catalog (no
-        # regional coverage to canonicalize), but they still have a page.
-        if family != "bes":
-            return None
-        page = get_bes_indicator_page(raw_id)
+        if family == "bes":
+            page = get_bes_indicator_page(raw_id)
+            if page is not None:
+                return _view_from_bes_only(family, raw_id, page)
+        page = provincial_families.indicator_page(family, raw_id)
         if page is None:
             return None
-        return _view_from_bes_only(family, raw_id, page)
+        return _view_from_external_only(family, raw_id, page)
 
     meta = _build_meta(family, raw_id, payload["metadata"])
     levels = [_level_from_series("regione", payload, meta)]
-    if family == "bes":
-        provincial = _provincial_level(raw_id, meta)
-        if provincial is not None:
-            levels.append(provincial)
+    provincial = _provincial_level(family, raw_id, meta)
+    if provincial is not None:
+        levels.append(provincial)
 
     return _assemble(meta, levels)
 
@@ -290,6 +290,8 @@ def _build_meta(family, raw_id, source_meta):
         "institution": source_meta.get("institution") or sources.family_institution(family),
         # No blanket default: a family that declares no licence renders none.
         "license_url": source_meta.get("license_url") or sources.family_license_url(family),
+        # Il testo della licenza viene dal registro, come l'URL: mai dal CSV.
+        "license": sources.family_license(family)[0],
         "archive": source_meta.get("archive"),
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
@@ -354,6 +356,16 @@ def indexability(family, raw_id, source_meta):
     """
     if family in ("bes", "multiscopo"):
         return _family_indexability(family).get(raw_id, (False, "copertura"))
+    if family in sources.EXTERNAL_FAMILIES:
+        page = provincial_families.indicator_page(family, raw_id)
+        if page is not None:
+            # La regola del manifesto per livello, sul livello base della scheda.
+            info = page["levels"][page["metadata"]["base_level"]]
+            if info["indexable"]:
+                return True, None
+            if info["year_max"] < provincial_families.MIN_PUBLIC_YEAR:
+                return False, "vecchia"
+            return False, "copertura"
     if profiles.is_search_indexable_indicator(source_meta):
         return True, None
     if profiles.is_gender_variant(source_meta):
@@ -393,9 +405,12 @@ def level_passes_rule(meta, level_key, base_key):
     """
     if level_key == base_key:
         return bool(meta["indexable"])
-    if meta.get("family") != "bes":
-        return False
-    return _bes_level_indexability().get((meta["raw_id"], level_key), False)
+    if meta.get("family") == "bes":
+        return _bes_level_indexability().get((meta["raw_id"], level_key), False)
+    if meta.get("family") in sources.EXTERNAL_FAMILIES:
+        page = provincial_families.indicator_page(meta["family"], meta["raw_id"])
+        return bool(page and page["levels"].get(level_key, {}).get("indexable"))
+    return False
 
 
 def level_indexable(meta, level_key, base_key):
@@ -483,19 +498,25 @@ def _bes_series_by_indicator(level):
     return by_indicator
 
 
-def provincial_series(raw_id):
-    """Le righe provinciali di un BES, le stesse da cui la scheda compone la
-    sua `/province`, o una lista vuota. I campi hanno i nomi del payload
-    regionale (`region`, `region_key`): chi le legge, come il confronto, non
-    distingue i due livelli. Chi le riceve non le deve mutare."""
-    return _bes_series_by_indicator("provincia").get(str(raw_id)) or []
+def provincial_series(raw_id, family="bes"):
+    """Le righe provinciali di un indicatore, BES o di una famiglia esterna, le
+    stesse da cui la scheda compone la sua `/province`, o una lista vuota. I
+    campi hanno i nomi del payload regionale (`region`, `region_key`): chi le
+    legge, come il confronto, non distingue i due livelli. Chi le riceve non le
+    deve mutare."""
+    if family == "bes":
+        return _bes_series_by_indicator("provincia").get(str(raw_id)) or []
+    return provincial_families.series(family, str(raw_id))
 
 
-def _provincial_level(raw_id, meta):
-    """The BES provincial series, which lives outside the atlas layer."""
-    rows = _bes_series_by_indicator("provincia").get(raw_id)
+def _provincial_level(family, raw_id, meta):
+    """Il livello provinciale BES o external, fuori dal catalogo regionale."""
+    rows = provincial_series(raw_id, family)
     if not rows:
         return None
+    # L'anagrafica delle province e' una sola per tutte le famiglie: il registro
+    # BES vale qui come elenco dei territori, non come provenienza, e la
+    # copertura si conta sulle osservazioni, non sulla dichiarazione del manifesto.
     territories = get_bes_territories("provincia")
     level = _build_level("provincia", rows, meta, territory_total=len(territories), coverage=None)
     if level is not None:
@@ -780,7 +801,7 @@ def _view_from_bes_only(family, raw_id, page):
     levels = []
     for level in page["level_payloads"]:
         if level["level"] == "provincia":
-            built = _provincial_level(raw_id, meta)
+            built = _provincial_level(family, raw_id, meta)
         else:
             rows = _bes_series_by_indicator("regione").get(raw_id)
             built = _build_level("regione", rows, meta, territory_total=None, coverage=None) if rows else None
@@ -790,6 +811,16 @@ def _view_from_bes_only(family, raw_id, page):
             levels.append(built)
     levels.sort(key=lambda level: 0 if level["key"] == "regione" else 1)
     return _assemble(meta, levels)
+
+
+def _view_from_external_only(family, raw_id, page):
+    """Scheda esterna con sole osservazioni provinciali."""
+    meta = _build_meta(family, raw_id, page["metadata"])
+    meta["downloads"] = None
+    level = _provincial_level(family, raw_id, meta)
+    if level is None:
+        return None
+    return _assemble(meta, [level])
 
 
 def _theme_neighbours(meta):
@@ -830,7 +861,7 @@ def related_cards(related):
 
     Si chiama al render, dalla rotta della scheda, e non dentro
     `build_indicator_view`: il view model lo costruisce anche la passata dei
-    634 di `indicator_universe.projection()`, che le correlate non le legge, e
+    passata di `indicator_universe.projection()`, che le correlate non le legge, e
     con il pavimento li' ne calcolava otto per scheda a vuoto, alla prima
     richiesta della home. Qui se ne calcolano solo le `RELATED_SHOWN` che i
     template disegnano."""

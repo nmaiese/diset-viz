@@ -426,6 +426,12 @@
         <dd>{{ meta.archive }} <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></dd>
       </div>
       {% endif %}
+      {% if meta.license_url %}
+      <div class="apparatus-specs__row">
+        <dt>Licenza</dt>
+        <dd><a href="{{ meta.license_url }}" target="_blank" rel="noopener">{{ meta.license or meta.license_url }}</a></dd>
+      </div>
+      {% endif %}
       <div class="apparatus-specs__row">
         <dt>Come citare</dt>
         <dd>
