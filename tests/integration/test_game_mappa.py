@@ -343,11 +343,19 @@ class ErrorsTest(Base):
         self._assert_reveals_nothing(response)
 
     def test_a_token_older_than_twelve_hours_says_so(self):
-        session = self._open()
+        # L'orologio di itsdangerous (che firma e controlla l'eta' del token) fermo
+        # su T0 all'apertura: a 11 ore il token vale ancora, a 13 no.
+        with mock.patch("itsdangerous.timed.time.time", return_value=T0):
+            session = self._open()
+        right = self._keys(session)[0]
         later = T0 + 13 * 3600
         with mock.patch("itsdangerous.timed.time.time", return_value=later):
-            response = self._answer(session, 0, self._keys(session)[0], now=later)
+            response = self._answer(session, 0, right, now=later)
         self.assertEqual((response.status_code, response.get_json()), (400, {"error": "session_expired"}))
+        self._assert_reveals_nothing(response)
+        with mock.patch("itsdangerous.timed.time.time", return_value=T0 + 11 * 3600):
+            response = self._answer(session, 0, right, now=T0 + 11 * 3600)
+        self.assertEqual(response.status_code, 200)
 
     def test_answer_rate_limit(self):
         codes = [self.client.post("/api/game/map/daily/answer", json={}).status_code for _ in range(121)]
