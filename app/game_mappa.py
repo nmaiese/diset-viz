@@ -50,19 +50,19 @@ Nessuna risposta diversa da 200 porta `chosen`, `right`, `distance_km` o
   `miss` (0), e `chosen` e' la regione scelta (`region` uguale a `name`, `path`
   `/regione/<key>`).
 - `distance_km` e `direction` vanno dalla provincia scelta a quella giusta, fra i
-  centroidi (`game_daily.distanza_km_direzione`): sono una STIMA, e il testo deve
+  centroidi (`game_daily.distance_km_direction`): sono una STIMA, e il testo deve
   dirlo. `null` se l'esito e' esatto o in modalita' `list`.
 - `next_question` ha la stessa forma di `question` (al livello `regione` quindi
   anche `region` e `region_key`, che servono allo zoom), `null` dopo l'ultima.
 - `summary.esiti` sono i 10 esiti in ordine. `summary.achievements` e' la lista dei
   traguardi appena valutati per chi ha un account, vuota per chi non ce l'ha.
 
-**Il giorno e il seed.** Il giorno e' quello di Roma (`game_daily.oggi_roma`), e il
+**Il giorno e il seed.** Il giorno e' quello di Roma (`game_daily.today_rome`), e il
 `puzzle_id` del client deve essere quello di oggi: chi apre alle 23:59:50 e risponde
 alle 00:00:05 riceve `puzzle_changed`. Le province escono da
-`HMAC(GAME_SEED_KEY, "mappa-<livello>|<data>")` (`game_daily.seed_giorno`), quindi i
+`HMAC(GAME_SEED_KEY, "mappa-<livello>|<data>")` (`game_daily.day_seed`), quindi i
 due livelli hanno due insiemi diversi e quello di domani non si calcola leggendo il
-repo. Senza la chiave in produzione si risponde 503 (`game_daily.chiave_seed`).
+repo. Senza la chiave in produzione si risponde 503 (`game_daily.seed_key`).
 
 **La storia.** Una provincia non torna prima di 7 giorni: il giorno N esclude quelle
 dei 6 giorni prima, che a loro volta dipendono dai precedenti. Nessuno le ha
@@ -105,7 +105,7 @@ from functools import lru_cache
 from itsdangerous import BadData, SignatureExpired
 
 from app import game_daily, quiz_tokens
-from app.game_daily import oggi_roma
+from app.game_daily import today_rome
 
 MODE = "mappa_daily"
 LEVELS = ("italia", "regione")
@@ -127,7 +127,7 @@ SCORE_GAMES = {
     ("italia", "list"): "mappa_elenco",
 }
 # Quante province per fascia (grandi, medie, piccole) per difficolta' del giorno
-# della settimana (`game_daily.DIFFICOLTA_SETTIMANA`).
+# della settimana (`game_daily.WEEKDAY_DIFFICULTY`).
 MIX = {0: (6, 4, 0), 1: (4, 4, 2), 2: (3, 4, 3), 3: (2, 4, 4), 4: (1, 3, 6)}
 # Province minime nella regione per il livello `regione` (con una sola, la domanda
 # si risponde da sola).
@@ -201,7 +201,7 @@ def pool(level):
     """Le chiavi che possono essere chieste a un livello, in ordine: le 107 senza la
     Sardegna, e al livello `regione` solo le regioni con almeno 3 province."""
     _check_level(level)
-    eligible = set(game_daily.regioni_idonee(REGION_LEVEL_MIN)) if level == "regione" else None
+    eligible = set(game_daily.eligible_regions(REGION_LEVEL_MIN)) if level == "regione" else None
     return tuple(sorted(
         p["key"] for p in game_daily.province_pool()
         if p["region"] not in QUESTION_EXCLUDED_REGIONS and (eligible is None or p["region"] in eligible)
@@ -210,7 +210,7 @@ def pool(level):
 
 def _areas():
     """{chiave: area della sagoma} da `province_centroidi.json`."""
-    shapes = json.loads(game_daily.CENTROIDI_JSON.read_text(encoding="utf-8"))["province"]
+    shapes = json.loads(game_daily.CENTROIDS_JSON.read_text(encoding="utf-8"))["province"]
     return {k: v["area"] for k, v in shapes.items()}
 
 
@@ -245,8 +245,8 @@ def _pick_day(day, level, key, recent):
     """Le 10 chiavi di un giorno, dalle fasce grandi alle piccole, escluse quelle in
     `recent`. Solleva se una fascia non ne ha abbastanza (con le fasce e il `MIX` di
     oggi non succede: lo prova un test su cinque anni)."""
-    rng = random.Random(game_daily.seed_giorno(f"mappa-{level}", day, key))
-    counts = MIX[game_daily.DIFFICOLTA_SETTIMANA[day.weekday()]]
+    rng = random.Random(game_daily.day_seed(f"mappa-{level}", day, key))
+    counts = MIX[game_daily.WEEKDAY_DIFFICULTY[day.weekday()]]
     picks = []
     for band, n in zip(size_bands(level), counts):
         free = [k for k in band if k not in recent]
@@ -275,7 +275,7 @@ def daily_provinces(day, level, key=None):
     """Le 10 chiavi della sfida di `day` a un livello, dalle facili alle difficili.
     La chiave del seed si risolve qui, PRIMA della cache di `_history`."""
     _check_level(level)
-    return _history(day, level, game_daily.chiave_seed() if key is None else key)[-1]
+    return _history(day, level, game_daily.seed_key() if key is None else key)[-1]
 
 
 # Le domande
@@ -335,15 +335,15 @@ def open_session(level, mode, now=None):
     nel token firmato."""
     if level not in LEVELS or mode not in ANSWER_MODES or (mode == "list" and level != "italia"):
         return None
-    day = oggi_roma(now)
+    day = today_rome(now)
     keys = daily_provinces(day, level)
     state = quiz_tokens.load_state(None, MODE, timer=False)
     state = {**state, SCORE_KEY: {"d": day.isoformat(), "l": level, "m": mode, "p": 0, "e": []}}
     body = {
         "puzzle_id": puzzle_id(day),
-        "number": game_daily.numero_sfida(day),
+        "number": game_daily.challenge_number(day),
         "date": day.isoformat(),
-        "next_puzzle_at": game_daily.prossima_sfida_roma(day),
+        "next_puzzle_at": game_daily.next_challenge_rome(day),
         "level": level,
         "level_label": LEVEL_LABELS[level],
         "mode": mode,
@@ -384,7 +384,7 @@ def answer(data, now=None):
     loro ordine sono nel docstring del modulo."""
     token = data.get("token")
     state = quiz_tokens.load_state(token, MODE)
-    day = oggi_roma(now)
+    day = today_rome(now)
     if data.get("puzzle_id") != puzzle_id(day):
         return 400, {"error": "puzzle_changed"}, None
     if state.get("fp") is None and _expired(token):
@@ -440,7 +440,7 @@ def answer(data, now=None):
         picked = provinces[chosen_key]
         chosen = {"key": chosen_key, "name": display_name(picked), "region": picked["region"],
                   "path": _PROVINCE_PATH + chosen_key}
-        distance, direction = (None, None) if result == "exact" else game_daily.distanza_km_direzione(chosen_key, right_key)
+        distance, direction = (None, None) if result == "exact" else game_daily.distance_km_direction(chosen_key, right_key)
     score = {"points": total, "max": points_max(mode), "answered": index + 1}
     body = {
         "index": index,
@@ -460,9 +460,9 @@ def answer(data, now=None):
     if finished:
         body["summary"] = {
             "puzzle_id": puzzle_id(day),
-            "number": game_daily.numero_sfida(day),
+            "number": game_daily.challenge_number(day),
             "date": day.isoformat(),
-            "next_puzzle_at": game_daily.prossima_sfida_roma(day),
+            "next_puzzle_at": game_daily.next_challenge_rome(day),
             "score": score,
             "esiti": results,
             "achievements": [],

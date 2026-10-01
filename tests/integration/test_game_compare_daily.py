@@ -29,8 +29,8 @@ GIORNO_30 = date(2026, 9, 30)
 
 def _orologio(now):
     """Fissa l'orologio del server su un istante, per le rotte."""
-    giorno = game_daily.oggi_roma(now)
-    return mock.patch.object(game_compare, "oggi_roma", return_value=giorno)
+    giorno = game_daily.today_rome(now)
+    return mock.patch.object(game_compare, "today_rome", return_value=giorno)
 
 
 def _valori_veri(livello, coppia):
@@ -42,7 +42,7 @@ def _valori_veri(livello, coppia):
             for riga in quiz._quiz_indicator_payload(indicatore["id"], indicatore["year"])["values"]
         }
     else:
-        _, righe = game_daily._righe_indicatore({"id": indicatore["id"]}, "province")
+        _, righe = game_daily._indicator_rows({"id": indicatore["id"]}, "province")
         valori = {riga["key"]: riga["value"] for riga in righe}
     return valori[coppia["a"]["key"]], valori[coppia["b"]["key"]]
 
@@ -120,9 +120,9 @@ class Base(unittest.TestCase):
 
 class SessioneTest(Base):
     def test_questions_carry_no_values_and_no_solution(self):
-        for livello in game_daily.LIVELLI:
+        for livello in game_daily.LEVELS:
             sessione = self._sessione(livello)
-            self.assertEqual(len(sessione["questions"]), game_daily.COMPARE_COPPIE)
+            self.assertEqual(len(sessione["questions"]), game_daily.COMPARE_PAIRS)
             testo = json.dumps(sessione)
             for rubrica in ("value", "winner", "correct", "description"):
                 self.assertNotIn(rubrica, testo, f"{livello}: {rubrica} nelle domande")
@@ -156,9 +156,9 @@ class SessioneTest(Base):
                     self.assertEqual(domanda[lato]["region"], regioni[domanda[lato]["key"]])
 
     def test_same_region_level_only_uses_eligible_regions(self):
-        idonee = set(game_daily.regioni_idonee(game_daily.MINIMO_COMPARE))
+        idonee = set(game_daily.eligible_regions(game_daily.MIN_PROVINCES_COMPARE))
         for giorno in range(10):
-            sfida = game_daily.compare_del_giorno(GIORNO_30 + timedelta(days=giorno), "stessa_regione")
+            sfida = game_daily.daily_compare(GIORNO_30 + timedelta(days=giorno), "stessa_regione")
             self.assertIn(sfida["region"], idonee)
             for coppia in sfida["pairs"]:
                 for lato in ("a", "b"):
@@ -328,7 +328,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         risposte = self._gioca(sessione, "regioni", giuste=10)
         ultima = risposte[-1].get_json()
-        stato = quiz_tokens.load_state(ultima["token"], game_compare.MODO)
+        stato = quiz_tokens.load_state(ultima["token"], game_compare.MODE)
         self.assertIsNone(stato["fp"])
         # La decima coppia non si può rispondere una seconda volta.
         self.assertEqual(self._risponde(sessione, 9, "region_a", token=ultima["token"]).status_code, 400)
@@ -337,7 +337,7 @@ class MonousoTest(Base):
         sessione = self._sessione()
         coppia = sessione["questions"][0]
         risposta = self._risponde(sessione, 0, _vincitore("regioni", coppia)).get_json()
-        stato = quiz_tokens.load_state(risposta["token"], game_compare.MODO)
+        stato = quiz_tokens.load_state(risposta["token"], game_compare.MODE)
         # "l" e' il livello: dopo la risposta `x` si svuota e "Avanti" lo legge da qui.
         self.assertEqual(stato["sfida"], {"d": sessione["date"], "c": 1, "l": "regioni"})
 
@@ -486,7 +486,7 @@ class AvantiTest(Base):
     def test_la_risposta_non_lega_piu_la_domanda_successiva(self):
         sessione = self._sessione()
         prima = self._risponde(sessione, 0, _vincitore("regioni", sessione["questions"][0])).get_json()
-        self.assertIsNone(quiz_tokens.load_state(prima["token"], game_compare.MODO)["fp"])
+        self.assertIsNone(quiz_tokens.load_state(prima["token"], game_compare.MODE)["fp"])
         seconda = self._risponde(sessione, 1, "region_a", token=prima["token"], now=T0 + 2)
         self.assertEqual((seconda.status_code, seconda.get_json()["error"]), (400, "token_invalid"))
 
@@ -566,7 +566,7 @@ class SerieTest(Base):
 
     def test_the_two_routes_keep_their_own_sessions(self):
         sessione = self._sessione()
-        stato = quiz_tokens.load_state(sessione["token"], game_compare.MODO)
+        stato = quiz_tokens.load_state(sessione["token"], game_compare.MODE)
         self.assertEqual(stato["q"], 1)
         self.assertEqual(stato["x"], "regioni")
         # Il round a serie resta un round: due regioni e la sua difficolta'.

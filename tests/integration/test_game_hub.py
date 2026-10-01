@@ -41,7 +41,7 @@ class Base(unittest.TestCase):
         config.LEADERBOARD_DB = str(Path(self._tmp) / "h.sqlite3")
         for chiave in ("rl:prov:ip:127.0.0.1", "rl:ans:ip:127.0.0.1"):
             cache.delete(chiave)
-        self.oggi = game_daily.oggi_roma()
+        self.oggi = game_daily.today_rome()
 
     def tearDown(self):
         config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB = self._saved
@@ -96,11 +96,11 @@ class GuessProvinciaTest(Base):
     def _gioca(self, sub, corretta, livello="province"):
         client = app.test_client()
         payload = client.get(f"/api/game/provincia/daily?level={livello}").get_json()
-        mistero = game_provincia.provincia_del_giorno(self.oggi)["key"]
+        mistero = game_provincia.daily_province(self.oggi)["key"]
         if corretta:
             chiave = mistero
         else:
-            chiave = next(o["key"] for o in game_provincia.opzioni(livello, self.oggi) if o["key"] != mistero)
+            chiave = next(o["key"] for o in game_provincia.options(livello, self.oggi) if o["key"] != mistero)
         cache.delete("rl:prov:ip:127.0.0.1")
         return client.post("/api/game/provincia/guess", json={"token": payload["token"], "province_key": chiave},
                            headers={"Authorization": f"Bearer {_jwt(sub)}"} if sub else {})

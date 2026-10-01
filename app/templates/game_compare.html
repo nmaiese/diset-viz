@@ -17,11 +17,11 @@
   "@context": "https://schema.org",
   "@type": "Game",
   "name": "Chi è maggiore?",
-  "description": {{ ("Sfida del giorno e allenamento a serie sugli indicatori territoriali di " ~ fonte_del_gioco("compare").istituzioni ~ ": scegli quale fra due regioni o province italiane ha il valore più alto.") | tojson }},
+  "description": {{ ("Sfida del giorno e allenamento a serie sugli indicatori territoriali di " ~ game_source("compare").istituzioni ~ ": scegli quale fra due regioni o province italiane ha il valore più alto.") | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": {{ organization_ref_jsonld | safe }},
-  "isBasedOn": {% set fonte = fonte_del_gioco("compare") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali regionali e provinciali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
+  "isBasedOn": {% set fonte = game_source("compare") %}{ "@type": "Dataset", "name": "Indicatori territoriali", "description": {{ ("Indicatori territoriali regionali e provinciali pubblicati da " ~ fonte.istituzioni ~ ".") | tojson }}, "license": {{ (fonte.licenze[0] if fonte.licenze|length == 1 else fonte.licenze) | tojson }}, "creator": {{ (fonte.creator[0] if fonte.creator|length == 1 else fonte.creator) | tojson }} },
   "isAccessibleForFree": true
 }
 </script>
@@ -36,7 +36,7 @@
 
   <header class="page-hero">
     <h1>Chi è maggiore?</h1>
-    <p class="page-lead">Un indicatore di {{ fonte_del_gioco("compare").istituzioni }}, due regioni o province: scegli quale ha il valore più alto prima che scada il tempo. Ogni giorno c'è una sfida di dieci coppie, le stesse per tutti, e chi vuole può allenarsi a serie.</p>
+    <p class="page-lead">Un indicatore di {{ game_source("compare").istituzioni }}, due regioni o province: scegli quale ha il valore più alto prima che scada il tempo. Ogni giorno c'è una sfida di dieci coppie, le stesse per tutti, e chi vuole può allenarsi a serie.</p>
   </header>
 
   <div id="compare-root">

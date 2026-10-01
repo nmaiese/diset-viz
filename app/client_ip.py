@@ -17,7 +17,7 @@ edge nuovo finisce nel caso "ultimo hop" e il limite torna condiviso, non aggira
 
 import ipaddress
 
-CLOUDFLARE_RETI = tuple(ipaddress.ip_network(r) for r in (
+CLOUDFLARE_NETWORKS = tuple(ipaddress.ip_network(r) for r in (
     "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22",
     "141.101.64.0/18", "108.162.192.0/18", "190.93.240.0/20", "188.114.96.0/20",
     "197.234.240.0/22", "198.41.128.0/17", "162.158.0.0/15", "104.16.0.0/13",
@@ -27,27 +27,27 @@ CLOUDFLARE_RETI = tuple(ipaddress.ip_network(r) for r in (
 ))
 
 
-def _ip(valore):
+def _ip(value):
     try:
-        return ipaddress.ip_address((valore or "").strip())
+        return ipaddress.ip_address((value or "").strip())
     except ValueError:
         return None
 
 
-def e_cloudflare(valore):
-    ip = _ip(valore)
-    return ip is not None and any(ip in rete for rete in CLOUDFLARE_RETI)
+def is_cloudflare(value):
+    ip = _ip(value)
+    return ip is not None and any(ip in network for network in CLOUDFLARE_NETWORKS)
 
 
-def ip_del_client(forwarded_for, cf_connecting_ip):
+def resolve_client_ip(forwarded_for, cf_connecting_ip):
     """L'IP del client da `X-Forwarded-For` e `CF-Connecting-IP` su Cloud Run.
     None se non c'e' un ultimo hop leggibile."""
     hops = [h.strip() for h in (forwarded_for or "").split(",") if h.strip()]
     if not hops:
         return None
-    ultimo = hops[-1]
-    if e_cloudflare(ultimo):
+    last_hop = hops[-1]
+    if is_cloudflare(last_hop):
         client = _ip(cf_connecting_ip)
         if client is not None:
             return str(client)
-    return ultimo
+    return last_hop

@@ -65,13 +65,13 @@ def _iso_days(dates):
     """Le date ISO distinte, in ordine. Le righe storiche di `daily_results` con il
     `puzzle_id` intero (`daily:2026-...`, `practice-...`) e ogni altra stringa non ISO
     si ignorano: una sola riga cosi' non deve far cadere le statistiche dell'account."""
-    giorni = set()
+    unique_days = set()
     for d in dates:
         try:
-            giorni.add(date.fromisoformat(d))
+            unique_days.add(date.fromisoformat(d))
         except (TypeError, ValueError):
             continue
-    return sorted(giorni)
+    return sorted(unique_days)
 
 
 def _daily_streaks(solved_dates, today=None):
@@ -82,7 +82,7 @@ def _daily_streaks(solved_dates, today=None):
     days = _iso_days(solved_dates)
     if not days:
         return 0, 0
-    today = today or game_daily.oggi_roma()
+    today = today or game_daily.today_rome()
     longest = run = 1
     for prev, cur in zip(days, days[1:]):
         run = run + 1 if cur - prev == timedelta(days=1) else 1
@@ -99,7 +99,7 @@ def _daily_streaks(solved_dates, today=None):
 
 
 # Un giorno di riposo perdonato si puo' usare una volta ogni tanti giorni.
-RIPOSO_OGNI_GIORNI = 7
+REST_EVERY_DAYS = 7
 
 
 def play_streak(dates, today=None):
@@ -117,22 +117,22 @@ def play_streak(dates, today=None):
     Funzione pura: i vettori di prova stanno in `tests/fixtures/play_streak_cases.json`
     e il frontend li legge con la stessa funzione in JS.
     """
-    today = today or game_daily.oggi_roma()
+    today = today or game_daily.today_rome()
     days = [d for d in _iso_days(dates) if d <= today]
     if not days:
         return {"current": 0, "max": 0}
     longest = run = 1
-    perdonato = None  # il giorno vuoto perdonato piu' di recente nella serie
+    forgiven = None  # il giorno vuoto perdonato piu' di recente nella serie
     for prev, cur in zip(days, days[1:]):
         gap = (cur - prev).days
-        riposo = prev + timedelta(days=1)
+        rest_day = prev + timedelta(days=1)
         if gap == 1:
             run += 1
-        elif gap == 2 and (perdonato is None or (riposo - perdonato).days >= RIPOSO_OGNI_GIORNI):
+        elif gap == 2 and (forgiven is None or (rest_day - forgiven).days >= REST_EVERY_DAYS):
             run += 1
-            perdonato = riposo
+            forgiven = rest_day
         else:
-            run, perdonato = 1, None
+            run, forgiven = 1, None
         longest = max(longest, run)
     current = run if today - days[-1] <= timedelta(days=1) else 0
     return {"current": current, "max": longest}
@@ -143,11 +143,11 @@ def play_streak_for(auth_id, today=None):
     if not auth_id:
         return {"current": 0, "max": 0}
     with session_scope() as s:
-        giorni = set(s.execute(select(DailyResult.puzzle_date)
-                               .where(DailyResult.auth_id == auth_id)).scalars())
-        giorni |= set(s.execute(select(DailyScore.data)
-                                .where(DailyScore.auth_id == auth_id)).scalars())
-    return play_streak(giorni, today)
+        unique_days = set(s.execute(select(DailyResult.puzzle_date)
+                                    .where(DailyResult.auth_id == auth_id)).scalars())
+        unique_days |= set(s.execute(select(DailyScore.data)
+                                     .where(DailyScore.auth_id == auth_id)).scalars())
+    return play_streak(unique_days, today)
 
 
 def record_daily(auth_id, puzzle_date, attempts, solved):
@@ -175,19 +175,19 @@ def record_daily(auth_id, puzzle_date, attempts, solved):
         return True
 
 
-def record_daily_score(auth_id, gioco, data, punteggio):
+def record_daily_score(auth_id, game, day, score):
     """Registra il punteggio di una sfida del giorno. Un solo tentativo per
     (account, gioco, data): il secondo si rifiuta (False) e non sovrascrive."""
-    if not auth_id or not gioco or not isinstance(data, str):
+    if not auth_id or not game or not isinstance(day, str):
         return False
     try:
-        date.fromisoformat(data)
+        date.fromisoformat(day)
     except ValueError:
         return False
     try:
         with session_scope() as s:
-            s.add(DailyScore(auth_id=auth_id, gioco=gioco, data=data,
-                             punteggio=int(punteggio), created_at=_now_iso()))
+            s.add(DailyScore(auth_id=auth_id, gioco=game, data=day,
+                             punteggio=int(score), created_at=_now_iso()))
         return True
     except IntegrityError:
         return False

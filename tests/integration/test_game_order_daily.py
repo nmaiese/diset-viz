@@ -20,7 +20,7 @@ class TestGameOrderDaily(unittest.TestCase):
         self.client = app.test_client()
 
     def test_daily_challenge_is_same_for_everyone_and_changes_at_rome_midnight(self):
-        with mock.patch.object(game_daily, "oggi_roma", return_value=date(2026, 9, 30)):
+        with mock.patch.object(game_daily, "today_rome", return_value=date(2026, 9, 30)):
             res1 = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
             res2 = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
             self.assertEqual(res1["date"], "2026-09-30")
@@ -31,7 +31,7 @@ class TestGameOrderDaily(unittest.TestCase):
                 [t["key"] for t in res2["territories"]],
             )
 
-        with mock.patch.object(game_daily, "oggi_roma", return_value=date(2026, 10, 1)):
+        with mock.patch.object(game_daily, "today_rome", return_value=date(2026, 10, 1)):
             res3 = self.client.get("/api/game/order/daily/session?level=regioni").get_json()
             self.assertEqual(res3["date"], "2026-10-01")
             self.assertEqual(res3["puzzle_id"], "daily:2026-10-01")
@@ -92,7 +92,7 @@ class TestGameOrderDaily(unittest.TestCase):
         self.assertEqual(res2.status_code, 409)
 
     def test_stessa_regione_uses_only_regions_with_at_least_5_provinces(self):
-        idonee = game_daily.regioni_idonee(5)
+        idonee = game_daily.eligible_regions(5)
         self.assertNotIn("Molise", idonee)
         self.assertNotIn("Valle d'Aosta", idonee)
         self.assertNotIn("Umbria", idonee)
@@ -251,7 +251,7 @@ class PercorsoCanonicoOrdinaTest(BaseOrdina):
     (`bes_data.bes_level_path`), non uno slug composto dal nome leggibile."""
 
     def test_nessun_301_sui_quaranta_indicatori_provinciali(self):
-        provinciali = [i for i in game_daily.indicatori_gioco() if i["provincia"]]
+        provinciali = [i for i in game_daily.game_indicators() if i["provincia"]]
         self.assertGreaterEqual(len(provinciali), 40)
         for ind in provinciali:
             with self.subTest(indicatore=ind["id"]):
@@ -289,7 +289,7 @@ class GiroDItaliaTest(unittest.TestCase):
 
     def _prepara(self, sub, tranne):
         from app import player_stats
-        oggi = game_daily.oggi_roma().isoformat()
+        oggi = game_daily.today_rome().isoformat()
         if tranne != "indovina":
             player_stats.record_daily(sub, oggi, 2, True)
         for gioco, punteggio in (("provincia", 1), ("compare", 7), ("order", 5)):
@@ -299,7 +299,7 @@ class GiroDItaliaTest(unittest.TestCase):
     def test_indovina_per_ultima_sblocca_il_giro_d_italia(self):
         from app import game
         self._prepara("giro-indovina", "indovina")
-        puzzle_id = f"daily:{game_daily.oggi_roma().isoformat()}"
+        puzzle_id = f"daily:{game_daily.today_rome().isoformat()}"
         r = self.client.post("/api/game/guess", headers=self._auth("giro-indovina"), json={
             "puzzle_id": puzzle_id, "region_key": game.build_puzzle(puzzle_id)["region_key"], "attempt": 1})
         self.assertIn("giro_ditalia", [a["id"] for a in r.get_json()["achievements"]])
@@ -310,7 +310,7 @@ class GiroDItaliaTest(unittest.TestCase):
         self._prepara("giro-provincia", "provincia")
         cache.delete("rl:prov:ip:127.0.0.1")
         payload = self.client.get("/api/game/provincia/daily?level=province").get_json()
-        mistero = game_provincia.provincia_del_giorno(game_daily.oggi_roma())["key"]
+        mistero = game_provincia.daily_province(game_daily.today_rome())["key"]
         r = self.client.post("/api/game/provincia/guess", headers=self._auth("giro-provincia"), json={
             "token": payload["token"], "province_key": mistero})
         self.assertIn("giro_ditalia", [a["id"] for a in r.get_json()["achievements"]])
@@ -334,7 +334,7 @@ class GiroDItaliaTest(unittest.TestCase):
 
     def test_ordina_per_ultima_sblocca_il_giro_d_italia_sull_ultima_risposta(self):
         from app import player_stats
-        oggi = game_daily.oggi_roma().isoformat()
+        oggi = game_daily.today_rome().isoformat()
         for gioco, punteggio in (("provincia", 1), ("compare", 7)):
             player_stats.record_daily_score("giro-1", gioco, oggi, punteggio)
         player_stats.record_daily("giro-1", oggi, 2, True)

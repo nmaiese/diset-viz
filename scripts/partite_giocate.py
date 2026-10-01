@@ -52,7 +52,7 @@ def main(argv=None):
     ap.add_argument("--punteggi", action="store_true", help="mostra anche la distribuzione dei punteggi")
     args = ap.parse_args(argv)
 
-    a = args.a or game_daily.oggi_roma().isoformat()
+    a = args.a or game_daily.today_rome().isoformat()
     da = args.da or (date.fromisoformat(a) - timedelta(days=args.giorni - 1)).isoformat()
     for riga in righe(daily_counter.totals(args.gioco, da, a), args.punteggi):
         print(riga)

@@ -213,7 +213,7 @@ def _client_ip():
     Cloudflare sta in `app/client_ip.py`: l'ultimo hop non si falsifica, il primo
     lo scrive il client."""
     if os.environ.get("K_SERVICE"):
-        ip = client_ip.ip_del_client(
+        ip = client_ip.resolve_client_ip(
             request.headers.get("X-Forwarded-For"), request.headers.get("CF-Connecting-IP"))
         if ip:
             return ip
@@ -3099,12 +3099,12 @@ def leaderboard_admin_delete_api():
 
 def _sfida_del_giorno_api(gioco):
     livello = request.args.get("level", "regioni")
-    if livello not in game_daily.LIVELLI:
+    if livello not in game_daily.LEVELS:
         abort(400)
-    return jsonify(game_daily.sfida_payload(gioco, livello))
+    return jsonify(game_daily.challenge_payload(gioco, livello))
 
 
-@app.errorhandler(game_daily.ChiaveSeedMancante)
+@app.errorhandler(game_daily.SeedKeyMissing)
 def game_seed_key_missing(errore):
     """Su Cloud Run senza `GAME_SEED_KEY` le sfide nuove sarebbero prevedibili: 503 e
     un errore nel log, mai una sfida calcolata con la chiave di sviluppo."""
@@ -3138,7 +3138,7 @@ def game_provincia_daily_api():
         return jsonify({"error": "rate_limited"}), 429
     try:
         return jsonify(game_provincia.payload(request.args.get("level", "province")))
-    except game_provincia.ErroreProvincia as errore:
+    except game_provincia.ProvinceError as errore:
         return jsonify({"error": errore.code}), errore.status
 
 
@@ -3148,14 +3148,14 @@ def game_provincia_guess_api():
         return jsonify({"error": "rate_limited"}), 429
     corpo = request.get_json(silent=True) or {}
     try:
-        risultato = game_provincia.valuta_tentativo(corpo.get("token"), corpo.get("province_key"))
-    except game_provincia.ErroreProvincia as errore:
+        risultato = game_provincia.evaluate_attempt(corpo.get("token"), corpo.get("province_key"))
+    except game_provincia.ProvinceError as errore:
         return jsonify({"error": errore.code}), errore.status
     if risultato.get("finished"):
         try:
             from app import daily_counter
             daily_counter.record("provincia" if risultato["level"] == "province" else "provincia_regione",
-                                 game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+                                 game_daily.today_rome().isoformat(), 1 if risultato["correct"] else 0)
         except Exception:  # noqa: BLE001
             app.logger.exception("provincia: partita finita non contata")
     utente = auth.current_user(request.headers) if risultato.get("finished") else None
@@ -3165,7 +3165,7 @@ def game_provincia_guess_api():
         # regione" quella facile ("provincia_regione") e non sblocca Geografo ne' Giro d'Italia.
         gioco = "provincia" if risultato["level"] == "province" else "provincia_regione"
         try:
-            player_stats.record_daily_score(utente["id"], gioco, game_daily.oggi_roma().isoformat(), 1 if risultato["correct"] else 0)
+            player_stats.record_daily_score(utente["id"], gioco, game_daily.today_rome().isoformat(), 1 if risultato["correct"] else 0)
         except Exception:  # noqa: BLE001
             app.logger.exception("provincia: punteggio del giorno non registrato")
         try:
@@ -3185,22 +3185,22 @@ def game_order_daily_session_api():
         return jsonify({"error": "rate_limited"}), 429
     try:
         return jsonify(game_order.daily_order_session(request.args.get("level", "regioni")))
-    except game_order.ErroreOrdina as errore:
+    except game_order.OrderError as errore:
         return jsonify({"error": errore.code}), errore.status
 
 
 @app.post("/api/game/order/daily/answer")
 def game_order_daily_answer_api():
     payload = request.get_json(silent=True) or {}
-    if _answer_rate_limited(game_order.sid_del_token(payload.get("token"))):
+    if _answer_rate_limited(game_order.sid_from_token(payload.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
     try:
         res = game_order.evaluate_daily_order_answer(payload, auth_user=auth.current_user(request.headers))
-    except game_order.ErroreOrdina as errore:
+    except game_order.OrderError as errore:
         return jsonify({"error": errore.code}), errore.status
     try:
         from app import daily_counter
-        daily_counter.record("order", game_daily.oggi_roma().isoformat(), res["score"])
+        daily_counter.record("order", game_daily.today_rome().isoformat(), res["score"])
     except Exception:  # noqa: BLE001
         app.logger.exception("order: partita finita non contata")
     # Il punteggio del giorno e' gia' registrato: i traguardi lo vedono.
@@ -3217,7 +3217,7 @@ def game_order_daily_answer_api():
 def game_compare_daily_session_api():
     # Livello e timer si dichiarano qui e da qui in poi viaggiano nel token
     # firmato: il client non li sceglie più.
-    sessione = game_compare.apri_sessione(
+    sessione = game_compare.open_session(
         request.args.get("level", "regioni"), _timer_requested()
     )
     if sessione is None:
@@ -3228,9 +3228,9 @@ def game_compare_daily_session_api():
 @app.post("/api/game/compare/daily/answer")
 def game_compare_daily_answer_api():
     dati = request.get_json(silent=True) or {}
-    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+    if _answer_rate_limited(game_compare.sid_from_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
-    stato, corpo = game_compare.risposta(dati)
+    stato, corpo = game_compare.answer(dati)
     if stato == 200 and corpo.get("finished") and isinstance(corpo.get("summary"), dict):
         try:
             from app import daily_counter
@@ -3258,11 +3258,11 @@ def game_compare_daily_answer_api():
 
 @app.post("/api/game/compare/daily/next")
 def game_compare_daily_next_api():
-    """"Avanti": lega la domanda dopo quella appena risposta (vedi `game_compare.avanti`)."""
+    """"Avanti": lega la domanda dopo quella appena risposta (vedi `game_compare.next_question`)."""
     dati = request.get_json(silent=True) or {}
-    if _answer_rate_limited(game_compare.sid_del_token(dati.get("token"))):
+    if _answer_rate_limited(game_compare.sid_from_token(dati.get("token"))):
         return jsonify({"error": "rate_limited"}), 429
-    stato, corpo = game_compare.avanti(dati)
+    stato, corpo = game_compare.next_question(dati)
     return jsonify(corpo), stato
 
 
@@ -3370,7 +3370,7 @@ def game_guess_api():
     result["achievements"] = []
     # Solo la giornaliera di oggi (giorno di Roma): allenamento e archivio si
     # giocano ma non entrano nello storico, e non contano per la serie.
-    if result.get("finished") and puzzle_id == f"daily:{game_daily.oggi_roma().isoformat()}":
+    if result.get("finished") and puzzle_id == f"daily:{game_daily.today_rome().isoformat()}":
         user = auth.current_user(request.headers)
         if user:
             from app import player_stats, achievements

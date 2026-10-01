@@ -125,7 +125,7 @@ class PlayStreakTest(StatsBase):
                 self.assertEqual(esito, {"current": caso["current"], "max": caso["max"]})
 
     def test_la_serie_di_gioco_si_legge_da_daily_results_e_daily_scores(self):
-        oggi = game_daily.oggi_roma()
+        oggi = game_daily.today_rome()
         with session_scope() as s:
             s.add(DailyResult(auth_id="u-gioco", puzzle_date=oggi.isoformat(), attempts=3, solved=0))
             s.add(DailyScore(auth_id="u-gioco", gioco="order", data=(oggi - timedelta(days=1)).isoformat(),
@@ -137,7 +137,7 @@ class PlayStreakTest(StatsBase):
     def test_player_me_espone_play_streak_e_tiene_il_resto(self):
         c = app.test_client()
         h = {"Authorization": "Bearer " + _token("u-me-streak")}
-        player_stats.record_daily("u-me-streak", game_daily.oggi_roma().isoformat(), 2, True)
+        player_stats.record_daily("u-me-streak", game_daily.today_rome().isoformat(), 2, True)
         stats = c.get("/api/player/me", headers=h).get_json()["stats"]
         self.assertEqual(stats["play_streak"], {"current": 1, "max": 1})
         self.assertEqual(stats["daily"]["current_daily_streak"], 1)
@@ -163,7 +163,7 @@ class ProgressoTraguardiTest(StatsBase):
     def test_il_valore_segue_le_statistiche_e_non_supera_la_soglia(self):
         player_stats.record_quiz_answer("u-prog2", "compare", True, 12)
         player_stats.record_quiz_answer("u-prog2", "order", True, 4)
-        oggi = game_daily.oggi_roma()
+        oggi = game_daily.today_rome()
         for i in range(3):
             player_stats.record_daily("u-prog2", (oggi - timedelta(days=i)).isoformat(), 1, True)
         lista = self._lista("u-prog2")

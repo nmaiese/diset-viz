@@ -176,7 +176,7 @@ class PaginaMappaTest(unittest.TestCase):
 
     def test_nessuna_provincia_chiesta_nel_markup(self):
         """La pagina e' la stessa per tutti i giorni: niente che dipenda dalla sfida di oggi."""
-        oggi = game_mappa.daily_provinces(game_daily.oggi_roma(), "italia")
+        oggi = game_mappa.daily_provinces(game_daily.today_rome(), "italia")
         prima = app.test_client().get(PATH).get_data(as_text=True)
         con_altro_seed = None
         with mock.patch.dict(os.environ, {"GAME_SEED_KEY": "un-altra-chiave"}):

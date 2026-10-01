@@ -13,7 +13,7 @@ from app import app
 from app.data import REGION_ORDER
 from app import config, game, game_daily, quiz_tokens
 from app.cache import cache
-from app.game_daily import oggi_roma
+from app.game_daily import today_rome
 
 
 def setUpModule():
@@ -264,7 +264,7 @@ class GameTest(unittest.TestCase):
 
     def test_archive_day_route(self):
         client = app.test_client()
-        today = oggi_roma()
+        today = today_rome()
 
         # A past (or launch-day) date is playable and carries the right puzzle number.
         past = max(today - timedelta(days=1), game.GAME_EPOCH)
@@ -298,7 +298,7 @@ class GameTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         puzzles = response.get_json()["puzzles"]
 
-        today = oggi_roma()
+        today = today_rome()
         for item in puzzles:
             day = date.fromisoformat(item["date"])
             self.assertLess(day, today)  # today is excluded, it's the main daily tab
@@ -312,7 +312,7 @@ class GameTest(unittest.TestCase):
         """Anti-spoiler: a client must not be able to fetch tomorrow's solution
         by fabricating a future daily puzzle_id and racing to attempt 6."""
         client = app.test_client()
-        tomorrow = (oggi_roma() + timedelta(days=1)).isoformat()
+        tomorrow = (today_rome() + timedelta(days=1)).isoformat()
         response = client.post("/api/game/guess", json={
             "puzzle_id": f"daily:{tomorrow}", "region_key": "lombardia", "attempt": 1,
         })
@@ -416,7 +416,7 @@ class SoluzioniPrimaDelCutoverTest(unittest.TestCase):
 
         giorno = game.GAME_EPOCH
         # Dal cutover in poi le soluzioni escono dall'HMAC, e la formula di prima non vale.
-        ultimo = min(oggi_roma(), game_daily.SEED_CUTOVER - timedelta(days=1))
+        ultimo = min(today_rome(), game_daily.SEED_CUTOVER - timedelta(days=1))
         while giorno <= ultimo:
             ciclo, pos = divmod((giorno - game.GAME_EPOCH).days, len(REGION_ORDER))
             regioni = list(REGION_ORDER)
@@ -428,7 +428,7 @@ class SoluzioniPrimaDelCutoverTest(unittest.TestCase):
 
 class ElencoGiocoTest(unittest.TestCase):
     def test_integrita_del_csv(self):
-        righe = game_daily.indicatori_gioco()
+        righe = game_daily.game_indicators()
         self.assertGreaterEqual(len(righe), 60)
         self.assertLessEqual(len(righe), 100)
         ids = [r["id"] for r in righe]
@@ -445,7 +445,7 @@ class ElencoGiocoTest(unittest.TestCase):
             if r["regione"]:
                 self.assertIn(r["id"], pool, r["id"])
             if r["provincia"]:
-                info = manifesto.get(game_daily.id_provinciale(r["id"]))
+                info = manifesto.get(game_daily.provincial_id(r["id"]))
                 self.assertIsNotNone(info, r["id"])
                 self.assertEqual(info["coverage_latest"], 1.0, r["id"])
                 self.assertGreaterEqual(info["year_max"], 2022, r["id"])
@@ -455,9 +455,9 @@ class ElencoGiocoTest(unittest.TestCase):
         di prodotto, guardando il manifesto grezzo."""
         with open("app/static/data/province_manifest.csv", encoding="utf-8", newline="") as handle:
             manifesto = {r["id"]: r for r in csv.DictReader(handle, delimiter=";")}
-        for r in game_daily.indicatori_gioco():
+        for r in game_daily.game_indicators():
             if r["provincia"]:
-                riga = manifesto[game_daily.id_provinciale(r["id"])]
+                riga = manifesto[game_daily.provincial_id(r["id"])]
                 self.assertEqual(int(riga["n_province_latest"]), 107, r["id"])
                 self.assertGreaterEqual(int(riga["year_max"]), 2022, r["id"])
 
@@ -473,8 +473,8 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
 
     def test_compare_ha_dieci_coppie_valide_a_ogni_livello_e_giorno(self):
         for giorno in self.giorni:
-            for livello in game_daily.LIVELLI:
-                sfida = game_daily.compare_del_giorno(giorno, livello)
+            for livello in game_daily.LEVELS:
+                sfida = game_daily.daily_compare(giorno, livello)
                 self.assertEqual(len(sfida["pairs"]), 10, (giorno, livello))
                 for coppia in sfida["pairs"]:
                     self.assertNotEqual(coppia["a"]["key"], coppia["b"]["key"])
@@ -485,12 +485,12 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
 
     def test_order_ha_cinque_territori_distinti_a_ogni_livello_e_giorno(self):
         for giorno in self.giorni:
-            for livello in game_daily.LIVELLI:
-                sfida = game_daily.order_del_giorno(giorno, livello)
+            for livello in game_daily.LEVELS:
+                sfida = game_daily.daily_order(giorno, livello)
                 chiavi = [t["key"] for t in sfida["territories"]]
                 self.assertEqual(len(set(chiavi)), 5, (giorno, livello))
                 if livello == "stessa_regione":
-                    self.assertIn(sfida["region"], game_daily.regioni_idonee(5))
+                    self.assertIn(sfida["region"], game_daily.eligible_regions(5))
                     self.assertTrue(all(t["region"] == sfida["region"] for t in sfida["territories"]))
 
     def test_ogni_regione_idonea_e_ogni_livello_hanno_indicatori_a_sufficienza(self):
@@ -498,30 +498,30 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
         regione idonea puo' restare senza indicatori, o quel giorno sarebbe un 500."""
         rng = game_daily.random.Random(0)
         giorno = self.giorni[0]
-        for gioco, minimo, distinti in (("compare", game_daily.MINIMO_COMPARE, 2), ("order", game_daily.MINIMO_ORDER, 5)):
-            for regione in game_daily.regioni_idonee(minimo):
-                utili = game_daily._candidati(
+        for gioco, minimo, distinti in (("compare", game_daily.MIN_PROVINCES_COMPARE, 2), ("order", game_daily.MIN_PROVINCES_ORDER, 5)):
+            for regione in game_daily.eligible_regions(minimo):
+                utili = game_daily._candidates(
                     "stessa_regione", "province", lambda r, regione=regione: r["region"] == regione, distinti, rng
                 )
-                soglia = game_daily.COMPARE_COPPIE if gioco == "compare" else 1
+                soglia = game_daily.COMPARE_PAIRS if gioco == "compare" else 1
                 self.assertGreaterEqual(len(utili), soglia, (gioco, regione))
             for livello, ambito in (("regioni", "regioni"), ("province", "province")):
-                utili = game_daily._candidati(livello, ambito, lambda r: True, distinti, rng)
+                utili = game_daily._candidates(livello, ambito, lambda r: True, distinti, rng)
                 self.assertGreaterEqual(len(utili), 10, (gioco, livello))
         self.assertTrue(giorno)
 
     def test_ogni_regione_idonea_esce_davvero_come_sfida(self):
         """Forza ogni regione idonea come regione del giorno e costruisce il payload."""
         for gioco, minimo, funzione in (
-            ("compare", game_daily.MINIMO_COMPARE, game_daily.compare_del_giorno),
-            ("order", game_daily.MINIMO_ORDER, game_daily.order_del_giorno),
+            ("compare", game_daily.MIN_PROVINCES_COMPARE, game_daily.daily_compare),
+            ("order", game_daily.MIN_PROVINCES_ORDER, game_daily.daily_order),
         ):
-            for regione in game_daily.regioni_idonee(minimo):
+            for regione in game_daily.eligible_regions(minimo):
                 # La sfida e' in cache per (giorno, livello, chiave): con la regione
                 # forzata va ricalcolata, e poi tolta, perche' la cache non la tenga.
                 game_daily._compare.cache_clear()
                 game_daily._order.cache_clear()
-                with mock.patch.object(game_daily, "regioni_idonee", lambda minimo, r=regione: [r]):
+                with mock.patch.object(game_daily, "eligible_regions", lambda minimo, r=regione: [r]):
                     sfida = funzione(self.giorni[0], "stessa_regione")
                 game_daily._compare.cache_clear()
                 game_daily._order.cache_clear()
@@ -531,20 +531,20 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
 
     def test_compare_stessa_regione_usa_regioni_con_almeno_tre_province(self):
         for giorno in self.giorni:
-            self.assertIn(game_daily.compare_del_giorno(giorno, "stessa_regione")["region"], game_daily.regioni_idonee(3))
+            self.assertIn(game_daily.daily_compare(giorno, "stessa_regione")["region"], game_daily.eligible_regions(3))
 
     def test_le_sfide_sono_deterministiche_e_dipendono_dalla_chiave(self):
         giorno = self.giorni[0]
-        for funzione in (game_daily.compare_del_giorno, game_daily.order_del_giorno):
+        for funzione in (game_daily.daily_compare, game_daily.daily_order):
             self.assertEqual(funzione(giorno, "province"), funzione(giorno, "province"))
-            self.assertNotEqual(funzione(giorno, "province"), funzione(giorno, "province", chiave="altra-chiave"))
+            self.assertNotEqual(funzione(giorno, "province"), funzione(giorno, "province", key="altra-chiave"))
             self.assertNotEqual(funzione(giorno, "regioni"), funzione(giorno + timedelta(days=1), "regioni"))
 
     def test_i_payload_non_rivelano_valori(self):
-        for livello in game_daily.LIVELLI:
+        for livello in game_daily.LEVELS:
             for sfida in (
-                game_daily.compare_del_giorno(self.giorni[0], livello),
-                game_daily.order_del_giorno(self.giorni[0], livello),
+                game_daily.daily_compare(self.giorni[0], livello),
+                game_daily.daily_order(self.giorni[0], livello),
             ):
                 testo = json.dumps(sfida)
                 self.assertNotIn('"value"', testo)
@@ -554,16 +554,16 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
     def test_la_difficolta_cresce_da_lunedi_a_domenica(self):
         lunedi, domenica = date(2026, 10, 5), date(2026, 10, 11)
         self.assertEqual((lunedi.weekday(), domenica.weekday()), (0, 6))
-        self.assertEqual(game_daily.compare_del_giorno(lunedi, "regioni")["difficulty"], 0)
-        self.assertEqual(game_daily.compare_del_giorno(domenica, "regioni")["difficulty"], 4)
-        self.assertEqual(list(game_daily.DIFFICOLTA_SETTIMANA), sorted(game_daily.DIFFICOLTA_SETTIMANA))
+        self.assertEqual(game_daily.daily_compare(lunedi, "regioni")["difficulty"], 0)
+        self.assertEqual(game_daily.daily_compare(domenica, "regioni")["difficulty"], 4)
+        self.assertEqual(list(game_daily.WEEKDAY_DIFFICULTY), sorted(game_daily.WEEKDAY_DIFFICULTY))
 
         def rapporti(giorno, livello):
             ritorno = []
-            for coppia in game_daily.compare_del_giorno(giorno, livello)["pairs"]:
-                ind = next(i for i in game_daily.indicatori_gioco() if i["id"] == coppia["indicator"]["id"])
+            for coppia in game_daily.daily_compare(giorno, livello)["pairs"]:
+                ind = next(i for i in game_daily.game_indicators() if i["id"] == coppia["indicator"]["id"])
                 ambito = "regioni" if livello == "regioni" else "province"
-                _, righe = game_daily._righe_indicatore(ind, ambito)
+                _, righe = game_daily._indicator_rows(ind, ambito)
                 distinti = sorted({r["value"] for r in righe}, reverse=True)
                 valori = {r["key"]: r["value"] for r in righe}
                 gap = abs(distinti.index(valori[coppia["a"]["key"]]) - distinti.index(valori[coppia["b"]["key"]]))
@@ -582,14 +582,14 @@ class SfidaDelGiornoLivelliTest(unittest.TestCase):
             risposta = client.get(f"/api/game/{gioco}/daily?level=province")
             self.assertEqual(risposta.status_code, 200)
             payload = risposta.get_json()
-            self.assertEqual(payload["puzzle_id"], f"daily:{oggi_roma().isoformat()}")
+            self.assertEqual(payload["puzzle_id"], f"daily:{today_rome().isoformat()}")
             self.assertEqual(payload["level"], "province")
             self.assertTrue(payload["next_puzzle_at"].endswith("+00:00"))
             self.assertIn(chiave, payload)
             self.assertEqual(client.get(f"/api/game/{gioco}/daily").get_json()["level"], "regioni")
             self.assertEqual(client.get(f"/api/game/{gioco}/daily?level=pianeti").status_code, 400)
             # Nessuna data a scelta del client: il parametro non esiste.
-            self.assertEqual(client.get(f"/api/game/{gioco}/daily?date=2030-01-01").get_json()["date"], oggi_roma().isoformat())
+            self.assertEqual(client.get(f"/api/game/{gioco}/daily?date=2030-01-01").get_json()["date"], today_rome().isoformat())
 
 
 class PaginaProvinciaTest(unittest.TestCase):

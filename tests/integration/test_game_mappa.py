@@ -19,7 +19,7 @@ from app import app, config, game_daily, game_mappa, quiz_tokens
 from app.cache import cache
 
 T0 = 1_800_000_000.0
-ROME = game_daily.ROMA
+ROME = game_daily.ROME_TZ
 # Estate: a Roma e' gia' il 6 ottobre (UTC+2). Inverno: l'ora solare inizia il 25
 # ottobre 2026, alle 22:30 UTC del 5 novembre a Roma e' ancora il 5 (UTC+1).
 SUMMER_2230 = datetime(2026, 10, 5, 22, 30, tzinfo=timezone.utc)
@@ -30,7 +30,7 @@ REVEALING = ("chosen", "right", "distance_km", "direction")
 
 def _clock(now):
     """Fissa il giorno di Roma visto dal modulo su un istante."""
-    return mock.patch.object(game_mappa, "oggi_roma", return_value=game_daily.oggi_roma(now))
+    return mock.patch.object(game_mappa, "today_rome", return_value=game_daily.today_rome(now))
 
 
 def _decode(token):
@@ -119,7 +119,7 @@ class SessionTest(Base):
         self.assertEqual(set(italia["question"]), {"index", "name", "label"})
         self.assertEqual((italia["total"], italia["points_max"], italia["question"]["index"]), (10, 20, 0))
         self.assertEqual(italia["puzzle_id"], "daily:2026-10-11")
-        self.assertEqual(italia["number"], game_daily.numero_sfida(date(2026, 10, 11)))
+        self.assertEqual(italia["number"], game_daily.challenge_number(date(2026, 10, 11)))
         self.assertEqual(italia["level_label"], "Tutta Italia")
 
         regione = self._open("regione", "map")
@@ -217,7 +217,7 @@ class AnswerTest(Base):
             session = self._open()
             body = self._answer(session, 0, choice).get_json()
             self.assertEqual((body["esito"], body["points"]), (result, points))
-            km, direction = game_daily.distanza_km_direzione(choice, right)
+            km, direction = game_daily.distance_km_direction(choice, right)
             self.assertEqual((body["distance_km"], body["direction"]), (km, direction))
         self.assertNotEqual(token, session["token"])
 
