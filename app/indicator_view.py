@@ -952,12 +952,15 @@ def province_indicators_by_theme():
     rimandava proprio li'. Il tema e' quello della scheda (`meta.theme_path`,
     lo stesso della briciola), e il link apre la scheda sulle province.
     Mezzo secondo a freddo, una volta per processo, come `_theme_siblings`.
+    Le schede sono le BES con le province e quelle delle famiglie esterne
+    (`provincial_families`): stessa regola di livello per tutte.
     """
+    refs = [("bes", item["id"]) for item in all_bes_indicators() if "provincia" in item["levels"]]
+    refs.extend((entry["metadata"]["family"], entry["metadata"]["raw_id"])
+                for entry in provincial_families.all_indicators())
     by_theme = defaultdict(list)
-    for item in all_bes_indicators():
-        if "provincia" not in item["levels"]:
-            continue
-        view = build_indicator_view("bes", item["id"])
+    for family, raw_id in refs:
+        view = build_indicator_view(family, raw_id)
         if view is None:
             continue
         level = next((lv for lv in view["levels"] if lv["key"] == "provincia"), None)
