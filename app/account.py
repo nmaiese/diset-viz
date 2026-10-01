@@ -13,8 +13,8 @@ from sqlalchemy import delete, select
 
 from app import config
 from app.db import session_scope
-from app.models import (Achievement, DailyResult, Favorite, PlayerStat, Profile,
-                        SavedComparison, Score)
+from app.models import (Achievement, DailyResult, DailyScore, Favorite, PlayerStat,
+                        Profile, SavedComparison, Score)
 
 
 def set_nickname(auth_id, nickname):
@@ -40,6 +40,9 @@ def export_data(auth_id):
                          .where(Favorite.auth_id == auth_id)).all()
         stats = s.execute(select(PlayerStat).where(PlayerStat.auth_id == auth_id)).scalars().all()
         daily = s.execute(select(DailyResult).where(DailyResult.auth_id == auth_id)).scalars().all()
+        daily_scores = s.execute(select(DailyScore.gioco, DailyScore.data, DailyScore.punteggio,
+                                        DailyScore.created_at)
+                                 .where(DailyScore.auth_id == auth_id)).all()
         achs = s.execute(select(Achievement.achievement_id, Achievement.unlocked_at)
                          .where(Achievement.auth_id == auth_id)).all()
         scores = s.execute(select(Score.mode, Score.score, Score.created_at)
@@ -57,6 +60,8 @@ def export_data(auth_id):
                               "max_daily_streak": r.max_daily_streak} for r in stats],
             "daily_results": [{"puzzle_date": r.puzzle_date, "attempts": r.attempts,
                                "solved": bool(r.solved)} for r in daily],
+            "daily_scores": [{"game": g, "date": d, "score": p, "created_at": c}
+                             for g, d, p, c in daily_scores],
             "achievements": [{"achievement_id": a, "unlocked_at": u} for a, u in achs],
             "scores": [{"mode": m, "score": sc, "when": w} for m, sc, w in scores],
             "saved_comparisons": [{"title": r.title, "config": r.config,
@@ -89,7 +94,7 @@ def delete_account(auth_id):
     if not auth_id:
         return {"rows_deleted": False, "supabase_deleted": False}
     with session_scope() as s:
-        for model in (Favorite, PlayerStat, DailyResult, Achievement, SavedComparison):
+        for model in (Favorite, PlayerStat, DailyResult, DailyScore, Achievement, SavedComparison):
             s.execute(delete(model).where(model.auth_id == auth_id))
         s.execute(delete(Score).where(Score.user_id == auth_id))
         s.execute(delete(Profile).where(Profile.auth_id == auth_id))

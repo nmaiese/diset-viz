@@ -11,9 +11,9 @@ from pathlib import Path
 
 import jwt
 
-from app import account, app, comparisons, config, favorites
+from app import account, app, comparisons, config, favorites, player_stats
 from app.db import session_scope
-from app.models import Favorite
+from app.models import DailyScore, Favorite
 
 _SECRET = "test-jwt-secret"
 
@@ -76,13 +76,19 @@ class AccountApiTest(AccountBase):
         h = {"Authorization": "Bearer " + _token()}
         c.get("/api/auth/me", headers=h)
         favorites.add("uuid-a", "105")
+        # Il punteggio di una sfida del giorno porta l'auth_id: va nell'export e nell'oblio.
+        self.assertTrue(player_stats.record_daily_score("uuid-a", "mappa", "2026-10-01", 14))
         exp = c.get("/api/account/export", headers=h).get_json()
         self.assertEqual([f["indicator_id"] for f in exp["favorites"]], ["105"])
+        self.assertEqual(exp["daily_scores"],
+                         [{"game": "mappa", "date": "2026-10-01", "score": 14,
+                           "created_at": exp["daily_scores"][0]["created_at"]}])
         # cancellazione: righe via, supabase non toccato in test
         res = c.delete("/api/account", headers=h).get_json()
         self.assertTrue(res["rows_deleted"])
         with session_scope() as s:
             self.assertEqual(s.query(Favorite).filter(Favorite.auth_id == "uuid-a").count(), 0)
+            self.assertEqual(s.query(DailyScore).filter(DailyScore.auth_id == "uuid-a").count(), 0)
 
     def test_account_page_renders(self):
         self.assertEqual(app.test_client().get("/account").status_code, 200)
