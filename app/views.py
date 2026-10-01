@@ -3247,6 +3247,58 @@ def game_compare_daily_next_api():
 # fine sfida del giorno di "Chi è maggiore?"
 
 
+# --- Dov'è la provincia? (mappa muta): API (app/game_mappa.py) ----------------
+# Due rotte e nient'altro: il contratto del JSON sta in testa a app/game_mappa.py.
+# Niente rotta "next" (non c'e' timer: la risposta lega gia' la domanda dopo),
+# niente classifica, niente serie a round (`_record_quiz`). L'import sta qui perche'
+# il blocco resta delimitato.
+from app import game_mappa  # noqa: E402
+
+
+@app.route("/api/game/map/daily/session")
+def game_map_daily_session_api():
+    if _ip_answer_limited():
+        return jsonify({"error": "rate_limited"}), 429
+    session_body = game_mappa.open_session(
+        request.args.get("level", "italia"), request.args.get("mode", "map"))
+    if session_body is None:
+        return jsonify({"error": "bad_request"}), 400
+    return jsonify(session_body)
+
+
+@app.post("/api/game/map/daily/answer")
+def game_map_daily_answer_api():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        data = {}
+    if _answer_rate_limited(game_mappa.sid_of_token(data.get("token"))):
+        return jsonify({"error": "rate_limited"}), 429
+    status, body, finished_game = game_mappa.answer(data)
+    if finished_game is None:
+        return jsonify(body), status
+    try:
+        from app import daily_counter
+        daily_counter.record(finished_game["game"], finished_game["date"], finished_game["points"])
+    except Exception:  # noqa: BLE001
+        app.logger.exception("mappa: partita finita non contata")
+    user = auth.current_user(request.headers)
+    if user and finished_game["plausible"]:
+        from app import achievements, player_stats
+        try:
+            player_stats.record_daily_score(
+                user["id"], finished_game["game"], finished_game["date"], finished_game["points"])
+        except Exception:  # noqa: BLE001
+            app.logger.exception("mappa: punteggio del giorno non registrato")
+        try:
+            body["summary"]["achievements"] = achievements.evaluate(user["id"])
+        except Exception:  # noqa: BLE001
+            app.logger.exception("mappa: traguardi non valutati")
+    return jsonify(body), status
+
+
+# --- fine Dov'è la provincia? --------------------------------------------------
+
+
 @app.route("/api/game/regions")
 def game_regions_api():
     return jsonify({"regions": profiles.all_regions_index()})
