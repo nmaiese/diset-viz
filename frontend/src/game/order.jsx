@@ -360,7 +360,7 @@ export default function OrderApp() {
           }
         }
         trackGameEvent("order_answer", { game: "order", mode, level, score: data.score, total: data.total });
-        if (isDaily) segnaGiocata("order", oggiRoma(), { ok: data.score === data.total, testo: `${data.score} su ${data.total} al posto giusto` });
+        if (isDaily) segnaGiocata("order", oggiRoma(), { ok: data.score > 0, tono: data.score === data.total ? "giusto" : data.score === 0 ? "sbagliato" : "parziale", testo: `${data.score} su ${data.total} al posto giusto` });
       })
       .catch(() => {
         submittingRef.current = false;

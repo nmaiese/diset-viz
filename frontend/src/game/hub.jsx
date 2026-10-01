@@ -201,7 +201,7 @@ function StatoGioco({ esito }) {
   if (!esito) return <>Gioca <span aria-hidden="true">→</span></>;
   return (
     <>
-      <Icona nome={esito.ok ? "stato-giusto" : "stato-sbagliato"} />
+      <Icona nome={`stato-${esito.tono || (esito.ok ? "giusto" : "sbagliato")}`} />
       <span>
         <strong>Giocata oggi</strong>
         {esito.testo && <> · {esito.testo}</>}

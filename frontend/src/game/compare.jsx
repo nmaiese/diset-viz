@@ -560,10 +560,11 @@ function SfidaDelGiorno({ livello, timer, onEsci, onAllena, sfida, onAvviata }) 
   const finita = stato === "fine" && risposta && risposta.summary;
   useEffect(() => {
     if (!finita || allenamento) return;
-    // L'hub ha due icone (giusto, sbagliato) e nessuna neutra: un parziale non e' una croce, quindi
-    // solo lo zero pieno e' "sbagliato". Un terzo stato lo deve dare l'hub (`oggi.js`, non di questo file).
+    // Un parziale non e' una croce: l'hub ha una terza icona, neutra, per il risultato a meta.
+    const tono = tonoCompare(finita.score.correct, finita.score.total);
     segnaGiocata("compare", finita.date, {
-      ok: tonoCompare(finita.score.correct, finita.score.total) !== "nullo",
+      ok: tono !== "nullo",
+      tono: tono === "pieno" ? "giusto" : tono === "nullo" ? "sbagliato" : "parziale",
       testo: `${finita.score.correct} su ${finita.score.total}`,
     });
   }, [finita, allenamento]);

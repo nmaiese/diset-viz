@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { playStreak, serieDaGiorni } from "./oggi.js";
+import { playStreak, serieDaGiorni, segnaGiocata, statoOggi } from "./oggi.js";
 
 test("giorni di fila fino a oggi", () => {
   assert.equal(serieDaGiorni(["2026-09-28", "2026-09-29", "2026-09-30"], "2026-09-30"), 3);
@@ -50,4 +50,21 @@ test("playStreak ignora date impossibili e un oggi illeggibile", () => {
 
 test("un riposo perdonato tiene viva la serie locale come quella del server", () => {
   assert.equal(serieDaGiorni(["2026-10-05", "2026-10-06", "2026-10-08", "2026-10-09", "2026-10-10"], "2026-10-10"), 5);
+});
+
+test("un risultato a meta ha il tono neutro, non quello sbagliato", () => {
+  const deposito = new Map();
+  globalThis.window = {
+    localStorage: { getItem: (k) => deposito.get(k) ?? null, setItem: (k, v) => deposito.set(k, v) },
+  };
+  try {
+    segnaGiocata("compare", "2026-10-01", { ok: true, tono: "parziale", testo: "6 su 10" });
+    assert.equal(statoOggi("compare", "2026-10-01").tono, "parziale");
+    segnaGiocata("order", "2026-10-01", { ok: false, testo: "0 su 5" });
+    assert.equal(statoOggi("order", "2026-10-01").tono, "sbagliato");
+    segnaGiocata("indovina", "2026-10-01", { ok: true, tono: "inventato", testo: "" });
+    assert.equal(statoOggi("indovina", "2026-10-01").tono, "giusto");
+  } finally {
+    delete globalThis.window;
+  }
 });

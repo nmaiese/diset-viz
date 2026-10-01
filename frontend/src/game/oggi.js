@@ -17,12 +17,17 @@ function chiave(gioco, iso) {
   return `${PREFISSO}${gioco}:${iso}`;
 }
 
-// `esito` e' `{ ok: boolean, testo: string }`: `ok` decide l'icona (giusto o
-// sbagliato), `testo` e' la riga che la accompagna ("Risolta in 3 tentativi").
+export const TONI_STATO = ["giusto", "parziale", "sbagliato"];
+
+// `esito` e' `{ ok: boolean, testo: string, tono?: "giusto"|"parziale"|"sbagliato" }`: `tono`
+// decide l'icona (la terza, neutra, e' per un risultato a meta: un parziale non e' una croce).
+// Senza `tono` vale `ok` (giusto o sbagliato). `testo` e' la riga che la accompagna.
 export function segnaGiocata(gioco, iso, esito) {
   if (!GIOCHI.includes(gioco) || !/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return;
   try {
-    window.localStorage.setItem(chiave(gioco, iso), JSON.stringify({ ok: Boolean(esito && esito.ok), testo: String((esito && esito.testo) || "") }));
+    const ok = Boolean(esito && esito.ok);
+    const tono = esito && TONI_STATO.includes(esito.tono) ? esito.tono : ok ? "giusto" : "sbagliato";
+    window.localStorage.setItem(chiave(gioco, iso), JSON.stringify({ ok, tono, testo: String((esito && esito.testo) || "") }));
   } catch {
     // Senza localStorage l'hub non sa che hai giocato: nessun danno per la partita.
   }
@@ -34,7 +39,8 @@ export function statoOggi(gioco, iso = oggiRoma()) {
     const grezzo = window.localStorage.getItem(chiave(gioco, iso));
     if (!grezzo) return null;
     const esito = JSON.parse(grezzo);
-    return { ok: Boolean(esito.ok), testo: String(esito.testo || "") };
+    const tono = TONI_STATO.includes(esito.tono) ? esito.tono : esito.ok ? "giusto" : "sbagliato";
+    return { ok: Boolean(esito.ok), tono, testo: String(esito.testo || "") };
   } catch {
     return null;
   }
