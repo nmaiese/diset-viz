@@ -220,9 +220,14 @@ Secondo giro, con un worker Claude (sonnet) in sola lettura. Le citazioni segnat
 
 ## 12. Che cosa è stato fatto (1 ottobre 2026)
 
-Decisione di Nello: la parola pubblica è "indicatore". Tre PR aperte, non ancora in master:
-- **#308**, testi di `/metodologia` e della scheda: riassunto, dieci definizioni con ancora, "DISET" tolto, "dodici" corretto, blocco "Come è calcolato" riscritto.
+Decisione di Nello: la parola pubblica è "indicatore". Tre PR, tutte in master e in produzione il 1 ottobre 2026:
+- **#308**, testi di `/metodologia` e dell'indicatore: riassunto, dieci definizioni con ancora, "DISET" tolto, "dodici" corretto, blocco "Come è calcolato" riscritto. In più la rifinitura: "Come nasce questa pagina", "dataset" solo dove è un termine tecnico, "scheda" passata a "indicatore" o "pagina" (da 62 a 10 occorrenze visibili) e la promessa sulle citazioni riscritta dopo averla misurata: su 383 articoli, 294 senza fonti autorate, almeno 41 con una lettura causale e nessuna fonte.
 - **#310**, giochi: lessico unico degli errori, Riprova dove mancava, tastiera di Ordina, "va in classifica" tolto. In allenamento "Riprova" azzera il contatore a schermo come fa il server.
-- **#309**, pagina 500 in italiano e messaggi su Esporta ed Elimina account.
+- **#309**, pagina 500 in italiano, messaggi su Esporta ed Elimina account, bottone "Elimina account" leggibile al passaggio del mouse.
 
-Restano fuori, da decidere: il blocco "Come nasce questa scheda" (tre test lo fissano), il catalogo dati che dice ancora "dataset", la promessa "citazione verificata" contraddetta da 292 schede senza fonti, `.account-danger:hover` con `var(--error)` non definita, i bersagli tattili della mappa a 375 px, la 404 di `/quiz/*`.
+Restano fuori:
+- le schede di territorio (regione, provincia), che sono un'altra cosa, e i 383 articoli editoriali e i 16 post, dove "scheda" resta;
+- la stringa `catalog_description` (alimenta il JSON-LD);
+- le etichette di `app/sources.py` ("BES nazionale");
+- i bersagli tattili della mappa a 375 px, gli `aria-label` dei gruppi e il rimando ai giochi nella 404 di `/quiz/*`;
+- le prove su telefono vero, con lettore di schermo e con il login Google reale; la pagina 500 in produzione non si può provocare, quindi è provata solo in locale e dai test.
