@@ -1,7 +1,7 @@
 """Le pagine della 1.0 su ogni loro istanza, non sul campione dei prototipi.
 
 I prototipi giravano su un esempio per pagina: la scheda del PIL, la Puglia,
-Lecce, due articoli, una classifica. Il sito serve 634 schede, 20 regioni, 107
+Lecce, due articoli, una classifica. Il sito serve tutte le schede dell'universo, 20 regioni, 107
 province, ogni post e due classifiche per sei profili, e una pagina che regge
 l'esempio puo' cedere sulla serie a un anno solo, sulla provincia con copertura
 parziale, sull'articolo di giugno.
@@ -29,7 +29,7 @@ import statistics
 import unittest
 from pathlib import Path
 
-from app import app, bes_data, indicator_view, profiles, province_profile, sources
+from app import app, bes_data, indicator_universe, indicator_view, profiles, province_profile, sources
 from app.atlas_catalog import get_atlas_indicator
 from app.blog import get_posts
 from app.data import REGION_GEO_AREA, REGION_ORDER, get_rows
@@ -151,11 +151,13 @@ class LePagineDellaV1SuOgniIstanza(unittest.TestCase):
         return guasti
 
     def test_ogni_scheda_indicatore(self):
-        percorsi = []
-        for indicator_id in json.loads(GOLDEN.read_text(encoding="utf-8")):
-            family, raw_id = family_and_raw(indicator_id)
-            percorsi.append(sources.indicator_url(family, raw_id, "x"))
-        self.assertEqual(len(percorsi), 634)
+        # L'elenco e' l'universo, non un totale scritto: una famiglia nuova
+        # allarga la prova senza toccare questo file. Il golden resta il
+        # pavimento, nessuna scheda che c'era puo' sparire.
+        refs = indicator_universe.all_indicator_refs()
+        golden = {sources.split_internal_id(indicator_id) for indicator_id in json.loads(GOLDEN.read_text(encoding="utf-8"))}
+        self.assertEqual(golden - set(refs), set())
+        percorsi = [sources.indicator_url(family, raw_id, "x") for family, raw_id in refs]
         guasti = self._guasti("indicatore", percorsi)
         self.assertEqual(guasti, [], guasti[:10])
         self.assertGreater(self.sparks_seen, 0, "nessuna sparkline nelle schede: la prova non guarda niente")
@@ -242,7 +244,7 @@ class LaSparklineHaIlPavimentoEDiceDiCheMediaE(unittest.TestCase):
         view = indicator_view.build_indicator_view("territorial", "901")
         # Il view model non porta il pavimento: lo calcola la rotta per le
         # sole correlate che la pagina mostra. Nel view model lo pagava anche
-        # la passata dei 634 di `indicator_universe`, che le correlate non le
+        # la passata di `indicator_universe`, che le correlate non le
         # legge.
         self.assertFalse([v["id"] for v in view["related"] if "spark_floor" in v])
         html = self.client.get(self.PAGE).get_data(as_text=True)

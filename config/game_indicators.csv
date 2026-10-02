@@ -1,96 +1,123 @@
-id;famiglia;nome_leggibile;unita;livello_regione;livello_provincia;note;campionario
-901;reddito;PIL per abitante;euro;1;0;;0
-902;reddito;Reddito disponibile delle famiglie per abitante;euro;1;0;;0
-multiscopo:MULTI_REDD_MEDIANO;reddito;Reddito netto mediano di una famiglia in un anno;euro;1;0;;1
-multiscopo:MULTI_ABIT_SPESA_EURO;abitazione;Spesa media mensile per la casa;euro al mese;1;0;;1
-631;reddito;Persone in povertà relativa;percentuale;1;0;da spiegare a fine partita: povertà relativa;1
-multiscopo:MULTI_DISAGIO_IMPREVISTI;reddito;Famiglie che non reggono una spesa imprevista;percentuale;1;0;;1
-multiscopo:MULTI_DISAGIO_RISPARMIO;reddito;Famiglie che non riescono a risparmiare;percentuale;1;0;;1
-12;lavoro;Tasso di disoccupazione;percentuale;1;0;;1
-15;lavoro;Tasso di disoccupazione giovanile;percentuale;1;0;;1
-57;lavoro;Distanza tra occupazione maschile e femminile;punti percentuali;1;0;;1
-402;imprese;Imprese guidate da donne;percentuale;1;0;;1
-bes:03LAV001-N22;lavoro;Occupati tra i 20 e i 64 anni;percentuale;1;1;;1
-bes:03LAV002-N22;lavoro;Persone che vorrebbero lavorare e non lavorano;percentuale;1;1;da spiegare a fine partita: nome della fonte, tasso di mancata partecipazione al lavoro;1
-339;istruzione;Laureati tra i 30 e i 34 anni;percentuale;1;0;;1
-bes:02IST002-N22;istruzione;Adulti con almeno il diploma;percentuale;1;1;;1
-bes:02IST005-N22;istruzione;Giovani che lasciano presto la scuola;percentuale;1;0;;1
-bes:02IST006-N22;istruzione;Giovani che non studiano e non lavorano;percentuale;1;1;;1
-bes:02IST007-N22;istruzione;Adulti che seguono corsi di formazione;percentuale;1;1;;1
-bes:02IST023;cultura;Persone che leggono libri e quotidiani;percentuale;1;0;;1
-bes:SDG-310;istruzione;Studenti di terza media deboli in matematica;percentuale;1;0;da spiegare a fine partita: la fonte dice competenza numerica non adeguata;1
-910;salute;Speranza di vita alla nascita;anni;1;0;;0
-bes:01SAL002;salute;Anni di vita in buona salute alla nascita;anni;1;0;;1
-bes:01SAL009;salute;Persone in eccesso di peso;per 100 persone;1;0;;1
-bes:01SAL010;salute;Fumatori;per 100 persone;1;0;;1
-bes:01SAL012;salute;Persone sedentarie;per 100 persone;1;0;;1
-multiscopo:MULTI_BMI_OBESI;salute;Adulti obesi;percentuale;1;0;;1
-590;salute;Pazienti che si curano in un'altra regione;percentuale;1;0;;0
-920;demografia;Età media della popolazione;anni;1;0;;0
-921;demografia;Anziani ogni 100 giovani;per 100 giovani;1;0;da spiegare a fine partita: indice di vecchiaia, rapporto tra over 65 e under 15;0
-922;demografia;Figli per donna;numero medio;1;0;;0
-dem:POP65OVER;demografia;Popolazione con più di 65 anni;percentuale;1;0;;0
-dem:POP014;demografia;Bambini e ragazzi fino a 14 anni;percentuale;1;0;;0
-923;demografia;Saldo migratorio: chi arriva meno chi parte, ogni 1.000 abitanti;per 1.000 abitanti;1;0;da spiegare a fine partita: saldo migratorio totale;0
-dem:MEANAGECH;demografia;Età media della madre al parto;anni;1;0;;0
-dem:BIRTHRATE;demografia;Nascite ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0
-dem:MARRATE;demografia;Matrimoni ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0
-52;ambiente;Raccolta differenziata dei rifiuti;percentuale;1;0;;0
-232;ambiente;Rifiuti urbani finiti in discarica;percentuale;1;0;;0
-84;ambiente;Rifiuti in discarica per abitante;chilogrammi;1;0;;0
-60;servizi;Interruzioni della corrente elettrica;numero medio per utente;1;0;;0
-105;turismo;Giornate di turismo per abitante;giornate per abitante;1;0;;0
-165;turismo;Giornate di turismo fuori dai mesi estivi per abitante;giornate per abitante;1;0;;0
-611;cultura;Biglietti del cinema ogni 100 abitanti;per 100 abitanti;1;0;;0
-27;cultura;Biglietti per teatro e concerti ogni 100 abitanti;per 100 abitanti;1;0;;0
-426;digitale;Persone di 6 anni e più che usano Internet;percentuale;1;0;da spiegare a fine partita: almeno una volta negli ultimi 12 mesi;1
-72;digitale;Addetti delle imprese che usano computer connessi a Internet;percentuale;1;0;da spiegare a fine partita: imprese con più di dieci addetti, industria e servizi;1
-multiscopo:MULTI_ICT_BANDA_LARGA;digitale;Famiglie con connessione a banda larga;percentuale;1;0;;1
-279;sicurezza;Furti denunciati ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0
-280;sicurezza;Rapine denunciate ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0
-542;giustizia;Durata dei processi nei tribunali;giorni;1;0;;0
-multiscopo:MULTI_ABIT_PROPRIETA;abitazione;Famiglie proprietarie della casa;percentuale;1;0;;1
-multiscopo:MULTI_ABIT_AFFITTO;abitazione;Famiglie in affitto;percentuale;1;0;;1
-multiscopo:MULTI_ABIT_UMIDITA;abitazione;Famiglie con umidità in casa;percentuale;1;0;;1
-multiscopo:MULTI_ZONA_RUMORI;abitazione;Famiglie che lamentano rumori nella zona;percentuale;1;0;;1
-multiscopo:MULTI_ZONA_INQUINAMENTO;ambiente;Famiglie che lamentano inquinamento nella zona;percentuale;1;0;;1
-bes:08BSO001;benessere;Persone molto soddisfatte della propria vita;percentuale;1;0;;1
-bes:05REL006;benessere;Persone che fanno volontariato;percentuale;1;0;;1
-bes:06POL007;istituzioni;Donne tra gli amministratori locali;percentuale;1;0;;1
-54;imprese;Nuove imprese ogni 100 esistenti;percentuale;1;0;;0
-123;imprese;Valore prodotto per occupato nell'industria;migliaia di euro;1;0;;0
-01SAL001;salute;Speranza di vita alla nascita;anni;0;1;;1
-01SAL004;salute;Bambini morti nel primo anno di vita ogni 1.000 nati;per 1.000 nati vivi;0;1;;1
-01SAL006;salute;Morti per tumore tra 20 e 64 anni;ogni 10.000 abitanti, tasso standardizzato;0;1;;1
-01SAL020;salute;Morti evitabili tra 0 e 74 anni;ogni 10.000 abitanti, tasso standardizzato;0;1;;1
-02IST001;istruzione;Bambini di 4 e 5 anni che vanno a scuola;percentuale;0;1;;1
-02IST003P-N22;istruzione;Laureati tra i 25 e i 39 anni;percentuale;0;1;;1
-02IST010P;istruzione;Studenti di terza media deboli in matematica;percentuale;0;1;;1
-02IST011P;istruzione;Studenti di terza media deboli in italiano;percentuale;0;1;;1
-03LAV003P-N22;lavoro;Giovani tra 15 e 29 anni che lavorano;percentuale;0;1;;1
-03LAV006P-N22;lavoro;Giovani tra 15 e 29 anni che vorrebbero lavorare e non lavorano;percentuale;0;1;;1
-03LAV007;lavoro;Infortuni gravi sul lavoro;per 10.000 occupati;0;1;;1
-04BEC001P;reddito;Reddito disponibile medio per abitante;euro;0;1;;1
-04BEC002P;reddito;Stipendio medio annuo dei dipendenti;euro;0;1;;1
-04BEC005P;reddito;Pensione media annua per abitante;euro;0;1;;1
-04BEC006P;reddito;Pensionati con pensione bassa;percentuale;0;1;;1
-04BEC009P;reddito;Prestiti alle famiglie non restituiti;percentuale;0;1;;1
-05REL008;benessere;Organizzazioni non profit ogni 10.000 abitanti;per 10.000 abitanti;0;1;;1
-06POL001;istituzioni;Partecipazione al voto;percentuale;0;1;;1
-06POL002P;istituzioni;Donne tra gli amministratori comunali;percentuale;0;1;;1
-06POL003P;istituzioni;Amministratori comunali con meno di 40 anni;percentuale;0;1;;1
-09PAE002;cultura;Densità di musei e patrimonio museale;per 100 km2;0;1;;1
-09PAE008;turismo;Agriturismi ogni 100 km2;per 100 km2;0;1;;1
-10AMB003;ambiente;Acqua persa dalla rete idrica;percentuale;0;1;;1
-10AMB008;ambiente;Verde urbano per abitante;metri quadrati per abitante;0;1;;1
-10AMB014;ambiente;Territorio in aree protette;percentuale;0;1;;1
-10AMB016;ambiente;Energia elettrica da fonti rinnovabili;percentuale;0;1;;1
-10AMB017;ambiente;Raccolta differenziata dei rifiuti;percentuale;0;1;;1
-10AMB018P;ambiente;Suolo coperto da cemento e asfalto;percentuale;0;1;;1
-10AMB024P;ambiente;Rifiuti urbani prodotti per abitante;chilogrammi per abitante;0;1;;1
-11RIC002;imprese;Brevetti per milione di abitanti;per milione di abitanti;0;1;;1
-11RIC004P;cultura;Addetti nelle imprese culturali;percentuale;0;1;;1
-12SER002P;servizi;Medici specialisti ogni 10.000 abitanti;per 10.000 abitanti;0;1;;1
-12SER003P-N25;servizi;Posti letto negli ospedali ogni 10.000 abitanti;per 10.000 abitanti;0;1;;1
-12SER007;servizi;Interruzioni della corrente elettrica;numero medio per utente;0;1;;1
-12SER025;salute;Pazienti che si curano in un'altra regione;percentuale;0;1;;1
+id;famiglia;nome_leggibile;unita;livello_regione;livello_provincia;note;campionario;dal
+901;reddito;PIL per abitante;euro;1;0;;0;
+902;reddito;Reddito disponibile delle famiglie per abitante;euro;1;0;;0;
+multiscopo:MULTI_REDD_MEDIANO;reddito;Reddito netto mediano di una famiglia in un anno;euro;1;0;;1;
+multiscopo:MULTI_ABIT_SPESA_EURO;abitazione;Spesa media mensile per la casa;euro al mese;1;0;;1;
+631;reddito;Persone in povertà relativa;percentuale;1;0;da spiegare a fine partita: povertà relativa;1;
+multiscopo:MULTI_DISAGIO_IMPREVISTI;reddito;Famiglie che non reggono una spesa imprevista;percentuale;1;0;;1;
+multiscopo:MULTI_DISAGIO_RISPARMIO;reddito;Famiglie che non riescono a risparmiare;percentuale;1;0;;1;
+12;lavoro;Tasso di disoccupazione;percentuale;1;0;;1;
+15;lavoro;Tasso di disoccupazione giovanile;percentuale;1;0;;1;
+57;lavoro;Distanza tra occupazione maschile e femminile;punti percentuali;1;0;;1;
+402;imprese;Imprese guidate da donne;percentuale;1;0;;1;
+bes:03LAV001-N22;lavoro;Occupati tra i 20 e i 64 anni;percentuale;1;1;;1;
+bes:03LAV002-N22;lavoro;Persone che vorrebbero lavorare e non lavorano;percentuale;1;1;da spiegare a fine partita: nome della fonte, tasso di mancata partecipazione al lavoro;1;
+339;istruzione;Laureati tra i 30 e i 34 anni;percentuale;1;0;;1;
+bes:02IST002-N22;istruzione;Adulti con almeno il diploma;percentuale;1;1;;1;
+bes:02IST005-N22;istruzione;Giovani che lasciano presto la scuola;percentuale;1;0;;1;
+bes:02IST006-N22;istruzione;Giovani che non studiano e non lavorano;percentuale;1;1;;1;
+bes:02IST007-N22;istruzione;Adulti che seguono corsi di formazione;percentuale;1;1;;1;
+bes:02IST023;cultura;Persone che leggono libri e quotidiani;percentuale;1;0;;1;
+bes:SDG-310;istruzione;Studenti di terza media deboli in matematica;percentuale;1;0;da spiegare a fine partita: la fonte dice competenza numerica non adeguata;1;
+910;salute;Speranza di vita alla nascita;anni;1;0;;0;
+bes:01SAL002;salute;Anni di vita in buona salute alla nascita;anni;1;0;;1;
+bes:01SAL009;salute;Persone in eccesso di peso;per 100 persone;1;0;;1;
+bes:01SAL010;salute;Fumatori;per 100 persone;1;0;;1;
+bes:01SAL012;salute;Persone sedentarie;per 100 persone;1;0;;1;
+multiscopo:MULTI_BMI_OBESI;salute;Adulti obesi;percentuale;1;0;;1;
+590;salute;Pazienti che si curano in un'altra regione;percentuale;1;0;;0;
+920;demografia;Età media della popolazione;anni;1;0;;0;
+921;demografia;Anziani ogni 100 giovani;per 100 giovani;1;0;da spiegare a fine partita: indice di vecchiaia, rapporto tra over 65 e under 15;0;
+922;demografia;Figli per donna;numero medio;1;0;;0;
+dem:POP65OVER;demografia;Popolazione con più di 65 anni;percentuale;1;0;;0;
+dem:POP014;demografia;Bambini e ragazzi fino a 14 anni;percentuale;1;0;;0;
+923;demografia;Saldo migratorio: chi arriva meno chi parte, ogni 1.000 abitanti;per 1.000 abitanti;1;0;da spiegare a fine partita: saldo migratorio totale;0;
+dem:MEANAGECH;demografia;Età media della madre al parto;anni;1;0;;0;
+dem:BIRTHRATE;demografia;Nascite ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0;
+dem:MARRATE;demografia;Matrimoni ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0;
+52;ambiente;Raccolta differenziata dei rifiuti;percentuale;1;0;;0;
+232;ambiente;Rifiuti urbani finiti in discarica;percentuale;1;0;;0;
+84;ambiente;Rifiuti in discarica per abitante;chilogrammi;1;0;;0;
+60;servizi;Interruzioni della corrente elettrica;numero medio per utente;1;0;;0;
+105;turismo;Giornate di turismo per abitante;giornate per abitante;1;0;;0;
+165;turismo;Giornate di turismo fuori dai mesi estivi per abitante;giornate per abitante;1;0;;0;
+611;cultura;Biglietti del cinema ogni 100 abitanti;per 100 abitanti;1;0;;0;
+27;cultura;Biglietti per teatro e concerti ogni 100 abitanti;per 100 abitanti;1;0;;0;
+426;digitale;Persone di 6 anni e più che usano Internet;percentuale;1;0;da spiegare a fine partita: almeno una volta negli ultimi 12 mesi;1;
+72;digitale;Addetti delle imprese che usano computer connessi a Internet;percentuale;1;0;da spiegare a fine partita: imprese con più di dieci addetti, industria e servizi;1;
+multiscopo:MULTI_ICT_BANDA_LARGA;digitale;Famiglie con connessione a banda larga;percentuale;1;0;;1;
+279;sicurezza;Furti denunciati ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0;
+280;sicurezza;Rapine denunciate ogni 1.000 abitanti;per 1.000 abitanti;1;0;;0;
+542;giustizia;Durata dei processi nei tribunali;giorni;1;0;;0;
+multiscopo:MULTI_ABIT_PROPRIETA;abitazione;Famiglie proprietarie della casa;percentuale;1;0;;1;
+multiscopo:MULTI_ABIT_AFFITTO;abitazione;Famiglie in affitto;percentuale;1;0;;1;
+multiscopo:MULTI_ABIT_UMIDITA;abitazione;Famiglie con umidità in casa;percentuale;1;0;;1;
+multiscopo:MULTI_ZONA_RUMORI;abitazione;Famiglie che lamentano rumori nella zona;percentuale;1;0;;1;
+multiscopo:MULTI_ZONA_INQUINAMENTO;ambiente;Famiglie che lamentano inquinamento nella zona;percentuale;1;0;;1;
+bes:08BSO001;benessere;Persone molto soddisfatte della propria vita;percentuale;1;0;;1;
+bes:05REL006;benessere;Persone che fanno volontariato;percentuale;1;0;;1;
+bes:06POL007;istituzioni;Donne tra gli amministratori locali;percentuale;1;0;;1;
+54;imprese;Nuove imprese ogni 100 esistenti;percentuale;1;0;;0;
+123;imprese;Valore prodotto per occupato nell'industria;migliaia di euro;1;0;;0;
+01SAL001;salute;Speranza di vita alla nascita;anni;0;1;;1;
+01SAL004;salute;Bambini morti nel primo anno di vita ogni 1.000 nati;per 1.000 nati vivi;0;1;;1;
+01SAL006;salute;Morti per tumore tra 20 e 64 anni;ogni 10.000 abitanti, tasso standardizzato;0;1;;1;
+01SAL020;salute;Morti evitabili tra 0 e 74 anni;ogni 10.000 abitanti, tasso standardizzato;0;1;;1;
+02IST001;istruzione;Bambini di 4 e 5 anni che vanno a scuola;percentuale;0;1;;1;
+02IST003P-N22;istruzione;Laureati tra i 25 e i 39 anni;percentuale;0;1;;1;
+02IST010P;istruzione;Studenti di terza media deboli in matematica;percentuale;0;1;;1;
+02IST011P;istruzione;Studenti di terza media deboli in italiano;percentuale;0;1;;1;
+03LAV003P-N22;lavoro;Giovani tra 15 e 29 anni che lavorano;percentuale;0;1;;1;
+03LAV006P-N22;lavoro;Giovani tra 15 e 29 anni che vorrebbero lavorare e non lavorano;percentuale;0;1;;1;
+03LAV007;lavoro;Infortuni gravi sul lavoro;per 10.000 occupati;0;1;;1;
+04BEC001P;reddito;Reddito disponibile medio per abitante;euro;0;1;;1;
+04BEC002P;reddito;Stipendio medio annuo dei dipendenti;euro;0;1;;1;
+04BEC005P;reddito;Pensione media annua per abitante;euro;0;1;;1;
+04BEC006P;reddito;Pensionati con pensione bassa;percentuale;0;1;;1;
+04BEC009P;reddito;Prestiti alle famiglie non restituiti;percentuale;0;1;;1;
+05REL008;benessere;Organizzazioni non profit ogni 10.000 abitanti;per 10.000 abitanti;0;1;;1;
+06POL001;istituzioni;Partecipazione al voto;percentuale;0;1;;1;
+06POL002P;istituzioni;Donne tra gli amministratori comunali;percentuale;0;1;;1;
+06POL003P;istituzioni;Amministratori comunali con meno di 40 anni;percentuale;0;1;;1;
+09PAE002;cultura;Densità di musei e patrimonio museale;per 100 km2;0;1;;1;
+09PAE008;turismo;Agriturismi ogni 100 km2;per 100 km2;0;1;;1;
+10AMB003;ambiente;Acqua persa dalla rete idrica;percentuale;0;1;;1;
+10AMB008;ambiente;Verde urbano per abitante;metri quadrati per abitante;0;1;;1;
+10AMB014;ambiente;Territorio in aree protette;percentuale;0;1;;1;
+10AMB016;ambiente;Energia elettrica da fonti rinnovabili;percentuale;0;1;;1;
+10AMB017;ambiente;Raccolta differenziata dei rifiuti;percentuale;0;1;;1;
+10AMB018P;ambiente;Suolo coperto da cemento e asfalto;percentuale;0;1;;1;
+10AMB024P;ambiente;Rifiuti urbani prodotti per abitante;chilogrammi per abitante;0;1;;1;
+11RIC002;imprese;Brevetti per milione di abitanti;per milione di abitanti;0;1;;1;
+11RIC004P;cultura;Addetti nelle imprese culturali;percentuale;0;1;;1;
+12SER002P;servizi;Medici specialisti ogni 10.000 abitanti;per 10.000 abitanti;0;1;;1;
+12SER003P-N25;servizi;Posti letto negli ospedali ogni 10.000 abitanti;per 10.000 abitanti;0;1;;1;
+12SER007;servizi;Interruzioni della corrente elettrica;numero medio per utente;0;1;;1;
+12SER025;salute;Pazienti che si curano in un'altra regione;percentuale;0;1;;1;
+multiscopo:MULTI_ASL_FILA_OLTRE_20_MIN;servizi;Utenti dell'ASL che aspettano in fila più di 20 minuti;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_BANCA_FILA_OLTRE_20_MIN;servizi;Utenti della banca che aspettano in fila più di 20 minuti;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_BUS_FREQUENZA_CORSE;servizi;Utenti del bus soddisfatti della frequenza delle corse;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_BUS_ATTESA_FERMATA;servizi;Utenti del bus soddisfatti della comodità dell'attesa alla fermata;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_BUS_COMODITA_ORARI;servizi;Utenti del bus soddisfatti della comodità degli orari;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_LAVORO_AUTO_PRIVATA;lavoro;Occupati che vanno al lavoro in auto come conducente;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_GIOVANI_CON_GENITORI;demografia;Giovani tra 18 e 34 anni, celibi e nubili, che vivono con un genitore;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_TEATRO;cultura;Persone di 6 anni e più andate a teatro nell'ultimo anno;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_CINEMA;cultura;Persone di 6 anni e più andate al cinema nell'ultimo anno;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_SITI_ARCHEOLOGICI;cultura;Persone di 6 anni e più che hanno visitato siti archeologici o monumenti nell'ultimo anno;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_CONDIZIONATORI;abitazione;Famiglie con il condizionatore;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_PIU_DI_UN_AUTO;servizi;Famiglie con più di un'automobile;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_BICICLETTE;servizi;Famiglie con almeno una bicicletta;percentuale;1;0;;1;2026-10-04
+multiscopo:MULTI_LAVASTOVIGLIE;abitazione;Famiglie con la lavastoviglie;percentuale;1;0;;1;2026-10-04
+eur:ilc_mdes01_r;abitazione;Persone in case riscaldate in modo inadeguato;percentuale;1;0;;1;2026-10-04
+eur:hrst_st_rcat;lavoro;Scienziati e ingegneri sulla popolazione attiva;percentuale;1;0;;1;2026-10-04
+eur:tour_occ_nin2;turismo;Pernottamenti dei turisti residenti all'estero;percentuale;1;0;da spiegare a fine partita: quota sul totale dei pernottamenti;0;2026-10-04
+eur:tour_occ_anor2;turismo;Posti letto degli alberghi occupati;percentuale;1;0;da spiegare a fine partita: tasso netto di occupazione dei posti letto;0;2026-10-04
+aci:autovetture-alimentazione-alternativa;servizi;Autovetture con alimentazione alternativa a benzina e gasolio;percentuale;1;1;le auto contano dove sono immatricolate: il noleggio e le flotte aziendali alzano la quota in alcune province;0;2026-10-04
+aci:autovetture-ante-2009;servizi;Autovetture immatricolate fino al 2009;percentuale;1;1;le auto contano dove sono immatricolate: il noleggio e le flotte aziendali pesano in alcune province;0;2026-10-04
+agcom:copertura-ftth;digitale;Famiglie raggiunte dalla fibra fino a casa;percentuale;1;1;da spiegare a fine partita: rete in fibra FTTH;0;2026-10-04
+ipr:figli-per-donna;demografia;Figli per donna;figli per donna;0;1;;0;2026-10-04
+ipr:indice-di-vecchiaia;demografia;Anziani ogni 100 giovani;per 100 giovani;0;1;da spiegare a fine partita: indice di vecchiaia, rapporto tra over 65 e under 15;0;2026-10-04
+ipr:saldo-migratorio-interno;demografia;Saldo migratorio interno: chi arriva meno chi parte, ogni 1.000 abitanti;per 1.000 abitanti;0;1;da spiegare a fine partita: saldo migratorio interno;0;2026-10-04
+ipr:tasso-di-natalita;demografia;Nascite ogni 1.000 abitanti;per 1.000 abitanti;0;1;;0;2026-10-04
+ipr:tasso-di-disoccupazione;lavoro;Tasso di disoccupazione;percentuale;0;1;;1;2026-10-04
+ipr:tasso-di-attivita;lavoro;Persone tra 15 e 64 anni che lavorano o cercano lavoro;percentuale;0;1;da spiegare a fine partita: tasso di attività;1;2026-10-04

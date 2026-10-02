@@ -36,6 +36,19 @@ PROMOTION_PARSERS = {
     "istat_demografia": istat_regional_source.normalized_rows,
 }
 
+
+def _unimplemented_source(source_id, *_args, **_kwargs):
+    raise SystemExit(
+        f"La fonte {source_id!r} ha un namespace registrato ma non ancora un parser di promozione."
+    )
+
+
+for _feed in (
+    "mef_irpef", "ispra_suolo", "mim_scuola", "salute_dati",
+    "aci_statistiche", "unioncamere_movimprese", "agcom_bbmap", "istat_provinciale",
+):
+    PROMOTION_PARSERS[_feed] = lambda *args, _feed=_feed, **kwargs: _unimplemented_source(_feed, *args, **kwargs)
+
 EXTERNAL_DATASET = PROJECT_ROOT / "app" / "static" / "data" / "external" / "normalized_external_indicators.csv"
 EXTERNAL_MANIFEST = PROJECT_ROOT / "app" / "static" / "data" / "external_indicator_manifest.csv"
 

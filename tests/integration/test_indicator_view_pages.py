@@ -252,6 +252,12 @@ class EveryIndicatorPageRenders(unittest.TestCase):
             if len(entry["levels"]) > 1
         ]
         self.assertEqual(len(two_level), 34)
+        # Le schede esterne a due livelli (ACI, AGCOM) non stanno nella golden
+        # delle schede di prima: si aggiungono dal loader che le possiede.
+        from app import provincial_families
+
+        two_level += [item["metadata"]["id"] for item in provincial_families.all_indicators()
+                      if "regione" in item["levels"]]
         indexed, not_indexed = set(), set()
         for indicator_id in two_level:
             family, raw_id = family_and_raw(indicator_id)
@@ -268,7 +274,8 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 else:
                     self.assertTrue(robots.startswith("index, follow"), robots)
                     indexed.add(path)
-        self.assertEqual((len(indexed), len(not_indexed)), (17, 17))
+        from tests.integration.test_url_migration import province_views_expected
+        self.assertEqual((len(indexed), len(not_indexed)), (province_views_expected(), 17))
         listed = {page["path"] for page in indicator_universe.level_pages() if not page["base"]}
         self.assertEqual(indexed, listed)
 

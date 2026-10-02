@@ -37,7 +37,7 @@ possono scrivere direttamente su `master`.
 | **un articolo del blog da un trend di ricerca**: segnali, classifica, dossier, grafici, foto con licenza | [`docs/WORKFLOW_ARTICOLI_TREND.md`](docs/WORKFLOW_ARTICOLI_TREND.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | **famiglie di indicatori**: stessa misura, dimensioni diverse (genere, età, regione/provincia) | [`docs/FAMIGLIE_INDICATORI.md`](docs/FAMIGLIE_INDICATORI.md) |
-| **a che punto è la prosa dell'atlante**: lo stato dei 634 indicatori | `app/editorial_state.py` (il criterio, uno solo), `app/indicator_universe.py` (la passata, una sola) |
+| **a che punto è la prosa dell'atlante**: lo stato di tutti gli indicatori con una pagina | `app/editorial_state.py` (il criterio, uno solo), `app/indicator_universe.py` (la passata, una sola) |
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | fonti verticali esterne | [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md) |

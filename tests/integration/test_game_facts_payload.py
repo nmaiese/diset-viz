@@ -463,9 +463,11 @@ class FattiVeriTest(unittest.TestCase):
         per_id = {r["id"]: r["sample_survey"] for r in righe}
         for ind_id in ("426", "57", "72"):
             self.assertTrue(per_id[ind_id], ind_id)
-        # i prefissi campionari e le righe solo provinciali (BES) sono tutte 1
+        # i prefissi campionari e le righe solo provinciali BES sono tutte 1; le
+        # famiglie esterne provinciali (ipr, aci, agcom) dicono il loro nella colonna
         for r in righe:
-            if r["id"].startswith(("bes:", "multiscopo:")) or not r["regione"]:
+            solo_bes = not r["regione"] and game_daily.province_source(r["id"])[0] == "bes"
+            if r["id"].startswith(("bes:", "multiscopo:")) or solo_bes:
                 self.assertTrue(r["sample_survey"], r["id"])
 
 

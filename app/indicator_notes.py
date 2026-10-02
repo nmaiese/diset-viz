@@ -265,7 +265,7 @@ _FEMININE_PLURAL = {
 _MASCULINE_PLURAL_GLI = {
     "15enni", "abitanti", "addetti", "adulti", "alunni", "amministratori",
     "anziani", "ingressi", "investimenti", "impieghi", "occupati", "ospiti",
-    "studenti", "utenti",
+    "scienziati", "studenti", "utenti",
 }
 
 _MASCULINE_PLURAL_I = {

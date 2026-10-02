@@ -18,6 +18,7 @@ DATA_DIR = Path(__file__).resolve().parent / "static" / "data"
 EXTERNAL_DIR = DATA_DIR / "external"
 EXTERNAL_DATASET = EXTERNAL_DIR / "normalized_external_indicators.csv"
 EXTERNAL_MANIFEST = DATA_DIR / "external_indicator_manifest.csv"
+EXTERNAL_LEVELS_MANIFEST = DATA_DIR / "external" / "external_indicator_levels.csv"
 
 EXTERNAL_COLUMNS = [
     "source",
@@ -62,6 +63,30 @@ MANIFEST_COLUMNS = [
     "review_notes",
 ]
 
+# Pubblicazione per livello: separata dal manifesto di ammissione storico,
+# perché questo file contiene decisioni già pubblicabili e non candidati.
+LEVEL_COLUMNS = [
+    "target_indicator_id",
+    "territory_level",
+    "name",
+    "theme",
+    "quality_life_category",
+    "direction",
+    "scoreable",
+    "sample_survey",
+    "year_min",
+    "year_max",
+    "territory_count_latest",
+    "coverage_latest",
+    "source_dataset",
+    "source_indicator_id",
+    "source_url",
+    "license",
+    "definition_match",
+    "reviewed_at",
+    "notes",
+]
+
 
 def freshness_status(year):
     if year is None:
@@ -101,6 +126,12 @@ def get_external_rows():
 @cache.memoize(timeout=3600)
 def get_external_manifest():
     return _read_semicolon_csv(EXTERNAL_MANIFEST)
+
+
+@cache.memoize(timeout=3600)
+def get_external_levels():
+    """Legge decisioni di pubblicazione per `(indicatore, livello)`."""
+    return _read_semicolon_csv(EXTERNAL_LEVELS_MANIFEST)
 
 
 @cache.memoize(timeout=3600)

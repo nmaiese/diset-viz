@@ -293,7 +293,8 @@ class AppSmokeTest(unittest.TestCase):
         self.assertTrue(sitemap_indicators)
         self.assertEqual(sitemap_indicators, llms_indicators)
         views = {url for url in llms_indicators if url.endswith("/province")}
-        self.assertEqual(len(views), 17)
+        from tests.integration.test_url_migration import province_views_expected
+        self.assertEqual(len(views), province_views_expected())
         self.assertLessEqual(views, sitemap_indicators)
         self.assertNotIn("?livello=", llms_full)
         self.assertEqual(len(sitemap_indicators), sitemap.count("<loc>https://divarioitalia.it/indicatore/"))
@@ -500,12 +501,11 @@ class AppSmokeTest(unittest.TestCase):
             self.assertNotIn("BY 3.0", body, path)
             self.assertNotIn("licenses/by/3", body, path)
 
-        # And the registry itself stays coherent: every family declares a deed,
-        # spelled with the same version the URL points at.
+        # And the registry itself stays coherent: every family declares its own
+        # verified or explicitly provisional licence, never a global Istat deed.
         for family, meta in sources.SOURCES.items():
             self.assertTrue(meta.get("license"), family)
-            self.assertEqual(meta.get("license_url"), sources.LICENSE_URL, family)
-            self.assertIn("4.0", meta["license"], family)
+            self.assertEqual(meta.get("license_url"), sources.family_license_url(family), family)
 
     def test_indicator_page_has_data_derived_depth(self):
         from app.data import get_catalog

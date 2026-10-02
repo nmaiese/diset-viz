@@ -54,7 +54,7 @@ provinciale, non quello regionale.
 
 from __future__ import annotations
 
-from app import bes_data, game_daily, game_facts, quiz, quiz_tokens, sources
+from app import game_daily, game_facts, quiz, quiz_tokens, sources
 from app.game_daily import LEVELS, today_rome
 
 # Modalita' di token propria: il token della sfida del giorno non entra nelle serie
@@ -62,10 +62,6 @@ from app.game_daily import LEVELS, today_rome
 # il token di una serie apre una sessione nuova qui.
 MODE = "compare_daily"
 PAIRS = game_daily.COMPARE_PAIRS
-# Etichetta della fonte per i livelli con le province, che non passano da
-# quiz.evaluate_compare: viene da app/sources.py, l'unica fonte di verita' dei
-# nomi (un'etichetta scritta qui ha gia' pubblicato una serie sotto un altro nome).
-PROVINCE_SOURCE = sources.SOURCES["bes"]["label"]
 # La scheda del territorio: la stessa forma degli altri giochi (`/regione/<key>`
 # e `/provincia/<key>`).
 TERRITORY_PATHS = {"regioni": "/regione/", "stessa_regione": "/provincia/", "province": "/provincia/"}
@@ -112,26 +108,21 @@ def _question(pair, index, level):
 def _province_indicator(ind_id, year, name, unit):
     """I campi dell'indicatore per una risposta ai livelli con le province: nome
     leggibile e unità sono quelli scelti per il gioco in
-    `config/game_indicators.csv`, la spiegazione e il link canonico vengono dal
-    catalogo BES, l'unica fonte che li ha per gli indicatori solo provinciali."""
-    raw = game_daily.provincial_id(ind_id)
-    info = bes_data.get_bes_manifest("provincia").get(raw)
+    `config/game_indicators.csv`, la spiegazione, il link canonico e la fonte
+    vengono dalla famiglia dell'indicatore (`game_daily.province_info`)."""
+    info = game_daily.province_info(ind_id)
     if info is None:
         return None
-    try:
-        path = bes_data.bes_path(raw)
-    except LookupError:
-        path = None
     return {
         "id": ind_id,
         "name": name,
         "unit": unit,
         "year": year,
-        "description": info["explain"]["plain"],
-        "value_explanation": info["explain"]["example"],
-        "path": path,
-        "source_label": PROVINCE_SOURCE,
-        "source_url": bes_data.BES_SOURCE_URLS["provincia"],
+        "description": info["description"],
+        "value_explanation": info["value_explanation"],
+        "path": info["path"],
+        "source_label": info["source_label"],
+        "source_url": info["source_url"],
     }
 
 

@@ -265,7 +265,8 @@ def _neighbours(ctx: dict) -> dict:
     return {"near": with_me(ctx.get("vicine") or []), "sisters": with_me(ctx.get("sister_provinces") or [])}
 
 
-def _tiles(ctx: dict, rows: list[dict], sisters: list[dict], covered: int | None) -> list[dict]:
+def _tiles(ctx: dict, rows: list[dict], sisters: list[dict], covered: int | None,
+           measured: int | None = None) -> list[dict]:
     """Tre cifre che l'H1, la risposta e la striscia non dicono.
 
     La posizione in regione e' un `numfmt.rank` gia' composto: la macro delle
@@ -299,7 +300,9 @@ def _tiles(ctx: dict, rows: list[dict], sisters: list[dict], covered: int | None
                           "unit": "indicatore" if last == 1 else "indicatori",
                           "sub": f"e prima in nessuno, {tail}"})
     if rows:
-        tiles.append({"label": "Indicatori misurati", "value": len(rows), "role": "count", "unit": None,
+        # Le righe delle altre fonti si contano fra i misurati e restano fuori
+        # da "prima in regione": la sotto-riga dice quanti pesano sul punteggio.
+        tiles.append({"label": "Indicatori misurati", "value": measured or len(rows), "role": "count", "unit": None,
                       "sub": f"{count_word(covered, feminine=False)} entrano nel punteggio" if covered else None})
     return tiles
 
@@ -330,10 +333,43 @@ def _score_coverage(key: str) -> tuple[int, int] | None:
     return sum(1 for i in ids if key in (matrix.get(i) or {})), len(ids)
 
 
+def _external_sources(rows: list[dict]) -> list[dict]:
+    """Le famiglie delle righe esterne, nell'ordine del registro, con quante
+    righe porta ciascuna. Etichetta, istituzione, licenza e indirizzo vengono
+    da `app/sources.py` e dalla riga, mai da un testo scritto qui."""
+    counts: dict[str, int] = {}
+    urls: dict[str, str] = {}
+    for r in rows:
+        family = r.get("family")
+        if family in sources.SOURCES:
+            counts[family] = counts.get(family, 0) + 1
+            urls.setdefault(family, r.get("source_url") or "")
+    out = []
+    for family in sources.SOURCES:
+        if family in counts:
+            licence, licence_url = sources.family_license(family)
+            out.append({"family": family, "label": sources.family_label(family),
+                        "institution": sources.family_institution(family), "count": counts[family],
+                        "url": urls[family], "license": licence, "license_url": licence_url})
+    return out
+
+
+def _table_source(methodology: dict, external: list[dict]) -> str:
+    """"Istat, Automobile Club d'Italia ed Autorita'...": le istituzioni della
+    tabella, nell'ordine del registro e senza ripetizioni."""
+    families = [f for f in (methodology.get("source_counts") or {}) if f in sources.SOURCES]
+    return sources.institutions_label(families + [e["family"] for e in external]) or _source_label(methodology)
+
+
 def derive(ctx: dict) -> dict:
     profile = ctx["profile"]
     rows = _with_units(ctx.get("indicatori") or [])
     by_id = {r["id"]: r for r in rows}
+    # Le righe delle altre fonti: descrittive, nella tabella e basta. Tutto il
+    # resto (sintesi, movimento, tessere, copertura) conta solo `rows`.
+    external_rows = _with_units(ctx.get("external_indicators") or [])
+    all_rows = rows + external_rows
+    external = _external_sources(external_rows)
     methodology = profile.get("methodology") or {}
 
     categories = [c for c in profile.get("categories") or [] if c.get("score") is not None]
@@ -343,14 +379,16 @@ def derive(ctx: dict) -> dict:
     macro_areas = list(ctx.get("macro_aree") or [])
     groups = []
     for area in macro_areas:
-        items = [r for r in rows if r.get("macro_area") == area]
+        items = [r for r in all_rows if r.get("macro_area") == area]
         if items:
             groups.append({"name": area, "anchor": "area-" + slugify_taxonomy(area), "rows": items})
-    orphans = [r for r in rows if r.get("macro_area") not in macro_areas]
+    orphans = [r for r in all_rows if r.get("macro_area") not in macro_areas]
     if orphans:
         groups.append({"name": "Altri indicatori", "anchor": "area-altri", "rows": orphans})
 
     neighbours = _neighbours(ctx)
+    # Gli anni sono quelli del BES: dicono "dal 2015 al 2024" alla riga della
+    # fonte BES e alla citazione, e le righe delle altre fonti arrivano al 2026.
     years = [r["year"] for r in rows if r.get("year")]
     first_years = [r["year_from"] for r in rows if r.get("year_from")]
     year_from = min(first_years) if first_years else None
@@ -378,7 +416,7 @@ def derive(ctx: dict) -> dict:
         "region_key": region_path.rstrip("/").rsplit("/", 1)[-1] if region_path else None,
         "region_map": common.region_map(region_path.rstrip("/").rsplit("/", 1)[-1]) if region_path else None,
         "strip": _strip(profile),
-        "tiles": _tiles(ctx, rows, neighbours["sisters"], covered),
+        "tiles": _tiles(ctx, rows, neighbours["sisters"], covered, len(all_rows)),
         "dims": _dimensions(profile),
         "synthesis": _synthesis(ctx, by_id),
         "moves": _moves(ctx, rows),
@@ -387,6 +425,11 @@ def derive(ctx: dict) -> dict:
         "sisters": neighbours["sisters"],
         "year_from": year_from, "year_to": year_to,
         "source": source,
+        # Sotto la tabella la fonte e' l'unione delle istituzioni delle righe,
+        # dal registro; senza righe esterne e' quella di sempre.
+        "table_source": _table_source(methodology, external) if external else source,
+        "rows": all_rows, "external": external, "external_count": len(external_rows),
+        "external_label": sources.institutions_label([e["family"] for e in external]),
         "dataset": methodology.get("source"),
         "in_score": in_score, "covered": covered,
         "citation": citation,

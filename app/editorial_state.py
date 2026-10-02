@@ -177,8 +177,8 @@ def catalogo():
     """Le righe del cruscotto editoriale piu' i totali del recap.
 
     Una riga per (indicatore, livello), che e' l'unita' della coda verbatim: due
-    unita' diverse per la stessa cosa divergono. Le righe predefinite sono i 634
-    indicatori con una pagina.
+    unita' diverse per la stessa cosa divergono. Le righe predefinite sono tutti gli
+    indicatori con una pagina, quanti ne conta `indicator_universe.all_indicator_refs()`.
 
     In cache per la vita del processo, come `projection()`: `content/indicators/`
     lo legge `app/indicator_texts._load()` sotto `lru_cache`, quindi dentro un

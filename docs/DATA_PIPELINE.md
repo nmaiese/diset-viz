@@ -138,6 +138,44 @@ della categoria, così i link già indicizzati non si perdono.
    indicatori core + direzionali) e quali restano descrittivi. Usa la diagnostica
    qui sotto.
 
+## Famiglie esterne con le province (dal 2 ottobre 2026)
+
+Una fonte ufficiale non BES, a livello provinciale e/o regionale, entra senza
+toccare i loader BES. Il disegno e le sue ragioni stanno in
+`docs/ricerca-nuovi-dati/design-piattaforma.md`; qui il percorso operativo.
+
+1. **Estrazione**: uno script in `scripts/nuovi_dati/<fonte>.py` scrive
+   `app/static/data/nuovi/<fonte>.csv` (`indicator_id;level;territory_key;year;value`)
+   e `<fonte>_manifest.csv` (nome, istituzione, unita, verso, tema, licenza con la
+   frase letta, anni, copertura). Per Istat si legge **solo la cache**
+   (`data/istat_cache`, mai la rete: 5 richieste al minuto, blocco di giorni).
+2. **Decisione editoriale e caricamento**: la tabella `PUBBLICATI` di
+   `scripts/nuovi_dati/build_external.py` dice quali serie entrano, con quale id
+   pubblico, famiglia (feed), tema e livelli; il comando scrive
+   `external/normalized_external_indicators.csv` e
+   `external/external_indicator_levels.csv` (una riga per indicatore e livello,
+   con `direction`, `scoreable`, `sample_survey`). Idempotente.
+3. **Registro**: ogni istituzione e una famiglia di `app/sources.py` (`ipr`, `aci`,
+   `agcom`, `eur`, ...), con licenza e URL letti sulla fonte, mai ereditati da Istat.
+4. **Loader**: `app/provincial_families.py` serve le righe provinciali. La scheda
+   (`/indicatore/<slug>/<acronimo>-<id>` e `/province`), l'universo, l'atlante, il
+   confronto, la ricerca, la sitemap, le pagine `/provincia/<key>` e `/regione/<key>`
+   leggono da li, senza un ramo per istituzione.
+5. **Punteggio**: nessuna serie nuova e `scoreable` finche non si misura lo
+   spostamento di rango (regola usata il 2 ottobre 2026: media assoluta sotto 1
+   posizione, nessun territorio oltre 3, su ogni profilo). Il Multiscopo nuovo
+   (`MULTI_*`) e fuori da `QUALITY_LIFE_SCORE_IDS`.
+
+**Vincolo di freschezza**: entrano solo serie con ultimo anno di riferimento 2025
+o 2026. MEF (IRPEF, anno d'imposta 2024) e ISPRA (consumo di suolo, 2024) sono
+estratti e testati nei rami `nmaiese/nd-estr-mef` e `nmaiese/nd-estr-ispra` ma
+**non** in `PUBBLICATI`: si accendono aggiungendo una riga li' quando escono i
+dati 2025 (ISPRA a ottobre 2026, MEF a primavera 2027).
+
+**Le serie dell'indagine Aspetti della vita quotidiana** (23, regionali) non
+passano dallo strato esterno: sono voci di `scripts/multiscopo_sources.py`
+(`MULTI_*`) e `scripts/update_multiscopo_regions.py` le legge dalla cache.
+
 ## Scoperta di nuovi indicatori (a monte)
 
 Il passo che *trova* nuovi indicatori presso fonti istituzionali e li mette in
