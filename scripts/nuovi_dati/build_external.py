@@ -12,7 +12,9 @@ Idempotente: prima toglie dai due file le righe degli id che governa, poi le
 riscrive. Le righe degli altri id non si toccano. Nessuna rete.
 
 La tabella `PUBBLICATI` e' la decisione editoriale: quali serie entrano, con
-quale id pubblico, famiglia (feed), tema e livelli. Un indicatore estratto ma
+quale id pubblico, famiglia (feed), tema e livelli, e se la serie entra nel
+punteggio della qualita della vita (`scoreable`: decisione del 2 ottobre 2026
+su misura dello spostamento di rango, solo `eur:ilc_mdes01_r` e `eur:hrst_st_rcat`). Un indicatore estratto ma
 non elencato qui non va in produzione (e' il caso di MEF e ISPRA, fermi al
 2024, e delle serie Eurostat che si fermano al 2024).
 """
@@ -85,8 +87,8 @@ PUBBLICATI = {
     "eurostat_nuovi": {
         "feed": "eurostat_regional",
         "serie": {
-            "EUROSTAT_CASA_NON_RISCALDATA": ("eur:ilc_mdes01_r", "Abitazione", "reddito_accessibilita", ("regione",), {"campionario": True}),
-            "EUROSTAT_SCIENZIATI_INGEGNERI": ("eur:hrst_st_rcat", "Ricerca e sviluppo (Eurostat)", "ricerca_innovazione_digitale", ("regione",), {"campionario": True, "nota": TAA_PESO_ATTIVI}),
+            "EUROSTAT_CASA_NON_RISCALDATA": ("eur:ilc_mdes01_r", "Abitazione", "reddito_accessibilita", ("regione",), {"campionario": True, "scoreable": True}),
+            "EUROSTAT_SCIENZIATI_INGEGNERI": ("eur:hrst_st_rcat", "Ricerca e sviluppo (Eurostat)", "ricerca_innovazione_digitale", ("regione",), {"campionario": True, "scoreable": True, "nota": TAA_PESO_ATTIVI}),
             "EUROSTAT_ORE_LAVORATE": ("eur:lfst_r_lfe2ehour", "Lavoro e conciliazione dei tempi di vita", "lavoro_opportunita", ("regione",), {"campionario": True, "nota": TAA_PESO_OCCUPATI}),
             "EUROSTAT_NOTTI_ESTERO": ("eur:tour_occ_nin2", "Turismo", "cultura_patrimonio_turismo", ("regione",)),
             "EUROSTAT_OCCUPAZIONE_POSTI_LETTO": ("eur:tour_occ_anor2", "Turismo", "cultura_patrimonio_turismo", ("regione",), {"nota": TAA_PESO_POSTI_LETTO}),
@@ -181,7 +183,7 @@ def build(only=None):
                 new_levels.append({
                     "target_indicator_id": public_id, "territory_level": level, "name": m["name"],
                     "theme": theme, "quality_life_category": category, "direction": m["direction"],
-                    "scoreable": "false",
+                    "scoreable": "true" if opts.get("scoreable") else "false",
                     "sample_survey": "true" if opts.get("campionario") else "false", "year_min": years[0],
                     "year_max": last, "territory_count_latest": n_last,
                     "coverage_latest": f"{n_last / universe:.4f}".rstrip("0").rstrip("."),
