@@ -63,6 +63,11 @@ class ExternalPlatformVerticalSlice(unittest.TestCase):
                 if callable(getattr(attr, "cache_clear", None)) and attr.__module__ == name:
                     attr.cache_clear()
         indicator_universe.cache_clear()
+        # Anche la cache delle pagine (Flask-Caching): in una suite intera un
+        # `/atlante` reso prima, con i dati veri, restava servito alla fixture.
+        from app.cache import cache
+
+        cache.clear()
 
     def test_scheda_province_api_sitemap_e_jsonld(self):
         code = "mef-reddito-irpef-medio"
