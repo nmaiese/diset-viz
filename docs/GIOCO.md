@@ -1,6 +1,6 @@
 # Sfida Italia: il gioco sotto `/quiz`
 
-Il sottomarchio dei giochi di Divario Italia si chiama **Sfida Italia**. Cinque giochi brevi sui dati territoriali (regioni e province), tutti sotto `/quiz`. Il nome l'ha scelto Nello il 30 settembre 2026. L'URL è rimasto `/quiz` perché le quattro pagine già indicizzate avevano 6 clic e 170 impression in 90 giorni, in posizioni da 6 a 9 (Search Console, 30 settembre 2026): cambiare indirizzo avrebbe buttato quel poco.
+Il sottomarchio dei giochi di Divario Italia si chiama **Sfida Italia**. Cinque giochi brevi sui dati territoriali (regioni e province), tutti sotto `/quiz`. Il nome l'ha scelto Nello il 30 settembre 2026. L'URL è rimasto `/quiz` perché cambiare indirizzo avrebbe rotto i link esistenti. Dal 3 ottobre 2026 l'hub e i cinque giochi sono `noindex, follow` e fuori dalla sitemap: sono schermate di interfaccia senza testo editoriale, non pagine da indicizzare (le regola `_NOINDEX_FOLLOW_PATHS` in `app/__init__.py`). Restano raggiungibili e linkate.
 
 Questo documento è il contratto della sezione e **possiede l'argomento**. Chi tocca `app/game*.py`, `app/quiz*.py`, `frontend/src/game/` o `config/game_indicators.csv` lo legge prima e lo aggiorna quando cambia un fatto. Dove il documento e il codice non tornano, ha ragione il codice: si corregge il documento. Le regole visive stanno in `design/v1/SISTEMA.md`, gli eventi in `docs/tracking_spec.md`, l'account in `docs/ACCOUNT.md`, i passi di rilascio in `DEPLOY.md`.
 
@@ -20,7 +20,7 @@ Intorno ai giochi: l'hub `/quiz` (`game_hub.html`, `hub.jsx`, `quiz-hub`) e la c
 
 Quello che i giochi hanno in comune sta in pochi posti: `app/game_daily.py` (giorno, seed, pool dei territori, elenco curato), `app/quiz_tokens.py` (token e round monouso), `frontend/src/game/shared.jsx` (componenti `FinePartita`, `Condividi`, `SfidaCondivisa`, e `trackGameEvent`), `frontend/src/game/oggi.js` (lo stato di oggi e la serie locale) e `frontend/src/game/puri.js` (funzioni pure che `node --test` prova senza DOM).
 
-**Due scelte di struttura da non disfare.** Il gioco **non è una pagina della 1.0**: non passa da `design.render` e non va spostato in `app/templates/v1/`, perché ha il suo sottomarchio (vedi sotto). E la sfida di oggi è **prerenderizzata nell'hub** con gli attributi `data-oggi-*` di `game_hub.html`: la pagina indicizzabile non deve dipendere da React, che aggiunge solo lo stato (numero, conto alla rovescia, "giocata oggi", serie).
+**Due scelte di struttura da non disfare.** Il gioco **non è una pagina della 1.0**: non passa da `design.render` e non va spostato in `app/templates/v1/`, perché ha il suo sottomarchio (vedi sotto). E la sfida di oggi è **prerenderizzata nell'hub** con gli attributi `data-oggi-*` di `game_hub.html`: la pagina non deve dipendere da React, che aggiunge solo lo stato (numero, conto alla rovescia, "giocata oggi", serie).
 
 ### Come funziona ciascun gioco
 
@@ -226,7 +226,7 @@ I valori e le regole di contrasto stanno nel posto che possiede l'argomento, `de
 
 ## Gli eventi
 
-Tutti gli eventi del gioco passano da `trackGameEvent()` in `shared.jsx`, e ognuno porta il parametro `game` (uno di `GIOCHI_EVENTO`: `regione`, `provincia`, `compare`, `order`, `mappa`). `parametriEvento` toglie un valore fuori elenco e l'evento parte lo stesso: una misura incompleta vale più di una persa. La lista degli eventi e dei loro parametri è in `docs/tracking_spec.md` e **non si duplica qui**. Due cose da ricordare: la misura non blocca mai la partita, e un sesto gioco va aggiunto a `GIOCHI_EVENTO`, a `GIOCHI` in `oggi.js`, a `_home_quiz_games` e alla sitemap in `app/views.py`, al JSON-LD `ItemList` di `game_hub.html` (il suo `numberOfItems` è scritto) e a `tests/integration/test_game_pages.py`.
+Tutti gli eventi del gioco passano da `trackGameEvent()` in `shared.jsx`, e ognuno porta il parametro `game` (uno di `GIOCHI_EVENTO`: `regione`, `provincia`, `compare`, `order`, `mappa`). `parametriEvento` toglie un valore fuori elenco e l'evento parte lo stesso: una misura incompleta vale più di una persa. La lista degli eventi e dei loro parametri è in `docs/tracking_spec.md` e **non si duplica qui**. Due cose da ricordare: la misura non blocca mai la partita, e un sesto gioco va aggiunto a `GIOCHI_EVENTO`, a `GIOCHI` in `oggi.js`, a `_home_quiz_games`, al JSON-LD `ItemList` di `game_hub.html` (il suo `numberOfItems` è scritto) e a `tests/integration/test_game_pages.py`.
 
 ## La Sardegna, i confini e l'attribuzione
 
@@ -313,7 +313,7 @@ Nota d'ambiente: sulla macchina di sviluppo la suite intera è caduta in segfaul
 | `app/player_stats.py`, `app/achievements.py`, `app/leaderboard.py`, `app/daily_counter.py` | serie e statistiche, traguardi, classifica, contatore |
 | `app/models.py`, `migrations/versions/0010_*`, `0011_*`, `scripts/supabase_setup.sql` | tabelle, migrazioni, RLS |
 | `app/views.py` | rotte delle pagine e delle API, limiti di frequenza, 503 senza chiave |
-| `app/__init__.py` | `noindex` della classifica (`_NOINDEX_EXACT_PATHS`) |
+| `app/__init__.py` | `noindex, follow` delle pagine del gioco (`_NOINDEX_FOLLOW_PATHS`) e `noindex, nofollow, noarchive` della classifica (`_NOINDEX_EXACT_PATHS`) |
 | `app/page_types.py` | `/quiz` e `/gioco` hanno `page_type = "game"` |
 | `config/game_indicators.csv` | gli indicatori giocabili (colonne `campionario` e `dal`) |
 | `frontend/src/game/` | l'interfaccia: `shared.jsx`, `oggi.js`, `puri.js`, `guess/`, `mappa/`, `compare.jsx`, `order.jsx`, `hub.jsx`, `leaderboard.jsx` |

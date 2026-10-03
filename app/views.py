@@ -2534,6 +2534,7 @@ def quality_life_classifica(url_level):
     payload = qb.build_bes_ranking(level, slug)
     if payload is None:
         abort(404)
+    is_default = slug == qb.DEFAULT_PROFILE
     quality_map_data = (
         {
             row["key"]: {"name": row["name"], "score": it_num(row["score"]), "rank": row["rank"]}
@@ -2541,7 +2542,7 @@ def quality_life_classifica(url_level):
         }
         if level == "regione" else {}
     )
-    public_matches = public_urls.quality_life_public_urls(url_level, slug)
+    public_matches = public_urls.quality_life_public_urls(url_level)
     if not public_matches:
         abort(404)
     canonical = public_matches[0]["loc"]
@@ -2576,11 +2577,12 @@ def quality_life_classifica(url_level):
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=canonical,
+        noindex=not is_default,
     ))
-    # Aliases and extra query state are useful for compatibility, but only the
-    # exact URL in the public inventory is an autonomous indexable document.
-    requested_path = request.full_path.removesuffix("?")
-    if requested_path != canonical.removeprefix(SITE_URL):
+    # Un profilo che non sia quello di default e' uno stato di esplorazione in
+    # pagina (`?profilo=` riordina le stesse righe), non un documento nuovo:
+    # canonical alla base e `noindex, follow`, come per `seo_policy.EXPLORE_PARAMS`.
+    if not is_default:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 
@@ -3524,12 +3526,6 @@ def sitemap():
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/province", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
-        {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/quiz/indovina-la-regione", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/quiz/indovina-la-provincia", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/quiz/province-italiane", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]

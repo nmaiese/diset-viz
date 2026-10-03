@@ -143,6 +143,16 @@ _NOINDEX_EXACT_PATHS = {
 }
 _NOINDEX_PATH_PREFIXES = ("/api/", "/download/", "/.well-known/")
 
+# Le pagine del gioco (`/quiz` e i cinque giochi) sono schermate di interfaccia
+# senza testo editoriale: restano raggiungibili e linkate, ma `noindex, follow`
+# e fuori dalla sitemap. `follow`, non `nofollow`: i link interni che portano
+# alle pagine dell'atlante devono passare la link equity. La classifica del quiz
+# (`/quiz/classifica`) e' gia' in `_NOINDEX_EXACT_PATHS` con un meta piu' chiuso.
+_NOINDEX_FOLLOW_PATHS = frozenset({
+    "/quiz", "/quiz/indovina-la-regione", "/quiz/indovina-la-provincia",
+    "/quiz/chi-e-maggiore", "/quiz/ordina", "/quiz/province-italiane",
+})
+
 
 def _supabase_connect_origins():
     # Supabase Auth (fetch REST) e Realtime (websocket) verso il progetto: vanno
@@ -206,6 +216,8 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     elif request_path in _NOINDEX_EXACT_PATHS or request_path.startswith(_NOINDEX_PATH_PREFIXES):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+    elif request_path in _NOINDEX_FOLLOW_PATHS:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
     elif "X-Robots-Tag" not in response.headers:
         # Default-deny: force an explicit index signal on every public response
         # unless something upstream (the 404 handler) already set its own
@@ -317,6 +329,11 @@ ADS_OFF_ENDPOINTS = frozenset({"ricerca", "account_page", "game_leaderboard_page
 def inject_site_config():
     return {
         "ADS_OFF": request.endpoint is None or request.endpoint in ADS_OFF_ENDPOINTS,
+        # Le pagine del gioco sono `noindex, follow`: lo dice il meta robots e
+        # spegne lo script degli annunci (`_third_party_head.html`) con la stessa
+        # condizione. Una view puo' sovrascriverlo passando `noindex` a
+        # `render_template` (la classifica della qualita' della vita lo fa).
+        "noindex": request.path in _NOINDEX_FOLLOW_PATHS,
         "SITE_NAME": config.SITE_NAME,
         "SITE_URL": config.SITE_URL,
         "STAGING": config.STAGING,

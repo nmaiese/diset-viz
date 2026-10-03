@@ -42,13 +42,10 @@ class GameTest(unittest.TestCase):
         self.assertIn(b'id="game-map-frame"', page.data)
         self.assertIn(b"Indovina la Regione", page.data)
 
-    def test_game_page_has_explicit_index_header(self):
+    def test_game_page_has_explicit_noindex_header(self):
         client = app.test_client()
         page = client.get("/quiz/indovina-la-regione")
-        self.assertEqual(
-            page.headers.get("X-Robots-Tag"),
-            "index, follow, max-snippet:-1, max-image-preview:large",
-        )
+        self.assertEqual(page.headers.get("X-Robots-Tag"), "noindex, follow")
 
     def test_hub_page_responds(self):
         client = app.test_client()
@@ -71,11 +68,11 @@ class GameTest(unittest.TestCase):
             self.assertEqual(response.status_code, 301, old)
             self.assertTrue(response.headers["Location"].endswith(new), old)
 
-    def test_sitemap_lists_game_page(self):
+    def test_sitemap_esclude_le_pagine_del_gioco(self):
         client = app.test_client()
         sitemap = client.get("/sitemap.xml").data
-        self.assertIn(b"/quiz<", sitemap)
-        self.assertIn(b"/quiz/indovina-la-regione", sitemap)
+        self.assertNotIn(b"/quiz<", sitemap)
+        self.assertNotIn(b"/quiz/indovina-la-regione", sitemap)
         self.assertNotIn(b"/gioco", sitemap)
 
     def test_game_regions_api(self):
@@ -610,12 +607,11 @@ class PaginaProvinciaTest(unittest.TestCase):
         gioco = next(d for d in giochi if d.get("@type") == "Game")
         self.assertEqual(gioco["creator"]["name"], "Divario Italia")
 
-    def test_pagina_e_in_sitemap_con_priorita(self):
+    def test_pagina_fuori_sitemap_e_noindex(self):
         sitemap = app.test_client().get("/sitemap.xml").get_data(as_text=True)
-        self.assertRegex(
-            sitemap,
-            re.escape(f"<loc>{config.SITE_URL}/quiz/indovina-la-provincia</loc>") + r"\s*(?:<lastmod>[^<]*</lastmod>\s*)?<priority>0.7</priority>",
-        )
+        self.assertNotIn(f"{config.SITE_URL}/quiz/indovina-la-provincia</loc>", sitemap)
+        pagina = app.test_client().get("/quiz/indovina-la-provincia")
+        self.assertEqual(pagina.headers.get("X-Robots-Tag"), "noindex, follow")
 
     def test_page_type_game(self):
         from app import page_types
@@ -869,12 +865,35 @@ class QuizOrderTest(unittest.TestCase):
         self.assertEqual(answer({"indicator_id": "9999999", "year": year, "region_keys": keys}).status_code, 400)
         self.assertEqual(answer({}).status_code, 400)
 
-    def test_sitemap_lists_quiz_pages(self):
+    def test_pagine_quiz_noindex_e_fuori_sitemap(self):
         client = app.test_client()
         sitemap = client.get("/sitemap.xml").data
-        self.assertIn(b"/quiz/chi-e-maggiore", sitemap)
-        self.assertIn(b"/quiz/ordina", sitemap)
-        self.assertIn(b"/quiz/province-italiane", sitemap)
+        for path in (b"/quiz", b"/quiz/chi-e-maggiore", b"/quiz/ordina",
+                     b"/quiz/province-italiane", b"/quiz/indovina-la-provincia"):
+            self.assertNotIn(path, sitemap)
+        for path in ("/quiz", "/quiz/indovina-la-regione", "/quiz/indovina-la-provincia",
+                     "/quiz/chi-e-maggiore", "/quiz/ordina", "/quiz/province-italiane"):
+            response = client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            self.assertEqual(response.headers["X-Robots-Tag"], "noindex, follow", path)
+            self.assertIn('name="robots" content="noindex, follow"',
+                          response.get_data(as_text=True), path)
+
+    def test_pagine_quiz_non_caricano_lo_script_annunci(self):
+        from app import config
+
+        client = app.test_client()
+        original = config.ADSENSE_CLIENT
+        try:
+            config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
+            for path in ("/quiz", "/quiz/indovina-la-regione", "/quiz/province-italiane"):
+                html = client.get(path).get_data(as_text=True)
+                self.assertNotIn("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", html, path)
+            # Una pagina indicizzabile, invece, carica il loader.
+            html = client.get("/atlante").get_data(as_text=True)
+            self.assertIn("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", html)
+        finally:
+            config.ADSENSE_CLIENT = original
 
 
 class IndizioCollegatoTest(unittest.TestCase):

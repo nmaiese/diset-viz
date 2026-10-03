@@ -344,16 +344,23 @@ class QualityLifeBesEngineTest(unittest.TestCase):
 
         profiles = [profile["slug"] for profile in qb.get_quality_life_profiles()]
         for url_level in ("regioni", "province"):
+            base = f"https://divarioitalia.it/qualita-della-vita/classifica/{url_level}"
             for slug in profiles:
                 suffix = "" if slug == qb.DEFAULT_PROFILE else f"?profilo={slug}"
                 path = f"/qualita-della-vita/classifica/{url_level}{suffix}"
-                expected = f"https://divarioitalia.it{path}"
                 response = client.get(path)
                 html = response.get_data(as_text=True)
                 self.assertEqual(response.status_code, 200, path)
-                self.assertIn(f'rel="canonical" href="{expected}"', html, path)
-                self.assertFalse(response.headers["X-Robots-Tag"].startswith("noindex"), path)
-                self.assertIn(expected, locs, path)
+                # Il canonical di ogni variante punta alla base; solo la base e'
+                # un documento indicizzabile e in sitemap.
+                self.assertIn(f'rel="canonical" href="{base}"', html, path)
+                if slug == qb.DEFAULT_PROFILE:
+                    self.assertFalse(response.headers["X-Robots-Tag"].startswith("noindex"), path)
+                    self.assertIn(base, locs, path)
+                else:
+                    self.assertEqual(response.headers["X-Robots-Tag"], "noindex, follow", path)
+                    self.assertIn('name="robots" content="noindex, follow"', html, path)
+                    self.assertNotIn(f"{base}?profilo={slug}", locs, path)
 
             invalid = f"/qualita-della-vita/classifica/{url_level}?profilo=inesistente"
             self.assertEqual(client.get(invalid).status_code, 404)
@@ -362,7 +369,7 @@ class QualityLifeBesEngineTest(unittest.TestCase):
             alias = f"/qualita-della-vita/classifica/{url_level}?profile=giovani"
             alias_response = client.get(alias)
             self.assertEqual(alias_response.status_code, 200)
-            self.assertTrue(alias_response.headers["X-Robots-Tag"].startswith("noindex"))
+            self.assertEqual(alias_response.headers["X-Robots-Tag"], "noindex, follow")
 
     def _provincial_matrix_with_fixture(self, **level_overrides):
         """Provincial matrix and ranking with the synthetic MEF series loaded,
