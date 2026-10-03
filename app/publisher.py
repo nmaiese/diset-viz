@@ -92,8 +92,8 @@ def editor_name():
 
 def titolare():
     """Chi e' il titolare del trattamento in /privacy: l'intestatario legale se
-    c'e', altrimenti il nome della firma. Non si inventa un nome: se manca, il
-    file dice `TODO titolare`."""
+    c'e', altrimenti il nome della firma (il ripiego serve al file di prova,
+    dove l'intestatario e' vuoto)."""
     ident = identity()
     return ident["intestatario_legale"] or ident["nome"]
 

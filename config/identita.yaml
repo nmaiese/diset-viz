@@ -23,7 +23,7 @@ url_autore: /chi-siamo
 # Profili esterni verificati e posseduti. Vuoti finche' non ce ne sono.
 same_as: []
 
-# Intestatario legale, titolare del trattamento in /privacy.
-# TODO titolare: indicare nome o ragione sociale. Finche' e' vuoto /privacy
-# mostra il nome della firma.
-intestatario_legale: ""
+# Intestatario legale, titolare del trattamento. Compare solo in /privacy:
+# non firma gli articoli, non sta in /chi-siamo, nei JSON-LD, nel feed, ne'
+# nel footer.
+intestatario_legale: "Aniello Maiese"

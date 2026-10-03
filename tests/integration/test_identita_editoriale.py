@@ -62,7 +62,9 @@ class IdentitaEditorialeTest(unittest.TestCase):
         ident = publisher.identity()
         self.assertEqual(ident["tipo"], "organizzazione")
         self.assertEqual(ident["same_as"], [])
-        self.assertEqual(ident["intestatario_legale"], "", "TODO titolare: l'intestatario non si inventa")
+        self.assertTrue(ident["intestatario_legale"], "l'intestatario legale non si lascia vuoto")
+        self.assertNotEqual(ident["intestatario_legale"], ident["nome"],
+                            "l'intestatario legale e' una persona, non la firma")
         articolo = self.client.get(f"/blog/{self.slug}")
         autore = trova(jsonld(articolo), "Article")["author"]
         self.assertEqual(autore["@type"], "Organization")
@@ -107,6 +109,36 @@ class IdentitaEditorialeTest(unittest.TestCase):
         self.assertEqual(publisher.identity()["tipo"], "organizzazione")
         self.assertNotIn(NOME_DI_PROVA, self.client.get("/chi-siamo").get_data(as_text=True))
 
+    def test_intestatario_legale_solo_in_privacy(self):
+        """L'intestatario legale firma /privacy e nessun'altra superficie.
+
+        Il titolare del trattamento compare solo nella pagina privacy: non
+        firma gli articoli, non sta in /chi-siamo, nei JSON-LD, nel feed,
+        nella home/footer, nella sitemap, ne' nel markdown per gli agenti."""
+        intestatario = publisher.identity()["intestatario_legale"]
+        self.assertTrue(intestatario)
+
+        privacy = self.client.get("/privacy").get_data(as_text=True)
+        self.assertIn(intestatario, privacy)
+        self.assertIn("che pubblica Divario Italia", privacy)
+
+        for percorso in ("/chi-siamo", "/blog", "/", "/sitemap.xml"):
+            with self.subTest(percorso=percorso):
+                self.assertNotIn(intestatario, self.client.get(percorso).get_data(as_text=True))
+
+        feed = self.client.get("/blog/feed.xml").get_data(as_text=True)
+        self.assertNotIn(intestatario, feed)
+
+        articolo = self.client.get(f"/blog/{self.slug}")
+        testo = articolo.get_data(as_text=True)
+        self.assertNotIn(intestatario, testo, "l'intestatario non firma l'articolo")
+        self.assertNotIn(intestatario, json.dumps(jsonld(articolo), ensure_ascii=False))
+
+        from app import agent_discovery, blog
+        post = blog.get_post(self.slug)
+        self.assertNotIn(intestatario, agent_discovery.blog_post_markdown(post, "https://x"))
+        self.assertNotIn(intestatario, agent_discovery.blog_index_markdown([post], "https://x"))
+
     def test_tipo_non_ammesso_o_nome_vuoto_falliscono(self):
         with tempfile.TemporaryDirectory() as cartella:
             for contenuto in ("tipo: azienda\nnome: X\n", "tipo: persona\nnome: ''\n"):
@@ -117,9 +149,12 @@ class IdentitaEditorialeTest(unittest.TestCase):
                         publisher.identity()
 
     def test_nessuna_firma_codificata_fuori_dal_file_di_identita(self):
-        """Il grep dell'accettazione: il nome della firma sta solo nel file."""
-        nome = publisher.identity()["nome"]
-        for vecchio in (nome, "Aniello Maiese", "Maiese"):
+        """Il grep dell'accettazione: firma e intestatario stanno solo nel file."""
+        ident = publisher.identity()
+        nomi = {ident["nome"], ident["intestatario_legale"]}
+        if ident["intestatario_legale"]:
+            nomi.add(ident["intestatario_legale"].split()[-1])
+        for vecchio in sorted(nomi):
             risultato = subprocess.run(
                 ["git", "grep", "-n", "-I", vecchio, "--", "app", "scripts", "tests", "config", "Dockerfile",
                  ":(exclude)config/identita.yaml", ":(exclude)tests/integration/test_identita_editoriale.py"],

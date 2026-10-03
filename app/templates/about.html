@@ -41,7 +41,7 @@
     <p>Divario Italia è fondato e curato da <strong>{{ author_name() }}</strong>. Sceglie quali indicatori approfondire e in che ordine, legge e approva ogni indicatore, ogni articolo e ogni correzione prima che vada online, e risponde di quello che il sito pubblica. Per il lavoro di scrittura e di controllo usa anche strumenti automatici, come racconta la <a href="/metodologia#come-nasce-il-testo">pagina di metodo</a>: le cifre vengono sempre dalle fonti istituzionali, e la decisione su che cosa pubblicare resta sua.</p>
     {%- else %}
     <p>I contenuti di Divario Italia sono firmati dalla redazione, <strong>{{ author_name() }}</strong>. La redazione sceglie quali indicatori approfondire e in che ordine, legge e approva ogni indicatore, ogni articolo e ogni correzione prima che vada online, e risponde di quello che il sito pubblica. Per il lavoro di scrittura e di controllo usa anche strumenti automatici, come racconta la <a href="/metodologia#come-nasce-il-testo">pagina di metodo</a>: le cifre vengono sempre dalle fonti istituzionali, e la decisione su che cosa pubblicare resta umana.</p>
-    {#- TODO titolare: indicare qui chi risponde legalmente, quando vorrà dirlo, in `config/identita.yaml`. #}
+    {#- L'intestatario legale non sta qui: compare solo in /privacy, non in /chi-siamo. #}
     {%- endif %}
     <p>{% if identity().tipo == "persona" %}Gli si scrive{% else %}Si scrive alla redazione{% endif %} a <!--email_off--><a href="mailto:{{ contact_email }}">{{ contact_email }}</a><!--email_on-->, per una correzione, una domanda sul metodo o una proposta.</p>
   </section>
