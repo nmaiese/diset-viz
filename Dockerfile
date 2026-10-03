@@ -58,6 +58,7 @@ COPY data/ data/
 # accorge. Si copia il solo file e non `config/`: il resto della cartella non e'
 # mai stato nell'immagine e una COPY larga cambierebbe cio' che le altre pagine leggono.
 COPY config/game_indicators.csv config/game_indicators.csv
+COPY config/identita.yaml config/identita.yaml
 COPY run.py .
 COPY --from=frontend-build /build/app/static/dist app/static/dist
 

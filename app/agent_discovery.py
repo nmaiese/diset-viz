@@ -8,7 +8,7 @@ from pathlib import Path
 
 from flask import Response, request
 
-from app import it_numbers
+from app import it_numbers, publisher
 from app.design import numfmt
 
 
@@ -396,7 +396,7 @@ def blog_index_markdown(posts, site_url):
         lines += [
             f"## [{post['title']}]({post['url']})",
             "",
-            f"{post['date'].isoformat()} · {post['author']} · {post['read_time']} min",
+            f"{post['date'].isoformat()} · {publisher.editor_name()} · {post['read_time']} min",
             "",
             _clean(post["description"]),
             "",
@@ -411,7 +411,7 @@ def blog_post_markdown(post, site_url):
         "",
         f"Data: {post['date'].isoformat()}",
         f"Ultima modifica: {post['date_modified'].isoformat()}",
-        f"Autore: {post['author']}",
+        f"Autore: {publisher.editor_name()}",
         f"URL canonica: {post['url']}",
         "",
         _clean(post["description"]),

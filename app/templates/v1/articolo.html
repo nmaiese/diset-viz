@@ -65,7 +65,7 @@
   "image": [{{ og_image_abs | tojson }}],
   "datePublished": "{{ post.date.isoformat() }}",
   "dateModified": "{{ post.date_modified.isoformat() }}",
-  "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
+  "author": {{ author_jsonld() | safe }},
   "publisher": {{ publisher_jsonld | safe }},
   "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
   {% if post.indicator_meta %}"about": {
@@ -115,7 +115,7 @@
     <h1 class="h-display">{{ post.title }}</h1>
     <p class="lede">{{ post.description }}</p>
     <p class="meta">
-      <span class="byline">Di <a href="/chi-siamo">{{ post.author }}</a></span>
+      <span class="byline">Di <a href="{{ identity().url_autore }}">{{ author_name() }}</a></span>
       <span>Pubblicato il <time datetime="{{ post.date }}">{{ d.published }}</time></span>
       {% if d.modified %}<span>Aggiornato il <time datetime="{{ post.date_modified }}">{{ d.modified }}</time></span>{% endif %}
       {% if post.read_time %}<span>{{ post.read_time | num(None, 'count') }} {{ 'minuto' if post.read_time == 1 else 'minuti' }} di lettura</span>{% endif %}

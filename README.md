@@ -69,7 +69,6 @@ seo_title: "Short SERP title if different from the H1"
 slug: optional-custom-slug          # otherwise derived from the filename
 description: "Meta description, ~155 chars, used for SEO and Open Graph."
 date: 2026-06-19
-author: "Redazione Divario Italia"
 cover: /static/img/blog/your-cover.svg
 cover_alt: "Accessible description of the cover"
 tags: [Turismo, Divario Nord-Sud]
@@ -77,6 +76,9 @@ indicator: 105                      # optional: links the post to catalog indica
 indicator_label: "Tasso di turisticità (2024)"
 draft: false                        # set true to hide
 ---
+
+L'autore non si scrive nel frontmatter: la firma di ogni articolo viene da
+`config/identita.yaml` (un campo `author` nel frontmatter e' ignorato).
 
 Body in Markdown. Tables, lists and `> blockquotes` are supported. Add
 `{: .data-callout}` after a paragraph to render it as a highlighted data box,
