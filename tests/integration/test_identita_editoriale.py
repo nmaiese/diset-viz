@@ -9,14 +9,39 @@ import re
 import subprocess
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
+from html import unescape
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 from unittest import mock
 
-from app import app, publisher
+from flask import Response
+
+from app import agent_discovery, app, publisher
 
 ROOT = Path(__file__).resolve().parents[2]
 # Il gestore GitHub personale: non deve comparire in nessuna pagina servita.
 GESTORE_GITHUB = "nm" + "aiese"
+COGNOME_TITOLARE = "mai" + "ese"
+EMAIL_PERSONALE = COGNOME_TITOLARE + ".next" + "@" + "gmail" + ".com"
+# TODO titolare: aggiungere il dominio personale se esiste
+DOMINI_PERSONALI = ()
+GESTORI_GITHUB_AMMESSI = {
+    # Organizzazione che pubblica dati, citata come fonte in app/sources.py.
+    "openpolis",
+}
+# Rotte GET senza parametri che richiedono una sessione oppure rifiutano una
+# richiesta priva dei parametri obbligatori. Il test verifica sotto che restino
+# 4xx: quando una diventa pubblicamente servibile va rimossa da questa mappa.
+GET_ENDPOINTS_4XX = {
+    "account_export_api": "richiede autenticazione",
+    "atlante_modulo": "richiede il parametro tema",
+    "comparisons_list_api": "richiede autenticazione",
+    "favorites_list_api": "richiede autenticazione",
+    "leaderboard_get_api": "richiede il parametro game",
+    "game_order_round_api": "richiede una sessione di gioco",
+    "player_me_api": "richiede autenticazione",
+}
 NOME_DI_PROVA = "Zeta Provaldi"
 IDENTITA_PERSONA = f"""\
 tipo: persona
@@ -46,6 +71,82 @@ def trova(nodi, tipo):
             if trovato:
                 return trovato
     return None
+
+
+def find_personal_identifiers(response, path):
+    """Restituisce gli identificativi personali trovati in una risposta testuale."""
+    if not (response.mimetype.startswith("text/") or response.mimetype.endswith(("json", "xml"))
+            or response.mimetype == "application/linkset+json"):
+        return set()
+
+    text = unquote(unescape(response.get_data(as_text=True))).casefold()
+    found = set()
+    legal_holder = unescape(publisher.identity()["intestatario_legale"]).casefold()
+    surname_text = text.replace(legal_holder, "") if path == "/privacy" else text
+
+    if COGNOME_TITOLARE in surname_text:
+        found.add("cognome")
+    if GESTORE_GITHUB in text:
+        found.add("gestore_github")
+    if EMAIL_PERSONALE in text:
+        found.add("email_personale")
+    if "linkedin" + ".com/in/" in text:
+        found.add("linkedin")
+    for handle in re.findall(r"github\.com/([a-z0-9-]+)", text):
+        if handle not in GESTORI_GITHUB_AMMESSI:
+            found.add("github_personale")
+    for domain in DOMINI_PERSONALI:
+        if domain.casefold() in text:
+            found.add("dominio_personale")
+    return found
+
+
+def served_paths(client):
+    """Costruisce le URL pubbliche da sitemap e regole GET, senza liste a mano.
+
+    Le regole con parametri entrano tramite la prima URL della sitemap che le
+    istanzia. Quelle senza rappresentante in sitemap restano fuori: senza un
+    valore canonico non esiste una richiesta pubblica deterministica da fare.
+    """
+    response = client.get("/sitemap.xml")
+    if response.status_code != 200:
+        raise AssertionError(f"/sitemap.xml risponde {response.status_code}")
+    root = ET.fromstring(response.data)
+    response.close()
+    sitemap_paths = [urlsplit(node.text).path for node in root.findall("{*}url/{*}loc")]
+    paths = set(sitemap_paths)
+
+    adapter = app.url_map.bind("divarioitalia.it")
+    first_sitemap_path = {}
+    for path in sitemap_paths:
+        rule, _ = adapter.match(path, method="GET", return_rule=True)
+        first_sitemap_path.setdefault((rule.rule, rule.endpoint), path)
+
+    for rule in app.url_map.iter_rules():
+        if "GET" not in rule.methods or rule.endpoint == "static":
+            continue
+        if rule.arguments:
+            representative = first_sitemap_path.get((rule.rule, rule.endpoint))
+            if representative:
+                paths.add(representative)
+        elif rule.endpoint not in GET_ENDPOINTS_4XX:
+            paths.add(rule.rule)
+    return sorted(paths)
+
+
+class RicercaIdentificativiPersonaliTest(unittest.TestCase):
+    def test_la_ricerca_riconosce_ogni_forma_vietata(self):
+        casi = (
+            ("cognome", "MAI&#101;SE", "cognome"),
+            ("gestore GitHub", "GitHub.com/NM" + "AIESE", "gestore_github"),
+            ("email personale", EMAIL_PERSONALE.replace("@", "%40"), "email_personale"),
+            ("LinkedIn", "LINKEDIN.COM&#47;IN/profilo", "linkedin"),
+            ("altro gestore GitHub", "github.com/altro-handle", "github_personale"),
+        )
+        for nome, corpo, atteso in casi:
+            with self.subTest(nome=nome):
+                risposta = Response(corpo, content_type="text/plain")
+                self.assertIn(atteso, find_personal_identifiers(risposta, "/"))
 
 
 class IdentitaEditorialeTest(unittest.TestCase):
@@ -141,29 +242,62 @@ class IdentitaEditorialeTest(unittest.TestCase):
         self.assertNotIn(intestatario, agent_discovery.blog_post_markdown(post, "https://x"))
         self.assertNotIn(intestatario, agent_discovery.blog_index_markdown([post], "https://x"))
 
-    def test_il_gestore_personale_non_esce_dalle_rotte_pubbliche(self):
-        percorsi = (
-            "/", "/blog", f"/blog/{self.slug}", "/legacy", "/catalogo-dati",
-            "/sitemap.xml", "/chi-siamo", "/contatti", "/privacy", "/termini", "/metodologia",
-            "/blog/feed.xml", "/robots.txt", "/llms.txt",
-        )
-        gestore = GESTORE_GITHUB
-        for percorso in percorsi:
-            with self.subTest(percorso=percorso):
-                risposta = self.client.get(percorso)
-                self.assertEqual(risposta.status_code, 200)
-                testo = risposta.get_data(as_text=True).lower()
-                self.assertNotIn(f"github.com/{gestore}", testo)
-                self.assertNotIn(gestore, testo)
+    def test_gli_identificativi_personali_non_escono_da_nessuna_rotta_pubblica(self):
+        paths = served_paths(self.client)
+        self.assertGreater(len(paths), 600, f"visitate solo {len(paths)} rotte")
 
-        from app import agent_discovery, blog
-        post = blog.get_post(self.slug)
-        for nome, markdown in (
-            ("articolo", agent_discovery.blog_post_markdown(post, "https://x")),
-            ("indice", agent_discovery.blog_index_markdown([post], "https://x")),
-        ):
-            with self.subTest(markdown=nome):
-                self.assertNotIn(gestore, markdown.lower())
+        required = {
+            "/legacy", "/legacy-reddito", "/llms.txt", "/llms-full.txt",
+            "/robots.txt", "/blog/feed.xml", "/openapi.json",
+        }
+        required.update(
+            rule.rule for rule in app.url_map.iter_rules()
+            if rule.rule.startswith("/.well-known/")
+        )
+        self.assertFalse(required.difference(paths),
+                         f"rotte obbligatorie non visitate: {sorted(required.difference(paths))}")
+
+        excluded = {
+            rule.endpoint: rule for rule in app.url_map.iter_rules()
+            if rule.endpoint in GET_ENDPOINTS_4XX
+        }
+        self.assertEqual(set(excluded), set(GET_ENDPOINTS_4XX),
+                         "una esclusione non corrisponde piu' a una regola GET")
+        for endpoint, rule in excluded.items():
+            with self.subTest(esclusa=rule.rule, motivo=GET_ENDPOINTS_4XX[endpoint]):
+                response = self.client.get(rule.rule)
+                try:
+                    self.assertGreaterEqual(
+                        response.status_code, 400,
+                        f"{rule.rule} ora risponde {response.status_code}: rimuovere l'esclusione",
+                    )
+                finally:
+                    response.close()
+
+        leaks = {}
+        unreachable = {}
+        variants_visited = 0
+        for path in paths:
+            responses = [(path, self.client.get(path))]
+            if agent_discovery.markdown_available(path):
+                responses.append((f"{path} [text/markdown]", self.client.get(
+                    path, headers={"Accept": "text/markdown"},
+                )))
+            for label, response in responses:
+                variants_visited += 1
+                try:
+                    if response.status_code >= 400:
+                        unreachable[label] = response.status_code
+                        continue
+                    found = find_personal_identifiers(response, path)
+                    if found:
+                        leaks[label] = sorted(found)
+                finally:
+                    response.close()
+
+        summary = f"{len(paths)} rotte e {variants_visited} risposte visitate"
+        self.assertEqual(unreachable, {}, f"{summary}; non raggiungibili: {unreachable}")
+        self.assertEqual(leaks, {}, f"{summary}; identificativi trovati: {leaks}")
 
     def test_tipo_non_ammesso_o_nome_vuoto_falliscono(self):
         with tempfile.TemporaryDirectory() as cartella:
