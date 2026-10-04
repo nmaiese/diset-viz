@@ -57,14 +57,11 @@ class W2Test(unittest.TestCase):
 
 
 class UrlInspectionTest(unittest.TestCase):
-    def test_ops_senza_script_search_console_dichiarato_non_disponibile(self):
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as tmp:
-            Path(tmp, "analytics.py").write_text("")
-            status = audit.url_inspection_status(Path(tmp))
+    def test_dichiarato_non_misurato_da_questo_script(self):
+        status = audit.url_inspection_status()
         self.assertFalse(status["available"])
-        self.assertIn("nessuno script Search Console", status["reason"])
+        self.assertIn("non misurato da questo script", status["reason"])
+        self.assertIn("webmasters.readonly", status["reason"])
 
 
 class BuildReportTest(unittest.TestCase):
@@ -108,6 +105,19 @@ class BuildReportTest(unittest.TestCase):
             path = audit.write_report(self._payload(), Path(tmp))
             self.assertEqual(path.name, "adsense_audit_20261003.md")
             self.assertTrue(path.exists())
+
+
+class NoNetTest(unittest.TestCase):
+    def test_no_net_stampa_e_non_scrive_il_report_del_giorno(self):
+        from unittest import mock
+        import contextlib
+        import io
+
+        with mock.patch.object(audit, "write_report") as write, \
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(audit.main(["--no-net"]), 0)
+        write.assert_not_called()
+        self.assertIn("URL Inspection", out.getvalue())
 
 
 if __name__ == "__main__":

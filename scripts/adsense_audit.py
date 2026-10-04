@@ -6,7 +6,7 @@ in ``reports/adsense_audit_<data>.md``. Sola lettura: non modifica il sito.
 
     PYTHONPATH=. bin/py scripts/adsense_audit.py            # scrive il report
     PYTHONPATH=. bin/py scripts/adsense_audit.py --json      # stampa i dati
-    PYTHONPATH=. bin/py scripts/adsense_audit.py --no-net    # solo misure dal repo
+    PYTHONPATH=. bin/py scripts/adsense_audit.py --no-net    # stampa le misure dal repo, non scrive
 
 Misura:
 
@@ -15,7 +15,8 @@ Misura:
   e risorse della pagina servita;
 - link rotti: legge il rapporto del check W2 se esiste, non lo rifa';
 - ads.txt: confronta il contenuto live con la riga attesa;
-- URL Inspection su Search Console: non c'e' script in ``~/dev/ops``, dichiarato.
+- URL Inspection su Search Console: non misurata qui, dichiarato (si misura con
+  uno script a parte, account di servizio, scope webmasters.readonly).
 
 Le funzioni pure (CMP, parsing asset, parsing W2, build del report) sono
 testabili senza rete in ``tests/unit/test_adsense_audit.py``.
@@ -24,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import urllib.error
@@ -49,8 +51,10 @@ PAGES = {
     "blog": "/blog/casa-affitti-mercato",
 }
 
-OPS_DIR = Path("/home/nilo/dev/ops")
-W2_REPORT = Path("/mnt/c/Users/Nilo/dev/trade5/review/divarioitalia_link_check/RAPPORTO.md")
+W2_REPORT = Path(os.environ.get(
+    "W2_REPORT",
+    Path.home() / "dev" / "trade5" / "review" / "divarioitalia_link_check" / "RAPPORTO.md",
+))
 
 _CMP_FILES = {
     "publisher": ROOT / "app" / "publisher.py",
@@ -215,18 +219,12 @@ def read_w2(path: Path = W2_REPORT) -> dict | None:
     return parse_w2(path.read_text(encoding="utf-8"))
 
 
-def url_inspection_status(ops_dir: Path = OPS_DIR) -> dict:
-    """URL Inspection su Search Console: raggiungibile solo se esiste uno script in ops."""
-    if not ops_dir.exists():
-        return {"available": False, "reason": f"{ops_dir} non esiste"}
-    scripts = sorted(p.name for p in ops_dir.iterdir() if p.is_file())
-    search_console = [name for name in scripts if "search" in name.lower() or "console" in name.lower()]
-    if search_console:
-        return {"available": True, "scripts": search_console}
+def url_inspection_status() -> dict:
+    """URL Inspection su Search Console: non la misura questo script."""
     return {
         "available": False,
-        "reason": "nessuno script Search Console in ~/dev/ops (solo GA4 analytics.py, Cloudflare, doctor.sh)",
-        "scripts": scripts,
+        "reason": "non misurato da questo script, si misura con uno script a parte "
+        "(account di servizio, scope webmasters.readonly)",
     }
 
 
@@ -285,7 +283,7 @@ def build_report(payload: dict) -> str:
     lines.append("")
     w2 = payload.get("w2")
     if w2 is None:
-        lines.append("- rapporto W2 assente, non leggibile.")
+        lines.append(f"- rapporto W2 assente o non leggibile ({W2_REPORT}): imposta W2_REPORT per indicarlo.")
     else:
         lines.append(f"- link rotti: {w2.get('link_rotti')}")
         lines.append(f"- link verso URL non in sitemap: {w2.get('fuori_sitemap')}")
@@ -297,7 +295,7 @@ def build_report(payload: dict) -> str:
     lines.append("## URL Inspection (Search Console)")
     lines.append("")
     url_inspection = payload["url_inspection"]
-    lines.append(f"- disponibile da CLI: {url_inspection['available']}")
+    lines.append(f"- misurato da questo script: {url_inspection['available']}")
     if not url_inspection["available"]:
         lines.append(f"- motivo: {url_inspection['reason']}")
     lines.append("")
@@ -357,6 +355,10 @@ def main(argv=None) -> int:
     payload = run(no_net=args.no_net, timeout=args.timeout)
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+        return 0
+    if args.no_net:
+        # Misure vuote: non devono sovrascrivere il report del giorno.
+        print(build_report(payload))
         return 0
     path = write_report(payload)
     print(f"report scritto: {path}")
