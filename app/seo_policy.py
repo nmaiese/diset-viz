@@ -2,6 +2,7 @@
 
 import csv
 import functools
+import logging
 from pathlib import Path
 
 from app.data import get_catalog
@@ -10,11 +11,15 @@ from app.data import get_catalog
 MIN_INDEXABLE_YEAR = 2020
 MIN_COMPLETENESS = 0.98
 REQUIRED_REGION_COUNT = 20
+# Sta in `config/` e non in `reports/` perche' il Dockerfile non copia
+# `reports/` nell'immagine: li' il file mancherebbe in produzione e la regola
+# fallirebbe aperta in silenzio. Un file letto a runtime vuole la sua COPY.
 INDICATOR_CLASSIFICATION = (
-    Path(__file__).resolve().parents[1]
-    / "reports"
-    / "adsense_indicator_classification_20261003.csv"
+    Path(__file__).resolve().parents[1] / "config" / "indicator_search_metrics.csv"
 )
+
+_log = logging.getLogger(__name__)
+_warned_missing_classification = False
 
 # Exploration query parameters that put an indicator or region page into an
 # in-page state (a chosen year, a focused region, a territorial level). They
@@ -58,6 +63,16 @@ def indicator_search_metrics():
     except (OSError, KeyError, TypeError, ValueError):
         # Un file assente o illeggibile non deve togliere per errore tutto
         # l'atlante dall'indice. I test verificano presenza, forma e conteggi.
+        # Il fallimento aperto resta, ma non piu' in silenzio: una volta sola,
+        # col percorso, cosi' in produzione si vede il buco e non una regola muta.
+        global _warned_missing_classification
+        if not _warned_missing_classification:
+            _warned_missing_classification = True
+            _log.warning(
+                "metriche GSC non leggibili da %s: la regola del contenuto risponde "
+                "True per tutto",
+                INDICATOR_CLASSIFICATION,
+            )
         return {}
 
 

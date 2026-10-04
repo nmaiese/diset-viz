@@ -1719,6 +1719,18 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
             "del giorno di Chi e' maggiore? e Ordina rispondono 500.",
         )
 
+    def test_the_indicator_search_metrics_csv_is_shipped(self):
+        """`app/seo_policy.py` legge `config/indicator_search_metrics.csv` a runtime.
+        `reports/` non entra nell'immagine: senza questa COPY la regola del contenuto
+        fallisce aperta in produzione e le schede senza prosa restano nell'indice, un
+        guasto che la suite qui, che gira col repo intero, non vede."""
+        text = (self.ROOT / "Dockerfile").read_text(encoding="utf-8")
+        self.assertRegex(
+            text, r"(?m)^COPY\s+config/indicator_search_metrics\.csv\s+config/indicator_search_metrics\.csv\s*$",
+            "il Dockerfile non copia config/indicator_search_metrics.csv: in produzione "
+            "la regola del contenuto fallisce aperta e le schede senza prosa restano nell'indice.",
+        )
+
     def test_dockerignore_keeps_runtime_state_out_of_the_image(self):
         """`COPY data/` spedisce la storia committata, ma `.gitignore` NON protegge
         il build context: solo `.dockerignore` lo fa. Un `docker build .` da un

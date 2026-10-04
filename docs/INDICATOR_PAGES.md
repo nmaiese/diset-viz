@@ -634,7 +634,7 @@ aggiornato quando se ne aggiunge uno.
 Non aggiungere paragrafi di riempimento. Le varianti quasi duplicate, incomplete
 o obsolete seguono le regole di indicizzazione definite in `app/profiles.py`.
 Dal 3 ottobre 2026 `app/seo_policy.py` applica anche la fotografia GSC versionata
-in `reports/adsense_indicator_classification_20261003.csv`: una scheda senza
+in `config/indicator_search_metrics.csv`: una scheda senza
 impressioni nei 28 giorni misurati resta `noindex, follow` finche' non riceve un
 lead o una sezione scritta. La prosa viene riletta a ogni nuovo processo, quindi
 la scheda rientra senza aggiornare una lista di ID. Una scheda assente dalla
