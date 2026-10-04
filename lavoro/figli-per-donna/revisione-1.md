@@ -1,0 +1,28 @@
+# Revisore pilota 2 (ter-922), sola lettura, c292977f
+## 1. Cifre: passano tutte (480 valori ricalcolati da data.get_indicator('922')['series'])
+- Conteggi >=1,3 soglia inclusiva, 2002-2025: 4, 4, 10, 8, 12, 14, 16, 16, 17, 16, 17, 15, 16, 14, 14, 11, 8, 6, 3, 3, 3, 2, 1, 1 (Calabria 1,30 nel 2012/2014/2017 dentro). Articolo: 17/20 nel 2010, 1 nel 2025, 4 nel 2002, 16 nel 2008, 14-17 fino al 2016, 8 nel 2018, 3 nel 2020, 1 nel 2024: giusto.
+- Sotto 1,1: zero 2007-2015 e 7 nel 2025 (Toscana 1,08, Basilicata 1,08, Abruzzo 1,07, Umbria 1,06, Lazio 1,05, Molise 1,02, Sardegna 0,85): giusto. Posti: Lombardia 3^a con 1,56 e Calabria 17^a con 1,32 nel 2010; Calabria 4^a con 1,19 e Lombardia 5^a con 1,16 nel 2025: giusto.
+- Calabria sempre fra 1,19 e 1,32; Lombardia 1,26 nel 2002, max 1,56, 1,16 nel 2025; sorpasso 2022 con 1,28 contro 1,25 (primo anno Calabria > Lombardia): giusto. Cals: VA 0,50, Lombardia 0,40, Lazio 0,39, Emilia-Romagna 0,38, poi Basilicata 0,12, Calabria 0,13, Sicilia 0,19, Campania 0,22. 0,40 = 3,08 volte 0,13: giusto.
+- Sardegna 0,33 = Veneto 0,33; Abruzzo 0,27 > Friuli 0,25 > Liguria 0,24. Pearson(valore 2010, calo) = 0,566. Dispersione 0,45 nel 2010 e 0,55 nel 2025; 0,42 -> 0,21 senza estremi. Sardegna 1,03 nel 2002, 0,85 nel 2025 (minimo assoluto), sotto 1 dal 2020 (2019 = 1,00). Campania prima nel 2002 con 1,47 davanti a TA 1,45; Sicilia 2024 = 1,27 e seconda, Trento 1,27 pari merito: giusto.
+- Le 6 citazioni letterali sono parola per parola in fonti.md e non vanno oltre quello che dicono. Nessuna causa regionale inventata.
+## 2. Rilievi
+R1 BLOCCANTE. Fonte di 1,51 e 1,27 sbagliata nel frontmatter. Il testo dice "Nel 2024, secondo l'Istat", ma external_figures le da' come "Istat, Indicatori demografici, anno 2025, 31 marzo 2026" con URL 2026/03: un PDF del 2026 non contiene il 2024 provinciale. fonti.md riga 4a le da' a "Istat 2024", cioe' il rapporto sull'anno 2024. Riga giusta per entrambe: source: Istat, Natalita' e fecondita' della popolazione residente, anno 2024, 21 ottobre 2025 + url: https://www.istat.it/wp-content/uploads/2025/10/Natalita-e-fecondita-della-popolazione-residente_Anno-2024.pdf
+R2 DA CORREGGERE. "La Lombardia e' quinta, a pari merito con il Veneto, con 1,16." Il sito non condivide mai un posto: la pagina live ter-922 da' 5 Lombardia, 6 Veneto, 10 Liguria, 11 Marche, 12 Puglia, 14 Basilicata, 15 Toscana. Il CSV usa la pari merito (5,5 poi 7; 10,10,10 poi 13; 14,14 poi 16) e anche il 2010 (6,6 poi 8; 10,10 poi 12; 12,12 poi 14). Stessa regola in app/design/common.py:229 e nel dossier (scripts/editoriale/brief.py:426).
+R3 DA CORREGGERE. 1087 parole di prosa contro il massimo mille di REVIEW.md (misura di verify.py, tabelle e fonti escluse); la sezione "Chi stava piu' in alto" ne pesa 338.
+R4 DA CORREGGERE. "Il sorpasso e' del 2022, l'anno in cui la Calabria e' risalita a 1,28 mentre la Lombardia scendeva a 1,25." Dato giusto, ma nel 2020 il divario era 0,01 (1,26 contro 1,27) e nel 2021 1,23 contro 1,27: su stime provvisorie l'anno esatto regge su un margine invisibile.
+R5 MINORE. "sono salite a sedici nel 2008": la salita non e' monotona (2004 dieci, 2005 otto, 2006 dodici, 2007 quattordici), e il pezzo che scrive "Il crollo non e' arrivato tutto insieme" ignora il gradino del 2005.
+R6 MINORE. "tre volte il calo della Calabria": 0,40 su 0,13 fa 3,08. Dire "poco piu' di tre volte".
+R7 MINORE. Il caveat "le fonti non lo dicono" due volte (righe 87 e 93). Tienine uno solo.
+R8 MINORE. 13 frasi su 65 aprono con "Il/La + nome", tre con "Il numero".
+R9 MINORE. Nessuna frase sotto le 6 parole (min 6, max 51, media 14,7): ritmo uniforme, manca la frase corta che STYLE.md chiede ogni tanto.
+R10 MINORE. CSV senza colonna chiave (il pilota 1 ce l'ha) e fonte che ripete "(2025 stima provvisoria)" anche dove il 2010 e' definitivo.
+R11 MINORE. "la correlazione e' 0,57" non dice Pearson ne' che e' un calcolo sulle venti regioni del sito; la figura 2 parte da 0,6 senza etichettare l'origine dell'asse.
+## 3. Figure, copertina, frontmatter: passano
+24 barre e 20 manubri riscalcolati (numeri, ordine, scale, geometrie); title e desc veri; cover_alt dice "grafico a barre" ed e' vero; "cerchio vuoto 2010" e' vero (.fig__pt-dot--old in articolo.css:97); link /regione/<chiave> alla prima menzione con valore (12 chiavi, tutte valide); marcatori da soli, entrambe le figure rendono e non resta commento; external_figures coerente col testo (5 numeri, 5 usati); description 159 caratteri; title 59; CSV 20 righe e valori giusti.
+## 4. Lista "non IA": passa
+Domanda reale e dato con fonte e anno nel lead, tesi nel title, esempi territoriali, 4 H2 narrative e uniche, niente apertura generica, niente chiusura riassuntiva (chiude su scheda e CSV), nessuna formula da IA, nessun nome di persona, zero — – ; ..., un'idea per frase, il caveat prende la sua frase, nessun numero due volte nella stessa frase, niente falsi intervalli ("Non e' nemmeno una divisione fra Nord e Sud"), una sola digressione. Si prende al primo passaggio.
+Tre frasi piu' da bot, con proposta:
+1. "Il risultato e' una classifica con gli estremi piu' lontani e il centro piu' stretto." -> "In testa e in fondo la classifica si e' allargata, in mezzo si e' stretta."
+2. "Poi la discesa: otto nel 2018, tre nel 2020, una nel 2024." -> "Poi e' scesa piu' netto. Erano otto nel 2018, sei nel 2019, tre nel 2020, una nel 2024."
+3. "Il modo piu' semplice per vedere che cosa e' cambiato e' seguire due regioni." -> togliere la dichiarazione di metodo: "La Lombardia era terza in Italia nel 2010. La Calabria era diciassettesima."
+VERDETTO: PRONTA dopo R1, R2, R3, R4. R1 non deve passare cosi' com'e'.
