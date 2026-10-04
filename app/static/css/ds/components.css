@@ -572,6 +572,28 @@ details.more[open] > summary { color: var(--ink); }
 }
 .cite p { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink); overflow-wrap: anywhere; }
 .cite .btn { justify-self: start; min-height: 36px; font-size: var(--fs-small); }
+
+/* ---------- dati e metodo ----------
+   La firma, la fonte e la freschezza: un riquadro compatto che ogni pagina
+   indicizzabile mostra in fondo, sempre con la stessa forma. Nessun colore
+   cotto, solo i token: la pagina scura lo segue da sola. */
+.dati-metodo {
+  max-width: 48rem;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+  border-left: 3px solid var(--rule-strong);
+  background: var(--surface-1);
+}
+.dati-metodo p { font-size: var(--fs-small); line-height: var(--lh-small); }
+.dati-metodo__fonte { color: var(--ink); }
+.dati-metodo__fonte a { color: var(--ink); }
+.dati-metodo__data,
+.dati-metodo__limiti,
+.dati-metodo__firma { color: var(--text-2); }
+.dati-metodo__firma a { color: var(--text-2); }
+
 .linkarrow { font-weight: 600; text-decoration: none; }
 .linkarrow::after { content: " \2192"; }
 .linkarrow:hover { text-decoration: underline; }

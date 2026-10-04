@@ -1,5 +1,6 @@
 {% extends "blog_base.html" %}
 {% import "v1/_ui.html" as ui %}
+{% import "v1/_dati_metodo.html" as dm with context %}
 {% import "_breadcrumb.html" as breadcrumb %}
 {#- La pagina di un tema della 1.0 (`/tema/<slug>`).
 
@@ -198,6 +199,12 @@
     </ul>
   </section>
   {% endif %}
+
+  <section class="section" id="dati-metodo" aria-labelledby="h-dati-metodo">
+    <h2 id="h-dati-metodo">Dati e metodo</h2>
+    {% set src = page_source('theme') %}
+    {{ dm.box(src.label, src.url, src.updated, "Il punteggio non pesa gli indicatori per importanza e non è una classifica ufficiale.") }}
+  </section>
 </div>
 
 <section class="band tema-next" id="continua" aria-labelledby="h-continua">
