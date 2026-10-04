@@ -130,7 +130,7 @@ def level_pages(listed=False):
     le elenca o le misura le deve vedere. `indexable_catalog()` resta una voce
     per scheda, con la sua forma. Manca la base che ha il canonical su un'altra
     scheda (`indicator_view.canonical_elsewhere`, la vista regionale di
-    bes-01SAL001): indicizzabile, ma elencata dalla sua canonica.
+    bes-01SAL001): elencata dalla sua canonica quando e' indicizzabile.
 
     Ogni voce: `meta` e `levels` della scheda (come in `indexable_catalog`),
     `level` (il riassunto del livello), `path` (il canonico del livello) e
@@ -159,8 +159,8 @@ def _rule_level_pages():
             if not indicator_view.level_passes_rule(meta, level["key"], base_key):
                 continue
             # Una vista col canonical su un'altra scheda (bes-01SAL001 regionale,
-            # verso ter-910) resta indicizzabile, cioe' senza `noindex`, ma la
-            # sitemap e llms-full elencano solo la scheda canonica.
+            # verso ter-910) non va elencata a parte. Un'altra regola puo'
+            # comunque rendere l'intera scheda `noindex` prima di questo punto.
             if indicator_view.canonical_elsewhere(meta, level["key"]):
                 continue
             pages.append({

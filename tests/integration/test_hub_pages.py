@@ -11,7 +11,7 @@ import unittest
 from html import unescape
 from pathlib import Path
 
-from app import app
+from app import app, indicator_universe
 
 
 INDEX_HEADER = "index, follow, max-snippet:-1, max-image-preview:large"
@@ -1230,10 +1230,29 @@ class LeProvincePerLeMacchine(unittest.TestCase):
         self.assertIn("/province\n", markdown + "\n")
 
     def test_llms_full_e_lo_skill_dicono_dove_stanno_i_valori_per_provincia(self):
+        # Un esempio indicizzabile: la `/province` di bes-01SAL001 e' `noindex`
+        # (classe b) e non sta in llms-full.
         completo = self.client.get("/llms-full.txt").get_data(as_text=True)
-        self.assertIn("bes-01SAL001/province", completo)
+        self.assertIn("bes-03LAV001-N22/province", completo)
         skill = self.client.get("/.well-known/agent-skills/query-divario-italia/SKILL.md").get_data(as_text=True)
-        self.assertIn("bes-01SAL001/province", skill)
+        self.assertIn("bes-03LAV001-N22/province", skill)
+
+    def test_ogni_link_province_di_llms_full_e_dello_skill_e_indicizzabile(self):
+        """Un agente che segue un esempio non deve finire su una pagina `noindex`."""
+        completo = self.client.get("/llms-full.txt").get_data(as_text=True)
+        skill = self.client.get("/.well-known/agent-skills/query-divario-italia/SKILL.md").get_data(as_text=True)
+        with app.app_context():
+            indicizzabili = {page["path"] for page in indicator_universe.level_pages()}
+        for nome, testo in (("llms-full", completo), ("SKILL.md", skill)):
+            percorsi = set(re.findall(r"/indicatore/[a-z0-9-]+/[A-Za-z0-9-]+/province\b", testo))
+            self.assertTrue(percorsi or nome == "llms-full", nome)
+            for percorso in sorted(percorsi):
+                with self.subTest(fonte=nome, percorso=percorso):
+                    self.assertIn(percorso, indicizzabili)
+                    risposta = self.client.get(percorso)
+                    self.assertEqual(risposta.status_code, 200)
+                    self.assertNotIn("noindex", risposta.headers.get("X-Robots-Tag", ""))
+                    self.assertNotRegex(risposta.get_data(as_text=True), r'<meta name="robots" content="[^"]*noindex')
 
     def test_home_e_metodologia_in_markdown_portano_le_province(self):
         for percorso in ("/", "/metodologia"):

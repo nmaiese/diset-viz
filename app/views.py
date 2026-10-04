@@ -153,10 +153,10 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         # porta il numero, che segue il dato.
         {"path": "/province", "content_type": "text/html", "marker": "province italiane, regione per regione</h1>", "kind": "html", "markdown_marker": "province italiane, regione per regione"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
-        # La vista provinciale di una scheda a due livelli, una pagina a se'
-        # dal 25/9/2026: indicizzata finche' `seo_policy.LEVEL_PAGES_INDEXABLE`
-        # e' acceso. Spegnendolo, questa voce va spostata su `x_robots`.
-        {"path": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province", "content_type": "text/html", "marker": "<link rel=\"canonical\" href=\"https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province\">", "kind": "html", "markdown_marker": "URL canonica: https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province"},
+        # La vista provinciale di una scheda a due livelli resta raggiungibile,
+        # ma la fotografia GSC del 3/10 la tiene fuori dall'indice finche' non
+        # riceve prosa scritta o impressioni.
+        {"path": "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province", "content_type": "text/html", "marker": "<link rel=\"canonical\" href=\"https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province\">", "kind": "html", "markdown_marker": "URL canonica: https://divarioitalia.it/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001/province", "x_robots": "noindex, follow"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
         {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
     ),

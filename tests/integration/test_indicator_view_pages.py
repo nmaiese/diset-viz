@@ -13,6 +13,7 @@ Rendering all of them costs several seconds, which is worth paying, just not
 on every edit-save cycle.
 """
 
+import csv
 import json
 import re
 import unittest
@@ -240,11 +241,21 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 ))
         self.assertEqual(wrong, [], f"sitemap and pages disagree: {wrong[:10]}")
 
+    PROVINCE_INDICIZZATE = 15
+    PROVINCE_NON_INDICIZZATE = 22
+    VISTE_TOLTE_DALLA_CLASSE_B = (
+        "bes:01SAL001",
+        "bes:12SER025",
+        "aci:autovetture-alimentazione-alternativa",
+        "aci:autovetture-ante-2009",
+        "agcom:copertura-ftth",
+    )
+
     def test_the_provincial_view_is_its_own_page_indexed_by_the_level_rule(self):
         """La `/province` di ogni scheda a due livelli: 200, canonical su se'
-        stessa, e `index` solo se il suo livello provinciale passa la regola
-        (copertura almeno 0,8 e anno almeno 2023). Sono 17 e 17: se il conto
-        cambia e' cambiato il dato, e il numero va riletto, non allargato."""
+        stessa, e `index` solo se la scheda passa la regola editoriale e il suo
+        livello provinciale passa la regola dati (copertura almeno 0,8 e anno
+        almeno 2023)."""
         from app import indicator_universe
 
         two_level = [
@@ -274,8 +285,25 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 else:
                     self.assertTrue(robots.startswith("index, follow"), robots)
                     indexed.add(path)
-        from tests.integration.test_url_migration import province_views_expected
-        self.assertEqual((len(indexed), len(not_indexed)), (province_views_expected(), 17))
+        # Il numero va riletto, non allargato. Su master erano 20 indicizzate e
+        # 17 no. Cinque schede a due livelli sono in classe b nella fotografia
+        # GSC (nessuna impressione, nessuna prosa) e la regola AdSense ne toglie
+        # la vista: 20 - 5 = 15 indicizzate, 17 + 5 = 22 no. L'ancora e' qui,
+        # nel CSV statico, non nella funzione che calcola l'attesa.
+        classe_b = {
+            row["indicatore"]
+            for row in csv.DictReader(
+                (Path(__file__).resolve().parents[2] / "config" / "indicator_search_metrics.csv").open(encoding="utf-8")
+            )
+            if row["classe"] == "b"
+        }
+        self.assertEqual(
+            classe_b & set(self.VISTE_TOLTE_DALLA_CLASSE_B), set(self.VISTE_TOLTE_DALLA_CLASSE_B)
+        )
+        self.assertEqual(
+            (len(indexed), len(not_indexed)),
+            (self.PROVINCE_INDICIZZATE, self.PROVINCE_NON_INDICIZZATE),
+        )
         listed = {page["path"] for page in indicator_universe.level_pages() if not page["base"]}
         self.assertEqual(indexed, listed)
 

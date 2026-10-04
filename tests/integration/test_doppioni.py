@@ -1,8 +1,8 @@
 """Le decisioni 1 e 2 del piano SEO sui doppioni fra schede BES e territoriali.
 
 1. Le regioni di bes-01SAL001 sono ter-910 cella per cella: canonical verso
-   ter-910, fuori dalla sitemap, ma senza `noindex` (canonical e `noindex`
-   insieme sono due segnali contrari). La `/province` resta una pagina a se'.
+   ter-910. La fotografia GSC del 3/10 tiene tutta la scheda fuori dall'indice
+   finche' non riceve prosa scritta o impressioni.
 2. `DUPLICATE_BES_IDS` diceva "identical values" di serie che non lo sono:
    10AMB008, 12SER006 e 12SER025 sono schede a se', con un H1 che le
    distingue, e per le due SDG la navigazione mostra la BES, indicizzabile e
@@ -69,13 +69,13 @@ class LeRegioniDellaSperanzaDiVitaHannoIlCanonicalSuTer910(unittest.TestCase):
     def setUpClass(cls):
         cls.client = app.test_client()
 
-    def test_la_base_porta_il_canonical_su_ter_910_senza_noindex(self):
+    def test_la_base_porta_il_canonical_su_ter_910_con_noindex(self):
         response = self.client.get(BASE)
         self.assertEqual(response.status_code, 200)
         head = _head(response)
         self.assertEqual(head["canonical"], f"{SITE_URL}{TER_910}")
-        self.assertNotIn("noindex", head["robots"])
-        self.assertNotIn("noindex", head["x_robots"])
+        self.assertEqual(head["robots"], "noindex, follow")
+        self.assertEqual(head["x_robots"], "noindex, follow")
 
     def test_la_base_in_markdown_dice_la_stessa_url_canonica(self):
         response = self.client.get(BASE, headers={"Accept": "text/markdown"})
@@ -85,58 +85,57 @@ class LeRegioniDellaSperanzaDiVitaHannoIlCanonicalSuTer910(unittest.TestCase):
         # `Content-Location` descrive la rappresentazione servita: resta l'URL
         # della pagina, non quello del canonical.
         self.assertEqual(head["content_location"], f"{SITE_URL}{BASE}")
-        self.assertNotIn("noindex", head["x_robots"])
+        self.assertEqual(head["x_robots"], "noindex, follow")
 
-    def test_la_province_resta_canonica_di_se_stessa_e_indicizzata(self):
+    def test_la_province_resta_canonica_di_se_stessa_ma_noindex(self):
         for accept in ({}, {"Accept": "text/markdown"}):
             with self.subTest(accept=accept):
                 response = self.client.get(PROVINCE, headers=accept)
                 self.assertEqual(response.status_code, 200)
                 head = _head(response)
                 self.assertEqual(head["canonical"] or head["md_canonical"], f"{SITE_URL}{PROVINCE}")
-                self.assertNotIn("noindex", head["robots"] or "")
-                self.assertNotIn("noindex", head["x_robots"])
+                if accept:
+                    self.assertIsNone(head["robots"])
+                else:
+                    self.assertEqual(head["robots"], "noindex, follow")
+                self.assertEqual(head["x_robots"], "noindex, follow")
 
     def test_ter_910_resta_senza_province(self):
         self.assertEqual(self.client.get(TER_910).status_code, 200)
         self.assertEqual(self.client.get(TER_910 + "/province").status_code, 404)
 
-    def test_la_sitemap_ha_la_province_e_ter_910_e_non_la_base(self):
+    def test_la_sitemap_ha_ter_910_ma_non_la_scheda_bes(self):
         sitemap = self.client.get("/sitemap.xml").get_data(as_text=True)
         locs = set(re.findall(r"<loc>(.*?)</loc>", sitemap))
-        self.assertIn(f"{SITE_URL}{PROVINCE}", locs)
+        self.assertNotIn(f"{SITE_URL}{PROVINCE}", locs)
         self.assertIn(f"{SITE_URL}{TER_910}", locs)
         self.assertNotIn(f"{SITE_URL}{BASE}", locs)
 
-    def test_llms_full_elenca_la_province_e_non_la_base(self):
+    def test_llms_full_non_elenca_la_scheda_bes(self):
         corpus = self.client.get("/llms-full.txt").get_data(as_text=True)
-        self.assertIn(f"({SITE_URL}{PROVINCE})", corpus)
+        self.assertNotIn(f"({SITE_URL}{PROVINCE})", corpus)
         self.assertNotIn(f"({SITE_URL}{BASE})", corpus)
         self.assertNotIn(f"{SITE_URL}{BASE}\n", corpus)
 
-    def test_la_voce_della_province_non_porta_i_download_delle_regioni(self):
-        """Il CSV e il JSON di bes-01SAL001 hanno solo le regioni: la voce che
-        e' la `/province`, in llms-full e nel catalogo dati, non li offre. La
-        scheda regionale li tiene."""
+    def test_la_scheda_noindex_non_porta_download_nelle_liste(self):
         corpus = self.client.get("/llms-full.txt").get_data(as_text=True)
         self.assertNotIn("bes:01SAL001.csv", corpus)
         self.assertNotIn("bes:01SAL001.json", corpus)
         with app.test_request_context():
-            entry = next(e for e in views._listed_indicator_entries() if e["path"] == PROVINCE)
-            ter = next(e for e in views._listed_indicator_entries() if e["path"] == TER_910)
-        self.assertIsNone(entry["downloads"])
-        self.assertTrue(entry["meta"]["downloads"])  # la meta della scheda non si tocca
+            entries = views._listed_indicator_entries()
+            ter = next(e for e in entries if e["path"] == TER_910)
+        self.assertNotIn(PROVINCE, {entry["path"] for entry in entries})
         self.assertTrue(ter["downloads"])
         for accept in ({}, {"Accept": "text/markdown"}):
             with self.subTest(accept=accept):
                 page = self.client.get("/catalogo-dati", headers=accept).get_data(as_text=True)
                 self.assertNotIn("bes:01SAL001.csv", page)
 
-    def test_il_catalogo_dati_elenca_la_province_e_non_la_base(self):
+    def test_il_catalogo_dati_non_elenca_la_scheda_bes(self):
         for accept in ({}, {"Accept": "text/markdown"}):
             with self.subTest(accept=accept):
                 page = self.client.get("/catalogo-dati", headers=accept).get_data(as_text=True)
-                self.assertIn(PROVINCE, page)
+                self.assertNotIn(PROVINCE, page)
                 self.assertIn(TER_910, page)
                 self.assertEqual(re.findall(re.escape(BASE) + r'(?=["\)\s])', page), [])
 
@@ -258,14 +257,14 @@ class LaHomeNonLinkaLaBase(unittest.TestCase):
         with app.app_context():
             pool = home_pick.pool()
         self.assertNotIn(("bes", "01SAL001"), pool["regione"])
-        self.assertIn(("bes", "01SAL001"), pool["provincia"])
+        self.assertNotIn(("bes", "01SAL001"), pool["provincia"])
         self.assertIn(("territorial", "910"), pool["regione"])
 
     def test_la_home_chiesta_sulla_speranza_di_vita_bes(self):
         """Chiesta sulle regioni, la home ne pesca un'altra: nessun caso porta
         alla base."""
-        for query, drawn in (({"indicatore": "bes-01SAL001"}, True),
-                             ({"indicatore": "bes-01SAL001", "livello": "provincia"}, True),
+        for query, drawn in (({"indicatore": "bes-01SAL001"}, False),
+                             ({"indicatore": "bes-01SAL001", "livello": "provincia"}, False),
                              ({"indicatore": "bes-01SAL001", "livello": "regione"}, False)):
             with self.subTest(query=query):
                 page = app.test_client().get("/", query_string=query).get_data(as_text=True)
@@ -335,9 +334,9 @@ class LaNavigazioneMostraLaSchedaGiusta(unittest.TestCase):
                 else:
                     self.assertNotIn(meta["path"], paths)
 
-    def test_la_ricerca_trova_ancora_la_province_della_speranza_di_vita(self):
+    def test_la_ricerca_non_trova_la_scheda_noindex(self):
         found = self.client.get("/api/search", query_string={"q": "speranza di vita alla nascita"}).get_json()
-        self.assertIn(PROVINCE, [result["path"] for result in found["results"]])
+        self.assertNotIn(PROVINCE, [result["path"] for result in found["results"]])
 
     def test_la_metodologia_elenca_ogni_serie_del_punteggio(self):
         """bes-01SAL001 sta nel punteggio anche se la navigazione mostra
@@ -390,14 +389,16 @@ class LaNavigazioneMostraLaSchedaGiusta(unittest.TestCase):
         self.assertLessEqual({"bes:SDG-310", "bes:SDG-311"}, bes)
 
     def test_ter_590_resta_canonica_di_se_stessa(self):
-        """ter-590 e bes-12SER025 hanno cifre diverse: tutte e due nell'indice,
-        nessun canonical dall'una all'altra."""
+        """Le cifre diverse non creano canonical fra le schede. La fotografia
+        GSC puo' comunque tenere la BES fuori dall'indice."""
         with app.app_context():
             paths = {page["path"] for page in indicator_universe.level_pages()}
-        for path in ("/indicatore/emigrazione-ospedaliera-in-altra-regione/ter-590",
-                     "/indicatore/emigrazione-ospedaliera-in-altra-regione/bes-12SER025"):
+        indexed = "/indicatore/emigrazione-ospedaliera-in-altra-regione/ter-590"
+        excluded = "/indicatore/emigrazione-ospedaliera-in-altra-regione/bes-12SER025"
+        self.assertIn(indexed, paths)
+        self.assertNotIn(excluded, paths)
+        for path in (indexed, excluded):
             with self.subTest(path=path):
-                self.assertIn(path, paths)
                 head = _head(self.client.get(path))
                 self.assertEqual(head["canonical"], f"{SITE_URL}{path}")
 
