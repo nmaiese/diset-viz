@@ -15,6 +15,8 @@ from unittest import mock
 from app import app, publisher
 
 ROOT = Path(__file__).resolve().parents[2]
+# Il gestore GitHub personale: non deve comparire in nessuna pagina servita.
+GESTORE_GITHUB = "nm" + "aiese"
 NOME_DI_PROVA = "Zeta Provaldi"
 IDENTITA_PERSONA = f"""\
 tipo: persona
@@ -141,23 +143,27 @@ class IdentitaEditorialeTest(unittest.TestCase):
 
     def test_il_gestore_personale_non_esce_dalle_rotte_pubbliche(self):
         percorsi = (
-            "/sitemap.xml",
-            "/chi-siamo",
-            "/contatti",
-            "/privacy",
-            "/termini",
-            "/metodologia",
-            "/blog/feed.xml",
-            "/robots.txt",
-            "/llms.txt",
+            "/", "/blog", f"/blog/{self.slug}", "/legacy", "/catalogo-dati",
+            "/sitemap.xml", "/chi-siamo", "/contatti", "/privacy", "/termini", "/metodologia",
+            "/blog/feed.xml", "/robots.txt", "/llms.txt",
         )
+        gestore = GESTORE_GITHUB
         for percorso in percorsi:
             with self.subTest(percorso=percorso):
                 risposta = self.client.get(percorso)
                 self.assertEqual(risposta.status_code, 200)
                 testo = risposta.get_data(as_text=True).lower()
-                self.assertNotIn("github.com/nmaiese", testo)
-                self.assertNotIn("nmaiese", testo)
+                self.assertNotIn(f"github.com/{gestore}", testo)
+                self.assertNotIn(gestore, testo)
+
+        from app import agent_discovery, blog
+        post = blog.get_post(self.slug)
+        for nome, markdown in (
+            ("articolo", agent_discovery.blog_post_markdown(post, "https://x")),
+            ("indice", agent_discovery.blog_index_markdown([post], "https://x")),
+        ):
+            with self.subTest(markdown=nome):
+                self.assertNotIn(gestore, markdown.lower())
 
     def test_tipo_non_ammesso_o_nome_vuoto_falliscono(self):
         with tempfile.TemporaryDirectory() as cartella:
