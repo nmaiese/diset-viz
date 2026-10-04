@@ -1,5 +1,6 @@
 {% extends "blog_base.html" %}
 {% import "v1/_ui.html" as ui %}
+{% import "v1/_dati_metodo.html" as dm with context %}
 {% import "_breadcrumb.html" as breadcrumb %}
 {#- La classifica della qualita' della vita della 1.0, regioni e province, per
     ogni profilo dei pesi.
@@ -240,6 +241,8 @@
 
   <section class="section" id="fonti-dati" aria-labelledby="h-fonti">
     <h2 id="h-fonti">Fonti, dati e citazione</h2>
+    {% set src = page_source('quality_of_life') %}
+    {{ dm.box(src.label, src.url, src.updated, "Non è la classifica del Sole 24 Ore: ordina i territori, non misura il benessere.") }}
     {#- Da 960 pixel le fonti a sinistra, scaricare e citare nella colonna
         destra: in colonna sola la sezione lasciava vuota meta' pagina. -#}
     <div class="cl-sources">

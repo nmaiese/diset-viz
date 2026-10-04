@@ -19,7 +19,7 @@
       "headline": {{ post.title | tojson }},
       "url": {{ post.url | tojson }},
       "datePublished": "{{ post.date.isoformat() }}",
-      "author": { "@type": "Organization", "name": {{ post.author | tojson }} }
+      "author": {{ author_jsonld() | safe }}
     }{{ "," if not loop.last }}
     {% endfor %}
   ]

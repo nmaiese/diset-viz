@@ -115,10 +115,10 @@ class TestSitemapFinalUrls(unittest.TestCase):
             self.assertNotIn("www.", loc)
             path = urlsplit(loc).path
             self.assertNotRegex(path, r"^/indicatore/\d")
-            # The quality-of-life rankings list their profiles on purpose
-            # (`?profilo=`), each a page of its own. Territories and cards never.
-            if path.startswith(("/indicatore/", "/regione/", "/provincia/")):
-                self.assertNotIn("?", loc)
+            # Nessuna URL della sitemap porta una query: i profili della
+            # classifica sono stati consolidati sulla base, e i territori e le
+            # schede non hanno mai avuto uno stato in query.
+            self.assertNotIn("?", loc)
             self.assertFalse(path != "/" and path.endswith("/"), loc)
 
     def test_every_indicator_loc_is_final_and_self_canonical(self):

@@ -9,7 +9,7 @@
     nella pagina e nella sua variante Markdown, e un feed che lo duplica e' una
     terza copia da tenere in riga. -#}
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>{{ site_name }}, storie dai dati</title>
     <link>{{ site_url }}/blog</link>
@@ -26,6 +26,7 @@
       <guid isPermaLink="true">{{ site_url }}/blog/{{ post.slug }}</guid>
       <pubDate>{{ post.pub_date }}</pubDate>
       <description>{{ post.description }}</description>
+      <dc:creator>{{ author_name() }}</dc:creator>
       {%- for tag in post.tags %}
       <category>{{ tag }}</category>
       {%- endfor %}

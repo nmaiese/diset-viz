@@ -1,0 +1,20 @@
+{#- Il riquadro "Dati e metodo": chi firma la pagina, da dove vengono i dati
+    e quanto sono freschi. Una sola macro per tutte le pagine che lo mostrano,
+    cosi' niente HTML copiato e niente valori inventati: la data di
+    aggiornamento della fonte compare solo se `dataset_updated` c'e', la firma
+    viene da `redazione()` (`publisher.editor_name()`, identita' editoriale) e il
+    link porta a `/metodologia`. -#}
+{% macro box(source_label, source_url=None, dataset_updated=None, limits=None) -%}
+<aside class="dati-metodo" data-dati-metodo aria-label="Dati e metodo">
+  {%- if source_label %}
+  <p class="dati-metodo__fonte">Fonte: {% if source_url %}<a href="{{ source_url }}" rel="noopener">{{ source_label }}</a>{% else %}{{ source_label }}{% endif %}.</p>
+  {%- endif %}
+  {%- if dataset_updated %}
+  <p class="dati-metodo__data">Fonte aggiornata il <time datetime="{{ dataset_updated }}">{{ dataset_updated | date_it }}</time>.</p>
+  {%- endif %}
+  {%- if limits %}
+  <p class="dati-metodo__limiti">{{ limits }}</p>
+  {%- endif %}
+  <p class="dati-metodo__firma">A cura di <a href="/chi-siamo#chi-lo-cura">{{ redazione() }}</a>. <a href="/metodologia">Metodologia</a></p>
+</aside>
+{%- endmacro %}

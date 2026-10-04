@@ -20,6 +20,7 @@ import os
 
 from flask import current_app, render_template
 
+from app.design import common
 from app.design import numfmt
 
 # Il segno che una pagina e' uscita dal template della 1.0 e non dal ripiego.
@@ -36,6 +37,7 @@ def register(app) -> None:
     app.jinja_env.filters["numchange"] = numfmt.change_text
     app.jinja_env.filters["phrase_unit"] = numfmt.phrase_unit
     app.jinja_env.filters["of_place"] = _of_place
+    app.jinja_env.filters["date_it"] = common.date_it
     app.jinja_env.globals["column_decimals"] = numfmt.column_decimals
     from app.design import og, terms
 

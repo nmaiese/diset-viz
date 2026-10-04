@@ -1,0 +1,29 @@
+# L'identita' con cui il sito firma i contenuti. Unico posto: byline degli
+# articoli, JSON-LD, feed RSS, footer, meta author, Chi siamo, informativa
+# privacy e markdown per gli agenti lo leggono da qui (app/publisher.py).
+#
+# Per passare a una persona reale: `tipo: persona`, `nome` col suo nome,
+# `descrizione` e `same_as` coi profili verificati. Nient'altro da toccare.
+
+# organizzazione | persona
+tipo: organizzazione
+
+# Il nome che compare nelle firme.
+nome: Redazione Divario Italia
+
+descrizione: Redazione del progetto editoriale Divario Italia, che rende consultabili i dati pubblici su regioni e province.
+
+# Indirizzo a cui si risponde (compare in chiaro in /contatti e nel JSON-LD).
+# TODO titolare: confermare che sia l'indirizzo definitivo.
+email: divarioitalia@protonmail.com
+
+# Pagina che presenta chi firma (percorso del sito).
+url_autore: /chi-siamo
+
+# Profili esterni verificati e posseduti. Vuoti finche' non ce ne sono.
+same_as: []
+
+# Intestatario legale, titolare del trattamento. Compare solo in /privacy:
+# non firma gli articoli, non sta in /chi-siamo, nei JSON-LD, nel feed, ne'
+# nel footer.
+intestatario_legale: "Aniello Maiese"

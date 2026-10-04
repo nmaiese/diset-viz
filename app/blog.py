@@ -236,7 +236,6 @@ def _load_post(path):
         "description": _excerpt(meta, body_html),
         "date": date,
         "date_modified": date_modified,
-        "author": (meta.get("author") or SITE_NAME).strip(),
         "cover": meta.get("cover"),
         "cover_alt": meta.get("cover_alt") or title,
         "cover_credit": _cover_credit(meta),
