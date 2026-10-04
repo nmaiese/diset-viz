@@ -1,0 +1,94 @@
+---
+title: "Reddito pro capite per regione: non è il PIL"
+seo_title: "Reddito pro capite per regione, la mappa diversa dal PIL"
+slug: reddito-pro-capite-regioni-non-e-il-pil
+description: "Reddito pro capite per regione: nel 2024 la Lombardia ha 28.154 euro per abitante, la Calabria 16.796. Sul reddito la distanza è più bassa che sul PIL."
+date: 2026-10-05
+draft: true
+tags:
+  - Reddito e ricchezza
+  - PIL
+  - Dati 2024
+indicator: 901
+dataset:
+  name: PIL pro capite e reddito disponibile delle famiglie per abitante, per regione, 2024
+  description: PIL per abitante e reddito disponibile delle famiglie per abitante nelle venti regioni nel 2024, in euro correnti, con il reddito ogni 100 euro di PIL e il posto nelle due classifiche.
+  method: Valori Istat senza rielaborazione. Il reddito ogni 100 euro di PIL e i posti in classifica sono calcolati dal sito sugli stessi valori.
+  temporal: 2024
+  spatial: Italia, regioni
+  creator: Istat
+  source_url: https://www.istat.it/it/archivio/conti+territoriali
+  download: /static/data/articles/reddito-pro-capite-regioni.csv
+external_figures:
+- value: "61,6"
+  what: PIL per abitante della Provincia autonoma di Bolzano/Bozen nel 2024, in migliaia di euro correnti
+  source: Istat, Conti economici territoriali 2022-2024, 22 dicembre 2025
+  url: https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf
+- value: "32,7"
+  what: reddito disponibile delle famiglie per abitante della Provincia autonoma di Bolzano/Bozen nel 2024, in migliaia di euro correnti
+  source: Istat, Conti economici territoriali 2022-2024, 22 dicembre 2025
+  url: https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf
+- value: "7,8"
+  what: aumento percentuale del reddito disponibile medio per abitante in Italia dovuto alla redistribuzione pubblica, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+- value: "17,5"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile nel Mezzogiorno, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+- value: "2,3"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile nel Nord-ovest, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+---
+
+Chi cerca il reddito pro capite delle regioni italiane trova quasi sempre un'altra cifra, il PIL per abitante. Le due parole girano come sinonimi, ma rispondono a domande diverse. Il PIL dice quanto valore si produce in una regione. Il reddito disponibile dice quanto entra, a conti fatti, alle famiglie che ci vivono. Messe una accanto all'altra, le due misure disegnano due mappe dello stesso Paese. Sulla seconda le regioni sono più vicine fra loro.
+
+Nel 2024 il reddito disponibile delle famiglie valeva **28.154 euro per abitante in [Lombardia](/regione/lombardia) e 16.796 in [Calabria](/regione/calabria)**. Sono 11.358 euro a testa. In proporzione è meno della distanza fra le due regioni sul PIL.
+{: .data-callout}
+
+## Dove si produce e dove si vive
+
+Le differenze fra le due misure sono due. La prima è il luogo. Il PIL è registrato dove si produce, il reddito dove vive la famiglia. Per l'Istat il PIL è ["il risultato finale dell'attività di produzione delle unità produttrici residenti"](https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf), mentre il reddito lordo disponibile "esprime i risultati economici conseguiti dalle Famiglie residenti nella regione".
+
+La seconda è la redistribuzione. Il reddito include imposte, contributi, prestazioni sociali e altri trasferimenti netti. È lordo come il PIL, ed entrambi sono in euro correnti. Il reddito del sito è quello delle famiglie consumatrici, cioè delle persone, e non quello delle imprese.
+
+Quanto pesi questo secondo passaggio, l'Istat lo ha misurato per macro-area in un'[audizione del maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf), sui dati del 2023. In media la redistribuzione pubblica ha alzato il reddito disponibile per abitante del 7,8%. Nel Mezzogiorno vale il 17,5% del reddito delle famiglie, nel Nord-ovest il 2,3%. È un dato per ripartizione e non dice quanto conti in ciascuna regione.
+
+## Una distanza che si accorcia, l'altra che si allarga
+
+Torniamo alle due regioni del confronto. Sul PIL la Lombardia produce per abitante 2,3 volte la Calabria, con 50.399 euro contro 21.702. Sul reddito il rapporto scende a 1,7. Per chi ci abita conta di più la seconda. Lo scrive anche [Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Regional_household_income_statistics): il reddito per abitante descrive il reddito dei residenti di una regione meglio del PIL per abitante.
+
+I due rapporti, poi, non sono fermi. Nel 2004 la Lombardia produceva per abitante 2,2 volte la Calabria e le sue famiglie avevano un reddito 1,8 volte più alto. In vent'anni la distanza sul PIL si è riaperta, quella sul reddito si è ristretta. Lo stesso accade se si guarda alla prima e all'ultima regione di ogni classifica. Sul PIL il rapporto è passato da 2,25 a 2,52, sul reddito da 1,80 a 1,75.
+
+Sono rapporti fra regioni nello stesso anno, e per questo l'inflazione non li tocca. Non tengono conto, però, delle differenze nel costo della vita.
+
+<!-- figura: distanza-pil-reddito -->
+
+## In mezzo alla classifica le regioni cambiano posto
+
+Agli estremi le due mappe si somigliano. Il [Trentino-Alto Adige](/regione/trentino-alto-adige) è primo su tutte e due, con 54.637 euro di PIL e 29.344 di reddito per abitante, e la Calabria è ultima su tutte e due. Il resto si muove.
+
+Il caso più netto è il [Lazio](/regione/lazio), quinto per PIL e decimo per reddito. Il [Piemonte](/regione/piemonte) fa la strada opposta, dal decimo al sesto posto. Sul PIL il Lazio supera il Piemonte di 4.541 euro per abitante. Sul reddito è il Piemonte a stare avanti, di 990 euro. I dati dicono che il Lazio scende, non perché.
+
+Anche la [Liguria](/regione/liguria) sale, dal nono al quinto posto, con 25.504 euro di reddito per abitante. [Veneto](/regione/veneto) e [Toscana](/regione/toscana) scendono di due posti, all'ottavo e al nono. [Valle d'Aosta](/regione/valle-d-aosta) ed [Emilia-Romagna](/regione/emilia-romagna) si scambiano il terzo e il quarto.
+
+Cambiano posto 16 regioni su 20. Le due graduatorie restano comunque vicine: la correlazione di rango fra le due è 0,93, su un massimo di 1. Chi è ricco per PIL tende a esserlo anche per reddito, con qualche salto di posizione nel gruppo di mezzo.
+
+## Quanto reddito per 100 euro di PIL
+
+Un altro modo di leggere le due mappe è dividerle. In Trentino-Alto Adige il reddito delle famiglie per abitante vale 54 euro ogni 100 di PIL. In Calabria ne vale 77. Dietro la Calabria vengono la [Sicilia](/regione/sicilia) con 75, la [Puglia](/regione/puglia) con 74, la [Sardegna](/regione/sardegna) con 72 e la [Campania](/regione/campania) con 70.
+
+Questo rapporto non è una fetta del PIL che passa alle famiglie. Mette a confronto una grandezza contata dove si produce con una contata dove si vive.
+
+Il rapporto scende quando il PIL sale. La correlazione di rango è -0,93. Ci sono eccezioni. In [Basilicata](/regione/basilicata) il reddito vale 63 euro ogni 100 di PIL, meno che in Liguria e in Piemonte, dove si produce di più.
+
+Il meccanismo generale lo descrive la [Treccani](https://www.treccani.it/enciclopedia/la-redistribuzione-del-reddito-tra-regioni_(L'Italia-e-le-sue-Regioni)/). Dove ci sono squilibri territoriali e un welfare universalistico, il sistema sposta reddito dalle aree più ricche alle più povere. Queste hanno così "un reddito disponibile pro capite più elevato di quello giustificato dal reddito in esse prodotto". Il testo spiega come funziona, non quanto pesi in ogni regione.
+
+## Bolzano, se si guardano le province autonome
+
+Il sito tratta il Trentino-Alto Adige come una regione sola. L'Istat pubblica invece le due province autonome separate, e in quella classifica in cima c'è Bolzano. Nel 2024 la provincia ha prodotto [61,6 mila euro di PIL per abitante](https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf), più di qualunque regione. Le sue famiglie avevano 32,7 mila euro di reddito disponibile per abitante, il valore più alto anche su questa misura. Il primo posto del Trentino-Alto Adige, sul sito, mette insieme le due province.
+
+Per l'Istat le stime del 2024 sono ancora preliminari, e la prossima edizione dei conti territoriali può spostare qualche posizione.
+
+Le due serie complete, dal 1995, sono nelle schede del [PIL pro capite](/indicatore/pil-pro-capite/ter-901) e del [reddito disponibile delle famiglie per abitante](/indicatore/reddito-disponibile-delle-famiglie-per-abitante/ter-902). La classifica del PIL, regione per regione, è nel pezzo sul [PIL pro capite per regione](/blog/pil-pro-capite-regioni-divario-2024). I valori di questo articolo si scaricano dalla [tabella delle venti regioni](/static/data/articles/reddito-pro-capite-regioni.csv).
