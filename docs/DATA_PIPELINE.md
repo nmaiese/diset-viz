@@ -74,7 +74,9 @@ indicatori mal orientati o macro-aree incomplete.
     Oggi 10AMB008, 12SER006, 12SER025;
   - `REGIONAL_CANONICALS`: la vista regionale di una scheda che porta il
     canonical su un'altra, solo dove le cifre coincidono in ogni cella. Oggi
-    bes-01SAL001 verso ter-910, senza noindex e fuori dalla sitemap.
+    bes-01SAL001 verso ter-910. La regola GSC puo' aggiungere `noindex,
+    follow` e tenerla fuori dalla sitemap finche' non riceve prosa scritta o
+    impressioni.
 
   Nascondere e' un dedup della navigazione, non dei dati: la pagina resta
   raggiungibile col suo robots, e `app/quiz.py` legge la stessa regola.

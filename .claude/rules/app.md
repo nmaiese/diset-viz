@@ -95,8 +95,10 @@ paths:
   `/province` (ter-910, per esempio). Canonical, robots e sitemap delle
   `/province` stanno in `docs/INDICATOR_PAGES.md`. **Le regioni di
   bes-01SAL001** (speranza di vita BES) hanno il canonical su ter-910, la
-  stessa serie, **senza noindex**: stanno fuori da sitemap, llms-full e
-  `/catalogo-dati`, dove le sostituisce la loro `/province`. **Un template per tutte le famiglie**
+  stessa serie. La fotografia GSC del 3 ottobre 2026 mette la scheda
+  `noindex, follow` finche' non riceve prosa scritta o impressioni. Base e
+  `/province` stanno fuori da sitemap, llms-full e `/catalogo-dati`.
+  **Un template per tutte le famiglie**
   (`app/templates/indicator_page.html`) su un view model
   (`app/indicator_view.py`): leggere `docs/INDICATOR_PAGES.md` prima di toccare
   l'uno o l'altro.

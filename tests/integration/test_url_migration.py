@@ -123,9 +123,8 @@ class LaVistaProvincialeHaIlSuoUrl(unittest.TestCase):
         # non quello della scheda: si toglie solo quello giusto, e ogni altro
         # `/confronto?` con un livello resta davanti alla guardia.
         from app.design.pages import confronto
-        own = 'href="' + confronto.compare_path({"id": "bes:01SAL001"}, "provincia").replace("&", "&amp;") + '"'
-        self.assertEqual(html.count(own), 1)
-        self.assertNotIn("livello=", html.replace(own, ""))
+        self.assertIsNone(confronto.compare_path({"id": "bes:01SAL001"}, "provincia"))
+        self.assertNotIn("livello=", html)
         markdown = self.client.get(self.PROVINCE, headers={"Accept": "text/markdown"})
         self.assertEqual(markdown.headers["Content-Location"], f"https://divarioitalia.it{self.PROVINCE}")
 
@@ -185,17 +184,32 @@ class LaVistaProvincialeHaIlSuoUrl(unittest.TestCase):
 
 
 def province_views_expected():
-    """Le `/province` indicizzabili: le 17 della BES piu' una per ogni scheda
-    esterna a due livelli il cui livello provinciale passa la regola."""
-    from app import provincial_families
+    """Le `/province` che passano regola dati e regola editoriale."""
+    from app import provincial_families, seo_policy
+    from app.bes_data import all_bes_indicators
 
-    external = sum(1 for item in provincial_families.all_indicators()
-                   if "regione" in item["levels"] and item["levels"]["provincia"]["indexable"])
-    return 17 + external
+    bes = sum(
+        1
+        for item in all_bes_indicators()
+        if "regione" in item["levels"]
+        and "provincia" in item["levels"]
+        and item["levels"]["provincia"]["indexable"]
+        and seo_policy.indicator_passes_content_rule(
+            {"id": sources.internal_id("bes", item["id"])}
+        )
+    )
+    external = sum(
+        1
+        for item in provincial_families.all_indicators()
+        if "regione" in item["levels"]
+        and item["levels"]["provincia"]["indexable"]
+        and seo_policy.indicator_passes_content_rule(item["metadata"])
+    )
+    return bes + external
 
 
 class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
-    """17 `/province` in piu' nella sitemap, nessuna URL con una query, e
+    """Le `/province` ammesse in sitemap, nessuna URL con una query, e
     l'interruttore che le spegne senza togliere link e 301."""
 
     LOC = re.compile(r"<loc>([^<]+)</loc>")
@@ -223,8 +237,13 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
         self.assertEqual(len(province), province_views_expected())
         self.assertFalse([loc for loc in locs if "/indicatore/" in loc and "?" in loc])
         schede = [loc for loc in locs if "/indicatore/" in loc]
-        self.assertEqual(len(self._bases_elsewhere()), 1)
-        self.assertEqual(len(schede), len(self.universe.indexable_catalog()) - 1 + province_views_expected())
+        self.assertEqual(len(self._bases_elsewhere()), 0)
+        self.assertEqual(
+            len(schede),
+            len(self.universe.indexable_catalog())
+            - len(self._bases_elsewhere())
+            + province_views_expected(),
+        )
         self.assertEqual(len(schede), len(set(schede)))
 
     def test_l_interruttore_spento(self):
@@ -232,12 +251,12 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
 
         from app import seo_policy
 
-        base = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001"
+        base = "/indicatore/copertura-della-rete-fissa-di-accesso-ultra-veloce-a-internet/bes-12SER020"
         with mock.patch.object(seo_policy, "LEVEL_PAGES_INDEXABLE", False):
             locs = self._locs()
             self.assertEqual([loc for loc in locs if "/indicatore/" in loc and loc.endswith("/province")], [])
             elsewhere = self._bases_elsewhere()
-            self.assertEqual(len(elsewhere), 1)
+            self.assertEqual(len(elsewhere), 0)
             self.assertEqual(len([loc for loc in locs if "/indicatore/" in loc]),
                              len(self.universe.indexable_catalog()) - len(elsewhere))
             risposta = self.client.get(base + "/province")
@@ -252,7 +271,7 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
             self.assertEqual(vecchio.status_code, 301)
             self.assertEqual(vecchio.headers["Location"], base + "/province")
             self.assertIn(f'href="{base}/province"',
-                          self.client.get("/ricerca?q=speranza").get_data(as_text=True))
+                          self.client.get("/ricerca?q=rete").get_data(as_text=True))
         self.assertEqual(len([loc for loc in self._locs() if "/indicatore/" in loc and loc.endswith("/province")]), province_views_expected())
 
 

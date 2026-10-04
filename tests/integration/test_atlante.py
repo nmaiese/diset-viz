@@ -559,7 +559,7 @@ class LaMappaFissaDelleProvince(unittest.TestCase):
         family, raw_id = atlas_page.MAP_INDICATOR_PROVINCE
         view = indicator_view.build_indicator_view(family, raw_id)
         level = next(lv for lv in view["levels"] if lv["key"] == "provincia")
-        self.assertTrue(level["indexable"], "la /province della mappa deve essere indicizzabile")
+        self.assertFalse(level["indexable"], "la fotografia GSC tiene la scheda fuori dall'indice")
         self.assertEqual(len(level["observations"]), indicator_view.PANEL_TOTALS["provincia"])
         self.assertEqual(level["year_max"], max(int(y) for y in level["matrix"]))
         info = next(i for i in all_bes_indicators() if i["id"] == raw_id)["levels"]["provincia"]

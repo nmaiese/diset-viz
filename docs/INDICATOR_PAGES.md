@@ -128,9 +128,11 @@ solo provinciali.
 **La coppia ter-910 e bes-01SAL001** e' un caso a se'. La vista regionale di
 bes-01SAL001 e' identica a ter-910 in ogni cella, quindi ha il **canonical su
 ter-910** (`indicator_view.canonical_elsewhere`, da
-`taxonomy.REGIONAL_CANONICALS`) **senza noindex**: resta raggiungibile, ma
-sitemap, llms-full e `/catalogo-dati` non la elencano e al suo posto elencano
-la sua `/province`, e le linguette Regioni delle due schede portano a ter-910.
+`taxonomy.REGIONAL_CANONICALS`). La fotografia GSC del 3 ottobre 2026 mette
+tutta la scheda `noindex, follow` finche' non riceve prosa scritta o
+impressioni. Base e `/province` restano raggiungibili, ma sitemap, llms-full e
+`/catalogo-dati` non le elencano. Le linguette Regioni delle due schede portano
+a ter-910.
 Il path di arrivo si prende dal catalogo, mai ricostruito: se ter-910 sparisce,
 la pagina torna canonica di se stessa invece di puntare a un 404.
 
@@ -631,6 +633,12 @@ aggiornato quando se ne aggiunge uno.
 
 Non aggiungere paragrafi di riempimento. Le varianti quasi duplicate, incomplete
 o obsolete seguono le regole di indicizzazione definite in `app/profiles.py`.
+Dal 3 ottobre 2026 `app/seo_policy.py` applica anche la fotografia GSC versionata
+in `reports/adsense_indicator_classification_20261003.csv`: una scheda senza
+impressioni nei 28 giorni misurati resta `noindex, follow` finche' non riceve un
+lead o una sezione scritta. La prosa viene riletta a ogni nuovo processo, quindi
+la scheda rientra senza aggiornare una lista di ID. Una scheda assente dalla
+fotografia GSC resta invariata.
 
 ### Perche' le serie sono piu' delle schede in sitemap
 

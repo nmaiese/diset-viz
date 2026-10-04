@@ -1602,7 +1602,7 @@ class LUniversoHaUnProprietarioSolo(unittest.TestCase):
             self.assertEqual(vista["meta"]["indexable_reason"], "variante")
 
     def test_un_motivo_per_ogni_pagina_fuori_indice(self):
-        """`variante`, `copertura` e `vecchia` si riparano in tre modi diversi:
+        """I motivi si riparano in modi diversi:
         un motivo unico li appiattirebbe e la riga si leggerebbe come un guasto
         invece che come una scelta."""
         from app import indicator_universe
@@ -1611,7 +1611,10 @@ class LUniversoHaUnProprietarioSolo(unittest.TestCase):
             if meta["indexable"]:
                 self.assertIsNone(meta["indexable_reason"])
             else:
-                self.assertIn(meta["indexable_reason"], ("variante", "copertura", "vecchia"))
+                self.assertIn(
+                    meta["indexable_reason"],
+                    ("variante", "copertura", "vecchia", "senza_prosa"),
+                )
 
     def test_allargare_la_passata_non_cambia_la_sitemap(self):
         """Il dedup su `canonical_path` resta **dentro** il sottoinsieme

@@ -52,8 +52,9 @@ MAP_INDICATOR = ("territorial", "105")
 # L'indicatore della mappa sulle province: la speranza di vita alla nascita.
 # La prova guarda il livello provinciale della scheda, mai `meta`: la vista
 # regionale di bes-01SAL001 ha il canonical su ter-910, e la scheda come
-# insieme non dice niente della sua `/province`. Il livello deve restare
-# indicizzabile, con tutte le 107 province nell'ultimo anno e un verso.
+# insieme non dice niente della sua `/province`. La mappa resta utilizzabile
+# anche quando la regola GSC tiene la pagina fuori dall'indice. Il livello deve
+# avere tutte le 107 province nell'ultimo anno e un verso.
 MAP_INDICATOR_PROVINCE = ("bes", "01SAL001")
 MAP_INDICATORS = {"regione": MAP_INDICATOR, "provincia": MAP_INDICATOR_PROVINCE}
 

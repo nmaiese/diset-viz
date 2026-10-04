@@ -1,11 +1,20 @@
 """SEO policy overrides for public indicator landing pages."""
 
+import csv
+import functools
+from pathlib import Path
+
 from app.data import get_catalog
 
 
 MIN_INDEXABLE_YEAR = 2020
 MIN_COMPLETENESS = 0.98
 REQUIRED_REGION_COUNT = 20
+INDICATOR_CLASSIFICATION = (
+    Path(__file__).resolve().parents[1]
+    / "reports"
+    / "adsense_indicator_classification_20261003.csv"
+)
 
 # Exploration query parameters that put an indicator or region page into an
 # in-page state (a chosen year, a focused region, a territorial level). They
@@ -30,6 +39,53 @@ EXPLORE_PARAMS = ("anno", "regione", "livello")
 # modo di tornare indietro se Google le fonde con la base, senza togliere URL.
 # Non tocca la base delle schede ne' le schede solo provinciali.
 LEVEL_PAGES_INDEXABLE = True
+
+
+@functools.lru_cache(maxsize=1)
+def indicator_search_metrics():
+    """Metriche GSC versionate per indicatore, raccolte nei 28 giorni al 3/10."""
+    try:
+        with INDICATOR_CLASSIFICATION.open(encoding="utf-8", newline="") as stream:
+            rows = csv.DictReader(stream)
+            return {
+                row["indicatore"]: {
+                    "impressions": int(row["impressioni"]),
+                    "clicks": int(row["clic"]),
+                    "class": row["classe"],
+                }
+                for row in rows
+            }
+    except (OSError, KeyError, TypeError, ValueError):
+        # Un file assente o illeggibile non deve togliere per errore tutto
+        # l'atlante dall'indice. I test verificano presenza, forma e conteggi.
+        return {}
+
+
+def _has_authored_prose(indicator_id):
+    """True con un lead o almeno un corpo di sezione scritto."""
+    from app import indicator_texts
+
+    entry = indicator_texts.get_text(indicator_id) or {}
+    if (entry.get("lead") or "").strip():
+        return True
+    return any(
+        (section.get("body") or "").strip()
+        for section in entry.get("sections") or []
+        if isinstance(section, dict)
+    )
+
+
+def indicator_passes_content_rule(item):
+    """Tiene una scheda con impressioni GSC o prosa scritta.
+
+    Indicatori non presenti nella fotografia GSC restano invariati. Una scheda
+    senza impressioni rientra da sola al deploy successivo quando riceve prosa.
+    """
+    indicator_id = str(item.get("id") or "")
+    metrics = indicator_search_metrics().get(indicator_id)
+    if metrics is None or metrics["impressions"] > 0:
+        return True
+    return _has_authored_prose(indicator_id)
 
 
 def has_explore_params(args):
@@ -63,4 +119,6 @@ def is_search_indexable_indicator(original_policy, item):
         return False
     if item.get("completeness", 0) < MIN_COMPLETENESS:
         return False
-    return int(item.get("year_max") or 0) >= MIN_INDEXABLE_YEAR
+    if int(item.get("year_max") or 0) < MIN_INDEXABLE_YEAR:
+        return False
+    return indicator_passes_content_rule(item)

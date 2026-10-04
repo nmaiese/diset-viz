@@ -242,9 +242,9 @@ class EveryIndicatorPageRenders(unittest.TestCase):
 
     def test_the_provincial_view_is_its_own_page_indexed_by_the_level_rule(self):
         """La `/province` di ogni scheda a due livelli: 200, canonical su se'
-        stessa, e `index` solo se il suo livello provinciale passa la regola
-        (copertura almeno 0,8 e anno almeno 2023). Sono 17 e 17: se il conto
-        cambia e' cambiato il dato, e il numero va riletto, non allargato."""
+        stessa, e `index` solo se la scheda passa la regola editoriale e il suo
+        livello provinciale passa la regola dati (copertura almeno 0,8 e anno
+        almeno 2023)."""
         from app import indicator_universe
 
         two_level = [
@@ -275,7 +275,10 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                     self.assertTrue(robots.startswith("index, follow"), robots)
                     indexed.add(path)
         from tests.integration.test_url_migration import province_views_expected
-        self.assertEqual((len(indexed), len(not_indexed)), (province_views_expected(), 17))
+        self.assertEqual(
+            (len(indexed), len(not_indexed)),
+            (province_views_expected(), len(two_level) - province_views_expected()),
+        )
         listed = {page["path"] for page in indicator_universe.level_pages() if not page["base"]}
         self.assertEqual(indexed, listed)
 
