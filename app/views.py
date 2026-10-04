@@ -215,10 +215,10 @@ app.add_template_global(atlas_theme_url)
 
 # La fonte primaria del riquadro "Dati e metodo" (`v1/_dati_metodo.html`): un
 # solo posto la compone, e i template la chiamano con il tipo di pagina.
-from app.dati_metodo import REDAZIONE as _redazione, page_source as _page_source  # noqa: E402
+from app.dati_metodo import page_source as _page_source  # noqa: E402
 
 app.add_template_global(_page_source, "page_source")
-app.add_template_global(_redazione, "redazione")
+app.add_template_global(publisher.editor_name, "redazione")
 
 
 def _client_ip():

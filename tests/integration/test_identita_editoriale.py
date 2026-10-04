@@ -157,7 +157,8 @@ class IdentitaEditorialeTest(unittest.TestCase):
         for vecchio in sorted(nomi):
             risultato = subprocess.run(
                 ["git", "grep", "-n", "-I", vecchio, "--", "app", "scripts", "tests", "config", "Dockerfile",
-                 ":(exclude)config/identita.yaml", ":(exclude)tests/integration/test_identita_editoriale.py"],
+                 ":(exclude)config/identita.yaml", ":(exclude)tests/integration/test_identita_editoriale.py",
+                 ":(exclude)tests/unit/test_privacy_nome.py"],
                 cwd=ROOT, capture_output=True, text=True,
             )
             with self.subTest(vecchio=vecchio):

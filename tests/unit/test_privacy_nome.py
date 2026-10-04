@@ -25,22 +25,10 @@ from pathlib import Path
 
 RADICE = Path(__file__).resolve().parents[2]
 
-# I due soli posti dove la regola ammette il nome.
+# I due soli posti dove la regola ammette il nome: nessuna eccezione.
 CONSENTITI = {
     "config/identita.yaml",
     "app/templates/privacy.html",
-}
-
-# Eccezioni temporanee, da svuotare dopo il merge del ramo
-# `agenti/identita-editoriale`: quel ramo toglie il nome da `app/publisher.py`
-# (`EDITOR_NAME = "Aniello Maiese"`) e smette di stampare `{{ editor_name }}`
-# fuori dal box (about.html, metodologia.html e la sua copia 1.0). Finche' non
-# e' unito, il nome esce ancora da questi file.
-ECCEZIONI_IN_ATTESA_IDENTITA = {
-    "app/publisher.py",
-    "app/templates/about.html",
-    "app/templates/methodology.html",
-    "app/templates/v1/metodologia.html",
 }
 
 _NOME = re.compile(r"\b(?:Aniello|Maiese)\b|\bNello\b(?!\s+(?:stesso|stato)\b)")
@@ -64,7 +52,7 @@ class IlNomeDelTitolare(unittest.TestCase):
         for percorso in file:
             if not _in_ambito(percorso):
                 continue
-            if percorso in CONSENTITI or percorso in ECCEZIONI_IN_ATTESA_IDENTITA:
+            if percorso in CONSENTITI:
                 continue
             testo = (RADICE / percorso).read_text(encoding="utf-8", errors="replace")
             for match in _NOME.finditer(testo):
