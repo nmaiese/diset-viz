@@ -77,7 +77,7 @@ Anche la [Liguria](/regione/liguria) sale, dal nono al quinto posto, con 25.504 
 
 <!-- figura: posti-pil-reddito -->
 
-Cambiano posto 16 regioni su 20. Le due graduatorie restano comunque vicine: la correlazione di rango fra le due è 0,93, su un massimo di 1.
+Cambiano posto 16 regioni su 20. Le due graduatorie restano vicine, con una correlazione di rango di 0,93 su 1.
 
 ## Quanto reddito per 100 euro di PIL
 
@@ -93,6 +93,6 @@ Il meccanismo generale lo descrive la [Treccani](https://www.treccani.it/enciclo
 
 Il sito tratta il Trentino-Alto Adige come una regione sola. L'Istat pubblica invece le due province autonome separate, e in quella classifica in cima c'è [Bolzano](/provincia/bolzano). Nel 2024 la provincia ha prodotto [61,6 mila euro di PIL per abitante](https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf), più di qualunque regione. Le sue famiglie avevano 32,7 mila euro di reddito disponibile per abitante, il valore più alto anche su questa misura. Il primo posto del Trentino-Alto Adige, sul sito, mette insieme le due province.
 
-Per l'Istat le stime del 2024 sono ancora preliminari. La prossima edizione dei conti territoriali può spostare qualche posizione.
+L'Istat considera ancora preliminari le stime del 2024. La prossima edizione dei conti territoriali può spostare qualche posizione.
 
 Le due serie complete, dal 1995, sono nelle schede del [PIL pro capite](/indicatore/pil-pro-capite/ter-901) e del [reddito disponibile delle famiglie per abitante](/indicatore/reddito-disponibile-delle-famiglie-per-abitante/ter-902). La classifica del PIL, regione per regione, è nel pezzo sul [PIL pro capite per regione](/blog/pil-pro-capite-regioni-divario-2024). I valori di questo articolo si scaricano dalla [tabella delle venti regioni](/static/data/articles/reddito-pro-capite-regioni.csv).
