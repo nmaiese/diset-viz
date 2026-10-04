@@ -1,4 +1,4 @@
-<svg class="fig fig--narrow" viewBox="0 0 370 592" width="370" height="592" role="img" aria-labelledby="fig-variazione-2010-2025-t fig-variazione-2010-2025-d" xmlns="http://www.w3.org/2000/svg">
+<svg class="fig fig--narrow" viewBox="0 0 370 608" width="370" height="608" role="img" aria-labelledby="fig-variazione-2010-2025-t fig-variazione-2010-2025-d" xmlns="http://www.w3.org/2000/svg">
 <title id="fig-variazione-2010-2025-t">Dal 2010 al 2025 il calo va da 0,50 figli per donna in Valle d&#x27;Aosta a 0,12 in Basilicata</title>
 <desc id="fig-variazione-2010-2025-d">Numero medio di figli per donna nel 2010 e nel 2025 in ciascuna regione, ordinate dal calo maggiore al minore. Valle d&#x27;Aosta da 1,62 a 1,12, Lombardia da 1,56 a 1,16, Lazio da 1,44 a 1,05, Sicilia da 1,42 a 1,23, Campania da 1,44 a 1,22, Sardegna da 1,18 a 0,85, Basilicata da 1,20 a 1,08. Il valore scende in tutte e venti le regioni. Il 2025 è una stima.</desc>
 <text class="fig__title" x="0" y="18">Dal 2010 al 2025 il calo va da 0,50 figli</text>
@@ -134,6 +134,7 @@
 <text class="fig__value is-on" x="199.5" y="531" text-anchor="end">1,08</text>
 <text class="fig__value is-on" x="231.8" y="531">1,20</text>
 <text class="fig__value is-on" x="370" y="531" text-anchor="end">−0,12</text>
-<text class="fig__source" x="0" y="572">Fonte: Istat, Indicatori demografici, tasso di</text>
-<text class="fig__source" x="0" y="586">fecondità totale. 2025 stimato. Elaborazione Divario Italia.</text>
+<text class="fig__note" x="0" y="570">L'asse parte da 0,6, non da zero.</text>
+<text class="fig__source" x="0" y="588">Fonte: Istat, Indicatori demografici, tasso di</text>
+<text class="fig__source" x="0" y="602">fecondità totale. 2025 stimato. Elaborazione Divario Italia.</text>
 </svg>

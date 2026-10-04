@@ -108,7 +108,7 @@ def dumbbell_figure(s) -> str:
             f"Campania da {it(s['Campania'][2010])} a {it(s['Campania'][2025])}, Sardegna da {it(s['Sardegna'][2010])} a {it(s['Sardegna'][2025])}, "
             f"Basilicata da {it(last[1])} a {it(last[2])}. Il valore scende in tutte e venti le regioni. Il 2025 è una stima.")
     top, step = 100, 22
-    height = top + step * len(rows) + 52
+    height = top + step * len(rows) + 68
     xn = 126                     # fine dei nomi
     lo, hi, x0, x1 = 0.6, 1.7, 142, 292
 
@@ -136,6 +136,7 @@ def dumbbell_figure(s) -> str:
             parts.append(f'<text class="fig__value is-on" x="{x(b) - 8:.1f}" y="{cy + 4}" text-anchor="end">{it(b)}</text>')
             parts.append(f'<text class="fig__value is-on" x="{x(a) + 8:.1f}" y="{cy + 4}">{it(a)}</text>')
         parts.append(f'<text class="fig__value{on}" x="{W}" y="{cy + 4}" text-anchor="end">{MINUS}{it(-d)}</text>')
+    parts.append(f'<text class="fig__note" x="0" y="{height - 38}">L\'asse parte da 0,6, non da zero.</text>')
     parts += source_lines(height)
     parts.append("</svg>")
     return "\n".join(parts)
