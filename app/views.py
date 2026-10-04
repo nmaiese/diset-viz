@@ -192,7 +192,6 @@ def _inject_license():
         # organizzazione del publisher, la fonte va in `isBasedOn`.
         "organization_ref_jsonld": json.dumps({"@id": publisher.ORGANIZATION_ID}),
         "corrections_url": publisher.CORRECTIONS_URL,
-        "public_issues_url": publisher.PUBLIC_ISSUES_URL,
         # Chi firma lo dice `config/identita.yaml`: nessun template scrive un nome.
         "identity": publisher.identity,
         "author_name": publisher.editor_name,

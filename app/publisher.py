@@ -151,12 +151,8 @@ ORGANIZATION = {
 if identity()["tipo"] == "organizzazione" and identity()["same_as"]:
     ORGANIZATION["sameAs"] = identity()["same_as"]
 
-# "Segnala un errore" porta alla pagina contatti, dove si scrive per email. Fino
-# al 25/9/2026 portava a una issue GitHub, che chiede un account e il login a
-# chi vuole solo dire che una cifra e' sbagliata. GitHub resta come canale
-# pubblico, dichiarato in /contatti.
+# "Segnala un errore" porta alla pagina contatti, dove si scrive per email.
 CORRECTIONS_URL = "/contatti#segnala-un-errore"
-PUBLIC_ISSUES_URL = "https://github.com/nmaiese/diset-viz/issues/new"
 
 _SOURCE_STATE = Path(__file__).resolve().parents[1] / "data" / "source_state.json"
 _STATE_KEYS = {

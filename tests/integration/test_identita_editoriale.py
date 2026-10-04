@@ -139,6 +139,26 @@ class IdentitaEditorialeTest(unittest.TestCase):
         self.assertNotIn(intestatario, agent_discovery.blog_post_markdown(post, "https://x"))
         self.assertNotIn(intestatario, agent_discovery.blog_index_markdown([post], "https://x"))
 
+    def test_il_gestore_personale_non_esce_dalle_rotte_pubbliche(self):
+        percorsi = (
+            "/sitemap.xml",
+            "/chi-siamo",
+            "/contatti",
+            "/privacy",
+            "/termini",
+            "/metodologia",
+            "/blog/feed.xml",
+            "/robots.txt",
+            "/llms.txt",
+        )
+        for percorso in percorsi:
+            with self.subTest(percorso=percorso):
+                risposta = self.client.get(percorso)
+                self.assertEqual(risposta.status_code, 200)
+                testo = risposta.get_data(as_text=True).lower()
+                self.assertNotIn("github.com/nmaiese", testo)
+                self.assertNotIn("nmaiese", testo)
+
     def test_tipo_non_ammesso_o_nome_vuoto_falliscono(self):
         with tempfile.TemporaryDirectory() as cartella:
             for contenuto in ("tipo: azienda\nnome: X\n", "tipo: persona\nnome: ''\n"):
