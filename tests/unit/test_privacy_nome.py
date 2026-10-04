@@ -31,7 +31,11 @@ CONSENTITI = {
     "app/templates/privacy.html",
 }
 
-_NOME = re.compile(r"\b(?:Aniello|Maiese)\b|\bNello\b(?!\s+(?:stesso|stato)\b)")
+# Cognome e nome completo anche dentro un identificativo (un link LinkedIn o un
+# dominio personale con il nome attaccato passava la ricerca per parola intera):
+# senza distinzione di maiuscole e senza confini di parola. Il gestore GitHub
+# `nmaiese` (l'account del repository) non e' il nome e non conta.
+_NOME = re.compile(r"(?i:aniello|(?<![nN])maiese)|\bNello\b(?!\s+(?:stesso|stato)\b)")
 
 
 def _in_ambito(percorso):
