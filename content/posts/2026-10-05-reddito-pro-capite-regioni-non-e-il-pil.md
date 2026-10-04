@@ -5,6 +5,8 @@ slug: reddito-pro-capite-regioni-non-e-il-pil
 description: "Il reddito pro capite per regione nel 2024 va da 28.154 euro a testa in Lombardia a 16.796 in Calabria. Sul reddito le distanze sono più corte che sul PIL."
 date: 2026-10-05
 draft: true
+cover: /static/img/blog/reddito-pro-capite.svg
+cover_alt: "Lombardia e Calabria nel 2024, in euro per abitante. PIL: 50.399 contro 21.702. Reddito disponibile delle famiglie: 28.154 contro 16.796. Grafico a barre."
 tags:
   - Reddito e ricchezza
   - PIL
@@ -72,6 +74,8 @@ Agli estremi le due mappe si somigliano. Il [Trentino-Alto Adige](/regione/trent
 Il caso più netto è il [Lazio](/regione/lazio), quinto per PIL e decimo per reddito. Il [Piemonte](/regione/piemonte) fa la strada opposta, dal decimo al sesto posto. Il Lazio produce 4.541 euro per abitante più del Piemonte, ma le famiglie piemontesi hanno 990 euro di reddito in più a testa. I dati mostrano il posto in classifica, non la causa del calo.
 
 Anche la [Liguria](/regione/liguria) sale, dal nono al quinto posto, con 25.504 euro di reddito per abitante. [Veneto](/regione/veneto) e [Toscana](/regione/toscana) scendono di due posti, all'ottavo e al nono. [Valle d'Aosta](/regione/valle-d-aosta) ed [Emilia-Romagna](/regione/emilia-romagna) si scambiano il terzo e il quarto.
+
+<!-- figura: posti-pil-reddito -->
 
 Cambiano posto 16 regioni su 20. Le due graduatorie restano comunque vicine: la correlazione di rango fra le due è 0,93, su un massimo di 1.
 
