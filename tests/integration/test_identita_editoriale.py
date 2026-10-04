@@ -4,9 +4,11 @@ Il passaggio da un marchio a una persona deve costare la modifica di quel file.
 Il nome finto qui sotto esiste solo in questo test: nessuna persona vera e
 nessuna persona inventata entra nel sito.
 """
+import functools
 import json
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -18,6 +20,18 @@ from unittest import mock
 from flask import Response
 
 from app import agent_discovery, app, publisher
+from app import (
+    bes_data,
+    blog,
+    data,
+    game,
+    multiscopo_data,
+    profiles,
+    province_profile,
+    public_urls,
+    quality_life_config,
+    sources,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 # Il gestore GitHub personale: non deve comparire in nessuna pagina servita.
@@ -30,17 +44,19 @@ GESTORI_GITHUB_AMMESSI = {
     # Organizzazione che pubblica dati, citata come fonte in app/sources.py.
     "openpolis",
 }
-# Rotte GET senza parametri che richiedono una sessione oppure rifiutano una
-# richiesta priva dei parametri obbligatori. Il test verifica sotto che restino
-# 4xx: quando una diventa pubblicamente servibile va rimossa da questa mappa.
+# Rotte GET che richiedono una sessione oppure rifiutano una richiesta priva
+# dei parametri obbligatori. Il test verifica sotto che restino 4xx: quando una
+# diventa pubblicamente servibile va rimossa da questa mappa. La chiave e' la
+# regola (path), non l'endpoint: due endpoint possono condividere lo stesso
+# nome di funzione, il path no.
 GET_ENDPOINTS_4XX = {
-    "account_export_api": "richiede autenticazione",
-    "atlante_modulo": "richiede il parametro tema",
-    "comparisons_list_api": "richiede autenticazione",
-    "favorites_list_api": "richiede autenticazione",
-    "leaderboard_get_api": "richiede il parametro game",
-    "game_order_round_api": "richiede una sessione di gioco",
-    "player_me_api": "richiede autenticazione",
+    "/api/account/export": "richiede autenticazione",
+    "/api/atlante/modulo": "richiede il parametro indicatore",
+    "/api/comparisons": "richiede autenticazione",
+    "/api/favorites": "richiede autenticazione",
+    "/api/game/leaderboard": "richiede il parametro game",
+    "/api/game/order/round": "richiede una sessione di gioco",
+    "/api/player/me": "richiede autenticazione",
 }
 NOME_DI_PROVA = "Zeta Provaldi"
 IDENTITA_PERSONA = f"""\
@@ -79,7 +95,18 @@ def find_personal_identifiers(response, path):
             or response.mimetype == "application/linkset+json"):
         return set()
 
-    text = unquote(unescape(response.get_data(as_text=True))).casefold()
+    # Doppia codifica (`MAI%26%23101%3BSE` -> `MAI&#101;SE` -> `MAIESE`): si
+    # decodifica in ciclo finche' il testo smette di cambiare.
+    text = response.get_data(as_text=True)
+    while True:
+        decoded = unquote(unescape(text))
+        if decoded == text:
+            break
+        text = decoded
+    text = text.casefold()
+    # La `@` si nasconde anche in chiaro: `(at)`, `[at]`, ` at `.
+    email_text = text.replace("(at)", "@").replace("[at]", "@").replace(" at ", "@")
+
     found = set()
     legal_holder = unescape(publisher.identity()["intestatario_legale"]).casefold()
     surname_text = text.replace(legal_holder, "") if path == "/privacy" else text
@@ -88,7 +115,7 @@ def find_personal_identifiers(response, path):
         found.add("cognome")
     if GESTORE_GITHUB in text:
         found.add("gestore_github")
-    if EMAIL_PERSONALE in text:
+    if EMAIL_PERSONALE in email_text:
         found.add("email_personale")
     if "linkedin" + ".com/in/" in text:
         found.add("linkedin")
@@ -101,12 +128,91 @@ def find_personal_identifiers(response, path):
     return found
 
 
+@functools.lru_cache(maxsize=1)
+def _data_samples():
+    """Un valore rappresentativo per ogni tipo di parametro, dai dati veri.
+
+    Non si scrive a mano `lombardia` o `ter-105`: il campione esce dal catalogo,
+    dal blog, dal gioco e dai registri dei territori, quindi sopravvive
+    all'aggiunta di regioni, province, indicatori e articoli.
+    """
+    catalog = data.get_catalog()
+    featured_id = str(catalog["featured_indicator_id"])
+    featured = next(
+        (item for item in catalog["indicators"] if item["id"] == featured_id), None
+    ) or catalog["indicators"][0]
+    return {
+        "indicator_id": featured["id"],
+        "year": featured["year_max"],
+        "region_key": profiles.region_key_for(data.REGION_ORDER[0]),
+        "province_key": province_profile.chiavi()[0],
+        "blog_slug": blog.get_posts()[0]["slug"],
+        "theme_slug": catalog["indicators"][0]["theme_slug"],
+        "iso_date": game.archive_list()[0]["date"],
+        "url_level": next(iter(public_urls.QUALITY_LIFE_LEVELS)),
+        "profile_slug": quality_life_config.DEFAULT_PROFILE,
+        "bes_indicator_id": bes_data.all_bes_indicators()[0]["id"],
+        "multiscopo_indicator_id": multiscopo_data.all_multiscopo_indicators()[0]["id"],
+    }
+
+
+def _representative_value(rule, arg):
+    samples = _data_samples()
+    if arg == "indicator_id":
+        # Lo stesso nome di parametro risolve contro famiglie diverse: il
+        # valore giusto lo decide l'endpoint, la famiglia la danno i dati.
+        if rule.endpoint == "quality_life_indicator_legacy":
+            return samples["bes_indicator_id"]
+        if rule.endpoint == "quality_life_multiscopo_indicator_legacy":
+            return samples["multiscopo_indicator_id"]
+        return samples["indicator_id"]
+    if arg == "year":
+        return samples["year"]
+    if arg == "slug":
+        return samples["blog_slug"]
+    if arg in ("region_key", "territory_key"):
+        return samples["region_key"]
+    if arg == "province_key":
+        return samples["province_key"]
+    if arg == "theme_slug":
+        return samples["theme_slug"]
+    if arg == "url_level":
+        return samples["url_level"]
+    if arg == "profile_slug":
+        return samples["profile_slug"]
+    if arg == "iso_date":
+        return samples["iso_date"]
+    if arg == "first":
+        return sources.indicator_code("territorial", samples["indicator_id"])
+    return None
+
+
+def _fill_rule(rule, values):
+    path = rule.rule
+    for arg, value in values.items():
+        path = re.sub(r"<[^>]*\b%s\b[^>]*>" % re.escape(arg), str(value), path)
+    return path
+
+
+def _representative_path(rule):
+    """La URL concreta di una regola GET con parametri, o None se manca un valore."""
+    values = {arg: _representative_value(rule, arg) for arg in rule.arguments}
+    if any(value is None for value in values.values()):
+        return None
+    return _fill_rule(rule, values)
+
+
 def served_paths(client):
     """Costruisce le URL pubbliche da sitemap e regole GET, senza liste a mano.
 
     Le regole con parametri entrano tramite la prima URL della sitemap che le
-    istanzia. Quelle senza rappresentante in sitemap restano fuori: senza un
-    valore canonico non esiste una richiesta pubblica deterministica da fare.
+    istanzia; quelle senza rappresentante in sitemap vengono istanziate con un
+    valore rappresentativo ricavato dai dati veri. Una regola per cui non si
+    trova un valore solleva l'elenco delle regole non visitate, salvo quelle
+    escluse in `GET_ENDPOINTS_4XX` (4xx per costruzione).
+
+    Restituisce `(paths, visited_rules)`: le URL da visitare e l'insieme delle
+    regole GET (per path) che ciascuna istanzia.
     """
     response = client.get("/sitemap.xml")
     if response.status_code != 200:
@@ -122,24 +228,43 @@ def served_paths(client):
         rule, _ = adapter.match(path, method="GET", return_rule=True)
         first_sitemap_path.setdefault((rule.rule, rule.endpoint), path)
 
+    visited_rules = set()
+    unresolved = []
     for rule in app.url_map.iter_rules():
         if "GET" not in rule.methods or rule.endpoint == "static":
             continue
         if rule.arguments:
             representative = first_sitemap_path.get((rule.rule, rule.endpoint))
-            if representative:
-                paths.add(representative)
-        elif rule.endpoint not in GET_ENDPOINTS_4XX:
+            if representative is None:
+                representative = _representative_path(rule)
+            if representative is None:
+                if rule.rule in GET_ENDPOINTS_4XX:
+                    continue
+                unresolved.append(rule.rule)
+                continue
+            paths.add(representative)
+            visited_rules.add(rule.rule)
+        elif rule.rule not in GET_ENDPOINTS_4XX:
             paths.add(rule.rule)
-    return sorted(paths)
+            visited_rules.add(rule.rule)
+    if unresolved:
+        raise AssertionError(
+            "regole GET con parametri senza un valore rappresentativo: "
+            + ", ".join(sorted(unresolved))
+        )
+    return sorted(paths), visited_rules
 
 
 class RicercaIdentificativiPersonaliTest(unittest.TestCase):
     def test_la_ricerca_riconosce_ogni_forma_vietata(self):
         casi = (
             ("cognome", "MAI&#101;SE", "cognome"),
+            ("cognome doppiamente codificato", "MAI%26%23101%3BSE", "cognome"),
             ("gestore GitHub", "GitHub.com/NM" + "AIESE", "gestore_github"),
             ("email personale", EMAIL_PERSONALE.replace("@", "%40"), "email_personale"),
+            ("email come (at)", EMAIL_PERSONALE.replace("@", "(at)"), "email_personale"),
+            ("email come [at]", EMAIL_PERSONALE.replace("@", "[at]"), "email_personale"),
+            ("email come ' at '", EMAIL_PERSONALE.replace("@", " at "), "email_personale"),
             ("LinkedIn", "LINKEDIN.COM&#47;IN/profilo", "linkedin"),
             ("altro gestore GitHub", "github.com/altro-handle", "github_personale"),
         )
@@ -147,6 +272,19 @@ class RicercaIdentificativiPersonaliTest(unittest.TestCase):
             with self.subTest(nome=nome):
                 risposta = Response(corpo, content_type="text/plain")
                 self.assertIn(atteso, find_personal_identifiers(risposta, "/"))
+
+    def test_il_testo_pulito_non_trova_niente(self):
+        pulito = "Una pagina di divulgazione economica, priva di riferimenti a persone."
+        self.assertEqual(
+            find_personal_identifiers(Response(pulito, content_type="text/plain"), "/"),
+            set(),
+        )
+
+    def test_il_dominio_personale_conta_solo_se_configurato(self):
+        corpo = "Approfondimento su https://esempio.invalid/chi-sono"
+        with mock.patch.object(sys.modules[__name__], "DOMINI_PERSONALI", ("esempio.invalid",)):
+            trovati = find_personal_identifiers(Response(corpo, content_type="text/plain"), "/")
+        self.assertIn("dominio_personale", trovati)
 
 
 class IdentitaEditorialeTest(unittest.TestCase):
@@ -243,7 +381,7 @@ class IdentitaEditorialeTest(unittest.TestCase):
         self.assertNotIn(intestatario, agent_discovery.blog_index_markdown([post], "https://x"))
 
     def test_gli_identificativi_personali_non_escono_da_nessuna_rotta_pubblica(self):
-        paths = served_paths(self.client)
+        paths, visited_rules = served_paths(self.client)
         self.assertGreater(len(paths), 600, f"visitate solo {len(paths)} rotte")
 
         required = {
@@ -258,13 +396,13 @@ class IdentitaEditorialeTest(unittest.TestCase):
                          f"rotte obbligatorie non visitate: {sorted(required.difference(paths))}")
 
         excluded = {
-            rule.endpoint: rule for rule in app.url_map.iter_rules()
-            if rule.endpoint in GET_ENDPOINTS_4XX
+            rule.rule: rule for rule in app.url_map.iter_rules()
+            if rule.rule in GET_ENDPOINTS_4XX
         }
         self.assertEqual(set(excluded), set(GET_ENDPOINTS_4XX),
                          "una esclusione non corrisponde piu' a una regola GET")
-        for endpoint, rule in excluded.items():
-            with self.subTest(esclusa=rule.rule, motivo=GET_ENDPOINTS_4XX[endpoint]):
+        for path, rule in excluded.items():
+            with self.subTest(esclusa=rule.rule, motivo=GET_ENDPOINTS_4XX[path]):
                 response = self.client.get(rule.rule)
                 try:
                     self.assertGreaterEqual(
@@ -273,6 +411,18 @@ class IdentitaEditorialeTest(unittest.TestCase):
                     )
                 finally:
                     response.close()
+
+        # Nessuna regola GET resta senza una visita: le escluse sono 4xx per
+        # costruzione, ogni altra regola ha un rappresentante in `paths`.
+        expected_rules = {
+            rule.rule for rule in app.url_map.iter_rules()
+            if "GET" in rule.methods and rule.endpoint != "static"
+            and rule.rule not in GET_ENDPOINTS_4XX
+        }
+        self.assertEqual(
+            visited_rules, expected_rules,
+            "regole GET non visitate: " + ", ".join(sorted(expected_rules - visited_rules)),
+        )
 
         leaks = {}
         unreachable = {}
@@ -295,7 +445,8 @@ class IdentitaEditorialeTest(unittest.TestCase):
                 finally:
                     response.close()
 
-        summary = f"{len(paths)} rotte e {variants_visited} risposte visitate"
+        summary = (f"{len(paths)} rotte e {len(visited_rules)} regole GET, "
+                   f"{variants_visited} risposte visitate")
         self.assertEqual(unreachable, {}, f"{summary}; non raggiungibili: {unreachable}")
         self.assertEqual(leaks, {}, f"{summary}; identificativi trovati: {leaks}")
 
