@@ -10,6 +10,8 @@ tags:
 - Natalità
 - Regioni
 indicator: 922
+cover: /static/img/blog/figli-per-donna-regioni.svg
+cover_alt: "Numero medio di figli per donna nel 2010 e nel 2025. Trentino-Alto Adige da 1,63 a 1,40, Sicilia da 1,42 a 1,23, Campania da 1,44 a 1,22, Sardegna da 1,18 a 0,85. Grafico a barre."
 dataset:
   name: Numero medio di figli per donna per regione, 2010 e 2025
   description: Numero medio di figli per donna (tasso di fecondità totale) nelle venti regioni nel 2010 e nel 2025, con la variazione e il posto in classifica nei due anni.
