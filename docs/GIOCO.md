@@ -1,6 +1,6 @@
 # Sfida Italia: il gioco sotto `/quiz`
 
-Il sottomarchio dei giochi di Divario Italia si chiama **Sfida Italia**. Cinque giochi brevi sui dati territoriali (regioni e province), tutti sotto `/quiz`. Il nome l'ha scelto Nello il 30 settembre 2026. L'URL è rimasto `/quiz` perché cambiare indirizzo avrebbe rotto i link esistenti. Dal 3 ottobre 2026 l'hub e i cinque giochi sono `noindex, follow` e fuori dalla sitemap: sono schermate di interfaccia senza testo editoriale, non pagine da indicizzare (le regola `_NOINDEX_FOLLOW_PATHS` in `app/__init__.py`). Restano raggiungibili e linkate.
+Il sottomarchio dei giochi di Divario Italia si chiama **Sfida Italia**. Cinque giochi brevi sui dati territoriali (regioni e province), tutti sotto `/quiz`. Il nome è stato scelto il 30 settembre 2026. L'URL è rimasto `/quiz` perché cambiare indirizzo avrebbe rotto i link esistenti. Dal 3 ottobre 2026 l'hub e i cinque giochi sono `noindex, follow` e fuori dalla sitemap: sono schermate di interfaccia senza testo editoriale, non pagine da indicizzare (le regola `_NOINDEX_FOLLOW_PATHS` in `app/__init__.py`). Restano raggiungibili e linkate.
 
 Questo documento è il contratto della sezione e **possiede l'argomento**. Chi tocca `app/game*.py`, `app/quiz*.py`, `frontend/src/game/` o `config/game_indicators.csv` lo legge prima e lo aggiorna quando cambia un fatto. Dove il documento e il codice non tornano, ha ragione il codice: si corregge il documento. Le regole visive stanno in `design/v1/SISTEMA.md`, gli eventi in `docs/tracking_spec.md`, l'account in `docs/ACCOUNT.md`, i passi di rilascio in `DEPLOY.md`.
 
@@ -264,8 +264,8 @@ Cose vere oggi che non sono state corrette. Non sono un elenco di impegni.
 - **I punteggi del giorno stanno nell'esportazione e nella cancellazione dell'account** (`app/account.py`, tabella `daily_scores`, dal 1 ottobre 2026). Una tabella nuova che porta `auth_id` va aggiunta lì: lo prova `tests/integration/test_account.py`.
 - **Indovina la Regione non ha stato di sessione** (sopra): non farci poggiare nessuna classifica.
 - **`app/templates/game_provincia.html`** ha la riga di attribuzione dei confini scritta a mano (senza "semplificati e riproiettati") e non ha la frase sulla Sardegna: le due cose vivono composte solo nella pagina della mappa. Andrebbero allineate.
-- **iOS non è provato su un dispositivo vero**: il tocco sulle sagome della mappa e il focus da tastiera sono stati verificati con un browser automatizzato, non su un iPhone. La prova su un iPhone vero è un passo manuale di Nello.
-- **La pulizia della classifica dopo il deploy** non ha un criterio automatico: le righe nate prima del monouso e del timer lato server vanno guardate a mano (`DEPLOY.md`) e cancellate solo con la conferma di Nello.
+- **iOS non è provato su un dispositivo vero**: il tocco sulle sagome della mappa e il focus da tastiera sono stati verificati con un browser automatizzato, non su un iPhone. La prova su un iPhone vero è un passo manuale.
+- **La pulizia della classifica dopo il deploy** non ha un criterio automatico: le righe nate prima del monouso e del timer lato server vanno guardate a mano (`DEPLOY.md`) e cancellate solo con una conferma esplicita.
 
 ## Come si prova
 

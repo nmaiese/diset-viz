@@ -9,8 +9,9 @@ fonte e la firma della redazione.
 import re
 import unittest
 
-from app import app, publisher
+from app import app
 from app.blog import get_posts
+from app.dati_metodo import REDAZIONE
 
 MARKER = 'class="dati-metodo" data-dati-metodo'
 
@@ -46,7 +47,7 @@ class IlRiquadroCompareNeiTipi(unittest.TestCase):
         riquadro = _box(html)
         self.assertIn("dati-metodo__fonte", riquadro, f"{percorso}: fonte assente")
         self.assertIn("dati-metodo__firma", riquadro, f"{percorso}: firma assente")
-        self.assertIn(publisher.EDITOR_NAME, riquadro, f"{percorso}: nome della redazione assente")
+        self.assertIn(REDAZIONE, riquadro, f"{percorso}: nome della redazione assente")
         self.assertIn('href="/metodologia"', riquadro, f"{percorso}: link alla metodologia assente")
         self.assertNotIn("<script", riquadro, f"{percorso}: JavaScript dentro il riquadro")
 

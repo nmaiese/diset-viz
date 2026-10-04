@@ -1023,8 +1023,8 @@ def _dimension_siblings(family, indicator_id):
     l'id fa parte di una famiglia mappata.
 
     Nessun cambio di URL o di routing: ogni membro tiene la propria pagina
-    già pubblicata, questo collega fra loro pagine che esistono già (Nello,
-    4/9: "non modifichiamo la struttura delle pagine, url pubblicate, al
+    già pubblicata, questo collega fra loro pagine che esistono già (4/9:
+    "non modifichiamo la struttura delle pagine, url pubblicate, al
     massimo usiamo canonical"). Qui non serve nemmeno il canonical: ogni
     pagina resta indicizzabile secondo la sua stessa regola di sempre,
     `profiles.is_gender_variant`, invariata.

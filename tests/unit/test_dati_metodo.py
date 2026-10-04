@@ -13,19 +13,19 @@ import unittest
 from flask import render_template_string
 
 from app import app, publisher
-from app.dati_metodo import page_source
+from app.dati_metodo import REDAZIONE, page_source
 
 # Il segno con cui le prove trovano il riquadro, e il nome di chi firma.
 MARKER = 'class="dati-metodo" data-dati-metodo'
 
 
-def _render(source_label, source_url=None, dataset_updated=None, limits=None, editor_name="Test Redazione"):
+def _render(source_label, source_url=None, dataset_updated=None, limits=None):
     with app.test_request_context():
         return render_template_string(
             '{% import "v1/_dati_metodo.html" as dm with context %}'
             "{{ dm.box(source_label, source_url, dataset_updated, limits) }}",
             source_label=source_label, source_url=source_url,
-            dataset_updated=dataset_updated, limits=limits, editor_name=editor_name)
+            dataset_updated=dataset_updated, limits=limits)
 
 
 class IlRiquadroDatiEMetodo(unittest.TestCase):
@@ -34,7 +34,7 @@ class IlRiquadroDatiEMetodo(unittest.TestCase):
         self.assertIn("Fonte:", reso)
         self.assertIn("Istat, indicatori territoriali", reso)
         self.assertIn("A cura di", reso)
-        self.assertIn("Test Redazione", reso)
+        self.assertIn(REDAZIONE, reso)
         self.assertIn('href="/metodologia"', reso)
 
     def test_non_scrive_una_data_quando_la_fonte_non_la_registra(self):
