@@ -41,12 +41,12 @@ external_figures:
   what: aumento percentuale del reddito disponibile medio per abitante in Italia dovuto alla redistribuzione pubblica, 2023
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
-- value: "17,5"
-  what: incidenza percentuale della redistribuzione sul reddito disponibile nel Mezzogiorno, 2023
+- value: "22,0"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile in Calabria, 2023
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
-- value: "2,3"
-  what: incidenza percentuale della redistribuzione sul reddito disponibile nel Nord-ovest, 2023
+- value: "0,2"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile in Lombardia, 2023
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
 ---
