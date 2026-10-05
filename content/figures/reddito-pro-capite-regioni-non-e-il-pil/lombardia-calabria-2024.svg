@@ -1,0 +1,23 @@
+<svg class="fig fig--narrow" viewBox="0 0 370 262" role="img" aria-labelledby="fig-lombardia-calabria-2024-t fig-lombardia-calabria-2024-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-lombardia-calabria-2024-t">Lombardia su Calabria: 2,3 volte sul PIL, 1,7 sul reddito</title>
+<desc id="fig-lombardia-calabria-2024-d">Lombardia e Calabria nel 2024, in euro per abitante. PIL: 50.399 contro 21.702. Reddito disponibile delle famiglie: 28.154 contro 16.796.</desc>
+<text class="fig__title" x="0" y="18">Lombardia su Calabria: 2,3 volte</text>
+<text class="fig__title" x="0" y="37">sul PIL, 1,7 sul reddito</text>
+<text class="fig__subtitle" x="0" y="57">Euro per abitante, valori correnti, 2024.</text>
+<text class="fig__subtitle" x="0" y="98">PIL per abitante</text>
+<text class="fig__name" x="62" y="122" text-anchor="end">Lombardia</text>
+<rect class="fig__bar" x="70" y="110" width="246.0" height="16"/>
+<text class="fig__value" x="322.0" y="122">50.399</text>
+<text class="fig__name" x="62" y="144" text-anchor="end">Calabria</text>
+<rect class="fig__bar" x="70" y="132" width="105.9" height="16"/>
+<text class="fig__value" x="181.9" y="144">21.702</text>
+<text class="fig__subtitle" x="0" y="172">Reddito disponibile delle famiglie</text>
+<text class="fig__name is-on" x="62" y="196" text-anchor="end">Lombardia</text>
+<rect class="fig__bar is-on" x="70" y="184" width="137.4" height="16"/>
+<text class="fig__value is-on" x="213.4" y="196">28.154</text>
+<text class="fig__name is-on" x="62" y="218" text-anchor="end">Calabria</text>
+<rect class="fig__bar is-on" x="70" y="206" width="82.0" height="16"/>
+<text class="fig__value is-on" x="158.0" y="218">16.796</text>
+<text class="fig__source" x="0" y="242">Fonte: Istat, Conti economici territoriali,</text>
+<text class="fig__source" x="0" y="256">edizione dicembre 2025. Elaborazione Divario Italia.</text>
+</svg>

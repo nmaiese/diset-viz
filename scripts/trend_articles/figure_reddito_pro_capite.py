@@ -1,4 +1,4 @@
-"""Le due figure e la copertina del pezzo sul reddito pro capite.
+"""Le tre figure del pezzo sul reddito pro capite.
 
 Il pezzo confronta PIL pro capite (ter-901) e reddito disponibile delle famiglie
 per abitante (ter-902) sulle stesse venti regioni. Nessun dossier: i valori si
@@ -21,7 +21,6 @@ from app import data  # noqa: E402
 
 SLUG = "reddito-pro-capite-regioni-non-e-il-pil"
 OUT = ROOT / "content" / "figures" / SLUG
-COVER = ROOT / "app" / "static" / "img" / "blog" / "reddito-pro-capite.svg"
 W = 370
 SOURCE = ("Fonte: Istat, Conti economici territoriali,", "edizione dicembre 2025. Elaborazione Divario Italia.")
 
@@ -32,6 +31,10 @@ def source_lines(height: int) -> list[str]:
 
 def it(x: float, dec: int = 2) -> str:
     return f"{x:.{dec}f}".replace(".", ",")
+
+
+def eur(x: float) -> str:
+    return f"{x:,.0f}".replace(",", ".")
 
 
 def series(key: str) -> dict[str, dict[int, float]]:
@@ -143,36 +146,35 @@ def slope_figure(pil, red) -> str:
     return "\n".join(parts)
 
 
-def cover(pil, red) -> str:
-    """1200x630, colori cotti come le altre copertine (dentro un <img> la pagina non li legge)."""
-    ink, soft, nord, sud, bar = "#121519", "#3e4650", "#2466c3", "#983c75", "#093e6f"
-    disp = "'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif"
-    scale = 560 / pil["Lombardia"][2024]
-    rows = [
-        ("PIL per abitante", "Lombardia", pil["Lombardia"][2024], nord, 250),
-        (None, "Calabria", pil["Calabria"][2024], sud, 300),
-        ("Reddito disponibile delle famiglie per abitante", "Lombardia", red["Lombardia"][2024], nord, 420),
-        (None, "Calabria", red["Calabria"][2024], sud, 470),
-    ]
-    rp = pil["Lombardia"][2024] / pil["Calabria"][2024]
-    rr = red["Lombardia"][2024] / red["Calabria"][2024]
-    out = [
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="\'Sofia Sans\', Arial, sans-serif">',
-        '  <rect width="1200" height="630" fill="#ffffff"/>',
-        f'  <text x="56" y="84" font-size="22" font-weight="600" fill="{soft}">Divario Italia · dati 2024</text>',
-        f'  <text x="54" y="150" font-size="52" font-weight="700" font-family="{disp}" fill="{ink}">Reddito e PIL: due distanze</text>',
-        f'  <text x="56" y="192" font-size="22" fill="{soft}">Lombardia e Calabria · euro per abitante, valori correnti</text>',
-    ]
-    for label, name, v, color, y in rows:
-        if label:
-            out.append(f'  <text x="56" y="{y - 14}" font-size="22" font-weight="600" fill="{ink}">{escape(label)}</text>')
-        w = v * scale
-        out.append(f'  <rect x="56" y="{y}" width="{w:.0f}" height="34" fill="{color}"/>')
-        out.append(f'  <text x="{56 + w + 14:.0f}" y="{y + 25}" font-size="24" font-weight="700" font-family="{disp}" fill="{ink}">{f"{v:,.0f}".replace(",", ".")}</text>')
-        out.append(f'  <text x="70" y="{y + 24}" font-size="20" font-weight="600" fill="#ffffff">{name}</text>')
-    out.append(f'  <text x="56" y="590" font-size="26" font-weight="600" fill="{ink}">Lombardia su Calabria: {it(rp, 1)} volte sul PIL, {it(rr, 1)} sul reddito</text>')
-    out.append("</svg>")
-    return "\n".join(out)
+def bars_figure(pil, red) -> str:
+    lom_p, cal_p = pil["Lombardia"][2024], pil["Calabria"][2024]
+    lom_r, cal_r = red["Lombardia"][2024], red["Calabria"][2024]
+    rp, rr = lom_p / cal_p, lom_r / cal_r
+    title = f"Lombardia su Calabria: {it(rp, 1)} volte sul PIL, {it(rr, 1)} sul reddito"
+    desc = (f"Lombardia e Calabria nel 2024, in euro per abitante. PIL: {eur(lom_p)} contro {eur(cal_p)}. "
+            f"Reddito disponibile delle famiglie: {eur(lom_r)} contro {eur(cal_r)}.")
+    height, left, right = 262, 70, 54
+    scale = (W - left - right) / lom_p
+    parts, _ = head("fig-lombardia-calabria-2024", height,
+                    [f"Lombardia su Calabria: {it(rp, 1)} volte", f"sul PIL, {it(rr, 1)} sul reddito"],
+                    ["Euro per abitante, valori correnti, 2024."],
+                    title, desc)
+    y = 98
+    for label, rows, on in (("PIL per abitante", (("Lombardia", lom_p), ("Calabria", cal_p)), False),
+                            ("Reddito disponibile delle famiglie", (("Lombardia", lom_r), ("Calabria", cal_r)), True)):
+        c = " is-on" if on else ""
+        parts.append(f'<text class="fig__subtitle" x="0" y="{y}">{escape(label)}</text>')
+        y += 12
+        for name, v in rows:
+            w = v * scale
+            parts.append(f'<text class="fig__name{c}" x="{left - 8}" y="{y + 12}" text-anchor="end">{name}</text>')
+            parts.append(f'<rect class="fig__bar{c}" x="{left}" y="{y}" width="{w:.1f}" height="16"/>')
+            parts.append(f'<text class="fig__value{c}" x="{left + w + 6:.1f}" y="{y + 12}">{eur(v)}</text>')
+            y += 22
+        y += 18
+    parts += source_lines(height)
+    parts.append("</svg>")
+    return "\n".join(parts)
 
 
 def main() -> int:
@@ -180,7 +182,7 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "distanza-pil-reddito.svg").write_text(lines_figure(pil, red) + "\n", encoding="utf-8")
     (OUT / "posti-pil-reddito.svg").write_text(slope_figure(pil, red) + "\n", encoding="utf-8")
-    COVER.write_text(cover(pil, red) + "\n", encoding="utf-8")
+    (OUT / "lombardia-calabria-2024.svg").write_text(bars_figure(pil, red) + "\n", encoding="utf-8")
     return 0
 
 

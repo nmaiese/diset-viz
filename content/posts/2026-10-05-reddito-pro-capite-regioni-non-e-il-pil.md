@@ -5,8 +5,15 @@ slug: reddito-pro-capite-regioni-non-e-il-pil
 description: "Il reddito pro capite per regione nel 2024 va da 28.154 euro a testa in Lombardia a 16.796 in Calabria. Sul reddito le distanze sono più corte che sul PIL."
 date: 2026-10-05
 draft: true
-cover: /static/img/blog/reddito-pro-capite.svg
-cover_alt: "Lombardia e Calabria nel 2024, in euro per abitante. PIL: 50.399 contro 21.702. Reddito disponibile delle famiglie: 28.154 contro 16.796. Grafico a barre."
+cover: /static/img/blog/reddito-pro-capite-regioni-non-e-il-pil.jpg
+cover_alt: "Un portafoglio nero aperto, tenuto in mano, con banconote da cinque euro e di altri tagli."
+cover_credit:
+  author: "Santeri Viinamäki"
+  license: "CC BY-SA 4.0"
+  license_url: "https://creativecommons.org/licenses/by-sa/4.0"
+  source_url: "https://commons.wikimedia.org/wiki/File:Euro_banknotes_in_wallet.jpg"
+  source_name: "Wikimedia Commons"
+  changes: "Ritagliata e ridimensionata"
 tags:
   - Reddito e ricchezza
   - PIL
@@ -48,6 +55,8 @@ Chi cerca il reddito pro capite delle regioni italiane trova quasi sempre un'alt
 
 Nel 2024 il reddito disponibile delle famiglie valeva **28.154 euro per abitante in [Lombardia](/regione/lombardia) e 16.796 in [Calabria](/regione/calabria)**. Sono 11.358 euro a testa. In proporzione è meno della distanza fra le due regioni sul PIL.
 {: .data-callout}
+
+<!-- figura: lombardia-calabria-2024 -->
 
 ## Dove si produce e dove si vive
 
