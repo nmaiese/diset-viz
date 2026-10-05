@@ -62,6 +62,20 @@ class TestLastmod(unittest.TestCase):
             lastmod._date_fonti.cache_clear()
             self.assertIsNone(lastmod.lastmod_scheda("territorial", "regione"))
 
+    def test_json_valido_ma_di_forma_sbagliata_non_fa_cadere_la_sitemap(self):
+        """La sitemap non deve mai rispondere 500 per un `source_state.json` strano."""
+        for contenuto in ('[]', '"testo"', '{"sources": []}', '{"sources": null}',
+                          '{"sources": {"istat_bes_regioni": "x", "istat_indicatori_territoriali": []}}'):
+            with self.subTest(contenuto=contenuto):
+                with tempfile.TemporaryDirectory() as tmp:
+                    path = Path(tmp) / "source_state.json"
+                    path.write_text(contenuto, encoding="utf-8")
+                    with mock.patch.object(lastmod, "_SOURCE_STATE", path):
+                        lastmod._date_fonti.cache_clear()
+                        self.assertIsNone(lastmod.lastmod_regione())
+                        self.assertIsNone(lastmod.lastmod_scheda("bes", "regione"))
+                lastmod._date_fonti.cache_clear()
+
     def test_la_data_non_dipende_da_oggi(self):
         """Per costruzione: il modulo non legge l'orologio, ne' mtime di file."""
         self.addCleanup(_con_stato({

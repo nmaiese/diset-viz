@@ -41,13 +41,16 @@ def _date_fonti():
     """`{fonte: 'YYYY-MM-DD'}` da `source_state.json`; vuoto se manca o e' guasto."""
     try:
         sources = json.loads(_SOURCE_STATE.read_text(encoding="utf-8")).get("sources", {})
-    except (OSError, ValueError):
+        sources = dict(sources)
+    except (OSError, ValueError, AttributeError, TypeError):
+        # File assente, non JSON o di forma diversa da quella attesa: nessuna
+        # data, e la sitemap resta valida invece di rispondere 500.
         return {}
     dates = {}
     for name, state in sources.items():
         try:
             dates[name] = parsedate_to_datetime(state["last_modified"]).date().isoformat()
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, AttributeError):
             continue
     return dates
 
