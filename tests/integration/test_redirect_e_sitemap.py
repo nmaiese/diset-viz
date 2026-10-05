@@ -107,6 +107,22 @@ class TestSitemapFinalUrls(unittest.TestCase):
         cls.locs = re.findall(r"<loc>(.*?)</loc>", sitemap)
         cls.client = client
 
+    def test_lastmod_solo_dove_la_data_e_vera(self):
+        """Regioni e schede territoriali/BES portano la data dei dati, le province
+        e le pagine statiche nessuna, e nessuna voce e' la data di oggi per
+        costruzione: la fonte e' `source_state.json`, non l'orologio."""
+        from app import lastmod
+
+        xml = self.client.get("/sitemap.xml", base_url=APEX).get_data(as_text=True)
+        voci = {m.group(1): m.group(2)
+                for m in re.finditer(r"<url>\s*<loc>(.*?)</loc>(?:\s*<lastmod>(.*?)</lastmod>)?", xml)}
+        regione = f"{APEX}/regione/molise"
+        self.assertEqual(voci[regione], lastmod.lastmod_regione())
+        self.assertIsNone(voci[f"{APEX}/"])
+        self.assertTrue(all(voci[loc] is None for loc in voci if "/provincia/" in loc))
+        for data in filter(None, voci.values()):
+            self.assertRegex(data, r"^\d{4}-\d{2}-\d{2}$")
+
     def test_only_apex_https_and_no_legacy_form(self):
         self.assertGreater(len(self.locs), 400)
         self.assertEqual(len(self.locs), len(set(self.locs)))
