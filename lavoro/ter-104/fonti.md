@@ -49,3 +49,8 @@ Foto di riserva, non lette fino in fondo (solo metadati dall'API di Commons, lic
 7. **Il confronto con l'UE per regione.** Eurostat dà il dato nazionale su questa definizione, ma qui non è stato letto un dato regionale Eurostat equivalente: il confronto regione-UE non è fondato sul materiale raccolto.
 8. **Dire "ultimo dato 2025" per le regioni.** Il sito arriva al 2024. Il 2025 esiste solo come dato nazionale Eurostat (33,0 contro 18,8) e Istat non ha ancora pubblicato il report 2025.
 9. **La copertina come illustrazione del Sud.** La foto è un'aula di Trento: è un'immagine generica di scuola, non del divario.
+
+## Ricalcoli del sito usati dalla scheda (derivati da valori gia nelle fonti sopra, verificati da una seconda persona, vedi `numeri.md`)
+- Salto della serie nazionale Istat fra 2022 e 2023: 37,44 meno 34,81 = 2,63 punti, cioe circa 2,6 (riga 4).
+- Distanza Mezzogiorno meno Nord, medie semplici delle regioni: 44,0 meno 34,7 = 9,3 punti nel 2018; 38,2 meno 30,2 = 8,0 punti nel 2024.
+- Rapporto Mezzogiorno/Nord: 43,95 / 34,66 = 1,27 nel 2018; 38,22 / 30,19 = 1,27 nel 2024.
