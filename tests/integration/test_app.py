@@ -1602,7 +1602,7 @@ class LUniversoHaUnProprietarioSolo(unittest.TestCase):
             self.assertEqual(vista["meta"]["indexable_reason"], "variante")
 
     def test_un_motivo_per_ogni_pagina_fuori_indice(self):
-        """`variante`, `copertura` e `vecchia` si riparano in tre modi diversi:
+        """I motivi si riparano in modi diversi:
         un motivo unico li appiattirebbe e la riga si leggerebbe come un guasto
         invece che come una scelta."""
         from app import indicator_universe
@@ -1611,7 +1611,10 @@ class LUniversoHaUnProprietarioSolo(unittest.TestCase):
             if meta["indexable"]:
                 self.assertIsNone(meta["indexable_reason"])
             else:
-                self.assertIn(meta["indexable_reason"], ("variante", "copertura", "vecchia"))
+                self.assertIn(
+                    meta["indexable_reason"],
+                    ("variante", "copertura", "vecchia", "senza_prosa"),
+                )
 
     def test_allargare_la_passata_non_cambia_la_sitemap(self):
         """Il dedup su `canonical_path` resta **dentro** il sottoinsieme
@@ -1714,6 +1717,18 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
             text, r"(?m)^COPY\s+config/game_indicators\.csv\s+config/game_indicators\.csv\s*$",
             "il Dockerfile non copia config/game_indicators.csv: in produzione le sfide "
             "del giorno di Chi e' maggiore? e Ordina rispondono 500.",
+        )
+
+    def test_the_indicator_search_metrics_csv_is_shipped(self):
+        """`app/seo_policy.py` legge `config/indicator_search_metrics.csv` a runtime.
+        `reports/` non entra nell'immagine: senza questa COPY la regola del contenuto
+        fallisce aperta in produzione e le schede senza prosa restano nell'indice, un
+        guasto che la suite qui, che gira col repo intero, non vede."""
+        text = (self.ROOT / "Dockerfile").read_text(encoding="utf-8")
+        self.assertRegex(
+            text, r"(?m)^COPY\s+config/indicator_search_metrics\.csv\s+config/indicator_search_metrics\.csv\s*$",
+            "il Dockerfile non copia config/indicator_search_metrics.csv: in produzione "
+            "la regola del contenuto fallisce aperta e le schede senza prosa restano nell'indice.",
         )
 
     def test_dockerignore_keeps_runtime_state_out_of_the_image(self):

@@ -20,9 +20,17 @@ import random
 import re
 import unittest
 
-from app import app, home_pick, sources
+from app import app, home_pick, indicator_universe, sources
 from app.design.common import PLACEHOLDER
 from tests.integration.test_v1_pages import FUGHE, visible_text
+
+
+def _prima_scheda_provinciale_a_due_livelli():
+    """Il codice di una scheda con regioni e province la cui `/province` e'
+    indicizzabile, ricavato dal catalogo: gli esempi fissi escono dall'indice
+    quando la regola dei contenuti li mette in classe b."""
+    page = next(p for p in indicator_universe.level_pages() if not p["base"])
+    return sources.indicator_code(page["meta"]["family"], page["meta"]["raw_id"])
 
 
 class OgniCoppiaDelPool(unittest.TestCase):
@@ -39,10 +47,12 @@ class OgniCoppiaDelPool(unittest.TestCase):
     def test_la_mappa_ha_un_alternativa_testuale_completa(self):
         from app.design.pages import home
 
-        html = self.client.get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
+        with app.app_context():
+            code = _prima_scheda_provinciale_a_due_livelli()
+        html = self.client.get(f"/?indicatore={code}&livello=provincia").get_data(as_text=True)
         block = re.search(r'<details class="home-map-values".*?</details>', html, re.S).group(0)
         with app.app_context():
-            level = home.feature(home_pick.pick("bes-01SAL001", "provincia"))["levels"][0]
+            level = home.feature(home_pick.pick(code, "provincia"))["levels"][0]
         self.assertIn("Leggi i valori dell'indicatore", block)
         self.assertIn('class="home-map-values__list"', block)
         self.assertEqual(block.count("<li>"), len(level["value_rows"]))
@@ -166,9 +176,11 @@ class LaSchedaSulSuoLivello(unittest.TestCase):
                             self.assertEqual(panel["scheda"], atteso)
 
     def test_titolo_e_bottone_del_pannello_province(self):
-        html = app.test_client().get("/?indicatore=bes-01SAL001&livello=provincia").get_data(as_text=True)
-        self.assertRegex(html, r'<h3 class="feat__name" id="feat-name"><a href="[^"]*/bes-01SAL001/province"')
-        self.assertIn("/bes-01SAL001/province\">Tutto l'indicatore", html)
+        with app.app_context():
+            code = _prima_scheda_provinciale_a_due_livelli()
+        html = app.test_client().get(f"/?indicatore={code}&livello=provincia").get_data(as_text=True)
+        self.assertRegex(html, rf'<h3 class="feat__name" id="feat-name"><a href="[^"]*/{code}/province"')
+        self.assertIn(f"/{code}/province\">Tutto l'indicatore", html)
 
 
 class LeFrasi(unittest.TestCase):

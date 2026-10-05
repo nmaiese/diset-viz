@@ -104,7 +104,11 @@
   <p class="page-lead">{{ page_lead | analyst_html }}</p>
   <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa pagina</a>.</p>
   {% if not meta.indexable %}
+  {% if meta.indexable_reason == "senza_prosa" %}
+  <p class="page-note">Questa pagina resta consultabile, ma non ha ancora un commento scritto e non ha ricevuto impressioni da Google nei 28 giorni misurati.</p>
+  {% else %}
   <p class="page-note">Questa pagina resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
+  {% endif %}
   {% endif %}
 
   <nav class="page-note" aria-label="Domande a cui risponde questo indicatore">

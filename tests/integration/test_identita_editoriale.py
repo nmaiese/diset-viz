@@ -34,7 +34,7 @@ from app import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-# Il gestore GitHub personale: non deve comparire in nessuna pagina servita.
+# L'account GitHub personale: non deve comparire in nessuna pagina servita.
 GESTORE_GITHUB = "nm" + "aiese"
 COGNOME_TITOLARE = "mai" + "ese"
 EMAIL_PERSONALE = COGNOME_TITOLARE + ".next" + "@" + "gmail" + ".com"
@@ -44,19 +44,19 @@ GESTORI_GITHUB_AMMESSI = {
     # Organizzazione che pubblica dati, citata come fonte in app/sources.py.
     "openpolis",
 }
-# Rotte GET che richiedono una sessione oppure rifiutano una richiesta priva
-# dei parametri obbligatori. Il test verifica sotto che restino 4xx: quando una
-# diventa pubblicamente servibile va rimossa da questa mappa. La chiave e' la
-# regola (path), non l'endpoint: due endpoint possono condividere lo stesso
-# nome di funzione, il path no.
+# Rotte GET che restituiscono 4xx senza autenticazione o parametro valido.
+# Il test verifica sotto status e motivo: se diventano pubbliche vanno rimosse.
 GET_ENDPOINTS_4XX = {
-    "/api/account/export": "richiede autenticazione",
-    "/api/atlante/modulo": "richiede il parametro indicatore",
-    "/api/comparisons": "richiede autenticazione",
-    "/api/favorites": "richiede autenticazione",
-    "/api/game/leaderboard": "richiede il parametro game",
-    "/api/game/order/round": "richiede una sessione di gioco",
-    "/api/player/me": "richiede autenticazione",
+    "/api/account/export": ("richiede autenticazione", 401),
+    "/api/atlante/modulo": ("senza indicatore valido restituisce 404", 404),
+    "/api/comparisons": ("richiede autenticazione", 401),
+    "/api/favorites": ("richiede autenticazione", 401),
+    "/api/player/me": ("richiede autenticazione", 401),
+}
+# Rotte che sono pubbliche solo con query obbligatoria.
+GET_QUERY_PATHS = {
+    "/api/game/leaderboard": ("/api/game/leaderboard?mode=compare", 200),
+    "/api/game/order/round": ("/api/game/order/round?count=5", 200),
 }
 NOME_DI_PROVA = "Zeta Provaldi"
 IDENTITA_PERSONA = f"""\
@@ -95,8 +95,7 @@ def find_personal_identifiers(response, path):
             or response.mimetype == "application/linkset+json"):
         return set()
 
-    # Doppia codifica (`MAI%26%23101%3BSE` -> `MAI&#101;SE` -> `MAIESE`): si
-    # decodifica in ciclo finche' il testo smette di cambiare.
+    # Doppia codifica: si decodifica in ciclo finche' il testo smette di cambiare.
     text = response.get_data(as_text=True)
     while True:
         decoded = unquote(unescape(text))
@@ -244,9 +243,14 @@ def served_paths(client):
                 continue
             paths.add(representative)
             visited_rules.add(rule.rule)
-        elif rule.rule not in GET_ENDPOINTS_4XX:
+        elif rule.rule not in GET_ENDPOINTS_4XX and rule.rule not in GET_QUERY_PATHS:
             paths.add(rule.rule)
             visited_rules.add(rule.rule)
+    for path, (representative, _) in GET_QUERY_PATHS.items():
+        if not any(rule.rule == path and "GET" in rule.methods for rule in app.url_map.iter_rules()):
+            raise AssertionError(f"regola GET query non trovata: {path}")
+        paths.add(representative)
+        visited_rules.add(path)
     if unresolved:
         raise AssertionError(
             "regole GET con parametri senza un valore rappresentativo: "
@@ -282,8 +286,11 @@ class RicercaIdentificativiPersonaliTest(unittest.TestCase):
 
     def test_il_dominio_personale_conta_solo_se_configurato(self):
         corpo = "Approfondimento su https://esempio.invalid/chi-sono"
+        risposta = Response(corpo, content_type="text/plain")
+        with mock.patch.object(sys.modules[__name__], "DOMINI_PERSONALI", ()):
+            self.assertNotIn("dominio_personale", find_personal_identifiers(risposta, "/"))
         with mock.patch.object(sys.modules[__name__], "DOMINI_PERSONALI", ("esempio.invalid",)):
-            trovati = find_personal_identifiers(Response(corpo, content_type="text/plain"), "/")
+            trovati = find_personal_identifiers(risposta, "/")
         self.assertIn("dominio_personale", trovati)
 
 
@@ -402,13 +409,19 @@ class IdentitaEditorialeTest(unittest.TestCase):
         self.assertEqual(set(excluded), set(GET_ENDPOINTS_4XX),
                          "una esclusione non corrisponde piu' a una regola GET")
         for path, rule in excluded.items():
-            with self.subTest(esclusa=rule.rule, motivo=GET_ENDPOINTS_4XX[path]):
+            motivo, status_atteso = GET_ENDPOINTS_4XX[path]
+            with self.subTest(esclusa=rule.rule, motivo=motivo):
                 response = self.client.get(rule.rule)
                 try:
-                    self.assertGreaterEqual(
-                        response.status_code, 400,
-                        f"{rule.rule} ora risponde {response.status_code}: rimuovere l'esclusione",
-                    )
+                    self.assertEqual(response.status_code, status_atteso, motivo)
+                finally:
+                    response.close()
+
+        for path, (query_path, status_atteso) in GET_QUERY_PATHS.items():
+            with self.subTest(rotta_query=path):
+                response = self.client.get(query_path)
+                try:
+                    self.assertEqual(response.status_code, status_atteso, query_path)
                 finally:
                     response.close()
 

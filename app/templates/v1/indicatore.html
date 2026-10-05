@@ -130,7 +130,11 @@ addEventListener("pagereveal", function (e) {
       {% endif %}
     </p>
     {% if not meta.indexable %}
+    {% if meta.indexable_reason == "senza_prosa" %}
+    <p class="meta">Questa pagina resta consultabile, ma non ha ancora un commento scritto e non ha ricevuto impressioni da Google nei 28 giorni misurati.</p>
+    {% else %}
     <p class="meta">Questa pagina resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
+    {% endif %}
     {% endif %}
   </header>
   {% if d.tiles %}{{ ui.tiles(d.tiles) }}{% endif %}
