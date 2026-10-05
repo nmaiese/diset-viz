@@ -1,0 +1,106 @@
+/* proposta.css - miglioramenti di contrasto per la lettura (tema scuro) */
+
+:root[data-theme="dark"] {
+  /* Aumenta il contrasto del testo principale */
+  --ink: #f0f2f5;
+  --text-2: #d0d5db;
+  --muted: #a8aeb5;
+  
+  /* Link più visibili */
+  --link: #ffb340;
+  --accent: #ffb340;
+  --accent-strong: #ffcc66;
+  --accent-wash: #3d2b0a;
+  
+  /* Regole e bordi più visibili */
+  --rule: #3d434a;
+  --rule-strong: #4d535a;
+  --control-border: #80858a;
+  
+  /* Focus più evidente */
+  --focus: #ffb340;
+}
+
+/* Testo corpo: size minimo 16px, line-height 1.6 */
+.prose p, .prose li, .indicator-article p, .indicator-article li,
+.art-brief p.answer, .regione-intro, .regione-stacca__lead,
+.page-lead, .answer p, .art-body p, .art-body li {
+  font-size: max(16px, var(--fs-prose)) !important;
+  line-height: 1.65 !important;
+}
+
+/* Headings: scala più leggibile */
+h1, .h-display, .h-title { font-size: clamp(36px, 4vw, 48px) !important; line-height: 1.1 !important; }
+h2, .h-section, .h-sub { font-size: clamp(28px, 3vw, 36px) !important; line-height: 1.15 !important; }
+h3 { font-size: clamp(22px, 2.5vw, 28px) !important; line-height: 1.2 !important; }
+
+/* Link nel testo: sempre sottolineati, contrasto 3:1 vs testo */
+.prose a, .indicator-article a, .art-body a, .art-brief a {
+  color: var(--link) !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--link) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 0.2em !important;
+}
+.prose a:hover, .indicator-article a:hover, .art-body a:hover, .art-brief a:hover {
+  color: var(--accent-strong) !important;
+  text-decoration-color: var(--accent-strong) !important;
+}
+
+/* Meta, byline, caption: non sotto 14px */
+.meta, .byline, .art-hero__caption, .art-hero__credit,
+.regionmap__cap, .source, .chart-note, .subline,
+.answer .subline, .aside-block__label, .qlist a {
+  font-size: max(14px, var(--fs-small)) !important;
+  line-height: 1.5 !important;
+  color: var(--text-2) !important;
+}
+
+/* Tabelle: header e celle più leggibili */
+.table th, .table td { font-size: max(13px, var(--fs-small)) !important; line-height: 1.5 !important; }
+.table th { color: var(--ink) !important; font-weight: 600 !important; }
+.table td { color: var(--text-2) !important; }
+
+/* Card e blocchi: sfondo leggermente più chiaro del body per separazione */
+.card, .minicard, .aside-block, .section, .art-link,
+.lead-figure, .regionmap, .module, .within, .podiums,
+.rankwrap, .tablewrap, .analysis__map {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--rule) !important;
+  border-radius: var(--radius-panel) !important;
+}
+
+/* Badge e pill */
+.qz-badge, .gi-achv-state, .status, .n--nd {
+  font-size: max(12px, var(--fs-small)) !important;
+  padding: 2px 8px !important;
+  border-radius: var(--radius-control) !important;
+}
+
+/* Dettagli summary */
+details summary { cursor: pointer; font-weight: 600 !important; color: var(--ink) !important; }
+details summary::-webkit-details-marker { color: var(--ink); }
+
+/* TOC e navigazione */
+.toc a, .qlist a { color: var(--link) !important; text-decoration: underline !important; }
+.toc a:hover, .qlist a:hover { color: var(--accent-strong) !important; }
+
+/* Legenda e note */
+.legend, .lead-figure__head .seg, .stripbar__t {
+  font-size: max(13px, var(--fs-small)) !important;
+  color: var(--text-2) !important;
+}
+
+/* Input e controlli */
+input, select, textarea, button {
+  font-size: max(16px, var(--fs-ui)) !important;
+  min-height: 44px !important;
+}
+
+/* Riduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
