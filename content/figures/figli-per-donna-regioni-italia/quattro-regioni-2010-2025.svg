@@ -1,0 +1,51 @@
+<svg class="fig fig--narrow" viewBox="0 0 370 288" width="370" height="288" role="img" aria-labelledby="fig-quattro-regioni-2010-2025-t fig-quattro-regioni-2010-2025-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-quattro-regioni-2010-2025-t">Dal 2010 al 2025 la Sardegna scende da 1,18 a 0,85 figli per donna, il Trentino-Alto Adige da 1,63 a 1,40</title>
+<desc id="fig-quattro-regioni-2010-2025-d">Numero medio di figli per donna nel 2010 e nel 2025 in quattro regioni. Trentino-Alto Adige da 1,63 a 1,40. Sicilia da 1,42 a 1,23. Campania da 1,44 a 1,22. Sardegna da 1,18 a 0,85. Il 2025 è una stima.</desc>
+<text class="fig__title" x="0" y="18">Dal 2010 al 2025 la Sardegna scende da 1,18</text>
+<text class="fig__title" x="0" y="37">a 0,85 figli per donna, il Trentino-Alto Adige</text>
+<text class="fig__title" x="0" y="56">da 1,63 a 1,40</text>
+<text class="fig__subtitle" x="0" y="76">Figli per donna in quattro regioni.</text>
+<text class="fig__subtitle" x="0" y="91">Cerchio vuoto 2010, pieno 2025.</text>
+<text class="fig__axis-name" x="370" y="92" text-anchor="end">Variazione</text>
+<line class="fig__grid" x1="169.3" y1="98" x2="169.3" y2="216"/>
+<text class="fig__axis" x="169.3" y="232" text-anchor="middle">0,8</text>
+<line class="fig__grid" x1="196.5" y1="98" x2="196.5" y2="216"/>
+<text class="fig__axis" x="196.5" y="232" text-anchor="middle">1,0</text>
+<line class="fig__grid" x1="223.8" y1="98" x2="223.8" y2="216"/>
+<text class="fig__axis" x="223.8" y="232" text-anchor="middle">1,2</text>
+<line class="fig__grid" x1="251.1" y1="98" x2="251.1" y2="216"/>
+<text class="fig__axis" x="251.1" y="232" text-anchor="middle">1,4</text>
+<line class="fig__grid" x1="278.4" y1="98" x2="278.4" y2="216"/>
+<text class="fig__axis" x="278.4" y="232" text-anchor="middle">1,6</text>
+<text class="fig__name is-on" x="126" y="116" text-anchor="end">Trentino-Alto Adige</text>
+<line class="fig__dumb is-on" x1="251.1" y1="112" x2="282.5" y2="112"/>
+<circle class="fig__pt-dot fig__pt-dot--old is-on" cx="282.5" cy="112" r="3.5"/>
+<circle class="fig__pt-dot is-on" cx="251.1" cy="112" r="3.5"/>
+<text class="fig__value is-on" x="243.1" y="116" text-anchor="end">1,40</text>
+<text class="fig__value is-on" x="290.5" y="116">1,63</text>
+<text class="fig__value is-on" x="370" y="116" text-anchor="end">−0,23</text>
+<text class="fig__name is-on" x="126" y="146" text-anchor="end">Sicilia</text>
+<line class="fig__dumb is-on" x1="227.9" y1="142" x2="253.8" y2="142"/>
+<circle class="fig__pt-dot fig__pt-dot--old is-on" cx="253.8" cy="142" r="3.5"/>
+<circle class="fig__pt-dot is-on" cx="227.9" cy="142" r="3.5"/>
+<text class="fig__value is-on" x="219.9" y="146" text-anchor="end">1,23</text>
+<text class="fig__value is-on" x="261.8" y="146">1,42</text>
+<text class="fig__value is-on" x="370" y="146" text-anchor="end">−0,19</text>
+<text class="fig__name is-on" x="126" y="176" text-anchor="end">Campania</text>
+<line class="fig__dumb is-on" x1="226.5" y1="172" x2="256.5" y2="172"/>
+<circle class="fig__pt-dot fig__pt-dot--old is-on" cx="256.5" cy="172" r="3.5"/>
+<circle class="fig__pt-dot is-on" cx="226.5" cy="172" r="3.5"/>
+<text class="fig__value is-on" x="218.5" y="176" text-anchor="end">1,22</text>
+<text class="fig__value is-on" x="264.5" y="176">1,44</text>
+<text class="fig__value is-on" x="370" y="176" text-anchor="end">−0,22</text>
+<text class="fig__name is-on" x="126" y="206" text-anchor="end">Sardegna</text>
+<line class="fig__dumb is-on" x1="176.1" y1="202" x2="221.1" y2="202"/>
+<circle class="fig__pt-dot fig__pt-dot--old is-on" cx="221.1" cy="202" r="3.5"/>
+<circle class="fig__pt-dot is-on" cx="176.1" cy="202" r="3.5"/>
+<text class="fig__value is-on" x="168.1" y="206" text-anchor="end">0,85</text>
+<text class="fig__value is-on" x="229.1" y="206">1,18</text>
+<text class="fig__value is-on" x="370" y="206" text-anchor="end">−0,33</text>
+<text class="fig__note" x="0" y="250">L'asse parte da 0,6, non da zero.</text>
+<text class="fig__source" x="0" y="268">Fonte: Istat, Indicatori demografici, tasso di</text>
+<text class="fig__source" x="0" y="282">fecondità totale. 2025 stimato. Elaborazione Divario Italia.</text>
+</svg>

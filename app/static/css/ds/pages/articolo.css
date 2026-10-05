@@ -88,6 +88,14 @@
 .fig .fig__slope.is-on { stroke: var(--data-focus); stroke-width: 2.5; opacity: 1; }
 .fig .fig__pt-dot { fill: var(--cmp); }
 .fig .fig__pt-dot.is-on { fill: var(--data-focus); }
+/* Barre e manubri: l'evidenza e' il colore dei dati, mai l'arancio dell'interazione. */
+.fig--narrow .fig__bar { fill: var(--cmp); }
+.fig--narrow .fig__bar.is-on { fill: var(--data-focus); }
+.fig--narrow .fig__name, .fig--narrow .fig__value { fill: var(--ink); }
+.fig .fig__dumb { stroke: var(--cmp); stroke-width: 2; }
+.fig .fig__dumb.is-on { stroke: var(--data-focus); stroke-width: 3; }
+.fig .fig__pt-dot--old { fill: var(--bg); stroke: var(--cmp); stroke-width: 1.5; }
+.fig .fig__pt-dot--old.is-on { fill: var(--bg); stroke: var(--data-focus); stroke-width: 2; }
 
 /* ---------- rimando alla scheda, dati e metodo, storie ---------- */
 .art-link { margin-top: var(--space-8); max-width: var(--measure); padding-bottom: var(--space-4); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
