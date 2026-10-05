@@ -51,13 +51,13 @@ external_figures:
   url: https://www.istat.it/wp-content/uploads/2025/10/Natalita-e-fecondita-della-popolazione-residente_Anno-2024.pdf
 ---
 
-Nel 2025 il numero medio di figli per donna è più basso che nel 2010 in ogni regione italiana. L'indicatore riguarda tutte le residenti e applica i tassi di fecondità osservati nell'anno alle diverse età.
+In ogni regione italiana, rispetto al 2010, ogni anno nascono meno bambini per ogni donna in età fertile. Il calo non è stato uguale dappertutto.
 
-Quasi tutte le regioni stavano sopra quota 1,3 figli per donna. Oggi ce n'è una sola.
+Quasi tutte le regioni stavano a 1,3 o più figli per donna. Oggi ce n'è una sola.
 
-Nel [rapporto Istat sugli indicatori demografici del 2025](https://www.istat.it/wp-content/uploads/2026/03/Report_Indicatori-demografici_Anno-2025.pdf), il valore medio nazionale è 1,14, in calo dall'1,18 del 2024. Dove il numero è più alto? La risposta è diversa da quindici anni fa. Molte regioni che allora guidavano la classifica sono scese più delle altre. Sul podio, accanto al Trentino-Alto Adige, oggi ci sono Sicilia e Campania.
+Nel [rapporto Istat sugli indicatori demografici del 2025](https://www.istat.it/wp-content/uploads/2026/03/Report_Indicatori-demografici_Anno-2025.pdf), il valore medio nazionale è 1,14, in calo dall'1,18 del 2024. Dove se ne fanno di più è cambiato rispetto a quindici anni fa. Molte regioni che allora guidavano la classifica sono scese più delle altre. Sul podio, accanto al Trentino-Alto Adige, oggi ci sono Sicilia e Campania.
 
-Il valore nazionale è una stima dell'Istat. Le medie semplici non ponderate indicate nel riquadro metodologico si riferiscono alle sintesi del sito.
+Il valore nazionale è una stima dell'Istat.
 
 <!-- figura: quattro-regioni-2010-2025 -->
 
@@ -79,7 +79,7 @@ In fondo alla scala è successo il contrario. Dal 2007 al 2015 nessuna regione e
 
 La [Lombardia](/regione/lombardia) era terza in Italia nel 2010, con 1,56 figli per donna. La [Calabria](/regione/calabria) era diciassettesima, con 1,32.
 
-Nel 2025 la Calabria è quarta, con 1,19. Lombardia e [Veneto](/regione/veneto) hanno lo stesso valore, 1,16, e il sito le mette quinta e sesta in ordine alfabetico.
+Nel 2025 la Calabria è quarta, con 1,19. Lombardia e [Veneto](/regione/veneto) hanno lo stesso valore, 1,16, e il sito le mette quinta e sesta, a pari valore.
 
 La Calabria è salita in classifica anche se il suo valore è diminuito. Dal 2002 al 2025 è rimasto fra 1,19 e 1,32. La Lombardia nel 2002 partiva da 1,26, è salita fino a 1,56 e poi è scesa sotto il valore iniziale. Dal 2022 la Calabria sta sopra la Lombardia, con 1,28 contro 1,25 in quell'anno. Nel 2020 la distanza era di un centesimo, 1,26 contro 1,27, a favore della Lombardia. Sono scarti piccoli, e il 2025 è una stima. In quindici anni la Lombardia ha perso 0,40 figli per donna, poco più di tre volte il calo della Calabria.
 
