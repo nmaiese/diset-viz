@@ -1,0 +1,114 @@
+<svg class="fig fig--narrow" viewBox="0 0 370 564" role="img" aria-labelledby="fig-posti-pil-reddito-t fig-posti-pil-reddito-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-posti-pil-reddito-t">Lazio, Piemonte e Liguria cambiano posto tra PIL e reddito</title>
+<desc id="fig-posti-pil-reddito-d">Posto delle venti regioni nel 2024 nella classifica del PIL per abitante e in quella del reddito disponibile delle famiglie per abitante. Lazio da 5 a 10, Piemonte da 10 a 6, Liguria da 9 a 5. Trentino Alto Adige primo e Calabria ultima in entrambe. Cambiano posto 16 regioni su 20.</desc>
+<text class="fig__title" x="0" y="18">Lazio, Piemonte e Liguria cambiano</text>
+<text class="fig__title" x="0" y="37">posto tra PIL e reddito</text>
+<text class="fig__subtitle" x="0" y="57">Posto di ogni regione nella classifica per</text>
+<text class="fig__subtitle" x="0" y="72">abitante, 2024. 1 = valore più alto.</text>
+<text class="fig__axis-name" x="146" y="84" text-anchor="end">PIL</text>
+<text class="fig__axis-name" x="224" y="84">Reddito</text>
+<line class="fig__slope" x1="146" y1="98" x2="224" y2="98"/>
+<line class="fig__slope" x1="146" y1="118" x2="224" y2="118"/>
+<line class="fig__slope" x1="146" y1="138" x2="224" y2="158"/>
+<line class="fig__slope" x1="146" y1="158" x2="224" y2="138"/>
+<line class="fig__slope" x1="146" y1="198" x2="224" y2="238"/>
+<line class="fig__slope" x1="146" y1="218" x2="224" y2="258"/>
+<line class="fig__slope" x1="146" y1="238" x2="224" y2="218"/>
+<line class="fig__slope" x1="146" y1="298" x2="224" y2="318"/>
+<line class="fig__slope" x1="146" y1="318" x2="224" y2="298"/>
+<line class="fig__slope" x1="146" y1="338" x2="224" y2="338"/>
+<line class="fig__slope" x1="146" y1="358" x2="224" y2="418"/>
+<line class="fig__slope" x1="146" y1="378" x2="224" y2="358"/>
+<line class="fig__slope" x1="146" y1="398" x2="224" y2="378"/>
+<line class="fig__slope" x1="146" y1="418" x2="224" y2="458"/>
+<line class="fig__slope" x1="146" y1="438" x2="224" y2="398"/>
+<line class="fig__slope" x1="146" y1="458" x2="224" y2="438"/>
+<line class="fig__slope" x1="146" y1="478" x2="224" y2="478"/>
+<line class="fig__slope is-on" x1="146" y1="178" x2="224" y2="278"/>
+<line class="fig__slope is-on" x1="146" y1="258" x2="224" y2="178"/>
+<line class="fig__slope is-on" x1="146" y1="278" x2="224" y2="198"/>
+<circle class="fig__pt-dot" cx="146" cy="98" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="98" r="3"/>
+<text class="fig__pt-name" x="138" y="102" text-anchor="end">Trentino Alto Adige 1</text>
+<text class="fig__pt-name" x="232" y="102">1 Trentino Alto Adige</text>
+<circle class="fig__pt-dot" cx="146" cy="118" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="118" r="3"/>
+<text class="fig__pt-name" x="138" y="122" text-anchor="end">Lombardia 2</text>
+<text class="fig__pt-name" x="232" y="122">2 Lombardia</text>
+<circle class="fig__pt-dot" cx="146" cy="138" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="158" r="3"/>
+<text class="fig__pt-name" x="138" y="142" text-anchor="end">Valle d&#x27;Aosta 3</text>
+<text class="fig__pt-name" x="232" y="162">4 Valle d&#x27;Aosta</text>
+<circle class="fig__pt-dot" cx="146" cy="158" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="138" r="3"/>
+<text class="fig__pt-name" x="138" y="162" text-anchor="end">Emilia-Romagna 4</text>
+<text class="fig__pt-name" x="232" y="142">3 Emilia-Romagna</text>
+<circle class="fig__pt-dot" cx="146" cy="198" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="238" r="3"/>
+<text class="fig__pt-name" x="138" y="202" text-anchor="end">Veneto 6</text>
+<text class="fig__pt-name" x="232" y="242">8 Veneto</text>
+<circle class="fig__pt-dot" cx="146" cy="218" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="258" r="3"/>
+<text class="fig__pt-name" x="138" y="222" text-anchor="end">Toscana 7</text>
+<text class="fig__pt-name" x="232" y="262">9 Toscana</text>
+<circle class="fig__pt-dot" cx="146" cy="238" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="218" r="3"/>
+<text class="fig__pt-name" x="138" y="242" text-anchor="end">Friuli-Venezia Giulia 8</text>
+<text class="fig__pt-name" x="232" y="222">7 Friuli-Venezia Giulia</text>
+<circle class="fig__pt-dot" cx="146" cy="298" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="318" r="3"/>
+<text class="fig__pt-name" x="138" y="302" text-anchor="end">Marche 11</text>
+<text class="fig__pt-name" x="232" y="322">12 Marche</text>
+<circle class="fig__pt-dot" cx="146" cy="318" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="298" r="3"/>
+<text class="fig__pt-name" x="138" y="322" text-anchor="end">Umbria 12</text>
+<text class="fig__pt-name" x="232" y="302">11 Umbria</text>
+<circle class="fig__pt-dot" cx="146" cy="338" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="338" r="3"/>
+<text class="fig__pt-name" x="138" y="342" text-anchor="end">Abruzzo 13</text>
+<text class="fig__pt-name" x="232" y="342">13 Abruzzo</text>
+<circle class="fig__pt-dot" cx="146" cy="358" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="418" r="3"/>
+<text class="fig__pt-name" x="138" y="362" text-anchor="end">Basilicata 14</text>
+<text class="fig__pt-name" x="232" y="422">17 Basilicata</text>
+<circle class="fig__pt-dot" cx="146" cy="378" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="358" r="3"/>
+<text class="fig__pt-name" x="138" y="382" text-anchor="end">Sardegna 15</text>
+<text class="fig__pt-name" x="232" y="362">14 Sardegna</text>
+<circle class="fig__pt-dot" cx="146" cy="398" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="378" r="3"/>
+<text class="fig__pt-name" x="138" y="402" text-anchor="end">Molise 16</text>
+<text class="fig__pt-name" x="232" y="382">15 Molise</text>
+<circle class="fig__pt-dot" cx="146" cy="418" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="458" r="3"/>
+<text class="fig__pt-name" x="138" y="422" text-anchor="end">Campania 17</text>
+<text class="fig__pt-name" x="232" y="462">19 Campania</text>
+<circle class="fig__pt-dot" cx="146" cy="438" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="398" r="3"/>
+<text class="fig__pt-name" x="138" y="442" text-anchor="end">Puglia 18</text>
+<text class="fig__pt-name" x="232" y="402">16 Puglia</text>
+<circle class="fig__pt-dot" cx="146" cy="458" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="438" r="3"/>
+<text class="fig__pt-name" x="138" y="462" text-anchor="end">Sicilia 19</text>
+<text class="fig__pt-name" x="232" y="442">18 Sicilia</text>
+<circle class="fig__pt-dot" cx="146" cy="478" r="3"/>
+<circle class="fig__pt-dot" cx="224" cy="478" r="3"/>
+<text class="fig__pt-name" x="138" y="482" text-anchor="end">Calabria 20</text>
+<text class="fig__pt-name" x="232" y="482">20 Calabria</text>
+<circle class="fig__pt-dot is-on" cx="146" cy="178" r="3"/>
+<circle class="fig__pt-dot is-on" cx="224" cy="278" r="3"/>
+<text class="fig__pt-name is-on" x="138" y="182" text-anchor="end">Lazio 5</text>
+<text class="fig__pt-name is-on" x="232" y="282">10 Lazio</text>
+<circle class="fig__pt-dot is-on" cx="146" cy="258" r="3"/>
+<circle class="fig__pt-dot is-on" cx="224" cy="178" r="3"/>
+<text class="fig__pt-name is-on" x="138" y="262" text-anchor="end">Liguria 9</text>
+<text class="fig__pt-name is-on" x="232" y="182">5 Liguria</text>
+<circle class="fig__pt-dot is-on" cx="146" cy="278" r="3"/>
+<circle class="fig__pt-dot is-on" cx="224" cy="198" r="3"/>
+<text class="fig__pt-name is-on" x="138" y="282" text-anchor="end">Piemonte 10</text>
+<text class="fig__pt-name is-on" x="232" y="202">6 Piemonte</text>
+<text class="fig__note" x="0" y="512">Cambiano posto 16 regioni su 20.</text>
+<text class="fig__note" x="0" y="526">In evidenza Lazio, Piemonte e Liguria.</text>
+<text class="fig__source" x="0" y="544">Fonte: Istat, Conti economici territoriali,</text>
+<text class="fig__source" x="0" y="558">edizione dicembre 2025. Elaborazione Divario Italia.</text>
+</svg>

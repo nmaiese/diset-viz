@@ -1,0 +1,35 @@
+{
+  "title": "File:Euro banknotes in wallet.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Euro_banknotes_in_wallet.jpg",
+  "original": "https://upload.wikimedia.org/wikipedia/commons/2/21/Euro_banknotes_in_wallet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "preview": null,
+  "mime": "image/jpeg",
+  "width": 3648,
+  "height": 2736,
+  "author": "Santeri Viinamäki",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+  "attribution_required": "true",
+  "description": "Euro banknotes in wallet.",
+  "date": "2016-09-22 17:42:55",
+  "categories": "Taken with Olympus E-400|Second series Euro banknotes|Photographs taken on 2016-09-22",
+  "chosen_on": "2026-10-05",
+  "site_file": "/static/img/blog/reddito-pro-capite-regioni-non-e-il-pil.jpg",
+  "original_size": [
+    3648,
+    2736
+  ],
+  "focus": [
+    0.5,
+    0.5
+  ],
+  "changes": "ritaglio a 1200x630 e compressione JPG",
+  "cover_credit": {
+    "author": "Santeri Viinamäki",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Euro_banknotes_in_wallet.jpg",
+    "source_name": "Wikimedia Commons",
+    "changes": "Ritagliata e ridimensionata"
+  }
+}
