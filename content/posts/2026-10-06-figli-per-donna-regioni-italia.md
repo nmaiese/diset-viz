@@ -53,7 +53,7 @@ external_figures:
 
 In quindici anni le donne italiane hanno fatto meno figli, in tutte le regioni. Ma non dappertutto allo stesso modo.
 
-Quindici anni fa quasi tutte le regioni stavano sopra quota 1,3 figli per donna. Oggi ce n'è una sola. Molte delle regioni che erano in testa sono scese più delle altre.
+Quasi tutte le regioni stavano sopra quota 1,3 figli per donna. Oggi ce n'è una sola.
 
 Chi cerca quanti figli fa in media una donna in Italia trova un numero solo, 1,14. È la stima dell'Istat per il 2025, in calo dall'1,18 del 2024. Ma la domanda che viene subito dopo, dove se ne fanno di più, ha oggi una risposta diversa da quella di quindici anni fa. Molte delle regioni che allora guidavano la classifica sono scese più delle altre. Sul podio, accanto al Trentino-Alto Adige, oggi ci sono Sicilia e Campania.
 
