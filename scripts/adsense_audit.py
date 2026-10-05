@@ -283,7 +283,7 @@ def build_report(payload: dict) -> str:
     lines.append("")
     w2 = payload.get("w2")
     if w2 is None:
-        lines.append(f"- rapporto W2 assente o non leggibile ({W2_REPORT}): imposta W2_REPORT per indicarlo.")
+        lines.append("- rapporto W2 non trovato")
     else:
         lines.append(f"- link rotti: {w2.get('link_rotti')}")
         lines.append(f"- link verso URL non in sitemap: {w2.get('fuori_sitemap')}")
