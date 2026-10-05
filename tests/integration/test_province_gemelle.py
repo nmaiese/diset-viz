@@ -9,7 +9,7 @@ livello provinciale non aveva la mappa, che quella regionale ha.
 import re
 import unittest
 
-from app import app, bes_data, indicator_view, sources
+from app import app, bes_data, indicator_universe, indicator_view, sources
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_TWINS
 
 
@@ -99,10 +99,20 @@ class LeSchedeProvincialiNeiTemi(unittest.TestCase):
                     self.assertIn(f'href="{livello["canonical_path"]}"', sezione)
 
     def test_il_markdown_del_tema_porta_le_province(self):
-        markdown = app.test_client().get("/tema/istituzioni-e-partecipazione",
-                                         headers={"Accept": "text/markdown"}).get_data(as_text=True)
-        self.assertIn("## Per provincia", markdown)
-        self.assertIn("/bes-06POL012P)", markdown)
+        """Ogni scheda con la vista provinciale indicizzabile sta nel markdown
+        del suo tema, sotto "Per provincia". Le schede in classe b sono fuori."""
+        client = app.test_client()
+        with app.app_context():
+            pagine = [p for p in indicator_universe.level_pages() if p["level"]["key"] == "provincia"]
+        self.assertTrue(pagine)
+        temi = {}
+        for pagina in pagine:
+            tema = pagina["meta"]["theme_path"]
+            if tema not in temi:
+                temi[tema] = client.get(tema, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+            with self.subTest(scheda=pagina["path"], tema=tema):
+                self.assertIn("## Per provincia", temi[tema])
+                self.assertIn(f"{pagina['path']})", temi[tema])
 
 
 class LaMappaDelleProvince(unittest.TestCase):

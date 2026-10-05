@@ -106,6 +106,11 @@ ECCEZIONI_TAGLIA.update({("components.css", sel): TESTO_SVG for sel in (
     ".band__tick", ".band__lab", ".band__hllab", ".callout text",
 )})
 ECCEZIONI_TAGLIA[("pages/articolo.css", ".art-fig .fig text")] = TESTO_SVG
+# Le figure a viewBox stretto (370) dei pezzi del blog: a 375 pixel il testo
+# scala poco e deve restare sopra gli 11 pixel veri, quindi la taglia si decide
+# in unita' del viewBox come per le altre figure.
+ECCEZIONI_TAGLIA[("pages/articolo.css", ".fig--narrow text")] = TESTO_SVG
+ECCEZIONI_TAGLIA[("pages/articolo.css", ".fig--narrow .fig__title")] = TESTO_SVG
 
 
 def _corpi(testo, intestazione):

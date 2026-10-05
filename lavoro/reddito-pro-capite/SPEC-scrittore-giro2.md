@@ -1,0 +1,11 @@
+# Scrittore, riparazione 1 (pilota 1 del blog): rilievi del revisore, uno per uno
+Worktree divario-blog-reddito-pil, ramo divario/blog-reddito-pro-capite. Mai push, merge, deploy. Commit locale in italiano, prosa, senza Co-Authored-By. Modifica solo `content/posts/2026-10-05-reddito-pro-capite-regioni-non-e-il-pil.md`. Non cambiare i numeri: sono verificati. Regole di `content/STYLE.md` e lista "non IA" del brief invariate (niente em-dash, en-dash, punto e virgola, puntini; un'idea per frase).
+## Rilievi del revisore (big-pickle) e del leader, da chiudere TUTTI
+- **R1** (da correggere): "Per chi ci abita conta di piu la seconda. Lo scrive anche Eurostat: il reddito per abitante descrive il reddito dei residenti di una regione meglio del PIL per abitante." Interpreta oltre la fonte. Togli l'opinione "conta di piu" e riporta solo cio che dice Eurostat (`fonti.md` 3b): "Lo stesso concetto lo esprime Eurostat: il reddito per abitante descrive il reddito dei residenti meglio del PIL per abitante." (o una resa equivalente fedele).
+- **R2** (da correggere): la `description` ha 143 caratteri, ne servono 150-160, con la parola chiave "reddito pro capite per regione" e senza ripetere il titolo.
+- **R3** (minore): "I dati dicono che il Lazio scende, non perche." e ambigua. Resa piu chiara: i dati mostrano il posto, non la causa, in una frase sua.
+- **R4** (le tre frasi che suonano da bot, riscrivile in italiano piu naturale, senza toccare i numeri): (a) "Due differenze stanno gia nelle definizioni dell'Istat." (b) "Quanto pesi questo secondo passaggio, l'Istat lo ha misurato per macro-area in un'audizione ..." (c) "Messe una accanto all'altra, le due misure disegnano due mappe dello stesso Paese."
+- **R5** (leader): "Torniamo alle due regioni del confronto." e un raccordo da bot: toglilo o sostituiscilo con un attacco che dica una cosa.
+- **R6** (leader): rileggi ad alta voce ogni paragrafo, spezza dove perdi il soggetto, e controlla che nessuna sezione H2 apra con una formula e nessuna chiuda riassumendo.
+## Accettazione
+`rg -n "[—–;…]" content/posts/2026-10-05-reddito-pro-capite-regioni-non-e-il-pil.md` vuoto. I numeri nel testo non cambiano (confronta prima e dopo con `git diff`: nessuna cifra diversa). Rapporto: R1..R6 UNO PER UNO, ciascuno con "chiuso" e la frase nuova, in 15 righe. Poi worker_done.

@@ -3,8 +3,8 @@ title: "Figli per donna per regione: dal 2010 sono calati ovunque"
 seo_title: "Figli per donna per regione: dal 2010 sono calati ovunque"
 slug: figli-per-donna-regioni-italia
 description: "Dal 2010 al 2025 si fanno meno figli in tutte le regioni italiane, e il podio è cambiato. Il numero medio di figli per donna, regione per regione (dati Istat)."
-date: 2026-10-06
-draft: true
+date: 2026-10-05
+draft: false
 tags:
 - Demografia
 - Natalità

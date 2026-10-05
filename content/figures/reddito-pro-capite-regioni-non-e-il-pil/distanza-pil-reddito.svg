@@ -1,0 +1,31 @@
+<svg class="fig fig--narrow" viewBox="0 0 370 350" role="img" aria-labelledby="fig-distanza-pil-reddito-t fig-distanza-pil-reddito-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-distanza-pil-reddito-t">Sul PIL la distanza Lombardia-Calabria si riapre, sul reddito si chiude</title>
+<desc id="fig-distanza-pil-reddito-d">Rapporto fra Lombardia e Calabria, Calabria uguale a 1. PIL per abitante: da 2,19 nel 2004 a 2,32 nel 2024. Reddito disponibile delle famiglie per abitante: da 1,79 nel 2004 a 1,68 nel 2024.</desc>
+<text class="fig__title" x="0" y="18">Sul PIL la distanza Lombardia-Calabria</text>
+<text class="fig__title" x="0" y="37">si riapre, sul reddito si chiude</text>
+<text class="fig__subtitle" x="0" y="57">Rapporto Lombardia/Calabria (Calabria = 1),</text>
+<text class="fig__subtitle" x="0" y="72">valori correnti, 2004-2024.</text>
+<line class="fig__grid" x1="34" y1="268.0" x2="278" y2="268.0"/>
+<text class="fig__axis" x="29" y="272.0" text-anchor="end">1,5</text>
+<line class="fig__grid" x1="34" y1="182.0" x2="278" y2="182.0"/>
+<text class="fig__axis" x="29" y="186.0" text-anchor="end">2,0</text>
+<line class="fig__grid" x1="34" y1="96.0" x2="278" y2="96.0"/>
+<text class="fig__axis" x="29" y="100.0" text-anchor="end">2,5</text>
+<text class="fig__axis" x="34.0" y="285" text-anchor="middle">2004</text>
+<text class="fig__axis" x="156.0" y="285" text-anchor="middle">2014</text>
+<text class="fig__axis" x="278.0" y="285" text-anchor="middle">2024</text>
+<polyline class="fig__line fig__line--on" points="34.0,148.9 46.2,154.1 58.4,161.4 70.6,159.2 82.8,154.3 95.0,166.2 107.2,152.0 119.4,149.3 131.6,151.8 143.8,151.4 156.0,142.8 168.2,140.2 180.4,137.6 192.6,137.9 204.8,127.9 217.0,130.9 229.2,132.1 241.4,126.5 253.6,124.0 265.8,126.0 278.0,126.6"/>
+<circle class="fig__dot fig__dot--on" cx="278.0" cy="126.6" r="3.5"/>
+<circle class="fig__dot fig__dot--on" cx="34.0" cy="148.9" r="3"/>
+<text class="fig__label fig__label--on" x="36.0" y="139.9">2,19</text>
+<polyline class="fig__line fig__line--ink" points="34.0,218.9 46.2,220.2 58.4,224.7 70.6,225.7 82.8,225.2 95.0,235.2 107.2,229.6 119.4,228.1 131.6,229.6 143.8,228.7 156.0,226.6 168.2,226.9 180.4,227.5 192.6,228.0 204.8,233.2 217.0,235.4 229.2,239.9 241.4,236.9 253.6,235.1 265.8,233.8 278.0,237.7"/>
+<circle class="fig__dot fig__dot--ink" cx="278.0" cy="237.7" r="3.5"/>
+<circle class="fig__dot fig__dot--ink" cx="34.0" cy="218.9" r="3"/>
+<text class="fig__label fig__label--ink" x="36.0" y="235.9">1,79</text>
+<text class="fig__label fig__label--on" x="286.0" y="130.6">PIL 2,32</text>
+<text class="fig__label fig__label--ink" x="286.0" y="241.7">Reddito 1,68</text>
+<text class="fig__note" x="0" y="298">Rapporti fra regioni nello stesso anno,</text>
+<text class="fig__note" x="0" y="312">senza il costo della vita.</text>
+<text class="fig__source" x="0" y="330">Fonte: Istat, Conti economici territoriali,</text>
+<text class="fig__source" x="0" y="344">edizione dicembre 2025. Elaborazione Divario Italia.</text>
+</svg>

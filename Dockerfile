@@ -59,6 +59,12 @@ COPY data/ data/
 # mai stato nell'immagine e una COPY larga cambierebbe cio' che le altre pagine leggono.
 COPY config/game_indicators.csv config/game_indicators.csv
 COPY config/identita.yaml config/identita.yaml
+# `config/indicator_search_metrics.csv` e' la fotografia GSC che `app/seo_policy.py`
+# legge a runtime per la regola del contenuto. Senza questa riga il file manca in
+# produzione (reports/ non entra nell'immagine), la regola fallisce aperta e le 57
+# schede senza prosa restano nell'indice: un buco che la suite qui, che gira col
+# repo intero, non vede.
+COPY config/indicator_search_metrics.csv config/indicator_search_metrics.csv
 COPY run.py .
 COPY --from=frontend-build /build/app/static/dist app/static/dist
 

@@ -296,7 +296,8 @@ def _build_meta(family, raw_id, source_meta):
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
         "indexable": indexable,
-        # Perche' no: `variante`, `copertura`, `vecchia`. Nullo quando e' si'.
+        # Perche' no: `variante`, `copertura`, `vecchia`, `senza_prosa`.
+        # Nullo quando e' si'.
         "indexable_reason": motivo_indice,
         # The catalog already computed the canonical path for every family, and
         # the families do not agree on the slug: the atlas truncates it at 80
@@ -346,8 +347,8 @@ def indexability(family, raw_id, source_meta):
     so reading anything else here puts 47 BES and Multiscopo pages out of step
     with the sitemap that lists them. Picking between the rules is all this does.
 
-    Il motivo non è decorazione del cruscotto: `variante`, `copertura` e
-    `vecchia` si riparano in tre modi diversi, e senza di esso una pagina fuori
+    Il motivo non è decorazione del cruscotto: `variante`, `copertura`,
+    `vecchia` e `senza_prosa` si riparano in modi diversi, e senza di esso una pagina fuori
     indice si legge come un guasto invece che come una scelta. Sta qui e non
     dove lo si consuma perché **questa deve restare l'unica risposta**: una
     seconda copia della regola in `app/views.py` diceva indicizzabili due
@@ -355,14 +356,15 @@ def indexability(family, raw_id, source_meta):
     pubblica, cioè un cruscotto che contava pagine inesistenti.
     """
     if family in ("bes", "multiscopo"):
-        return _family_indexability(family).get(raw_id, (False, "copertura"))
+        result = _family_indexability(family).get(raw_id, (False, "copertura"))
+        return _apply_content_policy(result, source_meta)
     if family in sources.EXTERNAL_FAMILIES:
         page = provincial_families.indicator_page(family, raw_id)
         if page is not None:
             # La regola del manifesto per livello, sul livello base della scheda.
             info = page["levels"][page["metadata"]["base_level"]]
             if info["indexable"]:
-                return True, None
+                return _apply_content_policy((True, None), source_meta)
             if info["year_max"] < provincial_families.MIN_PUBLIC_YEAR:
                 return False, "vecchia"
             return False, "copertura"
@@ -382,7 +384,17 @@ def indexability(family, raw_id, source_meta):
     if (item.get("region_count", len(item.get("regions", []))) < seo_policy.REQUIRED_REGION_COUNT
             or (item.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
         return False, "copertura"
+    if int(item.get("year_max") or 0) >= seo_policy.MIN_INDEXABLE_YEAR:
+        return False, "senza_prosa"
     return False, "vecchia"
+
+
+def _apply_content_policy(result, source_meta):
+    """Applica la regola editoriale dopo la regola dati della famiglia."""
+    indexable, reason = result
+    if indexable and not seo_policy.indicator_passes_content_rule(source_meta):
+        return False, "senza_prosa"
+    return indexable, reason
 
 
 @synchronized_cache(maxsize=1)
@@ -403,6 +415,11 @@ def level_passes_rule(meta, level_key, base_key):
     decide la navigazione (temi, ricerca): l'interruttore toglie l'indice, non
     i link.
     """
+    # La regola editoriale vale per la scheda intera. La regola dati resta per
+    # livello, ma nessun livello aggira l'assenza congiunta di prosa e
+    # impressioni.
+    if meta.get("indexable_reason") == "senza_prosa":
+        return False
     if level_key == base_key:
         return bool(meta["indexable"])
     if meta.get("family") == "bes":
