@@ -1,0 +1,20 @@
+{
+  "name": "divario-ux-lettura",
+  "version": "1.0.0",
+  "description": "**Divario Italia** ([divarioitalia.it](https://divarioitalia.it)) is a Flask + React atlas for exploring territorial divides in Italy, built on Istat regional development indicators and BES territorial indicators.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}
