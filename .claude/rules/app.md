@@ -74,6 +74,12 @@ paths:
 - `/blog`, `/blog/<slug>` — blog server-rendered (Jinja) dai Markdown in
   `content/posts/`. L'indice e' una pagina della 1.0 dal 26 settembre 2026
   (`design/pages/blog.py`, ripiego `blog_list.html`).
+- `/sitemap.xml` — il `lastmod` c'e' solo dove la data e' vera: i post (`updated`
+  o `date`), le schede territoriali e BES regionali e le regioni (la data
+  `Last-Modified` della fonte Istat in `data/source_state.json`, letta da
+  `app/lastmod.py`). Province, `/province`, altre famiglie e pagine statiche
+  non ne hanno. Mai la data del deploy, di oggi o di un file: Google penalizza
+  un `lastmod` bugiardo.
 - `/blog/feed.xml` — il feed RSS 2.0 del blog, con `/feed.xml` e `/rss.xml` che
   ci arrivano con un 301. Le date vanno in RFC 822, non nell'ISO della sitemap.
 - `/qualita-della-vita`, `/qualita-della-vita/classifica/<regioni|province>` —

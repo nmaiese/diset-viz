@@ -20,6 +20,7 @@ from app.design import numfmt
 from app.design.pages import atlante as atlas_page
 from app.design.pages import confronto as compare_page
 from app import divari
+from app import lastmod
 from app import profiles
 from app import province_profile
 from app import sources
@@ -3547,8 +3548,14 @@ def sitemap():
             "lastmod": post.get("date_modified", post["date"]).isoformat(),
             "priority": "0.7",
         })
+    # `lastmod` solo dove la data e' vera (`app/lastmod.py`): la regione porta
+    # quella dei dati da cui e' costruita, mai la data del deploy o di oggi.
+    data_lastmod = lastmod.lastmod_regione()
     for region in profiles.all_regions_index():
-        pages.append({"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"})
+        page = {"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"}
+        if data_lastmod:
+            page["lastmod"] = data_lastmod
+        pages.append(page)
     for theme in all_atlas_themes_index():
         pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
     # Una voce per pagina di livello indicizzabile: la base di ogni scheda e la
@@ -3557,11 +3564,13 @@ def sitemap():
     # `seo_policy.LEVEL_PAGES_INDEXABLE` spento le `/province` escono da qui.
     for page in indicator_universe.level_pages():
         # No synthetic lastmod from year_max: an indexable page is not "modified"
-        # on 31 December of its last data year. Only posts carry a real date.
-        pages.append({
-            "loc": f"{SITE_URL}{page['path']}",
-            "priority": "0.6",
-        })
+        # on 31 December of its last data year. Only posts and the pages whose
+        # source has a monitored publication date carry one (`app/lastmod.py`).
+        entry = {"loc": f"{SITE_URL}{page['path']}", "priority": "0.6"}
+        scheda_lastmod = lastmod.lastmod_scheda(page["meta"]["family"], page["level"]["key"])
+        if scheda_lastmod:
+            entry["lastmod"] = scheda_lastmod
+        pages.append(entry)
     xml = render_template("sitemap.xml", pages=pages)
     return Response(xml, mimetype="application/xml")
 

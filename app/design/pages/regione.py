@@ -47,6 +47,13 @@ DIRECTION_WORDS = {
 }
 QUALITY_PATH = "/qualita-della-vita/classifica/regioni"
 
+# Esperimento di indicizzazione (ottobre 2026): su queste regioni le tabelle
+# lunghe degli indicatori stanno in un `<details>` chiuso, con tutte le righe
+# nell'HTML. Le altre pagine non cambiano di un byte. Sta qui e non in
+# `config/`, che l'immagine Docker non copia. Per chiudere l'esperimento
+# basta svuotare l'insieme.
+REGIONI_TABELLE_CHIUSE = frozenset({"molise", "valle-d-aosta"})
+
 
 def _scale(methodology: dict | None) -> dict | None:
     """Minimo, massimo e centro della scala del punteggio, letti dal metodo.
@@ -506,4 +513,5 @@ def derive(ctx: dict) -> dict:
         "external_label": source_registry.institutions_label([g["family"] for g in external_groups]),
         "min_theme": MIN_THEME_INDICATORS, "citation": citation,
         "count_word": common.count_word,
+        "tabelle_chiuse": key in REGIONI_TABELLE_CHIUSE,
     }
