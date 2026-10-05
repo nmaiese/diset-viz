@@ -51,9 +51,9 @@ external_figures:
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
 ---
 
-In Calabria si produce meno della metà di quanto si produce in Lombardia. Ma nelle tasche delle famiglie la distanza è molto più piccola.
+In Calabria si produce meno della metà che in Lombardia. Ma nelle tasche delle famiglie la distanza è molto più piccola.
 
-Non c'è nessun errore. Sono due modi diversi di misurare. Uno conta quello che si produce in una regione, l'altro quello che arriva alle famiglie che ci vivono. Ed è proprio nelle regioni che producono di più che le due cifre si allontanano di più.
+Non c'è nessun errore. Sono due modi diversi di misurare la stessa Italia. E le due cifre si allontanano di più proprio nelle regioni che producono di più.
 
 Chi cerca il reddito pro capite delle regioni italiane trova quasi sempre un'altra cifra, il PIL per abitante. Le due parole girano come sinonimi, ma rispondono a domande diverse. Il PIL dice quanto valore si produce in una regione. Il reddito disponibile dice quanto entra, a conti fatti, alle famiglie che ci vivono. Le due misure danno due mappe diverse dell'Italia. Sulla seconda le regioni sono più vicine fra loro.
 
