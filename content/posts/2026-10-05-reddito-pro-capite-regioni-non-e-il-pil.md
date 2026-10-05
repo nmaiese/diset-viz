@@ -4,7 +4,7 @@ seo_title: "Reddito pro capite per regione, la mappa diversa dal PIL"
 slug: reddito-pro-capite-regioni-non-e-il-pil
 description: "In Calabria si produce meno della metà che in Lombardia, ma nelle tasche delle famiglie la distanza è molto più piccola. Reddito pro capite per regione, 2024."
 date: 2026-10-05
-draft: true
+draft: false
 cover: /static/img/blog/reddito-pro-capite-regioni-non-e-il-pil.jpg
 cover_alt: "Un portafoglio nero aperto, tenuto in mano, con banconote da cinque euro e di altri tagli."
 cover_credit:
