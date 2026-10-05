@@ -41,7 +41,11 @@ class LePagine(unittest.TestCase):
         return response.get_data(as_text=True)
 
     def test_la_testata_della_home_ha_la_mappa_coi_dati(self):
-        html = self._get("/")
+        # La home pesca a caso l'indicatore in evidenza a ogni visita, e circa
+        # una volta su quaranta ne esce uno con meno di venti territori
+        # colorati: la CI cadeva a caso. L'indicatore si fissa con il parametro
+        # che la testata gia accetta, cosi la prova guarda sempre lo stesso.
+        html = self._get("/?indicatore=ter-901&livello=regione")
         head = html.split('class="doors"', 1)[0]
         self.assertIn("navmap--data", head)
         level = re.search(r'data-home-feature-level="(regione|provincia)"', head).group(1)
