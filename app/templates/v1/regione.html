@@ -394,7 +394,7 @@
 
     {#- Ogni macro-area in un details: aperto su schermo grande, chiuso dal
         JavaScript sul telefono, sempre nel DOM per chi cerca e per i motori. -#}
-    {% for area in d.areas %}
+    {% if d.tabelle_chiuse %}<details class="more regione-tabelle" id="indicatori-tabelle"><summary>I {{ d.indicator_count | num(None, 'count') }} indicatori {{ d.of_name }}, in tabella per macro-area</summary>{% endif %}{% for area in d.areas %}
     <details class="regione-area" data-rf-area="{{ area.slug }}" data-collapse-mobile open>
       <summary><h3 class="h-sub" id="{{ 'h-area-' ~ area.slug }}">{{ area.name }} <span class="regione-area__n">{{ area.count | num(None, 'count') }} {{ area.count | it_plural('indicatore', 'indicatori') }}</span></h3></summary>
       <div class="tablewrap stackwrap stackwrap--wide" tabindex="0" role="region" aria-labelledby="{{ 'h-area-' ~ area.slug }}">
@@ -434,14 +434,14 @@
         </table>
       </div>
     </details>
-    {% endfor %}
+    {% endfor %}{% if d.tabelle_chiuse %}</details>{% endif %}
   </section>
 
   {% if d.external_groups %}
   <section class="section" id="altre-fonti" aria-labelledby="h-altre-fonti">
     <h2 id="h-altre-fonti">Altri indicatori {{ d.of_name }}, da altre fonti</h2>
     <p class="regione-intro">{{ d.external_count | num(None, 'count') }} {{ d.external_count | it_plural('indicatore', 'indicatori') }} di {{ d.external_label }}, in una tabella a parte perché {{ d.external_count | it_plural('descrive', 'descrivono') }} la regione e non {{ d.external_count | it_plural('entra', 'entrano') }} nella posizione media, nei temi o nel punteggio della qualità della vita. Dove un indicatore ha un verso la tabella dà la posizione fra le regioni, altrimenti scrive che non si classifica: un valore alto o basso, lì, non è di per sé un bene o un male.</p>
-    {% for g in d.external_groups %}
+    {% if d.tabelle_chiuse %}<details class="more regione-tabelle"><summary>{{ d.external_count | num(None, 'count') }} {{ d.external_count | it_plural('indicatore', 'indicatori') }} di {{ d.external_label }}, in tabella</summary>{% endif %}{% for g in d.external_groups %}
     <div class="tablewrap stackwrap stackwrap--wide" tabindex="0" role="region" aria-labelledby="{{ 'h-fonte-' ~ g.family }}">
       <table class="table table--compact table--stack" role="table">
         <caption class="sr-only">{{ g.label }}: gli indicatori {{ d.of_name }} con valore, unità, anno, andamento e posizione fra le regioni</caption>
@@ -476,7 +476,7 @@
         </tbody>
       </table>
     </div>
-    {% endfor %}
+    {% endfor %}{% if d.tabelle_chiuse %}</details>{% endif %}
   </section>
   {% endif %}
 
@@ -580,5 +580,20 @@
   input.addEventListener("input", function () { query = input.value.trim().toLowerCase(); apply(); });
 })();
 </script>
-<script src="{{ asset_url('js/v1.js') }}" defer></script>
+{% if d.tabelle_chiuse %}<script>
+/* Esperimento: le tabelle stanno in un details chiuso. Il filtro nasconde righe
+   dentro il blocco, quindi quando un'area o una ricerca e' attiva lo apre. */
+(function () {
+  var box = document.getElementById("indicatori-tabelle");
+  var root = document.getElementById("indicatori");
+  if (!box || !root) return;
+  var input = root.querySelector("[data-rf-q]");
+  function open() { box.open = true; }
+  input.addEventListener("input", function () { if (input.value.trim()) open(); });
+  root.querySelectorAll("[data-rf-area-btn]").forEach(function (b) {
+    b.addEventListener("click", function () { if (b.getAttribute("data-rf-area-btn")) open(); });
+  });
+})();
+</script>
+{% endif %}<script src="{{ asset_url('js/v1.js') }}" defer></script>
 {% endblock %}
