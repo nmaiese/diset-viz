@@ -1,8 +1,8 @@
 ---
-title: "Reddito pro capite per regione: non è il PIL"
+title: "Reddito pro capite per regione: la distanza è più corta"
 seo_title: "Reddito pro capite per regione, la mappa diversa dal PIL"
 slug: reddito-pro-capite-regioni-non-e-il-pil
-description: "Il reddito pro capite per regione nel 2024 va da 28.154 euro a testa in Lombardia a 16.796 in Calabria. Sul reddito le distanze sono più corte che sul PIL."
+description: "In Calabria si produce meno della metà che in Lombardia, ma nelle tasche delle famiglie la distanza è molto più piccola. Reddito pro capite per regione, 2024."
 date: 2026-10-05
 draft: true
 cover: /static/img/blog/reddito-pro-capite-regioni-non-e-il-pil.jpg
@@ -50,6 +50,10 @@ external_figures:
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
 ---
+
+In Calabria si produce meno della metà di quanto si produce in Lombardia. Ma nelle tasche delle famiglie la distanza è molto più piccola.
+
+Non c'è nessun errore. Sono due modi diversi di misurare. Uno conta quello che si produce in una regione, l'altro quello che arriva alle famiglie che ci vivono. Ed è proprio nelle regioni che producono di più che le due cifre si allontanano di più.
 
 Chi cerca il reddito pro capite delle regioni italiane trova quasi sempre un'altra cifra, il PIL per abitante. Le due parole girano come sinonimi, ma rispondono a domande diverse. Il PIL dice quanto valore si produce in una regione. Il reddito disponibile dice quanto entra, a conti fatti, alle famiglie che ci vivono. Le due misure danno due mappe diverse dell'Italia. Sulla seconda le regioni sono più vicine fra loro.
 
