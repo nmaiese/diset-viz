@@ -51,7 +51,7 @@ external_figures:
   url: https://www.istat.it/wp-content/uploads/2025/10/Natalita-e-fecondita-della-popolazione-residente_Anno-2024.pdf
 ---
 
-In ogni regione italiana, rispetto al 2010, ogni anno nascono meno bambini per ogni donna in età fertile. Il calo non è stato uguale dappertutto.
+Rispetto al 2010, in ogni regione italiana nascono meno bambini per ogni donna in età fertile. Il calo non è stato uguale dappertutto.
 
 Quasi tutte le regioni stavano a 1,3 o più figli per donna. Oggi ce n'è una sola.
 
