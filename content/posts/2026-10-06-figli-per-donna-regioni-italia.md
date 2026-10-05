@@ -10,8 +10,15 @@ tags:
 - Natalità
 - Regioni
 indicator: 922
-cover: /static/img/blog/figli-per-donna-regioni.svg
-cover_alt: "Numero medio di figli per donna nel 2010 e nel 2025. Trentino-Alto Adige da 1,63 a 1,40, Sicilia da 1,42 a 1,23, Campania da 1,44 a 1,22, Sardegna da 1,18 a 0,85. Grafico a barre."
+cover: /static/img/blog/figli-per-donna-regioni-italia.jpg
+cover_alt: "Uno scivolo e giochi di legno su un prato, vuoti, con montagne innevate sullo sfondo, a Larey, in Valle d'Aosta."
+cover_credit:
+  author: "Patafisik"
+  license: "CC BY-SA 4.0"
+  license_url: "https://creativecommons.org/licenses/by-sa/4.0"
+  source_url: "https://commons.wikimedia.org/wiki/File:Larey,_Quart_(AO),_Italia_abc2_parco_giochi.jpg"
+  source_name: "Wikimedia Commons"
+  changes: "Ritagliata e ridimensionata"
 dataset:
   name: Numero medio di figli per donna per regione, 2010 e 2025
   description: Numero medio di figli per donna (tasso di fecondità totale) nelle venti regioni nel 2010 e nel 2025, con la variazione e il posto in classifica nei due anni.
@@ -45,6 +52,8 @@ external_figures:
 ---
 
 Chi cerca quanti figli fa in media una donna in Italia trova un numero solo, 1,14. È la stima dell'Istat per il 2025, in calo dall'1,18 del 2024. Ma la domanda che viene subito dopo, dove se ne fanno di più, ha oggi una risposta diversa da quella di quindici anni fa. Molte delle regioni che allora guidavano la classifica sono scese più delle altre. Sul podio, accanto al Trentino-Alto Adige, oggi ci sono Sicilia e Campania.
+
+<!-- figura: quattro-regioni-2010-2025 -->
 
 Va letto per quello che è. L'Istat lo definisce come "il numero di figli che una donna metterebbe al mondo nel caso in cui, nel corso nella propria vita riproduttiva (e in assenza di mortalità nel corso della stessa), fosse sottoposta al calendario di fecondità (sotto forma di tassi specifici di fecondità per età) dell'anno di osservazione". È una fotografia di un anno di calendario, non il conto dei figli che le donne di una regione hanno avuto davvero.
 

@@ -1,4 +1,4 @@
-"""Le due figure e la copertina del pezzo sul numero medio di figli per donna.
+"""Le tre figure del pezzo sul numero medio di figli per donna.
 
 Il pezzo segue ter-922 sulle venti regioni, 2002-2025. Nessun dossier: i valori
 si leggono dal sito, `figures.py` non ha una forma per un conteggio per anno ne'
@@ -21,7 +21,6 @@ from app import data  # noqa: E402
 
 SLUG = "figli-per-donna-regioni-italia"
 OUT = ROOT / "content" / "figures" / SLUG
-COVER = ROOT / "app" / "static" / "img" / "blog" / "figli-per-donna-regioni.svg"
 W = 370
 SOGLIA = 1.30
 SOURCE = ("Fonte: Istat, Indicatori demografici, tasso di", "fecondità totale. 2025 stimato. Elaborazione Divario Italia.")
@@ -142,32 +141,44 @@ def dumbbell_figure(s) -> str:
     return "\n".join(parts)
 
 
-def cover(s) -> str:
-    """1200x630, colori cotti come le altre copertine (dentro un <img> la pagina non li legge)."""
-    ink, soft, nord, sud, old = "#121519", "#3e4650", "#2466c3", "#983c75", "#b6bdc6"
-    disp = "'Sofia Sans Semi Condensed', 'Sofia Sans', 'Arial Narrow', Arial, sans-serif"
-    scale = 640 / s["Trentino Alto Adige"][2010]
-    rows = [("Trentino-Alto Adige", "Trentino Alto Adige", nord), ("Sicilia", "Sicilia", sud), ("Campania", "Campania", sud), ("Sardegna", "Sardegna", sud)]
-    out = [
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="\'Sofia Sans\', Arial, sans-serif">',
-        '  <rect width="1200" height="630" fill="#ffffff"/>',
-        f'  <text x="56" y="84" font-size="22" font-weight="600" fill="{soft}">Divario Italia · dati 2010 e 2025</text>',
-        f'  <text x="54" y="150" font-size="52" font-weight="700" font-family="{disp}" fill="{ink}">Figli per donna: il calo di quindici anni</text>',
-        f'  <text x="56" y="192" font-size="22" fill="{soft}">Numero medio di figli per donna · barra grigia 2010, barra colorata 2025 (stima)</text>',
-    ]
-    y = 240
-    for label, key, color in rows:
-        a, b = s[key][2010], s[key][2025]
-        out.append(f'  <text x="56" y="{y + 20}" font-size="26" font-weight="600" fill="{ink}">{escape(label)}</text>')
-        for off, v, fill, yr in ((0, a, old, "2010"), (40, b, color, "2025")):
-            w = v * scale
-            out.append(f'  <rect x="330" y="{y + off - 6}" width="{w:.0f}" height="34" fill="{fill}"/>')
-            out.append(f'  <text x="{330 + w + 14:.0f}" y="{y + off + 19}" font-size="24" font-weight="700" font-family="{disp}" fill="{ink}">{it(v)}</text>')
-            out.append(f'  <text x="342" y="{y + off + 18}" font-size="19" font-weight="600" fill="{"#121519" if fill == old else "#ffffff"}">{yr}</text>')
-        y += 98
-    out.append(f'  <text x="56" y="610" font-size="26" font-weight="600" fill="{ink}">La Sardegna passa da {it(s["Sardegna"][2010])} a {it(s["Sardegna"][2025])}, sotto un figlio per donna</text>')
-    out.append("</svg>")
-    return "\n".join(out)
+def four_figure(s) -> str:
+    keys = ["Trentino Alto Adige", "Sicilia", "Campania", "Sardegna"]
+    names = {"Trentino Alto Adige": "Trentino-Alto Adige"}
+    rows = [(names.get(k, k), s[k][2010], s[k][2025], round(s[k][2025] - s[k][2010], 2)) for k in keys]
+    assert [(it(r[1]), it(r[2])) for r in rows] == [("1,63", "1,40"), ("1,42", "1,23"), ("1,44", "1,22"), ("1,18", "0,85")], rows
+    title = "Dal 2010 al 2025 la Sardegna scende da 1,18 a 0,85 figli per donna, il Trentino-Alto Adige da 1,63 a 1,40"
+    desc = ("Numero medio di figli per donna nel 2010 e nel 2025 in quattro regioni. "
+            + " ".join(f"{n} da {it(a)} a {it(b)}." for n, a, b, _ in rows)
+            + " Il 2025 è una stima.")
+    top, step = 100, 30
+    height = top + step * len(rows) + 68
+    xn = 126
+    lo, hi, x0, x1 = 0.6, 1.7, 142, 292
+
+    def x(v):
+        return x0 + (v - lo) / (hi - lo) * (x1 - x0)
+
+    parts, _ = head("fig-quattro-regioni-2010-2025", height,
+                    ["Dal 2010 al 2025 la Sardegna scende da 1,18", "a 0,85 figli per donna, il Trentino-Alto Adige", "da 1,63 a 1,40"],
+                    ["Figli per donna in quattro regioni.", "Cerchio vuoto 2010, pieno 2025."],
+                    title, desc)
+    parts.append(f'<text class="fig__axis-name" x="{W}" y="{top - 8}" text-anchor="end">Variazione</text>')
+    for v in (0.8, 1.0, 1.2, 1.4, 1.6):
+        parts.append(f'<line class="fig__grid" x1="{x(v):.1f}" y1="{top - 2}" x2="{x(v):.1f}" y2="{top + step * len(rows) - 4}"/>')
+        parts.append(f'<text class="fig__axis" x="{x(v):.1f}" y="{top + step * len(rows) + 12}" text-anchor="middle">{it(v, 1)}</text>')
+    for i, (t, a, b, d) in enumerate(rows):
+        cy = top + i * step + 12
+        parts.append(f'<text class="fig__name is-on" x="{xn}" y="{cy + 4}" text-anchor="end">{escape(t)}</text>')
+        parts.append(f'<line class="fig__dumb is-on" x1="{x(b):.1f}" y1="{cy}" x2="{x(a):.1f}" y2="{cy}"/>')
+        parts.append(f'<circle class="fig__pt-dot fig__pt-dot--old is-on" cx="{x(a):.1f}" cy="{cy}" r="3.5"/>')
+        parts.append(f'<circle class="fig__pt-dot is-on" cx="{x(b):.1f}" cy="{cy}" r="3.5"/>')
+        parts.append(f'<text class="fig__value is-on" x="{x(b) - 8:.1f}" y="{cy + 4}" text-anchor="end">{it(b)}</text>')
+        parts.append(f'<text class="fig__value is-on" x="{x(a) + 8:.1f}" y="{cy + 4}">{it(a)}</text>')
+        parts.append(f'<text class="fig__value is-on" x="{W}" y="{cy + 4}" text-anchor="end">{MINUS}{it(-d)}</text>')
+    parts.append(f'<text class="fig__note" x="0" y="{height - 38}">L\'asse parte da 0,6, non da zero.</text>')
+    parts += source_lines(height)
+    parts.append("</svg>")
+    return "\n".join(parts)
 
 
 def main() -> int:
@@ -175,7 +186,7 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "regioni-sopra-1-3.svg").write_text(bars_figure(s) + "\n", encoding="utf-8")
     (OUT / "variazione-2010-2025.svg").write_text(dumbbell_figure(s) + "\n", encoding="utf-8")
-    COVER.write_text(cover(s) + "\n", encoding="utf-8")
+    (OUT / "quattro-regioni-2010-2025.svg").write_text(four_figure(s) + "\n", encoding="utf-8")
     return 0
 
 
