@@ -65,6 +65,13 @@ COPY config/identita.yaml config/identita.yaml
 # schede senza prosa restano nell'indice: un buco che la suite qui, che gira col
 # repo intero, non vede.
 COPY config/indicator_search_metrics.csv config/indicator_search_metrics.csv
+# `config/theme_categories.csv` e' la mappa dei temi per la navigazione e l'SEO
+# (`app/taxonomy.py`). Senza questa riga i temi non hanno categorie in produzione.
+COPY config/theme_categories.csv config/theme_categories.csv
+# `config/indicator_families.csv` raggruppa gli indicatori per famiglia
+# (`app/indicator_view.py`). Senza questa riga le pagine degli indicatori
+# non mostrano la famiglia in produzione.
+COPY config/indicator_families.csv config/indicator_families.csv
 COPY run.py .
 COPY --from=frontend-build /build/app/static/dist app/static/dist
 

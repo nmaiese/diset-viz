@@ -340,7 +340,7 @@
   <section class="section" id="fonti-verifica" aria-labelledby="h-fonti">
     <h2 id="h-fonti">Fonti e metodo</h2>
     {% set src = page_source('province') %}
-    {{ dm.box(src.label, src.url, src.updated, "Non è una classifica ufficiale: ordina i territori, non misura il benessere.") }}
+    {{ dm.box(src.label, src.url, src.updated, "Non è una classifica ufficiale: ordina i territori, non misura il benessere.", 3) }}
     <dl class="specs">
       <div><dt>Fonte</dt><dd>{{ d.source | replace('BES dei Territori', 'Benessere equo e sostenibile (BES) dei Territori') }}, {{ indicatori | length | num(None, 'count') }} indicatori con un dato per {{ p.name }}{% if d.year_from %}, dal {{ d.year_from }} al {{ d.year_to }}{% endif %}.{% if d.dataset %} Il dataset di origine è «{{ d.dataset }}».{% endif %}</dd></div>
       {% if d.external %}<div><dt>Altre fonti</dt><dd>{{ d.external_count | num(None, 'count') }} {{ d.external_count | it_plural('indicatore della tabella non viene', 'indicatori della tabella non vengono') }} dal BES e {{ d.external_count | it_plural('è descrittivo', 'sono descrittivi') }}, fuori dal punteggio. Ogni riga dice da quale fonte viene.<ul class="reflist">{% for e in d.external %}<li>{% if e.url %}<a href="{{ e.url }}">{{ e.label }}</a>{% else %}{{ e.label }}{% endif %}<small>{{ e.count | num(None, 'count') }} {{ e.count | it_plural('indicatore', 'indicatori') }}{% if e.license %}, licenza {{ e.license }}{% endif %}</small></li>{% endfor %}</ul></dd></div>{% endif %}

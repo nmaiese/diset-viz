@@ -587,6 +587,17 @@ details.more[open] > summary { color: var(--ink); }
   background: var(--surface-1);
 }
 .dati-metodo p { font-size: var(--fs-small); line-height: var(--lh-small); }
+/* Il titolo del riquadro, piccolo e pesante come le etichette di sezione: e'
+   il nome della fonte, non un titolo di pagina. Il selettore e' con l'ascendente
+   perche' `.ds h2, .ds h3` di system.css ha piu' peso di una classe sola e
+   porterebbe titolo, colore e interlinea del heading. */
+.dati-metodo .dati-metodo__titolo {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: var(--fw-label);
+  color: var(--ink);
+  margin: 0;
+}
 .dati-metodo__fonte { color: var(--ink); }
 .dati-metodo__fonte a { color: var(--ink); }
 .dati-metodo__data,

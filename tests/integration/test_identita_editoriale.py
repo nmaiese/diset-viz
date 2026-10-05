@@ -492,6 +492,37 @@ class IdentitaEditorialeTest(unittest.TestCase):
         dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
         self.assertIn("COPY config/identita.yaml config/identita.yaml", dockerfile)
 
+    def test_tutti_i_file_config_runtime_entrano_nell_immagine(self):
+        """Ogni file config/ letto a runtime da app/ ha la sua COPY nel Dockerfile.
+
+        La lista viene ricavata dal codice (app/), non tenuta a mano: se qualcuno
+        aggiunge un nuovo file letto a runtime senza la COPY, il test fallisce.
+        """
+        import re
+        dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+        # Ogni percorso costruito come `<qualcosa> / "config" / "nome.ext"` in app/
+        # (anche su piu righe): e' il modo in cui il codice legge i file di config.
+        pattern = re.compile(r'/\s*"config"\s*/\s*"([^"]+\.(?:csv|yaml|json))"')
+        config_files = set()
+        for py_file in (ROOT / "app").rglob("*.py"):
+            content = py_file.read_text(encoding="utf-8")
+            for match in pattern.finditer(content):
+                config_files.add(f"config/{match.group(1)}")
+        # La regola non deve marcire in silenzio: se non trova piu i file che
+        # sappiamo letti a runtime, il test si accorge che il riconoscimento e rotto.
+        noti = {
+            "config/identita.yaml", "config/game_indicators.csv",
+            "config/theme_categories.csv", "config/indicator_families.csv",
+            "config/indicator_search_metrics.csv",
+        }
+        self.assertTrue(noti <= config_files,
+                        f"il riconoscimento non vede piu {sorted(noti - config_files)}")
+        for cfg in sorted(config_files):
+            self.assertTrue((ROOT / cfg).exists(), f"{cfg} citato in app/ ma assente dal repo")
+            copy_line = f"COPY {cfg} {cfg}"
+            self.assertIn(copy_line, dockerfile,
+                          f"Manca COPY per {cfg} nel Dockerfile (letto a runtime da app/)")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,9 +3,16 @@
     cosi' niente HTML copiato e niente valori inventati: la data di
     aggiornamento della fonte compare solo se `dataset_updated` c'e', la firma
     viene da `redazione()` (`publisher.editor_name()`, identita' editoriale) e il
-    link porta a `/metodologia`. -#}
-{% macro box(source_label, source_url=None, dataset_updated=None, limits=None) -%}
+    link porta a `/metodologia`.
+
+    Il titolo sta dentro il riquadro e non solo nell'`aria-label`: sul sito vivo
+    la parola "Dati e metodo" non si leggeva da nessuna parte, e la direzione non
+    la trovava. `livello` dice se il riquadro apre la sezione (2) o sta dentro
+    una sezione che ha gia' il suo titolo (3). -#}
+{% macro box(source_label, source_url=None, dataset_updated=None, limits=None, livello=2) -%}
+{%- set tag_titolo = "h" ~ livello -%}
 <aside class="dati-metodo" data-dati-metodo aria-label="Dati e metodo">
+  <{{ tag_titolo }} class="dati-metodo__titolo">Dati e metodo</{{ tag_titolo }}>
   {%- if source_label %}
   <p class="dati-metodo__fonte">Fonte: {% if source_url %}<a href="{{ source_url }}" rel="noopener">{{ source_label }}</a>{% else %}{{ source_label }}{% endif %}.</p>
   {%- endif %}

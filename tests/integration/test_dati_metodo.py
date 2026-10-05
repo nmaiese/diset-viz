@@ -14,6 +14,9 @@ from app.blog import get_posts
 from app import publisher
 
 MARKER = 'class="dati-metodo" data-dati-metodo'
+# Il titolo che sul sito vivo non si vedeva: dentro il riquadro, non solo
+# nell'`aria-label`, e una volta sola per pagina.
+TITOLO = re.compile(r'<h[1-6] class="dati-metodo__titolo">\s*Dati e metodo\s*</h[1-6]>')
 
 # Una pagina per tipo, abbastanza stabile da non sparire alla prossima ondata.
 PAGINE = {
@@ -45,11 +48,21 @@ class IlRiquadroCompareNeiTipi(unittest.TestCase):
     def _verifica(self, html, percorso):
         self.assertIn(MARKER, html, f"{percorso}: riquadro assente")
         riquadro = _box(html)
+        self.assertRegex(riquadro, TITOLO,
+                         f"{percorso}: dentro il riquadro non c'e' il titolo visibile "
+                         "'Dati e metodo'")
         self.assertIn("dati-metodo__fonte", riquadro, f"{percorso}: fonte assente")
         self.assertIn("dati-metodo__firma", riquadro, f"{percorso}: firma assente")
         self.assertIn(publisher.editor_name(), riquadro, f"{percorso}: nome della redazione assente")
         self.assertIn('href="/metodologia"', riquadro, f"{percorso}: link alla metodologia assente")
         self.assertNotIn("<script", riquadro, f"{percorso}: JavaScript dentro il riquadro")
+        # La sezione che contiene il riquadro non ne ripete il titolo: due volte
+        # di fila si leggono come un refuso. Il titolo resta dentro l'`<aside>`,
+        # e l'unico titolo della pagina che porta quelle parole e' quello.
+        titoli = re.findall(r"<h[1-6][^>]*>\s*Dati e metodo\s*</h[1-6]>", html)
+        self.assertEqual(len(titoli), 1,
+                         f"{percorso}: {len(titoli)} titoli 'Dati e metodo' nella pagina, "
+                         "uno solo: quello dentro il riquadro")
 
     def test_indicatore_provincia_regione_tema_qualita_e_classifica(self):
         for tipo, percorso in PAGINE.items():

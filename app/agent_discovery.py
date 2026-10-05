@@ -10,6 +10,7 @@ from flask import Response, request
 
 from app import it_numbers, publisher
 from app.design import numfmt
+from app import indicator_universe
 
 
 AGENT_SKILL_SCHEMA = "https://schemas.agentskills.io/discovery/0.2.0/schema.json"
@@ -946,6 +947,9 @@ def provinces_index_markdown(regions, total, site_url):
 
 
 def theme_markdown(profile, site_url, standings=None, province_total=None, province_indicators=()):
+    indexable_paths = {record["meta"]["canonical_path"] for record in indicator_universe.indexable_catalog()}
+    indicators = [item for item in profile["indicators"] if item["path"] in indexable_paths]
+    province_items = [item for item in province_indicators if item.get("canonical_path") in indexable_paths]
     lines = [
         f"# {profile['theme']}",
         "",
@@ -955,8 +959,8 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         # Il livello come nel title della pagina HTML: gli indicatori del tema
         # sono il catalogo dell'atlante, regionale, e le schede con i valori
         # delle province si contano a parte, dalla sezione "Per provincia".
-        f"Indicatori per regione: {profile['indicator_count']}",
-        *([f"Indicatori per provincia: {len(province_indicators)}"] if province_indicators else []),
+        f"Indicatori per regione: {len(indicators)}",
+        *([f"Indicatori per provincia: {len(province_items)}"] if province_items else []),
         f"URL canonica: {_absolute(site_url, profile['theme_path'])}",
         "",
     ]
@@ -986,15 +990,15 @@ def theme_markdown(profile, site_url, standings=None, province_total=None, provi
         "## Indicatori del tema",
         "",
     ]
-    for item in profile["indicators"]:
+    for item in indicators:
         lines.append(
             f"- [{item['name']}]({_absolute(site_url, item['path'])}), "
             f"dal {item['year_min']} al {item['year_max']}. {_clean(item.get('plain'))}"
         )
-    if province_indicators:
+    if province_items:
         lines += ["", "## Per provincia", "",
                   "Gli indicatori del tema con i valori delle province, aperte sulle province.", ""]
-        for item in province_indicators:
+        for item in province_items:
             only = ", solo per provincia" if item["only_province"] else ""
             years = (f"nel {item['year_max']}" if item["year_min"] == item["year_max"]
                      else f"dal {item['year_min']} al {item['year_max']}")

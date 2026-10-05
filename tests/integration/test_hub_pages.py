@@ -716,12 +716,13 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
 
     def test_ogni_tema_dichiara_quello_che_elenca(self):
         """Il numero del title, della scheda in `/temi`, dei dati disponibili,
-        del link all'atlante e del gemello Markdown e' quello delle serie che la
-        pagina elenca, e la sezione "Per provincia" elenca le schede che dice.
-        La somma delle sezioni per provincia e' quella che `/temi` dichiara.
+        del link all'atlante e' quello delle serie che la pagina elenca.
+        Il gemello Markdown elenca solo gli indicatori indicizzabili (stessa
+        regola di llms-full.txt). La sezione "Per provincia" elenca le schede
+        che dice. La somma delle sezioni per provincia e' quella che `/temi` dichiara.
         Il JSON-LD dice chi pubblica le serie del tema: "Indicatori Istat" stava
         anche sul tema con due serie Eurostat."""
-        from app import atlas_catalog, sources
+        from app import atlas_catalog, indicator_universe, sources
 
         famiglie = {}
         for item in atlas_catalog.get_atlas_catalog()["indicators"]:
@@ -730,6 +731,8 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
         sulle_card = {t_path: int(n) for t_path, n in re.findall(
             r'<h3 class="temi-card__title"><a href="([^"]+)">.*?temi-card__n">(\d+) indicator', self.html, re.DOTALL)}
         self.assertEqual(len(sulle_card), len(atlas_catalog.all_atlas_themes_index()))
+        # Mappa tema -> path canonici indicizzabili per il confronto markdown
+        indexable_paths = {record["meta"]["canonical_path"] for record in indicator_universe.indexable_catalog()}
         per_provincia = solo_provincia = 0
         for voce in atlas_catalog.all_atlas_themes_index():
             html = self.client.get(voce["path"]).get_data(as_text=True)
@@ -766,10 +769,16 @@ class IConteggiDeiTemiSonoQuelliCheSiElencano(unittest.TestCase):
                 dichiarato = re.search(r": (\d+) indicatori", titolo)
                 if dichiarato:
                     self.assertEqual(int(dichiarato.group(1)), elencati)
-                self.assertIn(f"Indicatori per regione: {elencati}\n", markdown)
+                # Markdown: conta solo indicatori indicizzabili
+                theme_slug = voce["path"].split("/tema/")[1]
+                theme_profile = atlas_catalog.get_atlas_theme_profile(theme_slug)
+                indexabili = sum(1 for item in theme_profile["indicators"] if item["path"] in indexable_paths)
+                self.assertIn(f"Indicatori per regione: {indexabili}\n", markdown)
                 sezione = markdown.split("## Indicatori del tema", 1)[1].split("\n## ", 1)[0]
-                self.assertEqual(sezione.count("\n- ["), elencati)
+                self.assertEqual(sezione.count("\n- ["), indexabili)
                 if provinciali:
+                    # province_indicators sono gia' filtrati per level_passes_rule, ma il test
+                    # verifica che il markdown li includa (sono indicizzabili per definizione)
                     self.assertIn(f"Indicatori per provincia: {provinciali}\n", markdown)
                     self.assertIn(f"{provinciali} indicatori di questo tema" if provinciali > 1
                                   else "1 indicatore di questo tema", html)

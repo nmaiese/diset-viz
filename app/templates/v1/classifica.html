@@ -242,7 +242,7 @@
   <section class="section" id="fonti-dati" aria-labelledby="h-fonti">
     <h2 id="h-fonti">Fonti, dati e citazione</h2>
     {% set src = page_source('quality_of_life') %}
-    {{ dm.box(src.label, src.url, src.updated, "Non è la classifica del Sole 24 Ore: ordina i territori, non misura il benessere.") }}
+    {{ dm.box(src.label, src.url, src.updated, "Non è la classifica del Sole 24 Ore: ordina i territori, non misura il benessere.", 3) }}
     {#- Da 960 pixel le fonti a sinistra, scaricare e citare nella colonna
         destra: in colonna sola la sezione lasciava vuota meta' pagina. -#}
     <div class="cl-sources">

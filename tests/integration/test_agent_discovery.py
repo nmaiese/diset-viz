@@ -182,6 +182,19 @@ class AgentDiscoveryTest(unittest.TestCase):
         self.assertIn("Non dedurre cause", text)
         self.assertNotIn(artifact_path, self.client.get("/sitemap.xml").get_data(as_text=True))
 
+    def test_theme_markdown_excludes_non_indexable_indicators(self):
+        """Il markdown del tema non include schede non indicizzabili (es. eur-lfst_r_lfe2ehour)."""
+        theme_path = "/tema/lavoro-e-conciliazione"
+        response = self.client.get(theme_path, headers={"Accept": "text/markdown"})
+        self.assertEqual(response.status_code, 200)
+        text = response.get_data(as_text=True)
+        # L'indicatore Eurostat non indicizzabile non deve comparire
+        self.assertNotIn("Ore settimanali abituali nel lavoro principale", text)
+        self.assertNotIn("eur-lfst_r_lfe2ehour", text)
+        # Ma gli indicatori indicizzabili del tema sì
+        self.assertIn("Tasso di disoccupazione", text)
+        self.assertIn("Tasso di occupazione", text)
+
 
 class IlContrattoPubblicoValeAnchePrimaDelDeploy(unittest.TestCase):
     """`PUBLIC_DISCOVERABILITY_EXPECTATIONS` contro il client di prova.
