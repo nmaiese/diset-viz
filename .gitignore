@@ -58,7 +58,8 @@ data/lab/narrativa/
 data/articles/*/photo-candidates/
 
 # Antigravity / Orca agent working files (not project source)
-.agents/
+.agents/*
+!.agents/skills/
 ORIGINAL_REQUEST.md
 
 # Stato locale e note live dei worktree Orca
