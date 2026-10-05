@@ -49,6 +49,8 @@ possono scrivere direttamente su `master`.
 | **la versione 1.0**: griglia, tipografia, componenti, pagine, direzione "Cronaca", prototipi, e le pagine del sito che ne escono (`app/design/`, `app/templates/v1/`) | [`design/v1/SISTEMA.md`](design/v1/SISTEMA.md), [`design/README.md`](design/README.md) |
 | deploy su Cloud Run | [`DEPLOY.md`](DEPLOY.md) |
 | **lavoro multi-agente con Orca**: un worktree per agente, `TASK.md`, quale agente per quale task, cosa non fa un agente | [`docs/WORKFLOW_ORCA.md`](docs/WORKFLOW_ORCA.md) |
+| **scrivere o rivedere un testo del sito** (articolo del blog, testo di una scheda): ruoli, lista "non IA", controllo dei numeri, grafici | la skill `redazione-divario` (`.claude/skills/redazione-divario/SKILL.md`) |
+| **lanciare un worker, portare un ramo in produzione** (cancello, merge, prova dal vivo, rollback, pulizia) | la skill `lancio-e-cancello-divario` (`.claude/skills/lancio-e-cancello-divario/SKILL.md`) |
 
 ## Che cos'è
 
