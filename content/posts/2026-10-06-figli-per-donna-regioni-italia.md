@@ -1,8 +1,8 @@
 ---
-title: "Figli per donna per regione: il podio non è quello del 2010"
+title: "Figli per donna per regione: dal 2010 sono calati ovunque"
 seo_title: "Numero medio di figli per donna per regione dal 2010 al 2025"
 slug: figli-per-donna-regioni-italia
-description: "Numero medio di figli per donna per regione: nel 2010 diciassette regioni erano a 1,3 o più, nel 2025 una sola. Il calo più forte in Valle d'Aosta e Lombardia."
+description: "Dal 2010 al 2025 si fanno meno figli in tutte le regioni italiane, e il podio è cambiato. Il numero medio di figli per donna, regione per regione (dati Istat)."
 date: 2026-10-06
 draft: true
 tags:
@@ -50,6 +50,10 @@ external_figures:
   source: Istat, Natalità e fecondità della popolazione residente, anno 2024, 21 ottobre 2025
   url: https://www.istat.it/wp-content/uploads/2025/10/Natalita-e-fecondita-della-popolazione-residente_Anno-2024.pdf
 ---
+
+In quindici anni le donne italiane hanno fatto meno figli, in tutte le regioni. Ma non dappertutto allo stesso modo.
+
+Quindici anni fa quasi tutte le regioni stavano sopra quota 1,3 figli per donna. Oggi ce n'è una sola. Molte delle regioni che erano in testa sono scese più delle altre.
 
 Chi cerca quanti figli fa in media una donna in Italia trova un numero solo, 1,14. È la stima dell'Istat per il 2025, in calo dall'1,18 del 2024. Ma la domanda che viene subito dopo, dove se ne fanno di più, ha oggi una risposta diversa da quella di quindici anni fa. Molte delle regioni che allora guidavano la classifica sono scese più delle altre. Sul podio, accanto al Trentino-Alto Adige, oggi ci sono Sicilia e Campania.
 
