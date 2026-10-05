@@ -77,6 +77,25 @@
 .art-fig .fig .fig__dot--italy { fill: var(--data-reference); }
 .art-fig .fig .fig__label--italy { fill: var(--text-2); font-weight: 400; }
 .art-fig .fig .fig__pt.is-on { fill: var(--data-focus); }
+/* Le figure a viewBox stretto (370): a 375 px il testo scala poco e resta sopra gli 11 px. */
+.fig--narrow { display: block; max-width: 30rem; margin-inline: auto; }
+.fig--narrow text { font-size: 12.5px; }
+.fig--narrow .fig__title { font-size: 15px; font-weight: 700; fill: var(--ink); }
+.fig--narrow .fig__subtitle, .fig--narrow .fig__axis-name, .fig--narrow .fig__axis { fill: var(--muted); }
+.fig .fig__line--ink { stroke: var(--ink); stroke-dasharray: 7 4; }
+.fig .fig__dot--ink, .fig .fig__label--ink { fill: var(--ink); }
+.fig .fig__slope { stroke: var(--cmp); stroke-width: 1.2; opacity: 0.8; }
+.fig .fig__slope.is-on { stroke: var(--data-focus); stroke-width: 2.5; opacity: 1; }
+.fig .fig__pt-dot { fill: var(--cmp); }
+.fig .fig__pt-dot.is-on { fill: var(--data-focus); }
+/* Barre e manubri: l'evidenza e' il colore dei dati, mai l'arancio dell'interazione. */
+.fig--narrow .fig__bar { fill: var(--cmp); }
+.fig--narrow .fig__bar.is-on { fill: var(--data-focus); }
+.fig--narrow .fig__name, .fig--narrow .fig__value { fill: var(--ink); }
+.fig .fig__dumb { stroke: var(--cmp); stroke-width: 2; }
+.fig .fig__dumb.is-on { stroke: var(--data-focus); stroke-width: 3; }
+.fig .fig__pt-dot--old { fill: var(--bg); stroke: var(--cmp); stroke-width: 1.5; }
+.fig .fig__pt-dot--old.is-on { fill: var(--bg); stroke: var(--data-focus); stroke-width: 2; }
 
 /* ---------- rimando alla scheda, dati e metodo, storie ---------- */
 .art-link { margin-top: var(--space-8); max-width: var(--measure); padding-bottom: var(--space-4); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
