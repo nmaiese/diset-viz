@@ -500,17 +500,25 @@ class IdentitaEditorialeTest(unittest.TestCase):
         """
         import re
         dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
-        # Pattern: Path(...) / "config" / "filename.ext" in app/
-        pattern = re.compile(r'Path\([^)]*\)\s*/\s*"config"\s*/\s*"([^"]+)"')
+        # Ogni percorso costruito come `<qualcosa> / "config" / "nome.ext"` in app/
+        # (anche su piu righe): e' il modo in cui il codice legge i file di config.
+        pattern = re.compile(r'/\s*"config"\s*/\s*"([^"]+\.(?:csv|yaml|json))"')
         config_files = set()
         for py_file in (ROOT / "app").rglob("*.py"):
             content = py_file.read_text(encoding="utf-8")
             for match in pattern.finditer(content):
                 config_files.add(f"config/{match.group(1)}")
-        # Filtra: solo file che esistono davvero
-        config_files = {f for f in config_files if (ROOT / f).exists()}
-        # Ogni file deve avere la sua COPY nel Dockerfile
+        # La regola non deve marcire in silenzio: se non trova piu i file che
+        # sappiamo letti a runtime, il test si accorge che il riconoscimento e rotto.
+        noti = {
+            "config/identita.yaml", "config/game_indicators.csv",
+            "config/theme_categories.csv", "config/indicator_families.csv",
+            "config/indicator_search_metrics.csv",
+        }
+        self.assertTrue(noti <= config_files,
+                        f"il riconoscimento non vede piu {sorted(noti - config_files)}")
         for cfg in sorted(config_files):
+            self.assertTrue((ROOT / cfg).exists(), f"{cfg} citato in app/ ma assente dal repo")
             copy_line = f"COPY {cfg} {cfg}"
             self.assertIn(copy_line, dockerfile,
                           f"Manca COPY per {cfg} nel Dockerfile (letto a runtime da app/)")
