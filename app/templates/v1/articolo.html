@@ -224,8 +224,11 @@
 {{ d.body_after | safe }}
       </div>
 
-      <section class="section art-data" id="dati-metodo" aria-labelledby="h-dati-metodo">
-        <h2 id="h-dati-metodo">Dati e metodo</h2>
+      {#- Il titolo "Dati e metodo" e' dentro il riquadro (`dm.box`), non nella
+          sezione: due volte di fila si leggono come un refuso. La sezione resta
+          quella che l'indice e "Cita questo articolo" puntano con `#dati-metodo`,
+          e l'`id` del titolo non si ripete. -#}
+      <section class="section art-data" id="dati-metodo" aria-label="Dati e metodo">
         {{ dm.box(d.institution, ds.source_url, None, "L'analisi confronta territori di peso diverso: le medie sono medie semplici non ponderate.") }}
         <dl class="specs">
           {% if d.used %}<div id="dati-usati"><dt>Dati usati</dt><dd>{{ d.used | safe }}</dd></div>{% endif %}

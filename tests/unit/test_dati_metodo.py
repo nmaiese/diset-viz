@@ -20,13 +20,13 @@ from app.dati_metodo import page_source
 MARKER = 'class="dati-metodo" data-dati-metodo'
 
 
-def _render(source_label, source_url=None, dataset_updated=None, limits=None):
+def _render(source_label, source_url=None, dataset_updated=None, limits=None, livello=2):
     with app.test_request_context():
         return render_template_string(
             '{% import "v1/_dati_metodo.html" as dm with context %}'
-            "{{ dm.box(source_label, source_url, dataset_updated, limits) }}",
+            "{{ dm.box(source_label, source_url, dataset_updated, limits, livello) }}",
             source_label=source_label, source_url=source_url,
-            dataset_updated=dataset_updated, limits=limits)
+            dataset_updated=dataset_updated, limits=limits, livello=livello)
 
 
 class IlRiquadroDatiEMetodo(unittest.TestCase):
@@ -57,6 +57,17 @@ class IlRiquadroDatiEMetodo(unittest.TestCase):
         reso = _render("Istat", "https://www.istat.it/x", "2026-05-25")
         self.assertIn("<aside", reso)
         self.assertNotIn("<script", reso)
+
+    def test_il_titolo_si_vede_e_nel_riquadro(self):
+        """La parola "Dati e metodo" era solo un `aria-label`: sul sito vivo non
+        si leggeva da nessuna parte."""
+        reso = _render("Istat")
+        self.assertIn('<h2 class="dati-metodo__titolo">Dati e metodo</h2>', reso)
+        self.assertLess(reso.index("dati-metodo__titolo"), reso.index("dati-metodo__fonte"))
+
+    def test_il_titolo_scende_di_livello_dove_la_sezione_ha_il_suo(self):
+        reso = _render("Istat", None, None, None, 3)
+        self.assertIn('<h3 class="dati-metodo__titolo">Dati e metodo</h3>', reso)
 
 
 class LaFontePrimaria(unittest.TestCase):

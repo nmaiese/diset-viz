@@ -352,7 +352,7 @@ addEventListener("pagereveal", function (e) {
 
       <section class="section indicator-apparatus" id="fonti-verifica" aria-labelledby="h-fonti">
         <h2 id="h-fonti">Fonti, dati e citazione</h2>
-        {{ dm.box(meta.source_label, meta.source_url, dataset_updated, "La media è una media semplice non ponderata: ogni territorio pesa uguale, e non dice se una differenza è statisticamente significativa.") }}
+        {{ dm.box(meta.source_label, meta.source_url, dataset_updated, "La media è una media semplice non ponderata: ogni territorio pesa uguale, e non dice se una differenza è statisticamente significativa.", 3) }}
         <dl class="specs apparatus-specs">
           <div><dt>Dato più recente</dt><dd>{{ year }}{% if level.year_min != year %}, dati dal {{ level.year_min }}{% endif %}</dd></div>
           <div><dt>Fonte</dt><dd><a href="{{ meta.source_url }}">{{ meta.source_label }}</a>{% if meta.source_dataflow %}, dataflow <code>{{ meta.source_dataflow }}</code>{% endif %}</dd></div>
