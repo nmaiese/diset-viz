@@ -5,7 +5,7 @@ Stato al 6 ottobre 2026. La diagnosi sta in `orca/direzione/review/diagnosi-indi
 ## Che cosa si prova
 Su due regioni non indicizzate, **Molise** e **Valle d'Aosta**, le tabelle dei 157 indicatori e quella delle altre fonti stanno in un `details` chiuso, con un `summary` che dice cosa contiene e quante righe (commit `75b50804`, costante `REGIONI_TABELLE_CHIUSE` in `app/design/pages/regione.py`). Il contenuto resta nell'HTML. Le altre 18 regioni escono come prima.
 
-**Limite da dire chiaro:** la pagina pesa ancora circa 380-390 KB e le parole nel codice sono le stesse. L'esperimento cambia ciò che si vede (la pagina si apre su prosa e grafici invece che su 234 righe di tabella), non il peso. Distingue «forma percepita» da «peso»; **non** prova né smentisce l'ipotesi del peso. Se non si muove nulla, il passo due è ridurre davvero l'HTML (tabelle caricate a richiesta), con un secondo esperimento.
+**Limite da dire chiaro:** la pagina pesa ancora circa 380-390 KB e le parole nel codice sono le stesse. L'esperimento cambia ciò che si vede (la pagina si apre su prosa e grafici invece che su 234 righe di tabella), non il peso. Distingue «forma percepita» da «peso». **Non** prova né smentisce l'ipotesi del peso. Se non si muove nulla, il passo due è ridurre davvero l'HTML (tabelle caricate a richiesta), con un secondo esperimento.
 
 Le due regioni scelte coprono i due casi della diagnosi: Valle d'Aosta ha molto testo proprio (12 paragrafi), Molise meno.
 
