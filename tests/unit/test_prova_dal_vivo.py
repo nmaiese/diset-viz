@@ -53,6 +53,27 @@ class ProvaDalVivoTests(unittest.TestCase):
                                      scarica=lambda url: next(risposte), tentativi=2, pausa=0)
         self.assertEqual(result["frasi"][0]["trovata"], True)
 
+    def test_un_paragrafo_si_divide_in_frasi(self):
+        diff = (
+            "--- a/content/posts/x.md\n+++ b/content/posts/x.md\n@@ -1,0 +10,1 @@\n"
+            "+Il peso della redistribuzione è misurato dall'Istat nell'[audizione del maggio 2025](https://x.it/a.pdf). "
+            "Nel 2023 la redistribuzione pesa per il 22,0% del reddito disponibile in Calabria e per lo 0,2% in Lombardia. "
+            "Breve frase.\n"
+        )
+        frasi = prova.estrai_frasi_nuove(diff, body_start=1)
+        self.assertEqual(len(frasi), 2)
+        self.assertTrue(frasi[0].testo.startswith("Il peso della redistribuzione"))
+        self.assertIn("audizione del maggio 2025", frasi[0].testo)
+        self.assertNotIn("https", frasi[0].testo)
+        self.assertTrue(frasi[1].testo.startswith("Nel 2023"))
+
+    def test_un_link_nella_pagina_non_fa_mancare_la_frase(self):
+        pagina = ("<p>Il peso della redistribuzione è misurato dall&#39;Istat nell&#39;"
+                  "<a href='x'>audizione del maggio 2025</a>. Nel 2023 la redistribuzione pesa.</p>")
+        frase = "Il peso della redistribuzione è misurato dall'Istat nell'audizione del maggio 2025."
+        self.assertTrue(prova.frase_trovata(pagina, frase))
+        self.assertFalse(prova.frase_trovata(pagina, "Questa frase non è nella pagina e ha otto parole."))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -52,8 +52,12 @@ def estrai_frasi_nuove(diff: str, body_start: int | None = None) -> list[Frase]:
             elif ((body_start is not None and new_line >= body_start)
                   or (body_start is None and not in_frontmatter and delimiter_count >= 2)):
                 clean = _puliscimarkdown(content).strip()
-                if len(re.findall(r"\b[\wÀ-ÿ’'-]+\b", clean)) >= 8:
-                    frasi.append(Frase(clean, new_line))
+                # Una riga di Markdown e un paragrafo intero: si confronta una frase
+                # alla volta, cosi un link o un tag che spezza il testo nella pagina
+                # non fa mancare un paragrafo di dieci frasi per una virgola.
+                for frase in re.split(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý\"'«(])", clean):
+                    if len(re.findall(r"\b[\wÀ-ÿ’'-]+\b", frase)) >= 8:
+                        frasi.append(Frase(frase.strip(), new_line))
             new_line += 1
         elif line.startswith(" "):
             if line[1:].strip() == "---":
@@ -100,8 +104,15 @@ def normalizza(testo):
     return re.sub(r"\s+", " ", testo).strip().casefold()
 
 
+def _compatta(testo):
+    """Il testo senza nessuno spazio: nell'HTML un link o un tag spezza le parole con
+    uno spazio o senza («nell' audizione» contro «nell'audizione»), e per sapere se
+    una frase c'e conta l'ordine dei caratteri, non la spaziatura."""
+    return re.sub(r"\s+", "", normalizza(testo))
+
+
 def frase_trovata(pagina, frase):
-    return normalizza(frase) in normalizza(pagina)
+    return _compatta(frase) in _compatta(pagina)
 
 
 def scarica(url):
