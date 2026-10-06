@@ -208,6 +208,8 @@ di `opencode-big-pickle`. Per il resto l'account resta uno solo, quindi:
   Codex), lo fa con `git commit --author="<AGENT_ID> <n.maiese+<agente>@gmail.com>"`.
 - Per affidare un'issue a un agente si usa la label `agent:<nome>`: su GitHub
   l'assegnatario può essere solo un utente, e l'account è quello di Nello.
+- Le PR che cambiano `content/posts/` o `content/indicators/` devono includere nel corpo `Closes #N`, `Fixes #N`, `Resolves #N` o `Refs #N` e avere una label `run:`.
+- Il workflow `Controllo PR contenuti` blocca queste PR se manca uno dei due metadati; cancellazioni sole e PR fuori da quei percorsi passano senza controllo.
 
 ## 6. Antigravity in orchestrazione, misurato e diagnosticato il 28 settembre 2026
 

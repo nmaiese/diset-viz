@@ -1,0 +1,24 @@
+name: Controllo PR contenuti
+
+on:
+  pull_request:
+    types: [ opened, edited, synchronize, reopened, labeled, unlabeled ]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  controllo-contenuti:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Controlla metadati PR contenuti
+        env:
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: python scripts/ci/controlla_pr_contenuti.py
