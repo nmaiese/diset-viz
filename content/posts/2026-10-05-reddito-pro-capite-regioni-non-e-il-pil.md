@@ -2,7 +2,7 @@
 title: "Reddito pro capite per regione: la distanza è più corta"
 seo_title: "Reddito pro capite per regione: la distanza è più corta"
 slug: reddito-pro-capite-regioni-non-e-il-pil
-description: "In Calabria si produce meno della metà che in Lombardia, ma nelle tasche delle famiglie la distanza è molto più piccola. Reddito pro capite per regione, 2024."
+description: "In Calabria si produce per abitante meno della metà che in Lombardia, ma nelle tasche delle famiglie la distanza è più piccola. Reddito pro capite per regione, 2024."
 date: 2026-10-05
 draft: false
 cover: /static/img/blog/reddito-pro-capite-regioni-non-e-il-pil.jpg
@@ -41,6 +41,14 @@ external_figures:
   what: aumento percentuale del reddito disponibile medio per abitante in Italia dovuto alla redistribuzione pubblica, 2023
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+- value: "22,0"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile in Calabria, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+- value: "0,2"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile in Lombardia, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
 - value: "17,5"
   what: incidenza percentuale della redistribuzione sul reddito disponibile nel Mezzogiorno, 2023
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
@@ -51,11 +59,9 @@ external_figures:
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
 ---
 
-In Calabria si produce meno della metà che in Lombardia. Ma nelle tasche delle famiglie la distanza è molto più piccola.
+In Calabria si produce per abitante meno della metà che in Lombardia. Nelle tasche delle famiglie la distanza è più piccola.
 
-Non c'è nessun errore. Sono due modi diversi di misurare la stessa Italia. E le due cifre si allontanano di più proprio nelle regioni che producono di più.
-
-Chi cerca il reddito pro capite delle regioni italiane trova quasi sempre un'altra cifra, il PIL per abitante. Le due parole girano come sinonimi, ma rispondono a domande diverse. Il PIL dice quanto valore si produce in una regione. Il reddito disponibile dice quanto entra, a conti fatti, alle famiglie che ci vivono. Le due misure danno due mappe diverse dell'Italia. Sulla seconda le regioni sono più vicine fra loro.
+Il PIL misura quanto si produce in una regione, il reddito quanto arriva alle famiglie che ci abitano.
 
 Nel 2024 il reddito disponibile delle famiglie valeva **28.154 euro per abitante in [Lombardia](/regione/lombardia) e 16.796 in [Calabria](/regione/calabria)**. Sono 11.358 euro a testa. In proporzione è meno della distanza fra le due regioni sul PIL.
 {: .data-callout}
@@ -64,27 +70,27 @@ Nel 2024 il reddito disponibile delle famiglie valeva **28.154 euro per abitante
 
 ## Dove si produce e dove si vive
 
-Fra PIL e reddito ci sono due differenze, e l'Istat le mette già nelle definizioni. La prima è il luogo. Il PIL è registrato dove si produce, il reddito dove vive la famiglia. Per l'Istat il PIL ai prezzi di mercato è ["il risultato finale dell'attività di produzione delle unità produttrici residenti"](https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf), mentre il reddito lordo disponibile "esprime i risultati economici conseguiti dalle Famiglie residenti nella regione".
+Il luogo conta: il PIL è registrato dove si produce, il reddito dove vive la famiglia. Per l'Istat il PIL ai prezzi di mercato è ["il risultato finale dell'attività di produzione delle unità produttrici residenti"](https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_2022-2024_def-1.pdf), mentre il reddito lordo disponibile "esprime i risultati economici conseguiti dalle Famiglie residenti nella regione".
 
-La seconda è la redistribuzione. Il reddito include imposte, contributi, prestazioni sociali e altri trasferimenti netti. È lordo come il PIL, ed entrambi sono in euro correnti. Il reddito del sito è quello delle famiglie consumatrici.
+Il reddito disponibile delle famiglie tiene conto di imposte e contributi versati, oltre che di prestazioni sociali e trasferimenti ricevuti. È lordo come il PIL, ed entrambi sono espressi in euro correnti. Il dato del sito riguarda le famiglie consumatrici.
 
-Il peso di questo secondo passaggio l'Istat lo ha misurato per macro-area, nell'[audizione del maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf) e sui dati del 2023. In media la redistribuzione pubblica ha alzato il reddito disponibile per abitante del 7,8%. Nel Mezzogiorno vale il 17,5% del reddito delle famiglie, nel Nord-ovest il 2,3%. È un dato per ripartizione e non dice quanto conti in ciascuna regione.
+Il peso della redistribuzione è misurato dall'Istat per il 2023 nell'[audizione del maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf). Nel 2023, secondo l'Istat, la redistribuzione pesa per il 22,0% del reddito disponibile in Calabria e per lo 0,2% in Lombardia. In media ha alzato il reddito disponibile per abitante del 7,8%. Nelle ripartizioni la stessa incidenza è del 17,5% nel Mezzogiorno e del 2,3% nel Nord-ovest.
 
 ## Una distanza che si accorcia, l'altra che si allarga
 
 Sul PIL la Lombardia produce per abitante 2,3 volte la Calabria, con 50.399 euro contro 21.702. Sul reddito il rapporto scende a 1,7. Lo stesso concetto lo esprime [Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Regional_household_income_statistics): il reddito per abitante descrive il reddito dei residenti meglio del PIL per abitante.
 
-I due rapporti, poi, non sono fermi. Nel 2004 la Lombardia produceva per abitante 2,2 volte la Calabria e le sue famiglie avevano un reddito 1,8 volte più alto. In vent'anni la distanza sul PIL si è riaperta, quella sul reddito si è ristretta. Lo stesso accade fra la prima e l'ultima regione di ogni classifica. Nel PIL il loro rapporto è salito da 2,25 a 2,52, mentre quello del reddito è sceso da 1,80 a 1,75.
+I due rapporti non sono fermi. Nel 2004 la Lombardia produceva per abitante 2,2 volte la Calabria e il reddito delle sue famiglie era pari a 1,8 volte quello calabrese. In vent'anni la distanza sul PIL si è riaperta, quella sul reddito si è ristretta. Fra la prima e l'ultima regione di ogni classifica, il rapporto del PIL è salito da 2,25 a 2,52, mentre quello del reddito è sceso da 1,80 a 1,75.
 
-Sono rapporti fra regioni nello stesso anno, e per questo l'inflazione non li tocca. Non tengono conto, però, delle differenze nel costo della vita.
+Sono confronti nominali fra regioni nello stesso anno, non misure del potere d'acquisto.
 
 <!-- figura: distanza-pil-reddito -->
 
 ## In mezzo alla classifica le regioni cambiano posto
 
-Agli estremi le due mappe si somigliano. Il [Trentino-Alto Adige](/regione/trentino-alto-adige) è primo su tutte e due, con 54.637 euro di PIL e 29.344 di reddito per abitante, e la Calabria è ultima su tutte e due. Il resto si muove.
+Il [Trentino-Alto Adige](/regione/trentino-alto-adige) è primo in entrambe le classifiche, con 54.637 euro di PIL e 29.344 di reddito per abitante. La Calabria è ultima in entrambe.
 
-Il caso più netto è il [Lazio](/regione/lazio), quinto per PIL e decimo per reddito. Il [Piemonte](/regione/piemonte) fa la strada opposta, dal decimo al sesto posto. Il Lazio produce 4.541 euro per abitante più del Piemonte, ma le famiglie piemontesi hanno 990 euro di reddito in più a testa. I dati mostrano il posto in classifica, non la causa del calo.
+Il caso più netto è il [Lazio](/regione/lazio), quinto per PIL e decimo per reddito. Il [Piemonte](/regione/piemonte) fa la strada opposta, dal decimo al sesto posto. Il Lazio produce 4.541 euro per abitante più del Piemonte, ma le famiglie piemontesi hanno 990 euro di reddito in più a testa. I dati mostrano i due posti in classifica, non il motivo della differenza.
 
 Anche la [Liguria](/regione/liguria) sale, dal nono al quinto posto, con 25.504 euro di reddito per abitante. [Veneto](/regione/veneto) e [Toscana](/regione/toscana) scendono di due posti, all'ottavo e al nono. [Valle d'Aosta](/regione/valle-d-aosta) ed [Emilia-Romagna](/regione/emilia-romagna) si scambiano il terzo e il quarto.
 
@@ -98,7 +104,7 @@ In Trentino-Alto Adige il reddito delle famiglie per abitante vale 54 euro ogni 
 
 Questo rapporto non è una fetta del PIL che passa alle famiglie. Mette a confronto una grandezza contata dove si produce con una contata dove si vive.
 
-Il rapporto scende quando il PIL sale. La correlazione di rango è -0,93. Ci sono eccezioni. In [Basilicata](/regione/basilicata) il reddito vale 63 euro ogni 100 di PIL, meno che in Liguria e in Piemonte, dove si produce di più.
+Il rapporto tende a scendere quando il PIL sale. La correlazione di rango è -0,93. In [Basilicata](/regione/basilicata) il reddito vale 63 euro ogni 100 di PIL, meno che in Liguria e in Piemonte, dove si produce di più.
 
 Il meccanismo generale lo descrive la [Treccani](https://www.treccani.it/enciclopedia/la-redistribuzione-del-reddito-tra-regioni_(L'Italia-e-le-sue-Regioni)/). Dove ci sono squilibri territoriali e un welfare universalistico, il sistema sposta reddito dalle aree più ricche alle più povere. Queste hanno così "un reddito disponibile pro capite più elevato di quello giustificato dal reddito in esse prodotto". Il testo spiega come funziona, non quanto pesa in ogni regione.
 

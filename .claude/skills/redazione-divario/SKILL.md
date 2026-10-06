@@ -39,6 +39,12 @@ Ogni articolo ha almeno una figura nostra che regge la tesi, fatta con i dati de
 
 Per i pezzi nati dal trend c'e anche `bin/py -m scripts.trend_articles.verify <file>` (frontmatter, foto, cifre del dossier, link). Sui pilota senza trend segnala errori noti di foto, dossier e trend: non e un cancello, il revisore ricalcola i numeri.
 
+## Lunghezza (approvata dalla direzione il 6/10/2026, dati dei concorrenti in `direzione/review/concorrenti-sonnet.md`)
+- **Articolo di dati**: 700-1100 parole, tetto 1100 (mediana dei concorrenti 936). Una tesi, un dato, uno o due grafici.
+- **Analisi lunga**: 1400-2000 parole, al massimo un pezzo su cinque, solo se la tesi chiede metodo e confronto fra fonti.
+- **Un solo conteggio**: quello di `scripts/editoriale/guardia_articolo.py`, cioe la prosa del corpo prima di `## Fonti`, senza frontmatter, tabelle e URL dei link (come la conta la guardia, `count_words`). Nessun altro conteggio vale (un altro modello contava 996 dove la guardia ne conta 1015).
+- Il tetto non e un obiettivo e non e un criterio di valore: se per rientrare serve togliere un dato o una cautela, si toglie un raccordo. Sotto le 700 solo se la tesi sta in meno.
+
 ## 6. Rilievi, giri, approvazione
 I rilievi vanno allo scrittore uno per uno e il leader verifica che siano tutti chiusi nel diff, non sulla parola. Massimo due giri di review (regola della direzione del 4/10, piu stretta dei tre di PIANO.md del 28/09): se dopo il secondo resta un bloccante lo decide la direzione. Il pezzo resta `draft: true` e va in una PR draft: la pubblicazione e del titolare, mai del leader. Il frontmatter non porta `author` (la firma la da `config/identita.yaml`). Nessun nome di persona nei testi.
 

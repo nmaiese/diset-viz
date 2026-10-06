@@ -268,7 +268,10 @@ class ValutazioneTest(Base):
         sessione = self._sessione("province")
         coppia = sessione["questions"][0]
         corpo = self._risponde(sessione, 0, _vincitore("province", coppia)).get_json()
-        self.assertEqual(corpo["indicator"]["source_label"], sources.SOURCES["bes"]["label"])
+        # L'indicatore della coppia puo' essere BES o di una famiglia esterna: si
+        # confronta con l'etichetta della sua famiglia, non con quella BES.
+        family, _ = game_daily.province_source(corpo["indicator"]["id"])
+        self.assertEqual(corpo["indicator"]["source_label"], sources.family_label(family))
 
     def test_token_of_another_question_does_not_judge_this_one(self):
         sessione = self._sessione()

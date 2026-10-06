@@ -3,6 +3,7 @@
     bin/py -m scripts.editoriale.guardia_articolo content/posts/2026-10-05-reddito-pro-capite-regioni-non-e-il-pil.md
     bin/py -m scripts.editoriale.guardia_articolo content/posts/*.md --json
     bin/py -m scripts.editoriale.guardia_articolo content/posts/<file>.md --tetto 800
+    bin/py -m scripts.editoriale.guardia_articolo content/posts/<file>.md --lunga
 
 `guardia.py` guarda le schede indicatore, `scripts/trend_articles/verify.py`
 l'articolo nato dalla pipeline dei trend (dossier, scheda della foto, trend).
@@ -34,8 +35,10 @@ Cinque controlli, tutti meccanici:
    trend, e un articolo scritto a mano non li ha.
 4. **Forma di `content/STYLE.md`** che si controlla a macchina: mai `—`, `–`,
    `;`, `…`, e le parole di prosa (tabelle e fonti escluse, come in
-   `verify.py`) entro il tetto, mille per `REVIEW.md`. Il tetto superato e' un
-   avviso, come in `verify.py`: la lunghezza giusta la giudica il revisore.
+   `verify.py`) entro il tetto: 1100 per l'articolo di dati, 2000 con `--lunga`.
+   La regola editoriale sta in `.claude/skills/redazione-divario/SKILL.md`.
+   Il tetto superato e' un avviso, come in `verify.py`: la lunghezza giusta la
+   giudica il revisore.
 5. **Esito**: rilievi numerati con `file:riga`, in tre gravita'. Gli **errori**
    danno esito 1, gli **avvisi** e i **non verificabili** si leggono e danno 0.
    `--json` stampa lo stesso referto per le macchine.
@@ -61,7 +64,8 @@ from scripts.trend_articles.verify import LINK, _clean_body
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = ROOT / "app" / "static"
-WORD_CAP = 1000
+WORD_CAP = 1100
+WORD_CAP_LUNGA = 2000
 
 ERROR, WARNING, UNVERIFIABLE = "errore", "avviso", "non verificabile"
 SEVERITY_ORDER = {ERROR: 0, WARNING: 1, UNVERIFIABLE: 2}
@@ -459,14 +463,16 @@ def main(argv=None, link_status=None, **where):
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument("articoli", nargs="+", type=Path, help="uno o piu' file di content/posts/")
     parser.add_argument("--json", action="store_true", help="il referto per le macchine")
-    parser.add_argument("--tetto", type=int, default=WORD_CAP, help=f"tetto di parole di prosa (default {WORD_CAP})")
+    parser.add_argument("--tetto", type=int, help="tetto di parole di prosa (prevale su --lunga)")
+    parser.add_argument("--lunga", action="store_true", help=f"usa il tetto lungo ({WORD_CAP_LUNGA} parole)")
     args = parser.parse_args(argv)
+    cap = args.tetto if args.tetto is not None else (WORD_CAP_LUNGA if args.lunga else WORD_CAP)
 
     for path in args.articoli:
         if not path.is_file():
             parser.error(f"il file {path} non esiste")
     status = link_status or default_link_status()
-    reports = [check_article(path, link_status=status, cap=args.tetto, **where) for path in args.articoli]
+    reports = [check_article(path, link_status=status, cap=cap, **where) for path in args.articoli]
     failed = any(_counts(r)[ERROR] for r in reports)
     if args.json:
         print(json.dumps([report_dict(r) for r in reports], ensure_ascii=False, indent=2))

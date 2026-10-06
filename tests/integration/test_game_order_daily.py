@@ -123,11 +123,19 @@ class TestGameOrderDaily(unittest.TestCase):
             "token": session["token"], "level": "province", "region_keys": keys})
         self.assertEqual(r.status_code, 200)
         ind = r.get_json()["indicator"]
-        self.assertEqual(ind["source_label"], sources.SOURCES["bes"]["label"])
-        # Il link e' quello di `bes_level_path`: una scheda a due livelli si apre
-        # sulle `/province`, una solo provinciale resta sul suo canonico.
+        # L'indicatore del giorno puo' essere BES o di una famiglia esterna
+        # (`ipr:`, `aci:`, `agcom:`): l'etichetta attesa e' quella della sua
+        # famiglia, mai quella BES per forza (il test era rosso il giorno in cui
+        # il seme ha pescato un `ipr:`).
+        family, raw = game_daily.province_source(ind["id"])
+        self.assertEqual(ind["source_label"], sources.family_label(family))
         self.assertTrue(ind["path"].startswith("/indicatore/"))
-        self.assertEqual(ind["path"], bes_data.bes_level_path(game_daily.provincial_id(ind["id"]), "provincia"))
+        if family == "bes":
+            # Il link e' quello di `bes_level_path`: una scheda a due livelli si apre
+            # sulle `/province`, una solo provinciale resta sul suo canonico.
+            self.assertEqual(ind["path"], bes_data.bes_level_path(game_daily.provincial_id(ind["id"]), "provincia"))
+        else:
+            self.assertEqual(self.client.get(ind["path"]).status_code, 200)
         self.assertNotEqual(ind["source_url"], "https://www.istat.it")
 
 
@@ -195,7 +203,9 @@ class OrdinaDelGiornoSicuroTest(BaseOrdina):
         r = self.client.post("/api/game/order/daily/answer", json={
             "token": sessione["token"], "level": "regioni", "region_keys": self._chiavi(sessione)})
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.get_json()["indicator"]["source_label"], sources.SOURCES["bes"]["label"])
+        ind = r.get_json()["indicator"]
+        family, _ = game_daily.province_source(ind["id"])
+        self.assertEqual(ind["source_label"], sources.family_label(family))
 
     def test_la_sessione_del_giorno_non_ha_timer_e_una_risposta_tarda_conta(self):
         sessione = self._sessione()
