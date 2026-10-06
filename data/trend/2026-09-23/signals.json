@@ -519,6 +519,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Nasce l’Osservatorio sul Valore Pubblico delle Regioni",
       "outlet": "",
       "url": "https://www.istat.it/notizia/nasce-losservatorio-sul-valore-pubblico-delle-regioni/",
       "published": "2026-09-22T10:00:00+00:00",
@@ -527,6 +528,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Matrice di pendolarismo per studio",
       "outlet": "",
       "url": "https://www.istat.it/notizia/matrice-di-pendolarismo-per-studio/",
       "published": "2026-09-22T09:00:17+00:00",
@@ -535,6 +537,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Conti economici nazionali – Anni 2010-2025",
       "outlet": "",
       "url": "https://www.istat.it/comunicato-stampa/conti-economici-nazionali-anni-2010-2025/",
       "published": "2026-09-22T08:15:13+00:00",
@@ -543,6 +546,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Ciclo di seminari sul presente e sul futuro della statistica ufficiale",
       "outlet": "",
       "url": "https://www.istat.it/evento/ciclo-di-seminari-sul-presente-e-sul-futuro-della-statistica-ufficiale/",
       "published": "2026-09-21T13:56:45+00:00",
@@ -551,6 +555,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Indicatori territoriali per le politiche di sviluppo",
       "outlet": "",
       "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/",
       "published": "2026-09-21T13:34:00+00:00",
@@ -559,6 +564,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "#IstatNewsletter",
       "outlet": "",
       "url": "https://www.istat.it/newsletter/online-istatnewsletter-la-newsletter-dellistat/",
       "published": "2026-09-21T11:04:58+00:00",
@@ -567,6 +573,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Finanza locale: entrate e spese dei bilanci consuntivi (comuni, province e città metropolitane, unioni di comuni e comunità montane",
       "outlet": "",
       "url": "https://www.istat.it/tavole-di-dati/finanza-locale-entrate-e-spese-dei-bilanci-consuntivi-comuni-province-e-citta-metropolitane-unioni-di-comuni-e-comunita-montane/",
       "published": "2026-09-21T09:01:25+00:00",
@@ -575,6 +582,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Statistica & giovani, incontri ravvicinati",
       "outlet": "",
       "url": "https://www.istat.it/evento-territoriale/statistica-giovani-incontri-ravvicinati/",
       "published": "2026-09-21T08:53:54+00:00",

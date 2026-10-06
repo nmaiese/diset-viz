@@ -515,6 +515,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Prezzi alla produzione dell’industria e delle costruzioni – Agosto 2026",
       "outlet": "",
       "url": "https://www.istat.it/comunicato-stampa/prezzi-alla-produzione-dellindustria-e-delle-costruzioni-agosto-2026/",
       "published": "2026-09-29T09:04:59+00:00",
@@ -523,6 +524,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Fatturato dell’industria e dei servizi – Luglio 2026",
       "outlet": "",
       "url": "https://www.istat.it/comunicato-stampa/fatturato-dellindustria-e-dei-servizi-luglio-2026/",
       "published": "2026-09-29T08:00:06+00:00",
@@ -531,6 +533,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "#IstatNewsletter",
       "outlet": "",
       "url": "https://www.istat.it/newsletter/online-istatnewsletter-la-newsletter-dellistat/",
       "published": "2026-09-28T12:59:44+00:00",
@@ -539,6 +542,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Quanto giochiamo?",
       "outlet": "",
       "url": "https://www.istat.it/news-dati-alla-mano/quanto-giochiamo/",
       "published": "2026-09-28T09:08:47+00:00",
@@ -547,6 +551,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Commercio estero extra UE – Agosto 2026",
       "outlet": "",
       "url": "https://www.istat.it/comunicato-stampa/commercio-estero-extra-ue-agosto-2026/",
       "published": "2026-09-28T08:00:25+00:00",
@@ -555,6 +560,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Infografiche storie di dati: criminalità, giustizia, detenzione",
       "outlet": "",
       "url": "https://www.istat.it/infografiche/infografica-criminalita-giustizia-detenzione/",
       "published": "2026-09-25T12:54:43+00:00",
@@ -565,6 +571,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Infografiche storie di dati: La tecnologia e il sistema produttivo",
       "outlet": "",
       "url": "https://www.istat.it/infografiche/infografiche-storie-di-dati-la-tecnologia-e-il-sistema-produttivo/",
       "published": "2026-09-25T12:26:52+00:00",
@@ -573,6 +580,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Tempi di lavoro e disuguaglianze di genere in Italia ",
       "outlet": "",
       "url": "https://www.istat.it/comunicato-stampa/tempi-di-lavoro-e-disuguaglianze-di-genere-in-italia-anni-2003-2023/",
       "published": "2026-09-25T09:00:32+00:00",
@@ -581,6 +589,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "Il catalogo Istat per le scuole – Anno scolastico 2026-2027",
       "outlet": "",
       "url": "https://www.istat.it/notizia/laboratori-competizioni-e-attivita-di-promozione-della-cultura-statistica/",
       "published": "2026-09-24T09:50:19+00:00",
@@ -591,6 +600,7 @@
     },
     {
       "type": "istat_comunicato",
+      "title": "L’innovazione nelle imprese – Anni 2022-2024",
       "outlet": "",
       "url": "https://www.istat.it/comunicato-stampa/linnovazione-nelle-imprese-anni-2022-2024/",
       "published": "2026-09-24T09:00:04+00:00",
