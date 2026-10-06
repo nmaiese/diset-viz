@@ -41,11 +41,14 @@ LICENSE_QUOTE = (
 )
 METHOD_POP = "https://www.istat.it/statistiche-per-temi/popolazione/popolazione-e-famiglie/"
 METHOD_LAVORO = "https://www.istat.it/statistiche-per-temi/istruzione-e-lavoro/lavoro-e-retribuzioni/"
+METHOD_CONTI_TERRITORIALI = "https://www.istat.it/comunicato-stampa/conti-economici-territoriali-2022-2024/"
 SOURCE_BASE = "https://esploradati.istat.it/SDMXWS/rest/data/"
 
 FLUSSO_DEMOG = "22_293_DF_DCIS_INDDEMOG1_1"
 FLUSSO_DISOCC = "151_914_DF_DCCV_TAXDISOCCU1_8"
 FLUSSO_ATTIV = "150_916_DF_DCCV_TAXATVT1_5"
+FLUSSO_CONTI_TERRITORIALI = "93_1227_DF_DCCN_TNA1_6"
+CHIAVE_PIL_PRO_CAPITE = "A..B1GQ_B_W2_S1_R_POP.Z.Z.Z.V.N.Z.2025M12"
 
 # Regioni: codice NUTS2 Istat -> nome come in province_codes.csv (colonna region).
 # Il Trentino Alto Adige e' ITDA: il flusso lo porta gia' aggregato, quindi non si
@@ -107,6 +110,14 @@ SERIE = [
          decimals=1, direction="higher_better", theme="lavoro_opportunita",
          method=METHOD_LAVORO,
          note="Da leggere insieme al tasso di occupazione: da solo non distingue chi lavora da chi cerca lavoro. Valori arrotondati a 3 decimali."),
+    dict(id="ISTATP_PIL_PRO_CAPITE", flusso=FLUSSO_CONTI_TERRITORIALI,
+         key=CHIAVE_PIL_PRO_CAPITE, start=ANNO_MIN, year_max=2023,
+         levels=("provincia",), freshness_exception=True,
+         filtro={"FREQ": "A", "DATA_TYPE_AGGR": "B1GQ_B_W2_S1_R_POP"},
+         name="PIL per abitante", unit="euro per abitante, prezzi correnti", decimals=0,
+         direction="higher_better", theme="reddito_accessibilita",
+         method=METHOD_CONTI_TERRITORIALI,
+         note="PIL per abitante a prezzi correnti. Ultimo anno 2023: stima semi-definitiva Istat, il 2024 provinciale arriva a dicembre 2026. Misura la produzione del territorio, non il reddito di chi ci abita."),
 ]
 
 OUT_COLS = ["indicator_id", "level", "territory_key", "year", "value"]
@@ -144,9 +155,10 @@ def territorio(ref_area, province, alias):
 
 
 def estrai_serie(client, serie, province, mancanti):
-    alias = ALIAS_LAVORO if "filtro" in serie else {}
+    alias = ALIAS_LAVORO if serie["flusso"] in {FLUSSO_DISOCC, FLUSSO_ATTIV} else {}
     try:
-        righe = client.data(serie["flusso"], "", ANNO_MIN if "filtro" not in serie else None)
+        start = serie.get("start", ANNO_MIN if "filtro" not in serie else None)
+        righe = client.data(serie["flusso"], serie.get("key", ""), start)
     except istat_sdmx.CacheMissError as exc:
         mancanti.append(f"{serie['id']}: chiave non in cache ({exc})")
         return []
@@ -158,10 +170,10 @@ def estrai_serie(client, serie, province, mancanti):
         elif r["DATA_TYPE"] != serie["data_type"]:
             continue
         anno = int(r["TIME_PERIOD"])
-        if anno < ANNO_MIN or r["OBS_VALUE"] == "":
+        if anno < ANNO_MIN or anno > serie.get("year_max", anno) or r["OBS_VALUE"] == "":
             continue
         t = territorio(r["REF_AREA"], province, alias)
-        if t is None:
+        if t is None or t[0] not in serie.get("levels", ("provincia", "regione")):
             continue
         # Nei demografici Bolzano e' sia ITD1 che ITD10: ITD1 non e' una provincia
         # per `territorio` (non e' in province_codes), quindi nessun doppione.
@@ -200,7 +212,7 @@ def main(argv=None):
         n_prov = len({r[2] for r in righe if r[1] == "provincia" and r[3] == ultimo})
         n_reg = len({r[2] for r in righe if r[1] == "regione" and r[3] == ultimo})
         nota = serie["note"]
-        if ultimo < 2025:
+        if ultimo < 2025 and not serie.get("freshness_exception"):
             nota = f"ATTENZIONE ultimo anno {ultimo}, sotto il 2025. " + nota
         flusso = serie["flusso"]
         manifest.append({
