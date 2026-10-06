@@ -14,6 +14,20 @@ tags:
   - Dati 2024
 indicator: 104
 indicator_label: "Adulti 25-64 con al più la licenza media (2024)"
+cover_credit:
+  author: "Redazione Divario Italia"
+  license: "CC BY 4.0"
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  source_url: https://divarioitalia.it/blog/istruzione-adulti-licenza-media-divario-2024
+dataset:
+  name: Popolazione adulta con al più la licenza media per regione, 2018 e 2024
+  description: Quota percentuale di residenti tra 25 e 64 anni con al più la licenza media, per regione e ripartizione, nel 2018 e nel 2024, con la variazione in punti.
+  method: Valori Istat dell'indicatore 104, arrotondati a un decimale. La variazione è 2024 meno 2018, in punti percentuali. Le medie di ripartizione e delle venti regioni sono medie semplici.
+  temporal: 2018, 2024
+  spatial: Italia, regioni
+  creator: Istat
+  source_url: https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/
+  download: /static/data/articles/livello-istruzione-regioni.csv
 external_figures:
   - source: "Istat, Noi Italia 2025"
     url: "https://noi-italia.istat.it/pagina.php?id=3&categoria=5&action=show&L=0"
@@ -105,12 +119,6 @@ del 2022 al 34,8% nel 2023. Le fonti consultate non spiegano questo salto.
 Eurostat segnala rotture di serie nel 2018 e nel 2021 per la propria serie,
 quindi il confronto nel tempo va letto con cautela e non basta da solo per
 attribuire una causa al calo osservato.
-
-## Una media da leggere con attenzione
-
-La media semplice delle venti regioni era 38,1% nel 2018 ed è 33,0% nel 2024.
-Non è la media nazionale: nel 2024 Istat Noi Italia indica 33,6%. La differenza
-dipende dal metodo e dalla fonte, quindi i due numeri non vanno sovrapposti.
 
 ## Cosa cambia per lavoro e competenze
 
