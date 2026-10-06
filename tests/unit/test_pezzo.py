@@ -4,6 +4,7 @@ import importlib
 import importlib.util
 import io
 import json
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -206,7 +207,7 @@ class PezzoTest(unittest.TestCase):
 
     def test_prefissi_competenze_e_scuola(self):
         self.scrivi_post("competenze.md", "Competenza scolastica in matematica")
-        self.scrivi_post("abbandono.md", "Scuola media: risultati degli alunni")
+        self.scrivi_post("abbandono.md", "Abbandono della scuola media")
         for key, title, filename in (
             ("competenze-matematica", "Competenze scolastiche in matematica", "competenze.md"),
             ("abbandono-scolastico", "Abbandono scolastico", "abbandono.md"),
@@ -215,14 +216,103 @@ class PezzoTest(unittest.TestCase):
                 found = pezzo.trova_temi_esistenti(key, title, self.posts, self.indicators)
                 self.assertIn(filename, [item.percorso.name for item in found])
 
-    def test_indicatori_usano_solo_title(self):
-        (self.indicators / "12345.md").write_text("---\ntitle: Acqua potabile\n---\n")
-        (self.indicators / "acqua-potabile.md").write_text("Testo senza titolo.")
-        found = pezzo.trova_temi_esistenti("acqua-potabile", "Acqua potabile", self.posts, self.indicators)
-        self.assertEqual([item.percorso.name for item in found], ["12345.md"])
-        self.assertEqual(
-            pezzo.trova_temi_esistenti("12345", "Tema nuovo", self.posts, self.indicators), []
+    def test_indicatori_reali_trovano_raccolta_differenziata(self):
+        root = Path(__file__).resolve().parents[2]
+        found = pezzo.trova_temi_esistenti(
+            "raccolta-differenziata", "Raccolta differenziata",
+            root / "content/posts", root / "content/indicators",
         )
+        self.assertIn("52.md", [item.percorso.name for item in found])
+        self.assertEqual(next(item.titolo for item in found if item.percorso.name == "52.md"),
+                         "Raccolta differenziata dei rifiuti urbani")
+
+    def test_una_radice_non_basta_senza_chiave_nello_slug(self):
+        self.scrivi_post("divario-genere.md", "La differenza tra uomini e donne")
+        self.scrivi_post("servizi-bambini.md", "I servizi per l'infanzia")
+        for key, title in (("raccolta-rifiuti", "Raccolta differenziata dei rifiuti"),
+                           ("mortalita-infantile", "Mortalita infantile")):
+            with self.subTest(key=key):
+                self.assertEqual(pezzo.trova_temi_esistenti(
+                    key, title, self.posts, self.indicators), [])
+
+    def test_chiave_esatta_nello_slug_basta(self):
+        self.scrivi_post("2026-casa-mercato.md", "Prezzi immobiliari")
+        found = pezzo.trova_temi_esistenti("casa", "Abitare", self.posts, self.indicators)
+        self.assertEqual([item.percorso.name for item in found], ["2026-casa-mercato.md"])
+
+    def test_titolo_vuoto_o_multilinea_ferma_senza_comandi(self):
+        for title in ("", "   ", "Titolo\nAltro", "Titolo\rAltro"):
+            with self.subTest(title=title):
+                calls, errors = [], io.StringIO()
+                with redirect_stderr(errors), redirect_stdout(io.StringIO()):
+                    result = pezzo.main(
+                        ["apri", "blog", "tema", "--titolo", title, "--prova"],
+                        root=self.root, esegui_fn=lambda cmd: calls.append(cmd),
+                    )
+                self.assertNotEqual(result, 0)
+                self.assertIn("titolo", errors.getvalue())
+                self.assertEqual(calls, [])
+
+    def test_main_esegue_nel_root_richiesto(self):
+        with patch.object(pezzo.subprocess, "check_output", side_effect=RuntimeError("stop")) as run:
+            with redirect_stderr(io.StringIO()):
+                pezzo.main(["apri", "blog", "tema", "--titolo", "Tema nuovo"], root=self.root)
+        self.assertEqual(run.call_args.kwargs["cwd"], self.root)
+
+    def test_brief_forzato_contiene_percorsi_relativi(self):
+        self.scrivi_post("tema-nuovo.md", "Tema nuovo")
+        calls = []
+        with redirect_stdout(io.StringIO()):
+            result = pezzo.main(
+                ["apri", "blog", "tema-nuovo", "--titolo", "Tema nuovo", "--forza-tema-esistente"],
+                root=self.root, esegui_fn=self.opening_runner(calls, self.root),
+            )
+        self.assertEqual(result, 0)
+        brief = (self.root / "lavoro/tema-nuovo/brief.md").read_text()
+        self.assertIn("`content/posts/tema-nuovo.md`", brief)
+        self.assertNotIn(str(self.root), brief)
+
+    def test_ogni_comando_fallito_stampa_ripresa_esatta(self):
+        for target in ("fetch", "issue-list", "issue-create", "worktree", "switch", "add", "commit", "push", "pr"):
+            with self.subTest(target=target), tempfile.TemporaryDirectory(dir=self.root) as tmp:
+                worktree, calls = Path(tmp), []
+                base = self.opening_runner(calls, worktree)
+                failed = []
+                def runner(cmd):
+                    name = ("issue-" + cmd[2] if cmd[:2] == ["gh", "issue"] else
+                            "pr" if cmd[:2] == ["gh", "pr"] else
+                            "worktree" if cmd[0].endswith("orca-worktree.sh") else
+                            "worktree-list" if cmd[:3] == ["git", "worktree", "list"] else
+                            cmd[3] if cmd[:2] == ["git", "-C"] else cmd[1])
+                    if name == target:
+                        failed.extend(cmd)
+                        raise RuntimeError("errore simulato")
+                    return base(cmd)
+                result, _, errors = self.run_open(runner)
+                self.assertEqual(result, 1)
+                self.assertIn("Per riprendere: ", errors)
+                recovery = errors.split("Per riprendere: ", 1)[1].strip()
+                self.assertEqual(shlex.split(recovery), ["cd", str(self.root), "&&", *failed])
+
+    def test_scrittura_fallita_stampa_comando_eseguibile(self):
+        original_write = Path.write_text
+        for filename in ("brief.md", "numeri.md", "fonti.md"):
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory(dir=self.root) as tmp:
+                worktree = Path(tmp)
+                def write(path, *args, **kwargs):
+                    if path.name == filename:
+                        raise OSError("scrittura fallita")
+                    return original_write(path, *args, **kwargs)
+                with patch.object(Path, "write_text", write):
+                    result, _, errors = self.run_open(self.opening_runner([], worktree))
+                self.assertEqual(result, 1)
+                self.assertIn("Per riprendere: ", errors)
+                recovery = errors.split("Per riprendere: ", 1)[1].strip()
+                subprocess.run(["sh", "-c", recovery], check=True)
+                written = (worktree / "lavoro/tema-nuovo" / filename).read_text()
+                self.assertTrue(written.startswith("# "))
+                if filename == "brief.md":
+                    self.assertIn("Issue: #342", written)
 
     def test_casa_affitti_esiste(self):
         self.scrivi_post("2026-09-29-casa-affitti-mercato.md", "Casa e affitti: il mercato")
