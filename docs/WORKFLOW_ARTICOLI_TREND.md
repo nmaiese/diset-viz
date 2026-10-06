@@ -59,6 +59,7 @@ Legge, senza chiavi e da fonti aperte:
 Ogni segnale e' salvato com'e' arrivato, con fonte, URL e data. Ai segnali si
 abbinano i temi di `config/trend_topics.json` con parole intere (`rsa` non si
 accende in `borsa`). Il file si committa: e' la prova del perche'.
+I titoli delle notizie non si salvano, per privacy; restano url, fonte, data.
 
 Il feed delle tendenze e' dominato da sport, spettacolo e cronaca: e' normale.
 Quello che conta per questo sito e' la parte che tocca un tema con un dato,
