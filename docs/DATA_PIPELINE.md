@@ -174,6 +174,11 @@ estratti e testati nei rami `nmaiese/nd-estr-mef` e `nmaiese/nd-estr-ispra` ma
 **non** in `PUBBLICATI`: si accendono aggiungendo una riga li' quando escono i
 dati 2025 (ISPRA a ottobre 2026, MEF a primavera 2027).
 
+Deroga approvata il 6 ottobre 2026: il PIL per abitante provinciale entra con
+ultimo anno 2023 e licenza Istat CC BY 4.0. È l'ultimo anno provinciale disponibile
+e la scheda `ter-901` è la pagina più vista. Il dato provinciale 2024 esce a
+dicembre 2026 e va aggiunto allora.
+
 **Le serie dell'indagine Aspetti della vita quotidiana** (23, regionali) non
 passano dallo strato esterno: sono voci di `scripts/multiscopo_sources.py`
 (`MULTI_*`) e `scripts/update_multiscopo_regions.py` le legge dalla cache.
