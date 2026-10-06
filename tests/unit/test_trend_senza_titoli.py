@@ -128,7 +128,7 @@ class TestRankSenzaTitoli(unittest.TestCase):
 
 class TestCancelloDati(unittest.TestCase):
     def test_signals_json_senza_title_eccetto_istat(self):
-        root = Path("data/trend")
+        root = Path(__file__).resolve().parents[2] / "data" / "trend"
         if not root.exists():
             self.skipTest("data/trend non esiste")
         for signals_file in root.glob("*/signals.json"):
@@ -137,12 +137,12 @@ class TestCancelloDati(unittest.TestCase):
             for s in data.get("signals", []):
                 if s.get("type") == "istat_comunicato":
                     continue
-                self.assertNotIn("title", s, f"{signals_file}: segnale {s.get('type')} ha title")
+                self.assertFalse("title" in s, f"{signals_file}: segnale {s.get('type')} ha title")
                 for n in s.get("news", []):
-                    self.assertNotIn("title", n, f"{signals_file}: news in {s.get('type')} ha title")
+                    self.assertFalse("title" in n, f"{signals_file}: news in {s.get('type')} ha title")
 
     def test_ranking_json_senza_top_news_e_title(self):
-        root = Path("data/trend")
+        root = Path(__file__).resolve().parents[2] / "data" / "trend"
         if not root.exists():
             self.skipTest("data/trend non esiste")
         for ranking_file in root.glob("*/ranking.json"):
@@ -150,9 +150,9 @@ class TestCancelloDati(unittest.TestCase):
                 data = json.load(f)
             for pair in data.get("pairs", []):
                 inter = pair.get("interest", {})
-                self.assertNotIn("top_news", inter, f"{ranking_file}: interest ha top_news")
+                self.assertFalse("top_news" in inter, f"{ranking_file}: interest ha top_news")
                 for ex in inter.get("news_examples", []):
-                    self.assertNotIn("title", ex, f"{ranking_file}: news_examples ha title")
+                    self.assertFalse("title" in ex, f"{ranking_file}: news_examples ha title")
                 istat_list = inter.get("istat", [])
                 for item in istat_list:
                     self.assertIsInstance(item, str, f"{ranking_file}: istat deve essere lista di stringhe")
