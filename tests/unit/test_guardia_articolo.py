@@ -175,6 +175,34 @@ class GuardiaArticolo(unittest.TestCase):
         self.assertEqual([f.check for f in self.kinds(report, ga.WARNING)], ["lunghezza"])
         self.assertEqual(self.kinds(report, ga.ERROR), [])
 
+    def test_tetto_predefinito_1100(self):
+        for words, warns in ((1050, False), (1150, True)):
+            with self.subTest(words=words):
+                text = FRONTMATTER + "\n" + "parola " * words
+                report = self.check(text)
+                self.assertEqual(report["parole"], words)
+                self.assertEqual(bool(self.kinds(report, ga.WARNING)), warns)
+
+    def test_cli_lunga_usa_tetto_2000(self):
+        path = self.posts / "lunga.md"
+        path.write_text(FRONTMATTER + "\n" + "parola " * 1500, encoding="utf-8")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = ga.main([str(path), "--json", "--lunga"], link_status=risposta,
+                           static_dir=self.static, figures_dir=self.figures)
+        report = json.loads(out.getvalue())[0]
+        self.assertEqual((code, report["tetto"], report["parole"], report["avvisi"]), (0, 2000, 1500, 0))
+
+    def test_cli_tetto_prevale_su_lunga(self):
+        path = self.posts / "lunga.md"
+        path.write_text(FRONTMATTER + "\n" + "parola " * 1500, encoding="utf-8")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = ga.main([str(path), "--json", "--lunga", "--tetto", "1200"],
+                           link_status=risposta, static_dir=self.static, figures_dir=self.figures)
+        report = json.loads(out.getvalue())[0]
+        self.assertEqual((code, report["tetto"], report["parole"], report["avvisi"]), (0, 1200, 1500, 1))
+
     def test_cli_esito_e_json(self):
         buono = self.posts / "pulito.md"
         buono.write_text(PULITO, encoding="utf-8")
