@@ -10,7 +10,7 @@ Su due regioni non indicizzate, **Molise** e **Valle d'Aosta**, le tabelle dei 1
 Le due regioni scelte coprono i due casi della diagnosi: Valle d'Aosta ha molto testo proprio (12 paragrafi), Molise meno.
 
 ## Gruppo di controllo
-Le altre 12 regioni non indicizzate al 5 ottobre (Abruzzo, Basilicata, Campania, Friuli-Venezia Giulia, Lazio, Liguria, Marche, Piemonte, Puglia, Sardegna, Umbria, Veneto), invariate. Da verificare contro il censimento del 5/10 prima di leggere i risultati: l'elenco qui sopra è quello per esclusione dalle sei indicizzate (Emilia-Romagna, Lombardia, Calabria, Toscana, Sicilia, Trentino-Alto Adige) e dalle due prove.
+Le altre 12 regioni non indicizzate al 5 ottobre (Abruzzo, Basilicata, Campania, Friuli-Venezia Giulia, Lazio, Liguria, Marche, Piemonte, Puglia, Sardegna, Umbria, Veneto), invariate. Elenco verificato sul censimento del 5/10: sono tutte «scansionata, ma attualmente non indicizzata», come le due prove.
 
 ## Come si misura
 - **Prima:** censimento del 5 ottobre (`url_inspection_2026-10-05_160.json`): Molise e Valle d'Aosta «Pagina scansionata, ma attualmente non indicizzata», ultima scansione 24 settembre, cioè prima dell'esperimento.
