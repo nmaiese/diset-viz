@@ -126,3 +126,4 @@ La [scheda sul sovraccarico del costo dell'abitazione](/indicatore/sovraccarico-
 - Istat, [Indicatori del Benessere equo e sostenibile](https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/), aggiornamento intermedio 2026.
 - NapoliToday, [Famiglia di otto persone sotto sfratto](https://www.napolitoday.it/cronaca/famiglia-otto-persone-sfratto-casa-napoli.html), 15 aprile 2026.
 - Il Sole 24 Ore, [Milano, nuova partecipata dedicata all'housing sociale](https://www.ilsole24ore.com/art/milano-nuova-partecipata-dedicata-all-housing-sociale-AJ1d7zRB), 28 settembre 2026.
+
