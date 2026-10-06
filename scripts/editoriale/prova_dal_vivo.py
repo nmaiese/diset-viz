@@ -31,7 +31,7 @@ def _puliscimarkdown(testo: str) -> str:
     testo = re.sub(r"\[([^]]+)\]\([^)]*\)", r"\1", testo)
     testo = re.sub(r"!\[([^]]*)\]\([^)]*\)", r"\1", testo)
     testo = re.sub(r"[*_`~]", "", testo)
-    return re.sub(r"^\s*>\s?", "", testo)
+    return re.sub(r"^\s*(?:>\s?|[-+]\s+|\d+[.)]\s+)", "", testo)
 
 
 def estrai_frasi_nuove(diff: str, body_start: int | None = None) -> list[Frase]:
