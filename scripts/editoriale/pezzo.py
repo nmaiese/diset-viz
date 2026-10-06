@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -19,6 +20,7 @@ ORCA_WORKTREE = Path.home() / "dev/dev-tools/scripts/orca-worktree.sh"
 STOPWORD = {
     "alla", "alle", "anche", "come", "dalla", "dalle", "degli", "della", "delle",
     "dello", "dentro", "dopo", "italia", "nelle", "nella", "nello", "perche", "prima",
+    "divario", "regioni", "regione", "nord", "sud", "italiano", "dati",
     "quale", "quelli", "questo", "sono", "sulla", "sulle", "sullo", "tutte", "tutto",
 }
 
@@ -36,7 +38,8 @@ def _parole(testo: str) -> set[str]:
         if not unicodedata.combining(carattere)
     )
     return {
-        parola
+        # La famiglia scolastica non condivide il prefisso letterale con scuola.
+        "scuol" if parola.startswith(("scolast", "scuol")) else parola[:5]
         for parola in re.findall(r"[a-z0-9]+", senza_accenti)
         if len(parola) >= 4 and parola not in STOPWORD
     }
@@ -47,6 +50,8 @@ def _frase_normalizzata(testo: str) -> str:
 
 
 def valida_chiave(chiave: str) -> str:
+    if len(chiave) > 40:
+        raise ValueError("chiave non valida: massimo 40 caratteri")
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", chiave):
         raise ValueError("chiave non valida: usa solo minuscole, numeri e trattini")
     return chiave
@@ -66,14 +71,20 @@ def trova_temi_esistenti(
             continue
         for percorso in sorted(directory.glob("*.md")):
             try:
-                titolo_file = str(frontmatter.load(percorso).get("title") or percorso.stem)
+                title = frontmatter.load(percorso).get("title")
             except (OSError, UnicodeError, ValueError):
-                titolo_file = percorso.stem
+                title = None
+            is_indicator = directory == Path(indicators_dir)
+            if is_indicator and not title:
+                continue
+            titolo_file = str(title or percorso.stem)
             slug_norm = _frase_normalizzata(percorso.stem)
-            slug_parole = _parole(percorso.stem)
+            slug_parole = set() if is_indicator else _parole(percorso.stem)
             titolo_parole = _parole(titolo_file)
-            chiave_nello_slug = bool(re.search(rf"(?:^|-)({re.escape(chiave_norm)})(?:-|$)", slug_norm))
-            if len(richieste & slug_parole) >= 2 or len(richieste & titolo_parole) >= 2 or chiave_nello_slug:
+            chiave_nello_slug = not is_indicator and bool(_parole(chiave)) and bool(re.search(rf"(?:^|-)({re.escape(chiave_norm)})(?:-|$)", slug_norm))
+            # Basta una radice significativa: anche "abbandono scolastico"
+            # deve segnalare un pezzo sulla scuola, senza le parole generiche.
+            if richieste & slug_parole or richieste & titolo_parole or chiave_nello_slug:
                 trovati.append(TemaEsistente(percorso, titolo_file))
     return trovati
 
@@ -82,16 +93,20 @@ def corpo_issue(tipo: str, chiave: str, firma: str) -> str:
     return (
         f"Tipo: {tipo}\nChiave: `{chiave}`\n\n"
         "Consegna in una PR draft, con controlli e fonti previsti dal progetto. "
-        f"Seguire `docs/WORKFLOW_ORCA.md`.\n\n— {firma}"
+        "Seguire `docs/WORKFLOW_ORCA.md`."
+        + (f"\n\n— {firma}" if firma else "")
     )
 
 
 def corpo_pr(issue: int, tipo: str, chiave: str, firma: str) -> str:
-    return f"Apre il lavoro editoriale `{chiave}` di tipo `{tipo}`.\n\nCloses #{issue}\n\n— {firma}"
+    return (
+        f"Apre il lavoro editoriale `{chiave}` di tipo `{tipo}`.\n\nCloses #{issue}"
+        + (f"\n\n— {firma}" if firma else "")
+    )
 
 
 def identita_agente() -> str:
-    return os.environ.get("AGENT_ID", "").strip() or "codex-gpt-5.6-sol"
+    return os.environ.get("AGENT_ID", "").strip()
 
 
 def contenuto_brief(titolo: str, tipo: str, issue: int, simili: Sequence[TemaEsistente]) -> str:
@@ -111,31 +126,32 @@ def contenuto_brief(titolo: str, tipo: str, issue: int, simili: Sequence[TemaEsi
 
 
 def esegui(cmd: Sequence[str]) -> str:
-    return subprocess.check_output(list(cmd), cwd=ROOT, text=True, stderr=subprocess.STDOUT)
+    return subprocess.check_output(list(cmd), cwd=ROOT, text=True, stderr=subprocess.PIPE)
 
 
 def _esiste_ramo(cmd: Sequence[str], esegui_fn: Callable[[Sequence[str]], str]) -> bool:
     try:
         output = esegui_fn(cmd)
     except subprocess.CalledProcessError as error:
-        if error.returncode in (1, 2):
+        if error.returncode == 1 and cmd[1] == "show-ref":
             return False
         raise
-    return bool(output.strip())
+    return cmd[1] == "show-ref" or bool(output.strip())
 
 
 def _numero_issue(output: str) -> int:
-    match = re.search(r"/issues/(\d+)(?:\s*)$", output.strip())
+    match = re.search(r"/issues/(\d+)\b", output.strip())
     if not match:
         raise ValueError("GitHub non ha restituito il numero della issue")
     return int(match.group(1))
 
 
 def _ultimo_percorso(output: str) -> Path:
-    righe = [riga.strip() for riga in output.splitlines() if riga.strip()]
-    if not righe:
-        raise ValueError("Orca non ha restituito il percorso del worktree")
-    return Path(righe[-1])
+    for line in reversed(output.splitlines()):
+        candidate = Path(line.strip())
+        if line.strip() and candidate.is_dir():
+            return candidate
+    raise ValueError("Orca non ha restituito un percorso worktree esistente")
 
 
 class ParserItaliano(argparse.ArgumentParser):
@@ -177,6 +193,8 @@ def main(
     except SystemExit as error:
         return int(error.code)
 
+    resources: list[str] = []
+    step = "controlli preliminari"
     try:
         valida_chiave(args.chiave)
         posts = root / "content/posts"
@@ -196,42 +214,86 @@ def main(
             return 0
 
         ramo = f"divario/{args.chiave}"
-        if _esiste_ramo(["git", "show-ref", "--verify", f"refs/heads/{ramo}"], esegui_fn):
+        if _esiste_ramo(["git", "show-ref", "--verify", "--quiet", f"refs/heads/{ramo}"], esegui_fn):
             raise RuntimeError(f"il ramo locale {ramo} esiste già")
         if _esiste_ramo(
-            ["git", "ls-remote", "--exit-code", "--heads", "origin", f"refs/heads/{ramo}"], esegui_fn
+            ["git", "ls-remote", "--heads", "origin", f"refs/heads/{ramo}"], esegui_fn
         ):
             raise RuntimeError(f"il ramo remoto {ramo} esiste già")
         lavoro_root = root / "lavoro" / args.chiave
         if lavoro_root.exists():
             raise RuntimeError(f"la cartella lavoro/{args.chiave} esiste già")
 
+        worktree_name = f"divario-{args.chiave}"
+        listed = esegui_fn(["git", "worktree", "list", "--porcelain", "-z"])
+        if any(
+            entry.startswith("worktree ") and Path(entry[9:]).name == worktree_name
+            for entry in listed.split("\0")
+        ):
+            raise RuntimeError(f"il worktree {worktree_name} esiste già")
+        step = "aggiornamento origin/master"
+        esegui_fn(["git", "fetch", "origin", "master"])
+        print("Riferimento origin/master aggiornato.", flush=True)
+
         label = f"run:{args.tipo}"
         firma = identita_agente()
-        issue_output = esegui_fn(
-            [
-                "gh", "issue", "create", "--title", args.titolo, "--label", label,
-                "--body", corpo_issue(args.tipo, args.chiave, firma),
-            ]
-        )
-        issue = _numero_issue(issue_output)
-        worktree_output = esegui_fn([str(ORCA_WORKTREE), f"divario-{args.chiave}"])
+        step = "ricerca issue"
+        candidates = json.loads(esegui_fn([
+            "gh", "issue", "list", "--search", args.titolo,
+            "--state", "open", "--json", "number,title",
+        ]))
+        issue = next((item["number"] for item in candidates if item["title"] == args.titolo), None)
+        if issue is None:
+            step = "creazione issue"
+            issue_output = esegui_fn(
+                [
+                    "gh", "issue", "create", "--title", args.titolo, "--label", label,
+                    "--body", corpo_issue(args.tipo, args.chiave, firma),
+                ]
+            )
+            issue = _numero_issue(issue_output)
+            print(f"Issue #{issue} creata.", flush=True)
+        else:
+            print(f"Issue #{issue} riusata.", flush=True)
+        resources.append(f"Issue #{issue} aperta: riusala oppure chiudila manualmente con gh issue close {issue}.")
+        step = "creazione worktree"
+        worktree_output = esegui_fn([str(ORCA_WORKTREE), worktree_name, "--base-branch", "master"])
         worktree = _ultimo_percorso(worktree_output)
+        resources.append(f"Worktree {worktree}: conservalo per riprendere il lavoro.")
+        print(f"Worktree {worktree} creato.", flush=True)
+        step = "creazione ramo"
         esegui_fn(["git", "-C", str(worktree), "switch", "-c", ramo, "origin/master"])
 
+        resources.append(f"Ramo {ramo}: riprendi da questo ramo nel worktree indicato.")
+        print(f"Ramo {ramo} creato.", flush=True)
+        step = "scrittura file"
         cartella = worktree / "lavoro" / args.chiave
         cartella.mkdir(parents=True)
+        resources.append(f"Cartella {cartella}: verifica i file prima di riprendere.")
+        print(f"Cartella {cartella} creata.", flush=True)
         (cartella / "brief.md").write_text(
             contenuto_brief(args.titolo, args.tipo, issue, simili), encoding="utf-8"
         )
+        print(f"File {cartella / 'brief.md'} creato.", flush=True)
         (cartella / "numeri.md").write_text("# Numeri\n", encoding="utf-8")
+        print(f"File {cartella / 'numeri.md'} creato.", flush=True)
         (cartella / "fonti.md").write_text("# Fonti\n", encoding="utf-8")
 
+        print(f"File {cartella / 'fonti.md'} creato.", flush=True)
+        step = "git add"
         esegui_fn(["git", "-C", str(worktree), "add", "-f", f"lavoro/{args.chiave}"])
+        print(f"File di {cartella} aggiunti all'indice.", flush=True)
+        step = "commit"
         esegui_fn(
             ["git", "-C", str(worktree), "commit", "-m", f"Apre il lavoro editoriale su {args.titolo}"]
         )
+        resources.append(f"Commit creato sul ramo {ramo}.")
+        print(f"Commit creato sul ramo {ramo}.", flush=True)
+        step = "push"
         esegui_fn(["git", "-C", str(worktree), "push", "-u", "origin", ramo])
+        resources.append(f"Ramo remoto origin/{ramo} pubblicato: verifica il remoto prima di ripetere il push.")
+        print(f"Ramo remoto origin/{ramo} pubblicato.", flush=True)
+        step = "creazione PR"
         pr_output = esegui_fn(
             [
                 "gh", "pr", "create", "--draft", "--base", "master", "--head", ramo,
@@ -244,8 +306,19 @@ def main(
         print(f"Worktree {worktree}")
         return 0
     except (OSError, subprocess.CalledProcessError, ValueError, RuntimeError) as error:
-        dettaglio = error.output.strip() if isinstance(error, subprocess.CalledProcessError) and error.output else str(error)
-        print(f"Errore: {dettaglio}", file=sys.stderr)
+        dettaglio = str(error)
+        if isinstance(error, subprocess.CalledProcessError):
+            dettaglio = (error.stderr or error.output or str(error)).strip()
+        print(f"Errore al passo {step}: {dettaglio}", file=sys.stderr)
+        for resource in resources:
+            print(resource, file=sys.stderr)
+        if resources or step == "creazione issue":
+            print(
+                f"Per riprendere dal passo {step}, verifica prima le risorse elencate "
+                "e gli eventuali effetti parziali del comando fallito. "
+                "Non rilanciare l'apertura se worktree o ramo esistono già.",
+                file=sys.stderr,
+            )
         return 1
 
 
