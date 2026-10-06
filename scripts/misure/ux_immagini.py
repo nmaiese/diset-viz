@@ -27,9 +27,10 @@ PAGINE = {
     "scheda": "/indicatore/addetti-delle-nuove-imprese-nei-settori-culturali-e-creativi/ter-600",
 }
 
-# Solo desktop 1440 e mobile 375, tema chiaro
+# Desktop 1440, 1920 e mobile 375, tema chiaro
 LARGHEZZE = {
-    "desktop": (1440, 900),
+    "desktop1440": (1440, 900),
+    "desktop1920": (1920, 1080),
     "mobile": (375, 812),
 }
 

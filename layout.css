@@ -91,7 +91,11 @@ main.v1 > .toc {
 .indicator-article,
 .art-body,
 .answer,
+.page-lead,
 .regione-intro,
-.regione-stacca__lead {
+.regione-stacca__lead,
+.intro,
+.analysis,
+.come-leggere {
   max-width: 65ch;
 }

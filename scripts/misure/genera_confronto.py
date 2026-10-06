@@ -30,6 +30,13 @@ page_labels = {
     "scheda": "Scheda indicatore"
 }
 
+device_order = ["desktop1920", "desktop1440", "mobile"]
+device_labels = {
+    "desktop1920": "Desktop 1920px",
+    "desktop1440": "Desktop 1440px",
+    "mobile": "Mobile 375px"
+}
+
 html = """<!DOCTYPE html>
 <html lang="it">
 <head>
@@ -42,8 +49,9 @@ html = """<!DOCTYPE html>
   .subtitle { text-align: center; color: #666; margin-bottom: 2rem; }
   .page-section { margin-bottom: 4rem; }
   .page-title { font-size: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #ddd; }
-  .images-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-  @media (max-width: 900px) { .images-grid { grid-template-columns: 1fr; } }
+  .images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  @media (max-width: 1200px) { .images-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 800px) { .images-grid { grid-template-columns: 1fr; } }
   .img-wrap { background: white; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
   .img-wrap img { width: 100%; height: auto; display: block; }
   .img-label { padding: 0.5rem; background: #f5f5f5; font-size: 0.875rem; font-weight: 600; text-align: center; border-bottom: 1px solid #ddd; }
@@ -55,11 +63,12 @@ html = """<!DOCTYPE html>
   .scroll-no { color: #080; }
   .break { background: #fff3cd; }
   .legend { font-size: 0.8rem; color: #666; margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 4px; }
+  .viewport-badge { display: inline-block; padding: 0.1rem 0.4rem; font-size: 0.75rem; background: #e0e0e0; border-radius: 3px; margin-left: 0.5rem; }
 </style>
 </head>
 <body>
-<h1>Confronto prima / dopo — Implantito di pagina</h1>
-<p class="subtitle">7 pagine × 2 viewport (desktop 1440px, mobile 375px) × 2 stati = 28 screenshot. Tema chiaro.</p>
+<h1>Confronto prima / dopo — Impianto di pagina</h1>
+<p class="subtitle">7 pagine × 3 viewport (desktop 1920px, desktop 1440px, mobile 375px) × 2 stati = 42 screenshot. Tema chiaro.</p>
 """
 
 for chiave in page_order:
@@ -68,9 +77,11 @@ for chiave in page_order:
     p = pagine[chiave]
     html += f'<div class="page-section"><h2 class="page-title">{page_labels[chiave]}</h2>'
     html += '<div class="images-grid">'
-    for device in ["desktop", "mobile"]:
+    for device in device_order:
+        if device not in p:
+            continue
         for stato in ["prima", "dopo"]:
-            label = f"{page_labels[chiave]} — {device.capitalize()} — {stato.capitalize()}"
+            label = f"{page_labels[chiave]} — {device_labels[device]} — {stato.capitalize()}"
             fname = f"{chiave}_{device}_{stato}.png"
             html += f'''
   <div class="img-wrap">
@@ -85,7 +96,9 @@ for chiave in page_order:
     html += '<th>Altezza (schermi)</th><th>Blocchi principali</th><th>Blocchi/schermo</th><th>Scroll orizz.</th>'
     html += '</tr></thead><tbody>'
 
-    for device in ["desktop", "mobile"]:
+    for device in device_order:
+        if device not in p:
+            continue
         for stato in ["prima", "dopo"]:
             m = p[device][stato]
             main_w = m.get("main_width", "n/d")
@@ -99,7 +112,7 @@ for chiave in page_order:
             scroll_cls = "scroll-yes" if scroll else "scroll-no"
             scroll_txt = "SÌ" if scroll else "no"
             row_cls = "break" if scroll else ""
-            html += f'<tr class="{row_cls}"><td>{stato.capitalize()}</td><td>{device.capitalize()}</td><td>{main_w}</td><td>{cpl}</td><td>{schermi}</td><td>{blocchi}</td><td>{bps}</td><td class="{scroll_cls}">{scroll_txt}</td></tr>'
+            html += f'<tr class="{row_cls}"><td>{stato.capitalize()}</td><td>{device_labels[device]}</td><td>{main_w}</td><td>{cpl}</td><td>{schermi}</td><td>{blocchi}</td><td>{bps}</td><td class="{scroll_cls}">{scroll_txt}</td></tr>'
 
     html += '</tbody></table></div>'
 

@@ -29,70 +29,72 @@
   line-height: 1.65 !important;
 }
 
-/* Headings: scala più leggibile */
-h1, .h-display, .h-title { font-size: clamp(36px, 4vw, 48px) !important; line-height: 1.1 !important; }
-h2, .h-section, .h-sub { font-size: clamp(28px, 3vw, 36px) !important; line-height: 1.15 !important; }
-h3 { font-size: clamp(22px, 2.5vw, 28px) !important; line-height: 1.2 !important; }
+/* Headings: scala più leggibile - solo in aree di contenuto, non header/footer */
+main .prose h1, main .indicator-article h1, main .art-body h1, main .answer h1, main .regione-intro h1, main .regione-stacca__lead h1,
+main .h-display, main .h-title { font-size: clamp(36px, 4vw, 48px) !important; line-height: 1.1 !important; }
+main .prose h2, main .indicator-article h2, main .art-body h2, main .answer h2, main .regione-intro h2, main .regione-stacca__lead h2,
+main .h-section, main .h-sub { font-size: clamp(28px, 3vw, 36px) !important; line-height: 1.15 !important; }
+main .prose h3, main .indicator-article h3, main .art-body h3, main .answer h3, main .regione-intro h3, main .regione-stacca__lead h3 { font-size: clamp(22px, 2.5vw, 28px) !important; line-height: 1.2 !important; }
 
-/* Link nel testo: sempre sottolineati, contrasto 3:1 vs testo */
-.prose a, .indicator-article a, .art-body a, .art-brief a {
+/* Link nel testo: sempre sottolineati, contrasto 3:1 vs testo - solo in aree di contenuto */
+main .prose a, main .indicator-article a, main .art-body a, main .art-brief a {
   color: var(--link) !important;
   text-decoration: underline !important;
   text-decoration-color: var(--link) !important;
   text-decoration-thickness: 2px !important;
   text-underline-offset: 0.2em !important;
 }
-.prose a:hover, .indicator-article a:hover, .art-body a:hover, .art-brief a:hover {
+main .prose a:hover, main .indicator-article a:hover, main .art-body a:hover, main .art-brief a:hover {
   color: var(--accent-strong) !important;
   text-decoration-color: var(--accent-strong) !important;
 }
 
-/* Meta, byline, caption: non sotto 14px */
-.meta, .byline, .art-hero__caption, .art-hero__credit,
-.regionmap__cap, .source, .chart-note, .subline,
-.answer .subline, .aside-block__label, .qlist a {
+/* Meta, byline, caption: non sotto 14px - solo in aree di contenuto */
+main .meta, main .byline, main .art-hero__caption, main .art-hero__credit,
+main .regionmap__cap, main .source, main .chart-note, main .subline,
+main .answer .subline, main .aside-block__label, main .qlist a {
   font-size: max(14px, var(--fs-small)) !important;
   line-height: 1.5 !important;
   color: var(--text-2) !important;
 }
 
-/* Tabelle: header e celle più leggibili */
-.table th, .table td { font-size: max(13px, var(--fs-small)) !important; line-height: 1.5 !important; }
-.table th { color: var(--ink) !important; font-weight: 600 !important; }
-.table td { color: var(--text-2) !important; }
+/* Tabelle: header e celle più leggibili - solo in aree di contenuto */
+main .table th, main .table td { font-size: max(13px, var(--fs-small)) !important; line-height: 1.5 !important; }
+main .table th { color: var(--ink) !important; font-weight: 600 !important; }
+main .table td { color: var(--text-2) !important; }
 
-/* Card e blocchi: sfondo leggermente più chiaro del body per separazione */
-.card, .minicard, .aside-block, .section, .art-link,
-.lead-figure, .regionmap, .module, .within, .podiums,
-.rankwrap, .tablewrap, .analysis__map {
+/* Card e blocchi: sfondo leggermente più chiaro del body per separazione - solo in aree di contenuto */
+main .card, main .minicard, main .aside-block, main .section, main .art-link,
+main .lead-figure, main .regionmap, main .module, main .within, main .podiums,
+main .rankwrap, main .tablewrap, main .analysis__map {
   background: var(--surface-1) !important;
   border: 1px solid var(--rule) !important;
   border-radius: var(--radius-panel) !important;
 }
 
-/* Badge e pill */
-.qz-badge, .gi-achv-state, .status, .n--nd {
+/* Badge e pill - solo in aree di contenuto */
+main .qz-badge, main .gi-achv-state, main .status, main .n--nd {
   font-size: max(12px, var(--fs-small)) !important;
   padding: 2px 8px !important;
   border-radius: var(--radius-control) !important;
 }
 
-/* Dettagli summary */
-details summary { cursor: pointer; font-weight: 600 !important; color: var(--ink) !important; }
-details summary::-webkit-details-marker { color: var(--ink); }
+/* Dettagli summary - solo in aree di contenuto */
+main details summary { cursor: pointer; font-weight: 600 !important; color: var(--ink) !important; }
+main details summary::-webkit-details-marker { color: var(--ink); }
 
-/* TOC e navigazione */
-.toc a, .qlist a { color: var(--link) !important; text-decoration: underline !important; }
-.toc a:hover, .qlist a:hover { color: var(--accent-strong) !important; }
+/* TOC e navigazione - solo in aree di contenuto */
+main .toc a, main .qlist a { color: var(--link) !important; text-decoration: underline !important; }
+main .toc a:hover, main .qlist a:hover { color: var(--accent-strong) !important; }
 
-/* Legenda e note */
-.legend, .lead-figure__head .seg, .stripbar__t {
+/* Legenda e note - solo in aree di contenuto */
+main .legend, main .lead-figure__head .seg, main .stripbar__t {
   font-size: max(13px, var(--fs-small)) !important;
   color: var(--text-2) !important;
 }
 
-/* Input e controlli */
-input, select, textarea, button {
+/* Input e controlli - solo in aree di contenuto */
+main input, main select, main textarea, main button {
   font-size: max(16px, var(--fs-ui)) !important;
   min-height: 44px !important;
 }
