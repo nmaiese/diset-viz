@@ -432,6 +432,26 @@ def _eurostat_definitions():
     ]
 
 
+def _conti_territoriali_province_definitions():
+    """Il PIL per abitante provinciale (serie ISTATP_PIL_PRO_CAPITE, flusso Istat
+    93_1227_DF_DCCN_TNA1_6), con la definizione del glossario del report Istat."""
+    return [
+        _record(
+            "ipr:pil-per-abitante",
+            "PIL per abitante (province)",
+            "Prodotto interno lordo ai prezzi di mercato per abitante, valori correnti: il "
+            "risultato finale dell'attività di produzione delle unità produttrici residenti, "
+            "cioè la produzione totale di beni e servizi diminuita dei consumi intermedi e "
+            "aumentata delle imposte sui prodotti al netto dei contributi. Conti economici "
+            "territoriali, anni 2022-2024: per le province sono diffusi il 2022 e il 2023",
+            "Istat, Conti economici territoriali",
+            "https://www.istat.it/wp-content/uploads/2025/12/REPORT-CONTI-TERRITORIALI_Anni-2022-2024.pdf",
+            "Report Conti economici territoriali anni 2022-2024, glossario (Prodotto interno "
+            "lordo ai prezzi di mercato); serie ISTATP_PIL_PRO_CAPITE",
+        )
+    ]
+
+
 def build_records(
     bes_archive,
     bes_territories_archive,
@@ -451,6 +471,7 @@ def build_records(
         + _multiscopo_definitions(client)
         + _demographic_definitions(client)
         + _eurostat_definitions()
+        + _conti_territoriali_province_definitions()
     )
     by_id = {}
     for record in records:
