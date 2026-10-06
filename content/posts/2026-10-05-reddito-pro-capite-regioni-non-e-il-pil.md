@@ -49,6 +49,14 @@ external_figures:
   what: incidenza percentuale della redistribuzione sul reddito disponibile in Lombardia, 2023
   source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
   url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+- value: "17,5"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile nel Mezzogiorno, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
+- value: "2,3"
+  what: incidenza percentuale della redistribuzione sul reddito disponibile nel Nord-ovest, 2023
+  source: Istat, Audizione alla Commissione parlamentare per l'attuazione del federalismo fiscale, 28 maggio 2025
+  url: https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf
 ---
 
 In Calabria si produce per abitante meno della metà che in Lombardia. Nelle tasche delle famiglie la distanza è più piccola.
@@ -66,7 +74,7 @@ Il luogo conta: il PIL è registrato dove si produce, il reddito dove vive la fa
 
 Il reddito disponibile delle famiglie tiene conto di imposte e contributi versati, oltre che di prestazioni sociali e trasferimenti ricevuti. È lordo come il PIL, ed entrambi sono espressi in euro correnti. Il dato del sito riguarda le famiglie consumatrici.
 
-Il peso della redistribuzione è misurato dall'Istat per il 2023 nell'[audizione del maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf). Nel 2023, secondo l'Istat, la redistribuzione pesa per il 22,0% del reddito disponibile in Calabria e per lo 0,2% in Lombardia. In media ha alzato il reddito disponibile per abitante del 7,8%. Le percentuali del 17,5% nel Mezzogiorno e del 2,3% nel Nord-ovest riguardano le ripartizioni.
+Il peso della redistribuzione è misurato dall'Istat per il 2023 nell'[audizione del maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/Istat-Audizione-Commissione-Federalismo-fiscale_28_05.pdf). Nel 2023, secondo l'Istat, la redistribuzione pesa per il 22,0% del reddito disponibile in Calabria e per lo 0,2% in Lombardia. In media ha alzato il reddito disponibile per abitante del 7,8%. Nelle ripartizioni la stessa incidenza è del 17,5% nel Mezzogiorno e del 2,3% nel Nord-ovest.
 
 ## Una distanza che si accorcia, l'altra che si allarga
 
