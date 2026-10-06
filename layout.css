@@ -1,0 +1,97 @@
+/* layout.css - impianto di pagina: contenitore centrato, max-width, ritmo verticale
+ * Misure rilevate: a 1440px main=1440px (full), maxChild=1376-1440px; a 1920px main=1920px, maxChild=1440-1920px; a 375px main=375px.
+ * Scelta: max-width 1200px per colonna di lettura (45-80 ch), centrata, margini laterali clamp, ritmo verticale unico.
+ * Mobile (375px): cambiamento minimo, solo ritmo verticale.
+ */
+
+:root {
+  --layout-max: 1200px;
+  --layout-gap-desktop: clamp(48px, 4vw, 64px);
+  --layout-gap-mobile: clamp(32px, 5vw, 40px);
+  --layout-padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
+/* Contenitore principale: limita larghezza e centra */
+main.v1 {
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-padding-inline);
+  box-sizing: border-box;
+}
+
+/* Ritmo verticale tra figli diretti di main */
+main.v1 > * + * {
+  margin-block-start: var(--layout-gap-desktop);
+}
+
+/* Mobile: ritmo più compatto, max-width non vincolante ma niente overflow */
+@media (max-width: 480px) {
+  main.v1 {
+    max-width: 100%;
+    padding-inline: clamp(0.75rem, 4vw, 1.5rem);
+    overflow-x: hidden;
+  }
+  main.v1 > * + * {
+    margin-block-start: var(--layout-gap-mobile);
+  }
+}
+
+/* Eccezioni: elementi che devono stare a tutta larghezza (mappe, grafici, tabelle larghe, hero) */
+main.v1 > .regionmap,
+main.v1 > .lead-figure,
+main.v1 > .chartwrap,
+main.v1 > .tablewrap,
+main.v1 > .analysis__map,
+main.v1 > .fullwidth,
+main.v1 > .hero,
+main.v1 > .pagehead,
+main.v1 > header,
+main.v1 > .stripbar,
+main.v1 > nav,
+main.v1 > .breadcrumb,
+main.v1 > .toc {
+  max-width: none;
+  margin-inline: calc(-1 * var(--layout-padding-inline));
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* Su mobile le eccezioni tornano normali */
+@media (max-width: 480px) {
+  main.v1 > .regionmap,
+  main.v1 > .lead-figure,
+  main.v1 > .chartwrap,
+  main.v1 > .tablewrap,
+  main.v1 > .analysis__map,
+  main.v1 > .fullwidth,
+  main.v1 > .hero,
+  main.v1 > .pagehead,
+  main.v1 > header,
+  main.v1 > .stripbar,
+  main.v1 > nav,
+  main.v1 > .breadcrumb,
+  main.v1 > .toc {
+    max-width: none;
+    margin-inline: 0;
+    width: auto;
+    position: static;
+    left: auto;
+    right: auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* Prosa: line-length target 65ch dentro il contenitore 1200px */
+.prose,
+.indicator-article,
+.art-body,
+.answer,
+.regione-intro,
+.regione-stacca__lead {
+  max-width: 65ch;
+}
