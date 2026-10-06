@@ -141,6 +141,10 @@ bin/py scripts/orca_review.py <slug> --issue <numero>
 bin/py scripts/orca_clean.py <slug>
 ```
 
+Un nuovo pezzo si apre con `bin/py -m scripts.editoriale.pezzo apri <tipo> <chiave> --titolo "Titolo"`.
+Il comando blocca temi, rami e cartelle già esistenti, poi prepara issue, worktree, ramo e PR draft.
+Con `--prova` controlla il tema e descrive i passi successivi senza scrivere sul disco o su GitHub.
+
 `ORCA_CLI_COMMAND` può indicare il binario esportato da Orca; in sua assenza gli
 script cercano solo `orca-ide`. Le create usano `origin/master`, `--setup skip` e
 un prompt su una sola riga. Se Orca risponde `runtime_unavailable` o va in timeout,
