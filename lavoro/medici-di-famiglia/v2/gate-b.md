@@ -1,15 +1,15 @@
 # Gate B: medici-di-famiglia
-Esito: RISCRIVERE
-SHA bozza: 4c01ebaeaef4ca3f2ab6db87273e62888efb1728
-Hash bozza: 34105d7ec7e443bbcd75f88af1d8d6cb770d505b3cfe044339bfed57b66b4b79
+Esito: FERMO
+SHA bozza: f1eaf08563fcc3a0995500a49d0e89bb1c855355
+Hash bozza: ee6ddf9166bdcb538d50608d3184ee07d682b383dbf8efb36e3bdf307653acea
 Famiglie autore/revisore: Anthropic, Claude Sonnet 5.5 / OpenAI, Codex GPT-6 (variante non esposta)
-T: sì — «Da solo no» (riga 110): confronto con dimissioni e fila sostiene limite del singolo indicatore.
-R: sì — «In Molise il 32,6% ... In Lombardia il 5,1%» (riga 116): due territori ribaltano lettura iniziale.
-L: sì — «Questo numero dice quanto è difficile curarsi nella tua regione? Da solo no» (riga 110): significato pratico immediato, premessa da correggere.
-N: sì — «È anche fragile. Senza Lombardia e Molise ... -0,32» (riga 130) e «L'uso del pronto soccorso va nell'altro verso» (riga 142).
-Controllo anti-invenzione: nessuna persona nominata; riga 110 inventa come fatto la lista del medico del lettore a partire da una quota regionale, da trasformare in ipotesi.
-Bloccanti: 4
-Voto: 1 apertura individuale inventata; quota trattata da conteggio; generalizzazione oltre rho; grafico illeggibile nel gruppo di etichette
-Motivo: T/R/L/N presenti e cifre ricalcolate corrette, ma primo giudizio non supera bloccanti semantici e visivi; resta un giro di riscrittura.
-Rilievi localizzati: R1 riga 110 «Il tuo medico ... ha» -> «Se il tuo medico ... ha»; R2 riga 148 «conta quante liste» -> «indica la percentuale di medici oltre soglia»; R3 riga 126 e titolo SVG «Dove più ..., ... è più bassa» -> «tende a essere più bassa», con fragilità vicina; R4 SVG/PNG 375 e 1100, etichette del gruppo basso destro sovrapposte -> ridurre o riposizionare etichette mantenendo tabella completa. Ulteriori correzioni: riga 134 attenuare «Non è ... Nord e Sud»; riga 150 nominare quota di dimissioni; riga 136 scegliere rapporto o percentuale; completare CSV scaricabile con dati del pronto soccorso.
-Giri: 1
+T: sì — «Da solo no» (riga 110) e «da solo non basta» (riga 148): confronto sostiene limite del singolo indicatore.
+R: sì — Molise 32,6% e Lombardia 5,1% (riga 116) rovesciano la lettura della sola quota di medici.
+L: sì — «questo numero dice quanto è difficile curarsi nella tua regione? Da solo no» (riga 110) porta il significato al lettore nel lead.
+N: sì — «È anche fragile» con -0,32 (riga 130) e pronto soccorso di segno opposto (riga 142).
+Controllo anti-invenzione: nessuna persona nominata o scena individuale dedotta; il «Se» della riga 110 chiude R1. Cause regionali dichiarate ignote.
+Bloccanti: 1
+Voto: 3 quattro controlli narrativi presenti, ma grafico mobile sotto soglia di leggibilità e quindi non ammissibile al voto 4.
+Motivo: R1-R3 e gli altri rilievi semantici del primo giro sono chiusi; R4 resta bloccante perché legenda e fonte del grafico sono circa 5,8 px a 375 px. Secondo e ultimo giro: decisione alla direzione.
+Rilievi localizzati: R4 `content/figures/medici-di-famiglia-regioni/dispersione-dimissioni.svg` righe 2, 45-46: includere `.fig__note` e `.fig__source` nel trattamento mobile e verificare almeno 11 px effettivi nella pagina a 375 px; frontmatter bozza riga 7: `draft: false` da riportare a `true` prima del merge; righe 29 e 84-99: citare anche fonte Multiscopo per le serie e i rho ASL/pronto soccorso; riga 136: scegliere «circa una persona su sette» oppure 13,7%.
+Giri: 2
