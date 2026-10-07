@@ -1,0 +1,80 @@
+version: 1
+memory_min_mb: 1500
+max_rewrites: 2
+phases:
+  - name: scout
+    role: analista multi-indicatore
+    choices:
+      - {agent: codex, model: gpt-6-luna}
+      - {agent: codex, model: gpt-6-sol}
+    input: [brief_iniziale.md]
+    output: [dossier.json, copertura.csv, numeri.md, fonti.md]
+    template: scout.md
+    timeout_seconds: 1800
+    blocking: true
+  - name: brief
+    role: leader
+    choices:
+      - {agent: claude, model: sonnet}
+      - {agent: claude, model: fable}
+    input: [dossier.json, numeri.md, fonti.md]
+    output: [brief.md]
+    template: brief.md
+    timeout_seconds: 1200
+    blocking: true
+  - name: gate_a
+    role: caporedattore indipendente
+    choices:
+      - {agent: codex, model: gpt-6-astra}
+      - {agent: antigravity, model: gemini-3.1-pro-high}
+    input: [brief.md, dossier.json, numeri.md, fonti.md]
+    output: [gate-a.md]
+    template: gate_a.md
+    timeout_seconds: 900
+    blocking: true
+  - name: autore
+    role: autore
+    choices:
+      - {agent: claude, model: fable}
+      - {agent: claude, model: sonnet}
+    input: [brief.md, dossier.json, numeri.md, fonti.md, gate-a.md]
+    output: [bozza.md]
+    template: autore.md
+    timeout_seconds: 1800
+    blocking: true
+  - name: grafico
+    role: grafico
+    choices:
+      - {agent: codex, model: gpt-6-luna}
+      - {agent: claude, model: sonnet}
+    input: [bozza.md, dossier.json, numeri.md]
+    output: [grafici.md]
+    template: grafico.md
+    timeout_seconds: 1200
+    blocking: true
+  - name: guardia
+    role: controlli meccanici
+    choices: []
+    input: [bozza.md, grafici.md]
+    output: [guardia.json]
+    template: guardia.md
+    timeout_seconds: 300
+    blocking: true
+  - name: gate_b
+    role: verificatore indipendente
+    choices:
+      - {agent: antigravity, model: gemini-3.1-pro-high}
+      - {agent: codex, model: gpt-6-luna}
+    input: [bozza.md, brief.md, numeri.md, fonti.md, grafici.md, guardia.json]
+    output: [verifica.md, gate-b.md]
+    template: gate_b.md
+    timeout_seconds: 1200
+    blocking: true
+  - name: bozza
+    role: esportazione HTML e aggiornamento PR draft
+    choices: []
+    input: [bozza.md, grafici.md, gate-b.md]
+    output: [bozza.json]
+    template: bozza.md
+    timeout_seconds: 300
+    blocking: true

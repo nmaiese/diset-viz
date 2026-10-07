@@ -342,6 +342,46 @@ vede: che la definizione dell'indicatore sia detta giusta
 la notizia e il dato non sia forzato, che nessuna causa sia attribuita a un
 dato che non la mostra.
 
+### 8ter. Redazione in sequenza (orchestratore)
+
+Per un pezzo già aperto con `pezzo apri`, il coordinatore può eseguire la
+catena sequenziale con `bin/py -m scripts.editoriale.redazione <chiave>`.
+`config/redazione.yaml` possiede ordine, ruoli, modelli, input, output e
+timeout; i template brevi sono in `config/redazione/`. `--prova` mostra il
+piano e controlla RAM e ingressi senza avviare worker. `--da <fase>` riprende
+da una fase, `--solo <fase>` esegue una sola fase. Stato e hash sono in
+`lavoro/<chiave>/stato.json`; un gate malformato blocca, un esito negativo
+scrive nel ponte e restituisce codice 3. La sequenza usa sempre
+`orca-lancia.sh`, un worker per volta; il merge resta umano. La prova reale
+va fatta dal coordinatore sul pezzo aperto, dopo aver verificato issue, worktree
+e PR draft.
+||||||| ecfeba89
+
+### 8bis. La bozza si legge in una pagina HTML (regola del titolare, 7 ottobre 2026)
+
+Ogni articolo, prima del merge, si rende come pagina HTML autonoma, fatta come
+quella del sito (stile, testo, grafici, foto, didascalie, fonti), da aprire in
+locale:
+
+```bash
+bin/py -m scripts.editoriale.bozza_html <slug> --radice <worktree del pezzo> --pr <n>
+```
+
+Scrive `AAAAMMGG-<slug>.html` in `C:\Users\Nilo\orca\divario\bozze\` (WSL
+`/mnt/c/Users/Nilo/orca/divario/bozze/`) e aggiorna `index.html` (titolo, data,
+stato `da leggere`, `approvato` o `pubblicato`, link alla bozza e alla PR). Foglio
+di stile, font, immagini, grafici e CSV del dataset sono incorporati; gli script
+sono tolti. **Il merge, che e' la pubblicazione, avviene solo dopo che la bozza e'
+nell'indice e la direzione ha scritto l'ok.** Per portare lo stato a `approvato` o
+`pubblicato`: stesso comando con `--stato approvato`.
+
+La bozza serve anche a vedere cio' che i controlli non vedono. La prima, sui
+medici di famiglia, ha mostrato un grafico con le tre linee tutte grigie,
+la nota sopra le date e l'etichetta tagliata: lo script su misura non seguiva le
+posizioni fisse che il renderer dell'articolo si aspetta. I grafici si fanno con
+`scripts/trend_articles/figures.py`, non con un disegno scritto a mano, e si
+guardano nella bozza, a 375 e a 1100 px, prima di chiedere la review.
+
 ### 9. Pubblicazione
 
 Un ramo per pezzo o per gruppo di pezzi della stessa giornata, PR verso

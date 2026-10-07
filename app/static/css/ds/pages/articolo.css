@@ -41,7 +41,7 @@
 
 /* ---------- corpo: testo a misura, figure alla loro larghezza vera ---------- */
 .art-body.prose { max-width: none; }
-.art-body > * { max-width: 74ch; }
+.art-body > * { max-width: 52ch; }
 .art-body > .figure { max-width: 42.5rem; font-size: var(--fs-ui); line-height: var(--lh-ui); }
 .art-body .figure > * { margin: 0; }
 .art-body > .tablewrap, .art-body > .stackwrap { margin-block: var(--space-8); }

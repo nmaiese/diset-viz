@@ -62,6 +62,61 @@ sono, e in tre casi diverge per una scelta di Nello.
   uniti, pilota impilato sopra, documenti normativi dopo l'esito. Lo ha scelto
   Nello: prima l'articolo, poi il merge degli strumenti.
 
+## Aggiornamento del 7 ottobre 2026: redazione v2 (gate A e gate B)
+
+Feedback del titolare sul pezzo dei medici di famiglia (PR #353): «troppo numerico, nessun vero insight, non tiene conto di tutti gli indicatori»; gli articoli e le schede devono essere un racconto per il lettore. La redazione resta questa (team, issue, worktree, PR draft, stato nella issue) e si aggiungono due cancelli di sostanza. **Dove il resto di questo documento dice altro, vale questa sezione**: in particolare «Nessun Gate A» (flusso, passo 1), «tre giri» (passo 8 e regole di stop: ora due), il divieto di worker Antigravity e OpenCode e il lancio «solo in headless» (oggi si lancia con `orca-lancia.sh`, mai headless, modelli secondo `MODELLI.md`) e «nessun ruolo oltre i quattro» (si aggiungono il caporedattore del gate A e il verificatore del gate B). La spec completa, con la prova sui medici, sta in `REDAZIONE-divario-v2.md` (fuori dal repo, `orca/specs/`); qui sotto i requisiti, che sono la norma.
+
+### Gate A, prima della scrittura
+Il leader Claude scrive `lavoro/<chiave>/brief.md`: domanda del lettore, tesi provvisoria, almeno un insight e tre indicatori realmente incrociati. Astra giudica in contesto nuovo, di famiglia diversa dal brief. Tre classifiche affiancate non bastano.
+Lo scout estende il dossier a tutti gli indicatori dello stesso tema e ai pertinenti dei temi vicini. Oggi `brief.build(code)` tratta una scheda: ripetere `scripts.editoriale.brief` per codice in `dossier-<codice>.json` conserva compatibilità con la guardia. Estendere successivamente brief.py, non creare pacchetto_tema.py.
+Elenco da `indicator_universe.all_indicator_refs()` e viste, province comprese. `copertura.csv`: codice, nome, tema, livello, anni, inclusione/esclusione motivata. Le matrici delle viste contengono le serie complete, `projection()` le riduce. Salute ha 59 riferimenti, ma medici e rinunce stanno in Mobilità. `theme_categories.csv` è vuoto salvo intestazione, la tassonomia vive in `app/taxonomy.py`.
+Insight verificabile, tutte le condizioni necessarie:
+1. Corregge esplicitamente una lettura della sola classifica e risponde alla domanda del lettore.
+2. Incrocia tre misure pertinenti su anni comuni, stesso livello e popolazioni compatibili. Nessun indicatore ornamentale o gemello contato due volte.
+3. Ha formula, righe o chiavi delle osservazioni, numerosità ed esclusioni in `numeri.md`.
+4. Distingue risultato e causa: meccanismo candidato documentato oppure ignoto dichiarato.
+5. Resiste a un controllo contrario scelto prima del calcolo, per esempio anno alternativo o esclusione dell'estremo. Si conservano anche risultati negativi.
+`gate-a.md`, sotto `lavoro/<chiave>/`: SHA e hash del brief, autore/modello, giudice/modello, domanda, tesi, codici e confronto, tabella `criterio | sì/no | prova | limite`, esito PASSA/FERMO, motivo, correzione, destinatario, data. Un no ferma lo scrittore. Un solo ritorno mirato al leader, poi archivio se ancora insufficiente. Un ritorno in più è ammesso solo se il gate ha bocciato la forma del brief e non i numeri, e il giudice ha scritto la formulazione consentita. Label gate-a soltanto dopo PASSA, invalidata da modifiche alla tesi.
+
+### Aggiornamento v3: precedenza su requisiti v2 per il brief e Gate A
+Decisione del titolare: il blog parte da un fatto e da una domanda reale, non da un indicatore. Gli indicatori interni sono base e un tassello, mai la tesi; è vietata una tesi basata solo su correlazioni fra indicatori interni. La scheda indicatore spiega il proprio indicatore; altri indicatori sono solo contesto. Questa sezione sostituisce integralmente i requisiti v2 per brief e Gate A; Gate B resta invariato.
+
+Il brief e Gate A dichiarano ultimo anno/periodo osservato e data della fonte. Si dà priorità ai temi con dati recenti; a parità di forza dell'insight, temi più vecchi vengono dopo. Per i medici il caporedattore sceglie fra due o tre angoli verificati, senza fissare nel contratto un confronto pubblico/privato.
+
+**Gate A blog, criteri misurabili:** il report identifica tipo pezzo e domanda; presenta almeno due angoli verificati; dichiara ultimo dato e data/URL della fonte; documenta almeno tre fonti esterne autorevoli, aperte e verificate, con istituzione, data, URL e claim; descrive un grafico con variabile e periodo esterni collegati a una fonte verificata; dichiara il ruolo degli indicatori interni come base e tassello. Il PASSA richiede cinque criteri con prove specifiche e limiti, nessun “sì” generico. Per una scheda, si verifica l'indicatore oggetto del testo, una fonte esterna datata e il ruolo degli altri indicatori come contesto; il grafico esterno non è requisito.
+
+Formato dettagliato del report e validazioni automatiche: `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v3.md`. I prompt puntano a quella spec invece di copiarla. La versione del contratto invalida Gate A precedenti anche se brief e hash non cambiano.
+
+Gate B resta invariato: criteri, controlli, soglia, bloccanti, numero di giri e formato descritti nel PIANO v2. La v3 cambia distinzione blog/scheda, prove del brief e Gate A.
+
+### Gate B, in revisione
+Alle cinque domande del PIANO si aggiungono quattro controlli binari con citazioni della bozza: T, tesi sostenuta dalle prove. R, confronto fra due territori reali che fa avanzare il racconto. L, significato concreto per il lettore nei primi due paragrafi. N, risultato non ovvio e controllo contrario riconoscibili.
+Persone solo da fonti citate, mai inventate o composite. Nessuna scena individuale dedotta da medie. Causa ed effetto solo se documentati, altrimenti legame osservato e motivo ignoto. L'ignoto esplicito non penalizza da solo.
+| Voto | Regola osservabile, senza media |
+| --- | --- |
+| 1 | Errore fattuale bloccante, invenzione o causa non provata, oppure zero controlli soddisfatti. Esempio: “In Lombardia mancano medici perché non si investe”, senza prova |
+| 2 | Nessun errore bloccante, solo uno o due controlli soddisfatti |
+| 3 | Tre controlli soddisfatti. Esempio: incrocio corretto, ma nessuna conseguenza spiegata al lettore |
+| 4 | Tutti e quattro soddisfatti, zero bloccanti, limiti vicini alle affermazioni |
+| 5 | Come 4, più controesempio spiegato nella prosa e nessun paragrafo fatto soltanto di valori o ripetizioni del cruscotto |
+`lavoro/<chiave>/gate-b.md`: SHA/hash della bozza, famiglie autore/revisore, T/R/L/N con citazioni, controllo anti-invenzione, voto e motivo, rilievi localizzati, giri, esito PASSA/RISCRIVERE/FERMO. PASSA richiede almeno 4 e zero bloccanti numerici, semantici o visivi. Sotto 4 si riscrive, massimo due giri complessivi di revisione, poi FERMO alla direzione. Dissenso: indicare il controllo controverso, non mediare i voti.
+Exit zero delle guardie non risolve i fatti “non verificabili”. Label gate-b riferita allo SHA controllato, HTML aperto prima dell'ok.
+
+### Ruoli e modelli (rotazione del 7/10)
+Input/output sotto `lavoro/<chiave>/`. Tabella basata su MODELLI.md letto oggi, quote non misurate.
+| Ruolo | Prima / seconda scelta | Input | Output |
+| --- | --- | --- | --- |
+| Leader | Claude sonnet / fable | dossier, fonti, numeri | brief.md |
+| Caporedattore Gate A | Codex gpt-6-astra / Gemini 3.1 Pro High | brief e prove | gate-a.md |
+| Scout analista | Codex gpt-6-luna / gpt-6-sol | domanda, catalogo, fonti | dossier, copertura.csv, numeri.md, fonti.md |
+| Autore | Claude fable / sonnet, invertiti al pezzo seguente | brief passato, fonti | bozza.md |
+| Grafico | Codex gpt-6-luna / Claude sonnet | bozza, dati | grafici.md e risorse assegnate |
+| Verificatore Gate B | Gemini 3.1 Pro High / Codex gpt-6-luna | bozza, prove, figure | verifica.md, gate-b.md |
+Il coordinatore registra rotazione e modello effettivo nella issue. Astra: un giro circoscritto con battito, mai autore del brief. Verificatore distinto dall'analista, sempre di altra famiglia dall'autore. Un worker editoriale alla volta, niente headless. Pareri aggiuntivi della decisione 8 restano non bloccanti, lanciati dal coordinatore via Orca. Antigravity non riceve --model/--effort dal lanciatore: verificarne l'impostazione effettiva. Un solo ripiego, poi stop. Quote non leggibili: “non letto”. Il 5% Codex giornaliero resta budget indicativo.
+
+### Schede indicatore
+Due gate. Il Gate A v3 verifica che la scheda spieghi l'indicatore oggetto, con altri solo come contesto. Brief di una pagina, racconto indicativamente 180-350 parole: “che cosa significa per te”. Forma libera, level/vintage corretti, nessuna ripetizione del cruscotto. Grafici dinamici dispersione/ritratto esistenti. Gate B resta invariato.
+
 ## Decisioni già prese da Nello
 
 1. L'oggetto è la **scheda arricchita**, stessa pagina `/indicatore/...`.
@@ -272,8 +327,8 @@ Rilievi 10 e 23.
 
 1. **Controlli preliminari.** Si leggono quota e RAM (`free -m`). Poi la issue
    con `gh issue create --label run:team --body-file`: domanda, riga 1 del brief,
-   file attesi, sezione `## Stato` del corpo. Nessun Gate A e nessuna label
-   `gate-a`.
+   file attesi, sezione `## Stato` del corpo. Dal 7/10 il **Gate A** c'è: `gate-a.md` indipendente deve dare PASSA prima dello scrittore
+   (sezione «Aggiornamento del 7 ottobre»), e la label `gate-a` si mette solo dopo.
 2. **Worktree senza agente**, così non c'è un secondo coordinatore:
    `orca-ide worktree create --name ind-ter-12 --issue <n> --base-branch origin/<base> --no-parent --setup skip`.
    Non si usa `orca_dispatch.py --role worker`. `<base>` è `master` a regime. Nel
@@ -294,8 +349,8 @@ Rilievi 10 e 23.
    con lo SHA scritto nella spec (04, sezione 9). Poi `check`, `release` e `ack`.
 8. **Riparazione.** Se il verdetto è `DA CORREGGERE`, parte un **nuovo** worker
    scrittore sul worktree dell'indicatore, con i rilievi, lo SHA e i soli file
-   autorizzati. Poi guardia, push e un revisore nuovo. Tre giri al massimo, poi
-   la PR va a Nello.
+   autorizzati. Poi guardia, push e un revisore nuovo. Due giri al massimo dal 7/10, poi
+   FERMO alla direzione; il Gate B vuole voto almeno 4 e zero bloccanti sullo SHA corrente.
 9. **PRONTA PER NELLO.** Solo ora `gh pr ready` e label `gate-b` (rilievo 8).
 10. **Merge di Nello, poi pulizia** con `orca_clean.py`. Il leader promuove le
     fonti nel registro e chiude lo stato.
@@ -442,7 +497,7 @@ di Nello, perché è un altro repo.
 
 - Due schede respinte su tre: ci si ferma e si rilegge il brief, senza
   aggiungere controlli.
-- Più di tre giri su una scheda: la scheda si ferma.
+- Più di due giri su un pezzo (dal 7/10, prima erano tre): il pezzo si ferma e va alla direzione.
 - Quota Codex sotto il 30%, o swap in crescita con un solo worker: la scheda non
   parte.
 - Un gate che blocca tutto si ripara, non si spegne.
@@ -451,7 +506,7 @@ di Nello, perché è un altro repo.
 
 - Niente lotti e niente due indicatori insieme.
 - Niente Routine né automazioni Orca a orario.
-- Niente Antigravity od OpenCode come worker Orca (`worker-start --agent
+- (SUPERATO il 7/10: oggi si usano tutti i provider con `orca-lancia.sh`, vedi `MODELLI.md`.) Niente Antigravity od OpenCode come worker Orca (`worker-start --agent
   antigravity` o `opencode`). Solo in headless, lanciati dal worker del ruolo
   dentro il suo turno, con `timeout` e `< /dev/null`.
 - Nessun ruolo oltre i quattro.
