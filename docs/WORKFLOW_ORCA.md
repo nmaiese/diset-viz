@@ -122,6 +122,17 @@ Ne segue:
   delle dipendenze è lo stesso, ma se il codice importato è quello di un altro
   checkout il verdetto dei test è su un altro codice.
 
+### Misure sul sito pubblico
+
+Ogni worker che apre `divarioitalia.it` con un browser per screenshot o controlli
+imposta, prima della navigazione, uno user agent dichiarato contenente
+`DivarioCheck/1.0` e blocca con `page.route` o `context.route` le richieste a
+`googletagmanager.com`, `google-analytics.com`, `googlesyndication.com` e
+`doubleclick.net`, sottodomini compresi. I controlli HTTP usano lo stesso
+user agent dichiarato. Se non serve verificare Cloudflare o GTM, aprire
+`https://diset-viz-zlajtgogba-ew.a.run.app` invece del dominio pubblico.
+Gli script condivisi devono applicare il blocco per impostazione predefinita.
+
 ---
 
 ## 4. Comandi Orca CLI Essenziali
