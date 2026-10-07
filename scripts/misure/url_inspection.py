@@ -30,8 +30,8 @@ SITE_PROPERTY = "sc-domain:divarioitalia.it"
 ENDPOINT = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect"
 SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 DEFAULT_CREDENTIALS = "~/.config/gcloud/ga4-mcp-sa.json"
-# Cloudflare risponde 403 allo user-agent di default di Python.
-HEADERS = {"User-Agent": "Mozilla/5.0"}
+# User agent dichiarato per i controlli del sito pubblico.
+HEADERS = {"User-Agent": "DivarioCheck/1.0"}
 DAILY_QUOTA = 2000
 PAUSE_SECONDS = 1.0
 MAX_ATTEMPTS = 3

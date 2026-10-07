@@ -15,7 +15,7 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
 ROOT = Path(__file__).resolve().parents[1]
-USER_AGENT = "DivarioItalia-Discoverability-Audit/1.0 (+https://divarioitalia.it/llms.txt)"
+USER_AGENT = "DivarioCheck/1.0 DivarioItalia-Discoverability-Audit/1.0 (+https://divarioitalia.it/llms.txt)"
 
 
 def load_contract(path: Path = ROOT / "app" / "views.py") -> dict:

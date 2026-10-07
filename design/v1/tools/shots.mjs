@@ -30,6 +30,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const V1 = resolve(HERE, "..");
 const CHROME = process.env.CHROME || "/usr/bin/google-chrome";
 const PROD = "https://divarioitalia.it";
+const CHECK_UA = "DivarioCheck/1.0";
 
 // Le pagine di esempio: stesse chiavi dei prototipi in dist/pagine.
 const PAGES = {
@@ -48,12 +49,17 @@ const VIEWPORTS = {
 };
 const THEMES = { chiaro: "light", scuro: "dark" };
 
-// Terze parti che la produzione carica: consenso, annunci, analitica, login.
-const BLOCKED = [
-  "*googletagmanager.com*", "*googlesyndication.com*", "*doubleclick.net*",
-  "*iubenda.com*", "*adtrafficquality.google*", "*cloudflareinsights.com*",
-  "*supabase.co*", "*google-analytics.com*", "*fundingchoicesmessages.google.com*",
+const ANALYTICS_BLOCKED = [
+  "*googletagmanager.com*", "*google-analytics.com*", "*analytics.google.com*",
+  "*googlesyndication.com*", "*doubleclick.net*",
 ];
+// Le prove visive che isolano terze parti bloccano anche consenso e login.
+const BLOCKED = [
+  ...ANALYTICS_BLOCKED,
+  "*iubenda.com*", "*adtrafficquality.google*", "*cloudflareinsights.com*",
+  "*supabase.co*", "*fundingchoicesmessages.google.com*",
+];
+const publicBlocked = process.env.BLOCK === "1" ? BLOCKED : ANALYTICS_BLOCKED;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -117,13 +123,14 @@ async function launch() {
   return { send, waitFor, close, listen, unlisten };
 }
 
-async function openPage(cdp, { viewport, theme, blocked, initScript }) {
+async function openPage(cdp, { viewport, theme, blocked = ANALYTICS_BLOCKED, initScript }) {
   const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank" });
   const { sessionId } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
   const s = (m, p) => cdp.send(m, p, sessionId);
   await s("Page.enable");
   await s("Runtime.enable");
   await s("Network.enable");
+  await s("Network.setUserAgentOverride", { userAgent: CHECK_UA });
   if (blocked) await s("Network.setBlockedURLs", { urls: blocked });
   await s("Emulation.setDeviceMetricsOverride", viewport);
   const motion = process.env.MOTION === "no-preference" ? "no-preference" : "reduce";
@@ -186,7 +193,7 @@ async function shoot(label, urlFor, { blocked, initScript } = {}) {
   const outDir = join(V1, "screens", label);
   mkdirSync(outDir, { recursive: true });
   const cdp = await launch();
-  const manifest = { label, blocked: blocked || [], shots: [] };
+  const manifest = { label, blocked: blocked || ANALYTICS_BLOCKED, shots: [] };
   try {
     for (const [name, path] of Object.entries(PAGES)) {
       const url = urlFor(name, path);
@@ -293,8 +300,7 @@ async function check() {
 }
 
 
-// Il giro sul sito servito. Le terze parti restano bloccate solo se BLOCK=1:
-// contro la produzione servono a vedere che la CSP non rompe niente.
+// Il giro blocca sempre l'analitica. BLOCK=1 isola anche le altre terze parti.
 // Una navigazione che non lascia promesse rifiutate a mezz'aria: un server a
 // freddo puo' metterci piu' dell'attesa, e il giro deve passare alla pagina dopo.
 async function go(cdp, s, sessionId, url) {
@@ -309,7 +315,7 @@ async function giro(base, outDir, paths) {
   const cdp = await launch();
   const report = [];
   const theme = process.env.THEME === "dark" ? "dark" : "light";
-  const blocked = process.env.BLOCK ? BLOCKED : undefined;
+  const blocked = publicBlocked;
   let problems = 0;
   try {
     for (const path of paths) {
@@ -424,7 +430,7 @@ async function tastiera(base, paths) {
     for (const path of paths) {
       const url = base + path;
       {
-        const { s, sessionId, targetId } = await openPage(cdp, { viewport: VIEWPORTS[1440], theme: "light", blocked: BLOCKED });
+        const { s, sessionId, targetId } = await openPage(cdp, { viewport: VIEWPORTS[1440], theme: "light", blocked: publicBlocked });
         await go(cdp, s, sessionId, url);
         const stops = [];
         for (let i = 0; i < 30; i++) { await tab(s); const f = await evaluate(s, FOCUS); if (f) stops.push(f); }
@@ -457,7 +463,7 @@ async function tastiera(base, paths) {
         await cdp.send("Target.closeTarget", { targetId });
       }
       {
-        const { s, sessionId, targetId } = await openPage(cdp, { viewport: { width: 375, height: 740, deviceScaleFactor: 1, mobile: true }, theme: "light", blocked: BLOCKED });
+        const { s, sessionId, targetId } = await openPage(cdp, { viewport: { width: 375, height: 740, deviceScaleFactor: 1, mobile: true }, theme: "light", blocked: publicBlocked });
         await go(cdp, s, sessionId, url);
         await sleep(300);
         const opened = await evaluate(s, `(() => { const b = document.querySelector('[data-ds-drawer-open]'); if (!b || getComputedStyle(b).display === 'none') return 'bottone assente'; b.focus(); b.click(); const d = document.getElementById('ds-drawer'); return d && !d.hidden ? 'aperto' : 'chiuso'; })()`);
@@ -490,7 +496,7 @@ async function tastiera(base, paths) {
 const mode = process.argv[2];
 if (mode === "prima") {
   const day = process.argv[3] || new Date().toISOString().slice(0, 10);
-  await shoot(join("prima", day), (_n, path) => PROD + path, { blocked: BLOCKED });
+  await shoot(join("prima", day), (_n, path) => PROD + path, { blocked: publicBlocked });
 } else if (mode === "dopo") {
   const dist = join(V1, "dist", "pagine");
   const only = process.argv[3] ? process.argv[3].split(",") : null;
@@ -525,7 +531,7 @@ if (mode === "prima") {
     for (const w of widths.split(",")) {
       const viewport = { width: Number(w), height: Number(w) > 600 ? 900 : 800, deviceScaleFactor: Number(w) > 600 ? 1 : 2, mobile: Number(w) <= 600 };
       const initScript = "document.documentElement.dataset.shot='1'" + (process.env.FONT ? `;document.documentElement.dataset.font=${JSON.stringify(process.env.FONT)}` : "");
-      const info = await capture(cdp, url, { viewport, theme: process.env.THEME || "light", initScript }, `${prefix}-${w}`);
+      const info = await capture(cdp, url, { viewport, theme: process.env.THEME || "light", blocked: publicBlocked, initScript }, `${prefix}-${w}`);
       console.log(`${prefix} ${w}: ${info.h}px`);
     }
   } finally { cdp.close(); }
