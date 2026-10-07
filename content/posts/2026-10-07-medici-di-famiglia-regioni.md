@@ -22,7 +22,7 @@ cover_credit:
 dataset:
   name: Medici di famiglia con più di 1500 assistiti per regione, 2004, 2019 e 2023
   description: Quota di medici di medicina generale con più di 1500 assistiti nelle venti regioni e nei valori Istat di Italia, Nord, Centro e Mezzogiorno, con la variazione dal 2004 al 2023 e il posto di ogni regione nei due anni.
-  method: Valori Istat senza rielaborazione per regioni, Italia e ripartizioni. Variazione come differenza fra 2023 e 2004. Posto dal valore più alto, con Sud e Isole insieme come Mezzogiorno nelle ripartizioni. Le ripartizioni sono calcolate dall'Istat, non sono la media dei valori regionali.
+  method: Valori Istat senza rielaborazione per regioni, Italia e ripartizioni. Variazione come differenza fra 2023 e 2004. Posto dal valore più alto, con Sud e Isole insieme come Mezzogiorno nelle ripartizioni. Le ripartizioni sono calcolate dall'Istat, non sono la media dei valori regionali. La media semplice delle venti regioni citata nel testo conta ogni regione allo stesso modo ed è un'altra misura.
   temporal: 2004/2023
   spatial: Italia, ripartizioni, regioni
   creator: Istat
@@ -51,7 +51,7 @@ Nel 2023 più di un medico di famiglia su due, il 51,7%, aveva più di 1500 assi
 
 Il Nord è davanti, ma il Mezzogiorno non è fermo. E dentro il Mezzogiorno due regioni, la Sardegna e la Campania, stanno sopra la metà.
 
-L'indicatore è dell'Istat, dentro il Bes, ed è la quota di medici di medicina generale con un numero di pazienti oltre la soglia massima di 1500 prevista dal contratto. Le elaborazioni sono su dati del Ministero della Salute. La serie va dal 2004 al 2023 e non ha anni mancanti. Per Italia e ripartizioni usiamo i valori calcolati dall'Istat, non la media delle regioni.
+L'indicatore è dell'Istat, dentro il Bes, ed è la quota di medici di medicina generale con più di 1500 assistiti, la soglia massima prevista dal contratto. Le elaborazioni sono su dati del Ministero della Salute. La serie va dal 2004 al 2023 e non ha anni mancanti. Per Italia e ripartizioni usiamo i valori calcolati dall'Istat, non la media delle regioni.
 
 <!-- figura: serie-ripartizioni -->
 
