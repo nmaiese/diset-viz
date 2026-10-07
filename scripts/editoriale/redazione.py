@@ -222,14 +222,14 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
             return _orca_launcher(fallback, spec_path, worktree=worktree, timeout=timeout,
                                   clock=clock, sleep=sleep, progress=progress)
         raise
-    if completed is None or completed.returncode is None:
+    if completed is None:
         progress(f"{phase['name']}: lancio ancora in attesa dopo {launch_timeout} secondi")
-        partial = "" if completed is None else completed.stdout + "\n" + completed.stderr
-        handle = _parse_output(partial, "terminale")
-        dispatch = _parse_output(partial, "dispatch")
-        return {"success": False, "terminal_handle": handle, "dispatch_id": dispatch,
+        recovered = subprocess.run(["orca-ide", "terminal", "list", "--json"],
+                                   capture_output=True, text=True, timeout=20, check=False)
+        handle = _recover_terminal_handle(recovered.stdout, worktree.name)
+        return {"success": False, "terminal_handle": handle, "dispatch_id": None,
                 "model": choice.get("model"), "worker_state": "in corso" if handle else None,
-                "uncertain": True, "output": f"timeout del lancio; dispatch {dispatch or 'non letto'}"}
+                "output": "timeout del lancio; verificato elenco terminali"}
     transcript = completed.stdout + "\n" + completed.stderr
     handle = _parse_output(transcript, "terminale")
     dispatch = _parse_output(transcript, "dispatch")
@@ -240,17 +240,8 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
                               clock=clock, sleep=sleep, progress=progress)
     worker_state = None
     while dispatch and clock() - started < timeout:
-        try:
-            worker = subprocess.run(["orca-ide", "orchestration", "worker-show", "--dispatch", dispatch,
-                                     "--json"], capture_output=True, text=True, timeout=20, check=False)
-        except (OSError, subprocess.SubprocessError) as exc:
-            return {"success": False, "terminal_handle": handle, "dispatch_id": dispatch,
-                    "model": choice.get("model"), "worker_state": None,
-                    "output": f"worker-show non letto: {exc}"}
-        if worker.returncode != 0:
-            return {"success": False, "terminal_handle": handle, "dispatch_id": dispatch,
-                    "model": choice.get("model"), "worker_state": None,
-                    "output": f"worker-show non letto: {worker.stderr[-1000:]}"}
+        worker = subprocess.run(["orca-ide", "orchestration", "worker-show", "--dispatch", dispatch,
+                                 "--json"], capture_output=True, text=True, timeout=20, check=False)
         try:
             worker_state = json.loads(worker.stdout).get("result", {}).get("worker", {}).get("state")
         except (ValueError, AttributeError):
@@ -281,9 +272,7 @@ def _run_launch_command(command: list[str], *, cwd: Path, timeout: int,
         while process.poll() is None:
             elapsed = clock() - started
             if elapsed >= timeout:
-                stdout.seek(0)
-                stderr.seek(0)
-                return subprocess.CompletedProcess(command, None, stdout.read(), stderr.read())
+                return None
             if elapsed >= next_update:
                 progress(f"{phase_name}: lanciatore in corso da {int(elapsed // 60)} minuti")
                 next_update = (int(elapsed // 60) + 1) * 60
@@ -292,6 +281,22 @@ def _run_launch_command(command: list[str], *, cwd: Path, timeout: int,
         stdout.seek(0)
         stderr.seek(0)
         return subprocess.CompletedProcess(command, process.returncode, stdout.read(), stderr.read())
+
+
+def _recover_terminal_handle(payload_text: str, worktree_name: str) -> str | None:
+    try:
+        terminals = json.loads(payload_text).get("result", {}).get("terminals", [])
+    except (ValueError, AttributeError):
+        return None
+    def belongs(terminal: dict) -> bool:
+        values = (terminal.get("worktree"), terminal.get("worktree_name"), terminal.get("worktreePath"))
+        return any(isinstance(value, str) and value.replace("\\", "/").rstrip("/").split("/")[-1] == worktree_name
+                   for value in values)
+
+    matches = [t for t in terminals if isinstance(t, dict) and belongs(t)
+               and t.get("state") not in {"closed", "exited"} and t.get("connected") is not False
+               and t.get("handle")]
+    return matches[-1].get("handle") if matches else None
 
 
 def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: list[Path],
@@ -529,11 +534,7 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             _atomic_json(state_path, state)
         record = state.setdefault("phases", {}).setdefault(name, {})
         if name == "autore" and state.get("rewrite_rounds", 0) >= int(config.get("max_rewrites", 2)):
-            _bridge(bridge_dir, key, "b", "limite dei giri di riscrittura raggiunto",
-                    ["bozza.md", "gate-b.md"],
-                    f"bin/py -m scripts.editoriale.redazione {key} --da autore",
-                    datetime.now().astimezone())
-            return Result(3, "limite dei giri di riscrittura raggiunto; messaggio scritto nel ponte")
+            break
         input_files = [workdir / str(item) for item in phase.get("input", [])]
         missing = [str(p) for p in input_files if not p.is_file()]
         if missing:
@@ -588,13 +589,12 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
         try:
             result = launcher(_phase_choice(phase, state), spec_path)
         except (OSError, RedazioneError, ValueError, subprocess.SubprocessError) as exc:
-            uncertain = isinstance(exc, subprocess.TimeoutExpired) and name not in {"guardia", "bozza"}
+            uncertain = isinstance(exc, subprocess.TimeoutExpired)
             record.update({"status": "in corso" if uncertain else "fallita", "error": str(exc),
                            "finished_at": datetime.now().astimezone().isoformat()})
             _atomic_json(state_path, state)
             return Result(1, f"{name}: lancio fallito: {exc}")
         record.update({"handle": result.get("terminal_handle"), "dispatch_id": result.get("dispatch_id"),
-                       "uncertain": bool(result.get("uncertain")),
                        "model_effective": result.get("model"), "result": result.get("worker_state"),
                        "output": result.get("output")})
         output_changed = any(
@@ -605,14 +605,11 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
         )
         head_after = _head_sha(worktree)
         if not result.get("success") or any(not p.is_file() for p in output_files):
-            active = bool(result.get("uncertain") or (
-                result.get("terminal_handle") and result.get("worker_state") not in
-                {"succeeded", "failed", "stopped", "stop_unknown"}))
+            active = bool(result.get("terminal_handle") and result.get("worker_state") not in
+                          {"succeeded", "failed", "stopped", "stop_unknown"})
             record.update({"status": "in corso" if active else "fallita",
                            "finished_at": datetime.now().astimezone().isoformat()})
             _atomic_json(state_path, state)
-            if result.get("uncertain") and not result.get("terminal_handle"):
-                return Result(3, f"{name}: lancio incerto senza handle; verificare Orca prima di riprendere")
             return Result(1, f"{name}: fase {'ancora attiva' if active else 'fallita o file di uscita mancante'}")
         if not output_changed and head_after == head_before:
             record.update({"status": "fallita", "finished_at": datetime.now().astimezone().isoformat()})
@@ -643,28 +640,16 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             if negative:
                 if name == "gate_a" and int(state.get("gate_a_returns", 0)) < max_gate_a_retries:
                     state["gate_a_returns"] = int(state.get("gate_a_returns", 0)) + 1
-                    state["phases"].setdefault("brief", {})["status"] = "da rifare"
+                    state["phases"]["brief"]["status"] = "da rifare"
                     state["phases"]["gate_a"]["status"] = "da rifare"
+                    i = selected.index("brief") if "brief" in selected else len(selected)
                     _atomic_json(state_path, state)
-                    if "brief" not in selected:
-                        _bridge(bridge_dir, key, PHASE_LABEL[name], "FERMO: ritorno al leader richiesto",
-                                [p.name for p in output_files],
-                                f"bin/py -m scripts.editoriale.redazione {key} --da brief",
-                                datetime.now().astimezone())
-                        return Result(3, "gate A negativo; ritorno al leader richiesto nel ponte")
-                    i = selected.index("brief")
                     continue
                 if name == "gate_b" and outcome == "RISCRIVERE" and int(state.get("rewrite_rounds", 0)) < int(config.get("max_rewrites", 2)):
                     for downstream in ("autore", "grafico", "guardia", "gate_b", "bozza"):
                         state["phases"].setdefault(downstream, {})["status"] = "da rifare"
+                    i = selected.index("autore") if "autore" in selected else len(selected)
                     _atomic_json(state_path, state)
-                    if "autore" not in selected:
-                        _bridge(bridge_dir, key, PHASE_LABEL[name], "RISCRIVERE: ritorno all'autore richiesto",
-                                [p.name for p in output_files],
-                                f"bin/py -m scripts.editoriale.redazione {key} --da autore",
-                                datetime.now().astimezone())
-                        return Result(3, "gate B negativo; ritorno all'autore richiesto nel ponte")
-                    i = selected.index("autore")
                     continue
                 files = [p.name for p in output_files]
                 _bridge(bridge_dir, key, PHASE_LABEL[name], f"{outcome}, voto {vote or 'n/d'}", files,

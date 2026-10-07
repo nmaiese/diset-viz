@@ -145,58 +145,6 @@ class RedazioneTests(unittest.TestCase):
             self.assertEqual(launcher.calls.count("brief"), 2)
             self.assertEqual(launcher.calls.count("gate_a"), 2)
 
-    def test_solo_gate_a_negativo_richiede_intervento(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root, work, cfg = self.setup_case(tmp)
-            (work / "lavoro/demo/brief.md").write_text("brief", encoding="utf-8")
-            launcher = FakeLauncher(work / "lavoro/demo", gates=[gate_a("FERMO")])
-            result = self.run_case(root, work, cfg, launcher, only="gate_a")
-            self.assertEqual(result.exit_code, 3)
-            self.assertTrue(list((root / "ponte").glob("*.md")))
-
-    def test_solo_gate_b_negativo_richiede_intervento(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root, work, cfg = self.setup_case(tmp)
-            (work / "lavoro/demo/bozza.md").write_text("bozza", encoding="utf-8")
-            launcher = FakeLauncher(work / "lavoro/demo", gates=[gate_b("RISCRIVERE", 3)])
-            result = self.run_case(root, work, cfg, launcher, only="gate_b")
-            self.assertEqual(result.exit_code, 3)
-            self.assertTrue(list((root / "ponte").glob("*.md")))
-
-    def test_da_autore_con_limite_riscritture_non_dichiara_completamento(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root, work, cfg = self.setup_case(tmp)
-            (work / "lavoro/demo/stato.json").write_text(
-                json.dumps({"rewrite_rounds": 2, "phases": {}}), encoding="utf-8")
-            launcher = FakeLauncher(work / "lavoro/demo")
-            result = self.run_case(root, work, cfg, launcher, from_phase="autore")
-            self.assertEqual(result.exit_code, 3)
-            self.assertEqual(launcher.calls, [])
-
-    def test_timeout_fase_locale_si_puo_riprovare(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root, work, cfg = self.setup_case(tmp)
-
-            def timeout_launcher(_phase, _spec_path):
-                raise redazione.subprocess.TimeoutExpired(["guardia"], 60)
-
-            result = self.run_case(root, work, cfg, timeout_launcher, only="guardia")
-            self.assertEqual(result.exit_code, 1)
-            state = json.loads((work / "lavoro/demo/stato.json").read_text(encoding="utf-8"))
-            self.assertEqual(state["phases"]["guardia"]["status"], "fallita")
-            resumed = FakeLauncher(work / "lavoro/demo")
-            self.assertEqual(self.run_case(root, work, cfg, resumed, only="guardia").exit_code, 0)
-
-    def test_lancio_incerto_senza_handle_blocca_rilancio(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root, work, cfg = self.setup_case(tmp)
-            result = self.run_case(root, work, cfg,
-                lambda _phase, _spec: {"success": False, "uncertain": True}, only="scout")
-            self.assertEqual(result.exit_code, 3)
-            resumed = FakeLauncher(work / "lavoro/demo")
-            self.assertEqual(self.run_case(root, work, cfg, resumed, only="scout").exit_code, 1)
-            self.assertEqual(resumed.calls, [])
-
     def test_solo_esegue_una_fase(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = self.setup_case(tmp)
@@ -425,19 +373,6 @@ class GateParserTests(unittest.TestCase):
 
 
 class LauncherTests(unittest.TestCase):
-    def test_worker_show_timeout_conserva_dispatch_e_handle(self):
-        phase = {"name": "scout", "choices": [{"agent": "codex", "model": "gpt-6-luna"}]}
-        launched = redazione.subprocess.CompletedProcess([], 0,
-            "dispatch: ctx-fake\nterminale: term-fake\n", "")
-        with patch.object(redazione, "_run_launch_command", return_value=launched), \
-             patch.object(redazione.subprocess, "run", side_effect=redazione.subprocess.TimeoutExpired(
-                 ["orca-ide", "orchestration", "worker-show"], 20)):
-            result = redazione._orca_launcher(phase, Path("/tmp/divario-demo/lavoro/demo/SPEC.md"),
-                worktree=Path("/tmp/divario-demo"), timeout=60)
-        self.assertFalse(result["success"])
-        self.assertEqual(result["dispatch_id"], "ctx-fake")
-        self.assertEqual(result["terminal_handle"], "term-fake")
-
     def test_terminal_alive_distinguishes_unknown_from_closed(self):
         with patch.object(redazione.subprocess, "run", return_value=redazione.subprocess.CompletedProcess(
                 [], 1, "", "runtime unavailable")):
@@ -446,40 +381,29 @@ class LauncherTests(unittest.TestCase):
                 [], 0, json.dumps({"ok": True, "result": {"terminals": []}}), "")):
             self.assertFalse(redazione._terminal_alive("term-1"))
 
-    def test_lancio_usa_timeout_minimo_330_secondi_e_conserva_handle_dall_output(self):
+    def test_lancio_usa_timeout_minimo_330_secondi_e_recupera_handle(self):
         phase = {"name": "scout", "choices": [{"agent": "codex", "model": "gpt-6-luna"}],
                  "timeout_seconds": 900}
         class StillRunning:
-            def __init__(self, *_args, **kwargs):
-                kwargs["stdout"].write("dispatch: ctx-recovered\nterminale: term-recovered\n")
-                kwargs["stdout"].flush()
+            def __init__(self, *_args, **_kwargs):
+                pass
             def poll(self):
                 return None
 
         with patch.object(redazione.subprocess, "Popen", side_effect=StillRunning) as popen, \
-             patch.object(redazione.subprocess, "run") as run:
+             patch.object(redazione.subprocess, "run", side_effect=[
+            redazione.subprocess.CompletedProcess([], 0, json.dumps({"result": {"terminals": [
+                {"handle": "term-recovered", "worktreePath": r"\\wsl.localhost\Ubuntu\home\nilo\divario-demo", "connected": True}
+            ]}}), ""),
+        ]):
             ticks = iter(range(0, 100_000, 60))
             progress = []
             result = redazione._orca_launcher(phase, Path("/tmp/divario-demo/lavoro/demo/SPEC.md"),
                 worktree=Path("/tmp/divario-demo"), timeout=900,
                 clock=lambda: next(ticks), sleep=lambda _: None, progress=progress.append)
         self.assertEqual(popen.call_count, 1)
-        run.assert_not_called()
         self.assertEqual(result["terminal_handle"], "term-recovered")
-        self.assertEqual(result["dispatch_id"], "ctx-recovered")
-        self.assertTrue(result["uncertain"])
         self.assertTrue(any("minuti" in message for message in progress))
-
-    def test_timeout_lancio_senza_output_non_adotta_terminale_estraneo(self):
-        phase = {"name": "scout", "choices": [{"agent": "codex", "model": "gpt-6-luna"}]}
-        partial = redazione.subprocess.CompletedProcess([], None, "", "")
-        with patch.object(redazione, "_run_launch_command", return_value=partial), \
-             patch.object(redazione.subprocess, "run") as run:
-            result = redazione._orca_launcher(phase, Path("/tmp/divario-demo/lavoro/demo/SPEC.md"),
-                worktree=Path("/tmp/divario-demo"), timeout=900)
-        run.assert_not_called()
-        self.assertTrue(result["uncertain"])
-        self.assertIsNone(result["terminal_handle"])
 
     def test_fallback_una_volta_su_fallimento_lancio(self):
         phase = {"name": "gate_b", "choices": [
