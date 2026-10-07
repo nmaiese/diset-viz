@@ -15,10 +15,10 @@ Il titolare ha bocciato il pezzo dei medici di famiglia: «troppo numerico, ness
 - **Scout e brief**: i passaggi v2 sotto sono superati dalla distinzione blog/scheda e dal Gate A v3.
 - **Gate A**: non richiedere più l'incrocio di tre indicatori interni come tesi obbligatoria del blog.
 - **Grafici**: non limitare le figure del blog ai dati interni.
-- **Scout multi-indicatore** (§2): il dossier copre tutti gli indicatori dello stesso tema e dei temi vicini (`app.indicator_universe`), con `copertura.csv`; non si scrive su un solo indicatore.
-- **Gate A «insight»** prima dello scrittore: il brief dichiara domanda del lettore, tesi in una frase, almeno un insight non ovvio e tre indicatori incrociati; lo giudica un caporedattore di famiglia diversa (Astra, un giro, riga nel battito) in `lavoro/<chiave>/gate-a.md`. Senza PASSA lo scrittore non parte.
+- **Scout** (§2): per il blog parte da fatto e fonti esterne; censisce gli indicatori pertinenti come base (`app.indicator_universe`, `copertura.csv`). Per la scheda parte dall'indicatore da spiegare.
+- **Gate A «insight»** prima dello scrittore: il brief dichiara domanda reale, tesi giornalistica, dato recente e fonti esterne verificate; lo giudica un caporedattore di famiglia diversa in `lavoro/<chiave>/gate-a.md`. Senza PASSA v3 lo scrittore non parte.
 - **Gate B «racconto»** in revisione (§6): tesi sostenuta, confronto fra due territori reali, significato concreto per il lettore nei primi due paragrafi, risultato non ovvio con controllo contrario; voto 1-5, sotto 4 si riscrive, due giri al massimo, in `lavoro/<chiave>/gate-b.md`. Persone solo da fonti citate, mai inventate.
-- **Grafici** (§5): solo il generatore standard (`scripts/trend_articles/figures.py`) per il blog, mai disegni scritti a mano; si guardano nella bozza HTML.
+- **Grafici** (§5): il blog integra dati esterni, con il generatore standard (`scripts/trend_articles/figures.py`) o uno script dedicato verificabile; si guardano nella bozza HTML.
 - **Bozza HTML** (§6) prima del merge, e il merge solo con l'ok della direzione.
 Le sezioni 1-7 qui sotto restano valide per quanto non contraddicono questo blocco; dove il divieto «nessun nome di persona» si scontra con il racconto, vale: persone solo da fonti citate, mai inventate o composite.
 
