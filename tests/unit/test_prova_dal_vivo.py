@@ -22,6 +22,21 @@ class ProvaDalVivoTests(unittest.TestCase):
             "Una frase nuova con link utile e grassetto contiene molte parole valide."
         ])
 
+    def test_i_punti_elenco_non_entrano_nella_frase_cercata(self):
+        diff = """--- a/content/posts/2026-01-01-prova.md
++++ b/content/posts/2026-01-01-prova.md
+@@ -1,2 +1,4 @@
+ ---
+ title: Vecchio titolo
++- Una frase in un elenco puntato che contiene molte parole valide.
++1. Una frase in un elenco numerato che contiene molte parole valide.
+"""
+        frasi = prova.estrai_frasi_nuove(diff, body_start=1)
+        self.assertEqual([f.testo for f in frasi], [
+            "Una frase in un elenco puntato che contiene molte parole valide.",
+            "Una frase in un elenco numerato che contiene molte parole valide.",
+        ])
+
     def test_campione_deterministico_ordina_per_lunghezza_e_riga(self):
         frasi = [prova.Frase("breve ma abbastanza lunga per entrare nel campione", 8),
                  prova.Frase("questa frase contiene molte piu parole e deve essere scelta", 3),

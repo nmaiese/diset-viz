@@ -31,6 +31,7 @@ INTERVALLI = {
     "ISTATP_NATALITA": (2, 12),
     "ISTATP_DISOCCUPAZIONE": (0, 40),
     "ISTATP_ATTIVITA": (35, 85),
+    "ISTATP_PIL_PRO_CAPITE": (10_000, 120_000),
 }
 
 
@@ -70,9 +71,15 @@ class NuoviIstatProvTest(unittest.TestCase):
                 self.assertNotIn(vietato, m["name"])
             anni = [int(r["year"]) for r in self.righe if r["indicator_id"] == m["indicator_id"]]
             self.assertEqual((min(anni), max(anni)), (int(m["year_min"]), int(m["year_max"])))
-            self.assertGreaterEqual(int(m["year_max"]), 2025)
+            if m["indicator_id"] == "ISTATP_PIL_PRO_CAPITE":
+                self.assertEqual(int(m["year_max"]), 2023)
+            else:
+                self.assertGreaterEqual(int(m["year_max"]), 2025)
             self.assertEqual(int(m["n_provincia"]), 107)
-            self.assertEqual(int(m["n_regione"]), 20)
+            self.assertEqual(
+                int(m["n_regione"]),
+                0 if m["indicator_id"] == "ISTATP_PIL_PRO_CAPITE" else 20,
+            )
 
     def test_territori_validi(self):
         for r in self.righe:
@@ -117,6 +124,27 @@ class NuoviIstatProvTest(unittest.TestCase):
         self.assertAlmostEqual(v[("ISTATP_ATTIVITA", "provincia", "reggio-calabria", 2025)], 46.1, places=1)
         self.assertAlmostEqual(v[("ISTATP_INDICE_VECCHIAIA", "provincia", "bolzano", 2026)], 145.2)
         self.assertAlmostEqual(v[("ISTATP_INDICE_VECCHIAIA", "provincia", "oristano", 2026)], 352.2)
+
+    def test_pil_pro_capite_copre_107_province_dal_2015_al_2023(self):
+        indicatore = "ISTATP_PIL_PRO_CAPITE"
+        righe = [r for r in self.righe if r["indicator_id"] == indicatore]
+        self.assertEqual({int(r["year"]) for r in righe}, set(range(2015, 2024)))
+        for anno in range(2015, 2024):
+            dell_anno = [r for r in righe if int(r["year"]) == anno]
+            self.assertEqual({r["territory_key"] for r in dell_anno}, self.province)
+            self.assertTrue(all(r["value"] for r in dell_anno))
+
+        valori_2023 = {
+            r["territory_key"]: float(r["value"])
+            for r in righe
+            if int(r["year"]) == 2023
+        }
+        self.assertEqual(valori_2023["torino"], 39017.598)
+        self.assertEqual(valori_2023["milano"], max(valori_2023.values()))
+
+        manifest = next(m for m in self.manifest if m["indicator_id"] == indicatore)
+        self.assertEqual(manifest["license"], "CC BY 4.0")
+        self.assertEqual(manifest["year_max"], "2023")
 
     def test_bolzano_e_trento_non_scambiati(self):
         # nei flussi lavoro ITD1/ITD2 sono Bolzano/Trento, non regioni

@@ -134,6 +134,28 @@ def keyword_pattern(keyword: str) -> re.Pattern:
     return re.compile(rf"(?<![a-z0-9]){body}" + ("" if prefix else r"(?![a-z0-9])"))
 
 
+def senza_titoli_di_cronaca(signals: list[dict]) -> list[dict]:
+    """Rimuove i titoli delle notizie dai segnali di cronaca per privacy.
+
+    Toglie 'title' da:
+    - segnali 'google_news_principali'
+    - segnali 'google_news_tema'
+    - elementi 'news' dentro segnali 'google_trends_tendenza'
+
+    Non tocca i segnali 'istat_comunicato': i loro titoli sono pubblici.
+    Non modifica l'input, restituisce una nuova lista.
+    """
+    out = []
+    for s in signals:
+        new_s = dict(s)
+        if s["type"] in ("google_news_principali", "google_news_tema"):
+            new_s.pop("title", None)
+        elif s["type"] == "google_trends_tendenza":
+            new_s["news"] = [{k: v for k, v in n.items() if k != "title"} for n in s.get("news", [])]
+        out.append(new_s)
+    return out
+
+
 def match_topics(signals: list[dict], topics: list[dict]) -> None:
     """Scrive su ogni segnale i temi le cui parole compaiono nel suo testo.
 
@@ -181,6 +203,7 @@ def main(argv=None) -> int:
         time.sleep(1)
 
     match_topics(signals, topics)
+    signals = senza_titoli_di_cronaca(signals)
     out = common.day_dir(day) / "signals.json"
     common.write_json(out, {"detected": now.isoformat(timespec="seconds"), "signals": signals, "errors": errors})
     print(f"{len(signals)} segnali, {len(errors)} errori -> {out.relative_to(common.ROOT)}")

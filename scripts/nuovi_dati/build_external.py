@@ -82,6 +82,7 @@ PUBBLICATI = {
             "ISTATP_NATALITA": ("ipr:tasso-di-natalita", "Demografia e popolazione", "salute_cura", ("provincia",)),
             "ISTATP_DISOCCUPAZIONE": ("ipr:tasso-di-disoccupazione", "Lavoro", "lavoro_opportunita", ("provincia",), {"campionario": True, "nota": CAMPIONE_PROVINCIALE}),
             "ISTATP_ATTIVITA": ("ipr:tasso-di-attivita", "Lavoro", "lavoro_opportunita", ("provincia",), {"campionario": True, "nota": CAMPIONE_PROVINCIALE}),
+            "ISTATP_PIL_PRO_CAPITE": ("ipr:pil-per-abitante", "Benessere economico", "reddito_accessibilita", ("provincia",)),
         },
     },
     "eurostat_nuovi": {

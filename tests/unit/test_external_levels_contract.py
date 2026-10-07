@@ -18,10 +18,14 @@ class ExternalLevelsContract(unittest.TestCase):
             rows = list(reader)
         keys = [(row["target_indicator_id"], row["territory_level"]) for row in rows]
         self.assertEqual(len(keys), len(set(keys)))
+        deroghe_freschezza = {"ipr:pil-per-abitante": 2023}
         for row in rows:
             self.assertIn(row["territory_level"], {"regione", "provincia"})
             self.assertIn(row["direction"], {"higher_better", "lower_better", "contextual"})
-            self.assertGreaterEqual(int(row["year_max"]), 2025)
+            if row["target_indicator_id"] in deroghe_freschezza:
+                self.assertEqual(int(row["year_max"]), deroghe_freschezza[row["target_indicator_id"]])
+            else:
+                self.assertGreaterEqual(int(row["year_max"]), 2025)
 
     def test_fixture_exercises_both_levels_without_production_rows(self):
         self.assertEqual(len(external_mef.levels()), 2)

@@ -7,6 +7,15 @@ description: Scrivere, riscrivere o rivedere un testo di Divario Italia, cioe un
 
 Un testo del sito nasce da una domanda vera di chi cerca e da dati con fonte e anno, passa per ruoli separati e arriva al titolare come bozza. Le regole qui sotto vengono da errori reali: il pilota carceri del 28/09 (testo "molto grezzo", titolo su un estremo non verificato), il pilota ter-12 (cinque frasi che dicevano una cosa diversa dal dato mentre la guardia numerica era verde), una bozza scritta senza pipeline il 4/10 (definizioni infedeli, "il quadro non cambia" falso, link mancanti). Leggi anche `content/STYLE.md` (le regole tipografiche sono vincolanti) e, per le schede, `docs/INDICATOR_PAGES.md`.
 
+## 0. Redazione v2 (7 ottobre 2026): vale prima di tutto il resto
+Il titolare ha bocciato il pezzo dei medici di famiglia: «troppo numerico, nessun vero insight, non tiene conto di tutti gli indicatori». I requisiti (norma) stanno in `docs/design_drafts/team/PIANO.md`, sezione «Aggiornamento del 7 ottobre 2026». In breve, per blog e schede:
+- **Scout multi-indicatore** (§2): il dossier copre tutti gli indicatori dello stesso tema e dei temi vicini (`app.indicator_universe`), con `copertura.csv`; non si scrive su un solo indicatore.
+- **Gate A «insight»** prima dello scrittore: il brief dichiara domanda del lettore, tesi in una frase, almeno un insight non ovvio e tre indicatori incrociati; lo giudica un caporedattore di famiglia diversa (Astra, un giro, riga nel battito) in `lavoro/<chiave>/gate-a.md`. Senza PASSA lo scrittore non parte.
+- **Gate B «racconto»** in revisione (§6): tesi sostenuta, confronto fra due territori reali, significato concreto per il lettore nei primi due paragrafi, risultato non ovvio con controllo contrario; voto 1-5, sotto 4 si riscrive, due giri al massimo, in `lavoro/<chiave>/gate-b.md`. Persone solo da fonti citate, mai inventate.
+- **Grafici** (§5): solo il generatore standard (`scripts/trend_articles/figures.py`) per il blog, mai disegni scritti a mano; si guardano nella bozza HTML.
+- **Bozza HTML** (§6) prima del merge, e il merge solo con l'ok della direzione.
+Le sezioni 1-7 qui sotto restano valide per quanto non contraddicono questo blocco; dove il divieto «nessun nome di persona» si scontra con il racconto, vale: persone solo da fonti citate, mai inventate o composite.
+
 ## 1. Il filo, prima di tutto
 Scegli un argomento da una query vera (Search Console: `searchAnalytics` per `page` e `query`, 28 giorni) e da un dato che il sito ha. Scrivi in una frase la tesi, verificabile con i dati: se non riesci, non c'e pezzo. Controlla che non esista gia un articolo sul tema (`content/posts`) e non ripeterlo.
 
@@ -46,7 +55,7 @@ Per i pezzi nati dal trend c'e anche `bin/py -m scripts.trend_articles.verify <f
 - Il tetto non e un obiettivo e non e un criterio di valore: se per rientrare serve togliere un dato o una cautela, si toglie un raccordo. Sotto le 700 solo se la tesi sta in meno.
 
 ## 6. Rilievi, giri, approvazione
-I rilievi vanno allo scrittore uno per uno e il leader verifica che siano tutti chiusi nel diff, non sulla parola. Massimo due giri di review (regola della direzione del 4/10, piu stretta dei tre di PIANO.md del 28/09): se dopo il secondo resta un bloccante lo decide la direzione. Il pezzo resta `draft: true` e va in una PR draft: la pubblicazione e del titolare, mai del leader. Il frontmatter non porta `author` (la firma la da `config/identita.yaml`). Nessun nome di persona nei testi.
+I rilievi vanno allo scrittore uno per uno e il leader verifica che siano tutti chiusi nel diff, non sulla parola. Massimo due giri di review (regola della direzione del 4/10, piu stretta dei tre di PIANO.md del 28/09): se dopo il secondo resta un bloccante lo decide la direzione. Il pezzo resta `draft: true` e va in una PR draft: la pubblicazione e del titolare, mai del leader. **Prima del merge la bozza si rende in HTML** (`bin/py -m scripts.editoriale.bozza_html <slug> --radice <worktree> --pr <n>`, uscita in `/mnt/c/Users/Nilo/orca/divario/bozze/` con `index.html`) e si legge li: regola del titolare del 7/10/2026, dettagli in `docs/WORKFLOW_ARTICOLI_TREND.md` §8bis. Il merge solo dopo che la bozza e nell'indice e la direzione ha scritto l'ok. Il frontmatter non porta `author` (la firma la da `config/identita.yaml`). Nessun nome di persona nei testi.
 
 ## 7. Schede indicatore
 Stessa pipeline sul testo (`content/indicators/<codice>.md`), con il contratto in `docs/INDICATOR_PAGES.md`, la guardia `bin/py -m scripts.editoriale.guardia <codice> --dossier ... --fonti ...` e lo stato in `app/editorial_state.py`. Priorita per impressioni: poche schede fanno quasi tutto il traffico, scrivi prima quelle.

@@ -59,6 +59,7 @@ Legge, senza chiavi e da fonti aperte:
 Ogni segnale e' salvato com'e' arrivato, con fonte, URL e data. Ai segnali si
 abbinano i temi di `config/trend_topics.json` con parole intere (`rsa` non si
 accende in `borsa`). Il file si committa: e' la prova del perche'.
+I titoli delle notizie non si salvano, per privacy; restano url, fonte, data.
 
 Il feed delle tendenze e' dominato da sport, spettacolo e cronaca: e' normale.
 Quello che conta per questo sito e' la parte che tocca un tema con un dato,
@@ -354,6 +355,32 @@ scrive nel ponte e restituisce codice 3. La sequenza usa sempre
 `orca-lancia.sh`, un worker per volta; il merge resta umano. La prova reale
 va fatta dal coordinatore sul pezzo aperto, dopo aver verificato issue, worktree
 e PR draft.
+||||||| ecfeba89
+
+### 8bis. La bozza si legge in una pagina HTML (regola del titolare, 7 ottobre 2026)
+
+Ogni articolo, prima del merge, si rende come pagina HTML autonoma, fatta come
+quella del sito (stile, testo, grafici, foto, didascalie, fonti), da aprire in
+locale:
+
+```bash
+bin/py -m scripts.editoriale.bozza_html <slug> --radice <worktree del pezzo> --pr <n>
+```
+
+Scrive `AAAAMMGG-<slug>.html` in `C:\Users\Nilo\orca\divario\bozze\` (WSL
+`/mnt/c/Users/Nilo/orca/divario/bozze/`) e aggiorna `index.html` (titolo, data,
+stato `da leggere`, `approvato` o `pubblicato`, link alla bozza e alla PR). Foglio
+di stile, font, immagini, grafici e CSV del dataset sono incorporati; gli script
+sono tolti. **Il merge, che e' la pubblicazione, avviene solo dopo che la bozza e'
+nell'indice e la direzione ha scritto l'ok.** Per portare lo stato a `approvato` o
+`pubblicato`: stesso comando con `--stato approvato`.
+
+La bozza serve anche a vedere cio' che i controlli non vedono. La prima, sui
+medici di famiglia, ha mostrato un grafico con le tre linee tutte grigie,
+la nota sopra le date e l'etichetta tagliata: lo script su misura non seguiva le
+posizioni fisse che il renderer dell'articolo si aspetta. I grafici si fanno con
+`scripts/trend_articles/figures.py`, non con un disegno scritto a mano, e si
+guardano nella bozza, a 375 e a 1100 px, prima di chiedere la review.
 
 ### 9. Pubblicazione
 

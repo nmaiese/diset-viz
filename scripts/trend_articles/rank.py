@@ -144,11 +144,10 @@ def interest_score(topic: dict, signals: list[dict], interest: dict, most_news: 
         "parts": {k: round(v, 2) for k, v in parts.items()},
         "news_7d": len(news),
         "google_trending": [s["term"] for s in trending],
-        "top_news": [s["title"] for s in top],
-        "istat": [s["title"] for s in istat],
+        "istat": [s.get("title", "") for s in istat],
         "trends": [{k: m.get(k) for k in ("query", "growth", "level_vs_anchor", "mean_7d")} for m in measured],
         "top_regions": top_regions,
-        "news_examples": [{"title": s["title"], "url": s["url"], "published": s["published"]} for s in news[:5]],
+        "news_examples": [{"url": s["url"], "published": s.get("published")} for s in news[:5]],
     }
 
 
