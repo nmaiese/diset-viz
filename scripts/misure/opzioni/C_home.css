@@ -1,0 +1,6 @@
+/* Opzione C: B più, SOLO in home, due blocchi nascosti (anteprima, non proposta di cancellazione).
+ * #territori «Regioni e province»: 137 link, tutti già raggiungibili da testata, dalle porte
+ *   («Le sezioni del sito» in cima) e dalla pagina /regioni e /province.
+ * #temi «Gli indicatori, tema per tema»: ripete le porte /temi e /atlante e le 20 regioni. */
+main.v1.v1-home #territori,
+main.v1.v1-home #temi { display: none; }

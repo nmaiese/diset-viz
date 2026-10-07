@@ -1,0 +1,20 @@
+/* Opzione B «larghezza e lettura»: contenitore da 1120 px, colonna di testo, ritmo unico.
+ * Colonna: dove la prosa è lunga (articolo, regione, scheda) la riga scende a ~60-70 caratteri.
+ * Ritmo: --space-section è il passo fra le sezioni (le zone ne usano metà per lato). */
+main.v1 {
+  --container: 1120px;
+  --container-wide: 1120px;
+  --container-atlas: 1120px;
+  --space-section: clamp(48px, 4vw, 64px);
+  --col-prosa: 52ch;
+}
+@media (max-width: 600px) {
+  main.v1 { --space-section: 36px; }
+}
+/* articolo: figli diretti del corpo (paragrafi, liste, titoli) */
+main.v1 .art-body > * { max-width: var(--col-prosa); }
+main.v1 .art-body > .figure { max-width: 42.5rem; }
+/* regione: la prosa del ritratto */
+main.v1 .v1-regione .prose, main.v1.v1-regione .prose { max-width: var(--col-prosa); }
+/* scheda: l'analisi ha già 38rem (608 px); si allinea alla stessa colonna */
+main.v1 .indicator-article { max-width: var(--col-prosa); }

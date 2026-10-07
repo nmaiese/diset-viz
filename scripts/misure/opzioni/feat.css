@@ -1,0 +1,8 @@
+/* Ripresa comune ad A, B e C: con il contenitore più stretto le due classifiche
+ * («prime dieci» e «ultime dieci») dell'indicatore in evidenza in home sforavano il riquadro
+ * di 24 px (A) o 47 px (B). Si toglie spazio a riempimenti e intercolonna, non contenuto. */
+@media (min-width: 960px) {
+  main.v1 .feat__level { padding-inline: var(--space-6); }
+  main.v1 .feat__pair { grid-template-columns: minmax(0, 4.4fr) minmax(0, 7.6fr); column-gap: var(--space-8); }
+}
+main.v1 .feat__cols { column-gap: var(--space-5); }

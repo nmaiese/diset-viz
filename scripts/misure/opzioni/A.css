@@ -1,0 +1,9 @@
+/* Opzione A «solo larghezza»: contenitore centrato da 1200 px.
+ * Si agisce sul token --container, che il sito già usa per .wrap e le sue varianti:
+ * nessuna regola di fondo, bordo o ombra, quindi nessuna fascia nuova.
+ * Lo scope è main, così testata e piede (fuori da main) leggono ancora 1440. */
+main.v1 {
+  --container: 1200px;
+  --container-wide: 1200px;
+  --container-atlas: 1200px;
+}
