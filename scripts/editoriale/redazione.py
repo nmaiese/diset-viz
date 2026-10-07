@@ -20,6 +20,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config" / "redazione.yaml"
+BOZZA_OUT = Path("/mnt/c/Users/Nilo/orca/divario/bozze")
 DEFAULT_PHASES = ("scout", "brief", "gate_a", "autore", "grafico", "guardia", "gate_b", "bozza")
 PHASE_LABEL = {"gate_a": "a", "gate_b": "b"}
 KEY_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -56,7 +57,7 @@ def _set_issue_label(issue: str, label: str, *, add: bool) -> None:
         raise RedazioneError(f"impossibile {verb} label {label}: {result.stderr.strip()}")
 
 
-def _update_pr_preview(worktree: Path, pr: int, html_path: Path, index_path: Path,
+def _update_pr_preview(worktree: Path, key: str, pr: int, html_path: Path, index_path: Path,
                        brief_hash: str, draft_hash: str) -> None:
     current = subprocess.run(["gh", "pr", "view", str(pr), "--json", "body", "--jq", ".body"],
                              cwd=worktree, capture_output=True, text=True, check=True)
@@ -64,10 +65,14 @@ def _update_pr_preview(worktree: Path, pr: int, html_path: Path, index_path: Pat
     body = current.stdout.rstrip()
     if marker in body:
         body = body.split(marker, 1)[0].rstrip()
-    signature = os.environ.get("AGENT_ID", "").strip() or "codex-gpt-6-luna"
+    workdir = worktree / "lavoro" / key
+    gate_a, _ = _parse_gate(workdir / "gate-a.md", "gate_a", brief_hash)
+    gate_b, _ = _parse_gate(workdir / "gate-b.md", "gate_b", draft_hash)
+    signature = os.environ.get("AGENT_ID", "").strip()
     block = (f"{marker}\n## Anteprima editoriale\nStato: da leggere\n"
-             f"Gate A: PASSA (SHA-256 `{brief_hash}`)\nGate B: PASSA (SHA-256 `{draft_hash}`)\n"
-             f"HTML locale: `{html_path}`\nIndice locale: `{index_path}`\n\n— {signature}")
+             f"Gate A: {gate_a} (SHA-256 `{brief_hash}`)\nGate B: {gate_b} (SHA-256 `{draft_hash}`)\n"
+             f"HTML locale: `{html_path}`\nIndice locale: `{index_path}`"
+             + (f"\n\n— {signature}" if signature else ""))
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".md", delete=False) as handle:
         handle.write((body + "\n\n" if body else "") + block + "\n")
         body_file = Path(handle.name)
@@ -94,16 +99,18 @@ def _memory_available_mb() -> int:
     raise RedazioneError("free -m non ha restituito la riga Mem:")
 
 
-def _terminal_alive(handle: str) -> bool:
+def _terminal_alive(handle: str) -> bool | None:
     try:
         result = subprocess.run(["orca-ide", "terminal", "list", "--json"], capture_output=True,
                                 text=True, timeout=15, check=False)
         payload = json.loads(result.stdout or "{}")
-        terminals = payload.get("result", {}).get("terminals", [])
+        terminals = payload.get("result", {}).get("terminals")
+        if result.returncode != 0 or payload.get("ok") is not True or not isinstance(terminals, list):
+            return None
         return any(t.get("handle") == handle and t.get("state") not in {"closed", "exited"}
                    for t in terminals)
-    except (OSError, ValueError, subprocess.TimeoutExpired):
-        return False
+    except (OSError, ValueError, TypeError, AttributeError, subprocess.TimeoutExpired):
+        return None
 
 
 def _parse_output(stdout: str, marker: str) -> str | None:
@@ -154,7 +161,7 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
         if not dated:
             raise RedazioneError(f"nessun articolo blog datato per {spec_path.parent.name}")
         day = dated.group(1).replace("-", "")
-        output_dir = Path("/mnt/c/Users/Nilo/orca/divario/bozze")
+        output_dir = BOZZA_OUT
         html_path = output_dir / f"{day}-{spec_path.parent.name}.html"
         index_path = output_dir / "index.html"
         registry_path = output_dir / "indice.json"
@@ -167,7 +174,7 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
         if completed.returncode == 0 and artifacts_ready:
             gate_a_hash = _hash(worktree / "lavoro" / spec_path.parent.name / "brief.md") or ""
             gate_b_hash = _hash(worktree / "lavoro" / spec_path.parent.name / "bozza.md") or ""
-            _update_pr_preview(worktree, int(drafts[0]["number"]), html_path, index_path,
+            _update_pr_preview(worktree, spec_path.parent.name, int(drafts[0]["number"]), html_path, index_path,
                                gate_a_hash, gate_b_hash)
             receipt = {"html": str(html_path), "html_sha256": _hash(html_path),
                        "index": str(index_path), "registry": str(registry_path),
@@ -189,6 +196,12 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
         raise RedazioneError(f"config senza modello per {phase['name']}")
     choice = choices[0]
     if choice["agent"] == "antigravity" and choice.get("model") and not _antigravity_model_matches(choice["model"]):
+        if len(choices) > 1:
+            fallback = dict(phase)
+            fallback["choices"] = choices[1:2]
+            progress(f"{phase['name']}: modello antigravity assente; provo seconda scelta una volta")
+            return _orca_launcher(fallback, spec_path, worktree=worktree, timeout=timeout,
+                                  clock=clock, sleep=sleep, progress=progress)
         raise RedazioneError("modello Antigravity della fase non coincide con settings.json; configurarlo prima del rilancio")
     launcher = os.environ.get("ORCA_LANCIA", str(Path.home() / "dev/dev-tools/scripts/orca-lancia.sh"))
     command = [launcher, "--agent", choice["agent"], "--worktree", worktree.name,
@@ -196,11 +209,35 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
     if choice.get("model") and choice["agent"] != "antigravity":
         command.extend(["--model", choice["model"]])
     started = clock()
-    completed = subprocess.run(command, cwd=worktree, capture_output=True, text=True,
-                               timeout=min(180, timeout), check=False)
+    launch_timeout = max(330, min(timeout, 330))
+    try:
+        completed = _run_launch_command(command, cwd=worktree, timeout=launch_timeout,
+                                        clock=clock, sleep=sleep, progress=progress,
+                                        phase_name=phase["name"])
+    except OSError:
+        if len(choices) > 1:
+            fallback = dict(phase)
+            fallback["choices"] = choices[1:2]
+            progress(f"{phase['name']}: prima scelta non disponibile; provo seconda scelta una volta")
+            return _orca_launcher(fallback, spec_path, worktree=worktree, timeout=timeout,
+                                  clock=clock, sleep=sleep, progress=progress)
+        raise
+    if completed is None:
+        progress(f"{phase['name']}: lancio ancora in attesa dopo {launch_timeout} secondi")
+        recovered = subprocess.run(["orca-ide", "terminal", "list", "--json"],
+                                   capture_output=True, text=True, timeout=20, check=False)
+        handle = _recover_terminal_handle(recovered.stdout, worktree.name)
+        return {"success": False, "terminal_handle": handle, "dispatch_id": None,
+                "model": choice.get("model"), "worker_state": "in corso" if handle else None,
+                "output": "timeout del lancio; verificato elenco terminali"}
     transcript = completed.stdout + "\n" + completed.stderr
     handle = _parse_output(transcript, "terminale")
     dispatch = _parse_output(transcript, "dispatch")
+    if completed.returncode != 0 and len(choices) > 1:
+        fallback = dict(phase)
+        fallback["choices"] = choices[1:2]
+        return _orca_launcher(fallback, spec_path, worktree=worktree, timeout=timeout,
+                              clock=clock, sleep=sleep, progress=progress)
     worker_state = None
     while dispatch and clock() - started < timeout:
         worker = subprocess.run(["orca-ide", "orchestration", "worker-show", "--dispatch", dispatch,
@@ -221,6 +258,45 @@ def _orca_launcher(phase: dict, spec_path: Path, *, worktree: Path, timeout: int
     return {"success": success, "terminal_handle": handle, "dispatch_id": dispatch,
             "model": choice.get("model"), "worker_state": worker_state,
             "output": transcript[-2000:]}
+
+
+def _run_launch_command(command: list[str], *, cwd: Path, timeout: int,
+                        clock: Callable[[], float], sleep: Callable[[float], None],
+                        progress: Callable[[str], None], phase_name: str):
+    """Attende orca-lancia senza terminarlo e mostra avanzamento ogni minuto."""
+    started = clock()
+    next_update = 60
+    with tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as stdout, \
+            tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as stderr:
+        process = subprocess.Popen(command, cwd=cwd, stdout=stdout, stderr=stderr, text=True)
+        while process.poll() is None:
+            elapsed = clock() - started
+            if elapsed >= timeout:
+                return None
+            if elapsed >= next_update:
+                progress(f"{phase_name}: lanciatore in corso da {int(elapsed // 60)} minuti")
+                next_update = (int(elapsed // 60) + 1) * 60
+            wait = min(1.0, timeout - elapsed, max(0.05, next_update - elapsed))
+            sleep(wait)
+        stdout.seek(0)
+        stderr.seek(0)
+        return subprocess.CompletedProcess(command, process.returncode, stdout.read(), stderr.read())
+
+
+def _recover_terminal_handle(payload_text: str, worktree_name: str) -> str | None:
+    try:
+        terminals = json.loads(payload_text).get("result", {}).get("terminals", [])
+    except (ValueError, AttributeError):
+        return None
+    def belongs(terminal: dict) -> bool:
+        values = (terminal.get("worktree"), terminal.get("worktree_name"), terminal.get("worktreePath"))
+        return any(isinstance(value, str) and value.replace("\\", "/").rstrip("/").split("/")[-1] == worktree_name
+                   for value in values)
+
+    matches = [t for t in terminals if isinstance(t, dict) and belongs(t)
+               and t.get("state") not in {"closed", "exited"} and t.get("connected") is not False
+               and t.get("handle")]
+    return matches[-1].get("handle") if matches else None
 
 
 def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: list[Path],
@@ -249,7 +325,8 @@ GATE_REQUIRED = {
 def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tuple[str, str]:
     text = path.read_text(encoding="utf-8")
     required = GATE_REQUIRED[phase]
-    missing = [field for field in required if field not in text]
+    missing = [field for field in required
+               if not any(re.match(rf"^{re.escape(field)}", line) for line in text.splitlines())]
     if missing:
         raise RedazioneError(f"{path.name} malformato: campi mancanti {', '.join(missing)}")
     hash_field = "Hash brief:" if phase == "gate_a" else "Hash bozza:"
@@ -258,10 +335,10 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
         raise RedazioneError(f"{path.name} malformato: {hash_field} deve contenere SHA-256")
     if expected_hash and recorded_hash.group(1).lower() != expected_hash.lower():
         raise RedazioneError(f"{path.name} non riferito al file corrente ({hash_field})")
-    outcome_match = re.search(r"^Esito:\s*(\S+)", text, re.MULTILINE)
+    outcome_match = re.search(r"^Esito:\s*(\S+)\s*$", text, re.MULTILINE)
     if not outcome_match:
         raise RedazioneError(f"{path.name} malformato: esito assente")
-    outcome = outcome_match.group(1).upper()
+    outcome = outcome_match.group(1)
     if phase == "gate_a" and outcome not in {"PASSA", "FERMO"}:
         raise RedazioneError(f"{path.name} malformato: esito {outcome}")
     if phase == "gate_b" and outcome not in {"PASSA", "RISCRIVERE", "FERMO"}:
@@ -274,16 +351,29 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
                 and not re.match(r"^\|\s*:?-{2,}", line)]
         if len(rows) < 6 or not any(re.search(r"\|\s*(sì|no)\s*\|", row, re.IGNORECASE) for row in rows[1:]):
             raise RedazioneError("gate-a.md malformato: tabella criteri senza almeno cinque righe di prova")
+        criteria = [re.search(r"\|\s*(sì|no)\s*\|", row, re.IGNORECASE).group(1).lower()
+                    for row in rows[1:] if re.search(r"\|\s*(sì|no)\s*\|", row, re.IGNORECASE)]
+        if len(criteria) != 5:
+            raise RedazioneError("gate-a.md malformato: servono esattamente cinque criteri valutati")
+        all_yes = all(value == "sì" for value in criteria)
+        if (outcome == "PASSA") != all_yes:
+            raise RedazioneError("gate-a.md incoerente: esito non corrisponde ai cinque criteri")
     else:
+        controls = {}
         for control in "TRLN":
             match = re.search(rf"^{control}:\s*(?:sì|no)\s*[—-]\s*(\S.+)$", text, re.MULTILINE | re.IGNORECASE)
             if not match:
                 raise RedazioneError(f"gate-b.md malformato: controllo {control} senza esito e citazione")
+            controls[control] = re.search(rf"^{control}:\s*(sì|no)", text, re.MULTILINE | re.IGNORECASE).group(1).lower()
         blockers = re.search(r"^Bloccanti:\s*(\d+)\s*$", text, re.MULTILINE)
         if not blockers:
             raise RedazioneError("gate-b.md malformato: conteggio bloccanti assente")
-        if outcome_match.group(1).upper() == "PASSA" and int(blockers.group(1)) != 0:
-            raise RedazioneError("gate-b.md malformato: PASSA con bloccanti")
+        all_yes = all(value == "sì" for value in controls.values())
+        vote_value = int(vote.group(1))
+        pass_conditions = all_yes and vote_value >= 4 and int(blockers.group(1)) == 0
+        if ((outcome == "PASSA") != pass_conditions
+                or (outcome in {"RISCRIVERE", "FERMO"} and all_yes and vote_value == 5)):
+            raise RedazioneError("gate-b.md incoerente: esito non corrisponde a controlli, voto e bloccanti")
     return outcome, vote.group(1) if vote else ""
 
 
@@ -310,7 +400,7 @@ def _bridge(bridge_dir: Path, key: str, gate: str, reason: str, files: list[str]
     stamp = now.strftime("%Y%m%d-%H%M%S")
     path = bridge_dir / f"{stamp}-cdiv-a-cowork-gate-{gate}-{key}.md"
     path.write_text(
-        "---\nper: cowork-direzione\nda: C-DIV\nprogetto: divarioitalia\ntipo: info\npriorita: normale\n---\n\n"
+        "per: cowork-direzione | da: C-DIV | progetto: divarioitalia | tipo: info | priorita: normale\n\n"
         f"Gate {gate.upper()} bloccato per {key}.\n\nMotivo: {reason}\n\n"
         f"File: {', '.join(files)}\n\nRipresa: `{command}`\n", encoding="utf-8")
     return path
@@ -370,18 +460,24 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
     except (OSError, ValueError) as exc:
         return Result(1, f"stato.json non valido: {exc}")
     for record in state.get("phases", {}).values():
-        if record.get("status") == "in corso":
-            if not record.get("handle"):
-                return Result(1, f"fase {state.get('current_phase')} in corso senza handle; verificare Orca prima di riprendere")
-            if terminal_alive(record["handle"]):
-                return Result(1, f"fase {state.get('current_phase')} già in corso sul terminale {record['handle']}")
+        if record.get("status") != "in corso":
+            continue
+        if not record.get("handle"):
+            return Result(1, f"fase {state.get('current_phase')} in corso senza handle; verificare Orca prima di riprendere")
+        alive = terminal_alive(record["handle"])
+        if alive is None:
+            return Result(1, f"fase {state.get('current_phase')} in corso; stato terminale sconosciuto, Orca non interrogabile: verificare prima di riprendere")
+        if alive:
+            return Result(1, f"fase {state.get('current_phase')} già in corso sul terminale {record['handle']}")
 
     selected = [only] if only else names[names.index(from_phase):] if from_phase else names[:]
     if dry_run:
-        phase = phases[names.index(selected[0])]
-        first_inputs = [workdir / str(p) for p in phase.get("input", [])]
-        absent = [str(p) for p in first_inputs if not p.is_file()
-                  and not (p.name == "brief_iniziale.md" and (workdir / "brief.md").is_file())]
+        absent = []
+        for selected_name in selected:
+            phase = phases[names.index(selected_name)]
+            inputs = [workdir / str(p) for p in phase.get("input", [])]
+            absent.extend(str(p) for p in inputs if not p.is_file()
+                          and not (p.name == "brief_iniziale.md" and (workdir / "brief.md").is_file()))
         plan = [f"{p['name']}: {p.get('role')} {p.get('choices', [])} input={p.get('input', [])} output={p.get('output', [])}"
                 for p in phases if p["name"] in selected]
         progress("\n".join(plan))
@@ -413,6 +509,15 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                 return Result(1, str(exc))
         state["gate_a_sha"] = None
         state.setdefault("phases", {}).setdefault("gate_a", {})["status"] = "da rifare"
+    current_draft_sha = _hash(workdir / "bozza.md")
+    if state.get("gate_b_sha") and current_draft_sha and state["gate_b_sha"] != current_draft_sha:
+        if issue != "non registrata":
+            try:
+                labeler(issue, "gate-b", False)
+            except RedazioneError as exc:
+                return Result(1, str(exc))
+        state["gate_b_sha"] = None
+        state.setdefault("phases", {}).setdefault("gate_b", {})["status"] = "da rifare"
     config_root = config_path.parent
     i = 0
     while i < len(selected):
@@ -437,6 +542,12 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
         input_hashes = {str(p.relative_to(worktree)): _hash(p) for p in input_files}
         output_files = [workdir / str(item) for item in phase.get("output", [])]
         output_hashes = {str(p.relative_to(worktree)): _hash(p) for p in output_files}
+        output_dates = {str(p.relative_to(worktree)): p.stat().st_mtime_ns if p.is_file() else None
+                        for p in output_files}
+        head_before = _head_sha(worktree)
+        record["prelaunch_output_hashes"] = output_hashes
+        record["prelaunch_output_dates"] = output_dates
+        record["prelaunch_commit"] = head_before
         gate_sha_changed = ((name == "gate_a" and state.get("gate_a_sha") != _hash(workdir / "brief.md"))
                             or (name == "gate_b" and state.get("gate_b_sha") != _hash(workdir / "bozza.md")))
         if (record.get("status") == "riuscita"
@@ -486,6 +597,13 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
         record.update({"handle": result.get("terminal_handle"), "dispatch_id": result.get("dispatch_id"),
                        "model_effective": result.get("model"), "result": result.get("worker_state"),
                        "output": result.get("output")})
+        output_changed = any(
+            p.is_file() and (
+                _hash(p) != output_hashes[str(p.relative_to(worktree))]
+                or p.stat().st_mtime_ns != output_dates[str(p.relative_to(worktree))]
+            ) for p in output_files
+        )
+        head_after = _head_sha(worktree)
         if not result.get("success") or any(not p.is_file() for p in output_files):
             active = bool(result.get("terminal_handle") and result.get("worker_state") not in
                           {"succeeded", "failed", "stopped", "stop_unknown"})
@@ -493,6 +611,10 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                            "finished_at": datetime.now().astimezone().isoformat()})
             _atomic_json(state_path, state)
             return Result(1, f"{name}: fase {'ancora attiva' if active else 'fallita o file di uscita mancante'}")
+        if not output_changed and head_after == head_before:
+            record.update({"status": "fallita", "finished_at": datetime.now().astimezone().isoformat()})
+            _atomic_json(state_path, state)
+            return Result(1, f"{name}: fallita: output non aggiornato")
         record.update({"status": "riuscita", "output_hashes": {str(p.relative_to(worktree)): _hash(p) for p in output_files},
                        "commit_sha": _head_sha(worktree),
                        "finished_at": datetime.now().astimezone().isoformat()})
@@ -503,8 +625,16 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                 target = workdir / ("brief.md" if name == "gate_a" else "bozza.md")
                 outcome, vote = _parse_gate(_gate_file(workdir, name), name, _hash(target))
             except (OSError, RedazioneError) as exc:
+                attempts = int(record.get("malformed_attempts", 0)) + 1
+                record["malformed_attempts"] = attempts
                 record["status"] = "fallita"
                 _atomic_json(state_path, state)
+                if attempts >= 2:
+                    _bridge(bridge_dir, key, PHASE_LABEL[name], f"gate malformato al tentativo {attempts}: {exc}",
+                            [p.name for p in output_files],
+                            f"bin/py -m scripts.editoriale.redazione {key} --da {name}",
+                            datetime.now().astimezone())
+                    return Result(3, f"gate malformato due volte; messaggio scritto nel ponte: {exc}")
                 return Result(1, str(exc))
             negative = (outcome == "FERMO") if name == "gate_a" else (outcome != "PASSA" or int(vote) < 4)
             if negative:
@@ -536,6 +666,13 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                         return Result(1, str(exc))
             else:
                 state["gate_b_sha"] = _hash(workdir / "bozza.md")
+                if issue != "non registrata":
+                    try:
+                        labeler(issue, "gate-b", True)
+                    except RedazioneError as exc:
+                        record["status"] = "fallita"
+                        _atomic_json(state_path, state)
+                        return Result(1, str(exc))
         i += 1
     state["current_phase"] = None
     _atomic_json(state_path, state)
