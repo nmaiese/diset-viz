@@ -199,9 +199,27 @@ class RedazioneTests(unittest.TestCase):
             first = FakeLauncher(work / "lavoro" / "demo", failures=["brief"])
             self.assertEqual(self.run_case(root, work, cfg, first).exit_code, 1)
             second = FakeLauncher(work / "lavoro" / "demo")
-            self.assertEqual(self.run_case(root, work, cfg, second).exit_code, 0)
+            self.assertEqual(self.run_case(root, work, cfg, second,
+                                           terminal_alive=lambda _handle: False).exit_code, 0)
             self.assertNotIn("scout", second.calls)
             self.assertEqual(second.calls[0], "brief")
+
+    def test_run_redazione_passa_ripiego_al_launcher(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = self.setup_case(tmp)
+            cfg["phases"][0]["choices"] = [
+                {"agent": "codex", "model": "gpt-6-luna"},
+                {"agent": "claude", "model": "haiku"},
+            ]
+            actual = FakeLauncher(work / "lavoro" / "demo")
+            choices_seen = []
+
+            def launcher(phase, spec_path):
+                choices_seen.append(phase["choices"])
+                return actual(phase, spec_path)
+
+            self.assertEqual(self.run_case(root, work, cfg, launcher, only="scout").exit_code, 0)
+            self.assertEqual(choices_seen, [cfg["phases"][0]["choices"]])
 
     def test_rifiuta_ram_sotto_soglia(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -294,8 +312,8 @@ class RedazioneTests(unittest.TestCase):
     def test_secondo_gate_malformato_scrive_ponte_e_blocca(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = self.setup_case(tmp)
-            for _ in range(2):
-                launcher = FakeLauncher(work / "lavoro/demo", gates=["gate incompleto"])
+            for attempt in range(2):
+                launcher = FakeLauncher(work / "lavoro/demo", gates=[f"gate incompleto {attempt}"])
                 result = self.run_case(root, work, cfg, launcher, only="gate_a")
             self.assertEqual(result.exit_code, 3)
             self.assertIn("due volte", result.message)

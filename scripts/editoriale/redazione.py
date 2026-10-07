@@ -390,7 +390,7 @@ def _phase_choice(phase: dict, state: dict) -> dict:
             or (phase["name"] == "gate_b" and state.get("rewrite_rounds", 0) > 1)):
         index = 1
     selected = dict(phase)
-    selected["choices"] = [choices[min(index, len(choices) - 1)]]
+    selected["choices"] = choices[min(index, len(choices) - 1):]
     return selected
 
 
