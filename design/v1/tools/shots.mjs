@@ -30,6 +30,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const V1 = resolve(HERE, "..");
 const CHROME = process.env.CHROME || "/usr/bin/google-chrome";
 const PROD = "https://divarioitalia.it";
+const CHECK_UA = "DivarioCheck/1.0";
 
 // Le pagine di esempio: stesse chiavi dei prototipi in dist/pagine.
 const PAGES = {
@@ -124,6 +125,7 @@ async function openPage(cdp, { viewport, theme, blocked, initScript }) {
   await s("Page.enable");
   await s("Runtime.enable");
   await s("Network.enable");
+  await s("Network.setUserAgentOverride", { userAgent: CHECK_UA });
   if (blocked) await s("Network.setBlockedURLs", { urls: blocked });
   await s("Emulation.setDeviceMetricsOverride", viewport);
   const motion = process.env.MOTION === "no-preference" ? "no-preference" : "reduce";
@@ -309,7 +311,7 @@ async function giro(base, outDir, paths) {
   const cdp = await launch();
   const report = [];
   const theme = process.env.THEME === "dark" ? "dark" : "light";
-  const blocked = process.env.BLOCK ? BLOCKED : undefined;
+  const blocked = BLOCKED;
   let problems = 0;
   try {
     for (const path of paths) {
@@ -525,7 +527,7 @@ if (mode === "prima") {
     for (const w of widths.split(",")) {
       const viewport = { width: Number(w), height: Number(w) > 600 ? 900 : 800, deviceScaleFactor: Number(w) > 600 ? 1 : 2, mobile: Number(w) <= 600 };
       const initScript = "document.documentElement.dataset.shot='1'" + (process.env.FONT ? `;document.documentElement.dataset.font=${JSON.stringify(process.env.FONT)}` : "");
-      const info = await capture(cdp, url, { viewport, theme: process.env.THEME || "light", initScript }, `${prefix}-${w}`);
+      const info = await capture(cdp, url, { viewport, theme: process.env.THEME || "light", blocked: BLOCKED, initScript }, `${prefix}-${w}`);
       console.log(`${prefix} ${w}: ${info.h}px`);
     }
   } finally { cdp.close(); }

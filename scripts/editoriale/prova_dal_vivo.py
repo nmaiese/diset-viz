@@ -17,7 +17,7 @@ import frontmatter
 import requests
 
 ROOT = Path(__file__).resolve().parents[2]
-HEADERS = {"User-Agent": "Mozilla/5.0"}
+HEADERS = {"User-Agent": "DivarioCheck/1.0"}
 
 
 @dataclass(frozen=True)
