@@ -4,7 +4,7 @@ seo_title: "Medici di famiglia con più di 1500 assistiti: cosa dice il dato per
 slug: medici-di-famiglia-regioni
 description: "Nel 2023 il 74,0% dei medici di famiglia lombardi supera i 1500 assistiti, il 21,6% dei molisani. Da solo il numero non basta a dire come si cura una regione."
 date: 2026-10-07
-draft: false
+draft: true
 tags:
 - Sanità
 - Servizi
@@ -22,11 +22,12 @@ cover_credit:
 dataset:
   name: Medici di famiglia con più di 1500 assistiti, dimissioni fuori regione e fila allo sportello ASL, 2023
   description: Per le venti regioni, la quota di medici di medicina generale con più di 1500 assistiti, la quota di dimissioni ospedaliere dei residenti avvenute fuori regione e la quota di utenti ASL con una fila oltre 20 minuti e le persone ogni mille che hanno usato il pronto soccorso negli ultimi tre mesi, tutte del 2023, più la quota di chi rinuncia a visite o esami per la sola Sardegna e il valore dell'Italia nel 2004 e nel 2023.
-  method: Valori Istat senza rielaborazione, celle regionali del 2023. Il Trentino-Alto Adige è un aggregato di due province. Gli indici di Spearman citati nel testo sono calcolati sui ranghi delle venti regioni, con i ranghi medi in caso di parità, e sono un'osservazione esplorativa, non una prova.
+  method: Valori Istat senza rielaborazione dalle serie Bes e dall'indagine Multiscopo Aspetti della vita quotidiana per fila ASL e pronto soccorso, celle regionali del 2023. Il Trentino-Alto Adige è un aggregato di due province. Gli indici di Spearman citati nel testo sono calcolati sui ranghi delle venti regioni, con i ranghi medi in caso di parità, e sono un'osservazione esplorativa, non una prova.
   temporal: 2004/2023
   spatial: Italia, regioni
   creator: Istat
   source_url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
+  multiscopo_source_url: https://esploradati.istat.it/databrowser/#/it
   download: /static/data/articles/medici-di-famiglia-regioni.csv
 external_figures:
 - value: "74,0"
@@ -83,20 +84,20 @@ external_figures:
   url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
 - value: "-0,55"
   what: indice di Spearman fra quota di medici oltre soglia e quota di utenti ASL con fila oltre 20 minuti, 20 regioni, 2023
-  source: Istat, Bes, appendice statistica, aggiornamento intermedio 2026, elaborazione Divario Italia
-  url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
+  source: Istat, Bes e indagine Multiscopo Aspetti della vita quotidiana, elaborazione Divario Italia
+  url: https://esploradati.istat.it/databrowser/#/it
 - value: "-0,51"
   what: stesso indice senza Lombardia e Molise, 18 regioni, 2023
-  source: Istat, Bes, appendice statistica, aggiornamento intermedio 2026, elaborazione Divario Italia
-  url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
+  source: Istat, Bes e indagine Multiscopo Aspetti della vita quotidiana, elaborazione Divario Italia
+  url: https://esploradati.istat.it/databrowser/#/it
 - value: "0,42"
   what: indice di Spearman fra quota di medici oltre soglia e uso del pronto soccorso, 20 regioni, 2023
-  source: Istat, Bes, appendice statistica, aggiornamento intermedio 2026, elaborazione Divario Italia
-  url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
+  source: Istat, Bes e indagine Multiscopo Aspetti della vita quotidiana, elaborazione Divario Italia
+  url: https://esploradati.istat.it/databrowser/#/it
 - value: "0,36"
   what: stesso indice senza Lombardia e Molise, 18 regioni, 2023
-  source: Istat, Bes, appendice statistica, aggiornamento intermedio 2026, elaborazione Divario Italia
-  url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
+  source: Istat, Bes e indagine Multiscopo Aspetti della vita quotidiana, elaborazione Divario Italia
+  url: https://esploradati.istat.it/databrowser/#/it
 - value: "15,8"
   what: quota di medici di medicina generale con più di 1500 assistiti in Italia, 2004
   source: Istat, Bes, appendice statistica, aggiornamento intermedio 2026
@@ -133,7 +134,7 @@ Sulle venti regioni nel 2023 la relazione c'è e va nello stesso senso. Dove pi�
 
 Nel 2023 il 60,6% dei medici di famiglia [sardi](/regione/sardegna) superava i 1500 assistiti, più di ogni altra regione del Mezzogiorno. Per queste misure la Sardegna non segue una semplice divisione fra Nord e Sud, e non va oltre. E sulle dimissioni fuori regione la Sardegna sta con la Lombardia: il 7,1%.
 
-Ma circa una persona su sette, il 13,7%, ha dichiarato di aver rinunciato a una visita o a un esame di cui aveva bisogno. È la quota più alta fra le venti regioni. Il motivo può essere economico, di scomodità o una lista d'attesa lunga, e l'indagine non li separa. È un dato regionale, non il caso di una persona. Perché sia così, i dati non lo dicono.
+Ma circa una persona su sette ha dichiarato di aver rinunciato a una visita o a un esame di cui aveva bisogno. È la quota più alta fra le venti regioni. Il motivo può essere economico, di scomodità o una lista d'attesa lunga, e l'indagine non li separa. È un dato regionale, non il caso di una persona. Perché sia così, i dati non lo dicono.
 
 Sulle venti regioni, la quota di chi rinuncia non mostra nessun ordinamento comune evidente con quella dei medici oltre soglia.
 
