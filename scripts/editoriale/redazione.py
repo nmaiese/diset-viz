@@ -370,9 +370,11 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
                 rows.append(cells)
         if len(rows) != 5:
             raise RedazioneError("gate-a.md malformato: servono esattamente cinque criteri valutati")
-        for criterion, result, evidence, _limit in rows:
+        for criterion, result, evidence, limit in rows:
             if result.lower() not in {"sì", "no"} or len(evidence) < 18 or evidence.lower() in {"prova", "ok", "sì", "no", "dato verificato"}:
                 raise RedazioneError(f"gate-a.md malformato: prova non verificabile per criterio {criterion}")
+            if len(limit) < 5:
+                raise RedazioneError(f"gate-a.md malformato: limite assente per criterio {criterion}")
         all_yes = all(row[1].lower() == "sì" for row in rows)
         if (outcome == "PASSA") != all_yes:
             raise RedazioneError("gate-a.md incoerente: esito non corrisponde ai cinque criteri")
@@ -463,7 +465,7 @@ def _validate_gate_a_v3(text: str) -> None:
         if (len(chart_parts) < 3 or any(len(part) < 8 for part in chart_parts[:2])
                 or chart_parts[-1] not in valid_urls):
             raise RedazioneError("gate-a.md malformato: grafico deve indicare variabile, periodo e URL fonte verificata")
-        if len({row[0] for row in sources}) < 3:
+        if len({row[0].casefold() for row in sources}) < 3:
             raise RedazioneError("gate-a.md malformato: le tre fonti blog devono provenire da istituzioni distinte")
 
 

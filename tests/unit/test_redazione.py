@@ -394,6 +394,16 @@ class GateParserTests(unittest.TestCase):
         esito, _ = self.parse(gate_a("PASSA"))
         self.assertEqual(esito, "PASSA")
 
+    def test_gate_a_v3_rifiuta_limite_vuoto(self):
+        text = gate_a("PASSA").replace("| copertura regionale |", "| |")
+        with self.assertRaisesRegex(redazione.RedazioneError, "limite"):
+            self.parse(text)
+
+    def test_gate_a_v3_rifiuta_istituzioni_duplicate_con_maiuscole_diverse(self):
+        text = gate_a("PASSA").replace("| Eurostat |", "| ISTAT |")
+        with self.assertRaisesRegex(redazione.RedazioneError, "istituzioni distinte"):
+            self.parse(text)
+
     def test_gate_a_v3_ferma_se_mancano_fonti_grafico_o_date(self):
         casi = (
             gate_a("PASSA").replace("| Istat | 2026-09-12 | https://istat.example/dato | dato 2025 | sì |\n| Ministero | 2026-08-10 | https://ministero.example/rapporto | rapporto servizi | sì |\n| Eurostat | 2026-07-01 | https://ec.europa.example/serie | serie comparabile | sì |\n", ""),
