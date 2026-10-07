@@ -34,6 +34,7 @@ function arg(name, fallback) {
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
 }
 const BASE = arg("--base", process.env.BASE || "http://127.0.0.1:5050");
+const ANALYTICS_HOSTS = ["googletagmanager.com", "google-analytics.com", "googlesyndication.com", "doubleclick.net"];
 const PAGES = arg("--pagine", [
   "/", "/atlante", "/confronto", "/regioni", "/regione/campania", "/province", "/provincia/lecce",
   "/temi", "/tema/lavoro-e-conciliazione", "/indicatore/tasso-di-turisticita/ter-105",
@@ -78,7 +79,12 @@ async function stack(page) {
 }
 
 async function audit(browser, vp) {
-  const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: true, hasTouch: true });
+  const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: true, hasTouch: true, userAgent: "DivarioCheck/1.0" });
+  await context.route("**/*", (route) => {
+    const host = new URL(route.request().url()).hostname;
+    return ANALYTICS_HOSTS.some((domain) => host === domain || host.endsWith(`.${domain}`))
+      ? route.abort() : route.continue();
+  });
   const page = await context.newPage();
   const out = [];
   for (const path of PAGES) {

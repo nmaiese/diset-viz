@@ -3,15 +3,29 @@
 Uso: uv run --with playwright python shot_figura.py <url> <cartella>
 """
 import sys
+from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
+
+ANALYTICS_HOSTS = ("googletagmanager.com", "google-analytics.com", "googlesyndication.com", "doubleclick.net")
+
+
+def _route(route):
+    host = urlsplit(route.request.url).hostname or ""
+    if any(host == domain or host.endswith("." + domain) for domain in ANALYTICS_HOSTS):
+        route.abort()
+    else:
+        route.continue_()
+
 
 url, out = sys.argv[1], sys.argv[2]
 with sync_playwright() as p:
     browser = p.chromium.launch(channel="chrome", headless=True)
     for tema in ("light", "dark"):
         for w in (375, 768):
-            page = browser.new_page(viewport={"width": w, "height": 900}, color_scheme=tema)
+            context = browser.new_context(viewport={"width": w, "height": 900}, color_scheme=tema, user_agent="DivarioCheck/1.0")
+            context.route("**/*", _route)
+            page = context.new_page()
             page.goto(url, wait_until="networkidle")
             fig = page.locator("figure.scatter-figure").first
             n = fig.count()
@@ -27,5 +41,5 @@ with sync_playwright() as p:
                 box, punti, cap = None, 0, ""
             print(f"{w}px {tema}: figure={n} punti={punti} scrollWidth={larghezza} data-theme={tema_html} box={box and (round(box['width']), round(box['height']))}")
             print(f"   {cap}")
-            page.close()
+            context.close()
     browser.close()
