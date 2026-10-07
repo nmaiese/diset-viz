@@ -342,7 +342,7 @@ vede: che la definizione dell'indicatore sia detta giusta
 la notizia e il dato non sia forzato, che nessuna causa sia attribuita a un
 dato che non la mostra.
 
-### 8bis. Redazione in sequenza
+### 8ter. Redazione in sequenza (orchestratore)
 
 Per un pezzo già aperto con `pezzo apri`, il coordinatore può eseguire la
 catena sequenziale con `bin/py -m scripts.editoriale.redazione <chiave>`.
