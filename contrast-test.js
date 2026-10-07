@@ -335,7 +335,7 @@ async function runTest(page, pageName, url) {
     colorScheme: 'dark',
     userAgent: 'DivarioCheck/1.0'
   });
-  await context.route(/^https?:\/\/(?:[^/]+\.)?(?:googletagmanager|google-analytics|googlesyndication)\.com(?:[/:?#]|$)/i, route => route.abort());
+  await context.route(/^https?:\/\/(?:[^/]+\.)?(?:(?:googletagmanager|google-analytics|googlesyndication)\.com|doubleclick\.net)(?:[/:?#]|$)/i, route => route.abort());
   
   const results = {};
   

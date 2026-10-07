@@ -127,7 +127,7 @@ async function runTest(name, filterType, filterValue, page) {
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ userAgent: 'DivarioCheck/1.0' });
-  await page.route(/^https?:\/\/(?:[^/]+\.)?(?:googletagmanager|google-analytics|googlesyndication)\.com(?:[/:?#]|$)/i, route => route.abort());
+  await page.route(/^https?:\/\/(?:[^/]+\.)?(?:(?:googletagmanager|google-analytics|googlesyndication)\.com|doubleclick\.net)(?:[/:?#]|$)/i, route => route.abort());
   
   await page.goto('https://divarioitalia.it/regione/molise', { waitUntil: 'networkidle' });
   await page.addStyleTag({ content: PROPOSTA_CSS });

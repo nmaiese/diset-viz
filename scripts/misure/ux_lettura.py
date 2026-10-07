@@ -21,7 +21,7 @@ BASE = "https://divarioitalia.it"
 OUT = Path("/mnt/c/Users/Nilo/orca/direzione/ux-lettura/fase1")
 UA = "DivarioCheck/1.0"
 TRACKING_URL = re.compile(
-    r"^https?://(?:[^/]+\.)?(?:googletagmanager|google-analytics|googlesyndication)\.com(?:[:/?#]|$)",
+    r"^https?://(?:[^/]+\.)?(?:(?:googletagmanager|google-analytics|googlesyndication)\.com|doubleclick\.net)(?:[:/?#]|$)",
     re.I,
 )
 
