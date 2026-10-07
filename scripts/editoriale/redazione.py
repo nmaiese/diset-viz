@@ -24,6 +24,7 @@ BOZZA_OUT = Path("/mnt/c/Users/Nilo/orca/divario/bozze")
 DEFAULT_PHASES = ("scout", "brief", "gate_a", "autore", "grafico", "guardia", "gate_b", "bozza")
 PHASE_LABEL = {"gate_a": "a", "gate_b": "b"}
 KEY_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+GATE_A_CONTRACT_VERSION = "v3"
 
 
 @dataclass
@@ -313,9 +314,11 @@ def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: li
 # I campi che il parser pretende. I template in `config/redazione/gate_*.md` li riportano
 # tutti, in forma di scheletro da compilare: un test tiene allineati i due elenchi.
 GATE_REQUIRED = {
-    "gate_a": ["SHA brief:", "Hash brief:", "Autore/modello:", "Giudice/modello:",
-               "Domanda:", "Tesi:", "Codici e confronto:", "| criterio |", "Esito:",
-               "Motivo:", "Correzione:", "Destinatario:", "Data:"],
+    "gate_a": ["Contratto:", "Tipo pezzo:", "SHA brief:", "Hash brief:", "Autore/modello:",
+               "Giudice/modello:", "Domanda:", "Angoli verificati:", "Tesi:", "Codici e confronto:",
+               "Ultimo dato:", "Data fonte del dato:", "URL fonte del dato:",
+               "Ruolo indicatori interni:", "Fonti esterne verificate:", "Grafico con dati esterni:",
+               "| criterio |", "Esito:", "Motivo:", "Correzione:", "Destinatario:", "Data:"],
     "gate_b": ["SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
                "Controllo anti-invenzione:", "Bloccanti:", "Voto:", "Motivo:",
                "Rilievi localizzati:", "Giri:", "Esito:"],
@@ -347,15 +350,30 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
     if phase == "gate_b" and not vote:
         raise RedazioneError("gate-b.md malformato: voto 1-5 assente")
     if phase == "gate_a":
-        rows = [line for line in text.splitlines() if line.startswith("|") and line.count("|") >= 4
-                and not re.match(r"^\|\s*:?-{2,}", line)]
-        if len(rows) < 6 or not any(re.search(r"\|\s*(sì|no)\s*\|", row, re.IGNORECASE) for row in rows[1:]):
-            raise RedazioneError("gate-a.md malformato: tabella criteri senza almeno cinque righe di prova")
-        criteria = [re.search(r"\|\s*(sì|no)\s*\|", row, re.IGNORECASE).group(1).lower()
-                    for row in rows[1:] if re.search(r"\|\s*(sì|no)\s*\|", row, re.IGNORECASE)]
-        if len(criteria) != 5:
+        if _field(text, "Contratto") != GATE_A_CONTRACT_VERSION:
+            raise RedazioneError(f"gate-a.md usa contratto diverso da {GATE_A_CONTRACT_VERSION}")
+        _validate_gate_a_v3(text)
+        lines = text.splitlines()
+        header = next((i for i, line in enumerate(lines) if line.strip().lower() == "| criterio | esito | prova verificabile | limite |"), None)
+        if header is None:
+            raise RedazioneError("gate-a.md malformato: intestazione tabella criteri v3 assente")
+        rows = []
+        for line in lines[header + 1:]:
+            if not line.startswith("|"):
+                if rows:
+                    break
+                continue
+            if re.match(r"^\|\s*:?-{2,}", line):
+                continue
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            if len(cells) == 4:
+                rows.append(cells)
+        if len(rows) != 5:
             raise RedazioneError("gate-a.md malformato: servono esattamente cinque criteri valutati")
-        all_yes = all(value == "sì" for value in criteria)
+        for criterion, result, evidence, _limit in rows:
+            if result.lower() not in {"sì", "no"} or len(evidence) < 18 or evidence.lower() in {"prova", "ok", "sì", "no", "dato verificato"}:
+                raise RedazioneError(f"gate-a.md malformato: prova non verificabile per criterio {criterion}")
+        all_yes = all(row[1].lower() == "sì" for row in rows)
         if (outcome == "PASSA") != all_yes:
             raise RedazioneError("gate-a.md incoerente: esito non corrisponde ai cinque criteri")
     else:
@@ -375,6 +393,78 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
                 or (outcome in {"RISCRIVERE", "FERMO"} and all_yes and vote_value == 5)):
             raise RedazioneError("gate-b.md incoerente: esito non corrisponde a controlli, voto e bloccanti")
     return outcome, vote.group(1) if vote else ""
+
+
+def _field(text: str, name: str) -> str:
+    match = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE | re.IGNORECASE)
+    return match.group(1).strip() if match else ""
+
+
+def _validate_gate_a_v3(text: str) -> None:
+    piece_type = _field(text, "Tipo pezzo").lower()
+    if piece_type not in {"blog", "scheda indicatore"}:
+        raise RedazioneError("gate-a.md malformato: Tipo pezzo deve essere blog o scheda indicatore")
+    latest = _field(text, "Ultimo dato")
+    if not re.search(r"\b(?:19|20)\d{2}\b", latest):
+        raise RedazioneError("gate-a.md malformato: Ultimo dato deve indicare anno o periodo")
+    source_date = _field(text, "Data fonte del dato")
+    try:
+        datetime.strptime(source_date, "%Y-%m-%d")
+    except ValueError as exc:
+        raise RedazioneError("gate-a.md malformato: Data fonte del dato deve essere YYYY-MM-DD") from exc
+    source_url = _field(text, "URL fonte del dato")
+    if not source_url.startswith("https://"):
+        raise RedazioneError("gate-a.md malformato: URL fonte del dato deve essere HTTPS")
+    angles = [angle.strip() for angle in _field(text, "Angoli verificati").split(";") if len(angle.strip()) >= 12]
+    if piece_type == "blog" and len(angles) < 2:
+        raise RedazioneError("gate-a.md malformato: blog richiede almeno due angoli verificati")
+    internal_role = _field(text, "Ruolo indicatori interni").lower()
+    role_ok = ("base" in internal_role and "tassello" in internal_role) if piece_type == "blog" else (
+        "spieg" in internal_role and "contesto" in internal_role)
+    if not role_ok:
+        raise RedazioneError("gate-a.md malformato: ruolo indicatori interni non rispetta il tipo pezzo")
+
+    lines = text.splitlines()
+    heading = next((i for i, line in enumerate(lines)
+                    if line.strip().lower() == "| istituzione | data fonte | url aperto | dato o claim | verificata |"), None)
+    if heading is None:
+        raise RedazioneError("gate-a.md malformato: tabella fonti esterne assente")
+    sources = []
+    for line in lines[heading + 1:]:
+        if not line.startswith("|"):
+            if sources:
+                break
+            continue
+        if re.match(r"^\|\s*:?-{2,}", line):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) == 5:
+            sources.append(cells)
+    minimum = 3 if piece_type == "blog" else 1
+    valid_urls = set()
+    source_dates = {}
+    for institution, published, url, claim, verified in sources:
+        try:
+            datetime.strptime(published, "%Y-%m-%d")
+        except ValueError as exc:
+            raise RedazioneError("gate-a.md malformato: ogni fonte esterna richiede data YYYY-MM-DD") from exc
+        if (len(institution) < 3 or not url.startswith("https://") or not claim.strip()
+                or verified.lower() not in {"sì", "si"}):
+            raise RedazioneError("gate-a.md malformato: fonte esterna senza istituzione, URL aperto, claim e verifica")
+        valid_urls.add(url)
+        source_dates[url] = published
+    if len(valid_urls) < minimum:
+        raise RedazioneError(f"gate-a.md malformato: {piece_type} richiede almeno {minimum} fonti esterne verificate")
+    if source_url not in valid_urls or source_dates.get(source_url) != source_date:
+        raise RedazioneError("gate-a.md malformato: data e URL fonte del dato devono corrispondere alla fonte verificata")
+    chart = _field(text, "Grafico con dati esterni")
+    if piece_type == "blog":
+        chart_parts = [part.strip() for part in chart.split(";")]
+        if (len(chart_parts) < 3 or any(len(part) < 8 for part in chart_parts[:2])
+                or chart_parts[-1] not in valid_urls):
+            raise RedazioneError("gate-a.md malformato: grafico deve indicare variabile, periodo e URL fonte verificata")
+        if len({row[0] for row in sources}) < 3:
+            raise RedazioneError("gate-a.md malformato: le tre fonti blog devono provenire da istituzioni distinte")
 
 
 def _gate_file(workdir: Path, phase: str) -> Path:
@@ -509,6 +599,16 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                 return Result(1, str(exc))
         state["gate_a_sha"] = None
         state.setdefault("phases", {}).setdefault("gate_a", {})["status"] = "da rifare"
+    gate_a_record = state.setdefault("phases", {}).setdefault("gate_a", {})
+    if (gate_a_record.get("status") == "riuscita"
+            and state.get("gate_a_contract_version") != GATE_A_CONTRACT_VERSION):
+        if issue != "non registrata" and state.get("gate_a_sha"):
+            try:
+                labeler(issue, "gate-a", False)
+            except RedazioneError as exc:
+                return Result(1, str(exc))
+        state["gate_a_sha"] = None
+        gate_a_record["status"] = "da rifare"
     current_draft_sha = _hash(workdir / "bozza.md")
     if state.get("gate_b_sha") and current_draft_sha and state["gate_b_sha"] != current_draft_sha:
         if issue != "non registrata":
@@ -533,6 +633,19 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             state["gate_a_sha"] = None
             _atomic_json(state_path, state)
         record = state.setdefault("phases", {}).setdefault(name, {})
+        if name == "autore":
+            current_brief_sha = _hash(workdir / "brief.md")
+            gate_record = state.get("phases", {}).get("gate_a", {})
+            if (state.get("gate_a_contract_version") != GATE_A_CONTRACT_VERSION
+                    or state.get("gate_a_sha") != current_brief_sha
+                    or gate_record.get("status") != "riuscita"):
+                return Result(1, "Gate A v3 PASSA sul brief corrente richiesto prima della scrittura")
+            try:
+                gate_outcome, _ = _parse_gate(workdir / "gate-a.md", "gate_a", current_brief_sha)
+            except (OSError, RedazioneError) as exc:
+                return Result(1, f"Gate A non valido per l'autore: {exc}")
+            if gate_outcome != "PASSA":
+                return Result(1, "Gate A v3 non è PASSA sul brief corrente; autore fermo")
         if name == "autore" and state.get("rewrite_rounds", 0) >= int(config.get("max_rewrites", 2)):
             break
         input_files = [workdir / str(item) for item in phase.get("input", [])]
@@ -657,6 +770,7 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                 return Result(3, f"gate {PHASE_LABEL[name]} negativo; messaggio scritto nel ponte")
             if name == "gate_a":
                 state["gate_a_sha"] = _hash(workdir / "brief.md")
+                state["gate_a_contract_version"] = GATE_A_CONTRACT_VERSION
                 if issue != "non registrata":
                     try:
                         labeler(issue, "gate-a", True)

@@ -64,7 +64,40 @@ class FakeLauncher:
 
 
 def gate_a(outcome):
-    text = f"""SHA brief: abc\nHash brief: abc\nAutore/modello: A\nGiudice/modello: B\nDomanda: domanda\nTesi: tesi\nCodici e confronto: x/y/z\n| criterio | sì/no | prova | limite |\n|---|---|---|---|\n| A | sì | prova | limite |\n| B | sì | prova | limite |\n| C | sì | prova | limite |\n| D | sì | prova | limite |\n| E | sì | prova | limite |\nEsito: {outcome}\nMotivo: motivo\nCorrezione: correzione\nDestinatario: leader\nData: 2026-10-07\n"""
+    text = f"""Contratto: v3
+Tipo pezzo: blog
+SHA brief: abc
+Hash brief: abc
+Autore/modello: A
+Giudice/modello: B
+Domanda: domanda
+Angoli verificati: angolo sul cambiamento osservato; angolo sulle differenze territoriali
+Tesi: tesi
+Codici e confronto: x/y/z
+Ultimo dato: 2025
+Data fonte del dato: 2026-09-12
+URL fonte del dato: https://istat.example/dato
+Ruolo indicatori interni: base e un tassello del racconto
+Fonti esterne verificate:
+| istituzione | data fonte | URL aperto | dato o claim | verificata |
+|---|---|---|---|---|
+| Istat | 2026-09-12 | https://istat.example/dato | dato 2025 | sì |
+| Ministero | 2026-08-10 | https://ministero.example/rapporto | rapporto servizi | sì |
+| Eurostat | 2026-07-01 | https://ec.europa.example/serie | serie comparabile | sì |
+Grafico con dati esterni: disponibilità servizi; serie 2025; https://istat.example/dato
+| criterio | esito | prova verificabile | limite |
+|---|---|---|---|
+| A | sì | angolo confrontato con fonti esterne datate | copertura regionale |
+| B | sì | dato 2025 con data e URL fonte verificata | ultimo rilascio |
+| C | sì | tre istituzioni con data, URL e claim distinti | fonti non causali |
+| D | sì | grafico cita variabile esterna, periodo e URL | comparabilità |
+| E | sì | indicatori interni dichiarati come base e tassello | ambito Italia |
+Esito: {outcome}
+Motivo: motivazione riferita alle prove e al limite temporale
+Correzione: correzione
+Destinatario: leader
+Data: 2026-10-07
+"""
     return text.replace("| A | sì |", "| A | no |") if outcome == "FERMO" else text
 
 
@@ -357,6 +390,60 @@ class GateParserTests(unittest.TestCase):
         with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
             self.parse(text)
 
+    def test_gate_a_v3_passa_con_fonti_date_e_grafico_esterno(self):
+        esito, _ = self.parse(gate_a("PASSA"))
+        self.assertEqual(esito, "PASSA")
+
+    def test_gate_a_v3_ferma_se_mancano_fonti_grafico_o_date(self):
+        casi = (
+            gate_a("PASSA").replace("| Istat | 2026-09-12 | https://istat.example/dato | dato 2025 | sì |\n| Ministero | 2026-08-10 | https://ministero.example/rapporto | rapporto servizi | sì |\n| Eurostat | 2026-07-01 | https://ec.europa.example/serie | serie comparabile | sì |\n", ""),
+            gate_a("PASSA").replace("Grafico con dati esterni: disponibilità servizi; serie 2025; https://istat.example/dato\n", ""),
+            gate_a("PASSA").replace("| Istat | 2026-09-12 |", "| Istat | non trovata |"),
+        )
+        for text in casi:
+            with self.subTest(text=text[:80]), self.assertRaises(redazione.RedazioneError):
+                self.parse(text)
+
+    def test_gate_a_v2_non_vale_per_contratto_v3(self):
+        text = gate_a("PASSA").replace("Contratto: v3", "Contratto: v2")
+        with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
+            self.parse(text)
+
+    def test_run_rivaluta_gate_a_v2_anche_se_brief_non_cambia(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            brief = workdir / "brief.md"
+            brief.write_text("brief stabile\n", encoding="utf-8")
+            old_gate = workdir / "gate-a.md"
+            old_gate.write_text("Contratto: v2\n", encoding="utf-8")
+            digest = hashlib.sha256(brief.read_bytes()).hexdigest()
+            (workdir / "stato.json").write_text(json.dumps({
+                "key": "demo", "current_phase": "gate_a", "gate_a_sha": digest,
+                "gate_a_contract_version": "v2", "phases": {"gate_a": {
+                    "status": "riuscita", "input_hashes": {},
+                    "output_hashes": {"lavoro/demo/gate-a.md": hashlib.sha256(old_gate.read_bytes()).hexdigest()},
+                }},
+            }), encoding="utf-8")
+            launcher = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, launcher, only="gate_a")
+            self.assertEqual(result.exit_code, 0, result.message)
+            self.assertEqual(launcher.calls, ["gate_a"])
+            state = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(state["gate_a_contract_version"], "v3")
+
+    def test_autore_non_parte_se_gate_a_non_e_v3_corrente(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            (workdir / "brief.md").write_text("brief stabile\n", encoding="utf-8")
+            (workdir / "gate-a.md").write_text("Contratto: v2\nEsito: PASSA\n", encoding="utf-8")
+            launcher = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, launcher, only="autore")
+            self.assertEqual(result.exit_code, 1)
+            self.assertIn("Gate A", result.message)
+            self.assertEqual(launcher.calls, [])
+
     def test_gate_b_passa_solo_con_tutti_i_controlli_si(self):
         text = gate_b("PASSA", 4).replace("T: sì", "T: no")
         with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
@@ -480,8 +567,11 @@ class TemplateGateTests(unittest.TestCase):
         radice = Path(__file__).resolve().parents[2] / "config" / "redazione"
         for fase, nome in (("gate_a", "gate_a.md"), ("gate_b", "gate_b.md")):
             testo = (radice / nome).read_text(encoding="utf-8")
-            for campo in redazione.GATE_REQUIRED[fase]:
-                self.assertIn(campo, testo, f"{nome}: manca {campo}")
+            if fase == "gate_a":
+                self.assertIn("REDAZIONE-divario-v3.md", testo)
+            else:
+                for campo in redazione.GATE_REQUIRED[fase]:
+                    self.assertIn(campo, testo, f"{nome}: manca {campo}")
 
 
 if __name__ == "__main__":
