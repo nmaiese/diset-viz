@@ -157,7 +157,8 @@ class RedazioneTests(unittest.TestCase):
             seen.append(Path(command[-1]).read_text(encoding="utf-8"))
             return redazione.subprocess.CompletedProcess(command, 0, "", "")
 
-        with patch.object(redazione.subprocess, "run", side_effect=fake_run):
+        with patch.dict(redazione.os.environ, {"AGENT_ID": ""}), \
+                patch.object(redazione.subprocess, "run", side_effect=fake_run):
             redazione._update_pr_preview(Path("/tmp/worktree"), 17, Path("/tmp/preview.html"),
                                          Path("/tmp/index.html"), "a" * 64, "b" * 64)
         self.assertIn("Testo PR esistente", seen[0])
@@ -222,6 +223,15 @@ class RedazioneTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0)
             self.assertEqual(launcher.calls, [])
             self.assertEqual(before, after)
+
+
+class TemplateGateTests(unittest.TestCase):
+    def test_i_template_dei_gate_riportano_tutti_i_campi_del_parser(self):
+        radice = Path(__file__).resolve().parents[2] / "config" / "redazione"
+        for fase, nome in (("gate_a", "gate_a.md"), ("gate_b", "gate_b.md")):
+            testo = (radice / nome).read_text(encoding="utf-8")
+            for campo in redazione.GATE_REQUIRED[fase]:
+                self.assertIn(campo, testo, f"{nome}: manca {campo}")
 
 
 if __name__ == "__main__":

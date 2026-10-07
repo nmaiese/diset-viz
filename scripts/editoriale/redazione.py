@@ -234,16 +234,21 @@ def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: li
     return template_path.read_text(encoding="utf-8").format(**values)
 
 
+# I campi che il parser pretende. I template in `config/redazione/gate_*.md` li riportano
+# tutti, in forma di scheletro da compilare: un test tiene allineati i due elenchi.
+GATE_REQUIRED = {
+    "gate_a": ["SHA brief:", "Hash brief:", "Autore/modello:", "Giudice/modello:",
+               "Domanda:", "Tesi:", "Codici e confronto:", "| criterio |", "Esito:",
+               "Motivo:", "Correzione:", "Destinatario:", "Data:"],
+    "gate_b": ["SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
+               "Controllo anti-invenzione:", "Bloccanti:", "Voto:", "Motivo:",
+               "Rilievi localizzati:", "Giri:", "Esito:"],
+}
+
+
 def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tuple[str, str]:
     text = path.read_text(encoding="utf-8")
-    required = {
-        "gate_a": ["SHA brief:", "Hash brief:", "Autore/modello:", "Giudice/modello:",
-                   "Domanda:", "Tesi:", "Codici e confronto:", "| criterio |", "Esito:",
-                   "Motivo:", "Correzione:", "Destinatario:", "Data:"],
-        "gate_b": ["SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
-                   "Controllo anti-invenzione:", "Bloccanti:", "Voto:", "Motivo:",
-                   "Rilievi localizzati:", "Giri:", "Esito:"],
-    }[phase]
+    required = GATE_REQUIRED[phase]
     missing = [field for field in required if field not in text]
     if missing:
         raise RedazioneError(f"{path.name} malformato: campi mancanti {', '.join(missing)}")
