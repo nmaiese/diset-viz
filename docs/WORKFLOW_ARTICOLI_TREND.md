@@ -341,6 +341,20 @@ vede: che la definizione dell'indicatore sia detta giusta
 la notizia e il dato non sia forzato, che nessuna causa sia attribuita a un
 dato che non la mostra.
 
+### 8bis. Redazione in sequenza
+
+Per un pezzo già aperto con `pezzo apri`, il coordinatore può eseguire la
+catena sequenziale con `bin/py -m scripts.editoriale.redazione <chiave>`.
+`config/redazione.yaml` possiede ordine, ruoli, modelli, input, output e
+timeout; i template brevi sono in `config/redazione/`. `--prova` mostra il
+piano e controlla RAM e ingressi senza avviare worker. `--da <fase>` riprende
+da una fase, `--solo <fase>` esegue una sola fase. Stato e hash sono in
+`lavoro/<chiave>/stato.json`; un gate malformato blocca, un esito negativo
+scrive nel ponte e restituisce codice 3. La sequenza usa sempre
+`orca-lancia.sh`, un worker per volta; il merge resta umano. La prova reale
+va fatta dal coordinatore sul pezzo aperto, dopo aver verificato issue, worktree
+e PR draft.
+
 ### 9. Pubblicazione
 
 Un ramo per pezzo o per gruppo di pezzi della stessa giornata, PR verso
