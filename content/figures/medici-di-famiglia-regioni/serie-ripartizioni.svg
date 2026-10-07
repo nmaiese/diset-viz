@@ -1,0 +1,32 @@
+<svg class="fig fig--narrow" viewBox="0 0 370 330" width="370" height="330" role="img" aria-labelledby="fig-serie-t fig-serie-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-serie-t">Fra Nord e Mezzogiorno la distanza passa da 2 punti nel 2004 a 24 nel 2023</title>
+<desc id="fig-serie-d">Quota di medici di famiglia con più di 1500 assistiti, per ripartizione, dal 2004 al 2023. Nord da 17,6 a 63,8, Centro da 12,5 a 48,7, Mezzogiorno da 15,6 a 39,6. Nel 2004 il Nord stava a 2,0 punti dal Mezzogiorno, nel 2023 a 24,2.</desc>
+<text class="fig__title" x="0" y="18">Fra Nord e Mezzogiorno la distanza passa</text>
+<text class="fig__title" x="0" y="37">da 2 punti nel 2004 a 24 nel 2023</text>
+<text class="fig__subtitle" x="0" y="57">Medici di famiglia con più di 1500</text>
+<text class="fig__subtitle" x="0" y="72">assistiti, ogni 100. 2004-2023.</text>
+<line class="fig__grid" x1="30" y1="270.0" x2="282" y2="270.0"/>
+<text class="fig__axis" x="25" y="274.0" text-anchor="end">0</text>
+<line class="fig__grid" x1="30" y1="216.9" x2="282" y2="216.9"/>
+<text class="fig__axis" x="25" y="220.9" text-anchor="end">20</text>
+<line class="fig__grid" x1="30" y1="163.7" x2="282" y2="163.7"/>
+<text class="fig__axis" x="25" y="167.7" text-anchor="end">40</text>
+<line class="fig__grid" x1="30" y1="110.6" x2="282" y2="110.6"/>
+<text class="fig__axis" x="25" y="114.6" text-anchor="end">60</text>
+<text class="fig__axis" x="30.0" y="286" text-anchor="middle">2004</text>
+<text class="fig__axis" x="109.6" y="286" text-anchor="middle">2010</text>
+<text class="fig__axis" x="189.2" y="286" text-anchor="middle">2016</text>
+<text class="fig__axis" x="282.0" y="286" text-anchor="middle">2023</text>
+<polyline class="fig__line fig__line--north" points="30.0,223.2 43.3,222.4 56.5,213.4 69.8,203.6 83.1,194.0 96.3,185.2 109.6,179.9 122.8,177.3 136.1,170.9 149.4,166.6 162.6,164.2 175.9,162.7 189.2,158.9 202.4,151.0 215.7,145.4 228.9,137.9 242.2,132.4 255.5,124.7 268.7,110.6 282.0,100.5"/>
+<circle class="fig__dot fig__dot--north" cx="282.0" cy="100.5" r="3.5"/>
+<text class="fig__label fig__label--north" x="290" y="104.5">Nord 63,8</text>
+<polyline class="fig__line fig__line--centre" points="30.0,236.8 43.3,240.2 56.5,240.0 69.8,229.1 83.1,228.5 96.3,219.5 109.6,217.7 122.8,213.9 136.1,213.9 149.4,212.3 162.6,208.6 175.9,204.6 189.2,193.2 202.4,197.5 215.7,188.7 228.9,183.6 242.2,179.1 255.5,168.8 268.7,147.5 282.0,140.6"/>
+<circle class="fig__dot fig__dot--centre" cx="282.0" cy="140.6" r="3.5"/>
+<text class="fig__label fig__label--centre" x="290" y="144.6">Centro 48,7</text>
+<polyline class="fig__line fig__line--south" points="30.0,228.5 43.3,226.7 56.5,225.6 69.8,225.4 83.1,227.0 96.3,225.4 109.6,222.7 122.8,222.4 136.1,219.0 149.4,217.1 162.6,223.8 175.9,222.2 189.2,220.6 202.4,218.7 215.7,213.4 228.9,210.2 242.2,203.8 255.5,191.1 268.7,177.8 282.0,164.8"/>
+<circle class="fig__dot fig__dot--south" cx="282.0" cy="164.8" r="3.5"/>
+<text class="fig__label fig__label--south" x="290" y="168.8">Mezzogiorno 39,6</text>
+<text class="fig__note" x="0" y="282">Valori Istat per ripartizione, pesati. Ultimo anno 2023.</text>
+<text class="fig__source" x="0" y="296">Fonte: Istat, Bes, elaborazione su dati Ministero della Salute.</text>
+<text class="fig__source" x="0" y="310">Valori Istat di ripartizione. Elaborazione Divario Italia.</text>
+</svg>
