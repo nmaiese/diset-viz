@@ -1,0 +1,40 @@
+<svg class="fig fig--narrow" viewBox="0 0 370 386" role="img" aria-labelledby="fig-erogatori-cure-t fig-erogatori-cure-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-erogatori-cure-t">Chi eroga le cure ricevute da fuori regione</title>
+<desc id="fig-erogatori-cure-d">Quota del valore economico della mobilità sanitaria attiva erogata dal privato convenzionato nelle regioni di destinazione. Lombardia: ricoveri 73,2% e specialistica 61,9%. Emilia-Romagna: ricoveri 59,1% e specialistica 25,5%. Toscana: ricoveri 34,0% e specialistica 5,5%. Dati 2023. Fonte Fondazione GIMBE, tabella 4.5, pubblicata il 4 marzo 2026.</desc>
+<text class="fig__title" x="2" y="18">Chi eroga le cure ricevute da fuori regione</text>
+<text class="fig__subtitle" x="2" y="41"><tspan x="2">Quota del valore erogata dal privato convenzionato.</tspan><tspan x="2" dy="15">Anno 2023, percentuale. Scala comune 0-100%.</tspan></text>
+<circle class="fig__dot is-on" cx="7" cy="77" r="5"/>
+<text class="fig__axis-name" x="18" y="81">Ricoveri ordinari e day hospital</text>
+<circle class="fig__dot" cx="7" cy="95" r="5"/>
+<text class="fig__axis-name" x="18" y="99">Specialistica ambulatoriale</text>
+<line class="fig__grid" x1="166.0" y1="126" x2="166.0" y2="276"/>
+<text class="fig__axis" x="166.0" y="120" text-anchor="middle">0</text>
+<line class="fig__grid" x1="211.0" y1="126" x2="211.0" y2="276"/>
+<text class="fig__axis" x="211.0" y="120" text-anchor="middle">25</text>
+<line class="fig__grid" x1="256.0" y1="126" x2="256.0" y2="276"/>
+<text class="fig__axis" x="256.0" y="120" text-anchor="middle">50</text>
+<line class="fig__grid" x1="301.0" y1="126" x2="301.0" y2="276"/>
+<text class="fig__axis" x="301.0" y="120" text-anchor="middle">75</text>
+<line class="fig__grid" x1="346.0" y1="126" x2="346.0" y2="276"/>
+<text class="fig__axis" x="346.0" y="120" text-anchor="middle">100</text>
+<text class="fig__name" x="158" y="144" text-anchor="end">Lombardia · ric.</text>
+<rect class="fig__bar is-on" x="166" y="133" width="131.8" height="14"/>
+<text class="fig__value" x="302.8" y="144">73,2%</text>
+<text class="fig__name" x="158" y="166" text-anchor="end">Lombardia · spec.</text>
+<rect class="fig__bar" x="166" y="155" width="111.4" height="14"/>
+<text class="fig__value" x="282.4" y="166">61,9%</text>
+<text class="fig__name" x="158" y="196" text-anchor="end">Emilia-Romagna · ric.</text>
+<rect class="fig__bar is-on" x="166" y="185" width="106.4" height="14"/>
+<text class="fig__value" x="277.4" y="196">59,1%</text>
+<text class="fig__name" x="158" y="218" text-anchor="end">Emilia-Romagna · spec.</text>
+<rect class="fig__bar" x="166" y="207" width="45.9" height="14"/>
+<text class="fig__value" x="216.9" y="218">25,5%</text>
+<text class="fig__name" x="158" y="248" text-anchor="end">Toscana · ric.</text>
+<rect class="fig__bar is-on" x="166" y="237" width="61.2" height="14"/>
+<text class="fig__value" x="232.2" y="248">34,0%</text>
+<text class="fig__name" x="158" y="270" text-anchor="end">Toscana · spec.</text>
+<rect class="fig__bar" x="166" y="259" width="9.9" height="14"/>
+<text class="fig__value" x="180.9" y="270">5,5%</text>
+<text class="fig__note" x="2" y="296"><tspan x="2">Denominatore: valore pubblico più privato,</tspan><tspan x="2" dy="14">nello stesso settore e nella stessa destinazione.</tspan><tspan x="2" dy="14">Limite: tre destinazioni, confronto descrittivo.</tspan><tspan x="2" dy="14">Non sono quote di pazienti, ricoveri o prestazioni.</tspan></text>
+<text class="fig__source" x="2" y="362"><tspan x="2">Fonte: Fondazione GIMBE, tabella 4.5, dati 2023.</tspan><tspan x="2" dy="14">Pubblicata il 4 marzo 2026. Elaborazione Divario Italia.</tspan></text>
+</svg>
