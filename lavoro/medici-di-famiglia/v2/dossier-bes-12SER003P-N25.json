@@ -1,0 +1,3725 @@
+{
+  "identita": {
+    "chiave": "12SER003P-N25",
+    "codice": "bes-12SER003P-N25",
+    "nome": "Posti letto negli ospedali",
+    "percorso": "/indicatore/posti-letto-negli-ospedali/bes-12SER003P-N25",
+    "tema": "Mobilità e servizi territoriali",
+    "sottotema_fonte": null,
+    "definizione_fonte": null,
+    "unita": {
+      "fonte": "per 10.000 abitanti",
+      "cifra": "per 10.000 abitanti",
+      "variazione": "per 10.000 abitanti"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' alto",
+      "classifica_attiva": true
+    },
+    "livelli": [
+      {
+        "livello": "provincia",
+        "percorso": "/indicatore/posti-letto-negli-ospedali/bes-12SER003P-N25",
+        "primo_anno": 2015,
+        "ultimo_anno": 2022,
+        "anni": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "territori_ultimo_anno": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2015,
+      "ultimo": 2022
+    },
+    "fonte": {
+      "etichetta": "Istat, benessere e qualità della vita",
+      "famiglia": "Istat, benessere e qualità della vita",
+      "istituzione": "Istat",
+      "url": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/",
+      "url_dati": null,
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "provincia",
+      "fotografia": {
+        "anno": 2022,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Verbano-Cusio-Ossola",
+            "chiave": "verbano-cusio-ossola",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 55.9,
+              "testo": "55,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Cagliari",
+            "chiave": "cagliari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 50.7,
+              "testo": "50,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Pavia",
+            "chiave": "pavia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 47.2,
+              "testo": "47,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Parma",
+            "chiave": "parma",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 46.0,
+              "testo": "46,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Trieste",
+            "chiave": "trieste",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 44.5,
+              "testo": "44,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Enna",
+            "chiave": "enna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 44.4,
+              "testo": "44,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Ancona",
+            "chiave": "ancona",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 44.3,
+              "testo": "44,3 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Isernia",
+            "chiave": "isernia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 43.5,
+              "testo": "43,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Catanzaro",
+            "chiave": "catanzaro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 43.1,
+              "testo": "43,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Benevento",
+            "chiave": "benevento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 42.7,
+              "testo": "42,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Genova",
+            "chiave": "genova",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 42.1,
+              "testo": "42,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Pescara",
+            "chiave": "pescara",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 41.8,
+              "testo": "41,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "L'Aquila",
+            "chiave": "l-aquila",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 40.8,
+              "testo": "40,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Trento",
+            "chiave": "trento",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 40.3,
+              "testo": "40,3 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Foggia",
+            "chiave": "foggia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 40.1,
+              "testo": "40,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Bologna",
+            "chiave": "bologna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 39.3,
+              "testo": "39,3 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Pisa",
+            "chiave": "pisa",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 39.1,
+              "testo": "39,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Roma",
+            "chiave": "roma",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 39.1,
+              "testo": "39,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Rovigo",
+            "chiave": "rovigo",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 39.1,
+              "testo": "39,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Rimini",
+            "chiave": "rimini",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 38.5,
+              "testo": "38,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 21,
+            "territorio": "Novara",
+            "chiave": "novara",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 38.4,
+              "testo": "38,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 22,
+            "territorio": "Siena",
+            "chiave": "siena",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 37.8,
+              "testo": "37,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 23,
+            "territorio": "Torino",
+            "chiave": "torino",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 37.8,
+              "testo": "37,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 24,
+            "territorio": "Brescia",
+            "chiave": "brescia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 37.6,
+              "testo": "37,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 25,
+            "territorio": "Verona",
+            "chiave": "verona",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 37.6,
+              "testo": "37,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 26,
+            "territorio": "Alessandria",
+            "chiave": "alessandria",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 37.2,
+              "testo": "37,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 27,
+            "territorio": "Milano",
+            "chiave": "milano",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 37.2,
+              "testo": "37,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 28,
+            "territorio": "Firenze",
+            "chiave": "firenze",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 37.1,
+              "testo": "37,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 29,
+            "territorio": "Crotone",
+            "chiave": "crotone",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 37.0,
+              "testo": "37,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 30,
+            "territorio": "Forlì-Cesena",
+            "chiave": "forli-cesena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 36.9,
+              "testo": "36,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 31,
+            "territorio": "Potenza",
+            "chiave": "potenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 36.9,
+              "testo": "36,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 32,
+            "territorio": "Avellino",
+            "chiave": "avellino",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 36.7,
+              "testo": "36,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 33,
+            "territorio": "Catania",
+            "chiave": "catania",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 36.6,
+              "testo": "36,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 34,
+            "territorio": "Ravenna",
+            "chiave": "ravenna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 36.6,
+              "testo": "36,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 35,
+            "territorio": "Ferrara",
+            "chiave": "ferrara",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 36.3,
+              "testo": "36,3 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 36,
+            "territorio": "Fermo",
+            "chiave": "fermo",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 35.8,
+              "testo": "35,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 37,
+            "territorio": "Cremona",
+            "chiave": "cremona",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 35.5,
+              "testo": "35,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 38,
+            "territorio": "Bolzano",
+            "chiave": "bolzano",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 35.1,
+              "testo": "35,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 39,
+            "territorio": "Padova",
+            "chiave": "padova",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 34.8,
+              "testo": "34,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 40,
+            "territorio": "Terni",
+            "chiave": "terni",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 34.8,
+              "testo": "34,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 41,
+            "territorio": "Aosta",
+            "chiave": "aosta",
+            "ripartizione": "Nord",
+            "regione": "Valle d'Aosta",
+            "valore": {
+              "valore": 34.6,
+              "testo": "34,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 42,
+            "territorio": "Savona",
+            "chiave": "savona",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 34.6,
+              "testo": "34,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 43,
+            "territorio": "Sassari",
+            "chiave": "sassari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 34.5,
+              "testo": "34,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 44,
+            "territorio": "Piacenza",
+            "chiave": "piacenza",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 34.4,
+              "testo": "34,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 45,
+            "territorio": "Bergamo",
+            "chiave": "bergamo",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 34.0,
+              "testo": "34,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 46,
+            "territorio": "Udine",
+            "chiave": "udine",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 34.0,
+              "testo": "34,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 47,
+            "territorio": "Modena",
+            "chiave": "modena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 33.8,
+              "testo": "33,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 48,
+            "territorio": "Palermo",
+            "chiave": "palermo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 33.8,
+              "testo": "33,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 49,
+            "territorio": "Messina",
+            "chiave": "messina",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 33.7,
+              "testo": "33,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 50,
+            "territorio": "Campobasso",
+            "chiave": "campobasso",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 33.4,
+              "testo": "33,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 51,
+            "territorio": "Macerata",
+            "chiave": "macerata",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 33.0,
+              "testo": "33,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 52,
+            "territorio": "Lecco",
+            "chiave": "lecco",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 32.9,
+              "testo": "32,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 53,
+            "territorio": "Cuneo",
+            "chiave": "cuneo",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 32.6,
+              "testo": "32,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 54,
+            "territorio": "Perugia",
+            "chiave": "perugia",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 32.6,
+              "testo": "32,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 55,
+            "territorio": "Pordenone",
+            "chiave": "pordenone",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 32.5,
+              "testo": "32,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 56,
+            "territorio": "Bari",
+            "chiave": "bari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 32.2,
+              "testo": "32,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 57,
+            "territorio": "Biella",
+            "chiave": "biella",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 32.1,
+              "testo": "32,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 58,
+            "territorio": "Vercelli",
+            "chiave": "vercelli",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 32.1,
+              "testo": "32,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 59,
+            "territorio": "Taranto",
+            "chiave": "taranto",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 31.8,
+              "testo": "31,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 60,
+            "territorio": "Venezia",
+            "chiave": "venezia",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 31.8,
+              "testo": "31,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 61,
+            "territorio": "Lucca",
+            "chiave": "lucca",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 31.4,
+              "testo": "31,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 62,
+            "territorio": "Matera",
+            "chiave": "matera",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 30.6,
+              "testo": "30,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 63,
+            "territorio": "Salerno",
+            "chiave": "salerno",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 30.6,
+              "testo": "30,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 64,
+            "territorio": "Oristano",
+            "chiave": "oristano",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 30.3,
+              "testo": "30,3 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 65,
+            "territorio": "Como",
+            "chiave": "como",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 30.2,
+              "testo": "30,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 66,
+            "territorio": "Chieti",
+            "chiave": "chieti",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 29.9,
+              "testo": "29,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 67,
+            "territorio": "Lecce",
+            "chiave": "lecce",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 29.7,
+              "testo": "29,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 68,
+            "territorio": "Treviso",
+            "chiave": "treviso",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 29.6,
+              "testo": "29,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 69,
+            "territorio": "Belluno",
+            "chiave": "belluno",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 29.5,
+              "testo": "29,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 70,
+            "territorio": "Varese",
+            "chiave": "varese",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 29.2,
+              "testo": "29,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 71,
+            "territorio": "Napoli",
+            "chiave": "napoli",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 28.9,
+              "testo": "28,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 72,
+            "territorio": "Nuoro",
+            "chiave": "nuoro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 28.7,
+              "testo": "28,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 73,
+            "territorio": "Frosinone",
+            "chiave": "frosinone",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 28.3,
+              "testo": "28,3 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 74,
+            "territorio": "Mantova",
+            "chiave": "mantova",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 27.9,
+              "testo": "27,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 75,
+            "territorio": "La Spezia",
+            "chiave": "la-spezia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 27.8,
+              "testo": "27,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 76,
+            "territorio": "Reggio Calabria",
+            "chiave": "reggio-calabria",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 27.8,
+              "testo": "27,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 77,
+            "territorio": "Arezzo",
+            "chiave": "arezzo",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 27.6,
+              "testo": "27,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 78,
+            "territorio": "Reggio Emilia",
+            "chiave": "reggio-emilia",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 27.0,
+              "testo": "27,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 79,
+            "territorio": "Latina",
+            "chiave": "latina",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 26.9,
+              "testo": "26,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 80,
+            "territorio": "Sondrio",
+            "chiave": "sondrio",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 26.7,
+              "testo": "26,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 81,
+            "territorio": "Gorizia",
+            "chiave": "gorizia",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 26.6,
+              "testo": "26,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 82,
+            "territorio": "Teramo",
+            "chiave": "teramo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 26.5,
+              "testo": "26,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 83,
+            "territorio": "Grosseto",
+            "chiave": "grosseto",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 26.1,
+              "testo": "26,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 84,
+            "territorio": "Vicenza",
+            "chiave": "vicenza",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 26.0,
+              "testo": "26,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 85,
+            "territorio": "Massa-Carrara",
+            "chiave": "massa-carrara",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 25.9,
+              "testo": "25,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 86,
+            "territorio": "Caltanissetta",
+            "chiave": "caltanissetta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 25.8,
+              "testo": "25,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 87,
+            "territorio": "Siracusa",
+            "chiave": "siracusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 25.5,
+              "testo": "25,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 88,
+            "territorio": "Cosenza",
+            "chiave": "cosenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 25.0,
+              "testo": "25,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 89,
+            "territorio": "Brindisi",
+            "chiave": "brindisi",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 24.6,
+              "testo": "24,6 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 90,
+            "territorio": "Asti",
+            "chiave": "asti",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 24.5,
+              "testo": "24,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 91,
+            "territorio": "Prato",
+            "chiave": "prato",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 24.5,
+              "testo": "24,5 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 92,
+            "territorio": "Caserta",
+            "chiave": "caserta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 24.4,
+              "testo": "24,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 93,
+            "territorio": "Monza e della Brianza",
+            "chiave": "monza-e-della-brianza",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 24.4,
+              "testo": "24,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 94,
+            "territorio": "Ascoli Piceno",
+            "chiave": "ascoli-piceno",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 24.1,
+              "testo": "24,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 95,
+            "territorio": "Ragusa",
+            "chiave": "ragusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 24.0,
+              "testo": "24,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 96,
+            "territorio": "Livorno",
+            "chiave": "livorno",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 23.2,
+              "testo": "23,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 97,
+            "territorio": "Imperia",
+            "chiave": "imperia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 22.8,
+              "testo": "22,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 98,
+            "territorio": "Lodi",
+            "chiave": "lodi",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 22.8,
+              "testo": "22,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 99,
+            "territorio": "Pistoia",
+            "chiave": "pistoia",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 22.8,
+              "testo": "22,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 100,
+            "territorio": "Agrigento",
+            "chiave": "agrigento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 22.0,
+              "testo": "22,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 101,
+            "territorio": "Viterbo",
+            "chiave": "viterbo",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 21.9,
+              "testo": "21,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 102,
+            "territorio": "Trapani",
+            "chiave": "trapani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 20.7,
+              "testo": "20,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 103,
+            "territorio": "Rieti",
+            "chiave": "rieti",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 19.0,
+              "testo": "19,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 104,
+            "territorio": "Pesaro e Urbino",
+            "chiave": "pesaro-e-urbino",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 18.9,
+              "testo": "18,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Vibo Valentia",
+            "chiave": "vibo-valentia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 17.8,
+              "testo": "17,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Barletta-Andria-Trani",
+            "chiave": "barletta-andria-trani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 15.8,
+              "testo": "15,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Sud Sardegna",
+            "chiave": "sud-sardegna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 14.9,
+              "testo": "14,9 per 10.000 abitanti"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 107 province, non la media nazionale",
+          "valore": 32.333645,
+          "testo": "32,3 per 10.000 abitanti"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 32.6,
+          "testo": "32,6 per 10.000 abitanti"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 55,
+          "testo": "55"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 52,
+          "testo": "52"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Verbano-Cusio-Ossola",
+            "chiave": "verbano-cusio-ossola",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 55.9,
+              "testo": "55,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Cagliari",
+            "chiave": "cagliari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 50.7,
+              "testo": "50,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Pavia",
+            "chiave": "pavia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 47.2,
+              "testo": "47,2 per 10.000 abitanti"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Sud Sardegna",
+            "chiave": "sud-sardegna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 14.9,
+              "testo": "14,9 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Barletta-Andria-Trani",
+            "chiave": "barletta-andria-trani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 15.8,
+              "testo": "15,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Vibo Valentia",
+            "chiave": "vibo-valentia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 17.8,
+              "testo": "17,8 per 10.000 abitanti"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 41.0,
+          "testo": "41,0 per 10.000 abitanti"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 3.751678,
+          "testo": "3,8 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle province di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 47,
+                "testo": "47"
+              },
+              "media_semplice": {
+                "valore": 34.219149,
+                "testo": "34,2 per 10.000 abitanti"
+              },
+              "piu_alto": {
+                "territorio": "Verbano-Cusio-Ossola",
+                "valore": {
+                  "valore": 55.9,
+                  "testo": "55,9 per 10.000 abitanti"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Lodi",
+                "valore": {
+                  "valore": 22.8,
+                  "testo": "22,8 per 10.000 abitanti"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 22,
+                "testo": "22"
+              },
+              "media_semplice": {
+                "valore": 29.736364,
+                "testo": "29,7 per 10.000 abitanti"
+              },
+              "piu_alto": {
+                "territorio": "Ancona",
+                "valore": {
+                  "valore": 44.3,
+                  "testo": "44,3 per 10.000 abitanti"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Pesaro e Urbino",
+                "valore": {
+                  "valore": 18.9,
+                  "testo": "18,9 per 10.000 abitanti"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 38,
+                "testo": "38"
+              },
+              "media_semplice": {
+                "valore": 31.505263,
+                "testo": "31,5 per 10.000 abitanti"
+              },
+              "piu_alto": {
+                "territorio": "Cagliari",
+                "valore": {
+                  "valore": 50.7,
+                  "testo": "50,7 per 10.000 abitanti"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Sud Sardegna",
+                "valore": {
+                  "valore": 14.9,
+                  "testo": "14,9 per 10.000 abitanti"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2015,
+            "media_semplice": {
+              "valore": 34.634906,
+              "testo": "34,6 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 106,
+              "testo": "106"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 43.0,
+              "testo": "43,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2016,
+            "media_semplice": {
+              "valore": 34.036792,
+              "testo": "34,0 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 106,
+              "testo": "106"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 39.1,
+              "testo": "39,1 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2017,
+            "media_semplice": {
+              "valore": 33.71215,
+              "testo": "33,7 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 40.8,
+              "testo": "40,8 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 33.333645,
+              "testo": "33,3 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 42.7,
+              "testo": "42,7 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 33.176636,
+              "testo": "33,2 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 44.2,
+              "testo": "44,2 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 33.539216,
+              "testo": "33,5 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 102,
+              "testo": "102"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 47.4,
+              "testo": "47,4 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 32.652336,
+              "testo": "32,7 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 46.0,
+              "testo": "46,0 per 10.000 abitanti"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 32.333645,
+              "testo": "32,3 per 10.000 abitanti"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 41.0,
+              "testo": "41,0 per 10.000 abitanti"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 101,
+              "testo": "101"
+            },
+            "totale": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2015,
+              "valore": {
+                "valore": 35.079208,
+                "testo": "35,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2016,
+              "valore": {
+                "valore": 34.362376,
+                "testo": "34,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2017,
+              "valore": {
+                "valore": 34.077228,
+                "testo": "34,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 33.724752,
+                "testo": "33,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 33.556436,
+                "testo": "33,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 33.725743,
+                "testo": "33,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 33.134653,
+                "testo": "33,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 32.614851,
+                "testo": "32,6 per 10.000 abitanti"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2015,
+            "valore": {
+              "valore": 35.079208,
+              "testo": "35,1 per 10.000 abitanti"
+            }
+          },
+          "minimo": {
+            "anno": 2022,
+            "valore": {
+              "valore": 32.614851,
+              "testo": "32,6 per 10.000 abitanti"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2019,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 33.556436,
+                "testo": "33,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "anno": 2020,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 33.725743,
+                "testo": "33,7 per 10.000 abitanti"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2015,
+              "a": 2019,
+              "verso": "scende"
+            },
+            {
+              "da": 2019,
+              "a": 2020,
+              "verso": "sale"
+            },
+            {
+              "da": 2020,
+              "a": 2022,
+              "verso": "scende"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2015,
+          "a": 2022,
+          "media_semplice_da": {
+            "valore": 34.634906,
+            "testo": "34,6 per 10.000 abitanti"
+          },
+          "media_semplice_a": {
+            "valore": 32.333645,
+            "testo": "32,3 per 10.000 abitanti"
+          },
+          "assoluta": {
+            "valore": -2.301261,
+            "testo": "-2,3 per 10.000 abitanti"
+          },
+          "relativa": {
+            "valore": -6.64434,
+            "testo": "-6,6%"
+          },
+          "territori_da": {
+            "valore": 106,
+            "testo": "106"
+          },
+          "territori_a": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "nota_copertura": "le due medie stanno su gruppi di territori diversi",
+          "sul_pannello": {
+            "da": 2015,
+            "a": 2022,
+            "assoluta": {
+              "valore": -2.464356,
+              "testo": "-2,5 per 10.000 abitanti"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2021,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "media_semplice_da": {
+            "valore": 32.652336,
+            "testo": "32,7 per 10.000 abitanti"
+          },
+          "media_semplice_a": {
+            "valore": 32.333645,
+            "testo": "32,3 per 10.000 abitanti"
+          },
+          "variazione": {
+            "valore": -0.318692,
+            "testo": "-0,32 per 10.000 abitanti"
+          },
+          "in_aumento": {
+            "valore": 46,
+            "testo": "46"
+          },
+          "in_calo": {
+            "valore": 56,
+            "testo": "56"
+          },
+          "invariati": {
+            "valore": 5,
+            "testo": "5"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Catanzaro",
+              "prima": {
+                "valore": 34.6,
+                "testo": "34,6 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 43.1,
+                "testo": "43,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 8.5,
+                "testo": "+8,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Cosenza",
+              "prima": {
+                "valore": 20.8,
+                "testo": "20,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 25.0,
+                "testo": "25,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 4.2,
+                "testo": "+4,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Vercelli",
+              "prima": {
+                "valore": 28.0,
+                "testo": "28,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.1,
+                "testo": "32,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 4.1,
+                "testo": "+4,1 per 10.000 abitanti"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Rieti",
+              "prima": {
+                "valore": 25.7,
+                "testo": "25,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 19.0,
+                "testo": "19,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.7,
+                "testo": "-6,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Aosta",
+              "prima": {
+                "valore": 40.6,
+                "testo": "40,6 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.6,
+                "testo": "34,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.0,
+                "testo": "-6,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Messina",
+              "prima": {
+                "valore": 39.4,
+                "testo": "39,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 33.7,
+                "testo": "33,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -5.7,
+                "testo": "-5,7 per 10.000 abitanti"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2015,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 106,
+            "testo": "106"
+          },
+          "aumenti": [
+            {
+              "territorio": "Fermo",
+              "variazione": {
+                "valore": 13.7,
+                "testo": "+13,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pescara",
+              "variazione": {
+                "valore": 7.7,
+                "testo": "+7,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Cosenza",
+              "variazione": {
+                "valore": 6.9,
+                "testo": "+6,9 per 10.000 abitanti"
+              }
+            }
+          ],
+          "cali": [
+            {
+              "territorio": "Massa-Carrara",
+              "variazione": {
+                "valore": -17.1,
+                "testo": "-17,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Belluno",
+              "variazione": {
+                "valore": -12.4,
+                "testo": "-12,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Ascoli Piceno",
+              "variazione": {
+                "valore": -11.7,
+                "testo": "-11,7 per 10.000 abitanti"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2015,
+          "a": 2022,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 106,
+            "testo": "106"
+          },
+          "valori": [
+            {
+              "territorio": "Massa-Carrara",
+              "prima": {
+                "valore": 43.0,
+                "testo": "43,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 25.9,
+                "testo": "25,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -17.1,
+                "testo": "-17,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Fermo",
+              "prima": {
+                "valore": 22.1,
+                "testo": "22,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 35.8,
+                "testo": "35,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 13.7,
+                "testo": "+13,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Belluno",
+              "prima": {
+                "valore": 41.9,
+                "testo": "41,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 29.5,
+                "testo": "29,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -12.4,
+                "testo": "-12,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Ascoli Piceno",
+              "prima": {
+                "valore": 35.8,
+                "testo": "35,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.1,
+                "testo": "24,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -11.7,
+                "testo": "-11,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Sondrio",
+              "prima": {
+                "valore": 36.5,
+                "testo": "36,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 26.7,
+                "testo": "26,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -9.8,
+                "testo": "-9,8 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Ravenna",
+              "prima": {
+                "valore": 45.9,
+                "testo": "45,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 36.6,
+                "testo": "36,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -9.3,
+                "testo": "-9,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Trieste",
+              "prima": {
+                "valore": 53.7,
+                "testo": "53,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 44.5,
+                "testo": "44,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -9.2,
+                "testo": "-9,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Isernia",
+              "prima": {
+                "valore": 52.1,
+                "testo": "52,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 43.5,
+                "testo": "43,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -8.6,
+                "testo": "-8,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Bologna",
+              "prima": {
+                "valore": 47.2,
+                "testo": "47,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 39.3,
+                "testo": "39,3 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -7.9,
+                "testo": "-7,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pesaro e Urbino",
+              "prima": {
+                "valore": 26.8,
+                "testo": "26,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 18.9,
+                "testo": "18,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -7.9,
+                "testo": "-7,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pescara",
+              "prima": {
+                "valore": 34.1,
+                "testo": "34,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 41.8,
+                "testo": "41,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 7.7,
+                "testo": "+7,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Benevento",
+              "prima": {
+                "valore": 50.3,
+                "testo": "50,3 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 42.7,
+                "testo": "42,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -7.6,
+                "testo": "-7,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Padova",
+              "prima": {
+                "valore": 42.2,
+                "testo": "42,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.8,
+                "testo": "34,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -7.4,
+                "testo": "-7,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Cosenza",
+              "prima": {
+                "valore": 18.1,
+                "testo": "18,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 25.0,
+                "testo": "25,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 6.9,
+                "testo": "+6,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Cuneo",
+              "prima": {
+                "valore": 39.5,
+                "testo": "39,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.6,
+                "testo": "32,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.9,
+                "testo": "-6,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pavia",
+              "prima": {
+                "valore": 53.8,
+                "testo": "53,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 47.2,
+                "testo": "47,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.6,
+                "testo": "-6,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Reggio Emilia",
+              "prima": {
+                "valore": 33.5,
+                "testo": "33,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 27.0,
+                "testo": "27,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.5,
+                "testo": "-6,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Catanzaro",
+              "prima": {
+                "valore": 36.7,
+                "testo": "36,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 43.1,
+                "testo": "43,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 6.4,
+                "testo": "+6,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Piacenza",
+              "prima": {
+                "valore": 40.8,
+                "testo": "40,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.4,
+                "testo": "34,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.4,
+                "testo": "-6,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Taranto",
+              "prima": {
+                "valore": 25.5,
+                "testo": "25,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 31.8,
+                "testo": "31,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 6.3,
+                "testo": "+6,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Crotone",
+              "prima": {
+                "valore": 31.0,
+                "testo": "31,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.0,
+                "testo": "37,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 6.0,
+                "testo": "+6,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Latina",
+              "prima": {
+                "valore": 32.9,
+                "testo": "32,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 26.9,
+                "testo": "26,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -6.0,
+                "testo": "-6,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Imperia",
+              "prima": {
+                "valore": 28.0,
+                "testo": "28,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 22.8,
+                "testo": "22,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -5.2,
+                "testo": "-5,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Aosta",
+              "prima": {
+                "valore": 39.7,
+                "testo": "39,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.6,
+                "testo": "34,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -5.1,
+                "testo": "-5,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Modena",
+              "prima": {
+                "valore": 38.7,
+                "testo": "38,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 33.8,
+                "testo": "33,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.9,
+                "testo": "-4,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Ferrara",
+              "prima": {
+                "valore": 40.8,
+                "testo": "40,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 36.3,
+                "testo": "36,3 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Rieti",
+              "prima": {
+                "valore": 23.5,
+                "testo": "23,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 19.0,
+                "testo": "19,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Verona",
+              "prima": {
+                "valore": 42.1,
+                "testo": "42,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.6,
+                "testo": "37,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Bolzano",
+              "prima": {
+                "valore": 39.5,
+                "testo": "39,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 35.1,
+                "testo": "35,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.4,
+                "testo": "-4,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Udine",
+              "prima": {
+                "valore": 38.3,
+                "testo": "38,3 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.0,
+                "testo": "34,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.3,
+                "testo": "-4,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Frosinone",
+              "prima": {
+                "valore": 24.2,
+                "testo": "24,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 28.3,
+                "testo": "28,3 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 4.1,
+                "testo": "+4,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Alessandria",
+              "prima": {
+                "valore": 41.3,
+                "testo": "41,3 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.2,
+                "testo": "37,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.1,
+                "testo": "-4,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Varese",
+              "prima": {
+                "valore": 33.2,
+                "testo": "33,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 29.2,
+                "testo": "29,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.0,
+                "testo": "-4,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Grosseto",
+              "prima": {
+                "valore": 22.1,
+                "testo": "22,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 26.1,
+                "testo": "26,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 4.0,
+                "testo": "+4,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pordenone",
+              "prima": {
+                "valore": 36.5,
+                "testo": "36,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.5,
+                "testo": "32,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.0,
+                "testo": "-4,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Rovigo",
+              "prima": {
+                "valore": 43.1,
+                "testo": "43,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 39.1,
+                "testo": "39,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -4.0,
+                "testo": "-4,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Salerno",
+              "prima": {
+                "valore": 34.5,
+                "testo": "34,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 30.6,
+                "testo": "30,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.9,
+                "testo": "-3,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Viterbo",
+              "prima": {
+                "valore": 25.7,
+                "testo": "25,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 21.9,
+                "testo": "21,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.8,
+                "testo": "-3,8 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Messina",
+              "prima": {
+                "valore": 37.2,
+                "testo": "37,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 33.7,
+                "testo": "33,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.5,
+                "testo": "-3,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Sassari",
+              "prima": {
+                "valore": 38.0,
+                "testo": "38,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.5,
+                "testo": "34,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.5,
+                "testo": "-3,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Ancona",
+              "prima": {
+                "valore": 47.7,
+                "testo": "47,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 44.3,
+                "testo": "44,3 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.4,
+                "testo": "-3,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Rimini",
+              "prima": {
+                "valore": 41.9,
+                "testo": "41,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 38.5,
+                "testo": "38,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.4,
+                "testo": "-3,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Lecco",
+              "prima": {
+                "valore": 36.2,
+                "testo": "36,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.9,
+                "testo": "32,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.3,
+                "testo": "-3,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Monza e della Brianza",
+              "prima": {
+                "valore": 27.7,
+                "testo": "27,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.4,
+                "testo": "24,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.3,
+                "testo": "-3,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Treviso",
+              "prima": {
+                "valore": 32.9,
+                "testo": "32,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 29.6,
+                "testo": "29,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.3,
+                "testo": "-3,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Campobasso",
+              "prima": {
+                "valore": 36.6,
+                "testo": "36,6 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 33.4,
+                "testo": "33,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.2,
+                "testo": "-3,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Milano",
+              "prima": {
+                "valore": 40.4,
+                "testo": "40,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.2,
+                "testo": "37,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.2,
+                "testo": "-3,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Verbano-Cusio-Ossola",
+              "prima": {
+                "valore": 59.0,
+                "testo": "59,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 55.9,
+                "testo": "55,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.1,
+                "testo": "-3,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Parma",
+              "prima": {
+                "valore": 49.0,
+                "testo": "49,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 46.0,
+                "testo": "46,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -3.0,
+                "testo": "-3,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "La Spezia",
+              "prima": {
+                "valore": 30.7,
+                "testo": "30,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 27.8,
+                "testo": "27,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.9,
+                "testo": "-2,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Macerata",
+              "prima": {
+                "valore": 35.8,
+                "testo": "35,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 33.0,
+                "testo": "33,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.8,
+                "testo": "-2,8 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Savona",
+              "prima": {
+                "valore": 37.4,
+                "testo": "37,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.6,
+                "testo": "34,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.8,
+                "testo": "-2,8 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Novara",
+              "prima": {
+                "valore": 41.1,
+                "testo": "41,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 38.4,
+                "testo": "38,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.7,
+                "testo": "-2,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Vicenza",
+              "prima": {
+                "valore": 28.7,
+                "testo": "28,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 26.0,
+                "testo": "26,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.7,
+                "testo": "-2,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Cremona",
+              "prima": {
+                "valore": 38.1,
+                "testo": "38,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 35.5,
+                "testo": "35,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.6,
+                "testo": "-2,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Cagliari",
+              "prima": {
+                "valore": 48.3,
+                "testo": "48,3 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 50.7,
+                "testo": "50,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 2.4,
+                "testo": "+2,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Brindisi",
+              "prima": {
+                "valore": 27.0,
+                "testo": "27,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.6,
+                "testo": "24,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.4,
+                "testo": "-2,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Catania",
+              "prima": {
+                "valore": 34.2,
+                "testo": "34,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 36.6,
+                "testo": "36,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 2.4,
+                "testo": "+2,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Como",
+              "prima": {
+                "valore": 32.5,
+                "testo": "32,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 30.2,
+                "testo": "30,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.3,
+                "testo": "-2,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Barletta-Andria-Trani",
+              "prima": {
+                "valore": 18.0,
+                "testo": "18,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 15.8,
+                "testo": "15,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.2,
+                "testo": "-2,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Firenze",
+              "prima": {
+                "valore": 39.3,
+                "testo": "39,3 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.1,
+                "testo": "37,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.2,
+                "testo": "-2,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Avellino",
+              "prima": {
+                "valore": 38.7,
+                "testo": "38,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 36.7,
+                "testo": "36,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Enna",
+              "prima": {
+                "valore": 46.4,
+                "testo": "46,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 44.4,
+                "testo": "44,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Trapani",
+              "prima": {
+                "valore": 18.7,
+                "testo": "18,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 20.7,
+                "testo": "20,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 2.0,
+                "testo": "+2,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Venezia",
+              "prima": {
+                "valore": 33.8,
+                "testo": "33,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 31.8,
+                "testo": "31,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Chieti",
+              "prima": {
+                "valore": 31.8,
+                "testo": "31,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 29.9,
+                "testo": "29,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Forlì-Cesena",
+              "prima": {
+                "valore": 38.8,
+                "testo": "38,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 36.9,
+                "testo": "36,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pisa",
+              "prima": {
+                "valore": 41.0,
+                "testo": "41,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 39.1,
+                "testo": "39,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Prato",
+              "prima": {
+                "valore": 26.4,
+                "testo": "26,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.5,
+                "testo": "24,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Napoli",
+              "prima": {
+                "valore": 30.7,
+                "testo": "30,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 28.9,
+                "testo": "28,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Vibo Valentia",
+              "prima": {
+                "valore": 16.0,
+                "testo": "16,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 17.8,
+                "testo": "17,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 1.8,
+                "testo": "+1,8 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Bari",
+              "prima": {
+                "valore": 33.9,
+                "testo": "33,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.2,
+                "testo": "32,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "L'Aquila",
+              "prima": {
+                "valore": 39.1,
+                "testo": "39,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 40.8,
+                "testo": "40,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 1.7,
+                "testo": "+1,7 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Asti",
+              "prima": {
+                "valore": 26.1,
+                "testo": "26,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.5,
+                "testo": "24,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Foggia",
+              "prima": {
+                "valore": 41.7,
+                "testo": "41,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 40.1,
+                "testo": "40,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Trento",
+              "prima": {
+                "valore": 38.7,
+                "testo": "38,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 40.3,
+                "testo": "40,3 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 1.6,
+                "testo": "+1,6 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Biella",
+              "prima": {
+                "valore": 30.6,
+                "testo": "30,6 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.1,
+                "testo": "32,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 1.5,
+                "testo": "+1,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Brescia",
+              "prima": {
+                "valore": 39.1,
+                "testo": "39,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.6,
+                "testo": "37,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Terni",
+              "prima": {
+                "valore": 36.2,
+                "testo": "36,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.8,
+                "testo": "34,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Gorizia",
+              "prima": {
+                "valore": 28.0,
+                "testo": "28,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 26.6,
+                "testo": "26,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Reggio Calabria",
+              "prima": {
+                "valore": 26.5,
+                "testo": "26,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 27.8,
+                "testo": "27,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 1.3,
+                "testo": "+1,3 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Mantova",
+              "prima": {
+                "valore": 29.1,
+                "testo": "29,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 27.9,
+                "testo": "27,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Nuoro",
+              "prima": {
+                "valore": 29.9,
+                "testo": "29,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 28.7,
+                "testo": "28,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Oristano",
+              "prima": {
+                "valore": 31.5,
+                "testo": "31,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 30.3,
+                "testo": "30,3 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Perugia",
+              "prima": {
+                "valore": 33.7,
+                "testo": "33,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.6,
+                "testo": "32,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Lodi",
+              "prima": {
+                "valore": 23.9,
+                "testo": "23,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 22.8,
+                "testo": "22,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Agrigento",
+              "prima": {
+                "valore": 21.0,
+                "testo": "21,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 22.0,
+                "testo": "22,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 1.0,
+                "testo": "+1,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Lecce",
+              "prima": {
+                "valore": 30.7,
+                "testo": "30,7 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 29.7,
+                "testo": "29,7 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Potenza",
+              "prima": {
+                "valore": 36.0,
+                "testo": "36,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 36.9,
+                "testo": "36,9 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.9,
+                "testo": "+0,90 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Teramo",
+              "prima": {
+                "valore": 27.4,
+                "testo": "27,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 26.5,
+                "testo": "26,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Livorno",
+              "prima": {
+                "valore": 22.4,
+                "testo": "22,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 23.2,
+                "testo": "23,2 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.8,
+                "testo": "+0,80 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Caserta",
+              "prima": {
+                "valore": 25.1,
+                "testo": "25,1 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.4,
+                "testo": "24,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Siena",
+              "prima": {
+                "valore": 38.5,
+                "testo": "38,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.8,
+                "testo": "37,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Matera",
+              "prima": {
+                "valore": 31.3,
+                "testo": "31,3 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 30.6,
+                "testo": "30,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Arezzo",
+              "prima": {
+                "valore": 27.0,
+                "testo": "27,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 27.6,
+                "testo": "27,6 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Caltanissetta",
+              "prima": {
+                "valore": 25.2,
+                "testo": "25,2 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 25.8,
+                "testo": "25,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Lucca",
+              "prima": {
+                "valore": 32.0,
+                "testo": "32,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 31.4,
+                "testo": "31,4 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Torino",
+              "prima": {
+                "valore": 38.4,
+                "testo": "38,4 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 37.8,
+                "testo": "37,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Genova",
+              "prima": {
+                "valore": 42.5,
+                "testo": "42,5 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 42.1,
+                "testo": "42,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Siracusa",
+              "prima": {
+                "valore": 25.9,
+                "testo": "25,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 25.5,
+                "testo": "25,5 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Roma",
+              "prima": {
+                "valore": 38.9,
+                "testo": "38,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 39.1,
+                "testo": "39,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Ragusa",
+              "prima": {
+                "valore": 23.8,
+                "testo": "23,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 24.0,
+                "testo": "24,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Bergamo",
+              "prima": {
+                "valore": 33.9,
+                "testo": "33,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 34.0,
+                "testo": "34,0 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Palermo",
+              "prima": {
+                "valore": 33.9,
+                "testo": "33,9 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 33.8,
+                "testo": "33,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Vercelli",
+              "prima": {
+                "valore": 32.0,
+                "testo": "32,0 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 32.1,
+                "testo": "32,1 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10 per 10.000 abitanti"
+              }
+            },
+            {
+              "territorio": "Pistoia",
+              "prima": {
+                "valore": 22.8,
+                "testo": "22,8 per 10.000 abitanti"
+              },
+              "dopo": {
+                "valore": 22.8,
+                "testo": "22,8 per 10.000 abitanti"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "provincia"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione, la regione della provincia",
+    "territori": [
+      {
+        "territorio": "Verbano-Cusio-Ossola",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 55.9,
+          "testo": "55,9 per 10.000 abitanti"
+        },
+        "regione": "Piemonte",
+        "contesto": {
+          "ter-901": {
+            "valore": 38625.5,
+            "testo": "38.626 euro"
+          },
+          "ter-902": {
+            "valore": 25426.3,
+            "testo": "25.426 euro"
+          },
+          "ter-13": {
+            "valore": 68.935532,
+            "testo": "68,9%"
+          },
+          "ter-345": {
+            "valore": 74.279862,
+            "testo": "74,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Cagliari",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 50.7,
+          "testo": "50,7 per 10.000 abitanti"
+        },
+        "regione": "Sardegna",
+        "contesto": {
+          "ter-901": {
+            "valore": 27730.8,
+            "testo": "27.731 euro"
+          },
+          "ter-902": {
+            "valore": 19869.5,
+            "testo": "19.870 euro"
+          },
+          "ter-13": {
+            "valore": 58.241812,
+            "testo": "58,2%"
+          },
+          "ter-345": {
+            "valore": 62.289655,
+            "testo": "62,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Pavia",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 47.2,
+          "testo": "47,2 per 10.000 abitanti"
+        },
+        "regione": "Lombardia",
+        "contesto": {
+          "ter-901": {
+            "valore": 50398.9,
+            "testo": "50.399 euro"
+          },
+          "ter-902": {
+            "valore": 28154.3,
+            "testo": "28.154 euro"
+          },
+          "ter-13": {
+            "valore": 69.551243,
+            "testo": "69,6%"
+          },
+          "ter-345": {
+            "valore": 75.087736,
+            "testo": "75,1%"
+          }
+        }
+      },
+      {
+        "territorio": "Vibo Valentia",
+        "posizione_per_valore": 105,
+        "valore": {
+          "valore": 17.8,
+          "testo": "17,8 per 10.000 abitanti"
+        },
+        "regione": "Calabria",
+        "contesto": {
+          "ter-901": {
+            "valore": 21702.2,
+            "testo": "21.702 euro"
+          },
+          "ter-902": {
+            "valore": 16795.9,
+            "testo": "16.796 euro"
+          },
+          "ter-13": {
+            "valore": 46.414324,
+            "testo": "46,4%"
+          },
+          "ter-345": {
+            "valore": 50.346862,
+            "testo": "50,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Barletta-Andria-Trani",
+        "posizione_per_valore": 106,
+        "valore": {
+          "valore": 15.8,
+          "testo": "15,8 per 10.000 abitanti"
+        },
+        "regione": "Puglia",
+        "contesto": {
+          "ter-901": {
+            "valore": 24327.7,
+            "testo": "24.328 euro"
+          },
+          "ter-902": {
+            "valore": 17897.7,
+            "testo": "17.898 euro"
+          },
+          "ter-13": {
+            "valore": 51.007894,
+            "testo": "51,0%"
+          },
+          "ter-345": {
+            "valore": 55.185587,
+            "testo": "55,2%"
+          }
+        }
+      },
+      {
+        "territorio": "Sud Sardegna",
+        "posizione_per_valore": 107,
+        "valore": {
+          "valore": 14.9,
+          "testo": "14,9 per 10.000 abitanti"
+        },
+        "regione": "Sardegna",
+        "contesto": {
+          "ter-901": {
+            "valore": 27730.8,
+            "testo": "27.731 euro"
+          },
+          "ter-902": {
+            "valore": 19869.5,
+            "testo": "19.870 euro"
+          },
+          "ter-13": {
+            "valore": 58.241812,
+            "testo": "58,2%"
+          },
+          "ter-345": {
+            "valore": 62.289655,
+            "testo": "62,3%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": null,
+    "motivo_senza_correlazioni": "livello provinciale: i quattro indicatori di contesto sono regionali"
+  }
+}

@@ -1,0 +1,1511 @@
+{
+  "identita": {
+    "chiave": "multiscopo:MULTI_GUARDIA_MEDICA",
+    "codice": "ims-MULTI_GUARDIA_MEDICA",
+    "nome": "Persone che hanno usato la guardia medica negli ultimi 3 mesi",
+    "percorso": "/indicatore/persone-che-hanno-usato-la-guardia-medica-negli-ultimi-3-mesi/ims-MULTI_GUARDIA_MEDICA",
+    "tema": "Salute, demografia e cura",
+    "sottotema_fonte": "Salute",
+    "definizione_fonte": "Indagine Multiscopo sulle famiglie, Istat SDMX, 83_63_DF_DCCV_AVQ_PERSONE_216",
+    "unita": {
+      "fonte": "per 1000 persone",
+      "cifra": "per 1000 persone",
+      "variazione": "per 1000 persone"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' alto",
+      "classifica_attiva": false
+    },
+    "livelli": [
+      {
+        "livello": "regione",
+        "percorso": "/indicatore/persone-che-hanno-usato-la-guardia-medica-negli-ultimi-3-mesi/ims-MULTI_GUARDIA_MEDICA",
+        "primo_anno": 2018,
+        "ultimo_anno": 2025,
+        "anni": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "territori_ultimo_anno": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2018,
+      "ultimo": 2025
+    },
+    "fonte": {
+      "etichetta": "Istat, Indagine Multiscopo sulle famiglie",
+      "famiglia": "Istat, vita quotidiana delle famiglie",
+      "istituzione": "Istat",
+      "url": "https://esploradati.istat.it/databrowser/#/it",
+      "url_dati": "https://esploradati.istat.it/SDMXWS/rest/data/83_63_DF_DCCV_AVQ_PERSONE_216",
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "regione",
+      "fotografia": {
+        "anno": 2025,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 68.5,
+              "testo": "68,5 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 49.5,
+              "testo": "49,5 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 46.9,
+              "testo": "46,9 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 46.755422,
+              "testo": "46,8 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Marche",
+            "chiave": "marche",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 46.7,
+              "testo": "46,7 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 45.4,
+              "testo": "45,4 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Emilia-Romagna",
+            "chiave": "emilia-romagna",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 45.3,
+              "testo": "45,3 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Abruzzo",
+            "chiave": "abruzzo",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 41.7,
+              "testo": "41,7 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Umbria",
+            "chiave": "umbria",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 40.3,
+              "testo": "40,3 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 39.4,
+              "testo": "39,4 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Toscana",
+            "chiave": "toscana",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 39.4,
+              "testo": "39,4 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Molise",
+            "chiave": "molise",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 35.9,
+              "testo": "35,9 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 34.1,
+              "testo": "34,1 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 32.1,
+              "testo": "32,1 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 31.6,
+              "testo": "31,6 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Friuli-Venezia Giulia",
+            "chiave": "friuli-venezia-giulia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 30.8,
+              "testo": "30,8 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Valle d'Aosta",
+            "chiave": "valle-d-aosta",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 30.1,
+              "testo": "30,1 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 27.6,
+              "testo": "27,6 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Veneto",
+            "chiave": "veneto",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 27.2,
+              "testo": "27,2 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Liguria",
+            "chiave": "liguria",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 23.8,
+              "testo": "23,8 per 1000 persone"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 20 regioni, non la media nazionale",
+          "valore": 39.152771,
+          "testo": "39,2 per 1000 persone"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 39.4,
+          "testo": "39,4 per 1000 persone"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 11,
+          "testo": "11"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 9,
+          "testo": "9"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 68.5,
+              "testo": "68,5 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 49.5,
+              "testo": "49,5 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 46.9,
+              "testo": "46,9 per 1000 persone"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Liguria",
+            "chiave": "liguria",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 23.8,
+              "testo": "23,8 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Veneto",
+            "chiave": "veneto",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 27.2,
+              "testo": "27,2 per 1000 persone"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 27.6,
+              "testo": "27,6 per 1000 persone"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 44.7,
+          "testo": "44,7 per 1000 persone"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 2.878151,
+          "testo": "2,9 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle regioni di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 32.894428,
+                "testo": "32,9 per 1000 persone"
+              },
+              "piu_alto": {
+                "territorio": "Trentino Alto Adige",
+                "valore": {
+                  "valore": 46.755422,
+                  "testo": "46,8 per 1000 persone"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Liguria",
+                "valore": {
+                  "valore": 23.8,
+                  "testo": "23,8 per 1000 persone"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 4,
+                "testo": "4"
+              },
+              "media_semplice": {
+                "valore": 40.125,
+                "testo": "40,1 per 1000 persone"
+              },
+              "piu_alto": {
+                "territorio": "Marche",
+                "valore": {
+                  "valore": 46.7,
+                  "testo": "46,7 per 1000 persone"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Lazio",
+                "valore": {
+                  "valore": 34.1,
+                  "testo": "34,1 per 1000 persone"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 44.925,
+                "testo": "44,9 per 1000 persone"
+              },
+              "piu_alto": {
+                "territorio": "Basilicata",
+                "valore": {
+                  "valore": 68.5,
+                  "testo": "68,5 per 1000 persone"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Campania",
+                "valore": {
+                  "valore": 32.1,
+                  "testo": "32,1 per 1000 persone"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 43.908023,
+              "testo": "43,9 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 45.8,
+              "testo": "45,8 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 44.972233,
+              "testo": "45,0 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 43.4,
+              "testo": "43,4 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 33.273292,
+              "testo": "33,3 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 35.4,
+              "testo": "35,4 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 26.465581,
+              "testo": "26,5 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 23.6,
+              "testo": "23,6 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 30.921251,
+              "testo": "30,9 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 64.3,
+              "testo": "64,3 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2023,
+            "media_semplice": {
+              "valore": 32.486998,
+              "testo": "32,5 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 42.0,
+              "testo": "42,0 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2024,
+            "media_semplice": {
+              "valore": 42.655909,
+              "testo": "42,7 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 59.8,
+              "testo": "59,8 per 1000 persone"
+            }
+          },
+          {
+            "anno": 2025,
+            "media_semplice": {
+              "valore": 39.152771,
+              "testo": "39,2 per 1000 persone"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 44.7,
+              "testo": "44,7 per 1000 persone"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "totale": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 43.908023,
+                "testo": "43,9 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 44.972233,
+                "testo": "45,0 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 33.273292,
+                "testo": "33,3 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 26.465581,
+                "testo": "26,5 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 30.921251,
+                "testo": "30,9 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2023,
+              "valore": {
+                "valore": 32.486998,
+                "testo": "32,5 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2024,
+              "valore": {
+                "valore": 42.655909,
+                "testo": "42,7 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2025,
+              "valore": {
+                "valore": 39.152771,
+                "testo": "39,2 per 1000 persone"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2019,
+            "valore": {
+              "valore": 44.972233,
+              "testo": "45,0 per 1000 persone"
+            }
+          },
+          "minimo": {
+            "anno": 2021,
+            "valore": {
+              "valore": 26.465581,
+              "testo": "26,5 per 1000 persone"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2019,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 44.972233,
+                "testo": "45,0 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2021,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 26.465581,
+                "testo": "26,5 per 1000 persone"
+              }
+            },
+            {
+              "anno": 2024,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 42.655909,
+                "testo": "42,7 per 1000 persone"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2018,
+              "a": 2019,
+              "verso": "sale"
+            },
+            {
+              "da": 2019,
+              "a": 2021,
+              "verso": "scende"
+            },
+            {
+              "da": 2021,
+              "a": 2024,
+              "verso": "sale"
+            },
+            {
+              "da": 2024,
+              "a": 2025,
+              "verso": "scende"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2018,
+          "a": 2025,
+          "media_semplice_da": {
+            "valore": 43.908023,
+            "testo": "43,9 per 1000 persone"
+          },
+          "media_semplice_a": {
+            "valore": 39.152771,
+            "testo": "39,2 per 1000 persone"
+          },
+          "assoluta": {
+            "valore": -4.755252,
+            "testo": "-4,8 per 1000 persone"
+          },
+          "relativa": {
+            "valore": -10.83003,
+            "testo": "-10,8%"
+          },
+          "territori_da": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "territori_a": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "sul_pannello": {
+            "da": 2018,
+            "a": 2025,
+            "assoluta": {
+              "valore": -4.755252,
+              "testo": "-4,8 per 1000 persone"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2024,
+          "a": 2025,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "media_semplice_da": {
+            "valore": 42.655909,
+            "testo": "42,7 per 1000 persone"
+          },
+          "media_semplice_a": {
+            "valore": 39.152771,
+            "testo": "39,2 per 1000 persone"
+          },
+          "variazione": {
+            "valore": -3.503138,
+            "testo": "-3,5 per 1000 persone"
+          },
+          "in_aumento": {
+            "valore": 8,
+            "testo": "8"
+          },
+          "in_calo": {
+            "valore": 12,
+            "testo": "12"
+          },
+          "invariati": {
+            "valore": 0,
+            "testo": "0"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 32.6,
+                "testo": "32,6 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 45.4,
+                "testo": "45,4 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 12.8,
+                "testo": "+12,8 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 58.2,
+                "testo": "58,2 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 68.5,
+                "testo": "68,5 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 10.3,
+                "testo": "+10,3 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 24.8,
+                "testo": "24,8 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 34.1,
+                "testo": "34,1 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 9.3,
+                "testo": "+9,3 per 1000 persone"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 78.1,
+                "testo": "78,1 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 35.9,
+                "testo": "35,9 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -42.2,
+                "testo": "-42,2 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 65.5,
+                "testo": "65,5 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 49.5,
+                "testo": "49,5 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -16.0,
+                "testo": "-16,0 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 61.018187,
+                "testo": "61,0 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 46.755422,
+                "testo": "46,8 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -14.262765,
+                "testo": "-14,3 per 1000 persone"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2018,
+          "a": 2025,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "aumenti": [
+            {
+              "territorio": "Lazio",
+              "variazione": {
+                "valore": 10.1,
+                "testo": "+10,1 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Basilicata",
+              "variazione": {
+                "valore": 7.5,
+                "testo": "+7,5 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Puglia",
+              "variazione": {
+                "valore": 7.2,
+                "testo": "+7,2 per 1000 persone"
+              }
+            }
+          ],
+          "cali": [
+            {
+              "territorio": "Molise",
+              "variazione": {
+                "valore": -28.8,
+                "testo": "-28,8 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "variazione": {
+                "valore": -25.8,
+                "testo": "-25,8 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "variazione": {
+                "valore": -20.3,
+                "testo": "-20,3 per 1000 persone"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2018,
+          "a": 2025,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "valori": [
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 64.7,
+                "testo": "64,7 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 35.9,
+                "testo": "35,9 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -28.8,
+                "testo": "-28,8 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 55.9,
+                "testo": "55,9 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 30.1,
+                "testo": "30,1 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -25.8,
+                "testo": "-25,8 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 69.8,
+                "testo": "69,8 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 49.5,
+                "testo": "49,5 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -20.3,
+                "testo": "-20,3 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 63.160459,
+                "testo": "63,2 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 46.755422,
+                "testo": "46,8 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -16.405037,
+                "testo": "-16,4 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 52.1,
+                "testo": "52,1 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 39.4,
+                "testo": "39,4 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -12.7,
+                "testo": "-12,7 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 24.0,
+                "testo": "24,0 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 34.1,
+                "testo": "34,1 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 10.1,
+                "testo": "+10,1 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Liguria",
+              "prima": {
+                "valore": 33.5,
+                "testo": "33,5 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 23.8,
+                "testo": "23,8 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -9.7,
+                "testo": "-9,7 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 61.0,
+                "testo": "61,0 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 68.5,
+                "testo": "68,5 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 7.5,
+                "testo": "+7,5 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Puglia",
+              "prima": {
+                "valore": 39.7,
+                "testo": "39,7 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 46.9,
+                "testo": "46,9 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 7.2,
+                "testo": "+7,2 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Campania",
+              "prima": {
+                "valore": 38.3,
+                "testo": "38,3 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 32.1,
+                "testo": "32,1 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -6.2,
+                "testo": "-6,2 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "prima": {
+                "valore": 37.1,
+                "testo": "37,1 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 31.6,
+                "testo": "31,6 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -5.5,
+                "testo": "-5,5 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Veneto",
+              "prima": {
+                "valore": 32.4,
+                "testo": "32,4 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 27.2,
+                "testo": "27,2 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -5.2,
+                "testo": "-5,2 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Abruzzo",
+              "prima": {
+                "valore": 37.0,
+                "testo": "37,0 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 41.7,
+                "testo": "41,7 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 4.7,
+                "testo": "+4,7 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "prima": {
+                "valore": 42.9,
+                "testo": "42,9 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 46.7,
+                "testo": "46,7 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 3.8,
+                "testo": "+3,8 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Emilia-Romagna",
+              "prima": {
+                "valore": 47.4,
+                "testo": "47,4 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 45.3,
+                "testo": "45,3 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Umbria",
+              "prima": {
+                "valore": 38.4,
+                "testo": "38,4 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 40.3,
+                "testo": "40,3 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 1.9,
+                "testo": "+1,9 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Friuli-Venezia Giulia",
+              "prima": {
+                "valore": 29.6,
+                "testo": "29,6 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 30.8,
+                "testo": "30,8 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 1.2,
+                "testo": "+1,2 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "prima": {
+                "valore": 38.2,
+                "testo": "38,2 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 39.4,
+                "testo": "39,4 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 1.2,
+                "testo": "+1,2 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Lombardia",
+              "prima": {
+                "valore": 28.0,
+                "testo": "28,0 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 27.6,
+                "testo": "27,6 per 1000 persone"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 per 1000 persone"
+              }
+            },
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 45.0,
+                "testo": "45,0 per 1000 persone"
+              },
+              "dopo": {
+                "valore": 45.4,
+                "testo": "45,4 per 1000 persone"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40 per 1000 persone"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "regione"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione",
+    "territori": [
+      {
+        "territorio": "Basilicata",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 68.5,
+          "testo": "68,5 per 1000 persone"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 28416.3,
+            "testo": "28.416 euro"
+          },
+          "ter-902": {
+            "valore": 17816.1,
+            "testo": "17.816 euro"
+          },
+          "ter-13": {
+            "valore": 57.393507,
+            "testo": "57,4%"
+          },
+          "ter-345": {
+            "valore": 61.787063,
+            "testo": "61,8%"
+          }
+        }
+      },
+      {
+        "territorio": "Sardegna",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 49.5,
+          "testo": "49,5 per 1000 persone"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 27730.8,
+            "testo": "27.731 euro"
+          },
+          "ter-902": {
+            "valore": 19869.5,
+            "testo": "19.870 euro"
+          },
+          "ter-13": {
+            "valore": 58.241812,
+            "testo": "58,2%"
+          },
+          "ter-345": {
+            "valore": 62.289655,
+            "testo": "62,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Puglia",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 46.9,
+          "testo": "46,9 per 1000 persone"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 24327.7,
+            "testo": "24.328 euro"
+          },
+          "ter-902": {
+            "valore": 17897.7,
+            "testo": "17.898 euro"
+          },
+          "ter-13": {
+            "valore": 51.007894,
+            "testo": "51,0%"
+          },
+          "ter-345": {
+            "valore": 55.185587,
+            "testo": "55,2%"
+          }
+        }
+      },
+      {
+        "territorio": "Lombardia",
+        "posizione_per_valore": 18,
+        "valore": {
+          "valore": 27.6,
+          "testo": "27,6 per 1000 persone"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 50398.9,
+            "testo": "50.399 euro"
+          },
+          "ter-902": {
+            "valore": 28154.3,
+            "testo": "28.154 euro"
+          },
+          "ter-13": {
+            "valore": 69.551243,
+            "testo": "69,6%"
+          },
+          "ter-345": {
+            "valore": 75.087736,
+            "testo": "75,1%"
+          }
+        }
+      },
+      {
+        "territorio": "Veneto",
+        "posizione_per_valore": 19,
+        "valore": {
+          "valore": 27.2,
+          "testo": "27,2 per 1000 persone"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 41496.3,
+            "testo": "41.496 euro"
+          },
+          "ter-902": {
+            "valore": 24652.3,
+            "testo": "24.652 euro"
+          },
+          "ter-13": {
+            "valore": 69.25615,
+            "testo": "69,3%"
+          },
+          "ter-345": {
+            "valore": 74.714514,
+            "testo": "74,7%"
+          }
+        }
+      },
+      {
+        "territorio": "Liguria",
+        "posizione_per_valore": 20,
+        "valore": {
+          "valore": 23.8,
+          "testo": "23,8 per 1000 persone"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 38841.8,
+            "testo": "38.842 euro"
+          },
+          "ter-902": {
+            "valore": 25503.6,
+            "testo": "25.504 euro"
+          },
+          "ter-13": {
+            "valore": 68.757429,
+            "testo": "68,8%"
+          },
+          "ter-345": {
+            "valore": 73.768826,
+            "testo": "73,8%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.242105,
+          "testo": "-0,24"
+        }
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.257143,
+          "testo": "-0,26"
+        }
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "anno": 2025,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.306882,
+          "testo": "-0,31"
+        }
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "anno": 2025,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.311395,
+          "testo": "-0,31"
+        }
+      }
+    ],
+    "motivo_senza_correlazioni": null
+  }
+}
