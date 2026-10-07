@@ -32,6 +32,7 @@ import argparse
 import re
 import statistics
 import sys
+import textwrap
 from html import escape
 
 from app.design.common import _nice_ticks, tick_label
@@ -62,16 +63,36 @@ def _source_line(meta: dict) -> str:
     return f"Fonte: {institution}, {archive}. Elaborazione Divario Italia."
 
 
-def _head(title: str, subtitle: str, height: int, description: str) -> list[str]:
-    return [
+def _head(title: str, subtitle: str, height: int, description: str, *,
+          title_lines: list[str] | None = None, subtitle_lines: list[str] | None = None,
+          mobile_text: bool = False) -> list[str]:
+    title_lines = title_lines or [title]
+    subtitle_lines = subtitle_lines or [subtitle]
+    title_markup = "".join(
+        f'<tspan x="0" dy="{0 if i == 0 else 24}">{escape(line)}</tspan>'
+        for i, line in enumerate(title_lines)
+    )
+    subtitle_y = 20 + 24 * len(title_lines)
+    subtitle_markup = "".join(
+        f'<tspan x="0" dy="{0 if i == 0 else 18}">{escape(line)}</tspan>'
+        for i, line in enumerate(subtitle_lines)
+    )
+    parts = [
         # @ID@ diventa il nome della figura: due figure nella stessa pagina
         # non devono condividere gli id a cui punta aria-labelledby.
         f'<svg class="fig" viewBox="0 0 {WIDTH} {height}" role="img" aria-labelledby="@ID@-t @ID@-d" xmlns="http://www.w3.org/2000/svg">',
         f'<title id="@ID@-t">{escape(title)}</title>',
         f'<desc id="@ID@-d">{escape(description)}</desc>',
-        f'<text class="fig__title" x="0" y="20">{escape(title)}</text>',
-        f'<text class="fig__subtitle" x="0" y="40">{escape(subtitle)}</text>',
+        f'<text class="fig__title" x="0" y="20">{title_markup}</text>',
+        f'<text class="fig__subtitle" x="0" y="{subtitle_y}">{subtitle_markup}</text>',
     ]
+    if mobile_text:
+        parts.insert(1, '<style>@media (max-width: 600px) { .fig__title { font-size: 30px !important; } .fig__subtitle, .fig__axis, .fig__axis-name, .fig__pt-name { font-size: 22px !important; } }</style>')
+    return parts
+
+
+def _wrapped_lines(text: str, width: int) -> list[str]:
+    return textwrap.wrap(text, width=width, break_long_words=False, break_on_hyphens=False) or [""]
 
 
 def _subtitle(name: str, period: str, unit: str, extra: str = "") -> str:
@@ -238,7 +259,22 @@ def lines(slug, key, territories, title, simple_areas=True, with_key=None):
     return "\n".join(parts)
 
 
-def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name_y, subtitle=None):
+def _should_label(territory: str, highlight: set[str], label_territories: set[str] | None,
+                  name_all: bool) -> bool:
+    """Keep default labels unchanged; optionally name only selected territories."""
+    return name_all if label_territories is None else territory in highlight or territory in label_territories
+
+
+def _cover_max(ticks: list[float], maximum: float) -> list[float]:
+    """Add nice steps when rounded ticks otherwise clip a maximum data point."""
+    step = ticks[1] - ticks[0]
+    while ticks[-1] < maximum:
+        ticks.append(round(ticks[-1] + step, 10))
+    return ticks
+
+
+def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name_y, subtitle=None,
+            label_territories=None):
     """Un territorio per punto: un indicatore contro un altro.
 
     Due anni: la variazione fra i due. Un anno solo: il livello. Serve a
@@ -274,8 +310,7 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
     })
     print("legami:", links)
 
-    top, bottom, left, right = 60, 86, 56, 24
-    height = 440
+    bottom, left, right = 86, 56, 24
     xs, ys = [p[1] for p in points], [p[2] for p in points]
     changes = len(years_x) == 2
     # Con le variazioni lo zero deve stare nel disegno: separa chi e' salito da chi e' sceso.
@@ -283,7 +318,8 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
     y0, y1 = (min([*ys, 0]) if len(years_y) == 2 else min(ys)), max(ys)
     mx, my = (x1 - x0) * 0.08, (y1 - y0) * 0.08
     x0, x1, y0, y1 = x0 - mx, x1 + mx, y0 - my, y1 + my
-    x_ticks, y_ticks = _nice_ticks(x0, x1), _nice_ticks(y0, y1)
+    x_ticks = _cover_max(_nice_ticks(x0, x1), max(xs))
+    y_ticks = _cover_max(_nice_ticks(y0, y1), max(ys))
     x0, x1, y0, y1 = x_ticks[0], x_ticks[-1], y_ticks[0], y_ticks[-1]
 
     def px(v):
@@ -300,7 +336,12 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
         else:
             subtitle = f"Variazione {years_x[0]}-{years_x[1]} e {years_y[0]}-{years_y[1]}, in punti percentuali."
     description = "; ".join(f"{t}: {common.fmt(dx, 1)} e {common.fmt(dy, 1)}" for t, dx, dy in points)
-    parts = _head(title, subtitle, height, description)
+    title_lines = _wrapped_lines(title, 54)
+    subtitle_lines = _wrapped_lines(subtitle, 62)
+    top = 20 + 24 * len(title_lines) + 18 * len(subtitle_lines) + 12
+    height = 440 + top - 60
+    parts = _head(title, subtitle, height, description, title_lines=title_lines,
+                  subtitle_lines=subtitle_lines, mobile_text=True)
     if x0 < 0 < x1:
         parts.append(f'<line class="fig__grid" x1="{px(0):.1f}" y1="{top}" x2="{px(0):.1f}" y2="{height - bottom}"/>')
     if y0 < 0 < y1:
@@ -312,24 +353,27 @@ def scatter(slug, key_x, key_y, years_x, years_y, highlight, title, name_x, name
     parts.append(f'<text class="fig__axis-name" x="{WIDTH - right}" y="{height - bottom + 34}" text-anchor="end">{escape(name_x)} →</text>')
     parts.append(f'<text class="fig__axis-name" x="{left}" y="{top - 8}">↑ {escape(name_y)}</text>')
     name_all = len(points) <= 25  # con 100 province si nominano solo quelle di cui il testo parla
+    label_step = 24 if label_territories is not None else 12
+    label_width = 12.4 if label_territories is not None else 6.2
     labels = []
+    selected = set(highlight)
     for t, dx, dy in points:
-        on = " is-on" if t in highlight else ""
+        on = " is-on" if t in selected else ""
         if group[t] == "Mezzogiorno":
             parts.append(f'<rect class="fig__pt fig__pt--south{on}" x="{px(dx) - 4:.1f}" y="{py(dy) - 4:.1f}" width="8" height="8"/>')
         else:
             parts.append(f'<circle class="fig__pt fig__pt--cn{on}" cx="{px(dx):.1f}" cy="{py(dy):.1f}" r="4.5"/>')
-        if name_all or on:
+        if _should_label(t, selected, label_territories, name_all):
             to_right = px(dx) < WIDTH - 140
-            width = 6.2 * len(t)
+            width = label_width * len(t)
             x_text = px(dx) + (7 if to_right else -7)
             labels.append([py(dy) + 4, x_text if to_right else x_text - width, width, x_text, to_right, on, t])
     # Le etichette che si toccano scivolano in basso di una riga, una dopo l'altra.
     labels.sort()
     placed: list[list] = []
     for lab in labels:
-        while any(abs(lab[0] - p[0]) < 12 and lab[1] < p[1] + p[2] and p[1] < lab[1] + lab[2] for p in placed):
-            lab[0] += 12
+        while any(abs(lab[0] - p[0]) < label_step and lab[1] < p[1] + p[2] and p[1] < lab[1] + lab[2] for p in placed):
+            lab[0] += label_step
         placed.append(lab)
         yy, _, _, x_text, to_right, on, t = lab
         anchor = "" if to_right else ' text-anchor="end"'
@@ -362,6 +406,7 @@ def main(argv=None) -> int:
     parser.add_argument("--subtitle")
     parser.add_argument("--reference", help="bars/extremes: ext:bes_areas_* da cui prendere il valore Italia")
     parser.add_argument("--highlight", default="")
+    parser.add_argument("--labels", help="scatter: territori da etichettare oltre a quelli evidenziati")
     parser.add_argument("--territories", default="")
     parser.add_argument("--count", type=int, default=10)
     parser.add_argument("--year", type=int)
@@ -378,7 +423,8 @@ def main(argv=None) -> int:
     elif args.kind == "scatter":
         svg = scatter(args.slug, args.indicator, args.with_key, [int(y) for y in split(args.years_x)],
                       [int(y) for y in split(args.years_y)], set(split(args.highlight)), args.title,
-                      args.name_x, args.name_y, args.subtitle)
+                      args.name_x, args.name_y, args.subtitle,
+                      set(split(args.labels)) if args.labels is not None else None)
     else:
         svg = lines(args.slug, args.indicator, split(args.territories), args.title, not args.no_simple_areas, args.with_key)
 
