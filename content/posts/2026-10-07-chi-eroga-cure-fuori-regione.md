@@ -5,6 +5,15 @@ slug: chi-eroga-cure-fuori-regione
 description: "Nel 2023 in Lombardia il privato fa il 73,2% dei ricoveri di chi arriva da fuori e il 61,9% della specialistica. In Emilia-Romagna il 59,1% e il 25,5%."
 date: 2026-10-07
 draft: true
+cover: /static/img/blog/chi-eroga-cure-fuori-regione.jpg
+cover_alt: "La facciata gialla del padiglione Francesco Ponti del Policlinico di Milano, con la pensilina in ferro e vetro sopra l'ingresso e il cielo azzurro sopra."
+cover_credit:
+  author: "Chabe01"
+  license: "CC BY-SA 4.0"
+  license_url: "https://creativecommons.org/licenses/by-sa/4.0"
+  source_url: "https://commons.wikimedia.org/wiki/File:Pavillon_Francesco_Ponti_Polyclinique_Milan_-_Milan_(IT25)_-_2022-09-02_-_2.jpg"
+  source_name: "Wikimedia Commons"
+  changes: "Ritagliata e ridimensionata"
 tags:
 - Sanità
 - Mobilità sanitaria
