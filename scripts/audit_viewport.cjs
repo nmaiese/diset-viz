@@ -34,7 +34,7 @@ function arg(name, fallback) {
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
 }
 const BASE = arg("--base", process.env.BASE || "http://127.0.0.1:5050");
-const ANALYTICS_HOSTS = ["googletagmanager.com", "google-analytics.com", "googlesyndication.com", "doubleclick.net"];
+const ANALYTICS_HOSTS = ["googletagmanager.com", "google-analytics.com", "analytics.google.com", "googlesyndication.com", "doubleclick.net"];
 const PAGES = arg("--pagine", [
   "/", "/atlante", "/confronto", "/regioni", "/regione/campania", "/province", "/provincia/lecce",
   "/temi", "/tema/lavoro-e-conciliazione", "/indicatore/tasso-di-turisticita/ter-105",

@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
 
-ANALYTICS_HOSTS = ("googletagmanager.com", "google-analytics.com", "googlesyndication.com", "doubleclick.net")
+ANALYTICS_HOSTS = ("googletagmanager.com", "google-analytics.com", "analytics.google.com", "googlesyndication.com", "doubleclick.net")
 
 
 def _route(route):

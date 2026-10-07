@@ -135,7 +135,7 @@ def parse_asset_refs(html: str) -> dict:
 
 
 def _fetch(url: str, timeout: float) -> tuple[int, bytes]:
-    request = urllib.request.Request(url, headers={"User-Agent": "DivarioItalia-Adsense-Audit/1.0"})
+    request = urllib.request.Request(url, headers={"User-Agent": "DivarioCheck/1.0 DivarioItalia-Adsense-Audit/1.0"})
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.status, response.read()
 

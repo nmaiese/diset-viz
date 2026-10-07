@@ -50,7 +50,7 @@ const VIEWPORTS = {
 const THEMES = { chiaro: "light", scuro: "dark" };
 
 const ANALYTICS_BLOCKED = [
-  "*googletagmanager.com*", "*google-analytics.com*",
+  "*googletagmanager.com*", "*google-analytics.com*", "*analytics.google.com*",
   "*googlesyndication.com*", "*doubleclick.net*",
 ];
 // Le prove visive che isolano terze parti bloccano anche consenso e login.
@@ -123,7 +123,7 @@ async function launch() {
   return { send, waitFor, close, listen, unlisten };
 }
 
-async function openPage(cdp, { viewport, theme, blocked, initScript }) {
+async function openPage(cdp, { viewport, theme, blocked = ANALYTICS_BLOCKED, initScript }) {
   const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank" });
   const { sessionId } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
   const s = (m, p) => cdp.send(m, p, sessionId);
@@ -193,7 +193,7 @@ async function shoot(label, urlFor, { blocked, initScript } = {}) {
   const outDir = join(V1, "screens", label);
   mkdirSync(outDir, { recursive: true });
   const cdp = await launch();
-  const manifest = { label, blocked: blocked || [], shots: [] };
+  const manifest = { label, blocked: blocked || ANALYTICS_BLOCKED, shots: [] };
   try {
     for (const [name, path] of Object.entries(PAGES)) {
       const url = urlFor(name, path);
