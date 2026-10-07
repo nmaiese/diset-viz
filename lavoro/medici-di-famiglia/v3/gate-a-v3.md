@@ -20,7 +20,7 @@ Fonti esterne verificate:
 | AGENAS | 2026-04-15 | https://www.agenas.gov.it/images/Terzo_Rapporto_mobilita.pdf?download=1 | Nel 2024, mobilità effettiva: 544.316 ricoveri, circa 2,4 miliardi di euro. Privato accreditato: 69,23% della spesa e 62,62% dei ricoveri. | sì |
 | Fondazione GIMBE | 2026-03-04 | https://salviamo-ssn.it/var/contenuti/Report_mobilita_sanitaria_2023.pdf | Quote private per destinazione e settore nel 2023, tabella 4.5. | sì |
 | Istat | 2026-07-08 | https://www.istat.it/wp-content/uploads/2026/07/Istat-Audizione-Commissione-Affari-Sociali_07-luglio-2026.pdf | Emigrazione per acuti in regime ordinario 2024. | sì |
-Grafico con dati esterni: quota del valore economico della mobilità sanitaria attiva erogata dal privato convenzionato; 2023; https://salviamo-ssn.it/var/contenuti/Report_mobilita_sanitaria_2023.pdf
+Grafico con dati esterni: quota del valore economico della mobilità sanitaria attiva erogata dal privato convenzionato; anno 2023; https://salviamo-ssn.it/var/contenuti/Report_mobilita_sanitaria_2023.pdf
 | criterio | esito | prova verificabile | limite |
 |---|---|---|---|
 | Fatto/domanda reale | sì | La mobilità fuori regione e chi la eroga è una domanda reale. | Il confronto non sostituisce una misurazione della qualità delle cure. |
