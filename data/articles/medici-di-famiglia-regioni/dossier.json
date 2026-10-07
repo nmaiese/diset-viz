@@ -4193,6 +4193,3744 @@
           "indicator": "ext:bes_areas_12SER027"
         }
       ]
+    },
+    {
+      "meta": {
+        "key": "bes:12SER025",
+        "family": "bes",
+        "code": "12SER025",
+        "level": "regione",
+        "theme": "Qualità dei servizi",
+        "name": "Emigrazione ospedaliera in altra regione",
+        "unit": "Valori percentuali",
+        "source": "Istat - Elaborazioni su dati delle Schede di Dimissione Ospedaliera (SDO) del Ministero della salute",
+        "archive": "Benessere equo e sostenibile, aggiornamento intermedio 2026",
+        "file": "app/static/data/Assoluti_BES_Regione.csv",
+        "years": [
+          2004,
+          2024
+        ],
+        "territories": 20,
+        "definition": "Rapporto percentuale tra le dimissioni ospedaliere effettuate in regioni diverse da quella di residenza e il totale delle dimissioni dei residenti nella regione. I dati si riferiscono ai soli ricoveri ospedalieri in regime ordinario per \"acuti\" (sono esclusi i ricoveri dei reparti di \"unità spinale\", \"recupero e riabilitazione funzionale\", \"neuro-riabilitazione\" e \"lungodegenti\").",
+        "sources": "Istat - Elaborazioni su dati delle Schede di Dimissione Ospedaliera (SDO) del Ministero della salute",
+        "source_url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip",
+        "source_reference": "Metadati.xlsx, codice 12SER025",
+        "page": "/indicatore/emigrazione-ospedaliera-in-altra-regione/bes-12SER025",
+        "decimals": 1
+      },
+      "last_year": 2024,
+      "first_year": 2004,
+      "ranking": [
+        {
+          "rank": 1,
+          "territory": "Molise",
+          "value": 32.8,
+          "text": "32,8",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 2,
+          "territory": "Basilicata",
+          "value": 28.6,
+          "text": "28,6",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 3,
+          "territory": "Calabria",
+          "value": 22.8,
+          "text": "22,8",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 4,
+          "territory": "Valle d'Aosta",
+          "value": 19.6,
+          "text": "19,6",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 5,
+          "territory": "Abruzzo",
+          "value": 16.2,
+          "text": "16,2",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 6,
+          "territory": "Liguria",
+          "value": 14.6,
+          "text": "14,6",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 7,
+          "territory": "Umbria",
+          "value": 14.1,
+          "text": "14,1",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 8,
+          "territory": "Marche",
+          "value": 13.4,
+          "text": "13,4",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 9,
+          "territory": "Trentino Alto Adige",
+          "value": 9.7,
+          "text": "9,7",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 10,
+          "territory": "Campania",
+          "value": 9.6,
+          "text": "9,6",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 11,
+          "territory": "Puglia",
+          "value": 9.3,
+          "text": "9,3",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 12,
+          "territory": "Friuli-Venezia Giulia",
+          "value": 7.9,
+          "text": "7,9",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 13,
+          "territory": "Lazio",
+          "value": 7.4,
+          "text": "7,4",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 14,
+          "territory": "Toscana",
+          "value": 7.2,
+          "text": "7,2",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 15,
+          "territory": "Sardegna",
+          "value": 7.1,
+          "text": "7,1",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 16,
+          "territory": "Sicilia",
+          "value": 7.0,
+          "text": "7,0",
+          "area": "Mezzogiorno"
+        },
+        {
+          "rank": 17,
+          "territory": "Piemonte",
+          "value": 6.8,
+          "text": "6,8",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 18,
+          "territory": "Veneto",
+          "value": 6.5,
+          "text": "6,5",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 19,
+          "territory": "Emilia-Romagna",
+          "value": 5.7,
+          "text": "5,7",
+          "area": "Centro-Nord"
+        },
+        {
+          "rank": 20,
+          "territory": "Lombardia",
+          "value": 5.3,
+          "text": "5,3",
+          "area": "Centro-Nord"
+        }
+      ],
+      "means": {
+        "2004": {
+          "territories": 20,
+          "simple_mean": 10.1,
+          "mean_mezzogiorno": 11.8625,
+          "mean_centro_nord": 8.925
+        },
+        "2005": {
+          "territories": 20,
+          "simple_mean": 10.19,
+          "mean_mezzogiorno": 11.8875,
+          "mean_centro_nord": 9.0583
+        },
+        "2006": {
+          "territories": 20,
+          "simple_mean": 10.245,
+          "mean_mezzogiorno": 11.9125,
+          "mean_centro_nord": 9.1333
+        },
+        "2007": {
+          "territories": 20,
+          "simple_mean": 10.365,
+          "mean_mezzogiorno": 12.225,
+          "mean_centro_nord": 9.125
+        },
+        "2008": {
+          "territories": 20,
+          "simple_mean": 10.4,
+          "mean_mezzogiorno": 12.475,
+          "mean_centro_nord": 9.0167
+        },
+        "2009": {
+          "territories": 20,
+          "simple_mean": 10.525,
+          "mean_mezzogiorno": 12.825,
+          "mean_centro_nord": 8.9917
+        },
+        "2010": {
+          "territories": 20,
+          "simple_mean": 10.49,
+          "mean_mezzogiorno": 12.825,
+          "mean_centro_nord": 8.9333
+        },
+        "2011": {
+          "territories": 20,
+          "simple_mean": 10.6,
+          "mean_mezzogiorno": 13.025,
+          "mean_centro_nord": 8.9833
+        },
+        "2012": {
+          "territories": 20,
+          "simple_mean": 10.58,
+          "mean_mezzogiorno": 13.4125,
+          "mean_centro_nord": 8.6917
+        },
+        "2013": {
+          "territories": 20,
+          "simple_mean": 10.685,
+          "mean_mezzogiorno": 13.65,
+          "mean_centro_nord": 8.7083
+        },
+        "2014": {
+          "territories": 20,
+          "simple_mean": 10.685,
+          "mean_mezzogiorno": 13.7625,
+          "mean_centro_nord": 8.6333
+        },
+        "2015": {
+          "territories": 20,
+          "simple_mean": 11.01,
+          "mean_mezzogiorno": 14.075,
+          "mean_centro_nord": 8.9667
+        },
+        "2016": {
+          "territories": 20,
+          "simple_mean": 11.48,
+          "mean_mezzogiorno": 14.75,
+          "mean_centro_nord": 9.3
+        },
+        "2017": {
+          "territories": 20,
+          "simple_mean": 11.32,
+          "mean_mezzogiorno": 14.7625,
+          "mean_centro_nord": 9.025
+        },
+        "2018": {
+          "territories": 20,
+          "simple_mean": 11.495,
+          "mean_mezzogiorno": 15.0875,
+          "mean_centro_nord": 9.1
+        },
+        "2019": {
+          "territories": 20,
+          "simple_mean": 11.575,
+          "mean_mezzogiorno": 15.2875,
+          "mean_centro_nord": 9.1
+        },
+        "2020": {
+          "territories": 20,
+          "simple_mean": 10.445,
+          "mean_mezzogiorno": 14.1125,
+          "mean_centro_nord": 8.0
+        },
+        "2021": {
+          "territories": 20,
+          "simple_mean": 11.275,
+          "mean_mezzogiorno": 15.1375,
+          "mean_centro_nord": 8.7
+        },
+        "2022": {
+          "territories": 20,
+          "simple_mean": 12.065,
+          "mean_mezzogiorno": 16.1,
+          "mean_centro_nord": 9.375
+        },
+        "2023": {
+          "territories": 20,
+          "simple_mean": 12.52,
+          "mean_mezzogiorno": 16.6875,
+          "mean_centro_nord": 9.7417
+        },
+        "2024": {
+          "territories": 20,
+          "simple_mean": 12.58,
+          "mean_mezzogiorno": 16.675,
+          "mean_centro_nord": 9.85
+        }
+      },
+      "changes": [
+        {
+          "territory": "Valle d'Aosta",
+          "from": 2004,
+          "to": 2024,
+          "delta": -2.5,
+          "text": "2,5"
+        },
+        {
+          "territory": "Piemonte",
+          "from": 2004,
+          "to": 2024,
+          "delta": -1.6,
+          "text": "1,6"
+        },
+        {
+          "territory": "Trentino Alto Adige",
+          "from": 2004,
+          "to": 2024,
+          "delta": -0.8,
+          "text": "0,8"
+        },
+        {
+          "territory": "Emilia-Romagna",
+          "from": 2004,
+          "to": 2024,
+          "delta": -0.3,
+          "text": "0,3"
+        },
+        {
+          "territory": "Lazio",
+          "from": 2004,
+          "to": 2024,
+          "delta": 0.7,
+          "text": "0,7"
+        },
+        {
+          "territory": "Sicilia",
+          "from": 2004,
+          "to": 2024,
+          "delta": 1.0,
+          "text": "1,0"
+        },
+        {
+          "territory": "Lombardia",
+          "from": 2004,
+          "to": 2024,
+          "delta": 1.4,
+          "text": "1,4"
+        },
+        {
+          "territory": "Toscana",
+          "from": 2004,
+          "to": 2024,
+          "delta": 1.4,
+          "text": "1,4"
+        },
+        {
+          "territory": "Veneto",
+          "from": 2004,
+          "to": 2024,
+          "delta": 1.4,
+          "text": "1,4"
+        },
+        {
+          "territory": "Friuli-Venezia Giulia",
+          "from": 2004,
+          "to": 2024,
+          "delta": 1.8,
+          "text": "1,8"
+        },
+        {
+          "territory": "Puglia",
+          "from": 2004,
+          "to": 2024,
+          "delta": 1.9,
+          "text": "1,9"
+        },
+        {
+          "territory": "Campania",
+          "from": 2004,
+          "to": 2024,
+          "delta": 2.0,
+          "text": "2,0"
+        },
+        {
+          "territory": "Marche",
+          "from": 2004,
+          "to": 2024,
+          "delta": 2.9,
+          "text": "2,9"
+        },
+        {
+          "territory": "Sardegna",
+          "from": 2004,
+          "to": 2024,
+          "delta": 3.0,
+          "text": "3,0"
+        },
+        {
+          "territory": "Liguria",
+          "from": 2004,
+          "to": 2024,
+          "delta": 3.3,
+          "text": "3,3"
+        },
+        {
+          "territory": "Umbria",
+          "from": 2004,
+          "to": 2024,
+          "delta": 3.4,
+          "text": "3,4"
+        },
+        {
+          "territory": "Basilicata",
+          "from": 2004,
+          "to": 2024,
+          "delta": 3.8,
+          "text": "3,8"
+        },
+        {
+          "territory": "Abruzzo",
+          "from": 2004,
+          "to": 2024,
+          "delta": 6.5,
+          "text": "6,5"
+        },
+        {
+          "territory": "Calabria",
+          "from": 2004,
+          "to": 2024,
+          "delta": 8.4,
+          "text": "8,4"
+        },
+        {
+          "territory": "Molise",
+          "from": 2004,
+          "to": 2024,
+          "delta": 11.9,
+          "text": "11,9"
+        }
+      ],
+      "series": {
+        "Abruzzo": {
+          "2004": 9.7,
+          "2005": 10.2,
+          "2006": 10.7,
+          "2007": 12.1,
+          "2008": 14.2,
+          "2009": 15.7,
+          "2010": 16.6,
+          "2011": 16.5,
+          "2012": 15.8,
+          "2013": 15.8,
+          "2014": 15.9,
+          "2015": 15.9,
+          "2016": 16.0,
+          "2017": 15.7,
+          "2018": 16.3,
+          "2019": 16.6,
+          "2020": 14.5,
+          "2021": 14.9,
+          "2022": 16.0,
+          "2023": 16.3,
+          "2024": 16.2
+        },
+        "Basilicata": {
+          "2004": 24.8,
+          "2005": 24.0,
+          "2006": 23.4,
+          "2007": 24.4,
+          "2008": 23.8,
+          "2009": 23.0,
+          "2010": 23.1,
+          "2011": 22.2,
+          "2012": 23.5,
+          "2013": 23.2,
+          "2014": 22.5,
+          "2015": 22.9,
+          "2016": 23.7,
+          "2017": 23.7,
+          "2018": 24.0,
+          "2019": 24.7,
+          "2020": 24.9,
+          "2021": 26.9,
+          "2022": 28.4,
+          "2023": 29.7,
+          "2024": 28.6
+        },
+        "Calabria": {
+          "2004": 14.4,
+          "2005": 14.8,
+          "2006": 14.7,
+          "2007": 15.6,
+          "2008": 16.1,
+          "2009": 17.3,
+          "2010": 17.0,
+          "2011": 17.2,
+          "2012": 18.3,
+          "2013": 19.3,
+          "2014": 20.1,
+          "2015": 20.6,
+          "2016": 21.2,
+          "2017": 20.5,
+          "2018": 20.2,
+          "2019": 19.8,
+          "2020": 18.7,
+          "2021": 20.8,
+          "2022": 21.3,
+          "2023": 21.8,
+          "2024": 22.8
+        },
+        "Campania": {
+          "2004": 7.6,
+          "2005": 7.6,
+          "2006": 7.6,
+          "2007": 7.7,
+          "2008": 7.4,
+          "2009": 7.6,
+          "2010": 8.1,
+          "2011": 8.3,
+          "2012": 8.2,
+          "2013": 8.2,
+          "2014": 8.3,
+          "2015": 8.6,
+          "2016": 8.9,
+          "2017": 9.4,
+          "2018": 9.7,
+          "2019": 9.7,
+          "2020": 8.7,
+          "2021": 9.2,
+          "2022": 9.8,
+          "2023": 9.8,
+          "2024": 9.6
+        },
+        "Emilia-Romagna": {
+          "2004": 6.0,
+          "2005": 6.3,
+          "2006": 6.3,
+          "2007": 6.3,
+          "2008": 6.0,
+          "2009": 5.8,
+          "2010": 5.6,
+          "2011": 5.7,
+          "2012": 5.7,
+          "2013": 5.7,
+          "2014": 5.7,
+          "2015": 5.9,
+          "2016": 6.2,
+          "2017": 5.9,
+          "2018": 5.9,
+          "2019": 5.7,
+          "2020": 4.8,
+          "2021": 5.1,
+          "2022": 5.5,
+          "2023": 5.7,
+          "2024": 5.7
+        },
+        "Friuli-Venezia Giulia": {
+          "2004": 6.1,
+          "2005": 6.3,
+          "2006": 6.4,
+          "2007": 6.3,
+          "2008": 6.3,
+          "2009": 6.3,
+          "2010": 6.2,
+          "2011": 6.3,
+          "2012": 5.6,
+          "2013": 5.6,
+          "2014": 5.5,
+          "2015": 6.5,
+          "2016": 6.6,
+          "2017": 6.6,
+          "2018": 6.8,
+          "2019": 7.0,
+          "2020": 6.3,
+          "2021": 6.7,
+          "2022": 7.4,
+          "2023": 7.7,
+          "2024": 7.9
+        },
+        "Lazio": {
+          "2004": 6.7,
+          "2005": 6.6,
+          "2006": 6.8,
+          "2007": 6.9,
+          "2008": 6.6,
+          "2009": 6.6,
+          "2010": 6.8,
+          "2011": 7.4,
+          "2012": 7.5,
+          "2013": 7.9,
+          "2014": 8.5,
+          "2015": 8.9,
+          "2016": 9.3,
+          "2017": 9.0,
+          "2018": 9.0,
+          "2019": 9.1,
+          "2020": 7.1,
+          "2021": 7.1,
+          "2022": 7.4,
+          "2023": 7.4,
+          "2024": 7.4
+        },
+        "Liguria": {
+          "2004": 11.3,
+          "2005": 11.2,
+          "2006": 11.2,
+          "2007": 11.8,
+          "2008": 12.1,
+          "2009": 12.3,
+          "2010": 12.9,
+          "2011": 13.7,
+          "2012": 13.9,
+          "2013": 13.8,
+          "2014": 14.1,
+          "2015": 14.3,
+          "2016": 15.7,
+          "2017": 14.1,
+          "2018": 14.0,
+          "2019": 13.5,
+          "2020": 11.9,
+          "2021": 13.7,
+          "2022": 14.7,
+          "2023": 15.3,
+          "2024": 14.6
+        },
+        "Lombardia": {
+          "2004": 3.9,
+          "2005": 3.9,
+          "2006": 3.9,
+          "2007": 3.9,
+          "2008": 3.9,
+          "2009": 3.7,
+          "2010": 3.8,
+          "2011": 3.8,
+          "2012": 3.6,
+          "2013": 3.7,
+          "2014": 3.8,
+          "2015": 3.9,
+          "2016": 4.0,
+          "2017": 4.1,
+          "2018": 4.2,
+          "2019": 4.5,
+          "2020": 4.5,
+          "2021": 4.9,
+          "2022": 5.0,
+          "2023": 5.1,
+          "2024": 5.3
+        },
+        "Marche": {
+          "2004": 10.5,
+          "2005": 10.7,
+          "2006": 11.1,
+          "2007": 11.2,
+          "2008": 10.9,
+          "2009": 11.1,
+          "2010": 10.7,
+          "2011": 11.1,
+          "2012": 11.4,
+          "2013": 12.0,
+          "2014": 12.0,
+          "2015": 12.9,
+          "2016": 13.5,
+          "2017": 13.6,
+          "2018": 13.1,
+          "2019": 13.1,
+          "2020": 11.7,
+          "2021": 12.9,
+          "2022": 13.4,
+          "2023": 13.4,
+          "2024": 13.4
+        },
+        "Molise": {
+          "2004": 20.9,
+          "2005": 20.6,
+          "2006": 20.4,
+          "2007": 19.2,
+          "2008": 19.6,
+          "2009": 20.3,
+          "2010": 19.3,
+          "2011": 20.7,
+          "2012": 22.3,
+          "2013": 23.2,
+          "2014": 23.6,
+          "2015": 24.1,
+          "2016": 26.7,
+          "2017": 27.2,
+          "2018": 28.1,
+          "2019": 28.6,
+          "2020": 27.3,
+          "2021": 29.2,
+          "2022": 30.4,
+          "2023": 32.6,
+          "2024": 32.8
+        },
+        "Piemonte": {
+          "2004": 8.4,
+          "2005": 8.4,
+          "2006": 8.3,
+          "2007": 8.0,
+          "2008": 7.9,
+          "2009": 7.0,
+          "2010": 6.7,
+          "2011": 6.6,
+          "2012": 6.7,
+          "2013": 6.9,
+          "2014": 6.9,
+          "2015": 7.0,
+          "2016": 7.5,
+          "2017": 7.2,
+          "2018": 7.0,
+          "2019": 6.7,
+          "2020": 5.7,
+          "2021": 6.3,
+          "2022": 6.5,
+          "2023": 6.7,
+          "2024": 6.8
+        },
+        "Puglia": {
+          "2004": 7.4,
+          "2005": 7.6,
+          "2006": 7.6,
+          "2007": 7.3,
+          "2008": 7.1,
+          "2009": 7.1,
+          "2010": 6.9,
+          "2011": 7.3,
+          "2012": 7.6,
+          "2013": 7.8,
+          "2014": 8.1,
+          "2015": 8.4,
+          "2016": 8.7,
+          "2017": 8.9,
+          "2018": 9.0,
+          "2019": 9.0,
+          "2020": 7.8,
+          "2021": 8.4,
+          "2022": 9.2,
+          "2023": 9.2,
+          "2024": 9.3
+        },
+        "Sardegna": {
+          "2004": 4.1,
+          "2005": 4.2,
+          "2006": 4.8,
+          "2007": 5.3,
+          "2008": 5.3,
+          "2009": 5.2,
+          "2010": 5.1,
+          "2011": 5.3,
+          "2012": 5.3,
+          "2013": 5.3,
+          "2014": 5.1,
+          "2015": 5.4,
+          "2016": 5.7,
+          "2017": 5.5,
+          "2018": 6.0,
+          "2019": 6.4,
+          "2020": 5.1,
+          "2021": 5.5,
+          "2022": 6.7,
+          "2023": 7.1,
+          "2024": 7.1
+        },
+        "Sicilia": {
+          "2004": 6.0,
+          "2005": 6.1,
+          "2006": 6.1,
+          "2007": 6.2,
+          "2008": 6.3,
+          "2009": 6.4,
+          "2010": 6.5,
+          "2011": 6.7,
+          "2012": 6.3,
+          "2013": 6.4,
+          "2014": 6.5,
+          "2015": 6.7,
+          "2016": 7.1,
+          "2017": 7.2,
+          "2018": 7.4,
+          "2019": 7.5,
+          "2020": 5.9,
+          "2021": 6.2,
+          "2022": 7.0,
+          "2023": 7.0,
+          "2024": 7.0
+        },
+        "Toscana": {
+          "2004": 5.8,
+          "2005": 5.9,
+          "2006": 6.1,
+          "2007": 6.4,
+          "2008": 6.6,
+          "2009": 6.0,
+          "2010": 5.9,
+          "2011": 5.9,
+          "2012": 5.7,
+          "2013": 5.9,
+          "2014": 5.8,
+          "2015": 6.0,
+          "2016": 6.1,
+          "2017": 6.5,
+          "2018": 6.6,
+          "2019": 6.4,
+          "2020": 5.5,
+          "2021": 5.9,
+          "2022": 6.3,
+          "2023": 6.8,
+          "2024": 7.2
+        },
+        "Trentino Alto Adige": {
+          "2004": 10.5,
+          "2005": 10.6,
+          "2006": 10.6,
+          "2007": 10.4,
+          "2008": 10.3,
+          "2009": 10.2,
+          "2010": 10.0,
+          "2011": 9.5,
+          "2012": 8.8,
+          "2013": 8.9,
+          "2014": 8.6,
+          "2015": 8.9,
+          "2016": 9.6,
+          "2017": 9.5,
+          "2018": 9.4,
+          "2019": 9.5,
+          "2020": 8.3,
+          "2021": 8.5,
+          "2022": 9.0,
+          "2023": 9.8,
+          "2024": 9.7
+        },
+        "Umbria": {
+          "2004": 10.7,
+          "2005": 11.3,
+          "2006": 11.5,
+          "2007": 11.6,
+          "2008": 11.7,
+          "2009": 11.2,
+          "2010": 10.8,
+          "2011": 10.8,
+          "2012": 11.0,
+          "2013": 11.2,
+          "2014": 10.5,
+          "2015": 10.9,
+          "2016": 11.6,
+          "2017": 11.9,
+          "2018": 12.0,
+          "2019": 11.7,
+          "2020": 11.3,
+          "2021": 12.0,
+          "2022": 12.7,
+          "2023": 14.0,
+          "2024": 14.1
+        },
+        "Valle d'Aosta": {
+          "2004": 22.1,
+          "2005": 22.2,
+          "2006": 22.0,
+          "2007": 21.0,
+          "2008": 20.2,
+          "2009": 22.0,
+          "2010": 22.0,
+          "2011": 20.8,
+          "2012": 18.0,
+          "2013": 16.6,
+          "2014": 16.0,
+          "2015": 16.3,
+          "2016": 15.1,
+          "2017": 13.8,
+          "2018": 15.0,
+          "2019": 15.8,
+          "2020": 13.6,
+          "2021": 15.4,
+          "2022": 18.4,
+          "2023": 18.6,
+          "2024": 19.6
+        },
+        "Veneto": {
+          "2004": 5.1,
+          "2005": 5.3,
+          "2006": 5.4,
+          "2007": 5.7,
+          "2008": 5.7,
+          "2009": 5.7,
+          "2010": 5.8,
+          "2011": 6.2,
+          "2012": 6.4,
+          "2013": 6.3,
+          "2014": 6.2,
+          "2015": 6.1,
+          "2016": 6.4,
+          "2017": 6.1,
+          "2018": 6.2,
+          "2019": 6.2,
+          "2020": 5.3,
+          "2021": 5.9,
+          "2022": 6.2,
+          "2023": 6.4,
+          "2024": 6.5
+        }
+      },
+      "figures": [
+        {
+          "figure": "32,8",
+          "what": "Molise, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "28,6",
+          "what": "Basilicata, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,8",
+          "what": "Calabria, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "19,6",
+          "what": "Valle d'Aosta, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,2",
+          "what": "Abruzzo, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,6",
+          "what": "Liguria, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,1",
+          "what": "Umbria, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,4",
+          "what": "Marche, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,7",
+          "what": "Trentino Alto Adige, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,6",
+          "what": "Campania, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,3",
+          "what": "Puglia, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,9",
+          "what": "Friuli-Venezia Giulia, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Lazio, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,2",
+          "what": "Toscana, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Sardegna, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Sicilia, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,8",
+          "what": "Piemonte, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "Veneto, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Lombardia, 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,1",
+          "what": "simple mean dei territori, 2004 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,10",
+          "what": "simple mean dei territori, 2004 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,9",
+          "what": "mean mezzogiorno dei territori, 2004 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,86",
+          "what": "mean mezzogiorno dei territori, 2004 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "mean centro nord dei territori, 2004 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,93",
+          "what": "mean centro nord dei territori, 2004 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,2",
+          "what": "simple mean dei territori, 2005 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,19",
+          "what": "simple mean dei territori, 2005 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,9",
+          "what": "mean mezzogiorno dei territori, 2005 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,89",
+          "what": "mean mezzogiorno dei territori, 2005 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,1",
+          "what": "mean centro nord dei territori, 2005 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,06",
+          "what": "mean centro nord dei territori, 2005 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,2",
+          "what": "simple mean dei territori, 2006 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,24",
+          "what": "simple mean dei territori, 2006 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,9",
+          "what": "mean mezzogiorno dei territori, 2006 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,91",
+          "what": "mean mezzogiorno dei territori, 2006 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,1",
+          "what": "mean centro nord dei territori, 2006 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,13",
+          "what": "mean centro nord dei territori, 2006 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,4",
+          "what": "simple mean dei territori, 2007 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,37",
+          "what": "simple mean dei territori, 2007 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,2",
+          "what": "mean mezzogiorno dei territori, 2007 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,22",
+          "what": "mean mezzogiorno dei territori, 2007 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,1",
+          "what": "mean centro nord dei territori, 2007 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,12",
+          "what": "mean centro nord dei territori, 2007 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,4",
+          "what": "simple mean dei territori, 2008 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,40",
+          "what": "simple mean dei territori, 2008 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,5",
+          "what": "mean mezzogiorno dei territori, 2008 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,47",
+          "what": "mean mezzogiorno dei territori, 2008 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "mean centro nord dei territori, 2008 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,02",
+          "what": "mean centro nord dei territori, 2008 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,5",
+          "what": "simple mean dei territori, 2009 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,53",
+          "what": "simple mean dei territori, 2009 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,8",
+          "what": "mean mezzogiorno dei territori, 2009 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,82",
+          "what": "mean mezzogiorno dei territori, 2009 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "mean centro nord dei territori, 2009 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,99",
+          "what": "mean centro nord dei territori, 2009 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,5",
+          "what": "simple mean dei territori, 2010 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,49",
+          "what": "simple mean dei territori, 2010 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,8",
+          "what": "mean mezzogiorno dei territori, 2010 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,82",
+          "what": "mean mezzogiorno dei territori, 2010 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "mean centro nord dei territori, 2010 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,93",
+          "what": "mean centro nord dei territori, 2010 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,6",
+          "what": "simple mean dei territori, 2011 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,60",
+          "what": "simple mean dei territori, 2011 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,0",
+          "what": "mean mezzogiorno dei territori, 2011 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,03",
+          "what": "mean mezzogiorno dei territori, 2011 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "mean centro nord dei territori, 2011 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,98",
+          "what": "mean centro nord dei territori, 2011 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,6",
+          "what": "simple mean dei territori, 2012 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,58",
+          "what": "simple mean dei territori, 2012 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,4",
+          "what": "mean mezzogiorno dei territori, 2012 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,41",
+          "what": "mean mezzogiorno dei territori, 2012 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,7",
+          "what": "mean centro nord dei territori, 2012 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,69",
+          "what": "mean centro nord dei territori, 2012 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,7",
+          "what": "simple mean dei territori, 2013 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,69",
+          "what": "simple mean dei territori, 2013 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,7",
+          "what": "mean mezzogiorno dei territori, 2013 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,65",
+          "what": "mean mezzogiorno dei territori, 2013 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,7",
+          "what": "mean centro nord dei territori, 2013 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,71",
+          "what": "mean centro nord dei territori, 2013 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,7",
+          "what": "simple mean dei territori, 2014 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,69",
+          "what": "simple mean dei territori, 2014 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,8",
+          "what": "mean mezzogiorno dei territori, 2014 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,76",
+          "what": "mean mezzogiorno dei territori, 2014 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,6",
+          "what": "mean centro nord dei territori, 2014 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,63",
+          "what": "mean centro nord dei territori, 2014 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,0",
+          "what": "simple mean dei territori, 2015 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,01",
+          "what": "simple mean dei territori, 2015 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,1",
+          "what": "mean mezzogiorno dei territori, 2015 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,07",
+          "what": "mean mezzogiorno dei territori, 2015 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "mean centro nord dei territori, 2015 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,97",
+          "what": "mean centro nord dei territori, 2015 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,5",
+          "what": "simple mean dei territori, 2016 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,48",
+          "what": "simple mean dei territori, 2016 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,8",
+          "what": "mean mezzogiorno dei territori, 2016 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,75",
+          "what": "mean mezzogiorno dei territori, 2016 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,3",
+          "what": "mean centro nord dei territori, 2016 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,30",
+          "what": "mean centro nord dei territori, 2016 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,3",
+          "what": "simple mean dei territori, 2017 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,32",
+          "what": "simple mean dei territori, 2017 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,8",
+          "what": "mean mezzogiorno dei territori, 2017 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,76",
+          "what": "mean mezzogiorno dei territori, 2017 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "mean centro nord dei territori, 2017 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,03",
+          "what": "mean centro nord dei territori, 2017 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,5",
+          "what": "simple mean dei territori, 2018 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,49",
+          "what": "simple mean dei territori, 2018 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,1",
+          "what": "mean mezzogiorno dei territori, 2018 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,09",
+          "what": "mean mezzogiorno dei territori, 2018 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,1",
+          "what": "mean centro nord dei territori, 2018 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,10",
+          "what": "mean centro nord dei territori, 2018 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,6",
+          "what": "simple mean dei territori, 2019 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,57",
+          "what": "simple mean dei territori, 2019 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,3",
+          "what": "mean mezzogiorno dei territori, 2019 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,29",
+          "what": "mean mezzogiorno dei territori, 2019 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,1",
+          "what": "mean centro nord dei territori, 2019 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,10",
+          "what": "mean centro nord dei territori, 2019 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,4",
+          "what": "simple mean dei territori, 2020 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,45",
+          "what": "simple mean dei territori, 2020 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,1",
+          "what": "mean mezzogiorno dei territori, 2020 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,11",
+          "what": "mean mezzogiorno dei territori, 2020 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,0",
+          "what": "mean centro nord dei territori, 2020 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,00",
+          "what": "mean centro nord dei territori, 2020 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,3",
+          "what": "simple mean dei territori, 2021 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,28",
+          "what": "simple mean dei territori, 2021 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,1",
+          "what": "mean mezzogiorno dei territori, 2021 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,14",
+          "what": "mean mezzogiorno dei territori, 2021 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,7",
+          "what": "mean centro nord dei territori, 2021 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,70",
+          "what": "mean centro nord dei territori, 2021 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,1",
+          "what": "simple mean dei territori, 2022 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,06",
+          "what": "simple mean dei territori, 2022 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,1",
+          "what": "mean mezzogiorno dei territori, 2022 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,10",
+          "what": "mean mezzogiorno dei territori, 2022 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,4",
+          "what": "mean centro nord dei territori, 2022 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,38",
+          "what": "mean centro nord dei territori, 2022 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,5",
+          "what": "simple mean dei territori, 2023 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,52",
+          "what": "simple mean dei territori, 2023 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,7",
+          "what": "mean mezzogiorno dei territori, 2023 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,69",
+          "what": "mean mezzogiorno dei territori, 2023 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,7",
+          "what": "mean centro nord dei territori, 2023 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,74",
+          "what": "mean centro nord dei territori, 2023 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,6",
+          "what": "simple mean dei territori, 2024 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,58",
+          "what": "simple mean dei territori, 2024 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,7",
+          "what": "mean mezzogiorno dei territori, 2024 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,68",
+          "what": "mean mezzogiorno dei territori, 2024 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,8",
+          "what": "mean centro nord dei territori, 2024 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,85",
+          "what": "mean centro nord dei territori, 2024 (media semplice, non pesata)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "variazione Abruzzo 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,8",
+          "what": "variazione Basilicata 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,4",
+          "what": "variazione Calabria 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "2,0",
+          "what": "variazione Campania 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "0,3",
+          "what": "variazione Emilia-Romagna 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,8",
+          "what": "variazione Friuli-Venezia Giulia 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "0,7",
+          "what": "variazione Lazio 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,3",
+          "what": "variazione Liguria 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,4",
+          "what": "variazione Lombardia 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "2,9",
+          "what": "variazione Marche 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,9",
+          "what": "variazione Molise 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,6",
+          "what": "variazione Piemonte 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,9",
+          "what": "variazione Puglia 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,0",
+          "what": "variazione Sardegna 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,0",
+          "what": "variazione Sicilia 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,4",
+          "what": "variazione Toscana 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "0,8",
+          "what": "variazione Trentino Alto Adige 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,4",
+          "what": "variazione Umbria 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "2,5",
+          "what": "variazione Valle d'Aosta 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "1,4",
+          "what": "variazione Veneto 2004-2024 (in valore assoluto)",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "rapporto fra primo (Molise) e ultimo (Lombardia) nel 2024",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,7",
+          "what": "Abruzzo, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,2",
+          "what": "Abruzzo, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,7",
+          "what": "Abruzzo, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,1",
+          "what": "Abruzzo, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,2",
+          "what": "Abruzzo, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,7",
+          "what": "Abruzzo, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,6",
+          "what": "Abruzzo, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,5",
+          "what": "Abruzzo, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,8",
+          "what": "Abruzzo, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,8",
+          "what": "Abruzzo, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,9",
+          "what": "Abruzzo, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,9",
+          "what": "Abruzzo, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,0",
+          "what": "Abruzzo, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,7",
+          "what": "Abruzzo, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,3",
+          "what": "Abruzzo, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,6",
+          "what": "Abruzzo, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,5",
+          "what": "Abruzzo, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,9",
+          "what": "Abruzzo, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,0",
+          "what": "Abruzzo, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,3",
+          "what": "Abruzzo, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,8",
+          "what": "Basilicata, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,0",
+          "what": "Basilicata, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,4",
+          "what": "Basilicata, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,4",
+          "what": "Basilicata, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,8",
+          "what": "Basilicata, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,0",
+          "what": "Basilicata, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,1",
+          "what": "Basilicata, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,2",
+          "what": "Basilicata, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,5",
+          "what": "Basilicata, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,2",
+          "what": "Basilicata, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,5",
+          "what": "Basilicata, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,9",
+          "what": "Basilicata, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,7",
+          "what": "Basilicata, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,7",
+          "what": "Basilicata, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,0",
+          "what": "Basilicata, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,7",
+          "what": "Basilicata, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,9",
+          "what": "Basilicata, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "26,9",
+          "what": "Basilicata, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "28,4",
+          "what": "Basilicata, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "29,7",
+          "what": "Basilicata, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,4",
+          "what": "Calabria, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,8",
+          "what": "Calabria, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,7",
+          "what": "Calabria, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,6",
+          "what": "Calabria, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,1",
+          "what": "Calabria, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "17,3",
+          "what": "Calabria, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "17,0",
+          "what": "Calabria, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "17,2",
+          "what": "Calabria, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "18,3",
+          "what": "Calabria, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "19,3",
+          "what": "Calabria, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,1",
+          "what": "Calabria, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,6",
+          "what": "Calabria, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "21,2",
+          "what": "Calabria, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,5",
+          "what": "Calabria, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,2",
+          "what": "Calabria, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "19,8",
+          "what": "Calabria, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "18,7",
+          "what": "Calabria, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,8",
+          "what": "Calabria, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "21,3",
+          "what": "Calabria, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "21,8",
+          "what": "Calabria, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Campania, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Campania, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Campania, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,7",
+          "what": "Campania, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Campania, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Campania, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,1",
+          "what": "Campania, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,3",
+          "what": "Campania, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,2",
+          "what": "Campania, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,2",
+          "what": "Campania, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,3",
+          "what": "Campania, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,6",
+          "what": "Campania, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "Campania, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,4",
+          "what": "Campania, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,7",
+          "what": "Campania, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,7",
+          "what": "Campania, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,7",
+          "what": "Campania, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,2",
+          "what": "Campania, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,8",
+          "what": "Campania, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,8",
+          "what": "Campania, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,0",
+          "what": "Emilia-Romagna, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Emilia-Romagna, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Emilia-Romagna, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Emilia-Romagna, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,0",
+          "what": "Emilia-Romagna, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,8",
+          "what": "Emilia-Romagna, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,6",
+          "what": "Emilia-Romagna, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Emilia-Romagna, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Emilia-Romagna, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Emilia-Romagna, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Emilia-Romagna, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,8",
+          "what": "Emilia-Romagna, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,1",
+          "what": "Emilia-Romagna, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,5",
+          "what": "Emilia-Romagna, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Emilia-Romagna, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Friuli-Venezia Giulia, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Friuli-Venezia Giulia, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Friuli-Venezia Giulia, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Friuli-Venezia Giulia, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Friuli-Venezia Giulia, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Friuli-Venezia Giulia, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Friuli-Venezia Giulia, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Friuli-Venezia Giulia, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,6",
+          "what": "Friuli-Venezia Giulia, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,6",
+          "what": "Friuli-Venezia Giulia, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,5",
+          "what": "Friuli-Venezia Giulia, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "Friuli-Venezia Giulia, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Friuli-Venezia Giulia, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Friuli-Venezia Giulia, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,8",
+          "what": "Friuli-Venezia Giulia, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Friuli-Venezia Giulia, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Friuli-Venezia Giulia, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Friuli-Venezia Giulia, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Friuli-Venezia Giulia, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,7",
+          "what": "Friuli-Venezia Giulia, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Lazio, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Lazio, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,8",
+          "what": "Lazio, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,9",
+          "what": "Lazio, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Lazio, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Lazio, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,8",
+          "what": "Lazio, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Lazio, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,5",
+          "what": "Lazio, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,9",
+          "what": "Lazio, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,5",
+          "what": "Lazio, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "Lazio, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,3",
+          "what": "Lazio, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "Lazio, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "Lazio, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,1",
+          "what": "Lazio, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Lazio, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Lazio, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Lazio, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Lazio, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,3",
+          "what": "Liguria, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,2",
+          "what": "Liguria, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,2",
+          "what": "Liguria, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,8",
+          "what": "Liguria, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,1",
+          "what": "Liguria, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,3",
+          "what": "Liguria, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,9",
+          "what": "Liguria, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,7",
+          "what": "Liguria, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,9",
+          "what": "Liguria, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,8",
+          "what": "Liguria, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,1",
+          "what": "Liguria, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,3",
+          "what": "Liguria, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,7",
+          "what": "Liguria, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,1",
+          "what": "Liguria, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,0",
+          "what": "Liguria, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,5",
+          "what": "Liguria, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,9",
+          "what": "Liguria, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,7",
+          "what": "Liguria, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,7",
+          "what": "Liguria, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,3",
+          "what": "Liguria, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,9",
+          "what": "Lombardia, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,9",
+          "what": "Lombardia, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,9",
+          "what": "Lombardia, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,9",
+          "what": "Lombardia, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,9",
+          "what": "Lombardia, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,7",
+          "what": "Lombardia, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,8",
+          "what": "Lombardia, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,8",
+          "what": "Lombardia, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,6",
+          "what": "Lombardia, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,7",
+          "what": "Lombardia, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,8",
+          "what": "Lombardia, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "3,9",
+          "what": "Lombardia, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,0",
+          "what": "Lombardia, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,1",
+          "what": "Lombardia, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,2",
+          "what": "Lombardia, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,5",
+          "what": "Lombardia, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,5",
+          "what": "Lombardia, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,9",
+          "what": "Lombardia, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,0",
+          "what": "Lombardia, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,1",
+          "what": "Lombardia, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,5",
+          "what": "Marche, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,7",
+          "what": "Marche, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,1",
+          "what": "Marche, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,2",
+          "what": "Marche, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,9",
+          "what": "Marche, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,1",
+          "what": "Marche, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,7",
+          "what": "Marche, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,1",
+          "what": "Marche, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,4",
+          "what": "Marche, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,0",
+          "what": "Marche, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,0",
+          "what": "Marche, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,9",
+          "what": "Marche, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,5",
+          "what": "Marche, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,6",
+          "what": "Marche, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,1",
+          "what": "Marche, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,1",
+          "what": "Marche, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,7",
+          "what": "Marche, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,9",
+          "what": "Marche, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,4",
+          "what": "Marche, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,4",
+          "what": "Marche, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,9",
+          "what": "Molise, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,6",
+          "what": "Molise, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,4",
+          "what": "Molise, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "19,2",
+          "what": "Molise, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "19,6",
+          "what": "Molise, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,3",
+          "what": "Molise, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "19,3",
+          "what": "Molise, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,7",
+          "what": "Molise, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,3",
+          "what": "Molise, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,2",
+          "what": "Molise, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "23,6",
+          "what": "Molise, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "24,1",
+          "what": "Molise, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "26,7",
+          "what": "Molise, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "27,2",
+          "what": "Molise, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "28,1",
+          "what": "Molise, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "28,6",
+          "what": "Molise, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "27,3",
+          "what": "Molise, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "29,2",
+          "what": "Molise, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "30,4",
+          "what": "Molise, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "32,6",
+          "what": "Molise, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,4",
+          "what": "Piemonte, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,4",
+          "what": "Piemonte, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,3",
+          "what": "Piemonte, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,0",
+          "what": "Piemonte, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,9",
+          "what": "Piemonte, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Piemonte, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Piemonte, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Piemonte, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Piemonte, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,9",
+          "what": "Piemonte, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,9",
+          "what": "Piemonte, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Piemonte, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,5",
+          "what": "Piemonte, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,2",
+          "what": "Piemonte, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Piemonte, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Piemonte, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Piemonte, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Piemonte, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "Piemonte, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Piemonte, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Puglia, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Puglia, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Puglia, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,3",
+          "what": "Puglia, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Puglia, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Puglia, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,9",
+          "what": "Puglia, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,3",
+          "what": "Puglia, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,6",
+          "what": "Puglia, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,8",
+          "what": "Puglia, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,1",
+          "what": "Puglia, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,4",
+          "what": "Puglia, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,7",
+          "what": "Puglia, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "Puglia, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "Puglia, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "Puglia, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,8",
+          "what": "Puglia, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,4",
+          "what": "Puglia, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,2",
+          "what": "Puglia, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,2",
+          "what": "Puglia, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,1",
+          "what": "Sardegna, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,2",
+          "what": "Sardegna, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "4,8",
+          "what": "Sardegna, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Sardegna, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Sardegna, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,2",
+          "what": "Sardegna, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,1",
+          "what": "Sardegna, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Sardegna, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Sardegna, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Sardegna, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,1",
+          "what": "Sardegna, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,4",
+          "what": "Sardegna, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Sardegna, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,5",
+          "what": "Sardegna, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,0",
+          "what": "Sardegna, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Sardegna, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,1",
+          "what": "Sardegna, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,5",
+          "what": "Sardegna, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Sardegna, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Sardegna, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,0",
+          "what": "Sicilia, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Sicilia, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Sicilia, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Sicilia, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Sicilia, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Sicilia, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "Sicilia, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Sicilia, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Sicilia, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Sicilia, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "Sicilia, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,7",
+          "what": "Sicilia, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,1",
+          "what": "Sicilia, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,2",
+          "what": "Sicilia, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,4",
+          "what": "Sicilia, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,5",
+          "what": "Sicilia, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Sicilia, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Sicilia, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Sicilia, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "7,0",
+          "what": "Sicilia, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,8",
+          "what": "Toscana, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Toscana, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Toscana, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Toscana, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Toscana, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,0",
+          "what": "Toscana, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Toscana, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Toscana, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Toscana, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Toscana, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,8",
+          "what": "Toscana, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,0",
+          "what": "Toscana, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Toscana, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,5",
+          "what": "Toscana, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,6",
+          "what": "Toscana, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Toscana, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,5",
+          "what": "Toscana, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Toscana, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Toscana, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,8",
+          "what": "Toscana, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,5",
+          "what": "Trentino Alto Adige, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,6",
+          "what": "Trentino Alto Adige, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,6",
+          "what": "Trentino Alto Adige, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,4",
+          "what": "Trentino Alto Adige, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,3",
+          "what": "Trentino Alto Adige, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,2",
+          "what": "Trentino Alto Adige, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,0",
+          "what": "Trentino Alto Adige, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,5",
+          "what": "Trentino Alto Adige, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,8",
+          "what": "Trentino Alto Adige, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "Trentino Alto Adige, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,6",
+          "what": "Trentino Alto Adige, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,9",
+          "what": "Trentino Alto Adige, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,6",
+          "what": "Trentino Alto Adige, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,5",
+          "what": "Trentino Alto Adige, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,4",
+          "what": "Trentino Alto Adige, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,5",
+          "what": "Trentino Alto Adige, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,3",
+          "what": "Trentino Alto Adige, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "8,5",
+          "what": "Trentino Alto Adige, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,0",
+          "what": "Trentino Alto Adige, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "9,8",
+          "what": "Trentino Alto Adige, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,7",
+          "what": "Umbria, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,3",
+          "what": "Umbria, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,5",
+          "what": "Umbria, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,6",
+          "what": "Umbria, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,7",
+          "what": "Umbria, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,2",
+          "what": "Umbria, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,8",
+          "what": "Umbria, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,8",
+          "what": "Umbria, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,0",
+          "what": "Umbria, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,2",
+          "what": "Umbria, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,5",
+          "what": "Umbria, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "10,9",
+          "what": "Umbria, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,6",
+          "what": "Umbria, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,9",
+          "what": "Umbria, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,0",
+          "what": "Umbria, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,7",
+          "what": "Umbria, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "11,3",
+          "what": "Umbria, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,0",
+          "what": "Umbria, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "12,7",
+          "what": "Umbria, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "14,0",
+          "what": "Umbria, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,1",
+          "what": "Valle d'Aosta, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,2",
+          "what": "Valle d'Aosta, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,0",
+          "what": "Valle d'Aosta, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "21,0",
+          "what": "Valle d'Aosta, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,2",
+          "what": "Valle d'Aosta, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,0",
+          "what": "Valle d'Aosta, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "22,0",
+          "what": "Valle d'Aosta, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "20,8",
+          "what": "Valle d'Aosta, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "18,0",
+          "what": "Valle d'Aosta, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,6",
+          "what": "Valle d'Aosta, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,0",
+          "what": "Valle d'Aosta, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "16,3",
+          "what": "Valle d'Aosta, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,1",
+          "what": "Valle d'Aosta, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,8",
+          "what": "Valle d'Aosta, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,0",
+          "what": "Valle d'Aosta, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,8",
+          "what": "Valle d'Aosta, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "13,6",
+          "what": "Valle d'Aosta, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "15,4",
+          "what": "Valle d'Aosta, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "18,4",
+          "what": "Valle d'Aosta, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "18,6",
+          "what": "Valle d'Aosta, 2023",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,1",
+          "what": "Veneto, 2004",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Veneto, 2005",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,4",
+          "what": "Veneto, 2006",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Veneto, 2007",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Veneto, 2008",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,7",
+          "what": "Veneto, 2009",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,8",
+          "what": "Veneto, 2010",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Veneto, 2011",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Veneto, 2012",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,3",
+          "what": "Veneto, 2013",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Veneto, 2014",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Veneto, 2015",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Veneto, 2016",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,1",
+          "what": "Veneto, 2017",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Veneto, 2018",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Veneto, 2019",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,3",
+          "what": "Veneto, 2020",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "5,9",
+          "what": "Veneto, 2021",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,2",
+          "what": "Veneto, 2022",
+          "indicator": "bes:12SER025"
+        },
+        {
+          "figure": "6,4",
+          "what": "Veneto, 2023",
+          "indicator": "bes:12SER025"
+        }
+      ]
     }
   ]
 }
