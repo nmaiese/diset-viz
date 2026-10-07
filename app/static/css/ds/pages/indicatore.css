@@ -2,6 +2,8 @@
    modulo dato, serie, tessere, analisi) sta in components.css. Legge solo
    token. */
 
+main.v1-indicatore .analysis .prose { max-width: 52ch; }
+
 /* ---------- la striscia che diventa Italia ----------
    Il comando "Striscia | Italia" nella testata della figura d'apertura, e la
    griglia delle 20 regioni a tessere (app/design/tiles.py): una casella

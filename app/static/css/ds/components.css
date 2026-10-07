@@ -43,6 +43,18 @@ h1, h2, h3, .h-title, .h-display, .h-section, .h-sub, .card__title { font-family
   width: min(100% - 2 * var(--margin-s), var(--container));
   margin-inline: auto;
 }
+
+/* Opzione B: il contenuto 1.0 si ferma a 1120 px; chrome mantiene il token
+   globale e quindi la propria larghezza. Il ritmo segue lo stesso passo. */
+main.v1 {
+  --container: 1120px;
+  --container-wide: 1120px;
+  --container-atlas: 1120px;
+  --space-section: clamp(48px, 4vw, 64px);
+}
+@media (max-width: 600px) {
+  main.v1 { --space-section: 36px; }
+}
 @media (min-width: 600px) { .wrap { width: min(100% - 2 * var(--margin-m), var(--container)); } }
 @media (min-width: 960px) { .wrap { width: min(100% - 2 * var(--margin-l), var(--container)); } }
 

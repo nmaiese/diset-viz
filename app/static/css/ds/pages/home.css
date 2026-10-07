@@ -235,8 +235,8 @@
 }
 @media (min-width: 960px) {
   .feat__head { padding: var(--space-6) var(--space-10); }
-  .feat__level { padding: var(--space-8) var(--space-10); gap: var(--space-8); }
-  .feat__pair { grid-template-columns: minmax(0, 5.2fr) minmax(0, 6.8fr); align-items: start; }
+  .feat__level { padding: var(--space-8) var(--space-6); gap: var(--space-8); }
+  .feat__pair { grid-template-columns: minmax(0, 4.4fr) minmax(0, 7.6fr); column-gap: var(--space-8); align-items: start; }
   .feat__pairhead { grid-column: 1 / -1; }
   .feat__map .map { max-width: none; }
   .feat__map .map svg { max-height: 520px; min-height: 0; }
@@ -246,6 +246,7 @@
   .feat__rank[open] > summary { display: none; }
   details.more.feat__rank[open] { border-top: 0; margin-top: 0; }
 }
+.feat__cols { column-gap: var(--space-5); }
 
 /* ---------- regioni e province: mappa, anteprima, indice ----------
    Due blocchi, uno per livello, affiancati da 1200. In ogni blocco la mappa
