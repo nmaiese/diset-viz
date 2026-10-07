@@ -2,7 +2,9 @@
 
 ## Fonti del calcolo e separazione dal sondaggio
 
-Sondaggio Astra (ipotesi, non prova): H1 richiede che il segno opposto tra furti in abitazione e rischio percepito compaia su 2023-2025, sopravviva togliendo Toscana e Campania e si controlli anche 2019-2025. H2 propone che borseggi, rapine o degrado divergano dai furti nei territori H1. Matrici ricostruite dal CSV Istat locale `app/static/data/Assoluti_BES_Regione.csv` con chiavi `idIndicatore`, `Territorio`, `Anno`, `Livello/Variazione`, `Dato`, e ricalcolo di variazioni, ranghi e medie via le matrici regionali di `app.indicator_view.build_indicator_view`. Confronto puntuale CSV/view model su tutti i sei indicatori core, 20 regioni, anni 2019, 2023 e 2025: 360/360 celle coincidenti entro <1e-9. I valori di Toscana e Campania sono quindi verificati anche direttamente nel CSV BES.
+Ipotesi esplorative H1 e H2, non prove. Ho ricalcolato variazioni, ranghi medi e medie in aritmetica decimale dalle 360 celle regionali del CSV Istat locale `app/static/data/Assoluti_BES_Regione.csv`, con chiavi `idIndicatore`, `Territorio`, `Anno`, `Livello/Variazione`, `Dato`. Ho riconciliato le stesse 360 celle, sei indicatori, 20 regioni e anni 2019, 2023 e 2025, con l'appendice Istat ufficiale 2026: 360/360 identiche. Toscana e Campania incluse.
+
+Ricalcolo indipendente riproducibile: `DIVARIO_PYTHON=/home/nilo/.local/bin/python bin/py lavoro/furti-sicurezza-percepita/ricalcolo.py` dalla radice del repository. Lo script legge il CSV, non questo documento.
 
 Unità: furti per 1.000 famiglie; borseggi e rapine per 1.000 abitanti; rischio, degrado e sicurezza percepita in percentuale. Sono popolazioni e unità diverse. I livelli BES dei furti/borseggi/rapine stimano vittime e correggono il sommerso secondo la definizione Istat. Non confrontare i loro livelli direttamente con denunce provinciali per 100.000 residenti.
 
@@ -18,9 +20,9 @@ Unità: furti per 1.000 famiglie; borseggi e rapine per 1.000 abitanti; rischio,
 
 N=20. Divergenza in **8/20**: Emilia-Romagna, Friuli-Venezia Giulia, Lazio, Molise, Piemonte, Sardegna, Toscana, Umbria. Media semplice furti: 7,38 a 6,86 per 1.000 famiglie, delta -0,52. Media semplice rischio: 18,83% a 22,61%, delta +3,78 punti. Sono medie regionali non ponderate, non valori italiani.
 
-Spearman tra livelli 2025 furti e rischio: rho=0,635, N=20. Spearman tra le variazioni 2023-2025: rho=-0,014, N=20. Associazione dei livelli territoriali non descrive l’associazione tra i cambiamenti.
+Spearman tra livelli 2025 furti e rischio: ρ=0,634586466 (N=20). Tra le variazioni 2023-2025: ρ=-0,001129518 (N=20). L'associazione dei livelli territoriali non descrive quella tra cambiamenti.
 
-Esclusione pre-registrata Toscana e Campania: N=18, divergenze 7/18, Spearman tra variazioni rho=0,100. Il segno opposto resta presente, ma rho cambia e non è una misura di “tenuta” statistica. Valori CSV: Toscana furti 14,8→12,6, rischio 20,5→27,8; Campania furti 6,2→5,5, rischio 39,0→38,0. Le unità restano diverse.
+Esclusione di Toscana e Campania fissata prima del calcolo: N=18, divergenze 7/18, ρ furti/rischio=0,103359187. Il segno opposto compare ancora in sette regioni, ma il coefficiente cambia; non è una prova di tenuta. Toscana: furti 14,8→12,6, rischio 20,5→27,8, rapine 1,4→1,2. Campania: furti 6,2→5,5, rischio 39,0→38,0, rapine 1,5→1,1. Le unità restano diverse.
 
 | Regione | Furti 2023 | Furti 2025 | Δ furti | Rischio 2023 | Rischio 2025 | Δ rischio |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -47,7 +49,7 @@ Esclusione pre-registrata Toscana e Campania: N=18, divergenze 7/18, Spearman tr
 
 ## H1 finestra alternativa 2019-2025
 
-N=20. Divergenza in 11/20 regioni: Campania, Lazio, Liguria, Lombardia, Molise, Piemonte, Puglia, Sardegna, Toscana, Trentino Alto Adige, Umbria. Spearman tra variazioni furti/rischio rho=0.100. Senza Toscana e Campania: N=18, divergenza 9/18, rho=0.139. Media semplice 2019→2025 furti: 9.380→6.860, Δ=-2.520; rischio: 22.095→22.610, Δ=+0.515. La Toscana passa da 18,1 a 12,6 furti e da 25,9% a 27,8% rischio. La Campania da 7,0 a 5,5 furti e da 36,4% a 38,0% rischio: l’esito contrario del controllo 2023-25 non resta tale nella finestra lunga.
+N=20. Divergenza in 11/20 regioni: Campania, Lazio, Liguria, Lombardia, Molise, Piemonte, Puglia, Sardegna, Toscana, Trentino Alto Adige, Umbria. Spearman tra variazioni furti/rischio ρ=0,107802495. Senza Toscana e Campania: N=18, divergenza 9/18, ρ=0,148109808. Media semplice 2019→2025 furti: 9,380→6,860, Δ=-2,520. Rischio: 22,095→22,610, Δ=+0,515. Arrotondato a due decimali, 22,095 è 22,10. La media semplice del rischio è al minimo nel 2023 soltanto fra i tre anni confrontati, non nella serie: la serie disponibile 2005-2025 tocca il minimo nel 2021. Toscana: furti 18,1→12,6, rischio 25,9%→27,8%. Campania: 7,0→5,5 e 36,4%→38,0%. La Campania diverge anche nella finestra lunga, quindi il contrasto direzionale con la Toscana vale solo nel 2023-25.
 
 | Regione | Furti 2019 | Furti 2025 | Δ furti | Rischio 2019 | Rischio 2025 | Δ rischio |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -102,20 +104,32 @@ H2 selezionando i soli otto territori divergenti 2023-25: degrado cresce in 8/8 
 | Veneto | +0.8 | +6.6 | -0.1 | +0.2 | +2.0 | -7.8 | no |
 
 
-Rapine: media semplice regionale 0,810→0,775 per 1.000 abitanti (Δ -0,035) nel 2023-25; sale in 6/20. Borseggi: calano in media da 3.295 a 3.110 per 1.000 abitanti (Δ -0.185), sale in 6/20. Nel 2019-25 media rapine 0,680→0,775 per 1.000 abitanti (aumento), perciò non si può estendere la conclusione “la criminalità diminuisce” al periodo lungo.
+Rapine: media semplice regionale 0,810→0,775 per 1.000 abitanti (Δ=-0,035) nel 2023-25, in aumento in 6 regioni, in calo in 8, invariata in 6. Borseggi: media 3,295→3,110 per 1.000 abitanti (Δ=-0,185), in aumento in 6, in calo in 13, invariata in una. Dal 2019 al 2025 la media delle rapine sale da 0,680 a 0,775, in 13 regioni, scende in 4 ed è invariata in 3. Sono misure distinte, non una misura complessiva della criminalità.
 
-| Coppia di variazioni | N | Spearman | Lettura descrittiva |
-| --- | ---: | ---: | --- |
-| Δ furti vs Δ rischio (2023-2025) | 20 | -0.014 | Esplorativa, descrittiva; correlazione tra cambiamenti regionali. |
-| Δ furti vs Δ rapine (2023-2025) | 20 | +0.166 | Esplorativa, descrittiva; correlazione tra cambiamenti regionali. |
-| Δ furti vs Δ borseggi (2023-2025) | 20 | +0.074 | Esplorativa, descrittiva; correlazione tra cambiamenti regionali. |
-| Δ furti vs Δ degrado (2023-2025) | 20 | +0.086 | Esplorativa, descrittiva; correlazione tra cambiamenti regionali. |
-| Δ furti vs Δ sicurezza (2023-2025) | 20 | +0.144 | Esplorativa, descrittiva; correlazione tra cambiamenti regionali. |
+| Coppia di variazioni | Finestra | N | ρ di Spearman | Lettura |
+| --- | --- | ---: | ---: | --- |
+| Furti vs rischio | 2023-2025 | 20 | -0,001129518 | Associazione monotona quasi nulla nel campione osservato. |
+| Rapine vs rischio | 2023-2025 | 20 | 0,136080712 | Descrittiva, esplorativa. |
+| Furti vs rapine | 2023-2025 | 20 | 0,132720936 | Descrittiva, esplorativa. |
+| Furti vs rischio | 2023-2025, senza Toscana e Campania | 18 | 0,103359187 | Descrittiva, esplorativa. |
+| Rapine vs rischio | 2023-2025, senza Toscana e Campania | 18 | 0,126582566 | Descrittiva, esplorativa. |
+| Furti vs rapine | 2023-2025, senza Toscana e Campania | 18 | -0,010642689 | Descrittiva, esplorativa. |
+| Furti vs rischio | 2019-2025 | 20 | 0,107802495 | Descrittiva, esplorativa. |
+| Rapine vs rischio | 2019-2025 | 20 | 0,510114496 | Descrittiva, esplorativa. |
+| Furti vs rapine | 2019-2025 | 20 | -0,093683191 | Descrittiva, esplorativa. |
+| Furti vs rischio | 2019-2025, senza Toscana e Campania | 18 | 0,148109808 | Descrittiva, esplorativa. |
+| Rapine vs rischio | 2019-2025, senza Toscana e Campania | 18 | 0,579710433 | Descrittiva, esplorativa. |
+| Furti vs rapine | 2019-2025, senza Toscana e Campania | 18 | 0,095444803 | Descrittiva, esplorativa. |
+| Furti vs borseggi | 2023-2025 | 20 | 0,056440188 | Descrittiva, esplorativa. |
+| Furti vs degrado | 2023-2025 | 20 | 0,081794201 | Descrittiva, esplorativa. |
+| Furti vs sicurezza al buio | 2023-2025 | 20 | 0,121611480 | Descrittiva, esplorativa. |
+
+Leave-one-out esplorativo, ranghi ricalcolati dopo ogni esclusione. Per rapine/rischio 2019-2025, ρ varia da 0,458661 (senza Calabria) a 0,601812 (senza Emilia-Romagna). Per 2023-2025 varia da 0,011699 (senza Umbria) a 0,235790 (senza Toscana). Per furti/rischio 2023-2025 varia da -0,092707 (senza Sicilia) a 0,144552 (senza Molise); nel 2019-2025 da 0,016718 (senza Friuli-Venezia Giulia) a 0,229652 (senza Valle d'Aosta). Non sono intervalli di confidenza e non misurano stabilità inferenziale.
 
 
 ## Controllo serie percettive sovrapposte
 
-`ter-43` e `bes-07SIC022` hanno definizione pubblicata molto simile e sovrappongono il periodo 2018-2024 per tutte le 20 regioni (140 coppie), ma i valori non sono identici: scarto assoluto massimo annuo tra 0,23 e 0,52 punti percentuali. Correlazione di Spearman sulle 140 coppie regione-anno = 0 (ρ=1.000); le serie possono condividere rilevazione o input ma non si può provare qui identità di processo. Non contarle come due conferme indipendenti. I valori sono distinti, quindi tenerle separate nel censimento.
+`ter-43` e `bes-07SIC022` hanno definizioni pubblicate simili e periodi sovrapposti 2018-2024 per 20 regioni, 140 coppie. I valori differiscono, con scarto assoluto massimo per anno fra 0,233 e 0,515 punti percentuali. Spearman sui 140 valori appaiati è 0,999869, che arrotonda a 1,000. È una relazione osservata fra queste serie, non una prova indipendente né prova che condividano lo stesso processo di rilevazione. Non contarle come conferme indipendenti.
 
 `ims-MULTI_ZONA_CRIMINALITA` ha denominazione “Famiglie che lamentano criminalità nella zona di residenza”, copertura 17, 16, 14, 16, 14, 16, 18, 17 regioni dal 2018 al 2025. Toscana e Campania sono disponibili ma i livelli sono molto diversi dal rischio Bes: per esempio 2025 Toscana 11,2%, Campania 15,5%, contro Bes 27,8% e 38,0%. È una misura distinta, con missingness e formulazione diverse, quindi non prova indipendente né sostituto dell’indicatore BES.
 
@@ -123,4 +137,6 @@ Rapine: media semplice regionale 0,810→0,775 per 1.000 abitanti (Δ -0,035) ne
 
 Esclusione Toscana/Campania lascia 7 divergenze su 18 nel 2023-25 e 9 su 18 nel 2019-25. L’esito non dipende solo dai due casi evidenziati. Non è un test campionario né una prova che la percezione individuale non segua gli eventi: dati regionali aggregati, due misure soggettive campionarie/di popolazione e denominatori diversi.
 
-Limiti non verificati: errore campionario e intervalli di confidenza a livello regionale, differenze di composizione demografica, spiegazioni causali, rapporto individuale tra esposizione e percezione, verifica diretta della tavola sorgente scaricata nell’appendice online 2026 per tutti i record. Il file Istat ufficiale dell’appendice apribile online è archivio ZIP e lo strumento browser non ha potuto leggerne il contenuto; il CSV locale dell’app è stato usato e il controllo richiesto Toscana/Campania è riproducibile al suo interno.
+Limiti: errore campionario e intervalli regionali, composizione demografica, cause e relazione individuale fra esposizione e percezione non sono valutati. Il candidato è stato scelto dopo aver visto risultati sul 2019; confronti aggiunti e leave-one-out sono esplorativi, senza correzione per confronti multipli. Dati aggregati regionali non descrivono le stesse famiglie né consentono spiegazioni individuali. Le medie sono semplici medie regionali, non medie nazionali. Furti e rischio hanno denominatori distinti. Le rapine sono espresse con granularità di un decimale, con sei variazioni nulle nel 2023-2025. Le celle Istat sui reati 2025 sono provvisorie e la serie è ricostruita dal 2019 con la correzione dell'indagine 2022.
+
+La riconciliazione ufficiale riguarda esclusivamente sei indicatori, 20 regioni e tre anni (360 celle), non l'intero CSV né l'incertezza delle stime. Toscana e Campania sono state verificate nelle stesse celle. Codici e anni: furti 07SIC002, rischio 07SIC022, rapine 07SIC004, borseggi 07SIC003, degrado 07SIC021 e sicurezza al buio 07SIC020, 2019, 2023, 2025.
