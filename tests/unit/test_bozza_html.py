@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from scripts.editoriale import bozza_html as b
 
@@ -41,6 +42,10 @@ class BozzaHtmlTests(unittest.TestCase):
     def test_i_font_piccoli_si_incorporano(self):
         out = b.incorpora(self.PAGINA, fetch)
         self.assertIn("url(data:font/woff2;base64,", out)
+
+    def test_woff2_senza_catalogo_mime_di_sistema(self):
+        with patch.object(b.mimetypes, "guess_type", return_value=(None, None)):
+            self.assertTrue(b.data_uri(b"WOFF", "/static/fonts/f.woff2").startswith("data:font/woff2;base64,"))
 
     def test_link_interni_assoluti_ed_esterni_intatti(self):
         out = b.incorpora(self.PAGINA, fetch)
