@@ -2,7 +2,7 @@
 title: "Cure fuori regione: chi le fa in Lombardia ed Emilia-Romagna"
 seo_title: "Cure fuori regione: ospedali pubblici o privati accreditati?"
 slug: chi-eroga-cure-fuori-regione
-description: "Nel 2023 in Lombardia il privato convenzionato eroga il 73,2% del valore dei ricoveri di chi arriva da fuori e il 61,9% di quello della specialistica. In Emilia-Romagna il 59,1% e il 25,5%."
+description: "Nel 2023 in Lombardia il privato convenzionato eroga il 73,2% del valore dei ricoveri di chi arriva da fuori e il 61,9% di quello della specialistica. In Emilia-Romagna il 59,1% del valore dei ricoveri e il 25,5% di quello della specialistica."
 date: 2026-10-07
 draft: true
 cover: /static/img/blog/chi-eroga-cure-fuori-regione.jpg

@@ -5,6 +5,7 @@ Articolo: `content/posts/2026-10-07-chi-eroga-cure-fuori-regione.md` (resta `dra
 ## R1 (bloccante): quote GIMBE come quote del valore
 
 - `description`. Prima: «il privato fa il 73,2% dei ricoveri di chi arriva da fuori e il 61,9% della specialistica». Dopo: «il privato convenzionato eroga il 73,2% del valore dei ricoveri di chi arriva da fuori e il 61,9% di quello della specialistica. In Emilia-Romagna il 59,1% e il 25,5%.»
+- Seconda frase della description (segnalata dal coordinatore): «In Emilia-Romagna il 59,1% e il 25,5%» ora ripete «del valore dei ricoveri» e «di quello della specialistica».
 - Lead. Prima: «In Emilia-Romagna il 59,1% dei ricoveri, ma solo il 25,5% della specialistica» e «distano 14,1 punti percentuali». Dopo: «del valore» esplicito per entrambe le regioni e settori, e «la quota del valore dista 14,1 punti percentuali nei ricoveri e 36,4 nella specialistica». Il lead non cresce di numeri.
 - Dopo il grafico. Lombardia: «pesa più della metà del valore». Emilia-Romagna: «59,1% del valore», «25,5% del valore, cioè un quarto».
 - Toscana: «34,0% del valore»; «il valore della mobilità in arrivo va soprattutto al pubblico»; controesempio ER «nel valore».
