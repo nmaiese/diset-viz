@@ -76,7 +76,7 @@ Insight verificabile, tutte le condizioni necessarie:
 3. Ha formula, righe o chiavi delle osservazioni, numerosità ed esclusioni in `numeri.md`.
 4. Distingue risultato e causa: meccanismo candidato documentato oppure ignoto dichiarato.
 5. Resiste a un controllo contrario scelto prima del calcolo, per esempio anno alternativo o esclusione dell'estremo. Si conservano anche risultati negativi.
-`gate-a.md`, sotto `lavoro/<chiave>/`: SHA e hash del brief, autore/modello, giudice/modello, domanda, tesi, codici e confronto, tabella `criterio | sì/no | prova | limite`, esito PASSA/FERMO, motivo, correzione, destinatario, data. Un no ferma lo scrittore. Un solo ritorno mirato al leader, poi archivio se ancora insufficiente. Label gate-a soltanto dopo PASSA, invalidata da modifiche alla tesi.
+`gate-a.md`, sotto `lavoro/<chiave>/`: SHA e hash del brief, autore/modello, giudice/modello, domanda, tesi, codici e confronto, tabella `criterio | sì/no | prova | limite`, esito PASSA/FERMO, motivo, correzione, destinatario, data. Un no ferma lo scrittore. Un solo ritorno mirato al leader, poi archivio se ancora insufficiente. Un ritorno in più è ammesso solo se il gate ha bocciato la forma del brief e non i numeri, e il giudice ha scritto la formulazione consentita. Label gate-a soltanto dopo PASSA, invalidata da modifiche alla tesi.
 
 ### Gate B, in revisione
 Alle cinque domande del PIANO si aggiungono quattro controlli binari con citazioni della bozza: T, tesi sostenuta dalle prove. R, confronto fra due territori reali che fa avanzare il racconto. L, significato concreto per il lettore nei primi due paragrafi. N, risultato non ovvio e controllo contrario riconoscibili.
