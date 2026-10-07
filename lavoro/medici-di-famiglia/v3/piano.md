@@ -2,13 +2,13 @@
 
 Data: 2026-10-07. Autore: Codex GPT-6 Astra. La consegna corrente termina con scelta, brief, questo piano e commit locale dei tre file. Il nuovo Gate A, l'articolo e la bozza HTML non sono stati prodotti. Nessun lancio di altri agenti in questo incarico.
 
-## 1. Chiudere la lacuna prima dello scrittore
+## 1. Data della scheda AGENAS: prova primaria recuperata
 
-Recuperare una prova aperta del giorno di pubblicazione del Terzo rapporto AGENAS o una fonte datata che documenti esplicitamente quella pubblicazione. La pagina ufficiale riporta solo ultima modifica 2026-04-16. Il PDF non riporta un giorno. Il riepilogo PoliS-Lombardia del 2026-05-18 dimostra che il rapporto circolava allora, non quando è uscito. Non ricavare la data da metadati, dal mese o dalla data di un articolo che lo commenta.
+Integrazione C-DIV 2026-10-07: il [feed Atom ufficiale AGENAS](https://www.agenas.gov.it/i-quaderni-di-monitor-%E2%80%93-supplementi-alla-rivista?format=feed&type=atom) riporta published 2026-04-15T12:58:07+02:00 per la scheda che collega il Terzo rapporto; il [feed RSS](https://www.agenas.gov.it/i-quaderni-di-monitor-%E2%80%93-supplementi-alla-rivista?format=feed&type=rss) conferma pubDate e link/GUID. La pagina ufficiale riporta ultima modifica 2026-04-16; il PDF non indica un giorno proprio. Non confondere questi campi. Aggiornati scelta, fonti e brief; serve secondo Gate A indipendente sul nuovo SHA/hash prima dello scrittore.
 
 Per il rapporto SDO 2024 il titolare ha segnalato la [pagina ministeriale dei rapporti annuali](https://www.salute.gov.it/new/it/tema/assistenza-ospedaliera/rapporti-annuali-sui-ricoveri-ospedalieri/) con aggiornamento 2026-06-24. Da questo worker l'URL restituisce la pagina Gcore, anche con HTTP 200, non il contenuto. La copia ISS del PDF è invece aperta e letta. Registrare l'aggiornamento come tale quando verificabile, senza promuoverlo automaticamente a data di pubblicazione. Questa verifica non data il rapporto AGENAS.
 
-Se il giorno AGENAS resta non trovato, mantenere il brief fermo. Un'eventuale rifocalizzazione su sole fonti integralmente datate richiede un brief diverso, con una tesi sostenuta senza la fonte esclusa e tre istituzioni pertinenti, non la semplice rimozione della riga scomoda. Niente richiesta allo scrittore di colmare le lacune.
+Se il giudice ritiene insufficiente la data pubblicata della scheda come data della fonte che collega il PDF, mantenere il brief FERMO. Una rifocalizzazione su sole fonti integralmente datate richiede un brief diverso, con tesi sostenuta senza la fonte esclusa e tre istituzioni pertinenti, non la semplice rimozione della riga scomoda. Niente richiesta allo scrittore di colmare lacune.
 
 ## 2. Nuovo Gate A indipendente
 
