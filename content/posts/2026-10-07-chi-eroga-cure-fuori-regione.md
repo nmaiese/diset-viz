@@ -2,7 +2,7 @@
 title: "Cure fuori regione: chi le fa in Lombardia ed Emilia-Romagna"
 seo_title: "Cure fuori regione: ospedali pubblici o privati accreditati?"
 slug: chi-eroga-cure-fuori-regione
-description: "Nel 2023 in Lombardia il privato fa il 73,2% dei ricoveri di chi arriva da fuori e il 61,9% della specialistica. In Emilia-Romagna il 59,1% e il 25,5%."
+description: "Nel 2023 in Lombardia il privato convenzionato eroga il 73,2% del valore dei ricoveri di chi arriva da fuori e il 61,9% di quello della specialistica. In Emilia-Romagna il 59,1% e il 25,5%."
 date: 2026-10-07
 draft: true
 cover: /static/img/blog/chi-eroga-cure-fuori-regione.jpg
@@ -85,33 +85,33 @@ external_figures:
 
 Quando un malato si cura in un'altra regione, il conto lo paga il Servizio sanitario. Dove va a finire quel denaro? In una struttura pubblica o in una privata accreditata? Dipende dalla regione di arrivo e dal tipo di cura.
 
-Nel 2023 in Lombardia il privato ha erogato il 73,2% del valore dei ricoveri di chi veniva da fuori, e il 61,9% della specialistica. In Emilia-Romagna il 59,1% dei ricoveri, ma solo il 25,5% della specialistica. Sui ricoveri le due regioni distano 14,1 punti percentuali, sulla specialistica 36,4.
+Nel 2023 in Lombardia il privato ha erogato il 73,2% del valore dei ricoveri di chi veniva da fuori, e il 61,9% del valore della specialistica. In Emilia-Romagna il 59,1% del valore dei ricoveri, ma solo il 25,5% di quello della specialistica. Fra le due regioni la quota del valore dista 14,1 punti percentuali nei ricoveri e 36,4 nella specialistica.
 
 ## Il quadro nazionale: prevale il privato
 
 Partiamo dal totale. Nel 2024 l'AGENAS, l'agenzia dei servizi sanitari regionali, conta 544.316 ricoveri di mobilità effettiva, per circa 2,4 miliardi di euro. Sono i ricoveri di residenti italiani curati fuori regione a carico delle regioni, senza i casi che l'agenzia classifica come casuali o apparenti.
 
-Il privato accreditato ne eroga il 62,62%, e pesa il 69,23% della spesa. Chi si sposta per un ricovero finisce più spesso in una struttura privata che in una pubblica.
+Il privato accreditato ne eroga il 62,62%, e pesa il 69,23% della spesa. Tra i ricoveri di mobilità effettiva, quindi, la quota maggiore è del privato accreditato, e la sua quota di spesa supera quella dei ricoveri.
 
 Ma è una media nazionale, e un solo anno. Dice poco di come sono fatti i singoli poli che attirano pazienti.
 
 ## Due poli, due risposte
 
-Per vedere i poli serve un'altra fonte. La fondazione GIMBE ha ripartito per regione di destinazione il valore della mobilità del 2023 fra pubblico e privato convenzionato. Tiene separati i ricoveri, ordinari e day hospital, dalla specialistica ambulatoriale.
+Per vedere i poli serve un'altra fonte. La fondazione GIMBE ha ripartito per regione di destinazione il valore della mobilità del 2023 fra pubblico e privato convenzionato. Usa i valori dei Modelli M al primo addebito, cioè prima di contestazioni e compensazione fra regioni, e possono quindi cambiare: non sono il saldo definitivo. Tiene separati i ricoveri, ordinari e day hospital, dalla specialistica ambulatoriale.
 
 <!-- figura: erogatori-cure-fuori-regione -->
 
-Qui la Lombardia è il caso più netto. Il privato pesa più della metà in entrambi i settori, 73,2% nei ricoveri e 61,9% nella specialistica.
+Qui la Lombardia è il caso più netto. Il privato pesa più della metà del valore in entrambi i settori, 73,2% nei ricoveri e 61,9% nella specialistica.
 
-L'Emilia-Romagna ha due facce. Nei ricoveri il privato prevale, con il 59,1%. Nella specialistica pesa il 25,5%, cioè un quarto del valore. È la stessa regione e lo stesso anno, ma cambiando settore la risposta si rovescia.
+L'Emilia-Romagna ha due facce. Nei ricoveri il privato prevale, con il 59,1% del valore. Nella specialistica pesa il 25,5% del valore, cioè un quarto. È la stessa regione e lo stesso anno, ma cambiando settore la risposta si rovescia.
 
-Attenzione a cosa si misura. Queste sono quote del valore economico delle cure ricevute da chi viene da fuori, non conteggi di pazienti né di visite. E il valore è quello contabilizzato, non un costo reale né un margine.
+Attenzione a cosa si misura. Queste sono quote del valore economico delle cure ricevute da chi viene da fuori, non conteggi di pazienti né di visite. E il valore è quello contabilizzato al primo addebito, non un costo reale né un margine.
 
 ## La Toscana, dove la regola salta
 
-Se tutti i poli somigliassero alla Lombardia, si potrebbe dire che chi si cura fuori regione va nel privato. La Toscana lo smentisce.
+Se tutti i poli somigliassero alla Lombardia, si potrebbe dire che il valore della mobilità in arrivo va soprattutto al privato. La Toscana lo smentisce.
 
-Nei ricoveri il privato convenzionato pesa il 34,0%, nella specialistica il 5,5%. In Toscana la mobilità in arrivo passa soprattutto dal pubblico, in tutti e due i settori. Anche l'Emilia-Romagna è un controesempio, perché nella specialistica il privato resta in minoranza.
+Nei ricoveri il privato convenzionato pesa il 34,0% del valore, nella specialistica il 5,5%. In Toscana il valore della mobilità in arrivo va soprattutto al pubblico, in tutti e due i settori. Anche l'Emilia-Romagna è un controesempio, perché nella specialistica il privato resta in minoranza nel valore.
 
 Il privato, allora, non prevale ovunque. Prevale nel dato nazionale dei ricoveri e in Lombardia, e basta guardare un altro settore o un'altra regione perché la quota cambi di molto.
 
