@@ -4,7 +4,7 @@ seo_title: "Medici di famiglia con troppi assistiti: i dati per regione"
 slug: medici-di-famiglia-regioni
 description: "Nel 2023 il 51,7% dei medici di famiglia italiani supera i 1500 assistiti: 63,8% al Nord, 39,6% nel Mezzogiorno. Dati Istat per regione dal 2004."
 date: 2026-10-07
-draft: true
+draft: false
 tags:
 - Sanità
 - Servizi
