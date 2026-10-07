@@ -1,0 +1,116 @@
+{
+  "title": "Meno furti in casa, ma sentirsi sicuri è un’altra cosa",
+  "reader_question": "Se nella mia regione diminuiscono i furti, perché non mi sento più sicuro?",
+  "status": "scout completato; sondaggio esplorativo; Gate A non valutato",
+  "universe": {
+    "security_indicator_refs": 30,
+    "security_regional_refs": 24,
+    "security_provincial_refs": 6,
+    "adjacent_context_refs": 1,
+    "catalog_inventory_total": 31,
+    "core_analysis_codes": [
+      "bes:07SIC002",
+      "bes:07SIC003",
+      "bes:07SIC004",
+      "bes:07SIC020",
+      "bes:07SIC021",
+      "bes:07SIC022"
+    ],
+    "context_codes": [
+      "ter-43",
+      "ims-MULTI_ZONA_CRIMINALITA",
+      "bes-07SIC004P",
+      "bes-07SIC005P",
+      "bes-07SIC006P",
+      "bes-06POL005",
+      "bes-07SIC010"
+    ],
+    "excluded_from_core_count": 18,
+    "context_count": 7,
+    "excluded_from_core_codes": [
+      "ter-461",
+      "ter-542",
+      "ter-283",
+      "ter-134",
+      "ter-135",
+      "ter-284",
+      "ter-282",
+      "ter-279",
+      "ter-281",
+      "ter-280",
+      "bes-07SIC001",
+      "bes-07SIC001P",
+      "bes-07SIC005",
+      "bes-07SIC006",
+      "bes-07SIC007",
+      "bes-07SIC007P",
+      "bes-07SIC008",
+      "bes-07SIC008P"
+    ]
+  },
+  "data_source": "app/static/data/Assoluti_BES_Regione.csv; view model cross-check",
+  "comparisons": {
+    "2023_2025": {
+      "N": 20,
+      "divergent_count": 8,
+      "divergent_regions": [
+        "Emilia-Romagna",
+        "Friuli-Venezia Giulia",
+        "Lazio",
+        "Molise",
+        "Piemonte",
+        "Sardegna",
+        "Toscana",
+        "Umbria"
+      ],
+      "spearman_level_2025": 0.6345864661654136,
+      "spearman_change": -0.013538925365125222,
+      "leave_out_tuscany_campania": {
+        "N": 18,
+        "divergent_count": 7,
+        "spearman_change": 0.10015489202534705
+      }
+    },
+    "2019_2025": {
+      "N": 20,
+      "divergent_count": 11,
+      "spearman_change": 0.1004892807340198
+    },
+    "H2": {
+      "divergent_regions_degradation_up": "8/8",
+      "divergent_regions_safety_down": "8/8",
+      "other_regions_degradation_up": "10/12",
+      "other_regions_safety_down": "11/12",
+      "divergent_regions_rapine_up": "4/8",
+      "divergent_regions_pickpocket_up": "4/8"
+    }
+  },
+  "candidate_insights": [
+    {
+      "claim": "Nel 2023-2025 otto regioni hanno furti in abitazione in calo e rischio percepito in aumento; in tutte e otto aumentano gli elementi di degrado percepiti e cala la sicurezza camminando al buio.",
+      "indicators": [
+        "bes-07SIC002",
+        "bes-07SIC022",
+        "bes-07SIC021",
+        "bes-07SIC020"
+      ],
+      "contrary_check": "Tra le altre 12 regioni degrado cresce in 10 e sicurezza cala in 11; pattern non esclusivo delle otto. Rapine e borseggi aumentano solo in 4/8.",
+      "limits": "Analisi esplorativa selezionata per il risultato, misure con popolazioni/unità diverse, nessuna causa individuale o territoriale dimostrata."
+    },
+    {
+      "claim": "I livelli regionali 2025 di furti e rischio percepito hanno Spearman 0,635, ma le loro variazioni 2023-2025 hanno Spearman -0,014. Ranking cross-section e dinamica non coincidono.",
+      "indicators": [
+        "bes-07SIC002",
+        "bes-07SIC022",
+        "bes-07SIC004",
+        "bes-07SIC003"
+      ],
+      "contrary_check": "Nel periodo 2019-2025 la correlazione delle variazioni è +0,100 e il conteggio divergente sale a 11/20; furti calano ma rapine medie salgono da 0,680 a 0,775.",
+      "limits": "ρ descrittivo su sole 20 regioni, selezione esplorativa, livelli e cambiamenti non causali."
+    }
+  ],
+  "provenance": {
+    "brief_unit_dossiers": "Non usati. Nessun comando scripts.editoriale.brief eseguito.",
+    "source_vintage": "Istat, Aggiornamento intermedio aprile 2026. Tavola ZIP aperta come link ufficiale ma non leggibile via browser, segnato in fonti.md."
+  }
+}
