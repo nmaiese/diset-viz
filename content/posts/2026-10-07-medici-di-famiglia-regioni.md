@@ -21,7 +21,7 @@ cover_credit:
   changes: "Ritagliata e ridimensionata"
 dataset:
   name: Medici di famiglia con più di 1500 assistiti, dimissioni fuori regione e fila allo sportello ASL, 2023
-  description: Per le venti regioni, la quota di medici di medicina generale con più di 1500 assistiti, la quota di dimissioni ospedaliere dei residenti avvenute fuori regione e la quota di utenti ASL con una fila oltre 20 minuti, tutte del 2023, più la quota di chi rinuncia a visite o esami per la sola Sardegna e il valore dell'Italia nel 2004 e nel 2023.
+  description: Per le venti regioni, la quota di medici di medicina generale con più di 1500 assistiti, la quota di dimissioni ospedaliere dei residenti avvenute fuori regione e la quota di utenti ASL con una fila oltre 20 minuti e le persone ogni mille che hanno usato il pronto soccorso negli ultimi tre mesi, tutte del 2023, più la quota di chi rinuncia a visite o esami per la sola Sardegna e il valore dell'Italia nel 2004 e nel 2023.
   method: Valori Istat senza rielaborazione, celle regionali del 2023. Il Trentino-Alto Adige è un aggregato di due province. Gli indici di Spearman citati nel testo sono calcolati sui ranghi delle venti regioni, con i ranghi medi in caso di parità, e sono un'osservazione esplorativa, non una prova.
   temporal: 2004/2023
   spatial: Italia, regioni
@@ -107,9 +107,9 @@ external_figures:
   url: https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip
 ---
 
-Il tuo medico di famiglia ha più di 1500 assistiti. Questo numero dice quanto è difficile curarsi nella tua regione? Da solo no, e i dati di due regioni lontane lo mostrano bene.
+Se il tuo medico di famiglia ha più di 1500 assistiti, questo numero dice quanto è difficile curarsi nella tua regione? Da solo no, e i dati di due regioni lontane lo mostrano bene.
 
-Nel 2023 il 74,0% dei medici di famiglia lombardi superava i 1500 assistiti, il massimo previsto dal contratto. In Molise era il 21,6%. Di solito il numero si legge come un segno di sofferenza: liste più lunghe, più guai. La Lombardia starebbe peggio, il Molise meglio.
+Nel 2023 il 74,0% dei medici di famiglia lombardi superava i 1500 assistiti, il massimo previsto dal contratto. In Molise era il 21,6%. Di solito il numero si legge come un segno di sofferenza: più medici oltre soglia, più guai. La Lombardia starebbe peggio, il Molise meglio.
 
 ## Dove la lettura si rovescia
 
@@ -123,15 +123,15 @@ Perché sia così, i dati non lo dicono.
 
 Questa relazione non l'avevamo cercata. Abbiamo guardato 78 coppie di indicatori regionali e questa ci è sembrata la più utile da raccontare, scelta dopo aver visto tutta la matrice: è un'osservazione, non una prova. I controlli non sono stati provati in ordine cronologico e i singoli anni non sono verifiche indipendenti.
 
-Sulle venti regioni nel 2023 la relazione c'è e va nello stesso senso. Dove più medici superano i 1500 assistiti, la quota di dimissioni fuori regione è più bassa. L'indice è -0,50, su una scala che arriva a -1: un legame moderato, che confronta i posti in classifica.
+Sulle venti regioni nel 2023 la relazione c'è e va nello stesso senso. Dove più medici superano i 1500 assistiti, la quota di dimissioni fuori regione tende a essere più bassa, anche se non in ogni regione. L'indice è -0,50, su una scala che arriva a -1: un legame moderato, che confronta i posti in classifica.
 
 <!-- figura: dispersione-dimissioni -->
 
-È anche fragile. Senza Lombardia e Molise, i due estremi, l'indice scende a -0,32. Per la fila ASL la relazione regge meglio: -0,55 con tutte le regioni, -0,51 senza i due estremi.
+È anche fragile. Senza Lombardia e Molise, i due estremi, l'indice scende a -0,32. Per la fila ASL, dove più medici superano la soglia la quota di utenti con una fila oltre i 20 minuti tende a essere più bassa, e la relazione regge meglio: -0,55 con tutte le regioni, -0,51 senza i due estremi.
 
 ## La Sardegna non sta nella regola
 
-Nel 2023 il 60,6% dei medici di famiglia [sardi](/regione/sardegna) superava i 1500 assistiti, più di ogni altra regione del Mezzogiorno. Non è dunque una questione di Nord e Sud. E sulle dimissioni fuori regione la Sardegna sta con la Lombardia: il 7,1%.
+Nel 2023 il 60,6% dei medici di famiglia [sardi](/regione/sardegna) superava i 1500 assistiti, più di ogni altra regione del Mezzogiorno. Per queste misure la Sardegna non segue una semplice divisione fra Nord e Sud, e non va oltre. E sulle dimissioni fuori regione la Sardegna sta con la Lombardia: il 7,1%.
 
 Ma circa una persona su sette, il 13,7%, ha dichiarato di aver rinunciato a una visita o a un esame di cui aveva bisogno. È la quota più alta fra le venti regioni. Il motivo può essere economico, di scomodità o una lista d'attesa lunga, e l'indagine non li separa. È un dato regionale, non il caso di una persona. Perché sia così, i dati non lo dicono.
 
@@ -139,16 +139,16 @@ Sulle venti regioni, la quota di chi rinuncia non mostra nessun ordinamento comu
 
 ## Il risultato che non torna
 
-L'uso del pronto soccorso va nell'altro verso. Dove più medici superano i 1500 assistiti, una quota più alta di persone dichiara di essere andata in pronto soccorso negli ultimi tre mesi: l'indice è +0,42, e senza Lombardia e Molise +0,36. In Lombardia sono 64,8 persone ogni mille, in Molise 39,8.
+L'uso del pronto soccorso va nell'altro verso. Dove più medici superano i 1500 assistiti, tendono a essere più numerose le persone ogni mille che dichiarano di essere andate in pronto soccorso negli ultimi tre mesi: l'indice è +0,42, e senza Lombardia e Molise +0,36, una relazione debole. In Lombardia sono 64,8 persone ogni mille, in Molise 39,8.
 
 Usare il pronto soccorso non vuol dire averne bisogno né poterci arrivare. Perché le due misure vadano in senso opposto, i dati non lo dicono.
 
 ## Che cosa cambia per chi legge
 
-La quota di medici oltre soglia conta quante liste sono lunghe. In Italia è più che triplicata dal 2004: dal 15,8% al 51,7% nel 2023, valori Istat. Ma da solo non basta a dire come si cura una regione.
+Questa quota indica la percentuale di medici di famiglia oltre soglia in una regione. In Italia è più che triplicata dal 2004: dal 15,8% al 51,7% nel 2023, valori Istat. Ma da solo non basta a dire come si cura una regione.
 
-Conviene guardarla accanto ad altri dati: dove i residenti vanno a farsi ricoverare, quale quota di utenti dichiara una fila oltre i 20 minuti. Anche così resta una lettura parziale, con unità diverse e domande diverse, tra medici, utenti e dimissioni.
+Conviene guardarla accanto ad altri dati: quale quota di dimissioni dei residenti avviene fuori regione, quale quota di utenti dichiara una fila oltre i 20 minuti. Anche così resta una lettura parziale, con unità diverse e domande diverse, tra quote di medici, di utenti e di dimissioni.
 
-Quanto tempo ha il medico per ciascun paziente, la quota non lo dice. E non dice nemmeno se chi sta in una lista lunga sia curato bene o male. Sono i limiti di questo numero, e non li risolve nessun altro dato di questa pagina.
+Quanto tempo ha il medico per ciascun paziente, la quota non lo dice. E non dice nemmeno se chi ha un medico oltre soglia sia curato bene o male. Sono i limiti di questo numero, e non li risolve nessun altro dato di questa pagina.
 
 Ogni valore, anno per anno, sta nella scheda dei [medici di medicina generale con un numero di assistiti oltre soglia](/indicatore/medici-di-medicina-generale-con-un-numero-di-assistiti-oltre-soglia/bes-12SER027). Le altre due misure stanno nelle schede dell'[emigrazione ospedaliera](/indicatore/emigrazione-ospedaliera-in-altra-regione/bes-12SER025) e degli [utenti ASL con una fila oltre 20 minuti](/indicatore/utenti-della-asl-con-una-fila-di-oltre-20-minuti/ims-MULTI_ASL_FILA_OLTRE_20_MIN). Per i casi estremi si vedano il [Molise](/regione/molise) e la [Lombardia](/regione/lombardia). I dati dell'articolo si scaricano in [CSV](/static/data/articles/medici-di-famiglia-regioni.csv).
