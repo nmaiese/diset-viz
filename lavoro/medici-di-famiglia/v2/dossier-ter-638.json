@@ -1,0 +1,1707 @@
+{
+  "identita": {
+    "chiave": "638",
+    "codice": "ter-638",
+    "nome": "Ospiti anziani non autosufficienti dei presidi residenziali socio-assistenziali e socio-sanitari per centomila anziani",
+    "percorso": "/indicatore/ospiti-anziani-non-autosufficienti-dei-presidi-residenziali-socio-assistenziali/ter-638",
+    "tema": "Reddito, inclusione e accessibilità",
+    "sottotema_fonte": "Inclusione sociale",
+    "definizione_fonte": "(centomila anziani)",
+    "unita": {
+      "fonte": "centomila anziani",
+      "cifra": "centomila anziani",
+      "variazione": "centomila anziani"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' alto",
+      "classifica_attiva": false
+    },
+    "livelli": [
+      {
+        "livello": "regione",
+        "percorso": "/indicatore/ospiti-anziani-non-autosufficienti-dei-presidi-residenziali-socio-assistenziali/ter-638",
+        "primo_anno": 2009,
+        "ultimo_anno": 2022,
+        "anni": [
+          2009,
+          2010,
+          2011,
+          2012,
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "territori_ultimo_anno": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2009,
+      "ultimo": 2022
+    },
+    "fonte": {
+      "etichetta": "Istat, Banca dati territoriale per le politiche di sviluppo",
+      "famiglia": "Istat, indicatori territoriali",
+      "istituzione": "Istat",
+      "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/",
+      "url_dati": null,
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "regione",
+      "fotografia": {
+        "anno": 2022,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 3702.345259,
+              "testo": "3.702 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Friuli-Venezia Giulia",
+            "chiave": "friuli-venezia-giulia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2672.416626,
+              "testo": "2.672 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2636.798982,
+              "testo": "2.637 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Valle d'Aosta",
+            "chiave": "valle-d-aosta",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2636.289666,
+              "testo": "2.636 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2600.110511,
+              "testo": "2.600 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Veneto",
+            "chiave": "veneto",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2599.720275,
+              "testo": "2.600 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Emilia-Romagna",
+            "chiave": "emilia-romagna",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2183.624754,
+              "testo": "2.184 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Marche",
+            "chiave": "marche",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 1755.263602,
+              "testo": "1.755 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Liguria",
+            "chiave": "liguria",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 1741.260443,
+              "testo": "1.741 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Toscana",
+            "chiave": "toscana",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 1299.363599,
+              "testo": "1.299 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Umbria",
+            "chiave": "umbria",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 999.428651,
+              "testo": "999 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 955.137042,
+              "testo": "955 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Molise",
+            "chiave": "molise",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 845.094239,
+              "testo": "845 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 821.495471,
+              "testo": "821 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 744.635048,
+              "testo": "745 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Abruzzo",
+            "chiave": "abruzzo",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 688.808417,
+              "testo": "689 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 553.939681,
+              "testo": "554 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 528.519152,
+              "testo": "529 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 442.670406,
+              "testo": "443 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 227.696527,
+              "testo": "228 ogni centomila anziani"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 20 regioni, non la media nazionale",
+          "valore": 1531.730918,
+          "testo": "1.532 ogni centomila anziani"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 1149.396125,
+          "testo": "1.149 ogni centomila anziani"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 9,
+          "testo": "9"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 11,
+          "testo": "11"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 3702.345259,
+              "testo": "3.702 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Friuli-Venezia Giulia",
+            "chiave": "friuli-venezia-giulia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2672.416626,
+              "testo": "2.672 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 2636.798982,
+              "testo": "2.637 ogni centomila anziani"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 227.696527,
+              "testo": "228 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 442.670406,
+              "testo": "443 ogni centomila anziani"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 528.519152,
+              "testo": "529 ogni centomila anziani"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 3474.648732,
+          "testo": "3.475 ogni centomila anziani"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 16.259999,
+          "testo": "16,3 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle regioni di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 2596.570815,
+                "testo": "2.597 ogni centomila anziani"
+              },
+              "piu_alto": {
+                "territorio": "Trentino Alto Adige",
+                "valore": {
+                  "valore": 3702.345259,
+                  "testo": "3.702 ogni centomila anziani"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Liguria",
+                "valore": {
+                  "valore": 1741.260443,
+                  "testo": "1.741 ogni centomila anziani"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 4,
+                "testo": "4"
+              },
+              "media_semplice": {
+                "valore": 1145.643751,
+                "testo": "1.146 ogni centomila anziani"
+              },
+              "piu_alto": {
+                "territorio": "Marche",
+                "valore": {
+                  "valore": 1755.263602,
+                  "testo": "1.755 ogni centomila anziani"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Lazio",
+                "valore": {
+                  "valore": 528.519152,
+                  "testo": "529 ogni centomila anziani"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 659.934604,
+                "testo": "660 ogni centomila anziani"
+              },
+              "piu_alto": {
+                "territorio": "Basilicata",
+                "valore": {
+                  "valore": 955.137042,
+                  "testo": "955 ogni centomila anziani"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Campania",
+                "valore": {
+                  "valore": 227.696527,
+                  "testo": "228 ogni centomila anziani"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2009,
+            "media_semplice": {
+              "valore": 1728.444035,
+              "testo": "1.728 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3807.3141,
+              "testo": "3.807 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2010,
+            "media_semplice": {
+              "valore": 1699.917706,
+              "testo": "1.700 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3996.36949,
+              "testo": "3.996 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2011,
+            "media_semplice": {
+              "valore": 1630.844567,
+              "testo": "1.631 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 4061.754377,
+              "testo": "4.062 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2012,
+            "media_semplice": {
+              "valore": 1585.324527,
+              "testo": "1.585 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3994.284939,
+              "testo": "3.994 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2013,
+            "media_semplice": {
+              "valore": 1571.689507,
+              "testo": "1.572 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 4069.174591,
+              "testo": "4.069 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2014,
+            "media_semplice": {
+              "valore": 1598.429258,
+              "testo": "1.598 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3745.573288,
+              "testo": "3.746 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2015,
+            "media_semplice": {
+              "valore": 1584.198328,
+              "testo": "1.584 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3736.798438,
+              "testo": "3.737 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2016,
+            "media_semplice": {
+              "valore": 1610.655565,
+              "testo": "1.611 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3872.882449,
+              "testo": "3.873 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2017,
+            "media_semplice": {
+              "valore": 1600.226014,
+              "testo": "1.600 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3681.613898,
+              "testo": "3.682 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 1670.730821,
+              "testo": "1.671 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3742.480972,
+              "testo": "3.742 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 1627.508916,
+              "testo": "1.628 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3763.031241,
+              "testo": "3.763 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 1423.441657,
+              "testo": "1.423 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3108.941799,
+              "testo": "3.109 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 1501.068851,
+              "testo": "1.501 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3464.184993,
+              "testo": "3.464 ogni centomila anziani"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 1531.730918,
+              "testo": "1.532 ogni centomila anziani"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3474.648732,
+              "testo": "3.475 ogni centomila anziani"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "totale": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2009,
+              "valore": {
+                "valore": 1728.444035,
+                "testo": "1.728 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2010,
+              "valore": {
+                "valore": 1699.917706,
+                "testo": "1.700 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2011,
+              "valore": {
+                "valore": 1630.844567,
+                "testo": "1.631 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2012,
+              "valore": {
+                "valore": 1585.324527,
+                "testo": "1.585 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2013,
+              "valore": {
+                "valore": 1571.689507,
+                "testo": "1.572 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2014,
+              "valore": {
+                "valore": 1598.429258,
+                "testo": "1.598 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2015,
+              "valore": {
+                "valore": 1584.198328,
+                "testo": "1.584 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2016,
+              "valore": {
+                "valore": 1610.655565,
+                "testo": "1.611 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2017,
+              "valore": {
+                "valore": 1600.226014,
+                "testo": "1.600 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 1670.730821,
+                "testo": "1.671 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 1627.508916,
+                "testo": "1.628 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 1423.441657,
+                "testo": "1.423 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 1501.068851,
+                "testo": "1.501 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 1531.730918,
+                "testo": "1.532 ogni centomila anziani"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2009,
+            "valore": {
+              "valore": 1728.444035,
+              "testo": "1.728 ogni centomila anziani"
+            }
+          },
+          "minimo": {
+            "anno": 2020,
+            "valore": {
+              "valore": 1423.441657,
+              "testo": "1.423 ogni centomila anziani"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2013,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 1571.689507,
+                "testo": "1.572 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2014,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 1598.429258,
+                "testo": "1.598 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2015,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 1584.198328,
+                "testo": "1.584 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2016,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 1610.655565,
+                "testo": "1.611 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2017,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 1600.226014,
+                "testo": "1.600 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2018,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 1670.730821,
+                "testo": "1.671 ogni centomila anziani"
+              }
+            },
+            {
+              "anno": 2020,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 1423.441657,
+                "testo": "1.423 ogni centomila anziani"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2009,
+              "a": 2013,
+              "verso": "scende"
+            },
+            {
+              "da": 2013,
+              "a": 2014,
+              "verso": "sale"
+            },
+            {
+              "da": 2014,
+              "a": 2015,
+              "verso": "scende"
+            },
+            {
+              "da": 2015,
+              "a": 2016,
+              "verso": "sale"
+            },
+            {
+              "da": 2016,
+              "a": 2017,
+              "verso": "scende"
+            },
+            {
+              "da": 2017,
+              "a": 2018,
+              "verso": "sale"
+            },
+            {
+              "da": 2018,
+              "a": 2020,
+              "verso": "scende"
+            },
+            {
+              "da": 2020,
+              "a": 2022,
+              "verso": "sale"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2009,
+          "a": 2022,
+          "media_semplice_da": {
+            "valore": 1728.444035,
+            "testo": "1.728 ogni centomila anziani"
+          },
+          "media_semplice_a": {
+            "valore": 1531.730918,
+            "testo": "1.532 ogni centomila anziani"
+          },
+          "assoluta": {
+            "valore": -196.713118,
+            "testo": "-197 ogni centomila anziani"
+          },
+          "relativa": {
+            "valore": -11.380936,
+            "testo": "-11,4%"
+          },
+          "territori_da": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "territori_a": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "sul_pannello": {
+            "da": 2009,
+            "a": 2022,
+            "assoluta": {
+              "valore": -196.713118,
+              "testo": "-197 ogni centomila anziani"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2021,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "media_semplice_da": {
+            "valore": 1501.068851,
+            "testo": "1.501 ogni centomila anziani"
+          },
+          "media_semplice_a": {
+            "valore": 1531.730918,
+            "testo": "1.532 ogni centomila anziani"
+          },
+          "variazione": {
+            "valore": 30.662066,
+            "testo": "+30,7 ogni centomila anziani"
+          },
+          "in_aumento": {
+            "valore": 17,
+            "testo": "17"
+          },
+          "in_calo": {
+            "valore": 3,
+            "testo": "3"
+          },
+          "invariati": {
+            "valore": 0,
+            "testo": "0"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Piemonte",
+              "prima": {
+                "valore": 2520.410564,
+                "testo": "2.520 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2636.798982,
+                "testo": "2.637 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 116.388418,
+                "testo": "+116 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Friuli-Venezia Giulia",
+              "prima": {
+                "valore": 2580.962876,
+                "testo": "2.581 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2672.416626,
+                "testo": "2.672 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 91.45375,
+                "testo": "+91,5 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Emilia-Romagna",
+              "prima": {
+                "valore": 2116.253483,
+                "testo": "2.116 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2183.624754,
+                "testo": "2.184 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 67.37127,
+                "testo": "+67,4 ogni centomila anziani"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 944.686363,
+                "testo": "945 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 845.094239,
+                "testo": "845 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -99.592124,
+                "testo": "-99,6 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 501.42338,
+                "testo": "501 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 442.670406,
+                "testo": "443 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -58.752974,
+                "testo": "-58,8 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 2641.162768,
+                "testo": "2.641 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2636.289666,
+                "testo": "2.636 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -4.873101,
+                "testo": "-4,9 ogni centomila anziani"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2009,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "aumenti": [
+            {
+              "territorio": "Basilicata",
+              "variazione": {
+                "valore": 360.754506,
+                "testo": "+361 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "variazione": {
+                "valore": 312.290447,
+                "testo": "+312 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "variazione": {
+                "valore": 257.628953,
+                "testo": "+258 ogni centomila anziani"
+              }
+            }
+          ],
+          "cali": [
+            {
+              "territorio": "Lombardia",
+              "variazione": {
+                "valore": -1005.615196,
+                "testo": "-1.006 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Abruzzo",
+              "variazione": {
+                "valore": -975.314691,
+                "testo": "-975 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "variazione": {
+                "valore": -721.219147,
+                "testo": "-721 ogni centomila anziani"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2009,
+          "a": 2022,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "valori": [
+            {
+              "territorio": "Lombardia",
+              "prima": {
+                "valore": 3605.725706,
+                "testo": "3.606 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2600.110511,
+                "testo": "2.600 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -1005.615196,
+                "testo": "-1.006 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Abruzzo",
+              "prima": {
+                "valore": 1664.123109,
+                "testo": "1.664 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 688.808417,
+                "testo": "689 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -975.314691,
+                "testo": "-975 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 3357.508813,
+                "testo": "3.358 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2636.289666,
+                "testo": "2.636 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -721.219147,
+                "testo": "-721 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Veneto",
+              "prima": {
+                "valore": 3118.634743,
+                "testo": "3.119 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2599.720275,
+                "testo": "2.600 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -518.914468,
+                "testo": "-519 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 1358.494228,
+                "testo": "1.358 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 845.094239,
+                "testo": "845 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -513.399989,
+                "testo": "-513 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Friuli-Venezia Giulia",
+              "prima": {
+                "valore": 3097.860014,
+                "testo": "3.098 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2672.416626,
+                "testo": "2.672 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -425.443388,
+                "testo": "-425 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 833.860327,
+                "testo": "834 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 442.670406,
+                "testo": "443 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -391.18992,
+                "testo": "-391 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 594.382535,
+                "testo": "594 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 955.137042,
+                "testo": "955 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 360.754506,
+                "testo": "+361 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "prima": {
+                "valore": 2324.508535,
+                "testo": "2.325 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2636.798982,
+                "testo": "2.637 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 312.290447,
+                "testo": "+312 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Emilia-Romagna",
+              "prima": {
+                "valore": 2451.633526,
+                "testo": "2.452 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 2183.624754,
+                "testo": "2.184 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -268.008772,
+                "testo": "-268 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "prima": {
+                "valore": 1497.634649,
+                "testo": "1.498 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 1755.263602,
+                "testo": "1.755 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 257.628953,
+                "testo": "+258 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 3904.13342,
+                "testo": "3.904 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 3702.345259,
+                "testo": "3.702 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -201.78816,
+                "testo": "-202 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "prima": {
+                "valore": 1430.488073,
+                "testo": "1.430 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 1299.363599,
+                "testo": "1.299 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -131.124474,
+                "testo": "-131 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Campania",
+              "prima": {
+                "valore": 96.81932,
+                "testo": "96,8 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 227.696527,
+                "testo": "228 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 130.877207,
+                "testo": "+131 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 656.532528,
+                "testo": "657 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 528.519152,
+                "testo": "529 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -128.013376,
+                "testo": "-128 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Liguria",
+              "prima": {
+                "valore": 1641.272752,
+                "testo": "1.641 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 1741.260443,
+                "testo": "1.741 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 99.987692,
+                "testo": "+100,0 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Puglia",
+              "prima": {
+                "valore": 644.862842,
+                "testo": "645 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 744.635048,
+                "testo": "745 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 99.772206,
+                "testo": "+99,8 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Umbria",
+              "prima": {
+                "valore": 907.613094,
+                "testo": "908 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 999.428651,
+                "testo": "999 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 91.815557,
+                "testo": "+91,8 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 601.379796,
+                "testo": "601 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 553.939681,
+                "testo": "554 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": -47.440115,
+                "testo": "-47,4 ogni centomila anziani"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 781.412693,
+                "testo": "781 ogni centomila anziani"
+              },
+              "dopo": {
+                "valore": 821.495471,
+                "testo": "821 ogni centomila anziani"
+              },
+              "variazione": {
+                "valore": 40.082778,
+                "testo": "+40,1 ogni centomila anziani"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "regione"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione",
+    "territori": [
+      {
+        "territorio": "Trentino Alto Adige",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 3702.345259,
+          "testo": "3.702 ogni centomila anziani"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 54636.7,
+            "testo": "54.637 euro"
+          },
+          "ter-902": {
+            "valore": 29344.1,
+            "testo": "29.344 euro"
+          },
+          "ter-13": {
+            "valore": 72.8925,
+            "testo": "72,9%"
+          },
+          "ter-345": {
+            "valore": 78.801197,
+            "testo": "78,8%"
+          }
+        }
+      },
+      {
+        "territorio": "Friuli-Venezia Giulia",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 2672.416626,
+          "testo": "2.672 ogni centomila anziani"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 39005.1,
+            "testo": "39.005 euro"
+          },
+          "ter-902": {
+            "valore": 24780.9,
+            "testo": "24.781 euro"
+          },
+          "ter-13": {
+            "valore": 69.409967,
+            "testo": "69,4%"
+          },
+          "ter-345": {
+            "valore": 74.665198,
+            "testo": "74,7%"
+          }
+        }
+      },
+      {
+        "territorio": "Piemonte",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 2636.798982,
+          "testo": "2.637 ogni centomila anziani"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 38625.5,
+            "testo": "38.626 euro"
+          },
+          "ter-902": {
+            "valore": 25426.3,
+            "testo": "25.426 euro"
+          },
+          "ter-13": {
+            "valore": 68.935532,
+            "testo": "68,9%"
+          },
+          "ter-345": {
+            "valore": 74.279862,
+            "testo": "74,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Lazio",
+        "posizione_per_valore": 18,
+        "valore": {
+          "valore": 528.519152,
+          "testo": "529 ogni centomila anziani"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 43166.9,
+            "testo": "43.167 euro"
+          },
+          "ter-902": {
+            "valore": 24436.7,
+            "testo": "24.437 euro"
+          },
+          "ter-13": {
+            "valore": 64.166862,
+            "testo": "64,2%"
+          },
+          "ter-345": {
+            "valore": 69.345131,
+            "testo": "69,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Sicilia",
+        "posizione_per_valore": 19,
+        "valore": {
+          "valore": 442.670406,
+          "testo": "443 ogni centomila anziani"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 23308.7,
+            "testo": "23.309 euro"
+          },
+          "ter-902": {
+            "valore": 17402.1,
+            "testo": "17.402 euro"
+          },
+          "ter-13": {
+            "valore": 47.331588,
+            "testo": "47,3%"
+          },
+          "ter-345": {
+            "valore": 51.43712,
+            "testo": "51,4%"
+          }
+        }
+      },
+      {
+        "territorio": "Campania",
+        "posizione_per_valore": 20,
+        "valore": {
+          "valore": 227.696527,
+          "testo": "228 ogni centomila anziani"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 24564.2,
+            "testo": "24.564 euro"
+          },
+          "ter-902": {
+            "valore": 17177.1,
+            "testo": "17.177 euro"
+          },
+          "ter-13": {
+            "valore": 46.668865,
+            "testo": "46,7%"
+          },
+          "ter-345": {
+            "valore": 50.786082,
+            "testo": "50,8%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.76391,
+          "testo": "0,76"
+        }
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.833083,
+          "testo": "0,83"
+        }
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.867669,
+          "testo": "0,87"
+        }
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.864662,
+          "testo": "0,86"
+        }
+      }
+    ],
+    "motivo_senza_correlazioni": null
+  }
+}
