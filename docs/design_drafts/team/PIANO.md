@@ -78,6 +78,17 @@ Insight verificabile, tutte le condizioni necessarie:
 5. Resiste a un controllo contrario scelto prima del calcolo, per esempio anno alternativo o esclusione dell'estremo. Si conservano anche risultati negativi.
 `gate-a.md`, sotto `lavoro/<chiave>/`: SHA e hash del brief, autore/modello, giudice/modello, domanda, tesi, codici e confronto, tabella `criterio | sì/no | prova | limite`, esito PASSA/FERMO, motivo, correzione, destinatario, data. Un no ferma lo scrittore. Un solo ritorno mirato al leader, poi archivio se ancora insufficiente. Un ritorno in più è ammesso solo se il gate ha bocciato la forma del brief e non i numeri, e il giudice ha scritto la formulazione consentita. Label gate-a soltanto dopo PASSA, invalidata da modifiche alla tesi.
 
+### Aggiornamento v3: precedenza su requisiti v2 per il brief e Gate A
+Decisione del titolare: il blog parte da un fatto e da una domanda reale, non da un indicatore. Gli indicatori interni sono base e un tassello, mai la tesi; è vietata una tesi basata solo su correlazioni fra indicatori interni. La scheda indicatore spiega il proprio indicatore; altri indicatori sono solo contesto. Questa sezione sostituisce integralmente i requisiti v2 per brief e Gate A; Gate B resta invariato.
+
+Il brief e Gate A dichiarano ultimo anno/periodo osservato e data della fonte. Si dà priorità ai temi con dati recenti; a parità di forza dell'insight, temi più vecchi vengono dopo. Per i medici il caporedattore sceglie fra due o tre angoli verificati, senza fissare nel contratto un confronto pubblico/privato.
+
+**Gate A blog, criteri misurabili:** il report identifica tipo pezzo e domanda; presenta almeno due angoli verificati; dichiara ultimo dato e data/URL della fonte; documenta almeno tre fonti esterne autorevoli, aperte e verificate, con istituzione, data, URL e claim; descrive un grafico con variabile e periodo esterni collegati a una fonte verificata; dichiara il ruolo degli indicatori interni come base e tassello. Il PASSA richiede cinque criteri con prove specifiche e limiti, nessun “sì” generico. Per una scheda, si verifica l'indicatore oggetto del testo, una fonte esterna datata e il ruolo degli altri indicatori come contesto; il grafico esterno non è requisito.
+
+Formato dettagliato del report e validazioni automatiche: `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v3.md`. I prompt puntano a quella spec invece di copiarla. La versione del contratto invalida Gate A precedenti anche se brief e hash non cambiano.
+
+Gate B resta invariato: criteri, controlli, soglia, bloccanti, numero di giri e formato descritti nel PIANO v2. La v3 cambia distinzione blog/scheda, prove del brief e Gate A.
+
 ### Gate B, in revisione
 Alle cinque domande del PIANO si aggiungono quattro controlli binari con citazioni della bozza: T, tesi sostenuta dalle prove. R, confronto fra due territori reali che fa avanzare il racconto. L, significato concreto per il lettore nei primi due paragrafi. N, risultato non ovvio e controllo contrario riconoscibili.
 Persone solo da fonti citate, mai inventate o composite. Nessuna scena individuale dedotta da medie. Causa ed effetto solo se documentati, altrimenti legame osservato e motivo ignoto. L'ignoto esplicito non penalizza da solo.
@@ -104,7 +115,7 @@ Input/output sotto `lavoro/<chiave>/`. Tabella basata su MODELLI.md letto oggi, 
 Il coordinatore registra rotazione e modello effettivo nella issue. Astra: un giro circoscritto con battito, mai autore del brief. Verificatore distinto dall'analista, sempre di altra famiglia dall'autore. Un worker editoriale alla volta, niente headless. Pareri aggiuntivi della decisione 8 restano non bloccanti, lanciati dal coordinatore via Orca. Antigravity non riceve --model/--effort dal lanciatore: verificarne l'impostazione effettiva. Un solo ripiego, poi stop. Quote non leggibili: “non letto”. Il 5% Codex giornaliero resta budget indicativo.
 
 ### Schede indicatore
-Stessi due gate e tre indicatori incrociati. Brief di una pagina, racconto indicativamente 180-350 parole: “che cosa significa per te”. Forma libera, level/vintage corretti, nessuna ripetizione del cruscotto. Grafici dinamici dispersione/ritratto esistenti. Soglie dei gate invariate.
+Due gate. Il Gate A v3 verifica che la scheda spieghi l'indicatore oggetto, con altri solo come contesto. Brief di una pagina, racconto indicativamente 180-350 parole: “che cosa significa per te”. Forma libera, level/vintage corretti, nessuna ripetizione del cruscotto. Grafici dinamici dispersione/ritratto esistenti. Gate B resta invariato.
 
 ## Decisioni già prese da Nello
 
