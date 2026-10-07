@@ -162,6 +162,16 @@ macro-area, senza che niente fallisca.
 - Headless (`claude -p`, `codex exec`, `opencode run`, `agy -p`) vietato, anche
   per una review: guardia in `~/.claude/settings.json`. Review =
   `orca-lancia.sh --sola-lettura`. Eccezione: `agent-probe.sh`.
+- **Il divieto di lanciare altri agenti vale per i worker, non per il
+  coordinatore.** Un worker (lanciato da Orca, con `AGENT_ID` impostata) non
+  lancia agenti, né subagent né altri terminali: lavora sul suo task e chiude
+  con `worker_done`. Il coordinatore, aperto con `orca-coordinatore.sh`, delega
+  solo con `~/dev/dev-tools/scripts/orca-lancia.sh`, dal suo worktree, e attende
+  con `~/dev/dev-tools/scripts/orca-attendi.sh`; non invia `worker_done` per il
+  proprio turno. Un coordinatore lanciato come worker non delega.
+- **Caveman** vale per il dialogo operativo e i log tra agenti. È spento in
+  SPEC, esiti, PASSAGGIO, `.risposta`, descrizioni di PR e messaggi al titolare
+  o alla direzione: lì si scrive italiano normale.
 
 ## Vincoli
 
