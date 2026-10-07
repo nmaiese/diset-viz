@@ -8,7 +8,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ux_lettura import BASE, UA
+from ux_lettura import BASE, UA, block_tracking
 
 OUT = Path("/mnt/c/Users/Nilo/orca/direzione/review/ux-immagini")
 PAGINE = {
@@ -73,6 +73,7 @@ def main():
                         user_agent=UA,
                         color_scheme="light",
                     )
+                    block_tracking(ctx)
                     try:
                         page = ctx.new_page()
                         page.goto(url, wait_until="networkidle", timeout=60000)

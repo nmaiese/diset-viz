@@ -5,7 +5,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ux_lettura import BASE, UA
+from ux_lettura import BASE, UA, block_tracking
 
 LAYOUT_CSS = (Path(__file__).parent.parent.parent / "layout.css").read_text(encoding="utf-8")
 PROPOSTA_CSS = (Path(__file__).parent.parent.parent / "proposta.css").read_text(encoding="utf-8")
@@ -95,6 +95,7 @@ def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         ctx = browser.new_context(viewport={"width": 1440, "height": 900}, user_agent=UA, color_scheme="light")
+        block_tracking(ctx)
         page = ctx.new_page()
         prepara(page, url)
         

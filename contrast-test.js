@@ -333,8 +333,9 @@ async function runTest(page, pageName, url) {
   const context = await browser.newContext({
     viewport: VIEWPORT,
     colorScheme: 'dark',
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+    userAgent: 'DivarioCheck/1.0'
   });
+  await context.route(/^https?:\/\/(?:[^/]+\.)?(?:googletagmanager|google-analytics|googlesyndication)\.com(?:[/:?#]|$)/i, route => route.abort());
   
   const results = {};
   

@@ -20,7 +20,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ux_lettura import BASE, JS_MISURE, UA, fmt  # noqa: E402
+from ux_lettura import BASE, JS_MISURE, UA, block_tracking, fmt  # noqa: E402
 
 OUT = Path("/mnt/c/Users/Nilo/orca/direzione/ux-lettura/fase3")
 PAGINE = {
@@ -128,6 +128,7 @@ def main():
                             user_agent=UA,
                             color_scheme="dark" if tema == "scuro" else "light",
                         )
+                        block_tracking(ctx)
                         try:
                             page = ctx.new_page()
                             prepara(page, url, tema)

@@ -9,6 +9,7 @@ alla volta, pausa di 1 s fra una pagina e la successiva.
 """
 
 import json
+import re
 import statistics
 import sys
 import time
@@ -18,10 +19,16 @@ from playwright.sync_api import sync_playwright
 
 BASE = "https://divarioitalia.it"
 OUT = Path("/mnt/c/Users/Nilo/orca/direzione/ux-lettura/fase1")
-UA = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/130.0.0.0 Safari/537.36"
+UA = "DivarioCheck/1.0"
+TRACKING_URL = re.compile(
+    r"^https?://(?:[^/]+\.)?(?:googletagmanager|google-analytics|googlesyndication)\.com(?:[:/?#]|$)",
+    re.I,
 )
+
+
+def block_tracking(context):
+    context.route(TRACKING_URL, lambda route: route.abort())
+
 
 PAGINE = {
     "home": "/",
@@ -260,6 +267,7 @@ def main():
                             user_agent=UA,
                             color_scheme="dark" if tema == "scuro" else "light",
                         )
+                        block_tracking(ctx)
                         try:
                             page = ctx.new_page()
                             carica(page, url)

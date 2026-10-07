@@ -18,7 +18,7 @@ from playwright.sync_api import sync_playwright
 
 QUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(QUI.parent))
-from ux_lettura import BASE, UA  # noqa: E402
+from ux_lettura import BASE, UA, block_tracking  # noqa: E402
 from ux_immagini import CHIUDI_BANNER  # noqa: E402
 
 OUT = Path("/mnt/c/Users/Nilo/orca/direzione/review/ux-opzioni")
@@ -155,6 +155,7 @@ def main():
                 for dev in DEVICE_PER_PAGINA[pagina]:
                     w, h = DEVICE[dev]
                     ctx = browser.new_context(viewport={"width": w, "height": h}, user_agent=UA, color_scheme="light")
+                    block_tracking(ctx)
                     try:
                         pg = ctx.new_page()
                         resp = pg.goto(BASE + path, wait_until="networkidle", timeout=60000)
