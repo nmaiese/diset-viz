@@ -4,5 +4,11 @@
     "page": "Una scheda e un articolo",
     "error": "Link a documenti Istat ed Eurostat non più raggiungibili",
     "action": "Sostituiti con le pagine attuali o rimossi"
+  },
+  {
+    "date": "2026-10-08",
+    "page": "Scheda infortuni sul lavoro",
+    "error": "La scheda attribuiva gli infortuni a cause senza indicare una fonte",
+    "action": "Tolte le cause non sostenute da una fonte"
   }
 ]
