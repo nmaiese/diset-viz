@@ -120,9 +120,9 @@
     i confini regionali sopra. Ogni provincia della regione e' un link al
     profilo, fuori dalla tabulazione come in `navmap`: la pagina ha l'elenco.
     `selected` contorna la provincia della pagina. -#}
-{% macro regionmap(m, selected=None) -%}
+{% macro regionmap(m, label, selected=None) -%}
 <div class="navmap navmap--data navmap--zoom" data-navmap>
-  <svg viewBox="{{ m.viewbox }}" aria-hidden="true" focusable="false">
+  <svg viewBox="{{ m.viewbox }}" role="img" aria-label="{{ label }}" focusable="false">
     <g class="map__land">{%- for s in m.shapes %}{% if s.own %}<a href="{{ s.href }}" tabindex="-1" data-key="{{ s.key }}" data-name="{{ s.name }}"{% if s.key == selected %} class="is-on"{% endif %}><path d="{{ s.d }}"{% if s.step %} class="q{{ s.step }}"{% endif %}/></a>{% else %}<path class="navmap__ctx" d="{{ s.d }}"/>{% endif %}{% endfor %}</g>
     <g class="navmap__borders">{% for d in m.borders %}<path d="{{ d }}"/>{% endfor %}</g>
   </svg>
