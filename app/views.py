@@ -55,6 +55,7 @@ from app import public_urls
 from app import publisher
 from app import agent_discovery
 from app import nav
+from app.revision_dates import REVISIONS
 from app import taxonomy
 from app.taxonomy import (
     MACRO_AREA_ORDER,
@@ -193,6 +194,7 @@ def _inject_license():
         # organizzazione del publisher, la fonte va in `isBasedOn`.
         "organization_ref_jsonld": json.dumps({"@id": publisher.ORGANIZATION_ID}),
         "corrections_url": publisher.CORRECTIONS_URL,
+        "revision_dates": REVISIONS,
         # Chi firma lo dice `config/identita.yaml`: nessun template scrive un nome.
         "identity": publisher.identity,
         "author_name": publisher.editor_name,
@@ -1418,6 +1420,17 @@ def termini():
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/termini",
+    )
+
+
+@app.route("/correzioni")
+def correzioni():
+    with open(os.path.join(os.path.dirname(__file__), "..", "content", "correzioni.json"), encoding="utf-8") as file:
+        corrections = json.load(file)
+    return design.render(
+        "correzioni", "v1/correzioni.html", None,
+        site_url=SITE_URL, site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/correzioni", corrections=corrections,
     )
 
 
@@ -3564,6 +3577,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/confronto", "priority": "0.7"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/correzioni", "priority": "0.5"},
         {"loc": f"{SITE_URL}/chi-siamo", "priority": "0.6"},
         {"loc": f"{SITE_URL}/contatti", "priority": "0.5"},
         {"loc": f"{SITE_URL}/termini", "priority": "0.3"},

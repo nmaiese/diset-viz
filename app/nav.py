@@ -105,6 +105,7 @@ FOOTER_GROUPS = (
             {"label": "Quiz", "path": "/quiz"},
             {"label": "Chi siamo", "path": "/chi-siamo"},
             {"label": "Contatti", "path": "/contatti"},
+            {"label": "Errori e correzioni", "path": "/correzioni"},
         ),
     },
 )
