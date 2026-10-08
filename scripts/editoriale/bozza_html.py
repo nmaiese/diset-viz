@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import glob
 import html
 import json
 import mimetypes
@@ -106,6 +107,7 @@ class CacciaTag(HTMLParser):
             if c == "\n":
                 self.inizi_riga.append(i + 1)
         self.aperto: int | None = None
+        self.aperture: list[int] = []
         self.trovati: list[tuple[int, int]] = []
 
     def assoluta(self, pos: tuple[int, int]) -> int:
@@ -113,8 +115,12 @@ class CacciaTag(HTMLParser):
         return self.inizi_riga[riga - 1] + col
 
     def handle_starttag(self, tag, attrs):
-        if tag == self.tag and self.aperto is None:
-            self.aperto = self.assoluta(self.getpos())
+        if tag != self.tag:
+            return
+        inizio = self.assoluta(self.getpos())
+        self.aperture.append(inizio)
+        if self.aperto is None:
+            self.aperto = inizio
 
     def handle_endtag(self, tag):
         if tag != self.tag or self.aperto is None:
@@ -124,9 +130,12 @@ class CacciaTag(HTMLParser):
         fine = len(self.testo) if chiusura < 0 else chiusura + 1
         self.trovati.append((inizio, fine))
 
-    def regioni(self) -> list[tuple[int, int]]:
+    def analizza(self) -> None:
         self.feed(self.testo)
         self.close()
+
+    def regioni(self) -> list[tuple[int, int]]:
+        self.analizza()
         return self.trovati
 
 
@@ -153,9 +162,17 @@ def controlla(pagina: str) -> None:
     arriva mai su disco.
     """
     minuscolo = pagina.lower()
-    aperti, chiusi = minuscolo.count("<style"), minuscolo.count("</style>")
+    stili = CacciaTag(pagina, "style")
+    stili.analizza()
+    aperti, chiusi = len(stili.aperture), len(stili.trovati)
     if aperti != chiusi:
         raise ValueError(f"<style> e </style> non combaciano: {aperti} aperti, {chiusi} chiusi (stile mangiato, pagina bianca)")
+    # Il parser conta solo i tag veri: `<script>` in un commento CSS, in un
+    # attributo o dentro un <style> non e' un residuo e non deve far fallire.
+    script = CacciaTag(pagina, "script")
+    script.analizza()
+    if script.aperture:
+        raise ValueError(f"resta uno <script> nella bozza ({len(script.aperture)}), forse aperto e non chiuso")
     for chiusura in ("</body>", "</html>"):
         if chiusura not in minuscolo:
             raise ValueError(f"manca {chiusura}")
@@ -277,7 +294,8 @@ def render_indice(registro: list[dict]) -> str:
 
 
 def data_dal_file(radice: Path, slug: str) -> str:
-    for p in (radice / "content" / "posts").glob(f"*-{slug}.md"):
+    # glob.escape: uno slug con `[`, `*` o `?` non deve far combaciare altri file.
+    for p in (radice / "content" / "posts").glob(f"*-{glob.escape(slug)}.md"):
         m = re.match(r"(\d{4})-(\d{2})-(\d{2})-", p.name)
         if m:
             return "".join(m.groups())
@@ -285,8 +303,27 @@ def data_dal_file(radice: Path, slug: str) -> str:
 
 
 def nome_da_percorso(pagina: str) -> str:
-    """Nome della bozza quando non e' dato: il percorso, un segmento dopo l'altro."""
-    return pagina.strip("/").replace("/", "-")
+    """Nome della bozza quando non e' dato: il percorso, un segmento dopo l'altro.
+
+    Query e frammento non fanno parte del nome; una radice vuota (o solo `/`)
+    non ha nome e va rifiutata.
+    """
+    percorso = pagina.split("?", 1)[0].split("#", 1)[0]
+    return percorso.strip("/").replace("/", "-")
+
+
+def nome_valido(nome: str) -> bool:
+    """Nome di file sicuro: non vuoto, senza slash e senza traversal."""
+    if not nome or nome != nome.strip() or nome in (".", ".."):
+        return False
+    return "/" not in nome and "\\" not in nome and ".." not in nome
+
+
+def slug_pagina_blog(pagina: str) -> str | None:
+    """Lo slug del post per --pagina /blog/<slug>, per recuperarne la data vera."""
+    pulito = pagina.split("?", 1)[0].split("#", 1)[0]
+    m = re.fullmatch(r"/blog/([^/]+)", pulito)
+    return m.group(1) if m else None
 
 
 def main(argv=None) -> int:
@@ -303,7 +340,11 @@ def main(argv=None) -> int:
     if bool(args.slug) == bool(args.pagina):
         ap.error("serve lo slug del blog oppure --pagina, non entrambi")
     percorso = f"/blog/{args.slug}" if args.slug else args.pagina
-    nome = args.nome or (args.slug or nome_da_percorso(args.pagina))
+    # `--nome ""` e' un nome scelto e va rifiutato, non sostituito col default.
+    nome = args.nome if args.nome is not None else (args.slug or nome_da_percorso(args.pagina))
+    if not nome_valido(nome):
+        ap.error(f"--nome non valido (vuoto, slash o traversal): {nome!r}")
+    slug_post = args.slug if args.slug else slug_pagina_blog(args.pagina)
 
     radice = Path(args.radice).resolve()
     sys.path.insert(0, str(radice))
@@ -329,7 +370,7 @@ def main(argv=None) -> int:
         print(f"{percorso}: bozza scartata, {errore}. Nessun file scritto.", file=sys.stderr)
         return 1
 
-    giorno = data_dal_file(radice, nome)
+    giorno = data_dal_file(radice, slug_post) if slug_post else date.today().strftime("%Y%m%d")
     nome_file = f"{giorno}-{nome}.html"
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
