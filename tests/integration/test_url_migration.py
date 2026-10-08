@@ -231,17 +231,45 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
         return [record for record in self.universe.indexable_catalog()
                 if indicator_view.canonical_elsewhere(record["meta"], record["levels"][0]["key"])]
 
+    def _bases_without_prose(self):
+        """Le basi escluse dalla sitemap dal criterio editoriale condiviso."""
+        from app import editorial_state
+
+        return [record for record in self.universe.indexable_catalog()
+                if editorial_state.senza_prosa(
+                    record["meta"]["family"], record["meta"]["raw_id"],
+                    record["levels"][0]["key"])]
+
+    @staticmethod
+    def _path(record):
+        return record["meta"]["canonical_path"]
+
+    def _assert_excluded_bases_match_sitemap(self, locs, elsewhere, senza_prosa):
+        catalog = self.universe.indexable_catalog()
+        fuori_sitemap = {
+            self._path(record) for record in catalog
+            if not any(loc.endswith(self._path(record)) for loc in locs)
+        }
+        esclusi = {self._path(record) for record in elsewhere + senza_prosa}
+        self.assertEqual(fuori_sitemap, esclusi)
+        self.assertTrue(all(not any(loc.endswith(self._path(record)) for loc in locs)
+                            for record in senza_prosa))
+
     def test_diciassette_province_e_nessuna_query(self):
         locs = self._locs()
         province = [loc for loc in locs if loc.endswith("/province") and "/indicatore/" in loc]
         self.assertEqual(len(province), province_views_expected())
         self.assertFalse([loc for loc in locs if "/indicatore/" in loc and "?" in loc])
         schede = [loc for loc in locs if "/indicatore/" in loc]
-        self.assertEqual(len(self._bases_elsewhere()), 0)
+        elsewhere = self._bases_elsewhere()
+        senza_prosa = self._bases_without_prose()
+        self.assertEqual(len(elsewhere), 0)
+        self._assert_excluded_bases_match_sitemap(locs, elsewhere, senza_prosa)
         self.assertEqual(
             len(schede),
             len(self.universe.indexable_catalog())
             - len(self._bases_elsewhere())
+            - len(senza_prosa)
             + province_views_expected(),
         )
         self.assertEqual(len(schede), len(set(schede)))
@@ -256,9 +284,11 @@ class LaSitemapElencaLeVisteIndicizzabili(unittest.TestCase):
             locs = self._locs()
             self.assertEqual([loc for loc in locs if "/indicatore/" in loc and loc.endswith("/province")], [])
             elsewhere = self._bases_elsewhere()
+            senza_prosa = self._bases_without_prose()
             self.assertEqual(len(elsewhere), 0)
+            self._assert_excluded_bases_match_sitemap(locs, elsewhere, senza_prosa)
             self.assertEqual(len([loc for loc in locs if "/indicatore/" in loc]),
-                             len(self.universe.indexable_catalog()) - len(elsewhere))
+                             len(self.universe.indexable_catalog()) - len(elsewhere) - len(senza_prosa))
             risposta = self.client.get(base + "/province")
             self.assertEqual(risposta.status_code, 200)
             self.assertEqual(risposta.headers.get("X-Robots-Tag"), "noindex, follow")
