@@ -8,6 +8,13 @@ nell'indice e la direzione ha dato l'ok.
 
     bin/py -m scripts.editoriale.bozza_html <slug> --pr 353
     bin/py -m scripts.editoriale.bozza_html <slug> --radice /percorso/del/worktree --pr 353 --stato "da leggere"
+    bin/py -m scripts.editoriale.bozza_html --pagina /indicatore/<slug>/<codice> --nome <nome-file> --radice /percorso/del/worktree
+
+`--pagina` rende una pagina qualunque servita dal client di test del worktree, non
+solo i post del blog; `--nome` dà il nome al file e alla voce di `indice.json`
+(default: lo slug, oppure il percorso). Prima di scrivere, `controlla` rifiuta le
+bozze con lo stile mangiato, senza `</body>`/`</html>` o con meno di 500 caratteri
+di testo visibile: meglio un errore adesso che una pagina bianca da rileggere.
 
 La pagina è quella che il sito serve per `/blog/<slug>`, renderizzata dal client di test di
 Flask del worktree indicato (la bozza deve essere in `content/posts` con `draft: false`:
@@ -25,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import glob
 import html
 import json
 import mimetypes
@@ -33,6 +41,7 @@ import posixpath
 import re
 import sys
 from datetime import date
+from html.parser import HTMLParser
 from pathlib import Path
 
 SITO = "https://divarioitalia.it"
@@ -79,9 +88,105 @@ def riscrivi_css(css: str, fetch, base: str = "/") -> str:
     return re.sub(r"url\((['\"]?)([^)'\"]+)\1\)", sost, css)
 
 
+class CacciaTag(HTMLParser):
+    """Cerca gli elementi veri `<tag>...</tag>` e ne restituisce le posizioni
+    sul testo originale (offset assoluti, non di riga).
+
+    Solo il parser li vede: la parola `<script>` dentro un commento HTML, dentro
+    un `<style>` (i fogli di stile sono in modalita CDATA) o dentro un attributo
+    non e' un elemento, e una regex non lo sa. `convert_charrefs=False` e la
+    ricostruzione dal testo originale tengono il resto byte per byte.
+    """
+
+    def __init__(self, testo: str, tag: str):
+        super().__init__(convert_charrefs=False)
+        self.tag = tag
+        self.testo = testo
+        self.inizi_riga = [0]
+        for i, c in enumerate(testo):
+            if c == "\n":
+                self.inizi_riga.append(i + 1)
+        self.aperto: int | None = None
+        self.aperture: list[int] = []
+        self.trovati: list[tuple[int, int]] = []
+
+    def assoluta(self, pos: tuple[int, int]) -> int:
+        riga, col = pos
+        return self.inizi_riga[riga - 1] + col
+
+    def handle_starttag(self, tag, attrs):
+        if tag != self.tag:
+            return
+        inizio = self.assoluta(self.getpos())
+        self.aperture.append(inizio)
+        if self.aperto is None:
+            self.aperto = inizio
+
+    def handle_endtag(self, tag):
+        if tag != self.tag or self.aperto is None:
+            return
+        inizio, self.aperto = self.aperto, None
+        chiusura = self.testo.find(">", self.assoluta(self.getpos()))
+        fine = len(self.testo) if chiusura < 0 else chiusura + 1
+        self.trovati.append((inizio, fine))
+
+    def analizza(self) -> None:
+        self.feed(self.testo)
+        self.close()
+
+    def regioni(self) -> list[tuple[int, int]]:
+        self.analizza()
+        return self.trovati
+
+
+def togli_elementi(pagina: str, *tag: str) -> str:
+    """Rimuove solo gli elementi indicati; tutto il resto resta intatto."""
+    regioni = []
+    for t in tag:
+        regioni.extend(CacciaTag(pagina, t).regioni())
+    out = pagina
+    for inizio, fine in sorted(regioni, reverse=True):
+        out = out[:inizio] + out[fine:]
+    return out
+
+
+def togli_script(pagina: str) -> str:
+    return togli_elementi(pagina, "script")
+
+
+def controlla(pagina: str) -> None:
+    """Verifica la bozza prima di scriverla: alza ValueError con il motivo.
+
+    Una pagina con uno stile rotto si vede bianca e non c'e' modo di accorgersene
+    dopo: il controllo sta prima della scrittura, cosi' un file difettoso non
+    arriva mai su disco.
+    """
+    minuscolo = pagina.lower()
+    stili = CacciaTag(pagina, "style")
+    stili.analizza()
+    aperti, chiusi = len(stili.aperture), len(stili.trovati)
+    if aperti != chiusi:
+        raise ValueError(f"<style> e </style> non combaciano: {aperti} aperti, {chiusi} chiusi (stile mangiato, pagina bianca)")
+    # Il parser conta solo i tag veri: `<script>` in un commento CSS, in un
+    # attributo o dentro un <style> non e' un residuo e non deve far fallire.
+    script = CacciaTag(pagina, "script")
+    script.analizza()
+    if script.aperture:
+        raise ValueError(f"resta uno <script> nella bozza ({len(script.aperture)}), forse aperto e non chiuso")
+    for chiusura in ("</body>", "</html>"):
+        if chiusura not in minuscolo:
+            raise ValueError(f"manca {chiusura}")
+    testo = togli_elementi(pagina, "script", "style")
+    testo = re.sub(r"<!--.*?-->", " ", testo, flags=re.S)
+    testo = html.unescape(re.sub(r"<[^>]+>", " ", testo))
+    testo = re.sub(r"\s+", " ", testo).strip()
+    if len(testo) < 500:
+        raise ValueError(f"testo visibile troppo corto: {len(testo)} caratteri, servono 500")
+
+
 def incorpora(pagina: str, fetch) -> str:
     """Toglie gli script, incorpora fogli di stile e immagini, rende assoluti i link."""
-    pagina = re.sub(r"<script\b.*?</script>", "", pagina, flags=re.S | re.I)
+    pagina = togli_script(pagina)
     pagina = re.sub(r'<link\b[^>]*rel="(?:preload|prefetch|alternate|canonical|shortcut icon|icon)"[^>]*>', "", pagina, flags=re.I)
 
     def foglio(m):
@@ -189,21 +294,57 @@ def render_indice(registro: list[dict]) -> str:
 
 
 def data_dal_file(radice: Path, slug: str) -> str:
-    for p in (radice / "content" / "posts").glob(f"*-{slug}.md"):
+    # glob.escape: uno slug con `[`, `*` o `?` non deve far combaciare altri file.
+    for p in (radice / "content" / "posts").glob(f"*-{glob.escape(slug)}.md"):
         m = re.match(r"(\d{4})-(\d{2})-(\d{2})-", p.name)
         if m:
             return "".join(m.groups())
     return date.today().strftime("%Y%m%d")
 
 
+def nome_da_percorso(pagina: str) -> str:
+    """Nome della bozza quando non e' dato: il percorso, un segmento dopo l'altro.
+
+    Query e frammento non fanno parte del nome; una radice vuota (o solo `/`)
+    non ha nome e va rifiutata.
+    """
+    percorso = pagina.split("?", 1)[0].split("#", 1)[0]
+    return percorso.strip("/").replace("/", "-")
+
+
+def nome_valido(nome: str) -> bool:
+    """Nome di file sicuro: non vuoto, senza slash e senza traversal."""
+    if not nome or nome != nome.strip() or nome in (".", ".."):
+        return False
+    return "/" not in nome and "\\" not in nome and ".." not in nome
+
+
+def slug_pagina_blog(pagina: str) -> str | None:
+    """Lo slug del post per --pagina /blog/<slug>, per recuperarne la data vera."""
+    pulito = pagina.split("?", 1)[0].split("#", 1)[0]
+    m = re.fullmatch(r"/blog/([^/]+)", pulito)
+    return m.group(1) if m else None
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("slug")
+    ap.add_argument("slug", nargs="?", help="slug del post del blog (/blog/<slug>)")
+    ap.add_argument("--pagina", help="percorso della pagina servita dal worktree, in alternativa allo slug (es. /indicatore/<slug>/<codice>)")
+    ap.add_argument("--nome", help="nome del file e dello slug di indice.json (default: lo slug, oppure il percorso)")
     ap.add_argument("--radice", default=str(Path(__file__).resolve().parents[2]), help="worktree che contiene la bozza")
     ap.add_argument("--out", default=str(OUT_DEFAULT))
     ap.add_argument("--pr")
     ap.add_argument("--stato", choices=STATI)
     args = ap.parse_args(argv)
+
+    if bool(args.slug) == bool(args.pagina):
+        ap.error("serve lo slug del blog oppure --pagina, non entrambi")
+    percorso = f"/blog/{args.slug}" if args.slug else args.pagina
+    # `--nome ""` e' un nome scelto e va rifiutato, non sostituito col default.
+    nome = args.nome if args.nome is not None else (args.slug or nome_da_percorso(args.pagina))
+    if not nome_valido(nome):
+        ap.error(f"--nome non valido (vuoto, slash o traversal): {nome!r}")
+    slug_post = args.slug if args.slug else slug_pagina_blog(args.pagina)
 
     radice = Path(args.radice).resolve()
     sys.path.insert(0, str(radice))
@@ -211,36 +352,42 @@ def main(argv=None) -> int:
     from run import app  # noqa: E402
 
     client = app.test_client()
-    risposta = client.get(f"/blog/{args.slug}")
+    risposta = client.get(percorso)
     if risposta.status_code != 200:
-        print(f"/blog/{args.slug}: {risposta.status_code}. La bozza è in content/posts con draft: false?", file=sys.stderr)
+        print(f"{percorso}: {risposta.status_code}. La bozza è in content/posts con draft: false? Esiste la scheda?", file=sys.stderr)
         return 1
 
-    def fetch(percorso: str):
-        r = client.get(percorso)
+    def fetch(percorso_statico: str):
+        r = client.get(percorso_statico)
         return r.get_data() if r.status_code == 200 else None
 
     oggi = date.today().isoformat()
     pagina = incorpora(risposta.get_data(as_text=True), fetch)
-    pagina = metti_banner(pagina, banner(args.slug, args.pr, oggi))
-    giorno = data_dal_file(radice, args.slug)
-    nome = f"{giorno}-{args.slug}.html"
+    pagina = metti_banner(pagina, banner(nome, args.pr, oggi))
+    try:
+        controlla(pagina)
+    except ValueError as errore:
+        print(f"{percorso}: bozza scartata, {errore}. Nessun file scritto.", file=sys.stderr)
+        return 1
+
+    giorno = data_dal_file(radice, slug_post) if slug_post else date.today().strftime("%Y%m%d")
+    nome_file = f"{giorno}-{nome}.html"
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    (out / nome).write_text(pagina, encoding="utf-8")
+    (out / nome_file).write_text(pagina, encoding="utf-8")
 
     reg_path = out / "indice.json"
     registro = json.loads(reg_path.read_text(encoding="utf-8")) if reg_path.exists() else []
     voce = {
-        "slug": args.slug, "titolo": titolo_pagina(risposta.get_data(as_text=True)),
-        "data": f"{giorno[:4]}-{giorno[4:6]}-{giorno[6:]}", "file": nome,
+        "slug": nome, "titolo": titolo_pagina(risposta.get_data(as_text=True)),
+        "data": f"{giorno[:4]}-{giorno[4:6]}-{giorno[6:]}", "file": nome_file,
         "stato": args.stato or "da leggere", "stato_esplicito": bool(args.stato),
-        "pr": args.pr or next((v.get("pr") for v in registro if v["slug"] == args.slug), None),
+        "pr": args.pr or next((v.get("pr") for v in registro if v["slug"] == nome), None),
     }
     registro = aggiorna_registro(registro, voce)
     reg_path.write_text(json.dumps(registro, ensure_ascii=False, indent=2), encoding="utf-8")
     (out / "index.html").write_text(render_indice(registro), encoding="utf-8")
-    print(f"{out / nome} ({len(pagina) // 1024} KB)\n{out / 'index.html'}")
+    print(f"{out / nome_file} ({len(pagina) // 1024} KB)\n{out / 'index.html'}")
     return 0
 
 
