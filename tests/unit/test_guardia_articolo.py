@@ -103,6 +103,20 @@ class GuardiaArticolo(unittest.TestCase):
         self.assertTrue(any(f.check == "G4" and f.severity == ga.WARNING for f in report["rilievi"]))
         self.assertTrue(all(f.line > 0 for f in report["rilievi"] if f.check in {"G2", "G4"}))
 
+    def test_g8_avvisa_con_riga_senza_provare_causalita(self):
+        sentence = "Il divario cresce perché mancano servizi."
+        report = self.check(PULITO + "\n" + sentence + "\n")
+        hits = [f for f in report["rilievi"] if f.check == "G8"]
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0].severity, ga.WARNING)
+        self.assertEqual((PULITO + "\n" + sentence + "\n").splitlines()[hits[0].line - 1], sentence)
+        self.assertIn("registro", hits[0].message)
+
+    def test_g8_non_avvisa_domanda_o_limite_causale(self):
+        report = self.check(PULITO + "\nPerché il divario cresce?\n"
+                            "La correlazione non prova che il divario sia dovuto ai servizi.\n")
+        self.assertFalse(any(f.check == "G8" for f in report["rilievi"]))
+
     def test_g1_csv_documentato_e_anno_ambiguo(self):
         csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
         csv_file.write_text("regione,anno,valore\nLombardia,2024,8.8\nCalabria,2024,9.0\n", encoding="utf-8")

@@ -423,6 +423,19 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
                 or (outcome in {"RISCRIVERE", "FERMO"} and all_yes and vote_value == 5)
                 or (outcome == "RISCRIVERE" and rounds.group(1) == "2")):
             raise RedazioneError("gate-b.md incoerente: esito non corrisponde a controlli, voto e bloccanti")
+        if outcome == "PASSA":
+            try:
+                brief_text = path.with_name("brief.md").read_text(encoding="utf-8")
+            except OSError:
+                return "FERMO", vote.group(1)
+            claims = _claims(brief_text)
+            complete = [row for row in claims if len(row) == 5 and len(row[0]) >= 10
+                        and (row[1].casefold().split() or [""])[0] in CLAIM_TYPES
+                        and all(_filled(cell) for cell in row[2:])]
+            t_evidence = re.search(r"^T:\s*sì\s*[—-]\s*(.+)$", text, re.MULTILINE | re.I)
+            if (not claims or len(complete) != len(claims) or not t_evidence
+                    or not any(row[0].casefold() in t_evidence.group(1).casefold() for row in claims)):
+                return "FERMO", vote.group(1)
     return outcome, vote.group(1) if vote else ""
 
 

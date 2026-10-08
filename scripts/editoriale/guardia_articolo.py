@@ -61,6 +61,7 @@ from app.design import numfmt
 from scripts.audit_link_interni import _internal_path
 from scripts.editoriale.guardia import NUMBER_RE, TYPO_RE, _excerpt, _is_checkable, _number_value
 from scripts.editoriale import guardie_v4
+from scripts.prose_lint import g8_findings
 from scripts.trend_articles.verify import LINK, _clean_body
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -457,6 +458,9 @@ def check_editorial_v4(article, table=None):
         line = article.field_line(key)
         if guardie_v4.g2(text):
             findings.append(Finding(ERROR, "G2", line, "messaggio editoriale interno nel testo pubblico", text))
+        for kind, _, phrase in g8_findings(text):
+            findings.append(Finding(WARNING, "G8", line,
+                                    f"{kind} da verificare nel registro delle affermazioni: {phrase!r}", text))
     age_lines = [(article.field_line(key), str(article.meta.get(key) or ""))
                  for key in PROSE_FIELDS if article.meta.get(key)]
     def selection(sentence):
@@ -485,6 +489,9 @@ def check_editorial_v4(article, table=None):
     for line_no, raw in enumerate(article.body_lines, 1):
         visible = _prose_line(raw)
         age_lines.append((article.body_line(line_no - 1), visible))
+        for kind, _, phrase in g8_findings(visible):
+            findings.append(Finding(WARNING, "G8", article.body_line(line_no - 1),
+                                    f"{kind} da verificare nel registro delle affermazioni: {phrase!r}", visible.strip()))
         if guardie_v4.g2(visible):
             findings.append(Finding(ERROR, "G2", article.body_line(line_no - 1),
                                     "messaggio editoriale interno nel testo pubblico", visible.strip()))

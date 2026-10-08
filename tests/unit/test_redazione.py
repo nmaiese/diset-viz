@@ -185,7 +185,7 @@ Data: 2026-10-07
 
 
 def gate_b(outcome, vote):
-    return f"""Contratto: v4\nSHA bozza: abc\nHash bozza: abc\nFamiglie autore/revisore: A/B\nT: sì — citazione\nR: sì — citazione\nL: sì — citazione\nN: sì — citazione\nControllo anti-invenzione: sì\nBloccanti: 0\nVoto: {vote}\nMotivo: motivo\nRilievi localizzati: nessuno\nGiri: 1\nEsito: {outcome}\n"""
+    return f"""Contratto: v4\nSHA bozza: abc\nHash bozza: abc\nFamiglie autore/revisore: A/B\nT: sì — La quota sale in tutte le regioni, registro: dato, regioni 0-2 anni 2019-2023, 20 regioni su 20, fonte Istat\nR: sì — citazione\nL: sì — citazione\nN: sì — citazione\nControllo anti-invenzione: sì\nBloccanti: 0\nVoto: {vote}\nMotivo: motivo\nRilievi localizzati: nessuno\nGiri: 1\nEsito: {outcome}\n"""
 
 
 class RedazioneTests(unittest.TestCase):
@@ -762,6 +762,7 @@ class GateParserTests(unittest.TestCase):
             workdir = work / "lavoro/demo"
             draft = workdir / "bozza.md"
             draft.write_text("bozza stabile\n", encoding="utf-8")
+            (workdir / "brief.md").write_text(brief_v4(), encoding="utf-8")
             digest = hashlib.sha256(draft.read_bytes()).hexdigest()
             (workdir / "stato.json").write_text(json.dumps({
                 "key": "demo", "gate_b_sha": digest, "phases": {"gate_b": {"status": "riuscita"}},
@@ -791,6 +792,12 @@ class GateParserTests(unittest.TestCase):
         text = gate_b("PASSA", 4).replace("T: sì", "T: no")
         with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
             self.parse(text, "gate_b")
+
+    def test_gate_b_ferma_se_registro_manca_o_citazione_non_corrisponde(self):
+        self.assertEqual(self.parse(gate_b("PASSA", 4), "gate_b", brief="brief senza registro"),
+                         ("FERMO", "4"))
+        without_match = gate_b("PASSA", 4).replace("La quota sale in tutte le regioni", "Una frase non nel registro")
+        self.assertEqual(self.parse(without_match, "gate_b"), ("FERMO", "4"))
 
     def test_gate_b_fermo_con_tutti_si_e_voto_5_e_incoerente(self):
         with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):

@@ -97,6 +97,38 @@ SLOGAN = re.compile(
     re.I,
 )
 
+# REV §10 / G8. The causal pattern is a prompt for source review, not proof.
+G8_LEXICON = re.compile(
+    r"\b(?:voragin\w*|spaccat\w*|frattur\w*|paes[ei]\s+spaccat\w*|"
+    r"i\s+numeri\s+non\s+mentono|non\s+[èe]\s+una\s+percezione|"
+    r"questo\s+dato\s+non\s+dice\s+tutto)\b", re.I,
+)
+G8_CAUSAL = re.compile(r"\b(?:perch[eé]|a\s+causa\s+di|dovut[oaie]\s+a|provoc\w*|effett[oi])\b", re.I)
+G8_DATA = re.compile(r"\b(?:dat[oi]|numer[oi]|tass[oi]|quot[ae]|divari[oi]|differenz\w*|"
+                     r"correlazion\w*|associazion\w*|indicatore|regioni|province|valori?)\b|\d", re.I)
+G8_LIMIT = re.compile(r"\b(?:non\s+(?:dimostra|prova|implica|misura|stima|identifica|consente|"
+                      r"permette|significa)|senza\s+(?:dimostrare|provare|identificare)|"
+                      r"non\s+si\s+pu[oò]|non\s+[èe]\s+(?:possibile|provato)|"
+                      r"non\s+necessariamente|nessun\s+nesso\s+causale|"
+                      r"non\s+stabilisce|non\s+perch[eé]|causalit[aà]\s+non\s+)\b", re.I)
+
+
+def g8_findings(text):
+    """(kind, offset, phrase) for review signals in prose; never certify causality."""
+    found = []
+    for sentence in re.finditer(r"[^.!?\n]+(?:[.!?]+|$)", text):
+        phrase = sentence.group(0).strip()
+        if not phrase:
+            continue
+        for match in G8_LEXICON.finditer(sentence.group(0)):
+            found.append(("lessico", sentence.start() + match.start(), match.group(0)))
+        if (text.lstrip().startswith("#") or "?" in sentence.group(0)
+                or G8_LIMIT.search(phrase) or not G8_DATA.search(phrase)):
+            continue
+        for match in G8_CAUSAL.finditer(sentence.group(0)):
+            found.append(("causalità", sentence.start() + match.start(), match.group(0)))
+    return found
+
 # "quasi nove anni" in una sezione e "8,9" in un'altra: lo stesso fatto due
 # volte, che è la regola ONS che STYLE.md già porta ("o l'immagine o la
 # cifra"), applicata a distanza invece che dentro la parentesi. Due giudici
@@ -142,6 +174,7 @@ CHECKS = (
 EXTRA_SIGNALS = {
     "domanda": "domanda retorica in chiusura di paragrafo",
     "ripetuto": "la stessa quantità come immagine e come cifra",
+    "G8": "lessico da evitare o conclusione causale da verificare nel registro",
 }
 ALL_SIGNALS = tuple(name for name, _, _ in CHECKS) + tuple(EXTRA_SIGNALS)
 
@@ -265,6 +298,10 @@ def inspect(entry):
     repeated = _same_number_twice(fields)
     if repeated:
         hits["ripetuto"] = repeated
+    g8 = sorted({f"{kind}: {phrase.lower()}" for _, body in fields
+                 for kind, _, phrase in g8_findings(body)})
+    if g8:
+        hits["G8"] = g8
     internal = [
         url for _, url in LINK.findall(text)
         if url.startswith("/") and not url.startswith("//")
