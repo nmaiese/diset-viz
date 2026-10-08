@@ -280,7 +280,10 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
         "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
     }
-    rank_rows = ranking(level, unit)
+    all_rank_rows = ranking(level, unit, include_missing=True)
+    rank_rows = [row for row in all_rank_rows if row.get("value") is not None]
+    missing_rows = [row for row in all_rank_rows if row.get("value") is None]
+    observed_values = {o["key"]: o["value"] for o in obs}
     folded = fold(rank_rows, plural) if level["key"] in ROW_ID else None
     if level["key"] in ROW_ID:
         # v1.js ridisegna le righe al cambio d'anno: con l'id, e piegate con
@@ -296,10 +299,13 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "claim": claim, "unit_note": unit_note(unit, meta["name"]), "short_unit": short_unit(unit),
         "level_tabs": tabs or [], "territories": level.get("territories") or [],
         "show_map": show_map, "map_classes": classes, "map_names": map_names,
-        "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
+        "map_values": {t["key"]: with_unit(observed_values[t["key"]], unit)
+                       if t["key"] in observed_values else "n.d."
+                       for t in level.get("territories") or []},
         "callouts": callouts, "legend": legend(values, unit) if values else None,
         "legend_nd": level["key"] == "regione" or map_missing,
-        "area_legend": strip.get("legend"), "ranking": rank_rows, "fold": folded,
+        "area_legend": strip.get("legend"), "ranking": rank_rows, "missing_rows": missing_rows,
+        "fold": folded,
         "row_id": ROW_ID.get(level["key"]),
         "decimals": numfmt.column_decimals([o["value"] for o in obs]),
         "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,

@@ -195,23 +195,11 @@ addEventListener("pagereveal", function (e) {
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
-          <li><a href="#esplora" data-query-intent="classifica">Chi è in testa</a></li>
-          {% if not d.series.single_year %}<li><a href="#serie-storica" data-query-intent="andamento">Com'è cambiato</a></li>{% endif %}
+          {% for item in query_map %}<li><a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a></li>{% endfor %}
           {% if page_article.sections %}<li><a href="#analisi">L'analisi</a></li>{% endif %}
-          <li><a href="#come-leggere" data-query-intent="definizione">Che cosa misura</a></li>
-          <li><a href="#fonti-verifica" data-query-intent="metodologia">Fonti e citazione</a></li>
-          {% if meta.downloads and level.key == 'regione' %}<li><a href="#download-dati" data-query-intent="download">Scarica i dati</a></li>{% endif %}
+          {% if not query_map %}<li><a href="#esplora">Esplora i dati</a></li><li><a href="#come-leggere">Che cosa misura</a></li><li><a href="#fonti-verifica">Fonti e citazione</a></li>{% endif %}
         </ol>
       </nav>
-      {#- Le domande a cui la scheda risponde, ciascuna col punto della pagina che
-          la risponde: le stesse del gemello Markdown e di llms.txt
-          (`level.query_map`, filtrato da `_query_map_for_article`). -#}
-      {% if query_map %}
-      <div class="aside-block">
-        <p class="aside-block__label">Le domande di questo indicatore</p>
-        <ul class="qlist">{% for item in query_map %}<li><a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a></li>{% endfor %}</ul>
-      </div>
-      {% endif %}
       <div class="aside-block">
         <p>Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
         <p><a class="linkarrow" href="#fonti-verifica">Cita questo indicatore</a></p>
