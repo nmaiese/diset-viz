@@ -73,8 +73,8 @@ Per leggere meglio il dato conviene affiancarlo ad altri indicatori dell'atlante
    - **Data di consultazione**: 2 luglio 2026
 
 2. **Eurostat**
-   - **Titolo**: Regional labour market statistics - Employment and activity rates by age group (15-29 years)
-   - **URL**: [https://ec.europa.eu/eurostat/databrowser/view/lfst_r_lfe2emprt/default/table?lang=en](https://ec.europa.eu/eurostat/databrowser/view/lfst_r_lfe2emprt/default/table?lang=en)
+   - **Titolo**: Youth employment rate by NUTS 2 region
+   - **URL**: [https://ec.europa.eu/eurostat/databrowser/view/yth_empl_030/default/table?lang=en](https://ec.europa.eu/eurostat/databrowser/view/yth_empl_030/default/table?lang=en)
    - **Data di consultazione**: 2 luglio 2026
 
 *Per approfondire, apri la [scheda dell'indicatore](/indicatore/tasso-di-occupazione-giovanile-totale/ter-407) o sfoglia il tema [Lavoro e conciliazione](/tema/lavoro-e-conciliazione).*
