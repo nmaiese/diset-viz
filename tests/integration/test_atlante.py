@@ -336,7 +336,9 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
             plain = self.client.get("/atlante").get_data()
             filtered = self.client.get("/atlante?theme=Ambiente%20ed%20energia&partial=1&q=rifiuti").get_data()
             self.assertEqual(render.call_count, 1)
-        self.assertEqual(plain, filtered)
+        robots = b'<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">'
+        noindex = b'<meta name="robots" content="noindex, follow">'
+        self.assertEqual(filtered.replace(noindex, robots), plain)
 
     def test_le_altre_mappe_si_rendono_senza_cache(self):
         """Seicento varianti da 600 KB non entrano nella cache del sito: la
@@ -634,6 +636,8 @@ class LaCacheSuDueLivelli(unittest.TestCase):
         meta = re.compile(r'<meta name="robots" content="([^"]+)"')
         for url, noindex in (("/atlante", False), ("/atlante?anno=2020", False),
                              ("/atlante?regione=Lazio", False), ("/atlante?livello=comune", False),
+                             ("/atlante?area=Lavoro", True),
+                             ("/atlante?theme=Ambiente&partial=1", True),
                              ("/atlante?livello=regione", False), (PROVINCE, True),
                              (PROVINCE + "&anno=2020", True)):
             with self.subTest(url=url):
