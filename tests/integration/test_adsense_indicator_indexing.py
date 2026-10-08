@@ -31,6 +31,14 @@ class AdsenseIndicatorIndexingTest(unittest.TestCase):
         self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
         self.assertNotIn(self.CLASS_B_PROVINCES, self.sitemap_paths)
 
+    def test_csv_di_approfondimento_noindex_fuori_sitemap(self):
+        path = "/static/data/articles/giovani-morti-in-strada-nord-sud.csv"
+        response = self.client.get(path)
+        response.close()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("noindex", response.headers.get("X-Robots-Tag", ""))
+        self.assertNotIn(path, self.sitemap_paths)
+
 
 if __name__ == "__main__":
     unittest.main()

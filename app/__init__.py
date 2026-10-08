@@ -218,6 +218,8 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     elif request_path in _NOINDEX_FOLLOW_PATHS:
         response.headers["X-Robots-Tag"] = "noindex, follow"
+    elif request_path.startswith("/static/data/articles/") and request_path.lower().endswith(".csv"):
+        response.headers["X-Robots-Tag"] = "noindex, follow"
     elif "X-Robots-Tag" not in response.headers:
         # Default-deny: force an explicit index signal on every public response
         # unless something upstream (the 404 handler) already set its own

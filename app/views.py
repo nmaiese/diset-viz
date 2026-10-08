@@ -500,19 +500,21 @@ def atlante():
     di una riga, che sceglie l'indicatore della mappa su quel livello.
 
     Le province non sono un documento a se': il canonical resta `/atlante`, e
-    `?livello=provincia` rende la pagina `noindex, follow` e la tiene fuori
-    dalla sitemap. Header e meta li decide il livello e nient'altro: il meta
-    sta nel corpo in cache, che conosce solo (livello, indicatore), e un
-    header deciso da altri parametri (`?anno=`, `?regione=`) direbbe
-    `noindex` sopra un meta `index`. Gli altri parametri restano come prima,
-    `index` col canonical `/atlante`."""
+    `?livello=provincia` e le varianti `area` o `theme`+`partial=1` sono
+    `noindex, follow`. La cache distingue le due forme SEO, non i singoli
+    filtri. Gli altri parametri restano indicizzabili col canonical `/atlante`."""
     level = "provincia" if request.args.get("livello") == "provincia" else "regione"
+    query_variant_noindex = (
+        "area" in request.args
+        or ("theme" in request.args and request.args.get("partial") == "1")
+    )
+    noindex = level == "provincia" or query_variant_noindex
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
             agent_discovery.atlas_markdown(_home_featured_indicator_links(), SITE_URL),
             f"{SITE_URL}/atlante",
         )
-        if level == "provincia":
+        if noindex:
             response.headers["X-Robots-Tag"] = "noindex, follow"
         return response
     target = _atlante_redirect(request.args)
@@ -527,15 +529,15 @@ def atlante():
         if shown is None:
             return redirect(atlas_page.LEVEL_PATHS[level], code=301)
     if shown == start:
-        body = _atlante_page(level, shown)
+        body = _atlante_page(level, shown, noindex)
     else:
         # Le altre mappe non vanno in cache: la pagina pesa 600 KB non
         # compressi, e 594 varianti riempirebbero la SimpleCache di tutto il
         # sito. Le righe sono gia' per processo, la resa costa pochi
         # millisecondi.
-        body = _render_atlante(level, shown)
+        body = _render_atlante(level, shown, noindex)
     response = make_response(body)
-    if level == "provincia":
+    if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 
@@ -628,7 +630,7 @@ def _bes_fuori_atlante(wanted, livello):
         return None
 
 
-def _render_atlante(level, map_indicator):
+def _render_atlante(level, map_indicator, noindex=False):
     """La pagina per (livello, indicatore della mappa).
 
     Senza ripiego: se la regia cede la risposta e' un 500, non un 200. Il
@@ -638,7 +640,7 @@ def _render_atlante(level, map_indicator):
     motori, che tornano a leggere dopo, e l'errore resta nel log."""
     return design.render(
         "atlante", "v1/atlante.html", None,
-        level=level, map_indicator=map_indicator,
+        level=level, map_indicator=map_indicator, noindex=noindex,
         featured_indicators=_home_featured_indicator_links(),
         percorso=[{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}],
         site_url=SITE_URL,

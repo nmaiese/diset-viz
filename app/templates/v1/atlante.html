@@ -27,7 +27,7 @@
 {% block description %}Le {{ d.total }} serie {{ adj }} di Divario Italia in un elenco solo, tema per tema, con l'andamento della media semplice delle {{ d.plural }} dal {{ d.year_min }} al {{ d.year_max }} e una mappa da esplorare.{% endblock %}
 {#- Le province non sono un documento a se': il canonical resta /atlante e la
     pagina esce dall'indice. L'header lo mette la view. -#}
-{% block robots_meta %}{% if prov %}<meta name="robots" content="noindex, follow">{% else %}{{ super() }}{% endif %}{% endblock %}
+{% block robots_meta %}{% if noindex %}<meta name="robots" content="noindex, follow">{% else %}{{ super() }}{% endif %}{% endblock %}
 
 {% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}"><link rel="stylesheet" href="{{ asset_url('css/ds/pages/atlante.css') }}">{% endblock %}
 
