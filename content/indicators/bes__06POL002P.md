@@ -9,7 +9,7 @@ Nel 2024 la percentuale di amministratori comunali donne varia tra il 43,0% di P
 <!-- sezione: definizione -->
 
 ## Cosa misura l'indicatore
-L'indicatore misura la percentuale di donne che ricoprono cariche di amministratore comunale.
+L'indicatore misura la quota di donne sul totale degli amministratori comunali.
 
 <!-- sezione: quadro -->
 
