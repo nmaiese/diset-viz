@@ -1,6 +1,7 @@
 ---
 fonti: []
 key: "bes:07SIC004P"
+level: "provincia"
 vintage: 2023
 ---
 
