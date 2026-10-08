@@ -734,6 +734,9 @@ details.more[open] > summary { color: var(--ink); }
 .n__u--pct { font-family: var(--font-num); color: inherit; }
 /* Eccezione: apici, unita' e pedici in em scalano insieme alla cifra. */
 .n__o { font-size: 0.72em; vertical-align: 0.28em; margin-left: 0.04em; }
+@media (max-width: 639px) {
+  .n__o, .table .rank .n__o, .tile .n__o, .bignum .n__o { font-size: max(0.72em, var(--fs-small)); }
+}
 .n--nd, .n--nd abbr { color: var(--muted); text-decoration: none; }
 .tile .n, .figure-num .n {
   font-size: var(--fs-figure-sm); line-height: var(--lh-figure-sm); font-weight: var(--fw-num); letter-spacing: -0.015em;
@@ -1189,4 +1192,9 @@ main.v1 h1 { view-transition-name: page-title; }
   .provincia-jump a, .dr-map .btn, .terr__name a { display: inline-flex; align-items: center; min-height: var(--target); }
   .linkarrow, .regione-area > summary, select, .field input:not([type="range"]), .hdr__brand { min-height: var(--target); }
   .linkarrow { display: inline-flex; align-items: center; }
+}
+
+@media (max-width: 639px) {
+  .crumbs a, .term { position: relative; }
+  .crumbs a::after, .term::after { content: ""; position: absolute; inset: -12px -6px; }
 }
