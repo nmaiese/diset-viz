@@ -1029,10 +1029,32 @@ def page_description(article, meta, level, composed=None, max_len=DESCRIPTION_MA
     """
     authored = (article or {}).get("lead")
     if authored:
-        return indicator_notes.meta_description_from_attacco(authored)
+        description = indicator_notes.meta_description_from_attacco(authored)
+        return _complete_short_description(description, meta, level, max_len)
     derived = answer_description(meta, level, max_len=max_len)
     if derived:
         return derived
     if composed:
-        return indicator_notes.meta_description_from_attacco(composed)
+        description = indicator_notes.meta_description_from_attacco(composed)
+        return _complete_short_description(description, meta, level, max_len)
     return None
+
+
+def _complete_short_description(description, meta, level, max_len):
+    """Aggiunge misura, ambito e anno ai lead autorati troppo brevi."""
+    if not description or len(description) >= 70:
+        return description
+    year = (level or {}).get("year_max")
+    plural = (level or {}).get("plural")
+    name = (meta or {}).get("name")
+    if not year or not plural or not name:
+        return description
+    territory = "province" if plural == "province" else "regioni"
+    prefix = f" Il dato riguarda le {territory} italiane nell'anno {year} e misura "
+    suffix = "."
+    budget = min(max_len, 155) - len(description.rstrip(". ")) - len(prefix) - len(suffix)
+    measure = indicator_notes._truncate_words(name, max(8, budget))
+    result = f"{description.rstrip('. ')}.{prefix}{measure}{suffix}"
+    if len(result) < 110:
+        result = result[:-1] + " con confronto fra territori."
+    return result

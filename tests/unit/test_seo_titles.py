@@ -315,8 +315,10 @@ class EstremiNonVerificatiTest(unittest.TestCase):
     def test_la_descrizione_non_porta_cifre(self):
         self.assertIsNone(seo_titles.answer_description(self.meta, self.lv))
         composto = "Rapporta il numero di persone detenute ai posti regolamentari."
-        self.assertEqual(seo_titles.page_description({}, self.meta, self.lv, composed=composto),
-                         composto)
+        description = seo_titles.page_description({}, self.meta, self.lv, composed=composto)
+        self.assertIn(composto, description)
+        self.assertIn("province italiane", description)
+        self.assertIn("2024", description)
 
 
 class OmonimaTest(unittest.TestCase):
@@ -536,6 +538,22 @@ class PrecedenzaTest(unittest.TestCase):
 
 
 class DescrizioneTest(unittest.TestCase):
+    def test_lead_corto_si_completa_con_misura_ambito_e_anno(self):
+        description = seo_titles.page_description(
+            {"lead": "Il volontariato disegna un'Italia a due velocità."},
+            meta(name="Attività di volontariato"), level(),
+        )
+        self.assertGreaterEqual(len(description), 110)
+        self.assertLessEqual(len(description), 155)
+        self.assertIn("Attività di volontariato", description)
+        self.assertIn("regioni italiane", description)
+        self.assertIn("2024", description)
+
+    def test_lead_normale_resta_invariato(self):
+        lead = ("Nel 2024 in Calabria si sono prodotti 21.702 euro per abitante, "
+                "con un valore che descrive la disponibilità economica media annuale.")
+        self.assertEqual(seo_titles.page_description({"lead": lead}, meta(), level()), lead)
+
     def test_l_attacco_del_pezzo_vince_su_tutto(self):
         attacco = "Nel 2024 in Calabria si sono prodotti 21.702 euro per abitante."
         self.assertIn("Calabria",
