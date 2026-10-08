@@ -535,7 +535,16 @@ def atlante():
         # millisecondi.
         body = _render_atlante(level, shown)
     response = make_response(body)
-    if level == "provincia":
+    query_variant_noindex = (
+        "area" in request.args
+        or ("theme" in request.args and request.args.get("partial") == "1")
+    )
+    if query_variant_noindex and level == "regione":
+        response.set_data(response.get_data(as_text=True).replace(
+            '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">',
+            '<meta name="robots" content="noindex, follow">',
+        ))
+    if level == "provincia" or query_variant_noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 
