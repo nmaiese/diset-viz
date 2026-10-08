@@ -747,6 +747,9 @@ details.more[open] > summary { color: var(--ink); }
 .answer .n, .lede .n, .subline .n, .sub .n, .tile .sub .n { font-family: inherit; font-weight: 600; font-size: inherit; line-height: inherit; letter-spacing: 0; }
 .tile .sub .n__u, .tile .sub .n__o { font-size: inherit; vertical-align: baseline; margin-left: 0; color: inherit; }
 .answer .n__u, .lede .n__u { color: inherit; font-weight: 600; }
+@media (max-width: 639px) {
+  .n__o, .table .rank .n__o, .tile .n__o, .bignum .n__o, .tile .sub .n__o { font-size: max(0.72em, var(--fs-small)); }
+}
 
 /* ---------- le ripartizioni: un colore per Nord, Centro, Mezzogiorno ---------- */
 .area--nord { fill: var(--area-nord); } .area--centro { fill: var(--area-centro); } .area--sud { fill: var(--area-sud); } .area--none { fill: var(--cmp); }
