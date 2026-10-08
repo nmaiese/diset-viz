@@ -262,7 +262,8 @@ html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-a
 }
 @media (max-width: 639px) {
   .sitechrome .ftr__cols a, .sitechrome .ftr__legal a { display: inline; min-height: 0; position: relative; }
-  .sitechrome .ftr__cols a::after, .sitechrome .ftr__legal a::after { content: ""; position: absolute; inset: -14px 0; }
+  .sitechrome .ftr__cols a::after { content: ""; position: absolute; inset: -14px 0; }
+  .sitechrome .ftr__legal a::after { content: ""; position: absolute; inset: -8px 0; }
 }
 
 /* --- cassetto del telefono ---------------------------------------------- */
