@@ -1,7 +1,7 @@
 import re
 import unittest
 
-from app import app, editorial_state
+from app import app, editorial_state, indicator_universe
 
 
 class AdsenseIndicatorIndexingTest(unittest.TestCase):
@@ -17,6 +17,11 @@ class AdsenseIndicatorIndexingTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        indicator_universe.cache_clear()
+        editorial_state.build_queue.cache_clear()
+        editorial_state.catalogo.cache_clear()
+        from app.cache import cache
+        cache.clear()
         cls.client = app.test_client()
         sitemap = cls.client.get("/sitemap.xml").get_data(as_text=True)
         cls.sitemap_paths = set(re.findall(r"https://divarioitalia\.it([^<]+)", sitemap))
