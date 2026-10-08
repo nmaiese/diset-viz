@@ -506,6 +506,13 @@ class GateParserTests(unittest.TestCase):
             with self.subTest(text=text[inizio:inizio + 160]):
                 self.assertEqual(self.parse(text), ("FERMO", ""))
 
+    def test_gate_a_v4_registro_accetta_le_diciture_del_tipo(self):
+        for tipo in ("interpretazione documentata", "interpretazione attribuita", "dato o calcolo", "Limite"):
+            text = gate_a("PASSA").replace("| Le rette pesano sull'accesso | interpretazione |",
+                                           f"| Le rette pesano sull'accesso | {tipo} |")
+            with self.subTest(tipo=tipo):
+                self.assertEqual(self.parse(text), ("PASSA", ""))
+
     def test_gate_a_v4_criteri_fissi_e_variante_coerente(self):
         casi = (
             (gate_a("PASSA").replace("| Prove e figure |", "| Racconto |"), "criteri v4"),

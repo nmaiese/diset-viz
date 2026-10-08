@@ -427,8 +427,8 @@ GATE_A_DEFINITION_FIELDS = ("Definizione specifica", "Unità", "Denominatore", "
 # Definizioni che ripetono il nome invece di dire che cosa si conta: il caso della bozza pensioni.
 GENERIC_DEFINITIONS = ("definito dalla fonte", "definita dalla fonte", "gruppo di riferimento")
 CLAIM_HEADER = "| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |"
-CLAIM_TYPES = {"dato", "calcolo", "dato o calcolo", "interpretazione", "interpretazione attribuita",
-               "ipotesi", "limite"}
+# Conta la prima parola: «interpretazione documentata» (REV) e «interpretazione attribuita» valgono uguale.
+CLAIM_TYPES = {"dato", "calcolo", "interpretazione", "ipotesi", "limite"}
 BLOG_VARIANTS = ("orientamento", "cambiamento", "verifica", "servizi", "differenze interne",
                  "gruppi demografici", "confronto tra misure")
 SHEET_VARIANTS = ("regionale", "provinciale", "multilivello", "per sesso", "per età", "con incroci",
@@ -460,7 +460,7 @@ def _gate_a_core_gaps(text: str) -> list[str]:
                 continue
             claims.append([cell.strip() for cell in line.strip().strip("|").split("|")])
     complete = [row for row in claims
-                if len(row) == 5 and len(row[0]) >= 10 and row[1].casefold() in CLAIM_TYPES
+                if len(row) == 5 and len(row[0]) >= 10 and (row[1].casefold().split() or [''])[0] in CLAIM_TYPES
                 and all(_filled(cell) for cell in row[2:])]
     if not claims or len(complete) != len(claims):
         gaps.append("Registro affermazioni")
