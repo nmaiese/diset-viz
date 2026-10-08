@@ -734,9 +734,6 @@ details.more[open] > summary { color: var(--ink); }
 .n__u--pct { font-family: var(--font-num); color: inherit; }
 /* Eccezione: apici, unita' e pedici in em scalano insieme alla cifra. */
 .n__o { font-size: 0.72em; vertical-align: 0.28em; margin-left: 0.04em; }
-@media (max-width: 639px) {
-  .n__o, .table .rank .n__o, .tile .n__o, .bignum .n__o { font-size: max(0.72em, var(--fs-small)); }
-}
 .n--nd, .n--nd abbr { color: var(--muted); text-decoration: none; }
 .tile .n, .figure-num .n {
   font-size: var(--fs-figure-sm); line-height: var(--lh-figure-sm); font-weight: var(--fw-num); letter-spacing: -0.015em;
@@ -750,6 +747,9 @@ details.more[open] > summary { color: var(--ink); }
 .answer .n, .lede .n, .subline .n, .sub .n, .tile .sub .n { font-family: inherit; font-weight: 600; font-size: inherit; line-height: inherit; letter-spacing: 0; }
 .tile .sub .n__u, .tile .sub .n__o { font-size: inherit; vertical-align: baseline; margin-left: 0; color: inherit; }
 .answer .n__u, .lede .n__u { color: inherit; font-weight: 600; }
+@media (max-width: 639px) {
+  .n__o, .table .rank .n__o, .tile .n__o, .bignum .n__o, .tile .sub .n__o { font-size: max(0.72em, var(--fs-small)); }
+}
 
 /* ---------- le ripartizioni: un colore per Nord, Centro, Mezzogiorno ---------- */
 .area--nord { fill: var(--area-nord); } .area--centro { fill: var(--area-centro); } .area--sud { fill: var(--area-sud); } .area--none { fill: var(--cmp); }
