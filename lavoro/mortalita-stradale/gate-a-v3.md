@@ -1,9 +1,9 @@
 # Gate A: mortalita-stradale
 Contratto: v3
 Tipo pezzo: scheda indicatore
-Esito: FERMO
-SHA brief: 9f15758c83d29e77ea7d0790f9f84b22cc8805dc
-Hash brief: 498ed7485327e032942d8862b9c10302e58a8a4124ceadc16ff698f80b6c2e6e
+Esito: PASSA
+SHA brief: 3870f2e781a478cf0540ef8d6d22a22194e449b3
+Hash brief: c6b2803420046228483391067549d7447aa017c0d43234696ec3d1030d1190f2
 Autore/modello: Claude Sonnet (leader del brief)
 Giudice/modello: Codex GPT-6
 Domanda: Dove il tasso di mortalità stradale tra i 15 e i 34 anni è più alto, e come è cambiato dal 2004?
@@ -27,8 +27,7 @@ Grafico con dati esterni: non richiesto per scheda indicatore
 | Fonti esterne datate e dati centrali verificati | sì | Ho aperto i metadati Istat e verificato la definizione letterale. Il report BesT Sardegna conferma 2023 e la cautela sulla variabilità. Ricalcolo indipendente dal CSV `Assoluti_BES_Regione.csv` con `DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py`: 20 regioni nel 2024, Sardegna 1,3, Calabria e Puglia 0,9, Liguria, Marche, Molise e Piemonte 0,4. Tutte le 20 regioni calano tra 2004 e 2024. | Il CSV verifica i valori regionali, non fornisce il valore Italia 2024. La media semplice dei territori non è un tasso nazionale. |
 | Limiti, definizioni e cause sono gestiti | sì | Brief indica classe 15-34, tasso standardizzato per 10.000 residenti, pochi decessi e oscillazioni annuali. Proibisce cause non documentate e dichiara non trovato il criterio territoriale di attribuzione dei decessi. Istat BesT conferma che l'indicatore è molto variabile per l'esiguità dei fenomeni. | La definizione non specifica se la regione sia quella dell'incidente o della residenza. Il numero assoluto regionale sottostante non è disponibile nelle fonti aperte. |
 | Livello e requisiti di struttura/metadati sono adeguati | sì | Il brief indica `level: regione`, chiave `bes:01SAL005`, vintage 2024, H1, `seo_title` entro 60 caratteri e fonti 1, 2 e 3. Prevede anche la fonte 5 se resta il dato sardo 113, che la struttura proposta include. | Sono istruzioni per la scheda futura. Il Gate A non verifica il front matter di una scheda ancora da scrivere. |
-| Brief scrivibile senza affermazioni non sostenute | no | La sezione 7 propone la frase “Nel 2024 il quadro nazionale sale (9 regioni su 20)”. Nel brief, sezione 4, la misura calcolata è invece “la media semplice” dei tassi regionali. La formulazione proposta può farla passare per un dato nazionale, contraddicendo il divieto esplicito della sezione 5 di chiamare media nazionale la media dei territori. | Il calcolo è riproducibile: media semplice regionale 0,590 nel 2023 e 0,685 nel 2024, ma non equivale al valore Italia, che per il 2024 non è stato trovato. |
-Motivo: Le prove sostengono definizione, ultimo anno, valori regionali, andamento e cautele. Resta una formulazione della struttura proposta che può trasformare la media semplice delle regioni in un andamento nazionale, proprio dove il brief vieta tale lettura. La scheda non passa finché l'istruzione non distingue chiaramente media dei tassi regionali e valore Italia.
-Correzione: In sezione 7 sostituire “Nel 2024 il quadro nazionale sale (9 regioni su 20)” con “Nel 2024 la media semplice dei 20 tassi regionali sale e 9 regioni su 20 aumentano”. Non chiamarla valore o quadro nazionale.
+| Brief scrivibile senza affermazioni non sostenute | sì | La sezione 7 ora dice: “Nel 2024 la media semplice dei 20 tassi regionali sale e 9 regioni su 20 aumentano”. La frase identifica l'unità territoriale della media e non la presenta come valore o andamento nazionale. La ricerca di “nazional”, “Italia” e “media” nel brief conferma che il divieto è esplicito: il valore Istat Italia è ammesso solo per il 2023, mentre il 2024 nazionale non è disponibile. Ricalcolo dal CSV: media semplice regionale 0,590 nel 2023 e 0,685 nel 2024; 9 regioni aumentano, 4 calano e 7 restano invariate. | La media è descrittiva dei 20 tassi regionali, non sostituisce il valore Italia. Il brief mantiene questo limite. |
+Motivo: Il brief aggiornato soddisfa la correzione richiesta. La frase separa la media semplice regionale dal dato nazionale, e nessun altro passaggio attribuisce alla media semplice delle regioni valore, quadro o andamento nazionale. Definizione, ultimo dato, confronti e cautele restano coerenti con le prove già raccolte.
 Destinatario: leader
 Data: 2026-10-08
