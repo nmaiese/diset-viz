@@ -120,6 +120,12 @@ class Ter12(unittest.TestCase):
         walk(self.dossier)
 
 
+class Durate(unittest.TestCase):
+    def test_speranza_di_vita_non_genera_rapporto_predefinito(self):
+        dossier = brief.build("ter-910")
+        self.assertIsNone(dossier["livelli"][0]["fotografia"]["rapporto_fra_estremi"])
+
+
 class Carceri(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

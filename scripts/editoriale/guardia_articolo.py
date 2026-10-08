@@ -56,7 +56,7 @@ from pathlib import Path
 
 import frontmatter
 
-from app import blog
+from app import blog, data, sources
 from app.design import numfmt
 from scripts.audit_link_interni import _internal_path
 from scripts.editoriale.guardia import NUMBER_RE, TYPO_RE, _excerpt, _is_checkable, _number_value
@@ -170,9 +170,15 @@ def _to_float(cell):
 class Table:
     """Il CSV: le colonne numeriche e i territori con le loro righe."""
 
-    def __init__(self, path):
+    def __init__(self, path, indicator=None):
         with Path(path).open(encoding="utf-8", newline="") as file:
             rows = list(csv.DictReader(file))
+        codes = {str(row.get("codice", "")).strip() for row in rows if row.get("codice")}
+        if len(codes) > 1:
+            parsed = sources.parse_indicator_code(str(indicator or ""))
+            target = parsed[1] if parsed else str(indicator or "").split(":")[-1]
+            rows = [row for row in rows if str(row.get("codice", "")).strip() == target]
+        self.rows = rows
         self.columns = {}
         names = list(rows[0].keys()) if rows else []
         for name in names:
@@ -192,6 +198,49 @@ class Table:
 
     def all_values(self):
         return [v for values in self.columns.values() for v in values]
+
+    def observed(self, geography):
+        """Distinct measured territories for each year, in source geography."""
+        result = {}
+        if geography == "regioni":
+            valid = {_normalize(name) for name in data.REGION_ORDER}
+        else:
+            with (STATIC / "data" / "province_codes.csv").open(encoding="utf-8", newline="") as file:
+                valid = {_normalize(row["name"]) for row in csv.DictReader(file, delimiter=";")}
+        conflicting_years = set()
+        for row in self.rows:
+            source_level = "provincia" if geography == "province" else "regione"
+            if row.get("livello") and row["livello"].lower() != source_level:
+                continue
+            territory = row.get("territorio") or row.get(geography) or row.get("regione")
+            year = row.get("anno")
+            value = guardie_v4.decimal_value(row.get("valore"))
+            if year and territory and _normalize(territory) in valid and value is not None:
+                cells = result.setdefault(str(year), {})
+                key = _normalize(territory)
+                if key in cells and cells[key] != value:
+                    conflicting_years.add(str(year))
+                cells[key] = value
+        for year in conflicting_years:
+            result.pop(year, None)
+        # Wide article CSV: one measured column per year and one row per territory.
+        if not result:
+            year_columns = {}
+            for column in self.rows[0] if self.rows else ():
+                match = _YEAR.search(column)
+                if match:
+                    year_columns.setdefault(match.group(), []).append(column)
+            for row in self.rows:
+                territory = row.get("provincia" if geography == "province" else "regione") or row.get("territorio")
+                if not territory or _normalize(territory) not in valid:
+                    continue
+                for year, columns in year_columns.items():
+                    if len(columns) != 1:
+                        continue
+                    value = guardie_v4.decimal_value(row.get(columns[0]))
+                    if value is not None:
+                        result.setdefault(year, {})[_normalize(territory)] = value
+        return result
 
 
 # --- il controllo 1: le cifre ----------------------------------------------------
@@ -401,19 +450,45 @@ def check_typography(article):
     return findings
 
 
-def check_editorial_v4(article):
+def check_editorial_v4(article, table=None):
     findings = []
     for key in PROSE_FIELDS:
         text = str(article.meta.get(key) or "")
         line = article.field_line(key)
         if guardie_v4.g2(text):
             findings.append(Finding(ERROR, "G2", line, "messaggio editoriale interno nel testo pubblico", text))
+    def selection(sentence):
+        has_provinces = bool(re.search(r"\bprovince\b", sentence, re.I))
+        has_regions = bool(re.search(r"\bregioni\b", sentence, re.I))
+        source_levels = {str(row.get("livello", "")).lower() for row in table.rows} if table else set()
+        if table and has_provinces != has_regions:
+            geography = "province" if has_provinces else "regioni"
+        elif table and source_levels == {"provincia"}:
+            geography = "province"
+        elif table and source_levels == {"regione"}:
+            geography = "regioni"
+        elif table and source_levels - {""}:
+            return "regioni", {}
+        else:
+            geography = "regioni"
+        return geography, table.observed(geography) if table else {}
+    official = bool(re.search(r"\b(?:ufficiale|istat|eurostat)\b", str((article.meta.get("dataset") or {}).get("method", "")), re.I))
+    name = str(article.meta.get("indicator_label") or article.meta.get("title") or "")
+    for key in PROSE_FIELDS:
+        value = str(article.meta.get(key) or "")
+        geography, observed = selection(value)
+        for severity, rule, message in guardie_v4.editorial_checks(value, observed, geography, name=name, official=official):
+            findings.append(Finding(severity, rule, article.field_line(key), message, value))
     body = "\n".join(_prose_line(line) for line in article.body_lines)
     for line_no, raw in enumerate(article.body_lines, 1):
         visible = _prose_line(raw)
         if guardie_v4.g2(visible):
             findings.append(Finding(ERROR, "G2", article.body_line(line_no - 1),
                                     "messaggio editoriale interno nel testo pubblico", visible.strip()))
+        for _, sentence in _sentences(visible):
+            geography, observed = selection(sentence)
+            for severity, rule, message in guardie_v4.editorial_checks(sentence, observed, geography, name=name, official=official):
+                findings.append(Finding(severity, rule, article.body_line(line_no - 1), message, sentence.strip()))
     for _, offset in guardie_v4.g4_text(body):
         absolute_line = article.body_start + body[:offset].count("\n") + 1
         fragment = body[max(0, offset - 24):offset + 40].splitlines()[0]
@@ -456,12 +531,12 @@ def check_article(path, link_status=None, cap=WORD_CAP, static_dir=STATIC, figur
     if download:
         csv_path = Path(static_dir) / str(download).removeprefix("/static/").lstrip("/")
         if csv_path.is_file():
-            table = Table(csv_path)
+            table = Table(csv_path, article.meta.get("indicator"))
     findings += check_figures(article, table, article.meta.get("external_figures") or [])
     findings += check_links(article, link_status or default_link_status())
     findings += check_figure_files(article, figures_dir)
     findings += check_typography(article)
-    findings += check_editorial_v4(article)
+    findings += check_editorial_v4(article, table)
     words, length = check_length(article, cap)
     findings += length
     findings.sort(key=lambda f: (SEVERITY_ORDER[f.severity], f.line))

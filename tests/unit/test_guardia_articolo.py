@@ -6,6 +6,7 @@ I link non aprono l'app di Flask: la guardia riceve una funzione che risponde
 al posto del sito, con le rotte che "esistono".
 """
 import contextlib
+import csv
 import io
 import json
 import tempfile
@@ -101,6 +102,36 @@ class GuardiaArticolo(unittest.TestCase):
         self.assertTrue(any(f.check == "G2" and f.severity == ga.ERROR for f in report["rilievi"]))
         self.assertTrue(any(f.check == "G4" and f.severity == ga.WARNING for f in report["rilievi"]))
         self.assertTrue(all(f.line > 0 for f in report["rilievi"] if f.check in {"G2", "G4"}))
+
+    def test_g1_csv_documentato_e_anno_ambiguo(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        csv_file.write_text("regione,anno,valore\nLombardia,2024,8.8\nCalabria,2024,9.0\n", encoding="utf-8")
+        report = self.check(PULITO + "\nIn Italia nel 2024 il valore è 8,9%.\n")
+        self.assertTrue(any(f.check == "G1" and f.severity == ga.ERROR for f in report["rilievi"]))
+        report = self.check(PULITO + "\nIn Italia nel 2023 il valore è 8,9%.\n")
+        self.assertTrue(any(f.check == "G1" and f.severity == ga.UNVERIFIABLE for f in report["rilievi"]))
+
+    def test_g7_csv_lungo_stessa_geografia(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        csv_file.write_text("livello,territorio,anno,valore\nprovincia,Arezzo,2022,3.0\nprovincia,Mantova,2022,1.0\nregione,Lombardia,2022,2.0\n", encoding="utf-8")
+        report = self.check(PULITO + "\nNel 2022 le 3 province sono osservate.\n")
+        self.assertTrue(any(f.check == "G7" and f.severity == ga.ERROR and "2 osservate" in f.message for f in report["rilievi"]))
+
+    def test_g1_csv_con_misure_conflittuali_non_inventa_media(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        csv_file.write_text("livello,territorio,anno,valore\nregione,Lombardia,2024,8.8\nregione,Lombardia,2024,18.8\nregione,Calabria,2024,9.0\n", encoding="utf-8")
+        report = self.check(PULITO + "\nIn Italia nel 2024 il valore è 8,9%.\n")
+        self.assertTrue(any(f.check == "G1" and f.severity == ga.UNVERIFIABLE for f in report["rilievi"]))
+
+    def test_g7_campione_sintetico_infortuni_107_su_103(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        with (ga.STATIC / "data" / "province_codes.csv").open(encoding="utf-8", newline="") as source:
+            names = [row["name"] for row in csv.DictReader(source, delimiter=";")][:103]
+        csv_file.write_text("livello,territorio,anno,valore\n" + "".join(
+            f"provincia,{name},2022,1.0\n" for name in names
+        ), encoding="utf-8")
+        report = self.check(PULITO + "\nNel 2022 i dati coprono 107 province.\n")
+        self.assertTrue(any(f.check == "G7" and f.severity == ga.ERROR and "103 osservate" in f.message for f in report["rilievi"]))
 
     def test_cifra_sbagliata_e_errore_con_la_riga(self):
         report = self.check(PULITO.replace("28.154 euro", "28.145 euro"))

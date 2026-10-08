@@ -387,12 +387,34 @@ def check_article(internal_key, entry, dossier=None, source_values=None):
         return []
     level_key = entry.get("level") or DEFAULT_LEVEL
     defects = []
+    observed, geography, unit, name = {}, "regioni", "", ""
+    parsed = sources.split_internal_id(internal_key)
+    if parsed:
+        view = build_indicator_view(*parsed)
+        if view:
+            level = next((item for item in view["levels"] if item["key"] == level_key), None)
+            if level:
+                geography = "province" if level_key == "provincia" else "regioni"
+                observed = {str(year): {key: guardie_v4.decimal_value(value.get("v") if isinstance(value, dict) else value)
+                                        for key, value in cells.items()}
+                            for year, cells in level["matrix"].items()}
+                observed = {year: {key: value for key, value in cells.items() if value is not None}
+                            for year, cells in observed.items()}
+                unit = str(view["meta"].get("unit") or "")
+                name = str(view["meta"].get("name") or "")
     for field, text in fields:
         if guardie_v4.g2(text):
             defects.append(Defect("G2", field, text[:160], "messaggio editoriale interno nel testo pubblico"))
         for number, offset in guardie_v4.g4_text(text):
             defects.append(Defect("G4-avviso", field, text[max(0, offset - 30):offset + 50],
                                   f"numero {number!r} senza unità né anno nella frase o nella precedente"))
+        for line in text.splitlines():
+            for sentence in guardie_v4._SENTENCE.finditer(line):
+                phrase = sentence.group(0)
+                for severity, rule, message in guardie_v4.editorial_checks(
+                        phrase, observed, geography, year=entry.get("vintage"), unit=unit, name=name,
+                        official=bool(view and view["meta"].get("source")) if parsed else False):
+                    defects.append(Defect(rule if severity == "errore" else f"{rule}-{severity}", field, phrase[:160], message))
     defects += check_typography(fields)
     defects += check_free_sections(entry)
     defects += check_links(fields)
@@ -445,7 +467,7 @@ def main(argv=None):
     print(f"guardia: {len(defects)} difetti su {args.code}", file=sys.stderr)
     for defect in defects:
         print(f"  {defect.line()}", file=sys.stderr)
-    return 1 if any(d.check != "G4-avviso" for d in defects) else 0
+    return 1 if any(not d.check.endswith(("-avviso", "-non verificabile")) for d in defects) else 0
 
 
 if __name__ == "__main__":

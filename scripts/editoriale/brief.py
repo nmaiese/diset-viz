@@ -474,7 +474,10 @@ def _snapshot(meta, code, level, universe, area_of, units, official):
         "piu_bassi": list(reversed(rows[-TOP_N:])),
         "distanza_fra_estremi": _flagged(figure(high - low, units["change"]) if values else None, unverified),
         "rapporto_fra_estremi": _flagged(
-            ratio(high / low) if values and low > 0 and not points_unit else None, unverified
+            ratio(high / low) if values and low > 0 and not points_unit
+            and str(unit).lower().strip() not in {"anni", "anno", "years"}
+            and not any(word in meta["name"].lower() for word in ("speranza di vita", "durata")) else None,
+            unverified
         ),
         "ripartizioni": {
             "metodo": f"media semplice dei valori delle {plural} di ogni ripartizione, Mezzogiorno = Sud e Isole",

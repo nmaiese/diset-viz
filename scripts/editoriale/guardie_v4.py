@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 
@@ -24,6 +25,80 @@ _UNIT = re.compile(
 _SENTENCE = re.compile(r".+?(?:[!?]+|\.(?!\d)|$)", re.S)
 _SKIP = re.compile(r"^\s*(?:>\s*)?(?:note|fonti|riferimenti|bibliografia)\b|^\s*\d+[.)]\s")
 _LINK_URL = re.compile(r"https?://\S+|(?:\]\()([^)]*)\)")
+_NATIONAL = re.compile(r"(?<!d')\b(?:italia|nazional\w*|media italiana)\b", re.I)
+_SIMPLE = re.compile(r"\bmedia\s+(?:aritmetica\s+)?semplice\b", re.I)
+_OFFICIAL = re.compile(r"\b(?:dato|valore|media)\s+(?:nazionale\s+)?ufficiale\b|\b(?:istat|eurostat)\b.{0,35}\b(?:dato|valore|media)\s+nazionale\b|\b(?:dato|valore|media)\s+(?:nazionale\s+)?(?:istat|eurostat)\b", re.I)
+_MEASURE = re.compile(r"(?<![\w])(?P<number>\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?)(?:\s*%|\b)")
+_COUNT = re.compile(r"\b(?P<count>\d{1,3})\s+(?P<geo>province|regioni)\b|\btutte\s+le\s+(?P<all>province|regioni)\b", re.I)
+_RATIO = re.compile(r"\b(?:\d+(?:,\d+)?|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+volte\b", re.I)
+_COMPARISON = re.compile(r"\b(?:estremi|divario|rapporto|rispetto|confronto|quello|quella|tra|fra)\b", re.I)
+
+
+def decimal_value(value):
+    """Read published decimal text without binary float subtraction."""
+    try:
+        return Decimal(str(value).strip().replace(".", "").replace(",", ".") if isinstance(value, str) and "," in value else str(value).strip())
+    except (InvalidOperation, ValueError):
+        return None
+
+
+def editorial_checks(sentence, observations, geography, year=None, unit="", name="", official=False):
+    """Return (severity, rule, reason) for one sentence and one source selection.
+
+    observations maps year to distinct territory keys and Decimal values. Missing
+    selection stays unverifiable; no national value is synthesized.
+    """
+    sentence = str(sentence)
+    years = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", sentence))
+    selected = next(iter(years)) if len(years) == 1 else str(year) if not years and year is not None else None
+    if selected is None and len(observations) == 1:
+        selected = next(iter(observations))
+    values = observations.get(str(selected)) if selected is not None else None
+    result = []
+    if _NATIONAL.search(sentence) and not _SIMPLE.search(sentence):
+        national = _NATIONAL.search(sentence)
+        near = sentence[max(0, national.start() - 25):national.end() + 70]
+        numbers = [decimal_value(m.group("number")) for m in _MEASURE.finditer(near)]
+        numbers = [n for n in numbers if n is not None and not (1900 <= n <= 2100 and n == n.to_integral_value())]
+        if numbers:
+            if not values or len(years) > 1:
+                result.append(("non verificabile", "G1", "CSV o anno della media territoriale non determinabile"))
+            elif not (_OFFICIAL.search(sentence) and
+                      (official or re.search(r"\b(?:dato|valore|media)\s+(?:nazionale\s+)?(?:istat|eurostat)\b", sentence, re.I))):
+                mean = sum(values.values()) / len(values)
+                if any(abs(number - mean) <= Decimal("0.05") for number in numbers):
+                    result.append(("errore", "G1", f"media semplice di {len(values)} {geography} nel {selected} chiamata nazionale"))
+    count_matches = list(_COUNT.finditer(sentence))
+    for match in count_matches:
+        geo = match.group("geo") or match.group("all")
+        before = sentence[max(0, match.start() - 12):match.start()]
+        if geo.lower() != geography or re.search(r"\b(?:su|non)\s*$", before, re.I):
+            continue
+        after = sentence[match.end():match.end() + 20]
+        if re.match(r"\s+su\s+\d+", after, re.I):
+            continue
+        count_values = values
+        count_period = selected
+        if not count_values and not years and observations and len({len(cells) for cells in observations.values()}) == 1:
+            count_values = next(iter(observations.values()))
+            count_period = "ogni anno disponibile"
+        if not count_values or len(years) > 1:
+            result.append(("non verificabile", "G7", f"anno o CSV delle {geo} non determinabile"))
+            continue
+        claimed = int(match.group("count")) if match.group("count") else {"province": 107, "regioni": 20}[geo.lower()]
+        if claimed != len(count_values):
+            result.append(("errore", "G7", f"{claimed} {geo} dichiarate, {len(count_values)} osservate nel {count_period}"))
+    if _RATIO.search(sentence) and _COMPARISON.search(sentence):
+        duration = bool(re.search(r"\b(?:speranza di vita|durata|anni di vita|anni vissuti)\b", name, re.I)) or unit.lower().strip() in {"anni", "anno", "years"}
+        if re.search(r"\bvolte\s+(?:il|lo|la)\s+(?:divario|differenza|distanza)\b", sentence, re.I):
+            duration = False
+        nonpositive = bool(values and min(values.values()) <= 0)
+        if duration or nonpositive:
+            reason = "durata in anni" if duration else "valori non positivi"
+            result.append(("errore", "G6", f"rapporto fra estremi non giustificato: {reason}"))
+        else:
+            result.append(("avviso", "G6", "verificare significato del rapporto fra estremi"))
+    return result
 
 
 def g2(text):
