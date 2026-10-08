@@ -260,6 +260,10 @@ html.is-hdr-off .sitechrome .hdr { transform: translateY(calc(-100% - env(safe-a
   .sitechrome .ftr__cols a, .sitechrome .ftr__legal a { display: inline-flex; align-items: center; min-height: var(--target); }
   .sitechrome .site-auth__login, .fav-star { min-height: var(--target); min-width: var(--target); }
 }
+@media (max-width: 639px) {
+  .sitechrome .ftr__cols a, .sitechrome .ftr__legal a { display: inline; min-height: 0; position: relative; }
+  .sitechrome .ftr__cols a::after, .sitechrome .ftr__legal a::after { content: ""; position: absolute; inset: -14px 0; }
+}
 
 /* --- cassetto del telefono ---------------------------------------------- */
 .sitechrome .drawer { position: fixed; inset: 0; background: var(--scrim); z-index: var(--z-modal); }
