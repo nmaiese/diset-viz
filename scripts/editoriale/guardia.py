@@ -49,6 +49,7 @@ from app.indicator_texts import DEFAULT_LEVEL, LIBERA
 from app.indicator_view import build_indicator_view
 from scripts import indicator_store
 from scripts.editoriale import brief
+from scripts.editoriale import guardie_v4
 from scripts.prose_lint import LINK, prose_fields
 
 
@@ -328,6 +329,12 @@ def check_markers(fields, internal_key, level_key):
                 continue
             if not svg:
                 defects.append(Defect("grafico", field, quote, "il marcatore non produce nessun SVG"))
+                continue
+            title = re.search(r"<title[^>]*>(.*?)</title>", svg, re.DOTALL)
+            if title:
+                for number in guardie_v4.g4_title(title.group(1)):
+                    defects.append(Defect("G4", field, title.group(1).strip(),
+                                          f"titolo figura: numero {number!r} senza unità né anno"))
     return defects
 
 
@@ -380,6 +387,12 @@ def check_article(internal_key, entry, dossier=None, source_values=None):
         return []
     level_key = entry.get("level") or DEFAULT_LEVEL
     defects = []
+    for field, text in fields:
+        if guardie_v4.g2(text):
+            defects.append(Defect("G2", field, text[:160], "messaggio editoriale interno nel testo pubblico"))
+        for number, offset in guardie_v4.g4_text(text):
+            defects.append(Defect("G4-avviso", field, text[max(0, offset - 30):offset + 50],
+                                  f"numero {number!r} senza unità né anno nella frase o nella precedente"))
     defects += check_typography(fields)
     defects += check_free_sections(entry)
     defects += check_links(fields)
@@ -432,7 +445,7 @@ def main(argv=None):
     print(f"guardia: {len(defects)} difetti su {args.code}", file=sys.stderr)
     for defect in defects:
         print(f"  {defect.line()}", file=sys.stderr)
-    return 1
+    return 1 if any(d.check != "G4-avviso" for d in defects) else 0
 
 
 if __name__ == "__main__":

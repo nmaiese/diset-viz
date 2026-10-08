@@ -94,6 +94,14 @@ class GuardiaArticolo(unittest.TestCase):
         unverifiable = self.kinds(report, ga.UNVERIFIABLE)
         self.assertEqual([f.message.split()[0] for f in unverifiable], ["'11.358'"])
 
+    def test_g2_blocca_e_g4_avvisa_con_righe(self):
+        report = self.check(PULITO.replace(
+            "Nel 2024 il reddito", "Nel 2024 la priorità di indicizzazione riguarda il reddito"
+        ) + "\nIl valore era 17.\n")
+        self.assertTrue(any(f.check == "G2" and f.severity == ga.ERROR for f in report["rilievi"]))
+        self.assertTrue(any(f.check == "G4" and f.severity == ga.WARNING for f in report["rilievi"]))
+        self.assertTrue(all(f.line > 0 for f in report["rilievi"] if f.check in {"G2", "G4"}))
+
     def test_cifra_sbagliata_e_errore_con_la_riga(self):
         report = self.check(PULITO.replace("28.154 euro", "28.145 euro"))
         errors = self.kinds(report, ga.ERROR)

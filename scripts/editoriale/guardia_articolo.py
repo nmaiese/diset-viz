@@ -60,6 +60,7 @@ from app import blog
 from app.design import numfmt
 from scripts.audit_link_interni import _internal_path
 from scripts.editoriale.guardia import NUMBER_RE, TYPO_RE, _excerpt, _is_checkable, _number_value
+from scripts.editoriale import guardie_v4
 from scripts.trend_articles.verify import LINK, _clean_body
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -372,6 +373,11 @@ def check_figure_files(article, figures_dir=None):
                 findings.append(Finding(ERROR, "figure", line_no, f"la figura {name} non ha il suo SVG ({article.slug}/{name}.svg)", match.group(0)))
                 continue
             svg = path.read_text(encoding="utf-8")
+            title = re.search(r"<title[^>]*>(.*?)</title>", svg, re.DOTALL)
+            if title:
+                for number in guardie_v4.g4_title(title.group(1)):
+                    findings.append(Finding(ERROR, "G4", line_no,
+                                            f"numero {number!r} senza unità nel titolo figura", title.group(1).strip()))
             for tag, role in (("title", "alt"), ("desc", "didascalia")):
                 found = re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", svg, re.DOTALL)
                 if not found or not found.group(1).strip():
@@ -392,6 +398,32 @@ def check_typography(article):
         line = _prose_line(raw)
         for match in TYPO_RE.finditer(line):
             findings.append(Finding(ERROR, "tipografia", article.body_line(index), f"carattere vietato {match.group(0)!r}", _excerpt(line, match.start(), match.end())))
+    return findings
+
+
+def check_editorial_v4(article):
+    findings = []
+    for key in PROSE_FIELDS:
+        text = str(article.meta.get(key) or "")
+        line = article.field_line(key)
+        if guardie_v4.g2(text):
+            findings.append(Finding(ERROR, "G2", line, "messaggio editoriale interno nel testo pubblico", text))
+    body = "\n".join(_prose_line(line) for line in article.body_lines)
+    for line_no, raw in enumerate(article.body_lines, 1):
+        visible = _prose_line(raw)
+        if guardie_v4.g2(visible):
+            findings.append(Finding(ERROR, "G2", article.body_line(line_no - 1),
+                                    "messaggio editoriale interno nel testo pubblico", visible.strip()))
+    for _, offset in guardie_v4.g4_text(body):
+        absolute_line = article.body_start + body[:offset].count("\n") + 1
+        fragment = body[max(0, offset - 24):offset + 40].splitlines()[0]
+        findings.append(Finding(WARNING, "G4", absolute_line,
+                                "numero senza unità né anno nella frase o nella precedente", fragment.strip()))
+    for index, line in enumerate(article.body_lines):
+        if re.match(r"^\s*(?:#{1,6}\s*)?(?:Figura|Tabella)\b", line, re.I):
+            for number in guardie_v4.g4_title(line):
+                findings.append(Finding(ERROR, "G4", article.body_line(index),
+                                        f"numero {number!r} senza unità nel titolo figura/tabella", line.strip()))
     return findings
 
 
@@ -429,6 +461,7 @@ def check_article(path, link_status=None, cap=WORD_CAP, static_dir=STATIC, figur
     findings += check_links(article, link_status or default_link_status())
     findings += check_figure_files(article, figures_dir)
     findings += check_typography(article)
+    findings += check_editorial_v4(article)
     words, length = check_length(article, cap)
     findings += length
     findings.sort(key=lambda f: (SEVERITY_ORDER[f.severity], f.line))

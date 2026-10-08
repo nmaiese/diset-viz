@@ -38,6 +38,14 @@ class AssetParserTest(unittest.TestCase):
         assets = audit.parse_asset_refs(html)
         self.assertEqual(assets["js"], [])
 
+    def test_testo_reso_rileva_messaggio_interno_e_ignora_script(self):
+        from scripts.editoriale.guardie_v4 import g2
+
+        parser = audit._AssetParser()
+        parser.feed("<p>La priorità di indicizzazione è alta</p><script>noindex</script>")
+        hits = [text for text in parser.visible_text if g2(text)]
+        self.assertEqual(hits, ["La priorità di indicizzazione è alta"])
+
 
 class W2Test(unittest.TestCase):
     def test_legge_i_conteggi_del_rapporto(self):
