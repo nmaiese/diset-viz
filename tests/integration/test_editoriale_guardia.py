@@ -28,7 +28,7 @@ def entry(sections, lead="", level="regione"):
 
 
 class AllCommittedArticles(unittest.TestCase):
-    """Il vincolo decisivo: nessun articolo committato trova un difetto."""
+    """Il catalogo non contiene rilievi bloccanti; gli avvisi restano visibili."""
 
     def test_nessun_difetto_senza_dossier(self):
         articles = indicator_store.load_all()
@@ -36,7 +36,18 @@ class AllCommittedArticles(unittest.TestCase):
         for key, article in articles.items():
             with self.subTest(key=key):
                 defects = guardia.check_article(key, article)
-                self.assertEqual(defects, [], "\n".join(d.line() for d in defects))
+                blocking = guardia.blocking_defects(defects)
+                self.assertEqual(blocking, [], "\n".join(d.line() for d in blocking))
+
+    def test_avvisi_catalogo_restano_nel_rapporto(self):
+        articles = indicator_store.load_all()
+        findings = [(key, defect) for key, article in articles.items()
+                    for defect in guardia.check_article(key, article)
+                    if not defect.blocking]
+        self.assertGreater(len(findings), 0)
+        self.assertTrue(all(defect.check.endswith("-avviso") or
+                            defect.check.endswith("-non verificabile")
+                            for _, defect in findings))
 
     def test_ter_901_e_ter_12_come_sono_oggi(self):
         for code in ("ter-901", "ter-12"):
@@ -45,7 +56,7 @@ class AllCommittedArticles(unittest.TestCase):
                 key = key_for(family, raw_id)
                 article = indicator_store.read(key)
                 self.assertIsNotNone(article, f"{code} non ha un articolo scritto")
-                self.assertEqual(guardia.check_article(key, article), [])
+                self.assertEqual(guardia.blocking_defects(guardia.check_article(key, article)), [])
 
 
 def key_for(family, raw_id):
@@ -64,6 +75,18 @@ class Typography(unittest.TestCase):
     def test_prosa_pulita_non_solleva_niente(self):
         article = entry([{"role": "quadro", "h": "Titolo", "body": "Una frase pulita, senza niente di vietato."}])
         self.assertEqual(guardia.check_article("9999999", article), [])
+
+
+class FindingSeverity(unittest.TestCase):
+    def test_g4_titolo_figura_o_tabella_resta_bloccante(self):
+        for title in ("Figura 3 regioni", "Tabella 4 province"):
+            with self.subTest(title=title):
+                self.assertTrue(guardia.Defect("G4", "figure", title, "numero nudo").blocking)
+
+    def test_g4_avviso_non_blocca_ma_resta_rilievo(self):
+        warning = guardia.Defect("G4-avviso", "lead", "17", "numero nudo")
+        self.assertFalse(warning.blocking)
+        self.assertEqual(guardia.blocking_defects([warning]), [])
 
 
 class FreeSections(unittest.TestCase):

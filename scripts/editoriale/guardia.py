@@ -76,6 +76,16 @@ class Defect:
     def line(self):
         return f"[{self.check}] {self.field}: {self.message} -- {self.quote!r}"
 
+    @property
+    def blocking(self):
+        """Warning and unverifiable findings stay visible without failing gates."""
+        return not self.check.endswith(("-avviso", "-non verificabile"))
+
+
+def blocking_defects(defects):
+    """Filter findings by severity while preserving all findings for reports."""
+    return [defect for defect in defects if defect.blocking]
+
 
 def _excerpt(text, start, end, radius=30):
     """La frase citata: il testo colpito con un po' di contesto attorno."""
@@ -467,7 +477,7 @@ def main(argv=None):
     print(f"guardia: {len(defects)} difetti su {args.code}", file=sys.stderr)
     for defect in defects:
         print(f"  {defect.line()}", file=sys.stderr)
-    return 1 if any(not d.check.endswith(("-avviso", "-non verificabile")) for d in defects) else 0
+    return 1 if blocking_defects(defects) else 0
 
 
 if __name__ == "__main__":
