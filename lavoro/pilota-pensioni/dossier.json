@@ -1,0 +1,3682 @@
+{
+  "identita": {
+    "chiave": "04BEC006P",
+    "codice": "bes-04BEC006P",
+    "nome": "Pensionati con reddito pensionistico di basso importo",
+    "percorso": "/indicatore/pensionati-con-reddito-pensionistico-di-basso-importo/bes-04BEC006P",
+    "tema": "Reddito, inclusione e accessibilità",
+    "sottotema_fonte": null,
+    "definizione_fonte": null,
+    "unita": {
+      "fonte": "%",
+      "cifra": "%",
+      "variazione": "punti percentuali"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' basso",
+      "classifica_attiva": true
+    },
+    "livelli": [
+      {
+        "livello": "provincia",
+        "percorso": "/indicatore/pensionati-con-reddito-pensionistico-di-basso-importo/bes-04BEC006P",
+        "primo_anno": 2015,
+        "ultimo_anno": 2023,
+        "anni": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "territori_ultimo_anno": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2015,
+      "ultimo": 2023
+    },
+    "fonte": {
+      "etichetta": "Istat, benessere e qualità della vita",
+      "famiglia": "Istat, benessere e qualità della vita",
+      "istituzione": "Istat",
+      "url": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/",
+      "url_dati": null,
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "provincia",
+      "fotografia": {
+        "anno": 2023,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Crotone",
+            "chiave": "crotone",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 16.9,
+              "testo": "16,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Barletta-Andria-Trani",
+            "chiave": "barletta-andria-trani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 15.9,
+              "testo": "15,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Napoli",
+            "chiave": "napoli",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 15.6,
+              "testo": "15,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Agrigento",
+            "chiave": "agrigento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 15.4,
+              "testo": "15,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Cosenza",
+            "chiave": "cosenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 14.5,
+              "testo": "14,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Reggio Calabria",
+            "chiave": "reggio-calabria",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 14.0,
+              "testo": "14,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Lecce",
+            "chiave": "lecce",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 13.9,
+              "testo": "13,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Caltanissetta",
+            "chiave": "caltanissetta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 13.7,
+              "testo": "13,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Messina",
+            "chiave": "messina",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 13.7,
+              "testo": "13,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Avellino",
+            "chiave": "avellino",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 13.6,
+              "testo": "13,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Caserta",
+            "chiave": "caserta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 13.4,
+              "testo": "13,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Vibo Valentia",
+            "chiave": "vibo-valentia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 13.4,
+              "testo": "13,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Enna",
+            "chiave": "enna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.8,
+              "testo": "12,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Benevento",
+            "chiave": "benevento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 12.7,
+              "testo": "12,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Foggia",
+            "chiave": "foggia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 12.7,
+              "testo": "12,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Catania",
+            "chiave": "catania",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.4,
+              "testo": "12,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Palermo",
+            "chiave": "palermo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.2,
+              "testo": "12,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Potenza",
+            "chiave": "potenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 12.2,
+              "testo": "12,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Taranto",
+            "chiave": "taranto",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 12.2,
+              "testo": "12,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Catanzaro",
+            "chiave": "catanzaro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 12.1,
+              "testo": "12,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 21,
+            "territorio": "Latina",
+            "chiave": "latina",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 12.1,
+              "testo": "12,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 22,
+            "territorio": "Bari",
+            "chiave": "bari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 12.0,
+              "testo": "12,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 23,
+            "territorio": "Trapani",
+            "chiave": "trapani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 11.9,
+              "testo": "11,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 24,
+            "territorio": "Siracusa",
+            "chiave": "siracusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 11.8,
+              "testo": "11,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 25,
+            "territorio": "Salerno",
+            "chiave": "salerno",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 11.7,
+              "testo": "11,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 26,
+            "territorio": "Ragusa",
+            "chiave": "ragusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 11.6,
+              "testo": "11,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 27,
+            "territorio": "Teramo",
+            "chiave": "teramo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 11.2,
+              "testo": "11,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 28,
+            "territorio": "Sud Sardegna",
+            "chiave": "sud-sardegna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 11.0,
+              "testo": "11,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 29,
+            "territorio": "Sassari",
+            "chiave": "sassari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 10.8,
+              "testo": "10,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 30,
+            "territorio": "Brindisi",
+            "chiave": "brindisi",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 10.6,
+              "testo": "10,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 31,
+            "territorio": "Campobasso",
+            "chiave": "campobasso",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 10.6,
+              "testo": "10,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 32,
+            "territorio": "Roma",
+            "chiave": "roma",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 10.5,
+              "testo": "10,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 33,
+            "territorio": "Oristano",
+            "chiave": "oristano",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 10.4,
+              "testo": "10,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 34,
+            "territorio": "Pescara",
+            "chiave": "pescara",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 10.3,
+              "testo": "10,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 35,
+            "territorio": "Frosinone",
+            "chiave": "frosinone",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 10.2,
+              "testo": "10,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 36,
+            "territorio": "L'Aquila",
+            "chiave": "l-aquila",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 10.1,
+              "testo": "10,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 37,
+            "territorio": "Cagliari",
+            "chiave": "cagliari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 10.0,
+              "testo": "10,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 38,
+            "territorio": "Rieti",
+            "chiave": "rieti",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 10.0,
+              "testo": "10,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 39,
+            "territorio": "Matera",
+            "chiave": "matera",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 9.9,
+              "testo": "9,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 40,
+            "territorio": "Ascoli Piceno",
+            "chiave": "ascoli-piceno",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 9.7,
+              "testo": "9,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 41,
+            "territorio": "Chieti",
+            "chiave": "chieti",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 9.7,
+              "testo": "9,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 42,
+            "territorio": "Terni",
+            "chiave": "terni",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 9.3,
+              "testo": "9,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 43,
+            "territorio": "Isernia",
+            "chiave": "isernia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 9.2,
+              "testo": "9,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 44,
+            "territorio": "Nuoro",
+            "chiave": "nuoro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 9.2,
+              "testo": "9,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 45,
+            "territorio": "Pesaro e Urbino",
+            "chiave": "pesaro-e-urbino",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 9.1,
+              "testo": "9,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 46,
+            "territorio": "Viterbo",
+            "chiave": "viterbo",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 9.1,
+              "testo": "9,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 47,
+            "territorio": "Imperia",
+            "chiave": "imperia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 8.9,
+              "testo": "8,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 48,
+            "territorio": "Verbano-Cusio-Ossola",
+            "chiave": "verbano-cusio-ossola",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 8.9,
+              "testo": "8,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 49,
+            "territorio": "Sondrio",
+            "chiave": "sondrio",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 8.8,
+              "testo": "8,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 50,
+            "territorio": "Rimini",
+            "chiave": "rimini",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 8.6,
+              "testo": "8,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 51,
+            "territorio": "Varese",
+            "chiave": "varese",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 8.6,
+              "testo": "8,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 52,
+            "territorio": "Perugia",
+            "chiave": "perugia",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 8.5,
+              "testo": "8,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 53,
+            "territorio": "Como",
+            "chiave": "como",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 8.2,
+              "testo": "8,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 54,
+            "territorio": "Massa-Carrara",
+            "chiave": "massa-carrara",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 8.1,
+              "testo": "8,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 55,
+            "territorio": "Lucca",
+            "chiave": "lucca",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 7.9,
+              "testo": "7,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 56,
+            "territorio": "Livorno",
+            "chiave": "livorno",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 7.7,
+              "testo": "7,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 57,
+            "territorio": "Fermo",
+            "chiave": "fermo",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 7.5,
+              "testo": "7,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 58,
+            "territorio": "Genova",
+            "chiave": "genova",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 7.5,
+              "testo": "7,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 59,
+            "territorio": "Pisa",
+            "chiave": "pisa",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 7.4,
+              "testo": "7,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 60,
+            "territorio": "La Spezia",
+            "chiave": "la-spezia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 7.2,
+              "testo": "7,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 61,
+            "territorio": "Macerata",
+            "chiave": "macerata",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 7.2,
+              "testo": "7,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 62,
+            "territorio": "Pistoia",
+            "chiave": "pistoia",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 7.1,
+              "testo": "7,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 63,
+            "territorio": "Piacenza",
+            "chiave": "piacenza",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 7.0,
+              "testo": "7,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 64,
+            "territorio": "Ancona",
+            "chiave": "ancona",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 6.9,
+              "testo": "6,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 65,
+            "territorio": "Lodi",
+            "chiave": "lodi",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.8,
+              "testo": "6,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 66,
+            "territorio": "Arezzo",
+            "chiave": "arezzo",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 6.7,
+              "testo": "6,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 67,
+            "territorio": "Pordenone",
+            "chiave": "pordenone",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 6.7,
+              "testo": "6,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 68,
+            "territorio": "Reggio Emilia",
+            "chiave": "reggio-emilia",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 6.7,
+              "testo": "6,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 69,
+            "territorio": "Torino",
+            "chiave": "torino",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 6.7,
+              "testo": "6,7%"
+            }
+          },
+          {
+            "posizione_per_valore": 70,
+            "territorio": "Bergamo",
+            "chiave": "bergamo",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.6,
+              "testo": "6,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 71,
+            "territorio": "Modena",
+            "chiave": "modena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 6.5,
+              "testo": "6,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 72,
+            "territorio": "Savona",
+            "chiave": "savona",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 6.5,
+              "testo": "6,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 73,
+            "territorio": "Belluno",
+            "chiave": "belluno",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 6.4,
+              "testo": "6,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 74,
+            "territorio": "Forlì-Cesena",
+            "chiave": "forli-cesena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 6.4,
+              "testo": "6,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 75,
+            "territorio": "Pavia",
+            "chiave": "pavia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.4,
+              "testo": "6,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 76,
+            "territorio": "Udine",
+            "chiave": "udine",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 6.4,
+              "testo": "6,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 77,
+            "territorio": "Alessandria",
+            "chiave": "alessandria",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 78,
+            "territorio": "Brescia",
+            "chiave": "brescia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 79,
+            "territorio": "Grosseto",
+            "chiave": "grosseto",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 80,
+            "territorio": "Lecco",
+            "chiave": "lecco",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 81,
+            "territorio": "Parma",
+            "chiave": "parma",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 82,
+            "territorio": "Trento",
+            "chiave": "trento",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 83,
+            "territorio": "Treviso",
+            "chiave": "treviso",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 84,
+            "territorio": "Venezia",
+            "chiave": "venezia",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 85,
+            "territorio": "Vicenza",
+            "chiave": "vicenza",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3%"
+            }
+          },
+          {
+            "posizione_per_valore": 86,
+            "territorio": "Prato",
+            "chiave": "prato",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 6.2,
+              "testo": "6,2%"
+            }
+          },
+          {
+            "posizione_per_valore": 87,
+            "territorio": "Cuneo",
+            "chiave": "cuneo",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 6.1,
+              "testo": "6,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 88,
+            "territorio": "Verona",
+            "chiave": "verona",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 6.1,
+              "testo": "6,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 89,
+            "territorio": "Aosta",
+            "chiave": "aosta",
+            "ripartizione": "Nord",
+            "regione": "Valle d'Aosta",
+            "valore": {
+              "valore": 6.0,
+              "testo": "6,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 90,
+            "territorio": "Milano",
+            "chiave": "milano",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.0,
+              "testo": "6,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 91,
+            "territorio": "Padova",
+            "chiave": "padova",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 6.0,
+              "testo": "6,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 92,
+            "territorio": "Siena",
+            "chiave": "siena",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 6.0,
+              "testo": "6,0%"
+            }
+          },
+          {
+            "posizione_per_valore": 93,
+            "territorio": "Asti",
+            "chiave": "asti",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 5.9,
+              "testo": "5,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 94,
+            "territorio": "Gorizia",
+            "chiave": "gorizia",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 5.9,
+              "testo": "5,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 95,
+            "territorio": "Trieste",
+            "chiave": "trieste",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 5.9,
+              "testo": "5,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 96,
+            "territorio": "Cremona",
+            "chiave": "cremona",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 5.8,
+              "testo": "5,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 97,
+            "territorio": "Monza e della Brianza",
+            "chiave": "monza-e-della-brianza",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 5.8,
+              "testo": "5,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 98,
+            "territorio": "Vercelli",
+            "chiave": "vercelli",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 5.8,
+              "testo": "5,8%"
+            }
+          },
+          {
+            "posizione_per_valore": 99,
+            "territorio": "Firenze",
+            "chiave": "firenze",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 5.6,
+              "testo": "5,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 100,
+            "territorio": "Mantova",
+            "chiave": "mantova",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 5.6,
+              "testo": "5,6%"
+            }
+          },
+          {
+            "posizione_per_valore": 101,
+            "territorio": "Rovigo",
+            "chiave": "rovigo",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 5.5,
+              "testo": "5,5%"
+            }
+          },
+          {
+            "posizione_per_valore": 102,
+            "territorio": "Bologna",
+            "chiave": "bologna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 5.4,
+              "testo": "5,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 103,
+            "territorio": "Ferrara",
+            "chiave": "ferrara",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 5.4,
+              "testo": "5,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 104,
+            "territorio": "Novara",
+            "chiave": "novara",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 5.4,
+              "testo": "5,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Ravenna",
+            "chiave": "ravenna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 5.4,
+              "testo": "5,4%"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Biella",
+            "chiave": "biella",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 4.9,
+              "testo": "4,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Bolzano",
+            "chiave": "bolzano",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 4.1,
+              "testo": "4,1%"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 107 province, non la media nazionale",
+          "valore": 8.856075,
+          "testo": "8,9%"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 8.1,
+          "testo": "8,1%"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 48,
+          "testo": "48"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 59,
+          "testo": "59"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Crotone",
+            "chiave": "crotone",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 16.9,
+              "testo": "16,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Barletta-Andria-Trani",
+            "chiave": "barletta-andria-trani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 15.9,
+              "testo": "15,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Napoli",
+            "chiave": "napoli",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 15.6,
+              "testo": "15,6%"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Bolzano",
+            "chiave": "bolzano",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 4.1,
+              "testo": "4,1%"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Biella",
+            "chiave": "biella",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 4.9,
+              "testo": "4,9%"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Ravenna",
+            "chiave": "ravenna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 5.4,
+              "testo": "5,4%"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 12.8,
+          "testo": "12,8 punti percentuali"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 4.121951,
+          "testo": "4,1 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle province di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 47,
+                "testo": "47"
+              },
+              "media_semplice": {
+                "valore": 6.451064,
+                "testo": "6,5%"
+              },
+              "piu_alto": {
+                "territorio": "Imperia",
+                "valore": {
+                  "valore": 8.9,
+                  "testo": "8,9%"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Bolzano",
+                "valore": {
+                  "valore": 4.1,
+                  "testo": "4,1%"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 22,
+                "testo": "22"
+              },
+              "media_semplice": {
+                "valore": 8.140909,
+                "testo": "8,1%"
+              },
+              "piu_alto": {
+                "territorio": "Latina",
+                "valore": {
+                  "valore": 12.1,
+                  "testo": "12,1%"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Firenze",
+                "valore": {
+                  "valore": 5.6,
+                  "testo": "5,6%"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 38,
+                "testo": "38"
+              },
+              "media_semplice": {
+                "valore": 12.244737,
+                "testo": "12,2%"
+              },
+              "piu_alto": {
+                "territorio": "Crotone",
+                "valore": {
+                  "valore": 16.9,
+                  "testo": "16,9%"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Nuoro",
+                "valore": {
+                  "valore": 9.2,
+                  "testo": "9,2%"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2015,
+            "media_semplice": {
+              "valore": 10.616038,
+              "testo": "10,6%"
+            },
+            "territori": {
+              "valore": 106,
+              "testo": "106"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 13.2,
+              "testo": "13,2 punti percentuali"
+            }
+          },
+          {
+            "anno": 2016,
+            "media_semplice": {
+              "valore": 10.715094,
+              "testo": "10,7%"
+            },
+            "territori": {
+              "valore": 106,
+              "testo": "106"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 13.3,
+              "testo": "13,3 punti percentuali"
+            }
+          },
+          {
+            "anno": 2017,
+            "media_semplice": {
+              "valore": 10.71215,
+              "testo": "10,7%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 13.4,
+              "testo": "13,4 punti percentuali"
+            }
+          },
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 10.380374,
+              "testo": "10,4%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 12.7,
+              "testo": "12,7 punti percentuali"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 10.300935,
+              "testo": "10,3%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 12.9,
+              "testo": "12,9 punti percentuali"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 9.637383,
+              "testo": "9,6%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 12.3,
+              "testo": "12,3 punti percentuali"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 9.56729,
+              "testo": "9,6%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 12.3,
+              "testo": "12,3 punti percentuali"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 9.213084,
+              "testo": "9,2%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 11.7,
+              "testo": "11,7 punti percentuali"
+            }
+          },
+          {
+            "anno": 2023,
+            "media_semplice": {
+              "valore": 8.856075,
+              "testo": "8,9%"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 12.8,
+              "testo": "12,8 punti percentuali"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 106,
+              "testo": "106"
+            },
+            "totale": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2015,
+              "valore": {
+                "valore": 10.616038,
+                "testo": "10,6%"
+              }
+            },
+            {
+              "anno": 2016,
+              "valore": {
+                "valore": 10.715094,
+                "testo": "10,7%"
+              }
+            },
+            {
+              "anno": 2017,
+              "valore": {
+                "valore": 10.675472,
+                "testo": "10,7%"
+              }
+            },
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 10.348113,
+                "testo": "10,3%"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 10.270755,
+                "testo": "10,3%"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 9.612264,
+                "testo": "9,6%"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 9.543396,
+                "testo": "9,5%"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 9.191509,
+                "testo": "9,2%"
+              }
+            },
+            {
+              "anno": 2023,
+              "valore": {
+                "valore": 8.835849,
+                "testo": "8,8%"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2016,
+            "valore": {
+              "valore": 10.715094,
+              "testo": "10,7%"
+            }
+          },
+          "minimo": {
+            "anno": 2023,
+            "valore": {
+              "valore": 8.835849,
+              "testo": "8,8%"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2016,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 10.715094,
+                "testo": "10,7%"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2015,
+              "a": 2016,
+              "verso": "sale"
+            },
+            {
+              "da": 2016,
+              "a": 2023,
+              "verso": "scende"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2015,
+          "a": 2023,
+          "media_semplice_da": {
+            "valore": 10.616038,
+            "testo": "10,6%"
+          },
+          "media_semplice_a": {
+            "valore": 8.856075,
+            "testo": "8,9%"
+          },
+          "assoluta": {
+            "valore": -1.759963,
+            "testo": "-1,8 punti percentuali"
+          },
+          "relativa": null,
+          "territori_da": {
+            "valore": 106,
+            "testo": "106"
+          },
+          "territori_a": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "nota_relativa": "unita' percentuale: la variazione si scrive in punti, non in percentuale",
+          "nota_copertura": "le due medie stanno su gruppi di territori diversi",
+          "sul_pannello": {
+            "da": 2015,
+            "a": 2023,
+            "assoluta": {
+              "valore": -1.780189,
+              "testo": "-1,8 punti percentuali"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2022,
+          "a": 2023,
+          "territori_comuni": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "media_semplice_da": {
+            "valore": 9.213084,
+            "testo": "9,2%"
+          },
+          "media_semplice_a": {
+            "valore": 8.856075,
+            "testo": "8,9%"
+          },
+          "variazione": {
+            "valore": -0.357009,
+            "testo": "-0,36 punti percentuali"
+          },
+          "in_aumento": {
+            "valore": 1,
+            "testo": "1"
+          },
+          "in_calo": {
+            "valore": 102,
+            "testo": "102"
+          },
+          "invariati": {
+            "valore": 4,
+            "testo": "4"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Crotone",
+              "prima": {
+                "valore": 16.8,
+                "testo": "16,8%"
+              },
+              "dopo": {
+                "valore": 16.9,
+                "testo": "16,9%"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10 punti percentuali"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Bolzano",
+              "prima": {
+                "valore": 6.9,
+                "testo": "6,9%"
+              },
+              "dopo": {
+                "valore": 4.1,
+                "testo": "4,1%"
+              },
+              "variazione": {
+                "valore": -2.8,
+                "testo": "-2,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Agrigento",
+              "prima": {
+                "valore": 16.2,
+                "testo": "16,2%"
+              },
+              "dopo": {
+                "valore": 15.4,
+                "testo": "15,4%"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Enna",
+              "prima": {
+                "valore": 13.6,
+                "testo": "13,6%"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8%"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 punti percentuali"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2015,
+          "a": 2023,
+          "territori_comuni": {
+            "valore": 106,
+            "testo": "106"
+          },
+          "aumenti": [],
+          "cali": [
+            {
+              "territorio": "Palermo",
+              "variazione": {
+                "valore": -4.9,
+                "testo": "-4,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Enna",
+              "variazione": {
+                "valore": -4.8,
+                "testo": "-4,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Siracusa",
+              "variazione": {
+                "valore": -4.7,
+                "testo": "-4,7 punti percentuali"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2015,
+          "a": 2023,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 106,
+            "testo": "106"
+          },
+          "valori": [
+            {
+              "territorio": "Palermo",
+              "prima": {
+                "valore": 17.1,
+                "testo": "17,1%"
+              },
+              "dopo": {
+                "valore": 12.2,
+                "testo": "12,2%"
+              },
+              "variazione": {
+                "valore": -4.9,
+                "testo": "-4,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Enna",
+              "prima": {
+                "valore": 17.6,
+                "testo": "17,6%"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8%"
+              },
+              "variazione": {
+                "valore": -4.8,
+                "testo": "-4,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Siracusa",
+              "prima": {
+                "valore": 16.5,
+                "testo": "16,5%"
+              },
+              "dopo": {
+                "valore": 11.8,
+                "testo": "11,8%"
+              },
+              "variazione": {
+                "valore": -4.7,
+                "testo": "-4,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Bolzano",
+              "prima": {
+                "valore": 8.6,
+                "testo": "8,6%"
+              },
+              "dopo": {
+                "valore": 4.1,
+                "testo": "4,1%"
+              },
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Catania",
+              "prima": {
+                "valore": 16.5,
+                "testo": "16,5%"
+              },
+              "dopo": {
+                "valore": 12.4,
+                "testo": "12,4%"
+              },
+              "variazione": {
+                "valore": -4.1,
+                "testo": "-4,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Caltanissetta",
+              "prima": {
+                "valore": 17.7,
+                "testo": "17,7%"
+              },
+              "dopo": {
+                "valore": 13.7,
+                "testo": "13,7%"
+              },
+              "variazione": {
+                "valore": -4.0,
+                "testo": "-4,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Agrigento",
+              "prima": {
+                "valore": 19.0,
+                "testo": "19,0%"
+              },
+              "dopo": {
+                "valore": 15.4,
+                "testo": "15,4%"
+              },
+              "variazione": {
+                "valore": -3.6,
+                "testo": "-3,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Cagliari",
+              "prima": {
+                "valore": 13.6,
+                "testo": "13,6%"
+              },
+              "dopo": {
+                "valore": 10.0,
+                "testo": "10,0%"
+              },
+              "variazione": {
+                "valore": -3.6,
+                "testo": "-3,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Isernia",
+              "prima": {
+                "valore": 12.6,
+                "testo": "12,6%"
+              },
+              "dopo": {
+                "valore": 9.2,
+                "testo": "9,2%"
+              },
+              "variazione": {
+                "valore": -3.4,
+                "testo": "-3,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Trapani",
+              "prima": {
+                "valore": 15.3,
+                "testo": "15,3%"
+              },
+              "dopo": {
+                "valore": 11.9,
+                "testo": "11,9%"
+              },
+              "variazione": {
+                "valore": -3.4,
+                "testo": "-3,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Napoli",
+              "prima": {
+                "valore": 18.9,
+                "testo": "18,9%"
+              },
+              "dopo": {
+                "valore": 15.6,
+                "testo": "15,6%"
+              },
+              "variazione": {
+                "valore": -3.3,
+                "testo": "-3,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Ragusa",
+              "prima": {
+                "valore": 14.5,
+                "testo": "14,5%"
+              },
+              "dopo": {
+                "valore": 11.6,
+                "testo": "11,6%"
+              },
+              "variazione": {
+                "valore": -2.9,
+                "testo": "-2,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Foggia",
+              "prima": {
+                "valore": 15.5,
+                "testo": "15,5%"
+              },
+              "dopo": {
+                "valore": 12.7,
+                "testo": "12,7%"
+              },
+              "variazione": {
+                "valore": -2.8,
+                "testo": "-2,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Caserta",
+              "prima": {
+                "valore": 16.1,
+                "testo": "16,1%"
+              },
+              "dopo": {
+                "valore": 13.4,
+                "testo": "13,4%"
+              },
+              "variazione": {
+                "valore": -2.7,
+                "testo": "-2,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Nuoro",
+              "prima": {
+                "valore": 11.9,
+                "testo": "11,9%"
+              },
+              "dopo": {
+                "valore": 9.2,
+                "testo": "9,2%"
+              },
+              "variazione": {
+                "valore": -2.7,
+                "testo": "-2,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Oristano",
+              "prima": {
+                "valore": 13.1,
+                "testo": "13,1%"
+              },
+              "dopo": {
+                "valore": 10.4,
+                "testo": "10,4%"
+              },
+              "variazione": {
+                "valore": -2.7,
+                "testo": "-2,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Sassari",
+              "prima": {
+                "valore": 13.4,
+                "testo": "13,4%"
+              },
+              "dopo": {
+                "valore": 10.8,
+                "testo": "10,8%"
+              },
+              "variazione": {
+                "valore": -2.6,
+                "testo": "-2,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Belluno",
+              "prima": {
+                "valore": 8.9,
+                "testo": "8,9%"
+              },
+              "dopo": {
+                "valore": 6.4,
+                "testo": "6,4%"
+              },
+              "variazione": {
+                "valore": -2.5,
+                "testo": "-2,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Pescara",
+              "prima": {
+                "valore": 12.8,
+                "testo": "12,8%"
+              },
+              "dopo": {
+                "valore": 10.3,
+                "testo": "10,3%"
+              },
+              "variazione": {
+                "valore": -2.5,
+                "testo": "-2,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Crotone",
+              "prima": {
+                "valore": 19.3,
+                "testo": "19,3%"
+              },
+              "dopo": {
+                "valore": 16.9,
+                "testo": "16,9%"
+              },
+              "variazione": {
+                "valore": -2.4,
+                "testo": "-2,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Teramo",
+              "prima": {
+                "valore": 13.6,
+                "testo": "13,6%"
+              },
+              "dopo": {
+                "valore": 11.2,
+                "testo": "11,2%"
+              },
+              "variazione": {
+                "valore": -2.4,
+                "testo": "-2,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Bergamo",
+              "prima": {
+                "valore": 8.9,
+                "testo": "8,9%"
+              },
+              "dopo": {
+                "valore": 6.6,
+                "testo": "6,6%"
+              },
+              "variazione": {
+                "valore": -2.3,
+                "testo": "-2,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Brescia",
+              "prima": {
+                "valore": 8.4,
+                "testo": "8,4%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Monza e della Brianza",
+              "prima": {
+                "valore": 7.9,
+                "testo": "7,9%"
+              },
+              "dopo": {
+                "valore": 5.8,
+                "testo": "5,8%"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Sondrio",
+              "prima": {
+                "valore": 10.9,
+                "testo": "10,9%"
+              },
+              "dopo": {
+                "valore": 8.8,
+                "testo": "8,8%"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Udine",
+              "prima": {
+                "valore": 8.5,
+                "testo": "8,5%"
+              },
+              "dopo": {
+                "valore": 6.4,
+                "testo": "6,4%"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Trento",
+              "prima": {
+                "valore": 8.3,
+                "testo": "8,3%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Treviso",
+              "prima": {
+                "valore": 8.3,
+                "testo": "8,3%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Aosta",
+              "prima": {
+                "valore": 8.0,
+                "testo": "8,0%"
+              },
+              "dopo": {
+                "valore": 6.0,
+                "testo": "6,0%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Campobasso",
+              "prima": {
+                "valore": 12.6,
+                "testo": "12,6%"
+              },
+              "dopo": {
+                "valore": 10.6,
+                "testo": "10,6%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Lucca",
+              "prima": {
+                "valore": 9.9,
+                "testo": "9,9%"
+              },
+              "dopo": {
+                "valore": 7.9,
+                "testo": "7,9%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Matera",
+              "prima": {
+                "valore": 11.9,
+                "testo": "11,9%"
+              },
+              "dopo": {
+                "valore": 9.9,
+                "testo": "9,9%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Verona",
+              "prima": {
+                "valore": 8.1,
+                "testo": "8,1%"
+              },
+              "dopo": {
+                "valore": 6.1,
+                "testo": "6,1%"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Avellino",
+              "prima": {
+                "valore": 15.5,
+                "testo": "15,5%"
+              },
+              "dopo": {
+                "valore": 13.6,
+                "testo": "13,6%"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Bari",
+              "prima": {
+                "valore": 13.9,
+                "testo": "13,9%"
+              },
+              "dopo": {
+                "valore": 12.0,
+                "testo": "12,0%"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Parma",
+              "prima": {
+                "valore": 8.2,
+                "testo": "8,2%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Cosenza",
+              "prima": {
+                "valore": 16.4,
+                "testo": "16,4%"
+              },
+              "dopo": {
+                "valore": 14.5,
+                "testo": "14,5%"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Chieti",
+              "prima": {
+                "valore": 11.5,
+                "testo": "11,5%"
+              },
+              "dopo": {
+                "valore": 9.7,
+                "testo": "9,7%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Como",
+              "prima": {
+                "valore": 10.0,
+                "testo": "10,0%"
+              },
+              "dopo": {
+                "valore": 8.2,
+                "testo": "8,2%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Frosinone",
+              "prima": {
+                "valore": 12.0,
+                "testo": "12,0%"
+              },
+              "dopo": {
+                "valore": 10.2,
+                "testo": "10,2%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Salerno",
+              "prima": {
+                "valore": 13.5,
+                "testo": "13,5%"
+              },
+              "dopo": {
+                "valore": 11.7,
+                "testo": "11,7%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Savona",
+              "prima": {
+                "valore": 8.3,
+                "testo": "8,3%"
+              },
+              "dopo": {
+                "valore": 6.5,
+                "testo": "6,5%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Imperia",
+              "prima": {
+                "valore": 10.7,
+                "testo": "10,7%"
+              },
+              "dopo": {
+                "valore": 8.9,
+                "testo": "8,9%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Lecce",
+              "prima": {
+                "valore": 15.7,
+                "testo": "15,7%"
+              },
+              "dopo": {
+                "valore": 13.9,
+                "testo": "13,9%"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Catanzaro",
+              "prima": {
+                "valore": 13.8,
+                "testo": "13,8%"
+              },
+              "dopo": {
+                "valore": 12.1,
+                "testo": "12,1%"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Firenze",
+              "prima": {
+                "valore": 7.3,
+                "testo": "7,3%"
+              },
+              "dopo": {
+                "valore": 5.6,
+                "testo": "5,6%"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Venezia",
+              "prima": {
+                "valore": 8.0,
+                "testo": "8,0%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Vicenza",
+              "prima": {
+                "valore": 8.0,
+                "testo": "8,0%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Trieste",
+              "prima": {
+                "valore": 7.6,
+                "testo": "7,6%"
+              },
+              "dopo": {
+                "valore": 5.9,
+                "testo": "5,9%"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Lecco",
+              "prima": {
+                "valore": 7.9,
+                "testo": "7,9%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Reggio Emilia",
+              "prima": {
+                "valore": 8.3,
+                "testo": "8,3%"
+              },
+              "dopo": {
+                "valore": 6.7,
+                "testo": "6,7%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Barletta-Andria-Trani",
+              "prima": {
+                "valore": 17.5,
+                "testo": "17,5%"
+              },
+              "dopo": {
+                "valore": 15.9,
+                "testo": "15,9%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Genova",
+              "prima": {
+                "valore": 9.1,
+                "testo": "9,1%"
+              },
+              "dopo": {
+                "valore": 7.5,
+                "testo": "7,5%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "L'Aquila",
+              "prima": {
+                "valore": 11.7,
+                "testo": "11,7%"
+              },
+              "dopo": {
+                "valore": 10.1,
+                "testo": "10,1%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Latina",
+              "prima": {
+                "valore": 13.7,
+                "testo": "13,7%"
+              },
+              "dopo": {
+                "valore": 12.1,
+                "testo": "12,1%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Massa-Carrara",
+              "prima": {
+                "valore": 9.7,
+                "testo": "9,7%"
+              },
+              "dopo": {
+                "valore": 8.1,
+                "testo": "8,1%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Padova",
+              "prima": {
+                "valore": 7.6,
+                "testo": "7,6%"
+              },
+              "dopo": {
+                "valore": 6.0,
+                "testo": "6,0%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Prato",
+              "prima": {
+                "valore": 7.8,
+                "testo": "7,8%"
+              },
+              "dopo": {
+                "valore": 6.2,
+                "testo": "6,2%"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Biella",
+              "prima": {
+                "valore": 6.4,
+                "testo": "6,4%"
+              },
+              "dopo": {
+                "valore": 4.9,
+                "testo": "4,9%"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Pisa",
+              "prima": {
+                "valore": 8.9,
+                "testo": "8,9%"
+              },
+              "dopo": {
+                "valore": 7.4,
+                "testo": "7,4%"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "La Spezia",
+              "prima": {
+                "valore": 8.7,
+                "testo": "8,7%"
+              },
+              "dopo": {
+                "valore": 7.2,
+                "testo": "7,2%"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Pordenone",
+              "prima": {
+                "valore": 8.2,
+                "testo": "8,2%"
+              },
+              "dopo": {
+                "valore": 6.7,
+                "testo": "6,7%"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Brindisi",
+              "prima": {
+                "valore": 12.0,
+                "testo": "12,0%"
+              },
+              "dopo": {
+                "valore": 10.6,
+                "testo": "10,6%"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Cremona",
+              "prima": {
+                "valore": 7.2,
+                "testo": "7,2%"
+              },
+              "dopo": {
+                "valore": 5.8,
+                "testo": "5,8%"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Grosseto",
+              "prima": {
+                "valore": 7.7,
+                "testo": "7,7%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Milano",
+              "prima": {
+                "valore": 7.4,
+                "testo": "7,4%"
+              },
+              "dopo": {
+                "valore": 6.0,
+                "testo": "6,0%"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Rimini",
+              "prima": {
+                "valore": 10.0,
+                "testo": "10,0%"
+              },
+              "dopo": {
+                "valore": 8.6,
+                "testo": "8,6%"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Mantova",
+              "prima": {
+                "valore": 6.9,
+                "testo": "6,9%"
+              },
+              "dopo": {
+                "valore": 5.6,
+                "testo": "5,6%"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Pistoia",
+              "prima": {
+                "valore": 8.4,
+                "testo": "8,4%"
+              },
+              "dopo": {
+                "valore": 7.1,
+                "testo": "7,1%"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Roma",
+              "prima": {
+                "valore": 11.8,
+                "testo": "11,8%"
+              },
+              "dopo": {
+                "valore": 10.5,
+                "testo": "10,5%"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Viterbo",
+              "prima": {
+                "valore": 10.4,
+                "testo": "10,4%"
+              },
+              "dopo": {
+                "valore": 9.1,
+                "testo": "9,1%"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Arezzo",
+              "prima": {
+                "valore": 8.0,
+                "testo": "8,0%"
+              },
+              "dopo": {
+                "valore": 6.7,
+                "testo": "6,7%"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Gorizia",
+              "prima": {
+                "valore": 7.2,
+                "testo": "7,2%"
+              },
+              "dopo": {
+                "valore": 5.9,
+                "testo": "5,9%"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Potenza",
+              "prima": {
+                "valore": 13.4,
+                "testo": "13,4%"
+              },
+              "dopo": {
+                "valore": 12.2,
+                "testo": "12,2%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Alessandria",
+              "prima": {
+                "valore": 7.5,
+                "testo": "7,5%"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Livorno",
+              "prima": {
+                "valore": 8.9,
+                "testo": "8,9%"
+              },
+              "dopo": {
+                "valore": 7.7,
+                "testo": "7,7%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Novara",
+              "prima": {
+                "valore": 6.6,
+                "testo": "6,6%"
+              },
+              "dopo": {
+                "valore": 5.4,
+                "testo": "5,4%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Ravenna",
+              "prima": {
+                "valore": 6.6,
+                "testo": "6,6%"
+              },
+              "dopo": {
+                "valore": 5.4,
+                "testo": "5,4%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Verbano-Cusio-Ossola",
+              "prima": {
+                "valore": 10.1,
+                "testo": "10,1%"
+              },
+              "dopo": {
+                "valore": 8.9,
+                "testo": "8,9%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Vibo Valentia",
+              "prima": {
+                "valore": 14.6,
+                "testo": "14,6%"
+              },
+              "dopo": {
+                "valore": 13.4,
+                "testo": "13,4%"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Cuneo",
+              "prima": {
+                "valore": 7.2,
+                "testo": "7,2%"
+              },
+              "dopo": {
+                "valore": 6.1,
+                "testo": "6,1%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Asti",
+              "prima": {
+                "valore": 7.0,
+                "testo": "7,0%"
+              },
+              "dopo": {
+                "valore": 5.9,
+                "testo": "5,9%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Bologna",
+              "prima": {
+                "valore": 6.5,
+                "testo": "6,5%"
+              },
+              "dopo": {
+                "valore": 5.4,
+                "testo": "5,4%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Forlì-Cesena",
+              "prima": {
+                "valore": 7.5,
+                "testo": "7,5%"
+              },
+              "dopo": {
+                "valore": 6.4,
+                "testo": "6,4%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Piacenza",
+              "prima": {
+                "valore": 8.1,
+                "testo": "8,1%"
+              },
+              "dopo": {
+                "valore": 7.0,
+                "testo": "7,0%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Rieti",
+              "prima": {
+                "valore": 11.1,
+                "testo": "11,1%"
+              },
+              "dopo": {
+                "valore": 10.0,
+                "testo": "10,0%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Torino",
+              "prima": {
+                "valore": 7.8,
+                "testo": "7,8%"
+              },
+              "dopo": {
+                "valore": 6.7,
+                "testo": "6,7%"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Ancona",
+              "prima": {
+                "valore": 7.9,
+                "testo": "7,9%"
+              },
+              "dopo": {
+                "valore": 6.9,
+                "testo": "6,9%"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Pavia",
+              "prima": {
+                "valore": 7.4,
+                "testo": "7,4%"
+              },
+              "dopo": {
+                "valore": 6.4,
+                "testo": "6,4%"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Siena",
+              "prima": {
+                "valore": 7.0,
+                "testo": "7,0%"
+              },
+              "dopo": {
+                "valore": 6.0,
+                "testo": "6,0%"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Fermo",
+              "prima": {
+                "valore": 8.4,
+                "testo": "8,4%"
+              },
+              "dopo": {
+                "valore": 7.5,
+                "testo": "7,5%"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Modena",
+              "prima": {
+                "valore": 7.4,
+                "testo": "7,4%"
+              },
+              "dopo": {
+                "valore": 6.5,
+                "testo": "6,5%"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Perugia",
+              "prima": {
+                "valore": 9.3,
+                "testo": "9,3%"
+              },
+              "dopo": {
+                "valore": 8.5,
+                "testo": "8,5%"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Varese",
+              "prima": {
+                "valore": 9.4,
+                "testo": "9,4%"
+              },
+              "dopo": {
+                "valore": 8.6,
+                "testo": "8,6%"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Macerata",
+              "prima": {
+                "valore": 8.0,
+                "testo": "8,0%"
+              },
+              "dopo": {
+                "valore": 7.2,
+                "testo": "7,2%"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Vercelli",
+              "prima": {
+                "valore": 6.6,
+                "testo": "6,6%"
+              },
+              "dopo": {
+                "valore": 5.8,
+                "testo": "5,8%"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Benevento",
+              "prima": {
+                "valore": 13.4,
+                "testo": "13,4%"
+              },
+              "dopo": {
+                "valore": 12.7,
+                "testo": "12,7%"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Rovigo",
+              "prima": {
+                "valore": 6.2,
+                "testo": "6,2%"
+              },
+              "dopo": {
+                "valore": 5.5,
+                "testo": "5,5%"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Ferrara",
+              "prima": {
+                "valore": 6.1,
+                "testo": "6,1%"
+              },
+              "dopo": {
+                "valore": 5.4,
+                "testo": "5,4%"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Terni",
+              "prima": {
+                "valore": 10.0,
+                "testo": "10,0%"
+              },
+              "dopo": {
+                "valore": 9.3,
+                "testo": "9,3%"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Taranto",
+              "prima": {
+                "valore": 12.8,
+                "testo": "12,8%"
+              },
+              "dopo": {
+                "valore": 12.2,
+                "testo": "12,2%"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Lodi",
+              "prima": {
+                "valore": 7.4,
+                "testo": "7,4%"
+              },
+              "dopo": {
+                "valore": 6.8,
+                "testo": "6,8%"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Pesaro e Urbino",
+              "prima": {
+                "valore": 9.7,
+                "testo": "9,7%"
+              },
+              "dopo": {
+                "valore": 9.1,
+                "testo": "9,1%"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Messina",
+              "prima": {
+                "valore": 14.1,
+                "testo": "14,1%"
+              },
+              "dopo": {
+                "valore": 13.7,
+                "testo": "13,7%"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Ascoli Piceno",
+              "prima": {
+                "valore": 10.0,
+                "testo": "10,0%"
+              },
+              "dopo": {
+                "valore": 9.7,
+                "testo": "9,7%"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30 punti percentuali"
+              }
+            },
+            {
+              "territorio": "Reggio Calabria",
+              "prima": {
+                "valore": 14.2,
+                "testo": "14,2%"
+              },
+              "dopo": {
+                "valore": 14.0,
+                "testo": "14,0%"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20 punti percentuali"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "provincia"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione, la regione della provincia",
+    "territori": [
+      {
+        "territorio": "Crotone",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 16.9,
+          "testo": "16,9%"
+        },
+        "regione": "Calabria",
+        "contesto": {
+          "ter-901": {
+            "valore": 21702.2,
+            "testo": "21.702 euro"
+          },
+          "ter-902": {
+            "valore": 16795.9,
+            "testo": "16.796 euro"
+          },
+          "ter-13": {
+            "valore": 46.414324,
+            "testo": "46,4%"
+          },
+          "ter-345": {
+            "valore": 50.346862,
+            "testo": "50,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Barletta-Andria-Trani",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 15.9,
+          "testo": "15,9%"
+        },
+        "regione": "Puglia",
+        "contesto": {
+          "ter-901": {
+            "valore": 24327.7,
+            "testo": "24.328 euro"
+          },
+          "ter-902": {
+            "valore": 17897.7,
+            "testo": "17.898 euro"
+          },
+          "ter-13": {
+            "valore": 51.007894,
+            "testo": "51,0%"
+          },
+          "ter-345": {
+            "valore": 55.185587,
+            "testo": "55,2%"
+          }
+        }
+      },
+      {
+        "territorio": "Napoli",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 15.6,
+          "testo": "15,6%"
+        },
+        "regione": "Campania",
+        "contesto": {
+          "ter-901": {
+            "valore": 24564.2,
+            "testo": "24.564 euro"
+          },
+          "ter-902": {
+            "valore": 17177.1,
+            "testo": "17.177 euro"
+          },
+          "ter-13": {
+            "valore": 46.668865,
+            "testo": "46,7%"
+          },
+          "ter-345": {
+            "valore": 50.786082,
+            "testo": "50,8%"
+          }
+        }
+      },
+      {
+        "territorio": "Ravenna",
+        "posizione_per_valore": 105,
+        "valore": {
+          "valore": 5.4,
+          "testo": "5,4%"
+        },
+        "regione": "Emilia-Romagna",
+        "contesto": {
+          "ter-901": {
+            "valore": 44557.0,
+            "testo": "44.557 euro"
+          },
+          "ter-902": {
+            "valore": 26683.8,
+            "testo": "26.684 euro"
+          },
+          "ter-13": {
+            "valore": 71.405801,
+            "testo": "71,4%"
+          },
+          "ter-345": {
+            "valore": 76.997683,
+            "testo": "77,0%"
+          }
+        }
+      },
+      {
+        "territorio": "Biella",
+        "posizione_per_valore": 106,
+        "valore": {
+          "valore": 4.9,
+          "testo": "4,9%"
+        },
+        "regione": "Piemonte",
+        "contesto": {
+          "ter-901": {
+            "valore": 38625.5,
+            "testo": "38.626 euro"
+          },
+          "ter-902": {
+            "valore": 25426.3,
+            "testo": "25.426 euro"
+          },
+          "ter-13": {
+            "valore": 68.935532,
+            "testo": "68,9%"
+          },
+          "ter-345": {
+            "valore": 74.279862,
+            "testo": "74,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Bolzano",
+        "posizione_per_valore": 107,
+        "valore": {
+          "valore": 4.1,
+          "testo": "4,1%"
+        },
+        "regione": "Trentino Alto Adige",
+        "contesto": {
+          "ter-901": {
+            "valore": 54636.7,
+            "testo": "54.637 euro"
+          },
+          "ter-902": {
+            "valore": 29344.1,
+            "testo": "29.344 euro"
+          },
+          "ter-13": {
+            "valore": 72.8925,
+            "testo": "72,9%"
+          },
+          "ter-345": {
+            "valore": 78.801197,
+            "testo": "78,8%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": null,
+    "motivo_senza_correlazioni": "livello provinciale: i quattro indicatori di contesto sono regionali"
+  }
+}
