@@ -59,3 +59,9 @@
 ## File e comando di provenienza
 - File CSV: app/static/data/Assoluti_BES_Regione.csv, app/static/data/Assoluti_Provincia.csv
 - Comando: DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m scripts.editoriale.brief bes:10AMB016 --out lavoro/energia-rinnovabile/dossier.json
+## Correzioni del brief (08/10/2026, ricalcolo dal CSV e da Istat)
+- I numeri chiave di `numeri.md` sono corretti (estremi 2024, media semplice 66,63, 20 su 20 in salita 2004-2024). Ricalcolati.
+- Mancava il valore nazionale: Istat dà Italia 41,7 (2024), Nord 40,7, Centro 30,8, Mezzogiorno 51,3. La media semplice 66,63 non è nazionale.
+- «Confermato da dati Terna-BES» in `note.md`: non verificato, nessuno ha letto il file Terna. Fonti vere in `fonti.md`.
+- Il Mezzogiorno supera il Nord dal 2012 (ripartizioni Istat). In assoluto nel 2023 il Nord produce di più (Terna via Regione VdA).
+- Basilicata sopra 100 dal 2019, non solo nel 2024. Trentino-Alto Adige sotto 100 nel 2022 (97,1).
