@@ -1,0 +1,1406 @@
+{
+  "identita": {
+    "chiave": "multiscopo:MULTI_REDD_MEDIO",
+    "codice": "ims-MULTI_REDD_MEDIO",
+    "nome": "Reddito netto medio annuale delle famiglie",
+    "percorso": "/indicatore/reddito-netto-medio-annuale-delle-famiglie/ims-MULTI_REDD_MEDIO",
+    "tema": "Reddito, inclusione e accessibilità",
+    "sottotema_fonte": "Reddito e ricchezza",
+    "definizione_fonte": "Indagine Multiscopo sulle famiglie, Istat SDMX, 32_292_DF_DCCV_REDNETFAMFONTERED_9",
+    "unita": {
+      "fonte": "euro",
+      "cifra": "euro",
+      "variazione": "euro"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' alto",
+      "classifica_attiva": true
+    },
+    "livelli": [
+      {
+        "livello": "regione",
+        "percorso": "/indicatore/reddito-netto-medio-annuale-delle-famiglie/ims-MULTI_REDD_MEDIO",
+        "primo_anno": 2018,
+        "ultimo_anno": 2024,
+        "anni": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "territori_ultimo_anno": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2018,
+      "ultimo": 2024
+    },
+    "fonte": {
+      "etichetta": "Istat, Indagine Multiscopo sulle famiglie",
+      "famiglia": "Istat, vita quotidiana delle famiglie",
+      "istituzione": "Istat",
+      "url": "https://esploradati.istat.it/databrowser/#/it",
+      "url_dati": "https://esploradati.istat.it/SDMXWS/rest/data/32_292_DF_DCCV_REDNETFAMFONTERED_9",
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "regione",
+      "fotografia": {
+        "anno": 2024,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 55295.113251,
+              "testo": "55.295 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 52559.0,
+              "testo": "52.559 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Emilia-Romagna",
+            "chiave": "emilia-romagna",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 51994.0,
+              "testo": "51.994 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Valle d'Aosta",
+            "chiave": "valle-d-aosta",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 51354.0,
+              "testo": "51.354 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Umbria",
+            "chiave": "umbria",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 49570.0,
+              "testo": "49.570 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Veneto",
+            "chiave": "veneto",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 48590.0,
+              "testo": "48.590 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Friuli-Venezia Giulia",
+            "chiave": "friuli-venezia-giulia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 47408.0,
+              "testo": "47.408 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Toscana",
+            "chiave": "toscana",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 47201.0,
+              "testo": "47.201 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Marche",
+            "chiave": "marche",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 47146.0,
+              "testo": "47.146 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 45685.0,
+              "testo": "45.685 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 45576.0,
+              "testo": "45.576 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Liguria",
+            "chiave": "liguria",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 44570.0,
+              "testo": "44.570 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Abruzzo",
+            "chiave": "abruzzo",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 39631.0,
+              "testo": "39.631 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 39380.0,
+              "testo": "39.380 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 39259.0,
+              "testo": "39.259 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Molise",
+            "chiave": "molise",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 39172.0,
+              "testo": "39.172 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 37778.0,
+              "testo": "37.778 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 37596.0,
+              "testo": "37.596 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 34754.0,
+              "testo": "34.754 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 34741.0,
+              "testo": "34.741 euro"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 20 regioni, non la media nazionale",
+          "valore": 44462.955663,
+          "testo": "44.463 euro"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 45630.5,
+          "testo": "45.631 euro"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 12,
+          "testo": "12"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 8,
+          "testo": "8"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 55295.113251,
+              "testo": "55.295 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 52559.0,
+              "testo": "52.559 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Emilia-Romagna",
+            "chiave": "emilia-romagna",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 51994.0,
+              "testo": "51.994 euro"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 34741.0,
+              "testo": "34.741 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 34754.0,
+              "testo": "34.754 euro"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 37596.0,
+              "testo": "37.596 euro"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 20554.113251,
+          "testo": "20.554 euro"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 1.591639,
+          "testo": "1,6 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle regioni di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 49681.889156,
+                "testo": "49.682 euro"
+              },
+              "piu_alto": {
+                "territorio": "Trentino Alto Adige",
+                "valore": {
+                  "valore": 55295.113251,
+                  "testo": "55.295 euro"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Liguria",
+                "valore": {
+                  "valore": 44570.0,
+                  "testo": "44.570 euro"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 4,
+                "testo": "4"
+              },
+              "media_semplice": {
+                "valore": 47373.25,
+                "testo": "47.373 euro"
+              },
+              "piu_alto": {
+                "territorio": "Umbria",
+                "valore": {
+                  "valore": 49570.0,
+                  "testo": "49.570 euro"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Lazio",
+                "valore": {
+                  "valore": 45576.0,
+                  "testo": "45.576 euro"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 37788.875,
+                "testo": "37.789 euro"
+              },
+              "piu_alto": {
+                "territorio": "Abruzzo",
+                "valore": {
+                  "valore": 39631.0,
+                  "testo": "39.631 euro"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Calabria",
+                "valore": {
+                  "valore": 34741.0,
+                  "testo": "34.741 euro"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 35330.4373,
+              "testo": "35.330 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 15883.745995,
+              "testo": "15.884 euro"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 37063.176243,
+              "testo": "37.063 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 15700.0,
+              "testo": "15.700 euro"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 36592.815613,
+              "testo": "36.593 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 14669.312251,
+              "testo": "14.669 euro"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 37885.650958,
+              "testo": "37.886 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 16190.019168,
+              "testo": "16.190 euro"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 40201.262709,
+              "testo": "40.201 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 19957.25419,
+              "testo": "19.957 euro"
+            }
+          },
+          {
+            "anno": 2023,
+            "media_semplice": {
+              "valore": 41875.804815,
+              "testo": "41.876 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 17723.0,
+              "testo": "17.723 euro"
+            }
+          },
+          {
+            "anno": 2024,
+            "media_semplice": {
+              "valore": 44462.955663,
+              "testo": "44.463 euro"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 20554.113251,
+              "testo": "20.554 euro"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "totale": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 35330.4373,
+                "testo": "35.330 euro"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 37063.176243,
+                "testo": "37.063 euro"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 36592.815613,
+                "testo": "36.593 euro"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 37885.650958,
+                "testo": "37.886 euro"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 40201.262709,
+                "testo": "40.201 euro"
+              }
+            },
+            {
+              "anno": 2023,
+              "valore": {
+                "valore": 41875.804815,
+                "testo": "41.876 euro"
+              }
+            },
+            {
+              "anno": 2024,
+              "valore": {
+                "valore": 44462.955663,
+                "testo": "44.463 euro"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2024,
+            "valore": {
+              "valore": 44462.955663,
+              "testo": "44.463 euro"
+            }
+          },
+          "minimo": {
+            "anno": 2018,
+            "valore": {
+              "valore": 35330.4373,
+              "testo": "35.330 euro"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2019,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 37063.176243,
+                "testo": "37.063 euro"
+              }
+            },
+            {
+              "anno": 2020,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 36592.815613,
+                "testo": "36.593 euro"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2018,
+              "a": 2019,
+              "verso": "sale"
+            },
+            {
+              "da": 2019,
+              "a": 2020,
+              "verso": "scende"
+            },
+            {
+              "da": 2020,
+              "a": 2024,
+              "verso": "sale"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2018,
+          "a": 2024,
+          "media_semplice_da": {
+            "valore": 35330.4373,
+            "testo": "35.330 euro"
+          },
+          "media_semplice_a": {
+            "valore": 44462.955663,
+            "testo": "44.463 euro"
+          },
+          "assoluta": {
+            "valore": 9132.518363,
+            "testo": "+9.133 euro"
+          },
+          "relativa": {
+            "valore": 25.848869,
+            "testo": "+25,8%"
+          },
+          "territori_da": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "territori_a": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "sul_pannello": {
+            "da": 2018,
+            "a": 2024,
+            "assoluta": {
+              "valore": 9132.518363,
+              "testo": "+9.133 euro"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2023,
+          "a": 2024,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "media_semplice_da": {
+            "valore": 41875.804815,
+            "testo": "41.876 euro"
+          },
+          "media_semplice_a": {
+            "valore": 44462.955663,
+            "testo": "44.463 euro"
+          },
+          "variazione": {
+            "valore": 2587.150847,
+            "testo": "+2.587 euro"
+          },
+          "in_aumento": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "in_calo": {
+            "valore": 0,
+            "testo": "0"
+          },
+          "invariati": {
+            "valore": 0,
+            "testo": "0"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 47799.096305,
+                "testo": "47.799 euro"
+              },
+              "dopo": {
+                "valore": 55295.113251,
+                "testo": "55.295 euro"
+              },
+              "variazione": {
+                "valore": 7496.016946,
+                "testo": "+7.496 euro"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 47471.0,
+                "testo": "47.471 euro"
+              },
+              "dopo": {
+                "valore": 51354.0,
+                "testo": "51.354 euro"
+              },
+              "variazione": {
+                "valore": 3883.0,
+                "testo": "+3.883 euro"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 41732.0,
+                "testo": "41.732 euro"
+              },
+              "dopo": {
+                "valore": 45576.0,
+                "testo": "45.576 euro"
+              },
+              "variazione": {
+                "valore": 3844.0,
+                "testo": "+3.844 euro"
+              }
+            }
+          ],
+          "cali_maggiori": []
+        },
+        "territori_piu_mossi": {
+          "da": 2018,
+          "a": 2024,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "aumenti": [
+            {
+              "territorio": "Valle d'Aosta",
+              "variazione": {
+                "valore": 15546.0,
+                "testo": "+15.546 euro"
+              }
+            },
+            {
+              "territorio": "Emilia-Romagna",
+              "variazione": {
+                "valore": 12458.0,
+                "testo": "+12.458 euro"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "variazione": {
+                "valore": 11735.367256,
+                "testo": "+11.735 euro"
+              }
+            }
+          ],
+          "cali": []
+        },
+        "variazione_per_territorio": {
+          "da": 2018,
+          "a": 2024,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "valori": [
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 35808.0,
+                "testo": "35.808 euro"
+              },
+              "dopo": {
+                "valore": 51354.0,
+                "testo": "51.354 euro"
+              },
+              "variazione": {
+                "valore": 15546.0,
+                "testo": "+15.546 euro"
+              }
+            },
+            {
+              "territorio": "Emilia-Romagna",
+              "prima": {
+                "valore": 39536.0,
+                "testo": "39.536 euro"
+              },
+              "dopo": {
+                "valore": 51994.0,
+                "testo": "51.994 euro"
+              },
+              "variazione": {
+                "valore": 12458.0,
+                "testo": "+12.458 euro"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 43559.745995,
+                "testo": "43.560 euro"
+              },
+              "dopo": {
+                "valore": 55295.113251,
+                "testo": "55.295 euro"
+              },
+              "variazione": {
+                "valore": 11735.367256,
+                "testo": "+11.735 euro"
+              }
+            },
+            {
+              "territorio": "Umbria",
+              "prima": {
+                "valore": 37977.0,
+                "testo": "37.977 euro"
+              },
+              "dopo": {
+                "valore": 49570.0,
+                "testo": "49.570 euro"
+              },
+              "variazione": {
+                "valore": 11593.0,
+                "testo": "+11.593 euro"
+              }
+            },
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 27676.0,
+                "testo": "27.676 euro"
+              },
+              "dopo": {
+                "valore": 39172.0,
+                "testo": "39.172 euro"
+              },
+              "variazione": {
+                "valore": 11496.0,
+                "testo": "+11.496 euro"
+              }
+            },
+            {
+              "territorio": "Lombardia",
+              "prima": {
+                "valore": 41231.0,
+                "testo": "41.231 euro"
+              },
+              "dopo": {
+                "valore": 52559.0,
+                "testo": "52.559 euro"
+              },
+              "variazione": {
+                "valore": 11328.0,
+                "testo": "+11.328 euro"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "prima": {
+                "valore": 37794.0,
+                "testo": "37.794 euro"
+              },
+              "dopo": {
+                "valore": 47146.0,
+                "testo": "47.146 euro"
+              },
+              "variazione": {
+                "valore": 9352.0,
+                "testo": "+9.352 euro"
+              }
+            },
+            {
+              "territorio": "Friuli-Venezia Giulia",
+              "prima": {
+                "valore": 38128.0,
+                "testo": "38.128 euro"
+              },
+              "dopo": {
+                "valore": 47408.0,
+                "testo": "47.408 euro"
+              },
+              "variazione": {
+                "valore": 9280.0,
+                "testo": "+9.280 euro"
+              }
+            },
+            {
+              "territorio": "Puglia",
+              "prima": {
+                "valore": 30537.0,
+                "testo": "30.537 euro"
+              },
+              "dopo": {
+                "valore": 39380.0,
+                "testo": "39.380 euro"
+              },
+              "variazione": {
+                "valore": 8843.0,
+                "testo": "+8.843 euro"
+              }
+            },
+            {
+              "territorio": "Liguria",
+              "prima": {
+                "valore": 36116.0,
+                "testo": "36.116 euro"
+              },
+              "dopo": {
+                "valore": 44570.0,
+                "testo": "44.570 euro"
+              },
+              "variazione": {
+                "valore": 8454.0,
+                "testo": "+8.454 euro"
+              }
+            },
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 29638.0,
+                "testo": "29.638 euro"
+              },
+              "dopo": {
+                "valore": 37778.0,
+                "testo": "37.778 euro"
+              },
+              "variazione": {
+                "valore": 8140.0,
+                "testo": "+8.140 euro"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "prima": {
+                "valore": 39133.0,
+                "testo": "39.133 euro"
+              },
+              "dopo": {
+                "valore": 47201.0,
+                "testo": "47.201 euro"
+              },
+              "variazione": {
+                "valore": 8068.0,
+                "testo": "+8.068 euro"
+              }
+            },
+            {
+              "territorio": "Campania",
+              "prima": {
+                "valore": 29535.0,
+                "testo": "29.535 euro"
+              },
+              "dopo": {
+                "valore": 37596.0,
+                "testo": "37.596 euro"
+              },
+              "variazione": {
+                "valore": 8061.0,
+                "testo": "+8.061 euro"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "prima": {
+                "valore": 37745.0,
+                "testo": "37.745 euro"
+              },
+              "dopo": {
+                "valore": 45685.0,
+                "testo": "45.685 euro"
+              },
+              "variazione": {
+                "valore": 7940.0,
+                "testo": "+7.940 euro"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 37803.0,
+                "testo": "37.803 euro"
+              },
+              "dopo": {
+                "valore": 45576.0,
+                "testo": "45.576 euro"
+              },
+              "variazione": {
+                "valore": 7773.0,
+                "testo": "+7.773 euro"
+              }
+            },
+            {
+              "territorio": "Veneto",
+              "prima": {
+                "valore": 41048.0,
+                "testo": "41.048 euro"
+              },
+              "dopo": {
+                "valore": 48590.0,
+                "testo": "48.590 euro"
+              },
+              "variazione": {
+                "valore": 7542.0,
+                "testo": "+7.542 euro"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 31789.0,
+                "testo": "31.789 euro"
+              },
+              "dopo": {
+                "valore": 39259.0,
+                "testo": "39.259 euro"
+              },
+              "variazione": {
+                "valore": 7470.0,
+                "testo": "+7.470 euro"
+              }
+            },
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 28282.0,
+                "testo": "28.282 euro"
+              },
+              "dopo": {
+                "valore": 34754.0,
+                "testo": "34.754 euro"
+              },
+              "variazione": {
+                "valore": 6472.0,
+                "testo": "+6.472 euro"
+              }
+            },
+            {
+              "territorio": "Abruzzo",
+              "prima": {
+                "valore": 33966.0,
+                "testo": "33.966 euro"
+              },
+              "dopo": {
+                "valore": 39631.0,
+                "testo": "39.631 euro"
+              },
+              "variazione": {
+                "valore": 5665.0,
+                "testo": "+5.665 euro"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 29307.0,
+                "testo": "29.307 euro"
+              },
+              "dopo": {
+                "valore": 34741.0,
+                "testo": "34.741 euro"
+              },
+              "variazione": {
+                "valore": 5434.0,
+                "testo": "+5.434 euro"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "regione"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione",
+    "territori": [
+      {
+        "territorio": "Trentino Alto Adige",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 55295.113251,
+          "testo": "55.295 euro"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 54636.7,
+            "testo": "54.637 euro"
+          },
+          "ter-902": {
+            "valore": 29344.1,
+            "testo": "29.344 euro"
+          },
+          "ter-13": {
+            "valore": 72.8925,
+            "testo": "72,9%"
+          },
+          "ter-345": {
+            "valore": 78.801197,
+            "testo": "78,8%"
+          }
+        }
+      },
+      {
+        "territorio": "Lombardia",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 52559.0,
+          "testo": "52.559 euro"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 50398.9,
+            "testo": "50.399 euro"
+          },
+          "ter-902": {
+            "valore": 28154.3,
+            "testo": "28.154 euro"
+          },
+          "ter-13": {
+            "valore": 69.551243,
+            "testo": "69,6%"
+          },
+          "ter-345": {
+            "valore": 75.087736,
+            "testo": "75,1%"
+          }
+        }
+      },
+      {
+        "territorio": "Emilia-Romagna",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 51994.0,
+          "testo": "51.994 euro"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 44557.0,
+            "testo": "44.557 euro"
+          },
+          "ter-902": {
+            "valore": 26683.8,
+            "testo": "26.684 euro"
+          },
+          "ter-13": {
+            "valore": 71.405801,
+            "testo": "71,4%"
+          },
+          "ter-345": {
+            "valore": 76.997683,
+            "testo": "77,0%"
+          }
+        }
+      },
+      {
+        "territorio": "Campania",
+        "posizione_per_valore": 18,
+        "valore": {
+          "valore": 37596.0,
+          "testo": "37.596 euro"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 24564.2,
+            "testo": "24.564 euro"
+          },
+          "ter-902": {
+            "valore": 17177.1,
+            "testo": "17.177 euro"
+          },
+          "ter-13": {
+            "valore": 46.668865,
+            "testo": "46,7%"
+          },
+          "ter-345": {
+            "valore": 50.786082,
+            "testo": "50,8%"
+          }
+        }
+      },
+      {
+        "territorio": "Sicilia",
+        "posizione_per_valore": 19,
+        "valore": {
+          "valore": 34754.0,
+          "testo": "34.754 euro"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 23308.7,
+            "testo": "23.309 euro"
+          },
+          "ter-902": {
+            "valore": 17402.1,
+            "testo": "17.402 euro"
+          },
+          "ter-13": {
+            "valore": 47.331588,
+            "testo": "47,3%"
+          },
+          "ter-345": {
+            "valore": 51.43712,
+            "testo": "51,4%"
+          }
+        }
+      },
+      {
+        "territorio": "Calabria",
+        "posizione_per_valore": 20,
+        "valore": {
+          "valore": 34741.0,
+          "testo": "34.741 euro"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 21702.2,
+            "testo": "21.702 euro"
+          },
+          "ter-902": {
+            "valore": 16795.9,
+            "testo": "16.796 euro"
+          },
+          "ter-13": {
+            "valore": 46.414324,
+            "testo": "46,4%"
+          },
+          "ter-345": {
+            "valore": 50.346862,
+            "testo": "50,3%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.903759,
+          "testo": "0,90"
+        }
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.906767,
+          "testo": "0,91"
+        }
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.923308,
+          "testo": "0,92"
+        }
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": 0.92782,
+          "testo": "0,93"
+        }
+      }
+    ],
+    "motivo_senza_correlazioni": null
+  }
+}
