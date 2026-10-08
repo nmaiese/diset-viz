@@ -495,10 +495,6 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .profile-weak { border-top: 3px solid var(--accent); }
 .theme-chips { list-style: none; padding: 0; margin: 0 0 16px; display: flex; flex-wrap: wrap; gap: 8px; }
 .theme-chips li { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); padding: 4px 10px; font-size: 13.5px; }
-@media (max-width: 639px) {
-  .theme-chips li > a { position: relative; }
-  .theme-chips li > a::after { content: ""; position: absolute; inset: -14px -4px; }
-}
 .theme-chips li span { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink-soft); }
 .profile-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .profile-list li { display: grid; }

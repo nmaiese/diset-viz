@@ -1193,8 +1193,3 @@ main.v1 h1 { view-transition-name: page-title; }
   .linkarrow, .regione-area > summary, select, .field input:not([type="range"]), .hdr__brand { min-height: var(--target); }
   .linkarrow { display: inline-flex; align-items: center; }
 }
-
-@media (max-width: 639px) {
-  .crumbs a, .term { position: relative; }
-  .crumbs a::after, .term::after { content: ""; position: absolute; inset: -12px -6px; }
-}
