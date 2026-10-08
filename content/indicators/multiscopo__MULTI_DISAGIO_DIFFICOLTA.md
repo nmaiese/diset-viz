@@ -17,7 +17,7 @@ Nel 2024 la media semplice delle regioni è pari al 12,9%. La Calabria è la pi�
 
 <!-- sezione: dinamica -->
 ## Andamento nel tempo
-Il confronto tra gli anni parte dal 2019, poiché il 2018 copre 20 regioni mentre gli anni successivi ne coprono 19. La media semplice delle regioni è stata pari al 14,3% nel 2019, è scesa al 14,0% nel 2020, è poi salita al 14,7% nel 2021 e al 14,8% nel 2022, per poi scendere al 12,9% nel 2023 e vi è rimasta nel 2024.
+Il confronto tra gli anni parte dal 2019, poiché il 2018 copre 20 regioni mentre gli anni successivi ne coprono 19. La media semplice delle regioni è stata pari al 14,3% nel 2019, è scesa al 14,0% nel 2020, è poi salita al 14,7% nel 2021 e al 14,8% nel 2022, per poi scendere al 12,9% nel 2023, valore che resta invariato nel 2024.
 
 <!-- sezione: limiti -->
 ## Dati e copertura
