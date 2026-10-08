@@ -86,6 +86,7 @@
 <main id="contenuto" class="v1 v1-metodologia" data-v1="metodologia" tabindex="-1">
 <div class="wrap">
   {{ ui.crumbs(percorso) }}
+  <p>Ultima revisione: <time datetime="{{ revision_dates['metodologia'] }}">{{ revision_dates['metodologia'] | date_it }}</time></p>
 
   <header class="pagehead">
     <p class="eyebrow"><a href="/atlante">Atlante e dati</a>{% if mr and mr.catalog_institutions %}<span class="sep" aria-hidden="true">·</span>{{ mr.catalog_institutions }}{% endif %}</p>
@@ -94,6 +95,7 @@
     <p class="meta">
       {% if mr %}<span>{{ mr.manifest_indicators_total | num(None, 'count') }} indicatori regionali nell'atlante, {{ mr.score_indicators_total | num(None, 'count') }} nel punteggio della qualità della vita</span>{% endif %}
       <a href="{{ corrections_url }}">Segnala un errore</a>
+      <a href="/correzioni">Registro delle correzioni</a>
     </p>
   </header>
 
