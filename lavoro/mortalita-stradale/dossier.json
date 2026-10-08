@@ -1,0 +1,5395 @@
+{
+  "identita": {
+    "chiave": "bes:01SAL005",
+    "codice": "bes-01SAL005",
+    "nome": "Mortalità per incidenti stradali (15-34 anni)",
+    "percorso": "/indicatore/mortalita-per-incidenti-stradali-15-34-anni/bes-01SAL005",
+    "tema": "Salute, demografia e cura",
+    "sottotema_fonte": "Salute",
+    "definizione_fonte": "Benessere equo e sostenibile, aggiornamento intermedio 2026",
+    "unita": {
+      "fonte": "Tassi standardizzati per 10.000 residenti",
+      "cifra": "Tassi standardizzati per 10.000 residenti",
+      "variazione": "Tassi standardizzati per 10.000 residenti"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' basso",
+      "classifica_attiva": true
+    },
+    "livelli": [
+      {
+        "livello": "regione",
+        "percorso": "/indicatore/mortalita-per-incidenti-stradali-15-34-anni/bes-01SAL005",
+        "primo_anno": 2004,
+        "ultimo_anno": 2024,
+        "anni": [
+          2004,
+          2005,
+          2006,
+          2007,
+          2008,
+          2009,
+          2010,
+          2011,
+          2012,
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "territori_ultimo_anno": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        }
+      },
+      {
+        "livello": "provincia",
+        "percorso": "/indicatore/mortalita-per-incidenti-stradali-15-34-anni/bes-01SAL005/province",
+        "primo_anno": 2015,
+        "ultimo_anno": 2023,
+        "anni": [
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "territori_ultimo_anno": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2004,
+      "ultimo": 2024
+    },
+    "fonte": {
+      "etichetta": "Istat, BES nazionale, aggiornamento intermedio 2026",
+      "famiglia": "Istat, benessere e qualità della vita",
+      "istituzione": "Istat",
+      "url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/",
+      "url_dati": null,
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "regione",
+      "fotografia": {
+        "anno": 2024,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Abruzzo",
+            "chiave": "abruzzo",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Umbria",
+            "chiave": "umbria",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Valle d'Aosta",
+            "chiave": "valle-d-aosta",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Veneto",
+            "chiave": "veneto",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Emilia-Romagna",
+            "chiave": "emilia-romagna",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Friuli-Venezia Giulia",
+            "chiave": "friuli-venezia-giulia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Toscana",
+            "chiave": "toscana",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Liguria",
+            "chiave": "liguria",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Marche",
+            "chiave": "marche",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Molise",
+            "chiave": "molise",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 20 regioni, non la media nazionale",
+          "valore": 0.685,
+          "testo": "0,68"
+        },
+        "valore_italia": {
+          "anno": 2024,
+          "valore": 0.6,
+          "testo": "0,60",
+          "ripartizioni_ufficiali": [
+            {
+              "ripartizione": "Nord",
+              "valore": 0.5,
+              "testo": "0,50"
+            },
+            {
+              "ripartizione": "Centro",
+              "valore": 0.6,
+              "testo": "0,60"
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          ],
+          "fonte": "data/derived/bes_areas_01SAL005.csv",
+          "metodo": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni)."
+        },
+        "mediana": {
+          "valore": 0.7,
+          "testo": "0,70"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 12,
+          "testo": "12"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 8,
+          "testo": "8"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Molise",
+            "chiave": "molise",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Marche",
+            "chiave": "marche",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 0.9,
+          "testo": "0,90"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 3.25,
+          "testo": "3,3 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle regioni di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 0.5875,
+                "testo": "0,59"
+              },
+              "piu_alto": {
+                "territorio": "Valle d'Aosta",
+                "valore": {
+                  "valore": 0.8,
+                  "testo": "0,80"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Piemonte",
+                "valore": {
+                  "valore": 0.4,
+                  "testo": "0,40"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 4,
+                "testo": "4"
+              },
+              "media_semplice": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "piu_alto": {
+                "territorio": "Umbria",
+                "valore": {
+                  "valore": 0.8,
+                  "testo": "0,80"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Marche",
+                "valore": {
+                  "valore": 0.4,
+                  "testo": "0,40"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 0.825,
+                "testo": "0,83"
+              },
+              "piu_alto": {
+                "territorio": "Sardegna",
+                "valore": {
+                  "valore": 1.3,
+                  "testo": "1,3"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Molise",
+                "valore": {
+                  "valore": 0.4,
+                  "testo": "0,40"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2004,
+            "media_semplice": {
+              "valore": 1.78,
+              "testo": "1,8"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.6,
+              "testo": "1,6"
+            }
+          },
+          {
+            "anno": 2005,
+            "media_semplice": {
+              "valore": 1.715,
+              "testo": "1,7"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.5,
+              "testo": "1,5"
+            }
+          },
+          {
+            "anno": 2006,
+            "media_semplice": {
+              "valore": 1.675,
+              "testo": "1,7"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "anno": 2007,
+            "media_semplice": {
+              "valore": 1.41,
+              "testo": "1,4"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.6,
+              "testo": "1,6"
+            }
+          },
+          {
+            "anno": 2008,
+            "media_semplice": {
+              "valore": 1.285,
+              "testo": "1,3"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.0,
+              "testo": "1,00"
+            }
+          },
+          {
+            "anno": 2009,
+            "media_semplice": {
+              "valore": 1.145,
+              "testo": "1,1"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.4,
+              "testo": "1,4"
+            }
+          },
+          {
+            "anno": 2010,
+            "media_semplice": {
+              "valore": 1.085,
+              "testo": "1,1"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.1,
+              "testo": "1,1"
+            }
+          },
+          {
+            "anno": 2011,
+            "media_semplice": {
+              "valore": 0.92,
+              "testo": "0,92"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "anno": 2012,
+            "media_semplice": {
+              "valore": 0.875,
+              "testo": "0,88"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "anno": 2013,
+            "media_semplice": {
+              "valore": 0.7,
+              "testo": "0,70"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "anno": 2014,
+            "media_semplice": {
+              "valore": 0.82,
+              "testo": "0,82"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.6,
+              "testo": "1,6"
+            }
+          },
+          {
+            "anno": 2015,
+            "media_semplice": {
+              "valore": 0.72,
+              "testo": "0,72"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "anno": 2016,
+            "media_semplice": {
+              "valore": 0.715,
+              "testo": "0,72"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "anno": 2017,
+            "media_semplice": {
+              "valore": 0.82,
+              "testo": "0,82"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 2.1,
+              "testo": "2,1"
+            }
+          },
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 0.69,
+              "testo": "0,69"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 0.652632,
+              "testo": "0,65"
+            },
+            "territori": {
+              "valore": 19,
+              "testo": "19"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 0.542105,
+              "testo": "0,54"
+            },
+            "territori": {
+              "valore": 19,
+              "testo": "19"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 0.652632,
+              "testo": "0,65"
+            },
+            "territori": {
+              "valore": 19,
+              "testo": "19"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 0.665,
+              "testo": "0,67"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "anno": 2023,
+            "media_semplice": {
+              "valore": 0.59,
+              "testo": "0,59"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "anno": 2024,
+            "media_semplice": {
+              "valore": 0.685,
+              "testo": "0,68"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 19,
+              "testo": "19"
+            },
+            "totale": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2004,
+              "valore": {
+                "valore": 1.778947,
+                "testo": "1,8"
+              }
+            },
+            {
+              "anno": 2005,
+              "valore": {
+                "valore": 1.715789,
+                "testo": "1,7"
+              }
+            },
+            {
+              "anno": 2006,
+              "valore": {
+                "valore": 1.668421,
+                "testo": "1,7"
+              }
+            },
+            {
+              "anno": 2007,
+              "valore": {
+                "valore": 1.394737,
+                "testo": "1,4"
+              }
+            },
+            {
+              "anno": 2008,
+              "valore": {
+                "valore": 1.263158,
+                "testo": "1,3"
+              }
+            },
+            {
+              "anno": 2009,
+              "valore": {
+                "valore": 1.094737,
+                "testo": "1,1"
+              }
+            },
+            {
+              "anno": 2010,
+              "valore": {
+                "valore": 1.052632,
+                "testo": "1,1"
+              }
+            },
+            {
+              "anno": 2011,
+              "valore": {
+                "valore": 0.931579,
+                "testo": "0,93"
+              }
+            },
+            {
+              "anno": 2012,
+              "valore": {
+                "valore": 0.826316,
+                "testo": "0,83"
+              }
+            },
+            {
+              "anno": 2013,
+              "valore": {
+                "valore": 0.715789,
+                "testo": "0,72"
+              }
+            },
+            {
+              "anno": 2014,
+              "valore": {
+                "valore": 0.752632,
+                "testo": "0,75"
+              }
+            },
+            {
+              "anno": 2015,
+              "valore": {
+                "valore": 0.710526,
+                "testo": "0,71"
+              }
+            },
+            {
+              "anno": 2016,
+              "valore": {
+                "valore": 0.731579,
+                "testo": "0,73"
+              }
+            },
+            {
+              "anno": 2017,
+              "valore": {
+                "valore": 0.736842,
+                "testo": "0,74"
+              }
+            },
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 0.705263,
+                "testo": "0,71"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 0.652632,
+                "testo": "0,65"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 0.542105,
+                "testo": "0,54"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 0.652632,
+                "testo": "0,65"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 0.678947,
+                "testo": "0,68"
+              }
+            },
+            {
+              "anno": 2023,
+              "valore": {
+                "valore": 0.6,
+                "testo": "0,60"
+              }
+            },
+            {
+              "anno": 2024,
+              "valore": {
+                "valore": 0.678947,
+                "testo": "0,68"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2004,
+            "valore": {
+              "valore": 1.778947,
+              "testo": "1,8"
+            }
+          },
+          "minimo": {
+            "anno": 2020,
+            "valore": {
+              "valore": 0.542105,
+              "testo": "0,54"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2013,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 0.715789,
+                "testo": "0,72"
+              }
+            },
+            {
+              "anno": 2014,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 0.752632,
+                "testo": "0,75"
+              }
+            },
+            {
+              "anno": 2015,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 0.710526,
+                "testo": "0,71"
+              }
+            },
+            {
+              "anno": 2017,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 0.736842,
+                "testo": "0,74"
+              }
+            },
+            {
+              "anno": 2020,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 0.542105,
+                "testo": "0,54"
+              }
+            },
+            {
+              "anno": 2022,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 0.678947,
+                "testo": "0,68"
+              }
+            },
+            {
+              "anno": 2023,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 0.6,
+                "testo": "0,60"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2004,
+              "a": 2013,
+              "verso": "scende"
+            },
+            {
+              "da": 2013,
+              "a": 2014,
+              "verso": "sale"
+            },
+            {
+              "da": 2014,
+              "a": 2015,
+              "verso": "scende"
+            },
+            {
+              "da": 2015,
+              "a": 2017,
+              "verso": "sale"
+            },
+            {
+              "da": 2017,
+              "a": 2020,
+              "verso": "scende"
+            },
+            {
+              "da": 2020,
+              "a": 2022,
+              "verso": "sale"
+            },
+            {
+              "da": 2022,
+              "a": 2023,
+              "verso": "scende"
+            },
+            {
+              "da": 2023,
+              "a": 2024,
+              "verso": "sale"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2004,
+          "a": 2024,
+          "media_semplice_da": {
+            "valore": 1.78,
+            "testo": "1,8"
+          },
+          "media_semplice_a": {
+            "valore": 0.685,
+            "testo": "0,68"
+          },
+          "assoluta": {
+            "valore": -1.095,
+            "testo": "-1,1"
+          },
+          "relativa": {
+            "valore": -61.516854,
+            "testo": "-61,5%"
+          },
+          "territori_da": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "territori_a": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "sul_pannello": {
+            "da": 2004,
+            "a": 2024,
+            "assoluta": {
+              "valore": -1.1,
+              "testo": "-1,1"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2023,
+          "a": 2024,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "media_semplice_da": {
+            "valore": 0.59,
+            "testo": "0,59"
+          },
+          "media_semplice_a": {
+            "valore": 0.685,
+            "testo": "0,68"
+          },
+          "variazione": {
+            "valore": 0.095,
+            "testo": "+0,09"
+          },
+          "in_aumento": {
+            "valore": 9,
+            "testo": "9"
+          },
+          "in_calo": {
+            "valore": 4,
+            "testo": "4"
+          },
+          "invariati": {
+            "valore": 7,
+            "testo": "7"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": 0.5,
+                "testo": "+0,50"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Veneto",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2004,
+          "a": 2024,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "aumenti": [],
+          "cali": [
+            {
+              "territorio": "Emilia-Romagna",
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2004,
+          "a": 2024,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "valori": [
+            {
+              "territorio": "Emilia-Romagna",
+              "prima": {
+                "valore": 2.7,
+                "testo": "2,7"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "prima": {
+                "valore": 2.0,
+                "testo": "2,0"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "prima": {
+                "valore": 2.1,
+                "testo": "2,1"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 2.3,
+                "testo": "2,3"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6"
+              }
+            },
+            {
+              "territorio": "Veneto",
+              "prima": {
+                "valore": 2.2,
+                "testo": "2,2"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5"
+              }
+            },
+            {
+              "territorio": "Abruzzo",
+              "prima": {
+                "valore": 2.2,
+                "testo": "2,2"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4"
+              }
+            },
+            {
+              "territorio": "Friuli-Venezia Giulia",
+              "prima": {
+                "valore": 2.0,
+                "testo": "2,0"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 2.0,
+                "testo": "2,0"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3"
+              }
+            },
+            {
+              "territorio": "Liguria",
+              "prima": {
+                "valore": 1.7,
+                "testo": "1,7"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "prima": {
+                "valore": 1.7,
+                "testo": "1,7"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3"
+              }
+            },
+            {
+              "territorio": "Lombardia",
+              "prima": {
+                "valore": 1.6,
+                "testo": "1,6"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 1.8,
+                "testo": "1,8"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0"
+              }
+            },
+            {
+              "territorio": "Puglia",
+              "prima": {
+                "valore": 1.9,
+                "testo": "1,9"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,00"
+              }
+            },
+            {
+              "territorio": "Umbria",
+              "prima": {
+                "valore": 1.7,
+                "testo": "1,7"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90"
+              }
+            },
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70"
+              }
+            },
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 1.4,
+                "testo": "1,4"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70"
+              }
+            },
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 1.2,
+                "testo": "1,2"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 1.7,
+                "testo": "1,7"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Campania",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 1.2,
+                "testo": "1,2"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "livello": "provincia",
+      "fotografia": {
+        "anno": 2023,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Vercelli",
+            "chiave": "vercelli",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 1.9,
+              "testo": "1,9"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Sondrio",
+            "chiave": "sondrio",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 1.4,
+              "testo": "1,4"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Asti",
+            "chiave": "asti",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Cagliari",
+            "chiave": "cagliari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Frosinone",
+            "chiave": "frosinone",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Sud Sardegna",
+            "chiave": "sud-sardegna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 1.2,
+              "testo": "1,2"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Latina",
+            "chiave": "latina",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 1.1,
+              "testo": "1,1"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Taranto",
+            "chiave": "taranto",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 1.1,
+              "testo": "1,1"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Treviso",
+            "chiave": "treviso",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 1.1,
+              "testo": "1,1"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Verona",
+            "chiave": "verona",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 1.1,
+              "testo": "1,1"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Catania",
+            "chiave": "catania",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Foggia",
+            "chiave": "foggia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Perugia",
+            "chiave": "perugia",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Pesaro e Urbino",
+            "chiave": "pesaro-e-urbino",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Piacenza",
+            "chiave": "piacenza",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Potenza",
+            "chiave": "potenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Rieti",
+            "chiave": "rieti",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Savona",
+            "chiave": "savona",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 1.0,
+              "testo": "1,0"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Bolzano",
+            "chiave": "bolzano",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Brindisi",
+            "chiave": "brindisi",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 21,
+            "territorio": "Enna",
+            "chiave": "enna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 22,
+            "territorio": "Lecco",
+            "chiave": "lecco",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 23,
+            "territorio": "Massa-Carrara",
+            "chiave": "massa-carrara",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 24,
+            "territorio": "Siracusa",
+            "chiave": "siracusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 25,
+            "territorio": "Venezia",
+            "chiave": "venezia",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 26,
+            "territorio": "Vibo Valentia",
+            "chiave": "vibo-valentia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 0.9,
+              "testo": "0,90"
+            }
+          },
+          {
+            "posizione_per_valore": 27,
+            "territorio": "Arezzo",
+            "chiave": "arezzo",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 28,
+            "territorio": "Bari",
+            "chiave": "bari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 29,
+            "territorio": "Cosenza",
+            "chiave": "cosenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 30,
+            "territorio": "Messina",
+            "chiave": "messina",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 31,
+            "territorio": "Modena",
+            "chiave": "modena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 32,
+            "territorio": "Nuoro",
+            "chiave": "nuoro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 33,
+            "territorio": "Teramo",
+            "chiave": "teramo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 0.8,
+              "testo": "0,80"
+            }
+          },
+          {
+            "posizione_per_valore": 34,
+            "territorio": "Bologna",
+            "chiave": "bologna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 35,
+            "territorio": "Brescia",
+            "chiave": "brescia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 36,
+            "territorio": "Caserta",
+            "chiave": "caserta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 37,
+            "territorio": "Chieti",
+            "chiave": "chieti",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 38,
+            "territorio": "Cuneo",
+            "chiave": "cuneo",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 39,
+            "territorio": "Ferrara",
+            "chiave": "ferrara",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 40,
+            "territorio": "Livorno",
+            "chiave": "livorno",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 41,
+            "territorio": "Salerno",
+            "chiave": "salerno",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 42,
+            "territorio": "Trento",
+            "chiave": "trento",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 43,
+            "territorio": "Udine",
+            "chiave": "udine",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 44,
+            "territorio": "Verbano-Cusio-Ossola",
+            "chiave": "verbano-cusio-ossola",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 0.7,
+              "testo": "0,70"
+            }
+          },
+          {
+            "posizione_per_valore": 45,
+            "territorio": "Ancona",
+            "chiave": "ancona",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 46,
+            "territorio": "Avellino",
+            "chiave": "avellino",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 47,
+            "territorio": "Barletta-Andria-Trani",
+            "chiave": "barletta-andria-trani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 48,
+            "territorio": "Isernia",
+            "chiave": "isernia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 49,
+            "territorio": "Lecce",
+            "chiave": "lecce",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 50,
+            "territorio": "Trapani",
+            "chiave": "trapani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.6,
+              "testo": "0,60"
+            }
+          },
+          {
+            "posizione_per_valore": 51,
+            "territorio": "Ascoli Piceno",
+            "chiave": "ascoli-piceno",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 52,
+            "territorio": "Benevento",
+            "chiave": "benevento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 53,
+            "territorio": "Bergamo",
+            "chiave": "bergamo",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 54,
+            "territorio": "Caltanissetta",
+            "chiave": "caltanissetta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 55,
+            "territorio": "Firenze",
+            "chiave": "firenze",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 56,
+            "territorio": "Grosseto",
+            "chiave": "grosseto",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 57,
+            "territorio": "Imperia",
+            "chiave": "imperia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 58,
+            "territorio": "L'Aquila",
+            "chiave": "l-aquila",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 59,
+            "territorio": "Matera",
+            "chiave": "matera",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 60,
+            "territorio": "Milano",
+            "chiave": "milano",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 61,
+            "territorio": "Padova",
+            "chiave": "padova",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 62,
+            "territorio": "Palermo",
+            "chiave": "palermo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 63,
+            "territorio": "Pisa",
+            "chiave": "pisa",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 64,
+            "territorio": "Ragusa",
+            "chiave": "ragusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 65,
+            "territorio": "Roma",
+            "chiave": "roma",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 66,
+            "territorio": "Rovigo",
+            "chiave": "rovigo",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 67,
+            "territorio": "Trieste",
+            "chiave": "trieste",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 68,
+            "territorio": "Viterbo",
+            "chiave": "viterbo",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 0.5,
+              "testo": "0,50"
+            }
+          },
+          {
+            "posizione_per_valore": 69,
+            "territorio": "Aosta",
+            "chiave": "aosta",
+            "ripartizione": "Nord",
+            "regione": "Valle d'Aosta",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 70,
+            "territorio": "Cremona",
+            "chiave": "cremona",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 71,
+            "territorio": "Mantova",
+            "chiave": "mantova",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 72,
+            "territorio": "Napoli",
+            "chiave": "napoli",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 73,
+            "territorio": "Pistoia",
+            "chiave": "pistoia",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 74,
+            "territorio": "Reggio Calabria",
+            "chiave": "reggio-calabria",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 75,
+            "territorio": "Reggio Emilia",
+            "chiave": "reggio-emilia",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 76,
+            "territorio": "Sassari",
+            "chiave": "sassari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 77,
+            "territorio": "Torino",
+            "chiave": "torino",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 78,
+            "territorio": "Vicenza",
+            "chiave": "vicenza",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 0.4,
+              "testo": "0,40"
+            }
+          },
+          {
+            "posizione_per_valore": 79,
+            "territorio": "Alessandria",
+            "chiave": "alessandria",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 80,
+            "territorio": "Biella",
+            "chiave": "biella",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 81,
+            "territorio": "Catanzaro",
+            "chiave": "catanzaro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 82,
+            "territorio": "Crotone",
+            "chiave": "crotone",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 83,
+            "territorio": "Genova",
+            "chiave": "genova",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 84,
+            "territorio": "Lucca",
+            "chiave": "lucca",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 85,
+            "territorio": "Novara",
+            "chiave": "novara",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 86,
+            "territorio": "Pavia",
+            "chiave": "pavia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 87,
+            "territorio": "Pescara",
+            "chiave": "pescara",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 88,
+            "territorio": "Pordenone",
+            "chiave": "pordenone",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 89,
+            "territorio": "Rimini",
+            "chiave": "rimini",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 90,
+            "territorio": "Terni",
+            "chiave": "terni",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 91,
+            "territorio": "Varese",
+            "chiave": "varese",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.3,
+              "testo": "0,30"
+            }
+          },
+          {
+            "posizione_per_valore": 92,
+            "territorio": "Agrigento",
+            "chiave": "agrigento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 0.2,
+              "testo": "0,20"
+            }
+          },
+          {
+            "posizione_per_valore": 93,
+            "territorio": "Como",
+            "chiave": "como",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.2,
+              "testo": "0,20"
+            }
+          },
+          {
+            "posizione_per_valore": 94,
+            "territorio": "Macerata",
+            "chiave": "macerata",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 0.2,
+              "testo": "0,20"
+            }
+          },
+          {
+            "posizione_per_valore": 95,
+            "territorio": "Monza e della Brianza",
+            "chiave": "monza-e-della-brianza",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.2,
+              "testo": "0,20"
+            }
+          },
+          {
+            "posizione_per_valore": 96,
+            "territorio": "Parma",
+            "chiave": "parma",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.2,
+              "testo": "0,20"
+            }
+          },
+          {
+            "posizione_per_valore": 97,
+            "territorio": "Forlì-Cesena",
+            "chiave": "forli-cesena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.1,
+              "testo": "0,10"
+            }
+          },
+          {
+            "posizione_per_valore": 98,
+            "territorio": "Ravenna",
+            "chiave": "ravenna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 0.1,
+              "testo": "0,10"
+            }
+          },
+          {
+            "posizione_per_valore": 99,
+            "territorio": "Belluno",
+            "chiave": "belluno",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 100,
+            "territorio": "Campobasso",
+            "chiave": "campobasso",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 101,
+            "territorio": "Fermo",
+            "chiave": "fermo",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 102,
+            "territorio": "Gorizia",
+            "chiave": "gorizia",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 103,
+            "territorio": "La Spezia",
+            "chiave": "la-spezia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 104,
+            "territorio": "Lodi",
+            "chiave": "lodi",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Oristano",
+            "chiave": "oristano",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Prato",
+            "chiave": "prato",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Siena",
+            "chiave": "siena",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 107 province, non la media nazionale",
+          "valore": 0.588785,
+          "testo": "0,59"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 0.5,
+          "testo": "0,50"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 50,
+          "testo": "50"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 57,
+          "testo": "57"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Vercelli",
+            "chiave": "vercelli",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 1.9,
+              "testo": "1,9"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Sondrio",
+            "chiave": "sondrio",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 1.4,
+              "testo": "1,4"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Asti",
+            "chiave": "asti",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 1.3,
+              "testo": "1,3"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Siena",
+            "chiave": "siena",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Prato",
+            "chiave": "prato",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Oristano",
+            "chiave": "oristano",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 0.0,
+              "testo": "0"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 1.9,
+          "testo": "1,9"
+        },
+        "rapporto_fra_estremi": null,
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle province di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 47,
+                "testo": "47"
+              },
+              "media_semplice": {
+                "valore": 0.548936,
+                "testo": "0,55"
+              },
+              "piu_alto": {
+                "territorio": "Vercelli",
+                "valore": {
+                  "valore": 1.9,
+                  "testo": "1,9"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Lodi",
+                "valore": {
+                  "valore": 0.0,
+                  "testo": "0"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 22,
+                "testo": "22"
+              },
+              "media_semplice": {
+                "valore": 0.572727,
+                "testo": "0,57"
+              },
+              "piu_alto": {
+                "territorio": "Frosinone",
+                "valore": {
+                  "valore": 1.3,
+                  "testo": "1,3"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Siena",
+                "valore": {
+                  "valore": 0.0,
+                  "testo": "0"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 38,
+                "testo": "38"
+              },
+              "media_semplice": {
+                "valore": 0.647368,
+                "testo": "0,65"
+              },
+              "piu_alto": {
+                "territorio": "Cagliari",
+                "valore": {
+                  "valore": 1.3,
+                  "testo": "1,3"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Oristano",
+                "valore": {
+                  "valore": 0.0,
+                  "testo": "0"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2015,
+            "media_semplice": {
+              "valore": 0.742991,
+              "testo": "0,74"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.8,
+              "testo": "1,8"
+            }
+          },
+          {
+            "anno": 2016,
+            "media_semplice": {
+              "valore": 0.76729,
+              "testo": "0,77"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 2.6,
+              "testo": "2,6"
+            }
+          },
+          {
+            "anno": 2017,
+            "media_semplice": {
+              "valore": 0.73271,
+              "testo": "0,73"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 2.4,
+              "testo": "2,4"
+            }
+          },
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 0.711215,
+              "testo": "0,71"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 2.7,
+              "testo": "2,7"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 0.699065,
+              "testo": "0,70"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 2.0,
+              "testo": "2,0"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 0.537383,
+              "testo": "0,54"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.6,
+              "testo": "1,6"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 0.67757,
+              "testo": "0,68"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 3.0,
+              "testo": "3,0"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 0.684112,
+              "testo": "0,68"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.8,
+              "testo": "1,8"
+            }
+          },
+          {
+            "anno": 2023,
+            "media_semplice": {
+              "valore": 0.588785,
+              "testo": "0,59"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 1.9,
+              "testo": "1,9"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "totale": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2015,
+              "valore": {
+                "valore": 0.742991,
+                "testo": "0,74"
+              }
+            },
+            {
+              "anno": 2016,
+              "valore": {
+                "valore": 0.76729,
+                "testo": "0,77"
+              }
+            },
+            {
+              "anno": 2017,
+              "valore": {
+                "valore": 0.73271,
+                "testo": "0,73"
+              }
+            },
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 0.711215,
+                "testo": "0,71"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 0.699065,
+                "testo": "0,70"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 0.537383,
+                "testo": "0,54"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 0.67757,
+                "testo": "0,68"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 0.684112,
+                "testo": "0,68"
+              }
+            },
+            {
+              "anno": 2023,
+              "valore": {
+                "valore": 0.588785,
+                "testo": "0,59"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2016,
+            "valore": {
+              "valore": 0.76729,
+              "testo": "0,77"
+            }
+          },
+          "minimo": {
+            "anno": 2020,
+            "valore": {
+              "valore": 0.537383,
+              "testo": "0,54"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2016,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 0.76729,
+                "testo": "0,77"
+              }
+            },
+            {
+              "anno": 2020,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 0.537383,
+                "testo": "0,54"
+              }
+            },
+            {
+              "anno": 2022,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 0.684112,
+                "testo": "0,68"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2015,
+              "a": 2016,
+              "verso": "sale"
+            },
+            {
+              "da": 2016,
+              "a": 2020,
+              "verso": "scende"
+            },
+            {
+              "da": 2020,
+              "a": 2022,
+              "verso": "sale"
+            },
+            {
+              "da": 2022,
+              "a": 2023,
+              "verso": "scende"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2015,
+          "a": 2023,
+          "media_semplice_da": {
+            "valore": 0.742991,
+            "testo": "0,74"
+          },
+          "media_semplice_a": {
+            "valore": 0.588785,
+            "testo": "0,59"
+          },
+          "assoluta": {
+            "valore": -0.154206,
+            "testo": "-0,15"
+          },
+          "relativa": {
+            "valore": -20.754717,
+            "testo": "-20,8%"
+          },
+          "territori_da": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "territori_a": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "sul_pannello": {
+            "da": 2015,
+            "a": 2023,
+            "assoluta": {
+              "valore": -0.154206,
+              "testo": "-0,15"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2022,
+          "a": 2023,
+          "territori_comuni": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "media_semplice_da": {
+            "valore": 0.684112,
+            "testo": "0,68"
+          },
+          "media_semplice_a": {
+            "valore": 0.588785,
+            "testo": "0,59"
+          },
+          "variazione": {
+            "valore": -0.095327,
+            "testo": "-0,10"
+          },
+          "in_aumento": {
+            "valore": 39,
+            "testo": "39"
+          },
+          "in_calo": {
+            "valore": 52,
+            "testo": "52"
+          },
+          "invariati": {
+            "valore": 16,
+            "testo": "16"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Asti",
+              "prima": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": 1.1,
+                "testo": "+1,1"
+              }
+            },
+            {
+              "territorio": "Savona",
+              "prima": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 1.0,
+                "testo": "+1,0"
+              }
+            },
+            {
+              "territorio": "Cagliari",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": 0.8,
+                "testo": "+0,80"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Belluno",
+              "prima": {
+                "valore": 1.6,
+                "testo": "1,6"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6"
+              }
+            },
+            {
+              "territorio": "Pordenone",
+              "prima": {
+                "valore": 1.8,
+                "testo": "1,8"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5"
+              }
+            },
+            {
+              "territorio": "Crotone",
+              "prima": {
+                "valore": 1.7,
+                "testo": "1,7"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2015,
+          "a": 2023,
+          "territori_comuni": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "aumenti": [
+            {
+              "territorio": "Sondrio",
+              "variazione": {
+                "valore": 1.1,
+                "testo": "+1,1"
+              }
+            },
+            {
+              "territorio": "Verbano-Cusio-Ossola",
+              "variazione": {
+                "valore": 0.7,
+                "testo": "+0,70"
+              }
+            },
+            {
+              "territorio": "Siracusa",
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60"
+              }
+            }
+          ],
+          "cali": [
+            {
+              "territorio": "Imperia",
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3"
+              }
+            },
+            {
+              "territorio": "Alessandria",
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1"
+              }
+            },
+            {
+              "territorio": "Lucca",
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2015,
+          "a": 2023,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "valori": [
+            {
+              "territorio": "Imperia",
+              "prima": {
+                "valore": 1.8,
+                "testo": "1,8"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3"
+              }
+            },
+            {
+              "territorio": "Alessandria",
+              "prima": {
+                "valore": 1.4,
+                "testo": "1,4"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1"
+              }
+            },
+            {
+              "territorio": "Lucca",
+              "prima": {
+                "valore": 1.4,
+                "testo": "1,4"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1"
+              }
+            },
+            {
+              "territorio": "Ravenna",
+              "prima": {
+                "valore": 1.2,
+                "testo": "1,2"
+              },
+              "dopo": {
+                "valore": 0.1,
+                "testo": "0,10"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1"
+              }
+            },
+            {
+              "territorio": "Sondrio",
+              "prima": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "dopo": {
+                "valore": 1.4,
+                "testo": "1,4"
+              },
+              "variazione": {
+                "valore": 1.1,
+                "testo": "+1,1"
+              }
+            },
+            {
+              "territorio": "Ferrara",
+              "prima": {
+                "valore": 1.6,
+                "testo": "1,6"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90"
+              }
+            },
+            {
+              "territorio": "Parma",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90"
+              }
+            },
+            {
+              "territorio": "Cremona",
+              "prima": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90"
+              }
+            },
+            {
+              "territorio": "Oristano",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90"
+              }
+            },
+            {
+              "territorio": "Belluno",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80"
+              }
+            },
+            {
+              "territorio": "Fermo",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80"
+              }
+            },
+            {
+              "territorio": "Ragusa",
+              "prima": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80"
+              }
+            },
+            {
+              "territorio": "Siena",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80"
+              }
+            },
+            {
+              "territorio": "Biella",
+              "prima": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70"
+              }
+            },
+            {
+              "territorio": "Livorno",
+              "prima": {
+                "valore": 1.4,
+                "testo": "1,4"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70"
+              }
+            },
+            {
+              "territorio": "Pavia",
+              "prima": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70"
+              }
+            },
+            {
+              "territorio": "Verbano-Cusio-Ossola",
+              "prima": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.7,
+                "testo": "+0,70"
+              }
+            },
+            {
+              "territorio": "L'Aquila",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60"
+              }
+            },
+            {
+              "territorio": "Macerata",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60"
+              }
+            },
+            {
+              "territorio": "Rovigo",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60"
+              }
+            },
+            {
+              "territorio": "Siracusa",
+              "prima": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60"
+              }
+            },
+            {
+              "territorio": "Taranto",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60"
+              }
+            },
+            {
+              "territorio": "Campobasso",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60"
+              }
+            },
+            {
+              "territorio": "Isernia",
+              "prima": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60"
+              }
+            },
+            {
+              "territorio": "Mantova",
+              "prima": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60"
+              }
+            },
+            {
+              "territorio": "Potenza",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60"
+              }
+            },
+            {
+              "territorio": "Reggio Emilia",
+              "prima": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60"
+              }
+            },
+            {
+              "territorio": "Aosta",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50"
+              }
+            },
+            {
+              "territorio": "La Spezia",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50"
+              }
+            },
+            {
+              "territorio": "Pistoia",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50"
+              }
+            },
+            {
+              "territorio": "Pordenone",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50"
+              }
+            },
+            {
+              "territorio": "Agrigento",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50"
+              }
+            },
+            {
+              "territorio": "Como",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50"
+              }
+            },
+            {
+              "territorio": "Arezzo",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Cagliari",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Catania",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Enna",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Foggia",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Gorizia",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Lodi",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Rieti",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Sassari",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Savona",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40"
+              }
+            },
+            {
+              "territorio": "Genova",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Monza e della Brianza",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Novara",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Terni",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40"
+              }
+            },
+            {
+              "territorio": "Barletta-Andria-Trani",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Brescia",
+              "prima": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Lecce",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Lecco",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Massa-Carrara",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Padova",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Trieste",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Ascoli Piceno",
+              "prima": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Avellino",
+              "prima": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Chieti",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Sud Sardegna",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 1.2,
+                "testo": "1,2"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Latina",
+              "prima": {
+                "valore": 1.4,
+                "testo": "1,4"
+              },
+              "dopo": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "variazione": {
+                "valore": -0.3,
+                "testo": "-0,30"
+              }
+            },
+            {
+              "territorio": "Vercelli",
+              "prima": {
+                "valore": 1.6,
+                "testo": "1,6"
+              },
+              "dopo": {
+                "valore": 1.9,
+                "testo": "1,9"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30"
+              }
+            },
+            {
+              "territorio": "Caserta",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Teramo",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20"
+              }
+            },
+            {
+              "territorio": "Treviso",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20"
+              }
+            },
+            {
+              "territorio": "Venezia",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20"
+              }
+            },
+            {
+              "territorio": "Verona",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20"
+              }
+            },
+            {
+              "territorio": "Vibo Valentia",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Benevento",
+              "prima": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20"
+              }
+            },
+            {
+              "territorio": "Crotone",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Pescara",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Prato",
+              "prima": {
+                "valore": 0.2,
+                "testo": "0,20"
+              },
+              "dopo": {
+                "valore": 0.0,
+                "testo": "0"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Grosseto",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Matera",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Perugia",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20"
+              }
+            },
+            {
+              "territorio": "Roma",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Torino",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Vicenza",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Viterbo",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20"
+              }
+            },
+            {
+              "territorio": "Asti",
+              "prima": {
+                "valore": 1.2,
+                "testo": "1,2"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Bari",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Cosenza",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Piacenza",
+              "prima": {
+                "valore": 1.1,
+                "testo": "1,1"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Varese",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Ancona",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Bologna",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Bolzano",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Brindisi",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Caltanissetta",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Firenze",
+              "prima": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Milano",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Modena",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Nuoro",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Palermo",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Pesaro e Urbino",
+              "prima": {
+                "valore": 0.9,
+                "testo": "0,90"
+              },
+              "dopo": {
+                "valore": 1.0,
+                "testo": "1,0"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Pisa",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10"
+              }
+            },
+            {
+              "territorio": "Reggio Calabria",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Trapani",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.6,
+                "testo": "0,60"
+              },
+              "variazione": {
+                "valore": -0.1,
+                "testo": "-0,10"
+              }
+            },
+            {
+              "territorio": "Bergamo",
+              "prima": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "dopo": {
+                "valore": 0.5,
+                "testo": "0,50"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Catanzaro",
+              "prima": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Cuneo",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Forlì-Cesena",
+              "prima": {
+                "valore": 0.1,
+                "testo": "0,10"
+              },
+              "dopo": {
+                "valore": 0.1,
+                "testo": "0,10"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Frosinone",
+              "prima": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "dopo": {
+                "valore": 1.3,
+                "testo": "1,3"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Messina",
+              "prima": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "dopo": {
+                "valore": 0.8,
+                "testo": "0,80"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Napoli",
+              "prima": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "dopo": {
+                "valore": 0.4,
+                "testo": "0,40"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Rimini",
+              "prima": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "dopo": {
+                "valore": 0.3,
+                "testo": "0,30"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Salerno",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Trento",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Udine",
+              "prima": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "dopo": {
+                "valore": 0.7,
+                "testo": "0,70"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "regione",
+      "provincia"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione",
+    "territori": [
+      {
+        "territorio": "Sardegna",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 1.3,
+          "testo": "1,3"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 27730.8,
+            "testo": "27.731 euro"
+          },
+          "ter-902": {
+            "valore": 19869.5,
+            "testo": "19.870 euro"
+          },
+          "ter-13": {
+            "valore": 58.241812,
+            "testo": "58,2%"
+          },
+          "ter-345": {
+            "valore": 62.289655,
+            "testo": "62,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Calabria",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 0.9,
+          "testo": "0,90"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 21702.2,
+            "testo": "21.702 euro"
+          },
+          "ter-902": {
+            "valore": 16795.9,
+            "testo": "16.796 euro"
+          },
+          "ter-13": {
+            "valore": 46.414324,
+            "testo": "46,4%"
+          },
+          "ter-345": {
+            "valore": 50.346862,
+            "testo": "50,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Puglia",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 0.9,
+          "testo": "0,90"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 24327.7,
+            "testo": "24.328 euro"
+          },
+          "ter-902": {
+            "valore": 17897.7,
+            "testo": "17.898 euro"
+          },
+          "ter-13": {
+            "valore": 51.007894,
+            "testo": "51,0%"
+          },
+          "ter-345": {
+            "valore": 55.185587,
+            "testo": "55,2%"
+          }
+        }
+      },
+      {
+        "territorio": "Marche",
+        "posizione_per_valore": 18,
+        "valore": {
+          "valore": 0.4,
+          "testo": "0,40"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 34149.1,
+            "testo": "34.149 euro"
+          },
+          "ter-902": {
+            "valore": 22489.3,
+            "testo": "22.489 euro"
+          },
+          "ter-13": {
+            "valore": 67.489319,
+            "testo": "67,5%"
+          },
+          "ter-345": {
+            "valore": 72.917708,
+            "testo": "72,9%"
+          }
+        }
+      },
+      {
+        "territorio": "Molise",
+        "posizione_per_valore": 19,
+        "valore": {
+          "valore": 0.4,
+          "testo": "0,40"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 27697.8,
+            "testo": "27.698 euro"
+          },
+          "ter-902": {
+            "valore": 18661.9,
+            "testo": "18.662 euro"
+          },
+          "ter-13": {
+            "valore": 57.909827,
+            "testo": "57,9%"
+          },
+          "ter-345": {
+            "valore": 62.281738,
+            "testo": "62,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Piemonte",
+        "posizione_per_valore": 20,
+        "valore": {
+          "valore": 0.4,
+          "testo": "0,40"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 38625.5,
+            "testo": "38.626 euro"
+          },
+          "ter-902": {
+            "valore": 25426.3,
+            "testo": "25.426 euro"
+          },
+          "ter-13": {
+            "valore": 68.935532,
+            "testo": "68,9%"
+          },
+          "ter-345": {
+            "valore": 74.279862,
+            "testo": "74,3%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.402041,
+          "testo": "-0,40"
+        }
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.489176,
+          "testo": "-0,49"
+        }
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.428029,
+          "testo": "-0,43"
+        }
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "anno": 2024,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.428029,
+          "testo": "-0,43"
+        }
+      }
+    ],
+    "motivo_senza_correlazioni": null
+  }
+}

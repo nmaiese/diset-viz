@@ -1,0 +1,4862 @@
+{
+  "identita": {
+    "chiave": "bes:03LAV007",
+    "codice": "bes-03LAV007",
+    "nome": "Tasso di infortuni sul lavoro mortali e con inabilità permanente",
+    "percorso": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+    "tema": "Lavoro e conciliazione",
+    "sottotema_fonte": "Lavoro e conciliazione dei tempi di vita",
+    "definizione_fonte": "Benessere equo e sostenibile, aggiornamento intermedio 2026",
+    "unita": {
+      "fonte": "Per 10.000 occupati",
+      "cifra": "Per 10.000 occupati",
+      "variazione": "Per 10.000 occupati"
+    },
+    "verso": {
+      "classifica_del_sito": "dal valore piu' basso",
+      "classifica_attiva": true
+    },
+    "livelli": [
+      {
+        "livello": "regione",
+        "percorso": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007",
+        "primo_anno": 2018,
+        "ultimo_anno": 2022,
+        "anni": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "territori_ultimo_anno": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        }
+      },
+      {
+        "livello": "provincia",
+        "percorso": "/indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007/province",
+        "primo_anno": 2018,
+        "ultimo_anno": 2022,
+        "anni": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "territori_ultimo_anno": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        }
+      }
+    ],
+    "anni": {
+      "primo": 2018,
+      "ultimo": 2022
+    },
+    "fonte": {
+      "etichetta": "Istat, BES nazionale, aggiornamento intermedio 2026",
+      "famiglia": "Istat, benessere e qualità della vita",
+      "istituzione": "Istat",
+      "url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/",
+      "url_dati": null,
+      "licenza": {
+        "etichetta": "CC BY 4.0 (Istat)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    }
+  },
+  "livelli": [
+    {
+      "livello": "regione",
+      "fotografia": {
+        "anno": 2022,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "territori_totali": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Umbria",
+            "chiave": "umbria",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 17.8,
+              "testo": "17,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 16.8,
+              "testo": "16,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Abruzzo",
+            "chiave": "abruzzo",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 16.7,
+              "testo": "16,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Marche",
+            "chiave": "marche",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 15.3,
+              "testo": "15,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Toscana",
+            "chiave": "toscana",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 14.4,
+              "testo": "14,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Molise",
+            "chiave": "molise",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 13.8,
+              "testo": "13,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Calabria",
+            "chiave": "calabria",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 13.5,
+              "testo": "13,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Sicilia",
+            "chiave": "sicilia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 13.4,
+              "testo": "13,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Puglia",
+            "chiave": "puglia",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 13.0,
+              "testo": "13,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Sardegna",
+            "chiave": "sardegna",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 12.4,
+              "testo": "12,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Trentino Alto Adige",
+            "chiave": "trentino-alto-adige",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 12.3,
+              "testo": "12,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Emilia-Romagna",
+            "chiave": "emilia-romagna",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 12.1,
+              "testo": "12,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Liguria",
+            "chiave": "liguria",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 12.0,
+              "testo": "12,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Campania",
+            "chiave": "campania",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 11.2,
+              "testo": "11,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Veneto",
+            "chiave": "veneto",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 10.4,
+              "testo": "10,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Valle d'Aosta",
+            "chiave": "valle-d-aosta",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 10.2,
+              "testo": "10,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Friuli-Venezia Giulia",
+            "chiave": "friuli-venezia-giulia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 8.8,
+              "testo": "8,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 8.2,
+              "testo": "8,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 8.1,
+              "testo": "8,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 8.0,
+              "testo": "8,0 per 10.000 occupati"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 20 regioni, non la media nazionale",
+          "valore": 12.42,
+          "testo": "12,4 per 10.000 occupati"
+        },
+        "valore_italia": {
+          "anno": 2022,
+          "valore": 11.0,
+          "testo": "11,0 per 10.000 occupati",
+          "ripartizioni_ufficiali": [
+            {
+              "ripartizione": "Nord",
+              "valore": 9.6,
+              "testo": "9,6 per 10.000 occupati"
+            },
+            {
+              "ripartizione": "Centro",
+              "valore": 11.9,
+              "testo": "11,9 per 10.000 occupati"
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "valore": 13.0,
+              "testo": "13,0 per 10.000 occupati"
+            }
+          ],
+          "fonte": "data/derived/bes_areas_03LAV007.csv",
+          "metodo": "Valori Istat per Italia, Nord, Centro e Mezzogiorno, senza rielaborazione (medie calcolate dall'Istat sui dati di base, non medie semplici delle regioni)."
+        },
+        "mediana": {
+          "valore": 12.35,
+          "testo": "12,4 per 10.000 occupati"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 9,
+          "testo": "9"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 11,
+          "testo": "11"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Umbria",
+            "chiave": "umbria",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 17.8,
+              "testo": "17,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Basilicata",
+            "chiave": "basilicata",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 16.8,
+              "testo": "16,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Abruzzo",
+            "chiave": "abruzzo",
+            "ripartizione": "Mezzogiorno",
+            "valore": {
+              "valore": 16.7,
+              "testo": "16,7 per 10.000 occupati"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Piemonte",
+            "chiave": "piemonte",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 8.0,
+              "testo": "8,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Lombardia",
+            "chiave": "lombardia",
+            "ripartizione": "Nord",
+            "valore": {
+              "valore": 8.1,
+              "testo": "8,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Lazio",
+            "chiave": "lazio",
+            "ripartizione": "Centro",
+            "valore": {
+              "valore": 8.2,
+              "testo": "8,2 per 10.000 occupati"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 9.8,
+          "testo": "9,8 per 10.000 occupati"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 2.225,
+          "testo": "2,2 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle regioni di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 10.2375,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "piu_alto": {
+                "territorio": "Trentino Alto Adige",
+                "valore": {
+                  "valore": 12.3,
+                  "testo": "12,3 per 10.000 occupati"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Piemonte",
+                "valore": {
+                  "valore": 8.0,
+                  "testo": "8,0 per 10.000 occupati"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 4,
+                "testo": "4"
+              },
+              "media_semplice": {
+                "valore": 13.925,
+                "testo": "13,9 per 10.000 occupati"
+              },
+              "piu_alto": {
+                "territorio": "Umbria",
+                "valore": {
+                  "valore": 17.8,
+                  "testo": "17,8 per 10.000 occupati"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Lazio",
+                "valore": {
+                  "valore": 8.2,
+                  "testo": "8,2 per 10.000 occupati"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 8,
+                "testo": "8"
+              },
+              "media_semplice": {
+                "valore": 13.85,
+                "testo": "13,9 per 10.000 occupati"
+              },
+              "piu_alto": {
+                "territorio": "Basilicata",
+                "valore": {
+                  "valore": 16.8,
+                  "testo": "16,8 per 10.000 occupati"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Campania",
+                "valore": {
+                  "valore": 11.2,
+                  "testo": "11,2 per 10.000 occupati"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 14.01,
+              "testo": "14,0 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 16.2,
+              "testo": "16,2 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 13.54,
+              "testo": "13,5 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 15.4,
+              "testo": "15,4 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 12.205,
+              "testo": "12,2 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 9.4,
+              "testo": "9,4 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 13.025,
+              "testo": "13,0 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 12.4,
+              "testo": "12,4 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 12.42,
+              "testo": "12,4 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 9.8,
+              "testo": "9,8 per 10.000 occupati"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "totale": {
+              "valore": 20,
+              "testo": "20"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 14.01,
+                "testo": "14,0 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 13.54,
+                "testo": "13,5 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 12.205,
+                "testo": "12,2 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 13.025,
+                "testo": "13,0 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 12.42,
+                "testo": "12,4 per 10.000 occupati"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2018,
+            "valore": {
+              "valore": 14.01,
+              "testo": "14,0 per 10.000 occupati"
+            }
+          },
+          "minimo": {
+            "anno": 2020,
+            "valore": {
+              "valore": 12.205,
+              "testo": "12,2 per 10.000 occupati"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2020,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 12.205,
+                "testo": "12,2 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2021,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 13.025,
+                "testo": "13,0 per 10.000 occupati"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2018,
+              "a": 2020,
+              "verso": "scende"
+            },
+            {
+              "da": 2020,
+              "a": 2021,
+              "verso": "sale"
+            },
+            {
+              "da": 2021,
+              "a": 2022,
+              "verso": "scende"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2018,
+          "a": 2022,
+          "media_semplice_da": {
+            "valore": 14.01,
+            "testo": "14,0 per 10.000 occupati"
+          },
+          "media_semplice_a": {
+            "valore": 12.42,
+            "testo": "12,4 per 10.000 occupati"
+          },
+          "assoluta": {
+            "valore": -1.59,
+            "testo": "-1,6 per 10.000 occupati"
+          },
+          "relativa": {
+            "valore": -11.349036,
+            "testo": "-11,3%"
+          },
+          "territori_da": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "territori_a": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "sul_pannello": {
+            "da": 2018,
+            "a": 2022,
+            "assoluta": {
+              "valore": -1.59,
+              "testo": "-1,6 per 10.000 occupati"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2021,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "media_semplice_da": {
+            "valore": 13.025,
+            "testo": "13,0 per 10.000 occupati"
+          },
+          "media_semplice_a": {
+            "valore": 12.42,
+            "testo": "12,4 per 10.000 occupati"
+          },
+          "variazione": {
+            "valore": -0.605,
+            "testo": "-0,61 per 10.000 occupati"
+          },
+          "in_aumento": {
+            "valore": 3,
+            "testo": "3"
+          },
+          "in_calo": {
+            "valore": 15,
+            "testo": "15"
+          },
+          "invariati": {
+            "valore": 2,
+            "testo": "2"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Umbria",
+              "prima": {
+                "valore": 16.5,
+                "testo": "16,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 17.8,
+                "testo": "17,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.3,
+                "testo": "+1,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Campania",
+              "prima": {
+                "valore": 10.5,
+                "testo": "10,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.2,
+                "testo": "11,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.7,
+                "testo": "+0,70 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "prima": {
+                "valore": 13.9,
+                "testo": "13,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.4,
+                "testo": "14,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.5,
+                "testo": "+0,50 per 10.000 occupati"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 20.6,
+                "testo": "20,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.8,
+                "testo": "16,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.8,
+                "testo": "-3,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 15.5,
+                "testo": "15,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.5,
+                "testo": "13,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.0,
+                "testo": "-2,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Liguria",
+              "prima": {
+                "valore": 13.8,
+                "testo": "13,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.0,
+                "testo": "12,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 per 10.000 occupati"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2018,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "aumenti": [
+            {
+              "territorio": "Campania",
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Lombardia",
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20 per 10.000 occupati"
+              }
+            }
+          ],
+          "cali": [
+            {
+              "territorio": "Basilicata",
+              "variazione": {
+                "valore": -7.3,
+                "testo": "-7,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "variazione": {
+                "valore": -4.8,
+                "testo": "-4,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 per 10.000 occupati"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2018,
+          "a": 2022,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 20,
+            "testo": "20"
+          },
+          "valori": [
+            {
+              "territorio": "Basilicata",
+              "prima": {
+                "valore": 24.1,
+                "testo": "24,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.8,
+                "testo": "16,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -7.3,
+                "testo": "-7,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Calabria",
+              "prima": {
+                "valore": 18.3,
+                "testo": "18,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.5,
+                "testo": "13,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.8,
+                "testo": "-4,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sardegna",
+              "prima": {
+                "valore": 16.9,
+                "testo": "16,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.4,
+                "testo": "12,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Liguria",
+              "prima": {
+                "valore": 15.3,
+                "testo": "15,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.0,
+                "testo": "12,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.3,
+                "testo": "-3,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Veneto",
+              "prima": {
+                "valore": 12.7,
+                "testo": "12,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.4,
+                "testo": "10,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.3,
+                "testo": "-2,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Emilia-Romagna",
+              "prima": {
+                "valore": 14.0,
+                "testo": "14,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.1,
+                "testo": "12,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Toscana",
+              "prima": {
+                "valore": 16.1,
+                "testo": "16,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.4,
+                "testo": "14,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Marche",
+              "prima": {
+                "valore": 16.8,
+                "testo": "16,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.3,
+                "testo": "15,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Abruzzo",
+              "prima": {
+                "valore": 18.1,
+                "testo": "18,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.7,
+                "testo": "16,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sicilia",
+              "prima": {
+                "valore": 14.8,
+                "testo": "14,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.4,
+                "testo": "13,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Friuli-Venezia Giulia",
+              "prima": {
+                "valore": 9.9,
+                "testo": "9,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.8,
+                "testo": "8,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Puglia",
+              "prima": {
+                "valore": 13.6,
+                "testo": "13,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.0,
+                "testo": "13,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Umbria",
+              "prima": {
+                "valore": 18.2,
+                "testo": "18,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 17.8,
+                "testo": "17,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Campania",
+              "prima": {
+                "valore": 10.9,
+                "testo": "10,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.2,
+                "testo": "11,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Valle d'Aosta",
+              "prima": {
+                "valore": 9.9,
+                "testo": "9,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.2,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Lombardia",
+              "prima": {
+                "valore": 7.9,
+                "testo": "7,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.1,
+                "testo": "8,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Piemonte",
+              "prima": {
+                "valore": 8.2,
+                "testo": "8,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.0,
+                "testo": "8,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Trentino Alto Adige",
+              "prima": {
+                "valore": 12.5,
+                "testo": "12,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.3,
+                "testo": "12,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.2,
+                "testo": "-0,20 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Lazio",
+              "prima": {
+                "valore": 8.2,
+                "testo": "8,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.2,
+                "testo": "8,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Molise",
+              "prima": {
+                "valore": 13.8,
+                "testo": "13,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.8,
+                "testo": "13,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "livello": "provincia",
+      "fotografia": {
+        "anno": 2022,
+        "ordine": "dal valore piu' alto al piu' basso",
+        "territori_con_dato": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "territori_totali": {
+          "valore": 107,
+          "testo": "107"
+        },
+        "valori": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Arezzo",
+            "chiave": "arezzo",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 20.3,
+              "testo": "20,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Potenza",
+            "chiave": "potenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 20.1,
+              "testo": "20,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Massa-Carrara",
+            "chiave": "massa-carrara",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 19.8,
+              "testo": "19,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 4,
+            "territorio": "Teramo",
+            "chiave": "teramo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 18.7,
+              "testo": "18,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 5,
+            "territorio": "Grosseto",
+            "chiave": "grosseto",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 18.4,
+              "testo": "18,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 6,
+            "territorio": "Perugia",
+            "chiave": "perugia",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 18.3,
+              "testo": "18,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 7,
+            "territorio": "Lucca",
+            "chiave": "lucca",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 18.2,
+              "testo": "18,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 8,
+            "territorio": "Chieti",
+            "chiave": "chieti",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 18.1,
+              "testo": "18,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 9,
+            "territorio": "Siena",
+            "chiave": "siena",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 17.8,
+              "testo": "17,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 10,
+            "territorio": "Forlì-Cesena",
+            "chiave": "forli-cesena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 17.6,
+              "testo": "17,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 11,
+            "territorio": "Reggio Calabria",
+            "chiave": "reggio-calabria",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 17.3,
+              "testo": "17,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 12,
+            "territorio": "Rieti",
+            "chiave": "rieti",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 17.0,
+              "testo": "17,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 13,
+            "territorio": "Ancona",
+            "chiave": "ancona",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 16.7,
+              "testo": "16,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 14,
+            "territorio": "Pescara",
+            "chiave": "pescara",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 16.5,
+              "testo": "16,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 15,
+            "territorio": "Messina",
+            "chiave": "messina",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 16.4,
+              "testo": "16,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 16,
+            "territorio": "Livorno",
+            "chiave": "livorno",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 16.3,
+              "testo": "16,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 17,
+            "territorio": "Terni",
+            "chiave": "terni",
+            "ripartizione": "Centro",
+            "regione": "Umbria",
+            "valore": {
+              "valore": 16.3,
+              "testo": "16,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 18,
+            "territorio": "Pisa",
+            "chiave": "pisa",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 16.0,
+              "testo": "16,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 19,
+            "territorio": "Ascoli Piceno",
+            "chiave": "ascoli-piceno",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 15.7,
+              "testo": "15,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 20,
+            "territorio": "Isernia",
+            "chiave": "isernia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 15.6,
+              "testo": "15,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 21,
+            "territorio": "Caltanissetta",
+            "chiave": "caltanissetta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 15.5,
+              "testo": "15,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 22,
+            "territorio": "Macerata",
+            "chiave": "macerata",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 15.5,
+              "testo": "15,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 23,
+            "territorio": "Rimini",
+            "chiave": "rimini",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 15.5,
+              "testo": "15,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 24,
+            "territorio": "La Spezia",
+            "chiave": "la-spezia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 15.4,
+              "testo": "15,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 25,
+            "territorio": "Sassari",
+            "chiave": "sassari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 15.4,
+              "testo": "15,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 26,
+            "territorio": "Pesaro e Urbino",
+            "chiave": "pesaro-e-urbino",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 15.1,
+              "testo": "15,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 27,
+            "territorio": "Ragusa",
+            "chiave": "ragusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 15.0,
+              "testo": "15,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 28,
+            "territorio": "Vercelli",
+            "chiave": "vercelli",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 14.5,
+              "testo": "14,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 29,
+            "territorio": "Avellino",
+            "chiave": "avellino",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 14.4,
+              "testo": "14,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 30,
+            "territorio": "Viterbo",
+            "chiave": "viterbo",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 14.4,
+              "testo": "14,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 31,
+            "territorio": "Reggio Emilia",
+            "chiave": "reggio-emilia",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 14.2,
+              "testo": "14,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 32,
+            "territorio": "Salerno",
+            "chiave": "salerno",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 14.1,
+              "testo": "14,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 33,
+            "territorio": "Crotone",
+            "chiave": "crotone",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 14.0,
+              "testo": "14,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 34,
+            "territorio": "Cosenza",
+            "chiave": "cosenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 13.9,
+              "testo": "13,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 35,
+            "territorio": "Benevento",
+            "chiave": "benevento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 13.7,
+              "testo": "13,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 36,
+            "territorio": "Taranto",
+            "chiave": "taranto",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 13.6,
+              "testo": "13,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 37,
+            "territorio": "Brindisi",
+            "chiave": "brindisi",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 13.5,
+              "testo": "13,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 38,
+            "territorio": "Bari",
+            "chiave": "bari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 13.4,
+              "testo": "13,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 39,
+            "territorio": "Oristano",
+            "chiave": "oristano",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 13.2,
+              "testo": "13,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 40,
+            "territorio": "Campobasso",
+            "chiave": "campobasso",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Molise",
+            "valore": {
+              "valore": 13.1,
+              "testo": "13,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 41,
+            "territorio": "Agrigento",
+            "chiave": "agrigento",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 13.0,
+              "testo": "13,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 42,
+            "territorio": "Sud Sardegna",
+            "chiave": "sud-sardegna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 13.0,
+              "testo": "13,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 43,
+            "territorio": "Enna",
+            "chiave": "enna",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.9,
+              "testo": "12,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 44,
+            "territorio": "Lecce",
+            "chiave": "lecce",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 12.9,
+              "testo": "12,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 45,
+            "territorio": "Catania",
+            "chiave": "catania",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.8,
+              "testo": "12,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 46,
+            "territorio": "Ferrara",
+            "chiave": "ferrara",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 12.8,
+              "testo": "12,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 47,
+            "territorio": "Foggia",
+            "chiave": "foggia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 12.8,
+              "testo": "12,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 48,
+            "territorio": "L'Aquila",
+            "chiave": "l-aquila",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Abruzzo",
+            "valore": {
+              "valore": 12.8,
+              "testo": "12,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 49,
+            "territorio": "Verona",
+            "chiave": "verona",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 12.8,
+              "testo": "12,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 50,
+            "territorio": "Pistoia",
+            "chiave": "pistoia",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 12.7,
+              "testo": "12,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 51,
+            "territorio": "Trapani",
+            "chiave": "trapani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.7,
+              "testo": "12,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 52,
+            "territorio": "Piacenza",
+            "chiave": "piacenza",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 12.6,
+              "testo": "12,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 53,
+            "territorio": "Bolzano",
+            "chiave": "bolzano",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 12.5,
+              "testo": "12,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 54,
+            "territorio": "Nuoro",
+            "chiave": "nuoro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 12.5,
+              "testo": "12,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 55,
+            "territorio": "Siracusa",
+            "chiave": "siracusa",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.4,
+              "testo": "12,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 56,
+            "territorio": "Modena",
+            "chiave": "modena",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 12.2,
+              "testo": "12,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 57,
+            "territorio": "Rovigo",
+            "chiave": "rovigo",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 12.1,
+              "testo": "12,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 58,
+            "territorio": "Palermo",
+            "chiave": "palermo",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sicilia",
+            "valore": {
+              "valore": 12.0,
+              "testo": "12,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 59,
+            "territorio": "Trento",
+            "chiave": "trento",
+            "ripartizione": "Nord",
+            "regione": "Trentino Alto Adige",
+            "valore": {
+              "valore": 12.0,
+              "testo": "12,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 60,
+            "territorio": "Savona",
+            "chiave": "savona",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 11.9,
+              "testo": "11,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 61,
+            "territorio": "Vibo Valentia",
+            "chiave": "vibo-valentia",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 11.9,
+              "testo": "11,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 62,
+            "territorio": "Genova",
+            "chiave": "genova",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 11.8,
+              "testo": "11,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 63,
+            "territorio": "Alessandria",
+            "chiave": "alessandria",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 11.7,
+              "testo": "11,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 64,
+            "territorio": "Parma",
+            "chiave": "parma",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 11.5,
+              "testo": "11,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 65,
+            "territorio": "Treviso",
+            "chiave": "treviso",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 11.5,
+              "testo": "11,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 66,
+            "territorio": "Brescia",
+            "chiave": "brescia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 11.2,
+              "testo": "11,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 67,
+            "territorio": "Cuneo",
+            "chiave": "cuneo",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 11.1,
+              "testo": "11,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 68,
+            "territorio": "Matera",
+            "chiave": "matera",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 10.8,
+              "testo": "10,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 69,
+            "territorio": "Frosinone",
+            "chiave": "frosinone",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 10.6,
+              "testo": "10,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 70,
+            "territorio": "Padova",
+            "chiave": "padova",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 10.6,
+              "testo": "10,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 71,
+            "territorio": "Aosta",
+            "chiave": "aosta",
+            "ripartizione": "Nord",
+            "regione": "Valle d'Aosta",
+            "valore": {
+              "valore": 10.2,
+              "testo": "10,2 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 72,
+            "territorio": "Bergamo",
+            "chiave": "bergamo",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 10.1,
+              "testo": "10,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 73,
+            "territorio": "Varese",
+            "chiave": "varese",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 10.1,
+              "testo": "10,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 74,
+            "territorio": "Barletta-Andria-Trani",
+            "chiave": "barletta-andria-trani",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Puglia",
+            "valore": {
+              "valore": 10.0,
+              "testo": "10,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 75,
+            "territorio": "Fermo",
+            "chiave": "fermo",
+            "ripartizione": "Centro",
+            "regione": "Marche",
+            "valore": {
+              "valore": 10.0,
+              "testo": "10,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 76,
+            "territorio": "Prato",
+            "chiave": "prato",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 10.0,
+              "testo": "10,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 77,
+            "territorio": "Asti",
+            "chiave": "asti",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 9.9,
+              "testo": "9,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 78,
+            "territorio": "Cremona",
+            "chiave": "cremona",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 9.9,
+              "testo": "9,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 79,
+            "territorio": "Caserta",
+            "chiave": "caserta",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 9.8,
+              "testo": "9,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 80,
+            "territorio": "Latina",
+            "chiave": "latina",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 9.8,
+              "testo": "9,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 81,
+            "territorio": "Napoli",
+            "chiave": "napoli",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Campania",
+            "valore": {
+              "valore": 9.6,
+              "testo": "9,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 82,
+            "territorio": "Imperia",
+            "chiave": "imperia",
+            "ripartizione": "Nord",
+            "regione": "Liguria",
+            "valore": {
+              "valore": 9.4,
+              "testo": "9,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 83,
+            "territorio": "Lodi",
+            "chiave": "lodi",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 9.4,
+              "testo": "9,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 84,
+            "territorio": "Ravenna",
+            "chiave": "ravenna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 9.1,
+              "testo": "9,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 85,
+            "territorio": "Udine",
+            "chiave": "udine",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 9.1,
+              "testo": "9,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 86,
+            "territorio": "Firenze",
+            "chiave": "firenze",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 9.0,
+              "testo": "9,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 87,
+            "territorio": "Gorizia",
+            "chiave": "gorizia",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 9.0,
+              "testo": "9,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 88,
+            "territorio": "Lecco",
+            "chiave": "lecco",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 8.9,
+              "testo": "8,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 89,
+            "territorio": "Bologna",
+            "chiave": "bologna",
+            "ripartizione": "Nord",
+            "regione": "Emilia-Romagna",
+            "valore": {
+              "valore": 8.6,
+              "testo": "8,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 90,
+            "territorio": "Trieste",
+            "chiave": "trieste",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 8.6,
+              "testo": "8,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 91,
+            "territorio": "Vicenza",
+            "chiave": "vicenza",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 8.6,
+              "testo": "8,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 92,
+            "territorio": "Sondrio",
+            "chiave": "sondrio",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 8.5,
+              "testo": "8,5 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 93,
+            "territorio": "Belluno",
+            "chiave": "belluno",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 8.4,
+              "testo": "8,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 94,
+            "territorio": "Cagliari",
+            "chiave": "cagliari",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Sardegna",
+            "valore": {
+              "valore": 8.4,
+              "testo": "8,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 95,
+            "territorio": "Venezia",
+            "chiave": "venezia",
+            "ripartizione": "Nord",
+            "regione": "Veneto",
+            "valore": {
+              "valore": 8.1,
+              "testo": "8,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 96,
+            "territorio": "Catanzaro",
+            "chiave": "catanzaro",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Calabria",
+            "valore": {
+              "valore": 8.0,
+              "testo": "8,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 97,
+            "territorio": "Pordenone",
+            "chiave": "pordenone",
+            "ripartizione": "Nord",
+            "regione": "Friuli-Venezia Giulia",
+            "valore": {
+              "valore": 8.0,
+              "testo": "8,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 98,
+            "territorio": "Roma",
+            "chiave": "roma",
+            "ripartizione": "Centro",
+            "regione": "Lazio",
+            "valore": {
+              "valore": 7.1,
+              "testo": "7,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 99,
+            "territorio": "Monza e della Brianza",
+            "chiave": "monza-e-della-brianza",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 7.0,
+              "testo": "7,0 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 100,
+            "territorio": "Como",
+            "chiave": "como",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.7,
+              "testo": "6,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 101,
+            "territorio": "Torino",
+            "chiave": "torino",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 6.6,
+              "testo": "6,6 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 102,
+            "territorio": "Milano",
+            "chiave": "milano",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 6.4,
+              "testo": "6,4 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 103,
+            "territorio": "Biella",
+            "chiave": "biella",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 6.3,
+              "testo": "6,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 104,
+            "territorio": "Pavia",
+            "chiave": "pavia",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 5.9,
+              "testo": "5,9 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Mantova",
+            "chiave": "mantova",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 5.8,
+              "testo": "5,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Novara",
+            "chiave": "novara",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 4.8,
+              "testo": "4,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Verbano-Cusio-Ossola",
+            "chiave": "verbano-cusio-ossola",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 4.7,
+              "testo": "4,7 per 10.000 occupati"
+            }
+          }
+        ],
+        "media_semplice_territori": {
+          "etichetta": "media semplice dei valori delle 107 province, non la media nazionale",
+          "valore": 12.265421,
+          "testo": "12,3 per 10.000 occupati"
+        },
+        "valore_italia": {
+          "valore": null,
+          "nota": "la fonte nei dati del sito non porta il valore Italia"
+        },
+        "mediana": {
+          "valore": 12.5,
+          "testo": "12,5 per 10.000 occupati"
+        },
+        "sopra_la_media_semplice": {
+          "valore": 55,
+          "testo": "55"
+        },
+        "sotto_la_media_semplice": {
+          "valore": 52,
+          "testo": "52"
+        },
+        "piu_alti": [
+          {
+            "posizione_per_valore": 1,
+            "territorio": "Arezzo",
+            "chiave": "arezzo",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 20.3,
+              "testo": "20,3 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 2,
+            "territorio": "Potenza",
+            "chiave": "potenza",
+            "ripartizione": "Mezzogiorno",
+            "regione": "Basilicata",
+            "valore": {
+              "valore": 20.1,
+              "testo": "20,1 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 3,
+            "territorio": "Massa-Carrara",
+            "chiave": "massa-carrara",
+            "ripartizione": "Centro",
+            "regione": "Toscana",
+            "valore": {
+              "valore": 19.8,
+              "testo": "19,8 per 10.000 occupati"
+            }
+          }
+        ],
+        "piu_bassi": [
+          {
+            "posizione_per_valore": 107,
+            "territorio": "Verbano-Cusio-Ossola",
+            "chiave": "verbano-cusio-ossola",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 4.7,
+              "testo": "4,7 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 106,
+            "territorio": "Novara",
+            "chiave": "novara",
+            "ripartizione": "Nord",
+            "regione": "Piemonte",
+            "valore": {
+              "valore": 4.8,
+              "testo": "4,8 per 10.000 occupati"
+            }
+          },
+          {
+            "posizione_per_valore": 105,
+            "territorio": "Mantova",
+            "chiave": "mantova",
+            "ripartizione": "Nord",
+            "regione": "Lombardia",
+            "valore": {
+              "valore": 5.8,
+              "testo": "5,8 per 10.000 occupati"
+            }
+          }
+        ],
+        "distanza_fra_estremi": {
+          "valore": 15.6,
+          "testo": "15,6 per 10.000 occupati"
+        },
+        "rapporto_fra_estremi": {
+          "valore": 4.319149,
+          "testo": "4,3 volte"
+        },
+        "ripartizioni": {
+          "metodo": "media semplice dei valori delle province di ogni ripartizione, Mezzogiorno = Sud e Isole",
+          "valori": [
+            {
+              "ripartizione": "Nord",
+              "territori": {
+                "valore": 47,
+                "testo": "47"
+              },
+              "media_semplice": {
+                "valore": 10.076596,
+                "testo": "10,1 per 10.000 occupati"
+              },
+              "piu_alto": {
+                "territorio": "Forlì-Cesena",
+                "valore": {
+                  "valore": 17.6,
+                  "testo": "17,6 per 10.000 occupati"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Verbano-Cusio-Ossola",
+                "valore": {
+                  "valore": 4.7,
+                  "testo": "4,7 per 10.000 occupati"
+                }
+              }
+            },
+            {
+              "ripartizione": "Centro",
+              "territori": {
+                "valore": 22,
+                "testo": "22"
+              },
+              "media_semplice": {
+                "valore": 14.772727,
+                "testo": "14,8 per 10.000 occupati"
+              },
+              "piu_alto": {
+                "territorio": "Arezzo",
+                "valore": {
+                  "valore": 20.3,
+                  "testo": "20,3 per 10.000 occupati"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Roma",
+                "valore": {
+                  "valore": 7.1,
+                  "testo": "7,1 per 10.000 occupati"
+                }
+              }
+            },
+            {
+              "ripartizione": "Mezzogiorno",
+              "territori": {
+                "valore": 38,
+                "testo": "38"
+              },
+              "media_semplice": {
+                "valore": 13.521053,
+                "testo": "13,5 per 10.000 occupati"
+              },
+              "piu_alto": {
+                "territorio": "Potenza",
+                "valore": {
+                  "valore": 20.1,
+                  "testo": "20,1 per 10.000 occupati"
+                }
+              },
+              "piu_basso": {
+                "territorio": "Catanzaro",
+                "valore": {
+                  "valore": 8.0,
+                  "testo": "8,0 per 10.000 occupati"
+                }
+              }
+            }
+          ]
+        },
+        "soglia": null
+      },
+      "serie": {
+        "media_semplice_per_anno": [
+          {
+            "anno": 2018,
+            "media_semplice": {
+              "valore": 13.883178,
+              "testo": "13,9 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 25.7,
+              "testo": "25,7 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2019,
+            "media_semplice": {
+              "valore": 13.330841,
+              "testo": "13,3 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 25.7,
+              "testo": "25,7 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2020,
+            "media_semplice": {
+              "valore": 12.259813,
+              "testo": "12,3 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 16.1,
+              "testo": "16,1 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2021,
+            "media_semplice": {
+              "valore": 12.85514,
+              "testo": "12,9 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 20.3,
+              "testo": "20,3 per 10.000 occupati"
+            }
+          },
+          {
+            "anno": 2022,
+            "media_semplice": {
+              "valore": 12.265421,
+              "testo": "12,3 per 10.000 occupati"
+            },
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "copertura_parziale": false,
+            "distanza_fra_estremi": {
+              "valore": 15.6,
+              "testo": "15,6 per 10.000 occupati"
+            }
+          }
+        ],
+        "forma": {
+          "base": {
+            "tipo": "pannello fisso",
+            "territori": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "totale": {
+              "valore": 107,
+              "testo": "107"
+            },
+            "anni_esclusi": {
+              "valore": 0,
+              "testo": "0"
+            },
+            "metodo": "media semplice dei territori presenti in tutti gli anni in cui almeno l'80% dei territori ha il dato"
+          },
+          "punti": [
+            {
+              "anno": 2018,
+              "valore": {
+                "valore": 13.883178,
+                "testo": "13,9 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2019,
+              "valore": {
+                "valore": 13.330841,
+                "testo": "13,3 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2020,
+              "valore": {
+                "valore": 12.259813,
+                "testo": "12,3 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2021,
+              "valore": {
+                "valore": 12.85514,
+                "testo": "12,9 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2022,
+              "valore": {
+                "valore": 12.265421,
+                "testo": "12,3 per 10.000 occupati"
+              }
+            }
+          ],
+          "massimo": {
+            "anno": 2018,
+            "valore": {
+              "valore": 13.883178,
+              "testo": "13,9 per 10.000 occupati"
+            }
+          },
+          "minimo": {
+            "anno": 2020,
+            "valore": {
+              "valore": 12.259813,
+              "testo": "12,3 per 10.000 occupati"
+            }
+          },
+          "svolte": [
+            {
+              "anno": 2020,
+              "tipo": "minimo locale",
+              "valore": {
+                "valore": 12.259813,
+                "testo": "12,3 per 10.000 occupati"
+              }
+            },
+            {
+              "anno": 2021,
+              "tipo": "massimo locale",
+              "valore": {
+                "valore": 12.85514,
+                "testo": "12,9 per 10.000 occupati"
+              }
+            }
+          ],
+          "tratti": [
+            {
+              "da": 2018,
+              "a": 2020,
+              "verso": "scende"
+            },
+            {
+              "da": 2020,
+              "a": 2021,
+              "verso": "sale"
+            },
+            {
+              "da": 2021,
+              "a": 2022,
+              "verso": "scende"
+            }
+          ]
+        },
+        "variazione_lungo_periodo": {
+          "da": 2018,
+          "a": 2022,
+          "media_semplice_da": {
+            "valore": 13.883178,
+            "testo": "13,9 per 10.000 occupati"
+          },
+          "media_semplice_a": {
+            "valore": 12.265421,
+            "testo": "12,3 per 10.000 occupati"
+          },
+          "assoluta": {
+            "valore": -1.617757,
+            "testo": "-1,6 per 10.000 occupati"
+          },
+          "relativa": {
+            "valore": -11.652642,
+            "testo": "-11,7%"
+          },
+          "territori_da": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "territori_a": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "sul_pannello": {
+            "da": 2018,
+            "a": 2022,
+            "assoluta": {
+              "valore": -1.617757,
+              "testo": "-1,6 per 10.000 occupati"
+            }
+          }
+        },
+        "variazione_ultimo_anno": {
+          "da": 2021,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "media_semplice_da": {
+            "valore": 12.85514,
+            "testo": "12,9 per 10.000 occupati"
+          },
+          "media_semplice_a": {
+            "valore": 12.265421,
+            "testo": "12,3 per 10.000 occupati"
+          },
+          "variazione": {
+            "valore": -0.58972,
+            "testo": "-0,59 per 10.000 occupati"
+          },
+          "in_aumento": {
+            "valore": 45,
+            "testo": "45"
+          },
+          "in_calo": {
+            "valore": 61,
+            "testo": "61"
+          },
+          "invariati": {
+            "valore": 1,
+            "testo": "1"
+          },
+          "aumenti_maggiori": [
+            {
+              "territorio": "Isernia",
+              "prima": {
+                "valore": 12.0,
+                "testo": "12,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.6,
+                "testo": "15,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 3.6,
+                "testo": "+3,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Massa-Carrara",
+              "prima": {
+                "valore": 17.0,
+                "testo": "17,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 19.8,
+                "testo": "19,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 2.8,
+                "testo": "+2,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Avellino",
+              "prima": {
+                "valore": 11.8,
+                "testo": "11,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.4,
+                "testo": "14,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 2.6,
+                "testo": "+2,6 per 10.000 occupati"
+              }
+            }
+          ],
+          "cali_maggiori": [
+            {
+              "territorio": "Ascoli Piceno",
+              "prima": {
+                "valore": 22.2,
+                "testo": "22,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.7,
+                "testo": "15,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -6.5,
+                "testo": "-6,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Oristano",
+              "prima": {
+                "valore": 19.0,
+                "testo": "19,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.2,
+                "testo": "13,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -5.8,
+                "testo": "-5,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Potenza",
+              "prima": {
+                "valore": 25.1,
+                "testo": "25,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 20.1,
+                "testo": "20,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -5.0,
+                "testo": "-5,0 per 10.000 occupati"
+              }
+            }
+          ]
+        },
+        "territori_piu_mossi": {
+          "da": 2018,
+          "a": 2022,
+          "territori_comuni": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "aumenti": [
+            {
+              "territorio": "Vercelli",
+              "variazione": {
+                "valore": 5.2,
+                "testo": "+5,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Messina",
+              "variazione": {
+                "valore": 3.8,
+                "testo": "+3,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Viterbo",
+              "variazione": {
+                "valore": 3.1,
+                "testo": "+3,1 per 10.000 occupati"
+              }
+            }
+          ],
+          "cali": [
+            {
+              "territorio": "Arezzo",
+              "variazione": {
+                "valore": -10.2,
+                "testo": "-10,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Potenza",
+              "variazione": {
+                "valore": -9.5,
+                "testo": "-9,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sud Sardegna",
+              "variazione": {
+                "valore": -8.8,
+                "testo": "-8,8 per 10.000 occupati"
+              }
+            }
+          ]
+        },
+        "variazione_per_territorio": {
+          "da": 2018,
+          "a": 2022,
+          "ordine": "dalla variazione piu' ampita' alla piu' stretta, a parita' per territorio",
+          "territori": {
+            "valore": 107,
+            "testo": "107"
+          },
+          "valori": [
+            {
+              "territorio": "Arezzo",
+              "prima": {
+                "valore": 30.5,
+                "testo": "30,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 20.3,
+                "testo": "20,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -10.2,
+                "testo": "-10,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Potenza",
+              "prima": {
+                "valore": 29.6,
+                "testo": "29,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 20.1,
+                "testo": "20,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -9.5,
+                "testo": "-9,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sud Sardegna",
+              "prima": {
+                "valore": 21.8,
+                "testo": "21,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.0,
+                "testo": "13,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -8.8,
+                "testo": "-8,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Oristano",
+              "prima": {
+                "valore": 21.6,
+                "testo": "21,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.2,
+                "testo": "13,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -8.4,
+                "testo": "-8,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Nuoro",
+              "prima": {
+                "valore": 20.9,
+                "testo": "20,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.5,
+                "testo": "12,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -8.4,
+                "testo": "-8,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Ascoli Piceno",
+              "prima": {
+                "valore": 23.9,
+                "testo": "23,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.7,
+                "testo": "15,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -8.2,
+                "testo": "-8,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Reggio Calabria",
+              "prima": {
+                "valore": 24.1,
+                "testo": "24,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 17.3,
+                "testo": "17,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -6.8,
+                "testo": "-6,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Benevento",
+              "prima": {
+                "valore": 20.4,
+                "testo": "20,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.7,
+                "testo": "13,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -6.7,
+                "testo": "-6,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Reggio Emilia",
+              "prima": {
+                "valore": 20.8,
+                "testo": "20,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.2,
+                "testo": "14,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -6.6,
+                "testo": "-6,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Cagliari",
+              "prima": {
+                "valore": 14.3,
+                "testo": "14,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.4,
+                "testo": "8,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -5.9,
+                "testo": "-5,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Catanzaro",
+              "prima": {
+                "valore": 13.3,
+                "testo": "13,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.0,
+                "testo": "8,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -5.3,
+                "testo": "-5,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Vercelli",
+              "prima": {
+                "valore": 9.3,
+                "testo": "9,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.5,
+                "testo": "14,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 5.2,
+                "testo": "+5,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "La Spezia",
+              "prima": {
+                "valore": 20.3,
+                "testo": "20,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.4,
+                "testo": "15,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.9,
+                "testo": "-4,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "L'Aquila",
+              "prima": {
+                "valore": 17.3,
+                "testo": "17,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.5,
+                "testo": "-4,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Genova",
+              "prima": {
+                "valore": 16.2,
+                "testo": "16,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.8,
+                "testo": "11,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.4,
+                "testo": "-4,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Catania",
+              "prima": {
+                "valore": 16.9,
+                "testo": "16,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.1,
+                "testo": "-4,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Taranto",
+              "prima": {
+                "valore": 17.6,
+                "testo": "17,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.6,
+                "testo": "13,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -4.0,
+                "testo": "-4,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Cosenza",
+              "prima": {
+                "valore": 17.8,
+                "testo": "17,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.9,
+                "testo": "13,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.9,
+                "testo": "-3,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Vicenza",
+              "prima": {
+                "valore": 12.5,
+                "testo": "12,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.6,
+                "testo": "8,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.9,
+                "testo": "-3,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Messina",
+              "prima": {
+                "valore": 12.6,
+                "testo": "12,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.4,
+                "testo": "16,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 3.8,
+                "testo": "+3,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Vibo Valentia",
+              "prima": {
+                "valore": 15.7,
+                "testo": "15,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.9,
+                "testo": "11,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.8,
+                "testo": "-3,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Ravenna",
+              "prima": {
+                "valore": 12.8,
+                "testo": "12,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.1,
+                "testo": "9,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.7,
+                "testo": "-3,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Chieti",
+              "prima": {
+                "valore": 21.6,
+                "testo": "21,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 18.1,
+                "testo": "18,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.5,
+                "testo": "-3,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Livorno",
+              "prima": {
+                "valore": 19.7,
+                "testo": "19,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.3,
+                "testo": "16,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.4,
+                "testo": "-3,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Ragusa",
+              "prima": {
+                "valore": 18.4,
+                "testo": "18,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.0,
+                "testo": "15,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.4,
+                "testo": "-3,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Enna",
+              "prima": {
+                "valore": 16.2,
+                "testo": "16,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.9,
+                "testo": "12,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.3,
+                "testo": "-3,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Caltanissetta",
+              "prima": {
+                "valore": 18.7,
+                "testo": "18,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.5,
+                "testo": "15,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.2,
+                "testo": "-3,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Mantova",
+              "prima": {
+                "valore": 8.9,
+                "testo": "8,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 5.8,
+                "testo": "5,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -3.1,
+                "testo": "-3,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Viterbo",
+              "prima": {
+                "valore": 11.3,
+                "testo": "11,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.4,
+                "testo": "14,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 3.1,
+                "testo": "+3,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Crotone",
+              "prima": {
+                "valore": 16.9,
+                "testo": "16,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.0,
+                "testo": "14,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.9,
+                "testo": "-2,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Matera",
+              "prima": {
+                "valore": 13.7,
+                "testo": "13,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.8,
+                "testo": "10,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.9,
+                "testo": "-2,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Massa-Carrara",
+              "prima": {
+                "valore": 17.0,
+                "testo": "17,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 19.8,
+                "testo": "19,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 2.8,
+                "testo": "+2,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Padova",
+              "prima": {
+                "valore": 13.4,
+                "testo": "13,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.6,
+                "testo": "10,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.8,
+                "testo": "-2,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Teramo",
+              "prima": {
+                "valore": 16.0,
+                "testo": "16,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 18.7,
+                "testo": "18,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 2.7,
+                "testo": "+2,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Terni",
+              "prima": {
+                "valore": 19.0,
+                "testo": "19,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.3,
+                "testo": "16,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.7,
+                "testo": "-2,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Verbano-Cusio-Ossola",
+              "prima": {
+                "valore": 7.3,
+                "testo": "7,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 4.7,
+                "testo": "4,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.6,
+                "testo": "-2,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Forlì-Cesena",
+              "prima": {
+                "valore": 20.2,
+                "testo": "20,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 17.6,
+                "testo": "17,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.6,
+                "testo": "-2,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sassari",
+              "prima": {
+                "valore": 13.0,
+                "testo": "13,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.4,
+                "testo": "15,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 2.4,
+                "testo": "+2,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Bergamo",
+              "prima": {
+                "valore": 12.4,
+                "testo": "12,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.1,
+                "testo": "10,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.3,
+                "testo": "-2,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Ferrara",
+              "prima": {
+                "valore": 10.5,
+                "testo": "10,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 2.3,
+                "testo": "+2,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Pesaro e Urbino",
+              "prima": {
+                "valore": 17.4,
+                "testo": "17,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.1,
+                "testo": "15,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.3,
+                "testo": "-2,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Grosseto",
+              "prima": {
+                "valore": 20.6,
+                "testo": "20,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 18.4,
+                "testo": "18,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.2,
+                "testo": "-2,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Bologna",
+              "prima": {
+                "valore": 10.7,
+                "testo": "10,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.6,
+                "testo": "8,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Caserta",
+              "prima": {
+                "valore": 11.9,
+                "testo": "11,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.8,
+                "testo": "9,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Cuneo",
+              "prima": {
+                "valore": 13.2,
+                "testo": "13,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.1,
+                "testo": "11,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Venezia",
+              "prima": {
+                "valore": 10.2,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.1,
+                "testo": "8,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Verona",
+              "prima": {
+                "valore": 14.9,
+                "testo": "14,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -2.1,
+                "testo": "-2,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Bolzano",
+              "prima": {
+                "valore": 14.4,
+                "testo": "14,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.5,
+                "testo": "12,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Treviso",
+              "prima": {
+                "valore": 13.4,
+                "testo": "13,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.5,
+                "testo": "11,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Macerata",
+              "prima": {
+                "valore": 17.4,
+                "testo": "17,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.5,
+                "testo": "15,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.9,
+                "testo": "-1,9 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Parma",
+              "prima": {
+                "valore": 13.3,
+                "testo": "13,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.5,
+                "testo": "11,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.8,
+                "testo": "-1,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Ancona",
+              "prima": {
+                "valore": 14.9,
+                "testo": "14,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.7,
+                "testo": "16,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.8,
+                "testo": "+1,8 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Cremona",
+              "prima": {
+                "valore": 8.2,
+                "testo": "8,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.9,
+                "testo": "9,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.7,
+                "testo": "+1,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Fermo",
+              "prima": {
+                "valore": 11.7,
+                "testo": "11,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.0,
+                "testo": "10,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Salerno",
+              "prima": {
+                "valore": 12.4,
+                "testo": "12,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.1,
+                "testo": "14,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.7,
+                "testo": "+1,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Sondrio",
+              "prima": {
+                "valore": 10.2,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.5,
+                "testo": "8,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.7,
+                "testo": "-1,7 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Trapani",
+              "prima": {
+                "valore": 14.3,
+                "testo": "14,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.7,
+                "testo": "12,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Firenze",
+              "prima": {
+                "valore": 10.6,
+                "testo": "10,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.0,
+                "testo": "9,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.6,
+                "testo": "-1,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Trento",
+              "prima": {
+                "valore": 10.4,
+                "testo": "10,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.0,
+                "testo": "12,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.6,
+                "testo": "+1,6 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Biella",
+              "prima": {
+                "valore": 4.8,
+                "testo": "4,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 6.3,
+                "testo": "6,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.5,
+                "testo": "+1,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Latina",
+              "prima": {
+                "valore": 11.3,
+                "testo": "11,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.8,
+                "testo": "9,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Piacenza",
+              "prima": {
+                "valore": 14.1,
+                "testo": "14,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.6,
+                "testo": "12,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Pordenone",
+              "prima": {
+                "valore": 9.5,
+                "testo": "9,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.0,
+                "testo": "8,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.5,
+                "testo": "-1,5 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Novara",
+              "prima": {
+                "valore": 6.2,
+                "testo": "6,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 4.8,
+                "testo": "4,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.4,
+                "testo": "-1,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Varese",
+              "prima": {
+                "valore": 8.7,
+                "testo": "8,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.1,
+                "testo": "10,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.4,
+                "testo": "+1,4 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Rieti",
+              "prima": {
+                "valore": 18.3,
+                "testo": "18,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 17.0,
+                "testo": "17,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Trieste",
+              "prima": {
+                "valore": 9.9,
+                "testo": "9,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.6,
+                "testo": "8,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Pavia",
+              "prima": {
+                "valore": 7.2,
+                "testo": "7,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 5.9,
+                "testo": "5,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.3,
+                "testo": "-1,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Napoli",
+              "prima": {
+                "valore": 8.3,
+                "testo": "8,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.6,
+                "testo": "9,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.3,
+                "testo": "+1,3 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Alessandria",
+              "prima": {
+                "valore": 12.9,
+                "testo": "12,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.7,
+                "testo": "11,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Gorizia",
+              "prima": {
+                "valore": 10.2,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.0,
+                "testo": "9,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Palermo",
+              "prima": {
+                "valore": 13.2,
+                "testo": "13,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.0,
+                "testo": "12,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.2,
+                "testo": "-1,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Rimini",
+              "prima": {
+                "valore": 14.3,
+                "testo": "14,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.5,
+                "testo": "15,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.2,
+                "testo": "+1,2 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Milano",
+              "prima": {
+                "valore": 5.3,
+                "testo": "5,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 6.4,
+                "testo": "6,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.1,
+                "testo": "+1,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Pistoia",
+              "prima": {
+                "valore": 11.6,
+                "testo": "11,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.7,
+                "testo": "12,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.1,
+                "testo": "+1,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Udine",
+              "prima": {
+                "valore": 10.2,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.1,
+                "testo": "9,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.1,
+                "testo": "-1,1 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Avellino",
+              "prima": {
+                "valore": 15.4,
+                "testo": "15,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 14.4,
+                "testo": "14,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Barletta-Andria-Trani",
+              "prima": {
+                "valore": 11.0,
+                "testo": "11,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.0,
+                "testo": "10,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Belluno",
+              "prima": {
+                "valore": 9.4,
+                "testo": "9,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.4,
+                "testo": "8,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Foggia",
+              "prima": {
+                "valore": 13.8,
+                "testo": "13,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.8,
+                "testo": "12,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Isernia",
+              "prima": {
+                "valore": 14.6,
+                "testo": "14,6 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 15.6,
+                "testo": "15,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 1.0,
+                "testo": "+1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Lecce",
+              "prima": {
+                "valore": 13.9,
+                "testo": "13,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.9,
+                "testo": "12,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Savona",
+              "prima": {
+                "valore": 12.9,
+                "testo": "12,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.9,
+                "testo": "11,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -1.0,
+                "testo": "-1,0 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Bari",
+              "prima": {
+                "valore": 12.5,
+                "testo": "12,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.4,
+                "testo": "13,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.9,
+                "testo": "+0,90 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Modena",
+              "prima": {
+                "valore": 13.1,
+                "testo": "13,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.2,
+                "testo": "12,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Siena",
+              "prima": {
+                "valore": 18.7,
+                "testo": "18,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 17.8,
+                "testo": "17,8 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.9,
+                "testo": "-0,90 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Brindisi",
+              "prima": {
+                "valore": 14.3,
+                "testo": "14,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.5,
+                "testo": "13,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.8,
+                "testo": "-0,80 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Rovigo",
+              "prima": {
+                "valore": 11.3,
+                "testo": "11,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.1,
+                "testo": "12,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.8,
+                "testo": "+0,80 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Pisa",
+              "prima": {
+                "valore": 16.7,
+                "testo": "16,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.0,
+                "testo": "16,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.7,
+                "testo": "-0,70 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Asti",
+              "prima": {
+                "valore": 9.3,
+                "testo": "9,3 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.9,
+                "testo": "9,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.6,
+                "testo": "+0,60 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Siracusa",
+              "prima": {
+                "valore": 13.0,
+                "testo": "13,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 12.4,
+                "testo": "12,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.6,
+                "testo": "-0,60 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Agrigento",
+              "prima": {
+                "valore": 13.5,
+                "testo": "13,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.0,
+                "testo": "13,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Frosinone",
+              "prima": {
+                "valore": 10.1,
+                "testo": "10,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.6,
+                "testo": "10,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.5,
+                "testo": "+0,50 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Lecco",
+              "prima": {
+                "valore": 8.4,
+                "testo": "8,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 8.9,
+                "testo": "8,9 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.5,
+                "testo": "+0,50 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Lucca",
+              "prima": {
+                "valore": 18.7,
+                "testo": "18,7 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 18.2,
+                "testo": "18,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.5,
+                "testo": "-0,50 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Prato",
+              "prima": {
+                "valore": 9.5,
+                "testo": "9,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.0,
+                "testo": "10,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.5,
+                "testo": "+0,50 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Campobasso",
+              "prima": {
+                "valore": 13.5,
+                "testo": "13,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 13.1,
+                "testo": "13,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Brescia",
+              "prima": {
+                "valore": 10.8,
+                "testo": "10,8 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 11.2,
+                "testo": "11,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.4,
+                "testo": "+0,40 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Pescara",
+              "prima": {
+                "valore": 16.9,
+                "testo": "16,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 16.5,
+                "testo": "16,5 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": -0.4,
+                "testo": "-0,40 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Perugia",
+              "prima": {
+                "valore": 18.0,
+                "testo": "18,0 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 18.3,
+                "testo": "18,3 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Aosta",
+              "prima": {
+                "valore": 9.9,
+                "testo": "9,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 10.2,
+                "testo": "10,2 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.3,
+                "testo": "+0,30 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Como",
+              "prima": {
+                "valore": 6.5,
+                "testo": "6,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 6.7,
+                "testo": "6,7 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.2,
+                "testo": "+0,20 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Monza e della Brianza",
+              "prima": {
+                "valore": 6.9,
+                "testo": "6,9 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 7.0,
+                "testo": "7,0 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Torino",
+              "prima": {
+                "valore": 6.5,
+                "testo": "6,5 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 6.6,
+                "testo": "6,6 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.1,
+                "testo": "+0,10 per 10.000 occupati"
+              }
+            },
+            {
+              "territorio": "Imperia",
+              "prima": {
+                "valore": 9.4,
+                "testo": "9,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.4,
+                "testo": "9,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Lodi",
+              "prima": {
+                "valore": 9.4,
+                "testo": "9,4 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 9.4,
+                "testo": "9,4 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            },
+            {
+              "territorio": "Roma",
+              "prima": {
+                "valore": 7.1,
+                "testo": "7,1 per 10.000 occupati"
+              },
+              "dopo": {
+                "valore": 7.1,
+                "testo": "7,1 per 10.000 occupati"
+              },
+              "variazione": {
+                "valore": 0.0,
+                "testo": "invariato"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dimensioni": {
+    "dimensione_di_questa_scheda": null,
+    "fratelli": [],
+    "confronto_per_territorio": null,
+    "livelli_nella_scheda": [
+      "regione",
+      "provincia"
+    ],
+    "gemello_di_livello": null
+  },
+  "avvisi": {
+    "estremi_non_verificati": [],
+    "territori_non_misurati": [],
+    "anni_copertura_parziale": []
+  },
+  "contesto_economico": {
+    "indicatori": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "ultimo_anno": 2024,
+        "unita": "euro",
+        "fonte": "Istat, Conti economici territoriali"
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "ultimo_anno": 2025,
+        "unita": "%",
+        "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo"
+      }
+    ],
+    "livello_dei_valori": "regione",
+    "territori": [
+      {
+        "territorio": "Umbria",
+        "posizione_per_valore": 1,
+        "valore": {
+          "valore": 17.8,
+          "testo": "17,8 per 10.000 occupati"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 32466.9,
+            "testo": "32.467 euro"
+          },
+          "ter-902": {
+            "valore": 22523.9,
+            "testo": "22.524 euro"
+          },
+          "ter-13": {
+            "valore": 69.111762,
+            "testo": "69,1%"
+          },
+          "ter-345": {
+            "valore": 74.615971,
+            "testo": "74,6%"
+          }
+        }
+      },
+      {
+        "territorio": "Basilicata",
+        "posizione_per_valore": 2,
+        "valore": {
+          "valore": 16.8,
+          "testo": "16,8 per 10.000 occupati"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 28416.3,
+            "testo": "28.416 euro"
+          },
+          "ter-902": {
+            "valore": 17816.1,
+            "testo": "17.816 euro"
+          },
+          "ter-13": {
+            "valore": 57.393507,
+            "testo": "57,4%"
+          },
+          "ter-345": {
+            "valore": 61.787063,
+            "testo": "61,8%"
+          }
+        }
+      },
+      {
+        "territorio": "Abruzzo",
+        "posizione_per_valore": 3,
+        "valore": {
+          "valore": 16.7,
+          "testo": "16,7 per 10.000 occupati"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 32108.7,
+            "testo": "32.109 euro"
+          },
+          "ter-902": {
+            "valore": 20310.1,
+            "testo": "20.310 euro"
+          },
+          "ter-13": {
+            "valore": 62.42999,
+            "testo": "62,4%"
+          },
+          "ter-345": {
+            "valore": 67.232818,
+            "testo": "67,2%"
+          }
+        }
+      },
+      {
+        "territorio": "Lazio",
+        "posizione_per_valore": 18,
+        "valore": {
+          "valore": 8.2,
+          "testo": "8,2 per 10.000 occupati"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 43166.9,
+            "testo": "43.167 euro"
+          },
+          "ter-902": {
+            "valore": 24436.7,
+            "testo": "24.437 euro"
+          },
+          "ter-13": {
+            "valore": 64.166862,
+            "testo": "64,2%"
+          },
+          "ter-345": {
+            "valore": 69.345131,
+            "testo": "69,3%"
+          }
+        }
+      },
+      {
+        "territorio": "Lombardia",
+        "posizione_per_valore": 19,
+        "valore": {
+          "valore": 8.1,
+          "testo": "8,1 per 10.000 occupati"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 50398.9,
+            "testo": "50.399 euro"
+          },
+          "ter-902": {
+            "valore": 28154.3,
+            "testo": "28.154 euro"
+          },
+          "ter-13": {
+            "valore": 69.551243,
+            "testo": "69,6%"
+          },
+          "ter-345": {
+            "valore": 75.087736,
+            "testo": "75,1%"
+          }
+        }
+      },
+      {
+        "territorio": "Piemonte",
+        "posizione_per_valore": 20,
+        "valore": {
+          "valore": 8.0,
+          "testo": "8,0 per 10.000 occupati"
+        },
+        "contesto": {
+          "ter-901": {
+            "valore": 38625.5,
+            "testo": "38.626 euro"
+          },
+          "ter-902": {
+            "valore": 25426.3,
+            "testo": "25.426 euro"
+          },
+          "ter-13": {
+            "valore": 68.935532,
+            "testo": "68,9%"
+          },
+          "ter-345": {
+            "valore": 74.279862,
+            "testo": "74,3%"
+          }
+        }
+      }
+    ],
+    "correlazioni_di_rango": [
+      {
+        "codice": "ter-901",
+        "nome": "PIL pro capite",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.502256,
+          "testo": "-0,50"
+        }
+      },
+      {
+        "codice": "ter-902",
+        "nome": "Reddito disponibile delle famiglie per abitante",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.524812,
+          "testo": "-0,52"
+        }
+      },
+      {
+        "codice": "ter-13",
+        "nome": "Tasso di occupazione (totale)",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.341353,
+          "testo": "-0,34"
+        }
+      },
+      {
+        "codice": "ter-345",
+        "nome": "Tasso di occupazione 20-64 anni",
+        "anno": 2022,
+        "territori": {
+          "valore": 20,
+          "testo": "20"
+        },
+        "rho_spearman": {
+          "valore": -0.345865,
+          "testo": "-0,35"
+        }
+      }
+    ],
+    "motivo_senza_correlazioni": null
+  }
+}
