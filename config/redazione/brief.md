@@ -14,6 +14,26 @@ usare correlazioni fra soli indicatori interni come risposta. Per una scheda
 spiega l'indicatore oggetto, con gli altri solo come contesto. Nessuna prosa del
 pezzo e nessun verdetto Gate A anticipato.
 
+Gate A rilegge il brief in modo formale prima del giudizio: senza queste righe,
+ciascuna a inizio riga e compilata, e senza il registro in questa tabella il
+gate vale FERMO qualunque cosa decida il giudice. Le altre sezioni restano in
+forma libera.
+
+```text
+Definizione specifica: <che cosa conta la misura, non ricavato dal nome>
+Unità: <unità>
+Denominatore: <numeratore e denominatore>
+Popolazione: <popolazione, fasce d'età comprese>
+Territorio: <territorio e geografia>
+Periodo: <periodo>
+Fonte e release: <fonte e release>
+
+Registro affermazioni:
+| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |
+|---|---|---|---|---|
+| <affermazione> | <dato, calcolo, interpretazione, ipotesi o limite> | <dato o calcolo> | <ambito e periodo> | <fonte> |
+```
+
 Input:
 {input}
 

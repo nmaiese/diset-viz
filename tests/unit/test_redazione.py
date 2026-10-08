@@ -57,10 +57,37 @@ class FakeLauncher:
                 draft = self.base / "bozza.md"
                 if draft.exists():
                     text = text.replace("Hash bozza: abc", f"Hash bozza: {hashlib.sha256(draft.read_bytes()).hexdigest()}")
+            elif output == "brief.md":
+                text = brief_v4()
             else:
                 text = f"prova {phase['name']}\n"
             path.write_text(text, encoding="utf-8")
         return {"success": True, "terminal_handle": "term-fake", "model": "gpt-6-luna"}
+
+
+def brief_v4():
+    """Brief v4 con le righe che Gate A rilegge: definizione specifica e registro."""
+    return """# Brief editoriale: demo
+
+Domanda: i servizi per l'infanzia sono cresciuti dove servivano?
+Definizione specifica: bambini di 0-2 anni iscritti ai servizi comunali e privati convenzionati su 100 residenti della stessa età
+Unità: per 100 bambini
+Denominatore: residenti di 0-2 anni al 1 gennaio
+Popolazione: bambini di 0-2 anni
+Territorio: 20 regioni su 20 previste
+Periodo: anno educativo 2023/2024
+Fonte e release: Istat, servizi educativi per l'infanzia, release 2026-09-12
+
+Registro affermazioni:
+| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |
+|---|---|---|---|---|
+| La quota sale in tutte le regioni | dato | 20 regioni su 20 in aumento | regioni, 0-2 anni, 2019-2023 | https://istat.example/dato |
+| Le rette pesano sull'accesso | interpretazione | quota famiglie che rinunciano per costo | Italia, 2024 | https://ministero.example/rapporto |
+"""
+
+
+# Il brief del caso della review: hash giusto, nessuna definizione e nessun registro.
+BRIEF_SENZA_DEFINIZIONE_NE_REGISTRO = "# Brief editoriale: demo\n\nDomanda: i servizi per l'infanzia sono cresciuti?\n"
 
 
 def gate_a(outcome):
@@ -233,6 +260,16 @@ class RedazioneTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 3)
             self.assertEqual(launcher.calls.count("brief"), 2)
             self.assertEqual(launcher.calls.count("gate_a"), 2)
+
+    def test_motivo_del_fermo_non_resta_dopo_un_gate_a_passa(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = self.setup_case(tmp)
+            launcher = FakeLauncher(work / "lavoro" / "demo", gates=[gate_a("FERMO")])
+            result = self.run_case(root, work, cfg, launcher)
+            self.assertEqual(result.exit_code, 0, result.message)
+            saved = json.loads((work / "lavoro/demo/stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(saved["phases"]["gate_a"]["status"], "riuscita")
+            self.assertNotIn("motivo", saved["phases"]["gate_a"])
 
     def test_solo_esegue_una_fase(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -421,9 +458,10 @@ class RedazioneTests(unittest.TestCase):
 
 
 class GateParserTests(unittest.TestCase):
-    def parse(self, text, phase="gate_a"):
+    def parse(self, text, phase="gate_a", brief=None):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / ("gate-a.md" if phase == "gate_a" else "gate-b.md")
+            (Path(tmp) / "brief.md").write_text(brief_v4() if brief is None else brief, encoding="utf-8")
             target = "brief" if phase == "gate_a" else "bozza"
             digest = hashlib.sha256(b"current").hexdigest()
             text = text.replace(f"Hash {target}: abc", f"Hash {target}: {digest}")
@@ -506,6 +544,48 @@ class GateParserTests(unittest.TestCase):
             with self.subTest(text=text[inizio:inizio + 160]):
                 self.assertEqual(self.parse(text), ("FERMO", ""))
 
+    def test_gate_a_passa_ferma_se_il_brief_non_ha_definizione_ne_registro(self):
+        # Riproduzione della review 1: hash del brief corrente giusto, report completo, PASSA.
+        self.assertEqual(self.parse(gate_a("PASSA"), brief=BRIEF_SENZA_DEFINIZIONE_NE_REGISTRO), ("FERMO", ""))
+
+    def test_gate_a_ferma_per_brief_con_definizione_generica_o_registro_incompleto(self):
+        casi = (
+            brief_v4().replace(
+                "Definizione specifica: bambini di 0-2 anni iscritti ai servizi comunali e privati convenzionati su 100 residenti della stessa età",
+                "Definizione specifica: esprime come percentuale il fenomeno nel gruppo di riferimento definito dalla fonte"),
+            brief_v4().replace("Definizione specifica: bambini", "Definizione specifica: <bambini"),
+            brief_v4().replace("| regioni, 0-2 anni, 2019-2023 |", "| |"),
+            brief_v4().replace("Popolazione: bambini di 0-2 anni\n", ""),
+        )
+        for brief in casi:
+            with self.subTest(brief=brief[60:200]):
+                self.assertEqual(self.parse(gate_a("PASSA"), brief=brief), ("FERMO", ""))
+
+    def test_gate_a_ferma_se_il_report_registra_affermazioni_assenti_dal_brief(self):
+        text = gate_a("PASSA").replace("| La quota sale in tutte le regioni |", "| La quota raddoppia al Sud |")
+        self.assertEqual(self.parse(text), ("FERMO", ""))
+
+    def test_lacune_formali_distinte_per_brief_e_report_in_italiano(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "brief.md").write_text(BRIEF_SENZA_DEFINIZIONE_NE_REGISTRO, encoding="utf-8")
+            report = Path(tmp) / "gate-a.md"
+            report.write_text(gate_a("PASSA").replace("Unità: per 100 bambini\n", ""), encoding="utf-8")
+            gaps = redazione.gate_a_formal_gaps(report)
+            self.assertIn("brief: manca «Definizione specifica»", gaps)
+            self.assertIn("brief: registro delle affermazioni assente o con righe incomplete", gaps)
+            self.assertIn("report: manca «Unità»", gaps)
+            self.assertNotIn("report: manca «Definizione specifica»", gaps)
+            (Path(tmp) / "brief.md").write_text(brief_v4(), encoding="utf-8")
+            report.write_text(gate_a("PASSA"), encoding="utf-8")
+            self.assertEqual(redazione.gate_a_formal_gaps(report), [])
+
+    def test_gate_a_senza_brief_accanto_non_vale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            report = Path(tmp) / "gate-a.md"
+            report.write_text(gate_a("PASSA").replace("Hash brief: abc", f"Hash brief: {'0' * 64}"), encoding="utf-8")
+            with self.assertRaisesRegex(redazione.RedazioneError, "brief.md"):
+                redazione._parse_gate(report, "gate_a")
+
     def test_gate_a_v4_registro_accetta_le_diciture_del_tipo(self):
         for tipo in ("interpretazione documentata", "interpretazione attribuita", "dato o calcolo", "Limite"):
             text = gate_a("PASSA").replace("| Le rette pesano sull'accesso | interpretazione |",
@@ -530,7 +610,7 @@ class GateParserTests(unittest.TestCase):
             root, work, cfg = RedazioneTests().setup_case(tmp)
             workdir = work / "lavoro/demo"
             brief = workdir / "brief.md"
-            brief.write_text("brief stabile\n", encoding="utf-8")
+            brief.write_text(brief_v4(), encoding="utf-8")
             digest = hashlib.sha256(brief.read_bytes()).hexdigest()
             old_gate = workdir / "gate-a.md"
             old_gate.write_text(gate_a_v3("PASSA").replace("Hash brief: abc", f"Hash brief: {digest}"),
@@ -569,6 +649,36 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 3)
             self.assertNotIn("autore", launcher.calls)
             self.assertEqual(launcher.calls.count("gate_a"), 2)
+
+    def test_autore_non_parte_se_il_brief_corrente_non_ha_definizione_ne_registro(self):
+        # Riproduzione della review 1 sulla sequenza: il ponte dice che cosa manca e dove.
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+
+            launcher = FakeLauncher(workdir)
+            original = launcher.__call__
+
+            def call(phase, spec_path):
+                if phase["name"] == "brief":
+                    launcher.calls.append("brief")
+                    (workdir / "brief.md").write_text(BRIEF_SENZA_DEFINIZIONE_NE_REGISTRO, encoding="utf-8")
+                    return {"success": True, "terminal_handle": "term-fake", "model": "gpt-6-luna"}
+                return original(phase, spec_path)
+
+            result = RedazioneTests().run_case(root, work, cfg, call)
+            self.assertEqual(result.exit_code, 3)
+            self.assertNotIn("autore", launcher.calls)
+            self.assertEqual(launcher.calls.count("gate_a"), 2)
+            self.assertIn("validazione formale", result.message)
+            message = next((root / "ponte").glob("*.md")).read_text(encoding="utf-8")
+            motivo = next(line for line in message.splitlines() if line.startswith("Motivo:"))
+            self.assertIn("FERMO, voto n/d per validazione formale, non giudizio di merito", motivo)
+            self.assertIn("brief: manca «Definizione specifica»", motivo)
+            self.assertIn("brief: registro delle affermazioni assente o con righe incomplete", motivo)
+            self.assertNotIn("report:", motivo)
+            saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertIn("brief: manca «Definizione specifica»", saved["phases"]["gate_a"]["motivo"])
 
     def test_autore_non_parte_se_gate_a_non_e_v4_corrente(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -610,6 +720,20 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(launcher.calls, ["gate_b"])
             saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
             self.assertEqual(saved["gate_b_contract_version"], "v4")
+
+    def test_gate_b_accetta_solo_giri_uno_o_due(self):
+        # Riproduzione della review 1: PASSA con «Giri: 3» passava benché il massimo sia due.
+        for giri in ("3", "0", "<1 o 2>", "1 o 2", ""):
+            text = gate_b("PASSA", 4).replace("Giri: 1", f"Giri: {giri}")
+            with self.subTest(giri=giri), self.assertRaisesRegex(redazione.RedazioneError, "Giri"):
+                self.parse(text, "gate_b")
+        self.assertEqual(self.parse(gate_b("PASSA", 4).replace("Giri: 1", "Giri: 2"), "gate_b"), ("PASSA", "4"))
+
+    def test_gate_b_riscrivere_al_secondo_giro_e_incoerente(self):
+        text = gate_b("RISCRIVERE", 3).replace("Giri: 1", "Giri: 2")
+        with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
+            self.parse(text, "gate_b")
+        self.assertEqual(self.parse(gate_b("FERMO", 3).replace("Giri: 1", "Giri: 2"), "gate_b"), ("FERMO", "3"))
 
     def test_gate_b_passa_solo_con_tutti_i_controlli_si(self):
         text = gate_b("PASSA", 4).replace("T: sì", "T: no")
@@ -739,6 +863,12 @@ class TemplateGateTests(unittest.TestCase):
             if fase == "gate_b":
                 for campo in redazione.GATE_REQUIRED[fase]:
                     self.assertIn(campo, testo, f"{nome}: manca {campo}")
+
+    def test_il_template_del_brief_riporta_le_righe_che_gate_a_rilegge(self):
+        testo = (Path(__file__).resolve().parents[2] / "config" / "redazione" / "brief.md").read_text(encoding="utf-8")
+        for campo in redazione.GATE_A_DEFINITION_FIELDS:
+            self.assertIn(f"\n{campo}: <", testo, f"brief.md: manca {campo}")
+        self.assertIn(redazione.CLAIM_HEADER, testo)
 
 
 if __name__ == "__main__":

@@ -319,8 +319,9 @@ def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: li
 
 # I campi che il parser pretende. I template in `config/redazione/gate_*.md` li riportano
 # tutti, in forma di scheletro da compilare: un test tiene allineati i due elenchi.
-# «Definizione specifica» e registro non stanno qui: se mancano il report non è malformato
-# ma vale FERMO, anche quando dice PASSA (REDAZIONE v4, §3).
+# «Definizione specifica» e registro non stanno qui: se mancano, nel report o nel brief cui il
+# report si riferisce, il report non è malformato ma vale FERMO, anche quando dice PASSA
+# (REDAZIONE v4, §3).
 GATE_REQUIRED = {
     "gate_a": ["Contratto:", "Tipo pezzo:", "SHA brief:", "Hash brief:", "Autore/modello:",
                "Giudice/modello:", "Domanda:", "Risposta in una frase:", "Variante:",
@@ -336,6 +337,7 @@ GATE_REQUIRED = {
 
 
 def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tuple[str, str]:
+    """Esito e voto del gate. Per Gate A legge anche `brief.md` accanto al report."""
     text = path.read_text(encoding="utf-8")
     # La versione si guarda prima dei campi: un report di un contratto precedente è invalido
     # in quanto tale, anche quando brief o bozza non sono cambiati.
@@ -365,7 +367,7 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
     if phase == "gate_b" and not vote:
         raise RedazioneError("gate-b.md malformato: voto 1-5 assente")
     if phase == "gate_a":
-        if _gate_a_core_gaps(text):
+        if gate_a_formal_gaps(path):
             return "FERMO", ""
         _validate_gate_a(text)
         lines = text.splitlines()
@@ -406,11 +408,16 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
         blockers = re.search(r"^Bloccanti:\s*(\d+)\s*$", text, re.MULTILINE)
         if not blockers:
             raise RedazioneError("gate-b.md malformato: conteggio bloccanti assente")
+        rounds = re.search(r"^Giri:\s*([12])\s*$", text, re.MULTILINE)
+        if not rounds:
+            raise RedazioneError("gate-b.md malformato: Giri deve essere 1 o 2")
         all_yes = all(value == "sì" for value in controls.values())
         vote_value = int(vote.group(1))
         pass_conditions = all_yes and vote_value >= 4 and int(blockers.group(1)) == 0
+        # Al secondo giro non c'è un terzo: sotto 4 l'esito è FERMO, non RISCRIVERE.
         if ((outcome == "PASSA") != pass_conditions
-                or (outcome in {"RISCRIVERE", "FERMO"} and all_yes and vote_value == 5)):
+                or (outcome in {"RISCRIVERE", "FERMO"} and all_yes and vote_value == 5)
+                or (outcome == "RISCRIVERE" and rounds.group(1) == "2")):
             raise RedazioneError("gate-b.md incoerente: esito non corrisponde a controlli, voto e bloccanti")
     return outcome, vote.group(1) if vote else ""
 
@@ -425,7 +432,9 @@ GATE_A_CRITERIA = ("Misura definita", "Confronti compatibili", "Livello delle af
 GATE_A_DEFINITION_FIELDS = ("Definizione specifica", "Unità", "Denominatore", "Popolazione",
                             "Territorio", "Periodo", "Fonte e release")
 # Definizioni che ripetono il nome invece di dire che cosa si conta: il caso della bozza pensioni.
-GENERIC_DEFINITIONS = ("definito dalla fonte", "definita dalla fonte", "gruppo di riferimento")
+GENERIC_DEFINITIONS = ("definito dalla fonte", "definita dalla fonte", "gruppo di riferimento",
+                       "definizione della fonte", "come da fonte", "vedi fonte", "si veda la fonte",
+                       "indicatore che misura")
 CLAIM_HEADER = "| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |"
 # Conta la prima parola: «interpretazione documentata» (REV) e «interpretazione attribuita» valgono uguale.
 CLAIM_TYPES = {"dato", "calcolo", "interpretazione", "ipotesi", "limite"}
@@ -441,13 +450,42 @@ def _filled(value: str) -> bool:
     return len(value) >= 3 and not value.startswith("<") and value.casefold() not in {"n/d", "nd", "-", "nessuno", "nessuna"}
 
 
-def _gate_a_core_gaps(text: str) -> list[str]:
-    """Ciò che rende FERMO un Gate A v4 qualunque esito dichiari: definizione e registro."""
-    gaps = [name for name in GATE_A_DEFINITION_FIELDS if not _filled(_field(text, name))]
-    definition = _field(text, "Definizione specifica").casefold()
-    if "Definizione specifica" not in gaps and (
-            len(definition) < 30 or any(phrase in definition for phrase in GENERIC_DEFINITIONS)):
-        gaps.append("Definizione specifica generica")
+def gate_a_formal_gaps(report: Path) -> list[str]:
+    """Lacune formali di un Gate A v4, nel brief corrente e nel report, in italiano.
+
+    È la validazione formale (REDAZIONE v4, §3): rende FERMO il gate qualunque esito dichiari
+    il giudice, e non entra nel merito, che resta ai cinque criteri. Lista vuota: niente manca.
+    """
+    brief = report.with_name("brief.md")
+    try:
+        brief_text = brief.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise RedazioneError(f"{report.name} senza brief.md leggibile accanto: {exc}") from exc
+    report_text = report.read_text(encoding="utf-8")
+    gaps = [f"brief: {GAP_LABELS[gap]}" for gap in _gate_a_core_gaps(brief_text)]
+    gaps += [f"report: {GAP_LABELS[gap]}" for gap in _gate_a_core_gaps(report_text)]
+    brief_claims = {row[0].casefold() for row in _claims(brief_text)}
+    foreign = [row[0] for row in _claims(report_text) if row[0].casefold() not in brief_claims]
+    if brief_claims and foreign:
+        gaps.append("report: registro con affermazioni assenti dal brief ("
+                    + ", ".join(f"«{claim}»" for claim in foreign) + ")")
+    return gaps
+
+
+def gate_a_stop_reason(gaps: list[str]) -> str:
+    """Motivo su una riga per ponte e risultato quando la validazione formale ferma Gate A."""
+    return ("validazione formale, non giudizio di merito: vale FERMO qualunque esito dichiari il giudice; "
+            + "; ".join(gaps))
+
+
+# Le chiavi sono quelle di `_gate_a_core_gaps`; le etichette finiscono nel ponte.
+GAP_LABELS = {name: f"manca «{name}»" for name in GATE_A_DEFINITION_FIELDS} | {
+    "Definizione specifica generica": "«Definizione specifica» generica o ricavata dal nome, non dice che cosa si conta",
+    "Registro affermazioni": "registro delle affermazioni assente o con righe incomplete",
+}
+
+
+def _claims(text: str) -> list[list[str]]:
     lines = text.splitlines()
     header = next((i for i, line in enumerate(lines)
                    if re.sub(r"\s+", " ", line.strip()).casefold() == CLAIM_HEADER), None)
@@ -459,6 +497,17 @@ def _gate_a_core_gaps(text: str) -> list[str]:
             if re.match(r"^\|\s*:?-{2,}", line):
                 continue
             claims.append([cell.strip() for cell in line.strip().strip("|").split("|")])
+    return claims
+
+
+def _gate_a_core_gaps(text: str) -> list[str]:
+    """Ciò che rende FERMO un Gate A v4 qualunque esito dichiari: definizione e registro."""
+    gaps = [name for name in GATE_A_DEFINITION_FIELDS if not _filled(_field(text, name))]
+    definition = _field(text, "Definizione specifica").casefold()
+    if "Definizione specifica" not in gaps and (
+            len(definition) < 30 or any(phrase in definition for phrase in GENERIC_DEFINITIONS)):
+        gaps.append("Definizione specifica generica")
+    claims = _claims(text)
     complete = [row for row in claims
                 if len(row) == 5 and len(row[0]) >= 10 and (row[1].casefold().split() or [''])[0] in CLAIM_TYPES
                 and all(_filled(cell) for cell in row[2:])]
@@ -785,6 +834,7 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             return Result(1, str(exc))
         spec_path = workdir / f"SPEC-{name}.md"
         spec_path.write_text(content, encoding="utf-8")
+        record.pop("motivo", None)
         record.update({"status": "in corso", "input_hashes": input_hashes,
                        "started_at": datetime.now().astimezone().isoformat(), "handle": None,
                        "giri": int(state.get("rewrite_rounds", 0))})
@@ -842,6 +892,14 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                     return Result(3, f"gate malformato due volte; messaggio scritto nel ponte: {exc}")
                 return Result(1, str(exc))
             negative = (outcome == "FERMO") if name == "gate_a" else (outcome != "PASSA" or int(vote) < 4)
+            reason = f"{outcome}, voto {vote or 'n/d'}"
+            if negative and name == "gate_a":
+                gaps = gate_a_formal_gaps(_gate_file(workdir, name))
+                if gaps:
+                    reason += f" per {gate_a_stop_reason(gaps)}"
+                record["motivo"] = reason
+                _atomic_json(state_path, state)
+                progress(f"Gate A: {reason}")
             if negative:
                 if name == "gate_a" and int(state.get("gate_a_returns", 0)) < max_gate_a_retries:
                     state["gate_a_returns"] = int(state.get("gate_a_returns", 0)) + 1
@@ -857,9 +915,9 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                     _atomic_json(state_path, state)
                     continue
                 files = [p.name for p in output_files]
-                _bridge(bridge_dir, key, PHASE_LABEL[name], f"{outcome}, voto {vote or 'n/d'}", files,
+                _bridge(bridge_dir, key, PHASE_LABEL[name], reason, files,
                         f"bin/py -m scripts.editoriale.redazione {key} --da {name}", datetime.now().astimezone())
-                return Result(3, f"gate {PHASE_LABEL[name]} negativo; messaggio scritto nel ponte")
+                return Result(3, f"gate {PHASE_LABEL[name]} negativo ({reason}); messaggio scritto nel ponte")
             if name == "gate_a":
                 state["gate_a_sha"] = _hash(workdir / "brief.md")
                 state["gate_a_contract_version"] = GATE_A_CONTRACT_VERSION
