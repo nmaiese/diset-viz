@@ -1,7 +1,6 @@
 ---
 fonti: []
 key: "bes:06POL002P"
-level: "provincia"
 vintage: 2024
 ---
 
@@ -15,14 +14,14 @@ L'indicatore misura la quota di donne sul totale degli amministratori comunali.
 <!-- sezione: quadro -->
 
 ## Presenza femminile nei comuni
-I dati mostrano che la media semplice delle province si attesta al 34,6%. Il valore più alto si registra a Pordenone con il 43,0%, mentre il minimo è di Benevento con il 22,2%.
+La media semplice delle province si attesta al 34,6%. Il valore più alto si registra a Pordenone con il 43,0%, mentre il minimo è di Benevento con il 22,2%.
 
 <!-- sezione: dinamica -->
 
 ## Andamento della rappresentanza
-Tra il 2015 e il 2024 la media semplice delle province è cresciuta di 6,2 punti percentuali, passando dal 28,4% al 34,6%. L'incremento è stato costante fino al 2020, con un valore di 33,8%, una leggera flessione nel 2021 al 33,1% e una successiva ripresa.
+Tra il 2015 e il 2024 la media semplice delle province è cresciuta di 6,2 punti percentuali, passando dal 28,4% al 34,6%. È salita ogni anno fino al 2020 (33,8%), con una flessione nel 2021 al 33,1%, poi è risalita fino al 34,6% del 2024.
 
 <!-- sezione: limiti -->
 
 ## Limiti del dato
-Il numero non cattura la distribuzione dei ruoli all'interno dell'amministrazione comunale.
+Il numero indica la quota sul totale degli amministratori e non specifica chi ricopra quali incarichi.
