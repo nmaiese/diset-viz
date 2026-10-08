@@ -139,7 +139,7 @@
         localizzatore. -#}
     {% if d.region_map %}{% set rm = d.region_map %}
     <figure class="regionmap">
-      {{ ui.regionmap(rm, 'Qualità della vita nelle province di ' ~ d.of_name ~ ', profilo ' ~ d.profile_name ~ ', dati fino al ' ~ d.year_to) }}
+      {{ ui.regionmap(rm, 'Mappa delle province ' ~ d.of_name ~ ' per qualità della vita') }}
       <figcaption>
         <span class="regionmap__cap">{% if rm.n > 1 %}Le {{ rm.n | num(None, 'count') }} province {{ d.of_name }} per qualità della vita: {{ rm.best.name }} {{ rm.best.rank | rank(rm.total) }}, {{ rm.worst.name }} {{ rm.worst.rank | rank(rm.total) }}.{% else %}{{ rm.best.name }} è {{ rm.best.rank | rank(rm.total) }} province per qualità della vita.{% endif %}</span>
         {{ ui.legend(rm.legend, 'Più intenso, punteggio più alto, sulla scala delle ' ~ rm.total ~ ' province.', nd=False) }}
