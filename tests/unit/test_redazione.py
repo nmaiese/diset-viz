@@ -64,6 +64,62 @@ class FakeLauncher:
 
 
 def gate_a(outcome):
+    text = f"""Contratto: v4
+Tipo pezzo: blog
+SHA brief: abc
+Hash brief: abc
+Autore/modello: A
+Giudice/modello: B
+Domanda: i servizi per l'infanzia sono cresciuti dove servivano?
+Risposta in una frase: la quota di bambini presi in carico sale ovunque, ma la distanza fra regioni resta
+Variante: D servizi
+Schema del racconto: domanda delle famiglie > quadro delle misure > offerta > utilizzo > limiti
+Angoli verificati: angolo sul cambiamento osservato; angolo sulle differenze territoriali
+Definizione specifica: bambini di 0-2 anni iscritti ai servizi comunali e privati convenzionati su 100 residenti della stessa età
+Unità: per 100 bambini
+Denominatore: residenti di 0-2 anni al 1 gennaio
+Popolazione: bambini di 0-2 anni
+Territorio: 20 regioni su 20 previste
+Periodo: anno educativo 2023/2024
+Fonte e release: Istat, servizi educativi per l'infanzia, release 2026-09-12
+Riferimento usato: Italia ufficiale (30,0, Istat)
+Codici e confronto: x/y/z
+Ultimo dato: 2025
+Data fonte del dato: 2026-09-12
+URL fonte del dato: https://istat.example/dato
+Ruolo indicatori interni: base e un tassello del racconto
+Fonti esterne verificate:
+| istituzione | data fonte | URL aperto | dato o claim | verificata |
+|---|---|---|---|---|
+| Istat | 2026-09-12 | https://istat.example/dato | dato 2025 | sì |
+| Ministero | 2026-08-10 | https://ministero.example/rapporto | rapporto servizi | sì |
+| Eurostat | 2026-07-01 | https://ec.europa.example/serie | serie comparabile | sì |
+Grafico con dati esterni: disponibilità servizi; serie 2025; https://istat.example/dato
+Figure previste: punti per regione con riferimento Italia ufficiale; serie della fascia centrale
+Limiti: la presa in carico non misura costi, orari e attese
+Registro affermazioni:
+| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |
+|---|---|---|---|---|
+| La quota sale in tutte le regioni | dato | 20 regioni su 20 in aumento | regioni, 0-2 anni, 2019-2023 | https://istat.example/dato |
+| Le rette pesano sull'accesso | interpretazione | quota famiglie che rinunciano per costo | Italia, 2024 | https://ministero.example/rapporto |
+| criterio | esito | prova verificabile | limite |
+|---|---|---|---|
+| Misura definita | sì | definizione con numeratore e denominatore 0-2 anni | servizi privati non convenzionati esclusi |
+| Confronti compatibili | sì | stessa fascia e stesso anno educativo per le regioni | Trentino-Alto Adige aggregato |
+| Livello delle affermazioni | sì | rette attribuite al rapporto ministeriale, nessuna causa | fonti non causali |
+| Prove e figure | sì | ogni riga del registro ha la sua figura prevista | figura dei costi solo nazionale |
+| Fonti e freschezza | sì | dato 2025 con data e URL fonte verificata | ultimo rilascio |
+Esito: {outcome}
+Motivo: motivazione riferita alle prove e al limite temporale
+Correzione: correzione
+Destinatario: leader
+Data: 2026-10-08
+"""
+    return text.replace("| Misura definita | sì |", "| Misura definita | no |") if outcome == "FERMO" else text
+
+
+def gate_a_v3(outcome):
+    """Report Gate A v3 valido sotto il contratto v3, congelato: la v4 lo deve invalidare."""
     text = f"""Contratto: v3
 Tipo pezzo: blog
 SHA brief: abc
@@ -102,7 +158,7 @@ Data: 2026-10-07
 
 
 def gate_b(outcome, vote):
-    return f"""SHA bozza: abc\nHash bozza: abc\nFamiglie autore/revisore: A/B\nT: sì — citazione\nR: sì — citazione\nL: sì — citazione\nN: sì — citazione\nControllo anti-invenzione: sì\nBloccanti: 0\nVoto: {vote}\nMotivo: motivo\nRilievi localizzati: nessuno\nGiri: 1\nEsito: {outcome}\n"""
+    return f"""Contratto: v4\nSHA bozza: abc\nHash bozza: abc\nFamiglie autore/revisore: A/B\nT: sì — citazione\nR: sì — citazione\nL: sì — citazione\nN: sì — citazione\nControllo anti-invenzione: sì\nBloccanti: 0\nVoto: {vote}\nMotivo: motivo\nRilievi localizzati: nessuno\nGiri: 1\nEsito: {outcome}\n"""
 
 
 class RedazioneTests(unittest.TestCase):
@@ -381,30 +437,30 @@ class GateParserTests(unittest.TestCase):
             self.parse(gate_a("passa"))
 
     def test_gate_a_passa_solo_con_tutti_i_criteri_si(self):
-        text = gate_a("PASSA").replace("| E | sì |", "| E | no |")
+        text = gate_a("PASSA").replace("| Fonti e freschezza | sì |", "| Fonti e freschezza | no |")
         with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
             self.parse(text)
 
     def test_gate_a_fermo_con_tutti_si_e_voto_pieno_e_incoerente(self):
-        text = gate_a("FERMO").replace("| A | no |", "| A | sì |")
+        text = gate_a("FERMO").replace("| Misura definita | no |", "| Misura definita | sì |")
         with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
             self.parse(text)
 
-    def test_gate_a_v3_passa_con_fonti_date_e_grafico_esterno(self):
+    def test_gate_a_v4_passa_con_definizione_registro_fonti_e_grafico(self):
         esito, _ = self.parse(gate_a("PASSA"))
         self.assertEqual(esito, "PASSA")
 
-    def test_gate_a_v3_rifiuta_limite_vuoto(self):
-        text = gate_a("PASSA").replace("| copertura regionale |", "| |")
+    def test_gate_a_rifiuta_limite_vuoto(self):
+        text = gate_a("PASSA").replace("| servizi privati non convenzionati esclusi |", "| |")
         with self.assertRaisesRegex(redazione.RedazioneError, "limite"):
             self.parse(text)
 
-    def test_gate_a_v3_rifiuta_istituzioni_duplicate_con_maiuscole_diverse(self):
+    def test_gate_a_rifiuta_istituzioni_duplicate_con_maiuscole_diverse(self):
         text = gate_a("PASSA").replace("| Eurostat |", "| ISTAT |")
         with self.assertRaisesRegex(redazione.RedazioneError, "istituzioni distinte"):
             self.parse(text)
 
-    def test_gate_a_v3_ferma_se_mancano_fonti_grafico_o_date(self):
+    def test_gate_a_ferma_se_mancano_fonti_grafico_o_date(self):
         casi = (
             gate_a("PASSA").replace("| Istat | 2026-09-12 | https://istat.example/dato | dato 2025 | sì |\n| Ministero | 2026-08-10 | https://ministero.example/rapporto | rapporto servizi | sì |\n| Eurostat | 2026-07-01 | https://ec.europa.example/serie | serie comparabile | sì |\n", ""),
             gate_a("PASSA").replace("Grafico con dati esterni: disponibilità servizi; serie 2025; https://istat.example/dato\n", ""),
@@ -414,45 +470,139 @@ class GateParserTests(unittest.TestCase):
             with self.subTest(text=text[:80]), self.assertRaises(redazione.RedazioneError):
                 self.parse(text)
 
-    def test_gate_a_v2_non_vale_per_contratto_v3(self):
-        text = gate_a("PASSA").replace("Contratto: v3", "Contratto: v2")
+    def test_gate_a_v3_non_vale_per_contratto_v4(self):
+        with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
+            self.parse(gate_a_v3("PASSA"))
+        text = gate_a("PASSA").replace("Contratto: v4", "Contratto: v3")
         with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
             self.parse(text)
 
-    def test_run_rivaluta_gate_a_v2_anche_se_brief_non_cambia(self):
+    def test_gate_a_v4_passa_ferma_senza_definizione_specifica(self):
+        senza = "\n".join(line for line in gate_a("PASSA").splitlines()
+                          if not line.startswith("Definizione specifica:")) + "\n"
+        casi = (
+            senza,
+            gate_a("PASSA").replace("Denominatore: residenti di 0-2 anni al 1 gennaio", "Denominatore: <denominatore>"),
+            gate_a("PASSA").replace("Fonte e release: Istat, servizi educativi per l'infanzia, release 2026-09-12\n", ""),
+            gate_a("PASSA").replace(
+                "Definizione specifica: bambini di 0-2 anni iscritti ai servizi comunali e privati convenzionati su 100 residenti della stessa età",
+                "Definizione specifica: esprime come percentuale il fenomeno nel gruppo di riferimento definito dalla fonte"),
+        )
+        for text in casi:
+            with self.subTest(text=text[-120:]):
+                self.assertEqual(self.parse(text), ("FERMO", ""))
+
+    def test_gate_a_v4_passa_ferma_senza_registro(self):
+        registro = gate_a("PASSA")
+        inizio = registro.index("Registro affermazioni:")
+        fine = registro.index("| criterio |")
+        casi = (
+            registro[:inizio] + registro[fine:],
+            registro[:inizio] + "Registro affermazioni:\n| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |\n|---|---|---|---|---|\n" + registro[fine:],
+            registro.replace("| regioni, 0-2 anni, 2019-2023 |", "| |"),
+            registro.replace("| La quota sale in tutte le regioni | dato |", "| La quota sale in tutte le regioni | opinione |"),
+        )
+        for text in casi:
+            with self.subTest(text=text[inizio:inizio + 160]):
+                self.assertEqual(self.parse(text), ("FERMO", ""))
+
+    def test_gate_a_v4_criteri_fissi_e_variante_coerente(self):
+        casi = (
+            (gate_a("PASSA").replace("| Prove e figure |", "| Racconto |"), "criteri v4"),
+            (gate_a("PASSA").replace("Variante: D servizi", "Variante: scheda provinciale"), "Variante"),
+            (gate_a("PASSA").replace("Schema del racconto: domanda delle famiglie > quadro delle misure > offerta > utilizzo > limiti",
+                                     "Schema del racconto: racconto libero"), "Schema"),
+            (gate_a("PASSA").replace("Riferimento usato: Italia ufficiale (30,0, Istat)", "Riferimento usato: Italia"), "Riferimento"),
+        )
+        for text, errore in casi:
+            with self.subTest(errore=errore), self.assertRaisesRegex(redazione.RedazioneError, errore):
+                self.parse(text)
+
+    def test_run_invalida_gate_a_v3_passa_anche_se_brief_non_cambia(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = RedazioneTests().setup_case(tmp)
             workdir = work / "lavoro/demo"
             brief = workdir / "brief.md"
             brief.write_text("brief stabile\n", encoding="utf-8")
-            old_gate = workdir / "gate-a.md"
-            old_gate.write_text("Contratto: v2\n", encoding="utf-8")
             digest = hashlib.sha256(brief.read_bytes()).hexdigest()
-            (workdir / "stato.json").write_text(json.dumps({
-                "key": "demo", "current_phase": "gate_a", "gate_a_sha": digest,
-                "gate_a_contract_version": "v2", "phases": {"gate_a": {
+            old_gate = workdir / "gate-a.md"
+            old_gate.write_text(gate_a_v3("PASSA").replace("Hash brief: abc", f"Hash brief: {digest}"),
+                                encoding="utf-8")
+            state = {
+                "key": "demo", "current_phase": "autore", "gate_a_sha": digest,
+                "gate_a_contract_version": "v3", "phases": {"gate_a": {
                     "status": "riuscita", "input_hashes": {},
                     "output_hashes": {"lavoro/demo/gate-a.md": hashlib.sha256(old_gate.read_bytes()).hexdigest()},
                 }},
-            }), encoding="utf-8")
+            }
+            (workdir / "stato.json").write_text(json.dumps(state), encoding="utf-8")
+            blocked = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, blocked, only="autore")
+            self.assertEqual(result.exit_code, 1)
+            self.assertIn("Gate A v4", result.message)
+            self.assertEqual(blocked.calls, [])
+
+            (workdir / "stato.json").write_text(json.dumps(state), encoding="utf-8")
             launcher = FakeLauncher(workdir)
             result = RedazioneTests().run_case(root, work, cfg, launcher, only="gate_a")
             self.assertEqual(result.exit_code, 0, result.message)
             self.assertEqual(launcher.calls, ["gate_a"])
-            state = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
-            self.assertEqual(state["gate_a_contract_version"], "v3")
+            saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(saved["gate_a_contract_version"], "v4")
+            self.assertEqual(saved["gate_a_sha"], digest)
 
-    def test_autore_non_parte_se_gate_a_non_e_v3_corrente(self):
+    def test_autore_non_parte_se_gate_a_v4_dice_passa_senza_definizione(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            senza = "\n".join(line for line in gate_a("PASSA").splitlines()
+                              if not line.startswith("Definizione specifica:")) + "\n"
+            launcher = FakeLauncher(workdir, gates=[senza, senza])
+            result = RedazioneTests().run_case(root, work, cfg, launcher)
+            self.assertEqual(result.exit_code, 3)
+            self.assertNotIn("autore", launcher.calls)
+            self.assertEqual(launcher.calls.count("gate_a"), 2)
+
+    def test_autore_non_parte_se_gate_a_non_e_v4_corrente(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = RedazioneTests().setup_case(tmp)
             workdir = work / "lavoro/demo"
             (workdir / "brief.md").write_text("brief stabile\n", encoding="utf-8")
-            (workdir / "gate-a.md").write_text("Contratto: v2\nEsito: PASSA\n", encoding="utf-8")
+            (workdir / "gate-a.md").write_text("Contratto: v3\nEsito: PASSA\n", encoding="utf-8")
             launcher = FakeLauncher(workdir)
             result = RedazioneTests().run_case(root, work, cfg, launcher, only="autore")
             self.assertEqual(result.exit_code, 1)
             self.assertIn("Gate A", result.message)
             self.assertEqual(launcher.calls, [])
+
+    def test_gate_b_sotto_4_non_passa(self):
+        with self.assertRaisesRegex(redazione.RedazioneError, "incoerente"):
+            self.parse(gate_b("PASSA", 3), "gate_b")
+        self.assertEqual(self.parse(gate_b("RISCRIVERE", 3), "gate_b"), ("RISCRIVERE", "3"))
+
+    def test_gate_b_senza_contratto_v4_non_vale(self):
+        text = gate_b("PASSA", 4).replace("Contratto: v4\n", "")
+        with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
+            self.parse(text, "gate_b")
+        with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
+            self.parse(gate_b("PASSA", 4).replace("Contratto: v4", "Contratto: v2"), "gate_b")
+
+    def test_run_rifà_gate_b_scritto_prima_della_v4(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            draft = workdir / "bozza.md"
+            draft.write_text("bozza stabile\n", encoding="utf-8")
+            digest = hashlib.sha256(draft.read_bytes()).hexdigest()
+            (workdir / "stato.json").write_text(json.dumps({
+                "key": "demo", "gate_b_sha": digest, "phases": {"gate_b": {"status": "riuscita"}},
+            }), encoding="utf-8")
+            launcher = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, launcher, only="gate_b")
+            self.assertEqual(result.exit_code, 0, result.message)
+            self.assertEqual(launcher.calls, ["gate_b"])
+            saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(saved["gate_b_contract_version"], "v4")
 
     def test_gate_b_passa_solo_con_tutti_i_controlli_si(self):
         text = gate_b("PASSA", 4).replace("T: sì", "T: no")
@@ -464,7 +614,7 @@ class GateParserTests(unittest.TestCase):
             self.parse(gate_b("FERMO", 5), "gate_b")
 
     def test_campi_devono_iniziare_la_riga(self):
-        text = gate_a("PASSA").replace("Domanda: domanda", "nota Domanda: domanda")
+        text = gate_a("PASSA").replace("Domanda: i servizi", "nota Domanda: i servizi")
         with self.assertRaisesRegex(redazione.RedazioneError, "Domanda"):
             self.parse(text)
 
@@ -577,9 +727,9 @@ class TemplateGateTests(unittest.TestCase):
         radice = Path(__file__).resolve().parents[2] / "config" / "redazione"
         for fase, nome in (("gate_a", "gate_a.md"), ("gate_b", "gate_b.md")):
             testo = (radice / nome).read_text(encoding="utf-8")
-            if fase == "gate_a":
-                self.assertIn("REDAZIONE-divario-v3.md", testo)
-            else:
+            self.assertIn("REDAZIONE-divario-v4.md", testo)
+            self.assertNotIn("REDAZIONE-divario-v3.md", testo)
+            if fase == "gate_b":
                 for campo in redazione.GATE_REQUIRED[fase]:
                     self.assertIn(campo, testo, f"{nome}: manca {campo}")
 

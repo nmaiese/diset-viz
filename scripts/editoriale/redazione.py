@@ -24,7 +24,8 @@ BOZZA_OUT = Path("/mnt/c/Users/Nilo/orca/divario/bozze")
 DEFAULT_PHASES = ("scout", "brief", "gate_a", "autore", "grafico", "guardia", "gate_b", "bozza")
 PHASE_LABEL = {"gate_a": "a", "gate_b": "b"}
 KEY_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-GATE_A_CONTRACT_VERSION = "v3"
+GATE_A_CONTRACT_VERSION = "v4"
+GATE_B_CONTRACT_VERSION = "v4"
 
 
 @dataclass
@@ -67,8 +68,13 @@ def _update_pr_preview(worktree: Path, key: str, pr: int, html_path: Path, index
     if marker in body:
         body = body.split(marker, 1)[0].rstrip()
     workdir = worktree / "lavoro" / key
-    gate_a, _ = _parse_gate(workdir / "gate-a.md", "gate_a", brief_hash)
-    gate_b, _ = _parse_gate(workdir / "gate-b.md", "gate_b", draft_hash)
+    gates = {}
+    for phase, name, digest in (("gate_a", "gate-a.md", brief_hash), ("gate_b", "gate-b.md", draft_hash)):
+        try:
+            gates[phase], _ = _parse_gate(workdir / name, phase, digest)
+        except (OSError, RedazioneError) as exc:
+            gates[phase] = f"non valido ({exc})"
+    gate_a, gate_b = gates["gate_a"], gates["gate_b"]
     signature = os.environ.get("AGENT_ID", "").strip()
     block = (f"{marker}\n## Anteprima editoriale\nStato: da leggere\n"
              f"Gate A: {gate_a} (SHA-256 `{brief_hash}`)\nGate B: {gate_b} (SHA-256 `{draft_hash}`)\n"
@@ -313,13 +319,17 @@ def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: li
 
 # I campi che il parser pretende. I template in `config/redazione/gate_*.md` li riportano
 # tutti, in forma di scheletro da compilare: un test tiene allineati i due elenchi.
+# «Definizione specifica» e registro non stanno qui: se mancano il report non è malformato
+# ma vale FERMO, anche quando dice PASSA (REDAZIONE v4, §3).
 GATE_REQUIRED = {
     "gate_a": ["Contratto:", "Tipo pezzo:", "SHA brief:", "Hash brief:", "Autore/modello:",
-               "Giudice/modello:", "Domanda:", "Angoli verificati:", "Tesi:", "Codici e confronto:",
-               "Ultimo dato:", "Data fonte del dato:", "URL fonte del dato:",
+               "Giudice/modello:", "Domanda:", "Risposta in una frase:", "Variante:",
+               "Schema del racconto:", "Angoli verificati:", "Riferimento usato:",
+               "Codici e confronto:", "Ultimo dato:", "Data fonte del dato:", "URL fonte del dato:",
                "Ruolo indicatori interni:", "Fonti esterne verificate:", "Grafico con dati esterni:",
-               "| criterio |", "Esito:", "Motivo:", "Correzione:", "Destinatario:", "Data:"],
-    "gate_b": ["SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
+               "Figure previste:", "Limiti:", "| criterio |", "Esito:", "Motivo:", "Correzione:",
+               "Destinatario:", "Data:"],
+    "gate_b": ["Contratto:", "SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
                "Controllo anti-invenzione:", "Bloccanti:", "Voto:", "Motivo:",
                "Rilievi localizzati:", "Giri:", "Esito:"],
 }
@@ -327,6 +337,11 @@ GATE_REQUIRED = {
 
 def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tuple[str, str]:
     text = path.read_text(encoding="utf-8")
+    # La versione si guarda prima dei campi: un report di un contratto precedente è invalido
+    # in quanto tale, anche quando brief o bozza non sono cambiati.
+    contract = GATE_A_CONTRACT_VERSION if phase == "gate_a" else GATE_B_CONTRACT_VERSION
+    if _field(text, "Contratto") != contract:
+        raise RedazioneError(f"{path.name} usa contratto diverso da {contract}")
     required = GATE_REQUIRED[phase]
     missing = [field for field in required
                if not any(re.match(rf"^{re.escape(field)}", line) for line in text.splitlines())]
@@ -350,13 +365,13 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
     if phase == "gate_b" and not vote:
         raise RedazioneError("gate-b.md malformato: voto 1-5 assente")
     if phase == "gate_a":
-        if _field(text, "Contratto") != GATE_A_CONTRACT_VERSION:
-            raise RedazioneError(f"gate-a.md usa contratto diverso da {GATE_A_CONTRACT_VERSION}")
-        _validate_gate_a_v3(text)
+        if _gate_a_core_gaps(text):
+            return "FERMO", ""
+        _validate_gate_a(text)
         lines = text.splitlines()
         header = next((i for i, line in enumerate(lines) if line.strip().lower() == "| criterio | esito | prova verificabile | limite |"), None)
         if header is None:
-            raise RedazioneError("gate-a.md malformato: intestazione tabella criteri v3 assente")
+            raise RedazioneError("gate-a.md malformato: intestazione tabella criteri assente")
         rows = []
         for line in lines[header + 1:]:
             if not line.startswith("|"):
@@ -370,6 +385,9 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
                 rows.append(cells)
         if len(rows) != 5:
             raise RedazioneError("gate-a.md malformato: servono esattamente cinque criteri valutati")
+        if [row[0].casefold() for row in rows] != [name.casefold() for name in GATE_A_CRITERIA]:
+            raise RedazioneError("gate-a.md malformato: i cinque criteri v4 sono fissi: "
+                                 + ", ".join(GATE_A_CRITERIA))
         for criterion, result, evidence, limit in rows:
             if result.lower() not in {"sì", "no"} or len(evidence) < 18 or evidence.lower() in {"prova", "ok", "sì", "no", "dato verificato"}:
                 raise RedazioneError(f"gate-a.md malformato: prova non verificabile per criterio {criterion}")
@@ -402,10 +420,72 @@ def _field(text: str, name: str) -> str:
     return match.group(1).strip() if match else ""
 
 
-def _validate_gate_a_v3(text: str) -> None:
+GATE_A_CRITERIA = ("Misura definita", "Confronti compatibili", "Livello delle affermazioni",
+                   "Prove e figure", "Fonti e freschezza")
+GATE_A_DEFINITION_FIELDS = ("Definizione specifica", "Unità", "Denominatore", "Popolazione",
+                            "Territorio", "Periodo", "Fonte e release")
+# Definizioni che ripetono il nome invece di dire che cosa si conta: il caso della bozza pensioni.
+GENERIC_DEFINITIONS = ("definito dalla fonte", "definita dalla fonte", "gruppo di riferimento")
+CLAIM_HEADER = "| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |"
+CLAIM_TYPES = {"dato", "calcolo", "dato o calcolo", "interpretazione", "interpretazione attribuita",
+               "ipotesi", "limite"}
+BLOG_VARIANTS = ("orientamento", "cambiamento", "verifica", "servizi", "differenze interne",
+                 "gruppi demografici", "confronto tra misure")
+SHEET_VARIANTS = ("regionale", "provinciale", "multilivello", "per sesso", "per età", "con incroci",
+                  "serie breve", "misura complessa")
+REFERENCES = ("italia ufficiale", "media semplice", "mediana", "obiettivo", "nessuno")
+
+
+def _filled(value: str) -> bool:
+    value = value.strip()
+    return len(value) >= 3 and not value.startswith("<") and value.casefold() not in {"n/d", "nd", "-", "nessuno", "nessuna"}
+
+
+def _gate_a_core_gaps(text: str) -> list[str]:
+    """Ciò che rende FERMO un Gate A v4 qualunque esito dichiari: definizione e registro."""
+    gaps = [name for name in GATE_A_DEFINITION_FIELDS if not _filled(_field(text, name))]
+    definition = _field(text, "Definizione specifica").casefold()
+    if "Definizione specifica" not in gaps and (
+            len(definition) < 30 or any(phrase in definition for phrase in GENERIC_DEFINITIONS)):
+        gaps.append("Definizione specifica generica")
+    lines = text.splitlines()
+    header = next((i for i, line in enumerate(lines)
+                   if re.sub(r"\s+", " ", line.strip()).casefold() == CLAIM_HEADER), None)
+    claims = []
+    if header is not None:
+        for line in lines[header + 1:]:
+            if not line.startswith("|") or line.strip().casefold().startswith("| criterio |"):
+                break
+            if re.match(r"^\|\s*:?-{2,}", line):
+                continue
+            claims.append([cell.strip() for cell in line.strip().strip("|").split("|")])
+    complete = [row for row in claims
+                if len(row) == 5 and len(row[0]) >= 10 and row[1].casefold() in CLAIM_TYPES
+                and all(_filled(cell) for cell in row[2:])]
+    if not claims or len(complete) != len(claims):
+        gaps.append("Registro affermazioni")
+    return gaps
+
+
+def _validate_gate_a(text: str) -> None:
     piece_type = _field(text, "Tipo pezzo").lower()
     if piece_type not in {"blog", "scheda indicatore"}:
         raise RedazioneError("gate-a.md malformato: Tipo pezzo deve essere blog o scheda indicatore")
+    variant = re.sub(r"^(?:[a-g][.)]?\s+|scheda\s+)", "", _field(text, "Variante").casefold())
+    allowed = BLOG_VARIANTS if piece_type == "blog" else SHEET_VARIANTS
+    if not any(variant.startswith(name) for name in allowed):
+        raise RedazioneError(f"gate-a.md malformato: Variante non valida per {piece_type}")
+    steps = [step.strip() for step in re.split(r"\s*(?:>|→)\s*", _field(text, "Schema del racconto"))]
+    if len([step for step in steps if len(step) >= 3]) < 3:
+        raise RedazioneError("gate-a.md malformato: Schema del racconto richiede almeno tre passaggi")
+    if len(_field(text, "Risposta in una frase")) < 15:
+        raise RedazioneError("gate-a.md malformato: Risposta in una frase assente")
+    if not _field(text, "Riferimento usato").casefold().startswith(REFERENCES):
+        raise RedazioneError("gate-a.md malformato: Riferimento usato non denominato")
+    if not _filled(_field(text, "Figure previste")):
+        raise RedazioneError("gate-a.md malformato: Figure previste assenti")
+    if not _filled(_field(text, "Limiti")):
+        raise RedazioneError("gate-a.md malformato: Limiti assenti")
     latest = _field(text, "Ultimo dato")
     if not re.search(r"\b(?:19|20)\d{2}\b", latest):
         raise RedazioneError("gate-a.md malformato: Ultimo dato deve indicare anno o periodo")
@@ -611,6 +691,16 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                 return Result(1, str(exc))
         state["gate_a_sha"] = None
         gate_a_record["status"] = "da rifare"
+    gate_b_record = state.setdefault("phases", {}).setdefault("gate_b", {})
+    if (gate_b_record.get("status") == "riuscita"
+            and state.get("gate_b_contract_version") != GATE_B_CONTRACT_VERSION):
+        if issue != "non registrata" and state.get("gate_b_sha"):
+            try:
+                labeler(issue, "gate-b", False)
+            except RedazioneError as exc:
+                return Result(1, str(exc))
+        state["gate_b_sha"] = None
+        gate_b_record["status"] = "da rifare"
     current_draft_sha = _hash(workdir / "bozza.md")
     if state.get("gate_b_sha") and current_draft_sha and state["gate_b_sha"] != current_draft_sha:
         if issue != "non registrata":
@@ -641,13 +731,13 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             if (state.get("gate_a_contract_version") != GATE_A_CONTRACT_VERSION
                     or state.get("gate_a_sha") != current_brief_sha
                     or gate_record.get("status") != "riuscita"):
-                return Result(1, "Gate A v3 PASSA sul brief corrente richiesto prima della scrittura")
+                return Result(1, f"Gate A {GATE_A_CONTRACT_VERSION} PASSA sul brief corrente richiesto prima della scrittura")
             try:
                 gate_outcome, _ = _parse_gate(workdir / "gate-a.md", "gate_a", current_brief_sha)
             except (OSError, RedazioneError) as exc:
                 return Result(1, f"Gate A non valido per l'autore: {exc}")
             if gate_outcome != "PASSA":
-                return Result(1, "Gate A v3 non è PASSA sul brief corrente; autore fermo")
+                return Result(1, f"Gate A {GATE_A_CONTRACT_VERSION} non è PASSA sul brief corrente; autore fermo")
         if name == "autore" and state.get("rewrite_rounds", 0) >= int(config.get("max_rewrites", 2)):
             break
         input_files = [workdir / str(item) for item in phase.get("input", [])]
@@ -782,6 +872,7 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                         return Result(1, str(exc))
             else:
                 state["gate_b_sha"] = _hash(workdir / "bozza.md")
+                state["gate_b_contract_version"] = GATE_B_CONTRACT_VERSION
                 if issue != "non registrata":
                     try:
                         labeler(issue, "gate-b", True)
