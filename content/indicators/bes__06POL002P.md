@@ -1,6 +1,7 @@
 ---
 fonti: []
 key: "bes:06POL002P"
+level: "provincia"
 vintage: 2024
 ---
 
