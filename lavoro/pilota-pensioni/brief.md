@@ -11,7 +11,7 @@ Tipo di pezzo: scheda indicatore (non blog). Livello: provincia, 107 province. U
 Quanti pensionati prendono una pensione bassa e dove? Chi cerca «pensioni minime» o «pensione bassa» vuole sapere dove si sta peggio e se sta migliorando. La scheda risponde con una quota, non con un numero di persone.
 
 ## 2. Tesi in una frase (un messaggio da dire a un amico)
-Dove vivi cambia di quattro volte la probabilità che un pensionato prenda meno di 500 euro lordi al mese: il 16,9% a Crotone, il 4,1% a Bolzano, e in nove anni il divario non si è chiuso.
+Nel 2023 la quota di pensionati con un reddito pensionistico sotto i 500 euro lordi al mese va dal 16,9% di Crotone al 4,1% di Bolzano, e in nove anni è scesa quasi ovunque senza che la distanza fra i due estremi si chiudesse. È una fotografia di quote per territorio, non l'effetto del luogo in cui si vive.
 
 ## 3. Esempi territoriali (dai dati, `numeri.md`)
 1. **Crotone e Biella** (2023): 16,9% contro 4,9%. Crotone è prima per quota, ultima per importo medio (16.309 euro l'anno). Biella è penultima per quota, seconda dal fondo dopo Bolzano.
@@ -47,11 +47,11 @@ Dove vivi cambia di quattro volte la probabilità che un pensionato prenda meno 
 ## 7. Struttura proposta (lead + 4 sezioni, ruolo `libera`, 600-800 parole)
 Diversa dallo schema fisso `definizione, quadro, dinamica, limiti`. Una sezione per movimento della storia.
 
-- **Lead** (60-80 parole). Apre sul significato: a Crotone circa un pensionato su sei ha un reddito pensionistico sotto i 500 euro lordi al mese, a Bolzano uno su ventiquattro. Il 16,9% e il 4,1% arrivano dopo, con l'anno, 2023. (Per scala umana usa una sola delle due forme: l'immagine o la cifra.)
+- **Lead** (60-80 parole). OBBLIGO (Gate A v3, correzione 1): il lead dice entro le prime due frasi che questa scheda NON misura la pensione minima INPS (il trattamento minimo, integrazione al minimo) ma la quota di pensionati con reddito pensionistico lordo sotto 500 euro al mese; chi cerca «pensioni minime» deve capirlo subito. Apre sul significato: a Crotone circa un pensionato su sei ha un reddito pensionistico sotto i 500 euro lordi al mese, a Bolzano uno su ventiquattro. Il 16,9% e il 4,1% arrivano dopo, con l'anno, 2023. (Per scala umana usa una sola delle due forme: l'immagine o la cifra.)
 - **Sez. 1 «Che cosa conta davvero quel 16,9%»** (150-180 parole). Definizione Istat, soglia, tasso e non persone. Pensione non è reddito. Una frase sua per il caveat. Fonti 1 e 2.
 - **Sez. 2 «Dove una pensione bassa è la regola»** (170-200 parole). Le prime venti del Mezzogiorno. Isernia sopra Verbano-Cusio-Ossola. Crotone contro Biella. Un solo contrasto vivido.
 - **Sez. 3 «Nove anni, un calo ovunque»** (150-180 parole). Scende in tutte le province, distanza intorno ai 13 punti, Napoli e Milano 2015 e 2023, Italia 10,4 -> 8,9. Una digressione sola: il Mezzogiorno 14,8 -> 12,8.
-- **Sez. 4 «Quello che il numero non dice»** (120-150 parole). Pensioni multiple, reversibilità, integrazione al minimo. Il fatto di Bolzano come limite del dato. L'INPS (1.1.2026, soglia 750, pensioni e non pensionati). Chiude con il passo successivo: l'importo medio (`bes-04BEC005P`) e la `/province` della scheda.
+- **Sez. 4 «Quello che il numero non dice»** (120-150 parole). Dire anche che la fonte Istat non chiarisce se la provincia indichi la residenza del pensionato o il luogo di erogazione della pensione (limite territoriale non documentato, Gate A v3, correzione 3). Pensioni multiple, reversibilità, integrazione al minimo. Il fatto di Bolzano come limite del dato. L'INPS (1.1.2026, soglia 750, pensioni e non pensionati). Chiude con il passo successivo: l'importo medio (`bes-04BEC005P`) e la `/province` della scheda.
 - Marcatori di figura: nessuno obbligatorio, usa i grafici dinamici esistenti (`docs/INDICATOR_PAGES.md`). Ogni sezione con `<!-- claims: [...] -->`.
 
 ## 8. Tre titoli SEO possibili (`seo_title` ≤ 60 caratteri)
