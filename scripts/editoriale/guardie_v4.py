@@ -11,7 +11,7 @@ from pathlib import Path
 _INTERNAL = re.compile(
     r"\bindicizz\w*|\bseo\b|\bsitemap\b|\bnoindex\b|\bparola\s+chiave\b|"
     r"\bgoogle\b.{0,100}\b(?:indicizz\w*|seo|sitemap|noindex|parola\s+chiave|priorit\w*)\b|"
-    r"\bpriorit\w*.{0,60}\bindicizz\w*\b",
+    r"\bpriorit\w*.{0,60}\bindicizz\w*\b|\bimpressioni\s+da\s+google\b",
     re.I,
 )
 _NUMBER = re.compile(r"(?<![\w/-])(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?(?:%|ª|°)?(?![\w/-])")

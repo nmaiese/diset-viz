@@ -10,9 +10,11 @@ from scripts.editoriale import guardie_v4
 class G2Test(unittest.TestCase):
     def test_blocca_messaggi_interni_e_non_google_fonte(self):
         self.assertTrue(guardie_v4.g2("La priorità di indicizzazione è alta."))
+        self.assertTrue(guardie_v4.g2("La pagina non ha ricevuto impressioni da Google."))
         self.assertTrue(guardie_v4.g2("Questa parola chiave porta traffico da Google."))
         self.assertTrue(guardie_v4.g2("La sitemap esclude la pagina noindex."))
         self.assertFalse(guardie_v4.g2("Google pubblica i dati nella pagina del servizio."))
+        self.assertFalse(guardie_v4.g2("Google è la fonte dei dati pubblicati."))
         self.assertFalse(guardie_v4.g2("I dati di Google Trends sono una fonte di ricerca."))
 
 

@@ -42,9 +42,18 @@ class AssetParserTest(unittest.TestCase):
         from scripts.editoriale.guardie_v4 import g2
 
         parser = audit._AssetParser()
-        parser.feed("<p>La priorità di indicizzazione è alta</p><script>noindex</script>")
+        parser.feed(
+            "<p>La priorità per l'indicizzazione è alta</p>"
+            "<p>La pagina non ha ricevuto impressioni da Google.</p>"
+            "<p>Il tasso misura la partecipazione elettorale.</p>"
+            "<p>Google pubblica i dati nella pagina del servizio.</p>"
+            "<script>noindex</script><style>impressioni da Google</style>"
+        )
         hits = [text for text in parser.visible_text if g2(text)]
-        self.assertEqual(hits, ["La priorità di indicizzazione è alta"])
+        self.assertEqual(hits, [
+            "La priorità per l'indicizzazione è alta",
+            "La pagina non ha ricevuto impressioni da Google.",
+        ])
 
 
 class W2Test(unittest.TestCase):
