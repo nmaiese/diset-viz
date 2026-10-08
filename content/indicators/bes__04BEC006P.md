@@ -16,7 +16,7 @@ seo_title: "Pensionati sotto i 500 euro al mese: dove sono di più"
 vintage: 2023
 ---
 
-La scheda non conta la pensione minima dell'INPS, cioè l'integrazione al minimo, ma i pensionati con un reddito da pensione sotto i 500 euro lordi al mese: nel 2023 sono il 16,9% a [Crotone](/provincia/crotone), circa uno su sei, e il 4,1% a [Bolzano](/provincia/bolzano). In nove anni la quota è scesa in ogni provincia confrontabile, ma la distanza fra le province agli estremi è rimasta quasi la stessa.
+Nel 2023 a [Crotone](/provincia/crotone) il 16,9% dei pensionati aveva un reddito da pensione sotto i 500 euro lordi al mese, a [Bolzano](/provincia/bolzano) il 4,1%. Non è la pensione minima dell'INPS, cioè l'integrazione al minimo: la scheda conta chi sta sotto una soglia fissa di reddito pensionistico. In nove anni la quota è scesa in ogni provincia confrontabile, ma la distanza fra gli estremi è rimasta quasi la stessa.
 
 <!-- sezione: libera -->
 <!-- claims: ["L'indicatore è la percentuale di pensionati che percepiscono un reddito pensionistico lordo mensile inferiore a 500 euro sul totale dei pensionati (Istat, Bes dei territori 2025, glossario).", "La soglia è di 500 euro lordi al mese, fissa in euro correnti (Istat, Bes dei territori 2025, glossario).", "Nel 2023 il valore nazionale è 8,9% (Istat, Bes dei territori 2025, report Calabria, Tavola 4).", "Nel 2023 Crotone ha il 16,9% (Istat, Bes dei territori 2025, report Calabria)."] -->
