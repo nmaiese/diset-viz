@@ -329,16 +329,17 @@ class IRimandiStannoFuoriDallaCache(unittest.TestCase):
         self.assertEqual(self.client.get("/atlante?indicator=910").status_code, 301)
 
     def test_i_filtri_non_moltiplicano_la_cache(self):
-        """Filtri e ricerca li applica il JavaScript: il server rende la stessa
-        pagina per ogni query string, dalla stessa voce di cache. Si contano
-        le rese: la seconda richiesta non ne fa una nuova."""
+        """I filtri noindex condividono resa cache distinta da quella indicizzabile."""
         with mock.patch.object(design, "render", wraps=design.render) as render:
             plain = self.client.get("/atlante").get_data()
             filtered = self.client.get("/atlante?theme=Ambiente%20ed%20energia&partial=1&q=rifiuti").get_data()
-            self.assertEqual(render.call_count, 1)
-        robots = b'<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">'
+            area = self.client.get("/atlante?area=Lavoro").get_data()
+            self.assertEqual(render.call_count, 2)
         noindex = b'<meta name="robots" content="noindex, follow">'
-        self.assertEqual(filtered.replace(noindex, robots), plain)
+        self.assertIn(noindex, filtered)
+        self.assertIn(noindex, area)
+        self.assertNotIn(noindex, plain)
+        self.assertNotEqual(filtered, plain)
 
     def test_le_altre_mappe_si_rendono_senza_cache(self):
         """Seicento varianti da 600 KB non entrano nella cache del sito: la
