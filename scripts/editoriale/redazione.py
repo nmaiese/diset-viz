@@ -336,7 +336,8 @@ GATE_REQUIRED = {
 }
 
 
-def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tuple[str, str]:
+def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
+                expected_rounds: int | None = None) -> tuple[str, str]:
     """Esito e voto del gate. Per Gate A legge anche `brief.md` accanto al report."""
     text = path.read_text(encoding="utf-8")
     # La versione si guarda prima dei campi: un report di un contratto precedente è invalido
@@ -411,6 +412,9 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None) -> tup
         rounds = re.search(r"^Giri:\s*([12])\s*$", text, re.MULTILINE)
         if not rounds:
             raise RedazioneError("gate-b.md malformato: Giri deve essere 1 o 2")
+        if expected_rounds and int(rounds.group(1)) != expected_rounds:
+            raise RedazioneError(f"gate-b.md incoerente: Giri {rounds.group(1)} nel report, "
+                                 f"{expected_rounds} in stato.json")
         all_yes = all(value == "sì" for value in controls.values())
         vote_value = int(vote.group(1))
         pass_conditions = all_yes and vote_value >= 4 and int(blockers.group(1)) == 0
@@ -469,6 +473,20 @@ def gate_a_formal_gaps(report: Path) -> list[str]:
     if brief_claims and foreign:
         gaps.append("report: registro con affermazioni assenti dal brief ("
                     + ", ".join(f"«{claim}»" for claim in foreign) + ")")
+    brief_rows = {row[0].casefold(): row for row in _claims(brief_text)}
+    for row in _claims(report_text):
+        original = brief_rows.get(row[0].casefold())
+        if original and len(row) == len(original) == 5:
+            changed = [name for name, left, right in zip(("affermazione", "tipo", "dato o calcolo",
+                                                          "ambito e periodo", "fonte"), original, row)
+                       if " ".join(left.split()).casefold() != " ".join(right.split()).casefold()]
+            if changed:
+                gaps.append(f"report: registro diverso dal brief per «{row[0]}» ({', '.join(changed)})")
+    for name in GATE_A_DEFINITION_FIELDS:
+        brief_value = " ".join(_field(brief_text, name).split()).casefold()
+        report_value = " ".join(_field(report_text, name).split()).casefold()
+        if brief_value and report_value and brief_value != report_value:
+            gaps.append(f"report: «{name}» diverso dal brief")
     return gaps
 
 
@@ -786,7 +804,9 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             except (OSError, RedazioneError) as exc:
                 return Result(1, f"Gate A non valido per l'autore: {exc}")
             if gate_outcome != "PASSA":
-                return Result(1, f"Gate A {GATE_A_CONTRACT_VERSION} non è PASSA sul brief corrente; autore fermo")
+                gaps = gate_a_formal_gaps(workdir / "gate-a.md")
+                reason = f": {'; '.join(gaps)}" if gaps else ""
+                return Result(1, f"Gate A {GATE_A_CONTRACT_VERSION} non è PASSA sul brief corrente{reason}; autore fermo")
         if name == "autore" and state.get("rewrite_rounds", 0) >= int(config.get("max_rewrites", 2)):
             break
         input_files = [workdir / str(item) for item in phase.get("input", [])]
@@ -812,7 +832,8 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             if name in {"gate_a", "gate_b"}:
                 try:
                     target = workdir / ("brief.md" if name == "gate_a" else "bozza.md")
-                    outcome, vote = _parse_gate(_gate_file(workdir, name), name, _hash(target))
+                    outcome, vote = _parse_gate(_gate_file(workdir, name), name, _hash(target),
+                                                int(state.get("rewrite_rounds", 0)) if name == "gate_b" else None)
                 except (OSError, RedazioneError) as exc:
                     record["status"] = "fallita"
                     _atomic_json(state_path, state)
@@ -878,7 +899,8 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
         if name in {"gate_a", "gate_b"}:
             try:
                 target = workdir / ("brief.md" if name == "gate_a" else "bozza.md")
-                outcome, vote = _parse_gate(_gate_file(workdir, name), name, _hash(target))
+                outcome, vote = _parse_gate(_gate_file(workdir, name), name, _hash(target),
+                                            int(state.get("rewrite_rounds", 0)) if name == "gate_b" else None)
             except (OSError, RedazioneError) as exc:
                 attempts = int(record.get("malformed_attempts", 0)) + 1
                 record["malformed_attempts"] = attempts
@@ -897,6 +919,8 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                 gaps = gate_a_formal_gaps(_gate_file(workdir, name))
                 if gaps:
                     reason += f" per {gate_a_stop_reason(gaps)}"
+                else:
+                    reason += f": {_field(_gate_file(workdir, name).read_text(encoding='utf-8'), 'Motivo')}"
                 record["motivo"] = reason
                 _atomic_json(state_path, state)
                 progress(f"Gate A: {reason}")
@@ -914,6 +938,9 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                     i = selected.index("autore") if "autore" in selected else len(selected)
                     _atomic_json(state_path, state)
                     continue
+                if name == "gate_a":
+                    record["status"] = "fermo"
+                    _atomic_json(state_path, state)
                 files = [p.name for p in output_files]
                 _bridge(bridge_dir, key, PHASE_LABEL[name], reason, files,
                         f"bin/py -m scripts.editoriale.redazione {key} --da {name}", datetime.now().astimezone())

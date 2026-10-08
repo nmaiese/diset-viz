@@ -252,6 +252,18 @@ class RedazioneTests(unittest.TestCase):
             self.assertEqual(message.splitlines()[1], "")
             self.assertNotIn("---", message)
 
+    def test_gate_a_formalmente_fermo_salva_stato_e_motivo(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = self.setup_case(tmp)
+            report = gate_a("PASSA").replace("Denominatore: residenti di 0-2 anni al 1 gennaio\n", "")
+            launcher = FakeLauncher(work / "lavoro/demo", gates=[report])
+            result = self.run_case(root, work, cfg, launcher, max_gate_a_retries=0)
+            saved = json.loads((work / "lavoro/demo/stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(result.exit_code, 3)
+            self.assertEqual(saved["phases"]["gate_a"]["status"], "fermo")
+            self.assertIn("report: manca «Denominatore»", saved["phases"]["gate_a"]["motivo"])
+            self.assertNotIn("autore", launcher.calls)
+
     def test_gate_a_concede_un_solo_ritorno_al_leader(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = self.setup_case(tmp)
@@ -313,11 +325,26 @@ class RedazioneTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = self.setup_case(tmp)
             launcher = FakeLauncher(work / "lavoro" / "demo", gates=[
-                gate_a("PASSA"), gate_b("RISCRIVERE", 3), gate_b("FERMO", 2)])
+                gate_a("PASSA"), gate_b("RISCRIVERE", 3),
+                gate_b("FERMO", 2).replace("Giri: 1", "Giri: 2")])
             result = self.run_case(root, work, cfg, launcher)
             self.assertEqual(result.exit_code, 3)
             self.assertEqual(launcher.calls.count("autore"), 2)
             self.assertEqual(launcher.calls.count("gate_b"), 2)
+
+    def test_gate_b_giri_report_devono_corrispondere_alla_seconda_bozza(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = self.setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            (workdir / "bozza.md").write_text("seconda bozza\n", encoding="utf-8")
+            (workdir / "stato.json").write_text(json.dumps({"rewrite_rounds": 2}), encoding="utf-8")
+            launcher = FakeLauncher(workdir, gates=[gate_b("PASSA", 4)])
+            result = self.run_case(root, work, cfg, launcher, only="gate_b")
+            saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(result.exit_code, 1)
+            self.assertIn("Giri", result.message)
+            self.assertEqual(saved["phases"]["gate_b"]["status"], "fallita")
+            self.assertEqual(launcher.calls, ["gate_b"])
 
     def test_ripresa_dopo_errore_non_rifà_fasi_riuscite(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -590,8 +617,10 @@ class GateParserTests(unittest.TestCase):
         for tipo in ("interpretazione documentata", "interpretazione attribuita", "dato o calcolo", "Limite"):
             text = gate_a("PASSA").replace("| Le rette pesano sull'accesso | interpretazione |",
                                            f"| Le rette pesano sull'accesso | {tipo} |")
+            brief = brief_v4().replace("| Le rette pesano sull'accesso | interpretazione |",
+                                       f"| Le rette pesano sull'accesso | {tipo} |")
             with self.subTest(tipo=tipo):
-                self.assertEqual(self.parse(text), ("PASSA", ""))
+                self.assertEqual(self.parse(text, brief=brief), ("PASSA", ""))
 
     def test_gate_a_v4_criteri_fissi_e_variante_coerente(self):
         casi = (
@@ -649,6 +678,29 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 3)
             self.assertNotIn("autore", launcher.calls)
             self.assertEqual(launcher.calls.count("gate_a"), 2)
+
+    def test_autore_non_parte_se_gate_a_cambia_dato_o_definizione_del_brief(self):
+        changes = (
+            ("| 20 regioni su 20 in aumento |", "| 10 regioni su 20 in aumento |", "dato o calcolo"),
+            ("Definizione specifica: bambini di 0-2 anni iscritti", "Definizione specifica: posti disponibili", "Definizione specifica"),
+        )
+        for before, after, reason in changes:
+            with self.subTest(reason=reason), tempfile.TemporaryDirectory() as tmp:
+                root, work, cfg = RedazioneTests().setup_case(tmp)
+                workdir = work / "lavoro/demo"
+                brief = workdir / "brief.md"
+                brief.write_text(brief_v4().replace(before, after), encoding="utf-8")
+                digest = hashlib.sha256(brief.read_bytes()).hexdigest()
+                gate = workdir / "gate-a.md"
+                gate.write_text(gate_a("PASSA").replace("Hash brief: abc", f"Hash brief: {digest}"), encoding="utf-8")
+                state = {"gate_a_sha": digest, "gate_a_contract_version": "v4",
+                         "phases": {"gate_a": {"status": "riuscita"}}}
+                (workdir / "stato.json").write_text(json.dumps(state), encoding="utf-8")
+                launcher = FakeLauncher(workdir)
+                result = RedazioneTests().run_case(root, work, cfg, launcher, only="autore")
+                self.assertEqual(result.exit_code, 1, result.message)
+                self.assertIn(reason, result.message)
+                self.assertEqual(launcher.calls, [])
 
     def test_autore_non_parte_se_il_brief_corrente_non_ha_definizione_ne_registro(self):
         # Riproduzione della review 1 sulla sequenza: il ponte dice che cosa manca e dove.
