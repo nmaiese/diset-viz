@@ -30,11 +30,17 @@ _SIMPLE = re.compile(r"\bmedia\s+(?:aritmetica\s+)?semplice\b", re.I)
 _OFFICIAL = re.compile(r"\b(?:dato|valore|media)\s+(?:nazionale\s+)?ufficiale\b|\b(?:istat|eurostat)\b.{0,35}\b(?:dato|valore|media)\s+nazionale\b|\b(?:dato|valore|media)\s+(?:nazionale\s+)?(?:istat|eurostat)\b", re.I)
 _MEASURE = re.compile(r"(?<![\w])(?P<number>\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?)(?:\s*%|\b)")
 _COUNT = re.compile(r"\b(?P<count>\d{1,3})\s+(?P<geo>province|regioni)\b|\btutte\s+le\s+(?P<all>province|regioni)\b", re.I)
+_COUNT_DENOMINATOR = re.compile(r"^\s+su\s+(?P<count>\d{1,3})\b(?:\s+(?:province|regioni))?(?P<observed>\s+osservat[ei]\b)?", re.I)
+_OBSERVED_COUNT = re.compile(r"\b(?:delle|dei)\s+(?P<count>\d{1,3})\s+osservat[ei]\b", re.I)
+_SUBSET_BEFORE = re.compile(r"\b(?:solo|appena|almeno|tra|fra)\s*$", re.I)
+_SUBSET_AFTER = re.compile(r"^\s+(?:super\w*|inferior\w*|sopra|sotto|oltre|meno|pi[uù]|con\b|hanno.{0,35}\b(?:sopra|sotto|superior\w*|inferior\w*))", re.I)
 _RATIO = re.compile(r"\b(?:\d+(?:,\d+)?|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+volte\b", re.I)
 _COMPARISON = re.compile(r"\b(?:estremi|divario|rapporto|rispetto|confronto|quello|quella|tra|fra)\b", re.I)
 _AGE_RANGE = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*(?:[-‐‑‒–—−]|\b(?:a|al|fino\s+a)\b)\s*(?P<hi>\d{1,2})\s*(?:anni?|aa\.?)(?!\w)", re.I)
 _AGE_OPEN = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*anni?\s*(?:e\s+)?(?:pi[uù]|oltre|o\s+pi[uù])\b", re.I)
-_AGE_COMPARE = re.compile(r"\b(?:confront\w*|rispetto|contro|tra|fra|differenz\w*|divari\w*|pi[uù]\s+che|meno\s+che|superior\w*|inferior\w*|maggiore|minore|pi[uù]\s+alt\w*|meno\s+alt\w*|mentre)\b", re.I)
+_AGE_DIRECT = re.compile(r"\b(?:confront\w*|rispetto|contro|superior\w*|inferior\w*|maggiore|minore|pi[uù]\s+(?:che|alt\w*)|meno\s+(?:che|alt\w*))\b", re.I)
+_AGE_DIRECT_PREFIX = re.compile(r"\b(?:confronto|divario|differenza)\s+(?:tra|fra)\b", re.I)
+_AGE_NONCOMPARABLE = re.compile(r"\bnon\s+(?:(?:si|è|sono)\s+)?confront\w*", re.I)
 _AGE_DEFINITION = re.compile(r"\b(?:fasce|classi|gruppi)\s+(?:d['’ ]et[aà]|di\s+et[aà])\s+(?:sono|:|includono|comprendono|considerate|definite)\b|\b(?:le\s+)?(?:fasce|classi)\s*(?:sono|:)", re.I)
 
 
@@ -73,25 +79,36 @@ def editorial_checks(sentence, observations, geography, year=None, unit="", name
                 if any(abs(number - mean) <= Decimal("0.05") for number in numbers):
                     result.append(("errore", "G1", f"media semplice di {len(values)} {geography} nel {selected} chiamata nazionale"))
     count_matches = list(_COUNT.finditer(sentence))
+    claims = []
     for match in count_matches:
         geo = match.group("geo") or match.group("all")
-        before = sentence[max(0, match.start() - 12):match.start()]
+        before = sentence[max(0, match.start() - 20):match.start()]
         if geo.lower() != geography or re.search(r"\b(?:su|non)\s*$", before, re.I):
             continue
-        after = sentence[match.end():match.end() + 20]
-        if re.match(r"\s+su\s+\d+", after, re.I):
-            continue
+        after = sentence[match.end():]
+        denominator = _COUNT_DENOMINATOR.match(after)
+        if denominator:
+            claims.append((int(match.group("count")), True))
+            if denominator.group("observed"):
+                claims.append((int(denominator.group("count")), False))
+        else:
+            claimed = int(match.group("count")) if match.group("count") else {"province": 107, "regioni": 20}[geo.lower()]
+            subset = bool(match.group("count") and (_SUBSET_BEFORE.search(before) or _SUBSET_AFTER.match(after)))
+            claims.append((claimed, subset))
+    if count_matches:
+        claims.extend((int(match.group("count")), False) for match in _OBSERVED_COUNT.finditer(sentence))
+    for claim in claims:
+        claimed, subset = claim if isinstance(claim, tuple) else (claim, False)
         count_values = values
         count_period = selected
         if not count_values and not years and observations and len({len(cells) for cells in observations.values()}) == 1:
             count_values = next(iter(observations.values()))
             count_period = "ogni anno disponibile"
         if not count_values or len(years) > 1:
-            result.append(("non verificabile", "G7", f"anno o CSV delle {geo} non determinabile"))
+            result.append(("non verificabile", "G7", f"anno o CSV delle {geography} non determinabile"))
             continue
-        claimed = int(match.group("count")) if match.group("count") else {"province": 107, "regioni": 20}[geo.lower()]
-        if claimed != len(count_values):
-            result.append(("errore", "G7", f"{claimed} {geo} dichiarate, {len(count_values)} osservate nel {count_period}"))
+        if claimed > len(count_values) or (not subset and claimed != len(count_values)):
+            result.append(("errore", "G7", f"{claimed} {geography} dichiarate, {len(count_values)} osservate nel {count_period}"))
     if _RATIO.search(sentence) and _COMPARISON.search(sentence):
         duration = bool(re.search(r"\b(?:speranza di vita|durata|anni di vita|anni vissuti)\b", name, re.I)) or unit.lower().strip() in {"anni", "anno", "years"}
         if re.search(r"\bvolte\s+(?:il|lo|la)\s+(?:divario|differenza|distanza)\b", sentence, re.I):
@@ -134,8 +151,11 @@ def g4_text(text, previous_has_year=False):
 
 
 def g4_title(text):
-    """Titoli di figura/tabella: ogni numero nudo costituisce blocco."""
+    """Block bare values, excluding figure/table identifiers and title units/years."""
     text = _LINK_URL.sub(" ", str(text or ""))
+    text = re.sub(r"^\s*(?:#{1,6}\s*|\*\*)?(?:figura|tabella)\s+\d+\b\s*:?[\s*]*", "", text, count=1, flags=re.I)
+    if _YEAR.search(text) or _UNIT.search(text):
+        return []
     return [m.group(0) for m in _NUMBER.finditer(text)
             if not m.group(0).endswith(("%", "ª", "°")) and not _YEAR.fullmatch(m.group(0))]
 
@@ -170,7 +190,19 @@ def g3_page(lines):
         found = age_cohorts(text)
         current = {item[0] for item in found}
         cohorts.update(current)
-        if len(current) > 1 and _AGE_COMPARE.search(text):
+        direct = False
+        for phrase in _SENTENCE.finditer(text):
+            words = phrase.group(0)
+            ranges = age_cohorts(words)
+            if len({item[0] for item in ranges}) < 2:
+                continue
+            for left, right in zip(ranges, ranges[1:]):
+                between = _AGE_NONCOMPARABLE.sub("", words[left[2]:right[1]])
+                if left[0] != right[0] and (_AGE_DIRECT.search(between) or
+                                                _AGE_DIRECT_PREFIX.search(words[:left[1]])):
+                    direct = True
+                    break
+        if direct:
             key = (line_no, "BLOCCO")
             if key not in seen:
                 findings.append(("errore", line_no, "G3 confronto diretto tra fasce d'età diverse nella stessa frase", text.strip()))

@@ -336,7 +336,8 @@ class Cli(unittest.TestCase):
             cwd=ROOT, capture_output=True, timeout=120,
         )
         self.assertEqual(result.returncode, 0, result.stderr.decode())
-        self.assertIn(b"pulito", result.stdout)
+        self.assertIn(b"G4-avviso", result.stderr)
+        self.assertNotIn(b"pulito", result.stdout)
 
     def test_dossier_mancante_esce_con_errore(self):
         result = subprocess.run(

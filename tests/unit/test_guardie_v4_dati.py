@@ -41,6 +41,25 @@ class GuardieDati(unittest.TestCase):
             "Nel 2022, 95 province su 107 province hanno dato.", data, "province") if rule == "G7"))
         self.assertEqual(self.checks("Nel 2022 tutte le province hanno dato.", data, "province")[0][:2], ("errore", "G7"))
 
+    def test_g7_sottoinsieme_e_perimetro_osservato(self):
+        data = self.PROVINCES
+        self.assertFalse(any(rule == "G7" for _, rule, _ in self.checks(
+            "Nel 2022, 8 province superano la media delle 103 osservate.", data, "province")))
+        self.assertFalse(any(rule == "G7" for _, rule, _ in self.checks(
+            "Nel 2022, solo 8 province hanno valori sopra la media.", data, "province")))
+        self.assertFalse(any(rule == "G7" for _, rule, _ in self.checks(
+            "Nel 2022, 8 province su 103 superano la media.", data, "province")))
+        self.assertTrue(any(rule == "G7" and severity == "errore" for severity, rule, _ in self.checks(
+            "Nel 2022, 8 province superano la media delle 104 osservate.", data, "province")))
+
+    def test_g7_denominatore_su_n_non_e_copertura_csv(self):
+        self.assertFalse(any(rule == "G7" for _, rule, _ in self.checks(
+            "Nel 2022, 8 province su 107 superano la media.", self.PROVINCES, "province")))
+
+    def test_g7_denominatore_dichiarato_osservato_errato_blocca(self):
+        self.assertTrue(any(rule == "G7" and severity == "errore" for severity, rule, _ in self.checks(
+            "Nel 2022, 8 province su 107 osservate superano la media.", self.PROVINCES, "province")))
+
     def test_scheda_usa_livello_e_anno_selezionati(self):
         view = {"meta": {"name": "Quota", "unit": "%", "source": "Istat"},
                 "levels": [{"key": "regione", "matrix": {"2023": {"a": 8.8, "b": 9.0}}}]}

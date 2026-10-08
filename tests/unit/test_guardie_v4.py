@@ -28,8 +28,16 @@ class G4Test(unittest.TestCase):
         self.assertEqual(guardie_v4.g4_text(text), [])
 
     def test_titolo_figura_o_tabella_con_numero_nudo_blocca(self):
-        self.assertEqual(guardie_v4.g4_title("Figura 3 regioni"), ["3"])
+        self.assertEqual(guardie_v4.g4_title("Figura 3: valore 17"), ["17"])
         self.assertEqual(guardie_v4.g4_title("Tabella 2024"), [])
+
+    def test_titolo_figura_con_identificativo_unita_e_anno(self):
+        self.assertEqual(guardie_v4.g4_title("Figura 2: tasso per 1.000 abitanti, 2023"), [])
+        self.assertEqual(guardie_v4.g4_title("Tabella 3: 17 per 1.000 abitanti"), [])
+        self.assertEqual(guardie_v4.g4_title("Figura 2: 17 nel 2023"), [])
+
+    def test_titolo_figura_valore_nudo_resta_bloccante(self):
+        self.assertEqual(guardie_v4.g4_title("Figura 2: valore 17"), ["17"])
 
     def test_sweep_markdown_stampa_file_riga_severita_e_blocca(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -54,6 +62,22 @@ class G3Test(unittest.TestCase):
     def test_confronto_diretto_nella_stessa_frase_blocca(self):
         findings = guardie_v4.g3_page([(7, "Il tasso 15-34 anni è superiore a quello dei 35-64 anni.")])
         self.assertTrue(any(severity == "errore" and line == 7 for severity, line, *_ in findings))
+        findings = guardie_v4.g3_page([(8, "Il confronto fra il tasso 15-34 anni e il tasso 35-64 anni mostra un divario.")])
+        self.assertTrue(any(severity == "errore" and line == 8 for severity, line, *_ in findings))
+        findings = guardie_v4.g3_page([(9, "Il tasso 15-34 anni è superiore a quello dei 35-64 anni, mentre le fasce non coincidono.")])
+        self.assertTrue(any(severity == "errore" and line == 9 for severity, line, *_ in findings))
+
+    def test_cautela_su_fasce_diverse_non_blocca(self):
+        examples = [
+            "Eurostat usa la fascia 20-64 anni mentre questa pagina usa 15-64 anni. Sono due misure diverse.",
+            "Eurostat pubblica fasce di età diverse, da 25 a 74 anni oppure da 25 a 34 anni, e non si confrontano senza attenzione.",
+            "Istat misura la fascia 20-64 anni. Il comunicato però misura la fascia 15-64 anni, un conteggio diverso.",
+            "Il dato nazionale usa 20-64 anni. I valori regionali usano 15-64 anni: le popolazioni non coincidono.",
+            "Il tasso 20-64 anni non è confrontabile con quello dei 15-64 anni.",
+        ]
+        for line in examples:
+            with self.subTest(line=line):
+                self.assertFalse(any(severity == "errore" for severity, *_ in guardie_v4.g3_page([(7, line)])))
 
     def test_lista_definitoria_non_e_confronto_ne_avviso(self):
         self.assertEqual(guardie_v4.g3_page([(3, "Le fasce d'età sono: 15-34 anni e 35-64 anni.")]), [])
