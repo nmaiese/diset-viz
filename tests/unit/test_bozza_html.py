@@ -32,6 +32,61 @@ class BozzaHtmlTests(unittest.TestCase):
         self.assertNotIn("preload", out)
         self.assertNotIn("canonical", out)
 
+    def test_toglie_lo_script_reale_e_tiene_il_resto_byte_per_byte(self):
+        pagina = (
+            '<html><head><meta charset="utf-8"></head><body><p>Testo &amp; entità</p>'
+            '<!-- commento intatto --><script src="/static/js/v1.js"></script><p>Dopo</p></body></html>'
+        )
+        atteso = (
+            '<html><head><meta charset="utf-8"></head><body><p>Testo &amp; entità</p>'
+            '<!-- commento intatto --><p>Dopo</p></body></html>'
+        )
+        self.assertEqual(b.togli_script(pagina), atteso)
+
+    def test_il_commento_css_con_script_non_mangia_lo_stile(self):
+        pagina = (
+            "<html><head><style>\n/* ci sono gli <script> qui */\n.x{color:red}\n</style></head>"
+            "<body><p>Testo</p><script>alert(1)</script></body></html>"
+        )
+        out = b.togli_script(pagina)
+        self.assertIn("</style>", out)
+        self.assertIn("/* ci sono gli <script> qui */", out)
+        self.assertIn(".x{color:red}", out)
+        self.assertNotIn("alert(1)", out)
+        self.assertEqual(out.count("<style"), out.count("</style>"))
+
+    def test_il_css_incorporato_con_script_commentato_resta_intero(self):
+        css = {"/static/css/rotta.css": b"/* ci sono gli <script> qui */\nbody{color:#000}"}
+        pagina = (
+            '<html><head><link rel="stylesheet" href="/static/css/rotta.css"></head>'
+            "<body><p>Testo</p></body></html>"
+        )
+        out = b.incorpora(pagina, css.get)
+        self.assertEqual(out.count("<style"), out.count("</style>"))
+        self.assertIn("/* ci sono gli <script> qui */", out)
+        self.assertIn("body{color:#000}", out)
+        self.assertIn("</style></head>", out)
+
+    def test_controlla_rifiuta_lo_style_non_chiuso(self):
+        pagina = "<html><head><style>body{color:red}</head><body>" + "parola " * 200 + "</body></html>"
+        with self.assertRaises(ValueError) as c:
+            b.controlla(pagina)
+        self.assertIn("style", str(c.exception))
+
+    def test_controlla_rifiuta_un_body_senza_testo_visibile(self):
+        pagina = "<html><head><style>body{color:red}</style></head><body><p>Ciao</p></body></html>"
+        with self.assertRaises(ValueError) as c:
+            b.controlla(pagina)
+        self.assertIn("testo visibile", str(c.exception))
+
+    def test_controlla_accetta_una_pagina_normale(self):
+        pagina = (
+            "<html><head><style>body{color:red}</style></head><body>"
+            + "<p>Una frase abbastanza lunga da superare la soglia del controllo. </p>" * 12
+            + "</body></html>"
+        )
+        self.assertIsNone(b.controlla(pagina))
+
     def test_incorpora_foglio_e_immagini(self):
         out = b.incorpora(self.PAGINA, fetch)
         self.assertIn("<style>", out)
