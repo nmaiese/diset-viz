@@ -919,6 +919,38 @@ def _search_indicators(query, theme=None, limit=50):
         seen.add(page["path"])
         if len(results) >= limit:
             break
+    # La ricerca interna resta utile anche per le schede che il criterio SEO
+    # editoriale toglie da sitemap e catalogo pubblico. Non sono pagine
+    # indicizzabili, ma restano raggiungibili e i suggerimenti devono trovarle.
+    if len(results) < limit:
+        for record in indicator_universe.projection():
+            meta = record["meta"]
+            family, raw_id = meta.get("family"), meta.get("raw_id")
+            base_level = record["default_level"]
+            noindex_for_prose = (
+                (meta.get("indexable") and editorial_state.senza_prosa(family, raw_id, base_level))
+                or (not meta.get("indexable") and meta.get("indexable_reason") == "senza_prosa")
+            )
+            if not noindex_for_prose or hidden_from_browsing(family, raw_id):
+                continue
+            if theme and meta.get("theme") != theme:
+                continue
+            path = meta["canonical_path"]
+            if path in seen:
+                continue
+            explain = meta.get("explain") or {}
+            haystack = _search_fold(f"{meta['name']} {meta.get('theme', '')} {explain.get('plain', '')}")
+            if folded and folded not in haystack:
+                continue
+            results.append({
+                "id": meta["id"], "name": meta["name"], "path": path,
+                "theme": meta.get("theme") or "",
+                "catalog_family_label": meta.get("family_label") or "",
+                "explain": explain, "year_max": meta.get("year_max"),
+            })
+            seen.add(path)
+            if len(results) >= limit:
+                break
     return results
 
 
@@ -1610,7 +1642,10 @@ def _render_indicator(family, raw_id, path_level=None):
     seo_description = seo_titles.page_description(article, meta, level, composed=lead)
 
     explore_state = seo_policy.has_explore_params(request.args)
-    noindex = (not level["indexable"]) or explore_state
+    noindex = (not level["indexable"]) or explore_state or (
+        level["key"] == view["levels"][0]["key"]
+        and editorial_state.senza_prosa(family, raw_id, level["key"])
+    )
     page_h1 = _page_h1(article, meta, level)
 
     if agent_discovery.prefers_markdown():

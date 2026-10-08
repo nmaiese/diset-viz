@@ -17,9 +17,10 @@ import csv
 import json
 import re
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from app import app, province_profile, sources
+from app import app, editorial_state, indicator_universe, province_profile, sources
 from app.indicator_texts import LIBERA, ROLE_ORDER, get_text
 from app.indicator_view import build_indicator_view
 
@@ -31,6 +32,11 @@ FIXTURE = Path(__file__).resolve().parent.parent / "fixtures" / "indicator_stats
 class EveryIndicatorPageRenders(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        indicator_universe.cache_clear()
+        editorial_state.build_queue.cache_clear()
+        editorial_state.catalogo.cache_clear()
+        from app.cache import cache
+        cache.clear()
         cls.golden = json.loads(FIXTURE.read_text(encoding="utf-8"))
         app.config["PROPAGATE_EXCEPTIONS"] = True
         cls.client = app.test_client()
@@ -221,6 +227,10 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         """
         sitemap = self.client.get("/sitemap.xml").get_data(as_text=True)
         self.assertIn("/indicatore/", sitemap)
+        sitemap_paths = {
+            node.text.removeprefix("https://divarioitalia.it")
+            for node in ET.fromstring(sitemap).findall(".//{*}loc")
+        }
         wrong = []
         for indicator_id in self.golden:
             family, raw_id = family_and_raw(indicator_id)
@@ -232,7 +242,7 @@ class EveryIndicatorPageRenders(unittest.TestCase):
             if response.status_code != 200:
                 wrong.append((indicator_id, path, f"status {response.status_code}"))
                 continue
-            listed = path in sitemap
+            listed = path in sitemap_paths
             noindex = (response.headers.get("X-Robots-Tag") or "").startswith("noindex")
             if listed == noindex:
                 wrong.append((
@@ -304,6 +314,9 @@ class EveryIndicatorPageRenders(unittest.TestCase):
             (len(indexed), len(not_indexed)),
             (self.PROVINCE_INDICIZZATE, self.PROVINCE_NON_INDICIZZATE),
         )
+        indicator_universe.cache_clear()
+        editorial_state.build_queue.cache_clear()
+        editorial_state.catalogo.cache_clear()
         listed = {page["path"] for page in indicator_universe.level_pages() if not page["base"]}
         self.assertEqual(indexed, listed)
 
