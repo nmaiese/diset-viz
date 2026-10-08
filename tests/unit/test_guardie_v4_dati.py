@@ -49,6 +49,18 @@ class GuardieDati(unittest.TestCase):
             defects = guardia.check_article("901", entry)
         self.assertTrue(any(defect.check == "G1" for defect in defects))
 
+    def test_g3_scheda_segnala_fasce_diverse_come_avviso(self):
+        view = {"meta": {"name": "Occupazione", "unit": "%", "source": "Istat"},
+                "dimension_siblings": [{"id": "902", "value": "15-34"}],
+                "levels": [{"key": "regione", "matrix": {"2024": {"a": 40, "b": 50}}}]}
+        entry = {"level": "regione", "vintage": 2024,
+                 "lead": "Tasso per 15-34 anni.",
+                 "sections": [{"role": "libera", "h": "Adulti", "body": "Tasso per 35-64 anni."}]}
+        with patch.object(guardia, "build_indicator_view", return_value=view):
+            defects = guardia.check_article("901", entry)
+        self.assertTrue(any(defect.check == "G3-avviso" for defect in defects))
+        self.assertFalse(any(defect.check == "G3" for defect in defects))
+
 
 if __name__ == "__main__":
     unittest.main()

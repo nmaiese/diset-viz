@@ -32,6 +32,10 @@ _MEASURE = re.compile(r"(?<![\w])(?P<number>\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,
 _COUNT = re.compile(r"\b(?P<count>\d{1,3})\s+(?P<geo>province|regioni)\b|\btutte\s+le\s+(?P<all>province|regioni)\b", re.I)
 _RATIO = re.compile(r"\b(?:\d+(?:,\d+)?|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+volte\b", re.I)
 _COMPARISON = re.compile(r"\b(?:estremi|divario|rapporto|rispetto|confronto|quello|quella|tra|fra)\b", re.I)
+_AGE_RANGE = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*(?:[-‐‑‒–—−]|\b(?:a|al|fino\s+a)\b)\s*(?P<hi>\d{1,2})\s*(?:anni?|aa\.?)(?!\w)", re.I)
+_AGE_OPEN = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*anni?\s*(?:e\s+)?(?:pi[uù]|oltre|o\s+pi[uù])\b", re.I)
+_AGE_COMPARE = re.compile(r"\b(?:confront\w*|rispetto|contro|tra|fra|differenz\w*|divari\w*|pi[uù]\s+che|meno\s+che|superior\w*|inferior\w*|maggiore|minore|pi[uù]\s+alt\w*|meno\s+alt\w*|mentre)\b", re.I)
+_AGE_DEFINITION = re.compile(r"\b(?:fasce|classi|gruppi)\s+(?:d['’ ]et[aà]|di\s+et[aà])\s+(?:sono|:|includono|comprendono|considerate|definite)\b|\b(?:le\s+)?(?:fasce|classi)\s*(?:sono|:)", re.I)
 
 
 def decimal_value(value):
@@ -136,6 +140,54 @@ def g4_title(text):
             if not m.group(0).endswith(("%", "ª", "°")) and not _YEAR.fullmatch(m.group(0))]
 
 
+def age_cohorts(text):
+    """Explicit age cohorts only; return normalized closed/open ranges."""
+    text = str(text or "")
+    found = []
+    for match in _AGE_RANGE.finditer(text):
+        lo, hi = int(match.group("lo")), int(match.group("hi"))
+        if lo < hi:
+            found.append(((lo, hi), match.start(), match.end()))
+    for match in _AGE_OPEN.finditer(text):
+        found.append(((int(match.group("lo")), None), match.start(), match.end()))
+    return sorted(found, key=lambda item: item[1])
+
+
+def g3_page(lines):
+    """Return (severity, line, message, quote) for explicit age-cohort issues.
+
+    `lines` contains (one-based line, visible prose). Definition lists are
+    excluded from population comparisons; they define the universe rather than
+    compare it.
+    """
+    cohorts = set()
+    findings = []
+    seen = set()
+    blocked_lines = set()
+    for line_no, text in lines:
+        if _AGE_DEFINITION.search(text):
+            continue
+        found = age_cohorts(text)
+        current = {item[0] for item in found}
+        cohorts.update(current)
+        if len(current) > 1 and _AGE_COMPARE.search(text):
+            key = (line_no, "BLOCCO")
+            if key not in seen:
+                findings.append(("errore", line_no, "G3 confronto diretto tra fasce d'età diverse nella stessa frase", text.strip()))
+                seen.add(key)
+                blocked_lines.add(line_no)
+    if len(cohorts) > 1:
+        for line_no, text in lines:
+            found = age_cohorts(text)
+            if not found or _AGE_DEFINITION.search(text) or line_no in blocked_lines:
+                continue
+            key = (line_no, "AVVISO")
+            if key not in seen:
+                findings.append(("avviso", line_no, "G3 più fasce d'età esplicite nella pagina: verificare comparabilità di popolazione, geografia e periodo", text.strip()))
+                seen.add(key)
+    return findings
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="+", type=Path)
@@ -151,6 +203,7 @@ def main(argv=None):
             in_public_metadata = False
             in_sources = False
             previous_line_has_year = False
+            g3_lines = []
             for line_no, line in enumerate(lines, 1):
                 if frontmatter:
                     if line.strip() == "---" and line_no > 1:
@@ -164,7 +217,11 @@ def main(argv=None):
                     if in_public_metadata and g2(line):
                         print(f"BLOCCO {file}:{line_no}: G2 messaggio interno")
                         blocked = True
+                    if in_public_metadata:
+                        g3_lines.append((line_no, line.split(":", 1)[-1]))
                     continue
+                if line.strip() and not line.lstrip().startswith(("|", "```", ">")):
+                    g3_lines.append((line_no, line))
                 if g2(line):
                     print(f"BLOCCO {file}:{line_no}: G2 messaggio interno")
                     blocked = True
@@ -183,6 +240,10 @@ def main(argv=None):
                         print(f"BLOCCO {file}:{line_no}: G4 titolo figura/tabella senza unità/anno: {number}")
                         blocked = True
                 previous_line_has_year = bool(_YEAR.search(line))
+            for severity, line_no, message, _quote in g3_page(g3_lines):
+                label = "BLOCCO" if severity == "errore" else "AVVISO"
+                print(f"{label} {file}:{line_no}: {message}")
+                blocked = blocked or severity == "errore"
     return int(blocked)
 
 

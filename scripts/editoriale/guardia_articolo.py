@@ -457,6 +457,8 @@ def check_editorial_v4(article, table=None):
         line = article.field_line(key)
         if guardie_v4.g2(text):
             findings.append(Finding(ERROR, "G2", line, "messaggio editoriale interno nel testo pubblico", text))
+    age_lines = [(article.field_line(key), str(article.meta.get(key) or ""))
+                 for key in PROSE_FIELDS if article.meta.get(key)]
     def selection(sentence):
         has_provinces = bool(re.search(r"\bprovince\b", sentence, re.I))
         has_regions = bool(re.search(r"\bregioni\b", sentence, re.I))
@@ -482,6 +484,7 @@ def check_editorial_v4(article, table=None):
     body = "\n".join(_prose_line(line) for line in article.body_lines)
     for line_no, raw in enumerate(article.body_lines, 1):
         visible = _prose_line(raw)
+        age_lines.append((article.body_line(line_no - 1), visible))
         if guardie_v4.g2(visible):
             findings.append(Finding(ERROR, "G2", article.body_line(line_no - 1),
                                     "messaggio editoriale interno nel testo pubblico", visible.strip()))
@@ -489,6 +492,8 @@ def check_editorial_v4(article, table=None):
             geography, observed = selection(sentence)
             for severity, rule, message in guardie_v4.editorial_checks(sentence, observed, geography, name=name, official=official):
                 findings.append(Finding(severity, rule, article.body_line(line_no - 1), message, sentence.strip()))
+    for severity, line_no, message, quote in guardie_v4.g3_page(age_lines):
+        findings.append(Finding(ERROR if severity == "errore" else WARNING, "G3", line_no, message, quote))
     for _, offset in guardie_v4.g4_text(body):
         absolute_line = article.body_start + body[:offset].count("\n") + 1
         fragment = body[max(0, offset - 24):offset + 40].splitlines()[0]

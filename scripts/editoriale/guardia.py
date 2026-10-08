@@ -425,6 +425,15 @@ def check_article(internal_key, entry, dossier=None, source_values=None):
                         phrase, observed, geography, year=entry.get("vintage"), unit=unit, name=name,
                         official=bool(view and view["meta"].get("source")) if parsed else False):
                     defects.append(Defect(rule if severity == "errore" else f"{rule}-{severity}", field, phrase[:160], message))
+    # Page-level age check uses only explicit cohorts in prose. Family siblings
+    # remain structured navigation metadata: their labels never establish a
+    # population comparison on their own. The current level/vintage above stay
+    # the selected geography and period for any future data-backed refinement.
+    for severity, field_index, message, quote in guardie_v4.g3_page(
+            [(index, text) for index, (_field, text) in enumerate(fields, 1)]):
+        field = fields[field_index - 1][0]
+        defects.append(Defect("G3" if severity == "errore" else "G3-avviso",
+                              field, quote[:160], message))
     defects += check_typography(fields)
     defects += check_free_sections(entry)
     defects += check_links(fields)

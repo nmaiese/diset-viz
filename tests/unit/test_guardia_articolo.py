@@ -133,6 +133,12 @@ class GuardiaArticolo(unittest.TestCase):
         report = self.check(PULITO + "\nNel 2022 i dati coprono 107 province.\n")
         self.assertTrue(any(f.check == "G7" and f.severity == ga.ERROR and "103 osservate" in f.message for f in report["rilievi"]))
 
+    def test_g3_blocca_confronto_diretto_e_avvisa_fasce_in_sezioni(self):
+        direct = self.check(PULITO + "\nIl tasso 15-34 anni è superiore a quello dei 35-64 anni.\n")
+        self.assertTrue(any(f.check == "G3" and f.severity == ga.ERROR for f in direct["rilievi"]))
+        separate = self.check(PULITO + "\n## Giovani\n15-34 anni.\n## Adulti\n35 anni e più.\n")
+        self.assertTrue(any(f.check == "G3" and f.severity == ga.WARNING for f in separate["rilievi"]))
+
     def test_cifra_sbagliata_e_errore_con_la_riga(self):
         report = self.check(PULITO.replace("28.154 euro", "28.145 euro"))
         errors = self.kinds(report, ga.ERROR)

@@ -41,5 +41,25 @@ class G4Test(unittest.TestCase):
         self.assertIn(f"AVVISO {path}:2: G4", output.getvalue())
 
 
+class G3Test(unittest.TestCase):
+    def test_stessa_fascia_non_segnalata(self):
+        self.assertEqual(guardie_v4.g3_page([(1, "Occupati 15–34 anni."), (2, "Ancora 15-34 anni.")]), [])
+
+    def test_fasce_diverse_in_sezioni_distinte_avviso_con_posizione(self):
+        findings = guardie_v4.g3_page([(4, "## Giovani 15-34 anni"), (9, "## Adulti 35–64 anni")])
+        self.assertEqual([(item[0], item[1]) for item in findings], [("avviso", 4), ("avviso", 9)])
+
+    def test_confronto_diretto_nella_stessa_frase_blocca(self):
+        findings = guardie_v4.g3_page([(7, "Il tasso 15-34 anni è superiore a quello dei 35-64 anni.")])
+        self.assertTrue(any(severity == "errore" and line == 7 for severity, line, *_ in findings))
+
+    def test_lista_definitoria_non_e_confronto_ne_avviso(self):
+        self.assertEqual(guardie_v4.g3_page([(3, "Le fasce d'età sono: 15-34 anni e 35-64 anni.")]), [])
+
+    def test_varianti_eta_aperta_e_trattini_tipografici(self):
+        self.assertEqual([item[0] for item in guardie_v4.age_cohorts("15 anni e più; 15—34 anni")],
+                         [(15, None), (15, 34)])
+
+
 if __name__ == "__main__":
     unittest.main()
