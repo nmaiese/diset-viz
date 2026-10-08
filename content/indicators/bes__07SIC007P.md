@@ -18,8 +18,8 @@ I dati indicano che la media semplice delle province è di 2,9 per 100.000 abita
 
 <!-- sezione: dinamica -->
 
-## Evoluzione della sicurezza
-Tra il 2016 e il 2023 la media semplice delle province è scesa da 3,0 a 2,9 per 100.000 abitanti. L'andamento ha visto un picco nel 2021 con 3,4 prima di flettere.
+## Andamento dei reati
+La media semplice delle province resta intorno a 3 per 100.000 abitanti (3,0 nel 2016, 2,9 nel 2023), con un massimo di 3,4 nel 2021.
 
 <!-- sezione: limiti -->
 
