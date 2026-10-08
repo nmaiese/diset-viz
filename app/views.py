@@ -1610,7 +1610,10 @@ def _render_indicator(family, raw_id, path_level=None):
     seo_description = seo_titles.page_description(article, meta, level, composed=lead)
 
     explore_state = seo_policy.has_explore_params(request.args)
-    noindex = (not level["indexable"]) or explore_state
+    noindex = (not level["indexable"]) or explore_state or (
+        level["key"] == view["levels"][0]["key"]
+        and editorial_state.senza_prosa(family, raw_id, level["key"])
+    )
     page_h1 = _page_h1(article, meta, level)
 
     if agent_discovery.prefers_markdown():

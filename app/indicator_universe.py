@@ -143,6 +143,15 @@ def level_pages(listed=False):
     si legge a ogni chiamata, quindi spegnerlo non chiede di svuotare cache.
     """
     pages = _rule_level_pages()
+    # L'indice editoriale misura ogni (indicatore, livello), ma la regola
+    # sull'assenza di prosa riguarda solo la pagina base della scheda.
+    from app import editorial_state
+    pages = [
+        page for page in pages
+        if not page["base"] or not editorial_state.senza_prosa(
+            page["meta"]["family"], page["meta"]["raw_id"], page["level"]["key"]
+        )
+    ]
     if listed or seo_policy.LEVEL_PAGES_INDEXABLE:
         return pages
     return [page for page in pages if page["base"]]
