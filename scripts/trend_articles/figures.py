@@ -35,6 +35,7 @@ import sys
 from html import escape
 
 from app.design.common import _nice_ticks, tick_label
+from app.figure_contract import missing_fields, visible_svg_fields
 from scripts.trend_articles import common
 
 WIDTH = 680
@@ -359,7 +360,11 @@ def main(argv=None) -> int:
     parser.add_argument("--years-y", help="scatter: uno o due anni, es. 2018,2025")
     parser.add_argument("--name-x", default="")
     parser.add_argument("--name-y", default="")
-    parser.add_argument("--subtitle")
+    parser.add_argument("--population", required=True, help="popolazione osservata, non dedotta dal titolo")
+    parser.add_argument("--territory", required=True, help="livello e universo territoriale")
+    parser.add_argument("--denominator", required=True, help="denominatore della misura, o 'non applicabile'")
+    parser.add_argument("--dataset", required=True, help="nome del dataset citato nella fonte")
+    parser.add_argument("--release", required=True, help="release documentata della fonte, distinta dall'anno del dato")
     parser.add_argument("--reference", help="bars/extremes: ext:bes_areas_* da cui prendere il valore Italia")
     parser.add_argument("--highlight", default="")
     parser.add_argument("--territories", default="")
@@ -378,10 +383,45 @@ def main(argv=None) -> int:
     elif args.kind == "scatter":
         svg = scatter(args.slug, args.indicator, args.with_key, [int(y) for y in split(args.years_x)],
                       [int(y) for y in split(args.years_y)], set(split(args.highlight)), args.title,
-                      args.name_x, args.name_y, args.subtitle)
+                    args.name_x, args.name_y)
     else:
         svg = lines(args.slug, args.indicator, split(args.territories), args.title, not args.no_simple_areas, args.with_key)
 
+    meta = _dossier_entry(args.slug, args.indicator)["meta"]
+    measure = f"{meta['name']} (unità: {meta['unit']}; denominatore: {args.denominator})"
+    if args.kind == "scatter":
+        other = _dossier_entry(args.slug, args.with_key)["meta"]
+        measure = (f"{meta['name']} / {other['name']} (unità: {meta['unit']} / {other['unit']}; "
+                   f"denominatore: {args.denominator})")
+    period = (f"{','.join(split(args.years_x))} / {','.join(split(args.years_y))}"
+              if args.kind == "scatter" else str(args.year or _dossier_entry(args.slug, args.indicator)["last_year"]))
+    if args.kind == "lines":
+        drawn_period = re.search(r"\b\d{4}-\d{4}\b", visible_svg_fields(svg)["subtitle"])
+        if not drawn_period:
+            parser.error(f"G5 {args.name}: periodo della serie non disponibile")
+        period = drawn_period.group()
+    subtitle = " · ".join((measure, args.population, args.territory, period))
+    institutions = meta["source"]
+    if args.kind == "scatter" and other["source"] != institutions:
+        institutions += f" e {other['source']}"
+    source = f"Fonte: {institutions}, {args.dataset}. Release: {args.release}. Elaborazione Divario Italia."
+    svg = re.sub(r'(<text class="fig__subtitle"[^>]*>).*?(</text>)',
+                 lambda m: m[1] + escape(subtitle) + m[2], svg, count=1, flags=re.S)
+    svg = re.sub(r'(<text class="fig__source"[^>]*>).*?(</text>)',
+                 lambda m: m[1] + escape(source) + m[2], svg, count=1, flags=re.S)
+    fields = visible_svg_fields(svg)
+    if args.kind == "scatter":
+        fields["axis_labels"] = (args.name_x, args.name_y)
+    missing = missing_fields(**fields)
+    if not args.denominator.strip() or args.denominator.strip().casefold() == "non disponibile":
+        missing.append("denominatore")
+    for field, value in (("dataset", args.dataset), ("release", args.release)):
+        if not value.strip():
+            missing.append(field)
+    if not str(meta.get("unit") or "").strip():
+        missing.append("unità")
+    if missing:
+        parser.error(f"G5 {args.name}: mancano {', '.join(dict.fromkeys(missing))}")
     out = common.FIGURES_DIR / args.slug / f"{args.name}.svg"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(svg.replace("@ID@", f"fig-{args.name}") + "\n", encoding="utf-8")
