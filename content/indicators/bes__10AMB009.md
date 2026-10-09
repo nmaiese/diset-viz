@@ -4,12 +4,24 @@ key: "bes:10AMB009"
 vintage: 2025
 ---
 
-La soddisfazione per la situazione ambientale del luogo in cui si vive è alta al Nord e più bassa al Sud urbano. È massima in Valle d'Aosta, 87,5%, e Trentino Alto Adige, 87%, minima in Campania, 58,6%, e Sicilia. La media delle regioni è del 75,3%.
+Nel 2025 la quota di persone di 14 anni e più molto o abbastanza soddisfatte di aria, acqua e rumore della zona in cui vivono va dal 58,6% della Campania all'87,5% della Valle d'Aosta (Istat, BES). La media delle regioni è 75,3%.
+
+<!-- sezione: definizione -->
+## Un giudizio unico su aria, acqua e rumore
+
+Il numero è la quota di residenti di 14 anni e più che si dichiarano molto o abbastanza contenti della situazione ambientale della zona in cui vivono, intesa come aria, acqua e rumore. Il giudizio è personale e riguarda tre aspetti insieme: un valore di 75 vuol dire che circa 75 persone su 100 rispondono di essere soddisfatte.
 
 <!-- sezione: quadro -->
+## Cinque regioni sotto il 69%, non tutte del Sud
 
-Il giudizio sull'ambiente unisce natura, pulizia, rifiuti e qualità dell'aria, e premia le regioni alpine, dove il paesaggio è integro e i servizi funzionano. La Campania in fondo sconta l'eredità dei rifiuti e dell'inquinamento urbano. È una percezione, ma nasce da condizioni reali sotto gli occhi di tutti.
+La mediana è 76,9 e la metà centrale delle regioni va da 69,1 a 79,8 persone su 100. Sopra l'84 stanno Valle d'Aosta (87,5), Trentino Alto Adige (87,0) e Friuli-Venezia Giulia (84,3), seguite da Sardegna (82,5) e Marche (81,1). Sotto il 69 ci sono Puglia (68,1), Lazio (67,4), Lombardia (66,1), Sicilia (61,8) e Campania (58,6). La distanza tra gli estremi è di 28,9 punti.
+
+<!-- sezione: dinamica -->
+## Un aumento di due punti in vent'anni, con oscillazioni
+
+La media delle regioni è 73,2% nel 2005, ha il minimo nel 2008 (70,2) e il massimo nel 2021 (76,2), per poi arrivare a 75,3% nel 2025. Nell'ultimo anno passa da 73,3 a 75,3, con aumenti in 17 regioni e cali in 3. La serie ha 21 anni, tutti presenti.
 
 <!-- sezione: limiti -->
+## Tre aspetti in un solo giudizio
 
-Rileva un giudizio soggettivo sull'ambiente, influenzato da attese e abitudini. Non distingue quale aspetto pesi di più, dall'aria ai rifiuti al verde, e chi vive a lungo in un luogo può assuefarsi ai suoi problemi.
+Il dato è una percezione soggettiva, influenzata da attese e abitudini, e unisce aria, acqua e rumore in una sola risposta: non dice quale dei tre pesi di più. Una persona può essere soddisfatta dell'acqua e infastidita dal rumore, e il valore non lo mostra. Non misura la qualità ambientale reale, e un valore alto non dimostra aria o acqua migliori.
