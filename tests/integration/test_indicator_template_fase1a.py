@@ -79,6 +79,20 @@ class IndicatorTemplateFase1a(unittest.TestCase):
         self.assertIn("## Definizione della fonte", markdown)
         self.assertIn(definition, markdown)
 
+    def test_initial_distribution_and_filter_payload_keep_distinct_units(self):
+        page = app.test_client().get(COMPLEX).get_data(as_text=True)
+        for key in ("median-value", "central-band"):
+            with self.subTest(key=key):
+                value = re.search(r'data-kpi="' + key + r'"[^>]*>(.*?)</dd>', page, re.S)
+                self.assertIsNotNone(value)
+                self.assertTrue(value.group(1).strip().endswith("%"), value.group(1))
+        gap = re.search(r'data-kpi="gap-value"[^>]*>(.*?)</dd>', page, re.S)
+        self.assertIsNotNone(gap)
+        self.assertTrue(gap.group(1).strip().endswith("punti percentuali"), gap.group(1))
+        payload = re.search(r'<script type="application/json" data-explore-data>(.*?)</script>', page, re.S)
+        self.assertIsNotNone(payload)
+        self.assertEqual(json.loads(payload.group(1))["changeUnit"], "punti percentuali")
+
     def test_missing_source_definition_is_explicit_in_both_renderers(self):
         client = app.test_client()
         with patch("app.indicator_view._official_definition", return_value=None):

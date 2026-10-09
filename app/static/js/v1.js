@@ -254,7 +254,7 @@
       return sorted[low] + (sorted[high] - sorted[low]) * (index - low);
     }
 
-    function paintDistribution(mod, vals, unit) {
+    function paintDistribution(mod, vals, unit, changeUnit) {
       var median = vals.length >= 5 ? quantile(vals, 0.5) : null;
       var firstQuartile = vals.length >= 5 ? quantile(vals, 0.25) : null;
       var thirdQuartile = vals.length >= 5 ? quantile(vals, 0.75) : null;
@@ -265,18 +265,18 @@
       if (distribution) distribution.hidden = median === null;
       if (medianEl) medianEl.textContent = median === null ? "n.d." : withUnit(median, unit);
       if (bandEl) bandEl.textContent = median === null ? "n.d." : "da " + withUnit(firstQuartile, unit) + " a " + withUnit(thirdQuartile, unit);
-      if (gapEl) gapEl.textContent = vals.length ? withUnit(Math.max.apply(null, vals) - Math.min.apply(null, vals), unit) : "n.d.";
+      if (gapEl) gapEl.textContent = vals.length ? withUnit(Math.max.apply(null, vals) - Math.min.apply(null, vals), changeUnit || unit) : "n.d.";
     }
     /* distribution:end */
 
     function paint(year) {
       var list = rows(year);
-      if (!list.length) { paintDistribution(mod, [], data.unit); return; }
+      if (!list.length) { paintDistribution(mod, [], data.unit, data.changeUnit); return; }
       var vals = list.map(function (r) { return r.value; });
       var sc = choroScale(vals);
       var lo = sc.lo, hi = sc.hi;
       var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
-      paintDistribution(mod, vals, data.unit);
+      paintDistribution(mod, vals, data.unit, data.changeUnit);
       var max = Math.max(hi, 0) || 1;
       var yearMatrix = data.matrix[String(year)] || {};
       var missing = Object.keys(data.names).filter(function (key) { return yearMatrix[key] === null || yearMatrix[key] === undefined; });

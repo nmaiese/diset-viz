@@ -770,11 +770,11 @@ class AppSmokeTest(unittest.TestCase):
 
         self.assertEqual(trend_framing("higher_better", None), "")
         self.assertEqual(trend_framing("higher_better", 0.5), "un andamento sostanzialmente stabile")
-        self.assertEqual(trend_framing("higher_better", 5.0), "una variazione media favorevole")
-        self.assertEqual(trend_framing("higher_better", -5.0), "una variazione media sfavorevole")
-        self.assertEqual(trend_framing("lower_better", -5.0), "una variazione media favorevole")
-        self.assertEqual(trend_framing("lower_better", 5.0), "una variazione media sfavorevole")
-        self.assertEqual(trend_framing("higher_worse", 5.0), "una variazione media sfavorevole")
+        self.assertEqual(trend_framing("higher_better", 5.0), "un aumento")
+        self.assertEqual(trend_framing("higher_better", -5.0), "una diminuzione")
+        self.assertEqual(trend_framing("lower_better", -5.0), "una diminuzione")
+        self.assertEqual(trend_framing("lower_better", 5.0), "un aumento")
+        self.assertEqual(trend_framing("higher_worse", 5.0), "un aumento")
         self.assertEqual(trend_framing("contextual", 5.0), "un aumento")
         self.assertEqual(trend_framing("contextual", -5.0), "una diminuzione")
 
