@@ -1,8 +1,8 @@
-<svg class="fig" viewBox="0 0 720 320" role="img" aria-labelledby="fig2-t fig2-d" xmlns="http://www.w3.org/2000/svg">
-<title id="fig2-t">Nel campione di circa tremila servizi, quasi sei su dieci non accolgono tutte le domande</title>
+<svg class="fig" viewBox="0 50 720 150" role="img" aria-labelledby="fig2-t fig2-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig2-t">Nel campione, quasi sei servizi su dieci non accolgono tutte le domande</title>
 <desc id="fig2-d">Grafico a barre orizzontali: quota di nidi e sezioni primavera che non ha accolto tutte le domande. 2023/2024: 59,5%. 2021/2022: 49,1%.</desc>
-<text class="fig__title" x="0" y="20">Nel campione, quasi sei servizi su dieci non accolgono tutte le domande</text>
-<text class="fig__subtitle" x="0" y="40">Quota di strutture che ha dichiarato di non aver accolto tutte le richieste per mancanza di posti disponibili.</text>
+
+
 <text class="fig__axis" x="120" y="65">0%</text>
 <text class="fig__axis" x="300.0" y="65">20%</text>
 <text class="fig__axis" x="480.0" y="65">40%</text>
@@ -11,10 +11,6 @@
 <rect x="120" y="100" width="535.5" height="24" fill="var(--seq-4)" opacity="0.9" />
 <text class="fig__pt-label" x="660.5" y="116" fill="var(--ink)" font-size="14" font-weight="bold">59,5%</text>
 <text class="fig__axis" x="110" y="176" text-anchor="end">2021/2022</text>
-<rect x="120" y="160" width="441.9000000000001" height="24" fill="var(--seq-4)" opacity="0.9" />
-<text class="fig__pt-label" x="566.9000000000001" y="176" fill="var(--ink)" font-size="14" font-weight="bold">49,1%</text>
-<text class="fig__meta" x="0" y="240"><tspan font-weight="bold">Unità:</tspan> quota percentuale delle strutture.</text>
-<text class="fig__meta" x="0" y="256"><tspan font-weight="bold">Campione:</tspan> indagine campionaria su circa 3.000 nidi e sezioni primavera.</text>
-<text class="fig__meta" x="0" y="272"><tspan font-weight="bold">Fonte:</tspan> Istat, "Offerta di nidi e servizi integrativi", 2026-02-03. <tspan font-weight="bold">Elaborazione:</tspan> Divario Italia.</text>
-<text class="fig__meta" x="0" y="288"><tspan font-weight="bold">Nota:</tspan> Il dato indica la quota di strutture sul campione intervistato, non la quota di famiglie respinte.</text>
+<rect x="120" y="160" width="441.9" height="24" fill="var(--seq-4)" opacity="0.9" />
+<text class="fig__pt-label" x="566.9" y="176" fill="var(--ink)" font-size="14" font-weight="bold">49,1%</text>
 </svg>
