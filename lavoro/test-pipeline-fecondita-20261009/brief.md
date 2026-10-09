@@ -1,6 +1,6 @@
 # Brief v4.1 — Fecondità regionale, 2014-2024
 
-Stato: test editoriale, nessuna pubblicazione autorizzata. Responsabile del brief: C-DIV, Codex gpt-6-sol. Data di verifica delle fonti: 2026-10-09.
+Stato: test editoriale di **revisione**, nessuna pubblicazione autorizzata. Pagina esistente da rivedere dopo Gate A PASSA: `content/posts/2026-10-06-figli-per-donna-regioni-italia.md`, slug invariato `figli-per-donna-regioni-italia`. Responsabile del brief: C-DIV, Codex gpt-6-sol. Data di verifica delle fonti: 2026-10-09. Il controllo del catalogo del 2026-10-09 ha trovato l'articolo già pubblicato: contiene già l'insight sulla Calabria che sale di posto pur calando nel valore. Questa prova è una revisione con contratto v4.1, non una proposta di secondo articolo sulla stessa domanda. Il pezzo vivo resta invariato finché il titolare non approva un eventuale rilascio.
 
 Tipo pezzo: blog
 Domanda: se una regione risale nella classifica della fecondità, significa che lì nascono più figli per donna?
@@ -34,6 +34,8 @@ Ruolo indicatori interni: base e tassello, senza confronti numerici fra la serie
 Grafico con dati esterni: Eurostat `tgs00100`, tasso di fecondità totale, 2014 e 2024, 21 unità italiane NUTS 2
 Figure previste: andamento 2014→2024 dei 21 valori per verificare il calo; rango e valore della Calabria e dei confronti rappresentativi
 Limiti: tasso di periodo, non numero di nati né fecondità compiuta; cause regionali non identificabili; serie Eurostat 2024 distinta dalla stima nazionale Istat 2025
+
+Funzione della revisione rispetto al pezzo esistente: provare il contratto v4.1 e le specifiche delle figure su una storia già reale. Il confronto Eurostat usa 21 unità NUTS 2, valori non arrotondati e 2024 senza flag nelle 42 celle; il pezzo esistente usa 20 regioni Istat fino al 2025, anno stimato e provvisorio per cui Istat avverte che l'errore pesa di più nel dettaglio regionale. La scelta proposta per il test è un confronto centrale 2014-2024 più stabile per i ranghi e un aggiornamento nazionale Istat 2025 separato e visibile. Non si fondono le due serie né si presenta il 2024 come ultimo dato disponibile in assoluto. Gate A deve giudicare se questa scelta migliora davvero la comprensione a fronte della perdita del confronto territoriale 2025; se no, FERMO e articolo vivo invariato.
 
 ## Domanda, risposta, lettore
 
