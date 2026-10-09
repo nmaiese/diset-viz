@@ -96,7 +96,8 @@
 {% set explain = level.explain or meta.explain %}
 <section class="come-leggere" id="come-leggere" aria-label="Come leggere il dato">
   <h2>Come leggere il dato</h2>
-  {% if explain.plain and mostra_plain %}<p>{{ explain.plain }}</p>{% endif %}
+  {% if mostra_plain and meta.official_definition %}<p>{{ meta.official_definition }}</p>
+  {% elif mostra_plain %}<p>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.</p>{% endif %}
   {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
   {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
   {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
@@ -114,7 +115,8 @@
    numero, e con nove varianti su tutte le pagine erano la stessa frase dentro
    trecento racconti diversi. Una sola di loro stava su 307 pagine. #}
 {% set explain = level.explain or meta.explain %}
-{% if explain.plain %}<p>{{ explain.plain }}</p>{% endif %}
+{% if meta.official_definition %}<p>{{ meta.official_definition }}</p>
+{% else %}<p>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.</p>{% endif %}
 {% endmacro %}
 
 
@@ -127,11 +129,7 @@
 {% if level.best and level.worst and stats.gap_abs is not none %}
 <p>Lo scarto tra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }} è quello osservato nell'anno più recente, {{ level.year_max }}.</p>
 {% endif %}
-{% if stats.above_avg_count is not none and stats.below_avg_count is not none %}
-<p>La media divide le {{ level.plural }} in due gruppi diseguali, {{ stats.above_avg_count }} sopra e {{ stats.below_avg_count }} sotto.
-  {%- if stats.median is not none and stats.year_avg is not none and (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %} Media e mediana non coincidono, segno che la distribuzione non è uniforme e che qualche valore estremo tira la media dalla sua parte.
-  {%- else %} Media e mediana sono vicine, quindi nessun valore estremo sta spostando da solo la sintesi.{% endif %}</p>
-{% elif stats.year_count is not none and stats.year_count < 5 %}
+{% if stats.year_count is not none and stats.year_count < 5 %}
 <p>Con {{ stats.year_count }} {{ stats.year_count | it_plural(level.singular, level.plural) }} a confronto i valori vanno letti come indicazioni di massima. Su così pochi dati mediana e distribuzione non sarebbero significative.</p>
 {% endif %}
 {# Il verso dell'indicatore e' una proprieta' della misura, non un fatto di
@@ -145,7 +143,7 @@
 {% if not stats.has_multi_year %}
 <p>La fonte pubblica un solo anno per questa serie, il {{ level.year_max }}. Non è quindi possibile calcolare una variazione rispetto a un anno precedente con la stessa definizione, e la fotografia va letta come tale.</p>
 {% else %}
-{% if stats.avg_change_abs is not none %}
+{% if stats.avg_change_abs is not none and stats.same_territory_sample %}
 {# Two rules learned from reading the rendered output:
    - the unit appears once, on the second figure. Several sources give a
      descriptive unit ("Numero medio di anni") and repeating it on both sides of
@@ -153,6 +151,8 @@
    - a percentage-like indicator states its change in points. A relative "9,8%"
      next to a "54,87%" level puts two unrelated percentages in one sentence. #}
 <p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media {{ level.singular == 'regione' and 'regionale' or 'provinciale' }} è passata da {{ stats.year_min_avg | it_num(2) }} a {{ value(stats.year_avg, meta.value_unit) }}{% if meta.percentage_like %}, {{ (stats.avg_change_abs | abs) | it_num(2) }} {{ meta.change_unit | phrase_unit or '' }} in {{ 'più' if stats.avg_change_abs > 0 else 'meno' }}{% elif stats.avg_change_pct is not none %}, {{ (stats.avg_change_pct | abs) | it_num(1) }}% in {{ 'più' if stats.avg_change_pct > 0 else 'meno' }}{% endif %}{% if level.trend_note %}, {{ level.trend_note }}{% endif %}.</p>
+{% elif not stats.same_territory_sample %}
+<p>Nel confronto fra {{ stats.year_min }} e {{ stats.year_max }} i campioni differiscono ({{ stats.year_min_count }} e {{ stats.year_max_count }} territori); le medie non consentono di attribuire la variazione al cambiamento degli stessi territori.</p>
 {% endif %}
 {% if stats.highest_delta and stats.lowest_delta %}
 <p>Sull'intero periodo

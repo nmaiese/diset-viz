@@ -14,9 +14,7 @@ import re
 from app.design import charts, maps, numfmt
 from app.design import tiles as tile_grid
 from app.design.common import (
-    MEZZOGIORNO,
     PATHS,
-    count_word,
     date_it,
     del_,
     legend,
@@ -48,11 +46,6 @@ from app.seo_titles import (
 # L'id di una riga della classifica provinciale: `/provincia/<key>` porta a
 # `...#p-<key>`, e la riga si accende con `:target` anche senza JavaScript.
 ROW_ID = {"provincia": "p-"}
-VERSO_WORDS = {"higher_better": "Qui un valore più alto è migliore.",
-               "lower_better": "Qui un valore più basso è migliore.",
-               "higher_worse": "Qui un valore più basso è migliore."}
-
-
 def fold(rows: list[dict], plural: str) -> dict | None:
     """La classifica lunga piegata come quella della qualita' della vita
     (`classifica.split`, stesse soglie): le prime e le ultime EDGE righe in
@@ -170,8 +163,7 @@ def within_regions(meta: dict, level: dict, unit: str | None) -> dict | None:
         "decimals": numfmt.column_decimals([o["value"] for o in observed]),
         "subline": (f"{meta['name']}{', ' + note if note else ''}, {level.get('year_max')}. "
                     "Per ogni regione con il dato di almeno due province, la provincia con il valore più alto, "
-                    f"quella con il più basso e la distanza fra le due{', in punti percentuali' if percent else ''}."
-                    + (f" {VERSO_WORDS[meta.get('direction')]}" if meta.get("direction") in VERSO_WORDS else "")),
+                    f"quella con il più basso e la distanza fra le due{', in punti percentuali' if percent else ''}."),
     }
 
 
@@ -191,23 +183,8 @@ def family_paths(ctx: dict) -> list[str]:
 
 
 def ranking_claim(level: dict) -> str | None:
-    """Il titolo-affermazione della classifica: un fatto verificato sul
-    Mezzogiorno, o quante stanno sopra e quante sotto la media semplice."""
-    stats = level.get("stats") or {}
-    year, plural = level.get("year_max"), level["plural"]
-    claim = None
-    if level["key"] == "regione" and stats.get("year_avg") is not None:
-        south = [o for o in level["observations"] if o["key"] in MEZZOGIORNO]
-        below = [o for o in south if o["value"] < stats["year_avg"]]
-        if south and len(below) == len(south):
-            claim = f"Nel {year} tutte le {count_word(len(south))} regioni del Mezzogiorno stanno sotto la media semplice"
-        elif south and not below:
-            claim = f"Nel {year} tutte le {count_word(len(south))} regioni del Mezzogiorno stanno sopra la media semplice"
-        elif south:
-            claim = f"Nel {year} {count_word(len(below))} regioni del Mezzogiorno su {count_word(len(south))} stanno sotto la media semplice"
-    if claim is None and stats.get("above_avg_count") is not None:
-        claim = f"Nel {year} {stats['above_avg_count']} {plural} stanno sopra la media semplice e {stats['below_avg_count']} sotto"
-    return claim
+    """No fixed count around a simple mean: the sorted data remains the claim."""
+    return None
 
 
 def level_tabs(meta: dict, level: dict, levels: list[dict], twin: dict | None) -> list[dict]:
@@ -251,7 +228,7 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         claim = ranking_claim(level)
     if strip is None:
         rows = [{**o, "area": areas.get(o["key"])} for o in obs]
-        strip = charts.divario_strip(rows, stats.get("year_avg"), unit, stats.get("gap_ratio"))
+        strip = charts.divario_strip(rows, stats.get("year_avg"), unit)
     # La mappa c'e' per tutti e due i livelli. `LEVELS["provincia"]["has_map"]`
     # resta falso perche' lo leggono il template di ripiego e il vecchio
     # esploratore, che hanno solo le regioni: qui le province hanno i loro
@@ -276,11 +253,16 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "years": [int(y) for y in sorted(level.get("matrix") or {}, key=int)],
         "matrix": level.get("matrix") or {},
         "names": {t["key"]: t["name"] for t in level.get("territories") or []},
-        "unit": numfmt.phrase_unit(unit), "direction": direction, "plural": plural,
+        "unit": numfmt.phrase_unit(unit), "changeUnit": numfmt.phrase_unit(meta.get("change_unit") or unit),
+        "direction": direction, "plural": plural,
         "decimals": numfmt.column_decimals([o["value"] for o in obs]), "areas": {o["key"]: areas.get(o["key"]) for o in obs},
-        "profile": level.get("profile_path"), "south": sorted(MEZZOGIORNO) if level["key"] == "regione" else [],
+        "profile": level.get("profile_path"),
     }
-    rank_rows = ranking(level, unit)
+    all_rank_rows = ranking(level, unit, include_missing=True)
+    rank_rows = [row for row in all_rank_rows if row.get("value") is not None or row.get("ref")]
+    observed_rank_rows = [row for row in rank_rows if row.get("value") is not None and not row.get("ref")]
+    missing_rows = [row for row in all_rank_rows if row.get("value") is None]
+    observed_values = {o["key"]: o["value"] for o in obs}
     folded = fold(rank_rows, plural) if level["key"] in ROW_ID else None
     if level["key"] in ROW_ID:
         # v1.js ridisegna le righe al cambio d'anno: con l'id, e piegate con
@@ -289,21 +271,36 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         explore_js["fold"] = {"edge": EDGE, "over": SPLIT_OVER} if folded else None
     map_missing = show_map and bool(set(maps.paths(level["key"])) - {o["key"] for o in obs})
     downloads = meta.get("downloads") or {}
+    focus = next((row for row in rank_rows if row.get("key") == (level.get("default_territory") or {}).get("key")), None)
+    comparison = (f"Confronto con la media semplice delle {plural}: {with_unit(stats['year_avg'], unit)}."
+                  if stats.get("year_avg") is not None else "Media semplice non disponibile.")
+    distinct_values = {row.get("value") for row in observed_rank_rows}
+    focus_rank = (f"{focus['rank']}ª su {len(observed_rank_rows)} {plural}"
+                  if focus and len(distinct_values) > 1 else "Rango non informativo" if focus else "dato non disponibile")
+    focus_summary = (f"{focus['name']}: {with_unit(focus['value'], unit)} nel {year}. {comparison} {focus_rank}."
+                     if focus else f"{comparison} Rango non disponibile nel {year}.")
     return {
         "name": meta["name"], "level": level["key"], "year": year, "year_min": level.get("year_min"),
         "years": level.get("years") or [], "n": len(obs), "plural": plural, "singular": level["singular"],
+        "unit": unit, "change_unit": meta.get("change_unit") or unit,
         "lower_better": direction in ("lower_better", "higher_worse"),
         "claim": claim, "unit_note": unit_note(unit, meta["name"]), "short_unit": short_unit(unit),
         "level_tabs": tabs or [], "territories": level.get("territories") or [],
         "show_map": show_map, "map_classes": classes, "map_names": map_names,
-        "map_values": {o["key"]: with_unit(o["value"], unit) for o in level.get("observations") or []},
+        "map_values": {t["key"]: with_unit(observed_values[t["key"]], unit)
+                       if t["key"] in observed_values else "n.d."
+                       for t in level.get("territories") or []},
         "callouts": callouts, "legend": legend(values, unit) if values else None,
         "legend_nd": level["key"] == "regione" or map_missing,
-        "area_legend": strip.get("legend"), "ranking": rank_rows, "fold": folded,
+        "area_legend": strip.get("legend"), "ranking": rank_rows, "missing_rows": missing_rows,
+        "fold": folded,
         "row_id": ROW_ID.get(level["key"]),
         "decimals": numfmt.column_decimals([o["value"] for o in obs]),
         "areas": {o["key"]: areas.get(o["key"]) for o in obs}, "area_label": charts.AREA_LABEL,
         "profile_path": level.get("profile_path"),
+        "focus_summary": focus_summary,
+        "median": stats.get("median"), "q1": stats.get("q1"), "q3": stats.get("q3"),
+        "gap_abs": stats.get("gap_abs"),
         "source_url": meta.get("source_url"), "source_label": meta.get("source_label"),
         "csv": downloads.get("csv") if level["key"] == "regione" else None,
         "js": explore_js,
@@ -361,9 +358,6 @@ def derive(ctx: dict) -> dict:
     if stats.get("year_avg") is not None:
         tiles.append({"label": f"Media semplice delle {stats.get('year_count', n)} {plural}", "value": stats["year_avg"], "unit": unit, "role": "figure",
                       "sub": "non pesata per popolazione"})
-    if stats.get("gap_ratio"):
-        tiles.append({"label": "Fra prima e ultima", "value": stats["gap_ratio"], "unit": "volte", "role": "ratio",
-                      "sub": f"una distanza di {with_unit(stats['gap_abs'], unit)}"})
     if annual:
         more, less = annual.get("increase_count", 0), annual.get("decrease_count", 0)
         trend = f"in aumento in {more} {plural} su {annual['common_count']}" if more >= less else f"in calo in {less} {plural} su {annual['common_count']}"
@@ -372,7 +366,7 @@ def derive(ctx: dict) -> dict:
     tiles = tiles[:4]
 
     direction = meta.get("direction")
-    verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso", "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
+    verso = "Ordine descrittivo dei valori, senza giudizio automatico"
 
     claim = ranking_claim(level)
 
@@ -380,11 +374,11 @@ def derive(ctx: dict) -> dict:
     obs = level.get("observations") or []
     rows = [{**o, "area": areas.get(o["key"])} for o in obs]
     series = charts.band_series(level, areas) if len(level.get("matrix") or {}) >= 2 else {"svg": "", "single_year": True}
-    strip = charts.divario_strip(rows, stats.get("year_avg"), unit, stats.get("gap_ratio"))
+    strip = charts.divario_strip(rows, stats.get("year_avg"), unit)
     series_claim = None
     what = None
     change_abs = stats.get("avg_change_abs")
-    if stats.get("has_multi_year") and meta.get("percentage_like") and change_abs is not None:
+    if stats.get("has_multi_year") and stats.get("same_territory_sample", True) and meta.get("percentage_like") and change_abs is not None:
         # Una percentuale cambia in punti, come nella prosa della stessa scheda
         # ("1,48 punti percentuali in meno") e come la distanza fra prima e
         # ultima qui sotto. La variazione relativa diceva "scesa dell'8,2%"
@@ -403,7 +397,7 @@ def derive(ctx: dict) -> dict:
             what = "rimasta la stessa"
         else:
             what = f"{'cresciuta' if change_abs > 0 else 'scesa'} di {with_unit(abs(change_abs), change_unit, decimals)}"
-    elif stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
+    elif stats.get("has_multi_year") and stats.get("same_territory_sample", True) and stats.get("avg_change_pct") is not None:
         r = 1 + stats["avg_change_pct"] / 100
         if r >= 3:
             what = "più che triplicata"
@@ -440,9 +434,6 @@ def derive(ctx: dict) -> dict:
     # grafico: le tessere dicono solo cio' che il grafico non dice.
     if strip.get("svg"):
         facts = [t for t in tiles if t["role"] == "delta"]
-        if stats.get("above_avg_count") is not None:
-            facts.append({"label": "Sopra la media semplice", "value": stats["above_avg_count"], "unit": None, "role": "count",
-                          "sub": f"{plural} su {stats.get('year_count', n)}, le altre sotto"})
         years_n = len(level.get("years") or [])
         if years_n > 1:
             facts.append({"label": "Anni della serie", "value": years_n, "unit": None, "role": "count",

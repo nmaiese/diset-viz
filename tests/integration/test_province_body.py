@@ -74,7 +74,7 @@ class ProvincialBody(unittest.TestCase):
         self.assertEqual(text(cells), "Lecco 84,9 Pavia 82,6 2,3")
         self.assertIn('<a href="/provincia/lecco">Lecco</a>', cells)
         self.assertIn('<a href="/provincia/pavia">Pavia</a>', cells)
-        self.assertIn("Qui un valore più alto è migliore.", block)
+        self.assertNotIn("Qui un valore più alto è migliore.", block)
         # Le distanze in ordine, dalla piu' ampia.
         gaps = [float(re.findall(r'<data class="n n--cell" value="([^"]+)"', cells)[-1]) for _, _, cells in rows]
         self.assertEqual(gaps, sorted(gaps, reverse=True))
@@ -196,7 +196,10 @@ class ProvincialBody(unittest.TestCase):
                 rows = RANK_ROW.findall(page)
                 self.assertGreater(len(rows), 20)
                 self.assertTrue(all(anchor == key for key, anchor, _ in rows))
-                self.assertEqual([int(rank) for _, _, rank in rows], list(range(1, len(rows) + 1)))
+                ranks = [int(rank) for _, _, rank in rows]
+                self.assertEqual(ranks[0], 1)
+                self.assertEqual(ranks, sorted(ranks))
+                self.assertTrue(all(rank <= position for position, rank in enumerate(ranks, 1)))
 
     def test_no_duplicate_ids(self):
         for path, page in self.pages.items():
@@ -210,9 +213,10 @@ class ProvincialBody(unittest.TestCase):
         incrocia."""
         parts = dict(PART.findall(self.scheda))
         ranks = {name: [int(r) for r in re.findall(r'<data value="(\d+)">', body)] for name, body in parts.items()}
-        self.assertEqual(ranks["head"], list(range(1, 11)))
-        self.assertEqual(ranks["middle"], list(range(11, 98)))
-        self.assertEqual(ranks["tail"], list(range(98, 108)))
+        self.assertEqual([len(ranks[part]) for part in ("head", "middle", "tail")], [10, 87, 10])
+        self.assertEqual(ranks["head"][0], 1)
+        self.assertEqual(ranks["head"] + ranks["middle"] + ranks["tail"],
+                         sorted(ranks["head"] + ranks["middle"] + ranks["tail"]))
         details = re.search(r"<details class=\"more\" data-rank-more>(.*?)</details>", self.scheda, re.DOTALL).group(1)
         self.assertIn('data-rank-part="middle"', details)
         self.assertIn("<summary data-rank-summary>Dall&#39;11ª alla 97ª: le altre 87 province</summary>", details)
@@ -240,16 +244,17 @@ class ProvincialBody(unittest.TestCase):
         regional = app.test_client().get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001").get_data(as_text=True)
         self.assertNotIn("data-rank-goto", regional)
 
-    def test_a_short_ranking_is_not_folded(self):
-        """29 province (elezioni regionali): sotto la soglia della classifica
-        della qualita' della vita, niente details. Gli id restano."""
+    def test_a_partial_ranking_includes_missing_provinces(self):
+        """29 province con dato: le altre restano consultabili come n.d."""
         page = next(p for path, p in self.pages.items() if path.endswith("/bes-06POL001P"))
         self.assertNotIn("data-rank-more", page)
+        self.assertIn('data-rank-missing-summary>77 province senza dato</summary>', page)
         self.assertEqual(len(RANK_ROW.findall(page)), 29)
+        self.assertEqual(page.count('<td class="rank">n.d.</td>'), 77)
 
     def test_the_regional_view_is_untouched(self):
         page = app.test_client().get("/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001").get_data(as_text=True)
-        for mark in ('id="dentro-le-regioni"', 'id="p-', "data-rank-part", "data-rank-more"):
+        for mark in ('id="dentro-le-regioni"', 'id="p-', 'data-rank-part="head"', "data-rank-more"):
             self.assertNotIn(mark, page)
 
 

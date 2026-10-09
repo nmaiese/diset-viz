@@ -49,6 +49,7 @@ from app.indicator_texts import DEFAULT_LEVEL, LIBERA
 from app.indicator_view import build_indicator_view
 from scripts import indicator_store
 from scripts.editoriale import brief
+from scripts.editoriale import guardie_v4
 from scripts.prose_lint import LINK, prose_fields
 
 
@@ -74,6 +75,16 @@ class Defect:
 
     def line(self):
         return f"[{self.check}] {self.field}: {self.message} -- {self.quote!r}"
+
+    @property
+    def blocking(self):
+        """Warning and unverifiable findings stay visible without failing gates."""
+        return not self.check.endswith(("-avviso", "-non verificabile"))
+
+
+def blocking_defects(defects):
+    """Filter findings by severity while preserving all findings for reports."""
+    return [defect for defect in defects if defect.blocking]
 
 
 def _excerpt(text, start, end, radius=30):
@@ -328,6 +339,12 @@ def check_markers(fields, internal_key, level_key):
                 continue
             if not svg:
                 defects.append(Defect("grafico", field, quote, "il marcatore non produce nessun SVG"))
+                continue
+            title = re.search(r"<title[^>]*>(.*?)</title>", svg, re.DOTALL)
+            if title:
+                for number in guardie_v4.g4_title(title.group(1)):
+                    defects.append(Defect("G4", field, title.group(1).strip(),
+                                          f"titolo figura: numero {number!r} senza unità né anno"))
     return defects
 
 
@@ -380,6 +397,43 @@ def check_article(internal_key, entry, dossier=None, source_values=None):
         return []
     level_key = entry.get("level") or DEFAULT_LEVEL
     defects = []
+    observed, geography, unit, name = {}, "regioni", "", ""
+    parsed = sources.split_internal_id(internal_key)
+    if parsed:
+        view = build_indicator_view(*parsed)
+        if view:
+            level = next((item for item in view["levels"] if item["key"] == level_key), None)
+            if level:
+                geography = "province" if level_key == "provincia" else "regioni"
+                observed = {str(year): {key: guardie_v4.decimal_value(value.get("v") if isinstance(value, dict) else value)
+                                        for key, value in cells.items()}
+                            for year, cells in level["matrix"].items()}
+                observed = {year: {key: value for key, value in cells.items() if value is not None}
+                            for year, cells in observed.items()}
+                unit = str(view["meta"].get("unit") or "")
+                name = str(view["meta"].get("name") or "")
+    for field, text in fields:
+        if guardie_v4.g2(text):
+            defects.append(Defect("G2", field, text[:160], "messaggio editoriale interno nel testo pubblico"))
+        for number, offset in guardie_v4.g4_text(text):
+            defects.append(Defect("G4-avviso", field, text[max(0, offset - 30):offset + 50],
+                                  f"numero {number!r} senza unità né anno nella frase o nella precedente"))
+        for line in text.splitlines():
+            for sentence in guardie_v4._SENTENCE.finditer(line):
+                phrase = sentence.group(0)
+                for severity, rule, message in guardie_v4.editorial_checks(
+                        phrase, observed, geography, year=entry.get("vintage"), unit=unit, name=name,
+                        official=bool(view and view["meta"].get("source")) if parsed else False):
+                    defects.append(Defect(rule if severity == "errore" else f"{rule}-{severity}", field, phrase[:160], message))
+    # Page-level age check uses only explicit cohorts in prose. Family siblings
+    # remain structured navigation metadata: their labels never establish a
+    # population comparison on their own. The current level/vintage above stay
+    # the selected geography and period for any future data-backed refinement.
+    for severity, field_index, message, quote in guardie_v4.g3_page(
+            [(index, text) for index, (_field, text) in enumerate(fields, 1)]):
+        field = fields[field_index - 1][0]
+        defects.append(Defect("G3" if severity == "errore" else "G3-avviso",
+                              field, quote[:160], message))
     defects += check_typography(fields)
     defects += check_free_sections(entry)
     defects += check_links(fields)
@@ -432,7 +486,7 @@ def main(argv=None):
     print(f"guardia: {len(defects)} difetti su {args.code}", file=sys.stderr)
     for defect in defects:
         print(f"  {defect.line()}", file=sys.stderr)
-    return 1
+    return 1 if blocking_defects(defects) else 0
 
 
 if __name__ == "__main__":

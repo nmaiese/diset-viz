@@ -96,8 +96,14 @@
       if (a.value !== b.value) return higherBetter ? b.value - a.value : a.value - b.value;
       return a.name.localeCompare(b.name, "it");
     });
-    rows.forEach(function (row, i) { row.rank = i + 1; });
+    rows.forEach(function (row, i) { row.rank = i && row.value === rows[i - 1].value ? rows[i - 1].rank : i + 1; });
     return rows;
+  }
+
+  function quantile(values, p) {
+    var sorted = values.slice().sort(function (a, b) { return a - b; });
+    var index = (sorted.length - 1) * p, low = Math.floor(index), high = Math.ceil(index);
+    return sorted[low] + (sorted[high] - sorted[low]) * (index - low);
   }
 
   function territorySeries(key) {
@@ -419,9 +425,10 @@
     // the unit is declared once in the facts strip, and formatting this one
     // differently made the tile visibly change on hydration.
     setText(kpi("focus-value"), focus ? numberFmt.format(focus.value) : "n.d.");
+    var distinctValues = rows.filter(function (row, i) { return rows.findIndex(function (other) { return other.value === row.value; }) === i; });
     setText(
       kpi("focus-rank"),
-      focus ? focus.rank + "ª su " + count + " " + lv.plural : "dato non disponibile nel " + year
+      focus ? (distinctValues.length > 1 ? focus.rank + "ª su " + count + " " + lv.plural : "rango non informativo") : "dato non disponibile nel " + year
     );
     var focusLink = kpi("focus-link");
     if (focusLink) {
@@ -445,16 +452,16 @@
       setText(kpi("mean-value"), numberFmt.format(sum / rows.length));
       setText(kpi("mean-count"), count);
 
+      var comparison = kpi("focus-comparison");
+      if (comparison) comparison.textContent = "Confronto con la media semplice delle " + count + " " + lv.plural + ": " + fmtValue(sum / count);
+      var distribution = kpi("distribution");
+      var median = rows.length >= 5 ? quantile(rows.map(function (r) { return r.value; }), 0.5) : null;
+      if (distribution) distribution.hidden = median === null;
+      setText(kpi("median-value"), median === null ? "n.d." : numberFmt.format(median));
+      setText(kpi("central-band"), median === null ? "n.d." : "da " + fmtValue(quantile(rows.map(function (r) { return r.value; }), 0.25)) + " a " + fmtValue(quantile(rows.map(function (r) { return r.value; }), 0.75)));
+
       var high = Math.max(top.value, bottom.value), low = Math.min(top.value, bottom.value);
       setText(kpi("gap-value"), numberFmt.format(high - low));
-      var gapRatio = kpi("gap-ratio");
-      if (gapRatio) {
-        // Below 1,2 a ratio rounds to "1,0 volte" and reads as broken next to a
-        // non-zero gap, so the unit is shown instead. Same threshold as the server.
-        gapRatio.textContent = low > 0 && high / low >= 1.2
-          ? compactFmt.format(high / low) + "× il più basso"
-          : changeUnit;
-      }
     }
 
     var change = changeAgainstPreviousYear(year);

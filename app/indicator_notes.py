@@ -1243,33 +1243,25 @@ def _reading_text(name, theme, unit, direction=None):
     if "standardizzato" in unit.lower() or "punteggio" in unit.lower():
         return "Il valore è un punteggio confrontabile tra territori. La distanza tra regioni conta più del numero preso da solo."
     if direction == "lower_better":
-        return "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore."
+        return "La graduatoria è ordinata dal valore più basso al più alto."
     if direction == "higher_better":
-        return "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore."
+        return "La graduatoria è ordinata dal valore più alto al più basso."
     if direction == "higher_worse":
-        return "Un valore alto segnala maggiore pressione o consumo. La graduatoria assegna quindi la posizione migliore al valore più basso."
+        return "Un valore alto segnala maggiore pressione o consumo. La graduatoria è ordinata dal valore più basso al più alto."
     if theme in ("Turismo", "Trasporti e mobilità", "Cultura"):
         return "Valori più alti indicano maggiore intensità del fenomeno. Possono essere un punto di forza, ma anche una pressione da gestire."
     if theme in ("Energia", "Competitività", "Dinamiche settoriali"):
         return "Valori più alti indicano maggiore intensità economica o produttiva. Il giudizio dipende dal tipo di risorsa usata e dal risultato che produce."
-    return "Non esiste una direzione univoca: un valore alto descrive una maggiore intensità del fenomeno, non una regione automaticamente migliore o peggiore."
+    return "Non esiste una direzione univoca: un valore alto descrive una maggiore intensità del fenomeno. La graduatoria ordina i valori dal più alto al più basso."
 
 
 def trend_framing(direction, avg_change_pct):
-    """Short qualitative fragment (no numbers) describing whether a national
-    average's movement reads as favorable, unfavorable, or neutral, given the
-    indicator's direction. Returns '' if avg_change_pct is None (caller must guard
-    rendering on that)."""
+    """Short neutral fragment for a mean movement. Returns '' when unavailable."""
     if avg_change_pct is None:
         return ""
     if abs(avg_change_pct) < 1:
         return "un andamento sostanzialmente stabile"
-    if direction not in ("higher_better", "lower_better", "higher_worse"):
-        return "un aumento" if avg_change_pct > 0 else "una diminuzione"
-    favorable = (direction == "higher_better" and avg_change_pct > 0) or (
-        direction in ("lower_better", "higher_worse") and avg_change_pct < 0
-    )
-    return "una variazione media favorevole" if favorable else "una variazione media sfavorevole"
+    return "un aumento" if avg_change_pct > 0 else "una diminuzione"
 
 
 def it_plural(count, singular, plural):
@@ -1371,16 +1363,10 @@ def annual_change_framing(name, direction, delta):
     if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
         outcome = "si è ampliato" if delta > 0 else "si è ridotto"
         return f"{def_movement} indica che il divario medio tra i due tassi {outcome}."
-    if direction not in ("higher_better", "lower_better", "higher_worse"):
-        return (
-            f"Il dato descrive {indef_movement}, ma non indica da solo un "
-            "miglioramento o un peggioramento."
-        )
-    favorable = (direction == "higher_better" and delta > 0) or (
-        direction in ("lower_better", "higher_worse") and delta < 0
+    return (
+        f"Il dato descrive {indef_movement}, ma non indica da solo un "
+        "miglioramento o un peggioramento."
     )
-    outcome = "favorevole" if favorable else "sfavorevole"
-    return f"Per la direzione di questo indicatore, il movimento medio è {outcome}."
 
 
 def _caveat_text(name, theme, lens):

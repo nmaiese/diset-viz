@@ -524,11 +524,6 @@ def _composed_indicator_section(role, meta, level):
                 f"osservato nell'anno più recente, {level['year_max']}. Da solo non dice se "
                 "la differenza sia statisticamente significativa, e non spiega da che cosa dipenda."
             )
-        if stats.get("above_avg_count") is not None and stats.get("below_avg_count") is not None:
-            paragraphs.append(
-                f"La media divide le {level['plural']} in due gruppi, "
-                f"{stats['above_avg_count']} sopra e {stats['below_avg_count']} sotto."
-            )
         if not meta.get("scoreable"):
             paragraphs.append(
                 "Questo indicatore non ha una direzione univoca. L'ordinamento descrive "
@@ -544,13 +539,19 @@ def _composed_indicator_section(role, meta, level):
                 "con la stessa definizione, e la fotografia va letta come tale."
             )
         paragraphs = []
-        if stats.get("avg_change_abs") is not None:
+        if stats.get("avg_change_abs") is not None and stats.get("same_territory_sample", True):
             unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
             level_adjective = "regionali" if level["key"] == "regione" else "provinciali"
             paragraphs.append(
                 f"Dal {stats['year_min']} al {stats['year_max']} la media semplice dei valori "
                 f"{level_adjective} è passata da {_number(stats['year_min_avg'])} a "
                 f"{_with_unit(_number(stats['year_avg']), unit)}."
+            )
+        elif not stats.get("same_territory_sample", True):
+            paragraphs.append(
+                f"Nel confronto fra {stats['year_min']} e {stats['year_max']} i campioni differiscono "
+                f"({stats['year_min_count']} e {stats['year_max_count']} territori); le medie non consentono "
+                "di attribuire la variazione al cambiamento degli stessi territori."
             )
         annual = level.get("annual_change")
         if annual:
@@ -621,18 +622,14 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         f"- Territori nell'ultimo anno: {len(level['observations'])}",
         f"- Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})",
     ]
-    # La definizione che ne da' l'istituto (`meta["archive"]`, che arriva da
-    # `data/definitions/`). La pagina HTML la mostra da sempre nell'apparato,
-    # sotto "Definizione della fonte", la proiezione markdown no: e' lo stesso
-    # documento alla stessa URL, quindi o sta in tutte e due o e' una pagina
-    # diversa con lo stesso canonico. Copre 346 delle 372 schede indicizzabili,
-    # ed e' la prima cosa che un agente deve poter citare invece di
-    # parafrasare la formula che il sito si compone da se'.
+    definition = (meta.get("official_definition") or "").strip()
+    if not definition:
+        definition = ("La fonte non fornisce una definizione specifica verificata per questa serie. "
+                      "Non ricostruiamo numeratore o denominatore dai soli nome e unità.")
+    lines += ["", "## Definizione della fonte", "", definition,
+              "", f"Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})"]
     if (meta.get("archive") or "").strip():
-        lines += ["", "## Definizione della fonte", "", meta["archive"].strip(),
-                  "", f"Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})"]
-    if explain.get("plain"):
-        lines += ["", "## Che cosa misura", "", explain["plain"]]
+        lines += ["", "## Dataset e release", "", meta["archive"].strip()]
     if explain.get("example"):
         lines += ["", "## Esempio di lettura", "", explain["example"]]
     if explain.get("reading"):

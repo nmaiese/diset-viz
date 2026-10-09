@@ -1,6 +1,7 @@
 import csv
 import math
 import os
+import re
 import unicodedata
 from collections import defaultdict
 from functools import lru_cache
@@ -540,17 +541,28 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
     # mean and the min-max gap (honest even at N=2) and drop the rest - the "None
     # means omit" contract then suppresses those claims in both templates.
     SMALL_N = 5
-    median = None
+    median = q1 = q3 = None
     above_avg_count = below_avg_count = None
     if year_values and year_count >= SMALL_N:
         sorted_values = sorted(year_values)
         mid = len(sorted_values) // 2
         median = sorted_values[mid] if len(sorted_values) % 2 else (sorted_values[mid - 1] + sorted_values[mid]) / 2
+        def percentile(position):
+            index = (len(sorted_values) - 1) * position
+            lower = math.floor(index)
+            upper = math.ceil(index)
+            return sorted_values[lower] + (sorted_values[upper] - sorted_values[lower]) * (index - lower)
+        q1, q3 = percentile(0.25), percentile(0.75)
         if year_avg is not None:
             above_avg_count = sum(1 for v in year_values if v > year_avg)
             below_avg_count = sum(1 for v in year_values if v < year_avg)
 
     year_min_avg = year_avg if not has_multi_year else indicator_year_average(payload["series"], year_min)
+    year_min_keys = {row.get("region_key") or row.get("territory_key") for row in payload["series"]
+                     if row["year"] == year_min and row["value"] is not None}
+    year_max_keys = {row.get("region_key") or row.get("territory_key") for row in payload["series"]
+                     if row["year"] == year_max and row["value"] is not None}
+    year_min_count, year_max_count = len(year_min_keys), len(year_max_keys)
 
     avg_change_abs = avg_change_pct = None
     if has_multi_year and year_avg is not None and year_min_avg is not None:
@@ -587,7 +599,12 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         gap_abs = high_value - low_value
         name_lower = meta["name"].lower()
         unit_lower = (meta.get("unit") or "").lower()
-        ratio_meaningless = "differenza" in name_lower or "punti percentuali" in unit_lower
+        ratio_meaningless = (
+            "differenza" in name_lower
+            or "punti percentuali" in unit_lower
+            or any(re.search(rf"(?<!\w){token}(?!\w)", f"{name_lower} {unit_lower}") for token in
+                   ("anni?", "giorni?", "ore?", "minuti?", "durata", "et[aà]"))
+        )
         if not ratio_meaningless and low_value > 0:
             ratio = high_value / low_value
             # A "X volte" ratio only reads as informative when the two values are
@@ -610,10 +627,15 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         "year_avg": year_avg,
         "year_count": year_count,
         "median": median,
+        "q1": q1,
+        "q3": q3,
         "above_avg_count": above_avg_count,
         "below_avg_count": below_avg_count,
         "year_min": year_min,
         "year_min_avg": year_min_avg,
+        "year_min_count": year_min_count,
+        "year_max_count": year_max_count,
+        "same_territory_sample": year_min_keys == year_max_keys,
         "year_max": year_max,
         "has_multi_year": has_multi_year,
         "avg_change_abs": avg_change_abs,

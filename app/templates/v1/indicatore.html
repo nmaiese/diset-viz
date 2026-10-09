@@ -64,7 +64,7 @@ addEventListener("pagereveal", function (e) {
   "publisher": {{ publisher_jsonld | safe }},{% if dataset_updated %}
   "dateModified": {{ dataset_updated | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
-  "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
+  "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, distanza fra gli estremi e classifica senza riponderazioni",
   {# `PropertyValue` invece della stringa nuda: cosi' la grandezza porta con se'
      l'unita' e l'intervallo osservato, che e' quello che un motore deve sapere
      per riusare il dato senza aprire la pagina. La stringa diceva solo il nome,
@@ -77,12 +77,12 @@ addEventListener("pagereveal", function (e) {
     "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
     "minValue": {{ estremi.basso.value }},
     "maxValue": {{ estremi.alto.value }},{% endif %}
-    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.archive %},
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.official_definition %},
+    "description": {{ meta.official_definition | tojson }}{% endif %}
     {# "Che cosa misura questa serie" secondo l'istituto: `description` della
        variabile e' lo slot giusto, e il testo e' lo stesso che la pagina
        mostra nell'apparato sotto "Definizione della fonte". Nessuna
        dichiarazione che la pagina visibile non sostenga. #}
-    "description": {{ meta.archive | tojson }}{% endif %}
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
@@ -113,7 +113,7 @@ addEventListener("pagereveal", function (e) {
       tornano in fila dopo la testata. -#}
   <div class="scheda-head">
   <header class="pagehead">
-    <p class="eyebrow"><a href="{{ meta.theme_path }}">{{ meta.theme }}</a><span class="sep" aria-hidden="true">·</span>{{ meta.source_label }}<span class="sep" aria-hidden="true">·</span>{{ n }} {{ level.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ year }}</p>
+    <p class="eyebrow"><a href="{{ meta.theme_path }}">{{ meta.theme }}</a><span class="sep" aria-hidden="true">·</span>{{ meta.source_label }}<span class="sep" aria-hidden="true">·</span>{{ meta.value_unit or 'unità non specificata' }}<span class="sep" aria-hidden="true">·</span>{{ n }} {{ level.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ year }}</p>
     <h1 class="h-title">{{ page_h1 }}</h1>
     {#- `page-lead` e' il contratto col JSON-LD: la `description` del Dataset e'
         questo attacco, e la prova lo confronta col testo visibile. -#}
@@ -129,13 +129,6 @@ addEventListener("pagereveal", function (e) {
               aria-pressed="false" aria-label="Aggiungi ai preferiti" title="Preferiti" hidden>☆</button>
       {% endif %}
     </p>
-    {% if not meta.indexable %}
-    {% if meta.indexable_reason == "senza_prosa" %}
-    <p class="meta">Questa pagina resta consultabile, ma non ha ancora un commento scritto e non ha ricevuto impressioni da Google nei 28 giorni misurati.</p>
-    {% else %}
-    <p class="meta">Questa pagina resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
-    {% endif %}
-    {% endif %}
   </header>
   {% if d.tiles %}{{ ui.tiles(d.tiles) }}{% endif %}
   </div>
@@ -143,7 +136,7 @@ addEventListener("pagereveal", function (e) {
   {% if d.strip.svg %}
   <figure class="lead-figure" aria-labelledby="divario-t" data-family="{{ d.family | tojson | forceescape }}">
     <figcaption class="lead-figure__head">
-      <span class="lead-figure__title" id="divario-t">Il divario nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
+      <span class="lead-figure__title" id="divario-t">La distanza fra gli estremi nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
       {{ ui.arealegend(d.strip.legend) }}
       {#- La striscia che diventa Italia: gli stessi venti punti si ricompongono
           in una griglia a forma d'Italia, una casella per regione, e prendono
@@ -195,23 +188,11 @@ addEventListener("pagereveal", function (e) {
       <nav class="toc" aria-label="In questa pagina">
         <p>In questa pagina</p>
         <ol>
-          <li><a href="#esplora" data-query-intent="classifica">Chi è in testa</a></li>
-          {% if not d.series.single_year %}<li><a href="#serie-storica" data-query-intent="andamento">Com'è cambiato</a></li>{% endif %}
+          {% for item in query_map %}<li><a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a></li>{% endfor %}
           {% if page_article.sections %}<li><a href="#analisi">L'analisi</a></li>{% endif %}
-          <li><a href="#come-leggere" data-query-intent="definizione">Che cosa misura</a></li>
-          <li><a href="#fonti-verifica" data-query-intent="metodologia">Fonti e citazione</a></li>
-          {% if meta.downloads and level.key == 'regione' %}<li><a href="#download-dati" data-query-intent="download">Scarica i dati</a></li>{% endif %}
+          {% if not query_map %}<li><a href="#esplora">Esplora i dati</a></li><li><a href="#come-leggere">Che cosa misura</a></li><li><a href="#fonti-verifica">Fonti e citazione</a></li>{% endif %}
         </ol>
       </nav>
-      {#- Le domande a cui la scheda risponde, ciascuna col punto della pagina che
-          la risponde: le stesse del gemello Markdown e di llms.txt
-          (`level.query_map`, filtrato da `_query_map_for_article`). -#}
-      {% if query_map %}
-      <div class="aside-block">
-        <p class="aside-block__label">Le domande di questo indicatore</p>
-        <ul class="qlist">{% for item in query_map %}<li><a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a></li>{% endfor %}</ul>
-      </div>
-      {% endif %}
       <div class="aside-block">
         <p>Fonte: <a href="{{ meta.source_url }}">{{ meta.source_label }}</a>. Elaborazione Divario Italia.</p>
         <p><a class="linkarrow" href="#fonti-verifica">Cita questo indicatore</a></p>
@@ -266,7 +247,7 @@ addEventListener("pagereveal", function (e) {
         <figure class="module">
           <figcaption class="module__head">
             {% if d.series_claim %}<h3 class="h-sub">{{ d.series_claim }}</h3>{% endif %}
-            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la {{ ui.term('media-semplice') }}. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è la distanza fra gli estremi. Tratteggiata la {{ ui.term('media-semplice') }}. Scegli una {{ level.singular }} qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
@@ -330,7 +311,8 @@ addEventListener("pagereveal", function (e) {
                 lead composto la contiene, e una sezione "definizione" dell'articolo
                 la direbbe due volte (`views._show_plain_definition`). La
                 frase-risposta delle province non la contiene. -#}
-            {% if show_plain_definition %}<p>{{ explain.plain }}</p>{% endif %}
+            {% if show_plain_definition and meta.official_definition %}<p>{{ meta.official_definition }}</p>
+            {% elif show_plain_definition %}<p>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.</p>{% endif %}
             {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
             {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
             {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
@@ -338,8 +320,10 @@ addEventListener("pagereveal", function (e) {
           <div>
             <h3>Secondo la fonte</h3>
             <dl>
-              {% if meta.archive %}<div><dt>Definizione della fonte</dt><dd>{{ meta.archive }} <a href="{{ meta.source_url }}">Consulta la fonte {{ meta.institution or "Istat" }}</a></dd></div>{% endif %}
-              <div><dt>Verso</dt><dd>{{ d.verso }}{% if not meta.scoreable %}: un valore alto descrive più intensità del fenomeno, non un territorio migliore{% endif %}.</dd></div>
+              {% if meta.official_definition %}<div><dt>Definizione della fonte</dt><dd>{{ meta.official_definition }} <a href="{{ meta.definition_url or meta.source_url }}">{{ meta.definition_source or 'Consulta la definizione originale' }}</a></dd></div>
+              {% else %}<div><dt>Definizione della fonte</dt><dd>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità. <a href="{{ meta.source_url }}">Consulta la fonte {{ meta.institution or "Istat" }}</a></dd></div>{% endif %}
+              {% if meta.archive %}<div><dt>Dataset e release</dt><dd>{{ meta.archive }}</dd></div>{% endif %}
+              <div><dt>Verso</dt><dd>{{ d.verso }}.</dd></div>
               {% if explain.caveat %}<div><dt>Il limite principale</dt><dd>{{ explain.caveat }}</dd></div>{% endif %}
               {#- La misura che chi cerca scambia con questa (PIL pro capite e
                   PIL totale o reddito, occupazione e disoccupazione):
@@ -360,7 +344,7 @@ addEventListener("pagereveal", function (e) {
               indicator_page.html, parola per parola (qui "Come e' calcolato"
               in piu' porta il link alla metodologia): le prove di trasparenza
               le leggono, e sono dichiarazioni, non testo da ridisegnare. -#}
-          <div><dt>Come è calcolato</dt><dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Il divario è la distanza fra il valore più alto e il più basso, e la classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
+          <div><dt>Come è calcolato</dt><dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. La distanza fra gli estremi è la differenza fra il valore più alto e il più basso osservati fra i {{ level.observations | length }} {{ level.plural }} con dato, espressa in {{ meta.value_unit or meta.unit or 'unità della fonte' }}. La classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
           <div><dt>Come nasce questa pagina</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della pagina sono ricalcolate dal codice a ogni caricamento.
             {%- if page_article.authored_count or page_article.lead %} Il racconto lo legge e lo approva una persona prima che vada online.
             {%- else %} Il commento ai numeri è costruito sui dati della fonte e si aggiorna con loro, quindi non può invecchiare rispetto ai dati.{% endif %}

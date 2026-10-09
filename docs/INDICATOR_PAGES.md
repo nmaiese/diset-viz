@@ -476,6 +476,27 @@ a ogni ricarico. Quel nome finisce nella prosa.
 - Un divario tra due tassi va espresso in punti percentuali e non descrive da
   solo il livello complessivo dei due tassi.
 
+## Riepilogo comune della scheda
+
+La scheda mostra la definizione specifica verificata dalla fonte. Se manca,
+dichiara il limite: nome e unità non bastano per ricostruire numeratore o
+denominatore. Nome del dataset o release resta metadato distinto dalla
+definizione.
+
+La distanza fra estremi è `massimo - minimo`, mai un rapporto in volte per
+durate. Quando almeno cinque valori sono confrontabili, il riepilogo mostra
+mediana e fascia centrale (primo e terzo quartile). Il conteggio sopra la media
+semplice non è una sintesi fissa. Ogni media indica chiaramente il proprio
+universo e numero di territori; non si chiama Italia o nazionale senza valore
+ufficiale con fonte e perimetro verificati.
+
+Selezione territoriale aggiorna valore, anno, confronto con media semplice e
+rango solo se i valori non sono tutti uguali. La vista provinciale mantiene
+serie e copertura proprie: una media delle province non sostituisce valore
+regionale ufficiale. Valori contestuali restano ordinamenti descrittivi, senza
+giudizi automatici di merito. Grafici e tabella devono restare coerenti dopo
+cambio di anno o territorio; mancanti restano `n.d.`, distinti da zero.
+
 ## Che cosa è verificato e che cosa no
 
 Oggi la struttura sopravvive per una via sola: sezione senza ruolo e

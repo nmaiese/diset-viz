@@ -255,7 +255,7 @@ class LaVistaProvinciale(unittest.TestCase):
         # La definizione in piano non sta piu' nella frase che apre la pagina,
         # e la pagina la dice lo stesso.
         body = re.sub(r"<script\b.*?</script>", "", self.province, flags=re.DOTALL)
-        self.assertIn("Esprime in anni la speranza di vita alla nascita", body)
+        self.assertIn("La speranza di vita esprime il numero medio di anni", body)
 
     def test_i_link_fra_i_livelli_dicono_di_che_cosa(self):
         self.assertIn(f'<a href="{self.REGIONI}">Speranza di vita alla nascita nelle 20 regioni</a>', self.province)
@@ -299,6 +299,62 @@ class IlRipiegoHaLaStessaTesta(unittest.TestCase):
                 self.assertNotIn('data-v1="', ripiego[path])
                 self.assertEqual(_head(ripiego[path]), _head(v1[path]))
                 self.assertNotIn("livello=regione", ripiego[path])
+
+
+class G2TestoPubblicoScheda(unittest.TestCase):
+    """G2 vale sul testo visibile dei template scheda, incluso il ripiego."""
+
+    PATHS = (
+        "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001",
+        "/indicatore/partecipazione-elettorale-elezioni-regionali/bes-06POL001P",
+    )
+
+    def test_nessun_messaggio_seo_interno_nei_due_renderer(self):
+        from scripts.adsense_audit import _AssetParser
+        from scripts.editoriale.guardie_v4 import g2
+
+        client = app.test_client()
+
+        def visible_g2(page):
+            parser = _AssetParser()
+            parser.feed(page)
+            forbidden = ("priorità per l'indicizzazione", "impressioni da google")
+            return [part for part in parser.visible_text
+                    if g2(part) or any(term in part.casefold() for term in forbidden)]
+
+        self.assertEqual(visible_g2("<p>La priorità per l'indicizzazione è bassa.</p>"),
+                         ["La priorità per l'indicizzazione è bassa."])
+        self.assertEqual(visible_g2("<p>La partecipazione elettorale varia tra regioni.</p>"), [])
+
+        livello = app.logger.level
+        app.logger.setLevel(logging.CRITICAL)
+        cache.clear()
+        try:
+            with mock.patch("app.indicator_view.indexability", return_value=(False, "senza_prosa")):
+                page = client.get(self.PATHS[0]).get_data(as_text=True)
+                with self.subTest(path=self.PATHS[0], renderer="v1"):
+                    self.assertIn('data-v1="indicatore"', page)
+                    self.assertEqual(visible_g2(page), [])
+            for path in self.PATHS[1:]:
+                page = client.get(path).get_data(as_text=True)
+                with self.subTest(path=path, renderer="v1"):
+                    self.assertIn('data-v1="indicatore"', page)
+                    self.assertEqual(visible_g2(page), [])
+            with mock.patch.dict(os.environ, {"DIVARIO_V1_STRICT": ""}), \
+                    mock.patch("app.design.derive", side_effect=RuntimeError("fallback")):
+                with mock.patch("app.indicator_view.indexability", return_value=(False, "senza_prosa")):
+                    page = client.get(self.PATHS[0]).get_data(as_text=True)
+                    with self.subTest(path=self.PATHS[0], renderer="legacy"):
+                        self.assertNotIn('data-v1="', page)
+                        self.assertEqual(visible_g2(page), [])
+                for path in self.PATHS[1:]:
+                    page = client.get(path).get_data(as_text=True)
+                    with self.subTest(path=path, renderer="legacy"):
+                        self.assertNotIn('data-v1="', page)
+                        self.assertEqual(visible_g2(page), [])
+        finally:
+            app.logger.setLevel(livello)
+            cache.clear()
 
 
 class LaDefinizioneInPiano(unittest.TestCase):

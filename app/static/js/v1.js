@@ -226,7 +226,6 @@
       middle: mod.querySelector('[data-rank-part="middle"]'),
       tail: mod.querySelector('[data-rank-part="tail"]')
     };
-    var claim = mod.querySelector("[data-claim]");
     var live = mod.querySelector("[data-live]");
     // "Vai alla riga nella classifica", accanto al campo (solo le province).
     var jump = mod.querySelector("[data-rank-goto]");
@@ -248,14 +247,39 @@
       return list;
     }
 
+    /* distribution:start */
+    function quantile(values, p) {
+      var sorted = values.slice().sort(function (a, b) { return a - b; });
+      var index = (sorted.length - 1) * p, low = Math.floor(index), high = Math.ceil(index);
+      return sorted[low] + (sorted[high] - sorted[low]) * (index - low);
+    }
+
+    function paintDistribution(mod, vals, unit, changeUnit) {
+      var median = vals.length >= 5 ? quantile(vals, 0.5) : null;
+      var firstQuartile = vals.length >= 5 ? quantile(vals, 0.25) : null;
+      var thirdQuartile = vals.length >= 5 ? quantile(vals, 0.75) : null;
+      var medianEl = mod.querySelector('[data-kpi="median-value"]');
+      var bandEl = mod.querySelector('[data-kpi="central-band"]');
+      var gapEl = mod.querySelector('[data-kpi="gap-value"]');
+      var distribution = mod.querySelector('[data-kpi="distribution"]');
+      if (distribution) distribution.hidden = median === null;
+      if (medianEl) medianEl.textContent = median === null ? "n.d." : withUnit(median, unit);
+      if (bandEl) bandEl.textContent = median === null ? "n.d." : "da " + withUnit(firstQuartile, unit) + " a " + withUnit(thirdQuartile, unit);
+      if (gapEl) gapEl.textContent = vals.length ? withUnit(Math.max.apply(null, vals) - Math.min.apply(null, vals), changeUnit || unit) : "n.d.";
+    }
+    /* distribution:end */
+
     function paint(year) {
       var list = rows(year);
-      if (!list.length) return;
+      if (!list.length) { paintDistribution(mod, [], data.unit, data.changeUnit); return; }
       var vals = list.map(function (r) { return r.value; });
       var sc = choroScale(vals);
       var lo = sc.lo, hi = sc.hi;
       var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+      paintDistribution(mod, vals, data.unit, data.changeUnit);
       var max = Math.max(hi, 0) || 1;
+      var yearMatrix = data.matrix[String(year)] || {};
+      var missing = Object.keys(data.names).filter(function (key) { return yearMatrix[key] === null || yearMatrix[key] === undefined; });
       var byKey = {};
       list.forEach(function (r) { byKey[r.key] = r; });
 
@@ -266,7 +290,7 @@
       mod.querySelectorAll(".map [data-key]").forEach(function (p) {
         var r = byKey[p.dataset.key];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6");
-        if (r) {
+        if (r && r.value !== null) {
           p.classList.add("q" + choroStep(r.value, sc));
           p.style.fill = "";
           p.dataset.value = withUnit(r.value, data.unit);
@@ -284,19 +308,24 @@
       // la segue. Si riscrivono solo i corpi: il details resta aperto o chiuso.
       var folded = !!(data.fold && parts.head && parts.middle && parts.tail && list.length > data.fold.over);
       var edge = folded ? data.fold.edge : 0;
-      var html = { head: [], middle: [], tail: [] }, refDone = false;
+      var html = { head: [], middle: [], tail: [] }, refDone = false, lastValue = null, lastRank = 0;
       list.forEach(function (r, i) {
         var part = !folded || i < edge ? "head" : i >= list.length - edge ? "tail" : "middle";
-        var crosses = lowerBetter ? r.value > avg : r.value < avg;
+        var crosses = r.value !== null && (lowerBetter ? r.value > avg : r.value < avg);
         if (!refDone && crosses) {
           html[part].push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
           refDone = true;
         }
         var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
         var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
-        var id = data.row_id ? ' id="' + data.row_id + r.key + '"' : "";
-        html[part].push('<tr data-key="' + r.key + '"' + id + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
-          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
+        var id = data.row_id && r.value !== null ? ' id="' + data.row_id + r.key + '"' : "";
+        if (r.value !== null && r.value !== lastValue) lastRank = i + 1;
+        lastValue = r.value;
+        var rank = r.value === null ? "n.d." : '<span class="n n--rank"><data value="' + lastRank + '">' + lastRank + '</data><span class="n__o">ª</span></span>';
+        var bar = r.value === null ? "" : '<span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span>';
+        var value = r.value === null ? '<span class="n n--nd">n.d.</span>' : '<data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data>";
+        html[part].push('<tr data-key="' + r.key + '"' + id + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + rank + '</td><th scope="row">' + name +
+          '</th><td class="barcell" aria-hidden="true">' + bar + '</td><td class="val">' + value + "</td></tr>");
       });
       if (parts.head && parts.middle && parts.tail) {
         parts.head.innerHTML = html.head.join("");
@@ -315,16 +344,18 @@
       } else {
         body.innerHTML = html.head.join("");
       }
-
-      if (claim && data.south && data.south.length) {
-        var south = list.filter(function (r) { return data.south.indexOf(r.key) >= 0; });
-        var below = south.filter(function (r) { return r.value < avg; });
-        var words = ["zero", "una", "due", "tre", "quattro", "cinque", "sei", "sette", "otto"];
-        var w = function (n) { return words[n] || String(n); };
-        if (below.length === south.length) claim.textContent = "Nel " + year + " tutte le " + w(south.length) + " regioni del Mezzogiorno stanno sotto la media semplice";
-        else if (!below.length) claim.textContent = "Nel " + year + " tutte le " + w(south.length) + " regioni del Mezzogiorno stanno sopra la media semplice";
-        else claim.textContent = "Nel " + year + " " + w(below.length) + " regioni del Mezzogiorno su " + w(south.length) + " stanno sotto la media semplice";
+      var missingMore = mod.querySelector("[data-rank-missing-more]");
+      var missingBody = mod.querySelector('[data-rank-part="missing"]');
+      if (missingMore && missingBody) {
+        missingMore.hidden = !missing.length;
+        mod.querySelector("[data-rank-missing-summary]").textContent = missing.length + " " + data.plural + " senza dato";
+        missingBody.innerHTML = missing.map(function (key) {
+          var dot = data.areas && data.areas[key] ? '<span class="area-dot area-dot--' + data.areas[key] + '" aria-hidden="true"></span>' : "";
+          var name = dot + (data.profile ? '<a href="' + profileHref(key) + '">' + esc(data.names[key]) + "</a>" : esc(data.names[key]));
+          return '<tr data-key="' + key + '"><td class="rank">n.d.</td><th scope="row">' + name + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><span class="n n--nd">n.d.</span></td></tr>';
+        }).join("");
       }
+
       page.querySelectorAll("[data-year-label]").forEach(function (el) { el.textContent = year; });
       var out = mod.querySelector("[data-year-out]");
       if (out) out.textContent = year;
@@ -388,9 +419,22 @@
         var list = rows(current), at = -1;
         list.forEach(function (x, i) { if (x.key === key) at = i; });
         if (at >= 0) {
-          live.textContent = list[at].name + ": " + withUnit(list[at].value, data.unit) + " nel " + current + ", " + (at + 1) + "ª su " + list.length + " " + data.plural +
-            (lowerBetter ? " dal valore più basso." : " dal valore più alto.");
+          var rank = list.findIndex(function (x) { return x.value === list[at].value; }) + 1;
+          var varied = list.some(function (x) { return x.value !== list[0].value; });
+          var avg = list.reduce(function (sum, x) { return sum + x.value; }, 0) / list.length;
+          live.textContent = list[at].name + ": " + withUnit(list[at].value, data.unit) + " nel " + current + ". Confronto con la media semplice delle " + list.length + " " + data.plural + ": " + withUnit(avg, data.unit) + ". " + (varied ? rank + "ª su " + list.length + " " + data.plural + "." : "Rango non informativo.");
         } else live.textContent = (data.names[key] || key) + ": dato non disponibile nel " + current + ".";
+      }
+      var summary = page.querySelector("[data-focus-summary]");
+      if (summary) {
+        var sample = rows(current), chosen = null;
+        sample.forEach(function (row) { if (row.key === key) chosen = row; });
+        var average = sample.length ? sample.reduce(function (sum, row) { return sum + row.value; }, 0) / sample.length : null;
+        var different = sample.some(function (row) { return row.value !== sample[0].value; });
+        var position = chosen ? sample.findIndex(function (row) { return row.value === chosen.value; }) + 1 : null;
+        summary.textContent = chosen
+          ? chosen.name + ": " + withUnit(chosen.value, data.unit) + " nel " + current + ". Confronto con la media semplice delle " + sample.length + " " + data.plural + ": " + withUnit(average, data.unit) + ". " + (different ? position + "ª su " + sample.length + " " + data.plural + "." : "Rango non informativo.")
+          : (data.names[key] ? data.names[key] + ": dato non disponibile nel " + current + ". " : "Nessun territorio selezionato nel " + current + ". ") + (average === null ? "Media semplice non disponibile." : "Confronto con la media semplice delle " + sample.length + " " + data.plural + ": " + withUnit(average, data.unit) + ".");
       }
       // Il link alla riga c'e' solo se la riga c'e': un anno senza il dato
       // della provincia scelta lo nasconde, il cambio d'anno lo rivaluta.

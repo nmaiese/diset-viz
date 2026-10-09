@@ -85,7 +85,7 @@ class QualityLifeStaticTest(unittest.TestCase):
         page = client.get(sample["path"])
         self.assertEqual(page.status_code, 200)
         self.assertIn("Densità di verde storico".encode("utf-8"), page.data)
-        self.assertIn("valore più alto occupa la posizione migliore".encode("utf-8"), page.data)
+        self.assertIn("La graduatoria è ordinata dal valore più alto al più basso".encode("utf-8"), page.data)
         # BES indicators render through the same template as every other family
         # now, so the checks are on the shared article skeleton rather than on
         # the wording of the old quality-of-life page.

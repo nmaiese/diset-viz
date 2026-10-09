@@ -3,22 +3,32 @@
 Issue: {issue}
 Worktree: {worktree}
 
-Applica la sezione B di `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v2.md`. Famiglia diversa dall'autore.
-Valuta T/R/L/N con citazioni della bozza, anti-invenzione, rilievi localizzati, conteggio dei bloccanti, voto e
-motivo. PASSA richiede voto almeno 4 e zero bloccanti. Scrivi `lavoro/{chiave}/verifica.md` (ricalcoli e
+Applica il Gate B v4.1 di `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v4.md` (§4). Famiglia diversa
+dall'autore. Valuta T/R/L/N nei significati v4, con citazioni della bozza e righe del registro del brief;
+i criteri T includono ogni frase forte (cifra, confronto, graduatoria, direzione, causa): per ciascuna cerca
+nel registro del brief affermazione corrispondente, fonte, ambito e periodo, livello di descrizione,
+associazione o spiegazione documentata e dato o calcolo che la sostiene. Per spiegazioni attribuite
+controlla prova specifica nella fonte; lessico G8 e URL da soli non provano causalità. Se registro manca,
+è incompleto o non corrisponde alle frasi forti, scrivi FERMO con T: no e rilievi localizzati.
+I criteri di pubblicazione della norma e le specifiche delle figure sono bloccanti. PASSA richiede T, R, L, N
+tutti sì, voto almeno 4 e zero bloccanti; massimo due giri. Scrivi `lavoro/{chiave}/verifica.md` (ricalcoli e
 controlli) e `lavoro/{chiave}/gate-b.md` con ESATTAMENTE questi campi, ognuno all'inizio di una riga
 (l'orchestratore li legge con un parser rigido):
 
 ```
 # Gate B: {chiave}
+Contratto: v4.1
+Tipo pagina: articolo oppure indicatore oppure profilo territoriale oppure confronto territoriale
 Esito: PASSA oppure RISCRIVERE oppure FERMO   (solo una parola dopo i due punti)
 SHA bozza: <git rev-parse HEAD al momento del giudizio>
 Hash bozza: <sha256sum lavoro/{chiave}/bozza.md, 64 caratteri esadecimali, nient'altro sulla riga>
 Famiglie autore/revisore: <famiglia e modello dell'autore e tuoi>
-T: sì oppure no — <citazione della bozza: la tesi è sostenuta dalle prove>
-R: sì oppure no — <citazione: confronto fra due territori reali che fa avanzare il racconto>
-L: sì oppure no — <citazione: significato concreto per il lettore nei primi due paragrafi>
-N: sì oppure no — <citazione: risultato non ovvio e controllo contrario riconoscibili>
+T: sì oppure no — <citazione e riga del registro: ogni frase forte ha dato e fonte>
+R: sì oppure no — <citazione: confronti compatibili o differenze dichiarate, contrario onesto>
+L: sì oppure no — <citazione: misura e limite chiari prima del primo grafico>
+N: sì oppure no — <citazione: nessun falso primato, conclusione commisurata alle prove>
+Oltre la tabella: sì oppure no — <risposta a «Questa pagina permette di capire qualcosa che la sola tabella non rende evidente?» e prova>
+Funzione paragrafi: sì oppure no — <funzione dei paragrafi e prova; classifica ripetuta senza funzione è bloccante>
 Controllo anti-invenzione: <persone solo da fonti citate: esito>
 Bloccanti: <numero intero>
 Voto: <1-5> <motivo breve>

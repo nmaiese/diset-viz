@@ -3,13 +3,46 @@
 Issue: {issue}
 Worktree: {worktree}
 
-Segui PIANO v3 e `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v3.md`. Per un
-blog costruisci angoli da un fatto e da una domanda reale; proponi due o tre
-angoli verificati, senza imporne uno al caporedattore. Non usare correlazioni
-fra soli indicatori interni come tesi. Per una scheda spiega l'indicatore
-oggetto, con gli altri solo come contesto. Dichiara ultimo anno/periodo del dato,
-data e URL della fonte, almeno tre fonti esterne verificate per il blog e ruolo
-degli indicatori interni come base e tassello. Non anticipare il verdetto Gate A.
+Scrivi il brief secondo il contratto v4.1 in `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v4.md`
+§2, nell'ordine che la norma fissa: domanda reale e risposta in una frase,
+schema del racconto con la variante scelta, definizione specifica della misura
+(non ricavata dal nome), disponibilità, registro delle affermazioni, limiti,
+figure previste, fonti. Il registro sta dentro il brief: ogni affermazione che
+il pezzo farà, con tipo, dato o calcolo, ambito e periodo, fonte. Per un blog
+proponi due o tre angoli verificati senza imporne uno al caporedattore e non
+usare correlazioni fra soli indicatori interni come risposta. Per una scheda
+spiega l'indicatore oggetto, con gli altri solo come contesto. Nessuna prosa del
+pezzo e nessun verdetto Gate A anticipato.
+
+Gate A rilegge il brief in modo formale prima del giudizio: senza queste righe,
+ciascuna a inizio riga e compilata, e senza il registro in questa tabella il
+gate vale FERMO qualunque cosa decida il giudice. Le altre sezioni restano in
+forma libera.
+
+```text
+Dopo questa pagina, il lettore deve aver capito che…: <comprensione oltre primi e ultimi>
+Scheda editoriale:
+Domanda: <domanda reale>
+Definizione: <cosa, su chi, denominatore>
+Risultato centrale: <risultato>
+Confronto: <anno, territorio, riferimento>
+Rilevanza: <perché conta>
+Spiegazione: <fonti causali o sole evidenze descrittive>
+Limite decisivo: <conclusione sbagliata da evitare>
+Passo successivo: <altro dato utile>
+Definizione specifica: <che cosa conta la misura, non ricavato dal nome>
+Unità: <unità>
+Denominatore: <numeratore e denominatore>
+Popolazione: <popolazione, fasce d'età comprese>
+Territorio: <territorio e geografia>
+Periodo: <periodo>
+Fonte e release: <fonte e release>
+
+Registro affermazioni:
+| affermazione | tipo | dato o calcolo | ambito e periodo | fonte |
+|---|---|---|---|---|
+| <affermazione> | <dato, calcolo, interpretazione, ipotesi o limite> | <dato o calcolo> | <ambito e periodo> | <fonte> |
+```
 
 Input:
 {input}
