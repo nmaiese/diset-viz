@@ -1,0 +1,9 @@
+# Audit C-DIV del primo rapporto Gate B
+
+Bozza esaminata: commit autore `d44888a4`, SHA256 articolo `3b56d1ad2cf024edfe16db592ad5cae67edc88dafdd0bf4c279e3357dca39300`. Rapporto revisore iniziale: commit `60e89be6`.
+
+Il revisore ha scritto «PASSA», ma `_parse_gate(gate-b.md, "gate_b", <hash bozza>)` solleva `RedazioneError: gate-b.md usa contratto diverso da v4.1`. Il rapporto è formalmente invalido e non autorizza la generazione di HTML/indice. Serve completamento del **medesimo** Gate B da parte del revisore Gemini, con campi e prove v4.1, senza modificare articolo o codice.
+
+Verifica funzionale C-DIV sul commit corrente, Flask locale e Playwright Chrome reale, viewport 375×900 e 1100×900, temi chiaro/scuro; 14 screenshot in `prove-gate-b/`. A 375: documento scrollWidth/clientWidth 375/375, due figure scrollWidth/clientWidth 720/343, testo assi SVG misurato circa 18 px CSS effettivi, caption tabella nel DOM `position:absolute` e larghezza 1 px, `updated` visibile. A 1100: documento 1100/1100, figure 545/545, testo assi circa 13,6 px effettivi, caption normale e istruzione di scroll assente. Gli screenshot `fig*-375-light-right.png` dimostrano che il lato destro dei grafici è raggiungibile tramite scroll locale. Ispezione visiva dei ritagli: etichette e valori leggibili, tabella card chiaro/scuro leggibile. La prova è C-DIV, non sostituisce valutazione editoriale autonoma del revisore.
+
+Fonti ufficiali riaperte il 9 ottobre 2026: rapporto Istat/Ca' Foscari 2023/2024, figura 3.6 a pagina stampata 21/PDF 25, base dei nidi e sezioni primavera con bambini in lista; Mezzogiorno 21,1+7,8=28,9. Rapporto Istat febbraio 2026: 31,6 posti per 100 bambini residenti 0–2 nazionale, LEP 33 a comune/bacino entro 2027; tabella per ripartizione p.2; dati 28,9/19,9/21,3 richiamati a p.5. URL nel brief. Il revisore deve comunque citare le proprie verifiche e il limite di ciò che non ha controllato.
