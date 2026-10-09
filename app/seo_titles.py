@@ -148,6 +148,15 @@ def _is_percentage(meta):
 # intervallo. La pagina resta com'e', con la sua classifica.
 UNVERIFIED_EXTREMES = frozenset({"bes-06POL012P"})
 
+# Le serie il cui titolo non porta l'intervallo, perche' i due estremi non sono
+# quote della stessa popolazione. `bes-10AMB016` e' produzione rinnovabile su
+# consumo interno lordo di *ciascuna* regione: la Valle d'Aosta esporta e sta al
+# 328%, la Liguria al 12,4%, e "dal 328% al 12,4%" in un `<title>` si legge come
+# una forbice di una stessa quota. Diversamente da `UNVERIFIED_EXTREMES` i
+# numeri sono veri e restano in pagina, nella description e nel Dataset: qui
+# esce solo dal titolo, e vale per entrambe le viste (regioni e province).
+NO_RANGE_IN_TITLE = frozenset({"bes-10AMB016"})
+
 
 def _same_name_qualifier(meta, level):
     """La famiglia da mettere accanto alla misura nel titolo derivato, o None.
@@ -214,6 +223,8 @@ def _figures(meta, level):
     ("dall'89,1% allo 0,22%"), e le due varianti coincidono: l'unita' e' il
     segno di percentuale, attaccato al numero.
     """
+    if _code(meta) in NO_RANGE_IN_TITLE:
+        return None, None
     high, low = extremes(meta, level)
     if high is None:
         return None, None

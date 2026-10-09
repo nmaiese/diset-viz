@@ -126,5 +126,32 @@ class IndicatorTemplateFase1a(unittest.TestCase):
         self.assertIn("serie storica", page.lower(), "serie storica provinciale assente")
 
 
+class TitoloEnergiaRinnovabile(unittest.TestCase):
+    """Il `<title>` di bes-10AMB016 non fa una forbice fra rapporti di regioni diverse."""
+
+    @staticmethod
+    def _head(path):
+        html = app.test_client().get(path).get_data(as_text=True)
+        title = re.search(r"<title>(.*?)</title>", html, re.S).group(1)
+        canonical = re.search(r'rel="canonical" href="([^"]*)"', html).group(1)
+        description = re.search(r'name="description" content="([^"]*)"', html).group(1)
+        return title, canonical, description
+
+    def test_title_senza_intervallo_con_denominatore(self):
+        title, canonical, description = self._head(COMPLEX)
+        self.assertEqual(title, "Energia elettrica da rinnovabili sul consumo interno lordo")
+        self.assertNotIn("328", title)
+        self.assertNotRegex(title, r"\bdal\b.*\bal\b")
+        self.assertLessEqual(len(title), 60)
+        self.assertEqual(canonical, "https://divarioitalia.it" + COMPLEX)
+        self.assertTrue(description.startswith("Il dato BES sull&#39;elettricità da rinnovabili"))
+
+    def test_vista_province_senza_intervallo(self):
+        title, canonical, description = self._head(COMPLEX + "/province")
+        self.assertEqual(title, "Elettricità da rinnovabili per provincia")
+        self.assertEqual(canonical, "https://divarioitalia.it" + COMPLEX + "/province")
+        self.assertIn("da 450% (Sondrio) a 4,5% (Genova)", description)
+
+
 if __name__ == "__main__":
     unittest.main()

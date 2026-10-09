@@ -757,5 +757,42 @@ class CaratteriVietatiTest(unittest.TestCase):
                         self.assertNotIn(c, testo or "")
 
 
+class SenzaIntervalloNelTitoloTest(unittest.TestCase):
+    """`bes-10AMB016`: i due estremi sono rapporti produzione/consumo di regioni
+    diverse (328% e 12,4%), non una forbice della stessa quota."""
+
+    TITOLO = "Energia elettrica da rinnovabili sul consumo interno lordo"
+
+    def setUp(self):
+        self.meta = meta(name="Energia elettrica da fonti rinnovabili", unit="%",
+                         family="bes", raw_id="10AMB016")
+        self.lv = level(best=("Valle d'Aosta", 327.8), worst=("Liguria", 12.4))
+
+    def test_il_titolo_scritto_resta_senza_intervallo(self):
+        for livello in (self.lv, provincia(("Sondrio", 449.6), ("Genova", 4.5))):
+            with self.subTest(livello=livello["key"]):
+                titolo = seo_titles.page_title(
+                    {"seo_title": self.TITOLO}, self.meta, livello, site_name="Divario Italia")
+                self.assertEqual(titolo, self.TITOLO)
+                self.assertNotIn("328", titolo)
+                self.assertNotRegex(titolo, r"\bdal\b.*\bal\b")
+                self.assertIn("consumo interno lordo", titolo)
+                self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
+
+    def test_neppure_il_derivato_porta_l_intervallo(self):
+        self.assertNotIn("%", seo_titles.page_title({}, self.meta, self.lv, site_name="Divario Italia"))
+
+    def test_gli_estremi_restano_per_description_e_dataset(self):
+        high, low = seo_titles.extremes(self.meta, self.lv)
+        self.assertEqual((high["value"], low["value"]), (327.8, 12.4))
+
+    def test_le_altre_serie_percentuali_tengono_l_intervallo(self):
+        altra = meta(name="Tasso di occupazione", unit="%", family="bes", raw_id="04BEC001")
+        titolo = seo_titles.page_title(
+            {"seo_title": "Tasso di occupazione per regione"}, altra,
+            level(best=("A", 70.0), worst=("B", 40.0)), site_name="Divario Italia")
+        self.assertIn("dal 70,0% al 40,0%", titolo)
+
+
 if __name__ == "__main__":
     unittest.main()

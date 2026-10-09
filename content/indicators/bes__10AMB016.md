@@ -1,6 +1,7 @@
 ---
 fonti: []
 key: "bes:10AMB016"
+seo_title: "Energia elettrica da rinnovabili sul consumo interno lordo"
 vintage: 2024
 ---
 
