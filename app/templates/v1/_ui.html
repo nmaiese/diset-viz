@@ -208,7 +208,7 @@
 <figure class="module" data-explore{% if root %} data-page-root{% endif %}>
   <figcaption class="module__head">
     {% if m.claim %}<h3 class="h-sub" data-claim>{{ m.claim }}</h3>{% endif %}
-    <p class="subline">{{ m.name }}{% if m.unit_note %}, {{ m.unit_note }}{% endif %}, <span data-year-label>{{ m.year }}</span>. Le {{ m.n }} {{ m.plural }} {% if m.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.</p>
+    <p class="subline">{{ m.name }}{% if m.unit_note %}, {{ m.unit_note }}{% endif %}, <span data-year-label>{{ m.year }}</span>. Le {{ m.n }} {{ m.plural }} {% if m.lower_better %}in ordine crescente di valore{% else %}in ordine decrescente di valore{% endif %}.</p>
   </figcaption>
   <div class="toolbar">
     {#- Il livello che manca a questa scheda, quando sta in una gemella
@@ -243,6 +243,13 @@
     <a class="toolbar__jump" href="#classifica-dati" data-rank-goto hidden>Vai alla riga nella classifica</a>
     {% endif %}
   </div>
+
+  <p class="page-note" data-focus-summary data-kpi="focus-comparison">{{ m.focus_summary }}</p>
+  {% if m.median is not none %}<dl class="page-note module__summary" data-kpi="distribution">
+    <div><dt>Mediana</dt><dd data-kpi="median-value">{{ m.median | num(None, 'cell', m.decimals) }} {{ m.unit }}</dd></div>
+    <div><dt>Fascia centrale</dt><dd data-kpi="central-band">da {{ m.q1 | num(None, 'cell', m.decimals) }} a {{ m.q3 | num(None, 'cell', m.decimals) }} {{ m.unit }}</dd></div>
+    {% if m.gap_abs is not none %}<div><dt>Distanza fra gli estremi</dt><dd>{{ m.gap_abs | num(None, 'cell', m.decimals) }} {{ m.change_unit }}</dd></div>{% endif %}
+  </dl>{% endif %}
 
   <div class="module__body">
     {% if m.show_map %}

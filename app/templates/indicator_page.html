@@ -57,12 +57,12 @@
     "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
     "minValue": {{ estremi.basso.value }},
     "maxValue": {{ estremi.alto.value }},{% endif %}
-    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.archive %},
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.official_definition %},
     {# "Che cosa misura questa serie" secondo l'istituto: `description` della
        variabile e' lo slot giusto, e il testo e' lo stesso che la pagina
        mostra nell'apparato sotto "Definizione della fonte". Nessuna
        dichiarazione che la pagina visibile non sostenga. #}
-    "description": {{ meta.archive | tojson }}{% endif %}
+      "description": {{ meta.official_definition | tojson }}{% endif %}
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
@@ -173,6 +173,7 @@
         <strong><span data-kpi="focus-value">{{ level.default_territory.value | it_num(2) }}</span>{% if meta.value_unit and meta.value_unit | length <= 8 %} <span class="u">{{ meta.value_unit }}</span>{% endif %}</strong>
         <span class="kpi__sub"><span data-kpi="focus-rank">1ª su {{ level.observations | length }} {{ level.plural }}</span> <a data-kpi="focus-link" href="{{ level.profile_path or '#' }}{{ level.default_territory.key }}"{% if not level.profile_path %} hidden{% endif %}>profilo →</a></span>
       </div>
+      <p class="page-note" data-focus-summary data-kpi="focus-comparison">{{ level.default_territory.name }}: {{ level.default_territory.value | it_num(2) }} {{ meta.value_unit }} nel {{ level.year_max }}. Confronto con la media semplice delle {{ level.stats.year_count }} {{ level.plural }}: {{ level.stats.year_avg | it_num(2) }} {{ meta.value_unit }}.</p>
 
       {% if level.best and level.worst %}
       <div class="kpi kpi--best">
@@ -200,17 +201,25 @@
 
       {% if level.stats.year_avg is not none %}
       <div class="kpi">
-        <small>Media delle {{ level.plural }}</small>
+        <small>Media semplice delle {{ level.plural }}</small>
         <strong data-kpi="mean-value">{{ level.stats.year_avg | it_num(2) }}</strong>
-        <span class="kpi__sub">su <span data-kpi="mean-count">{{ level.stats.year_count }}</span> {{ level.plural }}</span>
+        <span class="kpi__sub">confronto: <span data-kpi="mean-count">{{ level.stats.year_count }}</span> {{ level.plural }}</span>
+      </div>
+      {% endif %}
+
+      {% if level.stats.median is not none %}
+      <div class="kpi" data-kpi="distribution">
+        <small>Mediana</small>
+        <strong data-kpi="median-value">{{ level.stats.median | it_num(2) }}</strong>
+        <span class="kpi__sub">Fascia centrale <span data-kpi="central-band">da {{ level.stats.q1 | it_num(2) }} a {{ level.stats.q3 | it_num(2) }}</span> {{ meta.value_unit }}</span>
       </div>
       {% endif %}
 
       {% if level.stats.gap_abs is not none %}
       <div class="kpi">
-        <small>Divario</small>
+        <small>Distanza fra gli estremi</small>
         <strong data-kpi="gap-value">{{ level.stats.gap_abs | it_num(2) }}</strong>
-        <span class="kpi__sub"><span data-kpi="gap-ratio">{% if level.stats.gap_ratio %}{{ level.stats.gap_ratio | it_num(1) }}× il più basso{% else %}{{ meta.change_unit }}{% endif %}</span></span>
+        <span class="kpi__sub">{{ meta.change_unit }}</span>
       </div>
       {% endif %}
 
@@ -269,9 +278,8 @@
       <article class="data-card viz-card--ranking" id="classifica-dati" data-tabpanel="ranking">
         <header><small><span data-explore="year-label">{{ level.year_max }}</span> · {{ meta.value_unit }}</small><h3>Classifica</h3></header>
         <p class="page-note">
-          {% if meta.direction == 'higher_better' %}Più in alto nella lista, meglio è.
-          {% elif meta.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
-          {% else %}Questo indicatore non ha una direzione univoca, quindi la lista ordina i valori senza premiare nessuno.{% endif %}
+          {% if meta.direction in ('lower_better', 'higher_worse') %}La lista ordina i valori dal più basso al più alto.
+          {% else %}La lista ordina i valori dal più alto al più basso.{% endif %}
           {% if level.profile_path %}Clicca una riga per metterla in evidenza, il nome apre il profilo.{% else %}Clicca una riga per metterla in evidenza.{% endif %}
         </p>
         <div class="ranking" data-explore="ranking">
@@ -416,12 +424,13 @@
         </dd>
       </div>
       {% endif %}
-      {% if meta.archive %}
+      {% if meta.official_definition %}
       <div class="apparatus-specs__row">
         <dt>Definizione della fonte</dt>
-        <dd>{{ meta.archive }} <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></dd>
+        <dd>{{ meta.official_definition }} <a href="{{ meta.definition_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.definition_source or 'Consulta la definizione originale' }} →</a></dd>
       </div>
-      {% endif %}
+      {% else %}<div class="apparatus-specs__row"><dt>Definizione della fonte</dt><dd>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità. <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></dd></div>{% endif %}
+      {% if meta.archive %}<div class="apparatus-specs__row"><dt>Dataset e release</dt><dd>{{ meta.archive }}</dd></div>{% endif %}
       {% if meta.license_url %}
       <div class="apparatus-specs__row">
         <dt>Licenza</dt>

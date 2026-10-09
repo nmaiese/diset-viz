@@ -10,5 +10,11 @@
     "page": "Scheda infortuni sul lavoro",
     "error": "La scheda attribuiva gli infortuni a cause senza indicare una fonte",
     "action": "Tolte le cause non sostenute da una fonte"
+  },
+  {
+    "date": "2026-10-09",
+    "page": "Schede indicatore",
+    "error": "Il riepilogo usava definizioni generiche e confronti non sempre denominati",
+    "action": "Rese esplicite definizioni di fonte, limiti e basi dei confronti"
   }
 ]

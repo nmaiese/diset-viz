@@ -621,18 +621,14 @@ def indicator_markdown(meta, level, article, site_url, levels=(), twin=None, hea
         f"- Territori nell'ultimo anno: {len(level['observations'])}",
         f"- Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})",
     ]
-    # La definizione che ne da' l'istituto (`meta["archive"]`, che arriva da
-    # `data/definitions/`). La pagina HTML la mostra da sempre nell'apparato,
-    # sotto "Definizione della fonte", la proiezione markdown no: e' lo stesso
-    # documento alla stessa URL, quindi o sta in tutte e due o e' una pagina
-    # diversa con lo stesso canonico. Copre 346 delle 372 schede indicizzabili,
-    # ed e' la prima cosa che un agente deve poter citare invece di
-    # parafrasare la formula che il sito si compone da se'.
+    definition = (meta.get("official_definition") or "").strip()
+    if not definition:
+        definition = ("La fonte non fornisce una definizione specifica verificata per questa serie. "
+                      "Non ricostruiamo numeratore o denominatore dai soli nome e unità.")
+    lines += ["", "## Definizione della fonte", "", definition,
+              "", f"Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})"]
     if (meta.get("archive") or "").strip():
-        lines += ["", "## Definizione della fonte", "", meta["archive"].strip(),
-                  "", f"Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})"]
-    if explain.get("plain"):
-        lines += ["", "## Che cosa misura", "", explain["plain"]]
+        lines += ["", "## Dataset e release", "", meta["archive"].strip()]
     if explain.get("example"):
         lines += ["", "## Esempio di lettura", "", explain["example"]]
     if explain.get("reading"):

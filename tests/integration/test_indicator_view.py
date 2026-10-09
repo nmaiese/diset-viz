@@ -153,7 +153,8 @@ class UnifiedViewReproducesEveryFigure(unittest.TestCase):
                 if "gap_abs" in want:
                     checks += [
                         ("gap_abs", stats["gap_abs"]),
-                        ("gap_ratio", stats["gap_ratio"]),
+                        # Ratios are no longer part of the default page summary;
+                        # durations and other near-zero bases can make them misleading.
                         ("above_avg", stats["above_avg_count"]),
                         ("below_avg", stats["below_avg_count"]),
                         ("year_min_avg", stats["year_min_avg"]),

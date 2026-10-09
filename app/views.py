@@ -1806,16 +1806,8 @@ def _other_views(meta, level, levels, twin):
 
 
 def _show_plain_definition(article, meta, level, lead):
-    """La definizione in piano va in "Come leggere il dato"?
-
-    Si', a meno che la pagina non la dica gia' altrove: nel lead composto, che
-    la contiene, o in una sezione "definizione" dell'articolo (`come_leggere`
-    falso). Prima la condizione era "il lead e' scritto", e la frase-risposta
-    delle province, che non e' scritta e la definizione non la contiene, la
-    faceva sparire dalla pagina quando l'articolo non aveva quella sezione.
-    """
-    plain = ((level.get("explain") or meta.get("explain") or {}).get("plain") or "").strip()
-    return bool(plain) and article["come_leggere"] and plain not in (lead or "")
+    """Mostra fonte o limite esplicito quando «Come leggere» possiede la definizione."""
+    return bool(article.get("come_leggere"))
 
 
 def _dataset_name(meta, level):

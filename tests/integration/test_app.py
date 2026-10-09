@@ -1,6 +1,7 @@
 import csv
 import re
 import unittest
+from unittest.mock import patch
 from html import unescape
 from pathlib import Path
 
@@ -619,6 +620,14 @@ class AppSmokeTest(unittest.TestCase):
         gap_payload["metadata"] = dict(payload["metadata"], name="Differenza tra tasso di occupazione maschile e femminile")
         gap_stats = indicator_trend_stats(gap_payload, 2022, values, best, worst)
         self.assertIsNone(gap_stats["gap_ratio"])
+
+        # Durations cannot be made intuitive by expressing a difference in
+        # multiples; the absolute distance stays available for the page.
+        duration_payload = dict(payload)
+        duration_payload["metadata"] = dict(payload["metadata"], name="Età media", unit="anni")
+        duration_stats = indicator_trend_stats(duration_payload, 2022, values, best, worst)
+        self.assertEqual(duration_stats["gap_abs"], 22.0)
+        self.assertIsNone(duration_stats["gap_ratio"])
 
         # Single-year series: no trend claim, avg falls back to the only year available.
         single_year_payload = {
@@ -1924,12 +1933,8 @@ class NessunaAnteprimaSocialeEUnSvg(unittest.TestCase):
 class LaDefinizioneDellaFonteStaInTutteEDueLeForme(unittest.TestCase):
     """HTML e Markdown sono lo stesso documento alla stessa URL.
 
-    La definizione che ne da' l'istituto (`meta["archive"]`, da
-    `data/definitions/`) la pagina HTML la mostra da sempre nell'apparato. La
-    proiezione markdown no: chi chiedeva `Accept: text/markdown` riceveva la
-    formula che il sito si compone da se' e non la definizione della fonte,
-    cioe' una pagina diversa sotto lo stesso canonico. Copre 346 delle 372
-    schede indicizzabili.
+    La definizione verificata della fonte resta distinta dal nome di dataset o
+    release e dalla spiegazione editoriale del sito.
     """
 
     SCHEDE = (
@@ -1938,8 +1943,7 @@ class LaDefinizioneDellaFonteStaInTutteEDueLeForme(unittest.TestCase):
         "/indicatore/adeguata-alimentazione-tassi-standardizzati/bes-01SAL013",
     )
 
-    # Una delle 26 scoperte: `data/definitions/` non ha ancora il foglio delle
-    # serie provinciali BES, e li' la pagina deve restare com'era.
+    # Il limite è esplicito anche quando la fonte non ha definizione verificata.
     SENZA_DEFINIZIONE = "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
 
     def setUp(self):
@@ -1982,13 +1986,15 @@ class LaDefinizioneDellaFonteStaInTutteEDueLeForme(unittest.TestCase):
                 else:
                     self.fail(f"{path}: nessun Dataset")
 
-    def test_una_scheda_senza_definizione_non_inventa_la_sezione(self):
-        """Le 26 scoperte sono le provinciali BES, dove `data/definitions/` non
-        arriva ancora: li' ne' l'HTML ne' il markdown devono emettere un titolo
-        sopra il vuoto."""
-        html = self.client.get(self.SENZA_DEFINIZIONE).get_data(as_text=True)
-        self.assertNotIn("Definizione della fonte", html)
-        self.assertNotIn("## Definizione della fonte", self._markdown(self.SENZA_DEFINIZIONE))
+    def test_una_scheda_senza_definizione_dichiara_il_limite(self):
+        with patch("app.indicator_view._official_definition", return_value=None):
+            html = self.client.get(self.SENZA_DEFINIZIONE).get_data(as_text=True)
+        self.assertIn("Definizione della fonte", html)
+        self.assertIn("La fonte non fornisce una definizione specifica verificata", html)
+        with patch("app.indicator_view._official_definition", return_value=None):
+            markdown = self._markdown(self.SENZA_DEFINIZIONE)
+        self.assertIn("## Definizione della fonte", markdown)
+        self.assertIn("La fonte non fornisce una definizione specifica verificata", markdown)
 
 
 class IlTemaSegueIlSistemaFinoAllaPrimaScelta(unittest.TestCase):

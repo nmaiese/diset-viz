@@ -253,6 +253,9 @@ def _build_meta(family, raw_id, source_meta):
     name = source_meta["name"]
     explain = source_meta.get("explain") or {}
     direction = explain.get("direction") or source_meta.get("direction")
+    namespace = {"eurostat": "eur"}.get(family, family)
+    definition_id = raw_id if family == "territorial" else f"{namespace}:{raw_id}"
+    source_definition = _official_definition(definition_id)
     indexable, motivo_indice = indexability(family, raw_id, source_meta)
     return {
         "id": source_meta["id"],
@@ -293,6 +296,9 @@ def _build_meta(family, raw_id, source_meta):
         # Il testo della licenza viene dal registro, come l'URL: mai dal CSV.
         "license": sources.family_license(family)[0],
         "archive": source_meta.get("archive"),
+        "official_definition": source_definition.get("definizione") if source_definition else None,
+        "definition_source": (source_definition.get("fonti") or source_definition.get("dati_di_base")) if source_definition else None,
+        "definition_url": source_definition.get("source_url") if source_definition else None,
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
         "indexable": indexable,
@@ -309,6 +315,27 @@ def _build_meta(family, raw_id, source_meta):
         "downloads": _downloads(source_meta["id"]),
         "distinct_from": _distinct_from(source_meta["id"]),
     }
+
+
+@functools.lru_cache(maxsize=1)
+def _definitions_catalog():
+    """Committed source definitions, shared by territorial and federated ids."""
+    root = Path(__file__).resolve().parents[1] / "data" / "definitions"
+    records = {}
+    for name in ("istat_territoriali.csv", "federated.csv"):
+        path = root / name
+        if not path.exists():
+            continue
+        with path.open(encoding="utf-8", newline="") as handle:
+            for row in csv.DictReader(handle, delimiter=";"):
+                if row.get("id"):
+                    records[row["id"]] = row
+    return records
+
+
+def _official_definition(definition_id):
+    row = _definitions_catalog().get(str(definition_id))
+    return row if row and row.get("definizione", "").strip() else None
 
 
 def _distinct_from(indicator_id):

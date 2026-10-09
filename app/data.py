@@ -540,12 +540,18 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
     # mean and the min-max gap (honest even at N=2) and drop the rest - the "None
     # means omit" contract then suppresses those claims in both templates.
     SMALL_N = 5
-    median = None
+    median = q1 = q3 = None
     above_avg_count = below_avg_count = None
     if year_values and year_count >= SMALL_N:
         sorted_values = sorted(year_values)
         mid = len(sorted_values) // 2
         median = sorted_values[mid] if len(sorted_values) % 2 else (sorted_values[mid - 1] + sorted_values[mid]) / 2
+        def percentile(position):
+            index = (len(sorted_values) - 1) * position
+            lower = math.floor(index)
+            upper = math.ceil(index)
+            return sorted_values[lower] + (sorted_values[upper] - sorted_values[lower]) * (index - lower)
+        q1, q3 = percentile(0.25), percentile(0.75)
         if year_avg is not None:
             above_avg_count = sum(1 for v in year_values if v > year_avg)
             below_avg_count = sum(1 for v in year_values if v < year_avg)
@@ -587,7 +593,12 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         gap_abs = high_value - low_value
         name_lower = meta["name"].lower()
         unit_lower = (meta.get("unit") or "").lower()
-        ratio_meaningless = "differenza" in name_lower or "punti percentuali" in unit_lower
+        ratio_meaningless = (
+            "differenza" in name_lower
+            or "punti percentuali" in unit_lower
+            or any(token in f"{name_lower} {unit_lower}" for token in
+                   ("anno", "anni", "giorno", "giorni", "ora", "ore", "minuto", "durata", "età", "eta"))
+        )
         if not ratio_meaningless and low_value > 0:
             ratio = high_value / low_value
             # A "X volte" ratio only reads as informative when the two values are
@@ -610,6 +621,8 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         "year_avg": year_avg,
         "year_count": year_count,
         "median": median,
+        "q1": q1,
+        "q3": q3,
         "above_avg_count": above_avg_count,
         "below_avg_count": below_avg_count,
         "year_min": year_min,

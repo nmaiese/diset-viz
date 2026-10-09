@@ -77,12 +77,12 @@ addEventListener("pagereveal", function (e) {
     "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
     "minValue": {{ estremi.basso.value }},
     "maxValue": {{ estremi.alto.value }},{% endif %}
-    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.archive %},
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.official_definition %},
     {# "Che cosa misura questa serie" secondo l'istituto: `description` della
        variabile e' lo slot giusto, e il testo e' lo stesso che la pagina
        mostra nell'apparato sotto "Definizione della fonte". Nessuna
        dichiarazione che la pagina visibile non sostenga. #}
-    "description": {{ meta.archive | tojson }}{% endif %}
+    "description": {{ meta.official_definition | tojson }}{% endif %}
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
@@ -113,7 +113,7 @@ addEventListener("pagereveal", function (e) {
       tornano in fila dopo la testata. -#}
   <div class="scheda-head">
   <header class="pagehead">
-    <p class="eyebrow"><a href="{{ meta.theme_path }}">{{ meta.theme }}</a><span class="sep" aria-hidden="true">·</span>{{ meta.source_label }}<span class="sep" aria-hidden="true">·</span>{{ n }} {{ level.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ year }}</p>
+    <p class="eyebrow"><a href="{{ meta.theme_path }}">{{ meta.theme }}</a><span class="sep" aria-hidden="true">·</span>{{ meta.source_label }}<span class="sep" aria-hidden="true">·</span>{{ meta.value_unit or 'unità non specificata' }}<span class="sep" aria-hidden="true">·</span>{{ n }} {{ level.plural }}<span class="sep" aria-hidden="true">·</span>dati {{ year }}</p>
     <h1 class="h-title">{{ page_h1 }}</h1>
     {#- `page-lead` e' il contratto col JSON-LD: la `description` del Dataset e'
         questo attacco, e la prova lo confronta col testo visibile. -#}
@@ -311,7 +311,8 @@ addEventListener("pagereveal", function (e) {
                 lead composto la contiene, e una sezione "definizione" dell'articolo
                 la direbbe due volte (`views._show_plain_definition`). La
                 frase-risposta delle province non la contiene. -#}
-            {% if show_plain_definition %}<p>{{ explain.plain }}</p>{% endif %}
+            {% if show_plain_definition and meta.official_definition %}<p>{{ meta.official_definition }}</p>
+            {% elif show_plain_definition %}<p>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.</p>{% endif %}
             {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
             {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
             {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
@@ -319,8 +320,10 @@ addEventListener("pagereveal", function (e) {
           <div>
             <h3>Secondo la fonte</h3>
             <dl>
-              {% if meta.archive %}<div><dt>Definizione della fonte</dt><dd>{{ meta.archive }} <a href="{{ meta.source_url }}">Consulta la fonte {{ meta.institution or "Istat" }}</a></dd></div>{% endif %}
-              <div><dt>Verso</dt><dd>{{ d.verso }}{% if not meta.scoreable %}: un valore alto descrive più intensità del fenomeno, non un territorio migliore{% endif %}.</dd></div>
+              {% if meta.official_definition %}<div><dt>Definizione della fonte</dt><dd>{{ meta.official_definition }} <a href="{{ meta.definition_url or meta.source_url }}">{{ meta.definition_source or 'Consulta la definizione originale' }}</a></dd></div>
+              {% else %}<div><dt>Definizione della fonte</dt><dd>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità. <a href="{{ meta.source_url }}">Consulta la fonte {{ meta.institution or "Istat" }}</a></dd></div>{% endif %}
+              {% if meta.archive %}<div><dt>Dataset e release</dt><dd>{{ meta.archive }}</dd></div>{% endif %}
+              <div><dt>Verso</dt><dd>{{ d.verso }}.</dd></div>
               {% if explain.caveat %}<div><dt>Il limite principale</dt><dd>{{ explain.caveat }}</dd></div>{% endif %}
               {#- La misura che chi cerca scambia con questa (PIL pro capite e
                   PIL totale o reddito, occupazione e disoccupazione):

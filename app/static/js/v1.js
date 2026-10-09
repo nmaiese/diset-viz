@@ -226,7 +226,6 @@
       middle: mod.querySelector('[data-rank-part="middle"]'),
       tail: mod.querySelector('[data-rank-part="tail"]')
     };
-    var claim = mod.querySelector("[data-claim]");
     var live = mod.querySelector("[data-live]");
     // "Vai alla riga nella classifica", accanto al campo (solo le province).
     var jump = mod.querySelector("[data-rank-goto]");
@@ -248,6 +247,12 @@
       return list;
     }
 
+    function quantile(values, p) {
+      var sorted = values.slice().sort(function (a, b) { return a - b; });
+      var index = (sorted.length - 1) * p, low = Math.floor(index), high = Math.ceil(index);
+      return sorted[low] + (sorted[high] - sorted[low]) * (index - low);
+    }
+
     function paint(year) {
       var list = rows(year);
       if (!list.length) return;
@@ -255,6 +260,15 @@
       var sc = choroScale(vals);
       var lo = sc.lo, hi = sc.hi;
       var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+      var median = vals.length >= 5 ? quantile(vals, 0.5) : null;
+      var firstQuartile = vals.length >= 5 ? quantile(vals, 0.25) : null;
+      var thirdQuartile = vals.length >= 5 ? quantile(vals, 0.75) : null;
+      var medianEl = mod.querySelector('[data-kpi="median-value"]');
+      var bandEl = mod.querySelector('[data-kpi="central-band"]');
+      var distribution = mod.querySelector('[data-kpi="distribution"]');
+      if (distribution) distribution.hidden = median === null;
+      if (medianEl) medianEl.textContent = median === null ? "n.d." : withUnit(median, data.unit);
+      if (bandEl) bandEl.textContent = median === null ? "n.d." : "da " + withUnit(firstQuartile, data.unit) + " a " + withUnit(thirdQuartile, data.unit);
       var max = Math.max(hi, 0) || 1;
       var yearMatrix = data.matrix[String(year)] || {};
       var missing = Object.keys(data.names).filter(function (key) { return yearMatrix[key] === null || yearMatrix[key] === undefined; });
@@ -334,15 +348,6 @@
         }).join("");
       }
 
-      if (claim && data.south && data.south.length) {
-        var south = list.filter(function (r) { return data.south.indexOf(r.key) >= 0; });
-        var below = south.filter(function (r) { return r.value < avg; });
-        var words = ["zero", "una", "due", "tre", "quattro", "cinque", "sei", "sette", "otto"];
-        var w = function (n) { return words[n] || String(n); };
-        if (below.length === south.length) claim.textContent = "Nel " + year + " tutte le " + w(south.length) + " regioni del Mezzogiorno stanno sotto la media semplice";
-        else if (!below.length) claim.textContent = "Nel " + year + " tutte le " + w(south.length) + " regioni del Mezzogiorno stanno sopra la media semplice";
-        else claim.textContent = "Nel " + year + " " + w(below.length) + " regioni del Mezzogiorno su " + w(south.length) + " stanno sotto la media semplice";
-      }
       page.querySelectorAll("[data-year-label]").forEach(function (el) { el.textContent = year; });
       var out = mod.querySelector("[data-year-out]");
       if (out) out.textContent = year;
@@ -406,9 +411,22 @@
         var list = rows(current), at = -1;
         list.forEach(function (x, i) { if (x.key === key) at = i; });
         if (at >= 0) {
-          live.textContent = list[at].name + ": " + withUnit(list[at].value, data.unit) + " nel " + current + ", " + (at + 1) + "ª su " + list.length + " " + data.plural +
-            (lowerBetter ? " dal valore più basso." : " dal valore più alto.");
+          var rank = list.findIndex(function (x) { return x.value === list[at].value; }) + 1;
+          var varied = list.some(function (x) { return x.value !== list[0].value; });
+          var avg = list.reduce(function (sum, x) { return sum + x.value; }, 0) / list.length;
+          live.textContent = list[at].name + ": " + withUnit(list[at].value, data.unit) + " nel " + current + ". Confronto con la media semplice delle " + list.length + " " + data.plural + ": " + withUnit(avg, data.unit) + ". " + (varied ? rank + "ª su " + list.length + " " + data.plural + "." : "Rango non informativo.");
         } else live.textContent = (data.names[key] || key) + ": dato non disponibile nel " + current + ".";
+      }
+      var summary = page.querySelector("[data-focus-summary]");
+      if (summary) {
+        var sample = rows(current), chosen = null;
+        sample.forEach(function (row) { if (row.key === key) chosen = row; });
+        var average = sample.length ? sample.reduce(function (sum, row) { return sum + row.value; }, 0) / sample.length : null;
+        var different = sample.some(function (row) { return row.value !== sample[0].value; });
+        var position = chosen ? sample.findIndex(function (row) { return row.value === chosen.value; }) + 1 : null;
+        summary.textContent = chosen
+          ? chosen.name + ": " + withUnit(chosen.value, data.unit) + " nel " + current + ". Confronto con la media semplice delle " + sample.length + " " + data.plural + ": " + withUnit(average, data.unit) + ". " + (different ? position + "ª su " + sample.length + " " + data.plural + "." : "Rango non informativo.")
+          : (data.names[key] ? data.names[key] + ": dato non disponibile nel " + current + ". " : "Nessun territorio selezionato nel " + current + ". ") + (average === null ? "Media semplice non disponibile." : "Confronto con la media semplice delle " + sample.length + " " + data.plural + ": " + withUnit(average, data.unit) + ".");
       }
       // Il link alla riga c'e' solo se la riga c'e': un anno senza il dato
       // della provincia scelta lo nasconde, il cambio d'anno lo rivaluta.

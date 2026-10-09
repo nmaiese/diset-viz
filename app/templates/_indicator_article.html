@@ -96,7 +96,8 @@
 {% set explain = level.explain or meta.explain %}
 <section class="come-leggere" id="come-leggere" aria-label="Come leggere il dato">
   <h2>Come leggere il dato</h2>
-  {% if explain.plain and mostra_plain %}<p>{{ explain.plain }}</p>{% endif %}
+  {% if mostra_plain and meta.official_definition %}<p>{{ meta.official_definition }}</p>
+  {% elif mostra_plain %}<p>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.</p>{% endif %}
   {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
   {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
   {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
@@ -114,7 +115,8 @@
    numero, e con nove varianti su tutte le pagine erano la stessa frase dentro
    trecento racconti diversi. Una sola di loro stava su 307 pagine. #}
 {% set explain = level.explain or meta.explain %}
-{% if explain.plain %}<p>{{ explain.plain }}</p>{% endif %}
+{% if meta.official_definition %}<p>{{ meta.official_definition }}</p>
+{% else %}<p>La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.</p>{% endif %}
 {% endmacro %}
 
 

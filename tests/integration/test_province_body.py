@@ -74,7 +74,7 @@ class ProvincialBody(unittest.TestCase):
         self.assertEqual(text(cells), "Lecco 84,9 Pavia 82,6 2,3")
         self.assertIn('<a href="/provincia/lecco">Lecco</a>', cells)
         self.assertIn('<a href="/provincia/pavia">Pavia</a>', cells)
-        self.assertIn("Qui un valore più alto è migliore.", block)
+        self.assertNotIn("Qui un valore più alto è migliore.", block)
         # Le distanze in ordine, dalla piu' ampia.
         gaps = [float(re.findall(r'<data class="n n--cell" value="([^"]+)"', cells)[-1]) for _, _, cells in rows]
         self.assertEqual(gaps, sorted(gaps, reverse=True))
