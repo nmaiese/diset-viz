@@ -152,6 +152,29 @@ class TitoloEnergiaRinnovabile(unittest.TestCase):
         self.assertEqual(canonical, "https://divarioitalia.it" + COMPLEX + "/province")
         self.assertIn("da 450% (Sondrio) a 4,5% (Genova)", description)
 
+    def test_schede_gemelle_senza_intervallo(self):
+        attesi = {
+            "/indicatore/consumi-di-energia-elettrica-coperti-da-fonti-rinnovabili-incluso-idro/ter-85":
+                "Elettricità rinnovabile con idro sui consumi interni lordi",
+            "/indicatore/consumi-di-energia-elettrica-coperti-da-fonti-rinnovabili-escluso-idro/ter-86":
+                "Elettricità rinnovabile senza idro sui consumi interni lordi",
+            "/indicatore/quantita-di-frazione-umida-trattata-in-impianti-di-compostaggio-per-la-produzion/ter-53":
+                "Umido a compostaggio sull'umido dei rifiuti urbani",
+        }
+        for path, atteso in attesi.items():
+            with self.subTest(path=path):
+                title, canonical, description = self._head(path)
+                self.assertEqual(title.replace("&#39;", "'"), atteso)
+                self.assertNotIn("%", title)
+                self.assertLessEqual(len(title), 60)
+                self.assertEqual(canonical, "https://divarioitalia.it" + path)
+                self.assertGreater(len(description), 40)
+
+    def test_scheda_quota_vera_tiene_l_intervallo(self):
+        title, _, _ = self._head(
+            "/indicatore/potenza-efficiente-lorda-delle-fonti-rinnovabili/ter-81")
+        self.assertIn("dal 207% al 33,9%", title)
+
 
 if __name__ == "__main__":
     unittest.main()
