@@ -1,28 +1,19 @@
-# Gate B — Valutazione finale
-
-**Esito:** PASSA
-
-## Metadati
-- **Brief SHA256**: 2d512d87c77393f939c90c196c2c0b896098e8a47aaed604b6e0db70d0e7dd3b
-- **Bozza SHA256**: 3b56d1ad2cf024edfe16db592ad5cae67edc88dafdd0bf4c279e3357dca39300
-- **Voto:** 5/5
-
-## Criteri base (T/R/L/N)
-- [x] Tesi unitaria
-- [x] Rispetto dei vincoli numerici (nessun calcolo spurio)
-- [x] Limiti dichiarati esplicitamente
-- [x] Nessun riempitivo (N)
-
-## Verifiche di sostanza
-- **Oltre la tabella:** Sì.
-- **Funzione dei paragrafi:** Rispettata. Ogni sezione veicola un concetto univoco (posti, lista d'attesa, domande respinte).
-- **Ricalcolo Istat/Ca' Foscari:** Ricalcolo base classi 25-50% e >50% per Sud (21,1+7,8=28,9), Centro (15,8+4,1=19,9), Nord (17,1+4,2=21,3). Confermata l'applicazione corretta della base "nidi con lista d'attesa" anziché famiglie respinte.
-- **Unità di misura:** "Posti ogni 100 bambini residenti di 0-2 anni" rispettata rigorosamente.
-- **Test:** `guardia_articolo.py` rileva 0 errori. Suite di test integra (23 OK).
-- **Resa tecnica (mobile):** Screenshot documentano superamento del bug della caption a 375px. Non si registrano scroll di pagina. Dati frontmatter corretti (`updated: 2026-10-09`). Tutti gli URL esterni validi (HTTP 200). Nessuna anomalia. Cover source dichiarata validamente come asset interno con licenza CC BY 4.0.
-
-## Rilievi localizzati
-Nessuno.
-
-## Bloccanti
-Nessuno.
+# Gate B: test-pipeline-infanzia-ciclo2-20261009
+Contratto: v4.1
+Tipo pagina: articolo
+Esito: PASSA
+SHA bozza: da0fb5ec2aa7944f1fecad5e7716cbfbf1b1a1fa
+Hash bozza: 3b56d1ad2cf024edfe16db592ad5cae67edc88dafdd0bf4c279e3357dca39300
+Famiglie autore/revisore: Claude/Gemini
+T: sì — "In Italia ci sono 31,6 posti autorizzati ogni 100 bambini residenti di 0-2 anni." dal registro brief "In Italia ci sono 31,6 posti autorizzati per 100 bambini residenti di 0-2 anni."
+R: sì — "Il Centro ha 40,4 posti ogni 100 bambini residenti di 0-2 anni... Al Sud i posti sono 19,0", confronti compatibili
+L: sì — "Non misura chi riesce a entrare, a che retta e con quali orari."
+N: sì — "Il rapporto sale anche perché i bambini diminuiscono, e lo segnala la stessa Istat", evita falsi primati.
+Oltre la tabella: sì — Distingue concettualmente posti, partecipazione, presa in carico, LEP.
+Funzione paragrafi: sì — Esposizione lineare: dati base, differenze territoriali, target UE, liste di attesa, limiti informativi.
+Controllo anti-invenzione: sì
+Bloccanti: 0
+Voto: 5 Solido
+Motivo: Rispetta i criteri v4.1, calcoli corretti e verificabili, testo fedele al brief.
+Rilievi localizzati: nessuno
+Giri: 1
