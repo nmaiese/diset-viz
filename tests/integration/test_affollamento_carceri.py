@@ -42,24 +42,25 @@ class LaSchedaProvinciale(unittest.TestCase):
             with self.subTest(provincia=key):
                 path = re.search(rf'<(?:path|use) [^>]*data-key="{key}"[^>]*>', self.html)
                 self.assertIsNotNone(path)
-                self.assertIn('data-value=""', path.group(0))
+                self.assertIn('data-value="n.d."', path.group(0))
                 self.assertIn("url(#nd-", path.group(0))
         self.assertIn("n.d., dato non disponibile", self.html)
 
     def test_nessuno_zero_per_loro_in_pagina(self):
-        """Ne' nella striscia del divario, ne' nella classifica, ne' sulla
-        mappa: prima c'erano come "Macerata 0" e "0%", in testa."""
-        # La riga porta anche l'id dell'ancora (`id="p-<key>"`): si cerca
-        # l'apertura del tag, non il tag intero.
+        """Nessun valore numerico o rango per le province senza misura."""
         self.assertRegex(self.html, r'<tr data-key="arezzo"[ >]')
         for key, name in zip(NOT_MEASURED_KEYS, ("Macerata", "Savona")):
             with self.subTest(provincia=name):
-                self.assertNotRegex(self.html, rf'<tr data-key="{key}"[ >]')
+                row = re.search(rf'<tr data-key="{key}"[^>]*>.*?</tr>', self.html, re.DOTALL)
+                self.assertIsNotNone(row)
+                self.assertIn('<td class="rank">n.d.</td>', row.group(0))
+                self.assertIn('<span class="n n--nd">n.d.</span>', row.group(0))
+                self.assertNotIn('<data ', row.group(0))
+                self.assertNotIn('class="bar"', row.group(0))
                 self.assertNotIn(f'data-key="{key}" cx=', self.html)
                 self.assertNotIn(f'data-tip="{name} 0"', self.html)
                 self.assertNotIn(f'<tspan class="callout__nm">{name}</tspan>', self.html)
                 self.assertNotIn(f'<tspan class="strip__nm">{name}</tspan>', self.html)
-                self.assertNotIn(f'href="/provincia/{key}"', self.html)
 
     def test_il_modello_non_le_porta_dal_2016(self):
         observed = {o["key"] for o in self.level["observations"]}

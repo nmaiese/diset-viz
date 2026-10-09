@@ -29,7 +29,7 @@ class AdsenseIndicatorIndexingTest(unittest.TestCase):
     def test_classe_b_noindex_e_fuori_sitemap(self):
         html = self.client.get(self.CLASS_B).get_data(as_text=True)
         self.assertIn('<meta name="robots" content="noindex, follow">', html)
-        self.assertIn("non ha ancora un commento scritto", html)
+        self.assertNotIn("non ha ancora un commento scritto", html)
         self.assertNotIn(self.CLASS_B, self.sitemap_paths)
 
     def test_classe_a_index_e_in_sitemap(self):
