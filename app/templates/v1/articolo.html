@@ -229,7 +229,7 @@
           quella che l'indice e "Cita questo articolo" puntano con `#dati-metodo`,
           e l'`id` del titolo non si ripete. -#}
       <section class="section art-data" id="dati-metodo" aria-label="Dati e metodo">
-        {{ dm.box(d.institution, ds.source_url, None, "L'analisi confronta territori di peso diverso: le medie sono medie semplici non ponderate.") }}
+        {{ dm.box(d.institution, ds.source_url, None, "L'analisi confronta territori di peso diverso: salvo indicazione diversa per i valori ufficiali, le medie sono medie semplici non ponderate.") }}
         <dl class="specs">
           {% if d.used %}<div id="dati-usati"><dt>Dati usati</dt><dd>{{ d.used | safe }}</dd></div>{% endif %}
           {% if d.sources %}<div id="fonti"><dt>Fonti</dt><dd>{{ d.sources | safe }}</dd></div>
