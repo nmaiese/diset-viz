@@ -248,7 +248,7 @@
   {% if m.median is not none %}<dl class="page-note module__summary" data-kpi="distribution">
     <div><dt>Mediana</dt><dd data-kpi="median-value">{{ m.median | num(None, 'cell', m.decimals) }} {{ m.unit }}</dd></div>
     <div><dt>Fascia centrale</dt><dd data-kpi="central-band">da {{ m.q1 | num(None, 'cell', m.decimals) }} a {{ m.q3 | num(None, 'cell', m.decimals) }} {{ m.unit }}</dd></div>
-    {% if m.gap_abs is not none %}<div><dt>Distanza fra gli estremi</dt><dd>{{ m.gap_abs | num(None, 'cell', m.decimals) }} {{ m.change_unit }}</dd></div>{% endif %}
+    {% if m.gap_abs is not none %}<div><dt>Distanza fra gli estremi</dt><dd data-kpi="gap-value">{{ m.gap_abs | num(None, 'cell', m.decimals) }} {{ m.change_unit }}</dd></div>{% endif %}
   </dl>{% endif %}
 
   <div class="module__body">

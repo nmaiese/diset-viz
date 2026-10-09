@@ -129,11 +129,7 @@
 {% if level.best and level.worst and stats.gap_abs is not none %}
 <p>Lo scarto tra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }} è quello osservato nell'anno più recente, {{ level.year_max }}.</p>
 {% endif %}
-{% if stats.above_avg_count is not none and stats.below_avg_count is not none %}
-<p>La media divide le {{ level.plural }} in due gruppi diseguali, {{ stats.above_avg_count }} sopra e {{ stats.below_avg_count }} sotto.
-  {%- if stats.median is not none and stats.year_avg is not none and (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %} Media e mediana non coincidono, segno che la distribuzione non è uniforme e che qualche valore estremo tira la media dalla sua parte.
-  {%- else %} Media e mediana sono vicine, quindi nessun valore estremo sta spostando da solo la sintesi.{% endif %}</p>
-{% elif stats.year_count is not none and stats.year_count < 5 %}
+{% if stats.year_count is not none and stats.year_count < 5 %}
 <p>Con {{ stats.year_count }} {{ stats.year_count | it_plural(level.singular, level.plural) }} a confronto i valori vanno letti come indicazioni di massima. Su così pochi dati mediana e distribuzione non sarebbero significative.</p>
 {% endif %}
 {# Il verso dell'indicatore e' una proprieta' della misura, non un fatto di

@@ -524,11 +524,6 @@ def _composed_indicator_section(role, meta, level):
                 f"osservato nell'anno più recente, {level['year_max']}. Da solo non dice se "
                 "la differenza sia statisticamente significativa, e non spiega da che cosa dipenda."
             )
-        if stats.get("above_avg_count") is not None and stats.get("below_avg_count") is not None:
-            paragraphs.append(
-                f"La media divide le {level['plural']} in due gruppi, "
-                f"{stats['above_avg_count']} sopra e {stats['below_avg_count']} sotto."
-            )
         if not meta.get("scoreable"):
             paragraphs.append(
                 "Questo indicatore non ha una direzione univoca. L'ordinamento descrive "

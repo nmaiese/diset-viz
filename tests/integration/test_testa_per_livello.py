@@ -255,7 +255,7 @@ class LaVistaProvinciale(unittest.TestCase):
         # La definizione in piano non sta piu' nella frase che apre la pagina,
         # e la pagina la dice lo stesso.
         body = re.sub(r"<script\b.*?</script>", "", self.province, flags=re.DOTALL)
-        self.assertIn("Esprime in anni la speranza di vita alla nascita", body)
+        self.assertIn("La speranza di vita esprime il numero medio di anni", body)
 
     def test_i_link_fra_i_livelli_dicono_di_che_cosa(self):
         self.assertIn(f'<a href="{self.REGIONI}">Speranza di vita alla nascita nelle 20 regioni</a>', self.province)

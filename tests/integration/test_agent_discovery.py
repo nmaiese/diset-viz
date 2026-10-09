@@ -110,7 +110,7 @@ class AgentDiscoveryTest(unittest.TestCase):
         text = response.get_data(as_text=True)
         for marker in (
             "# Tasso di turisticità",
-            "## Che cosa misura",
+            "## Definizione della fonte",
             "## Ultimo cambiamento disponibile",
             "## Valori per regioni, 2024",
             "Istat",

@@ -1256,20 +1256,12 @@ def _reading_text(name, theme, unit, direction=None):
 
 
 def trend_framing(direction, avg_change_pct):
-    """Short qualitative fragment (no numbers) describing whether a national
-    average's movement reads as favorable, unfavorable, or neutral, given the
-    indicator's direction. Returns '' if avg_change_pct is None (caller must guard
-    rendering on that)."""
+    """Short neutral fragment for a mean movement. Returns '' when unavailable."""
     if avg_change_pct is None:
         return ""
     if abs(avg_change_pct) < 1:
         return "un andamento sostanzialmente stabile"
-    if direction not in ("higher_better", "lower_better", "higher_worse"):
-        return "un aumento" if avg_change_pct > 0 else "una diminuzione"
-    favorable = (direction == "higher_better" and avg_change_pct > 0) or (
-        direction in ("lower_better", "higher_worse") and avg_change_pct < 0
-    )
-    return "una variazione media favorevole" if favorable else "una variazione media sfavorevole"
+    return "un aumento" if avg_change_pct > 0 else "una diminuzione"
 
 
 def it_plural(count, singular, plural):
@@ -1371,16 +1363,10 @@ def annual_change_framing(name, direction, delta):
     if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
         outcome = "si è ampliato" if delta > 0 else "si è ridotto"
         return f"{def_movement} indica che il divario medio tra i due tassi {outcome}."
-    if direction not in ("higher_better", "lower_better", "higher_worse"):
-        return (
-            f"Il dato descrive {indef_movement}, ma non indica da solo un "
-            "miglioramento o un peggioramento."
-        )
-    favorable = (direction == "higher_better" and delta > 0) or (
-        direction in ("lower_better", "higher_worse") and delta < 0
+    return (
+        f"Il dato descrive {indef_movement}, ma non indica da solo un "
+        "miglioramento o un peggioramento."
     )
-    outcome = "favorevole" if favorable else "sfavorevole"
-    return f"Per la direzione di questo indicatore, il movimento medio è {outcome}."
 
 
 def _caveat_text(name, theme, lens):

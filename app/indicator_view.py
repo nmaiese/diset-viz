@@ -253,8 +253,10 @@ def _build_meta(family, raw_id, source_meta):
     name = source_meta["name"]
     explain = source_meta.get("explain") or {}
     direction = explain.get("direction") or source_meta.get("direction")
-    namespace = {"eurostat": "eur"}.get(family, family)
-    definition_id = raw_id if family == "territorial" else f"{namespace}:{raw_id}"
+    # Il catalogo delle definizioni usa gli acronimi pubblici della famiglia,
+    # non i nomi interni usati dai loader (per esempio istat_demografia).
+    definition_prefix = sources.SOURCES[family]["internal_prefix"]
+    definition_id = f"{definition_prefix}{raw_id}" if definition_prefix else raw_id
     source_definition = _official_definition(definition_id)
     indexable, motivo_indice = indexability(family, raw_id, source_meta)
     return {

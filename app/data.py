@@ -1,6 +1,7 @@
 import csv
 import math
 import os
+import re
 import unicodedata
 from collections import defaultdict
 from functools import lru_cache
@@ -596,8 +597,8 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         ratio_meaningless = (
             "differenza" in name_lower
             or "punti percentuali" in unit_lower
-            or any(token in f"{name_lower} {unit_lower}" for token in
-                   ("anno", "anni", "giorno", "giorni", "ora", "ore", "minuto", "durata", "età", "eta"))
+            or any(re.search(rf"(?<!\w){token}(?!\w)", f"{name_lower} {unit_lower}") for token in
+                   ("anni?", "giorni?", "ore?", "minuti?", "durata", "et[aà]"))
         )
         if not ratio_meaningless and low_value > 0:
             ratio = high_value / low_value

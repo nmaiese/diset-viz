@@ -1806,8 +1806,14 @@ def _other_views(meta, level, levels, twin):
 
 
 def _show_plain_definition(article, meta, level, lead):
-    """Mostra fonte o limite esplicito quando «Come leggere» possiede la definizione."""
-    return bool(article.get("come_leggere"))
+    """Mostra la definizione solo se non è già nella frase-risposta."""
+    if not article.get("come_leggere"):
+        return False
+    definition = (meta.get("official_definition") or "").strip()
+    if not definition:
+        definition = (meta.get("explain") or {}).get("plain") or ""
+    visible_lead = indicator_notes.strip_markdown(lead or "")
+    return not definition or definition not in visible_lead
 
 
 def _dataset_name(meta, level):
