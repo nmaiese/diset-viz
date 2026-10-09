@@ -5,7 +5,7 @@ slug: servizi-infanzia-regioni-2023
 description: "Nel 2023/2024 ci sono 31,6 posti ogni 100 residenti 0-2 anni. Un divario non solo tra Nord e Sud, ma anche tra capoluoghi e piccoli comuni. Dati Istat."
 date: 2026-06-30
 author: "Redazione Divario Italia"
-cover: /static/img/blog/servizi-infanzia.svg
+cover: /static/img/blog/posti-autorizzati-2023.svg
 cover_alt: "Servizi per l'infanzia 2023/2024: posti autorizzati per 100 residenti, grafico a barre."
 cover_credit:
   author: "Redazione"
@@ -18,7 +18,7 @@ dataset:
   creator: "Istat"
   source_url: "https://www.istat.it/wp-content/uploads/2026/02/REPORT_OFFERTA-DI-NIDI-E-SERVIZI-INTEGRATIVI-PER-LA-PRIMA-INFANZIA.pdf"
   download: "/static/data/articles/servizi-infanzia-regioni-2023.csv"
-  method: "Indagine censuaria annuale"
+  method: "Indagine censuaria annuale. Valori dalla tabella Istat p.2; il dato 'Italia ufficiale' è il rapporto calcolato da Istat, non la media delle ripartizioni."
   period: "2023/2024"
 external_figures:
   - source: "Istat"
@@ -30,7 +30,7 @@ external_figures:
     value: "49,1"
     description: "Strutture che non accolgono tutte le domande 2021/2022"
   - source: "Consiglio UE"
-    url: "https://www.consilium.europa.eu/it/policies/childcare/"
+    url: "https://www.consilium.europa.eu/en/press/press-releases/2022/12/08/eu-ministers-adopt-recommendations-on-early-childhood-and-long-term-care/"
     value: "45"
     description: "Target UE 2030"
   - source: "Istat"
@@ -47,7 +47,7 @@ indicator_label: "Presa in carico servizi per l'infanzia (2023)"
 
 I servizi per la prima infanzia, ovvero asili nido e servizi integrativi per i bambini sotto i tre anni, sono uno strumento essenziale per conciliare lavoro e cura familiare. In Italia l'offerta è però distribuita in modo molto disuguale. 
 
-Quando si parla di asili nido occorre distinguere tra grandezze diverse: i posti autorizzati (quanti posti il sistema offre fisicamente), i bambini frequentanti (chi è effettivamente iscritto) e gli utenti presi in carico (i bambini iscritti nei servizi gestiti o pagati dal pubblico). L'indicatore principale per misurare la capacità del sistema è il rapporto tra i posti autorizzati al funzionamento e i bambini residenti di 0-2 anni compiuti.
+Quando si parla di asili nido occorre distinguere tra grandezze diverse: i posti autorizzati (quanti posti il sistema offre fisicamente), i bambini frequentanti (chi è effettivamente iscritto) e la presa in carico di tutti gli utenti (i bambini 0-2 che hanno usufruito di nidi, micronidi o servizi integrativi e innovativi). L'indicatore principale per misurare la capacità del sistema è il rapporto tra i posti autorizzati al funzionamento e i bambini residenti di 0-2 anni compiuti.
 
 Secondo i dati Istat pubblicati il 2026-02-03, nell'anno educativo 2023/2024 in Italia ci sono **31,6 posti autorizzati ogni 100 residenti**. 
 {: .data-callout}
@@ -75,9 +75,11 @@ Tra l'anno educativo precedente (2022/2023) e il 2023/2024, il numero assoluto d
 
 ## Domande e frequenza
 
-Avere un posto sul territorio non significa automaticamente potervi accedere. Il target fissato dal Consiglio dell'Unione europea per il 2030 prevede la **partecipazione** (ovvero la frequenza effettiva) di almeno il 45% dei bambini sotto i tre anni. Si tratta di un obiettivo di partecipazione formale, non di una soglia minima di posti autorizzati.
+Avere un posto sul territorio non significa automaticamente potervi accedere. Il target fissato dal [Consiglio dell'Unione europea](https://www.consilium.europa.eu/en/press/press-releases/2022/12/08/eu-ministers-adopt-recommendations-on-early-childhood-and-long-term-care/) (Raccomandazione dell'8 dicembre 2022) per il 2030 prevede la **partecipazione** (ovvero la frequenza effettiva) di almeno il 45% dei bambini sotto i tre anni. Si tratta di un obiettivo di partecipazione formale, non di una soglia minima di posti autorizzati.
 
-Le barriere all'accesso documentate dalla Commissione europea comprendono la carenza di posti, ma anche costi elevati e procedure di ammissione complesse. Questo si riflette sulle liste d'attesa, che non riguardano tutti i territori allo stesso modo, ma rappresentano un ostacolo frequente.
+Le barriere generali all'accesso ai servizi per l'infanzia, come documentato dalla [Commissione europea](https://education.ec.europa.eu/resources-and-tools/data-and-analysis-on-education-and-skills/key-trends-in-education/early-education-for-under-3s) (dati 2024), comprendono la carenza di posti, ma anche costi elevati e procedure di ammissione complesse.
+
+Nel contesto italiano, le difficoltà specifiche si riflettono sulle liste d'attesa, che non riguardano tutti i territori allo stesso modo, ma rappresentano un ostacolo frequente.
 
 ## Le barriere documentate: le domande non accolte
 
@@ -100,6 +102,10 @@ La distribuzione territoriale dei posti è solo il primo livello di analisi. Il 
 
 Una famiglia cerca disponibilità effettiva, tempi e costi sostenibili. I dati aggregati documentano la carenza di posti, ma non provano le cause individuali dell'accesso. Per avere un quadro chiaro delle proprie possibilità, occorre verificare i posti, la domanda locale e i criteri d'accesso nel proprio comune.
 
-Puoi esplorare l'indicatore separato sulla presa in carico comunale per l'anno 2023 nella [scheda dell'indicatore](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414).
+Puoi esplorare l'indicatore separato sulla presa in carico di tutti gli utenti per l'anno 2023 nella [scheda dell'indicatore](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414).
 
-*Dati: Istat, "Offerta di nidi e servizi integrativi per la prima infanzia", rapporto del 03 febbraio 2026.*
+## Fonti
+
+* **Istat**: [Offerta di nidi e servizi integrativi per la prima infanzia](https://www.istat.it/wp-content/uploads/2026/02/REPORT_OFFERTA-DI-NIDI-E-SERVIZI-INTEGRATIVI-PER-LA-PRIMA-INFANZIA.pdf), rapporto del 3 febbraio 2026 (dati anno educativo 2023/2024).
+* **Consiglio dell'Unione europea**: [Raccomandazione sull'educazione e cura della prima infanzia](https://www.consilium.europa.eu/en/press/press-releases/2022/12/08/eu-ministers-adopt-recommendations-on-early-childhood-and-long-term-care/), 8 dicembre 2022 (target partecipazione 2030).
+* **Commissione europea**: [Early education for under-3s](https://education.ec.europa.eu/resources-and-tools/data-and-analysis-on-education-and-skills/key-trends-in-education/early-education-for-under-3s), dati al 2024 sulle barriere generali all'accesso nei Paesi UE.
