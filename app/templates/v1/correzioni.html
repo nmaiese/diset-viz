@@ -1,0 +1,58 @@
+{% extends "blog_base.html" %}
+{% import "v1/_ui.html" as ui %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Errori e correzioni", "path": "/correzioni"}] %}
+
+{% block title %}Errori e correzioni | {{ site_name }}{% endblock %}
+{% block description %}Come segnalare errori nei dati e nei testi di Divario Italia e registro delle correzioni verificate.{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ asset_url('css/ds/components.css') }}">{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Errori e correzioni",
+  "url": {{ canonical | tojson }},
+  "publisher": { "@id": {{ publisher['@id'] | tojson }} },
+  "isPartOf": { "@type": "WebSite", "name": {{ site_name | tojson }}, "url": "{{ site_url }}/" }
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<main id="contenuto" class="v1" data-v1="correzioni" tabindex="-1">
+<div class="wrap">
+  {{ ui.crumbs(percorso) }}
+  <header class="pagehead">
+    <h1 class="h-title">Errori e correzioni</h1>
+    <p>Ultima revisione: <time datetime="{{ revision_dates['correzioni'] }}">{{ revision_dates['correzioni'] | date_it }}</time></p>
+    <p class="answer">Registro iniziato l'8 ottobre 2026.</p>
+    <p>Correggiamo una cifra che non coincide con la fonte Istat o Eurostat, un link che non si apre, una frase che la fonte non sostiene, oppure un errore di unità o di anno. Possiamo accorgercene durante i controlli, quando una serie non torna, o grazie a una segnalazione.</p>
+  </header>
+  <section class="section">
+    <h2>Come segnalare</h2>
+    <div class="prose">
+      <p>Scrivi dalla pagina <a href="/contatti#segnala-un-errore">Contatti</a>. Indica l'indirizzo della pagina, il valore o la frase che non torna e il collegamento alla fonte, se disponibile. Questi dettagli ci aiutano a ripetere il controllo.</p>
+      <p>Verifichiamo la segnalazione sulla fonte primaria. Se l'errore è confermato, correggiamo la pagina e registriamo qui che cosa abbiamo cambiato. Di norma rispondiamo entro 7 giorni.</p>
+      <p>Nel registro riportiamo la data dell'intervento, la pagina interessata, il problema verificato e la modifica. Se un collegamento a una fonte è stato sostituito, indichiamo il nuovo riferimento. Se la fonte non è più disponibile, togliamo il collegamento e descriviamo il limite.</p>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="registro-titolo">
+    <h2 id="registro-titolo">Registro delle correzioni</h2>
+    <table class="table">
+      <thead><tr><th scope="col">Data</th><th scope="col">Pagina o indicatore</th><th scope="col">Che cosa era sbagliato</th><th scope="col">Che cosa abbiamo fatto</th></tr></thead>
+      <tbody>
+      {% for item in corrections %}<tr>
+        <td><time datetime="{{ item.date }}">{{ item.date | date_it }}</time></td>
+        <td>{{ item.page }}{% if item.reference %} ({{ item.reference }}){% endif %}</td>
+        <td>{{ item.error }}</td>
+        <td>{{ item.action }}</td>
+      </tr>{% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+</main>
+{% endblock %}

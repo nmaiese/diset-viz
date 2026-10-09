@@ -154,6 +154,19 @@ def assess(family, raw_id, level_key=None):
     return None if record is None else _valuta(record, level_key)
 
 
+def parole_per_pagina(family, raw_id, level_key):
+    """Parole pubblicate per pagina, dal conteggio unico di ``catalogo()``."""
+    record = next((row for row in catalogo()["righe"]
+                   if row["famiglia"] == family and row["codice"] == sources.indicator_code(family, raw_id)
+                   and row["livello"] == level_key), None)
+    return None if record is None else record["parole"]
+
+
+def senza_prosa(family, raw_id, level_key):
+    """True quando il catalogo editoriale conta zero parole sulla pagina."""
+    return parole_per_pagina(family, raw_id, level_key) == 0
+
+
 @synchronized_cache(maxsize=1)
 def build_queue():
     """One row per (indicator, territorial level), because that is the unit of

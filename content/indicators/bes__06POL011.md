@@ -4,7 +4,7 @@ key: "bes:06POL011"
 vintage: 2025
 ---
 
-La durata dei processi civili misura l'efficienza della giustizia, e spacca l'Italia. Un procedimento dura in media 390 giorni, ma va dai 160 della Valle d'Aosta agli 828 della Basilicata, con Calabria e Campania oltre i 600. Il divario supera le cinque volte.
+La durata dei processi civili misura l'efficienza della giustizia, e spacca l'Italia. Un procedimento dura in media 390 giorni, ma va dai 160 della Valle d'Aosta agli 828 della Basilicata, con Calabria e Campania oltre i 600.
 
 <!-- sezione: quadro -->
 

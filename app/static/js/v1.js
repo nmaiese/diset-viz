@@ -256,6 +256,8 @@
       var lo = sc.lo, hi = sc.hi;
       var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
       var max = Math.max(hi, 0) || 1;
+      var yearMatrix = data.matrix[String(year)] || {};
+      var missing = Object.keys(data.names).filter(function (key) { return yearMatrix[key] === null || yearMatrix[key] === undefined; });
       var byKey = {};
       list.forEach(function (r) { byKey[r.key] = r; });
 
@@ -266,7 +268,7 @@
       mod.querySelectorAll(".map [data-key]").forEach(function (p) {
         var r = byKey[p.dataset.key];
         p.classList.remove("q1", "q2", "q3", "q4", "q5", "q6");
-        if (r) {
+        if (r && r.value !== null) {
           p.classList.add("q" + choroStep(r.value, sc));
           p.style.fill = "";
           p.dataset.value = withUnit(r.value, data.unit);
@@ -284,19 +286,24 @@
       // la segue. Si riscrivono solo i corpi: il details resta aperto o chiuso.
       var folded = !!(data.fold && parts.head && parts.middle && parts.tail && list.length > data.fold.over);
       var edge = folded ? data.fold.edge : 0;
-      var html = { head: [], middle: [], tail: [] }, refDone = false;
+      var html = { head: [], middle: [], tail: [] }, refDone = false, lastValue = null, lastRank = 0;
       list.forEach(function (r, i) {
         var part = !folded || i < edge ? "head" : i >= list.length - edge ? "tail" : "middle";
-        var crosses = lowerBetter ? r.value > avg : r.value < avg;
+        var crosses = r.value !== null && (lowerBetter ? r.value > avg : r.value < avg);
         if (!refDone && crosses) {
           html[part].push('<tr class="ref"><td></td><th scope="row">Media semplice delle ' + list.length + " " + data.plural + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><data class="n n--cell" value="' + avg + '">' + fmt(avg, data.decimals) + "</data></td></tr>");
           refDone = true;
         }
         var dot = data.areas && data.areas[r.key] ? '<span class="area-dot area-dot--' + data.areas[r.key] + '" aria-hidden="true"></span>' : "";
         var name = dot + (data.profile ? '<a href="' + profileHref(r.key) + '">' + esc(r.name) + "</a>" : esc(r.name));
-        var id = data.row_id ? ' id="' + data.row_id + r.key + '"' : "";
-        html[part].push('<tr data-key="' + r.key + '"' + id + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank"><span class="n n--rank"><data value="' + (i + 1) + '">' + (i + 1) + '</data><span class="n__o">ª</span></span></td><th scope="row">' + name +
-          '</th><td class="barcell" aria-hidden="true"><span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span></td><td class="val"><data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data></td></tr>");
+        var id = data.row_id && r.value !== null ? ' id="' + data.row_id + r.key + '"' : "";
+        if (r.value !== null && r.value !== lastValue) lastRank = i + 1;
+        lastValue = r.value;
+        var rank = r.value === null ? "n.d." : '<span class="n n--rank"><data value="' + lastRank + '">' + lastRank + '</data><span class="n__o">ª</span></span>';
+        var bar = r.value === null ? "" : '<span class="bar"><i style="width:' + (Math.max(r.value, 0) / max * 100).toFixed(1) + '%"></i></span>';
+        var value = r.value === null ? '<span class="n n--nd">n.d.</span>' : '<data class="n n--cell" value="' + r.value + '">' + fmt(r.value, data.decimals) + "</data>";
+        html[part].push('<tr data-key="' + r.key + '"' + id + (r.key === sel ? ' class="is-on" aria-current="true"' : "") + '><td class="rank">' + rank + '</td><th scope="row">' + name +
+          '</th><td class="barcell" aria-hidden="true">' + bar + '</td><td class="val">' + value + "</td></tr>");
       });
       if (parts.head && parts.middle && parts.tail) {
         parts.head.innerHTML = html.head.join("");
@@ -314,6 +321,17 @@
         }
       } else {
         body.innerHTML = html.head.join("");
+      }
+      var missingMore = mod.querySelector("[data-rank-missing-more]");
+      var missingBody = mod.querySelector('[data-rank-part="missing"]');
+      if (missingMore && missingBody) {
+        missingMore.hidden = !missing.length;
+        mod.querySelector("[data-rank-missing-summary]").textContent = missing.length + " " + data.plural + " senza dato";
+        missingBody.innerHTML = missing.map(function (key) {
+          var dot = data.areas && data.areas[key] ? '<span class="area-dot area-dot--' + data.areas[key] + '" aria-hidden="true"></span>' : "";
+          var name = dot + (data.profile ? '<a href="' + profileHref(key) + '">' + esc(data.names[key]) + "</a>" : esc(data.names[key]));
+          return '<tr data-key="' + key + '"><td class="rank">n.d.</td><th scope="row">' + name + '</th><td class="barcell" aria-hidden="true"></td><td class="val"><span class="n n--nd">n.d.</span></td></tr>';
+        }).join("");
       }
 
       if (claim && data.south && data.south.length) {

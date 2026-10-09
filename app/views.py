@@ -55,6 +55,7 @@ from app import public_urls
 from app import publisher
 from app import agent_discovery
 from app import nav
+from app.revision_dates import REVISIONS
 from app import taxonomy
 from app.taxonomy import (
     MACRO_AREA_ORDER,
@@ -193,6 +194,7 @@ def _inject_license():
         # organizzazione del publisher, la fonte va in `isBasedOn`.
         "organization_ref_jsonld": json.dumps({"@id": publisher.ORGANIZATION_ID}),
         "corrections_url": publisher.CORRECTIONS_URL,
+        "revision_dates": REVISIONS,
         # Chi firma lo dice `config/identita.yaml`: nessun template scrive un nome.
         "identity": publisher.identity,
         "author_name": publisher.editor_name,
@@ -500,19 +502,21 @@ def atlante():
     di una riga, che sceglie l'indicatore della mappa su quel livello.
 
     Le province non sono un documento a se': il canonical resta `/atlante`, e
-    `?livello=provincia` rende la pagina `noindex, follow` e la tiene fuori
-    dalla sitemap. Header e meta li decide il livello e nient'altro: il meta
-    sta nel corpo in cache, che conosce solo (livello, indicatore), e un
-    header deciso da altri parametri (`?anno=`, `?regione=`) direbbe
-    `noindex` sopra un meta `index`. Gli altri parametri restano come prima,
-    `index` col canonical `/atlante`."""
+    `?livello=provincia` e le varianti `area` o `theme`+`partial=1` sono
+    `noindex, follow`. La cache distingue le due forme SEO, non i singoli
+    filtri. Gli altri parametri restano indicizzabili col canonical `/atlante`."""
     level = "provincia" if request.args.get("livello") == "provincia" else "regione"
+    query_variant_noindex = (
+        "area" in request.args
+        or ("theme" in request.args and request.args.get("partial") == "1")
+    )
+    noindex = level == "provincia" or query_variant_noindex
     if agent_discovery.prefers_markdown():
         response = agent_discovery.markdown_response(
             agent_discovery.atlas_markdown(_home_featured_indicator_links(), SITE_URL),
             f"{SITE_URL}/atlante",
         )
-        if level == "provincia":
+        if noindex:
             response.headers["X-Robots-Tag"] = "noindex, follow"
         return response
     target = _atlante_redirect(request.args)
@@ -527,15 +531,15 @@ def atlante():
         if shown is None:
             return redirect(atlas_page.LEVEL_PATHS[level], code=301)
     if shown == start:
-        body = _atlante_page(level, shown)
+        body = _atlante_page(level, shown, noindex)
     else:
         # Le altre mappe non vanno in cache: la pagina pesa 600 KB non
         # compressi, e 594 varianti riempirebbero la SimpleCache di tutto il
         # sito. Le righe sono gia' per processo, la resa costa pochi
         # millisecondi.
-        body = _render_atlante(level, shown)
+        body = _render_atlante(level, shown, noindex)
     response = make_response(body)
-    if level == "provincia":
+    if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 
@@ -628,7 +632,7 @@ def _bes_fuori_atlante(wanted, livello):
         return None
 
 
-def _render_atlante(level, map_indicator):
+def _render_atlante(level, map_indicator, noindex=False):
     """La pagina per (livello, indicatore della mappa).
 
     Senza ripiego: se la regia cede la risposta e' un 500, non un 200. Il
@@ -638,7 +642,7 @@ def _render_atlante(level, map_indicator):
     motori, che tornano a leggere dopo, e l'errore resta nel log."""
     return design.render(
         "atlante", "v1/atlante.html", None,
-        level=level, map_indicator=map_indicator,
+        level=level, map_indicator=map_indicator, noindex=noindex,
         featured_indicators=_home_featured_indicator_links(),
         percorso=[{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}],
         site_url=SITE_URL,
@@ -917,6 +921,38 @@ def _search_indicators(query, theme=None, limit=50):
         seen.add(page["path"])
         if len(results) >= limit:
             break
+    # La ricerca interna resta utile anche per le schede che il criterio SEO
+    # editoriale toglie da sitemap e catalogo pubblico. Non sono pagine
+    # indicizzabili, ma restano raggiungibili e i suggerimenti devono trovarle.
+    if len(results) < limit:
+        for record in indicator_universe.projection():
+            meta = record["meta"]
+            family, raw_id = meta.get("family"), meta.get("raw_id")
+            base_level = record["default_level"]
+            noindex_for_prose = (
+                (meta.get("indexable") and editorial_state.senza_prosa(family, raw_id, base_level))
+                or (not meta.get("indexable") and meta.get("indexable_reason") == "senza_prosa")
+            )
+            if not noindex_for_prose or hidden_from_browsing(family, raw_id):
+                continue
+            if theme and meta.get("theme") != theme:
+                continue
+            path = meta["canonical_path"]
+            if path in seen:
+                continue
+            explain = meta.get("explain") or {}
+            haystack = _search_fold(f"{meta['name']} {meta.get('theme', '')} {explain.get('plain', '')}")
+            if folded and folded not in haystack:
+                continue
+            results.append({
+                "id": meta["id"], "name": meta["name"], "path": path,
+                "theme": meta.get("theme") or "",
+                "catalog_family_label": meta.get("family_label") or "",
+                "explain": explain, "year_max": meta.get("year_max"),
+            })
+            seen.add(path)
+            if len(results) >= limit:
+                break
     return results
 
 
@@ -1387,6 +1423,17 @@ def termini():
     )
 
 
+@app.route("/correzioni")
+def correzioni():
+    with open(os.path.join(os.path.dirname(__file__), "..", "content", "correzioni.json"), encoding="utf-8") as file:
+        corrections = json.load(file)
+    return design.render(
+        "correzioni", "v1/correzioni.html", None,
+        site_url=SITE_URL, site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/correzioni", corrections=corrections,
+    )
+
+
 @app.route("/metodologia")
 def methodology():
     regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
@@ -1608,7 +1655,10 @@ def _render_indicator(family, raw_id, path_level=None):
     seo_description = seo_titles.page_description(article, meta, level, composed=lead)
 
     explore_state = seo_policy.has_explore_params(request.args)
-    noindex = (not level["indexable"]) or explore_state
+    noindex = (not level["indexable"]) or explore_state or (
+        level["key"] == view["levels"][0]["key"]
+        and editorial_state.senza_prosa(family, raw_id, level["key"])
+    )
     page_h1 = _page_h1(article, meta, level)
 
     if agent_discovery.prefers_markdown():
@@ -3527,6 +3577,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/confronto", "priority": "0.7"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/correzioni", "priority": "0.5"},
         {"loc": f"{SITE_URL}/chi-siamo", "priority": "0.6"},
         {"loc": f"{SITE_URL}/contatti", "priority": "0.5"},
         {"loc": f"{SITE_URL}/termini", "priority": "0.3"},

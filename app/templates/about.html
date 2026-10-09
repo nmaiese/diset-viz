@@ -27,6 +27,7 @@
 <article class="page prose-wrap" id="contenuto">
   <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
   <h1>Chi siamo</h1>
+  <p>Ultima revisione: <time datetime="{{ revision_dates['chi-siamo'] }}">{{ revision_dates['chi-siamo'] | date_it }}</time></p>
   <p class="page-lead">Divario Italia è un progetto editoriale indipendente, {% if identity().tipo == "persona" %}fondato e curato da {{ author_name() }}{% else %}curato da una redazione, {{ author_name() }},{% endif %} che rende consultabili e comprensibili dati pubblici sui territori italiani. Pubblica dal giugno 2026. Divario Italia è l'editore e il proprietario del progetto, delle elaborazioni e delle visualizzazioni, non dei dati originali.</p>
 
   <section>
@@ -74,6 +75,7 @@
     <p>Si scrive a <!--email_off--><a href="mailto:{{ contact_email }}">{{ contact_email }}</a><!--email_on-->. È l'indirizzo della redazione, e da lì arrivano le risposte. Gli altri modi per raggiungerci stanno in <a href="/contatti">Contatti</a>.</p>
     <p>Per segnalare un errore indica l'indirizzo della pagina, il passaggio o il valore da controllare e, se possibile, la fonte corretta. Invia la segnalazione a <!--email_off--><a href="mailto:{{ contact_email }}">{{ contact_email }}</a><!--email_on-->.</p>
     <p>Una segnalazione di errore ha la precedenza sul resto del lavoro. Una cifra sbagliata si corregge appena è verificata contro la fonte, e non aspetta il giro di aggiornamento successivo. Gli articoli mostrano la data di pubblicazione e quella dell'ultima revisione editoriale. Le pagine degli indicatori mostrano la data di aggiornamento della fonte quando è disponibile, e quella data si muove da sola quando la fonte pubblica.</p>
+    <p>Le correzioni verificate sono raccolte nel <a href="/correzioni">registro degli errori e delle correzioni</a>.</p>
   </section>
 
   <section id="come-citare">

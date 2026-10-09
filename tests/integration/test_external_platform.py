@@ -3,6 +3,7 @@ import json
 import re
 import sys
 import unittest
+import xml.etree.ElementTree as ET
 from unittest.mock import patch
 
 from app import app, indicator_universe, indicator_view
@@ -28,6 +29,13 @@ def _walk(node):
             yield from _walk(value)
 
 
+def _sitemap_paths(xml):
+    return {
+        node.text.removeprefix("https://divarioitalia.it")
+        for node in ET.fromstring(xml).findall(".//{*}loc")
+    }
+
+
 class ExternalPlatformVerticalSlice(unittest.TestCase):
     def setUp(self):
         self.rows = external_mef.rows()
@@ -46,6 +54,11 @@ class ExternalPlatformVerticalSlice(unittest.TestCase):
         self.level_patch.stop()
         self.atlas_row_patch.stop()
         self.row_patch.stop()
+        self._clear_caches()
+        from app import editorial_state
+        editorial_state.build_queue.cache_clear()
+        editorial_state.catalogo.cache_clear()
+        indicator_universe.cache_clear()
 
     @staticmethod
     def _clear_caches():
@@ -81,7 +94,7 @@ class ExternalPlatformVerticalSlice(unittest.TestCase):
         self.assertIn("Ministero dell'Economia e delle Finanze", html)
         self.assertIn("https://creativecommons.org/licenses/by/3.0/it/", html)
         self._assert_jsonld_mef(html)
-        self.assertEqual(_robots(html), "index, follow")
+        self.assertEqual(_robots(html), "noindex, follow")
         canonical = re.search(r'<link rel="canonical" href="([^"]+)"', html)
         self.assertEqual(canonical.group(1), "https://divarioitalia.it" + path)
 
@@ -107,8 +120,9 @@ class ExternalPlatformVerticalSlice(unittest.TestCase):
         self.assertIsNotNone(indicator_universe.province_payload("mef:reddito-irpef-medio"))
 
         sitemap = self.client.get("/sitemap.xml").get_data(as_text=True)
-        self.assertIn("https://divarioitalia.it" + path, sitemap)
-        self.assertIn("https://divarioitalia.it" + province_path, sitemap)
+        paths = _sitemap_paths(sitemap)
+        self.assertNotIn(path, paths)
+        self.assertIn(province_path, paths)
 
 
     def _assert_jsonld_mef(self, html):
@@ -131,13 +145,14 @@ class ExternalPlatformVerticalSlice(unittest.TestCase):
             self._clear_caches()
             base = self.client.get(path)
             self.assertEqual(base.status_code, 200)
-            self.assertEqual(_robots(base.get_data(as_text=True)), "index, follow")
+            self.assertEqual(_robots(base.get_data(as_text=True)), "noindex, follow")
             province = self.client.get(province_path)
             self.assertEqual(province.status_code, 200)
             self.assertEqual(_robots(province.get_data(as_text=True)), "noindex, follow")
             sitemap = self.client.get("/sitemap.xml").get_data(as_text=True)
-            self.assertIn("https://divarioitalia.it" + path + "<", sitemap)
-            self.assertNotIn("https://divarioitalia.it" + province_path, sitemap)
+            paths = _sitemap_paths(sitemap)
+            self.assertNotIn(path, paths)
+            self.assertNotIn(province_path, paths)
             themed = [item["path"] for items in indicator_view.province_indicators_by_theme().values()
                       for item in items]
             self.assertNotIn(province_path, themed)

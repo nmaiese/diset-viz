@@ -63,7 +63,9 @@ paths:
     vengono dalle fonti di ciascun livello: un guasto delle province non
     manda nel ripiego la pagina delle regioni. Le righe regionali con una
     vista provinciale dicono "anche per provincia" (ter-910 porta a
-    bes-01SAL001/province). **Il robots lo decide solo il livello**:
+    bes-01SAL001/province). **Meta robots e header**: noindex per livello
+    provincia e per query con `area` o `theme` insieme a `partial=1`;
+    gli altri parametri non cambiano indicizzazione.
     `?livello=provincia` e' `noindex, follow` con canonical `/atlante`, header
     e meta insieme, fuori dalla sitemap. `?anno=`, `?regione=` e un livello
     sconosciuto restano la pagina delle regioni, indicizzabile;

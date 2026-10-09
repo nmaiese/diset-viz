@@ -41,6 +41,7 @@ _PREFIXES: tuple[tuple[str, str], ...] = (
     ("/metodologia", "info"),
     ("/chi-siamo", "info"),
     ("/contatti", "info"),
+    ("/correzioni", "info"),
     ("/termini", "info"),
     ("/privacy", "info"),
     ("/account", "account"),

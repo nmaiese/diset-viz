@@ -51,6 +51,26 @@ class EveryCheckFires(unittest.TestCase):
         for name in prose_lint.ALL_SIGNALS:
             self.assertTrue(summary["checks"][name]["label"], name)
 
+    def test_g8_editorial_lexicon_and_causal_conclusions(self):
+        for phrase in ("Una voragine separa le regioni.", "Il Paese è spaccato.",
+                       "La frattura cresce.", "I numeri non mentono.",
+                       "Non è una percezione.", "Questo dato non dice tutto.",
+                       "Il divario cresce perché mancano servizi.",
+                       "La quota cala a causa di minori nascite.",
+                       "Il tasso è dovuto a salari bassi.",
+                       "La differenza provoca migrazioni.",
+                       "È un effetto del divario regionale."):
+            with self.subTest(phrase=phrase):
+                self.assertIn("G8", prose_lint.inspect(_entry(phrase))["hits"])
+
+    def test_g8_does_not_call_causal_limits_conclusions(self):
+        for phrase in ("Perché la quota cambia?", "Il dato non dimostra un effetto dei servizi.",
+                       "La correlazione non prova che il divario sia dovuto ai servizi.",
+                       "Il testo cita «a causa di» per spiegare perché la causalità non è provata.",
+                       "Nel 2024 il tasso era 35%."):
+            with self.subTest(phrase=phrase):
+                self.assertNotIn("G8", prose_lint.inspect(_entry(phrase))["hits"])
+
 
 class CorrectProseStaysClean(unittest.TestCase):
     CLEAN = (
