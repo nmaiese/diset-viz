@@ -26,8 +26,8 @@ Unità: posti autorizzati per 100 bambini residenti di 0-2 anni
 Denominatore: bambini residenti di 0-2 anni compiuti nel territorio; non utenti e non domande presentate
 Popolazione: residenti di 0, 1 e 2 anni; servizi per bambini sotto i tre anni
 Territorio: Italia ufficiale, cinque ripartizioni e confronto aggregato capoluoghi/non capoluoghi; 5/5 ripartizioni e 2/2 tipi di comune nella tabella Istat, più Italia. Le regioni entrano in eventuale grafico solo se estratte dalla tavola Istat con la stessa definizione.
-Periodo: anno educativo 2023/2024, posti disponibili al 31-12-2023; domanda e attese della stessa indagine 2023/2024; presa in carico ter-414 anno 2023 solo come misura separata
-Fonte e release: Istat, «Offerta di nidi e servizi integrativi per la prima infanzia», rapporto PDF datato 2026-02-02 e comunicato pubblicato il 2026-02-03; tavole tavole_nidi_2023.xlsx, copia locale SHA256 3cf261ad0c7643908f2a277321345e76873ddbe945650563e45f7eb8e47fda10
+Periodo: anno educativo 2023/2024, posti disponibili al 31-12-2023; domanda e attese della stessa indagine 2023/2024; presa in carico `ter-414` anno 2023 solo come misura separata
+Fonte e release: Istat, «Offerta di nidi e servizi integrativi per la prima infanzia», rapporto PDF datato 2026-02-02 e comunicato pubblicato il 2026-02-03; tavole `tavole_nidi_2023.xlsx`, copia locale SHA256 3cf261ad0c7643908f2a277321345e76873ddbe945650563e45f7eb8e47fda10
 Riferimento usato: Italia ufficiale, 31,6 posti per 100 bambini residenti di 0-2 anni, Istat PDF 2026-02-02; obiettivo europeo 45% di partecipazione nel 2030 solo in testo separato e non come linea sul grafico dei posti
 Codici e confronto: ter-414 presa in carico 2023 come tassello distinto; grafico principale da rapporto Istat 2023/2024, non media degli indicatori interni
 Ultimo dato: 2023/2024
@@ -57,7 +57,7 @@ Registro affermazioni:
 | LEP 33 posti ogni 100 bambini 0-2 entro il 2027 è garanzia da verificare al livello del Comune o del bacino territoriale; il 31,6 nazionale è solo un confronto di scala. | limite | 33 e 31,6; soglie e livelli diversi | comuni/bacini vs Italia, obiettivo 2027 e dato 2023/2024 | Istat, rapporto 2026-02-02 p.2; normativa citata nel rapporto |
 | La frequenza 34,5% e la presa in carico comunale 18,5% sono misure diverse dal rapporto di posti 31,6. | limite | tre numeratori e universi distinti | Italia, frequenza 2023/2024, presa in carico 2023, posti 2023/2024 | Istat, rapporto 2026-02-02 |
 | Il target UE 2030 riguarda la partecipazione di almeno il 45% dei bambini sotto tre anni. | dato | raccomandazione 45% | UE, 2030 | Consiglio UE, 2022-12-08 |
-| Posti, frequenza e presa in carico sono misure diverse. | limite | numeratori, universi e anni distinti | Italia, 2023/2024 vs ter-414 2023 | Istat rapporto e definizione indicatore interno |
+| Posti, frequenza e presa in carico sono misure diverse. | limite | numeratori, universi e anni distinti | Italia, 2023/2024 vs `ter-414` 2023 | Istat rapporto e definizione indicatore interno |
 | I dati aggregati non dicono se una singola famiglia troverà un posto. | limite | non contengono domanda locale, qualità, costi e orari per singola famiglia | livello locale, 2023/2024 | limite della misura Istat; Commissione UE 2026-03-20 per categorie di barriera |
 | criterio | esito | prova verificabile | limite |
 |---|---|---|---|
