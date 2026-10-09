@@ -5,8 +5,8 @@ slug: servizi-infanzia-regioni-2023
 description: "Nel 2023/2024 ci sono 31,6 posti ogni 100 residenti 0-2 anni. Un divario non solo tra Nord e Sud, ma anche tra capoluoghi e piccoli comuni. Dati Istat."
 date: 2026-06-30
 author: "Redazione Divario Italia"
-cover: /static/img/blog/posti-autorizzati-2023.svg
-cover_alt: "Servizi per l'infanzia 2023/2024: posti autorizzati per 100 residenti, grafico a barre."
+cover: /static/img/blog/posti-autorizzati-2023.png
+cover_alt: "Servizi per l'infanzia 2023/2024: posti autorizzati per 100 residenti, grafico a punti per ripartizione."
 cover_credit:
   author: "Redazione"
   license: "Proprietaria"
@@ -71,7 +71,7 @@ Oltre al classico divario tra Centro-Nord e Mezzogiorno, esiste una differenza i
 | Isole | 20,7 | 19,0 | 19,5 |
 | Italia ufficiale | 39,8 | 28,2 | 31,6 |
 
-Tra l'anno educativo precedente (2022/2023) e il 2023/2024, il numero assoluto di posti autorizzati è aumentato del 3,4%. Tuttavia, Istat segnala che la crescita del rapporto posti/residenti è dovuta in parte al continuo calo del denominatore, cioè la diminuzione dei bambini residenti.
+Tra l'anno educativo precedente (2022/2023) e il 2023/2024, il numero assoluto di posti autorizzati (quasi 378.500 posti) è aumentato del 3,4%. Tuttavia, Istat segnala che la crescita del rapporto posti/residenti è dovuta in parte al continuo calo del denominatore, cioè la diminuzione dei bambini residenti.
 
 ## Domande e frequenza
 
