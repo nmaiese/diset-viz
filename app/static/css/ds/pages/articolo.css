@@ -97,6 +97,33 @@
 .fig .fig__pt-dot--old { fill: var(--bg); stroke: var(--cmp); stroke-width: 1.5; }
 .fig .fig__pt-dot--old.is-on { fill: var(--bg); stroke: var(--data-focus); stroke-width: 2; }
 
+@media (max-width: 719px) {
+  [data-post-slug="servizi-infanzia-regioni-2023"] .tablewrap .table--stack caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  [data-post-slug="servizi-infanzia-regioni-2023"] .article-figure {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+  }
+  [data-post-slug="servizi-infanzia-regioni-2023"] .article-figure::before {
+    content: "Scorri orizzontalmente per vedere tutto il grafico";
+    display: block;
+    font-size: 13px;
+    color: var(--text-2);
+    margin-bottom: 8px;
+  }
+  [data-post-slug="servizi-infanzia-regioni-2023"] .article-figure svg.fig {
+    min-width: 720px;
+    height: auto;
+  }
+}
+
 /* ---------- rimando alla scheda, dati e metodo, storie ---------- */
 .art-link { margin-top: var(--space-8); max-width: var(--measure); padding-bottom: var(--space-4); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .art-data .specs dd p + p { margin-top: var(--space-2); }

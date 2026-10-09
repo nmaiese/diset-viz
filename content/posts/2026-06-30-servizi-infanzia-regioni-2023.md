@@ -126,35 +126,3 @@ Puoi esplorare l'indicatore separato sugli utenti dell'offerta comunale per l'an
 * **Istat e Università Ca’ Foscari**: [Rapporto infanzia 2023/2024](https://www.istat.it/wp-content/uploads/2025/05/report_infanzia_2023_2024.pdf), pubblicato il 16 maggio 2025.
 * **Consiglio dell'Unione europea**: [Raccomandazione sull'educazione e cura della prima infanzia](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=oj%3AJOC_2022_484_R_0001), 8 dicembre 2022 (target partecipazione 2030).
 * **Commissione europea**: [Early education for under-3s](https://education.ec.europa.eu/resources-and-tools/data-and-analysis-on-education-and-skills/key-trends-in-education/early-education-for-under-3s), dati al 2024 sulle barriere generali all'accesso nei Paesi UE.
-
-<style>
-@media (max-width: 719px) {
-  /* Nasconde la caption della prima tabella a 375 ma la mantiene accessibile */
-  .art-body > .tablewrap:first-of-type caption {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    overflow: hidden !important;
-    clip: rect(0 0 0 0) !important;
-    white-space: nowrap !important;
-  }
-
-  /* Rende i grafici SVG scorrevoli in orizzontale e leggibili */
-  .article-figure {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 12px;
-  }
-  .article-figure::before {
-    content: "Scorri orizzontalmente per vedere tutto il grafico";
-    display: block;
-    font-size: 13px;
-    color: var(--text-2);
-    margin-bottom: 8px;
-  }
-  .article-figure svg.fig {
-    min-width: 720px;
-    height: auto;
-  }
-}
-</style>
