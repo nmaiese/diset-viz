@@ -24,8 +24,8 @@ BOZZA_OUT = Path("/mnt/c/Users/Nilo/orca/divario/bozze")
 DEFAULT_PHASES = ("scout", "brief", "gate_a", "autore", "grafico", "guardia", "gate_b", "bozza")
 PHASE_LABEL = {"gate_a": "a", "gate_b": "b"}
 KEY_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-GATE_A_CONTRACT_VERSION = "v4"
-GATE_B_CONTRACT_VERSION = "v4"
+GATE_A_CONTRACT_VERSION = "v4.1"
+GATE_B_CONTRACT_VERSION = "v4.1"
 
 
 @dataclass
@@ -325,12 +325,14 @@ def _template(phase: dict, key: str, issue: str, worktree: Path, input_files: li
 GATE_REQUIRED = {
     "gate_a": ["Contratto:", "Tipo pezzo:", "SHA brief:", "Hash brief:", "Autore/modello:",
                "Giudice/modello:", "Domanda:", "Risposta in una frase:", "Variante:",
+               "Dopo questa pagina, il lettore deve aver capito che…:", "Scheda editoriale:",
                "Schema del racconto:", "Angoli verificati:", "Riferimento usato:",
                "Codici e confronto:", "Ultimo dato:", "Data fonte del dato:", "URL fonte del dato:",
                "Ruolo indicatori interni:", "Fonti esterne verificate:", "Grafico con dati esterni:",
                "Figure previste:", "Limiti:", "| criterio |", "Esito:", "Motivo:", "Correzione:",
                "Destinatario:", "Data:"],
-    "gate_b": ["Contratto:", "SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
+    "gate_b": ["Contratto:", "Tipo pagina:", "SHA bozza:", "Hash bozza:", "Famiglie autore/revisore:", "T:", "R:", "L:", "N:",
+               "Oltre la tabella:", "Funzione paragrafi:",
                "Controllo anti-invenzione:", "Bloccanti:", "Voto:", "Motivo:",
                "Rilievi localizzati:", "Giri:", "Esito:"],
 }
@@ -400,6 +402,8 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
         if (outcome == "PASSA") != all_yes:
             raise RedazioneError("gate-a.md incoerente: esito non corrisponde ai cinque criteri")
     else:
+        if _field(text, "Tipo pagina") not in PAGE_TYPES:
+            raise RedazioneError("gate-b.md malformato: Tipo pagina non valido")
         controls = {}
         for control in "TRLN":
             match = re.search(rf"^{control}:\s*(?:sì|no)\s*[—-]\s*(\S.+)$", text, re.MULTILINE | re.IGNORECASE)
@@ -416,6 +420,10 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
             raise RedazioneError(f"gate-b.md incoerente: Giri {rounds.group(1)} nel report, "
                                  f"{expected_rounds} in stato.json")
         all_yes = all(value == "sì" for value in controls.values())
+        for label in ("Oltre la tabella", "Funzione paragrafi"):
+            evidence = re.search(rf"^{label}:\s*sì\s*[—-]\s*(\S.+)$", text, re.MULTILINE | re.I)
+            if outcome == "PASSA" and (not evidence or len(evidence.group(1).strip()) < 20):
+                raise RedazioneError(f"gate-b.md incoerente: {label} assente o negativo")
         vote_value = int(vote.group(1))
         pass_conditions = all_yes and vote_value >= 4 and int(blockers.group(1)) == 0
         # Al secondo giro non c'è un terzo: sotto 4 l'esito è FERMO, non RISCRIVERE.
@@ -458,7 +466,10 @@ CLAIM_TYPES = {"dato", "calcolo", "interpretazione", "ipotesi", "limite"}
 BLOG_VARIANTS = ("orientamento", "cambiamento", "verifica", "servizi", "differenze interne",
                  "gruppi demografici", "confronto tra misure")
 SHEET_VARIANTS = ("regionale", "provinciale", "multilivello", "per sesso", "per età", "con incroci",
-                  "serie breve", "misura complessa")
+                  "serie breve", "misura complessa", "facile da fraintendere")
+PAGE_TYPES = {"articolo", "indicatore", "profilo territoriale", "confronto territoriale"}
+EDITORIAL_FIELDS = ("Domanda", "Definizione", "Risultato centrale", "Confronto", "Rilevanza",
+                    "Spiegazione", "Limite decisivo", "Passo successivo")
 REFERENCES = ("italia ufficiale", "media semplice", "mediana", "obiettivo", "nessuno")
 
 
@@ -500,6 +511,12 @@ def gate_a_formal_gaps(report: Path) -> list[str]:
         report_value = " ".join(_field(report_text, name).split()).casefold()
         if brief_value and report_value and brief_value != report_value:
             gaps.append(f"report: «{name}» diverso dal brief")
+    label = "Dopo questa pagina, il lettore deve aver capito che…"
+    if (_field(brief_text, label) and _field(report_text, label)
+            and _field(brief_text, label).casefold() != _field(report_text, label).casefold()):
+        gaps.append("report: comprensione diversa dal brief")
+    if _editorial_rows(brief_text) and _editorial_rows(report_text) and _editorial_rows(brief_text) != _editorial_rows(report_text):
+        gaps.append("report: scheda editoriale diversa dal brief")
     return gaps
 
 
@@ -513,6 +530,8 @@ def gate_a_stop_reason(gaps: list[str]) -> str:
 GAP_LABELS = {name: f"manca «{name}»" for name in GATE_A_DEFINITION_FIELDS} | {
     "Definizione specifica generica": "«Definizione specifica» generica o ricavata dal nome, non dice che cosa si conta",
     "Registro affermazioni": "registro delle affermazioni assente o con righe incomplete",
+    "Comprensione ulteriore": "manca una comprensione oltre la classifica",
+    "Scheda editoriale": "scheda editoriale assente o incompleta",
 }
 
 
@@ -531,6 +550,11 @@ def _claims(text: str) -> list[list[str]]:
     return claims
 
 
+def _editorial_rows(text: str) -> list[str]:
+    section = text.split("Scheda editoriale:\n", 1)
+    return section[1].splitlines()[:8] if len(section) == 2 else []
+
+
 def _gate_a_core_gaps(text: str) -> list[str]:
     """Ciò che rende FERMO un Gate A v4 qualunque esito dichiari: definizione e registro."""
     gaps = [name for name in GATE_A_DEFINITION_FIELDS if not _filled(_field(text, name))]
@@ -544,15 +568,27 @@ def _gate_a_core_gaps(text: str) -> list[str]:
                 and all(_filled(cell) for cell in row[2:])]
     if not claims or len(complete) != len(claims):
         gaps.append("Registro affermazioni")
+    understanding = _field(text, "Dopo questa pagina, il lettore deve aver capito che…")
+    # Riconosce solo la classifica ovvia; il giudice valuta il merito degli altri casi.
+    only_ranking = re.fullmatch(
+        r"\s*\S+\s+(?:è|sono)\s+(?:prima|primo|ultima|ultimo)\s+e\s+\S+\s+(?:è|sono)\s+(?:prima|primo|ultima|ultimo)\s*[.!]?",
+        understanding, re.I)
+    if not _filled(understanding) or only_ranking:
+        gaps.append("Comprensione ulteriore")
+    rows = _editorial_rows(text)
+    if len(rows) != 8 or any(not row.startswith(name + ":") or not _filled(row.partition(":")[2])
+                              for row, name in zip(rows, EDITORIAL_FIELDS)):
+        gaps.append("Scheda editoriale")
     return gaps
 
 
 def _validate_gate_a(text: str) -> None:
     piece_type = _field(text, "Tipo pezzo").lower()
-    if piece_type not in {"blog", "scheda indicatore"}:
-        raise RedazioneError("gate-a.md malformato: Tipo pezzo deve essere blog o scheda indicatore")
+    if piece_type not in {"blog", "scheda indicatore", "profilo territoriale", "confronto territoriale"}:
+        raise RedazioneError("gate-a.md malformato: Tipo pezzo non valido")
     variant = re.sub(r"^(?:[a-g][.)]?\s+|scheda\s+)", "", _field(text, "Variante").casefold())
-    allowed = BLOG_VARIANTS if piece_type == "blog" else SHEET_VARIANTS
+    allowed = (BLOG_VARIANTS if piece_type == "blog" else SHEET_VARIANTS if piece_type == "scheda indicatore"
+               else ("profilo",) if piece_type == "profilo territoriale" else ("confronto",))
     if not any(variant.startswith(name) for name in allowed):
         raise RedazioneError(f"gate-a.md malformato: Variante non valida per {piece_type}")
     steps = [step.strip() for step in re.split(r"\s*(?:>|→)\s*", _field(text, "Schema del racconto"))]
@@ -562,7 +598,7 @@ def _validate_gate_a(text: str) -> None:
         raise RedazioneError("gate-a.md malformato: Risposta in una frase assente")
     if not _field(text, "Riferimento usato").casefold().startswith(REFERENCES):
         raise RedazioneError("gate-a.md malformato: Riferimento usato non denominato")
-    if not _filled(_field(text, "Figure previste")):
+    if piece_type in {"blog", "scheda indicatore"} and not _filled(_field(text, "Figure previste")):
         raise RedazioneError("gate-a.md malformato: Figure previste assenti")
     if not _filled(_field(text, "Limiti")):
         raise RedazioneError("gate-a.md malformato: Limiti assenti")
@@ -581,18 +617,19 @@ def _validate_gate_a(text: str) -> None:
     if piece_type == "blog" and len(angles) < 2:
         raise RedazioneError("gate-a.md malformato: blog richiede almeno due angoli verificati")
     internal_role = _field(text, "Ruolo indicatori interni").lower()
-    role_ok = ("base" in internal_role and "tassello" in internal_role) if piece_type == "blog" else (
-        "spieg" in internal_role and "contesto" in internal_role)
+    role_ok = (("base" in internal_role and "tassello" in internal_role) if piece_type == "blog" else
+               ("spieg" in internal_role and "contesto" in internal_role) if piece_type == "scheda indicatore" else
+               _filled(internal_role))
     if not role_ok:
         raise RedazioneError("gate-a.md malformato: ruolo indicatori interni non rispetta il tipo pezzo")
 
     lines = text.splitlines()
     heading = next((i for i, line in enumerate(lines)
                     if line.strip().lower() == "| istituzione | data fonte | url aperto | dato o claim | verificata |"), None)
-    if heading is None:
+    if heading is None and piece_type in {"blog", "scheda indicatore"}:
         raise RedazioneError("gate-a.md malformato: tabella fonti esterne assente")
     sources = []
-    for line in lines[heading + 1:]:
+    for line in lines[heading + 1:] if heading is not None else []:
         if not line.startswith("|"):
             if sources:
                 break
@@ -602,7 +639,7 @@ def _validate_gate_a(text: str) -> None:
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
         if len(cells) == 5:
             sources.append(cells)
-    minimum = 3 if piece_type == "blog" else 1
+    minimum = 3 if piece_type == "blog" else 1 if piece_type == "scheda indicatore" else 0
     valid_urls = set()
     source_dates = {}
     for institution, published, url, claim, verified in sources:
@@ -617,7 +654,7 @@ def _validate_gate_a(text: str) -> None:
         source_dates[url] = published
     if len(valid_urls) < minimum:
         raise RedazioneError(f"gate-a.md malformato: {piece_type} richiede almeno {minimum} fonti esterne verificate")
-    if source_url not in valid_urls or source_dates.get(source_url) != source_date:
+    if piece_type in {"blog", "scheda indicatore"} and (source_url not in valid_urls or source_dates.get(source_url) != source_date):
         raise RedazioneError("gate-a.md malformato: data e URL fonte del dato devono corrispondere alla fonte verificata")
     chart = _field(text, "Grafico con dati esterni")
     if piece_type == "blog":

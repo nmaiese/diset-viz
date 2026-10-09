@@ -70,6 +70,16 @@ def brief_v4():
     return """# Brief editoriale: demo
 
 Domanda: i servizi per l'infanzia sono cresciuti dove servivano?
+Dopo questa pagina, il lettore deve aver capito che…: la crescita osservata non dimostra accesso per tutte le famiglie
+Scheda editoriale:
+Domanda: i servizi per l'infanzia sono cresciuti dove servivano?
+Definizione: iscritti di 0-2 anni su residenti della stessa età
+Risultato centrale: la quota cresce nelle regioni osservate
+Confronto: regioni nel 2023, riferimento Italia ufficiale
+Rilevanza: misura l'uso di un servizio per le famiglie
+Spiegazione: evidenze descrittive, cause non identificate
+Limite decisivo: uso non equivale ad accessibilità
+Passo successivo: confrontare costi e liste di attesa
 Definizione specifica: bambini di 0-2 anni iscritti ai servizi comunali e privati convenzionati su 100 residenti della stessa età
 Unità: per 100 bambini
 Denominatore: residenti di 0-2 anni al 1 gennaio
@@ -91,7 +101,7 @@ BRIEF_SENZA_DEFINIZIONE_NE_REGISTRO = "# Brief editoriale: demo\n\nDomanda: i se
 
 
 def gate_a(outcome):
-    text = f"""Contratto: v4
+    text = f"""Contratto: v4.1
 Tipo pezzo: blog
 SHA brief: abc
 Hash brief: abc
@@ -99,6 +109,16 @@ Autore/modello: A
 Giudice/modello: B
 Domanda: i servizi per l'infanzia sono cresciuti dove servivano?
 Risposta in una frase: la quota di bambini presi in carico sale ovunque, ma la distanza fra regioni resta
+Dopo questa pagina, il lettore deve aver capito che…: la crescita osservata non dimostra accesso per tutte le famiglie
+Scheda editoriale:
+Domanda: i servizi per l'infanzia sono cresciuti dove servivano?
+Definizione: iscritti di 0-2 anni su residenti della stessa età
+Risultato centrale: la quota cresce nelle regioni osservate
+Confronto: regioni nel 2023, riferimento Italia ufficiale
+Rilevanza: misura l'uso di un servizio per le famiglie
+Spiegazione: evidenze descrittive, cause non identificate
+Limite decisivo: uso non equivale ad accessibilità
+Passo successivo: confrontare costi e liste di attesa
 Variante: D servizi
 Schema del racconto: domanda delle famiglie > quadro delle misure > offerta > utilizzo > limiti
 Angoli verificati: angolo sul cambiamento osservato; angolo sulle differenze territoriali
@@ -185,7 +205,7 @@ Data: 2026-10-07
 
 
 def gate_b(outcome, vote):
-    return f"""Contratto: v4\nSHA bozza: abc\nHash bozza: abc\nFamiglie autore/revisore: A/B\nT: sì — La quota sale in tutte le regioni, registro: dato, regioni 0-2 anni 2019-2023, 20 regioni su 20, fonte Istat\nR: sì — citazione\nL: sì — citazione\nN: sì — citazione\nControllo anti-invenzione: sì\nBloccanti: 0\nVoto: {vote}\nMotivo: motivo\nRilievi localizzati: nessuno\nGiri: 1\nEsito: {outcome}\n"""
+    return f"""Contratto: v4.1\nTipo pagina: articolo\nSHA bozza: abc\nHash bozza: abc\nFamiglie autore/revisore: A/B\nT: sì — La quota sale in tutte le regioni, registro: dato, regioni 0-2 anni 2019-2023, 20 regioni su 20, fonte Istat\nR: sì — citazione\nL: sì — citazione\nN: sì — citazione\nOltre la tabella: sì — la crescita non dimostra accessibilità; prova: confronto con costi e attese\nFunzione paragrafi: sì — ogni paragrafo risponde alla domanda o sostiene il passaggio; prova: apertura definisce, confronto misura, limite circoscrive\nControllo anti-invenzione: sì\nBloccanti: 0\nVoto: {vote}\nMotivo: motivo\nRilievi localizzati: nessuno\nGiri: 1\nEsito: {outcome}\n"""
 
 
 class RedazioneTests(unittest.TestCase):
@@ -485,6 +505,89 @@ class RedazioneTests(unittest.TestCase):
 
 
 class GateParserTests(unittest.TestCase):
+    def test_gate_a_ferma_frase_assente_o_sola_classifica(self):
+        for value in (None, "X è prima e Y è ultima"):
+            for target in ("brief", "report"):
+                with self.subTest(value=value, target=target):
+                    brief, report = brief_v4(), gate_a("PASSA")
+                    if target == "brief":
+                        brief = self.change_understanding(brief, value)
+                    else:
+                        report = self.change_understanding(report, value)
+                    if value is None and target == "report":
+                        with self.assertRaisesRegex(redazione.RedazioneError, "campi mancanti"):
+                            self.parse(report, brief=brief)
+                    else:
+                        self.assertEqual(self.parse(report, brief=brief), ("FERMO", ""))
+
+    @staticmethod
+    def change_understanding(text, value):
+        lines = text.splitlines()
+        lines = [line for line in lines if not line.startswith("Dopo questa pagina, il lettore deve aver capito che…:")]
+        if value is not None:
+            lines.append("Dopo questa pagina, il lettore deve aver capito che…: " + value)
+        return "\n".join(lines) + "\n"
+
+    def test_gate_a_ferma_ogni_campo_della_scheda_editoriale_assente(self):
+        for name in ("Domanda", "Definizione", "Risultato centrale", "Confronto", "Rilevanza",
+                     "Spiegazione", "Limite decisivo", "Passo successivo"):
+            for target in ("brief", "report"):
+                with self.subTest(name=name, target=target):
+                    brief, report = brief_v4(), gate_a("PASSA")
+                    source = brief if target == "brief" else report
+                    lines = source.splitlines()
+                    start = lines.index("Scheda editoriale:")
+                    idx = next(i for i in range(start + 1, start + 9) if lines[i].startswith(name + ":"))
+                    del lines[idx]
+                    if target == "brief":
+                        brief = "\n".join(lines) + "\n"
+                    else:
+                        report = "\n".join(lines) + "\n"
+                    self.assertEqual(self.parse(report, brief=brief), ("FERMO", ""))
+
+    def test_gate_a_ferma_se_comprensione_o_scheda_divergono_dal_brief(self):
+        changes = (
+            ("la crescita osservata non dimostra accesso per tutte le famiglie", "il confronto da solo non spiega i costi"),
+            ("Passo successivo: confrontare costi e liste di attesa", "Passo successivo: leggere altre classifiche"),
+        )
+        for before, after in changes:
+            with self.subTest(before=before):
+                self.assertEqual(self.parse(gate_a("PASSA").replace(before, after)), ("FERMO", ""))
+
+    def test_gate_b_non_passa_senza_risposta_positiva_e_funzione_paragrafi(self):
+        for prefix in ("Oltre la tabella:", "Funzione paragrafi:"):
+            for replacement in (None, "no — prova insufficiente"):
+                with self.subTest(prefix=prefix, replacement=replacement):
+                    lines = gate_b("PASSA", 4).splitlines()
+                    lines = [line if not line.startswith(prefix) else (prefix + " " + replacement if replacement else "") for line in lines]
+                    with self.assertRaises(redazione.RedazioneError):
+                        self.parse("\n".join(lines) + "\n", "gate_b")
+
+    def test_gate_a_tipi_territoriali_senza_obblighi_blog_o_scheda(self):
+        for kind, variant in (("profilo territoriale", "profilo"), ("confronto territoriale", "confronto")):
+            with self.subTest(kind=kind):
+                report = gate_a("PASSA").replace("Tipo pezzo: blog", "Tipo pezzo: " + kind).replace("Variante: D servizi", "Variante: " + variant)
+                report = report.replace("Angoli verificati: angolo sul cambiamento osservato; angolo sulle differenze territoriali", "Angoli verificati: non applicabile")
+                report = report.replace("Ruolo indicatori interni: base e un tassello del racconto", "Ruolo indicatori interni: misure pertinenti alla domanda")
+                report = report.replace("Grafico con dati esterni: disponibilità servizi; serie 2025; https://istat.example/dato", "Grafico con dati esterni: non richiesto")
+                start = report.index("| istituzione | data fonte | URL aperto | dato o claim | verificata |")
+                end = report.index("Grafico con dati esterni:", start)
+                report = report[:start] + report[end:]
+                report = report.replace("Figure previste: punti per regione con riferimento Italia ufficiale; serie della fascia centrale", "Figure previste: non applicabile")
+                self.assertEqual(self.parse(report), ("PASSA", ""))
+
+    def test_gate_a_v4_precedente_non_vale_anche_con_hash_invariato(self):
+        with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
+            self.parse(gate_a("PASSA").replace("Contratto: v4.1", "Contratto: v4"))
+
+    def test_gate_b_tipi_territoriali_e_v4_precedente(self):
+        for kind in ("profilo territoriale", "confronto territoriale"):
+            with self.subTest(kind=kind):
+                self.assertEqual(self.parse(gate_b("PASSA", 4).replace("Tipo pagina: articolo", "Tipo pagina: " + kind), "gate_b"),
+                                 ("PASSA", "4"))
+        with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
+            self.parse(gate_b("PASSA", 4).replace("Contratto: v4.1", "Contratto: v4"), "gate_b")
+
     def parse(self, text, phase="gate_a", brief=None):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / ("gate-a.md" if phase == "gate_a" else "gate-b.md")
@@ -664,7 +767,7 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, result.message)
             self.assertEqual(launcher.calls, ["gate_a"])
             saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
-            self.assertEqual(saved["gate_a_contract_version"], "v4")
+            self.assertEqual(saved["gate_a_contract_version"], "v4.1")
             self.assertEqual(saved["gate_a_sha"], digest)
 
     def test_autore_non_parte_se_gate_a_v4_dice_passa_senza_definizione(self):
@@ -693,7 +796,7 @@ class GateParserTests(unittest.TestCase):
                 digest = hashlib.sha256(brief.read_bytes()).hexdigest()
                 gate = workdir / "gate-a.md"
                 gate.write_text(gate_a("PASSA").replace("Hash brief: abc", f"Hash brief: {digest}"), encoding="utf-8")
-                state = {"gate_a_sha": digest, "gate_a_contract_version": "v4",
+                state = {"gate_a_sha": digest, "gate_a_contract_version": "v4.1",
                          "phases": {"gate_a": {"status": "riuscita"}}}
                 (workdir / "stato.json").write_text(json.dumps(state), encoding="utf-8")
                 launcher = FakeLauncher(workdir)
@@ -750,11 +853,11 @@ class GateParserTests(unittest.TestCase):
         self.assertEqual(self.parse(gate_b("RISCRIVERE", 3), "gate_b"), ("RISCRIVERE", "3"))
 
     def test_gate_b_senza_contratto_v4_non_vale(self):
-        text = gate_b("PASSA", 4).replace("Contratto: v4\n", "")
+        text = gate_b("PASSA", 4).replace("Contratto: v4.1\n", "")
         with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
             self.parse(text, "gate_b")
         with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
-            self.parse(gate_b("PASSA", 4).replace("Contratto: v4", "Contratto: v2"), "gate_b")
+            self.parse(gate_b("PASSA", 4).replace("Contratto: v4.1", "Contratto: v2"), "gate_b")
 
     def test_run_rifà_gate_b_scritto_prima_della_v4(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -772,7 +875,7 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, result.message)
             self.assertEqual(launcher.calls, ["gate_b"])
             saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
-            self.assertEqual(saved["gate_b_contract_version"], "v4")
+            self.assertEqual(saved["gate_b_contract_version"], "v4.1")
 
     def test_gate_b_accetta_solo_giri_uno_o_due(self):
         # Riproduzione della review 1: PASSA con «Giri: 3» passava benché il massimo sia due.

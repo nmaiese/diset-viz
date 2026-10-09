@@ -3,7 +3,7 @@
 Issue: {issue}
 Worktree: {worktree}
 
-Applica il Gate B v4 di `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v4.md` (§4). Famiglia diversa
+Applica il Gate B v4.1 di `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v4.md` (§4). Famiglia diversa
 dall'autore. Valuta T/R/L/N nei significati v4, con citazioni della bozza e righe del registro del brief;
 i criteri T includono ogni frase forte (cifra, confronto, graduatoria, direzione, causa): per ciascuna cerca
 nel registro del brief affermazione corrispondente, fonte, ambito e periodo, livello di descrizione,
@@ -17,7 +17,8 @@ controlli) e `lavoro/{chiave}/gate-b.md` con ESATTAMENTE questi campi, ognuno al
 
 ```
 # Gate B: {chiave}
-Contratto: v4
+Contratto: v4.1
+Tipo pagina: articolo oppure indicatore oppure profilo territoriale oppure confronto territoriale
 Esito: PASSA oppure RISCRIVERE oppure FERMO   (solo una parola dopo i due punti)
 SHA bozza: <git rev-parse HEAD al momento del giudizio>
 Hash bozza: <sha256sum lavoro/{chiave}/bozza.md, 64 caratteri esadecimali, nient'altro sulla riga>
@@ -26,6 +27,8 @@ T: sì oppure no — <citazione e riga del registro: ogni frase forte ha dato e 
 R: sì oppure no — <citazione: confronti compatibili o differenze dichiarate, contrario onesto>
 L: sì oppure no — <citazione: misura e limite chiari prima del primo grafico>
 N: sì oppure no — <citazione: nessun falso primato, conclusione commisurata alle prove>
+Oltre la tabella: sì oppure no — <risposta a «Questa pagina permette di capire qualcosa che la sola tabella non rende evidente?» e prova>
+Funzione paragrafi: sì oppure no — <funzione dei paragrafi e prova; classifica ripetuta senza funzione è bloccante>
 Controllo anti-invenzione: <persone solo da fonti citate: esito>
 Bloccanti: <numero intero>
 Voto: <1-5> <motivo breve>

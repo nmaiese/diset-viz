@@ -3,7 +3,7 @@
 Issue: {issue}
 Worktree: {worktree}
 
-Scrivi il brief v4 secondo `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v4.md`
+Scrivi il brief secondo il contratto v4.1 in `/mnt/c/Users/Nilo/orca/specs/REDAZIONE-divario-v4.md`
 §2, nell'ordine che la norma fissa: domanda reale e risposta in una frase,
 schema del racconto con la variante scelta, definizione specifica della misura
 (non ricavata dal nome), disponibilità, registro delle affermazioni, limiti,
@@ -20,6 +20,16 @@ gate vale FERMO qualunque cosa decida il giudice. Le altre sezioni restano in
 forma libera.
 
 ```text
+Dopo questa pagina, il lettore deve aver capito che…: <comprensione oltre primi e ultimi>
+Scheda editoriale:
+Domanda: <domanda reale>
+Definizione: <cosa, su chi, denominatore>
+Risultato centrale: <risultato>
+Confronto: <anno, territorio, riferimento>
+Rilevanza: <perché conta>
+Spiegazione: <fonti causali o sole evidenze descrittive>
+Limite decisivo: <conclusione sbagliata da evitare>
+Passo successivo: <altro dato utile>
 Definizione specifica: <che cosa conta la misura, non ricavato dal nome>
 Unità: <unità>
 Denominatore: <numeratore e denominatore>
