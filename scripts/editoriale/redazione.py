@@ -402,7 +402,8 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
         if (outcome == "PASSA") != all_yes:
             raise RedazioneError("gate-a.md incoerente: esito non corrisponde ai cinque criteri")
     else:
-        if _field(text, "Tipo pagina") not in PAGE_TYPES:
+        page_type = _field(text, "Tipo pagina")
+        if page_type not in PAGE_TYPES:
             raise RedazioneError("gate-b.md malformato: Tipo pagina non valido")
         controls = {}
         for control in "TRLN":
@@ -420,18 +421,33 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
             raise RedazioneError(f"gate-b.md incoerente: Giri {rounds.group(1)} nel report, "
                                  f"{expected_rounds} in stato.json")
         all_yes = all(value == "sì" for value in controls.values())
+        editorial_yes = True
         for label in ("Oltre la tabella", "Funzione paragrafi"):
-            evidence = re.search(rf"^{label}:\s*sì\s*[—-]\s*(\S.+)$", text, re.MULTILINE | re.I)
-            if outcome == "PASSA" and (not evidence or len(evidence.group(1).strip()) < 20):
+            evidence = re.search(rf"^{label}:[ \t]*(sì|no)[ \t]*[—-][ \t]*(\S.+)$", text, re.MULTILINE | re.I)
+            if outcome == "PASSA" and (not evidence or evidence.group(1).lower() != "sì"
+                                        or len(evidence.group(2).strip()) < 20):
                 raise RedazioneError(f"gate-b.md incoerente: {label} assente o negativo")
+            editorial_yes &= bool(evidence and evidence.group(1).lower() == "sì")
         vote_value = int(vote.group(1))
-        pass_conditions = all_yes and vote_value >= 4 and int(blockers.group(1)) == 0
+        pass_conditions = all_yes and editorial_yes and vote_value >= 4 and int(blockers.group(1)) == 0
         # Al secondo giro non c'è un terzo: sotto 4 l'esito è FERMO, non RISCRIVERE.
         if ((outcome == "PASSA") != pass_conditions
-                or (outcome in {"RISCRIVERE", "FERMO"} and all_yes and vote_value == 5)
+                or (outcome in {"RISCRIVERE", "FERMO"} and pass_conditions and vote_value == 5)
                 or (outcome == "RISCRIVERE" and rounds.group(1) == "2")):
             raise RedazioneError("gate-b.md incoerente: esito non corrisponde a controlli, voto e bloccanti")
         if outcome == "PASSA":
+            try:
+                gate_a_text = path.with_name("gate-a.md").read_text(encoding="utf-8")
+                approved_type = _field(gate_a_text, "Tipo pezzo").casefold()
+                gate_a_outcome, _ = _parse_gate(path.with_name("gate-a.md"), "gate_a",
+                                                _hash(path.with_name("brief.md")))
+            except (OSError, RedazioneError):
+                return "FERMO", vote.group(1)
+            page_for_piece = {"blog": "articolo", "scheda indicatore": "indicatore",
+                              "profilo territoriale": "profilo territoriale",
+                              "confronto territoriale": "confronto territoriale"}
+            if gate_a_outcome != "PASSA" or page_for_piece.get(approved_type) != page_type:
+                return "FERMO", vote.group(1)
             try:
                 brief_text = path.with_name("brief.md").read_text(encoding="utf-8")
             except OSError:
@@ -448,7 +464,7 @@ def _parse_gate(path: Path, phase: str, expected_hash: str | None = None,
 
 
 def _field(text: str, name: str) -> str:
-    match = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE | re.IGNORECASE)
+    match = re.search(rf"^{re.escape(name)}:[ \t]*([^\r\n]*)$", text, re.MULTILINE | re.IGNORECASE)
     return match.group(1).strip() if match else ""
 
 

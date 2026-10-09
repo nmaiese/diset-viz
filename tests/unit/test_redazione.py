@@ -505,6 +505,20 @@ class RedazioneTests(unittest.TestCase):
 
 
 class GateParserTests(unittest.TestCase):
+    def test_gate_a_ferma_frase_vuota_senza_leggere_scheda_editoriale(self):
+        for target in ("brief", "report"):
+            with self.subTest(target=target):
+                brief, report = brief_v4(), gate_a("PASSA")
+                if target == "brief":
+                    brief = brief.replace("la crescita osservata non dimostra accesso per tutte le famiglie\nScheda editoriale:", "\nScheda editoriale:", 1)
+                    self.assertEqual(redazione._field(brief, "Dopo questa pagina, il lettore deve aver capito che…"), "")
+                else:
+                    report = report.replace("la crescita osservata non dimostra accesso per tutte le famiglie\nScheda editoriale:", "\nScheda editoriale:", 1)
+                    self.assertEqual(redazione._field(report, "Dopo questa pagina, il lettore deve aver capito che…"), "")
+                self.assertEqual(self.parse(report, brief=brief), ("FERMO", ""))
+        self.assertEqual(redazione._field(brief_v4(), "Definizione specifica"),
+                         "bambini di 0-2 anni iscritti ai servizi comunali e privati convenzionati su 100 residenti della stessa età")
+
     def test_gate_a_ferma_frase_assente_o_sola_classifica(self):
         for value in (None, "X è prima e Y è ultima"):
             for target in ("brief", "report"):
@@ -563,6 +577,26 @@ class GateParserTests(unittest.TestCase):
                     with self.assertRaises(redazione.RedazioneError):
                         self.parse("\n".join(lines) + "\n", "gate_b")
 
+    def test_gate_b_controlli_editoriali_negativi_ammettono_ciclo(self):
+        for label in ("Oltre la tabella", "Funzione paragrafi"):
+            for round_number, outcome in ((1, "RISCRIVERE"), (2, "FERMO")):
+                with self.subTest(label=label, round_number=round_number):
+                    text = gate_b(outcome, 4).replace(f"{label}: sì —", f"{label}: no —")
+                    text = text.replace("Giri: 1", f"Giri: {round_number}")
+                    self.assertEqual(self.parse(text, "gate_b"), (outcome, "4"))
+
+    def test_gate_b_tipo_pagina_coerente_con_gate_a(self):
+        text = gate_b("PASSA", 4).replace("Tipo pagina: articolo", "Tipo pagina: indicatore")
+        self.assertEqual(self.parse(text, "gate_b"), ("FERMO", "4"))
+        self.assertEqual(self.parse(gate_b("PASSA", 4), "gate_b", gate_a_type="scheda indicatore"),
+                         ("FERMO", "4"))
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "gate-b.md"
+            path.write_text(gate_b("PASSA", 4).replace("Hash bozza: abc", f"Hash bozza: {hashlib.sha256(b'current').hexdigest()}"), encoding="utf-8")
+            (Path(tmp) / "brief.md").write_text(brief_v4(), encoding="utf-8")
+            self.assertEqual(redazione._parse_gate(path, "gate_b", hashlib.sha256(b"current").hexdigest()),
+                             ("FERMO", "4"))
+
     def test_gate_a_tipi_territoriali_senza_obblighi_blog_o_scheda(self):
         for kind, variant in (("profilo territoriale", "profilo"), ("confronto territoriale", "confronto")):
             with self.subTest(kind=kind):
@@ -583,15 +617,27 @@ class GateParserTests(unittest.TestCase):
     def test_gate_b_tipi_territoriali_e_v4_precedente(self):
         for kind in ("profilo territoriale", "confronto territoriale"):
             with self.subTest(kind=kind):
-                self.assertEqual(self.parse(gate_b("PASSA", 4).replace("Tipo pagina: articolo", "Tipo pagina: " + kind), "gate_b"),
+                self.assertEqual(self.parse(gate_b("PASSA", 4).replace("Tipo pagina: articolo", "Tipo pagina: " + kind), "gate_b", gate_a_type=kind),
                                  ("PASSA", "4"))
         with self.assertRaisesRegex(redazione.RedazioneError, "contratto"):
             self.parse(gate_b("PASSA", 4).replace("Contratto: v4.1", "Contratto: v4"), "gate_b")
 
-    def parse(self, text, phase="gate_a", brief=None):
+    def parse(self, text, phase="gate_a", brief=None, gate_a_type="blog"):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / ("gate-a.md" if phase == "gate_a" else "gate-b.md")
-            (Path(tmp) / "brief.md").write_text(brief_v4() if brief is None else brief, encoding="utf-8")
+            brief_path = Path(tmp) / "brief.md"
+            brief_path.write_text(brief_v4() if brief is None else brief, encoding="utf-8")
+            if phase == "gate_b":
+                gate_a_text = gate_a("PASSA").replace("Hash brief: abc", f"Hash brief: {hashlib.sha256(brief_path.read_bytes()).hexdigest()}")
+                if gate_a_type == "scheda indicatore":
+                    gate_a_text = gate_a_text.replace("Tipo pezzo: blog", "Tipo pezzo: scheda indicatore")
+                    gate_a_text = gate_a_text.replace("Variante: D servizi", "Variante: scheda provinciale")
+                    gate_a_text = gate_a_text.replace("Ruolo indicatori interni: base e un tassello del racconto",
+                                                     "Ruolo indicatori interni: indicatore spiegato e contesto")
+                if gate_a_type in {"profilo territoriale", "confronto territoriale"}:
+                    variant = "profilo" if gate_a_type == "profilo territoriale" else "confronto"
+                    gate_a_text = gate_a_text.replace("Tipo pezzo: blog", f"Tipo pezzo: {gate_a_type}").replace("Variante: D servizi", f"Variante: {variant}")
+                (Path(tmp) / "gate-a.md").write_text(gate_a_text, encoding="utf-8")
             target = "brief" if phase == "gate_a" else "bozza"
             digest = hashlib.sha256(b"current").hexdigest()
             text = text.replace(f"Hash {target}: abc", f"Hash {target}: {digest}")
@@ -770,6 +816,32 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(saved["gate_a_contract_version"], "v4.1")
             self.assertEqual(saved["gate_a_sha"], digest)
 
+    def test_run_invalida_gate_a_v4_passa_sullo_stesso_hash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            brief = workdir / "brief.md"
+            brief.write_text(brief_v4(), encoding="utf-8")
+            digest = hashlib.sha256(brief.read_bytes()).hexdigest()
+            old_gate = workdir / "gate-a.md"
+            old_gate.write_text(gate_a("PASSA").replace("Contratto: v4.1", "Contratto: v4")
+                                .replace("Hash brief: abc", f"Hash brief: {digest}"), encoding="utf-8")
+            (workdir / "stato.json").write_text(json.dumps({
+                "gate_a_sha": digest, "gate_a_contract_version": "v4",
+                "phases": {"gate_a": {"status": "riuscita"}},
+            }), encoding="utf-8")
+            blocked = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, blocked, only="autore")
+            self.assertEqual(result.exit_code, 1)
+            self.assertEqual(blocked.calls, [])
+            launcher = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, launcher, only="gate_a")
+            self.assertEqual(result.exit_code, 0, result.message)
+            self.assertEqual(launcher.calls, ["gate_a"])
+            saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(saved["gate_a_sha"], digest)
+            self.assertEqual(saved["gate_a_contract_version"], "v4.1")
+
     def test_autore_non_parte_se_gate_a_v4_dice_passa_senza_definizione(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, work, cfg = RedazioneTests().setup_case(tmp)
@@ -866,6 +938,8 @@ class GateParserTests(unittest.TestCase):
             draft = workdir / "bozza.md"
             draft.write_text("bozza stabile\n", encoding="utf-8")
             (workdir / "brief.md").write_text(brief_v4(), encoding="utf-8")
+            brief_digest = hashlib.sha256((workdir / "brief.md").read_bytes()).hexdigest()
+            (workdir / "gate-a.md").write_text(gate_a("PASSA").replace("Hash brief: abc", f"Hash brief: {brief_digest}"), encoding="utf-8")
             digest = hashlib.sha256(draft.read_bytes()).hexdigest()
             (workdir / "stato.json").write_text(json.dumps({
                 "key": "demo", "gate_b_sha": digest, "phases": {"gate_b": {"status": "riuscita"}},
@@ -875,6 +949,31 @@ class GateParserTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, result.message)
             self.assertEqual(launcher.calls, ["gate_b"])
             saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(saved["gate_b_contract_version"], "v4.1")
+
+    def test_run_invalida_gate_b_v4_passa_sullo_stesso_hash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root, work, cfg = RedazioneTests().setup_case(tmp)
+            workdir = work / "lavoro/demo"
+            brief = workdir / "brief.md"
+            brief.write_text(brief_v4(), encoding="utf-8")
+            brief_digest = hashlib.sha256(brief.read_bytes()).hexdigest()
+            (workdir / "gate-a.md").write_text(gate_a("PASSA").replace("Hash brief: abc", f"Hash brief: {brief_digest}"), encoding="utf-8")
+            draft = workdir / "bozza.md"
+            draft.write_text("bozza stabile\n", encoding="utf-8")
+            digest = hashlib.sha256(draft.read_bytes()).hexdigest()
+            (workdir / "gate-b.md").write_text(gate_b("PASSA", 4).replace("Contratto: v4.1", "Contratto: v4")
+                                                 .replace("Hash bozza: abc", f"Hash bozza: {digest}"), encoding="utf-8")
+            (workdir / "stato.json").write_text(json.dumps({
+                "gate_b_sha": digest, "gate_b_contract_version": "v4",
+                "phases": {"gate_b": {"status": "riuscita"}},
+            }), encoding="utf-8")
+            launcher = FakeLauncher(workdir)
+            result = RedazioneTests().run_case(root, work, cfg, launcher, only="gate_b")
+            self.assertEqual(result.exit_code, 0, result.message)
+            self.assertEqual(launcher.calls, ["gate_b"])
+            saved = json.loads((workdir / "stato.json").read_text(encoding="utf-8"))
+            self.assertEqual(saved["gate_b_sha"], digest)
             self.assertEqual(saved["gate_b_contract_version"], "v4.1")
 
     def test_gate_b_accetta_solo_giri_uno_o_due(self):
