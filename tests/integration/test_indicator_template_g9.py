@@ -3,6 +3,7 @@
 import csv
 import html
 import io
+import json
 import re
 import unittest
 from unittest.mock import patch
@@ -18,6 +19,70 @@ PROVINCIAL = "/indicatore/partecipazione-elettorale-elezioni-regionali/bes-06POL
 
 
 class IndicatorTemplateG9(unittest.TestCase):
+    def test_initial_focus_rank_excludes_simple_mean_reference(self):
+        client = app.test_client()
+        for path, expected in ((REGIONAL, "su 20 regioni"), (PROVINCIAL, "su 29 province"),
+                               ("/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P", "su 107 province")):
+            with self.subTest(path=path):
+                page = client.get(path).get_data(as_text=True)
+                summary = re.search(r'<p[^>]*data-focus-summary[^>]*>(.*?)</p>', page, re.S)
+                self.assertIsNotNone(summary)
+                self.assertIn(expected, html.unescape(re.sub(r"<[^>]+>", "", summary.group(1))))
+                self.assertIn(f'Media semplice delle {expected.split("su ")[1]}', page)
+
+    def test_definition_and_generated_example_use_verified_source_or_absence(self):
+        client = app.test_client()
+        for path in (PROVINCIAL, "/indicatore/densita-popolazione-a-rischio-frane/ter-531"):
+            with self.subTest(path=path):
+                page = client.get(path).get_data(as_text=True)
+                markdown = client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+                if path == PROVINCIAL:
+                    self.assertIn("Percentuale di persone che hanno partecipato al voto", page)
+                    self.assertIn("Percentuale di persone che hanno partecipato al voto", markdown)
+                    self.assertNotIn("unità ogni 100", page)
+                    self.assertNotIn("unità ogni 100", markdown)
+                    self.assertNotIn(".zip", page)
+                    dataset = json.loads(re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S)[0])
+                    self.assertIn("Percentuale di persone che hanno partecipato al voto",
+                                  dataset["variableMeasured"]["description"])
+                else:
+                    self.assertIn("Non ricostruiamo numeratore o denominatore", page)
+                    self.assertIn("Non ricostruiamo numeratore o denominatore", markdown)
+                    dataset = json.loads(re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S)[0])
+                    self.assertNotIn("description", dataset["variableMeasured"])
+                self.assertNotIn("Ministero dell'Interno, .", page)
+
+    def test_generated_reading_and_apparatus_avoid_merit_and_gap_claims(self):
+        page = app.test_client().get(PROVINCIAL).get_data(as_text=True)
+        self.assertNotIn("posizione migliore", page)
+        self.assertNotIn("situazione migliore", page)
+        self.assertIn("distanza fra gli estremi", page)
+        self.assertNotIn("Il divario è la distanza", page)
+        from pathlib import Path
+        fallback = (Path(app.root_path) / "templates" / "indicator_page.html").read_text(encoding="utf-8")
+        self.assertIn("dal primo al terzo quartile", fallback)
+
+    def test_annual_comparison_discloses_incomplete_overlap(self):
+        page = app.test_client().get(PROVINCIAL).get_data(as_text=True)
+        self.assertIn("campioni differiscono (17 e 29 territori)", page)
+        self.assertIn("non consentono di attribuire la variazione", page)
+
+    def test_js_year_rebuild_uses_only_observed_rows_for_rank(self):
+        source = (app.root_path + "/static/js/v1.js")
+        from pathlib import Path
+        js = Path(source).read_text(encoding="utf-8")
+        self.assertIn('function rows(year)', js)
+        self.assertIn('filter(function (k) { return m[k] !== null; })', js)
+        self.assertIn('var rank = list.findIndex', js)
+        self.assertIn('"ª su " + list.length', js)
+        self.assertIn("distribution.hidden = median === null", js)
+        page = app.test_client().get(PROVINCIAL).get_data(as_text=True)
+        payload = json.loads(re.search(
+            r'<script type="application/json" data-explore-data>(.*?)</script>', page, re.S
+        ).group(1))
+        self.assertEqual(sum(value is not None for value in payload["matrix"]["2015"].values()), 17)
+        self.assertEqual(sum(value is not None for value in payload["matrix"]["2024"].values()), 29)
+
     def test_one_keyboard_navigation_with_valid_targets_on_both_levels(self):
         client = app.test_client()
         for path in (REGIONAL, PROVINCIAL):

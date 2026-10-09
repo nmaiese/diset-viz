@@ -56,6 +56,7 @@ from app.multiscopo_data import all_multiscopo_indicators
 from app.taxonomy import PROVINCE_TWINS, REGIONAL_CANONICALS, REGIONAL_TWINS
 from app.indicator_notes import (
     DISTINCT_FROM,
+    PLAIN_DEFINITION_OVERRIDES,
     annual_change_framing,
     change_unit_label,
     cover_bars,
@@ -258,7 +259,22 @@ def _build_meta(family, raw_id, source_meta):
     definition_prefix = sources.SOURCES[family]["internal_prefix"]
     definition_id = f"{definition_prefix}{raw_id}" if definition_prefix else raw_id
     source_definition = _official_definition(definition_id)
+    explain = dict(explain)
+    if source_definition and source_definition.get("definizione"):
+        explain["plain"] = source_definition["definizione"]
+        explain["example"] = None
+    else:
+        if str(source_meta["id"]) not in PLAIN_DEFINITION_OVERRIDES:
+            explain["plain"] = ("La fonte non fornisce una definizione specifica verificata per questa serie. "
+                                "Non ricostruiamo numeratore o denominatore dai soli nome e unità.")
+        explain["example"] = None
+        explain["scope"] = "La definizione specifica della serie non è stata verificata."
     indexable, motivo_indice = indexability(family, raw_id, source_meta)
+    definition_source = (source_definition.get("fonti") or source_definition.get("dati_di_base") or "") if source_definition else ""
+    definition_source = definition_source.strip(" .,") or None
+    definition_url = source_definition.get("source_url") if source_definition else None
+    if str(definition_url or "").lower().endswith(".zip"):
+        definition_url = None
     return {
         "id": source_meta["id"],
         "raw_id": raw_id,
@@ -299,8 +315,8 @@ def _build_meta(family, raw_id, source_meta):
         "license": sources.family_license(family)[0],
         "archive": source_meta.get("archive"),
         "official_definition": source_definition.get("definizione") if source_definition else None,
-        "definition_source": (source_definition.get("fonti") or source_definition.get("dati_di_base")) if source_definition else None,
-        "definition_url": source_definition.get("source_url") if source_definition else None,
+        "definition_source": definition_source,
+        "definition_url": definition_url,
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
         "indexable": indexable,
@@ -728,6 +744,22 @@ def _build_level(key, series, meta, territory_total, coverage):
 
     stats = indicator_trend_stats(level_payload, year_max, observations, best, worst)
     annual_change = indicator_year_over_year_stats(level_payload, year_max)
+    annual_note = annual_change_framing(
+        meta["name"], meta["direction"], annual_change["average_delta"] if annual_change else None
+    )
+    if annual_change and not annual_change["same_coverage"]:
+        annual_note = (
+            f"I dati disponibili riguardano {annual_change['previous_count']} territori nel "
+            f"{annual_change['previous_year']} e {annual_change['current_count']} nel {annual_change['year']}; "
+            f"la variazione della media è calcolata solo sui {annual_change['common_count']} territori "
+            "presenti in entrambi gli anni."
+        )
+    if not stats.get("same_territory_sample", True):
+        annual_note = (annual_note + " " if annual_note else "") + (
+            f"Nel confronto fra {stats['year_min']} e {stats['year_max']} i campioni differiscono "
+            f"({stats['year_min_count']} e {stats['year_max_count']} territori); le medie non consentono "
+            "di attribuire la variazione al cambiamento degli stessi territori."
+        )
 
     territories = {}
     matrix = {}
@@ -756,10 +788,9 @@ def _build_level(key, series, meta, territory_total, coverage):
         "worst": _territory(worst),
         "stats": _normalize_stats(stats),
         "annual_change": _normalize_annual(annual_change),
-        "annual_note": annual_change_framing(
-            meta["name"], meta["direction"], annual_change["average_delta"] if annual_change else None
-        ),
-        "trend_note": trend_framing(meta["direction"], stats["avg_change_pct"]),
+        "annual_note": annual_note,
+        "trend_note": (trend_framing(meta["direction"], stats["avg_change_pct"])
+                       if stats.get("same_territory_sample", True) else ""),
         "coverage": coverage,
         "territory_total": territory_total or len(territories),
         "territories": [

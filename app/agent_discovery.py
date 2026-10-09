@@ -539,13 +539,19 @@ def _composed_indicator_section(role, meta, level):
                 "con la stessa definizione, e la fotografia va letta come tale."
             )
         paragraphs = []
-        if stats.get("avg_change_abs") is not None:
+        if stats.get("avg_change_abs") is not None and stats.get("same_territory_sample", True):
             unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
             level_adjective = "regionali" if level["key"] == "regione" else "provinciali"
             paragraphs.append(
                 f"Dal {stats['year_min']} al {stats['year_max']} la media semplice dei valori "
                 f"{level_adjective} è passata da {_number(stats['year_min_avg'])} a "
                 f"{_with_unit(_number(stats['year_avg']), unit)}."
+            )
+        elif not stats.get("same_territory_sample", True):
+            paragraphs.append(
+                f"Nel confronto fra {stats['year_min']} e {stats['year_max']} i campioni differiscono "
+                f"({stats['year_min_count']} e {stats['year_max_count']} territori); le medie non consentono "
+                "di attribuire la variazione al cambiamento degli stessi territori."
             )
         annual = level.get("annual_change")
         if annual:

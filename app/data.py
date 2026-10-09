@@ -558,6 +558,11 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
             below_avg_count = sum(1 for v in year_values if v < year_avg)
 
     year_min_avg = year_avg if not has_multi_year else indicator_year_average(payload["series"], year_min)
+    year_min_keys = {row.get("region_key") or row.get("territory_key") for row in payload["series"]
+                     if row["year"] == year_min and row["value"] is not None}
+    year_max_keys = {row.get("region_key") or row.get("territory_key") for row in payload["series"]
+                     if row["year"] == year_max and row["value"] is not None}
+    year_min_count, year_max_count = len(year_min_keys), len(year_max_keys)
 
     avg_change_abs = avg_change_pct = None
     if has_multi_year and year_avg is not None and year_min_avg is not None:
@@ -628,6 +633,9 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         "below_avg_count": below_avg_count,
         "year_min": year_min,
         "year_min_avg": year_min_avg,
+        "year_min_count": year_min_count,
+        "year_max_count": year_max_count,
+        "same_territory_sample": year_min_keys == year_max_keys,
         "year_max": year_max,
         "has_multi_year": has_multi_year,
         "avg_change_abs": avg_change_abs,

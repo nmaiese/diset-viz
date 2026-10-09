@@ -259,7 +259,8 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "profile": level.get("profile_path"),
     }
     all_rank_rows = ranking(level, unit, include_missing=True)
-    rank_rows = [row for row in all_rank_rows if row.get("value") is not None]
+    rank_rows = all_rank_rows
+    observed_rank_rows = [row for row in rank_rows if row.get("value") is not None and not row.get("ref")]
     missing_rows = [row for row in all_rank_rows if row.get("value") is None]
     observed_values = {o["key"]: o["value"] for o in obs}
     folded = fold(rank_rows, plural) if level["key"] in ROW_ID else None
@@ -273,8 +274,8 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
     focus = next((row for row in rank_rows if row.get("key") == (level.get("default_territory") or {}).get("key")), None)
     comparison = (f"Confronto con la media semplice delle {plural}: {with_unit(stats['year_avg'], unit)}."
                   if stats.get("year_avg") is not None else "Media semplice non disponibile.")
-    distinct_values = {row.get("value") for row in rank_rows}
-    focus_rank = (f"{focus['rank']}ª su {len(rank_rows)} {plural}"
+    distinct_values = {row.get("value") for row in observed_rank_rows}
+    focus_rank = (f"{focus['rank']}ª su {len(observed_rank_rows)} {plural}"
                   if focus and len(distinct_values) > 1 else "Rango non informativo" if focus else "dato non disponibile")
     focus_summary = (f"{focus['name']}: {with_unit(focus['value'], unit)} nel {year}. {comparison} {focus_rank}."
                      if focus else f"{comparison} Rango non disponibile nel {year}.")
@@ -377,7 +378,7 @@ def derive(ctx: dict) -> dict:
     series_claim = None
     what = None
     change_abs = stats.get("avg_change_abs")
-    if stats.get("has_multi_year") and meta.get("percentage_like") and change_abs is not None:
+    if stats.get("has_multi_year") and stats.get("same_territory_sample", True) and meta.get("percentage_like") and change_abs is not None:
         # Una percentuale cambia in punti, come nella prosa della stessa scheda
         # ("1,48 punti percentuali in meno") e come la distanza fra prima e
         # ultima qui sotto. La variazione relativa diceva "scesa dell'8,2%"
@@ -396,7 +397,7 @@ def derive(ctx: dict) -> dict:
             what = "rimasta la stessa"
         else:
             what = f"{'cresciuta' if change_abs > 0 else 'scesa'} di {with_unit(abs(change_abs), change_unit, decimals)}"
-    elif stats.get("has_multi_year") and stats.get("avg_change_pct") is not None:
+    elif stats.get("has_multi_year") and stats.get("same_territory_sample", True) and stats.get("avg_change_pct") is not None:
         r = 1 + stats["avg_change_pct"] / 100
         if r >= 3:
             what = "più che triplicata"

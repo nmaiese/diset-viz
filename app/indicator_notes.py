@@ -1243,16 +1243,16 @@ def _reading_text(name, theme, unit, direction=None):
     if "standardizzato" in unit.lower() or "punteggio" in unit.lower():
         return "Il valore è un punteggio confrontabile tra territori. La distanza tra regioni conta più del numero preso da solo."
     if direction == "lower_better":
-        return "Per questo indicatore il valore più basso occupa la posizione migliore. La graduatoria è quindi ordinata dal dato minore al maggiore."
+        return "La graduatoria è ordinata dal valore più basso al più alto."
     if direction == "higher_better":
-        return "Per questo indicatore il valore più alto occupa la posizione migliore. La graduatoria è quindi ordinata dal dato maggiore al minore."
+        return "La graduatoria è ordinata dal valore più alto al più basso."
     if direction == "higher_worse":
-        return "Un valore alto segnala maggiore pressione o consumo. La graduatoria assegna quindi la posizione migliore al valore più basso."
+        return "Un valore alto segnala maggiore pressione o consumo. La graduatoria è ordinata dal valore più basso al più alto."
     if theme in ("Turismo", "Trasporti e mobilità", "Cultura"):
         return "Valori più alti indicano maggiore intensità del fenomeno. Possono essere un punto di forza, ma anche una pressione da gestire."
     if theme in ("Energia", "Competitività", "Dinamiche settoriali"):
         return "Valori più alti indicano maggiore intensità economica o produttiva. Il giudizio dipende dal tipo di risorsa usata e dal risultato che produce."
-    return "Non esiste una direzione univoca: un valore alto descrive una maggiore intensità del fenomeno, non una regione automaticamente migliore o peggiore."
+    return "Non esiste una direzione univoca: un valore alto descrive una maggiore intensità del fenomeno. La graduatoria ordina i valori dal più alto al più basso."
 
 
 def trend_framing(direction, avg_change_pct):

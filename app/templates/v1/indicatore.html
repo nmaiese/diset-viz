@@ -64,7 +64,7 @@ addEventListener("pagereveal", function (e) {
   "publisher": {{ publisher_jsonld | safe }},{% if dataset_updated %}
   "dateModified": {{ dataset_updated | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
-  "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
+  "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, distanza fra gli estremi e classifica senza riponderazioni",
   {# `PropertyValue` invece della stringa nuda: cosi' la grandezza porta con se'
      l'unita' e l'intervallo osservato, che e' quello che un motore deve sapere
      per riusare il dato senza aprire la pagina. La stringa diceva solo il nome,
@@ -77,12 +77,12 @@ addEventListener("pagereveal", function (e) {
     "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
     "minValue": {{ estremi.basso.value }},
     "maxValue": {{ estremi.alto.value }},{% endif %}
-    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }},
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.official_definition %},
+    "description": {{ meta.official_definition | tojson }}{% endif %}
     {# "Che cosa misura questa serie" secondo l'istituto: `description` della
        variabile e' lo slot giusto, e il testo e' lo stesso che la pagina
        mostra nell'apparato sotto "Definizione della fonte". Nessuna
        dichiarazione che la pagina visibile non sostenga. #}
-    "description": {{ (meta.official_definition or 'La fonte non fornisce una definizione specifica verificata per questa serie. Non ricostruiamo numeratore o denominatore dai soli nome e unità.') | tojson }}
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
@@ -136,7 +136,7 @@ addEventListener("pagereveal", function (e) {
   {% if d.strip.svg %}
   <figure class="lead-figure" aria-labelledby="divario-t" data-family="{{ d.family | tojson | forceescape }}">
     <figcaption class="lead-figure__head">
-      <span class="lead-figure__title" id="divario-t">Il divario nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
+      <span class="lead-figure__title" id="divario-t">La distanza fra gli estremi nel {{ year }}: le {{ n }} {{ level.plural }} sulla stessa scala</span>
       {{ ui.arealegend(d.strip.legend) }}
       {#- La striscia che diventa Italia: gli stessi venti punti si ricompongono
           in una griglia a forma d'Italia, una casella per regione, e prendono
@@ -247,7 +247,7 @@ addEventListener("pagereveal", function (e) {
         <figure class="module">
           <figcaption class="module__head">
             {% if d.series_claim %}<h3 class="h-sub">{{ d.series_claim }}</h3>{% endif %}
-            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è il divario. Tratteggiata la {{ ui.term('media-semplice') }}. Scegli una {{ level.singular }} qui sopra per vederla.</p>
+            <p class="subline">{{ meta.name }}{% if d.unit_note %}, {{ d.unit_note }}{% endif %}, dal {{ d.series.first }} al {{ d.series.last }}. La fascia va dal valore più alto al più basso di ogni anno: la sua larghezza è la distanza fra gli estremi. Tratteggiata la {{ ui.term('media-semplice') }}. Scegli una {{ level.singular }} qui sopra per vederla.</p>
           </figcaption>
           <div class="chart" data-series>{{ d.series.svg | safe }}</div>
           {% if d.series_note %}<p class="chart-note">{{ d.series_note }}</p>{% endif %}
@@ -344,7 +344,7 @@ addEventListener("pagereveal", function (e) {
               indicator_page.html, parola per parola (qui "Come e' calcolato"
               in piu' porta il link alla metodologia): le prove di trasparenza
               le leggono, e sono dichiarazioni, non testo da ridisegnare. -#}
-          <div><dt>Come è calcolato</dt><dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Il divario è la distanza fra il valore più alto e il più basso, e la classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
+          <div><dt>Come è calcolato</dt><dd>La media mostrata in questa pagina è la <a href="/metodologia#media-semplice">media semplice</a> dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}: ogni {{ level.singular }} pesa uguale, qualunque sia la popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. La distanza fra gli estremi è la differenza fra il valore più alto e il più basso osservati fra i {{ level.observations | length }} {{ level.plural }} con dato, espressa in {{ meta.value_unit or meta.unit or 'unità della fonte' }}. La classifica segue il <a href="/metodologia#verso">verso</a> dell'indicatore. I valori sono quelli della fonte, senza riponderazioni. <a href="/metodologia">Metodologia</a></dd></div>
           <div><dt>Come nasce questa pagina</dt><dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi della pagina sono ricalcolate dal codice a ogni caricamento.
             {%- if page_article.authored_count or page_article.lead %} Il racconto lo legge e lo approva una persona prima che vada online.
             {%- else %} Il commento ai numeri è costruito sui dati della fonte e si aggiorna con loro, quindi non può invecchiare rispetto ai dati.{% endif %}
