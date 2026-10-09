@@ -227,8 +227,14 @@ def level_panel(meta: dict, level: dict, base: str) -> dict | None:
     if table_claim == lead_claim:
         table_claim = None
 
+    # La fascia dice la differenza fra gli estremi, in unita' leggibili: mai un
+    # "N volte", che e' una conclusione e non un dato.
+    gap = high["value"] - low["value"]
+    gap_text = (f"{numfmt.text(gap, decimals)} punti percentuali" if numfmt.phrase_unit(unit) == "%"
+                else with_unit(gap, unit, decimals))
+    gap_label = f"differenza {gap_text}"
     strip = charts.divario_strip([{**o, "area": areas.get(o["key"])} for o in observations],
-                                 mean, unit, stats.get("gap_ratio"), xl_width=HOME_STRIP_WIDTH)
+                                 mean, unit, None, gap_label=gap_label, xl_width=HOME_STRIP_WIDTH)
     shapes = maps.paths(key)
     callouts = charts.map_callouts(shapes, [(high["key"], high["name"], with_unit(high["value"], unit, decimals)),
                                             (low["key"], low["name"], with_unit(low["value"], unit, decimals))])
@@ -330,8 +336,9 @@ def feature(pick: dict | None) -> dict | None:
         return None
     second = level_panel(meta, pick["other"], base) if pick.get("other") else None
     direction = meta.get("direction")
-    verso = {"higher_better": "Meglio se alto", "lower_better": "Meglio se basso",
-             "higher_worse": "Meglio se basso"}.get(direction, "Senza un verso")
+    # Descrive solo come e' ordinata la classifica, mai quale valore e' meglio.
+    verso = ("Ordinata dal valore più basso" if direction in LOWER_BETTER
+             else "Ordinata dal valore più alto" if direction in ("higher_better",) else "")
     shown = {first["key"]} | ({second["key"]} if second else set())
     available = pick.get("available") or [first["key"]]
     elsewhere = next((k for k in available if k not in shown), None)
