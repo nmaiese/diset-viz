@@ -38,10 +38,12 @@ _RATIO = re.compile(r"\b(?:\d+(?:,\d+)?|due|tre|quattro|cinque|sei|sette|otto|no
 _COMPARISON = re.compile(r"\b(?:estremi|divario|rapporto|rispetto|confronto|quello|quella|tra|fra)\b", re.I)
 _AGE_RANGE = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*(?:[-‐‑‒–—−]|\b(?:a|al|fino\s+a)\b)\s*(?P<hi>\d{1,2})\s*(?:anni?|aa\.?)(?!\w)", re.I)
 _AGE_OPEN = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*anni?\s*(?:e\s+)?(?:pi[uù]|oltre|o\s+pi[uù])\b", re.I)
-_AGE_DIRECT = re.compile(r"\b(?:confront\w*|rispetto|contro|superior\w*|inferior\w*|maggiore|minore|pi[uù]\s+(?:che|alt\w*)|meno\s+(?:che|alt\w*))\b", re.I)
+_AGE_DIRECT = re.compile(r"\b(?:confront\w*|rispetto|contro|superior\w*|supera\w*|inferior\w*|maggiore|minore|pi[uù]\s+(?:che|alt\w*)|meno\s+(?:che|alt\w*))\b", re.I)
 _AGE_DIRECT_PREFIX = re.compile(r"\b(?:confronto|divario|differenza)\s+(?:tra|fra)\b", re.I)
 _AGE_NONCOMPARABLE = re.compile(r"\bnon\s+(?:(?:si|è|sono)\s+)?confront\w*", re.I)
 _AGE_DEFINITION = re.compile(r"\b(?:fasce|classi|gruppi)\s+(?:d['’ ]et[aà]|di\s+et[aà])\s+(?:sono|:|includono|comprendono|considerate|definite)\b|\b(?:le\s+)?(?:fasce|classi)\s*(?:sono|:)", re.I)
+_AGE_VALUE = re.compile(r"\b(?:è|era|vale|pari\s+a)\s+(?:al?\s+)?\d+(?:[,.]\d+)?\s*%?\b", re.I)
+_AGE_GAP = re.compile(r"\b(?:distanza|divario|differenza)\b.{0,40}?\b\d+(?:[,.]\d+)?\s+punti?\b", re.I)
 
 
 def decimal_value(value):
@@ -198,8 +200,11 @@ def g3_page(lines):
                 continue
             for left, right in zip(ranges, ranges[1:]):
                 between = _AGE_NONCOMPARABLE.sub("", words[left[2]:right[1]])
+                values_compared = (_AGE_VALUE.search(words[left[2]:right[1]]) and
+                                   _AGE_VALUE.search(words[right[2]:]))
                 if left[0] != right[0] and (_AGE_DIRECT.search(between) or
-                                                _AGE_DIRECT_PREFIX.search(words[:left[1]])):
+                                               _AGE_DIRECT_PREFIX.search(words[:left[1]]) or
+                                               _AGE_GAP.search(words) or values_compared):
                     direct = True
                     break
         if direct:

@@ -67,8 +67,22 @@ class G3Test(unittest.TestCase):
         findings = guardie_v4.g3_page([(9, "Il tasso 15-34 anni è superiore a quello dei 35-64 anni, mentre le fasce non coincidono.")])
         self.assertTrue(any(severity == "errore" and line == 9 for severity, line, *_ in findings))
 
+    def test_confronti_numerici_bloccano_anche_con_cautela(self):
+        examples = [
+            "Il tasso 15-34 anni, non confrontabile, supera quello dei 35-64 anni.",
+            "Tra 15-34 anni e 35-64 anni la distanza è di 3 punti.",
+            "Il 15-34 anni è 5%, il 35-64 anni è 8%: un divario di 3 punti.",
+            "Il tasso 15-34 anni è 5 mentre il 35-64 anni è 8.",
+        ]
+        for line in examples:
+            with self.subTest(line=line):
+                findings = guardie_v4.g3_page([(12, line)])
+                self.assertTrue(any(severity == "errore" and line_no == 12
+                                    for severity, line_no, *_ in findings), findings)
+
     def test_cautela_su_fasce_diverse_non_blocca(self):
         examples = [
+            "La fonte usa 20-64 anni mentre questa pagina usa 15-64 anni: sono misure diverse.",
             "Eurostat usa la fascia 20-64 anni mentre questa pagina usa 15-64 anni. Sono due misure diverse.",
             "Eurostat pubblica fasce di età diverse, da 25 a 74 anni oppure da 25 a 34 anni, e non si confrontano senza attenzione.",
             "Istat misura la fascia 20-64 anni. Il comunicato però misura la fascia 15-64 anni, un conteggio diverso.",
@@ -77,7 +91,7 @@ class G3Test(unittest.TestCase):
         ]
         for line in examples:
             with self.subTest(line=line):
-                self.assertFalse(any(severity == "errore" for severity, *_ in guardie_v4.g3_page([(7, line)])))
+                self.assertEqual([severity for severity, *_ in guardie_v4.g3_page([(7, line)])], ["avviso"])
 
     def test_lista_definitoria_non_e_confronto_ne_avviso(self):
         self.assertEqual(guardie_v4.g3_page([(3, "Le fasce d'età sono: 15-34 anni e 35-64 anni.")]), [])
