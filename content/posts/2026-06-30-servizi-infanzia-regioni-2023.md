@@ -49,20 +49,20 @@ tags:
   - Dati 2023
 ---
 
-I servizi per la prima infanzia, ovvero asili nido e servizi integrativi per i bambini sotto i tre anni, sono uno strumento essenziale per conciliare lavoro e cura familiare. Il principale indicatore per misurare la capacità del sistema è il rapporto tra i posti autorizzati al funzionamento e i bambini residenti di 0-2 anni compiuti. In Italia questa offerta di posti è distribuita in modo molto disuguale.
+Sapere quanti posti ha il nido del proprio territorio non dice se un bambino ci entrerà. Il numero più citato, i posti autorizzati ogni 100 bambini residenti di 0-2 anni, misura l'offerta del sistema. Non misura chi riesce a entrare, a che retta e con quali orari.
 
-Quando si analizzano i nidi occorre distinguere tra grandezze diverse: i posti autorizzati (l'offerta fisica del sistema), i bambini frequentanti (la partecipazione, pari al 34,5% nel 2023/2024 inclusi anticipatari e ludoteche) e gli utenti dell'offerta comunale (la presa in carico pubblica, al 18,5% nazionale nel 2023).
-
-Secondo i dati Istat (comunicato del 3 febbraio 2026 su rapporto PDF datato 2 febbraio 2026), nell'anno educativo 2023/2024 in Italia ci sono **31,6 posti autorizzati ogni 100 bambini residenti di 0-2 anni**.
+Secondo i dati Istat (comunicato del 3 febbraio 2026, su rapporto PDF datato 2 febbraio 2026), nell'anno educativo 2023/2024 in Italia ci sono **31,6 posti autorizzati ogni 100 bambini residenti di 0-2 anni**.
 {: .data-callout}
 
-Questo numero include nidi, sezioni primavera e altri servizi integrativi, sia pubblici che privati. Si tratta di un rapporto di posti, non della quota dei bambini iscritti né di una probabilità di ammissione per la singola famiglia.
+Il conto comprende nidi, sezioni primavera, servizi domiciliari e integrativi, pubblici e privati. È un rapporto di posti. Non è la quota dei bambini iscritti e non è la probabilità di ammissione di una famiglia.
 
-## I posti: differenze per area e tipo di comune
+Per questo vanno tenute separate tre grandezze. I posti autorizzati sono l'offerta. I bambini che frequentano, il 34,5% dei residenti di 0-2 anni nel 2023/2024 contando anche anticipatari e ludoteche, sono la partecipazione. Gli utenti dell'offerta comunale, il 18,5% dei residenti sotto i tre anni nel 2023, sono la presa in carico pubblica. Numeratori, universi e anni sono diversi, quindi i tre numeri non si confrontano fra loro.
 
-La distribuzione territoriale dei posti è diseguale. Il Centro ha un'offerta di 40,4 posti ogni 100 bambini residenti di 0-2 anni, il Nord-est di 39,1 posti ogni 100 bambini residenti di 0-2 anni e il Nord-ovest di 36,6 posti ogni 100 bambini residenti di 0-2 anni. Al Sud l'offerta si ferma a 19,0 posti ogni 100 bambini residenti di 0-2 anni, nelle Isole a 19,5 posti ogni 100 bambini residenti di 0-2 anni.
+## I posti: dove sono e dove mancano
 
-Oltre al classico divario tra Centro-Nord e Mezzogiorno, esiste una differenza interna legata al tipo di comune. Nei capoluoghi, in media, si contano 39,8 posti ogni 100 bambini residenti di 0-2 anni, mentre negli altri comuni il numero scende a 28,2 posti. 
+Il Centro ha 40,4 posti ogni 100 bambini residenti di 0-2 anni, il Nord-est 39,1 posti e il Nord-ovest 36,6 posti. Al Sud i posti sono 19,0 e nelle Isole 19,5. Il Centro offre più del doppio dei posti del Sud.
+
+C'è poi una differenza dentro ogni area. Nei capoluoghi i posti sono 39,8 ogni 100 bambini, negli altri comuni 28,2, cioè 11,6 posti in meno. Al Nord e al Centro anche i comuni non capoluogo superano in media i 33 posti, il livello che la legge chiede di garantire entro il 2027. Al Sud nemmeno i capoluoghi ci si avvicinano, con 23,0.
 
 ### Nei capoluoghi l'offerta è spesso maggiore, ma resta il divario Nord-Sud
 *Posti autorizzati per 100 bambini residenti di 0-2 anni nei capoluoghi e negli altri comuni. Anno 2023/2024.*
@@ -83,19 +83,23 @@ Oltre al classico divario tra Centro-Nord e Mezzogiorno, esiste una differenza i
 
 *Nota: il dato "Italia ufficiale" di 31,6 è il rapporto complessivo nazionale calcolato da Istat, non la media delle righe.*
 
-Tra l'anno educativo precedente (2022/2023) e il 2023/2024, il numero assoluto di posti autorizzati (quasi 378.500) è aumentato del 3,4%. Tuttavia, Istat segnala che la crescita del rapporto posti/residenti è dovuta in parte al continuo calo del denominatore, cioè la diminuzione dei bambini. Il numero assoluto dei residenti 0-2 non è riportato nel rapporto usato qui. Con questi numeri, l'Italia si avvicina al Livello Essenziale delle Prestazioni (LEP) di 33 posti ogni 100 bambini residenti di 0-2 anni fissato per il 2027. Questo LEP è una garanzia da verificare al livello del Comune o del bacino territoriale. Il 31,6 nazionale del 2023/2024 è solo un confronto di scala e non prova la conformità locale.
+I posti autorizzati sono quasi 378.500, il 3,4% in più dell'anno educativo precedente. Ma il rapporto sale anche perché i bambini diminuiscono, e lo segnala la stessa Istat. Il rapporto usato qui non riporta il numero assoluto dei residenti di 0-2 anni, quindi non si può dire quanta parte della crescita venga dai posti in più e quanta dai bambini in meno.
 
-## Partecipazione e barriere
+Il 33 è il Livello essenziale delle prestazioni (LEP), da garantire a livello di comune o di bacino territoriale. I 31,6 posti nazionali gli si avvicinano, ma è solo un confronto di scala e non prova che un singolo comune sia in regola.
 
-Avere un posto sul territorio non significa automaticamente potervi accedere. Il target fissato dal [Consiglio dell'Unione europea](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=oj%3AJOC_2022_484_R_0001) (Raccomandazione dell'8 dicembre 2022) per il 2030 prevede la **partecipazione** (ovvero la frequenza effettiva) di almeno il 45% dei bambini sotto i tre anni. Si tratta di un obiettivo di partecipazione formale, non di una soglia minima di posti autorizzati.
+## Dal posto autorizzato alla frequenza
 
-Le barriere generali all'accesso ai servizi per l'infanzia, come documentato dalla [Commissione europea](https://education.ec.europa.eu/resources-and-tools/data-and-analysis-on-education-and-skills/key-trends-in-education/early-education-for-under-3s) (dati 2024), comprendono la carenza di posti, ma anche costi elevati e procedure di ammissione complesse.
+L'obiettivo europeo riguarda la frequenza, non i posti. La raccomandazione del [Consiglio dell'Unione europea](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=oj%3AJOC_2022_484_R_0001) dell'8 dicembre 2022 chiede che entro il 2030 almeno il 45% dei bambini sotto i tre anni partecipi a un servizio educativo.
 
-Nel contesto italiano, tra i nidi e le sezioni primavera campionati che dichiarano già bambini in lista d’attesa, la quota di strutture con lista pari ad almeno il 25% delle richieste è 28,9% nel Mezzogiorno, 19,9% al Centro e 21,3% al Nord. Questo calcolo si basa sulla [figura 3,6 a pagina 21 del rapporto dettagliato Istat/Ca' Foscari del 16 maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/report_infanzia_2023_2024.pdf#page=21) (sommando le classi 25-50% e oltre 50%). Questi valori non rappresentano le percentuali di famiglie, bambini, domande o di tutti i servizi, ma solo delle strutture campionate con lista d'attesa.
+Fra le barriere all'accesso, la [Commissione europea](https://education.ec.europa.eu/resources-and-tools/data-and-analysis-on-education-and-skills/key-trends-in-education/early-education-for-under-3s) (dati 2024) indica la carenza di posti, i costi elevati e le procedure di ammissione complesse. Sono barriere dei Paesi europei nel loro insieme, non una prova su un comune italiano.
 
-## Le barriere documentate: le domande non accolte
+Per l'Italia c'è un dato più mirato, con una base stretta. Si parte dai nidi e dalle sezioni primavera del campione che hanno già bambini in lista d'attesa. Fra questi, la quota con una lista pari ad almeno il 25% delle richieste è il 28,9% nel Mezzogiorno, il 19,9% al Centro e il 21,3% al Nord.
 
-I dati aggregati non bastano a prevedere se una singola famiglia troverà posto. L'indagine campionaria misura anche la quota di strutture che non ha accolto tutte le domande.
+Sono somme delle classi dal 25% al 50% e oltre il 50% nella [figura 3,6, a pagina 21 del rapporto Istat e Ca' Foscari del 16 maggio 2025](https://www.istat.it/wp-content/uploads/2025/05/report_infanzia_2023_2024.pdf#page=25). Non sono quote di famiglie, bambini o domande, né di tutti i servizi.
+
+## Le strutture che non accolgono tutte le richieste
+
+L'indagine campionaria Istat, su circa 3.000 servizi, misura anche la quota di strutture che non hanno accolto tutte le richieste per mancanza di posti.
 
 ### Nel campione, quasi sei servizi su dieci non accolgono tutte le domande
 *Quota di strutture che ha dichiarato di non aver accolto tutte le richieste per mancanza di posti disponibili.*
@@ -108,17 +112,15 @@ I dati aggregati non bastano a prevedere se una singola famiglia troverà posto.
 | 2023/2024 | 59,5% |
 | 2021/2022 | 49,1% |
 
-Secondo l'indagine campionaria Istat (circa 3.000 servizi), nell'anno educativo 2023/2024 il 59,5% dei nidi e sezioni primavera non ha accolto tutte le domande per mancanza di posti disponibili. Nell'edizione 2021/2022 il dato si attestava al 49,1%, sebbene il confronto temporale tra rilevazioni campionarie richieda cautela. 
+Nell'anno educativo 2023/2024 sono il 59,5% dei nidi e delle sezioni primavera, contro il 49,1% del 2021/2022. Il confronto fra due rilevazioni campionarie richiede cautela.
 
-Attenzione, però: questo 59,5% indica la quota di strutture campionate che non hanno accolto tutte le domande, non la quota di famiglie respinte. Non è possibile tradurre questo dato nel numero esatto di bambini rimasti in lista d'attesa.
+Questo 59,5% conta strutture, non famiglie respinte, e non si traduce nel numero di bambini rimasti in lista d'attesa. Non va sommato né confuso con le quote del paragrafo precedente, che riguardano solo i servizi con lista d'attesa.
 
-## Che cosa non sappiamo localmente
+## Che cosa si può sapere solo dal proprio comune
 
-La distribuzione territoriale dei posti è solo il primo livello di analisi. Il rapporto di 31,6 posti per 100 bambini residenti di 0-2 anni non misura la probabilità individuale di ammissione al nido, né dice nulla su qualità, orari di apertura e rette mensili.
+Il rapporto di 31,6 posti non dice nulla su qualità, orari di apertura e rette mensili. Una famiglia cerca disponibilità effettiva, tempi e costi sostenibili. I dati aggregati non dicono se una singola domanda andrà a buon fine.
 
-Una famiglia cerca disponibilità effettiva, tempi e costi sostenibili. I dati aggregati documentano la carenza di posti, ma non provano le cause individuali dell'accesso. Per avere un quadro chiaro delle proprie possibilità, occorre verificare i posti, la domanda locale e i criteri d'accesso nel proprio comune.
-
-Puoi esplorare l'indicatore separato sugli utenti dell'offerta comunale per l'anno 2023 nella [scheda dell'indicatore](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414).
+Per capire le proprie possibilità bisogna chiedere al comune quanti posti ci sono, quante domande arrivano, come è formata la graduatoria, quanto costa la retta e quali orari offre il servizio. Il dato nazionale non sostituisce queste risposte. L'indicatore sugli utenti dell'offerta comunale nel 2023 è nella [scheda dedicata](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414).
 
 ## Fonti
 
