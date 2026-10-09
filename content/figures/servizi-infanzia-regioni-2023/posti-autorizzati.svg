@@ -1,5 +1,5 @@
-<svg class="fig" viewBox="0 0 680 500" role="img" aria-labelledby="fig-t fig-d" xmlns="http://www.w3.org/2000/svg">
-<title id="fig-t">Nei capoluoghi l'offerta supera il 45% (tranne al Sud), nei comuni minori è molto più bassa</title>
+<svg class="fig" viewBox="0 0 720 520" role="img" aria-labelledby="fig-t fig-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-t">Nei capoluoghi l'offerta è maggiore, ma il divario col Mezzogiorno rimane ampio</title>
 <desc id="fig-d">Grafico a barre: posti nei nidi ogni 100 bambini. Centro: 49,9 capoluoghi, 33,4 altri. Nord-est: 47,3 e 36,1. Nord-ovest: 44,8 e 33,5. Italia: 39,8 e 28,2. Isole: 20,7 e 19,0. Sud: 23,0 e 17,9.</desc>
 <text class="fig__title" x="0" y="20">Nei capoluoghi l'offerta è molto superiore, ma il Sud resta indietro</text>
 <text class="fig__subtitle" x="0" y="40">Posti autorizzati per 100 bambini residenti 0-2 anni nei capoluoghi e negli altri comuni. Anno 2023/2024.</text>
@@ -41,7 +41,8 @@
 <text class="fig__pt-label" x="138" y="410" fill="#333" font-size="12">Capoluoghi</text>
 <rect x="220" y="400" width="12" height="12" fill="#666" opacity="0.7" />
 <text class="fig__pt-label" x="238" y="410" fill="#333" font-size="12">Altri comuni</text>
-<text class="fig__meta" x="0" y="440"><tspan font-weight="bold">Unità:</tspan> posti autorizzati ogni 100 residenti di 0, 1 e 2 anni compiuti al 31-12-2023. <tspan font-weight="bold">Campione:</tspan> Italia, totale strutture. <tspan font-weight="bold">Stato:</tspan> definitivo.</text>
-<text class="fig__meta" x="0" y="456"><tspan font-weight="bold">Fonte:</tspan> Istat, "Offerta di nidi e servizi integrativi", comunicato 2026-02-03. <tspan font-weight="bold">Elaborazione:</tspan> Divario Italia.</text>
-<text class="fig__meta" x="0" y="472"><tspan font-weight="bold">Nota:</tspan> Include nidi, sezioni primavera, servizi domiciliari e integrativi. Non rappresenta i bambini effettivamente iscritti.</text>
+<text class="fig__meta" x="0" y="440"><tspan font-weight="bold">Unità:</tspan> posti autorizzati ogni 100 residenti di 0, 1 e 2 anni compiuti al 31-12-2023.</text>
+<text class="fig__meta" x="0" y="456"><tspan font-weight="bold">Campione:</tspan> Italia, totale strutture. <tspan font-weight="bold">Stato:</tspan> definitivo.</text>
+<text class="fig__meta" x="0" y="472"><tspan font-weight="bold">Fonte:</tspan> Istat, "Offerta di nidi e servizi integrativi", comunicato 2026-02-03. <tspan font-weight="bold">Elaborazione:</tspan> Divario Italia.</text>
+<text class="fig__meta" x="0" y="488"><tspan font-weight="bold">Nota:</tspan> Include nidi, sezioni primavera, servizi domiciliari e integrativi. Non rappresenta i bambini effettivamente iscritti.</text>
 </svg>
