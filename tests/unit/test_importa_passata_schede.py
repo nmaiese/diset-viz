@@ -1,8 +1,9 @@
 """L'importazione di un blocco della passata schede nello store degli articoli.
 
-Due schede reali fanno da fixture, copiate in una root temporanea: la
-`multiscopo:MULTI_REDD_MEDIO` (lead, quadro, limiti, nessuna definizione) e la
-`920` (le quattro sezioni, definizione compresa). Lo store committato non si
+Due schede reali fanno da fixture, copiate in una root temporanea e riportate
+alla forma di prima della passata (le schede importate hanno già la definizione
+nuova): la `multiscopo:MULTI_REDD_MEDIO` senza definizione (quadro, limiti) e la
+`920` con le quattro sezioni, definizione compresa. Lo store committato non si
 tocca mai.
 """
 
@@ -20,13 +21,19 @@ REAL_KEYS = ("multiscopo:MULTI_REDD_MEDIO", "920")
 PATH_REDD = "/indicatore/reddito-netto-medio-annuale-delle-famiglie/ims-MULTI_REDD_MEDIO"
 PATH_ETA = "/indicatore/eta-media-della-popolazione/ter-920"
 
-LEAD = "Nel 2024 una famiglia del Trentino Alto Adige ha avuto in media 55.295 euro, una della Calabria 34.741."
+LEAD_BREVE = "Nel 2024 una famiglia del Trentino Alto Adige ha avuto in media 55.295 euro, una della Calabria 34.741."
+CODA = "Sopra i 50.000 euro stanno anche Lombardia ed Emilia-Romagna."
+LEAD = f"{LEAD_BREVE} {CODA}"
+T_SEMPLICI = "Come si legge: reddito netto"
+T_NON_DICE = "Che cosa non dice il reddito netto"
 SEMPLICI = "Il numero è il reddito netto annuo di una famiglia media della regione, dopo tasse e contributi."
 NON_DICE = "È una stima da campione e non tiene conto del costo della vita."
 
 
 def voce(**extra):
-    base = {"titolo": "Indicatore", "lead": LEAD, "parole_semplici": SEMPLICI,
+    base = {"titolo": "Indicatore", "lead": LEAD, "lead_breve": LEAD_BREVE,
+            "titolo_parole_semplici": T_SEMPLICI, "titolo_non_dice": T_NON_DICE,
+            "parole_semplici": SEMPLICI,
             "non_dice": NON_DICE, "il_lettore_capisce": "nota", "fonte_dati": "pagina del sito",
             "parole": imp.count_words(LEAD, SEMPLICI, NON_DICE)}
     base.update(extra)
@@ -34,7 +41,10 @@ def voce(**extra):
 
 
 def blocco(**extra):
-    return {PATH_REDD: voce(**extra), PATH_ETA: voce(**extra)}
+    """Due schede, con titoli di sezione diversi (due uguali sono un errore)."""
+    return {PATH_REDD: voce(**extra),
+            PATH_ETA: voce(**{"titolo_parole_semplici": "Come si legge: età media",
+                              "titolo_non_dice": "Che cosa non dice l'età media", **extra})}
 
 
 def ruoli(entry):
@@ -49,8 +59,16 @@ class StoreTemporaneo(unittest.TestCase):
         for key in REAL_KEYS:
             entry = indicator_store.read(key)
             self.assertIsNotNone(entry, f"la scheda reale {key} non c'è più nello store")
+            entry = self.forma_di_prima(key, entry)
             indicator_store.write(key, entry, root=self.root)
         self.prima = {k: indicator_store.read(k, root=self.root) for k in REAL_KEYS}
+
+    @staticmethod
+    def forma_di_prima(key, entry):
+        sezioni = [dict(s) for s in entry["sections"] if s["role"] != "definizione"]
+        if key == "920":
+            sezioni.insert(0, {"role": "definizione", "h": "Come si legge", "body": "Testo di prima."})
+        return {**entry, "sections": sezioni}
 
     def leggi(self, key):
         return indicator_store.read(key, root=self.root)
@@ -66,12 +84,13 @@ class ImportaDueSchede(StoreTemporaneo):
         self.assertEqual((len(esito.written), len(esito.errors)), (2, 0))
 
         redd = self.leggi("multiscopo:MULTI_REDD_MEDIO")
-        self.assertEqual(redd["lead"], LEAD)
+        self.assertEqual(redd["lead"], LEAD_BREVE)
         self.assertEqual(ruoli(redd), ["definizione", "quadro", "limiti"])
         definizione, quadro, limiti = redd["sections"]
+        # la coda del lead apre la definizione, in un paragrafo a sé
         self.assertEqual((definizione["h"], definizione["body"]),
-                         ("In parole semplici", SEMPLICI))
-        self.assertEqual((limiti["h"], limiti["body"]), ("Che cosa questo dato non dice", NON_DICE))
+                         (T_SEMPLICI, f"{CODA}\n\n{SEMPLICI}"))
+        self.assertEqual((limiti["h"], limiti["body"]), (T_NON_DICE, NON_DICE))
         # quadro e frontmatter restano com'erano
         self.assertEqual(quadro, self.prima["multiscopo:MULTI_REDD_MEDIO"]["sections"][0])
         for campo in ("fonti", "vintage"):
@@ -81,7 +100,8 @@ class ImportaDueSchede(StoreTemporaneo):
         antica = self.prima["920"]
         self.assertEqual(ruoli(eta), ruoli(antica))     # la definizione c'era: si sostituisce, non si duplica
         self.assertEqual(sum(r == "definizione" for r in ruoli(eta)), 1)
-        self.assertEqual(eta["sections"][0]["body"], SEMPLICI)
+        self.assertEqual(eta["lead"], LEAD_BREVE)
+        self.assertEqual(eta["sections"][0]["body"], f"{CODA}\n\n{SEMPLICI}")
         for ruolo in ("quadro", "dinamica"):
             self.assertEqual(next(s for s in eta["sections"] if s["role"] == ruolo),
                              next(s for s in antica["sections"] if s["role"] == ruolo))
@@ -114,28 +134,64 @@ class ImportaDueSchede(StoreTemporaneo):
         for key in REAL_KEYS:                       # nemmeno le schede buone
             self.assertEqual(self.leggi(key), self.prima[key])
 
-    def test_titoli_di_default_e_titoli_dati(self):
+    def test_titoli_dati_sostituiscono_i_vecchi(self):
         imp.import_block({PATH_REDD: voce()}, root=self.root)
-        sezioni = {s["role"]: s["h"] for s in self.leggi("multiscopo:MULTI_REDD_MEDIO")["sections"]}
-        self.assertEqual((sezioni["definizione"], sezioni["limiti"]),
-                         ("In parole semplici", "Che cosa questo dato non dice"))
         imp.import_block({PATH_REDD: voce(titolo_parole_semplici="Che cosa misura",
                                           titolo_non_dice="Cosa manca")}, root=self.root)
         sezioni = {s["role"]: s["h"] for s in self.leggi("multiscopo:MULTI_REDD_MEDIO")["sections"]}
         self.assertEqual((sezioni["definizione"], sezioni["limiti"]), ("Che cosa misura", "Cosa manca"))
 
-    def test_lead_vuoto_lascia_l_esistente_con_avviso(self):
-        esito = imp.import_block({PATH_REDD: voce(lead="", parole=0)}, root=self.root)
-        redd = self.leggi("multiscopo:MULTI_REDD_MEDIO")
-        self.assertEqual(redd["lead"], self.prima["multiscopo:MULTI_REDD_MEDIO"]["lead"])
-        self.assertEqual(esito.empty_leads, [PATH_REDD])
-        self.assertTrue(any("lead vuoto" in testo for _, testo in esito.warnings))
-        self.assertEqual(ruoli(redd), ["definizione", "quadro", "limiti"])
+    def test_titolo_mancante_o_vuoto_e_errore(self):
+        for campo in ("titolo_parole_semplici", "titolo_non_dice"):
+            for valore in ("", None):
+                with self.subTest(campo=campo, valore=valore):
+                    dati = voce()
+                    dati[campo] = valore
+                    esito = imp.import_block({PATH_REDD: dati}, root=self.root)
+                    self.assertEqual([m for _, m in esito.errors],
+                                     [f"campo {campo} vuoto o mancante"])
+                    self.assertEqual(esito.written, [])
+        dati = voce()
+        del dati["titolo_non_dice"]
+        esito = imp.import_block({PATH_REDD: dati}, root=self.root)
+        self.assertEqual(len(esito.errors), 1)
+
+    def test_titolo_con_carattere_vietato_e_errore(self):
+        esito = imp.import_block({PATH_REDD: voce(titolo_non_dice="Cosa manca; e altro")},
+                                 root=self.root)
+        self.assertEqual(len(esito.errors), 1)
+        self.assertIn("titolo_non_dice", esito.errors[0][1])
+
+    def test_titoli_duplicati_fra_due_schede_sono_errore_e_nessuna_scrittura(self):
+        dati = {PATH_REDD: voce(), PATH_ETA: voce()}
+        esito = imp.import_block(dati, root=self.root)
+        self.assertEqual(esito.written, [])
+        self.assertEqual({p for p, _ in esito.errors}, {PATH_ETA})
+        self.assertEqual(len(esito.errors), 2)      # definizione e limiti
+        for key in REAL_KEYS:
+            self.assertEqual(self.leggi(key), self.prima[key])
+
+    def test_lead_breve_non_prefisso_del_lead_e_errore(self):
+        esito = imp.import_block({PATH_REDD: voce(lead_breve="Un'altra frase.")}, root=self.root)
+        self.assertEqual([m for _, m in esito.errors], ["lead_breve non è l'inizio del lead"])
+        self.assertEqual(esito.written, [])
+
+    def test_lead_breve_mancante_e_errore(self):
+        dati = voce()
+        del dati["lead_breve"]
+        esito = imp.import_block({PATH_REDD: dati}, root=self.root)
+        self.assertEqual([m for _, m in esito.errors], ["campo lead_breve vuoto o mancante"])
+
+    def test_lead_senza_coda_non_aggiunge_paragrafo(self):
+        imp.import_block({PATH_REDD: voce(lead=LEAD_BREVE)}, root=self.root)
+        definizione = self.leggi("multiscopo:MULTI_REDD_MEDIO")["sections"][0]
+        self.assertEqual(definizione["body"], SEMPLICI)
 
     def test_lead_lungo_avvisa_e_non_taglia(self):
         lungo = ("Una frase ragionevole. " * 20).strip()
         self.assertGreater(len(lungo), imp.LEAD_MAX)
-        esito = imp.import_block({PATH_REDD: voce(lead=lungo, parole=0)}, root=self.root)
+        esito = imp.import_block({PATH_REDD: voce(lead=lungo, lead_breve=lungo, parole=0)},
+                                 root=self.root)
         self.assertEqual(esito.long_leads, [PATH_REDD])
         self.assertEqual(self.leggi("multiscopo:MULTI_REDD_MEDIO")["lead"], lungo)
 
@@ -196,8 +252,7 @@ class LaPaginaResaMostraLaProsa(StoreTemporaneo):
             indicator_texts._load.cache_clear()
             self.addCleanup(indicator_texts._load.cache_clear)
             pagina = app.test_client().get(PATH_REDD).get_data(as_text=True)
-        for atteso in (LEAD, "In parole semplici", SEMPLICI,
-                       "Che cosa questo dato non dice", NON_DICE):
+        for atteso in (LEAD_BREVE, T_SEMPLICI, CODA, SEMPLICI, T_NON_DICE, NON_DICE):
             self.assertIn(atteso, pagina)
 
 

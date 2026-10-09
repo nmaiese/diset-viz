@@ -6,15 +6,17 @@
 
 Il blocco è un oggetto JSON: la chiave è il percorso della scheda
 (`/indicatore/<slug>/<acronimo>-<id>`, con o senza `/province`), il valore ha
-`titolo`, `lead`, `parole_semplici`, `non_dice`, `fonte_dati`, `parole` e, se la
-direzione ha voluto titoli di sezione propri, `titolo_parole_semplici` e
-`titolo_non_dice`. `il_lettore_capisce` è una nota di redazione e non si importa.
-Una voce con `non_pubblicare` al posto del testo è un dato da verificare: si
+`titolo`, `lead`, `lead_breve`, `parole_semplici`, `non_dice`,
+`titolo_parole_semplici`, `titolo_non_dice`, `fonte_dati`, `il_lettore_capisce` e
+`parole`. `il_lettore_capisce` è una nota di redazione e non si importa. Una voce con `non_pubblicare` al posto del testo è un dato da verificare: si
 salta e si dice.
 
-Per ogni scheda il lead diventa il lead dell'entrata, `parole_semplici` la
-sezione `definizione` e `non_dice` la sezione `limiti` (che sostituisce quella
-che c'era). `quadro`, `dinamica`, `libera` e il frontmatter restano come
+Per ogni scheda `lead_breve` (la prima frase del `lead`) diventa il lead
+dell'entrata; le frasi che nel `lead` lo seguono aprono la sezione `definizione`,
+in un paragrafo, prima di `parole_semplici`. `non_dice` è la sezione `limiti`
+(che sostituisce quella che c'era). I titoli delle due sezioni sono obbligatori,
+non possono contenere i caratteri vietati e non possono ripetersi fra due schede
+del blocco. `quadro`, `dinamica`, `libera` e il frontmatter restano come
 stavano. `fonte_dati` non si importa: nel blocco 1 è la nota «pagina del sito
 del 09/10/2026», cioè da dove la direzione ha letto, mentre `fonti` dello store è
 una lista di `{testo, url}` che il lettore vede come fonte del dato. Metterci
@@ -45,9 +47,6 @@ from scripts import indicator_store  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-DEFAULT_TITLE_DEFINITION = "In parole semplici"
-DEFAULT_TITLE_LIMITS = "Che cosa questo dato non dice"
-
 # Sopra questa lunghezza il lead non sta più intero in una meta description.
 LEAD_MAX = 320
 WORDS_TOLERANCE = 0.15
@@ -55,6 +54,9 @@ WORDS_TOLERANCE = 0.15
 FORBIDDEN = ("—", "–", ";", "…")
 
 # Una `definizione` nuova va prima del primo di questi ruoli.
+REQUIRED = ("lead", "lead_breve", "parole_semplici", "non_dice",
+            "titolo_parole_semplici", "titolo_non_dice")
+
 ROLES_AFTER_DEFINITION = ("quadro", "dinamica")
 
 
@@ -65,7 +67,6 @@ class Outcome:
     errors: list = field(default_factory=list)      # (path, reason)
     skipped: list = field(default_factory=list)     # (path, reason)
     warnings: list = field(default_factory=list)    # (path, text)
-    empty_leads: list = field(default_factory=list)
     long_leads: list = field(default_factory=list)
     guard: dict = field(default_factory=dict)       # key -> (exit code, output)
     diffs: dict = field(default_factory=dict)       # key -> unified diff
@@ -101,14 +102,12 @@ def _section(role: str, title: str, body: str) -> dict:
 def compose(entry: dict, item: dict) -> dict:
     """La nuova entrata: la vecchia con lead, definizione e limiti sostituiti."""
     new = dict(entry)
-    lead = (item.get("lead") or "").strip()
-    if lead:
-        new["lead"] = lead
-    definition = _section("definizione",
-                          item.get("titolo_parole_semplici") or DEFAULT_TITLE_DEFINITION,
-                          item["parole_semplici"])
-    limits = _section("limiti", item.get("titolo_non_dice") or DEFAULT_TITLE_LIMITS,
-                      item["non_dice"])
+    lead_short = item["lead_breve"].strip()
+    tail = item["lead"].strip()[len(lead_short):].strip()
+    new["lead"] = lead_short
+    body = f"{tail}\n\n{item['parole_semplici'].strip()}" if tail else item["parole_semplici"]
+    definition = _section("definizione", item["titolo_parole_semplici"].strip(), body)
+    limits = _section("limiti", item["titolo_non_dice"].strip(), item["non_dice"])
 
     sections = [dict(s) for s in entry.get("sections") or []]
     for role, section in (("definizione", definition), ("limiti", limits)):
@@ -129,21 +128,22 @@ def compose(entry: dict, item: dict) -> dict:
 def check_item(path: str, item: dict, outcome: Outcome) -> list[str]:
     """Gli errori bloccanti della voce. Gli avvisi vanno in `outcome`."""
     errors = []
-    for name in ("parole_semplici", "non_dice"):
+    for name in REQUIRED:
         if not (item.get(name) or "").strip():
             errors.append(f"campo {name} vuoto o mancante")
-    fields = ("lead", "parole_semplici", "non_dice", "titolo_parole_semplici", "titolo_non_dice")
+    fields = ("lead", "lead_breve", "parole_semplici", "non_dice",
+              "titolo_parole_semplici", "titolo_non_dice")
     for name in fields:
         found = sorted({c for c in FORBIDDEN if c in (item.get(name) or "")})
         if found:
             errors.append(f"{name}: caratteri vietati da content/STYLE.md ({' '.join(found)})")
     lead = (item.get("lead") or "").strip()
-    if not lead:
-        outcome.empty_leads.append(path)
-        outcome.warnings.append((path, "lead vuoto: resta quello esistente"))
-    elif len(lead) > LEAD_MAX:
+    short = (item.get("lead_breve") or "").strip()
+    if lead and short and not lead.startswith(short):
+        errors.append("lead_breve non è l'inizio del lead")
+    elif short and len(short) > LEAD_MAX:
         outcome.long_leads.append(path)
-        outcome.warnings.append((path, f"lead di {len(lead)} caratteri (> {LEAD_MAX}): "
+        outcome.warnings.append((path, f"lead_breve di {len(short)} caratteri (> {LEAD_MAX}): "
                                        "la meta description lo accorcia"))
     declared = item.get("parole")
     if isinstance(declared, int) and declared > 0:
@@ -185,6 +185,16 @@ def import_block(block: dict, root=None, dry_run: bool = False, guard: bool = Fa
             outcome.errors.extend((path, e) for e in errors)
             continue
         plan.append((path, key, item))
+
+    for name in ("titolo_parole_semplici", "titolo_non_dice"):
+        first_seen = {}
+        for path, _key, item in plan:
+            title = item[name].strip()
+            if title in first_seen:
+                outcome.errors.append(
+                    (path, f"{name} {title!r} uguale a quello di {first_seen[title]}"))
+            else:
+                first_seen[title] = path
 
     # Un errore su una scheda = nessuna scrittura per nessuna: il blocco si
     # corregge e si rilancia intero, invece di restare importato a metà.
@@ -237,7 +247,7 @@ def report(outcome: Outcome, dry_run: bool, total: int) -> None:
     print(f"{total} voci nel blocco: {len(outcome.written)} {verb}, "
           f"{len(outcome.unchanged)} invariate, {len(outcome.skipped)} saltate, "
           f"{len(outcome.errors)} in errore "
-          f"(lead vuoti {len(outcome.empty_leads)}, lead lunghi {len(outcome.long_leads)})")
+          f"(lead lunghi {len(outcome.long_leads)})")
     if outcome.errors:
         print("nessuna scheda scritta: correggi gli errori e rilancia", file=sys.stderr)
 
