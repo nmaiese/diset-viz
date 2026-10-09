@@ -1,22 +1,23 @@
 ---
-title: "Posti nei nidi: il divario tra Centro e Sud nel 2023/2024"
-seo_title: "Asili nido e servizi infanzia 2023: la copertura per ripartizione"
+title: "Infanzia: 40,4 posti al Centro, 19 al Sud per 100"
+seo_title: "Infanzia: 40,4 posti al Centro, 19 al Sud per 100"
 slug: servizi-infanzia-regioni-2023
 description: "Nel 2023/2024 ci sono 31,6 posti ogni 100 residenti 0-2 anni. Un divario non solo tra Nord e Sud, ma anche tra capoluoghi e altri comuni. Dati Istat."
 date: 2026-06-30
 date_modified: 2026-10-09
 author: "Redazione Divario Italia"
-indicator: "N/A"
-indicator_label: "Presa in carico servizi per l'infanzia (2023)"
+indicator: 414
+indicator_role: related
+indicator_label: "Utenti dell'offerta comunale (2023)"
 cover: /static/img/blog/posti-autorizzati-2023.png
 cover_alt: "Servizi per l'infanzia 2023/2024: posti autorizzati per 100 residenti, grafico a barre per ripartizione."
 cover_caption: "Elaborazione Divario Italia su dati Istat, 2023/2024."
 cover_credit:
-  author: "Divario Italia"
+  author: "Redazione Divario Italia"
   license: "CC BY 4.0"
   license_url: "https://creativecommons.org/licenses/by/4.0/"
-  source_name: "Istat"
-  source_url: "https://www.istat.it/wp-content/uploads/2026/02/REPORT_OFFERTA-DI-NIDI-E-SERVIZI-INTEGRATIVI-PER-LA-PRIMA-INFANZIA.pdf"
+  source_name: "Divario Italia"
+  source_url: "https://divarioitalia.it"
 dataset:
   name: "Posti autorizzati nei servizi per l'infanzia 2023/2024"
   description: "Posti autorizzati al funzionamento per 100 residenti 0-2 anni per ripartizione geografica e tipo di comune"
@@ -78,7 +79,7 @@ Oltre al classico divario tra Centro-Nord e Mezzogiorno, esiste una differenza i
 
 *Nota: il dato "Italia ufficiale" di 31,6 è il rapporto complessivo nazionale calcolato da Istat, non la media delle righe.*
 
-Tra l'anno educativo precedente (2022/2023) e il 2023/2024, il numero assoluto di posti autorizzati (quasi 378.500 posti su circa 1.198.000 residenti 0-2) è aumentato del 3,4%. Tuttavia, Istat segnala che la crescita del rapporto posti/residenti è dovuta in parte al continuo calo del denominatore, cioè la diminuzione dei bambini. Con questi numeri, l'Italia si avvicina al Livello Essenziale delle Prestazioni (LEP) del 33% di posti fissato per il 2027.
+Tra l'anno educativo precedente (2022/2023) e il 2023/2024, il numero assoluto di posti autorizzati (quasi 378.500) è aumentato del 3,4%. Tuttavia, Istat segnala che la crescita del rapporto posti/residenti è dovuta in parte al continuo calo del denominatore, cioè la diminuzione dei bambini. Il numero assoluto dei residenti 0-2 non è riportato nel rapporto usato qui. Con questi numeri, l'Italia si avvicina al Livello Essenziale delle Prestazioni (LEP) del 33% di posti fissato per il 2027.
 
 ## Partecipazione e barriere
 
@@ -90,7 +91,7 @@ Nel contesto italiano, l'indagine Istat sulle strutture documenta che nel Mezzog
 
 ## Le barriere documentate: le domande non accolte
 
-I dati aggregati non bastano a prevedere se una singola famiglia troverà posto. Un dato rivelatore riguarda la saturazione delle strutture. 
+I dati aggregati non bastano a prevedere se una singola famiglia troverà posto. L'indagine campionaria misura anche la quota di strutture che non ha accolto tutte le domande.
 
 <!-- figura: domande-non-accolte -->
 
@@ -109,7 +110,7 @@ La distribuzione territoriale dei posti è solo il primo livello di analisi. Il 
 
 Una famiglia cerca disponibilità effettiva, tempi e costi sostenibili. I dati aggregati documentano la carenza di posti, ma non provano le cause individuali dell'accesso. Per avere un quadro chiaro delle proprie possibilità, occorre verificare i posti, la domanda locale e i criteri d'accesso nel proprio comune.
 
-Puoi esplorare l'indicatore separato sulla presa in carico di tutti gli utenti per l'anno 2023 nella [scheda dell'indicatore](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414).
+Puoi esplorare l'indicatore separato sugli utenti dell'offerta comunale per l'anno 2023 nella [scheda dell'indicatore](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414).
 
 ## Fonti
 

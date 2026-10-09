@@ -18,3 +18,9 @@ L'endpoint `/blog/servizi-infanzia-regioni-2023` (HTTP 200) mostra la corretta v
 * I valori nell'header del file CSV riportano esplicitamente l'unità "posti per 100 residenti 0-2".
 
 Il perimetro delle modifiche è stato strettamente rispettato.
+
+## Preflight C-DIV dopo il commit autore `09c0024b`
+
+La verifica indipendente ha trovato tre problemi nel ritorno prima del Gate B2: `indicator: "N/A"` non esiste nel catalogo e rompeva 3 test di integrazione; `seo_title` aveva 65 caratteri contro il limite di 60; il testo trattava circa 1.198.000 residenti 0-2, derivati da due valori arrotondati, come numero della fonte. Inoltre il credito continuava a comparire come «Foto» per una grafica propria e la frase sulle medie semplici restava nel blocco metodo. C-DIV ha ripristinato `indicator: 414` come collegamento *correlato* e omesso la spiegazione automatica della scheda in questo articolo, accorciato il titolo, tolto il conteggio non attestato e indicato «non riportato» nel rapporto usato, corretto credito e frase generale del template. Le modifiche sono nel commit successivo di C-DIV.
+
+Prove dopo il preflight: `unittest tests.integration.test_blog_trend_articles tests.integration.test_blog_indicator_links -q` = 23 test OK; `guardia_articolo --json` = 0 errori, **19 avvisi** (prevalentemente righe della tabella non comprese dal controllo G4), 12 non verificabili; HTML Flask 200 con `art-hero`, senza vecchia `art-lead`, senza «Foto» o «medie semplici non ponderate». Questi avvisi e non verificabili devono essere valutati dal Gate B2, non trasformati in PASSA automatico.

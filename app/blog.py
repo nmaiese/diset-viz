@@ -247,6 +247,7 @@ def _load_post(path):
         "social_image_size": social_image_size(social_image(meta.get("cover"))),
         "tags": tags,
         "indicator": _normalize_indicator(meta.get("indicator")),
+        "indicator_role": meta.get("indicator_role") or "primary",
         "indicator_label": meta.get("indicator_label"),
         "read_time": _read_time(post.content),
         # Keep the source representation beside the rendered HTML so content

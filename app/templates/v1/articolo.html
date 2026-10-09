@@ -131,7 +131,7 @@
         originale. E' la condizione della licenza, non una cortesia. -#}
     {%- if h.caption or h.credit %}
     <figcaption>{% if h.caption %}<span class="art-hero__caption">{{ h.caption }}</span> {% endif %}
-      {%- if h.credit %}{% set c = h.credit %}<span class="art-hero__credit">Foto: {{ c.author }}, {% if c.license_url %}<a href="{{ c.license_url }}" rel="license">{{ c.license }}</a>{% else %}{{ c.license }}{% endif %}{% if c.source_url %}, via <a href="{{ c.source_url }}">{{ c.source_name }}</a>{% endif %}.{% if c.changes %} {{ c.changes }}.{% endif %}</span>{% endif %}</figcaption>
+      {%- if h.credit %}{% set c = h.credit %}<span class="art-hero__credit">Immagine: {{ c.author }}, {% if c.license_url %}<a href="{{ c.license_url }}" rel="license">{{ c.license }}</a>{% else %}{{ c.license }}{% endif %}{% if c.source_url %}, via <a href="{{ c.source_url }}">{{ c.source_name }}</a>{% endif %}.{% if c.changes %} {{ c.changes }}.{% endif %}</span>{% endif %}</figcaption>
     {%- endif %}
   </figure>
   {% elif d.lead %}{% set l = d.lead %}
@@ -229,7 +229,7 @@
           quella che l'indice e "Cita questo articolo" puntano con `#dati-metodo`,
           e l'`id` del titolo non si ripete. -#}
       <section class="section art-data" id="dati-metodo" aria-label="Dati e metodo">
-        {{ dm.box(d.institution, ds.source_url, None, "L'analisi confronta territori di peso diverso: salvo indicazione diversa per i valori ufficiali, le medie sono medie semplici non ponderate.") }}
+        {{ dm.box(d.institution, ds.source_url, None, "Le misure e gli eventuali riferimenti sono definiti nella fonte e nel metodo di questo articolo.") }}
         <dl class="specs">
           {% if d.used %}<div id="dati-usati"><dt>Dati usati</dt><dd>{{ d.used | safe }}</dd></div>{% endif %}
           {% if d.sources %}<div id="fonti"><dt>Fonti</dt><dd>{{ d.sources | safe }}</dd></div>
@@ -244,7 +244,7 @@
           {% if ds.temporal %}<div><dt>Periodo</dt><dd>{{ d.period }}</dd></div>{% endif %}
           {% if ds.spatial %}<div><dt>Territori</dt><dd>{{ ds.spatial }}</dd></div>{% endif %}
           {% endif %}
-          {% if meta.explain %}
+          {% if meta.explain and post.indicator_role != 'related' %}
           <div><dt>L'indicatore in parole semplici</dt><dd>
             <p><strong>{{ meta.name }}.</strong> {{ meta.explain.plain }}</p>
             {% if meta.explain.example %}<p><strong>In pratica.</strong> {{ meta.explain.example }}</p>{% endif %}
