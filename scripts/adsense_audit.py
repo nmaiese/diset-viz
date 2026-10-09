@@ -34,6 +34,10 @@ from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
+if __package__:
+    from scripts.editoriale.guardie_v4 import g2
+else:  # Support the documented `bin/py scripts/adsense_audit.py` invocation.
+    from editoriale.guardie_v4 import g2
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE_URL = "https://divarioitalia.it"
@@ -116,8 +120,12 @@ class _AssetParser(HTMLParser):
         self.js: list[str] = []
         self.css: list[str] = []
         self.img: list[str] = []
+        self.visible_text: list[str] = []
+        self._hidden = 0
 
     def handle_starttag(self, tag, attrs):
+        if tag.lower() in {"script", "style", "noscript"}:
+            self._hidden += 1
         values = {k.lower(): v for k, v in attrs if v is not None}
         if tag.lower() == "script" and values.get("src"):
             self.js.append(values["src"])
@@ -125,6 +133,14 @@ class _AssetParser(HTMLParser):
             self.css.append(values.get("href", ""))
         elif tag.lower() == "img" and values.get("src"):
             self.img.append(values["src"])
+
+    def handle_endtag(self, tag):
+        if tag.lower() in {"script", "style", "noscript"} and self._hidden:
+            self._hidden -= 1
+
+    def handle_data(self, data):
+        if not self._hidden and data.strip():
+            self.visible_text.append(data.strip())
 
 
 def parse_asset_refs(html: str) -> dict:
@@ -145,6 +161,9 @@ def measure_page(url: str, timeout: float = 15.0) -> dict:
     status, html = _fetch(url, timeout)
     text = html.decode("utf-8", errors="replace")
     assets = parse_asset_refs(text)
+    parser = _AssetParser()
+    parser.feed(text)
+    internal_messages = [part for part in parser.visible_text if g2(part)]
     same_origin = 0
     for kind in ("js", "css", "img"):
         for src in assets[kind]:
@@ -165,6 +184,7 @@ def measure_page(url: str, timeout: float = 15.0) -> dict:
         "immagini": len(assets["img"]),
         "asset_same_origin_bytes": same_origin,
         "totale_stimato_bytes": len(html) + same_origin,
+        "messaggi_editoriali_interni": internal_messages,
     }
 
 
@@ -306,6 +326,14 @@ def build_report(payload: dict) -> str:
     lines.append(f"- HTTP {ads.get('status', '-')}, riga attesa presente: {ads.get('riga_attesa')}")
     if not ads.get("riga_attesa"):
         lines.append(f"- contenuto: {ads.get('contenuto', '')}")
+    lines.append("")
+    lines.append("## Messaggi editoriali interni nel testo reso")
+    lines.append("")
+    for page in payload.get("pagine", []):
+        for finding in page.get("messaggi_editoriali_interni", []):
+            lines.append(f"- BLOCCO {page.get('url')}: {finding}")
+    if not any(p.get("messaggi_editoriali_interni") for p in payload.get("pagine", [])):
+        lines.append("- Nessun rilievo sulle pagine campione.")
     lines.append("")
     return "\n".join(lines)
 

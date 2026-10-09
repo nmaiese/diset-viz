@@ -6,6 +6,7 @@ I link non aprono l'app di Flask: la guardia riceve una funzione che risponde
 al posto del sito, con le rotte che "esistono".
 """
 import contextlib
+import csv
 import io
 import json
 import tempfile
@@ -93,6 +94,64 @@ class GuardiaArticolo(unittest.TestCase):
         # 11.358 e' una differenza che il CSV non porta: si elenca, non fa fallire.
         unverifiable = self.kinds(report, ga.UNVERIFIABLE)
         self.assertEqual([f.message.split()[0] for f in unverifiable], ["'11.358'"])
+
+    def test_g2_blocca_e_g4_avvisa_con_righe(self):
+        report = self.check(PULITO.replace(
+            "Nel 2024 il reddito", "Nel 2024 la priorità di indicizzazione riguarda il reddito"
+        ) + "\nIl valore era 17.\n")
+        self.assertTrue(any(f.check == "G2" and f.severity == ga.ERROR for f in report["rilievi"]))
+        self.assertTrue(any(f.check == "G4" and f.severity == ga.WARNING for f in report["rilievi"]))
+        self.assertTrue(all(f.line > 0 for f in report["rilievi"] if f.check in {"G2", "G4"}))
+
+    def test_g8_avvisa_con_riga_senza_provare_causalita(self):
+        sentence = "Il divario cresce perché mancano servizi."
+        report = self.check(PULITO + "\n" + sentence + "\n")
+        hits = [f for f in report["rilievi"] if f.check == "G8"]
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0].severity, ga.WARNING)
+        self.assertEqual((PULITO + "\n" + sentence + "\n").splitlines()[hits[0].line - 1], sentence)
+        self.assertIn("registro", hits[0].message)
+
+    def test_g8_non_avvisa_domanda_o_limite_causale(self):
+        report = self.check(PULITO + "\nPerché il divario cresce?\n"
+                            "La correlazione non prova che il divario sia dovuto ai servizi.\n")
+        self.assertFalse(any(f.check == "G8" for f in report["rilievi"]))
+
+    def test_g1_csv_documentato_e_anno_ambiguo(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        csv_file.write_text("regione,anno,valore\nLombardia,2024,8.8\nCalabria,2024,9.0\n", encoding="utf-8")
+        report = self.check(PULITO + "\nIn Italia nel 2024 il valore è 8,9%.\n")
+        self.assertTrue(any(f.check == "G1" and f.severity == ga.ERROR for f in report["rilievi"]))
+        report = self.check(PULITO + "\nIn Italia nel 2023 il valore è 8,9%.\n")
+        self.assertTrue(any(f.check == "G1" and f.severity == ga.UNVERIFIABLE for f in report["rilievi"]))
+
+    def test_g7_csv_lungo_stessa_geografia(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        csv_file.write_text("livello,territorio,anno,valore\nprovincia,Arezzo,2022,3.0\nprovincia,Mantova,2022,1.0\nregione,Lombardia,2022,2.0\n", encoding="utf-8")
+        report = self.check(PULITO + "\nNel 2022 le 3 province sono osservate.\n")
+        self.assertTrue(any(f.check == "G7" and f.severity == ga.ERROR and "2 osservate" in f.message for f in report["rilievi"]))
+
+    def test_g1_csv_con_misure_conflittuali_non_inventa_media(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        csv_file.write_text("livello,territorio,anno,valore\nregione,Lombardia,2024,8.8\nregione,Lombardia,2024,18.8\nregione,Calabria,2024,9.0\n", encoding="utf-8")
+        report = self.check(PULITO + "\nIn Italia nel 2024 il valore è 8,9%.\n")
+        self.assertTrue(any(f.check == "G1" and f.severity == ga.UNVERIFIABLE for f in report["rilievi"]))
+
+    def test_g7_campione_sintetico_infortuni_107_su_103(self):
+        csv_file = self.static / "data" / "articles" / "reddito-finto.csv"
+        with (ga.STATIC / "data" / "province_codes.csv").open(encoding="utf-8", newline="") as source:
+            names = [row["name"] for row in csv.DictReader(source, delimiter=";")][:103]
+        csv_file.write_text("livello,territorio,anno,valore\n" + "".join(
+            f"provincia,{name},2022,1.0\n" for name in names
+        ), encoding="utf-8")
+        report = self.check(PULITO + "\nNel 2022 i dati coprono 107 province.\n")
+        self.assertTrue(any(f.check == "G7" and f.severity == ga.ERROR and "103 osservate" in f.message for f in report["rilievi"]))
+
+    def test_g3_blocca_confronto_diretto_e_avvisa_fasce_in_sezioni(self):
+        direct = self.check(PULITO + "\nIl tasso 15-34 anni è superiore a quello dei 35-64 anni.\n")
+        self.assertTrue(any(f.check == "G3" and f.severity == ga.ERROR for f in direct["rilievi"]))
+        separate = self.check(PULITO + "\n## Giovani\n15-34 anni.\n## Adulti\n35 anni e più.\n")
+        self.assertTrue(any(f.check == "G3" and f.severity == ga.WARNING for f in separate["rilievi"]))
 
     def test_cifra_sbagliata_e_errore_con_la_riga(self):
         report = self.check(PULITO.replace("28.154 euro", "28.145 euro"))

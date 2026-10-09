@@ -218,7 +218,7 @@ def map_steps(values: dict[str, float]) -> dict[str, int]:
     return {k: choropleth_step(v, scale) for k, v in values.items()}
 
 
-def ranking(level: dict, unit: str | None) -> list[dict]:
+def ranking(level: dict, unit: str | None, *, include_missing: bool = False) -> list[dict]:
     """Le righe della classifica, con la riga della media semplice al suo posto."""
     obs = level.get("observations") or []
     avg = (level.get("stats") or {}).get("year_avg")
@@ -226,14 +226,25 @@ def ranking(level: dict, unit: str | None) -> list[dict]:
     rows = []
     ref_done = avg is None
     descending = len(obs) < 2 or obs[0]["value"] >= obs[-1]["value"]
+    last_value = None
+    last_rank = 0
     for i, o in enumerate(obs, 1):
         crosses = (o["value"] < avg) if descending else (o["value"] > avg) if avg is not None else False
         if not ref_done and crosses:
             rows.append({"ref": True, "label": f"Media semplice delle {len(obs)} {level['plural']}",
                          "value": avg, "width": round(max(avg, 0) / bar_max * 100, 1)})
             ref_done = True
-        rows.append({"rank": i, "key": o["key"], "name": o["name"], "value": o["value"],
+        if o["value"] != last_value:
+            last_rank = i
+        last_value = o["value"]
+        rows.append({"rank": last_rank, "key": o["key"], "name": o["name"], "value": o["value"],
                      "width": round(max(o["value"], 0) / bar_max * 100, 1)})
+    if include_missing:
+        observed = {o["key"] for o in obs}
+        for territory in level.get("territories") or []:
+            if territory["key"] not in observed:
+                rows.append({"rank": None, "key": territory["key"], "name": territory["name"],
+                             "value": None, "width": None})
     return rows
 
 
