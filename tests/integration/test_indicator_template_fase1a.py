@@ -95,20 +95,25 @@ class IndicatorTemplateFase1a(unittest.TestCase):
 
     def test_missing_source_definition_is_explicit_in_both_renderers(self):
         client = app.test_client()
+        no_definition = "/indicatore/densita-popolazione-a-rischio-frane/ter-531"
         with patch("app.indicator_view._official_definition", return_value=None):
-            response = client.get(NO_DEFINITION)
+            response = client.get(no_definition)
         page = response.get_data(as_text=True)
+        markdown = client.get(no_definition, headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertIn("La fonte non fornisce una definizione specifica", page)
         self.assertIn("Non ricostruiamo numeratore o denominatore", page, "limite definizione assente non visibile")
+        self.assertIn("Non ricostruiamo numeratore o denominatore", markdown)
         dataset_json = re.search(r'<script type="application/ld\+json">(.*?)</script>', page, re.S)
-        self.assertIn("Non ricostruiamo numeratore o denominatore", json.loads(dataset_json.group(1))["variableMeasured"]["description"])
+        dataset = json.loads(dataset_json.group(1))
+        self.assertNotIn("description", dataset["variableMeasured"])
 
         with patch.dict(os.environ, {"DIVARIO_V1_STRICT": ""}), \
              patch("app.design.derive", side_effect=RuntimeError("force fallback")), \
              patch("app.indicator_view._official_definition", return_value=None):
-            fallback = client.get(NO_DEFINITION).get_data(as_text=True)
+            fallback = client.get(no_definition).get_data(as_text=True)
         self.assertNotIn('data-v1="indicatore"', fallback)
         self.assertIn("La fonte non fornisce una definizione specifica", fallback)
+        self.assertIn("Non ricostruiamo numeratore o denominatore", fallback)
         self.assertIn('data-kpi="central-band"', fallback)
 
     def test_selected_province_has_denominated_comparison_and_series(self):

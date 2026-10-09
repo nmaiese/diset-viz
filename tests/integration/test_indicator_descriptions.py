@@ -1,6 +1,8 @@
+import json
 import re
 import unittest
 from html import unescape
+from unittest.mock import patch
 
 from app import app
 from app import indicator_notes
@@ -9,6 +11,8 @@ from app import quiz
 from app.bes_data import all_bes_indicators
 from app.data import get_catalog
 from app.profiles import indicator_path
+from app import sources
+from app.indicator_view import build_indicator_view
 
 
 class IndicatorDescriptionCoverageTest(unittest.TestCase):
@@ -74,24 +78,35 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
             )
 
     def test_indicator_page_exposes_the_explanation_in_visible_html_and_schema(self):
-        item = get_catalog()["indicators"][0]
+        item = next(item for item in get_catalog()["indicators"] if item["id"] == "920")
         response = app.test_client().get(indicator_path(item["id"], item["name"]))
         html = unescape(response.data.decode("utf-8"))
         self.assertEqual(response.status_code, 200)
-        # La spiegazione vive nella sezione "definizione" oppure, con le sezioni
-        # variabili, nel blocco "Come leggere il dato": in entrambi i casi deve
-        # essere testo visibile, non solo dati strutturati.
+        family, raw_id = sources.parse_indicator_code("ter-920")
+        definition = build_indicator_view(family, raw_id)["meta"].get("official_definition")
+        self.assertTrue(definition, "ter-920 deve avere definizione verificata")
+        self.assertIn(definition, html)
         self.assertTrue('id="sezione-definizione"' in html or 'id="come-leggere"' in html)
-        self.assertIn(item["explain"]["plain"], html)
-        self.assertIn(item["explain"]["example"], html)
-        self.assertIn('"@type": "Dataset"', html)
+        block = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
+        self.assertIsNotNone(block)
+        dataset = json.loads(block.group(1))
+        self.assertEqual(dataset["variableMeasured"]["description"], definition)
+        self.assertNotIn(item["explain"]["plain"], html)
+        self.assertNotIn(item["explain"]["example"], html)
         # The Dataset description has to be something the reader can also see:
         # it is the page lead, not a sentence written only for crawlers.
         lead = re.search(r'<p class="page-lead">(.*?)</p>', html, re.S)
         self.assertIsNotNone(lead)
-        description = re.search(r'"description": "(.*?)(?<!\\)"', html, re.S)
-        self.assertIsNotNone(description)
-        self.assertTrue(description.group(1)[:40] in unescape(re.sub(r"<[^>]+>", "", lead.group(1))))
+        visible_lead = unescape(re.sub(r"<[^>]+>", "", lead.group(1)))
+        self.assertTrue(dataset["description"][:40] in visible_lead)
+
+        missing_path = "/indicatore/densita-popolazione-a-rischio-frane/ter-531"
+        with patch("app.indicator_view._official_definition", return_value=None):
+            missing_html = app.test_client().get(missing_path).get_data(as_text=True)
+        missing_block = re.search(r'<script type="application/ld\+json">(.*?)</script>', missing_html, re.S)
+        missing_dataset = json.loads(missing_block.group(1))
+        self.assertIn("Non ricostruiamo numeratore o denominatore", missing_html)
+        self.assertNotIn("description", missing_dataset["variableMeasured"])
 
     def test_blog_posts_with_an_indicator_show_the_same_explanation(self):
         response = app.test_client().get("/blog/divario-turistico-nord-sud-2024")
