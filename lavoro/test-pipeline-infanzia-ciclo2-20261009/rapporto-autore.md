@@ -14,3 +14,11 @@
 
 ## Limiti
 - Le avvertenze di `guardia_articolo` rimangono in quanto i dati si riferiscono al rapporto PDF esterno non incluso nel CSV principale.
+
+## Verifica mobile pre-Gate B
+- CSS mirato aggiunto in `<style>` all'interno del file markdown `2026-06-30-servizi-infanzia-regioni-2023.md`.
+  - La caption della tabella è stata nascosta visivamente a max-width 719px mantenendola accessibile per gli screen reader (`clip: rect(0 0 0 0)` ecc).
+  - Aggiunto scroll orizzontale nativo (`overflow-x: auto`) con istruzione testuale in `::before` per il contenitore `.article-figure` SVG a max-width 719px, imponendo all'SVG originario `min-width: 720px`.
+- Comandi: script Node Playwright su 375 e 1100 viewport (temi chiaro/scuro). Controllo scroll `document.documentElement.scrollWidth > clientWidth` negativo a 375px.
+- Esito test screenshot mobile salvato in `lavoro/test-pipeline-infanzia-ciclo2-20261009/prove-mobile/`. Nomi leggibili senza schiacciamenti.
+- `updated` nel frontmatter visibile come 2026-10-09.
