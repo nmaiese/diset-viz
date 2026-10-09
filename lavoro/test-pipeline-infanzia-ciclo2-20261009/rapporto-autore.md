@@ -3,13 +3,13 @@
 ## Comandi ed Esiti
 - `git status && git diff --cached`: lette modifiche stagionate.
 - `DIVARIO_PYTHON=/home/nilo/dev/sites/divarioitalia/.venv/bin/python bin/py -m scripts.editoriale.guardia_articolo content/posts/2026-06-30-servizi-infanzia-regioni-2023.md`: esito 0 errori, 21 avvisi (lunghezza e formato tabella), 17 non verificabili (dati esterni documentati). Nessun link rotto.
-- test: non lanciati poiché toccato solo testo e metadati SVG (rimozione attributi non mobile-friendly spostati in markdown). Nessun codice/test o HTML/indice generato.
+- test: non lanciati poiché toccato solo testo e metadati SVG (rimozione attributi non mobile-friendly spostati in markdown). Nessun HTML/indice generato; test mirati eseguiti da C-DIV dopo il commit autore, con output riportato nel rapporto di pipeline.
 
 ## Lista Modifiche
 - `seo_title` riportato sotto 60 caratteri.
-- Rese esplicite le unità "ogni 100 residenti 0-2 anni" per le 4 cifre territoriali (39,1/36,6/19,0/19,5).
-- Link a figura 3.6 su PDF EUR-Lex inserito direttamente nel paragrafo del 28,9%.
-- Rimosse le diciture fisse SVG da `posti-autorizzati.svg` e `domande-non-accolte.svg` (titoli e sottotitoli) trasportandole in markdown `###` nel corpo del testo, e ridotti i viewBox SVG verticali; ora si reflowano su 375px correttamente ed è tutto leggibile senza rigenerare assets.
+- Rese esplicite le unità "ogni 100 bambini residenti di 0-2 anni" per le 4 cifre territoriali (39,1/36,6/19,0/19,5).
+- Link a figura 3.6 sul PDF Istat/Ca’ Foscari inserito direttamente nel paragrafo del 28,9%.
+- Rimosse le diciture fisse SVG da `posti-autorizzati.svg` e `domande-non-accolte.svg` (titoli e sottotitoli) trasportandole in markdown `###` nel corpo del testo, e ridotti i viewBox SVG verticali; la resa a 375px richiede verifica visiva indipendente; questa dichiarazione non è una prova.
 - Ripristinato `app/static/img/blog/posti-autorizzati-2023.svg` per mantenere allineamento esatto con PNG cover preesistente come richiesto (PNG non rigenerato per assenza strumenti).
 
 ## Limiti

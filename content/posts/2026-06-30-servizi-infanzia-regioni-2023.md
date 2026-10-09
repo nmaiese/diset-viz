@@ -1,6 +1,6 @@
 ---
 title: "Infanzia: 40,4 posti al Centro, 19 al Sud ogni 100 bambini residenti di 0-2 anni"
-seo_title: "Infanzia: 31,6 posti per 100 residenti 0-2 anni"
+seo_title: "Infanzia: 31,6 posti ogni 100 bambini residenti 0-2"
 slug: servizi-infanzia-regioni-2023
 description: "Nel 2023/2024 ci sono 31,6 posti ogni 100 bambini residenti di 0-2 anni. Un divario non solo tra Nord e Sud, ma anche tra capoluoghi e altri comuni. Dati Istat."
 date: 2026-06-30
@@ -60,7 +60,7 @@ Questo numero include nidi, sezioni primavera e altri servizi integrativi, sia p
 
 ## I posti: differenze per area e tipo di comune
 
-La distribuzione territoriale dei posti è diseguale. Il Centro ha un'offerta di 40,4 posti ogni 100 bambini residenti di 0-2 anni, il Nord-est di 39,1 posti ogni 100 residenti 0-2 anni e il Nord-ovest di 36,6 posti ogni 100 residenti 0-2 anni. Al Sud l'offerta si ferma a 19,0 posti ogni 100 residenti 0-2 anni, nelle Isole a 19,5 posti ogni 100 bambini residenti di 0-2 anni.
+La distribuzione territoriale dei posti è diseguale. Il Centro ha un'offerta di 40,4 posti ogni 100 bambini residenti di 0-2 anni, il Nord-est di 39,1 posti ogni 100 bambini residenti di 0-2 anni e il Nord-ovest di 36,6 posti ogni 100 bambini residenti di 0-2 anni. Al Sud l'offerta si ferma a 19,0 posti ogni 100 bambini residenti di 0-2 anni, nelle Isole a 19,5 posti ogni 100 bambini residenti di 0-2 anni.
 
 Oltre al classico divario tra Centro-Nord e Mezzogiorno, esiste una differenza interna legata al tipo di comune. Nei capoluoghi, in media, si contano 39,8 posti ogni 100 bambini residenti di 0-2 anni, mentre negli altri comuni il numero scende a 28,2 posti. 
 
@@ -68,7 +68,7 @@ Oltre al classico divario tra Centro-Nord e Mezzogiorno, esiste una differenza i
 *Posti autorizzati per 100 bambini residenti di 0-2 anni nei capoluoghi e negli altri comuni. Anno 2023/2024.*
 
 <!-- figura: posti-autorizzati -->
-<div class="fig-meta"><strong>Unità:</strong> posti autorizzati ogni 100 residenti di 0, 1 e 2 anni compiuti al 31-12-2023. <strong>Campione:</strong> censimento annuale, risposta Comuni 79,9%, mancate risposte stimate. <strong>Fonte:</strong> Istat, "Offerta di nidi e servizi integrativi", comunicato 2026-02-03. <strong>Elaborazione:</strong> Divario Italia. <strong>Nota:</strong> Include nidi, sezioni primavera, servizi domiciliari e integrativi. Non rappresenta i bambini effettivamente iscritti.</div>
+<div class="fig-meta"><strong>Unità:</strong> posti autorizzati ogni 100 bambini residenti di 0, 1 e 2 anni compiuti al 31-12-2023. <strong>Campione:</strong> censimento annuale, risposta Comuni 79,9%, mancate risposte stimate. <strong>Fonte:</strong> Istat, "Offerta di nidi e servizi integrativi", comunicato 2026-02-03. <strong>Elaborazione:</strong> Divario Italia. <strong>Nota:</strong> Include nidi, sezioni primavera, servizi domiciliari e integrativi. Non rappresenta i bambini effettivamente iscritti.</div>
 
 **Posti per 100 bambini residenti di 0-2 anni**
 
