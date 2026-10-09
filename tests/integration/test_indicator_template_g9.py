@@ -137,6 +137,13 @@ class IndicatorTemplateG9(unittest.TestCase):
         self.assertRegex(page, r'<tr data-key="pavia"><td class="rank">n\.d\.</td>.*?n\.d\.</span></td></tr>')
         self.assertIn('data-key="pavia" data-name="Pavia" data-value="n.d."', page)
 
+    def test_provincial_missing_row_renders_once_in_dedicated_section(self):
+        page = app.test_client().get(PROVINCIAL).get_data(as_text=True)
+        self.assertEqual(len(re.findall(r'<tr data-key="pavia"', page)), 1)
+        missing = re.search(r'<details class="more" data-rank-missing-more.*?</details>', page, re.S)
+        self.assertIsNotNone(missing)
+        self.assertEqual(len(re.findall(r'<tr data-key="pavia"', missing.group(0))), 1)
+
     def test_regional_csv_and_json_keep_missing_distinct_from_zero(self):
         payload = {
             "metadata": {"name": "Prova", "theme": "Prova", "unit": "%",

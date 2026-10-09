@@ -259,7 +259,7 @@ def explore_module(meta: dict, level: dict, *, tabs: list[dict] | None = None,
         "profile": level.get("profile_path"),
     }
     all_rank_rows = ranking(level, unit, include_missing=True)
-    rank_rows = all_rank_rows
+    rank_rows = [row for row in all_rank_rows if row.get("value") is not None or row.get("ref")]
     observed_rank_rows = [row for row in rank_rows if row.get("value") is not None and not row.get("ref")]
     missing_rows = [row for row in all_rank_rows if row.get("value") is None]
     observed_values = {o["key"]: o["value"] for o in obs}
