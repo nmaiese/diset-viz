@@ -44,9 +44,9 @@ moltissimo sull'economia locale. All'estremo opposto troviamo il Molise, fermo a
 | Molise | 1,6 |
 
 La media semplice delle venti regioni è 10,4 giornate per abitante, mentre il
-dato nazionale Istat, pesato per popolazione, è 7,9. Sono numeri che dicono
-poco da soli, perché poche regioni molto turistiche li tirano in alto mentre la
-maggioranza resta parecchio sotto.
+dato nazionale Istat, pesato per popolazione, è 7,9. Rispetto alla media
+semplice, quindici regioni su venti stanno sotto, perché poche regioni molto
+turistiche la tirano in alto.
 
 ## Non è solo questione di Nord e Sud
 

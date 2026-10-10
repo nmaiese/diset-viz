@@ -34,5 +34,17 @@
     "page": "Articolo sul divario turistico",
     "error": "Il testo chiamava «media nazionale» la media semplice delle regioni (10,4 giornate per abitante)",
     "action": "Indicato il dato nazionale Istat 2024 (7,9). La media semplice resta in tabella con la sua etichetta"
+  },
+  {
+    "date": "2026-10-10",
+    "page": "Articolo sul divario turistico",
+    "error": "La frase sulla maggioranza delle regioni sotto la media non distingueva il dato nazionale (7,9) dalla media semplice (10,4)",
+    "action": "La frase ora si riferisce alla media semplice: quindici regioni su venti stanno sotto"
+  },
+  {
+    "date": "2026-10-10",
+    "page": "Articolo sulla speranza di vita",
+    "error": "Il testo deduceva dal rialzo della media regionale che «la salute è migliorata ovunque»",
+    "action": "Sostituito con il solo dato mostrato: la media semplice delle regioni è salita di circa tre anni e mezzo"
   }
 ]

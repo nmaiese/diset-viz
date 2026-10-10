@@ -67,8 +67,8 @@ Sud, con la Campania stabilmente all'ultimo posto.
 ## Un divario che si è ridotto, ma non chiuso
 
 C'è un dato che aiuta a leggere il presente: nel 2002 la media semplice delle venti
-regioni era 80,1 anni, oggi è 83,6. In poco più di vent'anni le regioni hanno
-guadagnato in media circa tre anni e mezzo di vita attesa. La salute, nel complesso, è migliorata ovunque.
+regioni era 80,1 anni, oggi è 83,6. In poco più di vent'anni la media semplice
+delle regioni è salita di circa tre anni e mezzo.
 
 > Il divario sanitario non separa solo il Nord dal Sud. Separa i territori dove
 > prevenzione, servizi e condizioni di vita lavorano insieme da quelli dove
