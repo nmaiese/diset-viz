@@ -38,13 +38,15 @@ moltissimo sull'economia locale. All'estremo opposto troviamo il Molise, fermo a
 | Veneto | 15,1 |
 | Toscana | 12,6 |
 | Liguria | 10,7 |
-| *Media nazionale* | *10,4* |
+| *Media 20 regioni* | *10,4* |
+| *Italia (dato Istat)* | *7,9* |
 | Piemonte | 3,4 |
 | Molise | 1,6 |
 
-La media nazionale si ferma a 10,4 giornate per abitante. È un numero che dice
-poco da solo, perché poche regioni molto turistiche lo tirano in alto mentre la
-maggioranza resta parecchio sotto.
+La media semplice delle venti regioni è 10,4 giornate per abitante, mentre il
+dato nazionale Istat, pesato per popolazione, è 7,9. Rispetto alla media
+semplice, quindici regioni su venti stanno sotto, perché poche regioni molto
+turistiche la tirano in alto.
 
 ## Non è solo questione di Nord e Sud
 
@@ -52,7 +54,7 @@ Il divario più raccontato è quello tra Nord e Sud, e i numeri lo confermano. I
 Centro-Nord segna in media 14,2 giornate per abitante, contro le 4,8 del
 Mezzogiorno, quindi circa il triplo. Ma la storia è un po' più sfumata. Anche al
 Nord ci sono regioni con valori bassi, come il Piemonte a 3,4, sotto la media
-nazionale. Il vero motore è la montagna alpina, più che la pura contrapposizione
+delle regioni e sotto il dato nazionale. Il vero motore è la montagna alpina, più che la pura contrapposizione
 geografica.
 
 > Il divario turistico non separa solo il Nord dal Sud. Separa i territori che
@@ -71,4 +73,6 @@ dell'indicatore](/indicatore/tasso-di-turisticita/ter-105). La cosa più interes
 divario è cambiato dal 1981 a oggi. In molti casi si è allargato, non ridotto.
 
 *Dati: Istat, "Indicatori territoriali per le politiche di sviluppo". Le medie
-per ripartizione sono medie semplici tra le regioni, non pesate per popolazione.*
+per ripartizione e la media delle venti regioni sono medie semplici, non pesate
+per popolazione. Il dato nazionale (7,9 giornate per abitante nel 2024) è
+dell'Istat, "I flussi turistici, anno 2024".*

@@ -27,12 +27,12 @@ Il dato da cui partire sono **84,8 anni contro 82,1**. Tanto separa il Trentino-
 ## In breve
 
 - Trentino-Alto Adige in testa con 84,8 anni attesi alla nascita, Campania ultima con 82,1.
-- La media nazionale è 83,6 anni, in crescita dai 80,1 del 2002.
+- Il dato nazionale Istat è 83,7 anni (stima 2025). La media semplice delle regioni è 83,6, contro gli 80,1 del 2002.
 - Le regioni del Centro-Nord stanno quasi tutte sopra la media. Il Sud e le isole sotto.
 
 ## Dati usati
 
-- **Fonte:** Istat, Indicatori demografici.
+- **Fonte:** Istat, Indicatori demografici. Il dato nazionale 2025 viene dal Rapporto Istat sugli obiettivi di sviluppo sostenibile 2026 (Goal 3).
 - **Periodo:** 2025, ultimo anno disponibile (per confronto: 2002).
 - **Territorio:** 20 regioni italiane.
 - **Unità:** anni di vita media attesa alla nascita.
@@ -52,7 +52,8 @@ Mezzogiorno: Campania 82,1, Sicilia e Molise 82,6, Calabria 82,9, Sardegna 83,1.
 | Marche | 84,4 |
 | Lombardia | 84,3 |
 | Toscana | 84,3 |
-| *Media nazionale* | *83,6* |
+| *Media 20 regioni* | *83,6* |
+| *Italia (dato Istat)* | *83,7* |
 | Sardegna | 83,1 |
 | Calabria | 82,9 |
 | Molise | 82,6 |
@@ -65,9 +66,9 @@ Sud, con la Campania stabilmente all'ultimo posto.
 
 ## Un divario che si è ridotto, ma non chiuso
 
-C'è un dato che aiuta a leggere il presente: nel 2002 la media nazionale era 80,1
-anni, oggi è 83,6. In poco più di vent'anni l'Italia ha guadagnato circa tre anni
-e mezzo di vita media. La salute, nel complesso, è migliorata ovunque.
+C'è un dato che aiuta a leggere il presente: nel 2002 la media semplice delle venti
+regioni era 80,1 anni, oggi è 83,6. In poco più di vent'anni la media semplice
+delle regioni è salita di circa tre anni e mezzo.
 
 > Il divario sanitario non separa solo il Nord dal Sud. Separa i territori dove
 > prevenzione, servizi e condizioni di vita lavorano insieme da quelli dove
