@@ -33,14 +33,16 @@ here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 for candidate in \
     "${DIVARIO_PYTHON:-}" \
     "$here/.venv/bin/python" \
-    "${VIRTUAL_ENV:+$VIRTUAL_ENV/bin/python}"
+    "$here/.venv/Scripts/python.exe" \
+    "${VIRTUAL_ENV:+$VIRTUAL_ENV/bin/python}" \
+    "${VIRTUAL_ENV:+$VIRTUAL_ENV/Scripts/python.exe}"
 do
     [ -n "$candidate" ] && [ -x "$candidate" ] || continue
     exec "$candidate" "$@"
 done
 
 echo "bin/py: nessun interprete con le dipendenze del progetto." >&2
-echo "Cercati, in ordine: \$DIVARIO_PYTHON, $here/.venv/bin/python, \$VIRTUAL_ENV/bin/python" >&2
+echo "Cercati, in ordine: \$DIVARIO_PYTHON, $here/.venv/bin/python, $here/.venv/Scripts/python.exe, \$VIRTUAL_ENV (bin/python o Scripts/python.exe)" >&2
 echo >&2
 echo "Crealo qui:  python3 -m venv $here/.venv && $here/.venv/bin/pip install -r requirements.txt" >&2
 echo "Oppure punta a uno che hai gia':  export DIVARIO_PYTHON=/percorso/al/venv/bin/python" >&2

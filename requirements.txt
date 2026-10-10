@@ -23,3 +23,9 @@ PyJWT[crypto]==2.10.1
 # Il giorno del gioco e' quello di Roma (app/game_daily.py): serve il database dei fusi anche
 # nelle immagini senza /usr/share/zoneinfo.
 tzdata==2025.2
+
+# Servono agli script e ai test del progetto (scripts/trend_articles, foto con licenza,
+# guardia degli articoli), non all'app: senza, su un checkout nuovo (Windows incluso)
+# una decina di moduli di test non si importano. Versioni in uso nell'ambiente di sviluppo.
+requests==2.34.2
+pillow==12.3.0

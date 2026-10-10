@@ -47,15 +47,15 @@ from pathlib import Path
 SITO = "https://divarioitalia.it"
 OUT_DEFAULT = Path("/mnt/c/Users/Nilo/orca/divario/bozze")
 STATI = ("da leggere", "approvato", "pubblicato")
+TIPI_FISSI = {".woff2": "font/woff2", ".csv": "text/csv"}
 LIMITE_INCORPORA = 400_000  # byte: oltre, l'immagine resta un link al sito
 
 
 def data_uri(contenuto: bytes, percorso: str) -> str:
-    # python:3.12-slim non ha sempre .woff2 nel catalogo MIME di sistema.
-    tipo = (
-        "font/woff2"
-        if Path(percorso).suffix.lower() == ".woff2"
-        else (mimetypes.guess_type(percorso)[0] or "application/octet-stream")
+    # python:3.12-slim non ha sempre .woff2 nel catalogo MIME di sistema, e su
+    # Windows il registro di sistema dice che un .csv e' application/vnd.ms-excel.
+    tipo = TIPI_FISSI.get(Path(percorso).suffix.lower()) or (
+        mimetypes.guess_type(percorso)[0] or "application/octet-stream"
     )
     return f"data:{tipo};base64,{base64.b64encode(contenuto).decode('ascii')}"
 

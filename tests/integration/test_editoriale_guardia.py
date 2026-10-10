@@ -358,11 +358,11 @@ class Cli(unittest.TestCase):
 
     def test_fonti_senza_citazioni_stampa_su_stderr(self):
         import tempfile
-        with tempfile.NamedTemporaryFile(suffix=".md") as tmp:
-            tmp.write(b"| claim | altra colonna |\n| --- | --- |\n| 1 | 2 |")
-            tmp.flush()
+        with tempfile.TemporaryDirectory() as directory:
+            fonti = Path(directory) / "fonti.md"
+            fonti.write_bytes(b"| claim | altra colonna |\n| --- | --- |\n| 1 | 2 |")
             result = subprocess.run(
-                [sys.executable, "-m", "scripts.editoriale.guardia", "ter-12", "--fonti", tmp.name],
+                [sys.executable, "-m", "scripts.editoriale.guardia", "ter-12", "--fonti", str(fonti)],
                 cwd=ROOT, capture_output=True, timeout=120,
             )
             self.assertIn(b"nessuna citazione letta da", result.stderr)

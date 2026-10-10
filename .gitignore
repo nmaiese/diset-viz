@@ -6,7 +6,7 @@ __pycache__/
 .idea/
 .vscode/
 node_modules/
-frontend/node_modules/
+frontend/node_modules
 
 # Secrets / credentials — never commit
 client_secret_*.json

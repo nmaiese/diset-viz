@@ -201,10 +201,6 @@ regioni con il valore Italia dell'Istat come riferimento), **gli estremi**
 parla), **che cosa ci va insieme** (`scatter`, due indicatori, con le
 correlazioni in totale e dentro ciascun gruppo).
 
-L'esempio completo, con tutti i comandi dei quattro pezzi del 23 settembre
-2026, e' `data/articles/rebuild_2026-09-23.sh`: rifa' elaborazioni, dossier,
-figure e classifica a partire dalle fonti.
-
 Le figure sono SVG in linea, che l'articolo richiama con
 `<!-- figura: nome -->` su una riga sua. I colori sono classi CSS sui token
 del design system (`site.css`, sezione "Le figure degli articoli del blog"),

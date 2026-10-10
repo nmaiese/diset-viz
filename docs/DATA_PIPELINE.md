@@ -213,7 +213,7 @@ Per aggiornare insieme i due backbone regionali e i fingerprint delle fonti:
 ```
 
 Il refresh completo si esegue a mano, come gli altri passi della pipeline, con
-`scripts/refresh_official_local.sh` (`--check` per il solo controllo). Replica i
+`bin/py scripts/refresh_official_local.py` (`--check` per il solo controllo). Replica i
 passi storici del workflow: controllo hash, aggiornamento dei backbone e del
 Multiscopo regionale, e se qualcosa cambia rigenera il layer esterno e l'audit,
 poi test e build. Il diff resta da revisionare a mano: nessun commit e nessuna

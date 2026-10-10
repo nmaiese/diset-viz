@@ -331,7 +331,7 @@ class ScalaTipograficaTest(unittest.TestCase):
                 aperta = testo.rfind("{", 0, match.start())
                 inizio = max(testo.rfind("}", 0, aperta), testo.rfind("{", 0, aperta)) + 1
                 selettore = re.sub(r"\s+", " ", testo[inizio:aperta]).strip()
-                chiave = (str(foglio.relative_to(SISTEMA.parent)), selettore)
+                chiave = (foglio.relative_to(SISTEMA.parent).as_posix(), selettore)
                 trovate.add(chiave)
                 if chiave not in ECCEZIONI_TAGLIA:
                     errori.append(f"{chiave[0]}: {selettore}: font-size: {valore}")
