@@ -1,0 +1,6 @@
+*.sh text eol=lf
+*.py text eol=lf
+bin/* text eol=lf
+bin/*.cmd text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
