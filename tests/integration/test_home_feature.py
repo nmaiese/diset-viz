@@ -99,6 +99,26 @@ class OgniCoppiaDelPool(unittest.TestCase):
                     fuori |= {o["key"] for o in scelta["level"]["observations"] if areas.get(o["key"]) is None}
         self.assertEqual(fuori, set())
 
+    def test_la_fascia_dell_indicatore_non_giudica_il_verso_ne_scrive_rapporti(self):
+        """Per un indicatore per verso (alto, basso, contestuale) la fascia
+        `#dato` resa non dice "Meglio se", "migliore" o "N volte"."""
+        scelti = {}
+        with app.app_context():
+            for family, raw_id in self.pool["regione"]:
+                code = sources.indicator_code(family, raw_id)
+                direction = home_pick.pick(code, "regione")["meta"].get("direction")
+                kind = ("lower" if direction in ("lower_better", "higher_worse")
+                        else "higher" if direction == "higher_better" else "contextual")
+                scelti.setdefault(kind, code)
+                if len(scelti) == 3:
+                    break
+        self.assertEqual(set(scelti), {"lower", "higher", "contextual"})
+        for kind, code in scelti.items():
+            with self.subTest(kind=kind, code=code):
+                html = self.client.get(f"/?indicatore={code}&livello=regione").get_data(as_text=True)
+                band = re.search(r'<section class="zone home-feature" id="dato".*?</section>', html, re.S).group(0)
+                self.assertIsNone(re.search(r"Meglio se|migliore|volte", band, re.I))
+
     def test_ogni_coppia_rende_la_home_della_v1(self):
         guasti = []
         for level, pairs in self.pool.items():

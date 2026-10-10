@@ -26,7 +26,7 @@
   <article class="feat" aria-labelledby="feat-name">
     <header class="feat__head">
       <div class="feat__id">
-        <p class="feat__meta">{% if f.theme %}{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}<span class="sep" aria-hidden="true">·</span>{% endif %}{{ f.source_label }}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}</p>
+        <p class="feat__meta">{% if f.theme %}{% if f.theme_path %}<a href="{{ f.theme_path }}">{{ f.theme }}</a>{% else %}{{ f.theme }}{% endif %}<span class="sep" aria-hidden="true">·</span>{% endif %}{{ f.source_label }}{% if f.verso %}<span class="sep" aria-hidden="true">·</span>{{ f.verso }}{% endif %}</p>
         <h3 class="feat__name" id="feat-name"><a href="{{ f.levels[0].scheda }}" data-tab-href>{{ f.name }}</a></h3>
       </div>
       {#- Il rimando all'altro livello resta: e' l'unico link dalla home alla
@@ -71,7 +71,7 @@
           <div class="feat__cap">
             <p class="feat__kicker">Sulla mappa e in classifica</p>
             {% if lv.table_claim %}<span class="feat__claim">{{ lv.table_claim }}</span>{% endif %}
-            <p class="subline">{{ f.name }}{% if lv.unit_note %}, {{ lv.unit_note }}{% endif %}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %} {% if lv.lower_better %}dal valore più basso, che qui è il migliore, al più alto{% else %}dal valore più alto al più basso{% endif %}.{% if lv.middle %} Le altre {{ lv.middle | num(None, 'count') }} sono nella pagina.{% endif %}</p>
+            <p class="subline">{{ f.name }}{% if lv.unit_note %}, {{ lv.unit_note }}{% endif %}, {{ lv.year }}. {% if lv.middle %}Le prime e le ultime dieci delle {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% else %}Le {{ lv.n | num(None, 'count') }} {{ lv.plural }}{% endif %} {% if lv.lower_better %}dal valore più basso al più alto{% else %}dal valore più alto al più basso{% endif %}.{% if lv.middle %} Le altre {{ lv.middle | num(None, 'count') }} sono nella pagina.{% endif %}</p>
           </div>
           <label class="field feat__find" for="territorio-{{ lv.key }}">Trova la tua {{ lv.singular }}
             <select id="territorio-{{ lv.key }}" data-territory>

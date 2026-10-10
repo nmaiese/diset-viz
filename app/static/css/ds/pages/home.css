@@ -76,11 +76,11 @@
 /* ---------- indicatore in testata ---------- */
 .home-spotlight {
   display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-5);
-  background: var(--bg); border: 1px solid var(--rule); border-left: 3px solid var(--accent);
+  background: var(--bg); border: 1px solid var(--rule); border-left: 3px solid var(--rule-strong);
   border-radius: var(--radius-panel);
 }
 .home-spotlight__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); font-size: var(--fs-label); line-height: var(--lh-label); }
-.home-spotlight__badge { display: inline-flex; align-items: center; gap: var(--space-1); font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tr-label); }
+.home-spotlight__badge { display: inline-flex; align-items: center; gap: var(--space-1); font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: var(--tr-label); }
 .home-spotlight__badge svg { width: var(--space-4); height: var(--space-4); }
 .home-spotlight__theme, .home-spotlight__theme a { color: var(--muted); }
 .home-spotlight__theme a { text-decoration: none; }
@@ -135,7 +135,7 @@
   .door:first-child { grid-template-rows: auto auto auto; align-content: end; padding: var(--space-8); }
   /* La cifra vera e' lo span `.n`, che `.figure-num .n` tiene alla taglia piccola. */
   .door:first-child .door__num .n { font-size: var(--fs-figure); line-height: var(--lh-figure); letter-spacing: var(--tr-figure); }
-  .door:first-child .door__title { font-size: var(--fs-section); line-height: var(--lh-section); }
+  .door:first-child .door__title { font-size: var(--fs-lede); line-height: var(--lh-lede); }
 }
 @media (min-width: 960px) { .door { padding: var(--space-5) var(--space-6) var(--space-6); gap: var(--space-3); } }
 .door:hover { border-top-color: var(--accent); }
@@ -205,7 +205,7 @@
 .feat__cap { display: grid; gap: var(--space-1); margin-bottom: var(--space-4); }
 .feat__kicker { font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; color: var(--text-2); }
 .feat__caprow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--space-2) var(--space-6); }
-.feat__claim { font-family: var(--font-display); font-size: var(--fs-subsection); line-height: var(--lh-subsection); font-weight: 700; color: var(--ink); max-width: 44em; }
+.feat__claim { font-family: var(--font-display); font-size: var(--fs-prose); line-height: var(--lh-prose); font-weight: 700; color: var(--ink); max-width: 44em; }
 /* La striscia prende tutta la scheda: il taglio largo della home e' disegnato
    a 1320 (home.HOME_STRIP_WIDTH), non ai 1180 della scheda indicatore. */
 .home-feature .chart, .home-feature .chart:has(> .chart__xl), .home-feature .chart__xl svg { max-width: none; }
@@ -220,6 +220,7 @@
 .feat__rank { margin: 0; min-width: 0; }
 /* Due colonne da dieci righe: la mappa e la classifica finiscono insieme. */
 .feat__cols { display: grid; gap: var(--space-4) var(--space-8); align-items: start; }
+.feat__cols .tablewrap { container-type: inline-size; }
 .feat__cols caption { font-weight: 600; color: var(--ink); text-align: left; }
 @media (min-width: 720px) { .feat__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .feat__source { margin: 0; }
