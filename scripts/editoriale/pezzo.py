@@ -146,7 +146,7 @@ def identita_agente() -> str:
 def contenuto_brief(
     titolo: str, tipo: str, issue: int, simili: Sequence[TemaEsistente], root: Path = ROOT,
 ) -> str:
-    righe_simili = [f"- `{tema.percorso.relative_to(root)}`: {tema.titolo}" for tema in simili]
+    righe_simili = [f"- `{tema.percorso.relative_to(root).as_posix()}`: {tema.titolo}" for tema in simili]
     if not righe_simili:
         righe_simili = ["- Nessuno."]
     return (
@@ -219,7 +219,7 @@ def _mostra_simili(simili: Sequence[TemaEsistente], root: Path) -> None:
             percorso = tema.percorso.relative_to(root)
         except ValueError:
             percorso = tema.percorso
-        print(f"- {percorso}: {tema.titolo}")
+        print(f"- {percorso.as_posix()}: {tema.titolo}")
 
 
 def main(
