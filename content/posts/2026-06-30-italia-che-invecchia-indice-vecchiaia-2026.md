@@ -1,8 +1,8 @@
 ---
 title: "L'Italia che invecchia: l'indice di vecchiaia per regione nel 2026"
-seo_title: "233 anziani ogni 100 giovani: l'Italia che invecchia"
+seo_title: "216 anziani ogni 100 giovani: l'Italia che invecchia"
 slug: italia-che-invecchia-indice-vecchiaia-2026
-description: "All'inizio del 2026 in Italia ci sono 233 anziani ogni 100 giovani. In Sardegna quasi 300, in Trentino-Alto Adige 168. La mappa dell'invecchiamento per regione."
+description: "All'inizio del 2026 in Italia ci sono 216 anziani ogni 100 giovani. In Sardegna quasi 300, in Trentino-Alto Adige 168. La mappa dell'invecchiamento per regione."
 date: 2026-06-30
 author: "Redazione Divario Italia"
 cover: /static/img/blog/indice-vecchiaia.svg
@@ -20,18 +20,18 @@ sintetico per misurare quanto una popolazione è spostata verso l'alto nell'età
 All'inizio del 2026 l'Italia segna un valore molto alto, e tra le regioni la
 distanza è ampia.
 
-Il dato nazionale è di circa **233 anziani ogni 100 giovani**. Vent'anni fa, nel 2002, erano 146. La popolazione italiana ha continuato a invecchiare, in modo diffuso.
+Il dato nazionale Istat è di **216,3 anziani ogni 100 giovani** all'inizio del 2026, in base a dati provvisori. È una popolazione che invecchia da decenni. La media semplice delle venti regioni è 233,0. La popolazione italiana ha continuato a invecchiare, in modo diffuso.
 {: .data-callout}
 
 ## In breve
 
-- All'inizio del 2026 in Italia ci sono circa 233 persone di 65 anni e più ogni 100 under 15.
+- All'inizio del 2026 in Italia ci sono circa 216 persone di 65 anni e più ogni 100 under 15 (dato nazionale Istat, 216,3). La media semplice delle regioni è 233,0.
 - Si va dai 299,7 della Sardegna ai 168,5 del Trentino-Alto Adige.
-- Il numero medio di figli per donna nel 2025 è 1,12: in Sardegna scende a 0,8.
+- Il numero medio di figli per donna nel 2025 è 1,14 secondo l'Istat: in Sardegna scende a 0,8.
 
 ## Dati usati
 
-- **Fonte:** Istat, Indicatori demografici.
+- **Fonte:** Istat, Indicatori demografici (comunicato del 31 marzo 2026, dati provvisori per il 1° gennaio 2026).
 - **Periodo:** indice di vecchiaia ed età media all'1 gennaio 2026, figli per donna e saldo migratorio 2025.
 - **Territorio:** 20 regioni italiane.
 - **Unità:** anziani (65+) ogni 100 giovani (0-14), anni, numero medio di figli per donna e saldo per mille abitanti.
@@ -54,6 +54,7 @@ Campania (168,8) e Sicilia (192,0).
 | Molise | 272,4 |
 | Friuli-Venezia Giulia | 262,0 |
 | *Media 20 regioni* | *233,0* |
+| *Italia (dato Istat)* | *216,3* |
 | Sicilia | 192,0 |
 | Campania | 168,8 |
 | Trentino-Alto Adige | 168,5 |
@@ -71,7 +72,7 @@ Nord-Sud quasi scompare. **L'Italia invecchia ovunque, in modo abbastanza unifor
 ## Pochi figli, e il peso delle migrazioni
 
 Dietro l'invecchiamento c'è prima di tutto la natalità. Nel 2025 il numero medio
-di figli per donna in Italia è 1,12, molto sotto la soglia che terrebbe stabile la
+di figli per donna in Italia è 1,14, molto sotto la soglia che terrebbe stabile la
 popolazione. In Sardegna scende a 0,8, il valore più basso tra le regioni, e
 questo aiuta a capire perché l'isola sia la più anziana del Paese: pochi giovani
 in arrivo, generazione dopo generazione.
@@ -98,5 +99,5 @@ ci sono anche l'[età media della popolazione](/indicatore/eta-media-della-popol
 [numero medio di figli per donna](/indicatore/numero-medio-di-figli-per-donna/ter-922). Per il legame tra demografia
 e salute, leggi l'analisi sulla [speranza di vita per regione](/blog/speranza-di-vita-regioni-2025).
 
-*Dati: Istat, "Indicatori demografici". Le medie tra regioni sono medie semplici,
-non pesate per popolazione.*
+*Dati: Istat, "Indicatori demografici", anno 2025 (comunicato del 31 marzo 2026, dati provvisori). Le medie tra regioni sono medie semplici,
+non pesate per popolazione: il dato nazionale Istat è pesato e vale 216,3.*

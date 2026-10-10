@@ -16,5 +16,23 @@
     "page": "Schede indicatore",
     "error": "Il riepilogo usava definizioni generiche e confronti non sempre denominati",
     "action": "Rese esplicite definizioni di fonte, limiti e basi dei confronti"
+  },
+  {
+    "date": "2026-10-10",
+    "page": "Articolo sull'indice di vecchiaia",
+    "error": "Il testo chiamava «dato nazionale» la media semplice delle regioni (233 anziani ogni 100 giovani) e riportava 146 per il 2002 e 1,12 figli per donna nel 2025",
+    "action": "Sostituiti con il dato nazionale Istat al 1° gennaio 2026 (216,3), con 1,14 figli per donna e senza il confronto con il 2002, non verificato. La media semplice resta in tabella con la sua etichetta"
+  },
+  {
+    "date": "2026-10-10",
+    "page": "Articolo sulla speranza di vita",
+    "error": "Il testo chiamava «media nazionale» la media semplice delle regioni (83,6 anni nel 2025 e 80,1 nel 2002)",
+    "action": "Indicato il dato nazionale Istat 2025 (83,7). La media semplice è dichiarata come tale, anche per il confronto con il 2002"
+  },
+  {
+    "date": "2026-10-10",
+    "page": "Articolo sul divario turistico",
+    "error": "Il testo chiamava «media nazionale» la media semplice delle regioni (10,4 giornate per abitante)",
+    "action": "Indicato il dato nazionale Istat 2024 (7,9). La media semplice resta in tabella con la sua etichetta"
   }
 ]
