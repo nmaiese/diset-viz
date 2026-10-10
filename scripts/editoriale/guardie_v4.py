@@ -34,6 +34,17 @@ _COUNT_DENOMINATOR = re.compile(r"^\s+su\s+(?P<count>\d{1,3})\b(?:\s+(?:province
 _OBSERVED_COUNT = re.compile(r"\b(?:delle|dei)\s+(?P<count>\d{1,3})\s+osservat[ei]\b", re.I)
 _SUBSET_BEFORE = re.compile(r"\b(?:solo|appena|almeno|tra|fra)\s*$", re.I)
 _SUBSET_AFTER = re.compile(r"^\s+(?:super\w*|inferior\w*|sopra|sotto|oltre|meno|pi[uù]|con\b|hanno.{0,35}\b(?:sopra|sotto|superior\w*|inferior\w*))", re.I)
+_MOVE = (r"(?:sono\s+)?(?:(?:in\s+)?(?:r?isal\w*|sal(?:e|gono|ita|ite)|scend\w*|sces[aeio]|disces\w*|"
+         r"cal(?:a|ano|o|i|ata|ate|ati|ato)|cresc\w*|aument\w*|diminu\w*)|invariat\w+|ferm\w+|stabil[ei]|stazionari\w*|"
+         r"(?:rest(?:a|ano)|riman(?:e|gono))(?:\s+(?:uguale|uguali|invariat\w+|ferm\w+|stabil\w+|stazionari\w*))?)")
+_WORD_VALUES = {w: n for n, w in enumerate(
+    "uno due tre quattro cinque sei sette otto nove dieci undici dodici tredici quattordici quindici "
+    "sedici diciassette diciotto diciannove venti".split(), 1)}
+_WORD_VALUES["una"] = 1
+_NUM_WORDS = "|".join(_WORD_VALUES)
+_VAR_N = r"(?<![\w.,])(?P<n>\d{1,3}(?![\d]|[.,]\d)|(?:" + _NUM_WORDS + r")\b)"
+_VAR_AFTER = re.compile(_VAR_N + r"(?:\s+(?:province|regioni))?\s+(?:" + _MOVE + r")\b", re.I)
+_VAR_BEFORE = re.compile(r"\b(?:" + _MOVE + r")\s+in\s+" + _VAR_N + r"\b", re.I)
 _RATIO = re.compile(r"\b(?:\d+(?:,\d+)?|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+volte\b", re.I)
 _COMPARISON = re.compile(r"\b(?:estremi|divario|rapporto|rispetto|confronto|quello|quella|tra|fra)\b", re.I)
 _AGE_RANGE = re.compile(r"(?<!\d)(?P<lo>\d{1,2})\s*(?:[-‐‑‒–—−]|\b(?:a|al|fino\s+a)\b)\s*(?P<hi>\d{1,2})\s*(?:anni?|aa\.?)(?!\w)", re.I)
@@ -82,10 +93,18 @@ def editorial_checks(sentence, observations, geography, year=None, unit="", name
                     result.append(("errore", "G1", f"media semplice di {len(values)} {geography} nel {selected} chiamata nazionale"))
     count_matches = list(_COUNT.finditer(sentence))
     claims = []
+    variation = {}
+    for found in (*_VAR_AFTER.finditer(sentence), *_VAR_BEFORE.finditer(sentence)):
+        word = found.group("n").lower()
+        variation[found.start("n")] = int(word) if word.isdigit() else _WORD_VALUES[word]
+    variation_claim = False
     for match in count_matches:
         geo = match.group("geo") or match.group("all")
         before = sentence[max(0, match.start() - 20):match.start()]
         if geo.lower() != geography or re.search(r"\b(?:su|non)\s*$", before, re.I):
+            continue
+        if match.group("count") and match.start("count") in variation:
+            variation_claim = True
             continue
         after = sentence[match.end():]
         denominator = _COUNT_DENOMINATOR.match(after)
@@ -99,6 +118,9 @@ def editorial_checks(sentence, observations, geography, year=None, unit="", name
             claims.append((claimed, subset))
     if count_matches:
         claims.extend((int(match.group("count")), False) for match in _OBSERVED_COUNT.finditer(sentence))
+    if variation_claim:
+        # conteggi di variazione (quante si muovono in un verso): sottoinsiemi la cui somma sta entro le osservate
+        claims.append((sum(variation.values()), True))
     for claim in claims:
         claimed, subset = claim if isinstance(claim, tuple) else (claim, False)
         count_values = values
