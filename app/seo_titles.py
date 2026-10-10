@@ -148,6 +148,26 @@ def _is_percentage(meta):
 # intervallo. La pagina resta com'e', con la sua classifica.
 UNVERIFIED_EXTREMES = frozenset({"bes-06POL012P"})
 
+# Le serie il cui titolo non porta l'intervallo, perche' i due estremi non sono
+# quote della stessa popolazione. `bes-10AMB016` e' produzione rinnovabile su
+# consumo interno lordo di *ciascuna* regione: la Valle d'Aosta esporta e sta al
+# 328%, la Liguria al 12,4%, e "dal 328% al 12,4%" in un `<title>` si legge come
+# una forbice di una stessa quota. Diversamente da `UNVERIFIED_EXTREMES` i
+# numeri sono veri e restano in pagina, nella description e nel Dataset: qui
+# esce solo dal titolo, e vale per entrambe le viste (regioni e province).
+#
+# Stesso difetto, stesse ragioni, nelle gemelle territoriali: `ter-85` e
+# `ter-86` sono la produzione lorda da rinnovabili (con e senza idroelettrico)
+# in percentuale dei consumi interni lordi di ciascuna regione (Istat su dati
+# Terna), quindi la Basilicata sta al 116% e la Valle d'Aosta al 328%. `ter-53`
+# e' la frazione umida trattata negli impianti di compostaggio *della regione*
+# sull'umido del rifiuto urbano prodotto *nella regione*: i rifiuti importati
+# contano al numeratore e non al denominatore, e il 179% del Friuli-Venezia
+# Giulia non e' una quota. Restano fuori `ter-81` e `bes-02IST001`, dove il
+# numeratore e' un sottoinsieme del denominatore: lo scarto oltre il 100% e' un
+# errore del dato, non un'ambiguita' del rapporto.
+NO_RANGE_IN_TITLE = frozenset({"bes-10AMB016", "ter-85", "ter-86", "ter-53"})
+
 
 def _same_name_qualifier(meta, level):
     """La famiglia da mettere accanto alla misura nel titolo derivato, o None.
@@ -214,6 +234,8 @@ def _figures(meta, level):
     ("dall'89,1% allo 0,22%"), e le due varianti coincidono: l'unita' e' il
     segno di percentuale, attaccato al numero.
     """
+    if _code(meta) in NO_RANGE_IN_TITLE:
+        return None, None
     high, low = extremes(meta, level)
     if high is None:
         return None, None

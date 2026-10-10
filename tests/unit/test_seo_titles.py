@@ -757,5 +757,79 @@ class CaratteriVietatiTest(unittest.TestCase):
                         self.assertNotIn(c, testo or "")
 
 
+class SenzaIntervalloNelTitoloTest(unittest.TestCase):
+    """`bes-10AMB016`: i due estremi sono rapporti produzione/consumo di regioni
+    diverse (328% e 12,4%), non una forbice della stessa quota."""
+
+    TITOLO = "Energia elettrica da rinnovabili sul consumo interno lordo"
+
+    def setUp(self):
+        self.meta = meta(name="Energia elettrica da fonti rinnovabili", unit="%",
+                         family="bes", raw_id="10AMB016")
+        self.lv = level(best=("Valle d'Aosta", 327.8), worst=("Liguria", 12.4))
+
+    def test_il_titolo_scritto_resta_senza_intervallo(self):
+        for livello in (self.lv, provincia(("Sondrio", 449.6), ("Genova", 4.5))):
+            with self.subTest(livello=livello["key"]):
+                titolo = seo_titles.page_title(
+                    {"seo_title": self.TITOLO}, self.meta, livello, site_name="Divario Italia")
+                self.assertEqual(titolo, self.TITOLO)
+                self.assertNotIn("328", titolo)
+                self.assertNotRegex(titolo, r"\bdal\b.*\bal\b")
+                self.assertIn("consumo interno lordo", titolo)
+                self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
+
+    def test_neppure_il_derivato_porta_l_intervallo(self):
+        self.assertNotIn("%", seo_titles.page_title({}, self.meta, self.lv, site_name="Divario Italia"))
+
+    def test_gli_estremi_restano_per_description_e_dataset(self):
+        high, low = seo_titles.extremes(self.meta, self.lv)
+        self.assertEqual((high["value"], low["value"]), (327.8, 12.4))
+
+    def test_le_altre_serie_percentuali_tengono_l_intervallo(self):
+        altra = meta(name="Tasso di occupazione", unit="%", family="bes", raw_id="04BEC001")
+        titolo = seo_titles.page_title(
+            {"seo_title": "Tasso di occupazione per regione"}, altra,
+            level(best=("A", 70.0), worst=("B", 40.0)), site_name="Divario Italia")
+        self.assertIn("dal 70,0% al 40,0%", titolo)
+
+
+class SenzaIntervalloSchedeGemelleTest(unittest.TestCase):
+    """`ter-85`, `ter-86`, `ter-53`: estremi che sono rapporti con denominatori
+    propri di ciascuna regione, quindi niente «dal X% al Y%» nel titolo."""
+
+    CASI = {
+        "85": ("Elettricità rinnovabile con idro sui consumi interni lordi", 327.8, 12.4),
+        "86": ("Elettricità rinnovabile senza idro sui consumi interni lordi", 116.0, 3.9),
+        "53": ("Umido a compostaggio sull'umido dei rifiuti urbani", 179.0, 0.0),
+    }
+
+    def test_opt_out_dichiarato(self):
+        for raw_id in self.CASI:
+            self.assertIn(f"ter-{raw_id}", seo_titles.NO_RANGE_IN_TITLE)
+
+    def test_titolo_scritto_senza_intervallo(self):
+        for raw_id, (titolo, alto, basso) in self.CASI.items():
+            with self.subTest(scheda=raw_id):
+                m = meta(name="Quota", unit="%", family="territorial", raw_id=raw_id)
+                lv = level(best=("A", alto), worst=("B", basso))
+                reso = seo_titles.page_title(
+                    {"seo_title": titolo}, m, lv, site_name="Divario Italia")
+                self.assertEqual(reso, titolo)
+                self.assertNotRegex(reso, r"\bdal\b.*\bal\b|%")
+                self.assertLessEqual(len(reso), seo_titles.TITLE_MAX)
+                high, low = seo_titles.extremes(m, lv)
+                self.assertEqual((high["value"], low["value"]), (alto, basso))
+
+    def test_le_quote_vere_tengono_l_intervallo(self):
+        for raw_id in ("81", "142"):
+            with self.subTest(scheda=raw_id):
+                m = meta(name="Quota", unit="%", family="territorial", raw_id=raw_id)
+                reso = seo_titles.page_title(
+                    {"seo_title": "Quota per regione"}, m,
+                    level(best=("A", 90.0), worst=("B", 30.0)), site_name="Divario Italia")
+                self.assertIn("dal 90,0% al 30,0%", reso)
+
+
 if __name__ == "__main__":
     unittest.main()
