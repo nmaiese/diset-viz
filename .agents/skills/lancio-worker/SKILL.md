@@ -21,9 +21,11 @@ Esegui da worktree del repo giusto; altrimenti launcher può scegliere repo erra
 
 ```bash
 ~/dev/dev-tools/scripts/orca-lancia.sh --agent <codex|claude|opencode|antigravity|grok> \
-  [--model <modello-esatto>] [--effort <livello>] --worktree <nome> --spec-file <percorso>
+  [--model <modello-esatto>] --effort <livello> [--ok-direzione] --worktree <nome> --spec-file <percorso>
 # In alternativa: --attivita <nome> al posto di --agent (modello da agents/ruoli.tsv).
 ```
+
+Scegli l'effort dalla tabella di `docs/MODELLI.md` §7b.
 
 Per `agy`, launcher rifiuta `--effort` e non seleziona il modello con `--model`: modello ed effort stanno nelle impostazioni Antigravity. Anche OpenCode rifiuta `--effort`. Se spec usa modello gratuito, dichiara `dati personali: nessuno`. Modello in `docs/MODELLI.md`. Worktree non visibile? Controlla `git worktree list` e `orca-ide worktree list`; non duplicare stesso nome.
 
