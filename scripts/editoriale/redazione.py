@@ -879,10 +879,10 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
         missing = [str(p) for p in input_files if not p.is_file()]
         if missing:
             return Result(1, f"{name}: ingressi mancanti: {', '.join(missing)}")
-        input_hashes = {str(p.relative_to(worktree)): _hash(p) for p in input_files}
+        input_hashes = {p.relative_to(worktree).as_posix(): _hash(p) for p in input_files}
         output_files = [workdir / str(item) for item in phase.get("output", [])]
-        output_hashes = {str(p.relative_to(worktree)): _hash(p) for p in output_files}
-        output_dates = {str(p.relative_to(worktree)): p.stat().st_mtime_ns if p.is_file() else None
+        output_hashes = {p.relative_to(worktree).as_posix(): _hash(p) for p in output_files}
+        output_dates = {p.relative_to(worktree).as_posix(): p.stat().st_mtime_ns if p.is_file() else None
                         for p in output_files}
         head_before = _head_sha(worktree)
         record["prelaunch_output_hashes"] = output_hashes
@@ -941,8 +941,8 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
                        "output": result.get("output")})
         output_changed = any(
             p.is_file() and (
-                _hash(p) != output_hashes[str(p.relative_to(worktree))]
-                or p.stat().st_mtime_ns != output_dates[str(p.relative_to(worktree))]
+                _hash(p) != output_hashes[p.relative_to(worktree).as_posix()]
+                or p.stat().st_mtime_ns != output_dates[p.relative_to(worktree).as_posix()]
             ) for p in output_files
         )
         head_after = _head_sha(worktree)
@@ -957,7 +957,7 @@ def run_redazione(key: str, *, root: Path | None = None, worktree: Path | None =
             record.update({"status": "fallita", "finished_at": datetime.now().astimezone().isoformat()})
             _atomic_json(state_path, state)
             return Result(1, f"{name}: fallita: output non aggiornato")
-        record.update({"status": "riuscita", "output_hashes": {str(p.relative_to(worktree)): _hash(p) for p in output_files},
+        record.update({"status": "riuscita", "output_hashes": {p.relative_to(worktree).as_posix(): _hash(p) for p in output_files},
                        "commit_sha": _head_sha(worktree),
                        "finished_at": datetime.now().astimezone().isoformat()})
         _atomic_json(state_path, state)
