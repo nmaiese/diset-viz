@@ -97,6 +97,14 @@ class GuardieDati(unittest.TestCase):
         "La fiducia sale in 9 regioni, scende in 9 e resta invariata in 2.",
         "La media è ferma a 5,3, con 13 regioni in calo e 7 in aumento.",
         "11 regioni calano, 8 salgono e una resta invariata.",
+        "3 regioni rimangono invariate.",
+        "3 regioni rimangono stabili.",
+        "Una regione rimane invariata.",
+        "4 regioni sono stabili.",
+        "4 regioni sono invariate.",
+        "4 regioni sono ferme.",
+        "5 regioni stazionarie.",
+        "5 regioni restano stazionarie.",
     ]
 
     def g7(self, sentence, data=None):
@@ -111,13 +119,17 @@ class GuardieDati(unittest.TestCase):
         for frase in ("13 regioni salgono e 9 scendono.",
                       "La quota sale in 13 regioni, scende in 9 e resta invariata in una.",
                       "Sale in 21 regioni.",
-                      "Con 15 regioni in salita, 4 in discesa e due invariate."):
+                      "Con 15 regioni in salita, 4 in discesa e due invariate.",
+                      "13 regioni salgono e 9 scendono.",
+                      "In 25 regioni la quota sale.",
+                      "3 regioni sono stabili e 18 salgono."):
             with self.subTest(frase=frase):
                 self.assertEqual(self.g7(frase)[0][:2], ("errore", "G7"))
 
     def test_g7_copertura_sbagliata_resta_errore(self):
         dati19 = {"2025": {str(i): Decimal("1.0") for i in range(19)}}
         self.assertEqual(self.g7("Nel 2025 i dati coprono 13 regioni.")[0][:2], ("errore", "G7"))
+        self.assertEqual(self.g7("Il dato copre 13 regioni.")[0][:2], ("errore", "G7"))
         self.assertEqual(self.g7("Nel 2025 le 13 regioni del Mezzogiorno hanno dato.")[0][:2], ("errore", "G7"))
         self.assertEqual(self.g7("Nel 2025 il dato è presente in tutte le 20 regioni.", dati19)[0][:2], ("errore", "G7"))
         self.assertEqual(self.g7("Nel 2025 il dato è presente in tutte le regioni.", dati19)[0][:2], ("errore", "G7"))

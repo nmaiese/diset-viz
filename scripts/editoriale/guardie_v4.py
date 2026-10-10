@@ -34,9 +34,9 @@ _COUNT_DENOMINATOR = re.compile(r"^\s+su\s+(?P<count>\d{1,3})\b(?:\s+(?:province
 _OBSERVED_COUNT = re.compile(r"\b(?:delle|dei)\s+(?P<count>\d{1,3})\s+osservat[ei]\b", re.I)
 _SUBSET_BEFORE = re.compile(r"\b(?:solo|appena|almeno|tra|fra)\s*$", re.I)
 _SUBSET_AFTER = re.compile(r"^\s+(?:super\w*|inferior\w*|sopra|sotto|oltre|meno|pi[uù]|con\b|hanno.{0,35}\b(?:sopra|sotto|superior\w*|inferior\w*))", re.I)
-_MOVE = (r"(?:in\s+)?(?:r?isal\w*|sal(?:e|gono|ita|ite)|scend\w*|sces[aeio]|disces\w*|"
-         r"cal(?:a|ano|o|i|ata|ate|ati|ato)|cresc\w*|aument\w*|diminu\w*)|invariat\w+|ferm\w+|stabil[ei]|"
-         r"rest(?:a|ano)(?:\s+(?:uguale|uguali|invariat\w+|ferm\w+|stabil\w+))?")
+_MOVE = (r"(?:sono\s+)?(?:(?:in\s+)?(?:r?isal\w*|sal(?:e|gono|ita|ite)|scend\w*|sces[aeio]|disces\w*|"
+         r"cal(?:a|ano|o|i|ata|ate|ati|ato)|cresc\w*|aument\w*|diminu\w*)|invariat\w+|ferm\w+|stabil[ei]|stazionari\w*|"
+         r"(?:rest(?:a|ano)|riman(?:e|gono))(?:\s+(?:uguale|uguali|invariat\w+|ferm\w+|stabil\w+|stazionari\w*))?)")
 _WORD_VALUES = {w: n for n, w in enumerate(
     "uno due tre quattro cinque sei sette otto nove dieci undici dodici tredici quattordici quindici "
     "sedici diciassette diciotto diciannove venti".split(), 1)}
